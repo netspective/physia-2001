@@ -137,6 +137,7 @@ sub execute
 			payer_id => $payerId || undef,
 			plan_allow => $planAllow || 'NULL',
 			plan_paid => $payAmt || 'NULL',
+			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
 			net_adjust => defined $netAdjust ? $netAdjust : undef,
 			comments => $comments || undef,
 			_debug => 0
