@@ -356,8 +356,8 @@ sub populateData
 		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-			
-			my $line = $idx + 1;
+
+			my $line = $idx + 1;			
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
@@ -502,9 +502,14 @@ sub setPayerFields
 	
 }
 
-sub voidInvoice
+sub voidInvoicePostSubmit
 {
 	my ($self, $page, $command, $flags, $oldInvoiceId) = @_;
+
+	#In this case, all of the submitted claims information (which includes the transaction, invoice, invoice_items, and invoice_billing and excludes adjustments) is replicated
+	#into a voided claim where it's parent is the submitted claim and where the new transaction is of type 'VOID' and it's parent is the submitted claim's transaction.
+	#History attributes are created for both claims at the end.
+
 
 	my $sessOrg = $page->session('org_id');
 	my $sessUser = $page->session('user_id');
@@ -548,9 +553,8 @@ sub voidInvoice
 	my $invoiceType = $invoiceInfo->{invoice_type};
 	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	my $claimType = $invoiceInfo->{invoice_subtype};
-	my $totalAdjust = $invoiceInfo->{total_adjust};
 	my $totalCost = 0 - $invoiceInfo->{total_cost};
-	my $balance = $totalCost - $totalAdjust;
+	my $balance = $totalCost;
 	my $invoiceId = $page->schemaAction(
 		'Invoice', 'add',
 		parent_invoice_id => $oldInvoiceId || undef,
@@ -566,7 +570,7 @@ sub voidInvoice
 		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		client_id => $personId || undef,
 		total_items => $invoiceInfo->{total_items} || undef,
-		total_adjust => $totalAdjust || undef,
+		#total_adjust => $totalAdjust || undef,
 		total_cost => $totalCost || undef,
 		balance => $balance || undef,
 		_debug => 0
@@ -576,17 +580,19 @@ sub voidInvoice
 	foreach my $item (@{$lineItems})
 	{
 		my $itemType = $item->{item_type};
+
 		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
+		#next if $itemType == App::Universal::INVOICEITEMTYPE_VOID;
+		#next if $item->{data_text_b} eq 'void';
 
 		my $extCost = 0 - $item->{extended_cost};
-		my $itemTotalAdjust = $item->{total_adjust};
-		my $itemBalance = $extCost - $itemTotalAdjust;
+		my $itemBalance = $extCost;
 		my $emg = $item->{emergency};
 		$page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $invoiceId || undef,
-		#	service_begin_date => $item->{service_begin_date} || undef,
-		#	service_end_date => $item->{service_end_date} || undef,
+			service_begin_date => $item->{service_begin_date} || undef,
+			service_end_date => $item->{service_end_date} || undef,
 			hcfa_service_place => $item->{hcfa_service_place} || undef,
 			hcfa_service_type => $item->{hcfa_service_type} || undef,
 			modifier => $item->{modifier} || undef,
@@ -600,24 +606,10 @@ sub voidInvoice
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			extended_cost => $extCost || undef,
-			total_adjust => $itemTotalAdjust || undef,
 			balance => $itemBalance || undef,
 			_debug => 0
 		);
 	}
-
-	#add history attribute
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "This invoice is a voided copy of claim $oldInvoiceId. Transaction performed by $sessUser",
-		value_date => $todaysDate,
-		_debug => 0
-	);
 
 	#add old invoice's billing records	
 	my $billingInfo = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceBillingRecs', $oldInvoiceId);
@@ -640,6 +632,30 @@ sub voidInvoice
 			_debug => 0
 		);
 	}
+
+	#add history attribute for void copy
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "This invoice is a voided copy of claim $oldInvoiceId",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	#add history attribute for original (submitted) copy
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $oldInvoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "Invoice $invoiceId is a voided copy of this claim",
+		value_date => $todaysDate,
+		_debug => 0
+	);
 }
 
 sub handlePayers
@@ -648,12 +664,11 @@ sub handlePayers
 
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
-	#$command = $command eq 'update' && ($invoiceFlags & $attrDataFlag) ? 'add' : $command;
 	if($command eq 'update' && ($invoiceFlags & $attrDataFlag))
 	{
 		$command = 'add';
 		my $oldInvoiceId = $page->field('old_invoice_id');
-		voidInvoice($self, $page, $command, $flags, $oldInvoiceId);
+		voidInvoicePostSubmit($self, $page, $command, $flags, $oldInvoiceId);
 	}
 
 
@@ -1232,7 +1247,7 @@ sub handleInvoiceAttrs
 		);
 	}
 	
-	addProcedureItems($self, $page, $command, $flags, $invoiceId);
+	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
 }
 
@@ -1507,11 +1522,17 @@ sub handleBillingInfo
 
 
 	#redirect to next function according to copay due
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	my $invoiceFlags = $page->field('invoice_flags');
 
 	my $copayAmt = $page->field('copay_amt');
 	if($copayAmt && $page->field('claim_type') == App::Universal::CLAIMTYPE_HMO && ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
 	{
 		billCopay($self, $page, 'add', $flags, $invoiceId);
+	}
+	elsif($command eq 'add' && ($invoiceFlags & $attrDataFlag))
+	{
+		$page->redirect("/invoice/$invoiceId/summary");
 	}
 	elsif($command eq 'add')
 	{
@@ -1559,7 +1580,7 @@ sub billCopay
 		bill_to_id => $personId || undef,
 		bill_amount => defined $copayAmt ? $copayAmt : undef,
 		bill_date => $todaysDate || undef,
-		bill_status => 'Not paid',
+		#bill_status => 'Not paid',
 		_debug => 0
 	);
 
@@ -1583,8 +1604,14 @@ sub billCopay
 
 	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
 	$page->param('invoice_id', $invoiceId) if $command eq 'add';
-	
-	if($command eq 'add')
+
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	my $invoiceFlags = $page->field('invoice_flags');
+	if($command eq 'add' && ($invoiceFlags & $attrDataFlag))
+	{
+		$page->redirect("/invoice/$invoiceId/summary");
+	}
+	elsif($command eq 'add')
 	{
 		$self->handlePostExecute($page, $command, $flags);
 	}
@@ -1594,7 +1621,7 @@ sub billCopay
 	}
 }
 
-sub addProcedureItems
+sub handleProcedureItems
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
 
@@ -1611,15 +1638,15 @@ sub addProcedureItems
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
 		my $removeProc = $page->param("_f_proc_$line\_remove");
-		my $procCommand = $command;
 		my $itemId = $page->param("_f_proc_$line\_item_id");
 		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
 		{
-			$procCommand = 'add';
+			$command = 'add';
 		}
 		elsif($removeProc)
 		{
-			$procCommand = 'remove';
+			voidProcedureItem($self, $page, $command, $flags, $invoiceId, $itemId);
+			next;
 		}
 
 		my $cptCode = $page->param("_f_proc_$line\_procedure");
@@ -1656,7 +1683,7 @@ sub addProcedureItems
 
 
 		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-		$page->schemaAction('Invoice_Item', $procCommand,
+		$page->schemaAction('Invoice_Item', $command,
 			%record,
 			parent_id => $invoiceId,
 			_debug => 0,
@@ -1669,13 +1696,9 @@ sub addProcedureItems
 		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
 		my $totalItems = $invoice->{total_items};
-		if($procCommand eq 'add')
+		if($command eq 'add')
 		{
 			$totalItems = $invoice->{total_items} + 1;
-		}
-		elsif($procCommand eq 'remove')
-		{
-			$totalItems = $invoice->{total_items} - 1;
 		}
 
 		my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
@@ -1689,15 +1712,95 @@ sub addProcedureItems
 
 		my $invBalance = $totalCostForInvoice + $totalAdjustForInvoice;
 
-		$page->schemaAction('Invoice',
-			'update',
+		$page->schemaAction('Invoice', 'update',
 			invoice_id => $invoiceId,
 			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
 			total_items => defined $totalItems ? $totalItems : undef,
-			balance => defined $invBalance ? $invBalance : undef
+			balance => defined $invBalance ? $invBalance : undef,
+			_debug => 0
 		);
 	}
+}
+
+sub voidProcedureItem
+{
+	my ($self, $page, $command, $flags, $invoiceId, $itemId) = @_;
+
+	my $sessUser = $page->session('user_id');
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
+
+	my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
+	my $extCost = 0 - $invItem->{extended_cost};
+	my $itemBalance = $extCost + $invItem->{total_adjust};
+	my $emg = $invItem->{emergency};
+	my $cptCode = $invItem->{code};
+	my $voidItemId = $page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_item_id => $itemId || undef,
+			parent_id => $invoiceId,
+			item_type => defined $voidItemType ? $voidItemType : undef,
+			code => $cptCode || undef,
+			caption => $invItem->{caption} || undef,
+			modifier => $invItem->{modifier} || undef,
+			rel_diags => $invItem->{rel_diags} || undef,
+			unit_cost => $invItem->{unit_cost} || undef,
+			quantity => $invItem->{quantity} || undef,
+			extended_cost => defined $extCost ? $extCost : undef,
+			balance => defined $itemBalance ? $itemBalance : undef,
+			emergency => defined $emg ? $emg : undef,
+			#comments => $comments || undef,
+			hcfa_service_place => $invItem->{hcfa_service_place} || undef,
+			hcfa_service_type => $invItem->{hcfa_service_type} || 'NULL',
+			service_begin_date => $invItem->{service_begin_date} || undef,
+			service_end_date => $invItem->{service_end_date} || undef,
+			data_text_a => $invItem->{data_text_a} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			data_text_b => 'void',
+			_debug => 0
+		);
+
+
+	## UPDATE INVOICE TO WHICH ITEM BELONGS
+
+	my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+	my $totalCostForInvoice = '';
+	foreach my $item (@{$allInvItems})
+	{
+		$totalCostForInvoice += $item->{extended_cost};
+	}
+
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+	my $totalItems = $invoice->{total_items} - 1;
+	$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $invoiceId || undef,
+			total_items => defined $totalItems ? $totalItems : undef,
+			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+			balance => defined $invBalance ? $invBalance : undef,
+			_debug => 0
+		);
+
+
+
+	## ADD HISTORY ATTRIBUTE
+	$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId,
+			item_name => 'Invoice/History/Item',
+			value_type => App::Universal::ATTRTYPE_HISTORY,
+			value_text => "Voided $cptCode",
+			#value_textB => $comments || undef,
+			value_date => $todaysDate || undef,
+			_debug => 0
+	);
 }
 
 sub customValidate
@@ -1750,7 +1853,7 @@ sub customValidate
 			$otherPayerField->invalidate($page, qq{
 				Person Id '$otherPayer' does not exist.<br>
 				<img src="/resources/icons/arrow_right_red.gif">
-				<a href="$createHref">Create Third Party Person Id '$otherPayer' now</a>
+				<a href="$createHref">Add Third Party Person Id '$otherPayer' now</a>
 				})
 				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
 		}
@@ -1762,7 +1865,7 @@ sub customValidate
 			$otherPayerField->invalidate($page, qq{
 				Org Id '$otherPayer' does not exist.<br>
 				<img src="/resources/icons/arrow_right_red.gif">
-				Create '$otherPayer' Organization now as an
+				Add Third Party Organization Id '$otherPayer' now as an
 				<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
 				<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
 				})
