@@ -1401,6 +1401,78 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 #----------------------------------------------------------------------------------------------------------------------
 
+'org.superbills' => {
+	sqlStmt => qq{
+		select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+		from	Offering_Catalog oc, Org o
+		where	oc.catalog_type = 4
+		and	oc.org_internal_id = o.org_internal_id
+		and	o.org_id = ?
+	},
+
+	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
+
+	publishDefn => {
+		columnDefn => [
+			{ colIdx => 1, head => 'Superbill ID', },
+			{ colIdx => 2, head => 'Caption' },
+			{ colIdx => 3, head => 'Description' },
+			{ dataFmt => 'Print', url => '/org/#param.org_id#/superbills?action=printSample&superbillid=#0#' }
+		],
+
+#		separateDataColIdx => 2,
+
+		bullets => '/org/#param.org_id#/superbills?action=edit&superbillid=#0#',
+		banner =>
+		{
+			actionRows =>
+			[
+			{ caption => qq{ Add <A HREF= '/org/#param.org_id#/superbills?action=new'>Superbill</A> &nbsp; &nbsp; } },
+			],
+			contentColor=>'#EEEEEE',
+		},
+#		frame => {
+#			editUrl => '/org/#param.org_id#/superbills?action=edit&superbillid=#0#',
+#			addUrl => '/org/#param.org_id#/superbills?action=new',
+#		},
+	},
+	publishDefn_panel =>
+	{
+		style => 'panel.transparent.static',
+		frame => { 
+			heading => 'Superbill Catalog',
+			addUrl => '/org/#param.org_id#/superbills?action=new',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		style => 'panel.edit',
+		frame => { heading => 'Edit Superbill' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{
+					Add <A HREF= '/org/#param.org_id#/superbills?action=new'>Superbill</A> &nbsp; &nbsp;
+				}},
+			],
+		},
+		stdIcons =>	{
+			delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panelEdit'); },
+},
+
+#----------------------------------------------------------------------------------------------------------------------
+
 'org.insurancePlans' => {
 	sqlStmt => qq{
 			SELECT
