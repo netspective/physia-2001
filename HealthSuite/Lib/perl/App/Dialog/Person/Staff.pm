@@ -33,6 +33,7 @@ sub initialize
 	my $postHtml = "<a href=\"javascript:doActionPopup('/lookup/person');\">Lookup existing person</a>";
 
 	#$self->heading('$Command Staff');
+
 	$self->addContent(
 			new App::Dialog::Field::Person::ID::New(caption => 'Staff ID',
 							name => 'person_id',
@@ -40,6 +41,7 @@ sub initialize
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 						postHtml => $postHtml),
 			);
+
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::MultiField(caption =>'Employee ID/Exp Date',

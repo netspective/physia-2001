@@ -34,6 +34,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'acct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
 		#GENERAL INFORMATION
+
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
 		#					name => 'person_id',
 		#					options => FLDFLAG_REQUIRED,
