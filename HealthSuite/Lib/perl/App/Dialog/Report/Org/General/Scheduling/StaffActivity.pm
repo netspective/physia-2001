@@ -58,10 +58,11 @@ sub buildSqlStmt
 	my $reportBeginDate = $page->field('report_begin_date');
 	my $reportEndDate = $page->field('report_end_date');
 	my $person_id = $page->field('staff_id');
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $dateClause ;
-	$dateClause =qq{ and  trunc(pa.activity_stamp) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
-	$dateClause =qq{ and  trunc(pa.activity_stamp) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
-	$dateClause =qq{ and  trunc(pa.activity_stamp) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
+	$dateClause =qq{ and  trunc(pa.activity_stamp-$gmtDayOffset) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
+	$dateClause =qq{ and  trunc(pa.activity_stamp-$gmtDayOffset) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
+	$dateClause =qq{ and  trunc(pa.activity_stamp-$gmtDayOffset) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
 	my $orderBy = qq{order by pa.activity_stamp desc };
 
 	my $whereClause = qq{where
@@ -70,7 +71,7 @@ sub buildSqlStmt
 				$dateClause
 				};
 #	my $columns = qq{to_char(pa.activity_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_date,
-	my $columns = qq{pa.activity_stamp as activity_date,
+	my $columns = qq{pa.activity_stamp - $gmtDayOffset as activity_date,
 			sat.caption as caption,
 			pa.activity_data as data,
 			pa.action_scope as scope,
@@ -93,7 +94,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	my $pub = {
 		columnDefn => [
-			{ colIdx => 0, head => 'Activity Date', hAlign => 'left', dAlign => 'left', dataFmt => '#0#'},
+			{ colIdx => 0, tAlign=>'left',summarize=>'count', head => 'Activity Date', hAlign => 'left', dAlign => 'left', dataFmt => '#0#'},
 			{ colIdx => 1, head => 'Caption', hAlign => 'left', dAlign => 'left', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Data', hAlign => 'left', dAlign => 'left', dataFmt => '#2#' },
 			{ colIdx => 3, head => 'Scope', hAlign => 'left', dAlign => 'left', dataFmt => '#3#' },
