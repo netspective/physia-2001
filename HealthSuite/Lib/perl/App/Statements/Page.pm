@@ -16,6 +16,7 @@ $STMTMGR_PAGE = new App::Statements::Page(
 		select * 
 		from Persess_View_Count 
 		where person_id = ?
+			and view_init >= trunc(sysdate)
 			and view_scope = ?
 			and view_key   = ?
 	},
@@ -25,6 +26,7 @@ $STMTMGR_PAGE = new App::Statements::Page(
 		set view_count = view_count +1,
 			view_latest = sysdate
 		where person_id = ?
+			and view_init >= trunc(sysdate)
 			and view_scope = ?
 			and view_key   = ?
 	},
@@ -38,7 +40,8 @@ $STMTMGR_PAGE = new App::Statements::Page(
 
 	'person.mySessionViewCount' => {
 		sqlStmt => qq{
-			select view_caption, view_count, %simpleStamp:view_init%,	%simpleStamp:view_latest%
+			select view_caption, view_count, %simpleStamp:view_init%,	
+				%simpleStamp:view_latest%, view_arl
 			from Persess_View_Count 
 			where person_id = ?
 				and view_init > trunc(sysdate)
@@ -48,7 +51,7 @@ $STMTMGR_PAGE = new App::Statements::Page(
 		
 		publishDefn => {
 			columnDefn => [
-				{ head=> 'Target' },
+				{ head=> 'Target', url => '#4#' },
 				{ head=> 'Count', dAlign => 'right' },
 				{ head=> 'Init View' },
 				{ head=> 'Last View' },
@@ -60,7 +63,7 @@ $STMTMGR_PAGE = new App::Statements::Page(
 			# automatically inherits columnDefn and other items from publishDefn
 			style => 'panel.static',
 			flags => 0,
-			frame => { heading => 'My Session View Count' },
+			frame => { heading => 'My Activity View Count' },
 		},
 		publishDefn_panelTransp =>
 		{

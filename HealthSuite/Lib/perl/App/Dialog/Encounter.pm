@@ -1450,6 +1450,31 @@ sub customValidate
 	}
 }
 
+sub checkEventStatus
+{
+	my ($self, $page, $eventId) = @_;
+	
+	my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_eventInfo', $eventId);
+
+	my ($status, $person, $stamp);
+	
+	if ($checkStatus->{event_status} == 2)
+	{
+		$status = 'out';
+		$person = $checkStatus->{checkout_by_id};
+		$stamp  = $checkStatus->{checkout_stamp};
+
+	} 
+	elsif ($checkStatus->{event_status} == 1)
+	{
+		$status = 'in';
+		$person = $checkStatus->{checkin_by_id};
+		$stamp  = $checkStatus->{checkin_stamp};
+	}
+
+	return ($status, $person, $stamp);
+}
 
 use constant CLAIM_DIALOG => 'Dialog/Claim';
 

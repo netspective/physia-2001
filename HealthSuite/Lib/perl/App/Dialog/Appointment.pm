@@ -147,7 +147,7 @@ sub new
 	{
 		scope =>'event',
 		key => "#field.attendee_id#",
-		data => "appointment '#field.attendee_id#' <a href='/search/appointment'>#field.attendee_id#</a>"
+		data => "appointment '#field.attendee_id#' <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons);
 

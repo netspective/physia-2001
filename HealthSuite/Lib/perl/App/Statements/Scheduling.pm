@@ -130,6 +130,14 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where o.ORG_ID = oc.PARENT_ID
 			and UPPER(oc.MEMBER_NAME) in ('FACILITY','CLINIC')
 	},
+	'sel_eventInfo' => {
+		_stmtFmt => qq{
+			select event_status, checkin_by_id, checkout_by_id, %simpleStamp:checkin_stamp%
+				as checkin_stamp, %simpleStamp:checkout_stamp% as checkout_stamp
+			from Event 
+			where event_id = ?
+		}
+	},
 
 	# --------------------------------------------------------------------------------------------
 	'selPatientInfo' => qq{

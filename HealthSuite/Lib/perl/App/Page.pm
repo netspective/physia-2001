@@ -162,7 +162,7 @@ sub incrementViewCount
 		else
 		{
 			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'ins_newKey', $sessionId, $userId, $rsrc, $paramKey, 
-				qq{<a href='$arl'>$caption</a>}, $arl);
+				$caption, $arl);
 		}
 	}
 }

@@ -89,6 +89,18 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $eventId = $page->field('event_id');
+	
+	my $returnUrl = $page->field('dupCheckin_returnUrl');
+	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
+
+	if ($status eq 'out')
+	{
+		return (qq{
+			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
+			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.		
+		});
+
+	}
 
 	## First, update original event record to CHECKOUT status, and any changes
 	#my $checkOutStamp = $page->getTimeStamp();

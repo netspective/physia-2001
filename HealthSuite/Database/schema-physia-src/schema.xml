@@ -57,6 +57,7 @@
 	<table name="PerSess_Activity" abbrev="SesAct">
 		<description>All the activities undertaken by a user during a session</description>
 		<column name="session_id" parentref="Person_Session.session_id" indexed="yes" descr="The session ID for the activity"/>
+		<column name="person_id" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
 		<column name="activity_type" lookupref="Session_Activity_Type" required="yes" descr="The type of activity undertaken"/>
 		<column name="activity_stamp" type="stamp" required="yes" default="sysdate" descr="The date/time the activity was undertaken"/>
 		<column name="action_type" lookupref="Session_Action_Type" required="yes" descr="The type of action undertaken"/>

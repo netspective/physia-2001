@@ -454,8 +454,8 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	#
 	'insSessionActivity' => qq{
 		insert into PerSess_Activity
-		(session_id, activity_type, action_type, action_scope, action_key, detail_level, activity_data ) values
-		(?,          ?,             ?,           ?,            ?,          ?,		?)
+		(session_id, activity_type, action_type, action_scope, action_key, detail_level, activity_data, person_id ) values
+		(?         , ?            , ?          , ?           , ?         , ?           , ?            , ?)
 		},
 	'selSessionActivity' => {
 		sqlStmt => qq{

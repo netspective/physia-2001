@@ -66,6 +66,8 @@ sub makeStateChanges
 	$self->updateFieldFlags('procedures_heading', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
+	
+	$page->session('dupCheckin_returnUrl', $page->referer());
 }
 
 sub execute
@@ -74,10 +76,24 @@ sub execute
 
 	## First, update original event record to checkin status, and any changes
 	#my $timeStamp = $page->getTimeStamp();
+	
+	my $eventId = $page->field('event_id');
+	my $returnUrl = $page->field('dupCheckin_returnUrl');
+	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
+
+	if (defined $status)
+	{
+		return (qq{
+			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
+			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.		
+		});
+
+	}
+	
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
 	if ($page->schemaAction(
 			'Event', 'update',
-			event_id => $page->field('event_id') || undef,
+			event_id => $eventId || undef,
 			event_status => defined $eventStatus ? $eventStatus : undef,
 			checkin_stamp => $page->field('checkin_stamp') || undef,
 			checkin_by_id => $page->session('user_id'),

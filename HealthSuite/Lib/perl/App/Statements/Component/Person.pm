@@ -1909,18 +1909,18 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.mySessionActivity' => {
 	sqlStmt => qq{
-			select  to_char(a.activity_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_date,
-				b.caption as caption,
-				a.activity_data as data,
-				a.action_scope as scope,
-				a.action_key as action_key
-			from  	perSess_Activity a,  Session_Action_Type b
-			where  	activity_stamp > (select max(activity_stamp) - 1 from perSess_Activity)
-			and	a.session_id = ?
-			and	a.action_type = b.id
-			and	rownum <= 20
-			order by a.activity_stamp desc
-		},
+		select  to_char(pa.activity_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_date,
+			sat.caption as caption,
+			pa.activity_data as data,
+			pa.action_scope as scope,
+			pa.action_key as action_key
+		from Session_Action_Type sat, perSess_Activity pa
+		where pa.person_id = ?
+			and	pa.activity_stamp >= trunc(sysdate)
+			and	sat.id = pa.action_type
+		order by pa.activity_stamp desc
+	},
+
 	sqlStmtBindParamDescr => ['Session ID for the perSess_Activity table '],
 	publishDefn => {
 		columnDefn => [
@@ -1932,8 +1932,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
-		style => 'panel',
-		frame => { heading => 'My Session Activity' },
+		style => 'panel.static',
+		frame => { heading => 'My Recent Activity (Today)' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -1956,10 +1956,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $sessionId) = @_; $sessionId ||= $page->session('_session_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$sessionId]); },
-	publishComp_stp => sub { my ($page, $flags, $sessionId) = @_; $sessionId ||= $page->session('_session_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$sessionId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $sessionId) = @_; $sessionId ||= $page->session('_session_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$sessionId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $sessionId) = @_; $sessionId ||= $page->session('_session_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$sessionId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panelTransp'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
