@@ -2344,8 +2344,31 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelTransp'); },
 },
-
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'sel_referral'=> {
+	sqlStmt => qq{
+			select trans_id, trans_owner_id, trans_substatus_reason, trans_status_reason, caption, provider_id, care_provider_id,
+				 	trans_begin_stamp, trans_end_stamp, data_text_a, data_text_b, data_text_c, data_num_a,
+				 	related_data,detail
+				 from transaction
+				 where trans_type = 6000
+				 and trans_id = ?
+		},
+		publishDefn => 	{
+					columnDefn =>
+					[
+						{head => 'Referred By', dataFmt => '<A HREF = "/person/#5#/profile">#5#</A>'},
+						{head => 'Referred To', dataFmt => '<A HREF = "/person/#6#/profile">#6#</A>'},
+						{colIdx => 2, head => 'Requested Service'},
+						{colIdx => 4, head => 'Internal/External Flag', dAlign => 'CENTER'},
+						{colIdx => 7, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP},
+						{colIdx => 8, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP},
+						{colIdx => 9, head => 'Referral Type'},
+						{colIdx => 10, head => 'ICD Codes'},
+						{colIdx => 11, head => 'CPT Codes'},
+					],
+		},
+},
 
 );
 
