@@ -190,6 +190,7 @@ sub execute
 	push(@cpt, $cpt1);
 	push(@cpt, $cpt2);
 	my $dataTextC = join (', ', @cpt);
+	my $personId = $page->param('person_id');
 
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL;
 
@@ -216,7 +217,9 @@ sub execute
 			_debug => 0
 	);
 
-	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	$page->param('_dialogreturnurl', "/person/$personId/profile");
+
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
