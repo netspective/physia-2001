@@ -46,7 +46,7 @@ sub formatData
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
 
-	my $claimPayToProvider = $firstClaim->{payToOrganization};
+	my $claimPayToProvider = $firstClaim->{payToProvider};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
 	my $emcId;
 	my $taxId;
@@ -56,14 +56,14 @@ sub formatData
 	{
 		$taxId = $claimPayToProvider->getTaxId();
 		$taxId =~ s/-//g;
-		$taxIdType = 'E';
+		$taxIdType = 'S';
 	}
-	elsif($claimPayToProvider->getFederalTaxId() ne '')
-	{
-		$taxId = $claimPayToProvider->getFederalTaxId();
-		$taxId =~ s/-//g;
-		$taxIdType = 'E';
-	}
+	#elsif($claimPayToProvider->getFederalTaxId() ne '')
+	#{
+	#	$taxId = $claimPayToProvider->getFederalTaxId();
+	#	$taxId =~ s/-//g;
+	#	$taxIdType = 'E';
+	#}
 	else
 	{
 		$taxIdType = '';
@@ -130,11 +130,11 @@ my %payerType = ( THIN_MEDICARE . "" =>
 	  $spaces, # prov commercial no.
 	  $spaces, # prov no 1
 	  $spaces, # prov no 2
-	  substr(($taxIdType =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,33),
-	  $spaces, # substr(($taxIdType eq 'S') ? $claimRenderingProvider->getLastName() : $spaces,0,20),
-	  $spaces, # substr(($taxIdType eq 'S') ? $claimRenderingProvider->getFirstName(): $spaces,0,12),
-	  $spaces, # substr(($taxIdType eq 'S') ? $claimRenderingProvider->getMiddleInitial(): $spaces,0,1),
-	  $spaces, # substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
+	  $spaces, # substr(($taxIdType =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,33),
+	  substr(($taxIdType eq 'S') ? $claimPayToProvider->getLastName() : $spaces,0,20),
+	  substr(($taxIdType eq 'S') ? $claimPayToProvider->getFirstName(): $spaces,0,12),
+	  substr(($taxIdType eq 'S') ? $claimPayToProvider->getMiddleInitial(): $spaces,0,1),
+	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
 	  $spaces, # speciality license number
 	  $spaces, # state license number
 	  $spaces, # dentist license number
