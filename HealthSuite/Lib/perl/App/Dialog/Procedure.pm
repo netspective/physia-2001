@@ -215,6 +215,7 @@ sub execAction_submit
 			invoice_id => $invoiceId,
 			invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
 			submitter_id => $page->session('user_id') || undef,
+			submit_date => $todaysDate || undef,
 			flags => $invoiceFlags | $attrDataFlag,
 			_debug => 0
 	);
@@ -239,7 +240,6 @@ sub hmoCapWriteoff
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $writeoffCode = App::Universal::ADJUSTWRITEOFF_CONTRACTAGREEMENT;
 	my $totalAdjForItems = 0;
-	#my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 	my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	foreach my $proc (@{$procItems})
 	{
@@ -544,10 +544,12 @@ sub storePatientEmployment
 	my $personEmployStat = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selEmploymentStatusCaption', $invoice->{client_id});
 	foreach my $employStat (@{$personEmployStat})
 	{
+		my $valueType = $employStat->{value_type};
+	
 		my $status = '';
 		$status = $employStat->{caption};
-		$status = 'Retired' if $employStat->{value_type} == $retiredAttr;
-		$status = 'Employed' if $employStat->{value_type} >= $ftEmployAttr && $employStat->{value_type} <= $selfEmployAttr;
+		$status = 'Retired' if $valueType == $retiredAttr;
+		$status = 'Employed' if $valueType >= $ftEmployAttr && $valueType <= $selfEmployAttr;
 
 		if($status eq 'Employed')
 		{
@@ -555,7 +557,7 @@ sub storePatientEmployment
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
 					item_name => 'Patient/Employment/Status',
-					value_type => defined $textValueType ? $textValueType : undef,
+					value_type => defined $valueType ? $valueType : undef,
 					value_text => $status || undef,
 					_debug => 0
 				);
@@ -566,7 +568,7 @@ sub storePatientEmployment
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
 					item_name => 'Patient/Student/Status',
-					value_type => defined $textValueType ? $textValueType : undef,
+					value_type => defined $valueType ? $valueType : undef,
 					value_text => $status || undef,
 					_debug => 0
 				);
@@ -1130,12 +1132,13 @@ sub storeInsuranceInfo
 			my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
 			foreach my $employer (@{$insuredEmployers})
 			{
-				next if $employer->{value_type} == $retiredAttr;
+				my $valueType = $employer->{value_type};
+				next if $valueType == $retiredAttr;
 
 				my $occupType = 'Employer';
-				$occupType = 'School' if $employer->{value_type} == $ftStudentAttr || $employer->{value_type} == $ptStudentAttr;
+				$occupType = 'School' if $valueType == $ftStudentAttr || $valueType == $ptStudentAttr;
 
-				my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $employer->{value_type});
+				my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $valueType);
 
 				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_text});
 
@@ -1143,7 +1146,7 @@ sub storeInsuranceInfo
 						'Invoice_Attribute', $command,
 						parent_id => $invoiceId,
 						item_name => "Insurance/$payerBillSeq/Insured/$occupType/Name",
-						value_type => defined $textValueType ? $textValueType : undef,
+						value_type => defined $valueType ? $valueType : undef,
 						value_text => $employerName || undef,
 						value_textB => $empStatus || undef,
 						_debug => 0
@@ -1264,14 +1267,28 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $invoiceId = $page->param('invoice_id');
-	my $itemId = $page->param('item_id');
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId) if $command ne 'update';
+	if($command eq 'add' || $command eq 'update')
+	{
+		execute_addOrUpdate($self, $page, $command, $flags);
+	}
+	else
+	{
+		voidProcedure($self, $page, $command, $flags);
+	}
+
+	$self->handlePostExecute($page, $command, $flags);
+}
+
+sub execute_addOrUpdate
+{
+	my ($self, $page, $command, $flags) = @_;
 
 	my $sessOrg = $page->session('org_id');
 	my $sessUser = $page->session('user_id');
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $invoiceId = $page->param('invoice_id');
+	my $itemId = $page->param('item_id');
+	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId) if $command eq 'update';
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	if($page->field('lab_indicator'))
@@ -1343,17 +1360,13 @@ sub execute
 
 
 
-
 	## UPDATE INVOICE TO WHICH ITEM BELONGS
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
 	my $totalItems = $invoice->{total_items};
 	if($command eq 'add')
 	{
 		$totalItems = $invoice->{total_items} + 1;
-	}
-	elsif($command eq 'remove')
-	{
-		$totalItems = $invoice->{total_items} - 1;
 	}
 
 	my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
@@ -1364,7 +1377,6 @@ sub execute
 	}
 
 	my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
-
 	$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId || undef,
@@ -1382,7 +1394,6 @@ sub execute
 	my $action = '';
 	$action = 'Added' if $command eq 'add';
 	$action = 'Updated' if $command eq 'update';
-	$action = 'Deleted' if $command eq 'remove';
 	my $itemNum = $page->param('item_seq') || $invoice->{total_items} + 1;
 
 	$page->schemaAction(
@@ -1390,13 +1401,94 @@ sub execute
 			parent_id => $invoiceId,
 			item_name => 'Invoice/History/Item',
 			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => "$action line item $itemNum",
+			value_text => "$action $cptCode",
 			value_textB => $comments || undef,
 			value_date => $todaysDate || undef,
 			_debug => 0
 	);
 
-	$self->handlePostExecute($page, $command, $flags);
+}
+
+sub voidProcedure
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $sessUser = $page->session('user_id');
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $invoiceId = $page->param('invoice_id');
+	my $itemId = $page->param('item_id');
+	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
+
+	my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
+	my $extCost = 0 - $invItem->{extended_cost};
+	my $itemBalance = $extCost + $invItem->{total_adjust};
+	my $emg = $invItem->{emergency};
+	my $cptCode = $invItem->{code};
+	my $voidItemId = $page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_item_id => $itemId || undef,
+			parent_id => $invoiceId,
+			item_type => defined $voidItemType ? $voidItemType : undef,
+			code => $cptCode || undef,
+			caption => $invItem->{caption} || undef,
+			modifier => $invItem->{modifier} || undef,
+			rel_diags => $invItem->{rel_diags} || undef,
+			unit_cost => $invItem->{unit_cost} || undef,
+			quantity => $invItem->{quantity} || undef,
+			extended_cost => defined $extCost ? $extCost : undef,
+			balance => defined $itemBalance ? $itemBalance : undef,
+			emergency => defined $emg ? $emg : undef,
+			#comments => $comments || undef,
+			hcfa_service_place => $invItem->{hcfa_service_place} || undef,
+			hcfa_service_type => $invItem->{hcfa_service_type} || 'NULL',
+			service_begin_date => $invItem->{service_begin_date} || undef,
+			service_end_date => $invItem->{service_end_date} || undef,
+			data_text_a => $invItem->{data_text_a} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			data_text_b => 'void',
+			_debug => 0
+		);
+
+
+	## UPDATE INVOICE TO WHICH ITEM BELONGS
+
+	my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+	my $totalCostForInvoice = '';
+	foreach my $item (@{$allInvItems})
+	{
+		$totalCostForInvoice += $item->{extended_cost};
+	}
+
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+	my $totalItems = $invoice->{total_items} - 1;
+	$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $invoiceId || undef,
+			total_items => defined $totalItems ? $totalItems : undef,
+			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+			balance => defined $invBalance ? $invBalance : undef,
+			_debug => 0
+		);
+
+
+
+	## ADD HISTORY ATTRIBUTE
+	$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId,
+			item_name => 'Invoice/History/Item',
+			value_type => App::Universal::ATTRTYPE_HISTORY,
+			value_text => "Voided $cptCode",
+			#value_textB => $comments || undef,
+			value_date => $todaysDate || undef,
+			_debug => 0
+	);
 }
 
 1;
