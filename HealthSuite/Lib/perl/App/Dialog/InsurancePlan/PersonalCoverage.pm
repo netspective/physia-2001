@@ -36,7 +36,7 @@ sub new
 			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
-			new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/plan_name'),
+			new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insurance/plan_name'),
 			#new CGI::Dialog::Field::TableColumn(
 			#					caption => 'Insurance Type',
 			#					schema => $schema,
@@ -53,7 +53,7 @@ sub new
 								onValidateData => $self,
 								defaultValue => 1,
 								options => FLDFLAG_REQUIRED),
-			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',	style => 'check'),
+			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',style => 'check'),
 			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
 			new CGI::Dialog::Subhead(heading => 'General Plan Information', name => 'gen_plan_heading'),
 			new CGI::Dialog::MultiField(caption =>'Group Name/Group Number', name => 'group',
@@ -211,6 +211,12 @@ sub makeStateChanges
 	}
 
 	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+
+	if($page->param('_lcm_ispopup'))
+	{
+		$self->updateFieldFlags('insur_heading', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('insplan', FLDFLAG_INVISIBLE, 1);
+	}
 }
 
 sub customValidate
@@ -256,28 +262,30 @@ sub customValidate
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
 	my $sequence = $page->field('bill_sequence');
 
-	if ($sequence == 99)
+	if ($sequence == App::Universal::INSURANCE_INACTIVE)
 	{
 		do
 		{
 			$previousSequence ++;
+			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
+
 			if($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence))
 			{
-				$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
-				$page->field('create_record', 0);
-				my $createInsCoverageHref = "javascript:doActionPopup('/person/#param.person_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousSequence');";
-				$billSeq->invalidate($page, "Do u want to Create a New <a href='/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
 
+
+				my $createInsCoverageHref = "javascript:doActionPopup('/person-p/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#');";
+				$billSeq->invalidate($page, "Do u want to Create a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
+				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence) if $page->field('create_record', 0);
 			}
-			if($page->field('create_record') ne '')
+			elsif($page->field('create_record', 1))
 			{
 				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
 			}
-			if($page->field('create_record') eq '')
-			{
-				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence);
-			}
-		}until $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence) || $previousSequence <=3;
+			#if($page->field('create_record') eq '')
+			#{
+			#	return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence);
+			#}
+		}until $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence) && $previousSequence <=3;
 	}
 
 }
@@ -364,9 +372,11 @@ sub execute
 	my $productName = $page->field('product_name');
 	my $planName = $page->field('plan_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
+	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
-	my $parentInsId = $planData->{'ins_internal_id'};
-	my $insType = $planData->{'ins_type'};
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
+	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
+	my $insType = $planData->{'ins_type'} ne '' ? $planData->{'ins_type'} : $recordData->{'ins_type'};
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 
