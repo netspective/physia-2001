@@ -82,12 +82,22 @@ sub getForm
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');
 		</script>
-		<input name="search_expression" value="@{[$self->param('search_expression')]}">
+		<input name="search_expression" value="@{[$self->param('search_expression')]}" onChange="validateExpression(event);">
 		<input type=submit name="execute" value="Go">
 		</NOBR>
 		$createFns
 		$itemFns
 		</CENTER>
+		<SCRIPT language="JavaScript1.2">
+			function validateExpression(event)
+			{
+				var searchType = document.all.search_type.value;
+				if (searchType == "dob")
+				{
+					return validateChange_Date(event);
+				}
+			}
+		</SCRIPT>
 	});
 }
 
