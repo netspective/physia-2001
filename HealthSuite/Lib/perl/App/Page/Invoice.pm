@@ -2004,7 +2004,7 @@ sub initialize
 	my $invoiceId = $self->param('invoice_id');
 
 	$input->populateClaims($claimList, dbiHdl => $self->getSchema()->{dbh},
-		invoiceIds => [$invoiceId], valMgr => $valMgr);
+		invoiceIds => [$invoiceId], valMgr => $valMgr, page => $self);
 	my $st = $claimList->getStatistics;
 
 	if($valMgr->haveErrors())
