@@ -67,16 +67,16 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 	'selAttribute' => qq{
 		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
-			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT'),
-			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateEnd,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB,
 			parent_org_id
 		from person_attribute
 		where parent_id = ? and item_name = ?
 		},
 	'selAttributeByItemNameAndValueTypeAndParent' => qq{
 		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
-			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT'),
-			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateEnd,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB,
 			parent_org_id
 		from person_attribute
 		where parent_id = ? and item_name = ? and value_type = ?
@@ -309,9 +309,9 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			and org_id = ?
 	},
 	'insPersonLogin' => qq{
-		insert into Person_Login 
+		insert into Person_Login
 		(cr_session_id, cr_stamp, cr_user_id, cr_org_id, person_id, org_id, password, quantity)
-		values 
+		values
 		(?            , sysdate , ?         , ?        , ?        , ?     , ?       , ?)
 	},
 	'updSessionsTimeout' => qq{
