@@ -53,6 +53,23 @@
 		<deliverable id="99">
 			The person search/lookup now uses browser validation to be sure that a date of birth entered is really a date (thereby avoiding the nasty error message)
 		</deliverable>
-
+		<deliverable id="1322">
+			Fixed code to not to showup 'Administrator' while adding a new person in the Claim dialog
+		</deliverable>
+		<deliverable id="992">
+			Fixed code to not to show up duplicate records in the phone message comoponent when the Person Called and User are the same
+		</deliverable>		
+		<deliverable id="1080">
+			Now the Reference codes while doing a search are not case sensitive
+		</deliverable>		
+		<deliverable id="1180">
+			Now the org's show up the correct dialog while editing from the lookup window
+		</deliverable>	
+		<deliverable id="1113">
+			Updated the Certification componenet to show up the facility ID for which the physician belongs
+		</deliverable>
+		<deliverable id="1162">
+			Added a new field in the HealthCoverage dialog to add the date of injury
+		</deliverable>		
 	</deliverables>
 </release-notes>
