@@ -108,7 +108,8 @@ sub addPopup_as_html
 	my $dialogName = $dialog->formName();
 	my $fieldName = $page->fieldPName($self->{name});
 
-	if(my $arl = $self->{addPopup} && $self->{addPopup} !~ /none/i)
+	my $arl = $self->{addPopup};
+	if($arl && $arl !~ /^none$/i)
 	{
 		my $controlField = 'null';
 		$controlField = $self->{addPopupControlField} if $self->{addPopupControlField};
