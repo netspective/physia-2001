@@ -42,13 +42,14 @@ sub property
 sub setFaxNo
 {
 	my ($self,$value) = @_;
+	$value =~ s/-//g;
 	$self->{faxNo} = $value;
 }
 
 sub getFaxNo
 {
-	my ($self) = @_;
-	return $self->{faxNo};
+	my ($self, $formatIndicator) = @_;
+	return (TELEPHONE_FORMAT_DASH == $formatIndicator) ? $self->convertTelFormat($self->{faxNo}) : $self->{faxNo};
 }
 
 sub setEmailAddress
