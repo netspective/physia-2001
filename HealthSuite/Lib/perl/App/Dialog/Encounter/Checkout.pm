@@ -140,6 +140,15 @@ sub handle_page
 			</font>
 		});
 	}
+	elsif ($status ne 'in')
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Patient has NOT been checked-in.  Please check-in patient before check-out.<br>
+			Click here to <a href='/schedule/apptsheet/encounterCheckin/$eventId'><b>Check-In</b></a> patient.
+			</font>
+		});
+	}
 	else 
 	{
 		$self->SUPER::handle_page($page, $command);

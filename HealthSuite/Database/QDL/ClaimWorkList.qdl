@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="ClaimWorkList" db="Oracle">
+
+		<!-- Fields -->
+		<field id="patient_id" caption="Patient ID" join="invoice" column="client_id"/>
+		<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
+		<field id="ins_org_id" caption="Insurance Org ID" join="org" column="org_id"/>
+		<field id="ins_org_internal_id" caption="Ins Internal Org ID" join="org" column="org_internal_id"/>
+		<field id="ins_phone" caption="Carrier Phone" join="org_attribute" column="value_text"/>
+		<field id="invoice_status" caption="Claim Status" join="invoice_status" column="caption" />
+		<field id="balance" caption="Balance" join="invoice" column="balance" ui-datatype="currency"/>
+		<field id="invoice_age" caption="Age" join="invoice" columndefn="trunc(sysdate - invoice.invoice_date)"/>
+		<field id="invoice_date" caption="DOS" join="invoice" column="invoice_date" columndefn="TO_CHAR(invoice.invoice_date,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="member_number" caption="Member No." join="insurance" column="member_number"/>
+
+		<field id="service_facility" join="transaction" column="service_facility_id"/>
+
+		<field id="invoice_subtype" join="invoice" column="invoice_subtype"/>
+		<field id="owner_id" join="invoice" column="owner_id"/>
+		<field id="inv_status" join="invoice" column="invoice_status"/>
+		<field id="physician_id" join="transaction" column="care_provider_id"/>
+		<field id="name_last" join="person" column="name_last"/>
+		<field id="patient_name" join="person" column="simple_name"/>
+		<field id="product_name" join="insurance" column="product_name"/>
+
+		<!-- Joins -->
+		<join id="invoice" table="invoice" autoinclude="1"/>
+		<join id="invoice_billing" table="invoice_billing" condition="invoice_billing.bill_id = invoice.billing_id"/>
+		
+		<join id="org_attribute" table="org_attribute" requires="invoice_billing" condition="org_attribute.parent_id = org.org_internal_id AND org_attribute.value_type = 10 AND org_attribute.item_name = 'Primary'"/>
+		<join id="insurance" table="insurance" requires="invoice_billing" condition="insurance.ins_internal_id (+) = invoice_billing.bill_ins_id"/>
+		<join id="org" table="org" requires="invoice_billing" condition="TO_CHAR(org.org_internal_id (+)) = invoice_billing.bill_to_id"/>
+		
+		<join id="invoice_status" table="invoice_status" condition="invoice_status.id = invoice.invoice_status"/>
+		<join id="transaction" table="transaction" condition="transaction.trans_id = invoice.main_transaction"/>
+		<join id="person" table="person" condition="person.person_id = invoice.client_id"/>
+
+		<!-- Views -->
+		<view id="all" distinct="yes">
+			<column id="patient_id"/>
+			<column id="invoice_id"/>
+			<column id="ins_org_id"/>
+			<column id="ins_phone"/>
+			<column id="invoice_status"/>
+			<column id="balance"/>
+			<column id="invoice_date"/>
+			<column id="member_number"/>
+
+			<and-conditions>
+				<condition field="owner_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="invoice_subtype" comparison="isnot" criteria="0"/>
+				<condition field="invoice_subtype" comparison="isnot" criteria="7"/>
+			</and-conditions>
+		</view>
+
+	</query-defn>
+</component>
+
+

@@ -86,7 +86,7 @@ sub new
 		),
 		new App::Dialog::Field::Person::ID(caption => 'PCP ID',
 			name => 'provider_id',
-			types => ['Physician'],
+			types => ['Physician', 'Referring-Doctor'],
 			size => 25,
 		),
 		new CGI::Dialog::Field::(caption => 'Coverage Required',

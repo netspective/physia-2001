@@ -488,7 +488,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				and e.event_id = ea.parent_id
 				and e.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-				and e.event_status in (1, 2)
+				and e.event_status = 2
 			group by ea.value_textB
 		},
 		publishDefn => 	{
@@ -507,8 +507,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_detailPatientsSeenByPhysician' => {
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
-		whereCond =>q{ event_status in (1,2) AND ea.value_textB = :1},
-		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		whereCond =>q{ event_status = 2 AND ea.value_textB = :1},
+		#excludeDiscardedAppts => qq{AND e.event_status < 3},
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
@@ -535,7 +535,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				)
 				and e.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-				and e.event_status in (1, 2)
+				and e.event_status = 2
 				and Appt_Attendee_Type.id = ea.value_int
 			group by caption, Appt_Attendee_Type.id
 		},
@@ -555,8 +555,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_detailPatientsSeenByPatientType' => {
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
-		whereCond=>q{ea.value_int = :1 and event_status in (1,2) },
-		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		whereCond=>q{ea.value_int = :1 and event_status = 2 },
+		#excludeDiscardedAppts => qq{AND e.event_status < 3},
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
