@@ -1,0 +1,1248 @@
+<?xml version="1.0"?>
+
+<!-- do not use "/" or "." inside of id attributes -->
+
+<mdl>
+	<clinical-documentation>
+	<field-defns id="physia">
+	<field-defn id="vital_signs" caption="Vital Signs">		
+		<field-defn id="weight" type="composite" expanded="yes" review="yes" caption="Weight">
+			<field-defn id="integer" type="integer" expand="yes" review="yes"/>
+			<field-defn id="lbs_kgs" type="choose" review="yes" expand="yes" style="radio">
+			<options>			
+			<option>lbs</option>
+			<option>kgs</option>
+			</options>
+			</field-defn>
+		</field-defn>
+		<field-defn id="height" type="composite" review="yes" caption="Height">
+					<field-defn id="float" type="float" review="yes"/>
+					<field-defn id="inches_cms" type="choose" review="yes" style="radio">
+					<options>			
+					<option>inches</option>
+					<option>cms</option>
+					</options>
+					</field-defn>
+		</field-defn>
+		<field-defn id="Age" type="composite" review="yes" caption="Age">
+			<field-defn id="years" type="float" caption="years"/>
+			<field-defn id="years_label" type="static" review="yes" caption="years"/>
+			<field-defn id="months" type="float" review="yes" caption="months"/>
+			<field-defn id="month_label" type="static" review="yes" caption="months"/>
+			<field-defn id="weeks" type="float" caption="weeks"/>
+			<field-defn id="weeks_label" type="static" review="yes" caption="weeks"/>
+		</field-defn>
+		<field-defn id="temperature" type="composite" review="yes" caption="Temperature">
+			<field-defn id="degrees" type="float" caption="Degrees"/>
+			<field-defn id="degrees_f_or_c" type="choose" review="yes" caption="Scale" style="radio">
+			<options>
+			 	<option>F</option>
+			 	<option>C</option>
+			</options>
+			</field-defn>
+			<field-defn id="route" type="choose" review="yes" caption="Route" style="list">
+			<options>
+			 	<option>Oral</option>
+			 	<option>Rectal</option>
+			 	<option>Tympanic</option>
+			 	<option>Axillary</option>
+			 	<option>Cental</option>
+			</options>
+			</field-defn>
+		</field-defn>
+		<field-defn id="respiratory_rate" type="composite" review="yes" caption="Respiratory Rate">
+			<field-defn id="integer" type="integer" review="yes"/>
+			<field-defn id="per_min" type="static" review="yes" caption="per minute"/>
+		</field-defn>
+			
+		<field-defn id="pulse" type="grid" review="yes" expanded="yes" caption="Pulse" append="no">
+			<field-defn id="beats_per_min" type="integer" review="yes" caption="Beats per Minute"/>
+			<field-defn id="position" type="choose" review="yes" caption="Position" style="list">
+			<options>
+			 	<option>Sitting</option>
+			 	<option>Supine</option>
+			 	<option>Standing</option>
+			</options>
+			</field-defn>
+			<field-defn id="rythym_list" type="choose" review="yes" caption="Rhythm" style="list">
+			<options>
+			 	<option>Regular</option>
+			 	<option>Irregular</option>
+			 	<option>Irregularly irregular</option>
+			 	<option>Occ Ectopy</option>
+			 	<option>Frequent Ectopy</option>
+			 	<option>Bigeminy</option>
+			 	<option>Trigeminy</option>
+			</options>
+			</field-defn>
+		</field-defn>
+	
+		
+		<field-defn id="blood_pressure" type="grid" review="yes" expanded="yes" caption="Blood Pressure" append="no">
+			<field-defn id="Systolic" type="integer" review="yes" caption="Systolic"/>
+			<field-defn id="Diastolic" type="integer" review="yes" caption="Diastolic"/>
+			<field-defn id="side" type="choose" review="yes" caption="Side" style="radio">
+				<options>
+					<option>Right</option>
+					<option>Left</option>
+				</options>
+			</field-defn>
+			<field-defn id="cuff_location" type="choose" review="yes" caption="Cuff Location" style="list">
+				<options>
+				 	<option>Arm</option>
+				 	<option>Peds</option>
+				 	<option>Thigh</option>
+				</options>
+			</field-defn>
+			
+			
+			<field-defn id="position" type="choose" review="yes" caption="Position" style="list">
+			<options>
+				<option>Sitting</option>
+				<option>Supine</option>
+				<option>Standing</option>
+			</options>
+			</field-defn>
+		</field-defn>
+	</field-defn>
+	<field-defn id="hpi" caption="History of Present Illness">
+		<field-defn id="reason_for_visit" type="choose" review="yes" caption="Reason For Visit" style="list">
+			<options>
+			 <option>General Medical Exam</option>
+			 <option>Routine</option>
+			 <option>Follow up</option>
+			 <option>Complication</option>
+			 <option>New Problem</option>
+			 <option>Administration</option>
+			 <option>Other</option>
+			</options>
+		</field-defn>
+		<field-defn id="exam_other" type="text" review="yes" caption="Other" condition-field="hpi.reason_for_visit"  condition="control.options.selectedIndex==6"/>
+		<field-defn id="history_present_illness" type="text" lines="5" review="yes" caption="History of Present Illness"/>
+	</field-defn>
+	
+	<!--  Review of systems starts here -->
+		<field-defn id="ros" caption="Review of Systems">
+			<field-defn id="general" type="composite" review="yes" caption="General">     
+				<field-defn id="quest" type="choose" review="yes" caption="General" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="normal" type="static" review="yes" caption="Denies fever, chills, night sweats, weight loss or gain, or lethargy" condition-field="ros.general.quest" condition="control.value == 1"/>
+				<field-defn id="symptoms" type="grid" review="yes" expanded="yes" bareheading="yes" caption="Symptoms" condition-field="ros.general.quest" condition="control.value == 2">
+					<field-defn id="symptom" type="choose" review="yes" caption="Symptom" style="list">
+						<options>
+					 		<option>Fever</option>
+							<option>Chills</option>
+				 			<option>Night sweats</option>
+						 	<option>Weight loss</option>
+						 	<option>Weight gain</option>
+						 	<option>Lethargy</option>
+					 		<option>Other</option>
+						</options>
+					</field-defn>
+				<field-defn id="qandq" type="text" lines="1" review="yes" caption="Q and Q"/>
+				</field-defn>  
+			</field-defn>
+			  
+			<field-defn id="skin" type="composite" review="yes" caption="Skin">     
+				<field-defn id="skinquest" type="choose" review="yes" caption="Skin" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="skinnormal" type="static" review="yes" caption="Denies rash, change in skin color, itching" condition-field="ros.skin.skinquest" condition="control.value == 1"/>
+				<field-defn id="skinqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.skin.skinquest" condition="control.value == 2"/>
+				<field-defn id="skinnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.skin.skinquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="handn" type="composite" review="yes" caption="Head and Neck">     
+				<field-defn id="handnquest" type="choose" review="yes" caption="Head and Neck" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="handnnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.handn.handnquest" condition="control.value == 1"/>
+				<field-defn id="handnqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.handn.handnquest" condition="control.value == 2"/>
+				<field-defn id="handnnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.handn.handnquest" condition="control.value == 2"/>
+			</field-defn>  
+	
+			<field-defn id="eyes" type="composite" review="yes" caption="Eyes">     
+				<field-defn id="eyesquest" type="choose" review="yes" caption="Eyes" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="eyesnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.eyes.eyesquest" condition="control.value == 1"/>
+				<field-defn id="eyesqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.eyes.eyesquest" condition="control.value == 2"/>
+				<field-defn id="eyesnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.eyes.eyesquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="ears" type="composite" review="yes" caption="Ears">     
+				<field-defn id="earsquest" type="choose" review="yes" caption="Ears" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="earsnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.ears.earsquest" condition="control.value == 1"/>
+				<field-defn id="earsqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.ears.earsquest" condition="control.value == 2"/>
+				<field-defn id="earsnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.ears.earsquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="nose" type="composite" review="yes" caption="Nose">     
+				<field-defn id="nosequest" type="choose" review="yes" caption="Nose" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="nosenormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.nose.nosequest" condition="control.value == 1"/>
+				<field-defn id="noseqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.nose.nosequest" condition="control.value == 2"/>
+				<field-defn id="nosenstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.nose.nosequest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="mandt" type="composite" review="yes" caption="Mouth and Throat">     
+				<field-defn id="mandtquest" type="choose" review="yes" caption="Mouth and Throat" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="mandtnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.mandt.mandtquest" condition="control.value == 1"/>
+				<field-defn id="mandtqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.mandt.mandtquest" condition="control.value == 2"/>
+				<field-defn id="mandtnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.mandt.mandtquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="respiratory" type="composite" review="yes" caption="Respiratory">     
+				<field-defn id="respiratoryquest" type="choose" review="yes" caption="Respiratory" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="respiratorynormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.respiratory.respiratoryquest" condition="control.value == 1"/>
+				<field-defn id="respiratoryqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.respiratory.respiratoryquest" condition="control.value == 2"/>
+				<field-defn id="respiratorynstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.respiratory.respiratoryquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="cardiac" type="composite" review="yes" caption="Cardiac">     
+				<field-defn id="cardiacquest" type="choose" review="yes" caption="Cardiac" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="cardiacnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.cardiac.cardiacquest" condition="control.value == 1"/>
+				<field-defn id="cardiacqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.cardiac.cardiacquest" condition="control.value == 2"/>
+				<field-defn id="cardiacnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.cardiac.cardiacquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="breasts" type="composite" review="yes" caption="Breasts">     
+				<field-defn id="breastsquest" type="choose" review="yes" caption="Breasts" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="breastsnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.breasts.breastsquest" condition="control.value == 1"/>
+				<field-defn id="breastsqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.breasts.breastsquest" condition="control.value == 2"/>
+				<field-defn id="breastsnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.breasts.breastsquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="gastro" type="composite" review="yes" caption="Gastrointestinal">     
+				<field-defn id="gastroquest" type="choose" review="yes" caption="Gastrointestinal" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="gastronormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.gastro.gastroquest" condition="control.value == 1"/>
+				<field-defn id="gastroqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.gastro.gastroquest" condition="control.value == 2"/>
+				<field-defn id="gastronstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.gastro.gastroquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="urinary" type="composite" review="yes" caption="Urinary">     
+				<field-defn id="urinaryquest" type="choose" review="yes" caption="Urinary" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="urinarynormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.urinary.urinaryquest" condition="control.value == 1"/>
+				<field-defn id="urinaryqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.urinary.urinaryquest" condition="control.value == 2"/>
+				<field-defn id="urinarynstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.urinary.urinaryquest" condition="control.value == 2"/>
+			</field-defn>  
+	
+			<field-defn id="genitalia" type="choose" review="yes" caption="Genitalia" style="radio">
+				<options>
+				 	<option>Male</option>
+				 	<option>Female</option>
+				</options>
+			</field-defn>
+					
+			<field-defn id="musculoskeletal" type="composite" review="yes" caption="Musculoskeletal">     
+				<field-defn id="musculoskeletalquest" type="choose" review="yes" caption="Musculoskeletal" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="musculoskeletalnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.musculoskeletal.musculoskeletalquest" condition="control.value == 1"/>
+				<field-defn id="musculoskeletalqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.musculoskeletal.musculoskeletalquest" condition="control.value == 2"/>
+				<field-defn id="musculoskeletalnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.musculoskeletal.musculoskeletalquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="neurologic" type="composite" review="yes" caption="Neurologic">     
+				<field-defn id="neurologicquest" type="choose" review="yes" caption="Neurologic" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="neurologicnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.neurologic.neurologicquest" condition="control.value == 1"/>
+				<field-defn id="neurologicqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.neurologic.neurologicquest" condition="control.value == 2"/>
+				<field-defn id="neurologicnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.neurologic.neurologicquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="psychiatric" type="composite" review="yes" caption="Psychiatric">     
+				<field-defn id="psychiatricquest" type="choose" review="yes" caption="Psychiatric" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="psychiatricnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.psychiatric.psychiatricquest" condition="control.value == 1"/>
+				<field-defn id="psychiatricqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.psychiatric.psychiatricquest" condition="control.value == 2"/>
+				<field-defn id="psychiatricnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.psychiatric.psychiatricquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="hematologic" type="composite" review="yes" caption="Hematologic">     
+				<field-defn id="hematologicquest" type="choose" review="yes" caption="Hematologic" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="hematologicnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.hematologic.hematologicquest" condition="control.value == 1"/>
+				<field-defn id="hematologicqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.hematologic.hematologicquest" condition="control.value == 2"/>
+				<field-defn id="hematologicnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.hematologic.hematologicquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="endocrine" type="composite" review="yes" caption="Endocrine">     
+				<field-defn id="endocrinequest" type="choose" review="yes" caption="Endocrine" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="endocrinenormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.endocrine.endocrinequest" condition="control.value == 1"/>
+				<field-defn id="endocrineqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.endocrine.endocrinequest" condition="control.value == 2"/>
+				<field-defn id="endocrinenstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.endocrine.endocrinequest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="perivas" type="composite" review="yes" caption="Peripheral Vascular">     
+				<field-defn id="perivasquest" type="choose" review="yes" caption="Peripheral Vascular" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="perivasnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.perivas.perivasquest" condition="control.value == 1"/>
+				<field-defn id="perivasqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.perivas.perivasquest" condition="control.value == 2"/>
+				<field-defn id="perivasnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.perivas.perivasquest" condition="control.value == 2"/>
+			</field-defn>  
+					
+			<field-defn id="lymphnodes" type="composite" review="yes" caption="Lymph Nodes">     
+				<field-defn id="lymphnodesquest" type="choose" review="yes" caption="Lymph Nodes" style="radio" default="0">
+					<options>
+					 	<option>No Qstn</option>
+				 		<option>Normal</option>
+					 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="lymphnodesnormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.lymphnodes.lymphnodesquest" condition="control.value == 1"/>
+				<field-defn id="lymphnodesqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.lymphnodes.lymphnodesquest" condition="control.value == 2"/>
+				<field-defn id="lymphnodesnstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.lymphnodes.lymphnodesquest" condition="control.value == 2"/>
+			</field-defn>  
+	
+		</field-defn>
+	
+	<!--  End of review of systems -->
+
+	
+	<field-defn id="habits" caption="Habits">
+				<field-defn id="tobacco" caption="Tobacco use">
+					<field-defn id="tobacco_question" type="choose" review="yes" caption="Usage" style="radio" default="0">
+						<options>
+						<option normal="yes">never smoked</option>
+						<option>former smoker</option>
+						<option>active smoker</option>
+						</options>
+					</field-defn>
+					<field-defn id="tobacco_type" type="choose" caption="Type" style="checkbox" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2">
+						<options>
+						<option>cigarettes</option>
+						<option>cigar</option>
+						<option>pipe</option>
+						<option>chewing</option>
+						</options>
+					</field-defn>
+					
+					<field-defn id="started" type="text" caption="Date Started" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2"/>
+					<field-defn id="quit" type="text" caption="Quit" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1"/>
+					<field-defn id="duration" type="text" caption="Duration Years" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2"/>
+					<field-defn id="cigarette_amount" type="choose" review="yes" caption="Cigarette Amount" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2">
+					<options>
+					<option>less than 1 ppd</option>
+					<option>1 ppd</option>
+					<option>2 ppd</option>
+					<option>3 ppd</option>
+					<option>4+ ppd</option>
+					</options>
+					</field-defn>
+					<field-defn id="pack_years" type="text" caption="Pack Years" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2"/>
+				</field-defn>
+				<field-defn id="alcohol" caption="Alcohol Use">
+				<field-defn id="alcohol_question" type="choose" review="yes" caption="Alcohol use">
+					<options>
+					<option>Never drank</option>
+					<option normal="yes">Social or Occasional Drinker</option>
+					<option>Former drinker</option>
+					<option>Regular drinker</option>
+					</options>
+				</field-defn>
+				<field-defn id="alcohol_type" type="choose" caption="Type" style="checkbox" condition-field="habits.alcohol.alcohol_question" condition="control.value == 1">
+					<options>
+					<option>beer</option>
+					<option>wine</option>
+					<option>liquor</option>
+					</options>
+				</field-defn>
+				<field-defn id="alcohol_quit" type="float" caption="When Quit" condition-field="habits.alcohol.alcohol_question" condition="control.value == 2">	
+				</field-defn>
+				<field-defn id="alcohol_type" type="grid" caption="Type" bareheading="yes" expanded="yes" condition-field="habits.alcohol.alcohol_question" condition="control.value > 1">
+					<field-defn id="alcohol_types" type="choose" review="yes" caption="Alcohol Types" style="list">
+						<options>
+						 <option>Beer</option>
+						 <option>Wine</option>
+						 <option>Liquor</option>
+						</options>
+					</field-defn>
+					<field-defn id="alcohol_number" type="float" caption="Number"/>
+					<field-defn id="alcohol_quantity" type="choose" review="yes" caption="Quantity" style="list">
+					<options>
+					 	<option>Drinks</option>
+					 	<option>Cans</option>
+					 	<option>Glasses</option>
+					 	<option>6-packs</option>
+					 	<option>Fifth</option>
+					 	<option>Quart</option>
+					 	<option>Other</option>
+					</options>
+					</field-defn>
+					<field-defn id="alcohol_frequency" type="choose" review="yes" caption="Frequency" style="list">
+					<options>
+					 	<option>per day</option>
+					 	<option>per week</option>
+					 	<option>per month</option>
+					 	<option>per year</option>
+					 	<option>per weekend</option>
+					 	<option>Binge</option>
+					 	<option>Other</option>
+					</options>
+					</field-defn>
+					</field-defn>
+				
+				</field-defn>
+			
+				<field-defn id="drug" caption="Drug Use">
+				<field-defn id="drug_question" type="choose" review="yes" caption="Drug use" style="radio" default="0">
+					<options>
+					<option>denies illicit drug use</option>
+					<option>Illicit drug used</option>
+					</options>
+				</field-defn>
+				<field-defn id="illicit_drugs" caption="Illicit Drugs" type="grid" expanded="yes" bareheading="yes" condition-field="habits.drug.drug_question" condition="control.value = 1">
+				<field-defn id="illicit_drugs_types" type="choose" review="yes" caption="Types" style="list">
+					<options>
+					<option>marijuana</option>
+					<option>cocaine</option>
+					<option>crack cocaine</option>
+					<option>heroin</option>
+					<option>speed</option>
+					<option>presciption medications</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="illicit_drugs_route" type="choose" additive="yes" review="yes" caption="Route" style="list">
+					<options>
+					 	<option>Smoked</option>
+					 	<option>Snorted</option>
+					 	<option>IV</option>
+					 	<option>Oral</option>
+					 	<option>Inhaled</option>
+					 	<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="illicit_drugs_number" type="float" caption="Number"/>
+				<field-defn id="illicit_drugs_frequency" type="choose" review="yes" caption="Frequency" style="list">
+					<options>
+				 	<option>per day</option>
+				 	<option>per week</option>
+				 	<option>per month</option>
+				 	<option>per year</option>
+				 	<option>per weekend</option>
+				 	<option>binge</option>
+				 	<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="illicit_drugs_using" type="choose" review="yes" caption="Using" style="radio">
+					<options>
+				 	<option>Still Using</option>
+				 	<option>Stopped</option>
+					</options>
+				</field-defn>
+				<field-defn id="illicit_drugs_treatment" type="text" review="yes" additive="yes" caption="Treatment">
+					<options>
+					<option>None</option>
+					 <option>Methadone</option>
+					 <option>In Patient Rehab</option>
+					 <option>Out Patient Rehab</option>
+					 <option>Other</option>
+					</options>
+				</field-defn>
+				<field-defn id="drug_type" type="text" review="yes" caption="Type" condition-field="habits.drug.illicit_drugs.illicit_drugs_types"  condition="control.options.selectedIndex > 4"/>
+				</field-defn>
+		
+				
+				
+				<field-defn id="other" type="choose" review="yes" style="radio" default="0" caption="Other habits">
+					<options>
+					<option>Denies</option>
+					<option>Marijuana</option>
+					<option>Cocaine</option>
+					</options>
+				</field-defn>
+				</field-defn>
+		</field-defn>
+		
+		
+		<field-defn id="current_medications" caption="Current Medications">
+		</field-defn>
+		
+		
+		<field-defn id="family_planning" caption="Family Planning and Ob-Gyne Screening">
+			<field-defn id="menarche" type="choose" review="yes" caption="Menarche" style="radio">
+				<options>
+				<option>none</option>
+				<option>Yes</option>
+				</options>
+			</field-defn>
+			<field-defn id="menses" type="grid" review="yes" append="no" bareheading="yes" expanded="yes" caption="Menses" condition-field="family_planning.menarche" condition="control.value == 1">
+				<field-defn id="menarche_age" type="float" caption="Age"/>
+				<field-defn id="lmp" type="date" caption="LMP Date"/>
+				<field-defn id="regularity" type="choose" review="yes" caption="Regularity" style="radio">
+					<options>
+					 <option normal="yes">regular</option>
+					 <option>irregular</option>
+					</options>
+				</field-defn>
+				<field-defn id="menses_duration" type="float" caption="Duration Days"/>
+				<field-defn id="menses_bleeding" type="choose" review="yes" caption="Amount of Bleeding" style="list">
+					<options>
+					<option>light</option>
+					<option normal="yes">moderate</option>
+					<option>heavy</option>
+					<option>irregular</option>
+					</options>
+				</field-defn>
+				<field-defn id="menses_pain" type="choose" review="yes" caption="Pain" style="list">
+					<options>
+					<option normal="yes">mild</option>
+					<option>moderate</option>
+					<option>severe</option>
+					</options>
+				</field-defn>
+			</field-defn>
+			<field-defn id="menopausal" type="choose" review="yes" caption="Menopause" >
+				<options>
+				<option normal="yes">No</option>
+				 <option>menopausal</option>
+				 <option>post-menopausal</option>
+				 <option>artificial</option>
+				</options>
+			</field-defn>
+			<field-defn id="menopause" type="composite" review="yes" caption="Menopause" condition-field="family_planning.menopausal" condition="control.value > 0">
+				<field-defn id="menopause_age_caption" type="static" review="yes" caption="Age"/>
+				<field-defn id="menopause_age" type="float" caption="Age"/>
+				<field-defn id="menopause_symptoms_caption" type="static" review="yes" caption="Symptoms"/>
+				<field-defn id="menopause_symptoms" type="choose" review="yes" caption="Symptoms" additive= "yes" style="list">
+					<options>
+					 <option>hot flashes</option>
+					 <option>sweating</option>
+					 <option>headaches</option>
+					 <option>pain</option>
+					 <option>other</option>
+					 </options>
+				</field-defn>
+				<field-defn id="menopause_symptoms_other" type="text" review="yes" caption="Other" condition-field="family_planning.menopause.menopause_symptoms"  condition="control.options.selectedIndex== 4"/>
+				<field-defn id="menopause_bleeding_caption" type="static" review="yes" caption="Post Menopausal Bleeding"/>
+				<field-defn id="menopause_bleeding" type="choose" review="yes" caption="Post Menopausal Bleeding" style="list">
+					<options>
+					<option normal="yes">no</option>
+					 <option>yes</option>
+					</options>
+				</field-defn>
+			</field-defn>
+			<field-defn id="pregnancies" type="composite" review="yes" caption="Pregnancies">
+				<field-defn id="gravida" type="static" review="yes" caption="Gravida"/>
+				<field-defn id="pregnancy_gravida" type="float" caption="Gravida"/>
+				<field-defn id="para" type="static" review="yes" caption="Para"/>
+				<field-defn id="pregnancy_para" type="float" caption="Para"/>
+				<field-defn id="abortion" type="static" review="yes" caption="AB"/>
+				<field-defn id="pregnancy_ab" type="float" caption="AB"/>
+				<field-defn id="lc" type="static" review="yes" caption="LC"/>
+				<field-defn id="pregnancy_lc" type="float" caption="LC"/>
+			</field-defn>
+			
+			
+			<field-defn id="fertility_question" type="choose" review="yes" caption="Fertility" style="list">
+				<options>
+				 <option>Desires Pregnancy in Future</option>
+				 <option>No Desire for Pregnancy</option>
+				 <option>Trying to become pregnant</option>
+				 <option>Unable to become pregnant</option>				 
+				</options>				
+			</field-defn>
+			
+			<field-defn id="fertility_trying" type="composite" review="yes" caption="Trying for" condition-field="family_planning.fertility_question"  condition="control.options.selectedIndex == 2">
+			<field-defn id="fertility_trying_number_caption" type="static" review="yes" caption="Number"/>
+			<field-defn id="fertility_trying_number" type="float" caption="For number" />
+			<field-defn id="fertility_trying_time_caption" type="static" review="yes" caption="of"/>
+			<field-defn id="fertility_trying_time" type="choose" review="yes" caption="of" style="list">
+				<options>
+				 <option>weeks</option>
+				 <option>months</option>
+				 <option>years</option>
+				</options>
+			</field-defn>
+			</field-defn>
+			<field-defn id="fertility_infertile" type="choose" review="yes" caption="Reason" style="list" condition-field="family_planning.fertility_question"  condition="control.options.selectedIndex == 3">
+				<options>
+				 <option>Infertile</option>
+				 <option>BTL</option>
+				 <option>Partial Hysterectomy</option>
+				 <option>Complete Hysterectomy</option>
+				 <option>Husband Infertile</option>
+				 <option>Husband Vasectomy</option>
+				 <option>Husband Impotent</option>
+				</options>
+			</field-defn>
+						
+			<field-defn id="breast_exam" type="choose" review="yes" caption="Self Exam of Breast" style="radio">
+				<options>
+				 <option>Regularly</option>
+				 <option>Occasionally</option>
+				 <option>Never</option>
+				 <option>Never Demonstrated</option>
+				</options>
+			</field-defn>
+			<field-defn id="sexuality" type="choose" review="yes" caption="Sexuality" style="radio">
+				<options>
+				 <option>Virgin</option>
+				 <option>Not Virgin</option>
+				</options>
+			</field-defn>
+			<field-defn id="sexuality_info" type="grid" review="yes" caption="Sexual Active" expanded="yes" append="no" bareheading="yes" condition-field="family_planning.sexuality"  condition="control.value == 1">
+			
+			<field-defn id="sexually_active" type="choose" review="yes" style="list" caption="Sexual Active" >
+				<options>
+				 <option>Yes</option>
+				 <option>No</option>
+				 <option>Plans to be</option>
+				</options>
+			</field-defn>
+			<field-defn id="sexual_contact" type="date" review="yes" caption="Last Sexual Contact"/>
+			<field-defn id="sexual_frequency_number_" type="float" caption="Sexual Frequency"/>
+			<field-defn id="sexual_frequency_time" type="choose" review="yes" caption="per" style="list">
+				<options>
+				 <option>day</option>
+				 <option>week</option>
+				 <option>month</option>
+				 <option>year</option>
+				</options>
+			</field-defn>
+			<field-defn id="sexual_contacts_total" type="float" review="yes" caption="Total number sexual contacts"/>
+			</field-defn>
+			<field-defn id="sexual_preference" type="choose" review="yes" caption="Sexual Preference" style="radio">
+				<options>
+				 <option>Heterosexual</option>
+				 <option>Homosexual</option>
+				 <option>Bisexual</option>
+				</options>
+			</field-defn>
+			<field-defn id="contraception" caption="Contraception" type="grid" expanded="yes">
+				<field-defn id="contraception_method" type="choose" review="yes" caption="Method" style="list">
+					<options>
+					 <option>BTL</option>
+					 <option>Basal Temps</option>
+					 <option>BCP</option>
+					 <option>Depo Provera</option>
+					 <option>Condoms</option>
+					 <option>Diaphram</option>
+					 <option>IUD</option>
+					 <option>Rhythm</option>
+					 <option>Fern Test</option>
+					 <option>String Test</option>
+					 <option>Foam</option>
+					 <option>Inserts</option>
+					 <option>Suppositories</option>
+					 <option>Jelly</option>
+					 <option>Creme</option>
+					 <option>None</option>
+					</options>
+				</field-defn>
+				<field-defn id="contraception_type" type="text" lines="1" caption="Type or Size"/>
+				<field-defn id="contraception_usage" type="choose" review="yes" caption="Usage" style="list">
+					<options>
+					 <option>Now</option>
+					 <option>In Past</option>
+					 <option>Occasionally</option>
+					 <option>Regularly</option>
+					</options>
+				</field-defn>
+				<field-defn id="contraception_start" type="date" caption="Date Started"/>
+				<field-defn id="contraception_stopped" type="date" caption="Date Stopped"/>
+			</field-defn>
+		</field-defn>
+		
+<!--  Physical Exam systems starts here -->		
+		<field-defn id="physical_exam" caption="Physical Exam">
+			<field-defn id="pe_mental_status" type="composite" review="yes" caption="Mental Status">     
+				<field-defn id="pe_mental_stauts_quest" type="choose" review="yes" caption="Mental Statues" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option>Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_mental_status_normal" type="static" review="yes" caption="Normal Exam" condition-field="physical_exam.pe_mental_status.pe_mental_stauts_quest" condition="control.value == 1"/>
+				<field-defn id="pe_mental_status_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_mental_status.pe_mental_stauts_quest" condition="control.value == 2"/>
+				<field-defn id="pe_mental_status_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_mental_status.pe_mental_stauts_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_skin" type="composite" review="yes" caption="Skin">     
+				<field-defn id="pe_skin_quest" type="choose" review="yes" caption="Skin" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_skin_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_skin.pe_skin_quest" condition="control.value == 1"/>
+				<field-defn id="pe_skin_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_skin.pe_skin_quest" condition="control.value == 2"/>
+				<field-defn id="pe_skin_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_skin.pe_skin_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_hair" type="composite" review="yes" caption="Hair">     
+				<field-defn id="pe_hair_quest" type="choose" review="yes" caption="Hair" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hair_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_hair.pe_hair_quest" condition="control.value == 1"/>
+				<field-defn id="pe_hair_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_hair.pe_hair_quest" condition="control.value == 2"/>
+				<field-defn id="pe_hair_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_hair.pe_hair_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_nails" type="composite" review="yes" caption="Nails">
+				<field-defn id="pe_nails_quest" type="choose" review="yes" caption="Nails" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_normal" type="static" review="yes" caption="Normal Color wtih longitudinal ridging, hard and smooth with uniform thickness, no clubbing" condition-field="physical_exam.pe_nails.pe_nails_quest" condition="control.value == 1"/>
+				<field-defn id="pe_nails_abnormal" expanded="yes" bareheading="yes" caption="Nail Exam" type="grid" condition-field="physical_exam.pe_nails.pe_nails_quest" condition="control.value == 2">
+				<field-defn id="pe_nail_side" type="choose" review="yes" caption="Side" style="list">
+					<options>
+					<option>right</option>
+					<option>left</option>
+					<option>bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nail_fingers" type="choose" review="yes" caption="Fingers" style="list" additive="yes">
+					<options>
+					 <option>Thumb (1)</option>
+					 <option>Index (2)</option>
+					 <option>Middle (3)</option>
+					 <option>Ring (4)</option>
+					 <option>Little (5)</option>
+					 <option>All</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_color" type="choose" review="yes" caption="Color" style="list" additive="yes">
+					<options>
+					 <option normal="yes">Pink</option>
+					 <option>yellow</option>
+					 <option>white</option>
+					 <option>green</option>
+					 <option>red</option>
+					 <option>dark red</option>
+					 <option>streaks</option>
+					 <option>diffuse</option>
+					 <option>splinter hemorrhages</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_ridging" type="choose" review="yes" caption="Ridging and Beading" style="list" additive="yes">
+					<options>
+					 <option normal="yes">Normal Longitudinal</option>
+					 <option>transverse grooving(Beau lines)</option>
+					 <option>rippling</option>
+					 <option>depressions</option>
+					 <option>pitting</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_texture" type="choose" review="yes" caption="Texture" style="list" additive="yes">
+					<options>
+					 <option normal="yes">Hard and smooth with uniform thickness</option>
+					 <option>thickening</option>
+					 <option>thinning</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_adherence" type="choose" review="yes" caption="Adherence" style="list" additive="yes">
+					<options>
+					 <option normal="yes">firm</option>
+					 <option>separation(onycholysis)</option>
+					 <option>boggy</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_clubbing" type="choose" review="yes" caption="clubbing" style="list" additive="yes">
+					<options>
+					 <option normal="yes">No clubbing</option>
+					 <option>early(less than 180 degrees)</option>
+					 <option>moderate(180 degrees)</option>
+					 <option>severe(greater than 180 degrees)</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_abnormalities" type="choose" review="yes" caption="Abnormalities" style="list" additive="yes">
+					<options>
+					<option></option>
+					<option>spoon nail(kiolonychia)</option>
+					<option>absence of nail(anonychia)</option>
+					<option>paronychia</option>
+					<option>onychomycosis</option>
+					<option>subungal hematoma</option>
+					<option>Terry's nails</option>
+					<option>psoriatic nails</option>
+					<option>ingrown nail</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nails_qq" type="text" review="yes" caption="Q and Q" lines="1"/>
+				</field-defn>
+			</field-defn>
+
+			<field-defn id="pe_lymphatics" type="composite" review="yes" caption="Lymphatics">     
+				<field-defn id="pe_lymphatics_quest" type="choose" review="yes" caption="Lymphatics" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_lymphatics_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_lymphatics.pe_lymphatics_quest" condition="control.value == 1"/>
+				<field-defn id="pe_lymphatics_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_lymphatics.pe_lymphatics_quest" condition="control.value == 2"/>
+				<field-defn id="pe_lymphatics_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_lymphatics.pe_lymphatics_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_head_and_neck" type="composite" review="yes" caption="Head and Neck">     
+				<field-defn id="pe_head_and_neck_quest" type="choose" review="yes" caption="" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_head_and_neck_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_head_and_neck.pe_head_and_neck_quest" condition="control.value == 1"/>
+				<field-defn id="pe_head_and_neck_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_head_and_neck.pe_head_and_neck_quest" condition="control.value == 2"/>
+				<field-defn id="pe_head_and_neck_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_head_and_neck.pe_head_and_neck_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_nose_and_sinuses" type="composite" review="yes" caption="Nose and Sinuses">     
+				<field-defn id="pe_nose_and_sinuses_quest" type="choose" review="yes" caption="Nose and Sinuses" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_nose_and_sinuses_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_nose_and_sinuses.pe_nose_and_sinuses_quest" condition="control.value == 1"/>
+				<field-defn id="pe_nose_and_sinuses_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_nose_and_sinuses.pe_nose_and_sinuses_quest" condition="control.value == 2"/>
+				<field-defn id="pe_nose_and_sinuses_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_nose_and_sinuses.pe_nose_and_sinuses_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_mouth_and _oropharynx" type="composite" review="yes" caption="Mouth and Oropharynx">     
+				<field-defn id="pe_mouth_and _oropharynx_quest" type="choose" review="yes" caption="Mouth and Oropharynx" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_mouth_and _oropharynx_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_mouth_and _oropharynx.pe_mouth_and _oropharynx_quest" condition="control.value == 1"/>
+				<field-defn id="pe_mouth_and _oropharynx_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_mouth_and _oropharynx.pe_mouth_and _oropharynx_quest" condition="control.value == 2"/>
+				<field-defn id="pe_mouth_and _oropharynx_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_mouth_and _oropharynx.pe_mouth_and _oropharynx_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_ear" type="composite" review="yes" caption="Ear">     
+				<field-defn id="pe_ear_quest" type="choose" review="yes" caption="Ear" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_ear_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_ear.pe_ear_quest" condition="control.value == 1"/>
+				<field-defn id="pe_ear_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_ear.pe_ear_quest" condition="control.value == 2"/>
+				<field-defn id="pe_ear_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_ear.pe_ear_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_eyes" type="composite" review="yes" caption="Eyes">     
+				<field-defn id="pe_eyes_quest" type="choose" review="yes" caption="Eyes" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_eyes_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_eyes.pe_eyes_quest" condition="control.value == 1"/>
+				<field-defn id="pe_eyes_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_eyes.pe_eyes_quest" condition="control.value == 2"/>
+				<field-defn id="pe_eyes_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_eyes.pe_eyes_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_chest_and_lungs" type="composite" review="yes" caption="Chest and Lungs">     
+				<field-defn id="pe_chest_and_lungs_quest" type="choose" review="yes" caption="Chest and Lungs" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_chest_and_lungs_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_chest_and_lungs.pe_chest_and_lungs_quest" condition="control.value == 1"/>
+				<field-defn id="pe_chest_and_lungs_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_chest_and_lungs.pe_chest_and_lungs_quest" condition="control.value == 2"/>
+				<field-defn id="pe_chest_and_lungs_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_chest_and_lungs.pe_chest_and_lungs_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_cardiovascular" type="composite" review="yes" caption="Cardiovascular">     
+				<field-defn id="pe_cardiovascular_quest" type="choose" review="yes" caption="Cardiovascular" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_cardiovascular_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_cardiovascular.pe_cardiovascular_quest" condition="control.value == 1"/>
+				<field-defn id="pe_cardiovascular_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_cardiovascular.pe_cardiovascular_quest" condition="control.value == 2"/>
+				<field-defn id="pe_cardiovascular_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_cardiovascular.pe_cardiovascular_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_breast" type="composite" review="yes" caption="Breast">     
+				<field-defn id="pe_breast_quest" type="choose" review="yes" caption="Breast" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_breast_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_breast.pe_breast_quest" condition="control.value == 1"/>
+				<field-defn id="pe_breast_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_breast.pe_breast_quest" condition="control.value == 2"/>
+				<field-defn id="pe_breast_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_breast.pe_breast_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_abdominal" type="composite" review="yes" caption="Abdominal">     
+				<field-defn id="pe_abdominal_quest" type="choose" review="yes" caption="Abdominal" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_abdominal_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_abdominal.pe_abdominal_quest" condition="control.value == 1"/>
+				<field-defn id="pe_abdominal_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_abdominal.pe_abdominal_quest" condition="control.value == 2"/>
+				<field-defn id="pe_abdominal_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_abdominal.pe_abdominal_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_female_genitalia" type="composite" review="yes" caption="Female Genitalia">     
+				<field-defn id="pe_female_genitalia_quest" type="choose" review="yes" caption="Female Genitalia" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_female_genitalia_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_female_genitalia.pe_female_genitalia_quest" condition="control.value == 1"/>
+				<field-defn id="pe_female_genitalia_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_female_genitalia.pe_female_genitalia_quest" condition="control.value == 2"/>
+				<field-defn id="pe_female_genitalia_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_female_genitalia.pe_female_genitalia_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_male_genitalia" type="composite" review="yes" caption="Male Genitalia">     
+				<field-defn id="pe_male_genitalia_quest" type="choose" review="yes" caption="Male Genitalia" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 1"/>
+				<field-defn id="pe_male_genitalia_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2"/>
+				<field-defn id="pe_male_genitalia_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_prostate" type="composite" review="yes" caption="Prostate">     
+				<field-defn id="pe_prostate_quest" type="choose" review="yes" caption="Prostate" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 1"/>
+				<field-defn id="pe_prostate_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 2"/>
+				<field-defn id="pe_prostate_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_anus_and_rectum" type="composite" review="yes" caption="Anus and Rectum">     
+				<field-defn id="pe_anus_and_rectum_quest" type="choose" review="yes" caption="Anus and Rectum" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 1"/>
+				<field-defn id="pe_anus_and_rectum_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2"/>
+				<field-defn id="pe_anus_and_rectum_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_musculoskeletal" type="composite" review="yes" caption="Musculoskeletal">     
+				<field-defn id="pe_musculoskeletal_quest" type="choose" review="yes" caption="Musculoskeletal" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_musculoskeletal_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_musculoskeletal.pe_musculoskeletal_quest" condition="control.value == 1"/>
+				<field-defn id="pe_musculoskeletal_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_musculoskeletal.pe_musculoskeletal_quest" condition="control.value == 2"/>
+				<field-defn id="pe_musculoskeletal_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_musculoskeletal.pe_musculoskeletal_quest" condition="control.value == 2"/>
+			</field-defn>  
+			<field-defn id="pe_neurologic" type="composite" review="yes" caption="Neurologic">     
+				<field-defn id="pe_neurologic_quest" type="choose" review="yes" caption="Neurologic" style="radio" default="0">
+					<options>
+				 	<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+				 	<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_neurologic_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_neurologic.pe_neurologic_quest" condition="control.value == 1"/>
+				<field-defn id="pe_neurologic_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_neurologic.pe_neurologic_quest" condition="control.value == 2"/>
+				<field-defn id="pe_neurologic_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_neurologic.pe_neurologic_quest" condition="control.value == 2"/>
+			</field-defn>  
+		</field-defn>
+<!--  Physical Exam ends here -->		
+		
+		<field-defn id="laboratory_results" caption="Laboratory Results">
+		</field-defn>
+		<field-defn id="assessment" caption="Assessment">
+		</field-defn>
+		<field-defn id="procedures" caption="Procedures">
+			<field-defn id="visual_schedule" type="choose" review="yes" caption="Vision Testing" style="checkbox">
+				<options>
+				 <option>Acuity Testing</option>
+				 <option>Tonometry</option>
+				 <option>Color</option>
+				 <option>Peripheral Vision</option>
+				 <option>Peripheral Fields</option>
+				</options>
+			</field-defn>
+			
+			<field-defn id="visual_acuity_distance" type="composite" review="yes" caption="Visual Acuity Distance">
+				<field-defn id="visual_acuity_distance" type="static" review="yes" caption="L 20/"/>
+				<field-defn id="visual_acuity_distance_left" type="float" review="yes"/>
+				<field-defn id="visual_acuity_distance_r_caption" type="static" review="yes" caption="R 20/"/>
+				<field-defn id="visual_acuity_distance_right" type="float" review="yes"/>
+			</field-defn>
+			<field-defn id="visual_acuity_near" type="composite" review="yes" caption="Visual Acuity Near">
+				<field-defn id="visual_acuity_near" type="static" review="yes" caption="L 20/"/>
+				<field-defn id="visual_acuity_near_left" type="float" review="yes"/>
+				<field-defn id="visual_acuity_near_r_caption" type="static" review="yes" caption="R 20/"/>
+				<field-defn id="visual_acuity_near_right" type="float" review="yes"/>
+			</field-defn>
+			<field-defn id="visual_tonometry" type="composite" review="yes" caption="Tonometry">
+				<field-defn id="visual_tonometry_l_caption" type="static" review="yes" caption="L mm"/>
+				<field-defn id="visual_tonometry_left" type="float" review="yes"/>
+				<field-defn id="visual_tonometry_r_caption" type="static" review="yes" caption="R mm"/>
+				<field-defn id="visual_tonometry_right" type="float" review="yes"/>
+			</field-defn>
+			<field-defn id="visual_color" type="composite" review="yes" caption="Color Vision">
+				<field-defn id="color_question" type="choose" review="yes" caption="Testing" style="radio">
+					<options>
+					 <option>Normal</option>
+					 <option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="vision_color_comments_caption" type="static" review="yes" caption="Comments"/>
+				<field-defn id="vision_color_comments" type="text" review="yes" caption="Comments">
+				</field-defn>
+			</field-defn>
+			<field-defn id="visual_peripheral" type="choose" review="yes" caption="Peripheral Vision" style="radio">
+				<options>
+				 <option>Normal</option>
+				 <option>Abnormal</option>
+				</options>
+			</field-defn>
+			<field-defn id="visual_peripheral_abnormal" type="composite" review="yes" caption="Abnormal" condition-field="procedures.visual_peripheral"  condition="control.value == 1">
+				<field-defn id="visual_peripheral_abnormal_side" type="choose" review="yes" caption="" style="list">
+					<options>
+					 <option>Right</option>
+					 <option>Left</option>
+					 <option>Bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="visual_peripheral_comments_caption" type="static" review="yes" caption="Comments"/>
+				<field-defn id="visual_peripheral_comments" type="text" review="yes" caption="comments"/>
+			
+			</field-defn>
+			<field-defn id="visual_fields" type="choose" review="yes" caption="Visual Fields" style="radio">
+					<options>
+					 <option>Normal</option>
+					 <option>Abnormal</option>
+					</options>
+			</field-defn>
+			<field-defn id="visual_fields_abnormal" type="composite" review="yes" caption="Abnormal" condition-field="procedures.visual_fields"  condition="control.value == 1">
+				<field-defn id="visual_fields_abnormal_side" type="choose" review="yes" caption="" style="list">
+					<options>
+					 <option>Right</option>
+					 <option>Left</option>
+					 <option>Bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="visual_fields_comments_caption" type="static" review="yes" caption="Comments"/>
+				<field-defn id="visual_fields_comments" type="text" review="yes" caption="comments"/>
+
+			</field-defn>
+		</field-defn>
+		<field-defn id="plan" caption="Plan">
+			<field-defn id="patient_education" type="choose" review="yes" caption="Patient Education" style="checkbox">
+				<options>
+				 <option>Sexual Anatomy and Physiology</option>
+				 <option>Pregnancy</option>
+				 <option>Post Partum Figure Recovery</option>
+				 <option>Genetic Counseling</option>
+				 <option>Family Planning</option>
+				 <option>Contraception</option>
+				 <option>Sterilization</option>
+				 <option>Abortion</option>
+				 <option>Feminine Hygiene</option>
+				 <option>Douching</option>
+				 <option>Tampons</option>
+				 <option>Vaginal Discharge</option>
+				 <option>Venereal Disease</option>
+				 <option>Self Exam of Breast</option>
+				 <option>Cancer Danger Signs</option>
+				 <option>Risk Factors in Heart Disease</option>
+				 <option>Smoking</option>
+				 <option>Exercise</option>
+				 <option>Nutrition</option>
+				 <option>Diet</option>
+				 <option>Habits</option>
+				 <option>Stress Management</option>
+				 <option>Life Phases</option>
+				 <option>Crisis</option>
+				 <option>Diaphragm</option>
+				</options>
+			</field-defn>
+			<field-defn id="diaphragm_details" type="composite" review="yes" caption="Diaphragm" condition-field="plan.patient_education"  condition="control.value == 24">
+				<field-defn id="diaphragm_kit_caption" type="static" review="yes" caption="Diaphragm Kit"/>
+				<field-defn id="diaphragm_kit" type="text" review="yes"/>
+				<field-defn id="diaphragm_size_caption" type="static" review="yes" caption="Size"/>
+				<field-defn id="diaphragm_size" type="float"/>
+				<field-defn id="diaghragm_type_caption" type="static" review="yes" caption="Type"/>
+				<field-defn id="diaphragm_type" type="choose" review="yes" caption="" style="list">
+					<options>
+					 <option>Ortho</option>
+					 <option>All Flex</option>
+					 <option>Flat Spring</option>
+					 <option>Coil Spring</option>
+					 <option>Other</option>
+					</options>
+				</field-defn>
+				<field-defn id="diaphragm_type_other" type="text" review="yes" caption="Other" condition-field="plan.patient_education.diaphragm_details.diaphragm_type"  condition="control.options>selectedIndex == 4"/>
+			</field-defn>
+			<field-defn id="immunizations" caption="Immunizations" type="grid">
+				<field-defn id="immunizations_type" type="choose" review="yes" caption="" style="list">
+					<options>
+					 <option>tetanus</option>
+					 <option>DT</option>
+					 <option>Td</option>
+					 <option>TVOP</option>
+					 <option>MMR</option>
+					 <option>Mumps</option>
+					 <option>Measles</option>
+					 <option>Rubella</option>
+					 <option>Pneumovax</option>
+					 <option>Influenza</option>
+					 <option>Hepatitis A</option>
+					 <option>Hepatitis B</option>
+					 <option>Typhoid</option>
+					 <option>Yellow Fever</option>
+					</options>
+				</field-defn>
+				<field-defn id="immunizations_date1" type="date" review="yes" caption="Date"/>
+				<field-defn id="immunizations_date2" type="date" review="yes" caption="Date"/>
+				<field-defn id="immunizations_date3" type="date" review="yes" caption="Date"/>
+				<field-defn id="immunizations_date4" type="date" review="yes" caption="Date"/>
+				<field-defn id="immunizations_reactions" type="choose" review="yes" caption="Reactions">
+					<options>
+					 <option normal="yes">None</option>
+					 <option>Local pain</option>
+					 <option>Local redness</option>
+					 <option>Fever</option>
+					 <option>Rash</option>
+					 <option>Anaphylaxis</option>
+					</options>
+				</field-defn>
+			</field-defn>
+			<field-defn id="medications" review="yes" caption="Medications">
+			</field-defn>
+			<field-defn id="lab_tests" review="yes" caption="Lab Tests">
+			</field-defn>
+			<field-defn id="xray" review="yes" caption="X Ray">
+			</field-defn>
+			<field-defn id="procedures" review="yes" caption="Procedures">
+			</field-defn>
+			<field-defn id="therapy" review="yes" caption="Therapy">
+			</field-defn>
+			<field-defn id="referral" review="yes" caption="Referrals">
+			</field-defn>
+			<field-defn id="follow_up" review="yes" caption="Follow Up ">
+			</field-defn>
+			<field-defn id="admit" review="yes" caption="Admit">
+			</field-defn>
+		</field-defn>
+		
+	</field-defns>
+	
+	</clinical-documentation>
+</mdl>
