@@ -153,7 +153,7 @@ sub obsResultsAncestorFmt
 %PUB_OBS_RESULTS_HIST = (
 	name => 'obs_results_hist',
 	columnDefn => [
-		{head => 'Lab Test ID', dataFmt => '#{lab_panel_name}#',},
+		{head => 'Lab Test ID', dataFmt => '#{lab_panel_id}#',},
 		{head => 'Lab Test Name', dataFmt => '#{lab_panel_name}#',},
 		{head => 'Price', colIdx =>'#{lab_panel_price}#', dformat=>'currency'},
 	],

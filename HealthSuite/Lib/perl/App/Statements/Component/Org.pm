@@ -2172,7 +2172,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#4#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#1#/#4#?home=#homeArl#',
+			updUrlFmt => '/org/#param.org_id#/dlg-update-lab-location/#3#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/dlg-remove-lab-location/#3#?home=#homeArl#',
 		},
 	},		
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panel'); },
