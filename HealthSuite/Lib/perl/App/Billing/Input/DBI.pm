@@ -2152,6 +2152,13 @@ sub setClaimProperties
 			$renderingProvider->setInsType('99');
 		}
 	}
+
+	if($currentClaim->getInsType() == CLAIM_TYPE_BCBS)
+	{
+		my $payer1 = $currentClaim->getPayer(0);
+		$payer1->setSourceOfPayment('G');
+	}
+
 }
 
 sub diagnosisPtr
