@@ -399,49 +399,70 @@ sub readFile
 {
     
     my $self = shift;   
-	my ($hash,$value,$key,$tempSerial);
+	#my ($hash,$value,$key,$tempSerial);
 	my $params1 = {};
+		
+	$params1->{STATE} = 'TX';
+	$params1->{RECEIVER_ID} = '13305';
+	$params1->{TEST_PRODUCTION_INDICATOR} = 'TEST';
+	$params1->{REGION} = '';
+	$params1->{RETRANSMISSION_STATUS} = '0';
+	$params1->{SUBMISSION_SERIAL_NO} = '000001';
+	$params1->{VERSION_CODE_LOCAL} = '00000';
+	$params1->{RECEIVER_SUB_ID} = '2274';
+	$params1->{SUBMITTER_ID} = '760596983';
+	$params1->{CONTACT} = '';
+	$params1->{TELEPHONE_NUMBER} = '2814476800';
+	$params1->{ZIP_CODE} = '77060';
+	$params1->{RECEIVER_TYPE_CODE} = 'Z';
+	$params1->{VERSION_CODE_NATIONAL} = '00200';
+	$params1->{ADDRESS_1} = 'Physia Corporation';
+	$params1->{ADDRESS_2} = '260 N. Sam Houston Pkwy East, Suite 220';
+	$params1->{CITY} = 'Houston';
+	$params1->{VENDOR_SOFTWARE_UPDATE} = '52';
+	$params1->{VENDOR_SOFTWARE_VERSION} = '0021';
+	$params1->{SUBMITTER_NAME} = 'PHYSIA';
 	
-	open(CONF,"conf.txt");
-	my $abc='abc';
-	while ($abc ne '')
-	{
-		$abc = (<CONF>);
+	#open(CONF,"conf.txt");
+	#my $abc='abc';
+	#while ($abc ne '')
+	#{
+	#	$abc = (<CONF>);
 	
-		chop $abc;
-		($hash,$value) = split(/=/,$abc);
-			$params1->{$hash} = $value;
+	#	chop $abc;
+	#	($hash,$value) = split(/=/,$abc);
+	#		$params1->{$hash} = $value;
 
-	}
-	close(CONF);
+	#}
+	#close(CONF);
 	
-	open(CONFNEW,">conf.txt");
+	#open(CONFNEW,">conf.txt");
 
-	foreach $key (keys %$params1)
-	{
+	#foreach $key (keys %$params1)
+	#{
 			
-		if ($key ne '')
-		{
-			if($key eq 'SUBMISSION_SERIAL_NO')
-			{
-				$tempSerial = $params1->{$key} + 1;
-				print CONFNEW "$key=$tempSerial\n";
+	#	if ($key ne '')
+	#	{
+	#		if($key eq 'SUBMISSION_SERIAL_NO')
+	#		{
+	#			$tempSerial = $params1->{$key} + 1;
+	#			print CONFNEW "$key=$tempSerial\n";
 				
-			}
-			else
-			{
-				print CONFNEW "$key=$params1->{$key}\n";	
-			}
-		}
+	#		}
+	#		else
+	#		{
+	#			print CONFNEW "$key=$params1->{$key}\n";	
+	#		}
+	#	}
 	
-	 }
+	 #}
 
-	 close(CONFNEW);
+	# close(CONFNEW);
 
 	
-	open(VALID,">>valid.txt");
-	print VALID $self->getDate,",",$params1->{SUBMISSION_SERIAL_NO},"\n";
-	close(VALID);
+	#open(VALID,">>valid.txt");
+	#print VALID $self->getDate,",",$params1->{SUBMISSION_SERIAL_NO},"\n";
+	#close(VALID);
 		
 	return $params1;
 }

@@ -64,7 +64,7 @@ sub validateA
 	
 	my ($self,$valMgr,$callSeq,$vFlags,$tempClaim) = @_;	
 	# check serial and date for duplication
-	$self->checkValidSerialAndDate($tempClaim);
+	#$self->checkValidSerialAndDate($tempClaim);
 }
 
 sub validateB
