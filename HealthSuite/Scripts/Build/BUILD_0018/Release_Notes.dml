@@ -111,6 +111,11 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 			NOTE: Updated the Activitylog for the ContactMethods component and the SurgicalProcedure component
 		</deliverable>
 
+		<deliverable id="1448">
+			On the user home page under lookup a record the selections called Research /Web and Medical supplies
+			are deleted
+		</deliverable>
+		
 		<deliverable id="1501">
 			Fixed claim status changes.
 		</deliverable>
@@ -313,6 +318,10 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 			Fixed drop down box to pull correct Prescribe Medication dialog.
 		</deliverable>
 
+		<deliverable id="1848">
+			Fixed code for Personnel lookup to not to showup the referring-doctors in the list.
+		</deliverable>
+		
 		<deliverable id="1849">
 			Application error regarding 3rd party payer and blank payer option in claim dialog fixed.
 		</deliverable>
