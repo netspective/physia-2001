@@ -586,9 +586,9 @@ sub handleAttrs
 				_debug => 0
 	) if ($page->field('emp_id') ne '' && $member eq 'Nurse');
 
-	my $command = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
+	my $assocCommand = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
 	$page->schemaAction(
-			'Person_Attribute',	$command,
+			'Person_Attribute', $assocCommand,
 			parent_id => $page->field('person_id'),
 			item_name => 'Physician',
 			item_id   => $page->field('assoc_phy_item_id') || undef,
