@@ -29,7 +29,7 @@ sub initialize
 				name => 'attr_name',
 				lookup => $attrNameLookup,
 				caption => $attrNameCaption,
-				#priKey => 1,
+				priKey => 1,
 				attrNameFmt => "#field.attr_name#",
 				fKeyStmtMgr => $entityType eq 'person' ? $STMTMGR_PERSON : $STMTMGR_ORG,
 				valueType => $self->{valueType},
@@ -67,6 +67,21 @@ sub initialize
 
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	my $command = $self->getActiveCommand($page);
+	my $billing = $self->getField('attr_name');
+	my $parentId = $page->param('org_id');
+	my $valueType = App::Universal::ATTRTYPE_BILLING_PHONE;
+	my $billingExists = $STMTMGR_ORG->recordExists($page,STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $valueType);
+	if($command eq 'add' && $billingExists eq 1)
+	{
+
+		$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
+	}
+}
+
 #THIS IS FOR URLs
 #sub populateDialogData
 #{
@@ -102,6 +117,7 @@ sub populateData
 		$page->field('preferred_flag', 1) if $data->{value_int};
 	}
 }
+
 
 sub execute_add
 {
@@ -146,7 +162,7 @@ sub execute_add
 		value_text => $page->field('value_text') || undef,
 		value_textB => $page->field('attr_name') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
-		_debug => 0
+		_debug => 1
 	);
 
 	return "\u$command completed.";
@@ -173,6 +189,7 @@ sub execute_update
 		$tableName, 'update',
 		item_id => $page->param('item_id') || undef,
 		value_text => $page->field('value_text') || undef,
+		value_textB => $page->field('attr_name') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
 		_debug => 0
 	);
