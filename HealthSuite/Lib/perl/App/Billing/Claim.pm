@@ -33,17 +33,17 @@ use constant BILLSEQ_QUATERNARY_PAYER => 4;
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	$params{careReceiver} = undef;
-	
+
 	$params{payToOrganization} = undef;
 	$params{payToProvider} = undef; #$params{careProvider} = undef;
 	$params{renderingOrganization} = undef;
-	$params{renderingProvider} = undef;	
-	
-	
+	$params{renderingProvider} = undef;
+
+
 	# $params{billReceiverType} = undef;
-	
+
 	$params{insured} = [];
 	$params{treatment} = undef;
 	$params{diagnosis} = [];
@@ -60,7 +60,8 @@ sub new
 	$params{coInsuranceItems} = [];
 	$params{deductibleItems} = [];
 	$params{voidItems} = [];
-	
+	$params{suppressedItems} = [];
+
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
 	$params{totalCharge} = undef;
@@ -115,7 +116,7 @@ sub new
 
 	return bless \%params, $type; #binding the param hash with class reference
 }
-	
+
 sub property
 {
 	my ($self, $name, $value) = @_;
@@ -214,7 +215,7 @@ sub setInvoiceHistoryDate
 {
 	my ($self, $value) = @_;
 	$self->{invoiceHistoryItem}->[$self->{historyCount}][0] = $value;
-	
+
 }
 
 
@@ -243,7 +244,7 @@ sub getHistory
 	{
 	return [[]];
 	}
-	
+
 }
 
 sub setInvoiceHistoryItem
@@ -315,14 +316,14 @@ sub getInsured
 	return $self->{insured}->[$no] if defined;
 }
 
-sub setBCBSPlanCode	
+sub setBCBSPlanCode
 {
 	my($self, $value) = @_;
 	$self->{bcbsPlanCode} = $value;
 }
 
 
-sub getBCBSPlanCode	
+sub getBCBSPlanCode
 {
 	my $self = shift;
 	return $self->{bcbsPlanCode};
@@ -418,7 +419,7 @@ sub setPayer
 sub getPayer
 {
 	my ($self) = @_;
-	
+
 	return $self->{payer};
 }
 
@@ -431,7 +432,7 @@ sub setLegalRepresentator
 sub getLegalRepresentator
 {
 	my ($self) = @_;
-	
+
 	return $self->{legalRepresentator};
 }
 
@@ -445,7 +446,7 @@ sub setAccidentHour
 sub getAccidentHour
 {
 	my ($self) = @_;
-	
+
 	return $self->{accidentHour};
 }
 
@@ -460,7 +461,7 @@ sub setResponsibilityIndicator
 sub getResponsibilityIndicator
 {
 	my ($self) = @_;
-	
+
 	return $self->{responsibilityIndicator};
 }
 
@@ -473,7 +474,7 @@ sub setSourceOfPayment
 sub getSourceOfPayment
 {
 	my ($self) = @_;
-	
+
 	return $self->{sourceOfPayment};
 }
 
@@ -486,7 +487,7 @@ sub setRemarks
 sub getRemarks
 {
 	my ($self) = @_;
-	
+
 	return $self->{remarks};
 }
 
@@ -499,7 +500,7 @@ sub setAnesthesiaOxygenMinutes
 sub getAnesthesiaOxygenMinutes
 {
 	my ($self) = @_;
-	
+
 	return $self->{anesthesiaOxygenMinutes};
 }
 
@@ -532,7 +533,7 @@ sub getSerumCreatineDate
 {
 	my ($self, $formatIndicator) = @_;
 
-	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{serumCreatineDate}) : $self->{serumCreatineDate};	
+	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{serumCreatineDate}) : $self->{serumCreatineDate};
 }
 
 sub setQualifier
@@ -556,7 +557,7 @@ sub setRenderingProvider
 sub getRenderingProvider
 {
 	my ($self) = @_;
-	
+
 	return $self->{renderingProvider};
 }
 
@@ -587,7 +588,7 @@ sub getdateDocSent
 {
 	my ($self, $formatIndicator) = @_;
 
-	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateDocSent}) : $self->{dateDocSent};		
+	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateDocSent}) : $self->{dateDocSent};
 }
 
 sub setSpProgramIndicator
@@ -599,7 +600,7 @@ sub setSpProgramIndicator
 sub getSpProgramIndicator
 {
 	my ($self) = @_;
-	
+
 	return $self->{spProgramIndicator};
 }
 
@@ -612,7 +613,7 @@ sub setDisabilityType
 sub getDisabilityType
 {
 	my ($self) = @_;
-	
+
 	return $self->{disabilityType};
 }
 
@@ -634,13 +635,13 @@ sub getInformationReleaseDate
 sub setInformationReleaseIndicator
 {
 	my ($self, $value) = @_;
-	my $temp = 
-	{	
+	my $temp =
+	{
 		'0' => 'N',
 		'1' => 'Y',
 		'Yes' => 'Y',
 		'No' => 'N',
-		
+
 		};
 
 	$self->{informationReleaseIndicator} = $temp->{$value};
@@ -661,7 +662,7 @@ sub setSymptomExternalCause
 sub getSymptomExternalCause
 {
 	my ($self) = @_;
-	
+
 	return $self->{symptomExternalCause};
 }
 
@@ -674,7 +675,7 @@ sub setSymptomIndicator
 sub getSymptomIndicator
 {
 	my ($self) = @_;
-	
+
 	return $self->{symptomIndicator};
 }
 
@@ -687,7 +688,7 @@ sub setFilingIndicator
 sub getFilingIndicator
 {
 	my ($self) = @_;
-	
+
 	return $self->{filingIndicator};
 }
 
@@ -702,7 +703,7 @@ sub setAcceptAssignment
 			'1'  => 'Y',
 			'YES'  => 'Y',
 			'Y'  => 'Y',
-			
+
 		};
 
 	$self->{acceptAssignment} = $temp->{uc($treat)};
@@ -741,42 +742,42 @@ sub setAmountPaid
 sub getAcceptAssignment
 {
 	my ($self) = @_;
-	
+
 	return $self->{acceptAssignment};
 }
 
 sub getTotalCharge
 {
 	my ($self) = @_;
-	
+
 	return $self->{totalCharge};
 }
 
 sub getTotalChargePaid
 {
 	my ($self) = @_;
-	
+
 	return $self->{totalChargePaid};
 }
 
 sub getTotalInvoiceCharges
 {
 	my ($self) = @_;
-	
+
 	return $self->{totalInvoiceCharges};
 }
 
 sub getAmountPaid
 {
 	my ($self) = @_;
-	
+
 	return $self->{amountPaid};
 }
 
 sub getId
 {
 	my ($self) = @_;
-	
+
 	return $self->{id};
 }
 
@@ -817,7 +818,7 @@ sub setPayToOrganization
 {
 	my ($self, $value) = @_;
 	$self->{payToOrganization} = $value;
-	
+
 }
 
 
@@ -825,7 +826,7 @@ sub getPayToProvider
 {
 	my $self = shift;
 	return $self->{payToProvider};
-	
+
 }
 
 
@@ -845,7 +846,7 @@ sub addInsured
 	{
 		die 'only App::Billing::Claim::Insured objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Insured');
-		
+
 		push(@{$insuredListRef}, $_);
 	}
 }
@@ -859,7 +860,7 @@ sub addDiagnosis
 	{
 		die 'only App::Billing::Claim::Diagnosis objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Diagnosis');
-		
+
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -891,6 +892,7 @@ sub addAdjItems
 		push(@{$diagListRef}, $_);
 	}
 }
+
 sub addVoidItems
 {
 	my $self = shift;
@@ -904,6 +906,21 @@ sub addVoidItems
 		push(@{$diagListRef}, $_);
 	}
 }
+
+sub addSuppressedItems
+{
+	my $self = shift;
+
+	my $diagListRef = $self->{suppressedItems};
+	foreach (@_)
+	{
+		die 'only App::Billing::Claim::Procedure objects are allowed here'
+			unless $_->isa('App::Billing::Claim::Procedure');
+
+		push(@{$diagListRef}, $_);
+	}
+}
+
 
 sub addPolicy
 {
@@ -972,7 +989,7 @@ sub addProcedure
 sub setProgramName
 {
 	my ($self,$value) = @_;
-	
+
 	$self->{programName} = $value;
 }
 
@@ -980,7 +997,7 @@ sub setProgramName
 sub getProgramName
 {
 	my ($self) = @_;
-	
+
 	return $self->{programName};
 }
 
@@ -988,14 +1005,14 @@ sub getProgramName
 sub getConditionRelatedToEmployment
 {
 	my ($self) = @_;
-	
+
 	return $self->{conditionRelatedToEmployment};
 }
 
 sub getConditionRelatedToAutoAccident
 {
 	my ($self) = @_;
-	
+
 	return $self->{conditionRelatedToAutoAccident};
 }
 
@@ -1003,14 +1020,14 @@ sub getConditionRelatedToAutoAccident
 sub getConditionRelatedToOtherAccident
 {
 	my ($self) = @_;
-	
+
 	return $self->{conditionRelatedToOtherAccident};
 }
 
 sub getConditionRelatedToAutoAccidentPlace
 {
 	my ($self) = @_;
-	
+
 	return $self->{conditionRelatedToAutoAccidentPlace};
 }
 
@@ -1029,7 +1046,7 @@ sub setConditionRelatedToEmployment
 sub getClaimType
 {
 	my ($self) = @_;
-	
+
 	my $billSeq = [];
 			$billSeq->[BILLSEQ_PRIMARY_PAYER] = PRIMARY;
 			$billSeq->[BILLSEQ_SECONDARY_PAYER] = SECONDARY;
@@ -1042,7 +1059,7 @@ sub getClaimType
 sub getBillSeq
 {
 	my ($self) = @_;
-	
+
 	return $self->{billSeq} + 0;
 }
 
@@ -1056,7 +1073,7 @@ sub setBillSeq
 sub getInvoiceType
 {
 	my ($self) = @_;
-	
+
 	return $self->{invoiceType};
 }
 
@@ -1070,7 +1087,7 @@ sub setInvoiceType
 sub getInvoiceSubtype
 {
 	my ($self) = @_;
-	
+
 	return $self->{invoiceSubtype};
 }
 
@@ -1084,7 +1101,7 @@ sub setInvoiceSubtype
 sub getTotalItems
 {
 	my ($self) = @_;
-	
+
 	return $self->{totalItems};
 }
 
@@ -1129,14 +1146,14 @@ sub setConditionRelatedToOtherAccident
 sub setConditionRelatedToAutoAccidentPlace
 {
 	my ($self,$value) = @_;
-	
+
 	$self->{conditionRelatedToAutoAccidentPlace} = $value;
 }
 
 sub claimProcessor
 {
 	my $self = shift;
-	return 'Envoy';	
+	return 'Envoy';
 }
 
 sub getPayerId
@@ -1155,14 +1172,14 @@ sub addError
 {
 	my ($self, $facility, $id, $msg) = @_;
 	my $info = [$facility, $id, $msg];
-	
+
 	push(@{$self->{errors}}, $info);
 }
 
 sub haveErrors
 {
 	my $self =shift;
-	
+
 	my $errs = $self->{errors};
 	return $#$errs  >= 0 ? 1 : 0;
 }
@@ -1219,7 +1236,7 @@ sub convertDateToCCYYMMDD
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-						
+
 
 	$date =~ s/-//g;
 	if(length($date) == 7)
@@ -1228,20 +1245,20 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
+
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
@@ -1258,30 +1275,6 @@ sub setChangedTreatingDoctor
 	my ($self,$value) = @_;
 	$self->{changedTreatingDoctor} = $value;
 }
-
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'SSI', 'Billing Interface/Main Claim Object','Change log is implemented'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/Main Claim Object','Condition Related to Change'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/Main Claim Object','Accept Assignment has domain from (0 => N,NO  => N,1  => Y,YES  => Y)'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/Main Claim Object','setConditionRelatedToEmployment sets Y if employment else N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/Main Claim Object','setConditionRelatedToAutoAccident sets Y if Auto Accident else N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/Main Claim Object','setConditionRelatedToOtherAccident sets Y if Other Accident else N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Main Claim Object','convertDateToCCYYMMDD implemented here. its basic function is to convert the date format from dd-mmm-yy to CCYYMMDD'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Main Claim Object','setInsuranceCardEffectiveDate,setInsuranceCardTerminationDate,setHGBHCTDate,setSerumCreatineDate,setdateDocSent,setInformationReleaseDate use convertDateToCCYYMMDD  to change the date formats'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Main Claim Object','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to ddmmyyyy'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Main Claim Object','getInsuranceCardEffectiveDate, getInsuranceCardTerminationDate, getHGBHCTDate, getSerumCreatineDate, getdateDocSent, getInformationReleaseDate can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/14/2000', 'SSI', 'Billing Interface/Main Claim Object','setInformationReleaseIndicator map Yes or No to Y or N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/14/2000', 'SSI', 'Billing Interface/Main Claim Object','New field claim type is added which returns 0-Primary, 1-Secondary, 1-Tertiary'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/14/2000', 'SSI', 'Billing Interface/Main Claim Object','New field policy is added which returns 0-Primary, 1-Secondary, 1-Tertiary payers'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field transProviderId is added which reflect the transaction provider ID'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field billSeq is added which reflect the current submission order'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','1 is added to submission order to make it in proper bill sequence 1-4'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/23/2000', 'SY', 'Billing Interface/Main Claim Object','New fields added namely, invoiceType, invoiceSubtype and totalItems'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/23/2000', 'SSI', 'Billing Interface/Main Claim Object','New field and method added namely, VoidItems and addVoidItems respectively. The field will reflect the items of void type.'],
-);
 
 sub printVal
 {
