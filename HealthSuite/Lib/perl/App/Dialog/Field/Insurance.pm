@@ -119,7 +119,7 @@ sub new
 		$params{type} = 'text';
 		$params{size} = 16;
 		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/insurance/product_name';
+		$params{findPopup} = '/lookup/insproduct';
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -241,7 +241,7 @@ sub new
 		$params{type} = 'text';
 		$params{size} = 16;
 		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/insurance/plan_name';
+		$params{findPopup} = '/lookup/insplan';
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
