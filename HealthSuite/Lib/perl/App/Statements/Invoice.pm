@@ -102,9 +102,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and address_name = ?
 		},
 	'selOutstandingInvoicesByClient' => q{
-		select * from invoice
+		select * 
+		from invoice
 		where client_id = ?
 			and balance > 0
+			and invoice_status < 4
+			and invoice_subtype = 0
 		},
 	'selAllNonZeroBalanceInvoicesByClient' => q{
 		select * from invoice
