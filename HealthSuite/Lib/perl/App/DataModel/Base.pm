@@ -10,8 +10,7 @@ class 'App::DataModel::Base' =>
 {
 	id =>{type=>'$',post=>q{$id = uc($id);}},
 	sourceId=> '$',
-	loadIndicator=>'$',
-	
+	loadIndicator=>'$', #S = skip, D = delete , I = Insert , U = update 
 	'&equalSourceId'=>q{return 0 unless  ($_[0] && $sourceId);  ($_[0] eq $sourceId) ? return 1 : return 0;},
 };
 
@@ -29,6 +28,7 @@ subclass 'App::DataModel::Collection' =>
 	             	       },	             	      
 	             	       
 	'&findPersonBySourceID'=>q{&people->findBySourceID($_[0]);},
+
 	
 	##################################################
 	#Get Orgs objects in collection
@@ -197,7 +197,7 @@ subclass 'App::DataModel::Patient' =>
 	deceasedDate=>'$',	
 	employment=>'App::DataModel::Employment',	
 	guarantor => 'App::DataModel::Guarantor',
-	careProvider=>'App::DataModel::Physician',
+	careProvider=>'@App::DataModel::Physician',
 	careProviderSpecialty =>'$',
 	insurance=>'@App::DataModel::InsuranceCoverage',
 	'&link_insuranceCoverage' =>q{
@@ -295,7 +295,8 @@ subclass 'App::DataModel::Organization' =>
 	billingPhone=>'$',
 	parentOrg=>'App::DataModel::Organization',
 	ownerOrg=>'App::DataModel::Organization',
-	orgType=>'$',	
+	orgType=>'$',
+	assoicatedOrg=>'%';
 }, -parent => 'App::DataModel::Base';
 
 
@@ -358,6 +359,7 @@ subclass 'App::DataModel::InsuranceProduct' =>
 	billingAddress=>'App::DataModel::Address',
 	insurancePlan=>'@App::DataModel::InsurancePlan',
 	insuranceCoverage=>'@App::DataModel::InsuranceCoverage',	
+	insOrg=>'App::DataModel::InsuranceOrg',
    	phone=>'$',
    	fax=>'$',  
 	remittance=>'App::DataModel::Remittance',
@@ -381,6 +383,7 @@ subclass 'App::DataModel::InsurancePlan' =>
 	insuranceProduct=>'App::DataModel::InsuranceProduct',
 	officeCoPay=>'$',
 	deductible=>'App::DataModel::Deductible',	
+	billingAddress=>'App::DataModel::Address',
 }, -parent => 'App::DataModel::Base';
 
 
