@@ -368,8 +368,9 @@ sub populateData_add
 		}
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
+		my $insOrgId = $page->field('ins_org_id'');
 		my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-		my $planData = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
+		my $planData = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
 }
 
 sub populateData_update
@@ -399,9 +400,10 @@ sub execute
 
 	my $productName = $page->field('product_name');
 	my $planName = $page->field('plan_name');
+	my $insOrgId = $page->field('ins_org_id'');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
+	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
 	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
 

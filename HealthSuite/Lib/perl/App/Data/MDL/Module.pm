@@ -380,10 +380,10 @@ sub importInsurance
 			my $guarantor = $item->{guarantor};
 			my $guarantorType = $item->{'guarantor-type'};
 			my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
+			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
 			my $insInternalId = $planData->{'ins_internal_id'};
 			my $feeschedule =  $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
-			my $insType = $item->{'ins-type'} ne '' ? $item->{'ins-type'} : $planData->{ins_type};
+			my $insType = $item->{'ins-type'} ne '' ? $item->{'ins-type'} : $planData->{'ins_type'};
 			my $insIntId = $self->schemaAction($flags, "Insurance", 'add',
 								ins_org_id 		=> $insOrgId || undef,
 								record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
