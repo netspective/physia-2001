@@ -169,13 +169,30 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selCatalogItemNameById' => q{
 			select oce.flags,oce.units_avail,oce.entry_type, oce.name, oce.description,
 						oce.unit_cost, oce.data_text,
-						oc.catalog_id as catalog_id,oce.code,oce.modifier
+						oc.catalog_id as catalog_id,oce.code,oce.modifier,oc.caption,
+						oc.internal_catalog_id
 						from offering_catalog oc, offering_catalog_entry oce
 						where oce.entry_id = ?
 			and oc.internal_catalog_id = oce.catalog_id
 	},
 
-
+	#---ACS Service Type Queries
+	'selCodeByOrgIdCode'=>q{
+				SELECT 	oce.code,oce.catalog_id
+				FROM	offering_catalog_entry oce, offering_catalog oc
+				WHERE 	upper(oce.code)= upper(:1)
+				AND	oc.internal_catalog_id = :2
+				AND	oce.catalog_id = oc.internal_catalog_id
+				},
+	'sel1CatalogByOrgIDType'=>q{
+			SELECT	oc.internal_catalog_id
+			FROM 	offering_catalog oc, org_attribute oa
+			WHERE 	oa.parent_id = :1
+			AND	oc.catalog_type = :2
+			AND  	oa.item_name = 'Fee Schedule'
+			AND   	oa.value_int = oc.internal_catalog_id	
+			AND ROWNUM <2
+		},
 	#----CPT QUERIES
 
 	'selGenericCPT_LikeCode' => q{

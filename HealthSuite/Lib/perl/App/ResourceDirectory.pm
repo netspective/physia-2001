@@ -92,6 +92,50 @@ $ACCESS_CONTROL = buildAccessControl();
 # Utility functions
 ##############################################################################
 
+sub overrideClass
+{
+	my ($className) = @_;
+
+	#
+	# see if our page should be overriden
+	#
+	eval
+	{
+		if(my $session = CGI::Page::getActiveSession())
+		{	
+			my $tryClass = $$className;
+			my $findId = $session->{person_id};
+			$tryClass =~ s/^App::/$findId\::/;
+
+			my $file = $tryClass;
+			$file =~ s!::!/!g;
+			$file = File::Spec->catfile($CONFDATA_SERVER->path_PersonLib, $file) . '.pm';
+
+			if(-f $file)
+			{
+				require $file;
+				${$className} = "Person::$tryClass";
+				return;
+			}
+
+			$tryClass = $$className;
+			$findId = $session->{org_id};
+			$tryClass =~ s/^App::/$findId\::/;
+
+			$file = $tryClass;
+			$file =~ s!::!/!g;
+			$file = File::Spec->catfile($CONFDATA_SERVER->path_OrgLib, $file) . '.pm';
+
+			if(-f $file)
+			{
+				require $file;
+				${$className} = "Org::$tryClass";
+				return;
+			}
+		}	
+	};
+}
+
 sub handlePage
 {
 	my ($resource, $flags, $arl, $params, $resourceId, $pathItems) = @_;
@@ -111,9 +155,10 @@ sub handlePage
 
 	return 'ARL-000200' unless defined $resource->{_class};
 	my $pageClass = $resource->{_class};
-	my $page = $pageClass->new();
+	overrideClass(\$pageClass);
 	
-	
+	my $page = $pageClass->new();	
+	#$page->addDebugStmt("Class is $pageClass");
 	$page->property('resourceMap', $resource);
 	foreach (keys %{$resource})
 	{

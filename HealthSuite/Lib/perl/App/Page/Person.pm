@@ -590,6 +590,7 @@ sub prepare_view_profile
 				<TD>
 					<font size=1 face=arial>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
+					#component.stpt-person.patientInfo#<BR>
 					#component.stpt-person.officeLocation#
 					#component.stpt-person.phoneMessage#<BR>
 					#component.stpt-person.insurance#<BR>
