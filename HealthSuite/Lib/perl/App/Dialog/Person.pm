@@ -191,10 +191,10 @@ sub populateData
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $personId = $page->param('person_id');
-	my $itemName = 'Patient/Preferred/Day';
+	my $itemName11 = 'Patient/Preferred/Day';
 	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
-	my $preferredDay = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);	
+	my $preferredDay = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName11);	
 	$page->field('prefer_day', $preferredDay->{value_text});
 	my @ethnicity = split(', ', $personInfo->{ethnicity});
 	$page->field('ethnicity', @ethnicity);
