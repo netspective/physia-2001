@@ -258,13 +258,30 @@ sub initialize
 			cancelUrl => $self->{cancelUrl} || undef,
 		),
 	);
+
+	if($entityType eq 'person')
+	{
+		$self->{activityLog} = {
+			scope =>'person_attribute',
+			key => "#param.person_id#",
+			data => "$self->{propValueCaption} to <a href='/person/#param.person_id#/profile'>'#param.person_id#'</a>"
+		};
+	}
+	elsif($entityType eq 'org')
+	{
+		$self->{activityLog} = {
+				scope =>'org_attribute',
+				key => "#param.org_id#",
+				data => "$self->{propValueCaption} to <a href='/org/#param.org_id#/profile'>'#param.org_id#'</a>"
+		};
+	}
 }
 
 
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$self->updateFieldFlags('attr_name', FLDFLAG_INVISIBLE, 1) if $self->{valueType} eq App::Universal::ATTRTYPE_BILLING_PHONE;
 }
@@ -282,6 +299,20 @@ sub customValidate
 		{
 			my $billing = $self->getField('attr_name');
 			$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
+		}
+	}
+	my $valueType = $self->{valueType};
+	my $valueTextB = $page->field('attr_name');
+	my $contactType = $self->{propValueCaption};
+	my $parentId = $page->param('person_id') ? $page->param('person_id') : $page->param('org_id');
+	if ($valueType eq App::Universal::ATTRTYPE_EMAIL || $valueType eq App::Universal::ATTRTYPE_PAGER || $valueType eq App::Universal::ATTRTYPE_URL)
+	{
+		my $contactCaption = $self->getField('attr_name');
+
+		if($valueTextB ne 'Primary')
+		{
+			my $recPrimary = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $parentId, 'Primary', $valueType);
+			$contactCaption->invalidate($page, "Cannot $command $valueTextB unless Primary $contactType is added") if $recPrimary == 0;
 		}
 	}
 }
@@ -307,7 +338,7 @@ sub execute_add
 	my ($self, $page, $command,$flags) = @_;
 	my $valueType = $self->{valueType} || '0';
 	my $prefFlag = $page->field('preferred_flag') eq '' ? 0 : 1;
-	
+
 	# Set table name and parent id
 	my $tableName = '';
 	my $parentId;
@@ -346,6 +377,7 @@ sub execute_add
 		_debug => 0
 	);
 
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
@@ -372,6 +404,7 @@ sub execute_update
 		_debug => 0
 	);
 
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
@@ -397,6 +430,7 @@ sub execute_remove
 		_debug => 0
 	);
 
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
