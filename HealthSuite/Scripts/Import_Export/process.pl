@@ -11,8 +11,10 @@ use File::Spec;
 use Dumpvalue;
 use Date::Manip;
 use File::DosGlob 'glob';
-use DBI::StatementManager;
-use App::Data::Class::Collection;
+use Input::Promed;
+use Input::Semnet;
+use Output::PhysiaDB;
+use App::DataModel::Base;
 
 use constant DEFAULT_MAIN_ORG => 'PHYSIA_ADMIN'; # use this main org if no matching main org is found
 
@@ -27,41 +29,54 @@ sub main
 {
 	my $args = new Getopt::Declare(q{
 	[strict]
-	-type <id:s>				Process data of the -type in the directory specified by -path
+	-type <id:s>				Process data of the -type 
 								[required]
-								[requires: -path || -file] 
 	
-	-test						The data being processed should be done in test mode
+	-test					The data being processed should be done in test mode
 
 	-userid <id:s>				Force the user id to this person (person_id)
 	-orgid <id:i>				Force the organization id to this organization (org_internal_id)
 	
+	-createid <id:s>			Set cr_user_id to this value.  If not provided default to  IMPORT_PHYSIA
+
+	-delta <level:i>			Run load as a delta process to <level>
+						1: Run full delta performing insert update and deletes to DB
+						2: Run delta process performing inserts and updates to DB  and 
+						produce report for deletes
+						3: Produce delta report do not alter DB
+						
+	-loadFile <id:s>			Run process and create load file [default is to load database]				
+	
 	-connectkey <key:s>			Use <key> as connect string instead of what's specified in App::Configuration
-	-schema <file>				Use <file> as schema definition file instead of what's specified in App::Configuration
+	-schema <file>				Use <file> as schema definition file instead of what's specified in 
+						App::Configuration
 	
-	-file <files>...			Process one or more files 
-								Each item is treated as a parameter for File::DosGlob, 
-								files not found are ignored unless -verbose is specified
+	-file <files>...			Process one or more files. 
+							Each item is treated as a parameter for File::DosGlob, 
+							files not found are ignored unless -verbose is specified
 	
-	-verbose					Turn on verbose messages
+	-verbose				Turn on verbose messages
 	-debug <level:i>			Turn on debugging messages to <level>
 	});
 	
 	print "Running in TEST mode.\n" if $args->{'-test'};
 	print "Forcing User ID to '". $args->{'-userid'} ."'.\n" if $args->{'-userid'};
 	print "Forcing Org Internal ID to '". $args->{'-orgid'} ."'.\n" if $args->{'-orgid'};
+	print "Forcing Creation ID to' ". $args->{'-createid'} ."'.\n" if $args->{'-createid'};	
 	
 	if(exists $args->{'-type'})
 	{
 		my $dataType = $args->{'-type'};
 		eval
 		{
-			my $method = &{"process_" . $dataType};
+		
+			
+			my $method = \&{"process_" . $dataType};
 			&$method($args);
 		};
 		if($@)
 		{
-			die "Unable to find data type manager: $dataType\n";
+			die "Unable to find data type manager: $dataType ($@)\n";
 		}
 	}
 }
@@ -116,19 +131,60 @@ sub createUniqueFilesList
 # medisoft processing functions
 #
 
-sub process_medisoft
+sub process_promed
 {
 	my ($args, %params) = @_;
-	my $files = createUniqueFilesList($args, %params);
-	my $context = App::External::initializeContext($args, %params);
-	my $verbose = $args->{'-verbose'} || 0;
+	#my $files = createUniqueFilesList($args, %params);
 
-	my $collection = new App::Data::Class::Collection();
-	# my $obtainer = new App::Data::Obtain::Medisoft;
-	# create the collection
-	# obtain the data
-	# write the data
+	my $dataModel = new App::DataModel::Collection();
+
+	##########################################################
+	#These statements need to be in the new for Collection
+	#
+	$dataModel->orgs(new App::DataModel::Organizations());
+	$dataModel->people(new App::DataModel::People());
+	##########################################################
+	my @params = (dataModel => $dataModel, cmdLineArgs => $args, attributes => \%params, verbose => $args->{'-verbose'} || 0);	
+	my $input = new Input::Promed(@params);
+	$input->init();
+	$input->open();
+	$input->populateDataModel();
+	$input->close();
+
+	my $output = new Output::PhysiaDB(@params);
+	$output->init();
+	$output->open();
+	$output->transformDataModel();
+	$output->close();
 }
+
+sub process_semnet
+{
+	my ($args, %params) = @_;
+	#my $files = createUniqueFilesList($args, %params);
+
+	my $dataModel = new App::DataModel::Collection();
+
+	##########################################################
+	#These statements need to be in the new for Collection
+	#
+	$dataModel->orgs(new App::DataModel::Organizations());
+	$dataModel->people(new App::DataModel::People());
+	##########################################################
+	my @params = (dataModel => $dataModel, cmdLineArgs => $args, attributes => \%params, verbose => $args->{'-verbose'} || 0);	
+	my $input = new Input::Semnet(@params);
+	$input->init();
+	$input->open();
+	$input->populateDataModel();
+	$input->close();
+
+	my $output = new Output::PhysiaDB(@params);
+	$output->init();
+	$output->open();
+	$output->transformDataModel();				
+	$output->close();
+}
+
 
 
 
