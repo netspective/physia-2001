@@ -336,7 +336,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	a.bill_party_type  in (2,3)
 			AND	a.bill_plain = org.org_internal_id
 			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3) 
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND 	a.invoice_status <> 15
+			AND	entire_invoice_balance <> 0
 			GROUP BY bill_to_id
+			--having sum(total_pending) <> 0
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
@@ -345,7 +350,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			columnDefn =>
 				[
 #				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
+				{ colIdx => 0, tDataFmt => '&{count:0} Insurances',head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -359,26 +364,49 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 
 	},
 
-	'sel_aged_insurance_prov' =>
+
+	'sel_aged_insurance_detail' =>
 	{
-		sqlStmt => $STMTMGR_AGED_INSURANCE_ORG_PROV,
-
-		whereClause => 'and t.care_provider_id = :3',
-
+		sqlStmt => 		
+		qq
+		{
+			SELECT
+				a.invoice_id,
+				sum(a.item_count),
+				a.invoice_date,
+				ist.caption,
+				a.person_id,
+				a.bill_to_id,
+				sum(nvl(a.extended_cost,0)),
+				sum(nvl(a.total_adjust,0)),
+				sum(nvl(a.balance,0))
+			FROM	agedpayments a, org ,	invoice_status ist
+			WHERE	(a.bill_to_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			AND	bill_party_type in (2,3)
+			AND 	a.balance <> 0		
+			AND 	ist.id = a.invoice_status
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status <> 15
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id
+			having sum(balance)<> 0			
+		},		
 		publishDefn =>
 			{
-			columnDefn =>
+				columnDefn =>
 				[
-#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
-				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 0, head => 'ID',tDataFmt => '&{count:0}', dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>' },
+				{ colIdx => 1, head => 'IC', tAlign=>'center', ,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => 'Svc Date', dataFmt => '#2#' },
+				{ colIdx => 3, head => 'Status', dataFmt => '#3#'},
+				{ colIdx => 4, head => 'Client', dataFmt => '#4#' },
+				{ colIdx => 5, head => 'Payer', dataFmt => '#5#' },
+				{ colIdx => 6, head => 'Charges',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => 'Adjust',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Balance',summarize=>'sum', dataFmt => '#8#', dformat => 'currency' },
 				],
 			},
 	},
@@ -418,7 +446,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			columnDefn =>
 				[
 #				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
+				{ colIdx => 0,tDataFmt => '&{count:0} Insurances', head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -431,6 +459,59 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			},
 	},
 
+	'sel_aged_all' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT
+				p.simple_name person_name,
+				a.person_id person_ID,
+				count(distinct invoice_id),
+				sum(balance_0),
+				sum(balance_31),
+				sum(balance_61),
+				sum(balance_91),
+				sum(balance_121),
+				sum(balance_151),
+				sum(decode(item_type,3,total_pending,0)),
+				--a.bill_party_type  in (2,3)
+				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0))
+			FROM	agedpayments a, person p,person_org_category poc
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			--AND	bill_party_type in (0,1)
+			AND	entire_invoice_balance <> 0
+			AND 	p.person_id = a.person_id			
+			AND	a.person_id = poc.person_id
+			AND	poc.org_internal_id  = :2
+			AND	a.invoice_status <> 15
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)	
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)> 0
+		},
+		sqlStmtBindParamDescr => ['Org Insurance ID'],
+		publishDefn =>
+			{
+			reportTitle => 'Aged Patient Receivables',
+			columnDefn =>
+				[
+				{ colIdx => 0,dAlign=>'left',tAlign=>'left', tDataFmt => '&{count:0} Patients',hint=>"View Detail Data for : #1#", hAlign=>'left',head => 'Patient Name', dataFmt => '#0#',
+				url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_data&patient_id=#1#')}},
+				{ colIdx => 1, hAlign=>'left', head => 'Patient ID', dataFmt => '#1#',   },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Pending Insurance', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				],
+			},	
+	},
 
 	'sel_aged_patient' =>
 	{
@@ -449,18 +530,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
 				sum(total_pending)
-			FROM	agedpayments a, person p
+			FROM	agedpayments a, person p,person_org_category poc
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
-			AND 	a.balance <> 0
-			AND p.person_id = a.person_id
-			AND	a.person_id IN
-			(
-			 SELECT poc.person_id
-			 FROM 	person_org_category poc
-			 WHERE  org_internal_id = :2
-			)
+			AND	entire_invoice_balance <> 0
+			AND 	p.person_id = a.person_id			
+			AND	a.person_id = poc.person_id
+			AND	poc.org_internal_id  = :2
+			AND	a.invoice_status <> 15
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)	
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
@@ -470,8 +550,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
-				{ colIdx => 0, hAlign=>'left',head => 'Patient Name', dataFmt => '#0#'},
-				{ colIdx => 1, hAlign=>'left', head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 0,hint=>"View Detail Data for : #1#", hAlign=>'left',head => 'Patient Name', tDataFmt => '&{count:0} Patients', dataFmt => '#0#',
+				url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#1#')}},
+				{ colIdx => 1, hAlign=>'left', head => 'Patient ID', dataFmt => '#1#',   },
 				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
 				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
 				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
@@ -482,6 +563,144 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
 				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
 				],
+			},
+	},
+
+	'sel_aged_patient_detail' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT
+				a.invoice_id,
+				sum(a.item_count),
+				a.invoice_date,
+				ist.caption,
+				a.bill_to_id,
+				sum(nvl(a.extended_cost,0)),
+				sum(nvl(a.total_adjust,0)),
+				sum(nvl(a.balance,0))
+			FROM	agedpayments a, person p,
+				invoice_status ist ,person_org_category poc				
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			AND	bill_party_type in (0,1)
+			AND 	a.balance <> 0
+			AND 	p.person_id = a.person_id			
+			AND 	ist.id = a.invoice_status
+			AND	a.person_id = poc.person_id
+			AND	poc.org_internal_id  = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status <> 15
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
+			having sum(balance)<> 0
+		},
+		sqlStmtBindParamDescr => ['Org Insurance ID'],
+		publishDefn =>
+			{
+			reportTitle => 'Aged Patient Receivables',
+			columnDefn =>
+			[
+				{ head => 'ID', summarize=>'count',url => '/invoice/#&{?}#/summary', hint => "Created on: #14#",dAlign => 'RIGHT'},
+				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
+				{ head => 'Invoice Date'},
+				{ head => 'Status',# dataFmt => {
+							#			'0' => '#3#',
+							#			'1' => '#3#',
+							#			'2' => '#3#',
+							#			'3' => '#3#',
+							#			'4' => '#3#',
+							#			'5' => '#3#',
+							#			'6' => '#3#',
+							#			'7' => '#3#',
+							#			'8' => '#3#',
+							#			'9' => '#3#',
+							#			'10' => '#3#',
+							#			'11' => '#3#',
+							#			'12' => '#3#',
+							#			'13' => '#3#',
+							#			'14' => '#3#',
+							#			'15' => '#3#',
+							#			'16' => 'Void #13#'
+							#		},
+				},
+				{ head => 'Payer', },
+				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
+
+			],
+			},
+	},
+
+
+
+
+	'sel_aged_data_detail' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT
+				a.invoice_id,
+				sum(a.item_count),
+				a.invoice_date,
+				ist.caption,
+				a.bill_to_id,
+				sum(nvl(a.extended_cost,0)),
+				sum(nvl(a.total_adjust,0)),
+				sum(nvl(a.balance,0))
+			FROM	agedpayments a, person p,
+				invoice_status ist ,person_org_category poc				
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			AND 	a.balance <> 0
+			AND 	p.person_id = a.person_id			
+			AND 	ist.id = a.invoice_status
+			AND	a.person_id = poc.person_id
+			AND	poc.org_internal_id  = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status <> 15
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
+			having sum(balance)<> 0						
+		},
+		sqlStmtBindParamDescr => ['Org Insurance ID'],
+		publishDefn =>
+			{
+			reportTitle => 'Aged Patient Receivables',
+			columnDefn =>
+			[
+				{ head => 'ID', summarize=>'count',url => '/invoice/#&{?}#/summary', hint => "Created on: #14#",dAlign => 'RIGHT'},
+				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
+				{ head => 'Invoice Date'},
+				{ head => 'Status',# dataFmt => {
+							#			'0' => '#3#',
+							#			'1' => '#3#',
+							#			'2' => '#3#',
+							#			'3' => '#3#',
+							#			'4' => '#3#',
+							#			'5' => '#3#',
+							#			'6' => '#3#',
+							#			'7' => '#3#',
+							#			'8' => '#3#',
+							#			'9' => '#3#',
+							#			'10' => '#3#',
+							#			'11' => '#3#',
+							#			'12' => '#3#',
+							#			'13' => '#3#',
+							#			'14' => '#3#',
+							#			'15' => '#3#',
+							#			'16' => 'Void #13#'
+							#		},
+				},
+				{ head => 'Payer', },
+				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
+
+			],
 			},
 	},
 
