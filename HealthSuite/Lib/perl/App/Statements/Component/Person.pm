@@ -482,14 +482,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), 
+		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'),
 			caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
 		from Transaction
 		where trans_owner_id = ?
 			and caption = 'Phone Message'
 			and data_num_a is null
 		UNION
-		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), 
+		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'),
 			caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
 		from Transaction
 		where trans_owner_id = ?
@@ -2272,7 +2272,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.billinginfo' => {
 	sqlStmt => qq{
 		select value_type, item_id, value_text, %simpleDate:value_date%,
-			decode(value_int, 1,'Per Se', 2,'THINet', 'Other'),
+			decode(value_int, 0,'Per-Se', 2,'THINet', 'Other'),
 			decode(value_intb, '1','Active', 'Inactive')
 		from	person_attribute
 		where	parent_id = ?
@@ -2284,7 +2284,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		columnDefn => [
 			{
 				colIdx => 0,
-				dataFmt => "#5# #4# ID: <b>#2#</b> (Effective: #3#)",
+				dataFmt => "<b>#5#</b> #4# ID: <b>#2#</b> (Effective: #3#)",
 			},
 		],
 
@@ -2310,7 +2310,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.person_id#/0?home=#param.home#'>Clearing House Billing Info</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.person_id#/0?home=#param.home#'>Billing ID</A> } },
 			],
 		},
 		stdIcons =>	{

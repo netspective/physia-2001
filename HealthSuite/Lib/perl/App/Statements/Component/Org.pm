@@ -1325,7 +1325,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.billinginfo' => {
 	sqlStmt => qq{
 		(select	oa.value_type, oa.item_id, oa.value_text, %simpleDate:oa.value_date%,
-			decode(oa.value_int, 1,'Per Se',2,'THINet', 'Other'),
+			decode(oa.value_int, 0,'Per-Se',2,'THINet', 'Other'),
 			decode(oa.value_intb, '1','Active', 'Inactive'),
 			o.org_id, 2 as entity_type
 		from	org o, org_attribute oa
@@ -1336,7 +1336,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			and	oa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
 		UNION
 		(select	pa.value_type, pa.item_id, pa.value_text, %simpleDate:pa.value_date%,
-			decode(pa.value_int, 1,'Per Se', 2,'THINet', 'Other'),
+			decode(pa.value_int, 0,'Per-Se', 2,'THINet', 'Other'),
 			decode(pa.value_intb,'1','Active', 'Inactive'),
 			pa.parent_id, 0 as entity_type
 		from	Person_Attribute pa, Person_Org_Category poc
@@ -1355,7 +1355,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
-			{	dataFmt => "#6# - #5# #4# ID: <b>#2#</b> (Effective: #3#)",
+			{	dataFmt => "#6# - <b>#5#</b> #4# ID: <b>#2#</b> (Effective: #3#)",
 			},
 		],
 
@@ -1384,8 +1384,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			actionRows =>
 			[
 				{ caption => qq{
-					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Clearing House Info</A> &nbsp; &nbsp;
-					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo//0?home=#param.home#'>Individual Clearing House Info</A>
+					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Billing ID</A> &nbsp; &nbsp;
+					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo//0?home=#param.home#'>Individual Billing ID</A>
 				}},
 			],
 		},

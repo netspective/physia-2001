@@ -41,10 +41,10 @@ sub initialize
 			name => 'org_id',
 			options => FLDFLAG_REQUIRED,
 		),
-		new CGI::Dialog::Field(caption => 'ID Type',
+		new CGI::Dialog::Field(caption => 'Clearing House',
 			name => 'billing_id_type',
 			type => 'select',
-			selOptions => 'Per Se:1; THINnet:2; Other:3',
+			selOptions => 'Per-Se:0; THINet:2; Other:3',
 		),
 		new CGI::Dialog::Field(caption => 'Billing ID',
 			name => 'billing_id',
@@ -54,11 +54,10 @@ sub initialize
 		new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
 			name => 'billing_effective_date',
 		),
-		new CGI::Dialog::Field(caption => 'Active',
+		new CGI::Dialog::Field(caption => 'Process Live Claims',
 			name => 'billing_active',
 			type => 'bool',
 			style => 'check',
-			#defaultValue => 1
 		),
 	);
 
@@ -68,14 +67,14 @@ sub initialize
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	
-	$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1) 
+
+	$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1)
 		if (($command eq 'update') or ($command eq 'remove'));
 	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, $page->param('entity_type'));
-	
-	$self->updateFieldFlags('org_id', FLDFLAG_READONLY, 1) 
+
+	$self->updateFieldFlags('org_id', FLDFLAG_READONLY, 1)
 		if (($command eq 'update') or ($command eq 'remove'));
 	$self->updateFieldFlags('org_id', FLDFLAG_INVISIBLE, ! $page->param('entity_type'));
 }
@@ -86,9 +85,8 @@ sub populateData_add
 
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	$page->field('person_id', $page->param('person_id'));	
-	$page->field('org_id', $page->param('org_id'));	
-	$page->field('billing_active', 1);
+	$page->field('person_id', $page->param('person_id'));
+	$page->field('org_id', $page->param('org_id'));
 }
 
 sub populateData_update
@@ -98,12 +96,12 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $stmtMgr = $page->param('entity_type') ? $STMTMGR_ORG : $STMTMGR_PERSON;
-	
-	my $attribute = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeById', 
+
+	my $attribute = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeById',
 		$page->param('item_id'));
 
-	$page->field('person_id', $page->param('person_id') || $attribute->{parent_id});	
-	$page->field('org_id', $page->param('org_id'));	
+	$page->field('person_id', $page->param('person_id') || $attribute->{parent_id});
+	$page->field('org_id', $page->param('org_id'));
 	$page->field('billing_id_type', $attribute->{value_int});
 	$page->field('billing_id', $attribute->{value_text});
 	$page->field('billing_effective_date', $attribute->{value_date});
@@ -116,18 +114,46 @@ sub populateData_remove
 	$self->populateData_update($page, $command, $activeExecMode, $flags);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	if ($page->param('entity_type'))
+	{
+		my $activeCheck = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_ActiveOrgBillingIds',
+			$page->session('org_internal_id'));
+		
+		if (@{$activeCheck} >= 1 && $page->field('billing_active'))
+		{
+			my $field = $self->getField('org_id');
+			$field->invalidate($page, qq{Only One Billing ID can be Active for Processing Live Claims per Org.});
+		}
+	}
+	else
+	{
+		my $activeCheck = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_ActivePersonBillingIds',
+			$page->field('person_id'));
+		
+		if (@{$activeCheck} >= 1 && $page->field('billing_active'))
+		{
+			my $field = $self->getField('person_id');
+			$field->invalidate($page, qq{Only One Billing ID can be Active for Processing Live Claims per Physician.});
+		}
+	}
+}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
 	my $valueType = $self->{valueType};
 	my $billingActive = $page->field ('billing_active') ? 1 : 0;
-	
+
 	if ($page->param ('entity_type')) {
-		my $orgRecord = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOwnerOrgId', 
+		my $orgRecord = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOwnerOrgId',
 			$page->param ('org_id'));
 		my $orgIntId = $orgRecord->{org_internal_id};
-		
+
 		# Add an org's global billing information record...
 		$page->schemaAction(
 			'Org_Attribute', $command,
@@ -157,7 +183,7 @@ sub execute
 			_debug => 0
 		);
 	}
-	
+
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 
 	return "\u$command completed.";
