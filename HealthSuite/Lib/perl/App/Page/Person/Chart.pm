@@ -54,9 +54,10 @@ sub prepare_view
 }
 
 
-sub handleArl
+sub handleARL
 {
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+	my $self = shift;
+	my ($arl, $params, $rsrc, $pathItems) = @_;
 
 	# DEMO SPECIAL CONDITION
 	if($self->param('person_id') eq 'SZSMTIH' && $CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO)
@@ -64,9 +65,5 @@ sub handleArl
 		$self->redirect('/temp/EMRsummary/index.html');
 		return 0;
 	}
-
-	$self->printContents();
-
-	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
-	return 0;
+	return $self->SUPER::handleARL(@_);
 }
