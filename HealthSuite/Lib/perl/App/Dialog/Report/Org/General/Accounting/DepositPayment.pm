@@ -97,40 +97,80 @@ sub execute
 		reportTitle => $self->heading(),
 		columnDefn =>
 			[
-			{ colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
-			{ colIdx => 1, head => 'Payer', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
-			{ colIdx => 2, head => 'Payment Type',},
-			{ colIdx => 3, head => 'Total Amount of Check',  dformat => 'currency' ,
-			tDataFmt=>'&{sum_currency:5}',tAlign=>'right'},
-			#{ colIdx => 4, head => 'Invoice ID',},			
-			#{ colIdx => 5, head => 'Adjustment ID',},		
+			{groupBy=>'#0#', colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
+			{groupBy=>'#1#', colIdx => 1, head => 'Batch ID', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
+			{ colIdx => 2, head => 'Payer', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
+			{ groupBy=>'#3#',colIdx => 3, head => 'Payment Type',},
+			{ colIdx => 4, head => 'Check Number ',},
+			{ colIdx => 5, head => 'Amount',  dformat => 'currency',sAlign=>'right',summarize=>'sum' ,
+			,tAlign=>'right'},
 		],
 	};
-	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selDeposit',
-			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id')) ;
+	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selDepositSummary',
+			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id'),
+$batch_from, $batch_to) ;
 	@data = ();
 	@dataSub=();
 
 	my $payerId=undef;
 	my $batchDate=undef;
+	my $batchId=undef;
 	my $payTitle=undef;
 	my $payType=undef;
 	my $check=0;
 	my $payRef=undef;
 	my $totalAmount=0;
 	my @rowData =();
-	my $paymentText ="<B>Payments Applied:</B>";
-	my @rowSubData=[$paymentText];
 	foreach (@$orgResult)
 	{		
+		$_->{batch_id};
 		
-		my $payment=$_->{pay_type};
-		
-		#If payment method/type is check the attach Check Number to payment type
-		if('Check' eq $_->{pay_type})
+		if($_->{pay_type} ne 'Check')
 		{
-			$payment = $_->{pay_ref} ? "$_->{pay_type} #$_->{pay_ref}" :$_->{pay_type};
-		}
+			$_->{pay_ref}='';
+		};
+		#If payer type is an org then get org Id 
+		if($_->{payer_type} == 1)
+		{
+			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});	
+			$_->{payer_id} = $getName->{org_id};
+		}	
+		
+		@rowData=
+		[
+		$_->{batch_date},
+		$_->{batch_id},
+		$_->{payer_id},
+		$_->{pay_type}||'N/A',
+		$_->{pay_ref},
+		$_->{amount},
+		];
+		push(@data, @rowData);	
+	}
+	$html =   "<BR> <B>Deposit Summary</B><BR>" . createHtmlFromData($page, 0, \@data,$pub);
+
+	#Get Detail Data
+	$pub =
+	{
+		reportTitle => $self->heading(),
+		columnDefn =>
+			[
+			{groupBy=>'#0#',colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
+			{groupBy=>'#1#',colIdx => 1, head => 'Batch ID', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
+			{groupBy=>'#2#', colIdx => 2, head => 'Payer', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
+			{groupBy=>'#3#', colIdx => 3, head => 'Check', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
+			{ colIdx => 4, head => 'Invoice ID' , hAlign=>'left', tAlign=>'left',dAlign => 'left',},
+			{ colIdx => 5, head => 'Check Amount',  dformat => 'currency',sAlign=>'right',summarize=>'sum' ,,tAlign=>'right'},
+		],
+	};
+
+	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selDeposit',
+			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id'), 
+$batch_from, $batch_to) ;
+	@data = ();
+	foreach (@$orgResult)
+	{		
+		$_->{batch_id};
 		
 		#If payer type is an org then get org Id 
 		if($_->{payer_type} == 1)
@@ -139,85 +179,19 @@ sub execute
 			$_->{payer_id} = $getName->{org_id};
 		}	
 		
-		#If the key infomration has not changed then keeping counting total
-		#or if this is hte first record
-		if(!$payerId ||
-		   !(	$batchDate ne $_->{batch_date} ||
-			$payerId ne $_->{payer_id} ||
-			$payTitle ne $payment ||
-			$payRef ne $_->{pay_ref}
-		   )
-		   )
-		   
-		{
-
-			$batchDate =$_->{batch_date};
-			$payerId = $_->{payer_id};
-			$payTitle = $payment;
-			$totalAmount = $totalAmount + $_->{amount};
-			$payRef = $_->{pay_ref};	
-			$payType = $_->{pay_type};			
-		
-		}
-		#if some of the group by data has changed
-		#then output record and begin new group
-		#also if payment method group has been left add blank line		
-		elsif ($batchDate ne $_->{batch_date} ||
-			$payerId ne $_->{payer_id} ||
-			$payTitle ne $payment ||
-			$payRef ne $_->{pay_ref}
-		      )
-		{
-			@rowData=
-			[
-				$batchDate,
-				$payerId,
-				$payTitle,
-				$totalAmount,
-				$_->{invoice_id},
-				$totalAmount,
-				$payType
-			];
-			push(@data, @rowData);		
-			push(@data,@rowSubData) if ($payType eq 'Check');	
-			
-			#If we have entered a new payment type group (from check to Visa for example)
-			#then add a blank line thats what they asked for			
-			push(@data,[]) if ($payType ne $_->{pay_type});
-			#Clear out data 
-			@rowSubData=[$paymentText];
-			$batchDate =$_->{batch_date};
-			$payerId = $_->{payer_id};
-			$payTitle = $payment;
-			$totalAmount = $_->{amount};
-			$payRef = $_->{pay_ref};
-			$payType = $_->{pay_type};
-
-		}
-		#Store result in sub-results field	
-		push (@rowSubData,
-		["",
-		#"Invoice # <A HREF='/invoice/$_->{invoice_id}/summary'>$_->{invoice_id}</A>",	
-		"Invoice # $_->{invoice_id}",			
-		"",
-		$_->{amount},
-		$_->{invoice_id},				
-		]);
-
-	}
-	#Add Last set of record	s
-	@rowData=
-	[
-		$batchDate,
-		$payerId,
-		$payTitle,
-		$totalAmount,
+		@rowData=
+		[
+		$_->{batch_date},
+		$_->{batch_id} ,
+		$_->{payer_id},
+		$_->{pay_type}  . " #" . $_->{pay_ref},
 		$_->{invoice_id},
-		$totalAmount		
-	];
-	push(@data, @rowData);	
-	push(@data,@rowSubData)if ($payType eq 'Check');
-	$html = createHtmlFromData($page, 0, \@data,$pub);
+		$_->{amount},
+		];
+		push(@data, @rowData);	
+	}
+	$html .= "<BR> <B>Check Payements Detail</B><BR>" . createHtmlFromData($page, 0, \@data,$pub);
+
 	return $html;
 }
 
