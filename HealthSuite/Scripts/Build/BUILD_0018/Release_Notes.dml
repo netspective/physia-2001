@@ -202,5 +202,9 @@
 			In the 'Personal Insurance Coverage' dialog, it will inherit the parent Plan's or parent Product's remit_type.
 		</deliverable>
 		
+		<deliverable id="1802">
+			Removed diagnoses dialog from claim summary.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
