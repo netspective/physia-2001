@@ -42,6 +42,7 @@ sub populateData
 	my $data = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 	$page->field('value_int', $data->{value_int});
 	$page->field('value_textb', $data->{value_textb});
+	$page->field('value_date', $data->{value_date});
 }
 
 sub execute
@@ -85,7 +86,7 @@ sub execute
 		value_text => $authCaption || undef,
 		value_textB => $authorization || undef,
 		value_int => defined $indicator ? $indicator : undef,
-		value_date => $todaysDate || undef,
+		value_date => $page->field('value_date') || undef,
 		_debug => 0
 	);
 
