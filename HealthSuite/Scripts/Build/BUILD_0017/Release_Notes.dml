@@ -53,6 +53,13 @@
 		<deliverable id="1301">
 			UI: Added the Specialty field in the 'Referring Doctor' dialog.
 		</deliverable>
+		<deliverable id="1303">
+			UI: Updated the 'Personnel' component in the 'Personnel' tab to not to showup the referring doctors.
+		</deliverable>		
+		<deliverable id="1308">
+			UI: Under the 'Add New Record' component in the home page and in the worklist, select-type of 
+			    'Add Main Organization' is removed.
+		</deliverable>
 		<deliverable id="1315">
 			Created and added an addPopup icon wherever there is a lookup (magnifying glass).
 		</deliverable>
