@@ -26,6 +26,9 @@
 		<deliverable id="1300">
 			Proper payer name showing now when updating payer.
 		</deliverable>
+		<deliverable id="1302">
+			Changed collection worklist so transfer,close,reck date  function all work at the invoice level
+		</deliverable>
 
 	</deliverables>
 </release-notes>
