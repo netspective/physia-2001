@@ -33,7 +33,7 @@ sub prepare_view_default
 	my $self = shift;
 	my $children = $self->getChildResources();
 	my $html = qq{<br>\n<br>\n<p>\n<table align="center" cellpadding="10" cellspacing="5" border="0">};
-	foreach (keys %$children)
+	foreach (sort keys %$children)
 	{
 		my $icon = $IMAGETAGS{$children->{$_}->{_iconMedium}};
 		my $title = $children->{$_}->{_title};

@@ -151,13 +151,7 @@ sub getComponentHtml
 
 	my $startTime = $startDate . " $time1";
 	my $endTime   = $startDate . " $time2";
-
-	my $fromTZ = $page->session('TZ');
-	my $toTZ = App::Schedule::Utilities::BASE_TZ;
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-
-	my $convStartTime = convertStamp2Stamp($startTime, $fromTZ, $toTZ);
-	my $convEndTime = convertStamp2Stamp($endTime, $fromTZ, $toTZ);
 
 	my $orgInternalId = $page->session('org_internal_id');
 	my $appts;
@@ -170,14 +164,14 @@ sub getComponentHtml
 		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today_byTime', $gmtDayOffset, $convStartTime, $convEndTime, 
+				'sel_events_worklist_today_byTime', $gmtDayOffset, $startTime, $endTime, 
 				$user_id, $orgInternalId);
 		}
 	}
 	else
 	{
 		$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_events_worklist_not_today', $gmtDayOffset, $convStartTime, $convEndTime, $user_id, 
+			'sel_events_worklist_not_today', $gmtDayOffset, $startTime, $endTime, $user_id, 
 			$orgInternalId);
 	}
 

@@ -108,7 +108,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 
 		timeSelectClause => qq{
-			e.start_time between sysdate + :1 - (:2/24/60) and sysdate + :1 + (:3/24/60)
+			e.start_time between sysdate - (:2/24/60) and sysdate + (:3/24/60)
 		},
 
 		publishDefn => $STMTRPTDEFN_WORKLIST,
@@ -122,7 +122,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 
 		timeSelectClause => qq{
-			e.start_time between to_date(:2, '$STAMPFORMAT') and to_date(:3, '$STAMPFORMAT')
+			e.start_time between to_date(:2, '$STAMPFORMAT') + :1 and to_date(:3, '$STAMPFORMAT') + :1
 		},
 
 		publishDefn => $STMTRPTDEFN_WORKLIST,
@@ -136,7 +136,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 
 		timeSelectClause => qq{
-			e.start_time between to_date(:2, '$STAMPFORMAT') and to_date(:3, '$STAMPFORMAT')
+			e.start_time between to_date(:2, '$STAMPFORMAT') + :1 and to_date(:3, '$STAMPFORMAT') + :1
 		},
 
 		publishDefn => $STMTRPTDEFN_WORKLIST,
