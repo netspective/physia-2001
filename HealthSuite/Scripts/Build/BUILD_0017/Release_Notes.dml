@@ -412,6 +412,10 @@
 			On patient flow worklist, showing print option if invoice balance is greater than zero.
 		</deliverable>
 
+		<deliverable id="1729">
+			For postsubmit, address for third party orgs and person now showing correctly.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
