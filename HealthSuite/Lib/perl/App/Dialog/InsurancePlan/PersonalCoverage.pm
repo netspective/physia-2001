@@ -77,7 +77,7 @@ sub new
 							options => FLDFLAG_REQUIRED),
 
 			new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
-							types => ['Patient'],
+							#types => ['Patient'],
 							name => 'insured_id',
 							#options => FLDFLAG_REQUIRED
 							),
