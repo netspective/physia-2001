@@ -396,35 +396,51 @@ sub registerResource
 		}
 	}
 
-	if ( exists $$RESOURCES{$prefix . $resourceId} )
-	{
-		my $firstClass = $$RESOURCES{$prefix . $resourceId}->{_class};
-		die "Cannot create duplicate resource '$prefix$resourceId'.  Conflict between '$firstClass' and '$class'\n";
-		return 0;
-	}
-
 	# Make a copy of the resource data (so we don't modify the original)
-	my %resourceDataCopy = $resourceData ? %$resourceData : ( _class => $class );
+	my %newResource = $resourceData ? %$resourceData : ( _class => $class );
 
 	# Make sure it has some class
-	$resourceDataCopy{_class} = $class unless defined $resourceDataCopy{_class} || defined $resourceDataCopy{_default};
+	$newResource{_class} = $class unless defined $newResource{_class} || defined $newResource{_default};
 
 	# Add the prefix to any synonyms
-	if (defined $resourceDataCopy{_idSynonym})
+	if (defined $newResource{_idSynonym})
 	{
-		if (ref $resourceDataCopy{_idSynonym} eq 'ARRAY')
+		if (ref $newResource{_idSynonym} eq 'ARRAY')
 		{
-			@{$resourceDataCopy{_idSynonym}} = addPrefix($resourceDataCopy{_idSynonym}, $prefix);
+			@{$newResource{_idSynonym}} = addPrefix($newResource{_idSynonym}, $prefix);
 		}
 		else
 		{
-			$resourceDataCopy{_idSynonym} = addPrefix($resourceDataCopy{_idSynonym}, $prefix);
+			$newResource{_idSynonym} = addPrefix($newResource{_idSynonym}, $prefix);
 		}
 	}
 
-	# Register the resource and set class name to default if necessary
-	$$RESOURCES{$prefix . $resourceId} = \%resourceDataCopy;
-
+	# See if we already have this resource key
+	if (defined $$RESOURCES{$prefix . $resourceId})
+	{
+		my $existingResource = $$RESOURCES{$prefix . $resourceId};
+		
+		# If the existing resource has a class then we have a duplicate resourceID
+		if (defined $existingResource->{_class})
+		{
+			my $firstClass = $existingResource->{_class};
+			die "Cannot create duplicate resource '$prefix$resourceId'.  Conflict between '$firstClass' and '$class'\n";
+			return 0;
+		}
+		
+		# We will only get here if a parent resource is getting added after one of it's children
+		# Copy of the new stuff into the existing resource
+		foreach (keys %newResource)
+		{
+			$existingResource->{$_} = $newResource{$_};
+		}
+		
+	}
+	else
+	{
+		# Register the resource
+		$$RESOURCES{$prefix . $resourceId} = \%newResource;
+	}
 	return 1;
 }
 
