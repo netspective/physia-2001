@@ -151,11 +151,12 @@ sub getHtml
 	}
 
 	delete $self->{postHtml} if ($self->{flags} & FLDFLAG_READONLY);
+	#$mainData = qq{<span style="border: 2px; border-style: inset;">$mainData</span>} if $readOnly;
 	
 	if($self->{flags} & FLDFLAG_CUSTOMDRAW)
 	{
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
-		$html = "$self->{preHtml}$mainData $popupHtml &nbsp; &nbsp; $self->{postHtml}";
+		$html = "$self->{preHtml}$mainData $popupHtml $self->{postHtml}";
 	}
 	else
 	{
@@ -181,7 +182,7 @@ sub getHtml
 			</font>
 		</td><td>
 			<font $dialog->{bodyFontAttrs}>
-				$self->{preHtml}$mainData$popupHtml &nbsp; &nbsp; $self->{postHtml}
+				$self->{preHtml}$mainData $popupHtml$self->{postHtml}
 				$errorMsgsHtml
 				$hints
 			</font>
@@ -371,7 +372,7 @@ sub memo_as_html
 	{
 		$value =~ s/\n/<br>/g;
 		my $width = $self->{cols} * 6;
-		$value = '<div style="width: ' . $width . 'px; border: 2px; border-style: outset; padding: 5px;">' . $value . '</div>';
+		$value = '<div style="width: ' . $width . 'px; border: 2px; padding: 4px; border-style: inset;">' . $value . '</div>';
 	}
 	else
 	{
@@ -395,6 +396,7 @@ sub bool_as_html
 	if($readOnly)
 	{
 		$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value ? 'Yes' : 'No');
+		$html = qq{$html$self->{caption}};
 	}
 	else
 	{
@@ -610,6 +612,7 @@ sub select_as_html
 			push(@captions, $_->[1]);
 		}
 		$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, join($self->{choiceReadOnlyDelim}, @captions));
+		#$html = qq{<span style="border: 2px; border-style: outset;">$html</span>&nbsp;};
 	}
 	else
 	{
@@ -1448,6 +1451,7 @@ package CGI::Dialog::Buttons;
 ##############################################################################
 
 use strict;
+use CGI::ImageManager;
 use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::HeadFootItem);
@@ -1494,9 +1498,23 @@ sub new
 	#   just "nextActions_update" -- meaning show it just for "update" command
 	#   just "nextActions_remove" -- meaning show it just for "remove" command
 	#
-	$params{cancelUrl} = 'javascript:history.back()' unless $params{cancelUrl};
+	#$params{cancelUrl} = 'javascript:history.back()' unless $params{cancelUrl};
 	return CGI::Dialog::HeadFootItem::new($type, %params);
 }
+
+
+sub addActionButtons
+{
+	my $self = shift;
+	
+	foreach my $action (@_)
+	{
+		die 'Action must be a reference to a hash' unless ref($action) eq 'HASH';
+		$self->{actions} = [] unless defined $self->{actions};
+		push @{$self->{actions}}, $action;
+	}
+}
+
 
 sub getHtml
 {
@@ -1509,9 +1527,27 @@ sub getHtml
 		};
 	}
 
+	unless (defined $self->{actions} && ref($self->{actions}) eq 'ARRAY')
+	{
+		$self->{actions} = [
+			{caption => 'OK', onClick => 'if (validateOnSubmit()) document.forms.dialog.submit()'},
+		];
+	}
+	
+	my $home = $page->param('home');
+	my $cancelURL = defined $home ? "document.location = '$home'" : 'javascript:history.back()';
+	$cancelURL = $self->{cancelUrl} if defined $self->{cancelUrl};
+	$cancelURL = 'javascript:window.close()' if $page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
+
+	unless (defined $self->{noCancelButton} || $self->{noCancelButton})
+	{
+		push @{$self->{actions}}, {caption => 'Cancel', onClick => $cancelURL};
+	}
+
 	my $tableCols = $dialog->{_tableCols};
 	my $rowColor = '';
-	my $cancelURL = $page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP) ? 'javascript:window.close()' : $self->{cancelUrl};
+	
+	
 	my @nextActions = ();
 	if(my $actionsList = ($self->{"nextActions_$command"} || $self->{nextActions}))
 	{
@@ -1524,30 +1560,98 @@ sub getHtml
 	}
 	my $nextActions = @nextActions ? qq{ <FONT FACE=Arial,Helvetica SIZE=2 STYLE="font-size:8pt; font-family: tahoma,arial"><B>Next Action:</B> </FONT><SELECT NAME='_f_nextaction_redirecturl' style='font-size:8pt; font-family: tahoma,arial,helvetica'>@{[ join('', @nextActions) ]}</SELECT> } : '';
 
-	my $submitCaption = "Submit";
-	$submitCaption = "Create" if $self->{type} == 0;
-	$submitCaption = "Modify" if $self->{type} == 1;
-	$submitCaption = "Delete Record" if $self->{type} == 2;
+	#my $submitCaption = "Submit";
+	#$submitCaption = "Create" if $self->{type} == 0;
+	#$submitCaption = "Modify" if $self->{type} == 1;
+	#$submitCaption = "Delete Record" if $self->{type} == 2;
 
-	my $resetButton = '<input type="reset" value="Reset">';
-	$resetButton = '' if $self->{type} eq 'delete';
-	my $fieldName = $page->fieldPName('OK');
-	my $okButton =qq{<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">};
-	$okButton = qq{<a href="$cancelURL"><img src="/resources/widgets/ok_btn.gif" border=0></a>}if $dialog->{viewOnly};
+	#my $resetButton = '<input type="reset" value="Reset">';
+	#$resetButton = '' if $self->{type} eq 'delete';
+	#my $fieldName = $page->fieldPName('OK');
+	#my $okButton =qq{<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">};
+	#$okButton = qq{<a href="$cancelURL"><img src="/resources/widgets/ok_btn.gif" border=0></a>}if $dialog->{viewOnly};
+	
+	my @buttons = ();
+	foreach my $action (@{$self->{actions}})
+	{
+		push @buttons, $self->getButtonHtml(%$action);
+	}
+	
 	
 	return qq{
 		<tr><td colspan=$tableCols><font size=1>&nbsp;</font></td></tr>
 		<tr valign=center bgcolor=$rowColor>
 		<td align=center colspan=$tableCols valign=bottom>
-			$self->{preHtml}
-			$nextActions
-			$okButton
-			<a href="$cancelURL"><img src="/resources/widgets/cancel_btn.gif" border=0></a>
-			$self->{postHtml}
+			<table><tr><td>
+				$self->{preHtml}
+			</td><td>
+				$nextActions &nbsp;
+			</td><td>
+				@{[ join('</td><td>&nbsp;</td><td>', @buttons) ]}
+			</td><td>
+				$self->{postHtml}
+			</td></tr></table>
 		</td>
 		</tr>
 	};
+#			$okButton
+#			<a href="$cancelURL"><img src="/resources/widgets/cancel_btn.gif" border=0></a>
 }
+
+
+sub getButtonHtml
+{
+	my ($self, %options) = @_;
+	
+	my $label = defined $options{caption} ? $options{caption} : 'No Caption';
+
+	my $onClick = '';
+	if (defined $options{onClick})
+	{
+		$onClick = $options{onClick};
+	}
+	elsif (defined $options{href})
+	{
+		$onClick = "document.location = '$options{href}'" if defined $options{href};
+	}
+	else
+	{
+		$onClick = 'if (validateOnSubmit()) document.forms.dialog.submit()';
+	}
+
+	my $html =	qq{<table cellpadding="1" cellspacing="0" style="border: 2; border-style: outset; background-color: #DDDDDD;" onClick="$onClick" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='beige'" onMouseOut="this.style.cursor='default';this.style.backgroundColor='#DDDDDD'">} .
+				qq{<tr><td align="right" valign="bottom" style="width: 75px; text-align: center; font-family: tahoma helvetica sans-serif; color: black; font-size: 8pt; font-weight: bold;">};
+
+	$label = "<nobr>&nbsp;$label&nbsp;</nobr>";
+
+	if (defined $options{href})
+	{
+		$label = qq{<a href="$options{href}" style="text-decoration: none; color: black;">$label</a>};
+	}
+
+	if (defined $options{image})
+	{
+		my $image = "<nobr>&nbsp;$IMAGETAGS{$options{image}}&nbsp;</nobr>";
+		if (defined $options{href})
+		{
+			$image = qq{<a href="$options{href}" style="text-decoration: none;">$image</a>};
+		}
+
+		$html .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+		$html .= qq{<td valign="middle" style="font-family: tahoma helvetica sans-serif; color: black; font-size: 8pt; font-weight: bold;">$image</td>};
+		$html .= qq{<td valign="middle" style="font-family: tahoma helvetica sans-serif; color: black; font-size: 8pt; font-weight: bold;">$label</a></td>};
+		$html .= '</tr></table>';
+	}
+	else
+	{
+		$html .= $label;
+	}
+
+	$html .= '</td></tr></table>';
+
+	return $html;
+}
+
 
 ##############################################################################
 package CGI::Dialog::Text;
