@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="FinancialTransaction" caption="Financial Transaction" db="Oracle">
+		<field id="item_id" join="invitem" column="item_id" caption="Invoice Item ID"/>
+		<field id="item_type" join="invitem_type" column="caption" caption="Invoice Item Type"/>
+		<field id="hcfa_service_place" join="invitem_srv_place" column="caption" caption="Service Place"/>
+		<field id="hcfa_service_type" join="invitem_srv_type" column="caption" caption="Service Type"/>
+		<field id="invoice_id" join="invoice" column="invoice_id" caption="Invoice ID"/>
+		<field id="invoice_owner_id" join="invoice" column="owner_id"/>
+		<field id="service_begin_date" join="invitem" column="service_begin_date" caption="Service Begin Date" ui-datatype="date"/>
+		<field id="service_end_date" join="invitem" column="service_end_date" caption="Service End Date" ui-datatype="date"/>
+		<field id="description" join="invitem" column="caption" caption="Description"/>
+		<field id="code" join="invitem" column="code" caption="Code"/>
+		<field id="code_type" join="invitem_codetype" column="caption" caption="Code Type"/>
+		<field id="modifier" join="invitem" column="modifier" caption="Modifier"/>
+		<field id="unit_cost" join="invitem" column="unit_cost" caption="Unit Cost" ui-datatype="currency"/>
+		<field id="quantity" join="invitem" column="quantity" caption="Quantity" ui-datatype="number"/>
+		<field id="extended_cost" join="invitem" column="extended_cost" caption="Extended Cost" ui-datatype="currency"/>
+		<field id="writeoff_code" join="invitem" column="writeoff_code" caption="Writeoff Code"/>
+		<field id="writeoff_amt" join="invitem" column="writeoff_amount" caption="Writeoff Amount" ui-datatype="currency"/>
+		<field id="rel_diags" join="invitem" column="rel_diags" caption="Related Diagnosis"/>
+		<field id="comments" join="invitem" column="comments" caption="Comments"/>
+		<field id="bill_provider_id" join="main_trans" column="provider_id" caption="Billing Provider ID"/>
+		<field id="bill_provider_name" join="bill_provider" column="simple_name" caption="Billing Provider Name"/>
+		<field id="bill_provider_addr_line1" join="bill_provider_addr" column="line1" caption="Billing Provider Address - Line 1"/>
+		<field id="bill_provider_addr_city" join="bill_provider_addr" column="city" caption="Billing Provider Address - City"/>
+		<field id="bill_provider_addr_state" join="bill_provider_addr" column="state" caption="Billing Provider Address - State"/>
+		<field id="bill_provider_addr_zip" join="bill_provider_addr" column="zip" caption="Billing Provider Address - Zip"/>
+		<field id="rend_provider_id" join="main_trans" column="care_provider_id" caption="Rendering Provider ID"/>
+		<field id="rend_provider_name" join="rend_provider" column="simple_name" caption="Rendering Provider Name"/>
+		<field id="rend_provider_addr_line1" join="rend_provider_addr" column="line1" caption="Rendering Provider Address - Line 1"/>
+		<field id="rend_provider_addr_city" join="rend_provider_addr" column="city" caption="Rendering Provider Address - City"/>
+		<field id="rend_provider_addr_state" join="rend_provider_addr" column="state" caption="Rendering Provider Address - State"/>
+		<field id="rend_provider_addr_zip" join="rend_provider_addr" column="zip" caption="Rendering Provider Address - Zip"/>
+		<field id="bill_facility_id" join="main_trans" column="billing_facility_id" caption="Billing Facility ID"/>
+		<field id="srv_facility_id" join="main_trans" column="service_facility_id" caption="Service Facility ID"/>
+		<field id="adjustment_id" join="invitem_adjust" column="adjustment_id" caption="Adjustment ID"/>
+		<field id="adjustment_type" join="invitem_adjust_type" column="caption" caption="Adjustment Type"/>
+		<field id="patient_id" join="invoice" column="client_id" caption="Patient ID"/>
+		<field id="patient_name" join="patient" column="simple_name" caption="Patient Name"/>
+		<field id="patient_dob" join="patient" column="date_of_birth" caption="Patient Date of Birth" ui-datatype="date"/>
+		<field id="patient_gender" join="patient_gender" column="caption" caption="Patient Gender"/>
+		
+		<join id="invitem" table="invoice_item" autoinclude="1"/>
+		<join id="invoice" table="invoice" condition="invitem.parent_id = invoice.invoice_id"/>
+		<join id="invitem_type" table="inv_item_type" condition="invitem.item_type = invitem_type.id (+)"/>
+		<join id="invitem_srv_place" table="hcfa1500_service_place_code" condition="invitem.hcfa_service_place = invitem_srv_place.id (+)"/>
+		<join id="invitem_srv_type" table="hcfa1500_service_type_code" condition="invitem.hcfa_service_type = invitem_srv_type.id (+)"/>
+		<join id="invitem_codetype" table="catalog_entry_type" condition="invitem.code_type = invitem_codetype.id (+)"/>
+		<join id="main_trans" table="transaction" requires="invoice" condition="invoice.main_transaction = main_trans.trans_id"/>
+		<join id="bill_provider" table="person" requires="main_trans" condition="main_trans.provider_id = bill_provider.person_id (+)"/>
+		<join id="bill_provider_addr" table="person_address" requires="bill_provider" condition="bill_provider.person_id = bill_provider_addr.parent_id (+) AND bill_provider_addr.address_name (+) = 'Work'"/>
+		<join id="rend_provider" table="person" requires="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
+		<join id="rend_provider_addr" table="person_address" requires="rend_provider" condition="rend_provider.person_id = rend_provider_addr.parent_id (+) AND rend_provider_addr.address_name (+) = 'Work'"/>
+		<join id="invitem_adjust" table="invoice_item_adjust" condition="invitem.item_id = invitem_adjust.parent_id (+)"/>
+		<join id="invitem_adjust_type" table="adjust_method" requires="invitem_adjust" condition="invitem_adjust.adjustment_type = invitem_adjust_type.id (+)"/>
+		<join id="patient" table="person" requires="invoice" condition="invoice.client_id = patient.person_id (+)"/>
+		<join id="patient_gender" table="gender" requires="patient" condition="patient.gender = patient_gender.id (+)"/>
+		
+		<view id="all" caption="None">
+			<column id="invoice_id"/>
+			<column id="item_id"/>	
+			<column id="item_type"/>
+			
+			<condition field="invoice_owner_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+	</query-defn>
+</component>
