@@ -101,7 +101,7 @@ sub execute
 	my $status = $self->param('search_status');
 	my $type = $self->param('search_type');
 
-	if(($type eq 'date' || $type eq 'servicedate') && $expression ne '*' && ! ParseDate($expression))
+	if(($type eq 'date' || $type eq 'servicedate') && $expression ne '*' && ! ($expression =~ m/([\d][\d])\/([\d][\d])\/([\d][\d][\d][\d])/))
 	{
 		$self->addContent("<font face='arial' color='darkred'>Invalid date format '$expression'. Please enter date as 'MM/DD/YYYY'.</font>");
 
