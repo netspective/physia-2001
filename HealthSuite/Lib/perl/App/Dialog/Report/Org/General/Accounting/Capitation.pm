@@ -183,6 +183,14 @@ sub execute
 	my $orgClause2 =qq { and t.service_facility_id = $orgID} if($orgID ne '');
 
 
+	my $sqlStmtEnr = qq {
+		select product_name, plan_name, count(*) enrollees
+		from insurance
+		where ins_type <> 7
+		and record_type = 3
+		group by product_name, plan_name
+	};
+	my $rowsEnr = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmtEnr);
 
 
 	my $sqlStmt = qq {
@@ -190,18 +198,11 @@ sub execute
 			t.data_text_b plan,
 			t.data_text_a product,
 			t.provider_id provider,
-			o.org_internal_id org_id,
-			enr.enrollees
+			o.org_internal_id org_id
 		from
 			transaction t,
 			trans_attribute ta,
-			org o,
-			(	select product_name, plan_name, count(*) enrollees
-				from insurance
-				where ins_type <> 7
-				and record_type = 3
-				group by product_name, plan_name
-			) enr
+			org o
 		where
 			t.trans_type = 9030
 			and t.trans_status = 7
@@ -209,7 +210,6 @@ sub execute
 			and ta.item_name = 'Monthly Cap/Payment/Batch ID'
 			and t.receiver_id = o.org_internal_id
 			and o.owner_org_id = @{[ $page->session('org_internal_id')]}
-			and t.data_text_a = enr.product_name (+)
 			$batchIDClause1
 			$batchDateClause1
 			$planClause1
@@ -221,21 +221,14 @@ sub execute
 			ins.plan_name plan,
 			ins.product_name product,
 			t.care_provider_id provider,
-			t.service_facility_id org_id,
-			enr.enrollees
+			t.service_facility_id org_id
 		from
 			transaction t,
 			insurance ins,
 			invoice_billing ib,
 			invoice_attribute ia,
 			invoice_item ii,
-			invoice i,
-			(	select product_name, plan_name, count(*) enrollees
-				from insurance
-				where ins_type <> 7
-				and record_type = 3
-				group by product_name, plan_name
-			) enr
+			invoice i
 		where
 			i.invoice_subtype = 2
 			and ii.parent_id = i.invoice_id
@@ -246,7 +239,6 @@ sub execute
 			and ib.bill_ins_id = ins.ins_internal_id
 			and t.trans_id = i.main_transaction
 			and t.billing_facility_id = @{[ $page->session('org_internal_id')]}
-			and ins.product_name = enr.product_name (+)
 			$batchIDClause2
 			$batchDateClause2
 			$planClause2
@@ -262,6 +254,22 @@ sub execute
 
 	foreach my $row (@$rows)
 	{
+		my $enrollees = 0;
+
+		foreach my $rowEnr (@$rowsEnr)
+		{
+			if(($row->{plan} eq $rowEnr->{plan_name}) && ($row->{product} eq $rowEnr->{product_name}))
+			{
+				$enrollees = $rowEnr->{enrollees}
+			}
+		};
+		$row->{enrollees} = $enrollees;
+	};
+
+	foreach my $row (@$rows)
+	{
+
+
 #		my $batchIDClauseA = qq { and  ta.value_text = '$row->{batchid}'} if($row->{batchid} ne '');
 #		my $batchDateClauseA = qq { and ta.value_date = to_date('$row->{batchdate}', 'mm/dd/yyyy')} if($row->{batchdate} ne '');
 		my ($planClauseA, $productClauseA, $physicianClauseA, $orgClauseA);
@@ -443,7 +451,7 @@ sub execute
 			$org_id,
 			$row->{product},
 			$row->{plan},
-			($row->{enrollees} ne '' ? $row->{enrollees} : 0),
+			$row->{enrollees},
 			$month[$i],
 			$amount[$i],
 			$copay_expected[$i],
