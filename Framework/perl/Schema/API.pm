@@ -16,6 +16,7 @@ use vars qw(@ISA @EXPORT $cachedDbHdls $cachedSchemaFiles $cachedSchemaNames);
 
 @ISA = qw(Exporter Schema);
 @EXPORT = qw(
+	DEFAULT_SCHEMAAPIFLAGS
 	SCHEMAAPIFLAG_EXECSQL
 	SCHEMAAPIFLAG_LOGSQL
 );
@@ -49,9 +50,6 @@ sub new
 
 	my $self = Schema::new($type, @_);
 	$self->{flags} = DEFAULT_SCHEMAAPIFLAGS unless exists $self->{flags};
-
-	# each item in the log is comprised of another array ref of two entries: the SQL and a array ref of errors reported by SQL generator
-	$self->{sqlLog} = [];
 
 	$cachedSchemaFiles->{$self->{sourceFiles}->{primary}} = $self;
 	$cachedSchemaNames->{$self->{name}} = $self;
@@ -172,22 +170,6 @@ sub getFlags
 }
 
 #-----------------------------------------------------------------------------
-# manage the SQL log
-#-----------------------------------------------------------------------------
-
-sub getSqlLog
-{
-	return $_[0]->{sqlLog};
-}
-
-sub clearSqlLog
-{
-	my $self = shift;
-	$self->{sqlLog} = [];
-	return $self->{sqlLog};
-}
-
-#-----------------------------------------------------------------------------
 # Create extension methods for the Table object
 #-----------------------------------------------------------------------------
 
@@ -235,10 +217,10 @@ sub Table::insertRec
 		}
 	}
 
-	my $flags = $schema->{flags};
+	my $flags = $page->{schemaFlags};
 	my ($sql, $errors) = $self->createInsertSql($colDataRef);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$schema->{sqlLog}}, [$sql || colDataAsStr("[DATA] Insert ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
+	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Insert ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
@@ -280,10 +262,10 @@ sub Table::updateRec
 
 	die "no database connected" if ! $schema->{dbh};
 
-	my $flags = $schema->{flags};
+	my $flags = $page->{schemaFlags};
 	my ($sql, $errors) = $self->createUpdateSql($colDataRef);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$schema->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
+	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
@@ -323,10 +305,10 @@ sub Table::deleteRec
 
 	die "no database connected" if ! $schema->{dbh};
 
-	my $flags = $schema->{flags};
+	my $flags = $page->{schemaFlags};
 	my ($sql, $errors) = $self->createDeleteSql($colDataRef);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$schema->{sqlLog}}, [$sql || colDataAsStr("[DATA] Delete ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
+	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Delete ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
