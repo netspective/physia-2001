@@ -9,6 +9,7 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
 
@@ -71,16 +72,14 @@ sub execute
 			_debug => 0
 		);
 
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'On Hold',
-			value_textB => $page->field('reason') || undef,
-			value_date => $todaysDate,
-			_debug => 0
+
+	## Add history item
+	addHistoryItem($page, $invoiceId,
+		value_text => 'On Hold',
+		value_textB => $page->field('reason') || undef,
+		value_date => $todaysDate,
 	);
+
 
 	$page->redirect("/invoice/$invoiceId/summary");
 }

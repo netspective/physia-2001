@@ -17,6 +17,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::Organization;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
@@ -225,17 +226,11 @@ sub execute_remove
 	);
 
 
-	#ADD HISTORY ATTRIBUTE
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	#ADD HISTORY ITEM
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => 'Voided claim',
+	addHistoryItem($page, $invoiceId,
+		value_text => 'Voided invoice',
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
 	$page->redirect("/invoice/$invoiceId/summary");
@@ -349,7 +344,6 @@ sub addTransactionAndInvoice
 	my $invoiceStatusCreate = App::Universal::INVOICESTATUS_CREATED;
 	my $invoiceType = App::Universal::INVOICETYPE_SERVICE;
 	my $itemType = App::Universal::INVOICEITEMTYPE_INVOICE;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $personType = App::Universal::ENTITYTYPE_PERSON;
 	my $orgType = App::Universal::ENTITYTYPE_ORG;
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
@@ -466,18 +460,12 @@ sub addTransactionAndInvoice
 
 	## Add history and reset session batch id with batch id in field
 	$page->session('batch_id', $batchId);
-	my $description = $command eq 'add' ? "Created" : 'Modified';
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	my $description = $command eq 'add' ? 'Created' : 'Modified';
+	addHistoryItem($page, $invoiceId,
 		value_text => $description,
 		value_textB => "Batch ID: $batchId",
 		value_date => $todaysDate,
-		_debug => 0
 	);
-
 
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
 }
