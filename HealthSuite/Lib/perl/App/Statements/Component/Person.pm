@@ -2289,7 +2289,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%,
 					(select (decode(a.value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary'))
 					from person_attribute a where  a.value_type in (@{[ App::Universal::ATTRTYPE_SPECIALTY ]}) and a.item_id = b.item_id)value_int,
-					name_sort
+					name_sort,
+					decode(nvl(value_intb, '1'), '1','Active', 'Inactive')
 			from 	person_attribute b
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}, @{[App::Universal::ATTRTYPE_BOARD_CERTIFICATION]})
@@ -2302,12 +2303,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					{
 						colIdx => 0,
 						dataFmt => {
-							"@{[ App::Universal::ATTRTYPE_LICENSE ]}" => '#2# (#4# #5#): #3#, #6#',
-							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '#2# (#4# #5#): #3#, #6#',
-							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '#2# (#4# #5#): #3#',
-							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '#2# (#4# #5#)',
-							"@{[ App::Universal::ATTRTYPE_BOARD_CERTIFICATION ]}"  => '#2# (#4# #5#)',
-							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '#2# (#4# #5#)'
+							"@{[ App::Universal::ATTRTYPE_LICENSE ]}" => '<b>#7#</b> #2# (#4# #5#): #3#, #6#',
+							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '<b>#7#</b> #2# (#4# #5#): #3#, #6#',
+							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '<b>#7#</b> #2# (#4# #5#): #3#',
+							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '<b>#7#</b> #2# (#4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_BOARD_CERTIFICATION ]}"  => '<b>#7#</b> #2# (#4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '<b>#7#</b> #2# (#4# #5#)'
 						},
 					},
 		],
@@ -3896,6 +3897,61 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panelTransp'); },
 
 	},
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.bookmarks' =>
+{
+	sqlStmt => qq
+	{
+		select value_text, value_textb, parent_id
+		from person_attribute
+		where parent_id = :1
+		and item_name = 'Bookmarks'
+	},
+
+	sqlStmtBindParamDescr => ['Person ID for transaction table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => "#0#: <A HREF='#1#'>#1#</A>" },
+		],
+#		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-book-marks/#2#?home=#homeArl#',
+#		frame => {
+#			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-book-marks?home=#homeArl#',
+#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+#		},
+	},
+
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.static',
+		flags => 0,
+		frame => { heading => 'Bookmarks / HyperLinks' },
+	},
+
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		inherit => 'panel',
+	},
+
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+	},
+
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId] ); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelTransp'); },
+
+},
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------
 
