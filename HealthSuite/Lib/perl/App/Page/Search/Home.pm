@@ -196,6 +196,7 @@ sub prepare
 					<b>Add</b> a new
 					<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
 					<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
+					<a href="/org/#session.org_id#/dlg-add-close-date">Close Date</a>,
 					<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
 					<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
 					<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>,
