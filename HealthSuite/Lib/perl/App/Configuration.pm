@@ -108,12 +108,18 @@ my $userName = '';
 my $groupName = '';
 my $hostName = uc(`hostname`);
 
+if(my $forceConfig = $ENV{HS_CONFIG})
+{
+	$CONFDATA_SERVER = $AVAIL_CONFIGS{$forceConfig};
+	print "Forced configuration to '$forceConfig'\n";
+}
+
 if($^O ne 'MSWin32')
 {
 	my $userName = getpwuid($>) || '';
 	my $groupName = getgrgid($)) || '';
 
-	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"};
+	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"} unless $CONFDATA_SERVER;
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"group-$groupName"} unless $CONFDATA_SERVER;
 }
 unless ($CONFDATA_SERVER)
