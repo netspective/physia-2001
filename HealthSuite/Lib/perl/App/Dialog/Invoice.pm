@@ -442,13 +442,14 @@ sub addTransactionAndInvoice
 
 	## Add history and batch creation attribute
 	my $batchId = $page->field('batch_id');
-	my $description = $command eq 'add' ? "Created (Batch ID: $batchId)" : 'Modified';
+	my $description = $command eq 'add' ? "Created" : 'Modified';
 	$page->schemaAction(
 		'Invoice_Attribute', 'add',
 		parent_id => $invoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
 		value_text => $description,
+		value_textB => "Batch ID: $batchId",
 		value_date => $todaysDate,
 		_debug => 0
 	);

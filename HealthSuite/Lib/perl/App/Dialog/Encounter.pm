@@ -211,9 +211,9 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
 
-		new CGI::Dialog::Field(type => 'memo',
-				caption => 'Comments',
-				name => 'comments'),
+		#new CGI::Dialog::Field(type => 'memo',
+		#		caption => 'Comments',
+		#		name => 'comments'),
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
 				selOptions => 'Yes;No',
@@ -317,7 +317,6 @@ sub makeStateChanges
 		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
 		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
 		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
-		$self->setFieldFlags('comments', FLDFLAG_READONLY);
 	}
 }
 
@@ -987,7 +986,6 @@ sub addTransactionAndInvoice
 		bill_type => defined $claimType ? $claimType : undef,
 		related_to => $relTo || undef,
 		data_text_a => $page->field('ref_id') || undef,
-		data_text_b => $page->field('comments') || undef,
 		data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
 		trans_begin_stamp => $timeStamp || undef,
 		_debug => 0
@@ -1031,6 +1029,7 @@ sub handleInvoiceAttrs
 	my $todaysDate = $page->getDate();
 	my $personId = $page->field('attendee_id');
 	my $billingFacility = $page->field('billing_facility_id');
+	my $batchId = $page->field('batch_id');
 
 	#CONSTANTS
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -1053,16 +1052,16 @@ sub handleInvoiceAttrs
 		) if $command ne 'update';
 
 	## Then, create invoice attribute for history of invoice status
-	my $action = $command eq 'add' ? 'Created claim' : 'Updated claim';
+	my $action = $command eq 'add' ? 'Created' : 'Updated';
 
-
+	my $comments = $page->field('comments');
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => $action,
-			value_textB => $page->field('comments') || undef,
+			value_textB => "Creation Batch ID: $batchId",
 			value_date => $todaysDate,
 			_debug => 0
 	);
