@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.10 2001-01-10 00:39:07 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.11 2001-01-10 18:27:27 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -538,7 +538,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.10 2001-01-10 00:39:07 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.11 2001-01-10 18:27:27 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
@@ -556,7 +556,8 @@ sub getHtml
 
 	return '' unless $command eq 'read';
 
-	my $noteRows = $STMTMGR_DOCUMENT->getRowsAsArray($page, STMTMGRFLAG_NONE, 'selMessageNotes', $page->param('message_id'), $page->session('person_id'));
+	my $noteRows = $STMTMGR_DOCUMENT->getRowsAsArray($page, STMTMGRFLAG_NONE, 'selMessageNotes',
+		$page->param('message_id'), $page->session('person_id'), $page->session('STANDARD_TIME_OFFSET'));
 	my $html = '';
 	foreach my $note (@$noteRows)
 	{

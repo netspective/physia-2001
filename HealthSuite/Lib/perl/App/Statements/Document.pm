@@ -66,7 +66,7 @@ $STMTMGR_DOCUMENT = new App::Statements::Document(
 	},
 	'selMessageNotes' => qq{
 		SELECT
-			TO_CHAR(cr_stamp, 'IYYYMMDDHH24MISS') as when,
+			TO_CHAR(cr_stamp -:3, 'IYYYMMDDHH24MISS') as when,
 			person_id AS person_id,
 			value_text AS notes,
 			value_int AS private
