@@ -469,10 +469,6 @@
 	<table name="Org_Attribute" abbrev="OrgAttr" type="Attribute">
 		<param name="parentref">Org.org_internal_id</param>
 	</table>
-	<table name="Statement_Attribute" abbrev="StmtAttr" type="Attribute">
-		<param name="parentref">Statement.statement_id</param>
-	</table>
-	
 	<table name="Insurance_Attribute" abbrev="InsAttr" type="Attribute">
 		<param name="parentref">Insurance.ins_internal_id</param>
 	</table>
@@ -717,10 +713,11 @@
 		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
 		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>
 		<column name="tranmission_stamp" type="stamp" descr="Date Statement was sent " />
-		<column name="tranmission_status" type="integer" descr="Transmission Status"/>
+		<column name="tranmission_status" lookupref="transmission_status.id" type="integer" descr="Transmission Status"/>
 		<column name="ack_stamp" type="stamp" descr="Date statement was acknowledge"/>
-		<column name="int_statement_id" type="text" size="30" descr="Physia Internal Statement ID"/>
+		<column name="int_statement_id" type="autoinc" descr="Physia Internal Statement ID"/>
 		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>
+		<column name="amount_due" type="currency" descr="The total amount due on Statement"/>
 		<column name="inv_ids" type="text_set" descr="Invoice IDs included in this Statement"/>
 	</table>
 

@@ -14,9 +14,14 @@ create index INVOICE_OWNER_ID on Invoice (owner_id) TABLESPACE TS_INDEXES;
 start tables/Invoice_Worklist
 start tables-code/Invoice_Worklist
 
+start tables/Transmission_Status
+start data/Transmission_Status
+
 start tables/Statement
 start tables/Statement_Inv_ids
 start tables-code/Statement
+
+alter sequence STMT_INT_STATEMENT_ID_SEQ maxvalue 999999 cycle;
 
 start tables/Invoice_History
 start tables-code/Invoice_History
