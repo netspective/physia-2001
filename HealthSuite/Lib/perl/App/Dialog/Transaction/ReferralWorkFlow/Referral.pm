@@ -189,11 +189,11 @@ sub execute
 	my @cpt = ();
 	my @icd = ();
 
-	push(@icd, $icd1);
-	 push(@icd, $icd2);
+	push(@icd, $icd1) if $icd1 ne '';
+	 push(@icd, $icd2) if $icd2 ne '';
 	my $dataTextB = join (', ', @icd);
-	push(@cpt, $cpt1);
-	push(@cpt, $cpt2);
+	push(@cpt, $cpt1) if $cpt1 ne '';
+	push(@cpt, $cpt2) if $cpt2 ne '';;
 	my $dataTextC = join (', ', @cpt);
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 
