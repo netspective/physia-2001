@@ -572,21 +572,21 @@ sub getHtml
 					{			
 						if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Primary/)==0)
 						{				
-							document.$dialogName._f_proc_all_catalogs.value = 
-							document.$dialogName._f_ins_ffs.value + "," +
-							document.$dialogName._f_proc_default_catalog.value ;
+							document.$dialogName._f_proc_all_catalogs.value = document.$dialogName._f_proc_default_catalog.value ? 
+									document.$dialogName._f_proc_default_catalog.value : document.$dialogName._f_ins_ffs.value;
+							//document.$dialogName._f_proc_all_catalogs.value = 
+							//document.$dialogName._f_ins_ffs.value + "," +
+							//document.$dialogName._f_proc_default_catalog.value ;
 						}
 						else if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Work Comp/)==0)
 						{							
-							document.$dialogName._f_proc_all_catalogs.value = 
-							document.$dialogName._f_ins_ffs.value + "," +
-							document.$dialogName._f_proc_default_catalog.value ;
+							document.$dialogName._f_proc_all_catalogs.value = document.$dialogName._f_proc_default_catalog.value ? 
+									document.$dialogName._f_proc_default_catalog.value : document.$dialogName._f_ins_ffs.value;
 						}
 						else
 						{
-							document.$dialogName._f_proc_all_catalogs.value = 
-							document.$dialogName._f_ins_ffs.value + "," +
-							document.$dialogName._f_proc_default_catalog.value ;
+							document.$dialogName._f_proc_all_catalogs.value = document.$dialogName._f_proc_default_catalog.value ? 
+									document.$dialogName._f_proc_default_catalog.value : document.$dialogName._f_ins_ffs.value;
 						}
 																	
 					}
