@@ -92,7 +92,7 @@
 		<column name="tax_id" type="text" descr="Tax ID"/>
 		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
 		<column name="name_trade" type="text" size="128" descr="Trade name of organization"/>
-		<column name="time_zone" type="text" size="6" descr="Time zone that the organization operates in"/>
+		<column name="time_zone" type="text" size="20" descr="Time zone that the organization operates in"/>
 	</table>
 
 	<table name="Person_Org_Category" abbrev="PerOCatg" type="Audit,Secure">
@@ -693,24 +693,16 @@
 		<column name="comments" type="text" size="512" descr="Comment about invoice"/>
 	</table>
 
-
-
 	<table name="Statement" abbrev="Stmt" type="Secure,Audit">
 		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
-		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>										
-		<column name="tranmission_date" type="stamp" descr="Date Statement was sent " />
-		<column name="tranmission_status" lookupref="Transmission_Status.id" type="integer" descr="Transmission Status"/>						
-		<column name="ack_date" type="stamp" descr="Date statement was acknowledge"/>		
-		<column name="int_statement_id" type="text" size="30" descr="Physia Internal Statement ID"/>						
-		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>			
+		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>
+		<column name="tranmission_stamp" type="stamp" descr="Date Statement was sent " />
+		<column name="tranmission_status" type="integer" descr="Transmission Status"/>
+		<column name="ack_stamp" type="stamp" descr="Date statement was acknowledge"/>
+		<column name="int_statement_id" type="text" size="30" descr="Physia Internal Statement ID"/>
+		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>
+		<column name="inv_ids" type="text_set" descr="Invoice IDs included in this Statement"/>
 	</table>
-	
-	<table name="Statement_Invoice" abbrev="StmtInv" type="Secure,Audit">
-		<column name="invoice_stmt_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
-		<column name="parent_id" indexed="yes" parentref="Statement.statement_id" descr="The Statement invoice is included on"/>
-		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice on the worklist"/>		
-	</table>
-	
 
 	<table name="TEMP_FKM" abbrev="TempFM" >
 		<column name="person_id"  indexed="yes" type="text" size="16"/>
