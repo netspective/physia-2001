@@ -56,7 +56,7 @@ sub prepare_page_content_header
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-	my $category = lc($self->property('org_categories')->[0]) || undef;
+	my $category = defined $self->property('org_categories') ? lc($self->property('org_categories')->[0]) : undef;
 	#Retired Pane/Org/Heading.pm
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
