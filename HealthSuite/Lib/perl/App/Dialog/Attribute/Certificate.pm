@@ -154,9 +154,12 @@ sub execute
 	}
 	else
 	{
-		$itemName = $page->field('value_textb');
+		$itemName = ($valueType == App::Universal::ATTRTYPE_STATE) ? uc($page->field('value_textb')) : $page->field('value_textb');
 	}
+
 	my $valueTextB = $medSpecCaption ne '' ? $medSpecCaption : $page->field('value_textb');
+	$valueTextB = ($valueType == App::Universal::ATTRTYPE_STATE) ? uc($valueTextB) : $valueTextB;
+
 	my $facilityId = $page->field('name_sort') ne '' ? $page->field('name_sort') : $page->session('org_id');
 	$page->schemaAction(
 		'Person_Attribute',	$command,
