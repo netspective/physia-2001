@@ -90,6 +90,8 @@ sub prepare_detail_service
 		push(@data, \@rowData);
 	}
 
+	$html = 'Click <a href="javascript:history.back()">here</a> to go back<br><br>' . $html;
+
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	$page->addContent($html);
 }
@@ -117,10 +119,11 @@ sub execute
 	#my $appendStmtName = "sel_$serviceLike$like";
 	my $appendStmtName = "sel_donly$serviceLike$stateLike$like";
 
-	return $STMTMGR_ORG_SERVICE_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",[uc($service), uc($state), $sessionId]);
+	return 'Click <a href="javascript:history.back()">here</a> to go back<br><br>' . $STMTMGR_ORG_SERVICE_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",[uc($service), uc($state), $sessionId]);
 }
 
 #						[uc($service),
 #					$sessionId]);
+
 
 $INSTANCE = new __PACKAGE__;
