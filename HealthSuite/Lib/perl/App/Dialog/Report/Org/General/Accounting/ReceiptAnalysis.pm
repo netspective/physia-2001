@@ -18,6 +18,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
 use App::Dialog::Field::Person;
+use App::Dialog::Field::Organization;
 use App::Statements::Invoice;
 use App::Statements::Component::Invoice;
 use App::Statements::Report::Accounting;
@@ -37,7 +38,18 @@ sub new
 				begin_caption => 'Report Begin Date',
 				end_caption => 'Report End Date',
 				),
-			new App::Dialog::Field::Person::ID(caption =>'Physician ID',types => ['Physician'], name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
+			new App::Dialog::Field::Person::ID(caption =>'Physician ID',
+				types => ['Physician'], 
+				name => 'person_id', 
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
+			),
+
+			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
+				name => 'ins_org_id',
+				addType => 'insurance',
+			),
+			
 			new CGI::Dialog::Field(caption =>'Payment Type',
 					name => 'transaction_type',
 					options => FLDFLAG_PREPENDBLANK,
@@ -94,9 +106,11 @@ sub execute
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
-
+	
+	my $insOrgInternalId;
+	$insOrgInternalId = $STMTMGR_ORG->getSingleValue($page,STMTMGRFLAG_NONE,'selOrgId', $page->session('org_internal_id'), $page->field('ins_org_id')) if $page->field('ins_org_id');
+		
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
-
 
 	if($reportEndDate eq $reportBeginDate)
 	{
@@ -167,12 +181,12 @@ sub execute
 	if($totalReport)
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceiptTotal',
-		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId)  ;
+		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId);
 	}
 	else
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceipt',
-			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId);
+			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId);
 	}
 	my @data = ();
 	foreach (@$rcpt)
