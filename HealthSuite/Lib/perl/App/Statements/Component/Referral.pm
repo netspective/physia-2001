@@ -28,7 +28,7 @@ $STMTRPTDEFN_WORKLIST =
 	columnDefn =>
 	[
 		{colIdx => 1, head => 'ID', dAlign => 'left'},
-		#{colIdx => 2, head => 'Status', dAlign => 'left'},
+		{colIdx => 2, head => 'Status', dAlign => 'left'},
 		{colIdx => 3, head => 'Patient',hAlign=>'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
 		{colIdx => 4, head => 'Referral Type', dAlign => 'center'},
 		{colIdx => 5, head => 'Date of Request', dAlign => 'center'},
@@ -45,7 +45,7 @@ $STMTRPTDEFN_AUTH_WORKLIST =
 	[
 		{colIdx => 0, head => 'Service Request ID ', dAlign => 'left'},
 		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#7#"},
-		{colIdx => 2, head => 'Review Date ', dAlign => 'left'},
+		{colIdx => 2, head => 'Follow Up Date ', dAlign => 'left'},
 		{colIdx => 3, head => 'SSN', dAlign => 'left'},
 		{colIdx => 4, head => 'Last Name', dAlign => 'left'},
 		{colIdx => 5, head => 'First Name', dAlign => 'left'},
@@ -64,7 +64,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			trans_id as referral_id,
 			initiator_id as org_id,
 			consult_id as patient,
-			rd.caption as referral_type,
+			rd.name as referral_type,
 			aa.value_int as claim_number,
 			t.trans_substatus_reason as requested_service,
 			--%simpleDate:trans_end_stamp%,
@@ -77,7 +77,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			trans_subtype as intake_coordinator,
 			trans_substatus_reason as ref_status,
 			p.ssn as ssn
-		from transaction t, trans_attribute aa, person p, person_org_category po, referral_service_descr rd
+		from transaction t, trans_attribute aa, person p, person_org_category po, ref_service_category rd
 		where
 		t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
 		and t.trans_substatus_reason in ('Assigned', 'Unassigned')
@@ -85,7 +85,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		and aa.item_name = 'Referral Insurance'
 		and t.consult_id = p.person_id
 		and po.person_id = p.person_id
-		and rd.id = t.trans_expire_reason
+		and rd.serv_category = t.trans_expire_reason
 		and po.org_internal_id = ?
 		order by trans_id DESC
 	},
@@ -131,7 +131,8 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			 (
 			 	SELECT r.caption
 			 	FROM referral_followup_status r
-				WHERE r.id=t.trans_status_reason) AS follow_up,
+				WHERE r.id=t.trans_status_reason
+				) AS follow_up,
 		         initiator_id as org_id,
 		         p.ssn as ssn,
 		         p.name_last as last_name,
@@ -141,6 +142,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		AND      t.consult_id = p.person_id
 		AND      po.person_id = p.person_id
 		AND      po.org_internal_id = ?
+		AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
 		ORDER BY trans_id DESC
 	},
 
@@ -165,6 +167,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		AND     t.consult_id = p.person_id
 		AND 	po.person_id = p.person_id
 		AND     po.org_internal_id = ?
+		AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
 		ORDER BY trans_id DESC
 	},
 

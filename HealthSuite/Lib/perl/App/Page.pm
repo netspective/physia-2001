@@ -769,10 +769,10 @@ sub prepare_page_body
 		foreach ($self->getContentHandlers())
 		{
 			s/\$(\w+)[=]?(.*)\$/$self->param($1, $2) if defined $2 && ! defined $self->param($1); $self->param($1)/ge;
-			if(my $method = $self->can($_))
+			if($self->can($_))
 			{
 				$handlersCount++;
-				$handlersOkCount++ if &$method($self);
+				$handlersOkCount++ if $self->$_();
 			}
 		}
 

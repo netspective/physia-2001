@@ -902,4 +902,38 @@ sub hasPermission
 	return 0;
 }
 
+#-----------------------------------------------------------------------------
+# Static methods
+#-----------------------------------------------------------------------------
+
+#
+# return TRUE if the current user has any one of the permissions passed in
+# (pass in as many permissions as needed)
+#
+
+use CGI::Cookie;
+
+sub getActiveSession
+{	
+	my %cookies = fetch CGI::Cookie;
+	if(my $sessionCookie = $cookies{SESSIONID_COOKIENAME()})
+	{
+		my $schema = new Schema::API(xmlFile => $CONFDATA_SERVER->file_SchemaDefn);
+		$schema->connectDB($CONFDATA_SERVER->db_ConnectKey);
+		
+		my $sessionKey = $sessionCookie->value();
+		my ($ec, $em);
+		my %session;
+		tie %session, 'CGI::Session::DBI', $sessionKey,
+			{
+				dbh => $schema->{dbh},
+				remote_addr => $ENV{REMOTE_ADDR},
+				errorCode_ref => \$ec,
+				errorMsg_ref => \$em,
+			};
+		return \%session;
+	}
+	return undef;
+}
+
 1;

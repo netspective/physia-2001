@@ -48,14 +48,6 @@ sub initialize
 				new App::Dialog::Field::Person::ID(caption =>'Intake Coordinator ', name => 'coordinator'),
 				new CGI::Dialog::Field(caption => 'Referral Date',  type => 'date', name => 'ref_date'),
 			#	]),
-
-		new CGI::Dialog::Field(caption =>'Source of Referral',
-					name => 'source',
-					options => FLDFLAG_PREPENDBLANK,
-					fKeyStmtMgr => $STMTMGR_TRANSACTION,
-					fKeyStmt => 'selReferralSourceType',
-					fKeyDisplayCol => 1,
-					fKeyValueCol => 0),
 		new CGI::Dialog::Subhead(heading => 'Assign provider'),
 		new CGI::Dialog::Field(caption => 'Provider Contact', name => 'contact_provider'),
 		new CGI::Dialog::MultiField(
@@ -63,7 +55,7 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'Provider Phone', name => 'provider_phone', type => 'phone'),
 				new CGI::Dialog::Field(caption => 'Ext', name => 'provider_phone_ext', size =>'4'),
 			]),
-		new App::Dialog::Field::Organization::ID(caption =>'Provider Org', name => 'provider', findPopup => '/directory//ServiceStCityLookup/', ),
+		new CGI::Dialog::Field(caption =>'Provider Org', name => 'provider',findPopup => '/directory-p/ServiceStCityLookup', secondaryFindField => '_f_provider_name'),
 		new CGI::Dialog::Field(caption => 'Provider Name', name => 'provider_name'),
 
 		new CGI::Dialog::Subhead(heading => 'Fee Negotiation'),
@@ -113,7 +105,10 @@ sub initialize
 				]),
 		new CGI::Dialog::Field(caption => 'Code',  name => 'code', size => '7',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),
-		new CGI::Dialog::Field(caption => 'Service Request Rate',  name => 'service_rate', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption => 'Comment',  type => 'memo',name=>'code_comment',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption => 'Service Request Charge',  name => 'service_rate', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption => 'Source of Referral',  name => 'source_referral', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
+
 		new CGI::Dialog::Subhead(heading => 'Authorization'),
 		new CGI::Dialog::MultiField(name => 'clientid_num', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		fields => [
@@ -181,8 +176,10 @@ sub initialize
 			<script language="JavaScript1.2">
 				function clickMenu(url)
 				{
-					var urlNext = url;
-					window.location.href= '/' + urlNext;
+					var urlNext = '/' + url;
+					window.location.href= urlNext;
+					//document.dialog._f_on_submit_goto.value	= urlNext;
+					//document.dialog.submit();
 				}
 			</script>
 		});
@@ -203,6 +200,8 @@ sub makeStateChanges
 	$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
 	#$self->setFieldFlags('name', FLDFLAG_READONLY);
 	$self->setFieldFlags('person_id', FLDFLAG_READONLY);
+
+	#$page->field('provider') = $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 }
 
 sub customValidate
@@ -239,7 +238,10 @@ sub populateData_add
 	$page->field('ref_id', $transId);
 	$page->field('coordinator', $transId);
 	$page->field('person_id', $parentTransData->{'consult_id'});
-	$page->field('service', $parentTransData->{'data_text_a'});
+
+	my $sourceOfServiceData = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selServiceSourceTypeByTransId', $transId);
+	$page->field('source_referral', $sourceOfServiceData);
+
 	$parentTransData->{'trans_subtype'} ne '' ? $page->field('coordinator', $parentTransData->{'trans_subtype'}) : $page->field('coordinator', $personId);
 
 	my $prevIntake = $page->field('prev_intake_form');
@@ -259,7 +261,6 @@ sub populateData_add
 		$page->field('follow_up', $prevIntakeData->{'trans_status_reason'});
 		$page->field('followup_date', $prevIntakeData->{'data_date_b'});
 		$page->field('ref_date', $prevIntakeData->{'data_date_a'});
-		$page->field('source', $prevIntakeData->{'trans_subtype'});
 		$page->field('contact_provider', $prevIntakeData->{'trans_substatus_reason'});
 		$page->field('provider_phone', $prevIntakeData->{'receiver_id'});
 		$page->field('percent_usual', $prevIntakeData->{'data_num_a'});
@@ -288,12 +289,15 @@ sub populateData_update
 	# Populating the fields while updating the dialog
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
 	my $authData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByTransId', $page->param('trans_id'));
-	#my $clientData = $authData->{'billing_facility_id'};
 	my $providerData = $authData->{'service_facility_id'};
 	#my $clientId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $clientData);
 	my $provider = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $providerData);
 
 	my $providerInfo = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $page->param('trans_id'), 'Provider Phone');
+
+	my $sourceOfServiceData = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selServiceSourceTypeByTransId', $authData->{'data_text_a'});
+	$page->field('source_referral', $sourceOfServiceData);
+
 	$page->field('provider_phone', $providerInfo->{'name_sort'});
 	$page->field('provider_phone_ext', $providerInfo->{'value_text'});
 	$page->field('provider_item_id', $providerInfo->{'item_id'});
@@ -306,9 +310,10 @@ sub populateData_update
 	$page->field('coordinator', $authData->{'care_provider_id'});
 	$page->field('ref_id', $authData->{'data_text_a'});
 	$page->field('follow_up', $authData->{'trans_status_reason'});
+	$page->field('hds_num', $authData->{'trans_expire_reason'});
+	$page->field('delivery_date', $authData->{'auth_expire'});
 	$page->field('followup_date', $authData->{'data_date_b'});
 	$page->field('ref_date', $authData->{'data_date_a'});
-	$page->field('source', $authData->{'trans_subtype'});
 	$page->field('contact_provider', $authData->{'trans_substatus_reason'});
 	$page->field('provider_name', $authData->{'receiver_id'});
 	#$page->field('provider_phone_ext', $authData->{'trans_seq'});
@@ -334,6 +339,7 @@ sub populateData_update
 	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
 	$page->field('code',$serviceRequest->{code});
 	$page->field('code_description',$serviceRequest->{caption});
+	$page->field('code_comment',$serviceRequest->{detail});
 	my $rate=$serviceRequest->{unit_cost} * $serviceRequest->{quantity};
 	$page->field('service_rate',$rate);
 }
@@ -485,7 +491,7 @@ sub execute
 				data_date_a            => $page->field('ref_date') || undef,
 				care_provider_id       => $page->field('coordinator') || undef,
 				consult_id             => $page->field('person_id') || undef,
-				trans_subtype          => $page->field('source') || undef,
+				#trans_subtype          => $page->field('source') || undef,
 				trans_substatus_reason => $page->field('contact_provider') || undef,
 				receiver_id            => $page->field('provider_name') || undef,
 				service_facility_id    => $providerInternalId || undef,

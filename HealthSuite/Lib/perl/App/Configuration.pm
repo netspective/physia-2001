@@ -36,6 +36,8 @@ struct(ServerConfigData => [
 	path_PerSeEDIErrors => '$',
 	path_PerSeEDIErrorsDelim => '$',
 	path_PaperClaims => '$',
+	path_OrgLib => '$',
+	path_PersonLib => '$',
 
 	file_SchemaDefn => '$',
 	file_BuildLog => '$',
@@ -52,7 +54,10 @@ use constant CONFIGGROUP_DEMO => 'demonstration';
 use constant CONFIGGROUP_SOLO => 'solo';
 
 use constant PATH_APPROOT    => File::Spec->catfile(defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite');
-use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl', 'App');
+use constant PATH_LIB        => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl');
+use constant PATH_APPLIB     => File::Spec->catfile(PATH_LIB, 'App');
+use constant PATH_ORGLIB     => File::Spec->catfile(PATH_LIB, 'Org');
+use constant PATH_PERSONLIB  => File::Spec->catfile(PATH_LIB, 'Person');
 use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
 use constant PATH_DIRECTORY	 => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Directory');
@@ -150,6 +155,8 @@ sub getDefaultConfig
 	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
+	$config->path_OrgLib(PATH_ORGLIB);
+	$config->path_PersonLib(PATH_PERSONLIB);
 
 	if ($group eq CONFIGGROUP_PRO) {
 		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));

@@ -38,6 +38,12 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl => ['org_id'],
 		_idSynonym => 'Clinic'
 	},
+	'org-assoc-provider' => {
+		heading => '$Command Associated Provider Organization',
+		orgtype => 'assoc-provider',
+		_arl => ['org_id'],
+		_idSynonym => 'Assoc-provider'
+	},
 	'org-employer' => {
 		heading => '$Command Employer Organization',
 		orgtype => 'employer',
@@ -119,6 +125,22 @@ sub initialize
 		),
 	);
 
+	if ($self->{orgtype} eq 'assoc-provider')
+		{
+			$self->addContent(
+				new CGI::Dialog::Field(
+								caption => 'Org Type',
+								name => 'member_name',
+								type => 'select',
+								style => 'radio',
+								choiceDelim =>',',
+								selOptions => 'Main,Location',
+								options => FLDFLAG_REQUIRED,
+								invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
+							),
+			);
+	}
+
 	$self->addContentOrgType($self->{orgtype});
 
 	$self->addContent(
@@ -172,7 +194,6 @@ sub initialize
 			),
 		);
 	}
-
 	elsif ($self->{orgtype} ne 'insurance')
 	{
 		$self->addContent(
@@ -203,7 +224,17 @@ sub initialize
 			),
 		);
 	}
-
+	if ($self->{orgtype} eq 'assoc-provider')
+	{
+		$self->addContent(
+			new App::Dialog::Field::Address(
+				caption=>'Billing Address',
+				namePrefix => 'bill_',
+				options => FLDFLAG_REQUIRED,
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
+		);
+	}
 	$self->addContent(
 		new CGI::Dialog::Field(
 			caption => 'Email',
@@ -245,7 +276,7 @@ sub initialize
 		);
 	}
 
-	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider')
+	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'assoc-provider')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -295,7 +326,7 @@ sub initialize
 			),
 		);
 	}
-	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept')
+	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'assoc-provider')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -332,6 +363,19 @@ sub initialize
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE),
 	);
+
+	if ($self->{orgtype} eq 'assoc-provider')
+	{
+		$self->addContent(
+			new CGI::Dialog::Field(
+				caption => 'Area Served',
+				name => 'area_served',
+				type => 'select',
+				choiceDelim =>',',
+				selOptions => ' ,National,State,Regional'
+				),
+		);
+	}
 
 	$self->{activityLog} = {
 		scope =>'org',
@@ -480,7 +524,23 @@ sub populateData
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
+
+
 	my @members = $page->field('member_name');
+
+	if ($page->field('member_name') eq 'Main')
+	{
+			@members ='main_dir_entry';
+	}
+	elsif ($page->field('member_name') eq 'Location')
+	{
+			@members ='location_dir_entry';
+	}
+	else
+	{
+		@members = $page->field('member_name');
+	}
+
 	my $ownerOrg = $page->session('org_internal_id');
 	my $orgId = $page->field('org_id');
 	my $parentId = $page->field('parent_org_id');
@@ -522,15 +582,17 @@ sub execute_add
 	##Then add mailing address
 	$page->schemaAction(
 			'Org_Address', $command,
-			parent_id => $orgIntId,
+			parent_id => $orgIntId || undef,
 			address_name => 'Mailing',
-			line1 => $page->field('addr_line1'),
+			line1 => $page->field('addr_line1') || undef,
 			line2 => $page->field('addr_line2') || undef,
-			city => $page->field('addr_city'),
-			state => $page->field('addr_state'),
-			zip => $page->field('addr_zip'),
+			city => $page->field('addr_city') || undef,
+			state => $page->field('addr_state') || undef,
+			zip => $page->field('addr_zip')|| undef,
 			_debug => 0
 		) if $page->field('addr_line1') ne '';
+
+
 
 	##Then add attributes
 
@@ -699,6 +761,68 @@ sub execute_add
 			value_text => $page->field('clear_house') || undef,
 			_debug => 0
 		)if $page->field('clear_house') ne '';
+
+# ATTRIBUTES FOR	ACS ASSOCIATED PROVIDER
+
+	$page->schemaAction(
+				'Org_Attribute', $command,
+				parent_id => $orgIntId,
+				item_name =>  'Area Served',
+				value_type => App::Universal::ATTRTYPE_TEXT,
+				value_text => $page->field('area_served') || undef,
+				_debug => 0
+		)if $page->field('area_served') ne '';
+
+	$page->schemaAction(
+			'Org_Address', $command,
+			parent_id => $orgIntId || undef,
+			address_name => 'Billing',
+			line1 => $page->field('bill_line1') || undef,
+			line2 => $page->field('bill_line2') || undef,
+			city => $page->field('bill_city') || undef,
+			state => $page->field('bill_state') || undef,
+			zip => $page->field('bill_zip') || undef,
+			_debug => 0
+		) if $page->field('addr_line1') ne '';
+
+	my $orgInternalId = $page->session('org_internal_id');
+	my $catalogId = $page->field('org_id').'_FEE_SCHEDULE';
+	my $catInternalId = $page->schemaAction(
+									'Offering_Catalog', $command,
+									catalog_id => $catalogId || undef,
+									org_internal_id => $orgInternalId || undef,
+									catalog_type => 0,
+									caption => $catalogId || undef,
+									_debug => 0
+								)if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+
+	my$secCatalogId = $page->field('org_id').'_ST';
+	my $catSecIntenalId = $page->schemaAction(
+										'Offering_Catalog', $command,
+										org_internal_id => $orgInternalId || undef,
+										catalog_id => $secCatalogId || undef,
+										catalog_type => 0,
+										caption => $secCatalogId || undef,
+										_debug => 0
+								)if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+
+	$page->schemaAction(
+				'Org_Attribute', $command,
+				parent_id => $orgIntId,
+				item_name =>  'Fee Schedule',
+				value_type => App::Universal::ATTRTYPE_INTEGER,
+				value_int => $catInternalId || undef,
+				_debug => 0
+		) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+
+	$page->schemaAction(
+				'Org_Attribute', $command,
+				parent_id => $orgIntId,
+				item_name =>  'Fee Schedule',
+				value_type => App::Universal::ATTRTYPE_INTEGER,
+				value_int => $catSecIntenalId || undef,
+				_debug => 0
+		) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 

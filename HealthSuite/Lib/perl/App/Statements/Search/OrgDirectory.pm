@@ -6,8 +6,9 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use vars qw(@ISA @EXPORT $STMTMGR_ORG_DIR_SEARCH $STMTRPTDEFN_DEFAULT $STMTRPTDEFN_SERVICE_DEFAULT
-	$STMTFMT_SEL_ORG_DIR $STMTFMT_SEL_ORG_SERVICE_DIR $STMTMGR_ORG_SERVICE_DIR_SEARCH);
+use vars qw(@ISA @EXPORT $STMTMGR_ORG_DIR_SEARCH $STMTRPTDEFN_DEFAULT $STMTRPTDEFN_SERVICE_DEFAULT $STMTRPTDEFN_DRILL_SERVICE_DEFAULT
+	$STMTFMT_SEL_ORG_DIR $STMTFMT_SEL_ORG_SERVICE_DIR $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR $STMTMGR_ORG_SERVICE_DIR_SEARCH
+	$STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_ORG_DIR_SEARCH $STMTMGR_ORG_SERVICE_DIR_SEARCH);
 
@@ -77,15 +78,53 @@ $STMTFMT_SEL_ORG_SERVICE_DIR = qq{
 		AND     o.owner_org_id = ?
 		AND     rownum <= $LIMIT
 		ORDER BY o.org_id
-
 };
 
+$STMTFMT_SEL_ORG_DRILL_SERVICE_DIR = qq{
+
+		SELECT  unique a.state, a.city
+		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa
+		WHERE    oc.catalog_id = c.internal_catalog_id
+		AND     a.parent_id = o.org_internal_id
+		AND     cat.parent_id = o.org_internal_id
+		AND     cat.member_name in ('main_dir_entry', 'location_dir_entry')
+		AND     c.catalog_type = 1
+		AND     c.org_internal_id = o.owner_org_id
+		AND 	o.org_internal_id = oa.parent_id
+		AND     oa.item_name = 'Fee Schedule'
+		AND     value_int = c.internal_catalog_id
+		AND	%whereCond%
+		AND     o.owner_org_id = ?
+		AND     rownum <= $LIMIT
+		ORDER BY a.state, a.city
+};
+
+$STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR = qq{
+
+		SELECT  unique o.org_id,
+					o.name_primary
+		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa
+		WHERE    oc.catalog_id = c.internal_catalog_id
+		AND     a.parent_id = o.org_internal_id
+		AND     cat.parent_id = o.org_internal_id
+		AND     cat.member_name in ('main_dir_entry', 'location_dir_entry')
+		AND     c.catalog_type = 1
+		AND     c.org_internal_id = o.owner_org_id
+		AND 	o.org_internal_id = oa.parent_id
+		AND     oa.item_name = 'Fee Schedule'
+		AND     value_int = c.internal_catalog_id
+		AND     o.owner_org_id = ?
+		AND     oc.code = ?
+		AND     a.city = ?
+		AND     rownum <= $LIMIT
+		ORDER BY o.org_id
+};
 
 $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'Code', url => '/org/#0#/profile', },
+				{ head => 'Code', url => q{javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';},},
 				{ head => 'Provider Name' },
 				{ head => 'Category'},
 				{ head => 'City'},
@@ -99,12 +138,24 @@ $STMTRPTDEFN_SERVICE_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'Code', url => '/org/#0#/profile', },
+				{ head => 'Code', url => q{javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';},},
 				{ head => 'Provider Name' },
 				{ head => 'City'},
 				{ head => 'State'},
 			],
 };
+
+$STMTRPTDEFN_DRILL_SERVICE_DEFAULT =
+{
+	columnDefn =>
+			[
+				{ head => 'State'},
+				{ head => 'City', dataFmt => '#1#',  url => q{javascript:location.href='#hrefSelf#&detail=service&city=#1#'},},
+			],
+};
+
+
+
 
 $STMTMGR_ORG_DIR_SEARCH = new App::Statements::Search::OrgDirectory(
 	'sel_statecityzip' =>
@@ -269,6 +320,23 @@ $STMTMGR_ORG_SERVICE_DIR_SEARCH = new App::Statements::Search::OrgDirectory(
 			whereCond => " UPPER(oc.code) LIKE ?",
 			publishDefn => $STMTRPTDEFN_SERVICE_DEFAULT,
 		},
+	'sel_donlyservice' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
+			whereCond => " UPPER(oc.code) = ?",
+			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
+		},
+	'sel_donlyservice_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
+			whereCond => " UPPER(oc.code) LIKE ?",
+			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
+		},
+
+	'sel_sub_service_search' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR,
+	}
 
 
 );

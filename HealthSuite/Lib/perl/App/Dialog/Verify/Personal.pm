@@ -13,7 +13,7 @@ use base 'CGI::Dialog';
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
-	'personal-records' => { 
+	'personal-records' => {
 			_arl => ['event_id', 'person_id'],
 			_modes => ['verify'],
 		},
@@ -30,7 +30,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
-		
+
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'person_id',
 			size => 25,
@@ -52,14 +52,14 @@ sub new
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons());
-	
+
 	$self->{activityLog} =
 	{
 		scope =>'event',
 		key => "#field.person_id#",
 		data => "personal records 'Event #field.event_id#' <a href='/person/#field.person_id#/profile'>#field.person_id#</a>"
 	};
-	
+
 	return $self;
 }
 
@@ -80,6 +80,7 @@ sub getSupplementaryHtml
 					<TD>
 						<font size=1 face=arial>
 						#component.stpt-person.contactMethodsAndAddresses#<BR>
+						#component.stpt-person.patientInfo#<BR>
 						#component.stpt-person.accountPanel#<BR>
 						#component.stpt-person.officeLocation#
 						#component.stpt-person.employmentAssociations#<BR>
@@ -124,15 +125,15 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	my $eventId = $page->param('event_id');
-	
+
 	$page->field('event_id', $eventId);
 	$page->field('person_id', $page->param('person_id'));
 	$page->field('per_verified_by', $page->session('user_id'));
-	
+
 	$page->param('_verified_', $STMTMGR_COMPONENT_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'sel_populatePersonalVerifyDialog', $eventId));
 }
@@ -144,9 +145,9 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $eventId = $page->field('event_id');
-	
+
  	$page->schemaAction(
 		'Sch_Verify', $page->param('_verified_') ? 'update' : 'add',
 		event_id => $eventId,
@@ -155,20 +156,20 @@ sub execute
 		per_verify_date => $page->field('per_verify_date'),
 		owner_org_id => $page->session('org_internal_id'),
 	);
-	
+
 	my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
 
 	my $itemId = $eventAttribute->{item_id};
 	my $verifyFlags = $eventAttribute->{value_intb};
 	$verifyFlags |= App::Component::WorkList::PatientFlow::VERIFYFLAG_PERSONAL;
-		
+
 	$page->schemaAction(
 		'Event_Attribute', 'update',
 		item_id => $itemId,
 		value_intB => $verifyFlags,
 	);
-	
+
 	$self->handlePostExecute($page, $command, $flags);
 }
 

@@ -9,6 +9,7 @@ use App::Universal;
 use Data::Publish;
 use App::Statements::Component;
 use App::Statements::Org;
+use App::Statements::Catalog;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_ORG $PUBLDEFN_CONTACTMETHOD_DEFAULT
@@ -78,6 +79,173 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panel'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelTransp'); },
 	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelEdit'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------
+'org.serviceCatalog' => {
+	sqlStmt => qq{
+			SELECT	oc.catalog_id,oct.caption, count (oce.catalog_id) ,oc.internal_catalog_id
+			FROM 	offering_catalog oc, offering_catalog_entry oce,org_attribute oa,
+				offering_catalog_type oct
+			WHERE 	oce.catalog_id (+)= oc.internal_catalog_id
+			AND  	oa.parent_id = :1
+			AND  	oa.item_name = 'Fee Schedule'
+			AND   	oa.value_int = oc.internal_catalog_id	
+			AND oct.id = oc.catalog_type
+			GROUP BY oc.catalog_id,oct.caption,oc.internal_catalog_id
+	},
+	sqlvar_entityName => 'Org',
+	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
+	publishDefn => {
+				bullets => '/org/#param.org_id#/catalog/#3#/#0#?home=#homeArl#',
+		
+				columnDefn => [
+						{dataFmt =>'#1# : #0# (#2#)  '},
+					],					
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		frame => {
+			heading => 'Service Catalog/Fee Schedule',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.edit',	
+		frame => { heading => 'Edit Service Catalog/Fee Schedule' },		
+		banner => {
+			actionRows =>
+			[
+			{caption =>qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog-item/#param.fs_internal_catalog_id#?home=#homeArl#'>Fee Schedule Entry</A>} },
+			{caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-service-catalog/#param.sc_internal_catalog_id#?home=#homeArl#'>Service Catalog Entry</A> },},				
+			],
+			},
+		
+	},	
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); 
+	#Set param for fee schedule and service catalog
+	my $fs_internal_catalog_id=$STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'sel1CatalogByOrgIDType',$orgId,0);
+	my $sc_internal_catalog_id=$STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'sel1CatalogByOrgIDType',$orgId,1);
+	$page->param('fs_internal_catalog_id',$fs_internal_catalog_id);
+	$page->param('sc_internal_catalog_id',$sc_internal_catalog_id);
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panelEdit'); },
+},
+#----------------------------------------------------------------------------------------------------------------------
+'org.fsCatalogEntry' => {
+	sqlStmt => qq{
+			SELECT	oce.code,oce.name,(SELECT caption FROM catalog_entry_type WHERE id = oce.entry_type), oce.entry_id,
+			oce.unit_cost
+			FROM 	offering_catalog_entry oce,offering_catalog oc
+			WHERE 	oce.catalog_id = :1
+			AND	oc.internal_catalog_id = oce.catalog_id
+	},
+	sqlvar_entityName => 'Org',
+	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
+	publishDefn => {
+				bullets => '/org/#param.org_id#/dlg-update-catalog-item/#3#?home=#homeArl#',		
+				columnDefn => [
+				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},							
+				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},																	
+				{colIdx => 2, head => 'Code Type', hAlign=>'left',dAlign => 'left'},
+				{colIdx => 4, head => 'Charge', hAlign=>'right',dAlign => 'left',dformat => 'currency' ,summarize=>'sum'},
+				
+],
+			banner =>
+			{
+				actionRows =>
+				[
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#?home=#homeArl#'>Fee Schedule Entry</A> } },
+				],
+			},
+
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		#rowSepStr =>'',
+		frame => {
+			heading => 'Fee Schedule Entries',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+			#width=>'30%',
+		flags=>0,
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.fsCatalogEntry', [$orgId]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.fsCatalogEntry', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.fsCatalogEntry', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.fsCatalogEntry', [$orgId], 'panelEdit'); },
+},
+#----------------------------------------------------------------------------------------------------------------------
+'org.serviceCatalogEntry' => {
+	sqlStmt => qq{
+			SELECT	oce.code,(SELECT  name FROM ref_service_category WHERE oce.code = serv_category), oce.entry_id			
+			FROM 	offering_catalog_entry oce,offering_catalog oc
+			WHERE 	oce.catalog_id = :1
+			AND	oc.internal_catalog_id = oce.catalog_id
+	},
+	sqlvar_entityName => 'Org',
+	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
+	publishDefn => {
+				bullets => '/org/#param.org_id#/dlg-update-service-catalog/#2#?home=#homeArl#',		
+				columnDefn => [
+				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},							
+				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},																	
+				
+],
+			banner =>
+			{
+				actionRows =>
+				[
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-service-catalog/#param.internal_catalog_id#?home=#homeArl#'>Service Catalog Entry</A> } },
+				],
+			},
+
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		#rowSepStr =>'',
+		frame => {
+			heading => 'Service Catalog Entries',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+			#width=>'30%',
+		flags=>0,
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalogEntry', [$orgId]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalogEntry', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalogEntry', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('internal_catalog_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalogEntry', [$orgId], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------

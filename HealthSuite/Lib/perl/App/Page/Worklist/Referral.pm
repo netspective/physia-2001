@@ -21,11 +21,7 @@ use App::Dialog::CollectionSetup;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
-	'worklist/referral' => {
-		_views => [
-			{caption => 'Today', name => 'date',},
-			],
-		},
+	'worklist/referral' => { },
 	);
 
 sub prepare_view_date
@@ -156,12 +152,9 @@ sub prepare_page_content_header
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
 
-	$self->SUPER::prepare_page_content_header(@_);
-
 	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self,
 		STMTMGRFLAG_NONE, 'sel_personinfo', $self->session('user_id'));
 	my $userName = $userNameHash->{complete_name};
-
 
 	my $heading;
 	if ($self->param('user') eq 'physician' || $self->param('user'))
@@ -173,40 +166,9 @@ sub prepare_page_content_header
 	{
 		$heading = 'Service Request Worklist';
 	}
-	my $dateTitle = decodeDate($self->param('_seldate'));
 
-	my $urlPrefix = "/worklist";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
-			#[$dateTitle, "/worklist/date", 'date'],
-			#['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
-			#['Setup', "/worklist/collection/setup", 'setup', ],
-
-		], ' | ');
-
-	push(@{$self->{page_content_header}},
-	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
-
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
-		unless ($self->param('noControlBar'));
+	$self->{page_heading} = $heading;
+	$self->SUPER::prepare_page_content_header(@_);
 
 	return 1;
 }

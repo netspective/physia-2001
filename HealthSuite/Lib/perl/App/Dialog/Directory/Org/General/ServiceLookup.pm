@@ -24,6 +24,7 @@ sub new
 	$self->addContent(
 			new CGI::Dialog::Field(caption =>'Service',
 						name => 'service',
+						options => FLDFLAG_REQUIRED,
 						size => 6,
 						maxLength => 6),
 			#new CGI::Dialog::Field(caption =>'Service',

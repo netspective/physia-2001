@@ -2875,21 +2875,25 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.patientInfo'=> {
 	sqlStmt => qq{
 			SELECT
+				UNIQUE person_id,
 				ssn,
 				date_of_birth,
 				simple_name,
-				person_id
-			FROM	person p, transaction t
+				g.caption
+			FROM	person p, transaction t, gender g
 			WHERE   trans_type in (6000, 6010)
-			AND     trans_id = ?
-			AND 	p.person_id = t.consult_id
+			AND    consult_id = ?
+			AND 	  p.person_id = t.consult_id
+			AND 	  g.id = p.gender
 		},
 		publishDefn => 	{
 			columnDefn =>
 			[
-				{  dataFmt => "<a href='/person/#3#/profile'>#2#</a>: SSN (#0#), DOB(#1#)"},
+				{  dataFmt => "<a href='/person/#0#/profile'>#3#</a>: SSN (#1#), DOB(#2#), Gender(#4#)"},
 			],
+			bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-patient?home=#homeArl#',
 		},
+
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
@@ -2902,12 +2906,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		style => 'panel.transparent',
 		inherit => 'panel',
 	},
-
-
-	publishComp_st => sub { my ($page, $flags, $transId) = @_; $transId = $page->param('parent_trans_id') ne '' ? $page->param('parent_trans_id'):$page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$transId]); },
-	publishComp_stp => sub { my ($page, $flags, $transId) = @_; $transId = $page->param('parent_trans_id') ne '' ? $page->param('parent_trans_id'):$page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$transId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $transId) = @_; $transId = $page->param('parent_trans_id') ne '' ? $page->param('parent_trans_id'):$page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$transId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $transId) = @_; $transId = $page->param('parent_trans_id') ne '' ? $page->param('parent_trans_id'):$page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$transId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientInfo', [$personId], 'panelTransp'); },
 
 },
 
@@ -2986,11 +2988,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 			SELECT 	tr.trans_id,
 				to_char(tr.data_date_a,'MM/DD/YY'),
-				(SELECT rsd.caption FROM referral_service_descr rsd, transaction tp 
-				 WHERE rsd.id = tp.trans_expire_reason
+				(SELECT rsd.name
+					FROM ref_service_category rsd , transaction tp
+				 WHERE rsd.serv_category = tp.trans_expire_reason
 				 AND	tp.trans_id = tsr.parent_trans_id),
 				(SELECT caption FROM referral_followup_status where id = tr.trans_status_reason),
-				to_char(tr.data_date_b,'MM/DD/YY'),				
+				to_char(tr.data_date_b,'MM/DD/YY'),
 				tr.trans_type,
 				(SELECT parent_trans_id FROM transaction where trans_id = tr.parent_trans_id)
 			FROM  transaction tsr, transaction tr
@@ -3009,9 +3012,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		{colIdx => 2, head => 'Type', hHint=>'Referral Type', dAlign => 'center'},
 		{colIdx => 3, head => 'FUD', hHint=>'Follow Up Date', dAlign => 'center'},
 		{colIdx => 4, head => 'Followup', hHint=>'Follow Up Caption', dAlign => 'center'},
-		
+
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#6#/#0#?home=#homeArl#',
+		#bullets => '/org/#session.org_id#/dlg-update-trans-6010/#0#?home=#homeArl#',
 		frame => {
 		#addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
 		#editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -3042,7 +3045,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			#updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', 
+			#updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#',
 			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
 		},
 	},
@@ -3063,39 +3066,46 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				to_char(data_date_a,'MM/DD/YY'),
 				(SELECT to_char(data_date_a,'MM/DD/YY') FROM transaction where trans_id = t.parent_trans_id),
 				(
-				
-					SELECT rsd.caption
-					FROM referral_service_descr rsd, transaction t1,transaction t2 where t1.trans_id = t.parent_trans_id  
+
+					SELECT rsd.name
+					FROM ref_service_category rsd, transaction t1,transaction t2 where t1.trans_id = t.parent_trans_id
 					AND t2.trans_id = t1.parent_trans_id AND
-					t2.trans_expire_reason = rsd.id
+					t2.trans_expire_reason = rsd.SERV_CATEGORY
 				),
+				
 				to_char(data_date_b,'MM/DD/YY'),
 				(SELECT caption FROM referral_followup_status where id = trans_status_reason),
 				trans_type,
-				(SELECT parent_trans_id FROM transaction where trans_id = t.parent_trans_id)
+				(SELECT parent_trans_id FROM transaction where trans_id = t.parent_trans_id),
+				(SELECT to_char(t2.trans_end_stamp,'MM/DD/YY') FROM transaction t1, transaction t2 WHERE t1.trans_id = t.parent_trans_id
+				AND	t2.trans_id = t1.parent_trans_id),
+				(SELECT to_char(data_date_b,'MM/DD/YY') FROM transaction where trans_id = t.parent_trans_id)
 			FROM  transaction t
 			WHERE  	consult_id = ?
 			AND trans_type in (6010)
-			ORDER BY 1 desc
+			ORDER BY 3 desc
 		},
 		sqlStmtBindParamDescr => ['Trans ID'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-		{colIdx => 0, head => 'RID', hHint=>'Referral ID', dAlign => 'center',tDataFmt => '&{count:0} Referrals',},
-		{colIdx => 1, head => 'Date', hHint=>'Referral Date'},
-		{colIdx => 3, head => 'Type', hHint=>'Referral Type', dAlign => 'center'},
-		{colIdx => 4, head => 'FUD', hHint=>'Follow Up Date', dAlign => 'center'},
-		{colIdx => 5, head => 'Followup', hHint=>'Follow Up Caption', dAlign => 'center'},
-		{colIdx => 7, head => 'SID', hHint=>'Service Request ID', dAlign => 'center',url=>'/org/#session.org_id#/dlg-update-trans-6000/#7#'},
-		{colIdx => 2, head => 'SD', hHint=>'Service Request Date', dAlign => 'center',},
-		
+		{colIdx => 0, head => 'RID', hHint=>'Referral ID',hint=>'Referral ID', dAlign => 'center',tDataFmt => '&{count:0} Referrals',},
+		#{colIdx => 1, head => 'Date', hHint=>'Referral Date'},
+		{colIdx => 3, head => 'Type', hHint=>'Referral Type', hint=>'Referral Type' ,dAlign => 'center'},
+		{colIdx => 4, head => 'FUD', hHint=>'Follow Up Date',hint=>'Follow Up Date', dAlign => 'center'},
+		{colIdx => 5, head => 'Followup', hHint=>'Follow Up Caption', hint=>'Follow Up Caption',dAlign => 'center'},
+		{colIdx => 7, head => 'SID', hHint=>'Service Request ID', hint=>'Service Request ID', dAlign => 'center',url=>'/org/#session.org_id#/dlg-update-trans-6000/#7#'},
+		{colIdx => 8, head => 'SD', hHint=>'Service Request Date',hint=>'Service Request Date', dAlign => 'center',},
+		{colIdx => 2, head => 'SBD', hHint=>'Service Begin Date', hint=>'Service Begin Date',dAlign => 'center',},
+		{colIdx => 9, head =>'SED', hHint=>'Service End Date',hint=>'Service End Date', dAlign => 'center',},
+
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#6#/#0#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/dlg-update-trans-#6#/#0#?home=#homeArl#',
 		frame => {
-		addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
-		editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		#addUrl => '/person/#param.person_id#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
+		#editUrl => '/person/#param.person_id#/?home=#homeArl#',
+		editUrl => '/person/#param.person_id#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
 		},
 	},
 	publishDefn_panel =>
@@ -3123,7 +3133,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', 
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#',
 			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
 		},
 	},

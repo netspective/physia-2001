@@ -64,7 +64,7 @@ sub prepare_page_content_footer
 {
 	my $self = shift;
 	
-	if (ref($self) ne 'App::Page::Search::Home')
+	if($self->param('execute'))
 	{	
 		push(@{$self->{page_content_footer}}, qq{
 			<br>
