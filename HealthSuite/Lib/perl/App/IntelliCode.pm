@@ -280,8 +280,7 @@ sub crossChecks
 	{
 		my ($cpt, $modifier) = (uc($_->[0]), $_->[1]);
 		next unless ($CPT_CACHE{$cpt}->{cpt});
-		next if $cpt >= 99000 and $cpt <= 99999;
-
+		
 		my $count = scalar(@$_) -1;
 		my @diags = @$_[2..$count];
 
@@ -294,12 +293,15 @@ sub crossChecks
 			my $icdHash = $ICD_CACHE{$icd};
 			my $cptSet = $icdHash->{cpts_allowed};
 
-			if (defined $cptSet && (! $cptSet->member($cpt)))
+			unless($cpt >= 99000 and $cpt <= 99999)
 			{
-				my $cptName = $CPT_CACHE{$cpt}->{name};
-				my $icdName = $ICD_CACHE{$icd}->{name};
-				push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_PROCNOTALLOWED],
-					detailLink('cpt', $cpt), $cptName, detailLink('icd', $icd), $icdName));
+				if (defined $cptSet && (! $cptSet->member($cpt)))
+				{
+					my $cptName = $CPT_CACHE{$cpt}->{name};
+					my $icdName = $ICD_CACHE{$icd}->{name};
+					push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_PROCNOTALLOWED],
+						detailLink('cpt', $cpt), $cptName, detailLink('icd', $icd), $icdName));
+				}
 			}
 		}
 	}
