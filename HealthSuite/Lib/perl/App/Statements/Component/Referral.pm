@@ -119,7 +119,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 				where parent_id = ? and value_type = $ATTRITYPE_RESOURCE_PERSON and item_name = 'WorkList'))
 			)
 		)
-		order by trans_id
+		order by trans_id DESC
 	},
 
 	'sel_referral_authorization' => qq{
