@@ -33,7 +33,7 @@ use App::Dialog::PostTransfer;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
 use App::IntelliCode;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Page::Search;
 
 use constant DATEFORMAT_USA => 1;
@@ -59,8 +59,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'Halley NSF', name => 'halley_nsf',},
 					{caption => 'Dialog', name => 'dialog',},
 					{caption => 'Submit', name => 'submit',},
-					{caption => 'Review', name => 'review',},
+					{caption => 'Close', name => 'close',},
 					{caption => 'Intellicode', name => 'intellicode',},
+					{caption => 'Error', name => 'error',},
 					{caption => 'Adjustment', name => 'adjustment',},
 			],
 		},
@@ -1285,6 +1286,10 @@ sub prepare_view_summary
 	my $payerPane = "<TD><FONT FACE='Arial,Helvetica' SIZE=2>$payer</TD>";
 	my $payerPaneHeading = "<TD BGCOLOR=EEEEEE><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=333333><B>Payer</B></TD>";
 
+
+	#check if the claim has already been transferred to a carrier
+	my $beenTransferred = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selBeenTransferred', $invoiceId);
+
 	my $quickLinks = '';
 	unless($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
@@ -1316,38 +1321,48 @@ sub prepare_view_summary
 						</TD>" : '' ]}
 
 						@{[ $totalItems > 0 && $claimType != $selfPay && 
-							! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
+							! ($beenTransferred) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/submit'>Submit Claim for Transfer</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && 
-							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) ?
+						@{[ $totalItems > 0 && $claimType != $selfPay && 
+							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
+								$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted ) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer</a>
+							<a href='/invoice/$invoiceId/submit?resubmit=2'>Resubmit Claim for Transfer</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && 
-							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || 
+						@{[ $totalItems > 0 && $claimType != $selfPay && 
+							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
+								$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted || 
 								$invStatus == $awaitInsPayment  ) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</a>
+							<a href='/invoice/$invoiceId/submit?resubmit=3'>Submit Claim for Transfer to Next Payer</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $invStatus != $onHold && $invStatus < $transferred ?
+						@{[ ($invStatus != $onHold && $invStatus < $transferred) || (! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void && $invStatus != $awaitClientPayment ?
+						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $appealed || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
+						"<TD>
+							<FONT FACE='Arial,Helvetica' SIZE=2>
+							<a href='/invoice/$invoiceId/dialog/hold?transferred=1'>Place Claim On Hold</a>
+							</FONT>
+						</TD>" : '' ]}
+
+						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void && $invStatus != $awaitClientPayment && 
+							($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
@@ -1533,6 +1548,41 @@ sub prepare_view_adjustment
 	return 1;
 }
 
+sub prepare_view_error
+{
+	my $self = shift;
+	my $claim = $self->property('activeClaim');
+
+	push(@{$self->{page_content}}, qq{
+			<style>
+				ol {font-family: Tahoma; font-size: 9pt}
+				ul {font-family: Tahoma; font-size: 9pt}
+				h3 {font-family: Tahoma; font-size: 11pt}
+
+			</style>
+
+			<b style="color:red">Please correct the following errors</b><br><br>
+			<TABLE BGCOLOR='#EEEEEE' CELLSPACING=1 CELLPADDING=2 BORDER=0>
+				<TR BGCOLOR='#EEEEEE'>
+					<TD>
+						<FONT FACE="Arial,Helvetica" SIZE=2>
+						<b>IntelliCode Results</b>
+						</FONT>
+					</TD>
+				</TR>
+				<TR BGCOLOR=WHITE>
+					<TD>
+						<FONT FACE="Arial,Helvetica" SIZE=2>
+						@{[ $self->getIntelliCodeResultsHtml($claim) ]}
+						</FONT>
+					</TD>
+				</TR>
+			</TABLE>
+	});
+	
+	return 1;
+}
+
 sub prepare_view_intellicode
 {
 	my $self = shift;
@@ -1616,7 +1666,7 @@ sub prepare_view_submit
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
 	my $claim = $self->property('activeClaim');
-	my $resubmitFlag = $self->param('resubmit');
+	my $submitFlag = $self->param('resubmit') || App::Universal::SUBMIT_PAYER;
 	my $printFlag = $self->param('print');
 	my $patient = $claim->getCareReceiver();
 	my $patientId = $patient->getId();
@@ -1628,10 +1678,10 @@ sub prepare_view_submit
 	}
 	else
 	{
-		my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
+		my $handler = \&{'handleDataStorage'};
 		eval
 		{
-			$invoiceId = &{$handler}($self, 'add', $invoiceId, $resubmitFlag, $printFlag);
+			$invoiceId = &{$handler}($self, $invoiceId, $submitFlag, $printFlag);
 		};
 		$self->addError($@) if $@;
 
@@ -1644,6 +1694,18 @@ sub prepare_view_submit
 			$self->redirect("/invoice/$invoiceId/summary");
 		}
 	}
+}
+
+sub prepare_view_close
+{
+	my $self = shift;
+	my $invoiceId = $self->param('invoice_id');
+
+	handleDataStorage($self, $invoiceId);
+	$self->schemaAction('Invoice', 'update', invoice_id => $invoiceId, invoice_status => App::Universal::INVOICESTATUS_CLOSED);
+	addHistoryItem($self, $invoiceId, value_text => 'Closed');
+
+	$self->redirect("/invoice/$invoiceId/summary");
 }
 
 sub prepare_view_history
@@ -1699,7 +1761,7 @@ sub prepare_view_thin_nsf
 		$valMgr->validateClaim('Output', DEFAULT_VFLAGS, $claimList);
 
 		my @outArray = ();
-		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_THIN);
+		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_THIN, page => $self);
 
 		push(@{$self->{page_content}}, '<pre>', join("\n", @outArray), '</pre>');
 
@@ -1728,7 +1790,7 @@ sub prepare_view_halley_nsf
 	{
 		my $output = new App::Billing::Output::NSF();
 		my @outArray = ();
-		$output->processClaims(destination => NSFDEST_FILE, outArray => \@outArray, outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $fileName), claimList => $claimList, nsfType => App::Billing::Universal::NSF_HALLEY);
+		$output->processClaims(destination => NSFDEST_FILE, outArray => \@outArray, outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $fileName), claimList => $claimList, nsfType => App::Billing::Universal::NSF_HALLEY, page => $self);
 	};
 
 	eval
@@ -1738,7 +1800,7 @@ sub prepare_view_halley_nsf
 		$valMgr->validateClaim('Output', DEFAULT_VFLAGS, $claimList);
 
 		my @outArray = ();
-		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_HALLEY);
+		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_HALLEY, page => $self);
 
 		push(@{$self->{page_content}}, '<pre>', join("\n", @outArray), '</pre>');
 
@@ -1759,7 +1821,6 @@ sub prepare_view_1500
 
 	# these values are set in "initialize()" method
 	my $invoiceId = $self->param('invoice_id');
-	my $todaysDate = UnixDate('today', $self->defaultUnixDateFormat());
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
 	my $html = [];
@@ -1768,15 +1829,12 @@ sub prepare_view_1500
 	{
 #		my $output = new pdflib;
 		my $output = new App::Billing::Output::HTML;
-		$output->processClaims(outArray => $html, claimList => $claimList, TEMPLATE_PATH => File::Spec->catfile($CONFDATA_SERVER->path_BillingTemplate(), 'View1500.dat'));
+		$output->processClaims(outArray => $html, claimList => $claimList, TEMPLATE_PATH => File::Spec->catfile($CONFDATA_SERVER->path_BillingTemplate(), 'View1500.dat'), page => $self);
 	};
 	$self->addContent(@$html) if $html;
 	$self->addError('Problem in sub prepare_view_1500', $@) if $@;
 
-	addHistoryItem($self, $invoiceId,
-		value_text => 'Claim viewed',
-		value_date => $todaysDate,
-	);
+	addHistoryItem($self, $invoiceId, value_text => 'Claim viewed');
 
 	return 1;
 }
@@ -1794,7 +1852,7 @@ sub prepare_view_1500edit
 	{
 		#my $output = new pdflib;
 		my $output = new App::Billing::Output::HTML;
-		$output->processClaims(outArray => $html, claimList => $claimList, TEMPLATE_PATH => File::Spec->catfile($CONFDATA_SERVER->path_BillingTemplate(), 'Edit1500.dat'));
+		$output->processClaims(outArray => $html, claimList => $claimList, TEMPLATE_PATH => File::Spec->catfile($CONFDATA_SERVER->path_BillingTemplate(), 'Edit1500.dat'), page => $self);
 	};
 	$self->addContent(@$html) if $html;
 	$self->addError('Problem in sub prepare_view_1500', $@) if $@;
@@ -1820,7 +1878,7 @@ sub prepare_view_1500pdf
 	{
 		#my $output = new pdflib;
 		my $output = new App::Billing::Output::PDF;
-		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList, drawBackgroundForm => $plain ? 0 : 1);
+		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList, drawBackgroundForm => $plain ? 0 : 1, page => $self);
 	};
 	$self->redirect($pdfHref);
 	#$self->addContent("<a href='$pdfHref' target='$pdfName'>View HCFA PDF File for Claim $invoiceId</a><script>window.location.href = '$pdfHref';</script>");
@@ -1831,10 +1889,7 @@ sub prepare_view_1500pdf
 
 	return 1 if $claimPrintHistoryItem->{cr_user_id} eq $sessUser && $timeDiff < 10;
 
-	addHistoryItem($self, $invoiceId,
-		value_text => 'Claim printed',
-		value_date => $todaysDate,
-	);
+	addHistoryItem($self, $invoiceId, value_text => 'Claim printed');
 
 	return 1;
 }
@@ -1842,9 +1897,6 @@ sub prepare_view_1500pdf
 sub prepare_view_1500pdfplain
 {
 	my $self = shift;
-	my $invoiceId = $self->param('invoice_id');
-	my $todaysDate = UnixDate('today', $self->defaultUnixDateFormat());
-
 	$self->prepare_view_1500pdf(1);
 }
 
@@ -1862,7 +1914,7 @@ sub prepare_view_twcc60pdf
 	eval
 	{
 		my $twccForm = new App::Billing::Output::TWCC;
-		$twccForm->processClaims($claimList, reportId => 'TWCC60', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+		$twccForm->processClaims($claimList, reportId => 'TWCC60', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), page => $self);
 	};
 	$self->redirect($pdfHref);
 	$self->addError('Problem in sub prepare_view_twcc60pdf', $@) if $@;
@@ -1884,7 +1936,7 @@ sub prepare_view_twcc61pdf
 	eval
 	{
 		my $twccForm = new App::Billing::Output::TWCC;
-		$twccForm->processClaims($claimList, reportId => 'TWCC61', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+		$twccForm->processClaims($claimList, reportId => 'TWCC61', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), page => $self);
 	};
 	$self->redirect($pdfHref);
 	$self->addError('Problem in sub prepare_view_twcc61pdf', $@) if $@;
@@ -1906,7 +1958,7 @@ sub prepare_view_twcc64pdf
 	eval
 	{
 		my $twccForm = new App::Billing::Output::TWCC;
-		$twccForm->processClaims($claimList, reportId => 'TWCC64', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+		$twccForm->processClaims($claimList, reportId => 'TWCC64', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), page => $self);
 	};
 	$self->redirect($pdfHref);
 	$self->addError('Problem in sub prepare_view_twcc64pdf', $@) if $@;
@@ -1928,7 +1980,7 @@ sub prepare_view_twcc69pdf
 	eval
 	{
 		my $twccForm = new App::Billing::Output::TWCC;
-		$twccForm->processClaims($claimList, reportId => 'TWCC69', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+		$twccForm->processClaims($claimList, reportId => 'TWCC69', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), page => $self);
 	};
 	$self->redirect($pdfHref);
 	$self->addError('Problem in sub prepare_view_twcc69pdf', $@) if $@;
@@ -1950,7 +2002,7 @@ sub prepare_view_twcc73pdf
 	eval
 	{
 		my $twccForm = new App::Billing::Output::TWCC;
-		$twccForm->processClaims($claimList, reportId => 'TWCC73', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+		$twccForm->processClaims($claimList, reportId => 'TWCC73', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), page => $self);
 	};
 	$self->redirect($pdfHref);
 	$self->addError('Problem in sub prepare_view_twcc73pdf', $@) if $@;
@@ -2098,6 +2150,9 @@ sub prepare_page_content_header
 	my $invoiceTotalAdj = $claim->{amountPaid};
 	my $invoiceFlags = $claim->{flags};
 
+	#check if the claim has already been transferred to a carrier
+	my $beenTransferred = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selBeenTransferred', $invoiceId);
+
 	#check submission order of claim
 	my $submissionOrder;
 	my $orderCaption;
@@ -2168,7 +2223,7 @@ sub prepare_page_content_header
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
 
 	my $view = $self->param('_pm_view');
-	my $chooseActionMenu = '';
+	my $chooseActionMenu;
 	if($view eq 'thin_nsf' || $view eq 'halley_nsf' || $view eq 'history')
 	{
 		$chooseActionMenu = qq{ <TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD> };
@@ -2187,21 +2242,23 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $awaitClientPayment && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $awaitClientPayment && $invStatus != $void && $invType == $hcfaInvoiceType && ($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for this Patient</option>
 
-						@{[ $invType == $hcfaInvoiceType && ($submissionOrder->{value_int} == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+						@{[ $invType == $hcfaInvoiceType && ($invStatus < $submitted || ($invStatus > $transferred && $invStatus < $awaitInsPayment) || $invStatus == $paymentApplied || $invStatus == $paperPrinted) ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
 						@{[ ($invStatus < $submitted || $invStatus == $paymentApplied) && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
-						@{[ ! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && ($invStatus < $submitted || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || $invStatus == $awaitInsPayment  ) && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
+						@{[ ! ($beenTransferred) && ($invStatus < $submitted || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 
-						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || $invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || $invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted || $invStatus == $awaitInsPayment  ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=3'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
+
+						@{[ ($invStatus != $onHold && $invStatus < $transferred) || (! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && $invStatus == $paymentApplied) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $appealed || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ? "<option value='/invoice/$invoiceId/dialog/hold?transferred=1'>Place Claim On Hold</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
