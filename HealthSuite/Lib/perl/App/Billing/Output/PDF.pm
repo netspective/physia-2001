@@ -2042,11 +2042,11 @@ sub box9aClaimData
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 			if(uc($insured1->getInsurancePlanOrProgramName) eq "MEDICARE")
 			{
-				pdflib::PDF_show_xy($p , "MEDIGAP " . ($insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName), $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
+				pdflib::PDF_show_xy($p , "MEDIGAP " . $insured2->getMemberNumber() . " " . $insured2->getPolicyGroupOrFECANo, $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
 			}
 			else
 			{
-				pdflib::PDF_show_xy($p , $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName, $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
+				pdflib::PDF_show_xy($p , $insured2->getPolicyGroupOrFECANo, $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
 			}
 			pdflib::PDF_stroke($p);
 		}
@@ -2158,7 +2158,7 @@ sub box11ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo || $claim->{insured}->[0]->getPolicyGroupName, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_stroke($p);
 
 }

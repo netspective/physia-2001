@@ -294,7 +294,7 @@ sub populateOtherInsured
 				$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
 				$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
 				$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getMedigapNo; # $insured2->getInsurancePlanOrProgramName;
-				my $groupNumber = $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName;
+				my $groupNumber = $insured2->getMemberNumber() . " " . $insured2->getPolicyGroupOrFECANo; # || $insured2->getPolicyGroupName;
 				$data->{otherInsuredPolicyGroupName} =  "MEDIGAP " . $groupNumber;
 			}
 			else
@@ -306,7 +306,7 @@ sub populateOtherInsured
 				$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
 				$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
 				$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getInsurancePlanOrProgramName;
-				$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName;
+				$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo; # || $insured2->getPolicyGroupName;
 			}
 		}
 		elsif (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
