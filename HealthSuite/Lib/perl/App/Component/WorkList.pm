@@ -125,7 +125,6 @@ sub getComponentHtml
 	$selectedDate = 'today' unless ParseDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
-
 	my $facility_id = $page->session('org_id');
 	my $user_id = $page->session('user_id');
 	

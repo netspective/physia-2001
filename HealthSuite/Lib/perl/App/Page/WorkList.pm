@@ -18,7 +18,40 @@ use vars qw(@ISA @CHANGELOG);
 @ISA = qw(App::Page);
 
 
-sub prepare
+sub _prepare_view_date
+{
+	my ($self) = @_;
+
+	$self->addContent(qq{
+		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
+			<TR VALIGN=TOP>
+				<TD colspan=5>
+					#component.worklist#
+				</TD>
+			</TR>
+			<TR>
+				<TD>&nbsp;</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD>
+					#component.lookup-records#<BR>
+				</TD>
+				<TD>&nbsp;</TD>
+				<TD>
+					#component.create-records# <BR>
+				</TD>
+				<TD>&nbsp;</TD>
+				<TD>
+					#component.navigate-reports-root#
+				</TD>
+			</TR>
+		</TABLE>
+	});
+
+	return 1;
+}
+
+sub prepare_view_date
 {
 	my ($self) = @_;
 
@@ -57,6 +90,39 @@ sub prepare
 	return 1;
 }
 
+sub prepare_view_recentActivity
+{
+	my ($self) = @_;
+
+	$self->addContent(qq{<br>
+		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
+			<TR VALIGN=TOP>
+				<TD colspan=5>
+					#component.stp-person.mySessionActivity#
+				</TD>
+			</TR>
+			<TR>
+				<TD>&nbsp;</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD>
+					#component.lookup-records#<BR>
+				</TD>
+				<TD>&nbsp;</TD>
+				<TD>
+					#component.create-records# <BR>
+				</TD>
+				<TD>&nbsp;</TD>
+				<TD>
+					#component.navigate-reports-root#
+				</TD>
+			</TR>
+		</TABLE>
+	});
+
+	return 1;
+}
+
 sub prepare_page_content_footer
 {
 	my $self = shift;
@@ -68,6 +134,28 @@ sub prepare_page_content_footer
 	return 1;
 }
 
+sub decodeDate
+{
+	my ($date) = @_;
+	
+	$date = 'today' unless ParseDate($date);
+	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
+	my @today = Today();
+	
+	if (Delta_Days(@date_, @today) == 0)
+	{
+		return "Today";
+	}
+	elsif ($date_[0] == $today[0])
+	{
+		return UnixDate($date, '%a %b %e');
+	}
+	else
+	{
+		return UnixDate($date, '%a %m/%d/%Y');
+	}
+}
+
 sub prepare_page_content_header
 {
 	my $self = shift;
@@ -77,15 +165,16 @@ sub prepare_page_content_header
 
 	$self->SUPER::prepare_page_content_header(@_);
 
-	my $today = UnixDate('today', '%m-%d-%Y');
-	my $nextweek = UnixDate('nextweek', '%m-%d-%Y');
-
 	my $heading = "Work List";
-
+	my $dateTitle = decodeDate($self->param('_seldate'));
+	
 	my $urlPrefix = "/worklist";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
+			[$dateTitle, "/worklist/date", 'date'],
+			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
+			#['Setup', "/worklist/setup", 'setup'],
 			['Setup', "#SETUP", 'setup'],
 		], ' | ');
 
@@ -109,11 +198,8 @@ sub prepare_page_content_header
 		</TABLE>
 	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
 
-	unless ($self->param('noControlBar'))
-	{
-		my $controlBar = $self->getControlBarHtml();
-		push(@{$self->{page_content_header}}, $controlBar);
-	}
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
+		unless ($self->param('noControlBar'));
 
 	return 1;
 }
@@ -267,6 +353,49 @@ sub initialize
 	);
 }
 
+sub handleARL
+{
+	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
+
+	$self->param('_pm_view', $pathItems->[0] || 'date');
+	$self->param('noControlBar', 1);
+
+	# see if the ARL points to showing a dialog, panel, or some other standard action
+	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
+	{
+		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
+			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
+		}
+	}
+
+	$self->printContents();
+	return 0;
+}
+
+sub handleARL_date
+{
+	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+
+	$pathItems->[1] =~ s/\-/\//g if defined $pathItems->[1];
+	$self->param('_seldate', $pathItems->[1]);
+	$self->param('noControlBar', 0);
+}
+
+#sub handleARL_setup
+#{
+#	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+#	if ($pathItems->[1] =~ /^resource$/i)
+#	{
+#		$self->param('resources', $pathItems->[2]);
+#	}
+#}
+
+sub getContentHandlers
+{
+	return ('prepare_view_$_pm_view=date$');
+}
+
 sub getJavascripts
 {
 	my ($self) = @_;
@@ -313,49 +442,6 @@ sub getJavascripts
 		</SCRIPT>
 	};
 }
-
-sub handleARL
-{
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
-
-	$self->param('_pm_view', $pathItems->[0] || 'date');
-	$self->param('noControlBar', 1);
-
-	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
-	{
-		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
-			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
-		}
-	}
-
-	$self->printContents();
-	return 0;
-}
-
-sub handleARL_date
-{
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-
-	$pathItems->[1] =~ s/\-/\//g if defined $pathItems->[1];
-	$self->param('_seldate', $pathItems->[1]);
-	$self->param('noControlBar', 0);
-}
-
-#sub handleARL_setup
-#{
-#	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-#	if ($pathItems->[1] =~ /^resource$/i)
-#	{
-#		$self->param('resources', $pathItems->[2]);
-#	}
-#}
-
-#sub getContentHandlers
-#{
-#	return ('prepare_view_$_pm_view=my$');
-#}
 
 @CHANGELOG =
 (
