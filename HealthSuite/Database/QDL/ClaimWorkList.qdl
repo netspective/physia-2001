@@ -14,7 +14,8 @@
 		<field id="invoice_status" caption="Claim Status" join="invoice_status" column="caption" />
 		<field id="balance" caption="Balance" join="invoice" column="balance" ui-datatype="currency"/>
 		<field id="invoice_age" caption="Age" join="invoice" columndefn="trunc(sysdate - invoice.invoice_date)"/>
-		<field id="invoice_date" caption="DOS" join="invoice" column="invoice_date" columndefn="TO_CHAR(invoice.invoice_date,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="invoice_date" caption="Invoice Date" join="invoice" column="invoice_date" columndefn="TO_CHAR(invoice.invoice_date,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="cr_date" caption="Create Date" join="invoice" column="cr_stamp" columndefn="TO_CHAR(invoice.cr_stamp,'IYYYMMDD')" ui-datatype="date"/>
 		<field id="member_number" caption="Member No." join="insurance" column="member_number"/>
 
 		<field id="service_facility" join="transaction" column="service_facility_id"/>

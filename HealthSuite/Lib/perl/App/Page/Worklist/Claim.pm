@@ -66,7 +66,7 @@ my %pubDefn = (
 		{head => 'Claim Status', dataFmt => '#{invoice_status}#', dAlign => 'center'},
 		{head => 'Balance', colIdx => '#{balance}#', dformat => 'currency'},
 		{head => 'Age', dataFmt => '#{invoice_age}#',},
-		{head => 'DOS', colIdx => '#{invoice_date}#', dformat => 'date'},
+		{head => 'DOS', colIdx => '#{cr_date}#', dformat => 'date'},
 		{head => 'Member ID', dataFmt => '#{member_number}#', options => PUBLCOLFLAG_DONTWRAP,},
 	],
 	dnAncestorFmt => 'Insurance Claims',
@@ -91,7 +91,7 @@ sub claimQuery
 		'invoice_status',
 		'balance',
 		'invoice_age',
-		'invoice_date',
+		'cr_date',
 		'member_number',
 		'patient_name',
 	);
@@ -149,8 +149,8 @@ sub buildSqlStmt
 				org_attribute.value_text AS ins_phone,
 				invoice_status.caption AS invoice_status,
 				invoice.balance,
-				trunc(sysdate - invoice.invoice_date) AS invoice_age,
-				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
+				trunc(sysdate - invoice.cr_stamp) AS invoice_age,
+				TO_CHAR(invoice.cr_stamp,'IYYYMMDD') AS cr_date,
 				insurance.member_number AS member_number,
 				initcap(simple_name) as patient_name,
 				name_last
@@ -200,8 +200,8 @@ sub buildSqlStmt
 				org_attribute.value_text AS ins_phone,
 				invoice_status.caption AS invoice_status,
 				invoice.balance,
-				trunc(sysdate - invoice.invoice_date) AS invoice_age,
-				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
+				trunc(sysdate - invoice.cr_stamp) AS invoice_age,
+				TO_CHAR(invoice.cr_stamp, 'IYYYMMDD') AS cr_date,
 				insurance.member_number AS member_number,
 				initcap(simple_name) as patient_name,
 				name_last
@@ -324,7 +324,7 @@ sub buildSqlStmt
 
 	if ($ageFrom)
 	{
-		$sqlStmt =~ s/ageFromConstraint/AND invoice.invoice_date <= trunc(sysdate) - ?/;
+		$sqlStmt =~ s/ageFromConstraint/AND trunc(invoice.cr_stamp) <= trunc(sysdate) - ?/;
 		push(@bindParams, $ageFrom);
 	}
 	else
@@ -334,7 +334,7 @@ sub buildSqlStmt
 
 	if ($ageTo)
 	{
-		$sqlStmt =~ s/ageToConstraint/AND invoice.invoice_date >= trunc(sysdate) - ?/;
+		$sqlStmt =~ s/ageToConstraint/AND trunc(invoice.cr_stamp) >= trunc(sysdate) - ?/;
 		push(@bindParams, $ageTo);
 	}
 	else
@@ -592,7 +592,7 @@ sub __claimQuery
 		'invoice_status',
 		'balance',
 		'invoice_age',
-		'invoice_date',
+		'cr_date',
 		'member_number',
 	);
 
