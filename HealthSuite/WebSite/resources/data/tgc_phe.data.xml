@@ -65,7 +65,7 @@
 				</field-defn>
 			</field-defn>
 				
-			<field-defn id="pulse" type="grid" review="yes" expanded="yes" caption="Pulse" append="no">
+			<field-defn id="pulse" type="grid" review="yes" expanded="yes" caption="Pulse" >
 				<field-defn id="beats_per_min" type="integer" review="yes" caption="Beats per Minute"/>
 				<field-defn id="position" type="choose" review="yes" caption="Position" style="list">
 				<options>
@@ -88,7 +88,7 @@
 			</field-defn>
 		
 			
-			<field-defn id="blood_pressure" type="grid" review="yes" expanded="yes" caption="Blood Pressure" append="no">
+			<field-defn id="blood_pressure" type="grid" review="yes" expanded="yes" caption="Blood Pressure" >
 				<field-defn id="Systolic" type="integer" review="yes" caption="Systolic"/>
 				<field-defn id="Diastolic" type="integer" review="yes" caption="Diastolic"/>
 				<field-defn id="side" type="choose" review="yes" caption="Side" style="radio">
@@ -137,7 +137,7 @@
 					<field-defn id="quest" type="choose" review="yes" caption="General" style="radio" default="0">
 						<options>
 						 	<option>Not Reviewed</option>
-					 		<option>Normal</option>
+					 		<option normal="yes">Normal</option>
 						 	<option>Abnormal</option>
 						</options>
 					</field-defn>
@@ -258,6 +258,7 @@
 					<field-defn id="qandq" type="text" lines="1" review="yes" caption="Q and Q"/>
 					</field-defn>  
 				</field-defn>
+				
 					
 				<field-defn id="headache" type="composite" review="yes" caption="Headaches">     
 					<field-defn id="headache_quest" type="choose" review="yes" caption="Headaches" style="radio" default="0">
@@ -276,6 +277,8 @@
 						 <option>stabbing</option>
 						 <option>sharp</option>
 						 <option>dull</option>
+						 <option>squeezing</option>
+						 <option>pressing</option>
 						</options>
 					</field-defn>
 					<field-defn id="headache-location" type="choose" review="yes" caption="Location" style="list">
@@ -322,12 +325,12 @@
 					</field-defn>
 					</field-defn>
 									
-				</field-defn>  
-		
+				  
+				</field-defn>
 				<field-defn id="eyes" type="composite" review="yes" caption="Eyes">     
 					<field-defn id="eyesquest" type="choose" review="yes" caption="Eyes" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -340,7 +343,7 @@
 				<field-defn id="ears" type="composite" review="yes" caption="Ears">     
 					<field-defn id="earsquest" type="choose" review="yes" caption="Ears" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -353,7 +356,7 @@
 				<field-defn id="nose" type="composite" review="yes" caption="Nose">     
 					<field-defn id="nosequest" type="choose" review="yes" caption="Nose" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -366,7 +369,7 @@
 				<field-defn id="mandt" type="composite" review="yes" caption="Mouth and Throat">     
 					<field-defn id="mandtquest" type="choose" review="yes" caption="Mouth and Throat" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -379,7 +382,7 @@
 				<field-defn id="respiratory" type="composite" review="yes" caption="Respiratory">     
 					<field-defn id="respiratoryquest" type="choose" review="yes" caption="Respiratory" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -392,7 +395,7 @@
 				<field-defn id="cardiac" type="composite" review="yes" caption="Cardiac">     
 					<field-defn id="cardiacquest" type="choose" review="yes" caption="Cardiac" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -405,7 +408,7 @@
 				<field-defn id="breasts" type="composite" review="yes" caption="Breasts">     
 					<field-defn id="breastsquest" type="choose" review="yes" caption="Breasts" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -418,7 +421,7 @@
 				<field-defn id="gastro" type="composite" review="yes" caption="Gastrointestinal">     
 					<field-defn id="gastroquest" type="choose" review="yes" caption="Gastrointestinal" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -431,14 +434,75 @@
 				<field-defn id="urinary" type="composite" review="yes" caption="Urinary">     
 					<field-defn id="urinaryquest" type="choose" review="yes" caption="Urinary" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
 					</field-defn>
-					<field-defn id="urinarynormal" type="static" review="yes" caption="Asserts Normal" condition-field="ros.urinary.urinaryquest" condition="control.value == 1"/>
-					<field-defn id="urinaryqandq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="ros.urinary.urinaryquest" condition="control.value == 2"/>
-					<field-defn id="urinarynstatic" type="static" review="yes" caption="Q and Q" condition-field="ros.urinary.urinaryquest" condition="control.value == 2"/>
+					<field-defn id="urinarynormal" type="static" review="yes" caption="Denies lower tract symptoms, burning, pain, incontinence, infections, stones, change in stream" condition-field="ros.urinary.urinaryquest" condition="control.value == 1"/>
+					
+					<field-defn id="urinaryabnormal" type="grid" review="yes" caption="Abnormalities" expanded="yes" bareheading="yes" condition-field="ros.urinary.urinaryquest" condition="control.value == 2">
+					<field-defn id="urinary_symptoms" type="choose" review="yes" caption="Symptoms" style="list">
+						<options>
+						 <option>Frequency</option>
+						 <option>Urgency</option>
+						 <option>nocturia</option>
+						 <option>hematuria</option>
+						 <option>pyuria</option>
+						 <option>dribbling</option>
+						 <option>dysuria</option>
+						 <option>incontinence constant</option>
+						 <option>incontinence stress</option>
+						 <option>decrease in force</option>
+						 <option>decrease in caliber</option>
+						 <option>UTI</option>
+						 <option>Pyelonephritis</option>
+						 <option>kidney stones</option>
+						 <option>inguinal lymphadenopath</option>
+						 </options>
+					</field-defn>
+					<field-defn id="urinaryqandq" type="text" review="yes" caption="Q and Q" lines="1"/>
+					</field-defn>
+					<field-defn id="urinary_pain" type="grid" caption="Pain" expanded="yes" condition-field="ros.urinary.urinaryquest" condition="control.value == 2">
+					<field-defn id="urinary_pain_character" type="choose" review="yes" caption="Character" style="list">
+						<options>
+						<option normal="yes">None</option>
+						<option>pain</option>
+						 <option>throbbing</option>
+						 <option>pounding</option>
+						 <option>stabbing</option>
+						 <option>sharp</option>
+						 <option>dull</option>
+						 <option>squeezing</option>
+						 <option>pressing</option>
+						</options>
+					</field-defn>
+					<field-defn id="urinary_pain_location" type="choose" review="yes" caption="Location" style="list">
+						<options>
+						<option normal="yes">none</option>
+						 <option>urination</option>
+						 <option>initiation urination</option>
+						 <option>terminal urination</option>
+						 <option>groin</option>
+						 <option>flank</option>
+						 <option>suprapubic</option>
+						 <option>back</option>
+						 <option>abdominal</option>
+						</options>
+					</field-defn>
+					<field-defn id="urinary_pain_side" type="choose" review="yes" caption="Side" style="list" additive="yes">
+						<options>
+						<option normal="yes">none</option>
+						 <option>right</option>
+						 <option>left</option>
+						 <option>bilateral</option>
+						 <option>upper</option>
+						 <option>lower</option>
+						 <option>mid</option>
+						 </options>
+					</field-defn>
+					<field-defn id="urinary_pain_qandq" type="text" review="yes" caption="Q and Q" lines="1"/>
+					</field-defn>
 				</field-defn>  
 		
 				<field-defn id="genitalia" type="choose" review="yes" caption="Genitalia" style="radio">
@@ -447,11 +511,79 @@
 					 	<option>Female</option>
 					</options>
 				</field-defn>
+				<field-defn id="genitalia_male" type="composite" review="yes" caption="Male Genitalia">
+					<field-defn id="genitalia_malequest" type="choose" review="yes" caption="Male Genitalia" style="radio" default="0">
+						<options>
+							<option>Not Reviewed</option>
+							<option>Normal</option>
+							<option>Abnormal</option>
+						</options>
+					</field-defn>
+					<field-defn id="genitalia_malenormal" type="static" review="yes" caption="Denies penile discharge, ulcers, pain, masses, swelling, ejaculatory or sexual problems," condition-field="ros.genitalia_male.genitalia_malequest" condition="control.value == 1"/>
+
+					<field-defn id="genitalia_maleabnormal" type="grid" review="yes" caption="Abnormalities" expanded="yes" bareheading="yes" condition-field="ros.genitalia_male.genitalia_malequest" condition="control.value == 2">
+					<field-defn id="genitalia_male_symptoms" type="choose" review="yes" caption="Symptoms" style="list">
+						<options>
+						 <option>penile discharge</option>
+						 <option>ulcers</option>
+						 <option>testicular pain</option>
+						 <option>testicular masses</option>
+						 <option>penile swelling</option>
+						 <option>scrotal swelling</option>
+						 <option>testicular swelling</option>
+						 <option>erectile dysfunction</option>
+						 <option>premature ejaculation</option>
+						 <option>blood in ejaculate</option>
+						 <option>pain with ejaculation</option>
+						 <option>hernia</option>
+						 <option>prostate enlargement</option>
+						 <option>prostatitis acute</option>
+						 <option>prostatitis chronic</option>
+						 <option>other</option>
+						 </options>
+					</field-defn>
+					<field-defn id="genitalia_maleqandq" type="text" review="yes" caption="Q and Q" lines="1"/>
+					</field-defn>
+				
+					<field-defn id="genitalia_male_hiv_exposure" type="grid" review="yes" caption="HIV Exposure" expanded="yes" bareheading="yes" condition-field="ros.genitalia_male.genitalia_malequest" condition="control.value == 2">
+					<field-defn id="hiv_exposure" type="choose" review="yes" caption="HIV Exposure Risk Factors" style="radio">
+						<options>
+						 <option normal="yes">None</option>
+						 <option>yes</option>
+						</options>
+					</field-defn>
+					<field-defn id="hiv_exposure_type" type="choose" review="yes" caption="Type" style="list">
+						<options>						
+						<option normal="yes">none</option>
+						<option>Unprotected sex</option>
+						<option>sex with prostitutes</option>
+						<option>IV Drug Use</option>
+						<option>sexual contact with HIV person</option>
+						<option>homosexual</option>
+						<option>bisexual</option>
+						<option>blood transfusions</option>
+						<option>other</option>
+						</options>
+					</field-defn>
+					<field-defn id="hiv_exposureqandq" type="text" review="yes" caption="Q and Q" lines="1"/>
+					</field-defn>
+					<field-defn id="geneitalia_male_condoms_header" caption="Condom Use" bearheading="yes" expanded="yes" condition-field="ros.genitalia_male.genitalia_malequest" condition="control.value == 2">
+					
+					<field-defn id="genitalia_male_condoms" type="choose"  review="yes" caption="Condom Use" style="radio" >
+						<options>
+						 <option>never</option>
+						 <option>occasionally</option>
+						 <option>usually</option>
+						 <option>always</option>
+						</options>
+					</field-defn>
+					</field-defn>
+				</field-defn>
 						
 				<field-defn id="musculoskeletal" type="composite" review="yes" caption="Musculoskeletal">     
 					<field-defn id="musculoskeletalquest" type="choose" review="yes" caption="Musculoskeletal" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -464,7 +596,7 @@
 				<field-defn id="neurologic" type="composite" review="yes" caption="Neurologic">     
 					<field-defn id="neurologicquest" type="choose" review="yes" caption="Neurologic" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -477,7 +609,7 @@
 				<field-defn id="psychiatric" type="composite" review="yes" caption="Psychiatric">     
 					<field-defn id="psychiatricquest" type="choose" review="yes" caption="Psychiatric" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -490,7 +622,7 @@
 				<field-defn id="hematologic" type="composite" review="yes" caption="Hematologic">     
 					<field-defn id="hematologicquest" type="choose" review="yes" caption="Hematologic" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -503,7 +635,7 @@
 				<field-defn id="endocrine" type="composite" review="yes" caption="Endocrine">     
 					<field-defn id="endocrinequest" type="choose" review="yes" caption="Endocrine" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -516,7 +648,7 @@
 				<field-defn id="perivas" type="composite" review="yes" caption="Peripheral Vascular">     
 					<field-defn id="perivasquest" type="choose" review="yes" caption="Peripheral Vascular" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -529,7 +661,7 @@
 				<field-defn id="lymphnodes" type="composite" review="yes" caption="Lymph Nodes">     
 					<field-defn id="lymphnodesquest" type="choose" review="yes" caption="Lymph Nodes" style="radio" default="0">
 						<options>
-						 	<option>No Qstn</option>
+						 	<option>Not Reviewed</option>
 					 		<option>Normal</option>
 						 	<option>Abnormal</option>
 						</options>
@@ -690,16 +822,6 @@
 					</field-defn>
 					<field-defn id="drug_type" type="text" review="yes" caption="Type" condition-field="habits.drug.illicit_drugs.illicit_drugs_types"  condition="control.options.selectedIndex > 4"/>
 					</field-defn>
-			
-					
-					
-					<field-defn id="other" type="choose" review="yes" style="radio" default="0" caption="Other habits">
-						<options>
-						<option>Denies</option>
-						<option>Marijuana</option>
-						<option>Cocaine</option>
-						</options>
-					</field-defn>
 					</field-defn>
 		</field-defn>
 		
@@ -750,16 +872,7 @@
 				<field-defn id="pe_hair_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_hair.pe_hair_quest" condition="control.value == 2"/>
 				<field-defn id="pe_hair_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_hair.pe_hair_quest" condition="control.value == 2"/>
 			</field-defn> 
-			<field-defn id="pe_nail_fingers1" type="text" review="yes" caption="Fingers" additive="yes">
-								<options>
-								 <option>Thumb (1)</option>
-								 <option>Index (2)</option>
-								 <option>Middle (3)</option>
-								 <option>Ring (4)</option>
-								 <option>Little (5)</option>
-								 <option>All</option>
-								</options>
-			</field-defn>
+			
 			<field-defn id="pe_nails" type="composite" review="yes" caption="Nails">     
 				<field-defn id="pe_nails_quest" type="choose" review="yes" caption="Nails" style="radio" default="0">
 					<options>
@@ -885,7 +998,7 @@
 				<field-defn id="pe_nose_and_sinuses_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_nose_and_sinuses.pe_nose_and_sinuses_quest" condition="control.value == 2"/>
 				<field-defn id="pe_nose_and_sinuses_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_nose_and_sinuses.pe_nose_and_sinuses_quest" condition="control.value == 2"/>
 			</field-defn>  
-			<field-defn id="pe_mouth_and _oropharynx" type="composite" review="yes" caption="Mouth and Oropharynx">     
+			<field-defn id="pe_mouth_and_oropharynx" type="composite" review="yes" caption="Mouth and Oropharynx">     
 				<field-defn id="pe_mouth_and _oropharynx_quest" type="choose" review="yes" caption="Mouth and Oropharynx" style="radio" default="0">
 					<options>
 				 	<option>Not Examined</option>
@@ -989,9 +1102,212 @@
 				 	<option>Abnormal</option>
 					</options>
 				</field-defn>
-				<field-defn id="pe_male_genitalia_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 1"/>
-				<field-defn id="pe_male_genitalia_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2"/>
-				<field-defn id="pe_male_genitalia_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2"/>
+				<field-defn id="pe_male_genitalia_normal" type="static" review="yes" caption=" Normal, no lesions, masses, or discharge" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 1"/>
+				<field-defn id="pe_male_genitalia_hair" type="grid" review="yes" caption="Male Genital Hair" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+				<field-defn id="pe-male_genitalia_hair_choose" type="choose" review="yes" caption="Male Genital Hair" style="list">
+					<options>
+					<option normal="yes">Normal</option>
+					 <option>absent</option>
+					 <option>decreased</option>
+					 <option>other</option>
+					</options>
+				</field-defn>				
+				<field-defn id="pe_male_genitalia_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_penis" type="grid" review="yes" caption="Penis" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+				<field-defn id="pe_male_genitalia_penis_choose" type="choose" review="yes" caption="Penis" style="list" additive="yes">
+					<options>
+					<option>Normal Circumcised</option>
+					<option>Normal Uncircumcised</option>
+					 <option>Cirmumcised</option>
+					 <option>Uncirmucised</option>
+					 <option>phimosis</option>
+					 <option>blanoposthitis</option>
+					 <option>parphimosis</option>
+					 <option>hypospaias</option>
+					 <option>ulcers</option>
+					 <option>warts</option>
+					 <option>veiscles</option>
+					 <option>masses</option>
+					 <option>edema</option>
+					 <option>priapism</option>
+					 <option>Peyronie's Disease</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_penis_num" type="float" caption="Number"/>
+				<field-defn id="pe_male_genitalia_penis_location" type="choose" review="yes" caption="Location" style="list">
+					<options>
+					<option></option>
+					 <option>glans</option>
+					 <option>shift</option>
+					 <option>tip</option>
+					 <option>proximal</option>
+					 <option>distal</option>
+					 <option>diffuse</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_penis_size" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_male_genitalia_penis_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_meatus" type="grid" review="yes" caption="Urethral Meatus" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+					<field-defn id="pe-male_genitalia_meatus_choose" type="choose" review="yes" caption="Urethral Meatus" style="list">
+						<options>
+						<option normal="yes">Normal slit no discharge</option>
+						 <option>discharge</option>
+						 <option>slit not at tip</option>
+						 <option>other</option>
+						</options>
+					</field-defn>				
+					<field-defn id="pe_male_genitalia_meatus_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_scrotum" type="grid" review="yes" caption="scrotum" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+				<field-defn id="pe-male_genitalia_scrotum_choose" type="choose" review="yes" caption="Scrotum" style="list">
+					<options>
+					<option normal="yes">Normal skin without Inflammmation</option>
+					 <option>erythema</option>
+					 <option>edema</option>
+					 <option>ulcers</option>
+					 <option>warts</option>
+					 <option>vesicles</option>
+					 <option>masses</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_scrotum_size" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_male_genitalia_scrotum_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_scrotum_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_testis" type="grid" review="yes" caption="Testis" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+				<field-defn id="pe-male_genitalia_testis_choose" type="choose" review="yes" caption="Testis" style="list">
+					<options>
+					<option normal="yes">Normal smooth, no masses or tenderness</option>
+					 <option>smooth</option>
+					 <option>irregular</option>
+					 <option>masses</option>
+					 <option>tender</option>
+					 <option>absent</option>
+					 <option>cryptorchidism</option>
+					 <option>orchitis</option>
+					 <option>Other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_testis_size" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_male_genitalia_testis_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_testis_side" type="choose" review="yes" caption="Side" style="list">
+					<options>					
+					<option>right</option>
+					<option>left</option>
+					<option>bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_testis_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_epididymis" type="grid" review="yes" caption="Epididymis" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_male_genitalia.pe_male_genitalia_quest" condition="control.value == 2">
+				<field-defn id="pe-male_genitalia_epididymis_choose" type="choose" review="yes" caption="Epididymis" style="list">
+					<options>
+					<option normal="yes">Normal, no masses or tenderness</option>
+					 <option>smooth</option>
+					 <option>irregular</option>
+					 <option>masses</option>
+					 <option>tender</option>
+					 <option>absent</option>
+					 <option>cryptorchidism</option>
+					 <option>orchitis</option>
+					 <option>Other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_epididymis_size" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_male_genitalia_epididymis_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_epididymis_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>right</option>
+					<option>left</option>
+					<option>bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_male_genitalia_epididymis_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+			</field-defn>
+			<field-defn id="pe_hernia" type="composite" review="yes" caption="Hernia">     
+			<field-defn id="pe_hernia_quest" type="choose" review="yes" caption="Hernia" style="radio" default="0">
+					<options>
+					<option>Not Examined</option>
+					<option normal="yes">Normal</option>
+					<option>Abnormal</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hernia_normal" type="static" review="yes" caption="No Hernias" condition-field="physical_exam.pe_hernia.pe_hernia_quest" condition="control.value == 1"/>
+				<field-defn id="pe_hernia_abnormal" type="grid" review="yes" caption="Hernias" expanded="yes" bareheading="yes"  condition-field="physical_exam.pe_hernia.pe_hernia_quest" condition="control.value == 2">
+				<field-defn id="pe_hernia_type" type="choose" review="yes" caption="Type" style="list">
+				
+					<options>
+					 <option>Inguinal</option>
+					 <option>femoral</option>
+					 <option>abdominal wall</option>
+					 <option>incisional</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hernia_size" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_hernia_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hernia_side" type="choose" review="yes" caption="Side" style="list">
+					<options>					
+					<option>right</option>
+					<option>left</option>
+					<option>bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hernia_condition" type="choose" review="yes" caption="Condition" style="list" additive="yes">
+					<options>
+					 <option>reducible</option>
+					 <option>irreducible</option>
+					 <option>strangulated</option>
+					 <option>incarcerated</option>
+					 <option>tender</option>
+					 <option>non tender</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_hernia_comments" type="text" review="yes" caption="comments"  line="1" condition-field="physical_exam.pe_hernia.pe_hernia_quest" condition="control.value == 2"/>
+				</field-defn>
 			</field-defn>  
 			<field-defn id="pe_prostate" type="composite" review="yes" caption="Prostate">     
 				<field-defn id="pe_prostate_quest" type="choose" review="yes" caption="Prostate" style="radio" default="0">
@@ -1001,9 +1317,56 @@
 				 	<option>Abnormal</option>
 					</options>
 				</field-defn>
-				<field-defn id="pe_prostate_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 1"/>
-				<field-defn id="pe_prostate_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 2"/>
-				<field-defn id="pe_prostate_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 2"/>
+				<field-defn id="pe_prostate_normal" type="static" review="yes" caption=" Normal firm,smooth, nontender, no masses or nodules" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 1"/>
+				<field-defn id="pe_prostate_abnormal" type="grid" review="yes" caption="Prostate" expanded="yes" bareheading="yes" condition-field="physical_exam.pe_prostate.pe_prostate_quest" condition="control.value == 2">
+				<field-defn id="pe_prostate_contour" type="choose" review="yes" caption="Contour" style="list">
+					<options>
+					<option normal="yes">Symmetric, no masses or nodules</option>
+					<option>BPH</option>
+					 <option>assymetric</option>
+					 <option>mass</option>
+					 <option>nodule</option>
+					 <option>irregular</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_lesion_size" type="float" caption="Lesion Size"/>
+				<field-defn id="pe_prostate_lesion_cms" type="static" review="yes" caption="cm" bareheading="yes"/>
+				<field-defn id="pe_prostate_size" type="float" caption="Prostate Size"/>
+				<field-defn id="pe_prostate_cms" type="static" review="yes" caption="cm" bareheading="yes"/>
+				<field-defn id="pe_prostate_size_grade" type="choose" review="yes" caption="Size Grade" style="list">
+					<options>
+					 <option>I</option>
+					 <option>II</option>
+					 <option>III</option>
+					 <option>IV</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_lobe" type="choose" review="yes" caption="Lobes" style="list">
+					<options>
+					 <option>Right</option>
+					 <option>Left</option>
+					 <option>Bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_consistency" type="choose" review="yes" caption="Consistency" style="list">
+					<options>
+					 <option normal="yes">Firm</option>
+					 <option>boggy</option>
+					 <option>hard</option>
+					 <option>rubbery</option>
+					 <option>fluctuant</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_tender" type="choose" review="yes" caption="Tenderness" style="radio">
+					<options>
+					 <option normal="yes">Non tender</option>
+					 <option>tender</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_prostate_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
 			</field-defn>  
 			<field-defn id="pe_anus_and_rectum" type="composite" review="yes" caption="Anus and Rectum">     
 				<field-defn id="pe_anus_and_rectum_quest" type="choose" review="yes" caption="Anus and Rectum" style="radio" default="0">
@@ -1013,9 +1376,159 @@
 				 	<option>Abnormal</option>
 					</options>
 				</field-defn>
-				<field-defn id="pe_anus_and_rectum_normal" type="static" review="yes" caption=" Normal Exam" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 1"/>
-				<field-defn id="pe_anus_and_rectum_qq" type="text" review="yes" caption="Q and Q" lines="1" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2"/>
-				<field-defn id="pe_anus_and_rectum_static" type="static" review="yes" caption="Q and Q" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2"/>
+				<field-defn id="pe_anus_and_rectum_normal" type="static" review="yes" caption=" Normal No masses,lesions, fissure, fistula, irritation or tenderness" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 1"/>
+				
+				<field-defn id="pe_anus_and_rectum_sacro_perianal" type="grid" review="yes" caption="Sacrococcygeal and Perianal"  expanded="yes" bareheading="yes" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2">
+				<field-defn id="pe_anus_and_rectum_sacro_perianal_choices" type="choose" review="yes" caption="Sacrococcygeal and Perianal" style="list">
+					<options>
+					 <option normal="yes">Normal skin smooth, no irritation, masses or cyst</option>
+					 <option>Irritation</option>
+					 <option>lumps</option>
+					 <option>rashes</option>
+					 <option>excoriation</option>
+					 <option>drainage</option>
+					 <option>tenderness</option>
+					 <option>pilonidal cyst</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_sacro_perianal_location" type="choose" review="yes" caption="Location" style="list">
+					<options>
+					 <option></option>
+					 <option>coccyx</option>
+					 <option>buttocks</option>
+					 <option>perianal</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_sacro_perianal_num" type="float" review="yes" caption="Size"/>
+				<field-defn id="pe_anus_and_rectum_sacro_perianal_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_sacro_perianal_side" type="choose" review="yes" caption="Measure" style="list">
+					<options>
+					<option></option>
+					<option>right</option>
+					<option>left</option>
+					<option>bilateral</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_sacro_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_anus" type="grid" review="yes" caption="Anus"  expanded="yes" bareheading="yes" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2">
+				<field-defn id="pe_anus_and_rectum_anus_choices" type="choose" review="yes" caption="Anus" style="list">
+					<options>
+					 <option normal="yes">Normal  Non tender, no lesions, hemorrhoids, fissure or fistula, normal sphincter tone</option>
+					 <option>Irritation</option>
+					 <option>warts</option>
+					 <option>masses</option>
+					 <option>fissure</option>
+					 <option>fistula</option>
+					 <option>excoriation</option>
+					 <option>ulcer</option>
+					 <option>drainage</option>
+					 <option>tenderness</option>
+					 <option>blood</option>
+					 <option>sphincter tone decreased</option>
+					 <option>sphincter tone increased</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				
+				<field-defn id="pe_anus_and_rectum_anus_num" type="float" review="yes" caption="Lesion Size"/>
+				<field-defn id="pe_anus_and_rectum_anus_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_anus_location" type="choose" review="yes" caption="Location" style="list">
+					<options>
+					<option></option>
+					<option>right</option>
+					<option>left</option>
+					<option>anterior</option>
+					<option>popssterior</option>
+					<option>diffuse</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_anus_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_rectum" type="grid" review="yes" caption="Rectum"  expanded="yes" bareheading="yes" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2">
+				<field-defn id="pe_anus_and_rectum_rectum_choices" type="choose" review="yes" caption="Rectum" style="list">
+					<options>
+					 <option normal="yes">Normal  Non tender, no masses, hemorrhoids, tenderness</option>
+					 <option>masses</option>
+					 <option>ulcer</option>
+					 <option>tenderness</option>
+					 <option>mucosal irregularity</option>
+					 <option>rectal prolapse</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+
+				<field-defn id="pe_anus_and_rectum_rectum_num" type="float" review="yes" caption="Lesion Size"/>
+				<field-defn id="pe_anus_and_rectum_rectum_measure" type="choose" review="yes" caption="Measure" style="list">
+					<options>					
+					<option>mm</option>
+					<option>cm</option>
+					<option>inch</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_rectum_location" type="choose" review="yes" caption="Location" style="list">
+					<options>
+					<option></option>
+					<option>right</option>
+					<option>left</option>
+					<option>anterior</option>
+					<option>posterior</option>
+					<option>diffuse</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_rectum_distance" type="float" review="yes" caption="Distance from Anus"/>
+				<field-defn id="pe_anus_and_rectum_rectum_cms" type="static" review="yes" caption="cm" bareheading="yes"/>
+				<field-defn id="pe_anus_and_rectum_rectum_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_stool" type="grid" review="yes" caption="Stool"  expanded="yes" bareheading="yes" condition-field="physical_exam.pe_anus_and_rectum.pe_anus_and_rectum_quest" condition="control.value == 2">
+				<field-defn id="pe_anus_and_rectum_stool_choices" type="choose" review="yes" caption="Stool" style="list">
+					<options>
+					 <option normal="yes">Normal Brown and Firm</option>
+					 <option>brown</option>
+					 <option>yellow</option>
+					 <option>green</option>
+					 <option>tan</option>
+					 <option>gray prolapse</option>
+					 <option>black</option>
+					 <option>bright red blood</option>
+					 <option>dark blood</option>
+					 <option>streaks blood</option>
+					 <option>mucous</option>
+					 <option>firm</option>
+					 <option>hard</option>
+					 <option>impacted</option>
+					 <option>soft</option>
+					 <option>watery</option>
+					 <option>None</option>
+					 <option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_stool_guiac" type="choose" review="yes" caption="Guiac" style="list">
+					<options>
+					<option normal="yes">Not Tested</option>
+					 <option>Guiac Negative</option>
+					 <option>Guiac Positive</option>
+					</options>
+				</field-defn>
+				<field-defn id="pe_anus_and_rectum_stool_comments" type="text" review="yes" caption="Comments" lines="1"/>
+				</field-defn>
 			</field-defn>  
 			<field-defn id="pe_musculoskeletal" type="composite" review="yes" caption="Musculoskeletal">     
 				<field-defn id="pe_musculoskeletal_quest" type="choose" review="yes" caption="Musculoskeletal" style="radio" default="0">
@@ -1231,8 +1744,89 @@
 
 		
 		<field-defn id="laboratory_results" caption="Laboratory Results">
+			<field-defn id="results_labs" caption="Laboratory">
+			</field-defn>
+			<field-defn id="results_xray" caption="X-ray">
+			</field-defn>
+			<field-defn id="results_nuclear" caption="Nuclear">
+			</field-defn>
+			<field-defn id="results_misc" caption="Miscellaneous">
+			</field-defn>
 		</field-defn>
 		<field-defn id="assessment" caption="Assessment">
+			<field-defn id="assessment_exams_procedures_caption" caption="Exams and Procedures">
+				<field-defn id="assessment_exams_procedures" type="choose" review="yes" caption="Exams and Procedures" bareheading="yes" style="checkbox">
+				<options>
+				 <option>Gen Med Exam V70.0</option>
+				 <option>Administ Exam V70.3</option>
+				 <option>Gyne Exam V72.3</option>
+				 <option>Pap Smear  V72.3</option>
+				 <option>Contraception Advice  V25.09</option>
+				 <option>Family Planning V25.09</option>
+				 <option>Oral Contaception V25.01</option>
+				 <option>IUD Insertion  V 25.1</option>
+				 <option>IUD Removal  V25.42</option>
+				 <option>IUD Checking V25.42</option>
+				 <option>Diaphragm Fitting  V 25.02</option>
+				 <option>Post Natal Exam V24.2</option>
+				 <option>X-ray only V72.5</option>
+				 <option>Lab Tests Only V72.6</option>
+				</options>
+				</field-defn>
+			</field-defn>
+			
+			
+			<field-defn id="assessment_misc_gyn_caption" caption="Misc Gyn Problems">
+			<field-defn id="assessment_misc_gyn" type="choose" review="yes" caption="Misc Gyn Problems" style="checkbox">
+				<options>
+				 <option>UTI 599.0</option>
+				 <option>Yeast Vaginitis 112.1</option>
+				 <option>Trich Vaginitis 131.01</option>
+				 <option>Herpes Vaginitis  054.10</option>
+				 <option>Atrophic Vaginitis 627.3</option>
+				 <option>Cervical Erosion  622.0</option>
+				 <option>Cervical Polyp 622.7</option>
+				 <option>Prementrual Tension Syndrome  625.4</option>
+				 <option>Dysmenorrhea  625.3</option>
+				 <option>Corpus Luteum Cyst  620.1</option>
+				 <option>Ovulation Pain  625.2</option>
+				 <option>Leukorrhea  623.5</option>
+				 <option>Venereal Warts  078.1</option>
+				</options>
+			</field-defn>
+			</field-defn>
+			
+			<field-defn id="assessment_misc_caption" caption="Miscellaneous">
+			<field-defn id="assessment_misc" type="choose" review="yes" caption="Miscellaneous" style="checkbox">
+				<options>
+				 <option>Acute URI  465.9</option>
+				 <option>Acute Sinusitis  461.9</option>
+				 <option>Acute Pharyngitis 462</option>
+				 <option>Acute Bronchitis  466.0</option>
+				 <option>Respiratory Allergy  477.9</option>
+				 <option>Contact Dermatitits 692.9</option>
+				 <option>Warts  078.1</option>
+				 <option>Anemia  285.9</option>
+				 <option>Impacted Earwax 380.4</option>
+				 <option>Adenopathy 785.6</option>
+				 <option>Sebaceous Cyst 706.2</option>
+				 <option>Lipoma  214.9</option>
+				 <option>Benign Nevus</option>
+				 <option>Family Disruption V61.0</option>
+				 <option>Marital Problem V61.10</option>
+				 <option>Acute RXN to stress 308.9</option>
+				 <option>Adjustment RXN  309.9</option>
+				 <option>Phase of Life RXN  V62.89</option>
+				 <option>Medication Side Effects  995.2</option>
+				 <option>Diagnosis Deferred  799.9</option>
+				 <option>Follow-up V67.5</option>
+				</options>
+			</field-defn>
+			</field-defn>
+			<field-defn id="assessment_other" caption="Other" type="grid">
+			<field-defn id="assessment_other_text" type="text" review="yes" caption="Other">
+			</field-defn>
+			</field-defn>
 		</field-defn>
 		<field-defn id="procedures" caption="Procedures">
 			<field-defn id="visual_schedule" type="choose" review="yes" caption="Vision Testing" style="checkbox">
@@ -1312,7 +1906,8 @@
 			</field-defn>
 		</field-defn>
 		<field-defn id="plan" caption="Plan">
-			<field-defn id="patient_education" type="choose" review="yes" caption="Patient Education" style="checkbox">
+			<field-defn id="patient_education-heading" caption="Patient Education">			
+			<field-defn id="patient_education" type="choose" review="yes" caption="Patient Education" bareheading="yes" style="checkbox">
 				<options>
 				 <option>Sexual Anatomy and Physiology</option>
 				 <option>Pregnancy</option>
@@ -1357,6 +1952,7 @@
 					</options>
 				</field-defn>
 				<field-defn id="diaphragm_type_other" type="text" review="yes" caption="Other" condition-field="plan.patient_education.diaphragm_details.diaphragm_type"  condition="control.options>selectedIndex == 4"/>
+			</field-defn>
 			</field-defn>
 			<field-defn id="immunizations" caption="Immunizations" type="grid">
 				<field-defn id="immunizations_type" type="choose" review="yes" caption="" style="list">
