@@ -501,7 +501,7 @@ sub getFS
 		my $getFeeScheds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selFSLinkedProductPlan', $plan_id,$product_id);			
 		foreach my $fs (@{$getFeeScheds})
 		{			
-			$fsList .= $fsList ? ",$fs->{'internal_catalog_id'}" : $fs->{'internal_catalog_id'} ;	
+			$fsList .= $fsList ? ",$fs->{'catalog_id'}" : $fs->{'catalog_id'} ;	
 		}
 	}
 	#Store FS internal id(s)
