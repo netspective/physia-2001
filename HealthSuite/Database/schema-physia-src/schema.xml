@@ -360,6 +360,7 @@
 		<column name="emergency" type="boolean" descr="True if this item was an emergency service item"/>
 		<column name="caption" type="text" size="96" descr="The description that should be shown on the invoice/bill"/>
 		<column name="code" type="text" size="32" descr="Usually a CPT code or code for the service/product"/>
+		<column name="code_type" lookupref="Catalog_Entry_Type" descr="Code types such as cpt, hcpcs, etc"/>
 		<column name="modifier" type="text" size="32" descr="HCFA code for any special modifier to 'code' column"/>
 		<column name="other_modifier" type="text" size="32" descr="CPT or other code modifier"/>
 		<column name="unit_cost" type="currency" descr="Billable charge for this transaction/procedure"/>
