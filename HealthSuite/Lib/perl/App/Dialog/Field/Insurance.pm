@@ -52,7 +52,7 @@ sub isValid
 		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
 		my $orgId = $page->field('ins_org_id');
 		my $planName = $page->field('plan_name');
-		my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$value, $planName, $recordType, $ownerId);
+		my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$value, $planName, $recordType, $ownerId, $orgId);
 		my $newProductExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewProductExists',$value, $orgId);
 
 
@@ -80,7 +80,7 @@ use Devel::ChangeLog;
 use CGI::Dialog;
 use vars qw(@ISA @CHANGELOG);
 
-@ISA = qw(CGI::Dialog::Field CGI::Dialog);
+@ISA = qw(CGI::Dialog::Field);
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
 
@@ -123,62 +123,6 @@ sub new
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
-
-sub isValid
-{
-	my ($self, $page, $validator) = @_;
-
-	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
-	my $value = $page->field($self->{name});
-
-	#return 1 if $command ne 'add' || $value eq '';
-
-	return 0 unless $self->SUPER::isValid($page, $validator);
-
-	my $personId = $page->param('person_id');
-	my $recordTypeUnique = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
-
-	my $insTypeWrkCmp = App::Universal::CLAIMTYPE_WORKERSCOMP;
-	my $orgId = $page->field('ins_org_id');
-	my $planName = $page->field('plan_name');
-	my $productName = $page->field('product_name');
-	my $preFilledOrg = $page->field('ins_comp');
-	my $preFilledProduct = $page->field('product');
-	#my $preFilled =  $self->getField('product_name');
-	my $preFilledPlan =  $self->getField('plan');
-	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$productName, $orgId) if $productName ne '';
-	my $doesPreFilledProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$preFilledProduct, $preFilledOrg) if $preFilledProduct ne '';
-
-	my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$value');";
-	$self->invalidate($page, qq{$self->{caption} '$productName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductHref">Create Product '$productName' now</a>
-		}) if $doesProductExist eq '' && $productName ne '';
-
-	my $createInsProductPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-product?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct');";
-	$self->invalidate($page, qq{$self->{caption} '$preFilledProduct' does not exist in '$preFilledOrg'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductPreHref">Create Product '$preFilledProduct' now</a>
-		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
-
-	my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
-	my $insInternalId = $page->param('ins_internal_id') || undef;
-
-	my $personalCoverageData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$insInternalId);
-	my $dataOrgId = $personalCoverageData->{'ins_org_id'};
-	my $dataProductName = $personalCoverageData->{'product_name'};
-	my $dataPlanName = $personalCoverageData->{'plan_name'};
-
-	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$productName, $planName, $recordType, $personId, $orgId) if !($productName eq $dataProductName && $dataPlanName eq $planName && $orgId eq $dataOrgId);
-	my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
-
-	$self->invalidate($page, "This Personal Coverage already exists for '$personId'.") if  ($personPlanExists ne '' || $preFilledpersonPlanExists ne '');
-
-	#my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
-
-
-	# return TRUE if there were no errors, FALSE (0) if there were errors
-	return $page->haveValidationErrors() ? 0 : 1;
-}
-
 
 ##############################################################################
 package App::Dialog::Field::Insurance::Plan::New;
@@ -300,41 +244,6 @@ sub new
 		$params{findPopup} = '/lookup/insurance/plan_name';
 	}
 	return CGI::Dialog::Field::new($type, %params);
-}
-
-sub isValid
-{
-	my ($self, $page, $validator) = @_;
-
-	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
-	my $value = $page->field($self->{name});
-
-	#return 1 if $command ne 'add' || $value eq '';
-
-	return 0 unless $self->SUPER::isValid($page, $validator);
-
-	my $personId = $page->param('person_id');
-
-	my $insTypeWrkCmp = App::Universal::CLAIMTYPE_WORKERSCOMP;
-	my $orgId = $page->field('ins_org_id');
-	my $planName = $page->field('plan_name');
-	my $productName = $page->field('product_name');
-	my $preFilledOrg = $page->field('ins_comp');
-	my $preFilledProduct = $page->field('product');
-	my $preFilledPlan =  $page->field('plan');
-	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$productName, $planName, $orgId);
-	my $preFilledplanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$preFilledProduct, $preFilledPlan, $preFilledOrg);
-
-	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-plan?_f_ins_org_id=$orgId&_f_product_name=$productName&_f_plan_name=$planName');";
-	$self->invalidate($page, qq{ Plan Name '$planName' does not exist for the Product Name '$productName'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsPlanPreHref">Create Plan '$planName' now</a>
-		}) if $planForOrgExists eq '' && $planName ne '';
-
-	my $createPreInsPlanPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-plan?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct&_f_plan_name=$preFilledPlan');";
-	$self->invalidate($page, qq{ Plan Name '$preFilledPlan' does not exist for the Product Name '$preFilledProduct'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createPreInsPlanPreHref">Create Plan '$preFilledPlan' now</a>
-		}) if $preFilledplanExists eq '' && $preFilledPlan ne '';
-	return $page->haveValidationErrors() ? 0 : 1;
 }
 
 
