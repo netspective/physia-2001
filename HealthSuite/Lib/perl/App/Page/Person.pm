@@ -140,6 +140,7 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
+						<OPTION value="/person/$personId/dlg-add-referral">Add Referral</OPTION>
 						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-claim">Create Claim</OPTION>
 						<OPTION value="/person/$personId/dlg-add-invoice">Create Invoice</OPTION>
