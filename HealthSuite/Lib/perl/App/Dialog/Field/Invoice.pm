@@ -187,10 +187,19 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
-	my $totalAmtPaid = $page->field('total_amount');					#total amount paid
-	my $totalAmtEntered = $page->field('adjustment_amount');			#amount paid for today's visit
+	my $totalPayRcvd = $page->field('total_amount');					#total amount paid
+	my $payAmtForThisVisit = $page->field('adjustment_amount');			#amount paid for today's visit
+	my $totalAmtEntered = $payAmtForThisVisit;
 	my $totalPatientBalance = $page->param('_f_total_patient_balance');	#total patient balance
 
+	#validation for 'This Visit' invoice
+	if($payAmtForThisVisit > $totalPayRcvd)
+	{
+		my $diff = $payAmtForThisVisit - $totalPayRcvd;
+		$self->invalidate($page, "Amount entered for 'This Visit' exceeds 'Total Payment Received' by \$$diff");
+	}
+
+	#validation for each invoice listed
 	#calculate the total amount entered for each oustanding invoice in addition to amount paid for today's visit
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -200,42 +209,34 @@ sub isValid
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
 		next if $payAmt eq '';
 
-		if($payAmt > $invoiceBalance)
+		#no validation needed for overpayments - overpayments are allowed
+		if($payAmt > $totalPayRcvd)
 		{
-			$self->invalidate($page, "Line $line (Invoice $invoiceId): Amount entered exceeds balance.");
+			my $amtDiff = $payAmt - $totalPayRcvd;
+			$self->invalidate($page, "Line $line (Invoice $invoiceId): Amount entered exceeds 'Total Payment Received' by \$$amtDiff");
 		}
 
 		$totalAmtEntered += $payAmt;
 	}
 
 
-	#validate
-	if($totalAmtPaid > $totalPatientBalance)
+	#validation  - no validation needed for overpayments - overpayments are allowed
+	if($totalAmtEntered > $totalPayRcvd)
 	{
-		my $amtLeft = $totalAmtPaid - $totalPatientBalance;
-		$self->invalidate($page, "Patient has overpaid balance by \$$amtLeft.");
+		my $amtExceeded = $totalAmtEntered - $totalPayRcvd;
+		$self->invalidate($page, "The total amount applied exceeds the 'Total Payment Received' by \$$amtExceeded. Please reconcile.");
 	}
-	elsif($totalAmtEntered > $totalAmtPaid)
+	elsif($totalAmtEntered < $totalPayRcvd)
 	{
-		my $amtExceeded = $totalAmtEntered - $totalAmtPaid;
-		$self->invalidate($page, "The total amount applied exceeds the amount paid by \$$amtExceeded. Please reconcile.");
-	}
-	elsif($totalAmtEntered < $totalAmtPaid)
-	{
-		my $paidEnteredDiff = $totalAmtPaid - $totalAmtEntered;
-		if($totalAmtEntered == $totalPatientBalance)
-		{
-			$self->invalidate($page, "Patient has overpaid by \$$paidEnteredDiff.");
-		}
-		elsif($totalAmtEntered > $totalPatientBalance)
-		{
-			my $amtOver = $totalAmtPaid - $totalPatientBalance;
-			$self->invalidate($page, "There is \$$amtOver left.");
-		}
-		elsif($totalAmtEntered < $totalPatientBalance)
+		my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtEntered;
+		if($totalAmtEntered < $totalPatientBalance)
 		{
 			my $balanceRemain = $totalPatientBalance - $totalAmtEntered;
-			$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$paidEnteredDiff left.");
+			$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+		}
+		else
+		{
+			$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
 		}
 	}
 
@@ -290,7 +291,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_balance" VALUE="$invoiceBalance"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
-				<TD><FONT $textFontAttrs> $invoiceId </TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -324,7 +325,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Balance:</b></FONT></TD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
@@ -389,10 +390,11 @@ sub isValid
 
 		my $newTotal = $invoiceBalance + $refundAmt;
 
-		if($newTotal > 0)
-		{
-			$self->invalidate($page, "Line $line (Invoice $invoiceId): New balance is \$$newTotal. Please re-enter refund amount.");
-		}
+		#following was commented out on 5/15 because refunds that give the patient a positive balance are allowed
+		#if($newTotal > 0)
+		#{
+		#	$self->invalidate($page, "Line $line (Invoice $invoiceId): New balance is \$$newTotal. Please re-enter refund amount.");
+		#}
 	}
 
 	return $page->haveValidationErrors() ? 0 : 1;
@@ -419,17 +421,16 @@ sub getHtml
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
 	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId);
+	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId);
+	my $totalPossibleRefund = $totalPatientBalance * (-1);
+	my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? "(Amount refunded cannot exceed \$$totalPossibleRefund)" : "(There is no credit on this patient's balance)";
+
 	my $totalInvoices = scalar(@{$creditInvoices});
-	my $totalPatientBalance = 0;
 	for(my $line = 1; $line <= $totalInvoices; $line++)
 	{
 		my $invoice = $creditInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
-		$totalPatientBalance += $invoiceBalance;
-
-		next if $invoiceId == $page->param('invoice_id');	#param(invoiceid) is the invoice for the current visit,
-															#it has it's own payment section
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -446,7 +447,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_balance" VALUE="$invoiceBalance"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
-				<TD><FONT $textFontAttrs> $invoiceId </TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -480,8 +481,9 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Balance:</b></FONT></TD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Patient's Total Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
+						<TD COLSPAN=4><FONT $textFontAttrs>$totalPossibleRefundMsg</FONT></TD>
 					</TR>
 				</TABLE>
 			</TD>
@@ -565,18 +567,15 @@ sub getHtml
 
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selTransferInvoicesByClient', $personId);
+	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonZeroBalanceInvoicesByClient', $personId);
+	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId);
+
 	my $totalInvoices = scalar(@{$transferInvoices});
-	my $totalPatientBalance = 0;
 	for(my $line = 1; $line <= $totalInvoices; $line++)
 	{
 		my $invoice = $transferInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
-		$totalPatientBalance += $invoiceBalance;
-
-		next if $invoiceId == $page->param('invoice_id');	#param(invoiceid) is the invoice for the current visit,
-															#it has it's own payment section
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -593,7 +592,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_balance" VALUE="$invoiceBalance"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
-				<TD><FONT $textFontAttrs> $invoiceId </TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -619,7 +618,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Balance:</b></FONT></TD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
