@@ -18,7 +18,9 @@
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
-
+		<deliverable id="963">
+			UI: Made the license fields in the nurse dialog to be just text fields.
+		</deliverable>
 		<deliverable id="1262">
 			UI: The Electronic Billing Information component has now been moved form the Insurance tab
 			of an organization to the Clearing House tab.
@@ -37,7 +39,9 @@
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			not those of the current user of the app.
 		</deliverable>
-
+		<deliverable id="1512">
+			Deleted the validation check on the 'Nursing License' field in the 'Add Nurse' dialog
+		</deliverable>
 		<deliverable id="1517">
 			Report (patient activity staff) : The patient activity staff report was not converting from GMT to local timezone so work done late in a day would appear on the wrong date.
 		</deliverable>
