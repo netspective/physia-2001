@@ -24,23 +24,28 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-			new App::Dialog::Field::Attribute::Name(name => 'value_textb', caption => 'ID Caption', priKey => 1, type => 'select',
-						selOptions => ';Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#',
-						options => FLDFLAG_REQUIRED,
-						attrNameFmt => "#field.value_textb#",
-						fKeyStmtMgr => $STMTMGR_ORG,
-						valueType => $self->{valueType},
-						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
+		new App::Dialog::Field::Attribute::Name(name => 'value_textb', 
+			caption => 'ID Caption', priKey => 1, type => 'select',
+			selOptions => ';Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#',
+			options => FLDFLAG_REQUIRED,
+			attrNameFmt => "#field.value_textb#",
+			fKeyStmtMgr => $STMTMGR_ORG,
+			valueType => $self->{valueType},
+			selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'
+		),
+		new CGI::Dialog::Field(name => 'value_text', 
+			caption => 'ID Number',
+			options => FLDFLAG_REQUIRED
+		),
+	);
 
-			new CGI::Dialog::Field(name => 'value_text', caption => 'ID Number', options => FLDFLAG_REQUIRED),
-		);
-		$self->{activityLog} =
-		{
-			level => 2,
-			scope =>'org_attribute',
-			key => "#param.org_id#",
-			data => "Credentials '#field.attr_name#' to <a href='/org/#param.org_id#/profile'>#param.org_id#</a>"
-		};
+	$self->{activityLog} =
+	{
+		level => 2,
+		scope =>'org_attribute',
+		key => "#param.org_id#",
+		data => "Credentials '#field.value_textb#' to <a href='/org/#param.org_id#/profile'>#param.org_id#</a>"
+	};
 		
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
