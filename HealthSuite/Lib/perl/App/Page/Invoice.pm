@@ -1030,37 +1030,57 @@ sub getHistoryHtml
 
 	my $invoiceId = $self->param('invoice_id');
 	my $allStatusHistory = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selAllHistoryItems', $invoiceId);
+	my $historyItems = $claim->{invoiceHistoryItem};
+	my $historyCount = $claim->{historyCount};
 
 	my @rows = ();
-	foreach my $statusHistory (@{$allStatusHistory})
+	foreach my $item (@{$allStatusHistory})
 	{
 		push(@rows, qq{
 			<TR VALIGN=TOP>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_date}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_date}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_text}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_text}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{cr_user_id}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{cr_user_id}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_textb}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_textb}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
 			</TR>
 		});
 	}
 
+
+#	foreach my $idx (0..$historyCount-1)
+#	{
+#		push(@rows, qq{
+#			<TR VALIGN=TOP>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][0]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][1]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][3]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][2]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+#			</TR>
+#		});
+#	}
+
 	return qq{
-				<TABLE border=0 CELLSPACING=0>
-					<TR VALIGN=TOP BGCOLOR=EEEEEE>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Date</B></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Action</B></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>By</B></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Comments</B></TD>
-					</TR>
-					@rows
-				</TABLE>
-			};
+		<TABLE border=0 CELLSPACING=0>
+			<TR VALIGN=TOP BGCOLOR=EEEEEE>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Date</B></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Action</B></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>By</B></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Comments</B></TD>
+			</TR>
+			@rows
+		</TABLE>
+	};
 }
 
 sub getIntelliCodeResultsHtml
@@ -1225,6 +1245,7 @@ sub prepare_view_summary
 	my $billingOrg = $self->getOrgHtml($claim->{payToOrganization});
 	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{insurancePlanOrProgramName});
 	my $invStatus = $claim->getStatus();
+	my $invoiceFlags = $claim->{flags};
 	my $invType = $claim->getInvoiceType();
 	my $claimType = $claim->getInvoiceSubtype();
 	my $totalItems = $claim->getTotalItems();
@@ -1253,10 +1274,14 @@ sub prepare_view_summary
 	my $awaitClientPayment = App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT;
 	#--------------------
 
+	#other constants
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
+	my $thirdParty = App::Universal::CLAIMTYPE_CLIENT;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
+	#--------------------
+
 
 	my $payerPane = "<TD><FONT FACE='Arial,Helvetica' SIZE=2>$payer</TD>";
 	my $payerPaneHeading = "<TD BGCOLOR=EEEEEE><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=333333><B>Payer</B></TD>";
@@ -1284,28 +1309,37 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $invStatus < $submitted && $claimType != $selfPay ?
+						@{[ $totalItems > 0 && ($claimType == $selfPay || $claimType == $thirdParty) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
+						"<TD>
+							<FONT FACE='Arial,Helvetica' SIZE=2>
+							<a href='/invoice/$invoiceId/submit'>Submit Claim for Billing</a>
+							</FONT>
+						</TD>" : '' ]}
+
+						@{[ $totalItems > 0 && $claimType != $selfPay && 
+							! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/submit'>Submit Claim for Transfer</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						<!-- @{[ $totalItems > 0 && $claimType != $selfPay &&
-							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) ?
+						@{[ $totalItems > 0 && $claimType != $selfPay && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && 
+							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay &&
-							($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) ?
+						@{[ $totalItems > 0 && $claimType != $selfPay && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && 
+							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || 
+								$invStatus == $awaitInsPayment  ) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</a>
 							</FONT>
-						</TD>" : '' ]} -->
+						</TD>" : '' ]}
 
 						@{[ $invStatus != $onHold && $invStatus < $transferred ?
 						"<TD>
@@ -2045,9 +2079,6 @@ sub prepare_page_content_header
 	my $paperPrinted = App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED;
 	my $awaitClientPayment = App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT;
 
-	#invoice flags
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
-
 	#claim types
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
@@ -2166,10 +2197,10 @@ sub prepare_page_content_header
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
 						@{[ ($invStatus < $submitted || $invStatus == $paymentApplied) && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
-						@{[ ! ($invoiceFlags & $attrDataFlag) && ($invStatus < $submitted || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
+						@{[ ! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && ($invStatus < $submitted || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $onHold || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || $invStatus == $awaitInsPayment  ) && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
 
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $invoiceFlags & $attrDataFlag && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || $invStatus == $awaitInsPayment  ) && $invoiceFlags & $attrDataFlag && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
 						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
