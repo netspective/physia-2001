@@ -300,10 +300,10 @@ sub populateData
 	$page->field('emp_id', $nurseEmpData->{'value_text'});
 	$page->field('emp_exp_date', $nurseEmpData->{'value_datea'});
 
-	my $assocPhysician = 'Physician';
-	my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
-	$page->field('assoc_phy_item_id', $assocPhysicianData->{'item_id'});
-	$page->field('value_text', $assocPhysicianData->{'value_text'});
+	#my $assocPhysician = 'Physician';
+	#my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
+	#$page->field('assoc_phy_item_id', $assocPhysicianData->{'item_id'});
+	#$page->field('value_text', $assocPhysicianData->{'value_text'});
 }
 
 sub handleContactInfo
@@ -613,16 +613,16 @@ sub handleAttrs
 				_debug => 0
 	) if ($page->field('emp_id') ne '' && $member eq 'Nurse');
 
-	my $assocCommand = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
-	$page->schemaAction(
-			'Person_Attribute', $assocCommand,
-			parent_id => $page->field('person_id'),
-			item_name => 'Physician',
-			item_id   => $page->field('assoc_phy_item_id') || undef,
-			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
-			value_text => $page->field('value_text') || undef,
-			_debug => 0
-	) if $page->field('value_text') ne '';
+	#my $assocCommand = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
+	#$page->schemaAction(
+	#		'Person_Attribute', $assocCommand,
+	#		parent_id => $page->field('person_id'),
+	#		item_name => 'Physician',
+	#		item_id   => $page->field('assoc_phy_item_id') || undef,
+	#		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
+	#		value_text => $page->field('value_text') || undef,
+	#		_debug => 0
+	#) if $page->field('value_text') ne '';
 }
 
 sub customValidate
