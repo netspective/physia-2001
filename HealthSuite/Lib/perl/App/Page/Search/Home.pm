@@ -238,6 +238,7 @@ sub prepare
 						<a href="/search/hcpcs">HCPCS</a>,
 						<a href="/search/epsdt">EPSDT</a>,
 						<a href="/search/miscprocedure">Misc Procedure Code</a>,
+						<a href="/search/modifier">Modifier</a>,
 						<a href="/search/serviceplace">Service Place</a>,
 						<a href="/search/servicetype">Service Type</a>,
 						<a href="/search/gpci">GPCI</a>, or
