@@ -38,6 +38,7 @@ use App::IntelliCode;
 
 use App::Page::Search;
 
+use constant DATEFORMAT_USA => 1;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
@@ -165,11 +166,14 @@ sub getProcedureHtml
 	my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $procedure->{cpt});
 	my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
+	my $serviceFromDate = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);	#$procedure->{dateOfServiceFrom};
+	my $serviceToDate = $procedure->getDateOfServiceTo(DATEFORMAT_USA);	#$procedure->{dateOfServiceTo};
+
 	push(@rows, qq{
 		<TR>
 			<TD><FONT FACE="Arial,Helvetica" SIZE=3><B>$lineSeq</B></FONT></TD>
 			<TD>&nbsp;</TD>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{dateOfServiceFrom} @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $procedure->{dateOfServiceTo}" : '']} </TD>
+			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
 			<TD>&nbsp;</TD>
 			<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 			<TD>&nbsp;</TD>
@@ -264,6 +268,7 @@ sub getProceduresHtml
 
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
 		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx');";
+		#my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment?item_id=$itemId&item_idx=$itemIdx');";
 		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
 		$itemExtCost = $formatter->format_price($itemExtCost);
@@ -300,11 +305,13 @@ sub getProceduresHtml
 		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $procedure->{codeType});
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
+		my $serviceFromDate = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);	#$procedure->{dateOfServiceFrom};
+		my $serviceToDate = $procedure->getDateOfServiceTo(DATEFORMAT_USA);	#$procedure->{dateOfServiceTo};
 		push(@rows, qq{
 			<TR>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>$lineSeq</B></FONT></TD>
 				<TD>&nbsp;</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{dateOfServiceFrom} @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $procedure->{dateOfServiceTo}" : '']} </TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
 				<TD>&nbsp;</TD>
 				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 				<TD>&nbsp;</TD>
@@ -319,6 +326,91 @@ sub getProceduresHtml
 				<TD ALIGN="Center">$emg</td>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{reference}</FONT></td>
+			</TR>
+			$cmtRow
+			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+		});
+	}
+
+	my $suppressedItems = scalar(@{$claim->{suppressedItems}});
+	foreach my $itemIdx (0..$suppressedItems-1)
+	{
+		my $suppressedItem = $claim->{suppressedItems}->[$itemIdx];
+		my $lineSeq = $itemIdx + 1;
+		my $itemId = $suppressedItem->{itemId};
+		my $itemStatus = $suppressedItem->{itemStatus};
+		my $emg = $suppressedItem->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
+
+		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId";
+		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId";
+		my $editProcImg = '';
+		my $voidProcImg = '';
+		if($invStatus < $submitted && $itemStatus ne 'void')
+		{
+			$editProcImg = "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>";
+			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>";
+		}
+
+		my $itemAdjustmentTotal = $suppressedItem->{totalAdjustments};
+		my $itemExtCost = $suppressedItem->{extendedCost};
+
+		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
+
+		$itemExtCost = $formatter->format_price($itemExtCost);
+
+		my ($cmtRow, $unitCost) = ('', '');
+		if(my $comments = $suppressedItem->{comments})
+		{
+			$cmtRow = qq{
+				<TR>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+					<TD COLSPAN=15><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
+				</TR>
+			}
+		}
+		if($suppressedItem->{daysOrUnits} > 1)
+		{
+			$unitCost = "<BR>(\$$suppressedItem->{charges} x $suppressedItem->{daysOrUnits})";
+		}
+
+		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
+		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $suppressedItem->{placeOfService});
+		my $servPlaceCode = $suppressedItem->{placeOfService};
+		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
+
+		#my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $suppressedItem->{typeOfService});
+		my $servTypeCode = $suppressedItem->{typeOfService};
+		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
+
+		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
+
+		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $suppressedItem->{modifier});
+		my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $suppressedItem->{cpt});
+		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $suppressedItem->{codeType});
+		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
+
+		push(@rows, qq{
+			<TR bgcolor="lightsteelblue">
+				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>&nbsp;</B></FONT></TD>
+				<TD>&nbsp;</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{dateOfServiceFrom} @{[ $suppressedItem->{dateOfServiceTo} ne $suppressedItem->{dateOfServiceFrom} ? " - $suppressedItem->{dateOfServiceTo}" : '']} </TD>
+				<TD>&nbsp;</TD>
+				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
+				<TD>&nbsp;</TD>
+				<TD TITLE="$cptAndModTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{cpt} @{[$suppressedItem->{modifier} ? "($suppressedItem->{modifier})" : '']}</TD>
+				<TD>&nbsp;</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{diagnosis}</TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">$viewPaymentHtml</TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center">$emg</td>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{reference}</FONT></td>
 			</TR>
 			$cmtRow
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
@@ -501,8 +593,8 @@ sub getProceduresHtml
 
 
 	#SIM/CURR ILLNESS DATES:
-	my $simDate = $claim->{treatment}->{dateOfSameOrSimilarIllness};
-	my $currDate = $claim->{treatment}->{dateOfIllnessInjuryPregnancy};
+	my $simDate = $claim->{treatment}->getDateOfSameOrSimilarIllness(DATEFORMAT_USA);	#{dateOfSameOrSimilarIllness};
+	my $currDate = $claim->{treatment}->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA);	#{dateOfIllnessInjuryPregnancy};
 
 	#DIAGS AND THEIR CAPTIONS:
 	my @allDiags = ();
@@ -1257,6 +1349,101 @@ sub prepare_view_summary
 		</p>
 		@{[ $invType == $hcfaInvoiceType ? $intellicodeHtml : '' ]}
 	});
+
+	return 1;
+}
+
+sub prepare_view_adjustment
+{
+	my $self = shift;
+
+	my $adjItemType = App::Universal::INVOICEITEMTYPE_ADJUST;
+
+	my $invoiceId = $self->param('invoice_id');
+	my $dialogCmd = $self->param('_pm_dialog_cmd');
+	my ($idx, $itemType) = split(/,/, $dialogCmd);
+	my $itemId = $self->param('item_id');
+
+	my $itemAdjs = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selItemAdjustments', $itemId);
+	my $claim = $self->property('activeClaim');
+	$self->setFlag(PAGEFLAG_IGNORE_BODYHEAD | PAGEFLAG_IGNORE_BODYFOOT);
+
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAndClaimType', $invoiceId);
+	my $heading = "Type: $invoice->{claim_type_caption}</B>, Status: $invoice->{invoice_status_caption}<BR>" || "Unknown ID: $invoiceId";
+	my $procNum = $idx + 1;
+
+	push(@{$self->{page_content}}, qq{
+		<TABLE WIDTH=100% BGCOLOR=BEIGE CELLSPACING=0 CELLPADDING=3 BORDER=0>
+			<TD>
+				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
+					<B>Adjustments for Claim $invoiceId @{[ $itemType != $adjItemType ? ", Procedure $procNum" : '' ]}</B>
+				</FONT>
+			</TD>
+			<TD><a href='javascript:window.close()'><img src='/resources/icons/done.gif' border=0></a></TD>
+		</TABLE>
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+			<TR>
+				<TD>
+					<FONT FACE="Arial,Helvetica" SIZE=2 COLOR=DARKRED>
+						<B>$heading</B>
+					</FONT>
+				</TD>
+			</TR>
+		</TABLE>
+
+		<BR><BR>
+
+		<CENTER>
+		<TABLE>
+	});
+
+	push(@{$self->{page_content}}, qq{
+			<TR VALIGN=TOP>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Date</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payer</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Adj Type</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Type</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Method</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Ref</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Auth Ref</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payment</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff Amt</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff Code</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Net Adjust</TD>
+				<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Comments</TD>
+			</TR>
+	});
+
+	foreach my $adj (@{$itemAdjs})
+	{
+		my $totalAdj = $adj->{adjustment_amount} + $adj->{plan_paid};
+		my $payerId = $adj->{payer_type} == 0 ? $adj->{payer_id} : $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $adj->{payer_id});
+		push(@{$self->{page_content}}, qq{
+				<TR VALIGN=TOP>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_date}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$payerId</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{adjustment_type}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_type}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_method}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_ref}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{data_text_a}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$totalAdj</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{writeoff_amount}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{writeoff_code}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{net_adjust}</TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{comments}</TD>
+				</TR>
+		});
+	}
+
+	if($itemType != $adjItemType)
+	{
+		push(@{$self->{page_content}}, qq{
+			</TABLE>
+			<BR><BR>
+			@{[ $self->getProcedureHtml($claim, $idx) ]}
+		});
+	}
 
 	return 1;
 }
