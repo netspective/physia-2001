@@ -106,10 +106,15 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where client_id = ?
 			and balance > 0
 		},
-	'selTransferInvoicesByClient' => q{
+	'selAllNonZeroBalanceInvoicesByClient' => q{
 		select * from invoice
 		where client_id = ?
 			and NOT balance = 0
+		},
+	'selTotalPatientBalance' => qq{
+		select sum(balance)
+		from invoice
+		where client_id = ?
 		},
 	'selCreditInvoicesByClient' => q{
 		select * from invoice
