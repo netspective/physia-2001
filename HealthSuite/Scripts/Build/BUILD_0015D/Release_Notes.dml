@@ -92,6 +92,9 @@
 		<deliverable id="1453">
 			Added text payment method to daily and monthly audit detail report
 		</deliverable>	
+		<deliverable id="1455">
+			Corrected problem with collection worklist when "all" was selected for insurance products on the setup screen
+		</deliverable>	
 		<deliverable id="661">
 			Fixed code to show up only the list of physicians and referral-doctors in the lookup window when the 'Physician/Provider ID' 
 			field is cliked in the 'care provider' dialog of 'care provider' component. The target build for this bug is 16, but was shipped in BUILD_15
