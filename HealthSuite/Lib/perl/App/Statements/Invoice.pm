@@ -496,54 +496,55 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	},
 	
 	'selFSHierarchy' => qq{
-		select per.value_int as fs, 1 as fsOrder
+		select per.value_int as fs, 1 as fs_order
 		from person_attribute per, org_attribute org, insurance_attribute insplan, insurance_attribute insprod
-		where per.parent_id = ?
-			and org.parent_id = ?
-			and insplan.parent_id = ?
-			and insprod.parent_id = ?
+		where per.parent_id = :1
+			and org.parent_id = :2
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
 			and per.item_name = 'Fee Schedule'
 			and org.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
-			and insprod.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
 			and per.value_int = org.value_int
 			and org.value_int = insplan.value_text
-			and insplan.value_text = insprod.value_text
+			and insplan.value_text = insprod.value_text (+)
 		UNION
-		select per.value_int as fs, 2 as fsOrder
+		select per.value_int as fs, 2 as fs_order
 		from person_attribute per, insurance_attribute insplan, insurance_attribute insprod
-		where per.parent_id = ?
-			and insplan.parent_id = ?
-			and insprod.parent_id = ?
+		where per.parent_id = :1
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
 			and per.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
-			and insprod.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
 			and per.value_int = insplan.value_text
-			and insplan.value_text = insprod.value_text
+			and insplan.value_text = insprod.value_text (+)
 		UNION
-		select org.value_int as fs, 3 as fsOrder
+		select org.value_int as fs, 3 as fs_order
 		from org_attribute org, insurance_attribute insplan, insurance_attribute insprod
-		where org.parent_id = ?
-			and insplan.parent_id = ?
-			and insprod.parent_id = ?
+		where org.parent_id = :2
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
 			and org.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
-			and insprod.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
 			and org.value_int = insplan.value_text
-			and insplan.value_text = insprod.value_text
+			and insplan.value_text = insprod.value_text (+)
 		UNION
-		select insplan.value_text as fs, 4 as fsOrder
+		select to_number(insplan.value_text) as fs, 4 as fs_order
 		from insurance_attribute insplan, insurance_attribute insprod
-		where insplan.parent_id = ?
-			and insprod.parent_id = ?
+		where insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
 			and insplan.item_name = 'Fee Schedule'
-			and insprod.item_name = 'Fee Schedule'
-			and insplan.value_text = insprod.value_text
+			and insprod.item_name (+)= 'Fee Schedule'
+			and insplan.value_text = insprod.value_text (+)
 		UNION
-		select insprod.value_text as fs, 5 as fsOrder
+		select to_number(insprod.value_text) as fs, 5 as fsOrder
 		from insurance_attribute insprod
-		where insprod.parent_id = ?
+		where insprod.parent_id = :4
 			and insprod.item_name = 'Fee Schedule'
+		ORDER BY 2 asc
 	},
 );
 
