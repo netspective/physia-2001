@@ -771,15 +771,19 @@ aic.batch_id,
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
 				sum(total_pending)
-			FROM	agedpayments a, person p,person_org_category poc
+			FROM	agedpayments a, person p
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
-			AND	bill_party_type in (0,1)
+			AND	( bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3))
 			AND	entire_invoice_balance <> 0
 			AND 	p.person_id = a.person_id
-			AND	a.person_id = poc.person_id
-			AND	poc.org_internal_id  = :2
 			AND	a.invoice_status <> 15
+			AND	EXISTS
+			(SELECT 1 
+			 FROM person_org_category poc
+			 WHERE poc.person_id = a.person_id
+			 AND poc.org_internal_id  = :2
+			 )
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			GROUP BY a.person_id, p.simple_name
@@ -822,15 +826,19 @@ aic.batch_id,
 				sum(nvl(a.total_adjust,0)),
 				sum(nvl(a.balance,0))
 			FROM	agedpayments a, person p,
-				invoice_status ist ,person_org_category poc
+				invoice_status ist 
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
 			AND 	a.balance <> 0
 			AND 	p.person_id = a.person_id
 			AND 	ist.id = a.invoice_status
-			AND	a.person_id = poc.person_id
-			AND	poc.org_internal_id  = :2
+			AND	EXISTS
+			(SELECT 1 
+			 FROM person_org_category poc
+			 WHERE poc.person_id = a.person_id
+			 AND poc.org_internal_id  = :2
+			 )
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
