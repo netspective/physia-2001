@@ -12,13 +12,13 @@ sub new
 	$params{taxId} = undef;
 	$params{date} = undef;
 	$params{time} = undef;
-	$params{patientNo} = undef;
-	$params{patientName} = undef;
-	$params{reason} = undef;
-	$params{doctor} = undef;
-	$params{location} = undef;
+	$params{patient} = undef; # person object
+	$params{doctor} = undef; # person object
+	$params{location} = undef; # organization object
+	$params{insurance} = undef; # organization object
+
 	$params{superBillComponents} = [];
-		
+
 	return bless \%params, $type;
 }
 
@@ -70,40 +70,16 @@ sub getTime
 	return $self->{time};
 }
 
-sub setPatientNo
+sub setPatient
 {
 	my ($self, $value) = @_;
-	$self->{patientNo} = $value;
+	$self->{patient} = $value;
 }
 
-sub getPatientNo
+sub getPatient
 {
 	my ($self) = @_;
-	return $self->{patientNo};
-}
-
-sub setPatientName
-{
-	my ($self, $value) = @_;
-	$self->{patientName} = $value;
-}
-
-sub getPatientName
-{
-	my ($self) = @_;
-	return $self->{patientName};
-}
-
-sub setReason
-{
-	my ($self, $value) = @_;
-	$self->{reason} = $value;
-}
-
-sub getReason
-{
-	my ($self) = @_;
-	return $self->{reason};
+	return $self->{patient};
 }
 
 sub setDoctor
@@ -128,6 +104,18 @@ sub getLocation
 {
 	my ($self) = @_;
 	return $self->{location};
+}
+
+sub setInsurance
+{
+	my ($self, $value) = @_;
+	$self->{insurance} = $value;
+}
+
+sub getInsurance
+{
+	my ($self) = @_;
+	return $self->{insurance};
 }
 
 sub addSuperBillComponent

@@ -1,5 +1,10 @@
 package App::Billing::Output::SuperBillPDF;
 
+
+use App::Billing::SuperBill::SuperBills;
+use App::Billing::SuperBill::SuperBill;
+use App::Billing::SuperBill::SuperBillComponent;
+
 use App::Billing::Output::PDF::Report;
 use pdflib 2.01;
 
@@ -38,7 +43,7 @@ use constant DATA_TOP_PADDING2 => 4;
 use constant DATA_FONT_COLOR => '0,0,0';
 use constant REPORT_COLOR => '0,0,0';
 use constant REPORT_FILL_COLOR => '0.9,0.9,0.9';
-use constant DATA_FONT_SIZE => 8;
+use constant DATA_FONT_SIZE => 7;
 use constant THRESHOLD => 4;
 
 sub new
@@ -50,7 +55,7 @@ sub new
 
 sub printReport
 {
-	my ($self, $superBill, %params) = @_;
+	my ($self, $superBills, %params) = @_;
 
 	my $filename = $params{file} ne "" ? $params{file} : "SuperBill.pdf";
 	my $columns = $params{columns} ne "" ? $params{columns} : 4;
@@ -66,8 +71,12 @@ sub printReport
 	die "Couldn't open PDF file"  if (pdflib::PDF_open_file($p, $filename) == -1);
 	my $report = new App::Billing::Output::PDF::Report(color => $reportColor);
 
-	for my $pages (1..2) # it depends on the number of patients
+	my $allSuperBills = $superBills->getSuperBill();
+
+	for my $i (0 .. $#$allSuperBills) # it depends on the number of patients
 	{
+
+		my $superBill = $allSuperBills->[$i];
 
 		$report->newPage($p);
 
@@ -144,20 +153,20 @@ sub printReport
 
 		$x = $startX;
 		$y = $startY - HEAD_HEIGHT - $rows * ROW_HEIGHT - 20;
-		$self->box1f($p, $x, $y, $report);
-		$self->box2f($p, $x, $y - TALL_BOX_HEIGHT, $report);
-		$self->box3f($p, $x, $y - TALL_BOX_HEIGHT - BOX_HEIGHT, $report);
-		$self->box4f($p, $x, $y - TALL_BOX_HEIGHT - 2 * BOX_HEIGHT, $report);
-		$self->box5f($p, $x, $y - TALL_BOX_HEIGHT - 3 * BOX_HEIGHT, $report);
-		$self->box6f($p, $x, $y - TALL_BOX_HEIGHT - 4 * BOX_HEIGHT, $report);
-		$self->box7f($p, $x + BOX1_WIDTH, $y, $report);
-		$self->box8f($p, $x + BOX1_WIDTH, $y - TALL_BOX_HEIGHT, $report);
-		$self->box9f($p, $x + BOX1_WIDTH, $y - 2 * TALL_BOX_HEIGHT, $report);
-		$self->box10f($p, $x + BOX1_WIDTH, $y - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT, $report);
-		$self->box11f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y, $report);
-		$self->box12f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT, $report);
-		$self->box13f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT, $report);
-		$self->box14f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT - BOX13_HEIGHT, $report);
+		$self->box1f($p, $x, $y, $report, $superBill);
+		$self->box2f($p, $x, $y - TALL_BOX_HEIGHT, $report, $superBill);
+		$self->box3f($p, $x, $y - TALL_BOX_HEIGHT - BOX_HEIGHT, $report, $superBill);
+		$self->box4f($p, $x, $y - TALL_BOX_HEIGHT - 2 * BOX_HEIGHT, $report, $superBill);
+		$self->box5f($p, $x, $y - TALL_BOX_HEIGHT - 3 * BOX_HEIGHT, $report, $superBill);
+		$self->box6f($p, $x, $y - TALL_BOX_HEIGHT - 4 * BOX_HEIGHT, $report, $superBill);
+		$self->box7f($p, $x + BOX1_WIDTH, $y, $report, $superBill);
+		$self->box8f($p, $x + BOX1_WIDTH, $y - TALL_BOX_HEIGHT, $report, $superBill);
+		$self->box9f($p, $x + BOX1_WIDTH, $y - 2 * TALL_BOX_HEIGHT, $report, $superBill);
+		$self->box10f($p, $x + BOX1_WIDTH, $y - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT, $report, $superBill);
+		$self->box11f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y, $report, $superBill);
+		$self->box12f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT, $report, $superBill);
+		$self->box13f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT, $report, $superBill);
+		$self->box14f($p, $x + BOX1_WIDTH + BOX7_WIDTH, $y  - 2 * TALL_BOX_HEIGHT - BOX9_HEIGHT - BOX13_HEIGHT, $report, $superBill);
 
 		$report->endPage($p);
 	}
@@ -169,7 +178,7 @@ sub printReport
 
 sub box1f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -184,18 +193,23 @@ sub box1f
 				]
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, TALL_BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+
+	$self->boxData($p, $x, $y, $report, $superBill->getDate, 0, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->getTime, 45, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->getName, 76, 10);
+
 }
 
 sub box2f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
 			texts =>
 				[
 					{
-						'text' => "  CKET" . SPC x 15 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 25 . "LOCATION"  . SPC x 30 . "DOB"  ,
+						'text' => "  CKET" . SPC x 15 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 15 . "LOCATION"  . SPC x 60 . "DOB"  ,
 						'fontWidth' => 6,
 						'x' => $x,
 						'y' => $y
@@ -203,11 +217,16 @@ sub box2f
 				],
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+#	$self->boxData($p, $x, $y, $report, $superBill->{doctor}->getId, 45, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{doctor}->getName, 45, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{location}->getName, 120, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->getDateOfBirth(1), 250, 10);
+
 }
 
 sub box3f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -222,11 +241,15 @@ sub box3f
 				],
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->getId, 2, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getTelephoneNo(1), 160, 10);
+
 }
 
 sub box4f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -241,11 +264,20 @@ sub box4f
 				],
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+
+	my $xpos = ($superBill->{patient}->getSex eq 'M') ? 0 : 12 ;
+	$self->boxData($p, $x, $y, $report, "X", $xpos, 12);
+
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getAddress1, 30, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getCity, 150, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getState, 180, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getZipCode, 260, 10);
+
 }
 
 sub box5f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -264,7 +296,7 @@ sub box5f
 
 sub box6f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -279,11 +311,12 @@ sub box6f
 				],
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX6_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+#	$self->boxData($p, $x, $y, $report, $superBill->{insurance}->getName, 0, 10);
 }
 
 sub box7f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -302,7 +335,7 @@ sub box7f
 
 sub box8f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -321,7 +354,7 @@ sub box8f
 
 sub box9f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -340,7 +373,7 @@ sub box9f
 
 sub box10f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 	{
@@ -384,7 +417,7 @@ sub box10f
 
 sub box11f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -422,7 +455,7 @@ sub box11f
 
 sub box12f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -467,7 +500,7 @@ sub box12f
 
 sub box13f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 			{
@@ -512,7 +545,7 @@ sub box13f
 
 sub box14f
 {
-	my($self, $p, $x, $y, $report) = @_;
+	my($self, $p, $x, $y, $report, $superBill) = @_;
 
 	my $properties =
 	{
@@ -685,6 +718,21 @@ sub printRow
 		};
 		$report->drawBox($p, $x + $xpos, $y, $columnWidths->[$i], ROW_HEIGHT,LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
 	}
+}
+
+sub boxData
+{
+	my($self, $p, $x, $y, $report, $data, $xPadding, $yPadding) = @_;
+
+	my $properties =
+	{
+		'text' => $data,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $xPadding,
+		'y' => $y - $yPadding
+	};
+	$report->drawText($p, $properties);
 }
 
 

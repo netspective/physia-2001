@@ -169,7 +169,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		},
 		publishDefn => $discardAppt_defn,
 	},
-	
+
 	# -----------------------------------------------------------------------------------------
 	'sel_patientsCPT' =>{
 		sqlStmt => qq{
@@ -180,7 +180,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				invoice i,
 				invoice_item ii
 			WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void') 
+				AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void')
 					OR ii.data_text_b is NULL)
 				AND ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]}
 				AND (:1 is NULL or e.facility_id = :1)
@@ -226,7 +226,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
 		whereCond => qq{ii.parent_id = i.invoice_id
 			AND ii.code = :1
-			AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void') 
+			AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void')
 				OR ii.data_text_b is NULL)
 			AND ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]}
 			AND i.main_transaction = t.trans_id
@@ -290,7 +290,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -335,12 +335,12 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
 		whereCond => qq{
 			e.scheduled_stamp >= TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
-			and e.scheduled_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6 
+			and e.scheduled_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
 		},
 		startTimeConstraints => qq{
 			AND e.scheduled_stamp >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.scheduled_stamp <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -389,7 +389,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			WHERE e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
 				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND e.event_status < 3
-				AND (:1 is NULL or e.facility_id = :1)				
+				AND (:1 is NULL or e.facility_id = :1)
 				AND	ea.parent_id = e.event_id
 				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				AND (:6 is NULL or ea.value_textb = :6)
@@ -409,7 +409,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				AND ct.id = 0
 			GROUP BY ct.caption
 		},
-		
+
 		publishDefn => {
 			columnDefn =>
 			[
@@ -442,7 +442,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -465,7 +465,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -512,7 +512,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,
 
 	},
@@ -560,9 +560,62 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		startTimeConstraints => qq{
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		},		
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
+
+	'selSuperBills' => {
+		sqlStmt => qq
+		{
+			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
+				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
+			from event e, event_attribute ea
+			where e.event_id = ea.parent_id
+			and owner_id = :4
+			and e.superbill_id is not null
+			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
+			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
+			union
+			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
+				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
+			from event e, event_attribute ea, appt_type apt
+			where e.event_id = ea.parent_id
+			and owner_id = :4
+			and e.superbill_id is null
+			and e.appt_type = apt.appt_type_id
+			and apt.superbill_id is not null
+			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
+			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
+		}
+	},
+
+	'selSuperBillsPhysician' => {
+		sqlStmt => qq
+		{
+			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
+				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
+			from event e, event_attribute ea
+			where e.event_id = ea.parent_id
+			and owner_id = :4
+			and e.superbill_id is not null
+			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
+			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
+			and ea.value_textb = :5
+			union
+			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
+				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
+			from event e, event_attribute ea, appt_type apt
+			where e.event_id = ea.parent_id
+			and owner_id = :4
+			and e.superbill_id is null
+			and e.appt_type = apt.appt_type_id
+			and apt.superbill_id is not null
+			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
+			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
+			and ea.value_textb = :5
+		}
+	},
+
 );
 
 1;
