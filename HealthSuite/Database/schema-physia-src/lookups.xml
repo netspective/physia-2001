@@ -1790,7 +1790,7 @@
 			<row>
 				<col name="id">3051</col>
 				<col name="caption">Uterine monitoring</col>
-				<col name="group_name"></col>
+				<col name="group_name">Monitoring</col>
 			</row>
 			<row>
 				<col name="id">3099</col>
@@ -2446,65 +2446,304 @@
 	</table>
 
 	<table name="States" type="Lookup">
-		<enum id="0">Alabama</enum>
-		<enum id="1">Alaska</enum>
-		<enum id="2">Arizona</enum>
-		<enum id="3">Arkansas</enum>
-		<enum id="4">California</enum>
-		<enum id="5">Colorado</enum>
-		<enum id="6">Connecticut</enum>
-		<enum id="7">Delaware</enum>
-		<enum id="8">District of Columbia</enum>
-		<enum id="9">Florida</enum>
-		<enum id="10">Georgia</enum>
-		<enum id="11">Hawaii</enum>
-		<enum id="12">Idaho</enum>
-		<enum id="13">Illinois</enum>
-		<enum id="14">Indiana</enum>
-		<enum id="15">Iowa</enum>
-		<enum id="16">Kansas</enum>
-		<enum id="17">Kentucky</enum>
-		<enum id="18">Louisiana</enum>
-		<enum id="19">Maine</enum>
-		<enum id="20">Maryland</enum>
-		<enum id="21">Massachusetts</enum>
-		<enum id="22">Michigan</enum>
-		<enum id="23">Minnesota</enum>
-		<enum id="24">Mississippi</enum>
-		<enum id="25">Missouri</enum>
-		<enum id="26">Montana</enum>
-		<enum id="27">Nebraska</enum>
-		<enum id="28">Nevada</enum>
-		<enum id="29">New Hampshire</enum>
-		<enum id="30">New Jersey</enum>
-		<enum id="31">New Mexico</enum>
-		<enum id="32">New York</enum>
-		<enum id="33">North Carolina</enum>
-		<enum id="34">North Dakota</enum>
-		<enum id="35">Ohio</enum>
-		<enum id="36">Oklahoma</enum>
-		<enum id="37">Oregon</enum>
-		<enum id="38">Pennsylvania</enum>
-		<enum id="39">Rhode Island</enum>
-		<enum id="40">South Carolina</enum>
-		<enum id="41">South Dakota</enum>
-		<enum id="42">Tennessee</enum>
-		<enum id="43">Texas</enum>
-		<enum id="44">Utah</enum>
-		<enum id="45">Vermont</enum>
-		<enum id="46">Virginia</enum>
-		<enum id="47">Washington</enum>
-		<enum id="48">West Virginia</enum>
-		<enum id="49">Wisconsin</enum>
-		<enum id="50">Wyoming</enum>
-		<enum id="51">American Samoa</enum>
-		<enum id="52">Federated States of Micronesia</enum>
-		<enum id="53">Guam</enum>
-		<enum id="54">Marshall Islands</enum>
-		<enum id="55">Northern Mariana Islands</enum>
-		<enum id="56">Palau</enum>
-		<enum id="57">Puerto Rico</enum>
-		<enum id="58">Virgin Islands</enum>
+		<description>List of States.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Alabama</col>
+				<col name="abbrev">AL</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Alaska</col>
+				<col name="abbrev">AK</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Arizona</col>
+				<col name="abbrev">AZ</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Arkansas</col>
+				<col name="abbrev">AR</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">California</col>
+				<col name="abbrev">CA</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Colorado</col>
+				<col name="abbrev">CO</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Connecticut</col>
+				<col name="abbrev">CT</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Delaware</col>
+				<col name="abbrev">DE</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">District of Columbia</col>
+				<col name="abbrev">DC</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Florida</col>
+				<col name="abbrev">FL</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Georgia</col>
+				<col name="abbrev">GA</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Hawaii</col>
+				<col name="abbrev">HI</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Idaho</col>
+				<col name="abbrev">ID</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Illinois</col>
+				<col name="abbrev">IL</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Indiana</col>
+				<col name="abbrev">IN</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Iowa</col>
+				<col name="abbrev">IA</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Kansas</col>
+				<col name="abbrev">KS</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Kentucky</col>
+				<col name="abbrev">KY</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Louisiana</col>
+				<col name="abbrev">LA</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Maine</col>
+				<col name="abbrev">ME</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Maryland</col>
+				<col name="abbrev">MD</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Massachusetts</col>
+				<col name="abbrev">MA</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Michigan</col>
+				<col name="abbrev">MI</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Minnesota</col>
+				<col name="abbrev">MN</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Mississippi</col>
+				<col name="abbrev">MS</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Missouri</col>
+				<col name="abbrev">MO</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Montana</col>
+				<col name="abbrev">MT</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Nebraska</col>
+				<col name="abbrev">NE</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Nevada</col>
+				<col name="abbrev">NV</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">New Hampshire</col>
+				<col name="abbrev">NH</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">New Jersey</col>
+				<col name="abbrev">NJ</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">New Mexico</col>
+				<col name="abbrev">NM</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">New York</col>
+				<col name="abbrev">NY</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">North Carolina</col>
+				<col name="abbrev">NC</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">North Dakota</col>
+				<col name="abbrev">ND</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Ohio</col>
+				<col name="abbrev">OH</col>
+			</row>
+			<row>
+				<col name="id">36</col>
+				<col name="caption">Oklahoma</col>
+				<col name="abbrev">OK</col>
+			</row>
+			<row>
+				<col name="id">37</col>
+				<col name="caption">Oregon</col>
+				<col name="abbrev">OR</col>
+			</row>
+			<row>
+				<col name="id">38</col>
+				<col name="caption">Pennsylvania</col>
+				<col name="abbrev">PA</col>
+			</row>
+			<row>
+				<col name="id">39</col>
+				<col name="caption">Rhode Island</col>
+				<col name="abbrev">RI</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">South Carolina</col>
+				<col name="abbrev">SC</col>
+			</row>
+			<row>
+				<col name="id">41</col>
+				<col name="caption">South Dakota</col>
+				<col name="abbrev">SD</col>
+			</row>
+			<row>
+				<col name="id">42</col>
+				<col name="caption">Tennessee</col>
+				<col name="abbrev">TN</col>
+			</row>
+			<row>
+				<col name="id">43</col>
+				<col name="caption">Texas</col>
+				<col name="abbrev">TX</col>
+			</row>
+			<row>
+				<col name="id">44</col>
+				<col name="caption">Utah</col>
+				<col name="abbrev">UT</col>
+			</row>
+			<row>
+				<col name="id">45</col>
+				<col name="caption">Vermont</col>
+				<col name="abbrev">VT</col>
+			</row>
+			<row>
+				<col name="id">46</col>
+				<col name="caption">Virginia</col>
+				<col name="abbrev">VA</col>
+			</row>
+			<row>
+				<col name="id">47</col>
+				<col name="caption">Washington</col>
+				<col name="abbrev">WA</col>
+			</row>
+			<row>
+				<col name="id">48</col>
+				<col name="caption">West Virginia</col>
+				<col name="abbrev">WV</col>
+			</row>
+			<row>
+				<col name="id">49</col>
+				<col name="caption">Wisconsin</col>
+				<col name="abbrev">WI</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">Wyoming</col>
+				<col name="abbrev">WY</col>
+			</row>
+			<row>
+				<col name="id">51</col>
+				<col name="caption">American Samoa</col>
+				<col name="abbrev">A_S</col>
+			</row>
+			<row>
+				<col name="id">52</col>
+				<col name="caption">Federated States of Micronesia</col>
+				<col name="abbrev">F_S_M</col>
+			</row>
+			<row>
+				<col name="id">53</col>
+				<col name="caption">Guam</col>
+				<col name="abbrev">GUAM</col>
+			</row>
+			<row>
+				<col name="id">54</col>
+				<col name="caption">Marshall Islands</col>
+				<col name="abbrev">M_I</col>
+			</row>
+			<row>
+				<col name="id">55</col>
+				<col name="caption">Northern Mariana Islands</col>
+				<col name="abbrev">N_M_I</col>
+			</row>
+			<row>
+				<col name="id">56</col>
+				<col name="caption">Palau</col>
+				<col name="abbrev">PALAU</col>
+			</row>
+			<row>
+				<col name="id">57</col>
+				<col name="caption">Puerto Rico</col>
+				<col name="abbrev">P_R</col>
+			</row>
+			<row>
+				<col name="id">58</col>
+				<col name="caption">Virgin Islands</col>
+				<col name="abbrev">V_I</col>
+			</row>
+		</data>
 	</table>
 
 </schema>
