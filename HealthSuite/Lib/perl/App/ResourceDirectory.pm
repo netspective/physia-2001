@@ -40,6 +40,7 @@ use App::Page::Schedule;
 use App::Page::SDE;
 use App::Page::Report;
 use App::Page::WorkList;
+use App::Page::PatientBill;
 
 ##############################################################################
 # Directory of all available Search Page Objects
@@ -219,6 +220,7 @@ $SEARCH_CLASSES = {
 	'lookup' => $SEARCH_CLASSES,
 	'sde' => 'App::Page::SDE',
 	'worklist' => 'App::Page::WorkList',
+	'patientbill' => 'App::Page::PatientBill',
 );
 
 %DIALOG_CLASSES = (
