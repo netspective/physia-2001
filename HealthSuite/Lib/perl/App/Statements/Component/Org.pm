@@ -1083,7 +1083,14 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{head => 'Name', colIdx => 0, dataFmt => '<A HREF = "/person/#2#/profile">#2# #0#</A>'},
 			{head => 'Type', colIdx => 1, dataFmt => '#1#'},
 		],
-		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-personnel/?_f_person_id=#2#&_f_category=#1#&home=/org/#param.org_id#/personnel',
+		bullets => [
+			'/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-personnel/?_f_person_id=#2#&_f_category=#1#&home=/org/#param.org_id#/personnel',
+			{	imgSrc => '/resources/icons/action-edit-update.gif',
+				urlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#4#?home=/org/#param.org_id#/personnel',
+				title => 'Change Password',
+			},
+		],
+
 		frame => {
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#',
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
