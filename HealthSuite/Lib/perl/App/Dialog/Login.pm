@@ -6,6 +6,7 @@ use strict;
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
+use CGI::ImageManager;
 use App::Universal;
 use vars qw(@ISA);
 
@@ -43,7 +44,7 @@ sub new
 				options => FLDFLAG_INVISIBLE
 				),
 		new CGI::Dialog::Field(name => 'start_sep', type => 'separator'),
-		new CGI::Dialog::Field(caption => 'Start Page', name => 'nextaction_redirecturl', type => 'select', selOptions => 'Worklist:/worklist;Home:/home;Search:/search;Schedule:/schedule', options => FLDFLAG_PERSIST),
+		new CGI::Dialog::Field(caption => 'Start Page', name => 'nextaction_redirecturl', type => 'select', selOptions => 'Worklist:/worklist;Home:/home;Main Menu:/menu;Schedule:/schedule', options => FLDFLAG_PERSIST),
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -180,41 +181,60 @@ sub handle_page
 	else
 	{
 		$page->addContent(qq{
-			<CENTER>
-				<TABLE WIDTH=600 CELLSPACING=10>
-					<TR>
-						<TD COLSPAN=2>
-							<IMG SRC='/resources/images/w_restinghands.gif'>
-							<IMG SRC='/resources/images/Splash_ani.gif'>
-						</TD>
-					</TR>
-					<TR VALIGN=TOP>
-						<TD>$dlgHtml</TD>
-						<TD>
-							<FONT FACE="VERDANA,ARIAL,HELVETICA" SIZE=2 COLOR=333333>
-								@{[$page->{sessErrorMsg} ? "<FONT COLOR=DARKRED><B>Please Note</B></FONT><BR>$page->{sessErrorMsg}" : '' ]}
-							</FONT>
-						</TD>
-					</TR>
-					<TR>
-						<TD COLSPAN=2>
-							<A HREF="https://digitalid.verisign.com/as2/1940859b9af71702c65fb7f216fe0090" TARGET="new">
-							<IMG SRC="/resources/icons/verisignsealwhite.gif" WIDTH="98" HEIGHT="100" BORDER="0" ALIGN="LEFT"></A>
-							<FONT FACE="VERDANA,ARIAL,HELVETICA" SIZE=2 COLOR=777777>
-							In order to assure that your data is secure,
-							please be sure to logout of the system when you're done. In addition to
-							logging out, please close all your browser windows after you log out.
-							<p>
-							<b>If you do not logout and close your browser when you're done, <font color=red><u>others will be able to see, modify,
-							and potentially delete your data</u>.</font></b>
-							<p>
-							All of the work you perform during this session is tracked
-							and audited for security and authenticity purposes.
-							</FONT>
-						</TD>
-					</TR>
-				</TABLE>
-			</CENTER>
+			<center>
+				<table width="600" cellspacing="10" border="0"><tr><td colspan="2" align="center">
+					$IMAGETAGS{'images/welcome'}
+				</td></tr><tr valign="top"><td colspan="2" align="center">
+					$dlgHtml
+				</td><td>
+					<font face="Verdana,Arial,Helvetica" size="2" color="#333333">
+						@{[ $page->{sessErrorMsg} ? qq{<font color="darkred"><b>Please Note</b></font><br>$page->{sessErrorMsg}} : '' ]}
+					</font>
+				</td></tr><tr><td colspan="2">
+					<br>
+					<a href="https://digitalid.verisign.com/as2/1940859b9af71702c65fb7f216fe0090" target="new">@{[ getImageTag('icons/verisignsealwhite', { align => 'left' }) ]}</a>
+					<font face="Verdana,Arial,Helvetica" size="2" color="#777777">
+						<p>In order to assure that your data is secure,
+						please be sure to logout of the system when you're done. In addition to
+						logging out, please close all your browser windows after you log out.</p>
+						<p><b>If you do not logout and close your browser when you're done, 
+						<font color="red">others will be able to see, modify,
+						and potentially delete your data.</font></b></p>
+						<p>All of the work you perform during this session is tracked
+						and audited for security and authenticity purposes.<br><br></p>
+					</font>
+				<!--
+				</td></tr><tr><td align="center" valign="top" width="50%">
+					<font face="Verdana,Arial,Helvetica" size="1" color="#777777">Powered by:</font><br>
+				</td><td align="center" valign="top" width="50%">
+					<font face="Verdana,Arial,Helvetica" size="1" color="#777777">Secured by:</font><br>
+				</td></tr><tr><td align="center" valign="top" width="50%">
+					<table align="center" border="0" cellspacing="0" cellpadding="0"><tr><td align="center" valign="middle" width="33%">
+						<a href="http://www.physia.com/">$IMAGETAGS{'icons/ihos1'}</a>
+					</td><td align="center" valign="middle" width="33%">
+						<a href="http://www.oracle.com/">$IMAGETAGS{'icons/oracle_logo'}</a>
+					</td><td align="center" valign="middle" width="33%">
+						<a href="http://www.sun.com/">$IMAGETAGS{'icons/sun_logo'}</a><br>
+					</td></tr></table>
+				</td><td align="center" valign="top" width="50%">
+					<a href="https://digitalid.verisign.com/as2/1940859b9af71702c65fb7f216fe0090" target="new">@{[ getImageTag('icons/verisignsealwhite', { width => 49, height => 51 }) ]}</a><br>
+				-->
+				</td></tr><tr><td colspan="2" align="center">
+					<font face="Verdana,Arial,Helvetica" size="1" color="#777777">
+						<p>
+						<!--
+							<a href="/public/privacy">Privacy Statement</a>
+							| 
+							<a href="/public/security">Security Statement</a>
+							<br> 
+						-->
+						<br>
+						Copyright \&copy; 2000 <a href="http://www.physia.com/">Physia Corp</a> - All Rights Reserved.<br>
+						Various Trademarks Held By Their Respective Owners.<br>
+						</p>
+					</font>
+				</td></tr></table>
+			</center>
 			});
 	}
 }
