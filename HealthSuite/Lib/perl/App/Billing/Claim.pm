@@ -137,7 +137,8 @@ sub getEMCId
 	$ids[MEDICAID]= $self->{payToOrganization}->getMedicaidId();
 	$ids[WORKERSCOMP]= $self->{payToOrganization}->getWorkersComp();
 	$ids[RAILROAD]= $self->{payToOrganization}->getRailroadId();
-	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP, RAILROAD);
+	$ids[BCBS]= $self->{payToOrganization}->getBCBSId();
+	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP, RAILROAD, BCBS);
 	$self->{providerEMCId} =
 		(
 			(grep{$_ eq $self->{insType}} @payerCodes) ?
