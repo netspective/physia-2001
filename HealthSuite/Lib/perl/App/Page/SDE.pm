@@ -173,7 +173,7 @@ sub queryToHtmlTable
 
 	return '' unless $queryText;
 
-	my $hdFontTag="<font face='Arial,Helvetica' size=1 color=silver>";
+	my $hdFontTag="<font face='Arial,Helvetica' size=2 color=white>";
 	my $bdFontTag="<font face='Arial,Helvetica' size=2>";
 
 	if(exists $options{debug} && $options{debug})
@@ -274,7 +274,7 @@ sub prepare_TableStruct
 		my $updTableDataUrl = $self->selfRef(_reloadtabledata=>1);
 		my $allTables = $self->getTableListAsSelect();
 		my $html = $showHead ? qq{
-			<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+			<TABLE WIDTH=100% BGCOLOR='#EEEEEE' BORDER=0 CELLPADDING=0 CELLSPACING=0>
 			<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;<B>$table->{name}</B> Table ($table->{abbrev})</FONT></TD>
 			<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
 			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
@@ -500,7 +500,7 @@ sub prepare_TableQuery
 
 	queryToHtmlTable($self, $query, \$html);
 	$self->addContent(qq{
-		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TABLE WIDTH=100% BGCOLOR='#EEEEEE' BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;SQL Query</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
 		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
