@@ -41,8 +41,16 @@
 			Showing all line items when editing a claim.
 		</deliverable>
 
+		<deliverable id="1964">
+			[UI] Added Pharmacy location dialog. Add new component on Pharmacy summary page to allow user to get to new dialog.  
+			Note : Same dialog used for Pharmacy Location and Ancillary Location test to make sure it work correctly in both cases.
+		</deliverable>
 		<deliverable id="1983">
 			Removed specified claim statuses from Claim Worklist Setup.
+		</deliverable>
+		<deliverable id="1989">
+			[UI] : No longer allow 0 for 'Age Range' and 'Amount Range' on the collection worklist setup dialog.  
+			Note : Since this dialog is used by Claims worklist also please check to make sure claims worklist setup dialog works as expected.
 		</deliverable>
 		
 	</deliverables>
