@@ -38,15 +38,15 @@ sub connectDB
 
 		my $connectKey = $CONFDATA_SERVER->db_ConnectKey();
 		print STDOUT "Connecting to $connectKey\n";
+
 		$page->{schema}->connectDB($connectKey);
+		$page->{db} = $page->{schema}->{dbh};
+		
+		$sqlPlusKey = $connectKey;
+		$sqlPlusKey =~ s/dbi:Oracle://;
 	}
 	else
 	{
 		die "DB Schema File and Connect Key are required!";
 	}
-	
-	$sqlPlusKey = $connectKey;
-	$sqlPlusKey =~ s/dbi:Oracle://;
 }
-
-
