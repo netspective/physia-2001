@@ -51,17 +51,13 @@ sub initialize
 					new App::Dialog::Field::Diagnoses(caption => 'ICD-9 Codes', name => 'icd_code1', options => FLDFLAG_TRIM, size => 6),
 					new App::Dialog::Field::Diagnoses(caption => 'ICD-9 Codes', name => 'icd_code2', options => FLDFLAG_TRIM, size => 6)
 				]),
-		new CGI::Dialog::MultiField(caption =>'CPT Code',name => 'cpt-code',
-					fields => [
-							new CGI::Dialog::Field(caption => 'CPT Codes', name => 'cpt_code1', findPopup => '/lookup/cpt', size => 6),
-							new CGI::Dialog::Field(caption => 'CPT Codes', name => 'cpt_code2', findPopup => '/lookup/cpt',, size => 6)
-				]),
-		new CGI::Dialog::Field(caption => 'Date Of Injury', name => 'trans_begin_stamp', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 0, defaultValue => ''),
+
+		new CGI::Dialog::Field(caption => 'Date Of Injury', name => 'trans_begin_stamp', type => 'date', pastOnly => 0, defaultValue => ''),
 		new CGI::Dialog::Field(name => 'comments', caption => 'Comments', type => 'memo'),
 
 		new CGI::Dialog::Subhead(heading => 'Referral Information', name => 'referral_heading'),
 		new App::Dialog::Field::Person::ID(caption =>'Referred By ', name => 'provider_id', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::MultiField(caption =>'Referred To/Referral Type',name => 'referredto_type',
+		new CGI::Dialog::MultiField(caption =>'Referred To/Submit Referral',name => 'referredto_type',
 			fields => [
 					new App::Dialog::Field::Person::ID(caption =>'Referred To ', name => 'referral_id', options => FLDFLAG_REQUIRED),
 					new CGI::Dialog::Field(caption =>'Type ',
@@ -74,8 +70,8 @@ sub initialize
 				]),
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
-				selOptions => 'Internal;External;Either',
-				caption => 'Internal/External Flag',
+				selOptions => 'Internal;External',
+				caption => 'Network Affiliation',
 				postHtml => "</FONT></B>",
 				name => 'int_ext_flag',
 				defaultValue => 'Internal'),
@@ -87,17 +83,32 @@ sub initialize
 		#			new CGI::Dialog::Field(caption => 'Last Name', name => 'phy_last_name', options => FLDFLAG_READONLY)
 		#	]),
 
+		new CGI::Dialog::MultiField(caption =>'CPT/HCSPCS',name => 'cpt-code',
+					fields => [
+							new CGI::Dialog::Field(caption => 'CPT Codes', name => 'cpt_code1', findPopup => '/lookup/cpt', size => 6),
+							new CGI::Dialog::Field(caption => 'CPT Codes', name => 'cpt_code2', findPopup => '/lookup/cpt',, size => 6)
+				]),
+
 		new CGI::Dialog::Field(caption =>'Requested Service ',
 			name => 'request_service',
 			fKeyStmtMgr => $STMTMGR_PERSON,
 			fKeyStmt => 'selReferralReason',
 			fKeyDisplayCol => 1,
 			fKeyValueCol => 1,
-			options => FLDFLAG_REQUIRED),
+			options => FLDFLAG_PREPENDBLANK),
 		new CGI::Dialog::Field(caption =>'Service Details ', name => 'details', type => 'memo'),
 
 		new CGI::Dialog::Field(caption =>'Date Of Request ', name => 'trans_end_stamp',  options => FLDFLAG_REQUIRED, type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1),
 
+
+	);
+
+	$self->addFooter(new CGI::Dialog::Buttons(
+						nextActions_add => [
+							['View Summary', "/person/%param.person_id%/profile"],
+							['Go to Work List', "/worklist/referral?user=physician", 1],
+							],
+						cancelUrl => $self->{cancelUrl} || undef)
 
 	);
 
@@ -139,12 +150,13 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
 	my $payer = $page->field('payer');
-	if($payer eq 'Third-Party Payer')
-	{
-		$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 0);
-		$otherPayer->invalidate($page, "Please provide existing ID for Third-Pary") if $page->field('other_payer_id') eq '';
+	#if($payer eq 'Third-Party Payer')
+	#{
+	#	$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 0);
+	#	$page->field('payer', 'Third-Party Payer');
+	#	$otherPayer->invalidate($page, "Please provide existing ID for Third-Pary") if $page->field('other_payer_id') eq '';
 
-	}
+	#}
 
 	my $personId = $page->param('person_id');
 	my $orgId = $page->session('org_id');
