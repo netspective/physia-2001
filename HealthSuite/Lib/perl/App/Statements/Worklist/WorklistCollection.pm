@@ -95,7 +95,15 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	trans_type = $ACCOUNT_OWNER		
 	},
 
-
+	'selPersonAttribute' =>qq
+	{
+		SELECT 	parent_id, value_text, value_textB,value_int,value_intb,
+			value_float,value_floatb
+		FROM	person_Attribute
+		WHERE	parent_id = :1
+		AND	item_name = :2
+		AND	parent_org_id = :3
+	},
 	'selReckInfoById' => qq
 	{
 		SELECT 	trans_begin_stamp as reck_date , trans_id as reck_id 
@@ -146,6 +154,140 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	trans_owner_id = :1 
 		AND	provider_id = :2		
 	},
+	
+	
+	'selWorkListPop' =>qq
+	{
+	SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+					to_number(NULL) as trans_id,NULL as reck_date,to_number(NULL) as reck_id,
+					(
+						select min(to_char(e.start_time,'MM/DD/YYYY')) 
+						from event e, event_attribute ea
+						where ea.value_text = p.person_id
+						and ea.item_name = 'Appointment' 
+						and ea.value_type = 333
+						and e.event_id  = ea.parent_id
+						and e.start_time - to_date(:9,'MM/DD/YYYY') >=0			
+					)as appt,				
+					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+					   ii.item_type in (0,1,2) )
+					) as description			
+				FROM 	person p  ,invoice i 
+				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+				AND	upper(:2)
+				AND	i.client_id = p.person_id
+				AND	i.balance between (:3) 
+				AND	(:4)
+				AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+				AND	to_date(:6,'MM/DD/YYYY')		
+				AND	i.invoice_status not in (15,16)			
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM  	person_org_category poc
+					WHERE 	p.person_id = poc.person_id
+					AND	poc.org_internal_id = :7			
+				)
+				AND EXISTS
+				(
+					SELECT 	1
+					FROM 	person_attribute
+					WHERE	item_name = 'WorkList-Collection-Setup-Org'
+					AND	value_text = (select service_facility_id FROM transaction
+								WHERE trans_id= i.main_transaction)
+					AND 	parent_id = :8
+					AND	parent_org_id = :7
+				)
+				AND EXISTS
+				(	
+					SELECT 	1
+					FROM	person_attribute pa,invoice_billing ib
+					WHERE	pa.item_name = 'WorkList-Collection-Setup-Product'
+					AND	i.billing_id = ib.bill_id
+					AND 	parent_id = :8
+					AND	pa.parent_org_id = :7			
+					AND	(
+						ib.bill_party_type IN (0,1)
+						OR
+						EXISTS
+						(
+							SELECT 1 
+						 	FROM 	insurance coverage,insurance prod_plan 
+						 	WHERE	ib.bill_ins_id = coverage.ins_internal_id
+						 	AND	prod_plan.ins_internal_id = coverage.parent_ins_id
+						 	AND	
+						 	(
+						 		(prod_plan.ins_internal_id = pa.value_int AND prod_plan.record_type =1)
+						 		OR prod_plan.parent_ins_id = pa.value_int
+							)					 	
+						 )
+						)
+				)
+				AND EXISTS
+				(
+					SELECT 	1
+					FROM	person_attribute
+					WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+					AND	value_text = (select provider_id FROM transaction
+								WHERE trans_id= i.main_transaction)
+					AND 	parent_id = :8
+					AND	parent_org_id = :7						
+				)						
+				AND NOT EXISTS
+				(
+					SELECT	1 
+					FROM	transaction
+					WHERE	trans_type = 9520
+					AND 	trans_status = 2
+					AND 	provider_id = :8
+					AND	invoice_id = i.invoice_id	
+					AND 	invoice_id is not NULL
+					AND	billing_facility_id = :7			
+				)	
+				UNION ALL
+				SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+					t.trans_id,
+					(	SELECT 	to_char(trans_begin_stamp,'MM/DD/YYYY') 
+						FROM 	transaction 
+						WHERE 	trans_owner_id = t.trans_owner_id
+						AND 	trans_type = 9510 
+						AND 	provider_id = t.provider_id	
+						AND 	trans_status = 2
+					)as  reck_date ,
+					(	SELECT 	trans_id 
+						FROM 	transaction 
+						WHERE 	trans_owner_id = t.trans_owner_id
+						AND 	trans_type = 9510 
+						AND 	provider_id = t.provider_id	
+						AND 	trans_status = 2
+					)as reck_id,
+					(
+						select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+						from event e, event_attribute ea
+						where ea.value_text = t.trans_owner_id 
+						and ea.item_name = 'Appointment' 
+						and ea.value_type = 333
+						and e.event_id  = ea.parent_id
+						and e.start_time - to_date(:9,'MM/DD/YYYY') >=0			
+					)as appt,
+					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+					   ii.item_type in (0,1,2) )
+					) as description				
+				FROM 	transaction t ,invoice i
+				WHERE 	t.trans_type = 9520
+				AND 	t.trans_status = 2
+				AND 	t.trans_subtype = 'Owner'
+				AND	t.provider_id = :8
+				AND	t.invoice_id = i.invoice_id	
+				and     t.invoice_id is not null
+				AND	t.billing_facility_id = :7
+		ORDER BY 1
+	},	
+	
+	
+	
 	
 	#The data 01/31/1800 is used to make sure the dates sort correctly
 	'selPerCollByIdDate' =>qq
@@ -377,8 +519,10 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	},
 
 	'sel_worklist_available_products' => qq{
-		select ins_internal_id as product_id, product_name 
-		from Insurance where record_type = $INSURANCE_TYPE_PRODUCT
+	select i.ins_internal_id as product_id, product_name 
+		from insurance i, org where record_type = 1
+		AND	i.owner_org_id = org.org_internal_id
+		AND	org.owner_org_id = ?
 		order by product_name
 	},
 	'sel_worklist_associated_products' => qq{
