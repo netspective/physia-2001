@@ -356,7 +356,7 @@ sub getHtml
 		my $value = $page->field($self->{name});
 		#Get the name for the person
 		my $patData = $STMTMGR_PERSON->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonSimpleNameById',$value);
-		$self->{postHtml} =qq{<INPUT TYPE="HIDDEN" NAME="_f_$self->{name}_simple_name_h"  TYPE='text' size=30 STYLE="color:red" VALUE='FRANK MAJOR'>
+		$self->{postHtml} =qq{<INPUT TYPE="HIDDEN" NAME="_f_$self->{name}_simple_name_h"  TYPE='text' size=30 STYLE="color:red" VALUE='$patData'>
 			<SPAN ID="_f_$self->{name}_simple_name_s">$patData </SPAN>};
 	}
 	$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);
