@@ -225,6 +225,7 @@
 		<enum>Not Read</enum>
 		<enum>Pending</enum>
 		<enum>Filled</enum>
+		<enum>Denied</enum>
 	</table>
 
 	<table name="Invoice_Status" type="Enumeration">
