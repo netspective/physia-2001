@@ -408,7 +408,7 @@ sub execute
 				ins_org_id => $page->field('ins_org_id') || undef,
 				bill_sequence => $page->field('bill_sequence') || undef,
 				ins_type => $insType || undef,
-				fee_schedule => $page->field('fee_schedule') || undef,
+				#fee_schedule => $page->field('fee_schedule') || undef,
 				group_name => $page->field('group_name') || undef,
 				group_number => $page->field('group_number') || undef,
 				member_number => $page->field('member_number') || undef,
