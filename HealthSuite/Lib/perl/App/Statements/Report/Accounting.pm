@@ -543,12 +543,14 @@ aic.batch_id,
 				--AND o.org_internal_id = invoice_charges.facility
 				--AND o.owner_org_id = :5
 				AND invoice_charges.owner_org_id = :5	
-				AND invoice_charges.invoice_id in 
-					(select parent_id from invoice_item ii 
-					where (ii.service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
-					AND (ii.service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
-					AND ii.item_type in (0,1,2)
-					AND ii.data_text_b is NULL)
+				AND (service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
+				AND (service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
+				--AND invoice_charges.invoice_id in 
+				--	(select parent_id from invoice_item ii 
+				--	where (ii.service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
+				--	AND (ii.service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
+				--	AND ii.item_type in (0,1,2)
+				--	AND ii.data_text_b is NULL)
 				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 				ORDER BY 13, to_char(invoice_date,'MM')
 		},
@@ -1151,7 +1153,9 @@ aic.batch_id,
 		(invoice_charges.refund) as refund,
 		pm.caption as pay_type ,
 		p.simple_name simple_name
-	FROM	invoice_charges,org o, person p, payment_method pm
+	FROM	invoice_charges,
+		--org o, 
+		person p, payment_method pm
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
 		AND (care_provider_id = :3 or :3 IS NULL)
@@ -1162,8 +1166,9 @@ aic.batch_id,
 			AND
 			(batch_id <= :5  or :5 is NULL)
 		)
-		AND o.org_internal_id = invoice_charges.facility
-		AND o.owner_org_id = :6
+		--AND o.org_internal_id = invoice_charges.facility
+		--AND o.owner_org_id = :6
+		AND invoice_charges.owner_org_id = :6	
 		AND client_id = p.person_id
 	order by invoice_id
 	},
@@ -1178,15 +1183,17 @@ aic.batch_id,
 		sum(insurance_pay) insurance_pay ,
 		sum(person_write_off) person_write_off,
 		sum(refund) as refund
-	FROM 	invoice_charges,org o
+	FROM 	invoice_charges
+		--,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
 		AND (care_provider_id =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
-		AND o.org_internal_id = invoice_charges.facility
-		AND o.owner_org_id = :7
+		--AND o.org_internal_id = invoice_charges.facility
+		--AND i.owner_org_id = :7
+		AND invoice_charges.owner_org_id = :7			
 	group by invoice_date
 },
 
@@ -1202,15 +1209,17 @@ aic.batch_id,
 		sum(insurance_pay) insurance_pay ,
 		sum(person_write_off) person_write_off,
 		sum(refund) as refund
-	FROM 	invoice_charges,org o
+	FROM 	invoice_charges
+		--,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
 		AND (care_provider_id =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
-		AND o.org_internal_id = invoice_charges.facility
-		AND o.owner_org_id = :7
+		--AND o.org_internal_id = invoice_charges.facility
+		--AND o.owner_org_id = :7
+		AND invoice_charges.owner_org_id = :7	
 
 	group by to_char(invoice_date,'MM/YYYY')
 	order by invoice_date asc},
@@ -1289,7 +1298,9 @@ aic.batch_id,
 		(refund) as refund,
 		pm.caption as pay_type ,
 		p.simple_name
-	FROM 	invoice_charges, org o, person p,payment_method pm
+	FROM 	invoice_charges,
+	--org o, 
+		person p,payment_method pm
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -1302,8 +1313,9 @@ aic.batch_id,
 			AND
 			(batch_id <= :5  or :5 is NULL)
 		)
-	AND 	o.org_internal_id = invoice_charges.facility
-	AND 	o.owner_org_id = :6
+	--AND 	o.org_internal_id = invoice_charges.facility
+	--AND 	o.owner_org_id = :6
+	AND invoice_charges.owner_org_id = :6	
 	AND 	client_id = p.person_id
 	ORDER BY  invoice_date asc
 	},
