@@ -345,6 +345,9 @@
 		<deliverable id="1657">
 			Report : Changed sort order in query modified query to filter out cap payments that do not belong to the main org
 		</deliverable>
+		<deliverable id="1663">
+			Report (aged pt recv) :  Corrected SQL to pull co-pay information and not multi count patient that have more then one role
+		</deliverable>
 	</deliverables>
 	</deliverables>
 </release-notes>
