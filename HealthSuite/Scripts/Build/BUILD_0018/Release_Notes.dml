@@ -18,6 +18,11 @@
 		<deliverable id="110">
 			Medicaid resubmission code and original reference fields add to claim dialog and showing on HCFA.
 		</deliverable>
+
+		<deliverable id="273">
+			Patient bill now showing adjustments as line items with relevant information. 
+			Also, print option added to pt worklist for claims with no charges.
+		</deliverable>
 	
 		<deliverable id="713">
 			Popup a window displaying patient alerts if patient has an Appointment Alert.
