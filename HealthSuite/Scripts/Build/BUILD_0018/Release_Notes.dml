@@ -39,8 +39,12 @@
 		<deliverable id="1095">
 			Corrected Physician Home Page.
 		</deliverable>
+
+		<deliverable id="1187">
+			Saved account notes date when transferring account to new collector
+		</deliverable>
 		
-		<deliverable id="1316">
+		<deliverable id="1319">
 			UI :
 			 Added new Org type of Lab 
 			 Added new Catalog type of Lab Test to Orgs of Type Lab (Added Dialog for adding Lab Test to a Org Lab Catalog)
