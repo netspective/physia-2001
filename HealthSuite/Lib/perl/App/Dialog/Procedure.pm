@@ -862,7 +862,7 @@ sub storeInsuranceInfo
 			my $parentInsId = $personInsur->{parent_ins_id};
 
 			#Basic Insurance Information --------------------
-			my $insOrgInfo = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selRegistry', $insOrgId);
+			my $insOrgInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $insOrgId);
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
@@ -1171,7 +1171,7 @@ sub storeInsuranceInfo
 
 				my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $valueType);
 
-				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_text});
+				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_int});
 
 				$page->schemaAction(
 						'Invoice_Attribute', $command,
