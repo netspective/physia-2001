@@ -2534,6 +2534,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			FROM invoice i, invoice_billing ib
 			WHERE i.client_id = ?
 			AND ib.invoice_id = i.invoice_id
+			AND ib.bill_sequence = 1
 			AND ib.invoice_item_id is NULL
 			AND i.balance > 0
 			ORDER BY i.invoice_date
