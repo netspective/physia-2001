@@ -1183,11 +1183,11 @@ function doActionPopup(arl, autoRefresh, features, srcControlField, dstControlFi
 	if (isActionPopupWindow())
 	{
 
-		popUpWindow = open(arl, '', "location, status, width=620,height=600,scrollbars,resizable");
+		popUpWindow = open(arl, '', "status, width=620, height=600, scrollbars, resizable");
 	}
 	else
 	{
-		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "location, status, width=620,height=600,scrollbars,resizable");
+		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "status, width=620, height=600, scrollbars, resizable");
 	}
 	popUpWindow.focus();
 }
@@ -1257,6 +1257,59 @@ function setField(_field, _value, _re, _default)
 		_field.value = newValue;
 	}
 }
+
+
+//****************************************************************************
+// Cross-Browser Dynamic HTML Utilities
+//****************************************************************************
+
+
+function showFieldsNotValues(event, notValues, showFields)
+{
+	var myValue = event.srcElement.value;
+	var newDisplay = "block";
+	var i;
+	for (i = 0; i < notValues.length; i++)
+		if (notValues[i] == myValue)
+			newDisplay = "none";
+	for (i = 0; i < showFields.length; i++)
+		setIdDisplay(showFields[i], newDisplay);
+}
+
+
+function showFieldsOnValues(event, onValues, showFields)
+{
+	var myValue = event.srcElement.value;
+	var newDisplay = "none";
+	var i;
+	for (i = 0; i < onValues.length; i++)
+		if (onValues[i] == myValue)
+			newDisplay = "block";
+	for (i = 0; i < showFields.length; i++)
+		setIdDisplay(showFields[i], newDisplay);
+}
+
+
+function setIdDisplay(id, display)
+{
+	//alert("setting " + id + " to " + display);
+	var objPath = "document.all._id_" + id + ".style";
+	var objHandle;
+	if (eval(objPath))
+	{
+		objHandle = eval(objPath);
+	}
+	else
+	{
+		objHandle = eval("document.ids._id_" + id);
+	}
+	objHandle.display = display;
+	//IE Object: document.all._id_insured_id.style.display="none";
+	//NS Object: document.ids._id_insured_id.display="none";
+}
+
+
+
 
 //
 // The following variable is set so that pages that call this library can check
