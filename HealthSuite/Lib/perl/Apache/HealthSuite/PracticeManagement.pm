@@ -28,6 +28,7 @@ sub handler
 	if ($@)
 	{
 		my $msg = "<h1>Perl Runtime Errors:</h1><font color=red>$@</font>";
+		$msg .= "<h1>Environment:</h1>" . join '<br>', map {"$_ = $ENV{$_}"} sort keys %ENV;
 		my $user = getpwuid($>) || '';
 		$r->content_type('text/html');
 		$r->send_http_header();
