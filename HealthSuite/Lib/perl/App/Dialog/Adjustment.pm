@@ -74,7 +74,7 @@ sub new
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
 
-		new CGI::Dialog::MultiField(caption =>'Writeoff Amount/Code', name => 'writeoff_fields',
+		new CGI::Dialog::MultiField(caption =>'Adjustment Amount/Code', name => 'writeoff_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
