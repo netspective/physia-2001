@@ -15,6 +15,7 @@ use constant DATEFORMAT_USA => 1;
 #   -- This modlue contains all insured's data
 #   -- which is given in HCFA 1500 Form
 #
+use constant DEFAULT_RELATION_SHIP_TO_PATIENT => 01;
 sub new
 {
 	my ($type) = shift;
@@ -84,7 +85,7 @@ sub getRelationshipToInsured
 {
 	my ($self) = @_;
 	
-	return $self->{relationshipToPatient};
+	return $self->{relationshipToPatient} eq "" ? DEFAULT_RELATION_SHIP_TO_PATIENT : $self->{relationshipToPatient};
 }
 
 sub setRelationshipToInsured

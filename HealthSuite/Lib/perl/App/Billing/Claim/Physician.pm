@@ -43,18 +43,12 @@ sub new
 	return bless $self, $type;
 }
 
-sub setProviderId
-{
-	my ($self,$value) = @_;
-	
-	$self->{providerId} = $value;	
-}
 
 sub getProviderId
 {
 	my $self = shift;
 	
-	return $self->{providerId};
+	return $self->{pin};
 }
 
 sub setDocumentationType

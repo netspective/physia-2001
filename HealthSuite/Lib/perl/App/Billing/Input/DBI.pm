@@ -123,6 +123,9 @@ use constant BILLSEQ_SECONDARY_CAPTION => 'Secondary';
 use constant BILLSEQ_TERTIARY_CAPTION => 'Tertiary';
 use constant BILLSEQ_QUATERNARY_CAPTION => 'Quaternary';
 
+# Default place of service for items
+#use constant DEFAULT_PLACE_OF_SERIVCE => 11;
+my $DEFAULT_PLACE_OF_SERIVCE = 11;
 
 sub new
 {
@@ -412,12 +415,13 @@ sub assignPatientInsurance
 	$billSeq->[BILLSEQ_TERTIARY_PAYER] =  TERTIARY;
 	$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
 
-	if ($claim->getStatus() ne INVOICESTATUS_SUBMITTED)  # here populate only the current insurer for the bill
+
+	if (($claim->getStatus() ne INVOICESTATUS_SUBMITTED) and ($no ne "")) # here populate only the current insurer for the bill
 	{
 		$queryStatment = "select bill_party_type from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE = $no";
 		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 		# do the execute statement
-		#$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
 		if ($row[0] eq BILL_PARTY_TYPE_INSURANCE)
 		{
@@ -460,65 +464,69 @@ sub assignPatientInsurance
 		$insured->setBillSequence($row[2]);
 		$insured->setSsn($row[9]);
 	}
-	my @rowBilling;
-	$queryStatment = "select bill_id, bill_party_type, BILL_SEQUENCE from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE <> $no";
-	my $sth1 = $self->{dbiCon}->prepare(qq{$queryStatment});
-	# do the execute statement
-	$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	
-	while(@rowBilling = $sth1->fetchrow_array())
+	if ($no ne "")
 	{
-		if ($rowBilling[1] eq BILL_PARTY_TYPE_INSURANCE)
+		my @rowBilling;
+		$queryStatment = "select bill_id, bill_party_type, BILL_SEQUENCE from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE <> $no";
+		my $sth1 = $self->{dbiCon}->prepare(qq{$queryStatment});
+		# do the execute statement
+		$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		
+		while(@rowBilling = $sth1->fetchrow_array())
 		{
-			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
-									ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
-									ins.ins_type, Ins.member_number
-							from org, insurance ins, invoice_billing
-							where invoice_billing.invoice_id = $invoiceId
-								and invoice_billing.bill_id = $rowBilling[0]
-								and invoice_billing.invoice_item_id is NULL
-								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
-								" and invoice_billing.bill_ins_id = ins.ins_internal_id
-								and ins.ins_org_id = org.org_internal_id
-								and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
-		}
-		else
-		{
-			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
-									ins.guarantor_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
-									ins.ins_type, Ins.member_number
-							from insurance ins, invoice_billing
-							where invoice_billing.invoice_id = $invoiceId
-								and invoice_billing.bill_id = $rowBilling[0]
-								and invoice_billing.invoice_item_id is NULL
-								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
-								" and invoice_billing.bill_ins_id = ins.ins_internal_id
-								and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
-		}
-
-	$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
-	# do the execute statement
-	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	
-		$insured = $insureds[$billSeq->[$row[3]+0]];
-		if ($insured ne "")
-		{
-			if (($claim->getStatus() ne INVOICESTATUS_SUBMITTED) || ($no ne ($row[3]+ 0)))
-			# ($no ne ($row[3]+ 0)) other insureds of submit.
+			if ($rowBilling[1] eq BILL_PARTY_TYPE_INSURANCE)
 			{
-				$insured->setInsurancePlanOrProgramName($row[0]);
-				$insured->setPolicyGroupOrFECANo($row[1]);
-				$insured->setRelationshipToPatient($row[2]);
-				$insured->setBillSequence($row[3]);
-				$insured->setId($row[4]);
-				$insured->setEffectiveDate($row[5]);
-				$insured->setTerminationDate($row[6]);
-				$insured->setSsn($row[7]);
+				$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+										ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+										ins.ins_type, Ins.member_number
+								from org, insurance ins, invoice_billing
+								where invoice_billing.invoice_id = $invoiceId
+									and invoice_billing.bill_id = $rowBilling[0]
+									and invoice_billing.invoice_item_id is NULL
+									and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+									" and invoice_billing.bill_ins_id = ins.ins_internal_id
+									and ins.ins_org_id = org.org_internal_id
+									and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
+			}
+			else
+			{
+				$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+										ins.guarantor_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+										ins.ins_type, Ins.member_number
+								from insurance ins, invoice_billing
+								where invoice_billing.invoice_id = $invoiceId
+									and invoice_billing.bill_id = $rowBilling[0]
+									and invoice_billing.invoice_item_id is NULL
+									and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+									" and invoice_billing.bill_ins_id = ins.ins_internal_id
+									and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
+			}
+	
+			$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+			# do the execute statement
+			$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+			
+			$insured = $insureds[$billSeq->[$row[3]+0]];
+			if ($insured ne "")
+			{
+				if (($claim->getStatus() ne INVOICESTATUS_SUBMITTED) || ($no ne ($row[3]+ 0)))
+				# ($no ne ($row[3]+ 0)) other insureds of submit.
+				{
+					$insured->setInsurancePlanOrProgramName($row[0]);
+					$insured->setPolicyGroupOrFECANo($row[1]);
+					$insured->setRelationshipToPatient($row[2]);
+					$insured->setBillSequence($row[3]);
+					$insured->setId($row[4]);
+					$insured->setEffectiveDate($row[5]);
+					$insured->setTerminationDate($row[6]);
+					$insured->setSsn($row[7]);
+				}
 			}
 		}
 	}
 	$self->assignInsuredInfo($claim, $invoiceId);
 	$self->assignInsuredAddressInfo($claim, $invoiceId);
+	
 }
 
 sub assignInsuredInfo
@@ -1464,7 +1472,7 @@ sub assignInvoiceProperties
 
 	return \@objects;
 }
-# 4312448
+
 sub payersRemainingProperties
 {
 	my ($self, $payers, $invoiceId, $claim) = @_;
@@ -1774,7 +1782,7 @@ sub populateItems
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
- 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), hcfa_service_place, hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
+ 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), nvl(hcfa_service_place, $DEFAULT_PLACE_OF_SERIVCE), hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
  												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption, to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\'), data_text_b
  										from invoice_item
  										where parent_id = $invoiceId ";

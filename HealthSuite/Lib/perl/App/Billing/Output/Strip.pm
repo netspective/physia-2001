@@ -32,6 +32,7 @@ sub strip
 	{	
 		$self->stripDash($claim);
 		$self->fillData($claim);
+		$self->stripSpace($claim);
 	}		
 }
 
@@ -48,9 +49,9 @@ sub stripDash
 	$claim->{payToProvider}->{address}->{zipCode} =~ s/-//g;
 	$claim->{renderingProvider}->{address}->{zipCode} =~ s/-//g;
 	$claim->{payToOrganization}->{address}->{zipCode} =~ s/-//g;
-    $claim->{renderingOrganization}->{address}->{zipCode} =~ s/-//g;
-    $claim->{careReceiver}->{address}->{zipCode} =~ s/-//g;
-    $claim->{insured}->[0]->{address}->{zipCode} =~ s/-//g;
+	$claim->{renderingOrganization}->{address}->{zipCode} =~ s/-//g;
+ 	$claim->{careReceiver}->{address}->{zipCode} =~ s/-//g;
+ 	$claim->{insured}->[0]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[1]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[2]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[3]->{address}->{zipCode} =~ s/-//g;
@@ -59,6 +60,14 @@ sub stripDash
 	$claim->{policy}->[2]->{address}->{zipCode} =~ s/-//g;
 	$claim->{policy}->[3]->{address}->{zipCode} =~ s/-//g;
 	$claim->{legalRepresentator}->{address}->{zipCode} =~ s/-//g;
+	$claim->{careReceiver}->{ssn} =~ s/-//g;
+}
+
+sub stripSpace
+{
+	my ($self, $claim) = @_;
+	
+	$claim->{careReceiver}->{ssn} =~ s/\s*//g;
 }
 
 sub fillData
@@ -72,10 +81,10 @@ sub fillData
 	$claim->{insured}->[2]->{anotherHealthBenefitPlan} = '3';
 	$claim->{insured}->[3]->{anotherHealthBenefitPlan} = '3';
 	
-	$claim->{insured}->[0]->{relationshipToPatient} = '01';
-	$claim->{insured}->[1]->{relationshipToPatient} = '01';
-	$claim->{insured}->[2]->{relationshipToPatient} = '01';
-	$claim->{insured}->[3]->{relationshipToPatient} = '01';
+	# $claim->{insured}->[0]->{relationshipToPatient} = '01';
+	# $claim->{insured}->[1]->{relationshipToPatient} = '01';
+	# $claim->{insured}->[2]->{relationshipToPatient} = '01';
+	# $claim->{insured}->[3]->{relationshipToPatient} = '01';
 	
 	$claim->{policy}->[0]->{acceptAssignment} = 'Y';
 	$claim->{policy}->[1]->{acceptAssignment} = 'Y';
@@ -97,15 +106,15 @@ sub fillData
 
 
 
-	my $procedures = $claim->{procedures};
+	# my $procedures = $claim->{procedures};
 		
-	if ($#$procedures > -1)
-	{
-		for my $procedure (0..$#$procedures)
-		{
-			$claim->{procedures}->[$procedure]->{placeOfService} = '11';
-		}	
-	}
+	# if ($#$procedures > -1)
+	#{
+	#	for my $procedure (0..$#$procedures)
+	#	{
+	#		$claim->{procedures}->[$procedure]->{placeOfService} = '11';
+	#	}	
+	#}
 	
 	
 		
