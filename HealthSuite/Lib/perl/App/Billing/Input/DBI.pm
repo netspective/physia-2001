@@ -673,8 +673,14 @@ sub assignPaytoAndRendProviderInfo
 		my $inputMap =
 		{
 			CERTIFICATION_LICENSE . 'Tax ID' => [ $provider, [\&App::Billing::Claim::Physician::setTaxId, \&App::Billing::Claim::Physician::setTaxTypeId], [$colValText, $colValTextB]],
-			CERTIFICATION_LICENSE . 'UPIN' => [ $provider, \&App::Billing::Claim::Physician::setPIN, $colValText],
+			CERTIFICATION_LICENSE . 'UPIN' => [ $provider, \&App::Billing::Claim::Physician::setUPIN, $colValText],
 			CERTIFICATION_LICENSE . 'WC#' => [$provider, \&App::Billing::Claim::Physician::setWorkersComp, $colValText],
+			CERTIFICATION_LICENSE . 'Medicare' => [$provider, \&App::Billing::Claim::Physician::setMedicareId, $colValText],
+			CERTIFICATION_LICENSE . 'Medicaid' => [$provider, \&App::Billing::Claim::Physician::setMedicaidId, $colValText],
+			CERTIFICATION_LICENSE . 'BCBS' => [$provider, \&App::Billing::Claim::Physician::setBlueShieldId, $colValText],
+			CERTIFICATION_LICENSE . 'Railroad Medicare' => [$provider, \&App::Billing::Claim::Physician::setRailroadId, $colValText],
+			CERTIFICATION_LICENSE . 'EPSDT' => [$provider, \&App::Billing::Claim::Physician::setEPSDT, $colValText],
+			CERTIFICATION_LICENSE . 'Champus' => [$provider, \&App::Billing::Claim::Physician::setChampusId, $colValText],
 			PHYSICIAN_SPECIALTY . 'Primary' => [ $provider,  \&App::Billing::Claim::Physician::setSpecialityId, $colValTextB],
 			AUTHORIZATION_PATIENT . 'Provider Assignment' => [$provider, \&App::Billing::Claim::Physician::setAssignIndicator, $colValTextB],
 			PROFESSIONAL_LICENSE_NO . 'Provider Assignment' => [$provider, \&App::Billing::Claim::Physician::setProfessionalLicenseNo, $colValText],
@@ -771,7 +777,7 @@ sub assignServiceFacility
 
 	my $queryStatment = qq
 	{
-		select org.org_id, org.name_primary, org.org_internal_id
+		select org.org_id, org.name_primary, org.org_internal_id, org.tax_id
 		from org, transaction trans, invoice
 		where invoice_id = $invoiceId
 		and trans.trans_id = invoice.main_transaction
@@ -783,6 +789,7 @@ sub assignServiceFacility
 
 	$renderingOrganization->setId($row[0]);
 	$renderingOrganization->setName($row[1]);
+	$renderingOrganization->setTaxId($row[3]);
 	$self->populateAddress($renderingOrganization->getAddress(), "org_address", $row[2], "Mailing");
 	$self->populateContact($renderingOrganization->getAddress(), "org_attribute", $row[2], "Primary", CONTACT_METHOD_TELEPHONE);
 }
@@ -795,7 +802,7 @@ sub assignBillingFacility
 
 	my $queryStatment = qq
 	{
-		select org.org_id, org.name_primary, org.org_internal_id
+		select org.org_id, org.name_primary, org.org_internal_id, org.tax_id
 		from org, transaction trans, invoice
 		where invoice_id = $invoiceId and
 		trans.trans_id = invoice.main_transaction
@@ -807,8 +814,82 @@ sub assignBillingFacility
 
 	$payToOrganization->setId($row[0]);
 	$payToOrganization->setName($row[1]);
-	$self->populateAddress($payToOrganization->getAddress(), "org_address", $row[2], "Payment");
+	$payToOrganization->setTaxId($row[3]);
+	$self->populateAddress($payToOrganization->getAddress(), "org_address", $row[2], "Billing");
 	$self->populateContact($payToOrganization->getAddress(), "org_attribute", $row[2], "Primary", CONTACT_METHOD_TELEPHONE);
+}
+
+sub assignPaytoAndRendFacilityInfo
+{
+	my ($self, $claim, $invoiceId) = @_;
+
+	my $colValText = 0;
+	my $colValTextB = 1;
+	my $colAttrnName = 2;
+
+	my $renderingProvider = $claim->getRenderingOrganization();
+	my $payToProvider = $claim->getPayToOrganization();
+
+	my @providers = ($renderingProvider, $payToProvider);
+
+	my @row;
+	my $queryStatment;
+	my $sth;
+
+	foreach my $provider (@providers)
+	{
+		my $id = $provider->getId();
+
+		my $inputMap =
+		{
+			FACILITY_GROUP_NUMBER . 'Medicare#' => [$provider, \&App::Billing::Claim::Physician::setMedicareId, $colValText],
+			FACILITY_GROUP_NUMBER . 'Medicaid#' => [$provider, \&App::Billing::Claim::Physician::setMedicaidId, $colValText],
+			FACILITY_GROUP_NUMBER . 'BCBS#' => [$provider, \&App::Billing::Claim::Physician::setBCBSId, $colValText],
+		};
+
+		$queryStatment = qq
+		{
+			select value_text, value_textB, value_type || item_name
+			from person_attribute
+			where parent_id = \'$id\'
+		};
+		$sth = $self->{dbiCon}->prepare("$queryStatment");
+		$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+
+		while(@row = $sth->fetchrow_array())
+		{
+			if(my $attrInfo = $inputMap->{$row[$colAttrnName]})
+			{
+				my ($objInst, $method, $bindColumn) = @$attrInfo;
+				if ($objInst ne "")
+				{
+					if (ref $method eq 'ARRAY')
+					{
+						if (ref $objInst eq 'ARRAY')
+						{
+							for my $methodNum (0..$#$method)
+							{
+								my $functionRef = $method->[$methodNum];
+								&$functionRef($objInst->[$methodNum], ($row[$bindColumn->[$methodNum]]));
+							}
+						}
+						else
+						{
+							for my $methodNum (0..$#$method)
+							{
+								my $functionRef = $method->[$methodNum];
+								&$functionRef($objInst, ($row[$bindColumn->[$methodNum]]));
+							}
+						}
+					}
+					else
+					{
+						&$method($objInst, ($row[$bindColumn]));
+					}
+			  }
+			}
+		}
+	}
 }
 
 sub assignPayerInfo
@@ -1166,7 +1247,11 @@ sub assignInvoiceProperties
 		'Provider/Medicare' => [$payToProvider, \&App::Billing::Claim::Physician::setMedicareId, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Medicaid' => [$payToProvider, \&App::Billing::Claim::Physician::setMedicaidId, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Champus' => [$payToProvider, \&App::Billing::Claim::Physician::setChampusId, COLUMNINDEX_VALUE_TEXT],
+		'Provider/BCBS' => [$payToProvider, \&App::Billing::Claim::Physician::setBlueShieldId, COLUMNINDEX_VALUE_TEXT],
+		'Provider/UPIN' => [$payToProvider, \&App::Billing::Claim::Physician::setUPIN, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Workers Comp' => [$payToProvider, \&App::Billing::Claim::Physician::setWorkersComp, COLUMNINDEX_VALUE_TEXT],
+		'Provider/Railroad' => [$payToProvider, \&App::Billing::Claim::Physician::setRailroadId, COLUMNINDEX_VALUE_TEXT],
+		'Provider/EPSDT' => [$payToProvider, \&App::Billing::Claim::Physician::setEPSDT, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Specialty' => [$payToProvider, \&App::Billing::Claim::Physician::setSpecialityId, COLUMNINDEX_VALUE_TEXTB],
 		'Provider/Assign Indicator' => [$payToProvider, \&App::Billing::Claim::Physician::setAssignIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Signature/Date' => [$payToProvider, \&App::Billing::Claim::Physician::setSignatureDate, COLUMNINDEX_VALUE_DATE],
@@ -1174,8 +1259,6 @@ sub assignInvoiceProperties
 		'Provider/Name/First' => [$payToProvider, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Name/Last' => [$payToProvider, \&App::Billing::Claim::Person::setLastName, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Name/Middle' => [$payToProvider, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
-		'Provider/BCBS' => [$payToProvider, \&App::Billing::Claim::Physician::setBlueShieldId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/UPIN' => [$payToProvider, \&App::Billing::Claim::Physician::setPIN, COLUMNINDEX_VALUE_TEXT],
 
 		'Service Provider/Name' => [$renderingProvider, [\&App::Billing::Claim::Person::setName, \&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Service Provider/Name/First' => [$renderingProvider, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
@@ -1204,6 +1287,7 @@ sub assignInvoiceProperties
 		'Billing Facility/State' => [$payToOrganizationAddress, \&App::Billing::Claim::Address::setState, COLUMNINDEX_VALUE_TEXT],
 		'Billing Facility/Tax ID' => [$payToOrganization, \&App::Billing::Claim::Organization::setTaxId, COLUMNINDEX_VALUE_TEXT],
 		'Billing Facility/Workers Comp' => [$payToOrganization, \&App::Billing::Claim::Organization::setWorkersComp, COLUMNINDEX_VALUE_TEXT],
+		'Billing Facility/BCBS' => [$payToOrganization, \&App::Billing::Claim::Organization::setBCBSId, COLUMNINDEX_VALUE_TEXT],
 
 		'Claim Filing/Indicator' => [$claim, \&App::Billing::Claim::setFilingIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/History/Item' => [$claim, [\&App::Billing::Claim::setInvoiceHistoryDate, \&App::Billing::Claim::setInvoiceHistoryAction, \&App::Billing::Claim::setInvoiceHistoryComments], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1644,6 +1728,9 @@ sub setClaimProperties
 	$payToOrganization->setInsType($tempRow[5]);
 	$renderingProvider->setInsType($tempRow[5]);
 	$renderingOrganization->setInsType($tempRow[5]);
+	if($ins[$tempRow[5]] == 'MEDICARE')
+	{
+	}
 
 	$patient->setId($tempRow[6]);
 
