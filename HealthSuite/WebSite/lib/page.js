@@ -209,7 +209,7 @@ function populateField()
 function isPopupURL()
 {
 	var flag=false;
-	if(eval(parent.opener) && eval(parent.opener.activeActionARL))
+	if( eval("parent.opener") && (eval("parent.opener.activeActionARL")) )
 	{
 		var pathItems = parent.opener.activeActionARL.split('/');
 		var resource = pathItems[1];
@@ -910,7 +910,7 @@ function setSimpleName(itemValue)
 	if(isLookupWindow())
 	{
 		var spanObj = eval("parent.opener."+parent.opener.activeFindWinControl.name +"_simple_name_s");
-		if(eval(spanObj)) 
+		if(eval(spanObj))
 		{
 			spanObj.innerHTML = itemValue + " ";
 		}
