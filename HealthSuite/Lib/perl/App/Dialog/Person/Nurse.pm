@@ -44,10 +44,10 @@ sub initialize
 			postHtml => $postHtml,
 		),
 	);
-	
+
 	# Add in the default person fields
 	$self->SUPER::initialize();
-	
+
 	$self->addContent(
 		new CGI::Dialog::Field(
 			type => 'hidden',
@@ -192,7 +192,7 @@ sub initialize
 				['Add Another Nurse', '/org/#session.org_id#/dlg-add-nurse'],
 				['Go to Search', "/search/person/id/%field.person_id%"],
 				['Return to Home', "/person/#session.user_id#/home"],
-				['Go to Work List', "person/worklist"],
+				['Go to Work List', "/worklist/patientflow"],
 			],
 			cancelUrl => $self->{cancelUrl} || undef,
 		),
