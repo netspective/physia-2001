@@ -9,6 +9,7 @@ use App::Statements::Person;
 use App::Statements::Transaction;
 use App::Statements::Insurance;
 use App::Statements::Org;
+use App::Statements::Catalog;
 
 use Carp;
 use CGI::Dialog;
@@ -120,7 +121,7 @@ sub populateData
 		$page->param("_f_item_$line\_item_id", $items->[$idx]->{item_id});
 		$page->param("_f_item_$line\_unit_cost", $items->[$idx]->{unit_cost});
 		$page->param("_f_item_$line\_quantity", $items->[$idx]->{quantity});
-		$page->param("_f_item_$line\_description", $items->[$idx]->{caption});
+		$page->param("_f_item_$line\_code", $items->[$idx]->{code});
 		$page->param("_f_item_$line\_comments", $items->[$idx]->{comments});
 	}
 }
@@ -144,7 +145,50 @@ sub execute_remove
 	my $sessUser = $page->session('user_id');
 	my $invoiceId = $page->param('invoice_id');
 
-	#VOID INVOICE
+	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+	foreach my $item (@{$lineItems})
+	{
+		my $itemType = $item->{item_type};
+		my $itemId = $item->{item_id};
+		my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
+
+		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
+		next if $itemType == $voidItemType;
+		next if $item->{data_text_b} eq 'void';
+
+		my $extCost = 0 - $item->{extended_cost};
+		my $itemBalance = $extCost;
+		my $emg = $item->{emergency};
+		$page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_item_id => $itemId || undef,
+			parent_id => $invoiceId || undef,
+			item_type => defined $voidItemType ? $voidItemType : undef,
+			service_begin_date => $item->{service_begin_date} || undef,
+			service_end_date => $item->{service_end_date} || undef,
+			hcfa_service_place => $item->{hcfa_service_place} || undef,
+			hcfa_service_type => $item->{hcfa_service_type} || undef,
+			modifier => $item->{modifier} || undef,
+			quantity => $item->{quantity} || undef,
+			emergency => defined $emg ? $emg : undef,
+			code => $item->{code} || undef,
+			caption => $item->{caption} || undef,
+			#comments =>  $item->{} || undef,
+			unit_cost => $item->{unit_cost} || undef,
+			rel_diags => $item->{rel_diags} || undef,
+			data_text_a => $item->{data_text_a} || undef,
+			extended_cost => defined $extCost ? $extCost : undef,
+			_debug => 0
+		);
+
+		$page->schemaAction(
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			data_text_b => 'void',
+			_debug => 0
+		);
+	}
+
 	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	$page->schemaAction(
 		'Invoice', 'update',
@@ -152,18 +196,18 @@ sub execute_remove
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
 		_debug => 0
 	);
+	
 
-
-	#CREATE NEW VOID TRANSACTION FOR VOIDED INVOICE
-	my $parentTransId = $page->field('trans_id');
+	#CREATE NEW VOID TRANSACTION FOR VOIDED CLAIM
 	my $transType = App::Universal::TRANSTYPEACTION_VOID;
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 	$page->schemaAction(
 		'Transaction', 'add',
-		parent_trans_id => $parentTransId || undef,
+		parent_trans_id => $page->field('trans_id') || undef,
+		parent_event_id => $page->field('parent_event_id') || undef,
 		trans_type => defined $transType ? $transType : undef,
-		trans_status => defined $transStatus ? $transStatus : undef,
-		trans_status_reason => "Invoice $invoiceId has been voided by $sessUser",
+		trans_status => defined $transStatus ? $transStatus : undef,	
+		trans_status_reason => "Claim $invoiceId has been voided by $sessUser",
 		_debug => 0
 	);
 
@@ -176,12 +220,12 @@ sub execute_remove
 		parent_id => $invoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Voided by $sessUser",
+		value_text => 'Voided claim',
 		value_date => $todaysDate,
 		_debug => 0
 	);
 
-	$page->redirect('/search/claim');
+	$page->redirect("/invoice/$invoiceId/summary");
 }
 
 sub handlePayer
@@ -350,9 +394,9 @@ sub addTransactionAndInvoice
 	{
 		my $quantity = $page->param("_f_item_$line\_quantity") eq '' ? 1 : $page->param("_f_item_$line\_quantity");
 		my $unitCost = $page->param("_f_item_$line\_unit_cost");
-		my $description = $page->param("_f_item_$line\_description");
+		my $code = $page->param("_f_item_$line\_code");
 
-		next if $description eq '';
+		next if $code eq '';
 		next if $unitCost eq '';
 
 		my $extCost = $quantity * $unitCost;
@@ -366,19 +410,22 @@ sub addTransactionAndInvoice
 		}
 		elsif($removeProc)
 		{
-			$itemCommand = 'remove';
+			#$itemCommand = 'remove';
+			App::Dialog::Encounter::voidProcedureItem($self, $page, $command, $flags, $invoiceId, $itemId);
+			next;
 		}
-
+		
+		my $codeInfo = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selMiscProcedureBySessionOrgAndCode', $code, $sessOrg);
 		$page->schemaAction(
 			'Invoice_Item', $itemCommand,
 			item_id => $itemId || undef,
 			parent_id => $invoiceId || undef,
 			item_type => defined $itemType ? $itemType : undef,
-			caption => $description || undef,
+			caption => $codeInfo->{name} || undef,
+			code => $code || undef,
 			quantity => defined $quantity ? $quantity : undef,
 			unit_cost => defined $unitCost ? $unitCost : undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			#balance => defined $extCost ? $extCost : undef,
 			comments => $page->param("_f_item_$line\_comments") || undef,
 			_debug => 0
 		);
@@ -386,17 +433,6 @@ sub addTransactionAndInvoice
 		$invoiceTotal += $extCost;
 		$itemCount += 1;
 	}
-
-
-	## Update total_items, total_cost, balance for invoice
-	#$page->schemaAction(
-	#	'Invoice', 'update',
-	#	invoice_id => $invoiceId || undef,
-	#	total_items => defined $itemCount ? $itemCount : undef,
-	#	total_cost => defined $invoiceTotal ? $invoiceTotal : undef,
-	#	balance => defined $invoiceTotal ? $invoiceTotal : undef,
-	#	_debug => 0
-	#);
 
 
 
@@ -495,7 +531,7 @@ sub handleBillingInfo
 
 
 	my $primBillSeq = App::Universal::PAYER_PRIMARY;
-	$page->schemaAction(
+	my $billId = $page->schemaAction(
 		'Invoice_Billing', 'add',
 		invoice_id => $invoiceId || undef,
 		bill_sequence => defined $primBillSeq ? $primBillSeq : undef,
@@ -535,6 +571,12 @@ sub handleBillingInfo
 			_debug => 0
 		);
 	}
+
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		billing_id => $billId,
+	);
 
 	$self->handlePostExecute($page, $command, $flags, "/invoice/$invoiceId/summary");
 }
