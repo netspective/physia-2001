@@ -201,6 +201,7 @@ sub execute
 				payer_type => defined $payerType ? $payerType : undef,
 				payer_id => $payerId || undef,
 				net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+				data_text_a => $page->field('auth_ref') || undef,
 				#plan_allow => $page->field('plan_allow') || undef,
 				#plan_paid => $page->field('plan_paid') || undef,
 				#pay_type => defined $payType ? $payType : undef,
