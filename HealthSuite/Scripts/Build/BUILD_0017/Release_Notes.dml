@@ -252,6 +252,10 @@
 			[Database] : Requires new table Invoice_Worklist 
 		</deliverable>
 
+		<deliverable id="1562">
+			Fixed sql statement for insurance plans component for orgs per Alex's instructions.
+		</deliverable>
+
 		<deliverable id="1571">
 			UI: Added a new component called 'Person Categories' in the person's Summary page to add a new category to an existing person.
 			    If an existing person in the database is added as an 'Insured Person' in the PersonalCoverage dialog, then that person will be added
