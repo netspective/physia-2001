@@ -133,7 +133,12 @@
 			Allow lookup of physicians/provider and referring physicians/providers on the Insurance
 			Verification Dialog.
 		</deliverable>
-
+		
+		<deliverable id="1547">
+			UI: Added the begin/end date fields and added a checkbox to inactivate the ThirdParty in the 'Third Party' dailog of
+			    'Health Coverage' component.
+		</deliverable>
+		
 		<deliverable id="1548">
 			Require patient Check-In before Check-Out.
 		</deliverable>
