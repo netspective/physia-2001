@@ -279,6 +279,7 @@ use constant TRANSTYPE_ALERTORG => 8000;
 use constant TRANSTYPE_ALERTORGFACILITY => 8010;
 use constant TRANSTYPE_ALERTPATIENT => 8020;
 use constant TRANSTYPE_ALERTACCOUNTING => 8025;
+use constant TRANSTYPE_ALERTAPPOINTMENT => 8026;
 use constant TRANSTYPE_ALERTINSURANCE => 8030;
 use constant TRANSTYPE_ALERTMEDICATION => 8040;
 use constant TRANSTYPE_ALERTACTION => 8200;
@@ -427,8 +428,8 @@ use constant INVOICEBILLTYPE_THIRDPARTYINS => 3;
 
 #INVOICE SUBMISSION
 use constant SUBMIT_PAYER => 1;
-use constant SUBMIT_SAMEPAYER => 2;
-use constant SUBMIT_NEXTPAYER => 3;
+use constant RESUBMIT_SAMEPAYER => 2;
+use constant RESUBMIT_NEXTPAYER => 3;
 
 #INVOICE ITEM QUANTITY
 use constant INVOICEITEM_QUANTITY => 1;				#default quantity for optimized proc entry is 1
