@@ -41,6 +41,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'code_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'use_fee'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),	#for storing and updating fee schedules as attribute
+		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_catalog_ids'),	#for storing the internal catalog ids of the fee schedules entered in
 	
 
 		new CGI::Dialog::Field::Duration(
@@ -124,8 +125,8 @@ sub new
 							nextActions_add => [
 								['Add Another Procedure', "/invoice/%param.invoice_id%/dialog/procedure/add", 1],
 								['Put Claim On Hold', "/invoice/%param.invoice_id%/dialog/hold"],
-								['Submit Claim for Review', "/invoice/%param.invoice_id%/review"],
-								['Submit Claim for Transfer', "/invoice/%param.invoice_id%/review"],
+								#['Submit Claim for Review', "/invoice/%param.invoice_id%/review"],
+								['Submit Claim for Transfer', "/invoice/%param.invoice_id%/submit"],
 								],
 						cancelUrl => $self->{cancelUrl} || undef));
 
@@ -194,7 +195,7 @@ sub populateData
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
 	
 	my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
-	$page->field('fee_schedules', $feeSchedules->{value_text});
+	$page->field('fee_schedules', $feeSchedules->{value_textb});
 	$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
 }
 
@@ -1720,9 +1721,22 @@ sub customValidate
 	my $cptCode = $page->field('procedure');
 	my $modCode = $page->field('procmodifier');
 	my $use_fee = $page->field('use_fee');
-	
+
+	my @fsIntIds = ();
 	my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
-	my $svc_type = App::IntelliCode::getSvcType($page, $cptCode, $modCode, \@feeSchedules);
+	foreach (@feeSchedules)
+	{
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInternalCatalogIdByIdType',
+					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);
+		
+		push(@fsIntIds, $catalog->{internal_catalog_id});
+		#$page->addError("FS Names: $_");
+		#$page->addError("FS Ids: $catalog->{internal_catalog_id}");
+	}
+
+	$page->field('fee_schedules_catalog_ids', join(',', @fsIntIds));
+	
+	my $svc_type = App::IntelliCode::getSvcType($page, $cptCode, $modCode, \@fsIntIds);
 	my $count_type = scalar(@$svc_type);
 	my $count=0;	
 	unless ($servicetype)
@@ -1750,7 +1764,7 @@ sub customValidate
 		else
 		{
 			my $type = $self->getField('cptModfField')->{fields}->[0];
-			$type->invalidate($page,"Unable to find Code '$cptCode' in fee schedule(s) " . join ",",@feeSchedules);
+			$type->invalidate($page,"Unable to find Code '$cptCode' in fee schedule(s) " . join ",",@fsIntIds);
 		}
 	}
 	#GET ITEM COST FROM FEE SCHEDULE
@@ -1758,7 +1772,7 @@ sub customValidate
 	if (! $page->field('proccharge') && ! $page->field('alt_cost'))
 	{
 		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];				
-		my $fsResults = App::IntelliCode::getItemCost($page, $cptCode, $modCode, \@feeSchedules);
+		my $fsResults = App::IntelliCode::getItemCost($page, $cptCode, $modCode, \@fsIntIds);
 		my $resultCount = scalar(@$fsResults);
 		if($resultCount == 0)
 		{
@@ -1886,7 +1900,6 @@ sub execute_addOrUpdate
 	my $unitCost = $page->field('proccharge') || $page->field('alt_cost');
 	my $extCost = $unitCost * $page->field('procunits');
 
-	my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
 	my @relDiags = $page->field('procdiags');					#diags for this particular procedure
 	my @claimDiags = split(/\s*,\s*/, $page->field('claim_diags'));		#all diags for a claim
 	#my @hcpcsCode = split(/\s*,\s*/, $page->field('hcpcs'));
@@ -1972,11 +1985,11 @@ sub execute_addOrUpdate
 	## UPDATE FEE SCHEDULES ATTRIBUTE
 	if(my $feeSchedItemId = $page->field('fee_schedules_item_id'))
 	{
-		my $feeSchedules = $page->field('fee_schedules');
 		$page->schemaAction(
 				'Invoice_Attribute', 'update',
 				item_id => $feeSchedItemId,
-				value_text => $feeSchedules || undef,
+				value_text => $page->field('fee_schedules_catalog_ids') || undef,
+				value_textB => $page->field('fee_schedules') || undef,
 				_debug => 0
 		);
 	}

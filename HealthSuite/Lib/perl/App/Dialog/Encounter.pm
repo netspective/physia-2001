@@ -406,7 +406,7 @@ sub populateData
 
 		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
-		$page->param("_f_proc_default_catalog", $feeSchedules->{value_text});
+		$page->param('_f_proc_default_catalog', $feeSchedules->{value_textb});
 
 		my $cntrlData = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Patient/Control Number');
 		$page->field('cntrl_num_item_id', $cntrlData->{item_id});
@@ -1302,14 +1302,14 @@ sub handleInvoiceAttrs
 			_debug => 0
 	);
 
-	my $feeSchedules = $page->param("_f_proc_active_catalogs");
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			item_id => $page->field('fee_schedules_item_id') || undef,
 			parent_id => $invoiceId,
 			item_name => 'Fee Schedules',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $feeSchedules || undef,
+			value_text => $page->param('_f_proc_active_catalogs') || undef,
+			value_textB => $page->param('_f_proc_default_catalog') || undef,
 			_debug => 0
 	);
 
@@ -1757,8 +1757,6 @@ sub handleProcedureItems
 	my $servItemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
 
-	my @feeSchedules = $page->param('_f_proc_default_catalog');
-	
 	#convert place to it's foreign key id
 	my $svcFacility = $page->field('service_facility_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
