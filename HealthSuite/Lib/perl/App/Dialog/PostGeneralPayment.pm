@@ -238,7 +238,7 @@ sub execute
 				_debug => 0
 			);
 
-			if($invoiceBalance == 0)
+			if($invoiceBalance == 0 && $invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
 			{
 				$page->schemaAction(
 					'Invoice_Attribute', 'add',
