@@ -40,7 +40,7 @@ sub prepare_page_content_header
 			['Insurance Products', "$urlPrefix/insproduct", 'insproduct'],
 			['Insurance Plans', "$urlPrefix/insplan", 'plan'],
 			['Fee Schedules', "$urlPrefix/catalog", 'catalog'],
-			['Fee Schedule Items', "/query/Catalog/fee_schedule_items", 'catalog-item'],
+			['Fee Schedule Items', "/query/catalog/fee_schedule_items", 'catalog-item'],
 			['ICD', "$urlPrefix/icd", 'icd'],
 			['CPT', "$urlPrefix/cpt", 'cpt'],
 			['HCPCS', "$urlPrefix/cpt", 'hcpcs'],

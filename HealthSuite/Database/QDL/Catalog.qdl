@@ -3,7 +3,7 @@
 <!-- QDL Query Definition Language -->
 
 <component>
-	<query-defn id="Catalog" abbrev="Cat">
+	<query-defn id="catalog" caption="Catalog" abbrev="Cat">
 
 		<!-- Fields -->
 
