@@ -1,6 +1,84 @@
 
 -- /* Start of views for the daily audit report  which lists net charges and receipts per day*/
 
+
+create or replace view invoice_charges as
+SELECT	i.invoice_id,
+	ia.value_date invoice_date ,
+	(decode(invoice_type,0,nvl(extended_cost, 0),0)) as total_charges, 
+	(decode(invoice_type,1,nvl(extended_cost, 0),0)) as misc_charges ,
+	0 as person_pay ,
+	0 as insurance_pay,
+	0 as charge_adjust ,
+	0 as net_charges,
+	0 as balance_transfer,
+	0 as insurance_write_off ,
+	0 as person_write_off,
+	0 as a_r,
+	ii.quantity as units ,
+	ii.unit_cost as unit_cost,
+	service_facility_id as facility,
+	nvl(t.care_provider_id,t.provider_id) as provider,
+	ia.value_text as batch_id,
+	ii.item_type as item_type,
+	ii.service_end_date as service_begin_date,
+	ii.service_begin_date as service_end_date,
+	ii.code as code, 
+	ii.rel_diags as rel_diags,
+	ii.caption,
+	i.SUBMITTER_ID
+FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
+WHERE   t.trans_id = i.main_transaction 			
+	AND i.invoice_id = ia.parent_id 
+	AND ii.parent_id  = i.invoice_id
+	AND ia.item_name  = 'Invoice/Creation/Batch ID'			
+	
+	UNION ALL
+	
+SELECT	i.invoice_id,
+	ia.value_date invoice_date ,
+	0 as total_charges, 
+	0 as misc_charges ,
+	decode (iia.adjustment_type,2,0,nvl(iia.adjustment_amount,0)) as person_pay ,
+	nvl(iia.plan_paid,0) as insurance_pay,
+	
+	(  nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +
+	  nvl(iia.writeoff_amount,0)
+	) * -1 as charge_adjust ,
+	
+	decode(invoice_type,0,nvl(extended_cost, 0),0) +
+	decode(invoice_type,0,nvl(extended_cost, 0),0) - 
+	( nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) )
+	 as net_charges,			
+	
+	decode(iia.adjustment_type,2,nvl(iia.adjustment_amount,0),0) as balance_transfer,
+	decode(iia.payer_type,1,nvl(iia.writeoff_amount,0),0) as insurance_write_off ,
+	decode(iia.payer_type,0,nvl(iia.writeoff_amount,0),0) as person_write_off ,
+	0 as a_r,
+	ii.quantity as units ,
+	ii.unit_cost as unit_cost,
+	service_facility_id as facility,
+	nvl(t.care_provider_id,t.provider_id) as provider,
+	ia.value_text as batch_id,
+	ii.item_type as item_type,
+	ii.service_end_date as service_begin_date,
+	ii.service_begin_date as service_end_date,
+	ii.code as code, 
+	ii.rel_diags as rel_diags,
+	ii.caption,
+	i.SUBMITTER_ID
+FROM 	invoice i ,  transaction t ,	invoice_attribute ia ,
+	invoice_item_adjust iia , invoice_item ii
+WHERE   t.trans_id = i.main_transaction 			
+	AND i.invoice_id = ia.parent_id 
+	AND ia.item_name  = 'Invoice/Payment/Batch ID'
+	AND ia.value_int = iia.adjustment_id
+	AND ii.parent_id  = i.invoice_id
+	AND iia.parent_id = ii.item_id;
+			
+
+
+
 --view for total charges and charge_adjust
 create or replace view total_charges_adjust as
 select 	to_char(invoice_date, 'mm/dd/yyyy') as invoicedate, 
