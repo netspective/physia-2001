@@ -3,7 +3,7 @@ package App::Dialog::HandHeld::PatientLookup;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: PatientLookup.pm,v 1.2 2000-12-28 23:29:53 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: PatientLookup.pm,v 1.3 2000-12-29 20:04:56 thai_nguyen Exp $', '$Name:  $');
 
 use base qw(CGI::Dialog);
 use CGI::Validator::Field;
@@ -29,7 +29,6 @@ sub new
 				Account Number : account;
 				Chart Number : chart;
 			},
-			options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::Field(caption => 'Value',
 			name => 'search_value',
@@ -46,7 +45,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $type = $page->field('criteria');
-	my $expression = $page->field('search_value');
+	my $expression = $page->field('search_value') || '*';
 	my $category = '_patient';
 	
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
@@ -66,7 +65,7 @@ sub execute
 			<b>$_->{name}</b> <a href='Manage_Patient?pid=@{[ $_->{person_id} ]}'>$_->{person_id}</a><br>
 			DOB: $_->{dob}<br>
 			SSN: $_->{ssn}<br>
-			Home Phone: $_->{home_phone}<br>
+			Home Phone: $_->{home_phone}<br><br>
 		};
 	}
 
