@@ -42,9 +42,25 @@ sub new
 						fields => [
 			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12,options=>FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12,options=>FLDFLAG_REQUIRED),
-			]),				
+			]),
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id',),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -63,7 +79,7 @@ sub populateData
 
 sub prepare_detail_payment
 {
-	
+
 
 }
 
@@ -86,15 +102,31 @@ sub execute
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;
+	my @dataText = undef;
+	my @dataText2 = undef;
+
 	my @dataSub=undef;
 	my $html;
 	my $orgResult;
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
+	my $hardCopy = $page->field('printReport');
+	my ($textDepositSummary, $textCheckPayment);
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
+
 
 	my $pub =
 	{
-		reportTitle => $self->heading(),
+		#reportTitle => $self->heading(),
+		reportTitle => "Deposit Summary",
 		columnDefn =>
 			[
 			{groupBy=>'#0#', colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
@@ -106,11 +138,14 @@ sub execute
 			,tAlign=>'right'},
 		],
 	};
+
+
 	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selDepositSummary',
 			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id'),
 $batch_from, $batch_to) ;
 	@data = ();
 	@dataSub=();
+	@dataText=();
 
 	my $payerId=undef;
 	my $batchDate=undef;
@@ -122,20 +157,20 @@ $batch_from, $batch_to) ;
 	my $totalAmount=0;
 	my @rowData =();
 	foreach (@$orgResult)
-	{		
+	{
 		$_->{batch_id};
-		
+
 		if($_->{pay_type} ne 'Check')
 		{
 			$_->{pay_ref}='';
 		};
-		#If payer type is an org then get org Id 
+		#If payer type is an org then get org Id
 		if($_->{payer_type} == 1)
 		{
-			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});	
+			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});
 			$_->{payer_id} = $getName->{org_id};
-		}	
-		
+		}
+
 		@rowData=
 		[
 		$_->{batch_date},
@@ -145,14 +180,17 @@ $batch_from, $batch_to) ;
 		$_->{pay_ref},
 		$_->{amount},
 		];
-		push(@data, @rowData);	
+		push(@data, @rowData);
+
 	}
 	$html =   "<BR> <B>Deposit Summary</B><BR>" . createHtmlFromData($page, 0, \@data,$pub);
+	$textDepositSummary = createTextRowsFromData($page, 0, \@data, $pub);
 
 	#Get Detail Data
 	$pub =
 	{
-		reportTitle => $self->heading(),
+		#reportTitle => $self->heading(),
+		reportTitle => "Check Payment Detail",
 		columnDefn =>
 			[
 			{groupBy=>'#0#',colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
@@ -165,20 +203,20 @@ $batch_from, $batch_to) ;
 	};
 
 	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selDeposit',
-			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id'), 
+			$reportBeginDate,$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id'),
 $batch_from, $batch_to) ;
 	@data = ();
 	foreach (@$orgResult)
-	{		
+	{
 		$_->{batch_id};
-		
-		#If payer type is an org then get org Id 
+
+		#If payer type is an org then get org Id
 		if($_->{payer_type} == 1)
 		{
-			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});	
+			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});
 			$_->{payer_id} = $getName->{org_id};
-		}	
-		
+		}
+
 		@rowData=
 		[
 		$_->{batch_date},
@@ -188,11 +226,44 @@ $batch_from, $batch_to) ;
 		$_->{invoice_id},
 		$_->{amount},
 		];
-		push(@data, @rowData);	
+		push(@data, @rowData);
+		push(@dataText2, @rowData);
 	}
 	$html .= "<BR> <B>Check Payements Detail</B><BR>" . createHtmlFromData($page, 0, \@data,$pub);
+	$textCheckPayment = createTextRowsFromData($page, 0, \@data, $pub);
 
-	return $html;
+
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textDepositSummary) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+##
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textCheckPayment) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+##
+	return ($textDepositSummary ? qq{<a href="/temp$textDepositSummary">Printable version (Deposit Summary) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textDepositSummary))]} Page(s)
+</a> <br>} : "" ).($textCheckPayment ? qq{<a href="/temp$textCheckPayment">Printable version (Check Payements Detail) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textCheckPayment))]} Page(s)
+</a> <br>} : "" ).$html;
+
+	#return $html;
 }
 
 

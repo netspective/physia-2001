@@ -239,7 +239,7 @@ sub execute
 	{
 		$html .= createHtmlFromData($page, 0, \@data,$allPub);
 		$textOutputFilename = createTextRowsFromData($page, 0, \@data, $allPub);
-		$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+		$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename))]} Page(s)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue Collection Report");
 
 		if ($hardCopy == 1 and $printerAvailable) {
@@ -262,8 +262,8 @@ sub execute
 		$html .="<BR><BR><b>COLLECTION INFORMATION<b>";
 		$html .= createHtmlFromData($page, 0, \@data2,$prodPub);
 		$prodFilename = createTextRowsFromData($page, 0, \@data2, $prodPub);
-		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
-		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Collection Information (Printable version) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $prodFilename))]} Page(s)</a> <br>} : "" ) . $html;
+		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $collFilename))]} Page(s)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue / Collection Report");
 
 		if ($hardCopy == 1 and $printerAvailable) {

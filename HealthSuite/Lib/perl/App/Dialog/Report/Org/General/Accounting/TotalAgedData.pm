@@ -15,10 +15,12 @@ use App::Statements::Report::Accounting;
 use App::Statements::Report::Aging;
 use App::Statements::Person;
 
+use Data::Publish;
 use Data::TextPublish;
 use App::Configuration;
 use App::Device;
 use App::Statements::Device;
+
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Organization;
 
@@ -115,6 +117,7 @@ sub execute
 	# Get a printer device handle...
 	my $printerAvailable = 1;
 	my $printerDevice;
+	my $textOutputFilename;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
 
@@ -123,27 +126,53 @@ sub execute
 
 	my $data;
 	my $html;
+	my $pub  = {
+			reportTitle => 'Aged Patient Receivables',
+			columnDefn =>
+				[
+				{ colIdx => 0,dAlign=>'left',tAlign=>'left', tDataFmt => '&{count:0} Patients',hint=>"View Detail Data for : #1#", hAlign=>'left',head => 'Patient Name', dataFmt => '#0#',
+				url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_data&patient_id=#1#')}},
+				{ colIdx => 1, hAlign=>'left', head => 'Patient ID', dataFmt => '#1#',   },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Balance', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 11, head => 'Total Amount', summarize=>'sum',dataFmt => '#11#', dAlign => 'center', dformat => 'currency' },
+				],
+			};
 
-	#$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
-	#$providerId, $facilityId);
-	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_all',  [$personId, $page->session('org_internal_id'), 
-	$providerId, $facilityId]);
-	
+
+
+	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
+	$providerId, $facilityId);
+	#$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_all',  [$personId, $page->session('org_internal_id'),
+	#$providerId, $facilityId]);
+	#
+	$html = createHtmlFromData($page, 0, $data,$pub);
+	$textOutputFilename = createTextRowsFromData($page, 0,  $data, $pub);
+	#
 	#my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 
-	#if ($hardCopy == 1 and $printerAvailable) {
-	#	my $reportOpened = 1;
-	#	my $tempDir = $CONFDATA_SERVER->path_temp();
-	#	open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
-	#	if ($reportOpened) {
-	#		while (my $reportLine = <ASCIIREPORT>) {
-	#			print $printHandle $reportLine;
-	#		}
-	#	}
-	#	close ASCIIREPORT;
-	#}
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
 
-	return  $html;
+	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;
+	#return  $html;
 }
 
 

@@ -102,7 +102,7 @@ sub execute
 	foreach my $superbillPatientInfo (@{$superbillData}) {
 		my $patientID = $superbillPatientInfo->[8];
 
-		my $superbillAcctInfo = $STMTMGR_REPORT_ACCOUNTING->getRowAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $patientID, $page->session ('org_internal_id'), "", "");
+		my $superbillAcctInfo = $STMTMGR_REPORT_ACCOUNTING->getRowAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $patientID, $page->session ('org_internal_id'), "", "", "", "");
 
 		if ($#$superbillAcctInfo >= 0) {
 			push @{$superbillPatientInfo},
@@ -148,7 +148,10 @@ sub execute
 	my $html = createHtmlFromData ($page, STMTMGRFLAG_NONE, $superbillData, 
 		$STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
 
-	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
+	my $pages = int($self->getFileLineCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $theFilename)) / 66) + 1;
+	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version - $pages Page(s)</a> <br>} : "" )  . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
+	
+#	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
 #	return ($textOutputFilename ? qq{<a href="$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 }
 

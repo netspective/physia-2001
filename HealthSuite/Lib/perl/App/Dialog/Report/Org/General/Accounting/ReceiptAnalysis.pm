@@ -17,6 +17,7 @@ use Data::TextPublish;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+use App::Dialog::Field::Person;
 use App::Statements::Invoice;
 use App::Statements::Component::Invoice;
 use App::Statements::Report::Accounting;
@@ -223,7 +224,9 @@ sub execute
 		close ASCIIREPORT;
 	}
 
-	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;
+
 }
 
 

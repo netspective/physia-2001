@@ -16,6 +16,7 @@ use App::Statements::Org;
 use Data::Publish;
 use Data::TextPublish;
 use App::Configuration;
+use File::Spec;
 use App::Device;
 use App::Statements::Device;
 
@@ -137,14 +138,14 @@ sub prepare_detail_payment
 	my $trackInvoice=undef;
 	foreach (@$daily_audit_detail)
 	{
-	
+
 		my $parentInvoiceId = $STMTMGR_REPORT_ACCOUNTING->getSingleValue($page,STMTMGRFLAG_NONE,'selParentInvoicebyId',
 		$_->{invoice_id});
 		my $capInv = $_->{invoice_id};
 		if ($parentInvoiceId)
 		{
 			$capInv.="($parentInvoiceId)";
-		}		
+		}
 
 		if ($trackInvoice ne $_->{invoice_id})
 		{
@@ -156,7 +157,7 @@ sub prepare_detail_payment
 			$_->{patient_id}='';
 			$_->{simple_name}='';
 		};
-		
+
 
 
 		my @rowData =
@@ -199,7 +200,8 @@ sub prepare_detail_payment
 		close ASCIIREPORT;
 	}
 
-	$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
+	$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a><br>} : "" ) . $html;
 
 	$page->addContent($html);
 
@@ -306,10 +308,10 @@ sub execute
 		close ASCIIREPORT;
 	}
 
-	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;
 #	return $html
 }
-
 
 # create a new instance which will automatically add it to the directory of
 # reports
