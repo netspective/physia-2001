@@ -207,7 +207,9 @@
 		</deliverable>
 
 		<deliverable id="1456">
-			Added statuses to conditions for asking if user wants to submit to next payer.
+			Added statuses to conditions for asking if user wants to submit to next payer. Additional fix - included total
+			adjustments (not just total payments) to the check that determines whether the question should show up or not.
+			Also, if payment reversal is made that causes claim's balance to become positive again, the question will show up.
 		</deliverable>
 
 		<deliverable id="1457">
