@@ -14,6 +14,8 @@ use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
 use App::Statements::Transaction;
+use App::Statements::Catalog;
+
 use App::Statements::Component::Person;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -316,7 +318,7 @@ sub populateData_update
 	$page->field('followup_date', $authData->{'data_date_b'});
 	$page->field('ref_date', $authData->{'data_date_a'});
 	$page->field('contact_provider', $authData->{'trans_substatus_reason'});
-	$page->field('provider_name', $authData->{'receiver_id'});
+	$page->field('provider_name', $authData->{'detail'});
 	#$page->field('provider_phone_ext', $authData->{'trans_seq'});
 	$page->field('percent_usual', $authData->{'data_num_a'});
 	$page->field('percent_actual', $authData->{'data_num_b'});
@@ -339,7 +341,9 @@ sub populateData_update
 
 	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
 	$page->field('code',$serviceRequest->{code});
-	$page->field('code_description',$serviceRequest->{caption});
+	my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$serviceRequest->{code},$page->session('org_internal_id') );
+
+	$page->field('code_description',$data->{description});
 	$page->field('code_comment',$serviceRequest->{detail});
 	my $rate=$serviceRequest->{unit_cost} * $serviceRequest->{quantity};
 	$page->field('service_rate',$rate);
@@ -494,7 +498,7 @@ sub execute
 				consult_id             => $page->field('person_id') || undef,
 				#trans_subtype          => $page->field('source') || undef,
 				trans_substatus_reason => $page->field('contact_provider') || undef,
-				receiver_id            => $page->field('provider_name') || undef,
+				detail	            => $page->field('provider_name') || undef,
 				service_facility_id    => $providerInternalId || undef,
 				unit_cost              => $page->field('charge') || undef,
 				data_num_a             => $page->field('percent_usual') || undef,
