@@ -1,5 +1,7 @@
 package App::Billing::Output::TWCC::TWCC73;
 
+
+use App::Configuration;
 use App::Billing::Output::PDF::Report;
 use App::Billing::Claim::TWCC73;
 use pdflib 2.01;
@@ -241,14 +243,16 @@ sub header
 	};
 	$report->drawText($p,$properties);
 
+	my $webSite = $CONFDATA_SERVER->path_WebSite;
+	my $iconPath = File::Spec->catfile($webSite, 'resources', 'icons', 'blueseal.jpg');
 	$properties =
 	{
-		'imagePath' => LOGO_PATH,
+		'imagePath' => $iconPath,
 		'scale'  => 0.3,
 		'x' => LEFT_MARGIN + 230,
 		'y' => TOP_MARGIN - 30
 	};
-#	$report->drawImageJPEG($p,$properties);
+	$report->drawImageJPEG($p,$properties);
 }
 
 sub boxPart1
@@ -736,7 +740,7 @@ sub boxPart3
 			texts =>
 				[
 					{
-						'text' =>"PART III: ACTIVITY RESTRICTIONS* (ONLY COMPLETELY IF BOX 13(b) IS CHECKED",
+						'text' =>"PART III: ACTIVITY RESTRICTIONS* (ONLY COMPLETELY IF BOX 13(b) IS CHECKED)",
 						'fontName' => BOLD_FONT_NAME,
 						'fontWidth' => 9,
 						'color' => '1,1,1',
@@ -915,7 +919,7 @@ sub box16
 	my $arr = 	[
 					"* These restrictions are based on the doctor's best understanding of the employee's essential job functions. If a",
 					"particular restriction does not apply, it should be disregarded. If modified duty that meets these restrictions is not",
-					"available, the patient should be considered to be off work. Note these restrictions should be followed outside of work",
+					"available, the patient should be considered to be off work. Note - these restrictions should be followed outside of work",
 					"as well as at work.",
 				];
 
@@ -1047,7 +1051,7 @@ sub box19
 		texts =>
 			[
 				{
-					'text' => "19. MISC RESTRICTIONS (if any):",
+					'text' => "19. MISC. RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1108,7 +1112,7 @@ sub box20
 		texts =>
 			[
 				{
-					'text' => "20. MEDICATIONS RESTRICTIONS (if any):",
+					'text' => "20. MEDICATION RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1191,7 +1195,7 @@ sub box22
 		texts =>
 			[
 				{
-					'text' =>  "22.  Expected Follow-up Services include:",
+					'text' =>  "22.  Expected Follow-up Services Include:",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1807,7 +1811,7 @@ sub box14Data
 			}
 		}
 	}
-	
+
 	$properties =
 	{
 		'text' => $claim->{twcc73}->getPostureRestrictionsOtherText,
@@ -1925,7 +1929,7 @@ sub box17Data
 			}
 		}
 	}
-	
+
 	$properties =
 	{
 		'text' => $claim->{twcc73}->getMotionRestrictionsOtherText,
@@ -1935,7 +1939,7 @@ sub box17Data
 		'y' => $y - 125
 	};
 	$report->drawText($p, $properties);
-		
+
 }
 
 sub box18Data
@@ -1966,7 +1970,7 @@ sub box18Data
 	}
 
 	if ($claim->{twcc73}->getLiftRestrictions == 1 )
-	{	
+	{
 		for my $j(0..1)
 		{
 			$properties =
