@@ -16,9 +16,8 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(App::Dialog::Person);
 
@@ -87,7 +86,7 @@ sub initialize
 							['View Staff Summary', "/person/%field.person_id%/profile", 1],
 							['Add Another Staff Member', '/org/#session.org_id#/dlg-add-staff'],
 							['Go to Search', "/search/person/id/%field.person_id%"],
-							['Return to Create Record', '/search'],
+							['Return to Add Record', '/search'],
 							['Go to Work List', "person/worklist"],
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
@@ -156,26 +155,5 @@ sub execute_remove
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
 
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-
-use constant STAFF_DIALOG => 'Dialog/Staff';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/14/1999', 'MAF',
-		STAFF_DIALOG,
-		'Added entries for certification in the Staff dialog.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/23/1999', 'RK',
-		STAFF_DIALOG,
-		'Made a validation for the field ssn not to add an existing ssn while creating a new nurse record. ']
-);
 
 1;

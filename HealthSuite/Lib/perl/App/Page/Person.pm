@@ -142,7 +142,7 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">
 					<!--
 					<A HREF="/person/$personId/dlg-add-appointment">Schedule Appointment</A> -
-					<A HREF="/person/$personId/dlg-add-claim/$personId">Create Claim</A> -
+					<A HREF="/person/$personId/dlg-add-claim/$personId">Add Claim</A> -
 					<A HREF="/person/$personId/dlg-add-medication-prescribe">Prescribe Meds</A>
 					-->
 						$profileLine
@@ -154,13 +154,13 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/person/$personId/dlg-add-referral">Add Referral</OPTION>
 						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-claim">Create Claim</OPTION>
-						<OPTION value="/person/$personId/dlg-add-invoice">Create Invoice</OPTION>
+						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
+						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
 						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
-						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
+						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
 						<OPTION value="/person/$personId/dlg-add-postpayment">Apply Personal Payment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
 						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>

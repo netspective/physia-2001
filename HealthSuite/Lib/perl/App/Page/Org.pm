@@ -142,7 +142,7 @@ sub prepare_page_content_header
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
-						<OPTION value="/org/#session.org_id#/dlg-add-claim">Create Claim</OPTION>
+						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
 					</SELECT>
