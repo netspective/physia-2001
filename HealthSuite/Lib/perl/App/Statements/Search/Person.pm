@@ -183,7 +183,7 @@ my %personTemplates = (
 #
 # HEY! If you add anything to @categories you must add the array index below
 #
-my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor');
+my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'Referring-Doctor');
 my @categorySqls = ();
 foreach my $category (@categories)
 {
