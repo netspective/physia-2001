@@ -202,8 +202,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	(t.service_facility_id = pf.value_text)
 		AND	(
 			     ib.bill_party_type IN (0,1) 
-			 OR  pp.value_int =
-			     (SELECT product.ins_internal_id	
+			 OR  pp.value_int in
+			     (SELECT    product.ins_internal_id	
 			     FROM	insurance product, insurance plan
 			     WHERE	plan.ins_internal_id = ib.bill_ins_id 
 			     AND	plan.product_name = product.product_name
