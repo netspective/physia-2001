@@ -93,8 +93,8 @@ sub new
 
 	my $facilitiesField = new App::Dialog::Field::OrgType(
 		caption => '',
+		types => "'CLINIC', 'FACILITY/SITE','PRACTICE'",
 		name => 'facility_list',
-		#style => 'multicheck',
 		style => 'multidual',
 		multiDualCaptionLeft => 'Available Facilities',
 		multiDualCaptionRight => 'Selected Facilities',		
