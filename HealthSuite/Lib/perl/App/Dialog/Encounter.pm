@@ -75,6 +75,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS 
 		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
+		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS 
+		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
 		
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
@@ -456,9 +458,38 @@ sub populateData
 			setPayerFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
 		}
 	}
-
+	getOrgPersonFFS($self,$page);
 	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
 }
+
+#Gets the FS for all Orgs and Providers That could be assoicated with this claim
+#This information is used by Procedure.pm so the correct Lookup FS will appear
+sub getOrgPersonFFS
+{
+	my ($self,$page) = @_;
+	my @fsProv=();
+	my @fsOrg=();	
+	my $provider = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPersonServiceFFSByInternalId', 
+				$page->session('org_internal_id'));
+
+	foreach my $prov (@{$provider})
+	{
+		push(@fsProv,$prov->{value_int});
+	}	
+	my $org = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selOrgServiceFFSByInternalId',$page->session('org_internal_id'));
+
+	foreach my $prov (@{$org})
+	{
+		push(@fsOrg,$prov->{value_int});
+
+	}
+	my $org_list = join ',',@fsOrg;
+	my $prov_list = join',',@fsProv;
+	$page->field('org_ffs',$org_list);
+	$page->field('prov_ffs',$prov_list);
+	
+}
+
 
 sub setPayerFields
 {
