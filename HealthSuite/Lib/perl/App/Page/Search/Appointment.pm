@@ -128,12 +128,12 @@ sub getForm
 
 		Resource(s):
 		<input name='resource_ids' size=17 maxlength=64 value="@{[$self->param('resource_ids')]}" title='Resource ID'>
-			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_id, '/lookup/physician/id');">
+			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_ids, '/lookup/physician/id', ',', false);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
 		Facility(s):
 		<input name='facility_ids' size=17 maxlength=64 value="@{[$self->param('facility_ids')]}" title='Facility ID'>
-			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id');">
+			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',', false);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		<input type=submit name="execute" value="Go">
 		
