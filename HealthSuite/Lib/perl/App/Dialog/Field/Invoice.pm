@@ -190,7 +190,7 @@ sub isValid
 	my $totalPayRcvd = $page->field('total_amount');					#total amount paid
 	my $payAmtForThisVisit = $page->field('adjustment_amount');			#amount paid for today's visit
 	my $totalAmtEntered = $payAmtForThisVisit;
-	my $totalPatientBalance = $page->param('_f_total_patient_balance');	#total patient balance
+	my $totalBalance = $page->param('_f_total_balance');	#total patient balance
 
 	#validation for 'This Visit' invoice
 	if($payAmtForThisVisit > $totalPayRcvd)
@@ -229,9 +229,9 @@ sub isValid
 	elsif($totalAmtEntered < $totalPayRcvd)
 	{
 		my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtEntered;
-		if($totalAmtEntered < $totalPatientBalance)
+		if($totalAmtEntered < $totalBalance)
 		{
-			my $balanceRemain = $totalPatientBalance - $totalAmtEntered;
+			my $balanceRemain = $totalBalance - $totalAmtEntered;
 			$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
 		}
 		else
@@ -263,18 +263,18 @@ sub getHtml
 
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $outstandInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId);
+	my $sessOrg = $page->session('org_id');
+	my $isBatch = $page->param('batch_id');
+	my $outstandInvoices = $isBatch ? $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllOutstandingInvoicesByClient', $personId, $sessOrg)
+								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId, $sessOrg);
 	my $totalInvoices = scalar(@{$outstandInvoices});
-	my $totalPatientBalance = 0;
+	my $totalBalance = 0;
 	for(my $line = 1; $line <= $totalInvoices; $line++)
 	{
 		my $invoice = $outstandInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
-		$totalPatientBalance += $invoiceBalance;
-
-		next if $invoiceId == $page->param('invoice_id');	#param(invoiceid) is the invoice for the current visit,
-															#it has it's own payment section
+		$totalBalance += $invoiceBalance;
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -284,7 +284,7 @@ sub getHtml
 		}
 		my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
 
-		$page->param('_f_invoice_$line\_invoice_id', $invoiceId);
+		$page->param("_f_invoice_$line\_invoice_id", $invoiceId);
 
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_id" VALUE="$invoiceId"/>
@@ -310,7 +310,7 @@ sub getHtml
 			<TD colspan=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalInvoices"/>
-					<INPUT TYPE="HIDDEN" NAME="_f_total_patient_balance" VALUE="$totalPatientBalance"/>
+					<INPUT TYPE="HIDDEN" NAME="_f_total_balance" VALUE="$totalBalance"/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Claim #</FONT></TD>
@@ -326,7 +326,7 @@ sub getHtml
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
-						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
+						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
 			</TD>
