@@ -336,6 +336,10 @@ sub execute
 		#$page->addError("test($invoice->{balance})");
 		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
 	}
+	elsif($invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
+	{
+		$newStatus = App::Universal::INVOICESTATUS_PAYAPPLIED;
+	}
 	else
 	{
 		$newStatus = $paidBy eq 'insurance' ? App::Universal::INVOICESTATUS_PAYAPPLIED : $invoice->{invoice_status};
