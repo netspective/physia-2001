@@ -73,41 +73,47 @@ sub execute
 	my $person_id     = $page->field('person_id');
 	my $orgInternalId =$page->session('org_internal_id');
 	my $internalFacilityId =$page->field('facility_id');
-
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $html = qq{
 	<table cellpadding=10>
 		<tr align=center valign=top>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_appointments_byStatus',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Physician</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Patient Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen_byPatientType',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Procedure Code</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsCPT',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Product Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsProduct',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>		
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Missing Encounters</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_missingEncounter',
-				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset ]) ]}
 		</td>				
 		</tr>									
+		<td>
+			<b style="font-size:8pt; font-family:Tahoma">Date Appointments Entered</b>
+			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_dateEntered',
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId,$gmtDayOffset]) ]}
+		</td>				
+		
 	</table>
 	};
 
@@ -181,6 +187,20 @@ sub prepare_detail_missing_encounter
 	$page->addContent("<b>Missing Encounter ($encounterDate)</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
 			'sel_detailMissingEncounter', [$internalFacilityId, $encounterDate,$orgInternalId])
+	);
+}
+
+
+sub prepare_detail_date_entered
+{
+	my ($self, $page) = @_;
+	my $enteredDate = $page->param('entered');
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');	
+	$page->addContent("<b>Data Appointment Entered ($enteredDate)</b><br><br>",
+		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
+			'sel_detailDateEntered', [$internalFacilityId, $enteredDate,$orgInternalId,$gmtDayOffset])
 	);
 }
 
