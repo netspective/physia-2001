@@ -33,6 +33,7 @@ sub initialize
 
 	my $orgId = $self->param('org_id');
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'org_'], $orgId);
+	$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
 
 	#unless($orgId eq $self->session('org_id'))
 	#{
@@ -55,7 +56,7 @@ sub prepare_page_content_header
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-
+	my $category = lc($self->property('org_categories')->[0]) || undef;
 	#Retired Pane/Org/Heading.pm
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
@@ -82,7 +83,7 @@ sub prepare_page_content_header
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			['Profile', "$urlPrefix/profile", 'profile'],
+			['Summary', "$urlPrefix/profile", 'profile'],
 			['Insurance', "$urlPrefix/insurance", 'insurance'],
 			#@extras,
 			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
@@ -126,7 +127,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Create Claim</OPTION>
-						<OPTION value="/org/#session.org_id#/dlg-update-">Edit Profile</OPTION>
+						<OPTION value="/org/#param.org_id#/dlg-update-\u$category">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
 					</SELECT>
 					</FONT>
