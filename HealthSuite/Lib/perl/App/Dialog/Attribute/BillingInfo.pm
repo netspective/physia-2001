@@ -10,6 +10,7 @@ use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
 use App::Statements::Person;
+use App::Statements::Org;
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
@@ -17,7 +18,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'billinginfo' => {
 		valueType => App::Universal::ATTRTYPE_BILLING_INFO,
-		heading => '$Command Billing Information',
+		heading => '$Command Electronic Billing Information',
 		_arl => ['person_id'],
 		_arl_modify => ['item_id'],
 		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_BILLING_INFO()
@@ -28,7 +29,7 @@ sub initialize
 {
 	my $self = shift;
 
-	$self->heading('$Command Billing Information');
+	$self->heading('$Command Electronic Billing Information');
 
 	$self->addContent(
 		new CGI::Dialog::Field(caption => 'Person ID',
@@ -81,9 +82,12 @@ sub populateData
 #	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $itemId = $page->param('item_id');
+	my $orgIntId = $page->param('org_internal_id');
 	my $billingInfo;
 	my $billingExists = 0;
+	my $orgBillingExists = 0;
 	$billingExists = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId) if ($itemId);
+	$orgBillingExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID', App::Universal::ATTRTYPE_TEXT);
 
 	if ($billingExists) {
 		$billingInfo = $STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
@@ -93,6 +97,20 @@ sub populateData
 		$page->field ('billing_id', $billingInfo->[6]);
 		$page->field ('billing_effective_date', $billingInfo->[13]);
 		$page->field ('billing_active', $billingInfo->[7]);
+	} elsif ($orgBillingExists) {
+		my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
+			App::Universal::ATTRTYPE_TEXT
+		);
+		my $billingIDType;
+		$billingIDType = 1 if (lc ($clearHouseData->{value_text}) eq 'perse');
+		$billingIDType = 2 if (lc ($clearHouseData->{value_text}) eq 'thinet');
+		
+		$page->field ('parent_id', $page->param('person_id'));
+		$page->field ('billing_id_type', $billingIDType);
+		$page->field ('billing_id', $clearHouseData->{item_id});
+		$page->field ('billing_effective_date', $page->getDate());
+		$page->field ('billing_active', 1);
 	} else {
 		$page->field ('parent_id', $page->param('person_id'));
 		$page->field ('billing_id_type', 5);
