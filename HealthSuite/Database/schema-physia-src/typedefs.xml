@@ -558,6 +558,13 @@
 				<col name="remarks">Alert requiring action on a patient file</col>
 			</row>
 			<row>
+				<col name="id">8025</col>
+				<col name="caption">Patient Accounting Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert requiring action on a patient account</col>
+			</row>
+			<row>
 				<col name="id">8030</col>
 				<col name="caption">Insurance Alert</col>
 				<col name="group_name">Alert</col>
