@@ -158,7 +158,20 @@ sub new
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				},
 			]),
-
+ 			new CGI::Dialog::Subhead(heading => 'Certification/Accreditation', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			new CGI::Dialog::MultiField(caption => 'Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty',
+			fields => [
+					new CGI::Dialog::Field(caption => 'Specialty',
+						#type => 'foreignKey',
+						name => 'specialty_code',
+						fKeyStmtMgr => $STMTMGR_PERSON,
+						fKeyStmt => 'selMedicalSpeciality',
+						fKeyDisplayCol => 0,
+						fKeyValueCol => 1,
+						options => FLDFLAG_PREPENDBLANK,
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+				]),
 
 	);
 
@@ -340,7 +353,18 @@ sub execute
 
 		$q = $page->field("$idPName") ne '' ? '' : 1;
 	};
-
+	my $medSpecCode = $page->field('specialty_code');
+	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId,
+			item_name => $medSpecCaption,
+			value_type => App::Universal::ATTRTYPE_SPECIALTY,
+			value_text => $medSpecCode || undef,
+			value_textB => $medSpecCaption || undef,
+			value_int => $page->field('value_int1') || undef,
+			_debug => 0
+		);
 	$self->handlePostExecute($page, $command, $flags);
 }
 
