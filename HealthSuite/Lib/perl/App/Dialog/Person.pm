@@ -250,6 +250,35 @@ sub makeStateChanges
 		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 0);
 		$billRecField->invalidate($page, "'$billRecField->{caption}' is a required field when the 'Person Type' is '$personType'");
 	}
+
+	my @ethnicity = $page->field('ethnicity');
+	my @languages = $page->field('language');
+	my $ethnicityLength = @ethnicity;
+	my $languageLength = @languages;
+	my $lastEthnicity = $ethnicity[$ethnicityLength-1];
+	my $lastLanguage = $languages[$languageLength-1];
+	my $otherLanguage = $self->getField('other_language');
+	my $otherEthnicity = $self->getField('other_ethnicity');
+	my $language = $self->getField('language');
+	my $ethnicity = $self->getField('ethnicity');
+
+	if($page->field('other_ethnicity') eq '' &&  $lastEthnicity eq 'Other')
+	{
+		$otherEthnicity->invalidate($page, "'$otherEthnicity->{caption}' is a required field when the 'Other' checkbox in the 'Ethnicity' field is checked.");
+	}
+	elsif($page->field('other_ethnicity') ne '' && $lastEthnicity ne 'Other')
+	{
+		$ethnicity->invalidate($page, "The 'Other' checkbox should be checked when the 'Other Ethnicity' field is not blank");
+	}
+
+	if($page->field('other_language') eq '' &&  $lastLanguage eq 'Other')
+	{
+		$otherLanguage->invalidate($page, "'$otherLanguage->{caption}' is a required field when the 'Other' checkbox in the 'Language Spoken' field is checked.");
+	}
+	elsif($page->field('other_language') ne '' && $lastLanguage ne 'Other')
+	{
+		$language->invalidate($page, "The 'Other' checkbox should be checked when the 'Other Language' field is not blank");
+	}
 }
 
 sub populateData
@@ -357,6 +386,11 @@ sub populateData
 	my $otherLanguageData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $otherLanguage);
 	$page->field('language_item_id', $otherLanguageData->{'item_id'});
 	$page->field('other_language', $otherLanguageData->{'value_text'});
+
+	my $otherEthnicity = 'Other Ethnicity';
+	my $otherEthnicityData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $otherEthnicity);
+	$page->field('ethnicity_item_id', $otherEthnicityData->{'item_id'});
+	$page->field('other_ethnicity', $otherEthnicityData->{'value_text'});
 }
 
 sub handleContactInfo
@@ -716,25 +750,25 @@ sub handleAttrs
 
 	my $commandEthnicity = $command eq 'update' &&  $page->field('ethnicity_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-				'Person_Attribute', $commandEthnicity,
-				parent_id => $page->field('person_id')  || undef,
-				item_name => 'Other Ethnicity',
-				item_id   =>  $page->field('ethnicity_item_id') || undef,
-				value_type => App::Universal::ATTRTYPE_TEXT,
-				value_text => $page->field('other_ethnicity')  || undef,
-				_debug => 0
-	) if ($page->field('other_ethnicity') ne '');
+		'Person_Attribute', $commandEthnicity,
+		parent_id => $page->field('person_id')  || undef,
+		item_name => 'Other Ethnicity',
+		item_id   =>  $page->field('ethnicity_item_id') || undef,
+		value_type => App::Universal::ATTRTYPE_TEXT,
+		value_text => $page->field('other_ethnicity')  || undef,
+		_debug => 0
+	);
 
 	my $commandLanguage = $command eq 'update' &&  $page->field('language_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-				'Person_Attribute', $commandLanguage,
-				parent_id => $page->field('person_id')  || undef,
-				item_name => 'Other Language',
-				item_id   =>  $page->field('language_item_id') || undef,
-				value_type => App::Universal::ATTRTYPE_TEXT,
-				value_text => $page->field('other_language')  || undef,
-				_debug => 0
-	) if ($page->field('other_language') ne '');
+		'Person_Attribute', $commandLanguage,
+		parent_id => $page->field('person_id')  || undef,
+		item_name => 'Other Language',
+		item_id   =>  $page->field('language_item_id') || undef,
+		value_type => App::Universal::ATTRTYPE_TEXT,
+		value_text => $page->field('other_language')  || undef,
+		_debug => 0
+	);
 }
 
 sub customValidate
