@@ -74,6 +74,7 @@ use App::Page::Search::Session;
 use App::Page::Search::Drug;
 use App::Page::Search::AdhocQuery;
 use App::Page::Search::ApptType;
+use App::Page::Search::Gpci;
 
 ##############################################################################
 # Directory of all available Components - components are auto-registering
@@ -235,6 +236,7 @@ $SEARCH_CLASSES = {
 	'serviceplace' => 'App::Page::Search::ServicePlace',
 	'adhocquery' => 'App::Page::Search::AdhocQuery',
 	'appttype' => 'App::Page::Search::ApptType',
+	'gpci' => 'App::Page::Search::Gpci',
 };
 
 $WORKLIST_CLASSES = {
