@@ -999,7 +999,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	{
 		sqlStmt => qq
 		{
-			select DISTINCT TO_CHAR(thePatientAppt.start_time -:2 , 'MM/DD/YY') AS startDate,
+			select	DISTINCT TO_CHAR(thePatientAppt.start_time -:2 , 'MM/DD/YY') AS startDate,
 				TO_CHAR(thePatientAppt.start_time - :2, 'HH24:MI') AS startTime,
 				thePatient.short_name AS patientname,
 				thePatientAppt.subject AS reason,
@@ -1151,7 +1151,6 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			},
 	},
 
-
 	'sel_patient_superbill_ins_info' =>
 	{
 		sqlStmt => qq
@@ -1179,6 +1178,68 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 3, head => 'Relationship to Insured', dataFmt => '#3#' },
 				],
 			},
+	},
+
+	'sel_patient_superbill_info_from_eventid' =>
+	{
+		sqlStmt => qq
+		{
+			select	DISTINCT TO_CHAR(thePatientAppt.start_time -:2 , 'MM/DD/YY') AS startDate,
+				TO_CHAR(thePatientAppt.start_time - :2, 'HH24:MI') AS startTime,
+				thePatient.short_name AS patientname,
+				thePatientAppt.subject AS reason,
+				theDoctor.person_id AS doctorID,
+				theDoctor.short_name AS doctorName,
+				theApptOrg.name_primary as location,
+				TO_CHAR(thePatient.date_of_birth, 'MM/DD/YY') AS dob,
+				thePatient.person_id AS patientNo,
+				thePatient.person_id AS respParty,
+				thePatient.gender AS sex,
+				thePatientAddr.line1 AS patientAddress,
+				thePatientAddr.city,
+				thePatientAddr.state,
+				thePatientAddr.zip
+			FROM
+				Person thePatient,
+				Person theDoctor,
+				Person_Address thePatientAddr,
+				Person_Address theDoctorAddr,
+				Org theApptOrg,
+				Event_Attribute theAppointmentAttr,
+				Event thePatientAppt
+			WHERE
+				thePatientAppt.event_id = :1
+				AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+				AND theAppointmentAttr.value_type = '333'
+				AND theAppointmentAttr.value_text = thePatient.person_id
+				AND theAppointmentAttr.value_textB = theDoctor.person_id
+				AND thePatientAppt.owner_id = theApptOrg.org_internal_id
+				AND thePatient.person_id = thePatientAddr.parent_id
+				AND theDoctor.person_id = theDoctorAddr.parent_id
+		},
+
+		sqlStmtBindParamDescr => ['Event ID'],
+	},
+
+	'sel_patient_id_from_eventid' =>
+	{
+		sqlStmt => qq
+		{
+			select	DISTINCT
+				thePatientAppointmentAttr.value_text
+			FROM	Person thePatient,
+				Person_Address thePatientAddr,
+				Org theApptOrg,
+				Event_Attribute theAppointmentAttr,
+				Event thePatientAppt
+			WHERE	thePatientAppt.event_id = :1
+				AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+				AND theAppointmentAttr.value_type = '333'
+				AND theAppointmentAttr.value_text = thePatient.person_id
+				AND thePatientAppt.owner_id = theApptOrg.org_internal_id
+		},
+
+		sqlStmtBindParamDescr => ['Event ID'],
 	},
 );
 
