@@ -160,6 +160,7 @@ use App::Dialog::LoginType;
 use App::Dialog::Transaction::ReferralWorkFlow;
 use App::Dialog::Transaction::ReferralWorkFlow::Referral;
 use App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization;
+use App::Dialog::Transaction::ReferralWorkFlow::ReferralEnquiry;
 
 #use App::Dialog::Slot;
 use App::Dialog::Template;
@@ -639,7 +640,8 @@ $WORKLIST_CLASSES = {
 	'personnel' => {_class => 'App::Dialog::Personnel', heading => '$Command Personnel', _arl => ['person_id']},
 	'loginType' => {_class => 'App::Dialog::LoginType', heading => 'Change Login Type', _arl => ['person_id']},
 	'referral' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::Referral', heading => 'Add Referral', _arl => ['person_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL()},
-	'referral-auth' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization', transId => ['parent_trans_id'], heading => 'Add Referral Authorization', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION()},
+	'referral-auth' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization', transId => ['parent_trans_id'], heading => 'Review Authorization Request', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _arl_modify => ['trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION()},
+	'referral-enquiry' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralEnquiry', transId => ['parent_trans_id'], heading => 'Referral Inquiry', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _arl_modify => ['trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_ENQUIRY()},
 
 	'eligibility' => {_class => 'App::Dialog::Eligibility', heading => '$Command Eligibility', _arl => ['org_id']},
 	'eligibilitypatient' => {_class => 'App::Dialog::EligibilityPatient', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
