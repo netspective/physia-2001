@@ -35,6 +35,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'job_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -45,8 +46,7 @@ sub initialize
 
 		new CGI::Dialog::Field(name => 'nurse_title',
 						caption => 'Person Title/Job Code',
-						choiceDelim =>',',
-						selOptions => "RN:1, LVN/LPN:2, OTHER:3",
+						selOptions => "LVN/LPN;RN;OTHER",
 						type => 'select',
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Title'."
@@ -54,8 +54,7 @@ sub initialize
 
 		new CGI::Dialog::Field(name => 'physician_type',
 						caption => 'Person Type',
-						choiceDelim =>',',
-						selOptions => "Physician:1, Physician Extender (direct billing):2, Other Clinical Service Provider (direct billing):3, Other Clinical Services Provider (alternate billing):4",
+						selOptions => "Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)",
 						type => 'select',
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Type'."
@@ -177,7 +176,7 @@ sub makeStateChanges
 		#$self->setFieldFlags('person_id', FLDFLAG_READONLY);
 	}
 
-	$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
+	#$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
 }
 
 sub populateData
@@ -210,16 +209,11 @@ sub populateData
 	$page->field('chart_number', $chartNum->{'value_text'});
 	$page->field('chart_item_id', $chartNum->{'item_id'});
 
-	#my $itemName2 = 'Nurse/Title';
-	#my $nurseTitle  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName2);
-	#$page->field('nurse_title', $nurseTitle->{'value_text'});
-	#$page->field('nurse_title_item_id', $nurseTitle->{'item_id'});
-
-	#my $itemName3 = 'Physician/Type';
-	#my $physicianType  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName3);
-	#my @phyType = split(',', $physicianType->{'value_text'});
-	#$page->field('physician_type', @phyType);
-	#$page->field('phy_type_item_id', $physicianType->{'item_id'});
+	my $PhysicianType = 'Physician/Type';
+	my $physicianType  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $PhysicianType);
+	my @phyType = split(',', $physicianType->{'value_text'});
+	$page->field('physician_type', @phyType);
+	$page->field('phy_type_item_id', $physicianType->{'item_id'});
 
 	my $guarantor = 'Guarantor';
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
@@ -231,12 +225,24 @@ sub populateData
 	$page->field('blood_item_id', $bloodTypecap->{'item_id'});
 	$page->field('blood_type', $bloodTypecap->{'value_text'});
 
-	my $nurseLicense = 'RN';
+	my $nurseLicense = 'Nursing/License';
 	my $nurseLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseLicense);
 	$page->field('nurse_license_item_id', $nurseLicenseData->{'item_id'});
 	$page->field('rn_number', $nurseLicenseData->{'value_text'});
 	$page->field('rn_number_exp_date', $nurseLicenseData->{'value_date'});
 	$page->field('check_license', $nurseLicenseData->{'value_int'});
+
+	my $nurseTitle = 'Nurse/Title';
+	my $nurseTitleData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseTitle);
+	$page->field('nurse_title_item_id', $nurseTitleData->{'item_id'});
+	my @titles = split(',', $nurseTitleData->{'value_text'});
+	$page->field('nurse_title', @titles);
+
+	my $jobCode = 'Job Code';
+	my $jobCodeData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $jobCode);
+	$page->field('job_item_id', $jobCodeData->{'item_id'});
+	$page->field('job_code', $jobCodeData->{'value_textB'});
+	$page->field('job_title', $jobCodeData->{'value_text'});
 }
 
 sub handleContactInfo
@@ -250,7 +256,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Home',
-			value_type => 10,
+			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $page->field('home_phone'),
 			_debug => 0
 		) if $page->field('home_phone') ne '';
@@ -259,7 +265,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Work',
-			value_type => 10,
+			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $page->field('work_phone'),
 			_debug => 0
 		) if $page->field('work_phone') ne '';
@@ -268,7 +274,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Alternate',
-			value_type => 10,
+			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $page->field('alternate_phone'),
 			_debug => 0
 		) if $page->field('alternate_phone') ne '';
@@ -277,7 +283,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Cellular',
-			value_type => 10,
+			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $page->field('cell_phone'),
 			_debug => 0
 		) if $page->field('cell_phone') ne '';
@@ -286,7 +292,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Primary',
-			value_type => 20,
+			value_type =>  App::Universal::ATTRTYPE_PAGER,
 			value_text => $page->field('primary_pager'),
 			_debug => 0
 		) if $page->field('primary_pager') ne '';
@@ -295,7 +301,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId,
 			item_name => 'Primary',
-			value_type => 40,
+			value_type =>  App::Universal::ATTRTYPE_EMAIL,
 			value_text => $page->field('email'),
 			_debug => 0
 		) if $page->field('email') ne '';
@@ -304,7 +310,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'Personal/Preferred/Day',
-			value_type => 0,
+			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => $preferDay || undef,
 			_debug => 0
 		)if $page->field('prefer_day') ne '';
@@ -313,7 +319,7 @@ sub handleContactInfo
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'Person/Name/LastFirst',
-			value_type => 0,
+			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_int => $page->field('create_record'),
 			_debug => 0
 	) if $page->field('create_record') ne '';
@@ -445,37 +451,25 @@ sub handleAttrs
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
-			item_id => $page->field('phy_type_item_id') || undef,
-			parent_org_id => $orgId ||undef,
-			item_name => 'Physician/Type',
-			value_type => 0,
-			value_text => $page->field('physician_type') || undef,
-			_debug => 0
-			) if $page->field('physician_type') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
 			parent_org_id => $orgId ||undef,
 			item_name => 'Misc Notes' ,
 			value_text => $page->field('misc_notes') || undef,
 			_debug => 0
 			) if $page->field('misc_notes') ne '';
 
+	my $commandJobCode = $command eq 'update' &&  $page->field('job_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Person_Attribute', $command,
+			'Person_Attribute', $commandJobCode,
 			parent_id => $personId || undef,
 			parent_org_id => $orgId ||undef,
+			item_id => $page->field('job_item_id') || undef,
 			item_name => 'Job Code' ,
-			value_text => $page->field('job_code') || undef,
-			value_textB => $page->field('job_title') || undef,
+			value_text => $page->field('job_title') || undef,
+			value_textB => $page->field('job_code') || undef,
 			_debug => 0
-			) if ($page->field('job_code') ne '' || $page->field('job_title') ne '');
+		) if $member ne 'Patient';
 
 	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
-
-
-
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
@@ -492,23 +486,49 @@ sub handleAttrs
 			parent_id => $personId || undef,
 			item_id => $page->field('blood_item_id') || undef,
 			item_name => 'BloodType' || undef,
-			value_type => 0,
+			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => $page->field('blood_type') || undef,
 			_debug => 0
 		);
 
+	my $commandLicense = $command eq 'update' &&  $page->field('nurse_license_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Person_Attribute', $command,
+			'Person_Attribute', $commandLicense,
 			parent_id => $page->field('person_id'),
 			item_id => $page->field('nurse_license_item_id') || undef,
-			item_name => 'RN',
-			value_type => 500,
+			item_name => 'Nursing/License',
+			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => $page->field('rn_number')  || undef,
 			value_date => $page->field('rn_number_exp_date') || undef,
 			value_int => $page->field('check_license')  || undef,
 			_debug => 0
-		);
+		)if $member eq 'Nurse';
 
+	my $commandTitle = $command eq 'update' &&  $page->field('nurse_title_item_id') eq '' ? 'add' : $command;
+	my @titles = $page->field('nurse_title');
+	$page->schemaAction(
+			'Person_Attribute', $commandTitle,
+			parent_id => $personId || undef,
+			item_id => $page->field('nurse_title_item_id') || undef,
+			parent_org_id => $orgId ||undef,
+			item_name => 'Nurse/Title',
+			value_type => App::Universal::ATTRTYPE_LICENSE,
+			value_text => join(',', @titles) || undef,
+			_debug => 0
+		) if $member eq 'Nurse';
+
+	my $commandPhyType = $command eq 'update' &&  $page->field('phy_type_item_id') eq '' ? 'add' : $command;
+	my @physicianType = $page->field('physician_type');
+	$page->schemaAction(
+			'Person_Attribute', $commandPhyType,
+			parent_id => $personId || undef,
+			item_id => $page->field('phy_type_item_id') || undef,
+			parent_org_id => $orgId ||undef,
+			item_name => 'Physician/Type',
+			value_type => App::Universal::ATTRTYPE_TEXT,
+			value_text => join(',', @physicianType) || undef,
+			_debug => 0
+		) if $member eq 'Physician';
 }
 
 sub customValidate
