@@ -277,10 +277,10 @@ sub new
 	$params{flags} = FLDFLAGS_DEFAULT unless exists $params{flags};
 
 
-	$params{onBlurJS} = ONBLUR_UPPERCASE if ($params{options} & FLDFLAG_UPPERCASE) == FLDFLAG_UPPERCASE && ! exists $params{onBlurJS};
-	$params{onBlurJS} = ONBLUR_LOWERCASE if ($params{options} & FLDFLAG_LOWERCASE) == FLDFLAG_LOWERCASE && ! exists $params{onBlurJS};
-	$params{onBlurJS} = ONBLUR_UCASEINITIAL if ($params{options} & FLDFLAG_UCASEINITIAL) == FLDFLAG_UCASEINITIAL && ! exists $params{onBlurJS};
-	$params{onBlurJS} = ONBLUR_AUTOCAP if ($params{options} & FLDFLAG_AUTOCAP) == FLDFLAG_AUTOCAP && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_UPPERCASE if $params{options} && ($params{options} & FLDFLAG_UPPERCASE) == FLDFLAG_UPPERCASE && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_LOWERCASE if $params{options} && ($params{options} & FLDFLAG_LOWERCASE) == FLDFLAG_LOWERCASE && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_UCASEINITIAL if $params{options} && ($params{options} & FLDFLAG_UCASEINITIAL) == FLDFLAG_UCASEINITIAL && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_AUTOCAP if $params{options} && ($params{options} & FLDFLAG_AUTOCAP) == FLDFLAG_AUTOCAP && ! exists $params{onBlurJS};
 
 
 	my $type = $params{type};
