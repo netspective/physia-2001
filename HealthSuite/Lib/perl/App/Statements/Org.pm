@@ -181,6 +181,48 @@ $STMTMGR_ORG = new App::Statements::Org(
 			where org_internal_id = ?
 			order by field_order
 		},
+	'selReferralSource' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Source_Type
+		},
+	'selReferralPayor' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Payor
+		},
+	'selReferralService' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Service_Type
+		},
+	'selReferralDetail' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Service_Detail
+		},
+	'selReferralResult' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Result
+		},
+	'selReferralFollowup' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Followup_Status
+		},
+	'selReferralUnitType' => qq{
+		SELECT
+			id,
+			caption
+		FROM Referral_Unit_Type
+		},
 );
 
 1;
