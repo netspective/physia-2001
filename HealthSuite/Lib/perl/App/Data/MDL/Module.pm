@@ -12,7 +12,7 @@ use App::Statements::Person;
 use App::Statements::Catalog;
 use vars qw(@ISA);
 
-use vars qw(@ISA @EXPORT %PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP %BILL_SEQUENCE_TYPE_MAP %DEDUCTIBLE_TYPE_MAP %INSURANCE_TYPE_MAP %BILLINGPARTY_TYPE_MAP);
+use vars qw(@ISA @EXPORT %PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP %BILL_SEQUENCE_TYPE_MAP %DEDUCTIBLE_TYPE_MAP %INSURANCE_TYPE_MAP %BILLINGPARTY_TYPE_MAP %RELATION_INSURED_TYPE_MAP);
 use enum qw(BITMASK:MDLFLAG_ LOGSQL SHOWSTATUS SHOWMISSINGITEMS LOGACTIVITY DEBUG);
 use constant MDLFLAGS_VERBOSE => MDLFLAG_SHOWSTATUS | MDLFLAG_SHOWMISSINGITEMS | MDLFLAG_LOGACTIVITY;
 use constant MDLFLAGS_DEFAULT => 0;
@@ -62,6 +62,28 @@ use constant MDLFLAGS_DEFAULT => 0;
 	'WorkersComp' => App::Universal::CLAIMTYPE_WORKERSCOMP,
 	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NONCAP,
 	'ThirdParty' => App::Universal::CLAIMTYPE_CLIENT
+);
+
+%RELATION_INSURED_TYPE_MAP = (
+	'Self' => App::Universal::INSURED_SELF,
+	'Spouse' => App::Universal::INSURED_SPOUSE,
+	'Natural/Adopted Child(FR)' => App::Universal::INSURED_CHILD_FINANCIALRESP,
+	'Natural/Adopted Child ' => App::Universal::INSURED_CHILD_NOFINANCIALRESP,
+	'Step Child' => App::Universal::INSURED_STEPCHILD,
+	'Foster Child' => App::Universal::INSURED_FOSTERCHILD,
+	'Ward of the Court' => App::Universal::INSURED_WARDOFCOURT,
+	'Employee' => App::Universal::INSURED_EMPLOYEE,
+	'Unknown/Other' => App::Universal::INSURED_OTHER,
+	'Handicapped Dependent' => App::Universal::INSURED_HANDICAPPED_DEPENDENT,
+	'Organ Donor' => App::Universal::INSURED_ORGANDONOR,
+	'Cadaver Donor' => App::Universal::INSURED_CADAVERDONOR,
+	'Grandchild' => App::Universal::INSURED_GRANDCHILD,
+	'Niece/Nephew' => App::Universal::INSURED_NIECE_NEPHEW,
+	'Injured Plaintiff' => App::Universal::INSURED_INJURED_PLAINTIFF,
+	'Sponsored Dependent' => App::Universal::INSURED_SPONSORED_DEPENDENT,
+	'Minor Dependent of a Minor Dependent' =>  App::Universal::INSURED_MINORDEPEND_OF_MINORDEPEND,
+	'Parent' => App::Universal::INSURED_PARENT,
+	'Grandparent' => App::Universal::INSURED_GRANDPARENT
 );
 
 %BILLINGPARTY_TYPE_MAP = (
@@ -395,7 +417,8 @@ sub importInsurance
 
 			my $productName = $item->{'ins-id'};
 			my $planName = $item->{'policy-name'};
-			my $guarantor = $item->{guarantor};
+			my $guarantorId = $item->{guarantor};
+			my $guarantor = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $primaryOwnerOrgId, $guarantorId);
 			my $ownerOrg = $item->{'owner-org'};
 			my $ownerOrgInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
 
@@ -434,7 +457,8 @@ sub importInsurance
 								remit_type => $planData->{'remit_type'} || undef,
 								remit_payer_id => $planData->{'remit_payer_id'} || undef,
 								remit_payer_name => $planData->{'remit_payer_name'} || undef,
-								threshold => $planData->{threshold} || undef
+								threshold => $planData->{threshold} || undef,
+								rel_to_insured => $RELATION_INSURED_TYPE_MAP{exists $item->{'insured-relation'} ? $item->{'insured-relation'} :'1'} || undef
 							);
 
 				$self->schemaAction($flags,"Insurance_Attribute", 'add',
@@ -496,7 +520,9 @@ sub importInsurance
 		{
 			my $insOrgId = $item->{'insurance-org'};
 			my $primaryOrg = $item->{'ins-org-owner'};
+
 			my $primaryOwnerId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $primaryOrg);
+
 			my $primaryInsOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $primaryOwnerId, $insOrgId);
 
 			my $ownerOrg = $item->{'owner-org'};
@@ -549,12 +575,12 @@ sub importInsurance
 
 			$self->_importContactMethods($flags, $item->{'contact-methods'}, $item, 'Insurance', $insIntId);
 
+
 			if (my $insPlan = $item->{plan})
 			{
 				my $rec = $item;
-				$self->importinsPlan($flags, $insPlan, $rec, $insurance, $item->{'ins-id'}, $item->{'contact-methods'}, $insIntId, $primaryOrg);
+				$self->importinsPlan($flags, $insPlan, $rec, $insurance, $item->{'ins-id'}, $item->{'contact-methods'}, $insIntId, $primaryOwnerId);
 			}
-
 			#$deductflag = 0;
 		}
 	}
@@ -567,6 +593,8 @@ sub importinsPlan
 	#my $productName = $insurance;
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	#my $recordContactMethod = $insurance->{product}->{'contact-methods'};
+	my $dv = new Dumpvalue;
+	$dv->dumpValue($primaryOrg);
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selProductRecord', $primaryOrg, $productName);
 	my $insInternalId = $recordData->{'ins_internal_id'};
 	my $feeschedule =  $STMTMGR_INSURANCE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
@@ -575,6 +603,9 @@ sub importinsPlan
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $test = $recordData->{'ins_type'} ;
+			my $dv = new Dumpvalue;
+			$dv->dumpValue($test);
 
 			my $insIntId =  $self->schemaAction($flags, "Insurance", 'add',
 							product_name => $productName || undef,
