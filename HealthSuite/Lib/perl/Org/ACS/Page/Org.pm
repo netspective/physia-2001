@@ -225,25 +225,52 @@ sub prepare_view_profile
 
 	#$self->addLocatorLinks(['Profile', 'profile']);
 
+	if ($self->param('org_id') eq $self->session('org_id'))
+	{
+		$self->addContent(qq{
+			<TABLE>
+				<TR VALIGN=TOP>
+					<TD WIDTH=30%>
+						<font size=1 face=arial>
+						#component.stpt-org.contactMethodsAndAddresses#<BR>
+						#component.stpt-org.miscNotes#<BR>
+						#component.stpt-org.listAssociatedOrgs#<BR>
+						</font>
+					</TD>
+					<TD WIDTH=60%>
+						<font size=1 face=arial>
+						#component.stpt-org.personnel#<BR>
+						#component.stp-org.serviceCatalog#<BR>
 
-	$self->addContent(qq{
-		<TABLE>
-			<TR VALIGN=TOP>
-				<TD WIDTH=30%>
-					<font size=1 face=arial>
-					#component.stpt-org.contactMethodsAndAddresses#<BR>
-					#component.stpt-org.miscNotes#<BR>
-					#component.stpt-org.listAssociatedOrgs#<BR>
-					</font>
-				</TD>
-				<TD WIDTH=60%>
-					<font size=1 face=arial>
-					#component.stp-org.serviceCatalog#<BR>
-					</font>
-				</TD>
-			</TR>
-		</TABLE>
-	});
+						</font>
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	}
+
+	else
+	{
+		$self->addContent(qq{
+			<TABLE>
+				<TR VALIGN=TOP>
+					<TD WIDTH=30%>
+						<font size=1 face=arial>
+						#component.stpt-org.contactMethodsAndAddresses#<BR>
+						#component.stpt-org.miscNotes#<BR>
+						#component.stpt-org.listAssociatedOrgs#<BR>
+						</font>
+					</TD>
+					<TD WIDTH=60%>
+						<font size=1 face=arial>
+						#component.stp-org.serviceCatalog#
+
+						</font>
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	}
 }
 
 sub prepare_view_worklist
