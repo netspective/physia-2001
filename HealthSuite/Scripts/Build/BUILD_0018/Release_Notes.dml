@@ -145,6 +145,7 @@
 
 		<deliverable id="1618">
 			If intellicode errors occur in checkout or claim, redirect forced to an error view on the claim summary.
+			Reopened: Now forcing redirect to claim summary as requested.
 		</deliverable>
 
 		<deliverable id="1624">
