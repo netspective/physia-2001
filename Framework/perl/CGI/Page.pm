@@ -380,28 +380,37 @@ sub replaceRedirectVars
 	return $src;
 }
 
+
+# replaceVars - does replacements for #pageMethod.argument# style templates
+#
+# This includes #session.xxx#, #param.xxx# #property.xxx# #field.xxx# and
+# any other page method that returns a single value and takes 0 or 1 parameter
+#
+# NOTE: FOR PERFORMANCE, A COPY OF THIS SUBSTITION ALSO EXISTS IN DBI::StatementManager
+#       SO, IF YOU UPDATE THE REGEXP, DO IT THERE, TOO!
+#
+# It can be called with a reference to a scalar string or a scalar string.  It will return
+# the string in the same type it was called with.  It is preferred to call using 
+# scalar references for performance and memory
 sub replaceVars
 {
 	my ($self, $src) = @_;
-
-	#
-	# do replacements for #session.xxx#, #param.xxx# or #field.xxx# or
-	# any other page method that returns a single value
-	#
-	# NOTE: FOR PERFORMANCE, A COPY OF THIS SUBSTITION ALSO EXISTS IN DBI::StatementManager and
-	#       App::Page. SO, IF YOU UPDATE THE REGEXP, DO IT THERE, TOO!
-	#
-	$src =~ s/\#(\w+)\.?([\w\-\.]*)\#/
-		if(my $method = $self->can($1))
-		{
-			&$method($self, $2);
-		}
-		else
-		{
-			"method '$1' not found in $self";
-		}
-		/ge;
-	return $src;
+	my $data = ref($src) ? $src : \$src;
+	my $count = 1;
+	while($count)
+	{
+		$count = ($$data =~ s/\#(\w+)\.?([\w\-\.]*)\#/
+			if(my $method = $self->can($1))
+			{
+				&$method($self, $2);
+			}
+			else
+			{
+				"method '$1' not found in $self";
+			}
+			/ge);
+	}
+	return ref($src) ? $data : $$data;
 }
 
 sub send_http_header
