@@ -11,8 +11,18 @@ use App::Configuration;
 use App::ImageManager;
 use Devel::Symdump;
 
-use vars qw(@ISA @EXPORT);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(Exporter App::Page);
+%RESOURCE_MAP = (
+	'sde' => {
+		_views => [
+			{caption => 'Database', name => 'tables',},
+			{caption => 'Statements', name => 'stmgrs',},
+			{caption => 'Resources', name => 'resources',},
+			{caption => 'Source', name => 'source',},
+			],
+		},
+	);
 
 use constant DEFAULT_HIDE_COLUMNS => 'CR_SESSION_ID,CR_STAMP,CR_USER_ID,CR_ORG_ID,VERSION_ID';
 

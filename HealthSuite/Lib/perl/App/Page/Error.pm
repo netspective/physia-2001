@@ -6,8 +6,12 @@ use strict;
 use App::Page;
 use App::Universal;
 
-use vars qw(@ISA %MESSAGE_INFO);
+use vars qw(@ISA %MESSAGE_INFO %RESOURCE_MAP);
 @ISA = qw(App::Page);
+
+%RESOURCE_MAP = (
+	'error' => {},
+	);
 
 use enum qw(BITMASK:ERRMSGFLAG_ SHOWARLINFO SHOWCGIPARAMS);
 use constant DEFAULT_ERRORMSGFLAGS => ERRMSGFLAG_SHOWARLINFO;

@@ -16,9 +16,11 @@ use Date::Manip;
 use Date::Calc qw( Date_to_Days );
 use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
-  
+%RESOURCE_MAP = (
+	'eligibility' => {},
+	);
 
 sub prepare
 {

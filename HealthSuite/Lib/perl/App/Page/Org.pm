@@ -20,8 +20,19 @@ use App::Dialog::Organization;
 
 use App::Page::Search;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'org' => {
+		_views => [
+			{caption => 'Summary', name => 'profile',},
+			{caption => 'Insurance', name => 'insurance',},
+			{caption => 'Personnel', name => 'personnel',},
+			{caption => 'Catalog', name => 'catalog',},
+			{caption => 'Account', name => 'account',},
+			],
+		},
+	);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
 

@@ -8,8 +8,11 @@ use App::Universal;
 use App::Configuration;
 use App::Component::Navigate::FileSys;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'report' => {},
+	);
 
 sub initialize
 {

@@ -6,8 +6,15 @@ use strict;
 use App::Page;
 use App::Universal;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+
+%RESOURCE_MAP = (
+	'logout' => {},
+	'home' => {},
+	'homeorg' => {},
+	);
+
 
 sub prepare
 {

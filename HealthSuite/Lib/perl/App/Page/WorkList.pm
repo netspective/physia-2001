@@ -15,8 +15,11 @@ use App::Statements::Scheduling;
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA @CHANGELOG %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'worklist' => {},
+	);
 
 
 sub prepare_view_default

@@ -15,7 +15,17 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Search::Appointment;
 
+use vars qw(%RESOURCE_MAP);
 use base 'App::Page';
+%RESOURCE_MAP = (
+	'schedule' => {
+		'_views' => [
+			{ caption => '', name => '', },
+			{ caption => '', name => '', },
+			{ caption => '', name => '', },
+			],
+		},
+	);
 
 # ------------------------------------------------------------------------------------------
 

@@ -19,8 +19,11 @@ use App::Billing::Validators;
 use Date::Manip;
 use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'patientbill' => {},
+	);
 
 sub prepare
 {
@@ -349,12 +352,5 @@ sub handleARL
 	$self->printContents();
 	return 0;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/25/2000', 'TVN',
-		'Page/PatientBill',
-		'Added Patient Bill page.'],
-);
 
 1;

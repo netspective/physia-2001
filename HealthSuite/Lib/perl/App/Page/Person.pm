@@ -25,8 +25,18 @@ use App::Dialog::PostTransfer;
 
 use App::Page::Search;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'person' => {
+		_views => [
+			{caption => 'Summary', name => 'profile',},
+			{caption => 'Chart', name => 'chart',},
+			{caption => 'Account', name => 'account',},
+			{caption => 'Activity', name => 'activity',},
+			],
+		},
+	);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
 

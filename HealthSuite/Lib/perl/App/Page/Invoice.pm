@@ -35,10 +35,11 @@ use App::IntelliCode;
 
 use App::Page::Search;
 
-use Devel::ChangeLog;
-
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'invoice' => {},
+	);
 
 use constant NSFDEST_ARRAY => 0;
 use constant NSFDEST_FILE => 1;
