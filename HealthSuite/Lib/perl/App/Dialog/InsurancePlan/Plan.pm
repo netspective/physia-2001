@@ -34,14 +34,8 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'ins_type'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-				new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
+				new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct/insorgid/itemValue', findPopupControlField => '_f_ins_org_id'),
 				new App::Dialog::Field::Insurance::Plan::New(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED),
-				#new CGI::Dialog::Field::TableColumn(
-				#					caption => 'Insurance Type',
-				#					schema => $schema,
-				#					column => 'Insurance.ins_type',
-				#					typeGroup => ['insurance', 'workers compensation']),
-
 				new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', findPopup => '/lookup/catalog/catalog_id'),
 
 				new App::Dialog::Field::Address(caption=>'Billing Address', name => 'billing_addr',
@@ -181,7 +175,6 @@ sub populateData_add
 
 	my $insIntId = $recordData->{'ins_internal_id'};
 	my$planAdd = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
-	#$page->field('item_id', $planAdd->{item_id});
 
 	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Contact Method/Telephone/Primary');
 	$page->field('phone_item_id', $insPhone->{item_id});
@@ -273,7 +266,6 @@ sub execute
 				owner_org_id => $page->param('org_id') || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
 				ins_type => $insType || undef,
-				#fee_schedule => $page->field('fee_schedule') || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,
 				coverage_end_date => $page->field('coverage_end_date') || undef,
 				copay_amt => $page->field('copay_amt') || undef,
@@ -367,15 +359,5 @@ sub handleAttributes
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
-
-
-use constant INSURANCEEXISTS_DIALOG => 'Dialog/New Insurance Plan';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '04/05/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		'Cleaned up dialog fields and removed makeStateChanges.'],
-);
 
 1;
