@@ -597,6 +597,27 @@ sub getItemCost
 	
 		for my $entry (@{$entries})
 		{
+			push(@buffer, [$fs, $entry]);
+		}
+	}
+	
+	return \@buffer;
+}
+
+sub _getItemCost
+{
+	my ($page, $cpt, $modifier, $fsRef) = @_;
+	my @buffer = ();
+
+	for my $i (0..(@$fsRef -1))
+	{
+		my $fs = $fsRef->[$i];
+		
+		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
+	
+		for my $entry (@{$entries})
+		{
 			push(@buffer, [$fs, $entry->{unit_cost}]);
 		}
 	}
