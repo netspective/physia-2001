@@ -12,6 +12,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSI
 
 my $FILLED =App::Universal::TRANSSTATUS_FILLED;
 my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT;
+my $BILLING_EVENT =App::Universal::ATTRTYPE_BILLINGEVENT;
 
 $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 {
@@ -213,6 +214,83 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		},
 	},
 	
+	
+	#This query has a distinct because a patient could be on multiple billing cycles	
+	'selPatientInBillCycle'=>
+	{
+		sqlStmt=>
+		qq
+		{
+
+                        SELECT	oa.value_int as cycle ,count (distinct(pog.person_id)) as tlt_patient
+                        FROM	person p, org_attribute oa , person_org_category pog
+                        WHERE   upper(substr(p.name_last,1,1)) between oa.value_text
+                        AND     oa.value_textb
+                        AND     oa.item_name = 'Billing Event'
+                        AND     oa.value_type = 650
+                        AND     (:1 IS NULL OR oa.value_int = :1)
+                        AND     p.person_id = pog.person_id
+                        AND     pog.category='Patient'
+                        AND     pog.org_internal_id = :2
+                        AND     oa.parent_id = :2
+                        GROUP BY oa.value_int
+		},
+	},
+	
+	'selBillCycleData'=>
+	{
+		sqlStmt=>
+		qq
+		{
+
+			SELECT	s.amount_due,
+				p.simple_name,
+				s.patient_id,
+				ts.caption as status
+			FROM	Statement s, person p,Transmission_Status ts
+			WHERE	to_char(s.TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT') = :1
+			AND	p.person_id = s.patient_id
+			AND	ts.id (+)= s.transmission_status
+			AND	EXISTS
+			(
+				SELECT 1
+				FROM 	auto_invoice_chrg aic, statement_inv_ids sii
+				WHERE 	aic.invoice_id = sii.member_name
+				AND	(aic.care_provider_id = :3 OR :3 IS NULL)
+				AND	(aic.service_facility_id = :2 or :2 IS NULL)
+				AND	owner_org_id = :4
+				AND	s.statement_id = sii.parent_id
+			)	
+		},
+	},	
+		
+	'selFourBillCycleData'=>
+	{
+		sqlStmt=>
+		qq
+		{
+			SELECT * 
+			FROM 
+			(
+			SELECT	count (*) as stmt_count , sum(amount_due) as amount, to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT') as cycle_date
+			FROM	Statement s
+			WHERE	to_char(s.transmission_stamp,'DD') = to_number(:1)
+			AND	EXISTS
+			(
+				SELECT 1
+				FROM 	auto_invoice_chrg aic, statement_inv_ids sii
+				WHERE 	aic.invoice_id = sii.member_name
+				AND	(aic.care_provider_id = :3 OR :3 IS NULL)
+				AND	(aic.service_facility_id = :2 or :2 IS NULL)
+				AND	owner_org_id = :4
+				AND	s.statement_id = sii.parent_id
+			)	
+			GROUP BY to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT')
+			ORDER BY to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT')
+			) 
+			WHERE ROWNUM < 5
+		},
+	},
 	'selDeposit'=>
 	{
 		sqlStmt=>
@@ -495,8 +573,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				a.bill_to_id,
 				sum(nvl(a.extended_cost,0)),
 				sum(nvl(a.total_adjust,0)),
-				sum(nvl(a.balance,0))
-			FROM	agedpayments a, org ,	invoice_status ist
+				sum(nvl(a.balance,0)),
+				p.simple_name
+			FROM	agedpayments a, org ,	invoice_status ist,person p
 			WHERE	(a.bill_to_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (2,3)
@@ -507,7 +586,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
-			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id
+			AND	p.person_id (+) = a.person_id
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id,
+			p.simple_name
 			having sum(balance)<> 0
 		},
 		publishDefn =>
@@ -519,6 +600,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 2, head => 'Svc Date', dataFmt => '#2#' },
 				{ colIdx => 3, head => 'Status', dataFmt => '#3#'},
 				{ colIdx => 4, head => 'Client', dataFmt => '#4#' },
+				{ colIdx => 9, head => 'Client Name'},				
 				{ colIdx => 5, head => 'Payer', dataFmt => '#5#' },
 				{ colIdx => 6, head => 'Charges',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
 				{ colIdx => 7, head => 'Adjust',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
