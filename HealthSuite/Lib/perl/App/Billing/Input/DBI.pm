@@ -221,7 +221,7 @@ sub preSubmitStatusCheck
 	my ($self, $claim, $attrDataFlag, $row) = @_;
 	my $go = 0;
 
-	$go = 1 if(($claim->getStatus() < INVOICESTATUS_SUBMITTED) || (($claim->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claim->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claim->getStatus() == INVOICESTATUS_VOID) && not($attrDataFlag & $row)));
+	$go = 1 if(($row == 0) || ($claim->getStatus() < INVOICESTATUS_SUBMITTED) || (($claim->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claim->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claim->getStatus() == INVOICESTATUS_VOID) && not($attrDataFlag & $row)));
 
 	return $go
 }
@@ -282,6 +282,7 @@ sub populateClaims
 		my $sth = $self->{dbiCon}->prepare("$queryStatment");
 		$sth->execute or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
+		$claims->[$i]->setFlags($row[0]);
 		if($self->preSubmitStatusCheck($claims->[$i], $attrDataFlag, $row[0]) == 1)
 		{
 			$self->assignInvoicePreSubmit($claims->[$i], $targetInvoices->[$i]);
@@ -1724,6 +1725,21 @@ sub assignInvoiceProperties
 	$claim->setSourceOfPayment($payer1->getSourceOfPayment);
 	$claim->setPayer($payer1);
 
+	$queryStatment = qq
+	{
+		select to_char(value_date, 'DD-MON-YYYY'), value_text, value_textb
+		from invoice_history
+		where parent_id = $invoiceId
+	};
+	my $sthHist = $self->{dbiCon}->prepare("$queryStatment");
+	$sthHist->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+
+	while(my @row = $sth->fetchrow_array())
+	{
+		$claim->setInvoiceHistoryDate($row[0]);
+		$claim->setInvoiceHistoryAction($row[1]);
+		$claim->setInvoiceHistoryComments($row[2]);
+	}
 
 	#get all invoice_billing records for a claim
 
@@ -1797,6 +1813,7 @@ sub assignInvoiceProperties
 	$self->assignInvoiceAddresses($invoiceId, $claim);
 	$self->payersRemainingProperties([$payer1, $payer2, $payer3, $payer4], $invoiceId, $claim);
 	$self->assignProviderLicenses($invoiceId, $claim);
+	$self->assignInjuryInformation($invoiceId, $claim);
 
 	return $claim;
 }
@@ -1822,6 +1839,30 @@ sub assignProviderLicenses
 
 	my @row = $sth->fetchrow_array();
 	$serviceProvider->setProfessionalLicenseNo($row[0]);
+}
+
+sub assignInjuryInformation
+{
+	my ($self, $invoiceId, $claim) = @_;
+
+	my $treatment = $claim->getTreatment();
+
+	my $queryStatment = qq
+	{
+		select to_char(to_date(value_text,'mm/dd/yyyy'),'DD-MON-YYYY')
+		from insurance_attribute insa, insurance ins, invoice_billing ib, invoice i
+		where i.billing_id = ib.bill_id
+		and i.invoice_subtype = 6
+		and ib.bill_ins_id = ins.ins_internal_id
+		and ins.ins_internal_id = insa.parent_id
+		and insa.item_name = 'Injury Information'
+		and i.invoice_id = $invoiceId
+	};
+	my $sth = $self->{dbiCon}->prepare("$queryStatment");
+	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+
+	my @row = $sth->fetchrow_array();
+	$treatment->setDateOfIllnessInjuryPregnancy($row[0]) if ($row[0] ne '');
 }
 
 sub payersRemainingProperties
