@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+
+<!-- do not use "/" or "." inside of id attributes -->
+
+<mdl>
+	<clinical-documentation>
+	<field-defns id="physia">
+		<field-defn id="overview" caption="Overview">
+			<field-defn id="chief-complaint" type="text" caption="Chief complaint"/>
+			<field-defn id="hpi" type="text" lines="5" caption="HPI"/>
+		</field-defn>
+
+		<field-defn id="history" caption="Histories">
+			<field-defn id="past-medical" type="text" lines="3" review="yes" caption="Past medical history"/>
+			<field-defn id="family" type="text" lines="3" review="yes" caption="Family history"/>
+			<field-defn id="social" type="text" lines="3" review="yes" caption="Social history"/>
+			<field-defn id="war_veteran" type="choose" caption="War Veteran">
+				<options>
+					<option>No</option>
+					<option>Yes</option>
+				</options>
+			</field-defn>
+		</field-defn>
+
+		<field-defn id="habits" caption="Habits">
+			<field-defn id="tobacco" caption="Tobacco use">
+				<field-defn id="tobacco_question" type="choose" review="yes" caption="Usage" style="radio">
+					<options>
+					<option>never smoked</option>
+					<option>former smoker</option>
+					<option>active smoker</option>
+					</options>
+				</field-defn>
+				<field-defn id="tobacco_type" type="choose" caption="Type" style="checkbox" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1 || control.value == 2">
+					<options>
+					<option>cigarettes</option>
+					<option>cigar</option>
+					<option>pipe</option>
+					</options>
+				</field-defn>
+				<field-defn id="quit" type="text" caption="Quit" condition-field="habits.tobacco.tobacco_question" condition="control.value == 1"/>
+			</field-defn>
+			<field-defn id="tobacco" type="text" review="yes" caption="Tobacco use">
+				<options>
+				<option>never smoked</option>
+				<option>former smoker</option>
+				<option>cigarettes less than 1 ppd</option>
+				<option>cigarettes 1 ppd</option>
+				<option>cigarettes 2 ppd</option>
+				<option>cigarettes 3 ppd</option>
+				<option>cigarettes 4+ ppd</option>
+				<option>cigar</option>
+				<option>pipe</option>
+				</options>
+			</field-defn>
+			<field-defn id="alchohol" type="text" review="yes" caption="Alchohol use">
+				<options>
+				<option>never drank</option>
+				<option>former drinker</option>
+				<option>currently drinks</option>
+				</options>
+			</field-defn>
+			<field-defn id="drug" type="text" review="yes" caption="Drug use">
+				<options>
+				<option normal="yes">denies</option>
+				<option>marijuana</option>
+				<option>cocaine</option>
+				</options>
+			</field-defn>
+			<field-defn id="other" type="text" review="yes" caption="Other habits">
+				<options>
+				<option normal="yes">denies</option>
+				<option>marijuana</option>
+				<option>cocaine</option>
+				</options>
+			</field-defn>
+		</field-defn>
+
+		<field-defn id="chemical_weapons_exposure" caption="Chemical Weapons Exposure" condition-field="history.war_veteran" condition="control.value == 1">
+			<field-defn id="warVet" type="choose" caption="War Veteran">
+				<options>
+					<option>No</option>
+					<option>Gulf War</option>
+					<option>Vietnam War</option>
+					<option>Korean War</option>
+				</options>
+			</field-defn>
+			<field-defn id="chemical_weapons_exposure_treatment" type="choose" style="checkbox" caption="Treated for Chemical Weapons Exposure" condition-field="chemical_weapons_exposure.warVet" condition="control.value > 0">
+				<options>
+					<option>Yes</option>
+					<option>No</option>
+				</options>
+			</field-defn>
+			<field-defn id="float_test" type="float" review="yes" caption="Float" condition-field="chemical_weapons_exposure.warVet" condition="control.value > 0"/>
+			<field-defn id="percentage_test" type="percentage" review="yes" caption="Percentage"/>
+			<field-defn id="currency_test" type="currency" review="yes" caption="Currency"/>
+			<field-defn id="integer_test" type="integer" review="yes" caption="Integer"/>
+			<field-defn id="date_test" type="date" review="yes" caption="Date"/>
+			<field-defn id="time_test" type="time" review="yes" caption="Time"/>
+			<field-defn id="duration_test" type="group" review="yes" caption="Duration" condition-field="chemical_weapons_exposure.warVet" condition="control.value > 0">
+				<field-defn id="from_label" type="static" review="yes" caption="From"/>
+				<field-defn id="start" type="date" review="yes" caption="Start"/>
+				<field-defn id="to_label" type="static" review="yes" caption="To"/>
+				<field-defn id="end" type="date" review="yes" caption="End"/>
+			</field-defn>
+			<field-defn id="ammo_test" type="group" review="yes" caption="Ammunition">
+				<field-defn id="ammo_type" type="choose" caption="Ammo of Choice" style="list">
+					<options>
+					<option>tactical nukes</option>
+					<option>smartbombs</option>
+					<option>pipebombs</option>
+					<option>other</option>
+					</options>
+				</field-defn>
+				<field-defn id="ammo_other" type="text" review="yes" caption="Other" condition-field="ammo_test.ammo_type" condition="control.options.selectedIndex == 3"/>
+			</field-defn>
+			<field-defn id="frequency_test" type="text" review="yes" caption="Frequency">
+				<options>
+				<option>never</option>
+				<option>seldom</option>
+				<option>a few times per month</option>
+				<option>a few times per week</option>
+				<option>a few times every day</option>
+				<option>constantly</option>
+				</options>
+			</field-defn>
+			<field-defn id="additive_test" type="text" additive="yes" review="yes" caption="Additive Days of the Week">
+				<options>
+				<option>Monday</option>
+				<option>Tuesday</option>
+				<option>Wednesday</option>
+				<option>Thursday</option>
+				<option>Friday</option>
+				<option>Saturday</option>
+				<option>Sunday</option>
+				</options>
+			</field-defn>
+		</field-defn>
+
+		<field-defn id="allergies" caption="Allergies" type="grid">
+			<field-defn id="allergy" caption="Allergy" type="text">
+				<options>
+				<option>Accupril</option>
+				<option>Advil</option>
+				</options>
+			</field-defn>
+			<field-defn id="comments" caption="Comments" type="text"/>
+		</field-defn>
+
+		<field-defn id="directives" caption="Directives" type="grid">
+			<field-defn id="directive" caption="Directive" type="choose" style="list">
+				<options>
+				<option>Discussed - no decision made</option>
+				<option>Do not resucitate</option>
+				</options>
+			</field-defn>
+			<field-defn id="comments" caption="Comments" type="text"/>
+			<field-defn id="list_test" type="choose" caption="Type" style="list">
+				<options>
+				<option>First Class</option>
+				<option>Economy Class</option>
+				<option>Ham Class</option>
+				</options>
+			</field-defn>
+		</field-defn>
+
+		<field-defn id="review-of-systems" caption="Review of Systems">
+			<field-defn id="general" type="text" caption="General">
+				<options>
+				<option normal="yes">denies fevers, chills, sweats, anorexia, fatigue, malaise, weight loss</option>
+				<option>see HPI</option>
+				<option>fever</option>
+				<option>chills</option>
+				</options>
+			</field-defn>
+			<field-defn id="eyes" type="choose" caption="Eyes">
+				<options>
+				<option normal="yes">denies blurring, diplopia, irritation, discharge, vision loss, eye pain, photophobia</option>
+				<option>see HPI</option>
+				<option>vision loss</option>
+				</options>
+			</field-defn>
+		</field-defn>
+
+	</field-defns>
+
+	<templates id="physia">
+		<template id="visit" caption="Visit Note">
+			<field-defn idref="overview/chief-complaint"/>
+			<field-defn idref="overview/hpi"/>
+			<field-defn idref="habits"/>
+			<field-defn idref="allergies"/>
+			<field-defn idref="directives"/>
+			<field-defn idref="history"/>
+			<field-defn idref="chemical_weapons_exposure"/>
+			<field-defn idref="review-of-systems"/>
+		</template>
+	</templates>
+	</clinical-documentation>
+</mdl>

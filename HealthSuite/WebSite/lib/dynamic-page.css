@@ -1,0 +1,131 @@
+body 
+{ 
+	font-family: tahoma; 
+	font-size: 8pt; 
+}
+
+div.section
+{
+	font-family: expression(getSectionFontSize(this)); 
+	font-size: expression(getSectionFontSize(this)); 
+	margin-left: expression(getSectionMarginLeft(this));
+	font-weight: expression(getSectionFontWeight(this));
+	padding: 5;
+}
+
+div.section_head, div.section_head_expanded
+{
+	border-bottom: none;
+	margin-bottom: 0;
+	background: #EEEEEE;
+}
+
+div.section_head_expanded
+{
+	border-bottom: 1 dotted silver;
+	padding-bottom: 2;
+	margin-bottom: 5;
+	background: white;
+}
+
+div.section_body, div.section_body_expanded
+{
+	margin-left: 15;
+}
+
+div.section_body_expanded
+{
+	display: '';
+}
+
+div.section_field_area, div.section_field_area_conditional, div.section_field_area_conditional_expanded
+{
+	padding-left: 5;
+	font-family: tahoma; 
+	font-size: 8pt; 
+	font-weight: normal;
+}
+
+div.section_field_area_conditional
+{
+	display: none;
+}
+
+div.section_field_area_conditional_expanded
+{
+}
+
+span.section_field_label
+{
+	width: 100;
+	text-align: right;
+}
+
+span.section_field_control
+{
+}
+
+span.section_field_static
+{
+	font-family: tahoma; 
+	font-size: 8pt; 
+}
+
+span.options_choice
+{
+	font-family: tahoma;
+	font-size: 8pt;
+	text-decoration: underline;
+	color: blue;
+	cursor: hand;
+}
+
+span.options_choice_normal
+{
+	font-family: tahoma;
+	font-size: 8pt;
+	text-decoration: underline;
+	color: red;
+	cursor: hand;
+	font-weight: bold; 	
+}
+
+table.section_field_grid
+{
+}
+
+td.section_field_grid_head, td.section_field_grid_add, td.section_field_grid_data
+{
+	font-family: tahoma;
+	font-size: 8pt;
+}
+
+td.section_field_grid_add
+{
+	background: #EEEEEE;
+	padding-left: 5;
+	padding-right: 5;
+	border: 1 solid #999999;
+}
+
+td.section_field_grid_data
+{
+}
+
+input
+{
+	font-family: tahoma; 
+	font-size: 8pt; 
+}
+
+textarea
+{
+	font-family: tahoma; 
+	font-size: 8pt; 
+}
+
+select
+{
+	font-family: tahoma; 
+	font-size: 8pt; 
+}
