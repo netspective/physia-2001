@@ -13,16 +13,24 @@
 		<tested-date>12/15/2000 ***Tentative***</tested-date>
 		<release-date>TBD</release-date>
 		<overview>
-			Build 18 is targeted at two primary items.  1) Clinical Elements  2) Corrections and Fixes to the financial pieces of the PPMS production product.<br/>
-			Build 19 is a companion build to 18 with simular targets and timing.  Build 19 is being handled by Prosys.
+			Build 18 is targeted at two primary items.
+			<ol>
+			<li>Clinical Elements</li>
+			<li>Corrections and Fixes to the financial pieces of the PPMS production product.</li>
+			</ol>
+			<br/>
+			Build 19 is a companion build to 18 with simular targets and timing.  <br/>
+			Build 19 is being handled by Prosys.
 		</overview>	
 		<description>
-			<ul>1) Clinical elements
+			1) Clinical elements
+			<ul>
 				<li>Clinical tools</li>
 				<li>Clinical notes (as much as can be done)</li>
 				<li>Mobile (initial pieces)</li>
 			</ul>
-			<ul>2) Remedial repairs
+			2) Remedial repairs
+			<ul>
 				<li>Reporting errors</li>
 				<li>Functions which abnormally terminate</li>
 				<li>Errors in calculations</li>
