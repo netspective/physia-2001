@@ -53,11 +53,12 @@ sub execute
 	my $invoiceId = $page->param('invoice_id');
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $invoiceStatus = $invoice->{invoice_status};
+	my $invoiceFlags = $invoice->{flags};
 
 	#Delete auto writeoffs only if the claim was just submitted then placed on hold. Do not want to delete for other statuses passed submitted 
 	#because at that point resubmission or submission to next payer may take place (so you don't want to change writeoff data).
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
-	if($invoice->{flags} & $attrDataFlag && $invoice->{invoice_status} == App::Universal::INVOICESTATUS_SUBMITTED)
+	if($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED)
 	{
 		my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 		foreach my $item (@{$items})
@@ -70,6 +71,7 @@ sub execute
 		'Invoice', 'update',
 		invoice_id => $invoiceId,
 		invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
+		flags => $invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED ? $invoiceFlags &~ App::Universal::INVOICEFLAG_DATASTOREATTR : $invoiceFlags,
 		_debug => 0
 	);
 

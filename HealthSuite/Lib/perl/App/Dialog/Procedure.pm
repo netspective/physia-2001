@@ -216,61 +216,58 @@ sub execAction_submit
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $invoice->{main_transaction});
 
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $invoice->{flags};
 	my $claimType = $invoice->{invoice_subtype};
 	my $invoiceType = $invoice->{invoice_type};
-	#unless($invoiceFlags & $attrDataFlag)
-	#{
-		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
-		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAddresses', $invoiceId);
 
-		updateParentEvent($page, $command, $invoiceId, $invoice, $mainTransData);
-		storeFacilityInfo($page, $command, $invoiceId, $invoice, $mainTransData);
-		storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
-		storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
-		storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
-		storeServiceProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
-		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
+	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAddresses', $invoiceId);
 
-		if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
-		{
-			storeInsuranceInfo($page, $command, $invoiceId, $invoice, $mainTransData);
-		}
+	updateParentEvent($page, $command, $invoiceId, $invoice, $mainTransData);
+	storeFacilityInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+	storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
+	storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+	storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
+	storeServiceProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+	storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 
-		if($claimType == App::Universal::CLAIMTYPE_HMO)
-		{
-			hmoCapWriteoff($page, $command, $invoiceId, $invoice, $mainTransData);
-		}
+	if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
+	{
+		storeInsuranceInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+	}
 
-		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);
+	if($claimType == App::Universal::CLAIMTYPE_HMO)
+	{
+		hmoCapWriteoff($page, $command, $invoiceId, $invoice, $mainTransData);
+	}
+
+	createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);
 
 
-		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
+	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-		unless($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
-		{
-			my $invStat = $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
-			$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
-			$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId,
-				invoice_status => $invStat,
-				submitter_id => $page->session('user_id') || undef,
-				submit_date => $todaysDate || undef,
-				flags => $invoiceFlags | $attrDataFlag,
-				_debug => 0
-			);
+	unless($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
+	{
+		my $invStat = $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
+		$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
+		$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $invoiceId,
+			invoice_status => $invStat,
+			submitter_id => $page->session('user_id') || undef,
+			submit_date => $todaysDate || undef,
+			flags => $invoiceFlags | App::Universal::INVOICEFLAG_DATASTOREATTR,
+			_debug => 0
+		);
 
-			# create invoice history item for invoice status
-			my $action = $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted';
-			$action = $printFlag ? 'HCFA Printed' : $action;
-			addHistoryItem($page, $invoiceId,
-				value_text => $action,
-				value_date => $todaysDate,
-			);
-		}
-	#}
+		# create invoice history item for invoice status
+		my $action = $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted';
+		$action = $printFlag ? 'HCFA Printed' : $action;
+		addHistoryItem($page, $invoiceId,
+			value_text => $action,
+			value_date => $todaysDate,
+		);
+	}
 
 	return $invoiceId;
 }

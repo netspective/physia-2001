@@ -323,9 +323,7 @@ sub makeStateChanges
 	}
 
 	my $invoiceId = $page->param('invoice_id');
-	#my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	#my $invoiceFlags = $invoiceInfo->{flags};
 
 	my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
 	unless($submitOrder->{value_int} == 0 || $invoiceInfo->{invoice_status} > App::Universal::INVOICESTATUS_SUBMITTED)
@@ -849,10 +847,9 @@ sub handlePayers
 	my ($self, $page, $command, $flags) = @_;
 	my $sessOrgIntId = $page->session('org_internal_id');
 
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
 	my $currStatus = $page->field('current_status');
-	if($command eq 'update' && ($invoiceFlags & $attrDataFlag))
+	if($command eq 'update' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR))
 	{
 		$command = 'add';
 		my $oldInvoiceId = $page->field('old_invoice_id');
@@ -1164,7 +1161,6 @@ sub handleInvoiceAttrs
 	my $boolValueType = App::Universal::ATTRTYPE_BOOLEAN;
 	my $currencyValueType = App::Universal::ATTRTYPE_CURRENCY;
 	my $durationValueType = App::Universal::ATTRTYPE_DURATION;
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 
 	## Then, create invoice attribute indicating that this is the first (primary) claim
 	$page->schemaAction(
@@ -1434,7 +1430,7 @@ sub handleInvoiceAttrs
 
 
 	my $invoiceFlags = $page->field('invoice_flags');
-	if($invoiceFlags & $attrDataFlag)
+	if($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)
 	{
 		my $oldInvoiceId = $page->field('old_invoice_id');
 		addHistoryItem($page, $invoiceId,
@@ -1735,7 +1731,6 @@ sub handleBillingInfo
 
 
 	#redirect to next function according to copay due
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
 	my $copayAmt = $page->field('copay_amt');
 	my $copayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
@@ -1775,7 +1770,7 @@ sub handleBillingInfo
 			$page->redirect("/invoice/$invoiceId/summary");
 		}
 	}
-	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
+	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
 	{
 		if ($page->param('encounterDialog') eq 'checkout')
 		{
@@ -1847,9 +1842,8 @@ sub billCopay
 	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
 	$page->param('invoice_id', $invoiceId) if $command eq 'add';
 
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
-	if( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
+	if( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
 	{
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
