@@ -70,7 +70,7 @@ use constant CONTENT_HTML => qq{
 sub init
 {
 	my $self = shift;
-	$self->{layoutDefn}->{frame}->{heading} = 'Create a new record';
+	$self->{layoutDefn}->{frame}->{heading} = 'Add a new record';
 }
 
 sub getHtml
@@ -102,7 +102,7 @@ use constant CONTENT_HTML => qq{
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION VALUE="#">View Profile</OPTION>
 					<OPTION VALUE="#">View Account</OPTION>
-					<OPTION VALUE="#">Create Prescription</OPTION>
+					<OPTION VALUE="#">Add Prescription</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
@@ -122,7 +122,7 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION VALUE="#">View Profile</OPTION>
-					<OPTION VALUE="#">Create Fee Schedule</OPTION>
+					<OPTION VALUE="#">Add Fee Schedule</OPTION>
 				</SELECT>
 			</TD>
 		</TR>

@@ -41,7 +41,7 @@ use vars qw(@ISA @ITEM_TYPES @EXPORT
 %PHYSICIAN_URLS = (
 	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
 	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
-	'Create Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Create Schedule Template'},
+	'Add Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Add Schedule Template'},
 );
 
 %ORG_URLS = (
@@ -80,12 +80,12 @@ sub initialize
 				<a href='$arlPrefix/dlg-add-appointment'>Add Walk-In</a> |
 				<a href='$arlPrefix/dlg-add-appointment'>Add Appointment</a> |
 				<a href='$arlPrefix/dlg-add-patient/'>Add Patient</a> |
-				
+
 				&nbsp
 				<SELECT onChange='location.href=this.options[selectedIndex].value'>
 					<option value='#'>Select Action</option>
-					<option value='$arlPrefix/dlg-add-ins-product/'>Create Insurance Product</option>
-					<option value='$arlPrefix/dlg-add-ins-plan/'>Create Insurance Plan</option>
+					<option value='$arlPrefix/dlg-add-ins-product/'>Add Insurance Product</option>
+					<option value='$arlPrefix/dlg-add-ins-plan/'>Add Insurance Plan</option>
 					<option value='$arlPrefix/dlg-add-assign/'>Reassign Physician</option>
 					<option value='#'>Print Encounter Form</option>
 					<option value='#'>Print Face Sheet</option>
@@ -93,7 +93,7 @@ sub initialize
 			}
 		},
 	];
-	
+
 	for my $itemType (@ITEM_TYPES)
 	{
 		my $name = $itemType . 'OnSelect';
@@ -102,7 +102,7 @@ sub initialize
 			my $itemName = 'Worklist/' . "\u$itemType" . '/OnSelect';
 			my $preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 				'selSchedulePreferences', $page->session('user_id'), $itemName);
-			
+
 			my $defaultVar = $itemType. 'Default';
 			$page->session($name, $preference->{resource_id} || eval "\$$defaultVar");
 			#$page->addDebugStmt("Read Preference for $name", $page->session($name));
@@ -121,16 +121,16 @@ sub getHtml
 sub getComponentHtml
 {
 	my ($self, $page) = @_;
-	
+
 	my $selectedDate = $page->param('_seldate') || 'today';
 	$selectedDate = 'today' unless ParseDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
 	my $facility_id = $page->session('org_id');
 	my $user_id = $page->session('user_id');
-	
+
 	my ($time1, $time2);
-	
+
 	if ($page->session('showTimeSelect'))
 	{
 		$time1 = $page->session('time1') || '12:00am';
@@ -146,7 +146,7 @@ sub getComponentHtml
 	my @end_Date   = Add_Delta_Days (@start_Date, 1);
 	my $startDate = sprintf("%02d/%02d/%04d", $start_Date[1],$start_Date[2],$start_Date[0]);
 	my $endDate   = sprintf("%02d/%02d/%04d", $end_Date[1],$end_Date[2],$end_Date[0]);
-	
+
 	my $startTime = $startDate . " $time1";
 	my $endTime   = $startDate . " $time2";
 
@@ -155,9 +155,9 @@ sub getComponentHtml
 	{
 		if ($page->session('showTimeSelect') == 0)
 		{
-			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 				'sel_events_worklist_today', $time1, $time2, $user_id, $user_id);
-		} else 
+		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 				'sel_events_worklist_today_byTime', $startTime, $endTime, $user_id, $user_id);
@@ -195,10 +195,10 @@ sub getComponentHtml
 			$visitMinutes = $checkoutMinutes - $checkinMinutes;
 			$visitMinutes = 'early' if $visitMinutes < 0;
 		}
-		
-		my $deadBeatBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page, 
+
+		my $deadBeatBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
 			STMTMGRFLAG_NONE, 'sel_deadBeatBalance', $_->{patient_id});
-		
+
 		my $copay;
 		$copay = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page,
 			STMTMGRFLAG_NONE, 'sel_copayInfo', $_->{invoice_id}) if $_->{invoice_id};
@@ -211,12 +211,12 @@ sub getComponentHtml
 		$orgHref =~ s/itemValue/$_->{facility}/;
 		my $apptHref = $APPT_URLS{$page->session('apptOnSelect')}->{arl};
 		$apptHref =~ s/itemValue/$_->{event_id}/;
-		
+
 		my $patientTitle = $PATIENT_URLS{$page->session('patientOnSelect')}->{title};
 		my $physicianTitle = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{title};
 		my $orgTitle = $ORG_URLS{$page->session('orgOnSelect')}->{title};
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
-		
+
 		my @rowData = (
 			qq{
 				<A HREF='/worklist/patientflow/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'><IMG SRC='/resources/icons/square-lgray-hat-sm.gif' BORDER=0></A>
@@ -278,16 +278,16 @@ sub getComponentHtml
 				<a href='/invoice/$_->{invoice_id}' TITLE='View Claim $_->{invoice_id} Summary' class=today><b>$_->{invoice_id}</b></a> <br>
 				<strong style="color:#999999">($_->{invoice_status})</strong>
 			}
-				#: qq{<a href='/create/invoice_id/$_->{patient_id}' class=today>Create</a>},
+				#: qq{<a href='/create/invoice_id/$_->{patient_id}' class=today>Add</a>},
 				: undef,
-			
+
 			$_->{invoice_id} ? $copay->{balance} : undef,
 
 			$deadBeatBalance,
 			$_->{invoice_id},
 			$_->{patient_id},
 			$copay->{item_id},
-			
+
 			$_->{invoice_id} ? qq{
 				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">
 					Print</a>
@@ -299,10 +299,10 @@ sub getComponentHtml
 		push(@data, \@rowData);
 	}
 
-	$html .= createHtmlFromData($page, 0, \@data, 
+	$html .= createHtmlFromData($page, 0, \@data,
 		$App::Statements::Component::Scheduling::STMTRPTDEFN_WORKLIST);
 
-	$html .= "<i style='color=red'>No appointment data found.  Please setup Resource and Facility selections.</i> <P>" 
+	$html .= "<i style='color=red'>No appointment data found.  Please setup Resource and Facility selections.</i> <P>"
 		if (scalar @{$appts} < 1);
 
 	return $html;
