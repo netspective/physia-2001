@@ -3860,7 +3860,74 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId], 'panelTransp'); },
 },
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'person.bloodType' => {
+	sqlStmt => qq{
+			SELECT
+					value_type,
+					item_id,
+					parent_id,
+					item_name,
+					DECODE(value_text, '', 'Unknown', (
+																	SELECT b.caption
+																	FROM  blood_type b
+																	WHERE b.id = p.value_text
+																)
+					) AS caption
+				FROM  Person_Attribute p
+			WHERE  	parent_id = ?
+			AND item_name = 'BloodType'
 
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+
+		columnDefn => [
+					{ dataFmt => 'Blood Type: #4#' },
+		],
+
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#homeArl#',
+		frame => {
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Blood Type' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Blood Type' },
+		banner => {
+			actionRows =>
+			[
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodType', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodType', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodType', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodType', [$personId], 'panelTransp'); },
+},
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------Doc Short Term Stuff
 #----------------------------------------------------------------------------------------------------------------------
 
