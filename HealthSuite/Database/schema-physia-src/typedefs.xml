@@ -579,6 +579,12 @@
 				<col name="remarks">Response to an Alert</col>
 			</row>
 			<row>
+				<col name="id">8500</col>
+				<col name="caption">Account Notes</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Collector's notes associated with an account</col>
+			</row>
+			<row>
 				<col name="id">9000</col>
 				<col name="caption">Plan</col>
 				<col name="group_name">Action</col>
