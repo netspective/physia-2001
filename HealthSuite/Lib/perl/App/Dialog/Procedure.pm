@@ -219,6 +219,7 @@ sub execAction_submit
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $invoice->{flags};
 	my $claimType = $invoice->{invoice_subtype};
+	my $invoiceType = $invoice->{invoice_type};
 	unless($invoiceFlags & $attrDataFlag)
 	{
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
@@ -241,34 +242,35 @@ sub execAction_submit
 		}
 
 		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);		
-	}
-
-	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
-
-	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-	if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
-	{
-		$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId,
-				invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
-				submitter_id => $page->session('user_id') || undef,
-				submit_date => $todaysDate || undef,
-				flags => $invoiceFlags | $attrDataFlag,
-				_debug => 0
-		);
 
 
-		## create invoice attribute for history of invoice status
-		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId,
-				item_name => 'Invoice/History/Item',
-				value_type => App::Universal::ATTRTYPE_HISTORY,
-				value_text => 'Submitted',
-				value_date => $todaysDate || undef,
-				_debug => 0
-		);
+		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
+
+		## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
+		if($invoiceType != App::Universal::INVOICETYPE_SERVICE && $claimType != App::Universal::CLAIMTYPE_SELFPAY)
+		{
+			$page->schemaAction(
+					'Invoice', 'update',
+					invoice_id => $invoiceId,
+					invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
+					submitter_id => $page->session('user_id') || undef,
+					submit_date => $todaysDate || undef,
+					flags => $invoiceFlags | $attrDataFlag,
+					_debug => 0
+			);
+
+
+			## create invoice attribute for history of invoice status
+			$page->schemaAction(
+					'Invoice_Attribute', 'add',
+					parent_id => $invoiceId,
+					item_name => 'Invoice/History/Item',
+					value_type => App::Universal::ATTRTYPE_HISTORY,
+					value_text => 'Submitted',
+					value_date => $todaysDate || undef,
+					_debug => 0
+			);
+		}
 	}
 }
 
