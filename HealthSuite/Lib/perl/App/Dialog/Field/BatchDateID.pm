@@ -61,7 +61,7 @@ sub isValid
 		foreach my $invoiceId (@list)
 		{
 			$orgInternalId = $STMTMGR_INVOICE->getSingleValue($page,STMTMGRFLAG_NONE,'selServiceOrgByInvoiceId',$invoiceId);
-			my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
+			my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
 			next unless $item->{value_date};
 			my $closeDate = Date_SetTime ($item->{value_date});
 			$self->invalidate($page, "Close Date is <b>$item->{value_date}</b> for Invoice $invoiceId. Batch Date must be greater than Close Date ") if ($closeDate >=$checkDate);
@@ -69,7 +69,7 @@ sub isValid
 		return;
 	}
 	
-	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
+	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
 	return unless $item->{value_date};
 	my $checkDate = Date_SetTime ($page->field('batch_date'));
 	my $closeDate = Date_SetTime ($item->{value_date});
