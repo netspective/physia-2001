@@ -37,7 +37,7 @@ sub initialize
 			{
 				scope =>'person',
 				key => "#field.person_id#",
-				data => "Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> (Appt Time: #field.start_time#)"
+				data => "Check-out <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> (Check-out Time: #field.checkout_stamp#)"
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
