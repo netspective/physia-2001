@@ -696,9 +696,9 @@ sub isValid
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('client_id');
 
-	if($page->param('_f_item_1_description') eq '')
+	if($page->param('_f_item_1_code') eq '')
 	{
-		$self->invalidate($page, "[<B>P1</B>] Item description cannot be blank.");
+		$self->invalidate($page, "[<B>P1</B>] Item code cannot be blank.");
 	}
 	if($page->param('_f_item_1_unit_cost') eq '')
 	{
@@ -714,10 +714,10 @@ sub isValid
 	for(my $line = 2; $line <= $lineCount; $line++)
 	{
 		my $quantity = $page->param("_f_item_$line\_quantity");
-		my $description = $page->param("_f_item_$line\_description");
+		my $code = $page->param("_f_item_$line\_code");
 		my $unitCost = $page->param("_f_item_$line\_unit_cost");
 
-		if($description ne '')
+		if($code ne '')
 		{
 			if($quantity < 1)
 			{
@@ -734,9 +734,9 @@ sub isValid
 			{
 				$self->invalidate($page, "[<B>P$line</B>] Quantity must be 1 or more");
 			}
-			if($description eq '')
+			if($code eq '')
 			{
-				$self->invalidate($page, "[<B>P$line</B>] Item description cannot be blank");
+				$self->invalidate($page, "[<B>P$line</B>] Item code cannot be blank");
 			}
 		}	
 	}
@@ -765,7 +765,9 @@ sub getHtml
 				$removeChkbox
 				<TD><INPUT $readOnly NAME='_f_item_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT $readOnly NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_code' SIZE=8 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_code") ]}'>
+					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_item_$line\_code, '/lookup/miscprocedure', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR>
+				</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly  NAME='_f_item_$line\_unit_cost' TYPE='text' size=8 VALUE='@{[ $page->param("_f_item_$line\_unit_cost")  ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -774,7 +776,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=2 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
-				<TD COLSPAN=5><INPUT $readOnly NAME='_f_item_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
+				<TD COLSPAN=5><INPUT $readOnly NAME='_f_item_$line\_comments' TYPE='text' size=40 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
 			</TR>
 		} if $allowComments;
 	}
@@ -787,9 +789,10 @@ sub getHtml
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$lineCount"/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						@{[ $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '' ]}
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Qty</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD ALIGN=CENTER><FONT $textFontAttrs>Item Description</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Item Code</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Cost/Unit</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -866,7 +869,7 @@ sub isValid
 		next if $itemPayment eq '';
 
 		#no validation needed for overpayments - overpayments are allowed
-		if($itemPayment > $totalPayRcvd)
+		if($itemPayment > $totalPayRcvd && $totalPayRcvd >= 0)
 		{
 			my $amtDiff = $itemPayment - $totalPayRcvd;
 			$paidBy eq 'insurance' ? 
@@ -879,41 +882,44 @@ sub isValid
 
 
 	#validation  - no validation needed for overpayments - overpayments are allowed
-	if($totalAmtApplied > $totalPayRcvd)
-	{
-		my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
-		$paidBy eq 'insurance' ? 
-			$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.")
-			: $self->invalidate($page, "The total amount applied exceeds the total amount entered by \$$amtExceeded. Please reconcile.");
-	}
-	elsif($totalAmtApplied < $totalPayRcvd)
-	{
-		my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtApplied;
-		if($totalAmtApplied < $totalInvoiceBalance)
+	#if($totalPayRcvd >= 0)
+	#{
+		if($totalAmtApplied > $totalPayRcvd)
 		{
-			my $balanceRemain = $totalInvoiceBalance - $totalAmtApplied;
-			$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+			my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
+			$paidBy eq 'insurance' ? 
+				$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.")
+				: $self->invalidate($page, "The total amount applied exceeds the total amount entered by \$$amtExceeded. Please reconcile.");
 		}
-		else
+		elsif($totalAmtApplied < $totalPayRcvd)
 		{
-			$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+			my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtApplied;
+			if($totalAmtApplied < $totalInvoiceBalance)
+			{
+				my $balanceRemain = $totalInvoiceBalance - $totalAmtApplied;
+				$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+			}
+			else
+			{
+				$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+			}
 		}
-	}
-	elsif($totalAmtApplied > $totalPatientBalance && ! $creditWarned)
-	{
-		my $credit = $totalPatientBalance - $totalAmtApplied;
-		if($totalPatientBalance < 0)
+		elsif($totalAmtApplied > $totalPatientBalance && ! $creditWarned)
 		{
-			$self->invalidate($page, "WARNING: This patient currently has a credit of \$$totalPatientBalance on their account balance. 
-								This payment will increase the credit to \$$credit. Click 'OK' to continue.");
+			my $credit = $totalPatientBalance - $totalAmtApplied;
+			if($totalPatientBalance < 0)
+			{
+				$self->invalidate($page, "WARNING: This patient currently has a credit of \$$totalPatientBalance on their account balance. 
+									This payment will increase the credit to \$$credit. Click 'OK' to continue.");
+			}
+			else
+			{
+				$self->invalidate($page, "WARNING: This payment will put a credit of \$$credit on this patient's account balance. Click 'OK' to continue.");
+			}
+
+			$page->field('credit_warning_flag', 1);
 		}
-		else
-		{
-			$self->invalidate($page, "WARNING: This payment will put a credit of \$$credit on this patient's account balance. Click 'OK' to continue.");
-		}
-		
-		$page->field('credit_warning_flag', 1);
-	}
+	#}
 
 	return $page->haveValidationErrors() ? 0 : 1;
 }
