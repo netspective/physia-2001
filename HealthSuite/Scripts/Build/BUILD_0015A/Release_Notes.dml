@@ -27,6 +27,16 @@
 			    of the list of reasons for cancelling the appointment
 		</deliverable>		
 		
+		<deliverable id="1139">
+			Report : Added report that determines Appts that were entered on a particular date.
+		</deliverable>		
+		
+		<deliverable id="1143">
+			Report : Added  Facility/Site Constraint for Claim Status Report and 5 lastest EDI notes to Claim Status report
+		</deliverable>		
+		
+		
+		
 	</deliverables>
 </release-notes>
 
