@@ -797,7 +797,7 @@ sub importRegistry
 						parent_id => $personId || undef,
 						item_name => 'Guarantor' || undef,
 						value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
-						value_text => $registry->{responsible-person} || undef,
+						value_text => $registry->{'responsible-person'} || undef,
 						value_int => 1
 					);
 
