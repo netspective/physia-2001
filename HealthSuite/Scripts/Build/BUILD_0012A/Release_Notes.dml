@@ -19,5 +19,10 @@
 		<deliverable id="1094">
 			Added the new view for adjustments to the resource directory to fix security problem.
 		</deliverable>
+
+		<deliverable id="995">
+			Fixed problem in ins sequence validation where it wouldn't allow more than one inactive 
+			coverage record.
+		</deliverable>
 	</deliverables>
 </release-notes>
