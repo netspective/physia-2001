@@ -71,10 +71,16 @@ sub execute
 	my $day2 = UnixDate('12/31/'. $thisYear, '%m/%d/%Y');
 	
 	$self->param('eff_begin_date', UnixDate($day1, '%m/%d/%Y'))
-		unless ParseDate($self->param('eff_begin_date'));
-
+		if ( ! $self->param('eff_begin_date')
+			|| $self->param('eff_begin_date') !~ /\d\d\/\d\d\/\d\d\d\d/
+			|| ! ParseDate($self->param('eff_begin_date'))
+		);
+		
 	$self->param('eff_end_date', UnixDate($day2, '%m/%d/%Y'))
-		unless ParseDate($self->param('eff_end_date'));
+		if ( ! $self->param('eff_end_date')
+			|| $self->param('eff_end_date') !~ /\d\d\/\d\d\/\d\d\d\d/
+			|| ! ParseDate($self->param('eff_end_date'))
+		);
 
 	$expression =~ s/\*/%/g;
 	$expression = $self->findDefaultState() if $expression =~ /^\%$/ || ! $expression;
