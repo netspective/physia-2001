@@ -141,7 +141,7 @@ sub execute
 			trans_id => $transId || undef,
 			trans_owner_type => 0,
 			trans_owner_id => $page->param('person_id') || undef,
-			trans_type => App::Universal::TRANSTYPE_ALERTMEDICATION,
+			trans_type => App::Universal::TRANSTYPE_ALERTPATIENT,
 			trans_subtype => 'Medium' || undef,
 			caption => 'Preventive Care' || undef,
 			detail => $page->field('attr_name') || undef,
