@@ -228,6 +228,8 @@ sub validateDiags
 sub validateProcs
 {
 	my ($page, $flags, $errorRef, %params) = @_;
+	return if $flags & INTELLICODEFLAG_SKIPWARNING;
+	
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	for (@$procsRef)
@@ -543,7 +545,7 @@ sub isLabProc
 sub getItemCost
 {
 	my ($page, $cpt, $modifier, $fsRef, $flags) = @_;
-	
+
 	$flags |= INTELLICODEFLAG_NON_FACILITY_PRICING 
 		unless $flags & INTELLICODEFLAG_FACILITY_PRICING;
 
@@ -552,29 +554,50 @@ sub getItemCost
 	for my $i (0..(@$fsRef -1))
 	{
 		my $fs = $fsRef->[$i];
-		
-		my $entries;
-		if ($modifier)
-		{
-			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_catalogEntry_by_code_modifier_catalog', $cpt, $modifier, $fs
-			);
-		}
-		else
-		{
-			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_catalogEntry_by_code_catalog', $cpt, $fs);
-		}
-
-		for my $entry (@{$entries})
-		{
-			push(@buffer, [$fs, sprintf("%.2f", $entry->{unit_cost}) ]);
-		}
+		getItemPrice($page, $cpt, $modifier, \@buffer, $fs);
 	}
-	
+
 	calcRVRBS($page, $cpt, $modifier, $fsRef, \@buffer, $flags) unless scalar(@buffer);
+	defaultToFFS($page, $cpt, $modifier, \@buffer) unless scalar(@buffer);
 		
 	return \@buffer;
+}
+
+sub getItemPrice
+{
+	my ($page, $cpt, $modifier, $bufferRef, $fs) = @_;
+	
+	my $orgId = $page->session('org_id');
+
+	my $entry;
+	if ($modifier)
+	{
+		$entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_catalogEntry_by_code_modifier_catalog', $cpt, $modifier, $fs
+		);
+	}
+	else
+	{
+		$entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_catalogEntry_by_code_catalog', $cpt, $fs);
+	}
+
+	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}) ])
+		if exists $entry->{unit_cost};
+}
+
+sub defaultToFFS
+{
+	my ($page, $cpt, $modifier, $bufferRef) = @_;
+	
+	my $orgId = $page->session('org_id');
+	my $ffs = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_catalog_by_id_orgId', 'FFS', $orgId);
+		
+	if (my $fs = $ffs->{internal_catalog_id})
+	{
+		getItemPrice($page, $cpt, $modifier, $bufferRef, $fs);		
+	}
 }
 
 sub calcRVRBS

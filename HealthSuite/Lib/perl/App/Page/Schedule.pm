@@ -30,14 +30,15 @@ use base 'App::Page';
 sub handleARL
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
-
-	$self->param('_pm_view', $pathItems->[0] || 'apptsheet');
+	#return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
+	
 	$self->param('_dialogreturnurl', '/schedule');
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
 	{
+		$self->param('_pm_view', $pathItems->[0] || 'apptsheet');
+
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
 		}

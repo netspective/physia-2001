@@ -58,55 +58,63 @@ sub new
 			'/schedule-p/handleWaitingList/' + document.dialog._f_event_id.value)">View Details</a>
 	};
 
-	my $physField = new App::Dialog::Field::Person::ID(caption => 'Physician',
+	my $physField = new App::Dialog::Field::Person::ID(caption => 'Physician ID',
 		name => 'resource_id',
 		types => ['Physician'],
 		hints => 'Physician ID or select a Roving Physician',
 		options => FLDFLAG_REQUIRED,
-		size => 32);
+		size => 32,
+		maxLength => 32,
+	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
 	$self->addContent(
 		# the following hidden fields are needed in the "execute" phase
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Patient',
-			name => 'attendee_id', types => ['Patient'],
-			options => FLDFLAG_REQUIRED),
-
+		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
+			name => 'attendee_id', 
+			types => ['Patient'],
+			size => 32,
+			useShortForm => 1,
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(caption => 'Patient Type',
 			type => 'enum',
 			enum => 'appt_attendee_type',
 			name => 'attendee_type',
-			options => FLDFLAG_REQUIRED),
-
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(caption => 'Reason for Visit',
-			name => 'subject', options => FLDFLAG_REQUIRED),
-
+			name => 'subject',
+			size => 32,
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(caption => 'Symptoms',
-			type => 'memo', name => 'remarks'),
-
-		new CGI::Dialog::Field::TableColumn(caption => 'Event Type',
+			type => 'memo', name => 'remarks'
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Appointment Type',
 			name => 'event_type',
 			schema => $schema,
-			column => 'Event.event_type', typeRange => '100..199'),
-
+			column => 'Event.event_type', typeRange => '100..199'
+		),
 		new CGI::Dialog::Field(caption => 'Appointment Time',
 			name => 'start_stamp',
 			hints => $findAvailSlotHint,
-			options => FLDFLAG_REQUIRED),
-
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(caption => 'Check for Conflicts',
 			name => 'conflict_check',
-			type => 'bool', style => 'check', value => 1),
-
+			type => 'bool', style => 'check', value => 1
+		),
 		new CGI::Dialog::Field(caption => 'Duration',
 			name => 'duration',
 			fKeyStmtMgr => $STMTMGR_SCHEDULING,
 			fKeyStmt => 'selApptDuration',
 			fKeyDisplayCol => 1,
 			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED),
+			options => FLDFLAG_REQUIRED
+		),
 
 		$physField,
 
@@ -119,28 +127,19 @@ sub new
 			fKeyStmtMgr => $STMTMGR_SCHEDULING,
 			fKeyStmt => 'selRovingPhysicianTypes',
 		),
-
 		new App::Dialog::Field::OrgType(
 			caption => 'Facility',
-			name => 'facility_id'),
-
-		#new CGI::Dialog::Field(caption => 'Facility',
-		#	name => 'facility_id',
-		#	fKeyStmtMgr => $STMTMGR_SCHEDULING,
-		#	fKeyStmt => 'selFacilityList',
-		#	fKeyDisplayCol => 1,
-		#	fKeyValueCol => 0,
-		#	options => FLDFLAG_REQUIRED),
-
+			name => 'facility_id'
+		),
 		new CGI::Dialog::Field(caption => '$Command Remarks',
-		 	type => 'memo', name => 'discard_remarks'),
-
+		 	type => 'memo', name => 'discard_remarks'
+		),
 		new CGI::Dialog::Field(caption => "Rescheduled By",
 		 	type => 'select',
 			selOptions => 'Patient;Office',
 			name => 'rescheduled',
-			options => FLDFLAG_REQUIRED),
-
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(
 			name => 'waiting_patients',
 			caption => 'Waiting List',
@@ -173,7 +172,6 @@ sub setPhysicianFields
 	my $physicianData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPrimaryPhysician', $orgId, $personId);
 	my $physicianId = $physicianData->{phy};
 	$page->field('resource_id', $physicianId) unless $page->field('resource_id');
-
 }
 
 ###############################

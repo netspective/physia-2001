@@ -92,12 +92,10 @@ sub isValid
 	my @primaryInsFeeScheds = ();
 	foreach my $fs (@{$getFeeSchedsForInsur})
 	{
-		#$page->addDebugStmt($fs->{value_int});
-		#$page->addDebugStmt($fs->{value_text});
 		push(@primaryInsFeeScheds, $fs->{value_text});
 	}
 	$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
-
+	
 	my @insFeeSchedules = $page->param('_f_proc_insurance_catalogs');
 
 	# ------------------------------------------------------------------------------------------------------------------------
@@ -128,8 +126,6 @@ sub isValid
 		$units = $page->param("_f_proc_$line\_units");
 		$charges = $page->param("_f_proc_$line\_charges");
 		$emergency = $page->param("_f_proc_$line\_emg");
-
-		#$page->addDebugStmt("Detail dates: $servicedatebegin, $servicedateend, $servicetype, $procedure, emg is $emergency, charges are $charges");
 
 		next if $servicedatebegin eq 'From' && $servicedateend eq 'To';
 		next if $servicedatebegin eq '' && $servicedateend eq '';
@@ -230,7 +226,8 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
 
-		if( $charges eq '' && ($defaultFeeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
+		#if( $charges eq '' && ($defaultFeeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
+		unless ($charges)
 		{
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 
@@ -257,10 +254,11 @@ sub isValid
 			}
 			$page->param("_f_proc_active_catalogs", @storeFeeSchedules);
 		}
-		elsif($charges eq '' && ($defaultFeeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
-		{
-			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
-		}
+
+		#elsif($charges eq '' && ($defaultFeeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
+		#{
+		#	$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
+		#}
 
 		@errors = App::IntelliCode::validateCodes
 		(

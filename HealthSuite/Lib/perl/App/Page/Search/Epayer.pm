@@ -32,18 +32,12 @@ sub getForm
 		
 		<input name="search_expression" value="@{[$self->param('search_expression')]}">
 
-		<select name="payer_source" style="color: darkblue">
-			<option value=2>Perse</option>
-			<option value=1>Envoy</option>
-		</select>
-		
 		<input type=submit name="execute" value="Go">
 		</NOBR>
 		
 		</CENTER>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 'name' ]}');
-			setSelectedValue(document.search_form.payer_source, '@{[ $self->param('payer_source') || 2 ]}');
 		</script>
 	});
 }
@@ -53,14 +47,13 @@ sub execute
 	my ($self, $type, $expression) = @_;
 	
 	my $statement = 'sel_' . $self->param('search_type');
-	my $payerSource = $self->param('payer_source') || '%';
 	
 	$expression =~ s/\*/%/g;
 
 	$self->addContent(
 		'<CENTER>', 
 			$STMTMGR_EPAYER_SEARCH->createHtml($self, STMTMGRFLAG_NONE,	$statement, 
-				[$expression, $payerSource]
+				[$expression]
 			),
 		'</CENTER>'
 	);

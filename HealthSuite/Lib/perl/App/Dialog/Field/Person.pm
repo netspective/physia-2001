@@ -60,6 +60,7 @@ package App::Dialog::Field::Person::ID;
 use strict;
 use DBI::StatementManager;
 use App::Statements::Person;
+use App::Statements::Scheduling;
 use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
@@ -137,34 +138,56 @@ sub new
 sub isValid
 {
 	my ($self, $page, $validator) = @_;
+	return 0 unless $self->SUPER::isValid($page, $validator);
 
-	if($self->SUPER::isValid($page, $validator))
+	if (my $value = $page->field($self->{name}))
 	{
-		if (my $value = $page->field($self->{name}))
+		if ($value =~ /_\d$/ && $self->{types} && $self->{types}->[0] eq 'Physician')
 		{
-			return 1 if $value =~ /_\d$/;
-			return 1 if $value =~ /,/;
+			my $rovingHash = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+				'selRovingPhysicianTypes');
 
-			my $dlgName = 'patient';
-			if (my $types = $self->{types})
+			my @rovingPhysicians = ();
+			for (@$rovingHash)
 			{
-				foreach my $personType ('Guarantor', 'Patient', 'Staff', 'Nurse', 'Physician')
-				{
-					$dlgName = $personType if grep { $_ eq $personType } @$types;
-				}
-				my $invMsg = qq{$self->{caption} '$value' does not exist.<BR> Do you want to add '$value' as a };
-				foreach $types (@$types)
-				{
-					my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
-					$types = "Responsible Party" if $types eq "Guarantor";
-					unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
-					{
-						$invMsg .= qq{<a href="$createPersonHref">$types</a> }
-					}
-				}
-				$self->invalidate($page, $invMsg)unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value));
+				push(@rovingPhysicians, $_->{caption});
 			}
+			my $stem = $value;
+			$stem =~ s/_\d$//;
+			return 1 if grep(/^${stem}$/, @rovingPhysicians);
+		}
 
+		return 1 if $value =~ /,/;
+
+		my $dlgName = 'patient';
+		if (my $types = $self->{types})
+		{
+			foreach my $personType ('Guarantor', 'Patient', 'Staff', 'Nurse', 'Physician')
+			{
+				$dlgName = $personType if grep { $_ eq $personType } @$types;
+			}
+			my $invMsg = qq{$self->{caption} '$value' does not exist. &nbsp; Add '$value' as a };
+			foreach $types (@$types)
+			{
+				my $createPersonHref;
+				if ($self->{useShortForm})
+				{
+					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson/$value');" ;
+				}
+				else
+				{
+					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
+					$types = "Responsible Party" if $types eq "Guarantor";
+				}
+				unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
+				{
+					$invMsg .= qq{<a href="$createPersonHref">$types</a> }
+				}
+			}
+			$self->invalidate($page, $invMsg)unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value));
+		}
+		else
+		{
 			my $orgId = ($page->param('org_id') ne '') ? $page->param('org_id') : $page->session('org_id');
 			$self->invalidate($page, "You do not have permission to select people outside of your organization.")
 				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgId);

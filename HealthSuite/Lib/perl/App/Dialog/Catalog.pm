@@ -271,8 +271,10 @@ sub new
 	$self->addContent(
 		new App::Dialog::Field::Catalog::ID(caption => 'Existing Fee Schedule ID',
 			name => 'internal_catalog_id',
+			type => 'integer',
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
+			hints => 'Numeric Fee Schedule ID',
 		),
 		new CGI::Dialog::Subhead(heading => '', name => ''),
 		

@@ -145,7 +145,8 @@ sub makeStateChanges_special
 	
 	my $recExist;	
 	$recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
-		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')if ($page->field('catalog_id'));
+		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')
+		if ($page->field('catalog_id'));
 	
 	$self->updateFieldFlags('flags', FLDFLAG_INVISIBLE, ! $recExist->{value_int});
 	$page->field('flags', 0) unless $recExist->{value_int};
@@ -154,11 +155,11 @@ sub makeStateChanges_special
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
+	$page->field('catalog_id', $page->param('catalog_id'));	
 	$self->makeStateChanges_special($page);
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
-	$page->field('catalog_id', $page->param('catalog_id'));
+
 	$page->field('parent_entry_id', $page->param('parent_entry_id'));
 	$page->field('entry_type', 100);	
 	$page->field('status', 1);
@@ -174,8 +175,12 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $entryId = $page->param('entry_id');
-	unless ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+	if ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
 		'selCatalogItemById', $entryId))
+	{
+		$self->makeStateChanges_special($page);
+	}
+	else
 	{
 		$page->addError("Entry ID $entryId does not exist.");
 	}

@@ -1110,7 +1110,15 @@ function doActionPopup(arl, autoRefresh, features)
 	// either automatically populate the control or do something else
 	//
 	//open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=350,scrollbars,resizable" : features);
-	var popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=600,scrollbars,resizable" : features);
+	var popUpWindow;
+	if (isActionPopupWindow())
+	{
+		popUpWindow = open(arl, '', "width=620,height=600,scrollbars,resizable");
+	}
+	else
+	{
+		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "width=620,height=600,scrollbars,resizable");
+	}
 	popUpWindow.focus();
 }
 

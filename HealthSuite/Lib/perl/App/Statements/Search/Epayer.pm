@@ -16,15 +16,14 @@ my $BASE_SQL = qq{
 	select * from Ref_Epayer
 	where
 	%whereCond%
-		and psource like ?
 	order by name
 };
 
 my $PUBLISH_DEFN = {
 	columnDefn =>
 	[
-		{ head => 'ID 1', url => qq{javascript:chooseItem("/search/epayer/id/#&{?}#", "#&{?}#", false)} },
-		{ head => 'ID 2', url => qq{javascript:chooseItem("/search/epayer/id2/#&{?}#", "#&{?}#", false)} },
+		{ head => 'Perse Payer ID', url => qq{javascript:chooseItem("/search/epayer/id/#&{?}#", "#&{?}#", false)} },
+		{ head => 'Envoy Payer ID', url => qq{javascript:chooseItem("/search/epayer/id2/#&{?}#", "#&{?}#", false)} },
 		{ head => 'Name', },
 	],
 };
