@@ -121,7 +121,7 @@ sub prepare
 	my $sysdate = UnixDate('today', '%m/%d/%Y');
 	
 	my $futureAppts = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
-		'sel_futureAppointments', $claim->{careReceiver}->{id});
+		'sel_futureAppointments', $claim->{careReceiver}->{id}, $self->session('org_internal_id'));
 		
 	my $apptHtml = qq{
 		<b><u>Next Appointments</u>:</b><br>

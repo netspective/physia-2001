@@ -538,10 +538,11 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		sqlStmt => qq{
 			select to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
 				ea.value_textB as physician, e.subject
-			from 	event_attribute ea, event e
+			from Event_Attribute ea, Event e
 			where e.start_time > sysdate
 				and ea.parent_id = e.event_id
-				and	ea.value_text = ?
+				and upper(ea.value_text) = upper(?)
+				and e.owner_id = ?
 			order by e.start_time
 		},
 	},
