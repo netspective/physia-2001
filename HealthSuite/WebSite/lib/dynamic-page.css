@@ -106,6 +106,7 @@ td.section_field_grid_add
 	padding-left: 5;
 	padding-right: 5;
 	border: 1 solid #999999;
+	cursor: hand;
 }
 
 td.section_field_grid_data

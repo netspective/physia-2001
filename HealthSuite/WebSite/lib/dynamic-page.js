@@ -314,7 +314,7 @@ function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 		headRow += '<td class="section_field_grid_head">'+childFieldDefn.getAttribute('caption')+'</td>';
 		dataRowPrototype += '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn)+'</td>';
 	}
-	headRow += '<td class="section_field_grid_add"><button onClick="addGridRow(table_' + fieldNode.getAttribute ('id') + ')">Add...</button></td>';
+	headRow += '<td class="section_field_grid_add" onClick="addGridRow(table_' + fieldNode.getAttribute ('id') + ')">Add...</td>';
 	headRow = '<tr>' + headRow + '</tr>';
 	dataRowPrototype = '<tr>' + dataRowPrototype + '</tr>';
 	return '<table id="table_' + fieldNode.getAttribute ('id') + '" class="section_field_grid">'+headRow+dataRowPrototype+'</table>';
