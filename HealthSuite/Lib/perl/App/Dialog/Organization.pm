@@ -81,7 +81,8 @@ sub initialize
 			postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
 
 		new CGI::Dialog::Field::TableColumn(caption => 'Organization Name', name => 'name_primary',
-			schema => $schema, column => 'Org.name_primary'),
+			schema => $schema, 
+			column => 'Org.name_primary'),
 
 		new CGI::Dialog::Field::TableColumn(caption => 'Doing Business As', name => 'name_trade',
 			schema => $schema, column => 'Org.name_trade'),
