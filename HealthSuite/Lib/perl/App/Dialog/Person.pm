@@ -73,7 +73,7 @@ sub initialize
 					new CGI::Dialog::Field(caption => 'Chart Number', name => 'chart_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				]),
 
-		new CGI::Dialog::Subhead(heading => 'General Information', name => 'gen_info_heading'),
+		new CGI::Dialog::Subhead(heading => 'Profile Information', name => 'gen_info_heading'),
 
 		# Person::Name is a 5-part multifield, w/fields named "name_*" where * is prefix|first|middle|last|suffix
 		new App::Dialog::Field::Person::Name(),
