@@ -432,11 +432,16 @@ sub importInsurance
 						value_type => 0,
 						value_text => $item->{'hmo-ppo'});
 
-			$self->schemaAction($flags,"Insurance_Attribute", 'add',
-									parent_id => $insIntId,
-									item_name => 'Fee Schedule',
-									value_type => 0,
-						value_text => $item->{feeschedule});
+			my @fee = split(', ', $item->{feeschedule});
+
+			foreach my $feeSch (@fee)
+			{
+				$self->schemaAction($flags,"Insurance_Attribute", 'add',
+						parent_id => $insIntId,
+						item_name => 'Fee Schedule',
+						value_type => 0,
+						value_text => feeSch);
+			}
 
 			#if($item->{'record-type'} eq App::Universal::RECORDTYPE_INSURANCEPLAN)
 			#{
@@ -476,7 +481,7 @@ sub importinsPlan
 	#my $recordContactMethod = $insurance->{product}->{'contact-methods'};
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
 	my $insInternalId = $recordData->{'ins_internal_id'};
-	my $feeschedule =  $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
+	my $feeschedule =  $STMTMGR_INSURANCE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
 	if(my $list = $insPlan)
 	{
 		$list = [$list] if ref $list eq 'HASH';
@@ -503,12 +508,15 @@ sub importinsPlan
 							remit_payer_name => $recordData->{'remit_payer_name'} || undef,
 							threshold => $item->{threshold} || undef
 						);
+			foreach my $fee (@{$feeschedule})
+			{
 
-			$self->schemaAction($flags,"Insurance_Attribute", 'add',
-									parent_id => $insIntId || undef,
-									item_name => 'Fee Schedule',
-									value_type => 0,
-									value_text => $feeschedule->{'value_text'} || undef);
+				$self->schemaAction($flags,"Insurance_Attribute", 'add',
+					parent_id => $insIntId || undef,
+					item_name => 'Fee Schedule',
+					value_type => 0,
+					value_text => $fee->{'value_text'} || undef);
+			}
 
 			if (! $item->{'contact-methods'})
 			{
