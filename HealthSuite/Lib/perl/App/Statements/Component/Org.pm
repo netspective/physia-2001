@@ -1423,10 +1423,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				claim_type,
 				org
 			WHERE
-				insurance.ins_org_id = (SELECT org_internal_id FROM org WHERE owner_org_id = :2 AND org_id = :1) AND
-				(insurance.record_type in (1, 2) AND
+				org.org_id = :1 AND
+				org.owner_org_id = :2 AND
+				insurance.record_type in (1, 2) AND
 				insurance.ins_type = claim_type.id AND
-				insurance.ins_org_id = org.org_internal_id)
+				insurance.ins_org_id = org.org_internal_id				
 			ORDER BY
 				insurance.product_name,
 				insurance.plan_name
