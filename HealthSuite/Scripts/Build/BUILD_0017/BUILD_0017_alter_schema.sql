@@ -10,9 +10,6 @@ update Org_Aud set time_zone = null where time_zone is not null;
 alter table Org_Aud modify (time_zone varchar2(10));
 alter table Org_Aud drop (time_zone_temp);
 
-drop index INVOICE_BUDGET_ID;
-create index INVOICE_BUDGET_ID on Invoice (budget_id) TABLESPACE TS_INDEXES;
-
 drop index INVOICE_OWNER_ID;
 create index INVOICE_OWNER_ID on Invoice (owner_id) TABLESPACE TS_INDEXES;
 
