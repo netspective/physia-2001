@@ -152,7 +152,7 @@ sub handleTransferFromInvoice
 
 		## Add history item
 		addHistoryItem($page, $fromInvoiceId,
-			value_text => 'Reopened due to refund',
+			value_text => 'Reopened due to transfer',
 			value_date => $todaysDate,
 		);
 	}
@@ -228,7 +228,7 @@ sub handleTransferToInvoice
 
 		## Add history item
 		addHistoryItem($page, $toInvoiceId,
-			value_text => 'Reopened due to refund',
+			value_text => 'Reopened due to transfer',
 			value_date => $todaysDate,
 		);
 	}
