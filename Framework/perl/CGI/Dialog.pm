@@ -2113,7 +2113,7 @@ sub handlePostExecute
 	}
 	
 	my $url = defined $specificRedirect ? $specificRedirect : ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page) || $page->param('home'));
-
+	$url = $page->replaceRedirectVars($url);
 	if (defined $message)
 	{
 		$page->addContent(qq{$message<BR>Click <a href="$url">Here</a> to Continue});
