@@ -545,7 +545,7 @@ sub formatSqlData
 {
 	my $self = shift;
 	my $data = shift;
-
+	
 	return unless defined $data;
 	$data = App::Data::Manipulate::trim($data);
 	return undef if $data =~ /^$/;
@@ -569,6 +569,50 @@ sub formatSqlData
 			/egx;
 	return $fmt;
 }
+
+sub formatPlaceHolderData
+{
+	my $self = shift;
+	my $data = shift;
+	
+	return unless defined $data;
+	$data = App::Data::Manipulate::trim($data);
+	#Just in case a NULL is passed into a non text field change to undef place holders
+	#do not appear to like NULLs
+	$data = undef if ! m/'\$escapedTextValue\$\'/ && $data eq 'NULL';
+	return $data;
+	
+}
+
+sub formatPlaceHolder
+{
+	my $self = shift;
+	my $data = shift;	
+	my $fmt = $self->{sqlwritefmt};	
+	$fmt =~ s/\'\$escapedTextValue\$\'/\$value\$/;
+	$fmt =~ s/\'\$value\$\'/\$value\$/;
+	return unless defined $data;
+	$data = App::Data::Manipulate::trim($data);
+	return undef if $data =~ /^$/;	
+	return $data if $self->{sqlwritefmt} eq '$value$';		
+	$fmt =~ s/\$(\w+)\$/
+				if($1 eq 'value')
+				{
+					$data;
+				}
+				elsif($1 eq 'escapedTextValue')
+				{
+					$data =~ s!'!''!g;
+					"$data";
+				}
+				else
+				{
+					"#$1\_UNDEFINED#";
+				}
+			/egx;
+	return $fmt;
+}
+
 
 sub isValid
 {
@@ -1081,7 +1125,7 @@ sub getColumnGroups
 
 sub fillColumnData
 {
-	my ($self, $groupName, $colDataRef, $colNamesRef, $colValuesRef, $errorsRef, $options) = @_;
+	my ($self, $groupName, $colDataRef, $colNamesRef, $colValuesRef,$colPlaceHolder, $errorsRef, $options) = @_;
 	#
 	# NOTE: values specified as __xxxx => yyy are "default" values
 	# e.g.  abc => 123 means column abc has value 123, __abc => 234 means that if
@@ -1089,6 +1133,7 @@ sub fillColumnData
 	# that exist but have an undef value can be ignored or set to null (see $options),
 	# columns that are not found can also be ignored (see $options).
 	#
+	my $colValue;
 
 	if($groupName)
 	{
@@ -1106,8 +1151,10 @@ sub fillColumnData
 
 			if(defined $value && $value ne '')
 			{
-				push(@{$colNamesRef}, $name);
-				push(@{$colValuesRef}, $_->formatSqlData($value));
+				push(@{$colNamesRef}, $name);				
+				$colValue = $options->{placeHolder} ?  $_->formatPlaceHolderData($value) : $_->formatSqlData($value);
+				push(@{$colValuesRef}, $colValue);
+				push(@{$colPlaceHolder}, $_->formatPlaceHolder('?')) if $options->{placeHolder};
 				delete $colDataRef->{$name};      # take it out of the list so we don't process again
 				delete $colDataRef->{"__$name"};  # take it out of the list so we don't process again
 			}
@@ -1134,7 +1181,8 @@ sub fillColumnData
 			else
 			{
 				my $column = $self->{colsByName}->{$_};
-				my $colValue = $column->formatSqlData($colDataRef->{$_});
+				$colValue = $options->{placeHolder} ?  $column->formatPlaceHolderData($colDataRef->{$_}) : $column->formatSqlData($colDataRef->{$_});
+				my $colPlace = $column->formatPlaceHolder('?') if $options->{placeHolder};
 				#
 				# the ordering is purely cosmetic and it will be slower
 				#
@@ -1142,11 +1190,13 @@ sub fillColumnData
 				{
 					unshift(@{$colNamesRef}, $_);
 					unshift(@{$colValuesRef}, $colValue);
+					unshift(@{$colPlaceHolder},$colPlace) if $options->{placeHolder};		
 				}
 				else
 				{
 					push(@{$colNamesRef}, $_);
 					push(@{$colValuesRef}, $colValue);
+					push(@{$colPlaceHolder},$colPlace) if $options->{placeHolder};		
 				}
 				delete $colDataRef->{$_};      # take it out of the list so we don't process again
 				delete $colDataRef->{"__$_"};  # take out any default value so its not processed later
@@ -1171,15 +1221,18 @@ sub fillColumnData
 				# the ordering is purely cosmetic and it will be slower
 				#
 				my $column = $self->{colsByName}->{$_};
+				$colValue = $options->{placeHolder}==1 ?  $column->formatPlaceHolderData($colDataRef->{"__$_"}) : $column->formatSqlData($colDataRef->{"__$_"});					
 				if($column->{primarykey} || $column->{required})
 				{
-					unshift(@{$colNamesRef}, $_);
-					unshift(@{$colValuesRef}, $column->formatSqlData($colDataRef->{"__$_"}));
+					unshift(@{$colNamesRef}, $_);					
+					unshift(@{$colValuesRef}, $colValue);
+					unshift(@{$colPlaceHolder},$column->formatPlaceHolder('?')) if $options->{placeHolder};
 				}
 				else
 				{
 					push(@{$colNamesRef}, $_);
-					push(@{$colValuesRef}, $column->formatSqlData($colDataRef->{"__$_"}));
+					push(@{$colValuesRef}, $colValue);
+					push(@{$colPlaceHolder},$column->formatPlaceHolder('?')) if $options->{placeHolder};
 				}
 				delete $colDataRef->{"__$_"};  # take it out so we know we processed it
 			}
@@ -1214,69 +1267,75 @@ sub createInsertSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};      # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1 };
 
 	my ($sql, $errors) = ('', []);
 
 	my @colNames = ();
 	my @colValues = ();
-
-	if($self->fillColumnData('_primaryAndRequiredFrontEndKeys', \%colData, \@colNames, \@colValues, $errors, $options))
+	my @placeHolder = ();
+	
+	if($self->fillColumnData('_primaryAndRequiredFrontEndKeys', \%colData, \@colNames, \@colValues,\@placeHolder,$errors, $options))
 	{
-		$self->fillColumnData('', \%colData, \@colNames, \@colValues, $errors, $options);
- 		$sql = "insert into $self->{name} (" . join(', ', @colNames) . ") values (" . join(', ', @colValues) . ")";
+		$self->fillColumnData('', \%colData, \@colNames, \@colValues,\@placeHolder, $errors, $options);
+ 		$sql = "insert into $self->{name} (" . join(', ', @colNames) . ") values (" . join(', ', @placeHolder) . ")";
 	}
 
-	return ($sql, $errors);
+	return ($sql, \@colValues,$errors);
 }
 
 sub createUpdateSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};    # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 0, ignoreColsNotFound => 0 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 0, ignoreColsNotFound => 0 , placeHolder =>1 };
 
 	my ($sql, $errors) = ('', []);
 
 	my @priKeyColNames = ();
 	my @priKeyColValues = ();
+	my @priPlaceHolder = ();
 	my @updateColNames = ();
 	my @updateColValues = ();
+	my @updatePlaceHolder = ();
+	my @colValues=();
 
-	if($self->fillColumnData('_primaryKeys', \%colData, \@priKeyColNames, \@priKeyColValues, $errors, $options))
+	if($self->fillColumnData('_primaryKeys', \%colData, \@priKeyColNames, \@priKeyColValues,\@priPlaceHolder, $errors, $options))
 	{
-		$self->fillColumnData('', \%colData, \@updateColNames, \@updateColValues, $errors, $options);
+		$self->fillColumnData('', \%colData, \@updateColNames, \@updateColValues, \@updatePlaceHolder,$errors, $options);
 
-		my $whereCond = $self->createEquality(\@priKeyColNames, \@priKeyColValues, " and ");
-
+		my $whereCond = $self->createEquality(\@priKeyColNames, \@priPlaceHolder, " and ");
 		unshift(@updateColNames, @priKeyColNames);
 		unshift(@updateColValues, @priKeyColValues);
-		my $setStatements = $self->createEquality(\@updateColNames, \@updateColValues);
+		unshift(@updatePlaceHolder,@priPlaceHolder);
+		push(@colValues ,@updateColValues, @priKeyColValues);
+		my $setStatements = $self->createEquality(\@updateColNames, \@updatePlaceHolder);
 
 		$sql = "update $self->{name} set $setStatements where $whereCond";
 	}
 
-	return ($sql, $errors);
+	return ($sql, \@colValues,$errors);
 }
 
 sub createDeleteSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};   # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1 };
 
 	my ($sql, $errors) = ('', []);
 
 	my @colNames = ();
 	my @colValues = ();
+	my @placeHolder =();
 
-	if($self->fillColumnData('_primaryKeys', \%colData, \@colNames, \@colValues, $errors, $options))
+	if($self->fillColumnData('_primaryKeys', \%colData, \@colNames, \@colValues,\@placeHolder, $errors, $options))
 	{
-		my $whereCond = $self->createEquality(\@colNames, \@colValues, " and ");
+		my $whereCond = $self->createEquality(\@colNames, \@placeHolder, " and ");
 		$sql = "delete from $self->{name} where $whereCond";
 	}
 
-	return ($sql, $errors);
+	return ($sql, \@colValues,$errors);
 }
 
 sub isValid
