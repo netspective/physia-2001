@@ -63,8 +63,6 @@ sub initialize
 {
 	my $self = shift;
 
-	#$self->heading('$Command Claim');
-
 	$self->SUPER::initialize();
 
 	$self->{activityLog} =
@@ -96,7 +94,13 @@ sub makeStateChanges
 		$self->heading('$Command Hospital Claim');
 		$self->updateFieldFlags('org_fields', FLDFLAG_INVISIBLE, 1);
 
-		$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+		$self->addFooter(new CGI::Dialog::Buttons(
+			nextActions_add => [				
+				['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
+				['Go to Patient Account', NEXTACTION_PATIENTACCT],
+				['Return to Work List', NEXTACTION_WORKLIST],
+				],
+			cancelUrl => $self->{cancelUrl} || undef));
 	}
 	else
 	{
@@ -104,17 +108,17 @@ sub makeStateChanges
 		$self->updateFieldFlags('hosp_org_fields', FLDFLAG_INVISIBLE, 1);
 
 		$self->addFooter(new CGI::Dialog::Buttons(
-				nextActions_add => [
-					['Add a Procedure', NEXTACTION_ADDPROC],
-					['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
-					['Go to Patient Account', NEXTACTION_PATIENTACCT],
-					['Post Personal Payment to this Claim', NEXTACTION_POSTPAYMENT],
-					['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
-					['Add Claim', NEXTACTION_CREATECLAIM],
-					['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
-					['Return to Work List', NEXTACTION_WORKLIST],
-					],
-				cancelUrl => $self->{cancelUrl} || undef));
+			nextActions_add => [
+				['Add a Procedure', NEXTACTION_ADDPROC],
+				['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
+				['Go to Patient Account', NEXTACTION_PATIENTACCT],
+				['Post Personal Payment to this Claim', NEXTACTION_POSTPAYMENT],
+				['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
+				['Add Claim', NEXTACTION_CREATECLAIM],
+				['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
+				['Return to Work List', NEXTACTION_WORKLIST],
+				],
+			cancelUrl => $self->{cancelUrl} || undef));
 	}
 
 	#turn these fields off if there is no person id

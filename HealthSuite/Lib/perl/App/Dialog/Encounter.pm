@@ -83,7 +83,6 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'provider_pair'), # for hosp claims, the service and billing provider ids are concatenated and checked in the handleProcedureItems function
-		new CGI::Dialog::Field(type => 'hidden', name => 'isLastHospClaim'), # for hosp claims, if last claim created, redirect to its claim summary
 
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
@@ -1031,16 +1030,10 @@ sub handlePayers
 				$page->field('care_provider_id', $servProviderId);
 				$page->field('provider_id', $billProviderId);
 				$page->field('provider_pair', $providerPair);
-				if($line == $lineCount)
-				{
-					$page->field('isLastHospClaim', 1);
-				}
+
 				addTransactionAndInvoice($self, $page, $command, $flags);
 			}
 		}
-
-		my $patientId = $page->field('attendee_id');
-		$page->redirect("/person/$patientId/account");
 	}
 	else
 	{
@@ -1775,48 +1768,45 @@ sub handleBillingInfo
 	}
 	
 
-	unless($page->param('isHosp') == 1)
+	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 	{
-		if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
+		my $lineCount = $page->param('_f_line_count');
+		my $existsOfficeVisitCPT;
+		for(my $line = 1; $line <= $lineCount; $line++)
 		{
-			my $lineCount = $page->param('_f_line_count');
-			my $existsOfficeVisitCPT;
-			for(my $line = 1; $line <= $lineCount; $line++)
+			if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
 			{
-				if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
-				{
-					$existsOfficeVisitCPT = 1;
-				}
-			}
-
-			if($existsOfficeVisitCPT)
-			{
-				billCopay($self, $page, $command, $flags, $invoiceId);
-			}
-			elsif($command eq 'add')
-			{
-				$self->handlePostExecute($page, $command, $flags);
-			}
-			else
-			{
-				$page->redirect("/invoice/$invoiceId/summary");
+				$existsOfficeVisitCPT = 1;
 			}
 		}
-		elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
+
+		if($existsOfficeVisitCPT)
 		{
-			if ($page->param('encounterDialog') eq 'checkout')
-			{
-				$self->handlePostExecute($page, $command, $flags);
-			}
-			else
-			{
-				$page->redirect("/invoice/$invoiceId/summary");
-			}
+			billCopay($self, $page, $command, $flags, $invoiceId);
 		}
 		elsif($command eq 'add')
 		{
 			$self->handlePostExecute($page, $command, $flags);
 		}
+		else
+		{
+			$page->redirect("/invoice/$invoiceId/summary");
+		}
+	}
+	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
+	{
+		if ($page->param('encounterDialog') eq 'checkout')
+		{
+			$self->handlePostExecute($page, $command, $flags);
+		}
+		else
+		{
+			$page->redirect("/invoice/$invoiceId/summary");
+		}
+	}
+	elsif($command eq 'add')
+	{
+		$self->handlePostExecute($page, $command, $flags);
 	}
 }
 
