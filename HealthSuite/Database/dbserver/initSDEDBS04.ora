@@ -1,0 +1,175 @@
+# 
+# $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/initSDEDBS04.ora,v 1.1 2000-09-07 20:34:19 alex_hillman Exp $ 
+# 
+# Copyright (c) 1991, 1997, 1998 by Oracle Corporation
+# NAME
+#   init.ora
+# FUNCTION
+# NOTES
+# MODIFIED
+#     atsukerm   08/06/98 -  fix for 8.1.
+#     hpiao      06/05/97 -  fix for 803
+#     glavash    05/12/97 -  add oracle_trace_enable comment
+#     hpiao      04/22/97 -  remove ifile=, events=, etc.
+#     alingelb   09/19/94 -  remove vms-specific stuff
+#     dpawson    07/07/93 -  add more comments regarded archive start
+#     maporter   10/29/92 -  Add vms_sga_use_gblpagfile=TRUE 
+#     jloaiza    03/07/92 -  change ALPHA to BETA 
+#     danderso   02/26/92 -  change db_block_cache_protect to _db_block_cache_p
+#     ghallmar   02/03/92 -  db_directory -> db_domain 
+#     maporter   01/12/92 -  merge changes from branch 1.8.308.1 
+#     maporter   12/21/91 -  bug 76493: Add control_files parameter 
+#     wbridge    12/03/91 -  use of %c in archive format is discouraged 
+#     ghallmar   12/02/91 -  add global_names=true, db_directory=us.acme.com 
+#     thayes     11/27/91 -  Change default for cache_clone 
+#     jloaiza    08/13/91 -         merge changes from branch 1.7.100.1 
+#     jloaiza    07/31/91 -         add debug stuff 
+#     rlim       04/29/91 -         removal of char_is_varchar2 
+#   Bridge     03/12/91 - log_allocation no longer exists
+#   Wijaya     02/05/91 - remove obsolete parameters
+#
+##############################################################################
+# Example INIT.ORA file
+#
+# This file is provided by Oracle Corporation to help you customize
+# your RDBMS installation for your site.  Important system parameters
+# are discussed, and example settings given.
+#
+# Some parameter settings are generic to any size installation.
+# For parameters that require different values in different size
+# installations, three scenarios have been provided: SMALL, MEDIUM
+# and LARGE.  Any parameter that needs to be tuned according to 
+# installation size will have three settings, each one commented
+# according to installation size.
+#
+# Use the following table to approximate the SGA size needed for the 
+# three scenarious provided in this file:
+#
+#                     -------Installation/Database Size------
+#                      SMALL           MEDIUM           LARGE
+#  Block         2K    4500K            6800K           17000K
+#  Size          4K    5500K            8800K           21000K
+#
+# To set up a database that multiple instances will be using, place
+# all instance-specific parameters in one file, and then have all
+# of these files point to a master file using the IFILE command.
+# This way, when you change a public
+# parameter, it will automatically change on all instances.  This is 
+# necessary, since all instances must run with the same value for many
+# parameters. For example, if you choose to use private rollback segments, 
+# these must be specified in different files, but since all gc_* 
+# parameters must be the same on all instances, they should be in one file.
+#
+# INSTRUCTIONS: Edit this file and the other INIT files it calls for
+# your site, either by using the values provided here or by providing
+# your own.  Then place an IFILE= line into each instance-specific
+# INIT file that points at this file.
+#
+# NOTE: Parameter values suggested in this file are based on conservative
+# estimates for computer memory availability. You should adjust values upward
+# for modern machines.
+#
+# You may also consider using Database Configuration Assistant tool (DBCA)
+# to create INIT file and to size your initial set of tablespaces based
+# on the user input.
+###############################################################################
+
+# replace DEFAULT with your database name
+db_name=SDEDBS04
+
+db_files = 80                                                         # SMALL  
+# db_files = 400                                                      # MEDIUM 
+# db_files = 1500 
+
+db_block_size = 8192
+
+db_file_multiblock_read_count = 16                                     # SMALL  
+# db_file_multiblock_read_count = 16                                  # MEDIUM 
+# db_file_multiblock_read_count = 32                                  # LARGE  
+
+# db_block_buffers = 100                                              # SMALL  
+# db_block_buffers = 550                                              # MEDIUM 
+ db_block_buffers = 15000                                             # LARGE  
+
+#shared_pool_size = 3500000                                            # SMALL
+# shared_pool_size = 5000000                                          # MEDIUM
+ shared_pool_size = 120000000                                          # LARGE
+ 
+ java_pool_size = 1048576
+
+log_checkpoint_interval = 10000
+
+#processes = 50                                                        # SMALL  
+# processes = 100                                                     # MEDIUM 
+ processes = 200                                                     # LARGE  
+
+#parallel_max_servers = 5                                              # SMALL
+# parallel_max_servers = 4 x (number of CPUs)                         # MEDIUM
+# parallel_max_servers = 4 x (number of CPUs)                         # LARGE
+
+#log_buffer = 32768                                                    # SMALL
+# log_buffer = 32768                                                  # MEDIUM
+ log_buffer = 163840                                                 # LARGE
+
+audit_trail = DB            # if you want auditing
+# timed_statistics = true       # if you want timed statistics
+max_dump_file_size = 10240      # limit trace file size to 5 Meg each
+
+# Uncommenting the line below will cause automatic archiving if archiving has
+# been enabled using ALTER DATABASE ARCHIVELOG.
+log_archive_start = true      
+log_archive_dest = /share/app/oracle/admin/SDEDBS04/arch/
+log_archive_format = "SDEDBS04_%T%S.ARC"
+
+background_dump_dest = /share/app/oracle/admin/SDEDBS04/bdump/
+user_dump_dest = /share/app/oracle/admin/SDEDBS04/udump
+
+# If using private rollback segments, place lines of the following
+# form in each of your instance-specific init.ora files:
+ rollback_segments = (r01, r02, r03, r04)   
+
+# If using public rollback segments, define how many
+# rollback segments each instance will pick up, using the formula
+#   # of rollback segments = transactions / transactions_per_rollback_segment
+# In this example each instance will grab 40/5 = 8:
+# transactions = 40 
+# transactions_per_rollback_segment = 5 
+
+# Global Naming -- enforce that a dblink has same name as the db it connects to
+global_names = FALSE
+
+# Edit and uncomment the following line to provide the suffix that will be
+# appended to the db_name parameter (separated with a dot) and stored as the
+# global database name when a database is created.  If your site uses 
+# Internet Domain names for e-mail, then the part of your e-mail address after
+# the '@' is a good candidate for this parameter value.
+
+ db_domain = physia.com 	# global database name is db_name.db_domain
+
+# define two control files by default
+control_files = (/u03/oradata/SDEDBS04/control_01.ctl,
+                 /u02/oradata/SDEDBS04/control_02.ctl)
+
+# Uncomment the following line if you wish to enable the Oracle Trace product
+# to trace server activity.  This enables scheduling of server collections
+# from the Oracle Enterprise Manager Console.  
+# Also, if the oracle_trace_collection_name parameter is non-null, 
+# every session will write to the named collection, as well as enabling you 
+# to schedule future collections from the console.
+
+# oracle_trace_enable = TRUE
+
+# Uncomment the following line, if you want to use some of the new 8.1
+# features. Please remember that using them may require some downgrade
+# actions if you later decide to move back to 8.0.
+
+compatible = 8.1.6
+
+open_cursors = 500
+
+utl_file_dir = *
+
+job_queue_processes = 2
+
+query_rewrite_integrity = trusted
+query_rewrite_enable = true
