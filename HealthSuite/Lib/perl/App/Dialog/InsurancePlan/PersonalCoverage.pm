@@ -33,6 +33,7 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'bill_seq_hidden'),
+			new CGI::Dialog::Field(type => 'hidden', name => 'person_hidden'),
 			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
@@ -183,8 +184,8 @@ sub new
 
 			$self->addFooter(new CGI::Dialog::Buttons(
 							nextActions_add => [
-								['Add Another Insurance Coverage', "/person/%param.person_id%/dlg-add-ins-coverage?_f_product_name=%field.product%&_f_ins_org_id=%field.ins_comp%&_f_plan_name=%field.plan%&_f_bill_sequence=%field.bill_sequence%", 1],
-								['Go to Person Profile', "/person/%param.person_id%/profile"],
+								['Add Another Insurance Coverage', "/person/%field.person_hidden%/dlg-add-ins-coverage?_f_product_name=%field.product%&_f_ins_org_id=%field.ins_comp%&_f_plan_name=%field.plan%&_f_bill_sequence=%field.bill_sequence%", 1],
+								['Go to Person Profile', "/person/%field.person_hidden%/profile"],
 							],
 								cancelUrl => $self->{cancelUrl} || undef
 						)
@@ -201,7 +202,7 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if ($page->param('person_id') ne '');
 	#turn guarantor id off if patient is 21 or over
-	if(my $personId = $page->param('person_id'))
+	if(my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id'))
 	{
 		my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
 		my $insuredId = $patientAge >= 21 ? $personId : undef;
@@ -215,6 +216,9 @@ sub makeStateChanges
 		$self->updateFieldFlags('insur_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('insplan', FLDFLAG_INVISIBLE, 1);
 	}
+
+	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
+	$page->field('person_hidden', $personId);
 }
 
 sub customValidate
@@ -231,7 +235,7 @@ sub customValidate
 	my $insuredIdField = $self->getField('insured_id');
 	my $billSeq = $self->getField('bill_sequence');
 
-	my $personId = $page->param('person_id');
+	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 
 	if ($relToInsured != 0 && ($insuredId eq $personId || $insuredId eq ''))
 	{
@@ -294,7 +298,7 @@ sub populateData_add
 
 		return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 
-		my $personId = $page->param('person_id');
+		my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 		my $seq = 0;
 		my $hiddenBillSeq = $page->field('bill_sequence');
 		if($hiddenBillSeq ne  '')
