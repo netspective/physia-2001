@@ -455,10 +455,10 @@
 	</table>
 
 	<table name="Ethnicity" type="Lookup">
-		<enum>Native-American</enum>
+		<enum>American Indian/Alaskan Native</enum>
 		<enum>Caucasian</enum>
 		<enum>African-American</enum>
-		<enum>Asian-American</enum>
+		<enum>Asian/Pacific Islander</enum>
 		<enum>Hispanic</enum>
 	</table>
 
