@@ -74,7 +74,7 @@ alter table person_medication_aud modify (dose number(20,6), quantity number(20,
 start tables-code/Person_Medication
 
 start tables/Medication_Record_Type
-start tables-data/Medication_Record_Type
+start data/Medication_Record_Type
 
 
 -- Semnet loading
