@@ -126,7 +126,7 @@ sub getHtml
 
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
 		my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
-		$html = <<"		END_AS_HTML";
+		$html = qq{
 		<tr valign=top $bgColorAttr>
 		<td width=$self->{_spacerWidth}>$spacerHtml</td>
 		<td align=$dialog->{captionAlign}><font $dialog->{bodyFontAttrs}>$caption</td>
@@ -140,7 +140,7 @@ sub getHtml
 		</td>
 		<td width=$self->{_spacerWidth}>&nbsp;</td>
 		</tr>
-		END_AS_HTML
+		};
 	}
 
 	return $html;
@@ -1067,14 +1067,14 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 
-	return <<"	END_HTML";
+	return qq{
 	<tr valign=top>
 	<td colspan=$dialog->{_tableCols}>
 		$self->{text}
 		<br>&nbsp;
 	</td>
 	</tr>
-	END_HTML
+	};
 }
 
 ##############################################################################
@@ -1635,7 +1635,7 @@ sub getHtml
 	{
 		$heading = "$heading (<font color=white>ERROR</font>)";
 		my $errorMsgs = join("<li>", $page->validationMessages());
-		$errorsHtml = << "		END_ERRORS_HTML";
+		$errorsHtml = qq{
 		<font $self->{bodyFontAttrs}>
 		<!---<font color=red size=+1><b>There was some incorrect data entered.</b></font><br>--->
 		<font color=red size=+1><b>Please correct the following problems</b></font>:
@@ -1643,7 +1643,7 @@ sub getHtml
 			<li>$errorMsgs
 		</ul>
 		</font>
-		END_ERRORS_HTML
+		};
 	}
 
 	my $dialogName = $self->formName();
@@ -1733,7 +1733,7 @@ sub getHtml
 	my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
 	push(@dlgHouskeepingHiddens, "<input type='hidden' name='$execModeFieldName' value='$newExecMode'>");
 
-	return <<"	END_HTML";
+	return qq{
 	<center>
 	<table border=0 bgcolor=$self->{headColor} cellspacing=2 cellpadding=0>
 	<tr><td>
@@ -1764,7 +1764,7 @@ sub getHtml
 	</tr></td>
 	</table>
 	</center>
-	END_HTML
+	};
 }
 
 sub getStaticHtml
@@ -1832,11 +1832,11 @@ sub getStaticHtml
 	#	$html .= $_->getHtml($page, $self, $command, $flags);
 	#}
 
-	return <<"	END_HTML";
+	return qq{
 	<table border=0 cellspacing=1 cellpadding=2>
 		$html
 	</table>
-	END_HTML
+	};
 }
 
 #---------------------- DIALOG (AS A) PAGE MANAGEMENT ------------------------
