@@ -422,8 +422,8 @@ sub populateData
 		$page->field('pay_to_org_item_id', $payToOrg->{item_id});
 		$page->field('pay_to_org_id', $payToOrg->{value_textb});
 
-		my $payToOrgAddr = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAddr', $invoiceId, 'Pay To Org');
-		$page->field('pay_to_org_addr_item_id', $payToOrgAddr->{item_id});
+		#my $payToOrgAddr = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAddr', $invoiceId, 'Pay To Org');
+		#$page->field('pay_to_org_addr_item_id', $payToOrgAddr->{item_id});
 
 		my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
 		$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
@@ -1238,7 +1238,6 @@ sub handleInvoiceAttrs
 	my $payToOrgIntId = $page->field('pay_to_org_id');
 	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
 	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgIntId, 'Mailing');
 	my $payToOrgId = $payToFacilityInfo->{org_id};
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -1298,19 +1297,6 @@ sub handleInvoiceAttrs
 			_debug => 0
 	);
 
-	$page->schemaAction(
-			'Invoice_Address', $command,
-			item_id => $page->field('pay_to_org_addr_item_id') || undef,
-			parent_id => $invoiceId,
-			address_name => 'Pay To Org',
-			line1 => $payToFacilityAddr->{line1},
-			line2 => $payToFacilityAddr->{line2} || undef,
-			city => $payToFacilityAddr->{city},
-			state => $payToFacilityAddr->{state},
-			zip => $payToFacilityAddr->{zip},
-			_debug => 0
-	);
-
 	my $invoiceFlags = $page->field('invoice_flags');
 	if($invoiceFlags & $attrDataFlag)
 	{
@@ -1320,7 +1306,7 @@ sub handleInvoiceAttrs
 				parent_id => $invoiceId || undef,
 				item_name => 'Invoice/History/Item',
 				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => "This claim is a copy of claim $oldInvoiceId which has been submitted.",
+				value_text => "This claim is a copy of claim $oldInvoiceId which has been transferred.",
 				value_textB => $page->field('comments') || undef,
 				value_date => $todaysDate,
 				_debug => 0
