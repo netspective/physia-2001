@@ -12,7 +12,7 @@ use DBI::StatementManager;
 use App::Statements::Org;
 use Data::Publish;
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.3 2000-09-13 16:04:02 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.4 2000-09-13 23:41:21 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 %RESOURCE_MAP=();
@@ -28,20 +28,20 @@ sub new
 	my $page = $self->{page};
 	my $sqlGen = new SQL::GenerateQuery(file => $page->property('QDL'));
 	$self->{sqlGen} = $sqlGen;
-	my $styleName = $page->param('_style') || 'default';
-	my $style = $sqlGen->style($page->param('_style'));
-	$self->{style} = $style;
+	my $viewName = $page->param('_query_view') || 'all';
+	my $view = $sqlGen->views($page->param('_query_view'));
+	$self->{view} = $view;
 	
 	my $fieldSelections = 
 		join ';',
-			map {$sqlGen->field($_)->{caption} . ":" . $sqlGen->field($_)->{id}}
-				grep {defined $sqlGen->field($_)->{caption}}
-					$sqlGen->field();
+			map {$sqlGen->fields($_)->{caption} . ":" . $sqlGen->fields($_)->{id}}
+				grep {defined $sqlGen->fields($_)->{caption}}
+					$sqlGen->fields();
 	my $comparisonOps =
 		join ';',
-			map {$sqlGen->comparison($_)->{caption} . ":" . $sqlGen->comparison($_)->{id}}
-				grep {$sqlGen->comparison($_)->{placeholder} !~ /\@/}
-					$sqlGen->comparison();
+			map {$sqlGen->comparisons($_)->{caption} . ":" . $sqlGen->comparisons($_)->{id}}
+				grep {$sqlGen->comparisons($_)->{placeholder} !~ /\@/}
+					$sqlGen->comparisons();
 	my $joinOps = 'AND;OR';
 	
 	my $gridName = 'params';
@@ -113,19 +113,19 @@ sub new
 	# Setup data scructures necessary for JavaScript
 	my $fieldLookups = 
 		join ", ", 
-			map {$sqlGen->field($_)->{id} . " : '" . $sqlGen->field($_)->{'lookup-url'} . "'"} 
-				grep {exists $sqlGen->field($_)->{'lookup-url'}} 
-					$sqlGen->field();
+			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'lookup-url'} . "'"} 
+				grep {exists $sqlGen->fields($_)->{'lookup-url'}} 
+					$sqlGen->fields();
 	my $fieldTypes = 
 		join ", ", 
-			map {$sqlGen->field($_)->{id} . " : '" . $sqlGen->field($_)->{'ui-datatype'} . "'"} 
-				grep {exists $sqlGen->field($_)->{'ui-datatype'}}
-					$sqlGen->field();
+			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'ui-datatype'} . "'"} 
+				grep {exists $sqlGen->fields($_)->{'ui-datatype'}}
+					$sqlGen->fields();
 	my $noCriteria = 
 		join ", ",
-			map {$sqlGen->comparison($_)->{id} . " : 1"}
-				grep {defined $sqlGen->comparison($_)->{value} && $sqlGen->comparison($_)->{value} eq ''}
-					$sqlGen->comparison();
+			map {$sqlGen->comparisons($_)->{id} . " : 1"}
+				grep {defined $sqlGen->comparisons($_)->{value} && $sqlGen->comparisons($_)->{value} eq ''}
+					$sqlGen->comparisons();
 	
 	my $showRows = SHOWROWS;
 	
@@ -273,10 +273,10 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $sqlGen = $self->{sqlGen};
-	my $style = $self->{style};
-	my @outColumns = map {$_->{id}} @{$style->{columns}};
-	my @orderBy = map {$_->{id}} @{$style->{'order-by'}};
-	my $distinct = defined $style->{distinct} ? $style->{distinct} : 0;
+	my $view = $self->{view};
+	my @outColumns = map {$_->{id}} @{$view->{columns}};
+	my @orderBy = map {$_->{id}} @{$view->{'order-by'}};
+	my $distinct = defined $view->{distinct} ? $view->{distinct} : 0;
 	my $condition;
 	
 	my $startRow = $page->field('start_row');
@@ -299,9 +299,9 @@ sub execute
 		if ($field)
 		{
 			my $whereField = "UPPER({$field})";
-			if ($sqlGen->field($field) && defined $sqlGen->field($field)->{'ui-datatype'})
+			if ($sqlGen->fields($field) && defined $sqlGen->fields($field)->{'ui-datatype'})
 			{
-				my $dataType = $sqlGen->field($field)->{'ui-datatype'};
+				my $dataType = $sqlGen->fields($field)->{'ui-datatype'};
 				if ($dataType eq 'date')
 				{
 					$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY')";
@@ -327,9 +327,9 @@ sub execute
 	
 	
 	# If the style has a condition, combine it with the user's
-	if (exists $style->{condition} && defined $style->{condition})
+	if (exists $view->{condition} && defined $view->{condition})
 	{
-		$condition = $condition ? $sqlGen->AND($style->{condition}, $condition) : $style->{condition};
+		$condition = $condition ? $sqlGen->AND($view->{condition}, $condition) : $view->{condition};
 	}
 	
 	# Generate the SQL & Bind Params
@@ -350,6 +350,11 @@ sub execute
 	my $publDefn = {};
 	my $stmtHdl = $STMTMGR_ORG->execute($page, $stmgrFlags, $SQL, @$bindParams);
 	prepareStatementColumns($page, $stmgrFlags, $stmtHdl, $publDefn);
+	$publDefn->{bodyRowAttr} = {
+		onMouseOver => q{this.style.cursor='hand';this.style.backgroundColor='#CCCCCC'},
+		onMouseOut => q{this.style.cursor='default';this.style.backgroundColor='#FFFFFF'},
+		onClick => q{alert('You selected: #1#');},
+	};
 	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {stmtId => $SQL, maxRows => SHOWROWS});
 	my $nextPageExists = $stmtHdl->fetch();
 	$stmtHdl->finish();
