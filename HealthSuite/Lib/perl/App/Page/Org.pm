@@ -126,6 +126,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Create Claim</OPTION>
+						<OPTION value="/org/#session.org_id#/dlg-update-">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
 					</SELECT>
 					</FONT>
