@@ -1324,17 +1324,27 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.billinginfo' => {
 	sqlStmt => qq{
-			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
-				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
-				decode(pa.value_textb,'1','Active','Inactive'),
-				pa.parent_id
-			from	Person_Attribute pa, Org o, Person_Org_Category poc
-			where	o.org_id = ?
-			and	pa.parent_id = poc.person_id
-			and	poc.org_internal_id = o.org_internal_id
-			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
-			order by pa.value_int
-		},
+		(select	oa.value_type, oa.item_id, oa.value_text, oa.value_textB, oa.value_int, oa.value_date,
+			decode(oa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
+			decode(oa.value_textb,'1','Active','Inactive'),
+			o.org_id
+		from	org o, org_attribute oa
+		where	o.org_id = :1
+		and	oa.parent_id = o.org_internal_id
+		and	oa.item_name = 'Organization Default Clearing House ID'
+		and	oa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
+		union	
+		(select	pa.value_type, pa.item_id, pa.value_text, pa.value_textB, pa.value_int, pa.value_date,
+			decode(pa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
+			decode(pa.value_textb,'1','Active','Inactive'),
+			pa.parent_id
+		from	Person_Attribute pa, Org o, Org_Attribute oa, Person_Org_Category poc
+		where	o.org_id = :1
+		and	o.org_internal_id = oa.parent_id
+		and	pa.parent_id = poc.person_id
+		and	poc.org_internal_id = o.org_internal_id
+		and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
+	},
 	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
