@@ -89,6 +89,50 @@
 			and Appt_Type_R_Ids.parent_id = appt_type_id
 			order by caption, r_ids, appt_type_id
 			
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')"/>
+				<column heading="Caption/ Resource"/>
+				<column heading="Details"/>
+				<column heading="Addl Details"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')'
+
+					}
+					1 => {
+						dataFmt => '
+						Caption: <b>#2# </b><br>
+						<a href="javascript:location.href='/search/appttype/1/#1#'"
+							title='View #1# Appointment Types' style="text-decoration:none" >#1#</a> <br>
+					'
+						head => 'Caption/ Resource'
+
+					}
+					2 => {
+						dataFmt => '
+						<nobr>Duration: <b>#3# minutes</b></nobr><br>
+						<nobr>Lead / Lag Time: #4# / #5# minutes</nobr><br>
+						Add'l Resources: <i>#11#</i>
+					'
+						head => 'Details'
+
+					}
+					3 => {
+						dataFmt => '
+						<nobr>Back-to-Back: #6# </nobr><br>
+						<nobr>Multiple / Limits: #7# / #8#</nobr><br>
+						<nobr>Limits Day/AM/PM: #12# / #9# / #10# / </nobr><br>
+					'
+						head => 'Addl Details'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selAssociatedResources">
@@ -174,6 +218,82 @@
 				<param value="request:available"/>
 				<param value="request:status"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'"/>
+				<column heading="Resource(s)" url="javascript:location.href='/search/template/1/#&{?}#'"/>
+				<column heading="Caption"/>
+				<column heading="Facility" url="javascript:location.href='/search/template/1//#&{?}#'"/>
+				<column heading="Effective"/>
+				<column heading="Time"/>
+				<column index="8" heading="Available"/>
+				<column index="11" heading="Days"/>
+				<column index="12" heading="Months"/>
+				<column index="13" heading="Weekdays"/>
+				<column heading="Patient/ Visit"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Edit Template #&{?}#'
+						url => 'javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template''
+
+					}
+					1 => {
+						head => 'Resource(s)'
+						hint => 'View #&{?}# Templates'
+						url => 'javascript:location.href='/search/template/1/#&{?}#''
+
+					}
+					2 => {
+						head => 'Caption'
+
+					}
+					3 => {
+						head => 'Facility'
+						hint => 'View #&{?}# Templates'
+						url => 'javascript:location.href='/search/template/1//#&{?}#''
+
+					}
+					4 => {
+						dataFmt => '#6#-<br>#7#'
+						head => 'Effective'
+
+					}
+					5 => {
+						dataFmt => '#4#-<br>#5#'
+						head => 'Time'
+
+					}
+					6 => {
+						colIdx => '8'
+						head => 'Available'
+
+					}
+					7 => {
+						colIdx => '11'
+						head => 'Days'
+
+					}
+					8 => {
+						colIdx => '12'
+						head => 'Months'
+
+					}
+					9 => {
+						colIdx => '13'
+						head => 'Weekdays'
+
+					}
+					10 => {
+						dataFmt => '#9#<br>#10#'
+						head => 'Patient/ Visit'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selEncountersCheckIn/Out">
@@ -278,6 +398,82 @@
 				<param value="request:available"/>
 				<param value="request:status"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'"/>
+				<column heading="Resource(s)" url="javascript:location.href='/search/template/1/#&{?}#'"/>
+				<column heading="Caption"/>
+				<column heading="Facility" url="javascript:location.href='/search/template/1//#&{?}#'"/>
+				<column heading="Effective"/>
+				<column heading="Time"/>
+				<column index="8" heading="Available"/>
+				<column index="11" heading="Days"/>
+				<column index="12" heading="Months"/>
+				<column index="13" heading="Weekdays"/>
+				<column heading="Patient/ Visit"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Edit Template #&{?}#'
+						url => 'javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template''
+
+					}
+					1 => {
+						head => 'Resource(s)'
+						hint => 'View #&{?}# Templates'
+						url => 'javascript:location.href='/search/template/1/#&{?}#''
+
+					}
+					2 => {
+						head => 'Caption'
+
+					}
+					3 => {
+						head => 'Facility'
+						hint => 'View #&{?}# Templates'
+						url => 'javascript:location.href='/search/template/1//#&{?}#''
+
+					}
+					4 => {
+						dataFmt => '#6#-<br>#7#'
+						head => 'Effective'
+
+					}
+					5 => {
+						dataFmt => '#4#-<br>#5#'
+						head => 'Time'
+
+					}
+					6 => {
+						colIdx => '8'
+						head => 'Available'
+
+					}
+					7 => {
+						colIdx => '11'
+						head => 'Days'
+
+					}
+					8 => {
+						colIdx => '12'
+						head => 'Months'
+
+					}
+					9 => {
+						colIdx => '13'
+						head => 'Weekdays'
+
+					}
+					10 => {
+						dataFmt => '#9#<br>#10#'
+						head => 'Patient/ Visit'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selNextInLineEventID">

@@ -18,6 +18,26 @@
 			<params>
 				<param value="request:psource"/>
 			</params>
+			<report>
+				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Payer ID'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id2">
@@ -29,6 +49,26 @@
 			AND rownum &lt;= 250
 			ORDER BY name
 
+			<report>
+				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Payer ID'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name">
@@ -43,6 +83,26 @@
 			<params>
 				<param value="request:psource"/>
 			</params>
+			<report>
+				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Payer ID'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -33,6 +33,65 @@
 			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
+			<report>
+				<column index="0" heading="Physician ID"/>
+				<column index="1" heading="Category"/>
+				<column index="2" heading="Name"/>
+				<column index="3" heading="Facility ID"/>
+				<column index="4" heading="License Name"/>
+				<column index="5" heading="License No."/>
+				<column index="6" heading="Expiry Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Physician ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Category'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						head => 'Name'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Facility ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'License Name'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'License No.'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Expiry Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_physician_license_exp">
@@ -63,6 +122,65 @@
 			and to_char(pa.value_dateend, 'mm/yyyy') = ?
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
+			<report>
+				<column index="0" heading="Physician ID"/>
+				<column index="1" heading="Category"/>
+				<column index="2" heading="Name"/>
+				<column index="3" heading="Facility ID"/>
+				<column index="4" heading="License Name"/>
+				<column index="5" heading="License No."/>
+				<column index="6" heading="Expiry Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Physician ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Category'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						head => 'Name'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Facility ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'License Name'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'License No.'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Expiry Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_physician_license_prov">
@@ -93,6 +211,65 @@
 			and p.person_id = ?
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
+			<report>
+				<column index="0" heading="Physician ID"/>
+				<column index="1" heading="Category"/>
+				<column index="2" heading="Name"/>
+				<column index="3" heading="Facility ID"/>
+				<column index="4" heading="License Name"/>
+				<column index="5" heading="License No."/>
+				<column index="6" heading="Expiry Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Physician ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Category'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						head => 'Name'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Facility ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'License Name'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'License No.'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Expiry Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_physician_license_prov_exp">
@@ -123,6 +300,65 @@
 			and p.person_id = ? and to_char(pa.value_dateend, 'mm/yyyy') = ? 
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
+			<report>
+				<column index="0" heading="Physician ID"/>
+				<column index="1" heading="Category"/>
+				<column index="2" heading="Name"/>
+				<column index="3" heading="Facility ID"/>
+				<column index="4" heading="License Name"/>
+				<column index="5" heading="License No."/>
+				<column index="6" heading="Expiry Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Physician ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Category'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						head => 'Name'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Facility ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'License Name'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'License No.'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Expiry Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

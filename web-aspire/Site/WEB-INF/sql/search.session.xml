@@ -29,6 +29,40 @@
 				<param value="request:person_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="User ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column heading="Start"/>
+				<column heading="Last"/>
+				<column heading="Location"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'User ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Start'
+
+					}
+					3 => {
+						head => 'Last'
+
+					}
+					4 => {
+						head => 'Location'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_status_person_like">
@@ -53,6 +87,40 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="User ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column heading="Start"/>
+				<column heading="Last"/>
+				<column heading="Location"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'User ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Start'
+
+					}
+					3 => {
+						head => 'Last'
+
+					}
+					4 => {
+						head => 'Location'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -38,6 +38,23 @@
 			where trans_type = 9500
 			and trans_owner_id = ?
 			
+			<report>
+				<column index="0" heading="Notes"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						dataFmt => '#0#'
+						hAlign => 'center'
+						head => 'Notes'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selCollectorsNotesCount">

@@ -18,6 +18,26 @@
 			AND 	rownum &lt;= 250
 			ORDER BY name
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Code'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_other_service_code_like">
@@ -32,6 +52,26 @@
 			AND 	rownum &lt;= 250
 			ORDER BY name
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Code'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_other_service_name">
@@ -46,6 +86,26 @@
 			AND 	rownum &lt;= 250
 			ORDER BY name
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Code'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_other_service_name_like">
@@ -60,6 +120,26 @@
 			AND 	rownum &lt;= 250
 			ORDER BY name
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Code'
+						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

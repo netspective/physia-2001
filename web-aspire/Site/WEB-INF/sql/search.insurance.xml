@@ -44,6 +44,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_city_insplan">
@@ -85,6 +124,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_city_insproduct">
@@ -126,6 +211,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_city_like">
@@ -166,6 +291,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_city_like_insplan">
@@ -207,6 +371,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_city_like_insproduct">
@@ -248,6 +458,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid">
@@ -288,6 +538,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid_insplan">
@@ -329,6 +618,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid_insproduct">
@@ -370,6 +705,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid_like">
@@ -410,6 +785,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid_like_insplan">
@@ -451,6 +865,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insorgid_like_insproduct">
@@ -492,6 +952,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan">
@@ -532,6 +1032,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan_insplan">
@@ -573,6 +1112,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan_insproduct">
@@ -614,6 +1199,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan_like">
@@ -654,6 +1279,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan_like_insplan">
@@ -695,6 +1359,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_plan_like_insproduct">
@@ -736,6 +1446,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product">
@@ -776,6 +1526,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product_insplan">
@@ -817,6 +1606,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product_insproduct">
@@ -858,6 +1693,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product_like">
@@ -898,6 +1773,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product_like_insplan">
@@ -939,6 +1853,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_product_like_insproduct">
@@ -980,6 +1940,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state">
@@ -1020,6 +2020,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_insplan">
@@ -1061,6 +2100,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_insproduct">
@@ -1102,6 +2187,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_like">
@@ -1142,6 +2267,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_like_insplan">
@@ -1183,6 +2347,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_like_insproduct">
@@ -1224,6 +2434,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street">
@@ -1264,6 +2514,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street_insplan">
@@ -1305,6 +2594,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street_insproduct">
@@ -1346,6 +2681,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street_like">
@@ -1386,6 +2761,45 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Product Name"/>
+				<column heading="Plan Name"/>
+				<column heading="Street"/>
+				<column heading="City"/>
+				<column heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'Product Name'
+
+					}
+					2 => {
+						head => 'Plan Name'
+
+					}
+					3 => {
+						head => 'Street'
+
+					}
+					4 => {
+						head => 'City'
+
+					}
+					5 => {
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street_like_insplan">
@@ -1427,6 +2841,52 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="1" heading="Product Name"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Plan Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Product Name'
+
+					}
+					2 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_street_like_insproduct">
@@ -1468,6 +2928,46 @@
 				<param value="request:owner_org_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="3" heading="Street"/>
+				<column index="4" heading="City"/>
+				<column index="5" heading="State"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Product Name'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Insurance Org'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Street'
+
+					}
+					3 => {
+						colIdx => '4'
+						head => 'City'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'State'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

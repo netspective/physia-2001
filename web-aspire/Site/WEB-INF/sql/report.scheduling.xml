@@ -61,6 +61,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_DetailDiscardAppointment">
@@ -119,6 +202,81 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="18" heading="Remarks"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '18'
+						head => 'Remarks'
+
+					}
+					7 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					8 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					9 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_appointments_byStatus">
@@ -141,6 +299,34 @@
 			and Appt_Status.id = Event.event_status
 			group by caption, event_status
 			
+			<report>
+				<column heading="Appointments" url="javascript:doActionPopup(
+							'#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')
+						"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Appointments'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup(
+							'#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')
+						'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dateEntered">
@@ -163,6 +349,30 @@
 			GROUP BY to_char(e.scheduled_stamp -?, 'MM/DD/YYYY')
 			ORDER BY 1 desc
 			
+			<report>
+				<column heading="Date" url="javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#',
+						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Date'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#',
+						null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailDateEntered">
@@ -222,6 +432,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailMissingEncounter">
@@ -283,6 +576,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailPatientsCPT">
@@ -352,6 +728,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailPatientsProduct">
@@ -420,6 +879,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailPatientsProductSelfPay">
@@ -487,6 +1029,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailPatientsSeenByPatientType">
@@ -544,6 +1169,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailPatientsSeenByPhysician">
@@ -601,6 +1309,89 @@
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
+			<report>
+				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="2" heading="Chart"/>
+				<column index="1" heading="Account"/>
+				<column index="3" heading="Physician"/>
+				<column index="4" heading="Facility"/>
+				<column index="5" heading="Appt Status"/>
+				<column index="6" heading="Appointment Time"/>
+				<column index="7" heading="Reason for Visit"/>
+				<column index="8" heading="Scheduled By"/>
+				<column index="9" heading="Checkin By"/>
+				<column index="10" heading="Checkout By"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Patient'
+						hint => 'View #17# #11# Profile'
+						options => '1'
+						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Chart'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Account'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Physician'
+						options => '1'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Facility'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Appt Status'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Appointment Time'
+						hint => 'Event ID #16#'
+
+					}
+					7 => {
+						colIdx => '7'
+						head => 'Reason for Visit'
+
+					}
+					8 => {
+						colIdx => '8'
+						head => 'Scheduled By'
+						hint => '#13#'
+
+					}
+					9 => {
+						colIdx => '9'
+						head => 'Checkin By'
+						hint => '#14#'
+
+					}
+					10 => {
+						colIdx => '10'
+						head => 'Checkout By'
+						hint => '#15#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_missingEncounter">
@@ -626,6 +1417,30 @@
 			GROUP BY to_char(e.CHECKIN_STAMP - ?, 'MM/DD/YYYY')
 			ORDER BY 1 desc
 			
+			<report>
+				<column heading="Check In Date" url="javascript:doActionPopup('#hrefSelfPopup#&detail=missing_encounter&encounter=#&{?}#',
+						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Check In Date'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=missing_encounter&encounter=#&{?}#',
+						null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientsCPT">
@@ -662,6 +1477,30 @@
 			GROUP BY ii.code
 			ORDER BY 1
 			
+			<report>
+				<column heading="Procedure Code" url="javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#',
+					null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Procedure Code'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#',
+					null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientsProduct">
@@ -728,6 +1567,30 @@
 			AND ct.id = 0
 			GROUP BY ct.caption
 			
+			<report>
+				<column heading="Product Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#',
+				null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Product Name'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#',
+				null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientsSeen">
@@ -750,6 +1613,30 @@
 			and e.event_status = 2
 			group by ea.value_textB
 			
+			<report>
+				<column heading="Physician" url="javascript:doActionPopup('#hrefSelfPopup#&detail=physician&physician=#&{?}#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Physician'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=physician&physician=#&{?}#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientsSeen_byPatientType">
@@ -773,6 +1660,30 @@
 			and Appt_Attendee_Type.id = ea.value_int
 			group by caption, Appt_Attendee_Type.id
 			
+			<report>
+				<column heading="Patient type" url="javascript:doActionPopup('#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Patient type'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#',
+							null,'location,status,width=800,height=600,scrollbars,resizable')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

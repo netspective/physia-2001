@@ -16,6 +16,24 @@
 			v$statname sn
 			WHERE my.statistic# = sn.statistic#
 			
+			<report>
+				<column heading="Description"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Description'
+
+					}
+					1 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -16,6 +16,26 @@
 			trans_type = 9500 	
 			ORDER BY 6 asc
 			
+			<report>
+				<column heading="Account Notes"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<B>#4#</B> : #5# <BR> #1#</I>'
+						head => 'Account Notes'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="worklist.group-account-notes">
@@ -38,6 +58,40 @@
 			)
 			group by simple_name,trans_owner_id
 			
+			<report>
+				<column heading="Patient Name" url="/person/#4#/profile"/>
+				<column heading="Notes#" url="/worklist/collection/stpe-worklist.account-notes/?home=#homeArl#&person_id=#4#"/>
+				<column heading="First  Note Date"/>
+				<column heading="Last Note Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Patient Name'
+						url => '/person/#4#/profile'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Notes#'
+						url => '/worklist/collection/stpe-worklist.account-notes/?home=#homeArl#&person_id=#4#'
+
+					}
+					2 => {
+						head => 'First  Note Date'
+
+					}
+					3 => {
+						head => 'Last Note Date'
+
+					}
+
+				}
+				frame => {
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

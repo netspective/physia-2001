@@ -22,6 +22,41 @@
 			<params>
 				<param value="request:icd"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+				<column heading="Sex"/>
+				<column heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+					3 => {
+						head => 'Sex'
+
+					}
+					4 => {
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_icd_code">
@@ -40,6 +75,41 @@
 			<params>
 				<param value="request:icd"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+				<column heading="Sex"/>
+				<column heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+					3 => {
+						head => 'Sex'
+
+					}
+					4 => {
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_icd_code_like">
@@ -55,6 +125,41 @@
 			icd like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+				<column heading="Sex"/>
+				<column heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+					3 => {
+						head => 'Sex'
+
+					}
+					4 => {
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_icd_description">
@@ -73,6 +178,41 @@
 			<params>
 				<param value="request:descr"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+				<column heading="Sex"/>
+				<column heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+					3 => {
+						head => 'Sex'
+
+					}
+					4 => {
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_icd_description_like">
@@ -88,6 +228,41 @@
 			descr like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+				<column heading="Sex"/>
+				<column heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+					3 => {
+						head => 'Sex'
+
+					}
+					4 => {
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -1187,6 +1187,20 @@
 			<params>
 				<param value="request:owner_person_id"/>
 			</params>
+			<report>
+				<column heading="billingSequence"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '#&{?}#: #1# (#2#)'
+						head => 'billingSequence'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

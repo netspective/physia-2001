@@ -30,6 +30,47 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Role"/>
+				<column heading="Permission"/>
+				<column heading="Status"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Assign a Role <A HREF= '/admin/#param.org_id#/dlg-add-role-permission'>Permission</A> '
+
+						}
+
+					}
+
+				}
+				bullets => '/admin/#5#/dlg-update-role-permission?roleid=#1#&permnam=#2#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#'
+						head => 'Role'
+
+					}
+					1 => {
+						dataFmt => '#2#'
+						head => 'Permission'
+
+					}
+					2 => {
+						dataFmt => '#4#'
+						head => 'Status'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/admin/#5#/dlg-remove-role-permission?roleid=#1#&permnam=#2#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selRoleIDs">
@@ -52,6 +93,47 @@
 				<param value="request:role_name_id"/>
 				<param value="request:permission_name"/>
 			</params>
+			<report>
+				<column heading="Role"/>
+				<column heading="Permission"/>
+				<column heading="Status"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Assign a Role <A HREF= '/admin/#param.org_id#/dlg-add-role-permission'>Permission</A> '
+
+						}
+
+					}
+
+				}
+				bullets => '/admin/#5#/dlg-update-role-permission?roleid=#1#&permnam=#2#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#'
+						head => 'Role'
+
+					}
+					1 => {
+						dataFmt => '#2#'
+						head => 'Permission'
+
+					}
+					2 => {
+						dataFmt => '#4#'
+						head => 'Status'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/admin/#5#/dlg-remove-role-permission?roleid=#1#&permnam=#2#'
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

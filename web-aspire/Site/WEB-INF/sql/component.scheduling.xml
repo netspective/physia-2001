@@ -110,6 +110,23 @@
 			and Transaction_Type.id = Transaction.trans_type
 			order by subtype_sort asc, trans_begin_stamp desc
 			
+			<report>
+				<column heading="Alerts"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<b>#0#</b> <br>
+						#4# - #5#: (#3#) <u>#2#</u>: #6# <br>
+						#1#
+					'
+						head => 'Alerts'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_events_worklist_not_today">
@@ -161,6 +178,100 @@
 			order by 
 			e.start_time, e.facility_id, ea.value_text
 			
+			<report>
+				<column index="0" heading=""/>
+				<column index="1" heading="Patient"/>
+				<column index="2" heading="Appointment"/>
+				<column index="3" heading="Confirm"/>
+				<column index="4" heading="Checkin"/>
+				<column index="5" heading="Checkout"/>
+				<column index="6" heading="Claim"/>
+				<column index="7" type="currency" heading="OV Copay"/>
+				<column index="8" type="currency" heading="Account Balance" url="/person/#10#/account"/>
+				<column index="12" type="currency" heading="Patient Balance" url="/person/#10#/account"/>
+				<column index="11" heading="Action"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						head => ''
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Patient'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						head => 'Appointment'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'center'
+						head => 'Confirm'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'center'
+						head => 'Checkin'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'center'
+						head => 'Checkout'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'center'
+						head => 'Claim'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						hHint => 'Copay due by patient for this visit'
+						head => 'OV Copay'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Account Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					9 => {
+						colIdx => '12'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Patient Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					10 => {
+						colIdx => '11'
+						head => 'Action'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_events_worklist_today">
@@ -212,6 +323,100 @@
 			order by 
 			e.start_time, e.facility_id, ea.value_text
 			
+			<report>
+				<column index="0" heading=""/>
+				<column index="1" heading="Patient"/>
+				<column index="2" heading="Appointment"/>
+				<column index="3" heading="Confirm"/>
+				<column index="4" heading="Checkin"/>
+				<column index="5" heading="Checkout"/>
+				<column index="6" heading="Claim"/>
+				<column index="7" type="currency" heading="OV Copay"/>
+				<column index="8" type="currency" heading="Account Balance" url="/person/#10#/account"/>
+				<column index="12" type="currency" heading="Patient Balance" url="/person/#10#/account"/>
+				<column index="11" heading="Action"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						head => ''
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Patient'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						head => 'Appointment'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'center'
+						head => 'Confirm'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'center'
+						head => 'Checkin'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'center'
+						head => 'Checkout'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'center'
+						head => 'Claim'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						hHint => 'Copay due by patient for this visit'
+						head => 'OV Copay'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Account Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					9 => {
+						colIdx => '12'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Patient Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					10 => {
+						colIdx => '11'
+						head => 'Action'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_events_worklist_today_byTime">
@@ -263,6 +468,100 @@
 			order by 
 			e.start_time, e.facility_id, ea.value_text
 			
+			<report>
+				<column index="0" heading=""/>
+				<column index="1" heading="Patient"/>
+				<column index="2" heading="Appointment"/>
+				<column index="3" heading="Confirm"/>
+				<column index="4" heading="Checkin"/>
+				<column index="5" heading="Checkout"/>
+				<column index="6" heading="Claim"/>
+				<column index="7" type="currency" heading="OV Copay"/>
+				<column index="8" type="currency" heading="Account Balance" url="/person/#10#/account"/>
+				<column index="12" type="currency" heading="Patient Balance" url="/person/#10#/account"/>
+				<column index="11" heading="Action"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						head => ''
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Patient'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						head => 'Appointment'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'center'
+						head => 'Confirm'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'center'
+						head => 'Checkin'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'center'
+						head => 'Checkout'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'center'
+						head => 'Claim'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						hHint => 'Copay due by patient for this visit'
+						head => 'OV Copay'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Account Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					9 => {
+						colIdx => '12'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Patient Balance'
+						hint => 'View Account Balance'
+						summarize => 'sum'
+						url => '/person/#10#/account'
+
+					}
+					10 => {
+						colIdx => '11'
+						head => 'Action'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientBalance">
@@ -341,6 +640,34 @@
 			and ea.value_text = ?
 			order by 1, 2
 			
+			<report>
+				<column index="0" heading="Verification Dates"/>
+				<column index="1" heading="Insurance Product"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						dataFmt => '
+						<A HREF = '/person/#2#/dlg-verify-insurance-records/#3#/#2#?_dialogreturnurl=/person/#2#/billing'>#0#</A>
+					'
+						hAlign => 'center'
+						head => 'Verification Dates'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+						dataFmt => '#1#'
+						hAlign => 'center'
+						head => 'Insurance Product'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_worklist_facilities">

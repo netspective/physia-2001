@@ -19,6 +19,28 @@
 			<params>
 				<param value="request:id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'CENTER'
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'Name'
+						tAlign => 'LEFT'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like">
@@ -31,6 +53,28 @@
 			id LIKE ?
 			AND rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'CENTER'
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'Name'
+						tAlign => 'LEFT'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name">
@@ -43,6 +87,28 @@
 			UPPER(name) = ?
 			AND rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'CENTER'
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'Name'
+						tAlign => 'LEFT'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_like">
@@ -55,6 +121,28 @@
 			UPPER(name) LIKE ?
 			AND rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'CENTER'
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'Name'
+						tAlign => 'LEFT'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

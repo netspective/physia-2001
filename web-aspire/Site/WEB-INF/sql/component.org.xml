@@ -15,6 +15,49 @@
 			AND	oc.member_name='Lab'			
 			order by org_id
 			
+			<report>
+				<column index="0" heading="Lab ID"/>
+				<column index="1" heading="Lab Name"/>
+				<column index="3" heading="Actions"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-lab-test?home=#homeArl#'>Test</A> '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Lab ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Lab Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						dataFmt => '<A HREF="/org/#param.org_id#/dlg-add-lab-order/#3#"
+					TITLE='Modify Lab Test'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>'
+						hAlign => 'left'
+						head => 'Actions'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.ContractCatalogDetail">
@@ -38,6 +81,77 @@
 			AND	ocp.entry_id (+) = oce.entry_id
 			order by modifier, code
 			
+			<report>
+				<column index="0" heading="Code"/>
+				<column index="1" heading="Modifier"/>
+				<column index="2" heading="Type"/>
+				<column index="3" heading="Name"/>
+				<column index="4" type="currency" heading="Expected Price"/>
+				<column index="5" type="currency" heading="Allowed Price"/>
+				<column index="9" heading="Actions"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Code'
+						tDataFmt => '&{count:0} Entries'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Modifier'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Type'
+
+					}
+					3 => {
+						colIdx => '3'
+						hAlign => 'left'
+						head => 'Name'
+
+					}
+					4 => {
+						colIdx => '4'
+						dformat => 'currency'
+						head => 'Expected Price'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dformat => 'currency'
+						head => 'Allowed Price'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '9'
+						dataFmt => {
+							Add => '<A HREF="/org/#param.org_id#/dlg-add-contract-item/#7#/#6#"
+					TITLE='Add Contract Price'>
+					<IMG SRC="/resources/icons/black_a.gif" BORDER=0></A>'
+							Mod => '<A HREF="/org/#param.org_id#/dlg-update-contract-item/#8#"
+					TITLE='Modify Contract Price'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>
+					<A HREF="/org/#param.org_id#/dlg-remove-contract-item/#8#"
+										TITLE='Delete Contract Price'>
+					<img src="/resources/icons/black_d.gif" BORDER=0></A>
+									  '
+
+						}
+						head => 'Actions'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.ContractCatalogSummary">
@@ -52,6 +166,59 @@
 			FROM 	Contract_Catalog con
 			WHERE 	org_internal_id = ?
 			
+			<report>
+				<column index="0" heading="Contract ID" url="/org/#param.org_id#/catalog?catalog=contract_detail&contract_detail=#6#"/>
+				<column index="1" heading="Contract Name"/>
+				<column index="2" heading="Fee Schedule ID"/>
+				<column index="3" heading="Insurance Product"/>
+				<column index="4" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Contract Catalog</A> '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Contract ID'
+						tDataFmt => '&{count:0} Contracts'
+						url => '/org/#param.org_id#/catalog?catalog=contract_detail&contract_detail=#6#'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Contract Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Fee Schedule ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Insurance Product'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Entries'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.FSCatalogDetail">
@@ -82,6 +249,88 @@
 			oce.code,
 			oce.modifier
 			
+			<report>
+				<column index="0" heading="Code"/>
+				<column index="1" heading="Modifier"/>
+				<column index="2" heading="Procedure Type"/>
+				<column index="3" heading="Name"/>
+				<column index="4" heading="Contract Type"/>
+				<column index="5" type="currency" heading="Price"/>
+				<column index="5" heading="Actions"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.fee_schedule_detail#?home=#homeArl#'>Fee Schedule Item</A> '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Code'
+						tDataFmt => '&{count:0} Entries'
+
+					}
+					1 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Modifier'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Procedure Type'
+
+					}
+					3 => {
+						colIdx => '3'
+						hAlign => 'left'
+						head => 'Name'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Contract Type'
+
+					}
+					5 => {
+						colIdx => '5'
+						dformat => 'currency'
+						head => 'Price'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '5'
+						dataFmt => '
+						<A HREF="/org/#param.org_id#/dlg-add-catalog-item/#9#/#8#"
+						TITLE='Add Child Item'>
+						<img src="/resources/icons/black_a.gif" BORDER=0></A>
+						<A HREF="/org/#param.org_id#/dlg-update-catalog-item/#8#"
+						TITLE='Modify Item'>
+						<img src="/resources/icons/black_m.gif" BORDER=0></A>
+						<A HREF="/org/#param.org_id#/dlg-remove-catalog-item/#8#"
+											TITLE='Delete Item'>
+						<img src="/resources/icons/black_d.gif" BORDER=0></A>
+									  '
+						head => 'Actions'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.FSCatalogInsuranceSummary">
@@ -128,6 +377,69 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<report>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#"/>
+				<column index="1" heading="Catalog Name"/>
+				<column index="2" heading="Contract Type"/>
+				<column index="3" heading="Entries"/>
+				<column index="6" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '
+						<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+						<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+						<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
+					'
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-catalog/#5#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Catalog ID'
+						tDataFmt => '&{count:0} Schedules'
+						url => '/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#'
+
+					}
+					1 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Catalog Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Contract Type'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Entries'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '6'
+						hint => 'Add Child Item'
+						url => '/org/#session.org_id#/dlg-add-catalog/#5#'
+
+					}
+
+				}
+				stdIcons => {
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.FSCatalogSummary">
@@ -163,6 +475,69 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<report>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#"/>
+				<column index="1" heading="Catalog Name"/>
+				<column index="2" heading="Contract Type"/>
+				<column index="3" heading="Entries"/>
+				<column index="6" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '
+						<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+						<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+						<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
+					'
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-catalog/#5#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Catalog ID'
+						tDataFmt => '&{count:0} Schedules'
+						url => '/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#'
+
+					}
+					1 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Catalog Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Contract Type'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Entries'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '6'
+						hint => 'Add Child Item'
+						url => '/org/#session.org_id#/dlg-add-catalog/#5#'
+
+					}
+
+				}
+				stdIcons => {
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.LabTestDetail">
@@ -189,6 +564,76 @@
 			AND	parent_entry_id is null
 			order by oce.modifier,oce.code,oce.name 
 			
+			<report>
+				<column index="1" heading="Test ID"/>
+				<column index="2" heading="Test Name"/>
+				<column index="3" heading="Selection"/>
+				<column index="7" type="currency" heading="Physician Cost"/>
+				<column index="8" type="currency" heading="Patient Cost"/>
+				<column index="4" heading="Actions"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-lab-test/#param.labtest_detail#?home=#homeArl#'>Test</A> '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Test ID'
+						tDataFmt => '&{count:0} Tests'
+
+					}
+					1 => {
+						colIdx => '2'
+						hAlign => 'left'
+						head => 'Test Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'left'
+						head => 'Selection'
+
+					}
+					3 => {
+						colIdx => '7'
+						dformat => 'currency'
+						hAlign => 'left'
+						head => 'Physician Cost'
+
+					}
+					4 => {
+						colIdx => '8'
+						dformat => 'currency'
+						hAlign => 'left'
+						head => 'Patient Cost'
+
+					}
+					5 => {
+						colIdx => '4'
+						dataFmt => '<A HREF="/org/#param.org_id#/dlg-update-lab-test/#4#"
+					TITLE='Modify Lab Test'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>
+					<A HREF="/org/#param.org_id#/dlg-remove-lab-test/#4#"
+										TITLE='Delete Lab Test'>
+					<img src="/resources/icons/black_d.gif" BORDER=0></A> '
+						hAlign => 'left'
+						head => 'Actions'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.LabTestSummary">
@@ -204,6 +649,56 @@
 			group by oc.catalog_id,oc.caption ,oc.internal_catalog_id
 			order by oc.catalog_id
 			
+			<report>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#3#"/>
+				<column index="1" heading="Catalog Name"/>
+				<column index="2" heading="Entries"/>
+				<column heading="Action" url="/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&home=#homeArl#"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-test-catalog/#param.org_id#?home=#homeArl#'>Service Catalog</A> '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-test-catalog/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Catalog ID'
+						url => '/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#3#'
+
+					}
+					1 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Catalog Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						hAlign => 'left'
+						head => 'Entries'
+						tDataFmt => '&{sum:2} Entries'
+
+					}
+					3 => {
+						dataFmt => 'Add'
+						head => 'Action'
+						url => '/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&home=#homeArl#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.alerts">
@@ -228,6 +723,26 @@
 			AND a.caption = t.trans_subtype
 			ORDER BY a.id desc, trans_begin_stamp desc
 			
+			<report>
+				<column heading="Alerts"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<b>#4#</b>: #2#<br/><I>#3#</I>'
+						head => 'Alerts'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-alert-org?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.associatedOrgs">
@@ -242,6 +757,34 @@
 			)
 			and 	value_type = 252
 			
+			<report>
+				<column index="2" heading="Org"/>
+				<column index="3" heading="Org ID"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						head => 'Org'
+
+					}
+					1 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Org ID'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-resource-org?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.associatedResourcesStats">
@@ -256,6 +799,25 @@
 			)
 			group by category, org_internal_id
 			
+			<report>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '#1# #0#(s)'
+						head => 'Category'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.billingEvents">
@@ -275,6 +837,42 @@
 			ORDER BY
 			day
 			
+			<report>
+				<column index="1"/>
+				<column index="2"/>
+				<column index="4"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-billing-event/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						dataFmt => '<b>Day #1#</b>'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => 'Name From '#2#' to '#3#''
+
+					}
+					2 => {
+						colIdx => '4'
+						dataFmt => {
+							-1 => 'Balance < $#5#'
+							1 => 'Balance > $#5#'
+
+						}
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-billing-event?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.billinginfo">
@@ -306,6 +904,22 @@
 			)
 			order by entity_type DESC
 			
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/#7#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#6# - <b>#5#</b> #4# ID: <b>#2#</b> (Effective: #3#)'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+				separateDataColIdx => '2'
+
+			-->
 		</statement>
 
 		<statement name="org.catalogItems">
@@ -321,6 +935,39 @@
 			)
 			order by oce.entry_type, oce.status, oce.name, oce.code
 			
+			<report>
+				<column index="1" heading="Catalog ID"/>
+				<column index="2" heading="Code"/>
+				<column index="3" heading="Cost"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Catalog ID'
+						options => '1'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Code'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Cost'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog-item?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.closingDateInfo">
@@ -345,6 +992,29 @@
 			('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'THERAPEUTIC SERVICES')
 			ORDER BY parent_child DESC, o.org_id
 			
+			<report>
+				<column index="2"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						dataFmt => {
+							Child Org => '<A HREF = '/org/#0#/profile'>#0#</A> (Child Org, #3#): #1#'
+							Parent Org => '<A HREF = '/org/#0#/profile'>#0#</A> (Parent Org, #3#): #1#'
+
+						}
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-close-date?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.contactMethods">
@@ -375,6 +1045,40 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+						hint => 'Preferred'
+
+					}
+					1 => {
+						dAlign => 'RIGHT'
+						dataFmt => '#4#:'
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.contactMethodsAndAddresses">
@@ -442,6 +1146,40 @@
 			)
 			ORDER BY value_type
 
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+						hint => 'Preferred'
+
+					}
+					1 => {
+						dAlign => 'RIGHT'
+						dataFmt => '#4#:'
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.credentials">
@@ -456,6 +1194,30 @@
 			)
 			and 	value_type = 600
 			
+			<report>
+				<column heading="Name"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}'
+						head => 'Name'
+
+					}
+					1 => {
+						dataFmt => '#3#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-credential?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.departments">
@@ -471,6 +1233,34 @@
 			and 	ocat.member_name = 'Department'
 			and 	ocat.parent_id = org.org_internal_id
 			
+			<report>
+				<column index="1" heading="Primary Name"/>
+				<column index="2" heading="Org ID"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						dataFmt => '#1#:'
+						head => 'Primary Name'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '#3#'
+						head => 'Org ID'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-dept?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.feeSchedule">
@@ -487,6 +1277,45 @@
 			group by oc.catalog_id, oc.caption, oc.description, oc.parent_catalog_id
 			order by oc.caption
 			
+			<report>
+				<column index="0" heading="ID" url="/search/catalog/detail/#0#"/>
+				<column index="1" heading="Name"/>
+				<column index="2" heading="Entries"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '&{level_indent:0}#0#'
+						head => 'ID'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => '/search/catalog/detail/#0#'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'CENTER'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.feeschedules">
@@ -505,6 +1334,32 @@ SELECT	oc.catalog_id,
 			AND	oa.value_int = oc.internal_catalog_id
 			ORDER BY oc.catalog_id
 			
+			<report>
+				<column heading="Associated Fee Schedules"/>
+				<column index="1"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-feeschedule-org/#4#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF=/org/#param.org_id#/catalog/#3#/#0#>#0#</A>'
+						head => 'Associated Fee Schedules'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-feeschedule-org?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.fsCatalogEntry">
@@ -516,6 +1371,60 @@ SELECT	oc.catalog_id,
 			AND	oc.internal_catalog_id = oce.catalog_id
 			ORDER BY 1
 			
+			<report>
+				<column index="0" heading="Code"/>
+				<column index="1" heading="Name"/>
+				<column index="2" heading="Code Type"/>
+				<column index="4" type="currency" heading="Charge"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#?home=#homeArl#'>Fee Schedule Entry</A> '
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-catalog-item/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Code'
+						tDataFmt => '&{count:0} Entries'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Code Type'
+
+					}
+					3 => {
+						colIdx => '4'
+						dAlign => 'left'
+						dformat => 'currency'
+						hAlign => 'right'
+						head => 'Charge'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.generalInformation">
@@ -526,6 +1435,27 @@ SELECT	oc.catalog_id,
 			org_id = ?
 			)
 			
+			<report>
+				<column index="0" heading="Primary Name"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org/#4#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<b>#0#</b> <br> Legal Name: #0# <br> Tax ID: #3# <br> Category: #2#'
+						head => 'Primary Name'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-attr-0?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.healthMaintenanceRule">
@@ -539,6 +1469,26 @@ SELECT	oc.catalog_id,
 			org_id = ?
 			)
 			
+			<report>
+				<column heading="Rule"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#: #3#, #4#, #5# (#6#, #7#)'
+						head => 'Rule'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-health-rule?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.insurancePlans">
@@ -572,6 +1522,26 @@ SELECT	oc.catalog_id,
 			insurance.product_name,
 			insurance.plan_name
 			
+			<report>
+				<column index="0" heading="Policy Name"/>
+			</report>
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '&{level_indent:0} #2#(#3#): #4#, #13# (#7#)'
+						head => 'Policy Name'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.listAssociatedOrgs">
@@ -601,6 +1571,24 @@ SELECT	oc.catalog_id,
 			AND rownum &lt;= 250
 			ORDER BY org_id
 			
+			<report>
+				<column index="3"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '3'
+						dataFmt => {
+							Child Org => '#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #3#)'
+							Parent Org => '#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #3#)'
+
+						}
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.location">
@@ -614,6 +1602,36 @@ SELECT	oc.catalog_id,
 			WHERE org_address.address_name = oac.caption)
 			order by address_name
 			
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						head => 'P'
+
+					}
+					1 => {
+						dAlign => 'RIGHT'
+						dataFmt => '#4#:'
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.miscNotes">
@@ -637,6 +1655,22 @@ SELECT	oc.catalog_id,
 			)
 			AND item_name = 'Org Notes'
 			
+			<!--
+				bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-notes/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => 'Org Notes #4#: #5# (#6#, #7#)'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-notes?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.personnel">
@@ -653,6 +1687,43 @@ SELECT	oc.catalog_id,
 			and	p.person_id = pa.person_id
 			order by pa.person_id, pa.category, p.complete_name
 			
+			<report>
+				<column index="0" heading="Name"/>
+				<column index="1" heading="Type"/>
+			</report>
+			<!--
+				bullets => {
+					0 => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-personnel/?_f_person_id=#2#&_f_category=#1#&home=/org/#param.org_id#/personnel'
+					1 => {
+						imgSrc => '/resources/icons/action-edit-update.gif'
+						title => 'Change Password'
+						urlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#param.org_id#/personnel'
+
+					}
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#2#/profile">#2# #0#</A>'
+						head => 'Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Type'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#'
+					editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.serviceCatalog">
@@ -667,6 +1738,17 @@ SELECT	oc.catalog_id,
 			AND oct.id = oc.catalog_type
 			GROUP BY oc.catalog_id,oct.caption,oc.internal_catalog_id
 			
+			<!--
+				bullets => '/org/#param.org_id#/catalog/#3#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#1# : #0# (#2#)  '
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.serviceCatalogEntry">
@@ -677,6 +1759,42 @@ SELECT	oc.catalog_id,
 			AND	oc.internal_catalog_id = oce.catalog_id
 			ORDER BY 1
 			
+			<report>
+				<column index="0" heading="Code"/>
+				<column index="1" heading="Name"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF='/org/#param.org_id#/dlg-add-service-catalog/#param.internal_catalog_id#?home=#homeArl#'>Service Catalog Entry</A> '
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#param.org_id#/dlg-update-service-catalog/#2#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Code'
+						tDataFmt => '&{count:0} Entries'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+						hAlign => 'left'
+						head => 'Name'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="org.superbills">
@@ -690,6 +1808,50 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Superbill ID"/>
+				<column index="2" heading="Caption"/>
+				<column index="3" heading="Description"/>
+				<column url="/org/#param.org_id#/superbills?action=printSample&superbillid=#0#"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => ' Add <A HREF= '/org/#param.org_id#/superbills?action=new'>Superbill</A> &nbsp; &nbsp; '
+
+						}
+
+					}
+					contentColor => '#EEEEEE'
+
+				}
+				bullets => '/org/#param.org_id#/superbills?action=edit&superbillid=#0#'
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Superbill ID'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Caption'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Description'
+
+					}
+					3 => {
+						dataFmt => 'Print'
+						url => '/org/#param.org_id#/superbills?action=printSample&superbillid=#0#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

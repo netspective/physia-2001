@@ -17,6 +17,31 @@
 			<params>
 				<param value="request:hcpcs"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_code_like">
@@ -27,6 +52,31 @@
 			hcpcs like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_description">
@@ -37,6 +87,31 @@
 			upper(description) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_description_like">
@@ -47,6 +122,31 @@
 			upper(description) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_name">
@@ -57,6 +157,31 @@
 			upper(name) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_name_like">
@@ -67,6 +192,31 @@
 			upper(name) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_nameordescr">
@@ -77,6 +227,31 @@
 			upper(name) = ? or upper(description) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_hcpcs_nameordescr_like">
@@ -87,6 +262,31 @@
 			upper(name) like ? or upper(description) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

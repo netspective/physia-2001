@@ -55,6 +55,53 @@
 			group by p.simple_name, p.person_id, pa.item_name, p.name_last, cnt.ptCount
 			order by pa.item_name, p.name_last
 			
+			<report>
+				<column index="0" heading="Category"/>
+				<column index="1" heading="Doctor"/>
+				<column index="2" heading="# of Patients"/>
+				<column index="3" heading="% of Patients"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						dataFmt => '#3#'
+						groupBy => '#3#'
+						hAlign => 'center'
+						head => 'Category'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+						dataFmt => '#0# <A HREF = "/person/#1#/profile">#1#</A>'
+						hAlign => 'center'
+						head => 'Doctor'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'right'
+						dataFmt => '#2#'
+						hAlign => 'center'
+						head => '# of Patients'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'right'
+						dataFmt => '#5#'
+						hAlign => 'center'
+						head => '% of Patients'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="patientOrgCount">
@@ -95,6 +142,41 @@
 			and i.invoice_id = inv_items.parent_id
 			group by p.simple_name, p.person_id
 			
+			<report>
+				<column index="0" heading="Doctor"/>
+				<column index="1" heading="Insurance Org"/>
+				<column index="2" heading="# of Patients"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						dataFmt => '#0#'
+						hAlign => 'center'
+						head => 'Doctor'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'right'
+						dataFmt => '#2#'
+						hAlign => 'center'
+						head => 'Insurance Org'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'right'
+						dataFmt => '#3#'
+						hAlign => 'center'
+						head => '# of Patients'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="totalPatientCount">

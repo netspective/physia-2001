@@ -28,6 +28,50 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column index="1" heading="Begin"/>
+				<column index="2" heading="End"/>
+				<column index="3" heading="Locality"/>
+				<column index="4" heading="State"/>
+				<column index="5" heading="County"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Begin'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'End'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Locality'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'State'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'County'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_GPCI_county">
@@ -52,6 +96,50 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column index="1" heading="Begin"/>
+				<column index="2" heading="End"/>
+				<column index="3" heading="Locality"/>
+				<column index="4" heading="State"/>
+				<column index="5" heading="County"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Begin'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'End'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Locality'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'State'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'County'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_GPCI_id">
@@ -76,6 +164,50 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column index="1" heading="Begin"/>
+				<column index="2" heading="End"/>
+				<column index="3" heading="Locality"/>
+				<column index="4" heading="State"/>
+				<column index="5" heading="County"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Begin'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'End'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Locality'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'State'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'County'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_GPCI_locality">
@@ -100,6 +232,50 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column index="1" heading="Begin"/>
+				<column index="2" heading="End"/>
+				<column index="3" heading="Locality"/>
+				<column index="4" heading="State"/>
+				<column index="5" heading="County"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Begin'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'End'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Locality'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'State'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'County'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_GPCI_state">
@@ -124,6 +300,50 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column index="1" heading="Begin"/>
+				<column index="2" heading="End"/>
+				<column index="3" heading="Locality"/>
+				<column index="4" heading="State"/>
+				<column index="5" heading="County"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Begin'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'End'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Locality'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'State'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'County'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_stateForOrg">

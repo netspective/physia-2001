@@ -19,6 +19,31 @@
 			<params>
 				<param value="request:cpt"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_code_like">
@@ -31,6 +56,31 @@
 			cpt like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_description">
@@ -43,6 +93,31 @@
 			upper(description) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_description_like">
@@ -55,6 +130,31 @@
 			upper(description) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_name">
@@ -67,6 +167,31 @@
 			upper(name) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_name_like">
@@ -79,6 +204,31 @@
 			upper(name) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_nameordescr">
@@ -91,6 +241,31 @@
 			upper(name) = ? or upper(description) = ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cpt_nameordescr_like">
@@ -103,6 +278,31 @@
 			upper(name) like ? or upper(description) like ?
 			AND rownum &lt; 250
 
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_cpt">
@@ -118,6 +318,31 @@
 			<params>
 				<param value="request:cpt"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Name"/>
+				<column heading="Description"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						hint => 'Lookup Detailed Data'
+						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+
+					}
+					1 => {
+						head => 'Name'
+
+					}
+					2 => {
+						head => 'Description'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

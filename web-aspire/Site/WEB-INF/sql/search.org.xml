@@ -47,6 +47,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_category_like">
@@ -90,6 +114,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id">
@@ -133,6 +181,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like">
@@ -176,6 +248,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_primname">
@@ -219,6 +315,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_primname_like">
@@ -262,6 +382,30 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="Primary Name"/>
+				<column heading="Category"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+
+					}
+					1 => {
+						head => 'Primary Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -275,6 +275,129 @@ SELECT invoice_id
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)&gt; 0
 			
+			<report>
+				<column index="0" heading="Patient Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_data&patient_id=#1#')"/>
+				<column index="1" heading="Patient ID"/>
+				<column index="2" heading="Total Invoices"/>
+				<column index="3" type="currency" heading="0 - 30"/>
+				<column index="4" type="currency" heading="31 - 60"/>
+				<column index="5" type="currency" heading="61 - 90"/>
+				<column index="6" type="currency" heading="91 - 120"/>
+				<column index="7" type="currency" heading="121 - 150"/>
+				<column index="8" type="currency" heading="151+"/>
+				<column index="9" type="currency" heading="Total Balance"/>
+				<column index="10" type="currency" heading="Total Pending"/>
+				<column index="11" type="currency" heading="Total Amount"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'left'
+						dataFmt => '#0#'
+						hAlign => 'left'
+						head => 'Patient Name'
+						hint => 'View Detail Data for : #1#'
+						tAlign => 'left'
+						tDataFmt => '&{count:0} Patients'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=aged_data&patient_id=#1#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						hAlign => 'left'
+						head => 'Patient ID'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						dataFmt => '#2#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Total Balance'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '10'
+						dAlign => 'center'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+					11 => {
+						colIdx => '11'
+						dAlign => 'center'
+						dataFmt => '#11#'
+						dformat => 'currency'
+						head => 'Total Amount'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Patient Receivables'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_all_total">
@@ -359,6 +482,67 @@ SELECT invoice_id
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
 			having sum(balance)&lt;&gt; 0
 			
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Invoice Date"/>
+				<column heading="Status"/>
+				<column heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						summarize => 'count'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Invoice Date'
+
+					}
+					3 => {
+						head => 'Status'
+
+					}
+					4 => {
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Patient Receivables'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_insurance">
@@ -390,6 +574,98 @@ SELECT invoice_id
 			GROUP BY bill_to_id
 			--having sum(total_pending) &lt;&gt; 0
 			
+			<report>
+				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="1" heading="Total Invoices"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading="151+"/>
+				<column index="8" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Insurance'
+						tDataFmt => '&{count:0} Insurances'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Insurance Receivables'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_insurance_detail">
@@ -428,6 +704,92 @@ SELECT invoice_id
 			p.simple_name
 			having sum(balance)&lt;&gt; 0
 			
+			<report>
+				<column index="0" heading="ID"/>
+				<column index="1" heading="IC"/>
+				<column index="2" heading="Svc Date"/>
+				<column index="3" heading="Status"/>
+				<column index="4" heading="Client"/>
+				<column index="9" heading="Client Name"/>
+				<column index="5" heading="Payer"/>
+				<column index="6" type="currency" heading="Charges"/>
+				<column index="7" type="currency" heading="Adjust"/>
+				<column index="8" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						head => 'ID'
+						tDataFmt => '&{count:0}'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'IC'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '9'
+						head => 'Client Name'
+
+					}
+					6 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'Payer'
+
+					}
+					7 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_insurance_org">
@@ -450,6 +812,96 @@ SELECT invoice_id
 			and t.service_facility_id = ?
 			GROUP BY bill_to_id
 
+			<report>
+				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="1" heading="Total Invoices"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading="151+"/>
+				<column index="8" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Insurance'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_insurance_prov_org">
@@ -472,6 +924,97 @@ SELECT invoice_id
 			and t.care_provider_id = ? and t.service_facility_id = ?
 			GROUP BY bill_to_id
 
+			<report>
+				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="1" heading="Total Invoices"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading="151+"/>
+				<column index="8" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Insurance'
+						tDataFmt => '&{count:0} Insurances'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_insurance_total">
@@ -502,6 +1045,96 @@ SELECT invoice_id
 			)
 			--having sum(total_pending) &lt;&gt; 0
 			
+			<report>
+				<column index="0" heading="Insurance"/>
+				<column index="1" heading="Total Invoices"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading="151+"/>
+				<column index="8" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0# Insurances'
+						head => 'Insurance'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Insurance Receivables Totals Report'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient">
@@ -543,6 +1176,117 @@ SELECT invoice_id
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)&gt; 0
 			
+			<report>
+				<column index="0" heading="Patient Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#1#')"/>
+				<column index="1" heading="Patient ID"/>
+				<column index="2" heading="Total Invoices"/>
+				<column index="3" type="currency" heading="0 - 30"/>
+				<column index="4" type="currency" heading="31 - 60"/>
+				<column index="5" type="currency" heading="61 - 90"/>
+				<column index="6" type="currency" heading="91 - 120"/>
+				<column index="7" type="currency" heading="121 - 150"/>
+				<column index="8" type="currency" heading="151+"/>
+				<column index="9" type="currency" heading="Co-Pay Owed"/>
+				<column index="10" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						hAlign => 'left'
+						head => 'Patient Name'
+						hint => 'View Detail Data for : #1#'
+						tDataFmt => '&{count:0} Patients'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#1#')'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						hAlign => 'left'
+						head => 'Patient ID'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						dataFmt => '#2#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '10'
+						dAlign => 'center'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Patient Receivables'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient_detail">
@@ -583,6 +1327,67 @@ SELECT invoice_id
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
 			having sum(balance)&lt;&gt; 0
 			
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Invoice Date"/>
+				<column heading="Status"/>
+				<column heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						summarize => 'count'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Invoice Date'
+
+					}
+					3 => {
+						head => 'Status'
+
+					}
+					4 => {
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Patient Receivables'
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient_org">
@@ -617,6 +1422,112 @@ SELECT invoice_id
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)&gt; 0
 
+			<report>
+				<column index="0" heading="Patient Name"/>
+				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="2" heading="Total Invoices"/>
+				<column index="3" type="currency" heading="0 - 30"/>
+				<column index="4" type="currency" heading="31 - 60"/>
+				<column index="5" type="currency" heading="61 - 90"/>
+				<column index="6" type="currency" heading="91 - 120"/>
+				<column index="7" type="currency" heading="121 - 150"/>
+				<column index="8" type="currency" heading="151+"/>
+				<column index="9" type="currency" heading="Co-Pay Owed"/>
+				<column index="10" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Patient Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Patient ID'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						dataFmt => '#2#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '10'
+						dAlign => 'center'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient_prov">
@@ -651,6 +1562,112 @@ SELECT invoice_id
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)&gt; 0
 
+			<report>
+				<column index="0" heading="Patient Name"/>
+				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="2" heading="Total Invoices"/>
+				<column index="3" type="currency" heading="0 - 30"/>
+				<column index="4" type="currency" heading="31 - 60"/>
+				<column index="5" type="currency" heading="61 - 90"/>
+				<column index="6" type="currency" heading="91 - 120"/>
+				<column index="7" type="currency" heading="121 - 150"/>
+				<column index="8" type="currency" heading="151+"/>
+				<column index="9" type="currency" heading="Co-Pay Owed"/>
+				<column index="10" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Patient Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Patient ID'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						dataFmt => '#2#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '10'
+						dAlign => 'center'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient_prov_org">
@@ -685,6 +1702,112 @@ SELECT invoice_id
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)&gt; 0
 
+			<report>
+				<column index="0" heading="Patient Name"/>
+				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="2" heading="Total Invoices"/>
+				<column index="3" type="currency" heading="0 - 30"/>
+				<column index="4" type="currency" heading="31 - 60"/>
+				<column index="5" type="currency" heading="61 - 90"/>
+				<column index="6" type="currency" heading="91 - 120"/>
+				<column index="7" type="currency" heading="121 - 150"/>
+				<column index="8" type="currency" heading="151+"/>
+				<column index="9" type="currency" heading="Co-Pay Owed"/>
+				<column index="10" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Patient Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Patient ID'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						dataFmt => '#2#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '10'
+						dAlign => 'center'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_aged_patient_total">
@@ -750,6 +1873,106 @@ SELECT invoice_id
 			having sum(b.total_pending) &gt; 0
 			)
 			
+			<report>
+				<column index="0" heading="Total Patients"/>
+				<column index="1" heading="Total Invoices"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading="151+"/>
+				<column index="8" type="currency" heading="Co-Pay Owed"/>
+				<column index="9" type="currency" heading="Total Pending"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0# Patients'
+						hAlign => 'left'
+						head => 'Total Patients'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'Total Invoices'
+						summarize => 'sum'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '151+'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '9'
+						dAlign => 'center'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Total Pending'
+						summarize => 'sum'
+
+					}
+
+				}
+				reportTitle => 'Aged Patient Receivables Totals Report'
+
+			-->
 		</statement>
 
 		<statement name="sel_daily_audit">
@@ -868,6 +2091,127 @@ SELECT invoice_id
 			GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 			ORDER BY 13, to_char(invoice_date,'MM')
 			
+			<report>
+				<column index="12" heading="Year"/>
+				<column index="0" heading="Month"/>
+				<column index="1" type="currency" heading="Chrgs"/>
+				<column index="2" type="currency" heading="Misc Chrgs"/>
+				<column index="3" type="currency" heading="Chrg Adj"/>
+				<column index="4" type="currency" heading="Ins W/O"/>
+				<column index="5" type="currency" heading="Net Chrgs"/>
+				<column index="6" type="currency" heading="Bal Trans"/>
+				<column index="7" type="currency" heading="Per Rcpts"/>
+				<column index="8" type="currency" heading="Ins Rcpts"/>
+				<column index="9" type="currency" heading="Rcpt Adj"/>
+				<column index="10" type="currency" heading="Net Rcpts"/>
+				<column index="11" type="currency" heading="A/R"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '12'
+						dAlign => 'left'
+						groupBy => '#12#'
+						head => 'Year'
+
+					}
+					1 => {
+						colIdx => '0'
+						dAlign => 'left'
+						head => 'Month'
+
+					}
+					2 => {
+						colIdx => '1'
+						dAlign => 'left'
+						dformat => 'currency'
+						head => 'Chrgs'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dformat => 'currency'
+						hAlign => 'left'
+						head => 'Misc Chrgs'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '3'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Chrg Adj'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '4'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Ins W/O'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '5'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Net Chrgs'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '6'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Bal Trans'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '7'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Per Rcpts'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Ins Rcpts'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '9'
+						dAlign => 'center'
+						dformat => 'currency'
+						head => 'Rcpt Adj'
+						summarize => 'sum'
+
+					}
+					11 => {
+						colIdx => '10'
+						dformat => 'currency'
+						head => 'Net Rcpts'
+						summarize => 'sum'
+
+					}
+					12 => {
+						colIdx => '11'
+						dformat => 'currency'
+						head => 'A/R'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_monthly_audit">
@@ -1079,6 +2423,375 @@ SELECT invoice_id
 			AND thePatient.person_id = thePatientAddr.parent_id
 			AND theDoctor.person_id = theDoctorAddr.parent_id
 			
+			<report>
+				<column index="0" heading="Start Time"/>
+				<column index="1" heading="Patient"/>
+				<column index="2" heading="Reason"/>
+				<column index="3" heading="Dr #"/>
+				<column index="4" heading="Doctor"/>
+				<column index="5" heading="Location"/>
+				<column index="6" heading="DOB"/>
+				<column index="7" heading="Patient #"/>
+				<column index="8" heading="Resp. Party"/>
+				<column index="9" heading="Sex"/>
+				<column index="10" heading="Address"/>
+				<column index="11" heading="City/State"/>
+				<column index="12" heading="Zip"/>
+				<column index="13" heading="Over 90"/>
+				<column index="14" heading="Over 60"/>
+				<column index="15" heading="Over 30"/>
+				<column index="16" heading="Current"/>
+				<column index="17" heading="Total Due"/>
+				<column index="18" heading="Insurance Co."/>
+				<column index="19" heading="Policy #"/>
+				<column index="20" heading="Relationship to Insured"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0# #1#'
+						head => 'Start Time'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#2#'
+						head => 'Patient'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#3#'
+						head => 'Reason'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#4#'
+						groupBy => '#4#'
+						head => 'Dr #'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#5#'
+						head => 'Doctor'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#6#'
+						head => 'Location'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#7#'
+						head => 'DOB'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#8#'
+						head => 'Patient #'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#9#'
+						head => 'Resp. Party'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#10#'
+						head => 'Sex'
+
+					}
+					10 => {
+						colIdx => '10'
+						dataFmt => '#11#'
+						head => 'Address'
+
+					}
+					11 => {
+						colIdx => '11'
+						dataFmt => '#12#, #13#'
+						head => 'City/State'
+
+					}
+					12 => {
+						colIdx => '12'
+						dataFmt => '#14#'
+						head => 'Zip'
+
+					}
+					13 => {
+						colIdx => '13'
+						dataFmt => '#15#'
+						head => 'Over 90'
+
+					}
+					14 => {
+						colIdx => '14'
+						dataFmt => '#16#'
+						head => 'Over 60'
+
+					}
+					15 => {
+						colIdx => '15'
+						dataFmt => '#17#'
+						head => 'Over 30'
+
+					}
+					16 => {
+						colIdx => '16'
+						dataFmt => '#18#'
+						head => 'Current'
+
+					}
+					17 => {
+						colIdx => '17'
+						dataFmt => '#19#'
+						head => 'Total Due'
+
+					}
+					18 => {
+						colIdx => '18'
+						dataFmt => '#20#'
+						head => 'Insurance Co.'
+
+					}
+					19 => {
+						colIdx => '19'
+						dataFmt => '#21#'
+						head => 'Policy #'
+
+					}
+					20 => {
+						colIdx => '20'
+						dataFmt => '#22#'
+						head => 'Relationship to Insured'
+
+					}
+
+				}
+				fieldDefn => {
+					0 => {
+						align => 'LEFT'
+						col => '1'
+						colIdx => '0'
+						row => '48'
+						width => '10'
+
+					}
+					1 => {
+						align => 'LEFT'
+						col => '1'
+						colIdx => '1'
+						row => '49'
+						width => '10'
+
+					}
+					2 => {
+						align => 'LEFT'
+						col => '12'
+						colIdx => '2'
+						row => '48'
+						width => '18'
+
+					}
+					3 => {
+						align => 'LEFT'
+						col => '31'
+						colIdx => '3'
+						row => '48'
+						width => '11'
+
+					}
+					4 => {
+						align => 'LEFT'
+						col => '7'
+						colIdx => '4'
+						row => '51'
+						width => '4'
+
+					}
+					5 => {
+						align => 'LEFT'
+						col => '12'
+						colIdx => '5'
+						row => '51'
+						width => '10'
+
+					}
+					6 => {
+						align => 'LEFT'
+						col => '23'
+						colIdx => '6'
+						row => '51'
+						width => '13'
+
+					}
+					7 => {
+						align => 'LEFT'
+						col => '37'
+						colIdx => '7'
+						row => '51'
+						width => '8'
+
+					}
+					8 => {
+						align => 'LEFT'
+						col => '1'
+						colIdx => '8'
+						row => '53'
+						width => '6'
+
+					}
+					9 => {
+						align => 'LEFT'
+						col => '8'
+						colIdx => '9'
+						row => '53'
+						width => '19'
+
+					}
+					10 => {
+						align => 'LEFT'
+						col => '3'
+						colIdx => '10'
+						data => {
+							1 => 'X  '
+							2 => '  X'
+							3 => ' * '
+
+						}
+						row => '55'
+						type => 'conditional'
+						width => '3'
+
+					}
+					11 => {
+						align => 'LEFT'
+						col => '7'
+						colIdx => '11'
+						row => '55'
+						width => '13'
+
+					}
+					12 => {
+						align => 'LEFT'
+						col => '23'
+						colIdx => '12'
+						row => '55'
+						width => '10'
+
+					}
+					13 => {
+						align => 'LEFT'
+						col => '34'
+						colIdx => '13'
+						row => '55'
+						width => '2'
+
+					}
+					14 => {
+						align => 'LEFT'
+						col => '37'
+						colIdx => '14'
+						row => '55'
+						width => '7'
+
+					}
+					15 => {
+						align => 'LEFT'
+						col => '3'
+						colIdx => '15'
+						row => '57'
+						width => '5'
+
+					}
+					16 => {
+						align => 'LEFT'
+						col => '9'
+						colIdx => '16'
+						row => '57'
+						width => '5'
+
+					}
+					17 => {
+						align => 'LEFT'
+						col => '15'
+						colIdx => '17'
+						row => '57'
+						width => '6'
+
+					}
+					18 => {
+						align => 'LEFT'
+						col => '22'
+						colIdx => '18'
+						row => '57'
+						width => '4'
+
+					}
+					19 => {
+						align => 'LEFT'
+						col => '27'
+						colIdx => '19'
+						row => '57'
+						width => '5'
+
+					}
+					20 => {
+						align => 'LEFT'
+						col => '1'
+						colIdx => '20'
+						row => '59'
+						width => '12'
+
+					}
+					21 => {
+						align => 'LEFT'
+						col => '18'
+						colIdx => '21'
+						row => '59'
+						width => '16'
+
+					}
+					22 => {
+						align => 'LEFT'
+						col => '35'
+						colIdx => '22'
+						data => {
+							1 => 'X      '
+							13 => '      X'
+							14 => '      X'
+							16 => '      X'
+							17 => '      X'
+							18 => '      X'
+							19 => '      X'
+							2 => '  X    '
+							3 => '    X  '
+							4 => '    X  '
+							5 => '    X  '
+							6 => '    X  '
+							9 => '      X'
+
+						}
+						row => '61'
+						type => 'conditional'
+						width => '8'
+
+					}
+
+				}
+				maxCols => '80'
+				maxRows => '63'
+
+			-->
 		</statement>
 
 		<statement name="sel_patient_superbill_info_from_eventid">
@@ -1132,6 +2845,42 @@ SELECT invoice_id
 			AND	theInsurance.owner_person_id = thePatient.person_id
 			AND	thePatient.person_id = ?
 			
+			<report>
+				<column index="0" heading="Patient"/>
+				<column index="1" heading="Insurance Company"/>
+				<column index="2" heading="Policy ID"/>
+				<column index="3" heading="Relationship to Insured"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Patient'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Insurance Company'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Policy ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Relationship to Insured'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_providerreceipt">

@@ -60,6 +60,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_date_like">
@@ -116,6 +214,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_date_status">
@@ -173,6 +369,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_date_status_like">
@@ -230,6 +524,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_employer">
@@ -287,6 +679,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_employer_like">
@@ -344,6 +834,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_employer_status">
@@ -402,6 +990,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_employer_status_like">
@@ -460,6 +1146,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id">
@@ -517,6 +1301,104 @@
 				<param value="request:invoice_id"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like">
@@ -573,6 +1455,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_status">
@@ -631,6 +1611,104 @@
 				<param value="request:invoice_id"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_status_like">
@@ -688,6 +1766,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insurance">
@@ -744,6 +1920,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insurance_like">
@@ -800,6 +2074,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insurance_status">
@@ -857,6 +2229,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_insurance_status_like">
@@ -914,6 +2384,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname">
@@ -971,6 +2539,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like">
@@ -1028,6 +2694,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_status">
@@ -1086,6 +2850,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_status_like">
@@ -1144,6 +3006,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientid">
@@ -1201,6 +3161,104 @@
 				<param value="request:client_id"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientid_like">
@@ -1257,6 +3315,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientid_status">
@@ -1315,6 +3471,104 @@
 				<param value="request:client_id"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_patientid_status_like">
@@ -1372,6 +3626,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_servicedate">
@@ -1428,6 +3780,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_servicedate_like">
@@ -1484,6 +3934,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_servicedate_status">
@@ -1541,6 +4089,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_servicedate_status_like">
@@ -1598,6 +4244,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn">
@@ -1656,6 +4400,104 @@
 				<param value="request:ssn"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like">
@@ -1713,6 +4555,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_status">
@@ -1772,6 +4712,104 @@
 				<param value="request:ssn"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_status_like">
@@ -1830,6 +4868,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_upin">
@@ -1887,6 +5023,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_upin_like">
@@ -1944,6 +5178,104 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_upin_status">
@@ -2002,6 +5334,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_upin_status_like">
@@ -2060,6 +5490,104 @@
 				<param value="request:invoice_status"/>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="IC"/>
+				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="9" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						hint => 'Created on: #10#'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						head => 'IC'
+
+					}
+					2 => {
+						head => 'Patient'
+						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+
+					}
+					3 => {
+						head => 'Svc Date'
+
+					}
+					4 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							10 => '#4#'
+							11 => '#4#'
+							12 => '#4#'
+							13 => '#4#'
+							14 => '#4#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#4#'
+							18 => '#4#'
+							2 => '#4#'
+							3 => '#4#'
+							4 => '#4#'
+							5 => '#4#'
+							6 => '#4#'
+							7 => '#4#'
+							8 => '#4#'
+							9 => '#4#'
+
+						}
+						head => 'Status'
+
+					}
+					5 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							1 => '<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>'
+							2 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							3 => '<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>'
+							_DEFAULT => '#5#'
+
+						}
+						head => 'Payer'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					8 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+				select => {
+					type => 'checkbox'
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

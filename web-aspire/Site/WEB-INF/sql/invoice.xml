@@ -190,6 +190,120 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column heading="Provider of Service"/>
+				<column heading="Billing Provider"/>
+				<column heading="Service Org"/>
+				<column index="11" heading="Payer"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#3#'
+							18 => '#3#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '#15#'
+						head => 'Provider of Service'
+
+					}
+					5 => {
+						dAlign => 'CENTER'
+						dataFmt => '#16#'
+						head => 'Billing Provider'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						dataFmt => '#18#'
+						head => 'Service Org'
+
+					}
+					7 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					8 => {
+						colIdx => '5'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '6'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '7'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selAllNonVoidedInvoicesByClient">
@@ -1018,6 +1132,92 @@
 			<params>
 				<param value="request:bill_to_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="8" heading="Client"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Claim Identifier'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#3#'
+							18 => '#3#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '8'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '5'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selInvoicesByType">
@@ -1168,6 +1368,120 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column heading="Provider of Service"/>
+				<column heading="Billing Provider"/>
+				<column heading="Service Org"/>
+				<column index="11" heading="Payer"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => 'Closed #13#'
+							16 => 'Void #13#'
+							17 => '#3#'
+							18 => '#3#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '#15#'
+						head => 'Provider of Service'
+
+					}
+					5 => {
+						dAlign => 'CENTER'
+						dataFmt => '#16#'
+						head => 'Billing Provider'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						dataFmt => '#18#'
+						head => 'Service Org'
+
+					}
+					7 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					8 => {
+						colIdx => '5'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '6'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '7'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selPaperClaims">

@@ -19,6 +19,26 @@
 			)
 			WHERE ROWNUM &lt; 11
 			
+			<report>
+				<column heading="Account Notes"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#&{?}# - by #4#<br/> <b>#1#</b>'
+						head => 'Account Notes'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.accountPanel">
@@ -50,6 +70,28 @@
 			<params>
 				<param value="request:client_id"/>
 			</params>
+			<report>
+				<column index="9" heading="Invoice"/>
+			</report>
+			<!--
+				bullets => '/invoice/#0#/summary?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<b>Invoice: </b>#0#, Bill To: #7#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#'
+							1 => '<b>Invoice: </b>#0#, Bill To: #7#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#'
+							2 => '<b>Invoice: </b>#0#, Bill To: #8#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#'
+							3 => '<b>Invoice: </b>#0#, Bill To: #8#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#'
+
+						}
+						head => 'Invoice'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.activeMedications">
@@ -75,6 +117,68 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Medication"/>
+				<column index="4" type="date" heading="Date"/>
+				<column heading="Dosage"/>
+				<column index="5" heading="Freq"/>
+				<column heading="Refills"/>
+				<column index="7" heading="Approved By"/>
+				<column index="8" heading="Print"/>
+			</report>
+			<!--
+				bullets => {
+					0 => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#homeArl#'
+					1 => {
+						imgSrc => '/resources/widgets/mail/prescription.gif'
+						title => 'Refill Request'
+						urlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-refill-medication/#0#?home=#homeArl#'
+
+					}
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Medication'
+
+					}
+					1 => {
+						colIdx => '4'
+						dformat => 'date'
+						head => 'Date'
+
+					}
+					2 => {
+						dataFmt => '#2##3#'
+						head => 'Dosage'
+
+					}
+					3 => {
+						colIdx => '5'
+						head => 'Freq'
+
+					}
+					4 => {
+						dataFmt => '#6# Refills'
+						head => 'Refills'
+
+					}
+					5 => {
+						colIdx => '7'
+						head => 'Approved By'
+
+					}
+					6 => {
+						colIdx => '8'
+						dataFmt => '<a href=javascript:doActionPopup('/popup/prescription_pdf?permed_id=#0#');>Print Prescription</a>'
+						head => 'Print'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.activeMedicationsOld">
@@ -101,6 +205,22 @@
 			<params>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<report>
+				<column index="3" heading="Date"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '3'
+						dataFmt => '#2# (#4#)<BR>by <A HREF ="/person/#5#/profile">#5#</A> (#3#)'
+						head => 'Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.activeProblems">
@@ -136,6 +256,26 @@
 				<param value="request:trans_owner_id"/>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<report>
+				<column heading="Active Problems"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#2# <A HREF = "/search/icd">#6#</A><BR>by <A HREF = "/person/#3#/profile">#3#</A> (#1#)'
+						head => 'Active Problems'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+				separateDataColIdx => '2'
+
+			-->
 		</statement>
 
 		<statement name="person.additionalData">
@@ -148,6 +288,30 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Additional Data"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#2#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:0}: '
+						head => 'Additional Data'
+
+					}
+					1 => {
+						dataFmt => '#1#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-person-additional?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.addresses">
@@ -163,6 +327,24 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Address"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<IMG SRC="/resources/icons/address.gif">'
+
+					}
+					1 => {
+						dataFmt => '<b>#0#</b><BR>#1#'
+						head => 'Address'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.advancedDirectives">
@@ -175,6 +357,25 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Advance Directives"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:3} (#2#)'
+						head => 'Advance Directives'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.affiliations">
@@ -187,6 +388,27 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Affiliation"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}, #3# (#4#) <br>'
+						head => 'Affiliation'
+						options => '1'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-affiliation?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.alerts">
@@ -221,6 +443,30 @@
 			)
 			ORDER BY a.id desc, trans_begin_stamp desc
 			
+			<report>
+				<column index="6"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '6'
+						dataFmt => {
+							 => '<b>#4#</b>: #0#<br/><I>#1#</I>'
+							8040 => '<b>#4#</b>: #0#<br/><I>#1# (Due Date: #5#)</I>'
+
+						}
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.allMedications">
@@ -246,6 +492,68 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Medication"/>
+				<column index="4" type="date" heading="Start Date"/>
+				<column index="8" type="date" heading="End Date"/>
+				<column heading="Dosage"/>
+				<column index="5" heading="Freq"/>
+				<column heading="Refills"/>
+				<column index="7" heading="Approved By"/>
+			</report>
+			<!--
+				bullets => {
+					0 => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#homeArl#'
+					1 => {
+						imgSrc => '/resources/widgets/mail/prescription.gif'
+						title => 'Refill Request'
+						urlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-refill-medication/#0#?home=#homeArl#'
+
+					}
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Medication'
+
+					}
+					1 => {
+						colIdx => '4'
+						dformat => 'date'
+						head => 'Start Date'
+
+					}
+					2 => {
+						colIdx => '8'
+						dformat => 'date'
+						head => 'End Date'
+
+					}
+					3 => {
+						dataFmt => '#2##3#'
+						head => 'Dosage'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'Freq'
+
+					}
+					5 => {
+						dataFmt => '#6# Refills'
+						head => 'Refills'
+
+					}
+					6 => {
+						colIdx => '7'
+						head => 'Approved By'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.allergies">
@@ -258,6 +566,25 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Allergies"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}: <I>#3#</I>'
+						head => 'Allergies'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.appointmentCount">
@@ -275,6 +602,16 @@
 			<params>
 				<param value="request:person_id"/>
 			</params>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '#1#s : #0#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.associatedResources">
@@ -288,6 +625,30 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Record"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-assoc-nurse-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						head => 'Record'
+
+					}
+					1 => {
+						dataFmt => '#3#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-nurse?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.associatedSessionPhysicians">
@@ -300,6 +661,24 @@
 			and parent_org_id = ?
 			order by 1
 			
+			<report>
+				<column heading="Record"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#'
+						head => 'Record'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-resource-session-physicians?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.attendance">
@@ -312,6 +691,27 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Reason"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}: #3#'
+						head => 'Reason'
+						options => '1'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-attendance?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.authorization">
@@ -328,6 +728,32 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Type"/>
+				<column index="3" heading="Text"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						dataFmt => '&{fmt_stripLeadingPath:2} (#4#):'
+						head => 'Type'
+
+					}
+					1 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Text'
+
+					}
+
+				}
+				frame => {
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.benefits">
@@ -340,6 +766,31 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Benefits"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						head => 'Benefits'
+						options => '1'
+
+					}
+					1 => {
+						dataFmt => '#3#'
+						options => '1'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.billinginfo">
@@ -355,6 +806,25 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="0"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/0?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<b>#5#</b> #4# ID: <b>#2#</b> (Effective: #3#)'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.bloodType">
@@ -377,6 +847,22 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => 'Blood Type: #4#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-blood-type?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.bookmarks">
@@ -386,6 +872,26 @@
 			where parent_id = ?
 			and item_name = 'Bookmarks'
 			
+			<report>
+				<column heading="Bookmarks"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-book-marks/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#1#: <A HREF="#0#">#0#</A>'
+						head => 'Bookmarks'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-book-marks?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.careProviders">
@@ -406,6 +912,33 @@
 			and pc.org_internal_id = ?
 			and pc.category in ('Physician', 'Referring-Doctor')
 			
+			<report>
+				<column index="7" heading="CareProvider"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '7'
+						dataFmt => {
+							Physician => '<A HREF = '/person/#3#/profile' title='View #3# Profile'>#3#</A> (#2##6#)
+						<A HREF ='/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#' title='Schedule Appointment with #3#'>Sched Appointment</A>
+					'
+							Referring-Doctor => '<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)'
+
+						}
+						head => 'CareProvider'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-provider?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.certification">
@@ -425,6 +958,33 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="0"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => {
+							500 => '<b>#7#</b> #2# (#8# - #4# #5#): #3#, #6#'
+							510 => '<b>#7#</b> #2# (#8# - #4# #5#): #3#'
+							520 => '<b>#7#</b> #2# (#8# - #4# #5#)'
+							540 => '<b>#7#</b> #2# (#8# - #4# #5#)'
+							550 => '<b>#7#</b> #2# (#8# - #4# #5#): #3#, #6#'
+							560 => '<b>#7#</b> #2# (#8# - #4# #5#)'
+
+						}
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.childReferral">
@@ -444,6 +1004,58 @@
 			AND	tr.parent_trans_id = tsr.trans_id
 			ORDER BY 1 desc
 			
+			<report>
+				<column index="0" heading="RID" url="/org/#session.org_id#/dlg-update-trans-6010/#0#"/>
+				<column index="1" heading="Date"/>
+				<column index="2" heading="Type"/>
+				<column index="3" heading="FUD"/>
+				<column index="4" heading="Followup"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						hHint => 'Referral ID'
+						head => 'RID'
+						tDataFmt => '&{count:0} Referrals'
+						url => '/org/#session.org_id#/dlg-update-trans-6010/#0#'
+
+					}
+					1 => {
+						colIdx => '1'
+						hHint => 'Referral Date'
+						head => 'Date'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'center'
+						hHint => 'Referral Type'
+						head => 'Type'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'center'
+						hHint => 'Follow Up Date'
+						head => 'FUD'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'center'
+						hHint => 'Follow Up Caption'
+						head => 'Followup'
+
+					}
+
+				}
+				frame => {
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.clinical">
@@ -486,6 +1098,40 @@
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+						hint => 'Preferred'
+
+					}
+					1 => {
+						dAlign => 'RIGHT'
+						dataFmt => '#4#:'
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.contactMethodsAndAddresses">
@@ -538,6 +1184,40 @@
 				<param value="request:parent_id"/>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+						hint => 'Preferred'
+
+					}
+					1 => {
+						dAlign => 'RIGHT'
+						dataFmt => '#4#:'
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.diagnosisSummary">
@@ -554,6 +1234,20 @@
 			<params>
 				<param value="request:client_id"/>
 			</params>
+			<report>
+				<column heading="Diagnosis Summary"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF = "/search/icd/detail/#0#">(ICD #0#)</A> #1#<br> #2#--#3#: #4#<br><br>'
+						head => 'Diagnosis Summary'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.docPhone">
@@ -569,6 +1263,16 @@
 			<params>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#' >#10#</A>: (#6#): #7# '
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.docRefill">
@@ -596,6 +1300,16 @@
 				<param value="request:trans_owner_id"/>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF = '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#'> #11#</A> : (#6#) #7# (#3#)'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.docResults">
@@ -604,12 +1318,32 @@
 			UNION
 			select 	'GEORGE SCHMIDT' ,to_char(sysdate,'Mon-DD'),'X-Ray','Chest-Xray', 'GSCHMIDT','Normal' FROM DUAL
 			
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF='javascript:alert("NOT IMPLEMENTED")' >#0#</A>: (#1#) #3#  <B>#5#</B>'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.docSign">
 			
 select 'NOT IMPLEMENTED' from dual
 			
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<B>#0#</B>'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.emergencyAssociations">
@@ -630,6 +1364,26 @@ select 'NOT IMPLEMENTED' from dual
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Emergency Contact"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF ="/person/#3#/profile">#3#</A>#5# (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)'
+						head => 'Emergency Contact'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-contact-emergency?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.employmentAssociations">
@@ -643,6 +1397,26 @@ select 'NOT IMPLEMENTED' from dual
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Employer"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF = "/org/#3#/profile">#3#</A><BR>#4#, &{fmt_stripLeadingPath:2}'
+						head => 'Employer'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-employment?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.employmentRecord">
@@ -655,6 +1429,30 @@ select 'NOT IMPLEMENTED' from dual
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Record"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2}: '
+						head => 'Record'
+						options => '1'
+
+					}
+					1 => {
+						dataFmt => '#3#'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.extendedHealthCoverage">
@@ -698,6 +1496,31 @@ select 'NOT IMPLEMENTED' from dual
 			<params>
 				<param value="request:owner_person_id"/>
 			</params>
+			<report>
+				<column index="14"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-ins-#4#/#3#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '14'
+						dataFmt => {
+							 => '<b>#0#</b> (#1#, <b>#11#</b>, #10#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#, Begin Date: #17#, End Date: #8#'
+							0 => '<b>Client Billing (</b><A HREF = "/person/#12#/profile">#13#</A>, Third Party)'
+							1 => '<A HREF = "/org/#15#/profile">#13#</A> (Third Party)'
+
+						}
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-coverage?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.familyAssociations">
@@ -717,6 +1540,26 @@ select 'NOT IMPLEMENTED' from dual
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Family Contact"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF ="/person/#3#/profile">#3#</A>#5# (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)'
+						head => 'Family Contact'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-contact-family?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.feeschedules">
@@ -735,6 +1578,32 @@ SELECT	oc.catalog_id,
 			AND	pa.value_int = oc.internal_catalog_id
 			ORDER BY oc.catalog_id
 			
+			<report>
+				<column heading="Associated Fee Schedules"/>
+				<column index="1"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-feeschedule-person/#4#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF=/org/#session.org_id#/catalog/#3#/#0#>#0#</A>'
+						head => 'Associated Fee Schedules'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'left'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-feeschedule-person?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.group-account-notes">
@@ -751,6 +1620,41 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:provider_id"/>
 			</params>
+			<report>
+				<column heading="Patient Name" url="/person/#4#/profile"/>
+				<column heading="Notes#" url="/person/#param.person_id#/stpe-person.account-notes?home=#homeArl#&person_id=#4#"/>
+				<column heading="First  Note Date"/>
+				<column heading="Last Note Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Patient Name'
+						url => '/person/#4#/profile'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Notes#'
+						url => '/person/#param.person_id#/stpe-person.account-notes?home=#homeArl#&person_id=#4#'
+
+					}
+					2 => {
+						head => 'First  Note Date'
+
+					}
+					3 => {
+						head => 'Last Note Date'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.hospitalizationSurgeriesTherapies">
@@ -766,6 +1670,27 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<report>
+				<column index="3" heading="Provider"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#9#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '3'
+						dataFmt => '#1# (<A HREF ="/org/#2#/profile">#2#</A>)<BR>Admitted by <A HREF ="/person/#3#/profile">#3#</A> (#0#), Discharged (#10#)<BR>Room: #4#, Prior Auth: #11#<BR>ICD(s): #6#, CPT(s): #7#'
+						head => 'Provider'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-hospitalization?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.inPatient">
@@ -783,6 +1708,31 @@ SELECT	oc.catalog_id,
 			AND o.org_internal_id = t.service_facility_id
 			ORDER by p.name_last
 			
+			<report>
+				<column index="2" heading="Patient " url="/person/#0#/profile"/>
+				<column heading="Hospital/Room"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						head => 'Patient '
+						hint => '#3#'
+						options => '1'
+						url => '/person/#0#/profile'
+
+					}
+					1 => {
+						dAlign => 'left'
+						dataFmt => '#5# <br> <b>#4#</b> - Room #1# <br> Duration: #6# day(s)'
+						hAlign => 'left'
+						head => 'Hospital/Room'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.inactiveMedications">
@@ -809,6 +1759,67 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Medication"/>
+				<column index="6" type="date" heading="Date"/>
+				<column index="7" type="date" heading="End Date"/>
+				<column heading="Dosage"/>
+				<column index="5" heading="Freq"/>
+				<column index="4" heading="Route"/>
+				<column index="8" heading="Notes"/>
+			</report>
+			<!--
+				bullets => {
+					0 => {
+						imgSrc => '/resources/widgets/mail/prescription.gif'
+						title => 'Refill Request'
+						urlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-refill-medication/#0#?home=#homeArl#'
+
+					}
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						head => 'Medication'
+
+					}
+					1 => {
+						colIdx => '6'
+						dformat => 'date'
+						head => 'Date'
+
+					}
+					2 => {
+						colIdx => '7'
+						dformat => 'date'
+						head => 'End Date'
+
+					}
+					3 => {
+						dataFmt => '#2##3#'
+						head => 'Dosage'
+
+					}
+					4 => {
+						colIdx => '5'
+						head => 'Freq'
+
+					}
+					5 => {
+						colIdx => '4'
+						head => 'Route'
+
+					}
+					6 => {
+						colIdx => '8'
+						head => 'Notes'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.insurance">
@@ -851,6 +1862,30 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:owner_person_id"/>
 			</params>
+			<report>
+				<column index="15"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-ins-#13#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '15'
+						dataFmt => {
+							 => '<A HREF = "/org/#16#/profile">#16#</A>(#5# #13#): #4#, #2#, Begin Date: #18#, End Date: #19#'
+							0 => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party, #5#): Begin Date: #18#, End Date: #19#'
+							1 => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party, #5#): Begin Date: #18#, End Date: #19#'
+
+						}
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.insuranceVerify">
@@ -869,6 +1904,33 @@ SELECT	oc.catalog_id,
 			)
 			WHERE ROWNUM &lt; 11
 			
+			<report>
+				<column index="4" heading="Appointment Time"/>
+				<column index="2" heading="Verified By"/>
+				<column index="3" heading="Verify Date"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/dlg-view-insurance-records/#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '4'
+						head => 'Appointment Time'
+
+					}
+					1 => {
+						colIdx => '2'
+						head => 'Verified By'
+
+					}
+					2 => {
+						colIdx => '3'
+						head => 'Verify Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.labOrderDetail">
@@ -882,6 +1944,47 @@ SELECT	oc.catalog_id,
 			AND	los.id = lo.lab_order_status
 			order by date_order desc
 			
+			<report>
+				<column index="0" heading="Lab Order ID"/>
+				<column index="1" type="date" heading="Order Date"/>
+				<column index="2" heading="Provider ID"/>
+				<column index="3" heading="Lab Order Status"/>
+			</report>
+			<!--
+				bullets => {
+					0 => '/person/#param.person_id#/dlg-update-lab-order/#0#?home=#homeArl#'
+
+				}
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						hAlign => 'left'
+						head => 'Lab Order ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dformat => 'date'
+						hAlign => 'left'
+						head => 'Order Date'
+
+					}
+					2 => {
+						colIdx => '2'
+						hAlign => 'left'
+						head => 'Provider ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						hAlign => 'left'
+						head => 'Lab Order Status'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.labOrderSummary">
@@ -898,6 +2001,34 @@ SELECT	oc.catalog_id,
 			AND	oc.member_name='Ancillary Service'
 			order by org_id
 			
+			<report>
+				<column index="1" heading="Lab Name" url="/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&org_id=#0#"/>
+				<column index="3" heading="Patient Lab Requests"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						hAlign => 'left'
+						head => 'Lab Name'
+						hint => 'Add Order Entry to #1#'
+						url => '/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&org_id=#0#'
+
+					}
+					1 => {
+						colIdx => '3'
+						hAlign => 'left'
+						head => 'Patient Lab Requests'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.linkMedicalSite">
@@ -911,6 +2042,25 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/dlg-update-link-med-url/#3#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>'
+
+					}
+					1 => {
+						dataFmt => '#1#'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/dlg-add-link-med-url'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.linkNonMedicalSite">
@@ -924,6 +2074,25 @@ SELECT	oc.catalog_id,
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/dlg-update-link-non-url/#3#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>'
+
+					}
+					1 => {
+						dataFmt => '#1#'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/dlg-add-link-non-url'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.messageCounts">
@@ -944,6 +2113,31 @@ SELECT doc_spec_subtype, count(*)
 			AND	observation.observer_id = ?
 			group by 1
 			
+			<report>
+				<column index="0"/>
+				<column index="1"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => {
+							-1 => '<a href='/worklist/documents/labs'>Results</a>'
+							0 => '<a href='/person/#param.person_id#/mailbox/internalMessages'>Internal Message</a>'
+							1 => '<a href='/person/#param.person_id#/mailbox/phoneMessages'>Phone Message</a>'
+							2 => '<a href='/person/#param.person_id#/mailbox/prescriptionRequests'>Prescription Approval Request</a>'
+
+						}
+
+					}
+					1 => {
+						colIdx => '1'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.messageRegardingPatient">
@@ -960,6 +2154,16 @@ SELECT doc_spec_subtype, count(*)
 			)
 			WHERE ROWNUM &lt; 11
 			
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<a href="/person/#session.user_id#/dlg-read-message_#4#/#5#/#4#?home=#homeArl#" >#1#</a> &nbsp; From: #2# - To: #3# <br>&nbsp; #0#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.miscNotes">
@@ -979,6 +2183,22 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-misc-notes/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => 'Misc Notes by <A HREF="/person/#6#/profile">#6#</A> (#5#): #4#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-misc-notes?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.myAssociatedResourceAppointments">
@@ -1018,6 +2238,30 @@ SELECT doc_spec_subtype, count(*)
 			and Appt_Status.id = e.event_status
 			order by e.start_time
 			
+			<report>
+				<column heading="My Associated Resources Appointments"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-appointment/#8#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<a href="javascript:location='/schedule/apptsheet/encounterCheckin/#8#';">#0#</A>:'
+						head => 'My Associated Resources Appointments'
+
+					}
+					1 => {
+						dataFmt => '<A HREF="/person/#7#/profile">#2#</A> <BR> (<i>#5#</i>) <BR> Scheduled with #1# <BR> Appt Type: #4#  <BR> Subject: #3#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-appointment?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.myAssociatedResourceInPatients">
@@ -1059,6 +2303,37 @@ SELECT doc_spec_subtype, count(*)
 			AND org.org_internal_id = transaction.service_facility_id
 			ORDER BY trans_begin_stamp DESC
 			
+			<report>
+				<column heading="My Associated Resources In Patients"/>
+			</report>
+			<!--
+				bullets => '/person/#11#/stpe-#my.stmtId#/dlg-update-trans-#10#/#9#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#'
+						head => 'My Associated Resources In Patients'
+
+					}
+					1 => {
+						dataFmt => '<A HREF="/person/#11#/chart">#1#</A> <BR>
+					<b>#12#</b> <BR>
+					(#2#) <br>
+					Room: #3#  <BR>
+					Duration of Stay: #4# day(s)<BR>
+					Diagnoses: #5# <BR>
+					Procedures: #6#
+				'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-hospitalization?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.mySessionActivity">
@@ -1079,6 +2354,24 @@ SELECT doc_spec_subtype, count(*)
 			)
 			order by pa.activity_stamp desc
 			
+			<report>
+				<column heading="My Session Activity"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '#0# '
+						head => 'My Session Activity'
+
+					}
+					1 => {
+						dataFmt => '#1# #2#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.officeLocation">
@@ -1092,6 +2385,36 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="6"/>
+				<column index="2"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-office-location/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '6'
+						dataFmt => {
+							 => ''
+							1 => '<img src="/resources/icons/checkmark.gif" width="16" height="16" border="0">'
+
+						}
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '<A HREF = '/org/#4#/profile'>#7#</A> (#4#, #5#) '
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-office-location?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.patientAppointments">
@@ -1142,6 +2465,31 @@ SELECT doc_spec_subtype, count(*)
 			)
 			ORDER by group_sort, apptdate DESC
 			
+			<report>
+				<column heading="Appointments"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<a href="javascript:location='/schedule/apptsheet/#4#';">#0#</A>:'
+						head => 'Appointments'
+
+					}
+					1 => {
+						dataFmt => 'Scheduled with <A HREF="/person/#2#/profile">#2#</A> at #1# <BR>
+					Reason for Visit: #3#'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-appointment?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+				separateDataColIdx => '2'
+
+			-->
 		</statement>
 
 		<statement name="person.patientInfo">
@@ -1161,6 +2509,17 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:consult_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-patient?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<a href='/person/#0#/profile'>#3#</a>: SSN (#1#), DOB(#2#), Gender(#4#)'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.personCategory">
@@ -1177,6 +2536,26 @@ SELECT doc_spec_subtype, count(*)
 				<param value="request:person_id"/>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="Type"/>
+			</report>
+			<!--
+				bullets => 'stpe-#my.stmtId#/dlg-update-person-category/?_f_person_id=#2#&_f_category=#1#&home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#1#'
+						head => 'Type'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-person-category?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.phoneMessage">
@@ -1201,6 +2580,22 @@ SELECT doc_spec_subtype, count(*)
 				<param value="request:trans_owner_id"/>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF='/person/#10#/profile'>#10#</A> (#6#): #7# (<A HREF='/person/#5#/profile'>#5#</A>)'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-send-phone_message?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.preventiveCare">
@@ -1213,6 +2608,26 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="Preventive Care"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:2} : #6# (CPT #5#, #4#)'
+						head => 'Preventive Care'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-preventivecare?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.recentlyVisitedPatients">
@@ -1224,6 +2639,20 @@ SELECT doc_spec_subtype, count(*)
 			and	pvc.view_latest &gt;= trunc(sysdate) + ?
 			order by pvc.view_latest desc
 			
+			<report>
+				<column heading="Recently Visited Patients"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<A HREF="/person/#1#/profile" >#1#</A> <A> (#0#)</A>'
+						head => 'Recently Visited Patients'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.referralAndIntake">
@@ -1251,6 +2680,93 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:consult_id"/>
 			</params>
+			<report>
+				<column index="0" heading="RID"/>
+				<column index="3" heading="Type"/>
+				<column index="4" heading="FUD"/>
+				<column index="5" heading="Followup"/>
+				<column index="7" heading="SID" url="/org/#session.org_id#/dlg-update-trans-6000/#7#"/>
+				<column index="8" heading="SD"/>
+				<column index="2" heading="SBD"/>
+				<column index="9" heading="SED"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/dlg-update-trans-#6#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						hHint => 'Referral ID'
+						head => 'RID'
+						hint => 'Referral ID'
+						tDataFmt => '&{count:0} Referrals'
+
+					}
+					1 => {
+						colIdx => '3'
+						dAlign => 'center'
+						hHint => 'Referral Type'
+						head => 'Type'
+						hint => 'Referral Type'
+
+					}
+					2 => {
+						colIdx => '4'
+						dAlign => 'center'
+						hHint => 'Follow Up Date'
+						head => 'FUD'
+						hint => 'Follow Up Date'
+
+					}
+					3 => {
+						colIdx => '5'
+						dAlign => 'center'
+						hHint => 'Follow Up Caption'
+						head => 'Followup'
+						hint => 'Follow Up Caption'
+
+					}
+					4 => {
+						colIdx => '7'
+						dAlign => 'center'
+						hHint => 'Service Request ID'
+						head => 'SID'
+						hint => 'Service Request ID'
+						url => '/org/#session.org_id#/dlg-update-trans-6000/#7#'
+
+					}
+					5 => {
+						colIdx => '8'
+						dAlign => 'center'
+						hHint => 'Service Request Date'
+						head => 'SD'
+						hint => 'Service Request Date'
+
+					}
+					6 => {
+						colIdx => '2'
+						dAlign => 'center'
+						hHint => 'Service Begin Date'
+						head => 'SBD'
+						hint => 'Service Begin Date'
+
+					}
+					7 => {
+						colIdx => '9'
+						dAlign => 'center'
+						hHint => 'Service End Date'
+						head => 'SED'
+						hint => 'Service End Date'
+
+					}
+
+				}
+				frame => {
+					editUrl => '/person/#param.person_id#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.referralAndIntakeCount">
@@ -1265,6 +2781,20 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:consult_id"/>
 			</params>
+			<report>
+				<column heading="Record Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => 'Service Request Count : #0# <BR> Referral Count : #1#'
+						head => 'Record Count'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.refillRequest">
@@ -1278,6 +2808,16 @@ SELECT doc_spec_subtype, count(*)
 			AND document_attribute.value_int = 0
 			AND doc_spec_subtype = 2
 			
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<a href='/person/#param.person_id#/mailbox/prescriptionRequests'>Prescription Approval Request</a> #0#'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.scheduleAppts">
@@ -1296,6 +2836,46 @@ SELECT doc_spec_subtype, count(*)
 			AND a.id = e.event_status
 			ORDER by e.start_time
 			
+			<report>
+				<column index="5" heading="Patient" url="/person/#0#/profile"/>
+				<column heading="Appointment Time"/>
+				<column heading="Status"/>
+				<column heading="Reason For Visit"/>
+				<column heading="Facility"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '5'
+						hAlign => 'left'
+						head => 'Patient'
+						options => '1'
+						url => '/person/#0#/profile'
+
+					}
+					1 => {
+						hAlign => 'left'
+						head => 'Appointment Time'
+
+					}
+					2 => {
+						hAlign => 'left'
+						head => 'Status'
+
+					}
+					3 => {
+						hAlign => 'left'
+						head => 'Reason For Visit'
+
+					}
+					4 => {
+						head => 'Facility'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.sessionActivity">
@@ -1313,6 +2893,50 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:session_id"/>
 			</params>
+			<report>
+				<column heading="Time"/>
+				<column heading="Event"/>
+				<column heading="Details"/>
+				<column index="3" heading="Scope"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Time'
+
+					}
+					1 => {
+						head => 'Event'
+
+					}
+					2 => {
+						head => 'Details'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => {
+							_DEFAULT => '#4#'
+							insurance => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							invoice => 'Claim <A HREF='/invoice/#4#/summary' STYLE="text-decoration:none">#4#</A>'
+							invoice_item => 'Claim <A HREF='/invoice/#4#' STYLE="text-decoration:none">#4#</A>'
+							offering_catalog => 'FeeSchedule <A HREF='/search/catalog/detail/#4#/' STYLE="text-decoration:none">#4#</A>'
+							offering_catalog_entry => 'FeeSchedule <A HREF='/search/catalog/detail/#4#/ ' STYLE="text-decoration:none">#4#</A>'
+							org => 'Organization <A HREF='/org/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							org_attribute => 'Organization <A HREF='/org/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							person => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							person_address => 'Person <A HREF='/person/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							person_attribute => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							transaction => 'Person <A HREF='/person/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+
+						}
+						head => 'Scope'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="person.surgicalProcedures">
@@ -1336,6 +2960,27 @@ SELECT doc_spec_subtype, count(*)
 			ORDER BY
 			curr_onset_date DESC
 			
+			<report>
+				<column heading="Surgical Procedures"/>
+			</report>
+			<!--
+				bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#4#/#5#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#0#: #2# <A HREF = "/search/icd">#6#</A><BR>performed by <A HREF = "/person/#3#/profile">#3#</A> (#1#)'
+						head => 'Surgical Procedures'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-activeproblems-surgical?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+				separateDataColIdx => '2'
+
+			-->
 		</statement>
 
 		<statement name="person.testsAndMeasurements">
@@ -1349,6 +2994,43 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<report>
+				<column index="1" heading="Date"/>
+				<column index="3" heading="Tests"/>
+				<column index="4" heading="Value"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						dataFmt => '#1# #2#'
+						head => 'Date'
+						options => '1'
+
+					}
+					1 => {
+						colIdx => '3'
+						dAlign => 'LEFT'
+						dataFmt => '#3#'
+						head => 'Tests'
+						options => '1'
+
+					}
+					2 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Value'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-tests?home=#homeArl#'
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_referral">
@@ -1382,6 +3064,86 @@ SELECT doc_spec_subtype, count(*)
 			<params>
 				<param value="request:trans_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Trans ID"/>
+				<column index="1" heading="Claim Number"/>
+				<column index="2" heading="ICD Codes"/>
+				<column index="3" heading="CPT Codes"/>
+				<column index="4" heading="Date Of Injury"/>
+				<column index="5" heading="Date Of Request"/>
+				<column index="6" heading="Referral Type"/>
+				<column index="7" heading="SSN"/>
+				<column index="8" heading="Date of Birth"/>
+				<column index="9" heading="Comments"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<a href="javascript:doActionPopup('/org/#17#/dlg-update-trans-6000/#0#');">#0#</a>'
+						head => 'Trans ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#5#'
+						head => 'Claim Number'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '<a href="javascript:doActionPopup('/lookup/icd');">#8#</a>'
+						head => 'ICD Codes'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '<a href="javascript:doActionPopup('/lookup/cpt');">#9#</a>'
+						head => 'CPT Codes'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#11#'
+						head => 'Date Of Injury'
+						options => '1'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#12#'
+						head => 'Date Of Request'
+						options => '1'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#13#'
+						head => 'Referral Type'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#2#'
+						head => 'SSN'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#3#'
+						head => 'Date of Birth'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#16#'
+						head => 'Comments'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

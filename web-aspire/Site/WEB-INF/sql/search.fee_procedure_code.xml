@@ -19,6 +19,34 @@
 				<param value="request:internal_catalog_id"/>
 				<param value="request:code"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_fee_procedure_code_like">
@@ -33,6 +61,34 @@
 			<params>
 				<param value="request:internal_catalog_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_fee_procedure_description">
@@ -47,6 +103,34 @@
 			<params>
 				<param value="request:internal_catalog_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_fee_procedure_description_like">
@@ -61,6 +145,34 @@
 			<params>
 				<param value="request:internal_catalog_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_fee_procedure_name">
@@ -75,6 +187,34 @@
 			<params>
 				<param value="request:internal_catalog_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_fee_procedure_name_like">
@@ -89,6 +229,34 @@
 			<params>
 				<param value="request:internal_catalog_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Name"/>
+				<column index="3" heading="Code Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'LEFT'
+						head => 'Code'
+						url => 'javascript:chooseEntry('#&{?}#')'
+
+					}
+					1 => {
+						hAlign => 'LEFT'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '3'
+						hAlign => 'LEFT'
+						head => 'Code Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -49,6 +49,78 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column index="0" heading="ID"/>
+				<column index="1" heading="IC"/>
+				<column index="2" heading="Svc Date"/>
+				<column index="3" heading="Status"/>
+				<column index="4" heading="Client"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						head => 'ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'IC'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_ins_org">
@@ -95,6 +167,78 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column index="0" heading="ID"/>
+				<column index="1" heading="IC"/>
+				<column index="2" heading="Svc Date"/>
+				<column index="3" heading="Status"/>
+				<column index="4" heading="Client"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						head => 'ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'IC'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_ins_prov">
@@ -141,6 +285,78 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column index="0" heading="ID"/>
+				<column index="1" heading="IC"/>
+				<column index="2" heading="Svc Date"/>
+				<column index="3" heading="Status"/>
+				<column index="4" heading="Client"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						head => 'ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'IC'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_ins_prov_org">
@@ -187,6 +403,78 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column index="0" heading="ID"/>
+				<column index="1" heading="IC"/>
+				<column index="2" heading="Svc Date"/>
+				<column index="3" heading="Status"/>
+				<column index="4" heading="Client"/>
+				<column index="5" type="currency" heading="Charges"/>
+				<column index="6" type="currency" heading="Adjust"/>
+				<column index="7" type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						head => 'ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						head => 'IC'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Client'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_patient">
@@ -232,6 +520,94 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="11" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => '#3#'
+							16 => 'Void #13#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_patient_org">
@@ -278,6 +654,94 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="11" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => '#3#'
+							16 => 'Void #13#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_patient_prov">
@@ -324,6 +788,94 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="11" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => '#3#'
+							16 => 'Void #13#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_aged_patient_prov_org">
@@ -370,6 +922,94 @@
 			i.invoice_date
 			ORDER BY i.invoice_id desc
 
+			<report>
+				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="IC"/>
+				<column heading="Svc Date"/>
+				<column index="12" heading="Status"/>
+				<column index="11" heading="Payer"/>
+				<column type="currency" heading="Charges"/>
+				<column type="currency" heading="Adjust"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'RIGHT'
+						head => 'ID'
+						hint => 'Created on: #14#'
+						url => '/invoice/#&{?}#/summary'
+
+					}
+					1 => {
+						dAlign => 'CENTER'
+						head => 'IC'
+						hint => 'Number Of Items In Claim'
+
+					}
+					2 => {
+						head => 'Svc Date'
+
+					}
+					3 => {
+						colIdx => '12'
+						dataFmt => {
+							0 => '#3#'
+							1 => '#3#'
+							10 => '#3#'
+							11 => '#3#'
+							12 => '#3#'
+							13 => '#3#'
+							14 => '#3#'
+							15 => '#3#'
+							16 => 'Void #13#'
+							2 => '#3#'
+							3 => '#3#'
+							4 => '#3#'
+							5 => '#3#'
+							6 => '#3#'
+							7 => '#3#'
+							8 => '#3#'
+							9 => '#3#'
+
+						}
+						head => 'Status'
+
+					}
+					4 => {
+						colIdx => '11'
+						dataFmt => {
+							0 => '#4#'
+							1 => '#4#'
+							2 => '#10#'
+							3 => '#10#'
+
+						}
+						head => 'Payer'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Charges'
+						summarize => 'sum'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Adjust'
+						summarize => 'sum'
+
+					}
+					7 => {
+						dformat => 'currency'
+						head => 'Balance'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

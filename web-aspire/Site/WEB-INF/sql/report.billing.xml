@@ -28,6 +28,54 @@
 				<param value="request:code"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Procedure"/>
+				<column index="1" heading="Modifier"/>
+				<column index="2" heading="Invoice"/>
+				<column index="3" heading="Date"/>
+				<column index="4" heading="Patient"/>
+				<column index="5" heading="Provider"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Procedure'
+						summarize => 'count'
+						tAlign => 'left'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Modifier'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Invoice'
+
+					}
+					3 => {
+						colIdx => '3'
+						head => 'Date'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '<A HREF = "/person/#4#/account">#6#</A>'
+						head => 'Patient'
+						hint => 'View account: #4#'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Provider'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_insurance">
@@ -53,6 +101,77 @@
 				<param value="request:ins_org_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Insurance"/>
+				<column index="1" heading="Invoice"/>
+				<column index="2" heading="Date"/>
+				<column index="3" heading="Patient"/>
+				<column index="4" heading="Bill to"/>
+				<column index="5" heading="Provider"/>
+				<column index="6" heading="Status"/>
+				<column index="7" type="currency" heading="Total cost"/>
+				<column index="8" type="currency" heading="Total adjust"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Insurance'
+						summarize => 'count'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Invoice'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '<A HREF = "/person/#3#/account">#9#</A>'
+						head => 'Patient'
+						hint => 'View account: #3#'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Bill to'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Provider'
+
+					}
+					6 => {
+						colIdx => '6'
+						head => 'Status'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total cost'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total adjust'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detail_payers">
@@ -75,6 +194,72 @@
 				<param value="request:caption"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Payer ID"/>
+				<column index="1" heading="Invoice"/>
+				<column index="2" heading="Date"/>
+				<column index="3" heading="Patient"/>
+				<column index="4" heading="Provider"/>
+				<column index="5" heading="Status"/>
+				<column index="6" type="currency" heading="Total cost"/>
+				<column index="7" type="currency" heading="Total adjust"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Payer ID'
+						summarize => 'count'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Invoice'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '<A HREF = "/person/#3#/account">#8#</A>'
+						hAlign => 'left'
+						head => 'Patient'
+						hint => 'View account :#3#'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Provider'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Status'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total cost'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total adjust'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailearnings_insurance">
@@ -97,6 +282,77 @@
 			group by org.org_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
 			t.provider_id, Transaction_Status.caption ,p.simple_name
 			
+			<report>
+				<column index="0" heading="Payer ID"/>
+				<column index="1" heading="Invoice"/>
+				<column index="2" heading="Date"/>
+				<column index="3" heading="Patient ID"/>
+				<column index="8" heading="Patient Name"/>
+				<column index="4" heading="Provider"/>
+				<column index="5" heading="Status"/>
+				<column index="6" type="currency" heading="Total cost"/>
+				<column index="7" type="currency" heading="Total adjust"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Payer ID'
+						summarize => 'count'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Invoice'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '<A HREF = "/person/#3#/account">#3#</A>'
+						head => 'Patient ID'
+						hint => 'View account: #3#'
+
+					}
+					4 => {
+						colIdx => '8'
+						head => 'Patient Name'
+
+					}
+					5 => {
+						colIdx => '4'
+						head => 'Provider'
+
+					}
+					6 => {
+						colIdx => '5'
+						head => 'Status'
+
+					}
+					7 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total cost'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total adjust'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_detailearnings_person">
@@ -124,6 +380,72 @@
 				<param value="request:payer_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Payer ID"/>
+				<column index="1" heading="Invoice"/>
+				<column index="2" heading="Date"/>
+				<column index="3" heading="Patient"/>
+				<column index="4" heading="Provider"/>
+				<column index="5" heading="Status"/>
+				<column index="6" type="currency" heading="Total cost"/>
+				<column index="7" type="currency" heading="Total Payment"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						head => 'Payer ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						head => 'Invoice'
+						summarize => 'count'
+						tAlign => 'center'
+
+					}
+					2 => {
+						colIdx => '2'
+						head => 'Date'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '<A HREF = "/person/#3#/account">#8#</A>'
+						head => 'Patient'
+						hint => 'View account: #3#'
+
+					}
+					4 => {
+						colIdx => '4'
+						head => 'Provider'
+
+					}
+					5 => {
+						colIdx => '5'
+						head => 'Status'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total cost'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Total Payment'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_diagsFromInvoice_Item">
@@ -191,6 +513,34 @@
 				<param value="request:service_facility_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column index="2" heading="Payer" url="javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#0#&type=#2#')"/>
+				<column type="currency" heading="Earning"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '2'
+						dataFmt => {
+							1 => '#3# (#0#)'
+							2 => '#0#'
+
+						}
+						head => 'Payer'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#0#&type=#2#')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						dformat => 'currency'
+						head => 'Earning'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_payers">
@@ -210,6 +560,28 @@
 				<param value="request:service_facility_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Payer Type" url="javascript:doActionPopup('#hrefSelfPopup#&detail=payer&payer=#&{?}#')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						hAlign => 'left'
+						head => 'Payer Type'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=payer&payer=#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_payersByInsurance">
@@ -230,6 +602,27 @@
 				<param value="request:service_facility_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&insurance=#&{?}#')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Insurance'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&insurance=#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_proceduresFromInvoice_Item">
@@ -251,6 +644,27 @@
 				<param value="request:service_facility_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Procedure" url="javascript:doActionPopup('#hrefSelfPopup#&detail=cpt&code=#&{?}#')"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Procedure'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup('#hrefSelfPopup#&detail=cpt&code=#&{?}#')'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

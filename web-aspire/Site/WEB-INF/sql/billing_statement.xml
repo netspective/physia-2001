@@ -89,6 +89,61 @@
 			)
 			where rownum &lt; 5
 			
+			<report>
+				<column heading="Patient ID"/>
+				<column heading="Transmission Date"/>
+				<column heading="Status"/>
+				<column heading="Ack Date"/>
+				<column heading="Int Stmt ID"/>
+				<column heading="Ext Stmt ID"/>
+				<column type="currency" heading="Amount Due"/>
+				<column heading="Claim IDs"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Patient ID'
+
+					}
+					1 => {
+						hAlign => 'left'
+						head => 'Transmission Date'
+
+					}
+					2 => {
+						hAlign => 'left'
+						head => 'Status'
+
+					}
+					3 => {
+						hAlign => 'left'
+						head => 'Ack Date'
+
+					}
+					4 => {
+						hAlign => 'left'
+						head => 'Int Stmt ID'
+
+					}
+					5 => {
+						hAlign => 'left'
+						head => 'Ext Stmt ID'
+
+					}
+					6 => {
+						dformat => 'currency'
+						hAlign => 'right'
+						head => 'Amount Due'
+
+					}
+					7 => {
+						head => 'Claim IDs'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_orgAddress">
@@ -142,6 +197,31 @@ SELECT * FROM (
 			order by value_stamp desc
 			) WHERE ROWNUM &lt; 11
 			
+			<report>
+				<column heading="Payment Date"/>
+				<column type="currency" heading="Amount"/>
+				<column heading="Note"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Payment Date'
+
+					}
+					1 => {
+						dformat => 'currency'
+						head => 'Amount'
+						summarize => 'sum'
+
+					}
+					2 => {
+						head => 'Note'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_paymentPlan">
@@ -154,6 +234,58 @@ SELECT * FROM (
 			WHERE person_id = ?
 			and owner_org_id = ?
 			
+			<report>
+				<column heading="Payment Cycle"/>
+				<column type="currency" heading="Amount"/>
+				<column heading="First Due"/>
+				<column heading="Next Due"/>
+				<column heading="Last Payment Date"/>
+				<column type="currency" heading="Last Payment Amount"/>
+				<column type="currency" heading="Balance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => {
+							14 => 'Bi-Weekly'
+							30 => 'Monthly'
+							7 => 'Weekly'
+
+						}
+						head => 'Payment Cycle'
+
+					}
+					1 => {
+						dformat => 'currency'
+						head => 'Amount'
+
+					}
+					2 => {
+						head => 'First Due'
+
+					}
+					3 => {
+						head => 'Next Due'
+
+					}
+					4 => {
+						head => 'Last Payment Date'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Last Payment Amount'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Balance'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_personAddress">

@@ -17,6 +17,85 @@
 			<params>
 				<param value="request:insurance"/>
 			</params>
+			<report>
+				<column index="0" heading="Insurance"/>
+				<column index="1" heading="Total Patients"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading=">150"/>
+				<column index="8" type="currency" heading="Pending Insurance Total"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/org/#0#/profile">#0#</A>'
+						head => 'Insurance'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Total Patients'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '>150'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Pending Insurance Total'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.agedInsuranceDataAll">
@@ -26,6 +105,85 @@
 			from 	agedinsdata
 			group by insurance
 			
+			<report>
+				<column index="0" heading="Insurance"/>
+				<column index="1" heading="Total Patients"/>
+				<column index="2" type="currency" heading="0 - 30"/>
+				<column index="3" type="currency" heading="31 - 60"/>
+				<column index="4" type="currency" heading="61 - 90"/>
+				<column index="5" type="currency" heading="91 - 120"/>
+				<column index="6" type="currency" heading="121 - 150"/>
+				<column index="7" type="currency" heading=">150"/>
+				<column index="8" type="currency" heading="Pending Insurance Total"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/org/#0#/profile">#0#</A>'
+						head => 'Insurance'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Total Patients'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '0 - 30'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '31 - 60'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '61 - 90'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '91 - 120'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '121 - 150'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => '>150'
+
+					}
+					8 => {
+						colIdx => '8'
+						dAlign => 'center'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Pending Insurance Total'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.agedPatientData">
@@ -42,6 +200,93 @@
 			<params>
 				<param value="request:patient"/>
 			</params>
+			<report>
+				<column index="0" heading="Patient"/>
+				<column index="1" type="currency" heading="0 - 30"/>
+				<column index="2" type="currency" heading="31 - 60"/>
+				<column index="3" type="currency" heading="61 - 90"/>
+				<column index="4" type="currency" heading="91 - 120"/>
+				<column index="5" type="currency" heading="121 - 150"/>
+				<column index="6" type="currency" heading=">150"/>
+				<column index="7" type="currency" heading="Co-Pay Owed"/>
+				<column index="8" type="currency" heading="Total"/>
+				<column index="9" type="currency" heading="Pending Insurance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Patient'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						dformat => 'currency'
+						head => '0 - 30'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '31 - 60'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '61 - 90'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '91 - 120'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '121 - 150'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '>150'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Pending Insurance'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.agedPatientDataAll">
@@ -54,6 +299,93 @@
 			from 	agedpatientdata
 			group by patient
 			
+			<report>
+				<column index="0" heading="Patient"/>
+				<column index="1" type="currency" heading="0 - 30"/>
+				<column index="2" type="currency" heading="31 - 60"/>
+				<column index="3" type="currency" heading="61 - 90"/>
+				<column index="4" type="currency" heading="91 - 120"/>
+				<column index="5" type="currency" heading="121 - 150"/>
+				<column index="6" type="currency" heading=">150"/>
+				<column index="7" type="currency" heading="Co-Pay Owed"/>
+				<column index="8" type="currency" heading="Total"/>
+				<column index="9" type="currency" heading="Pending Insurance"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Patient'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						dformat => 'currency'
+						head => '0 - 30'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => '31 - 60'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => '61 - 90'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => '91 - 120'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => '121 - 150'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => '>150'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Co-Pay Owed'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Total'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Pending Insurance'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.appointmentCharges">
@@ -119,6 +451,92 @@
 			and i.client_id = p3.person_id
 			ORDER BY 2,12
 			
+			<report>
+				<column index="11" heading="Patient ID"/>
+				<column index="0" heading="Receptionist"/>
+				<column index="1" heading="Date"/>
+				<column index="2" heading="Start Time"/>
+				<column index="3" heading="End Time"/>
+				<column index="4" heading="Org"/>
+				<column index="5" heading="Reason"/>
+				<column index="7" heading="Visit Type"/>
+				<column index="8" heading="Provider Name"/>
+				<column index="9" heading="Billed To"/>
+				<column index="10" type="currency" heading="Charges"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '11'
+						dataFmt => '#11#'
+						head => 'Patient ID'
+
+					}
+					1 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Receptionist'
+
+					}
+					2 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Date'
+
+					}
+					3 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Start Time'
+
+					}
+					4 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'End Time'
+
+					}
+					5 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Org'
+
+					}
+					6 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'Reason'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						head => 'Visit Type'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						head => 'Provider Name'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						head => 'Billed To'
+
+					}
+					10 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Charges'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.claim-notes">
@@ -130,6 +548,26 @@
 			value_type = 20000
 			order by value_date desc
 			
+			<report>
+				<column heading="Claim Notes"/>
+			</report>
+			<!--
+				bullets => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-update-attr-#5#/#0#?home=#homeArl#'
+				columnDefn => {
+					0 => {
+						dataFmt => '#4# (#3#): <I>#2#</I>'
+						head => 'Claim Notes'
+
+					}
+
+				}
+				frame => {
+					addUrl => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-add-claim-notes?home=#homeArl#'
+					editUrl => '/invoice/#param.invoice_id#/stpe-#my.stmtId#?home=#homeArl#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.claimStatus">
@@ -154,6 +592,94 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Invoice ID"/>
+				<column index="1" heading="Number Of Items"/>
+				<column index="2" heading="Client ID"/>
+				<column index="3" heading="Invoice Date"/>
+				<column index="4" heading="Invoice Status"/>
+				<column index="5" heading="Bill To ID"/>
+				<column index="6" type="currency" heading="Total Cost"/>
+				<column index="7" type="currency" heading="Total Adjustment"/>
+				<column index="8" type="currency" heading="Balance"/>
+				<column index="9" heading="Reference"/>
+				<column index="10" heading="Bill To Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Invoice ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Number Of Items'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'Client ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'Invoice Date'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Invoice Status'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'Bill To ID'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Total Cost'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Total Adjustment'
+
+					}
+					8 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Balance'
+
+					}
+					9 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						head => 'Reference'
+
+					}
+					10 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						head => 'Bill To Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.dailyAuditRecap">
@@ -178,6 +704,112 @@
 			<params>
 				<param value="request:org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Day"/>
+				<column index="2" type="currency" heading="Chrgs"/>
+				<column index="3" type="currency" heading="Misc Chrgs"/>
+				<column index="4" type="currency" heading="Chrg Adj"/>
+				<column index="5" type="currency" heading="Ins Wrt-Off"/>
+				<column index="6" type="currency" heading="Net Chrgs"/>
+				<column index="7" type="currency" heading="Bal Trans"/>
+				<column index="8" type="currency" heading="Per Rcpts"/>
+				<column index="9" type="currency" heading="Ins Rcpts"/>
+				<column index="10" type="currency" heading="Ttl Rcpts"/>
+				<column index="11" type="currency" heading="End A/R"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'RIGHT'
+						dataFmt => '#0#'
+						head => 'Day'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => 'Chrgs'
+						summarize => 'sum'
+
+					}
+					2 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Misc Chrgs'
+						summarize => 'sum'
+
+					}
+					3 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => 'Chrg Adj'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Ins Wrt-Off'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Net Chrgs'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Bal Trans'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Per Rcpts'
+						summarize => 'sum'
+
+					}
+					8 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Ins Rcpts'
+						summarize => 'sum'
+
+					}
+					9 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Ttl Rcpts'
+						summarize => 'sum'
+
+					}
+					10 => {
+						colIdx => '11'
+						dataFmt => '#11#'
+						dformat => 'currency'
+						head => 'End A/R'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.financialAnalysisReport">
@@ -199,6 +831,93 @@
 			<params>
 				<param value="request:provider"/>
 			</params>
+			<report>
+				<column index="1" heading="Org"/>
+				<column index="2" type="currency" heading="Chrgs"/>
+				<column index="3" type="currency" heading="Per Rcpts"/>
+				<column index="4" type="currency" heading="Ins Rcpts"/>
+				<column index="5" type="currency" heading="Chrg Adj"/>
+				<column index="6" type="currency" heading="Ins Wrt-Off"/>
+				<column index="7" type="currency" heading="Net Chrgs"/>
+				<column index="8" type="currency" heading="Bal Trans"/>
+				<column index="9" type="currency" heading="Misc Chrgs"/>
+				<column index="10" type="currency" heading="Change In A/R"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						dataFmt => '<A HREF = "/org/#1#/profile">#1#</A>'
+						head => 'Org'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => 'Chrgs'
+
+					}
+					2 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Per Rcpts'
+
+					}
+					3 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => 'Ins Rcpts'
+
+					}
+					4 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Chrg Adj'
+
+					}
+					5 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Ins Wrt-Off'
+
+					}
+					6 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Net Chrgs'
+
+					}
+					7 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Bal Trans'
+
+					}
+					8 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Misc Chrgs'
+
+					}
+					9 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Change In A/R'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.financialAnalysisReportAll">
@@ -216,6 +935,93 @@
 			from 	provider_by_location
 			group by org_id, provider
 			
+			<report>
+				<column index="1" heading="Org"/>
+				<column index="2" type="currency" heading="Chrgs"/>
+				<column index="3" type="currency" heading="Per Rcpts"/>
+				<column index="4" type="currency" heading="Ins Rcpts"/>
+				<column index="5" type="currency" heading="Chrg Adj"/>
+				<column index="6" type="currency" heading="Ins Wrt-Off"/>
+				<column index="7" type="currency" heading="Net Chrgs"/>
+				<column index="8" type="currency" heading="Bal Trans"/>
+				<column index="9" type="currency" heading="Misc Chrgs"/>
+				<column index="10" type="currency" heading="Change In A/R"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '1'
+						dataFmt => '<A HREF = "/org/#1#/profile">#1#</A>'
+						head => 'Org'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => 'Chrgs'
+
+					}
+					2 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Per Rcpts'
+
+					}
+					3 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => 'Ins Rcpts'
+
+					}
+					4 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Chrg Adj'
+
+					}
+					5 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Ins Wrt-Off'
+
+					}
+					6 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Net Chrgs'
+
+					}
+					7 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Bal Trans'
+
+					}
+					8 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Misc Chrgs'
+
+					}
+					9 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Change In A/R'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.monthlyAuditRecap">
@@ -241,6 +1047,102 @@
 			<params>
 				<param value="request:org_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Month"/>
+				<column index="2" type="currency" heading="Chrgs"/>
+				<column index="3" type="currency" heading="Misc Chrgs"/>
+				<column index="4" type="currency" heading="Chrg Adj"/>
+				<column index="5" type="currency" heading="Ins Wrt-Off"/>
+				<column index="6" type="currency" heading="Net Chrgs"/>
+				<column index="7" type="currency" heading="Bal Trans"/>
+				<column index="8" type="currency" heading="Per Rcpts"/>
+				<column index="9" type="currency" heading="Ins Rcpts"/>
+				<column index="10" type="currency" heading="Ttl Rcpts"/>
+				<column index="11" type="currency" heading="End A/R"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'RIGHT'
+						dataFmt => '#0#'
+						head => 'Month'
+
+					}
+					1 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						dformat => 'currency'
+						head => 'Chrgs'
+
+					}
+					2 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Misc Chrgs'
+
+					}
+					3 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						dformat => 'currency'
+						head => 'Chrg Adj'
+
+					}
+					4 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Ins Wrt-Off'
+
+					}
+					5 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						head => 'Net Chrgs'
+
+					}
+					6 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Bal Trans'
+
+					}
+					7 => {
+						colIdx => '8'
+						dataFmt => '#8#'
+						dformat => 'currency'
+						head => 'Per Rcpts'
+
+					}
+					8 => {
+						colIdx => '9'
+						dataFmt => '#9#'
+						dformat => 'currency'
+						head => 'Ins Rcpts'
+
+					}
+					9 => {
+						colIdx => '10'
+						dataFmt => '#10#'
+						dformat => 'currency'
+						head => 'Ttl Rcpts'
+
+					}
+					10 => {
+						colIdx => '11'
+						dataFmt => '#11#'
+						dformat => 'currency'
+						head => 'End A/R'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.procAnalysis">
@@ -272,6 +1174,78 @@
 			i.code,tt.caption
 			order by p.short_sortable_name,tt.caption
 			
+			<report>
+				<column index="0" heading="Name"/>
+				<column index="1" heading="Visit Type"/>
+				<column index="2" heading="CPT Code"/>
+				<column index="3" heading="CPT Name"/>
+				<column index="4" heading="Monthly Units"/>
+				<column index="5" type="currency" heading="Month To Date Cost"/>
+				<column index="6" heading="Yearly Units"/>
+				<column index="7" type="currency" heading="Year To Date Cost"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						groupBy => '#0#'
+						head => 'Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						groupBy => '#1#'
+						head => 'Visit Type'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'CPT Code'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'CPT Name'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Monthly Units'
+						summarize => 'sum'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						head => 'Month To Date Cost'
+						summarize => 'sum'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Yearly Units'
+						summarize => 'sum'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						dformat => 'currency'
+						head => 'Year To Date Cost'
+						summarize => 'sum'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="invoice.procAnalysisAll">
@@ -290,6 +1264,70 @@
 			and	m.CPTNAME(+) = y.CPTNAME
 			and	m.DEPARTMENTNAME(+) = y.DEPARTMENTNAME
 			
+			<report>
+				<column index="0" heading="Name"/>
+				<column index="1" heading="Department Name"/>
+				<column index="2" heading="CPT Code"/>
+				<column index="3" heading="CPT Name"/>
+				<column index="4" heading="Monthly Units"/>
+				<column index="5" heading="Month To Date"/>
+				<column index="6" heading="Yearly Units"/>
+				<column index="7" heading="Year To Date"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '#0#'
+						head => 'Name'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Department Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						dataFmt => '#2#'
+						head => 'CPT Code'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						head => 'CPT Name'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Monthly Units'
+
+					}
+					5 => {
+						colIdx => '5'
+						dataFmt => '#5#'
+						head => 'Month To Date'
+
+					}
+					6 => {
+						colIdx => '6'
+						dataFmt => '#6#'
+						head => 'Yearly Units'
+
+					}
+					7 => {
+						colIdx => '7'
+						dataFmt => '#7#'
+						head => 'Year To Date'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

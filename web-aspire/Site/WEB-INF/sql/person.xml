@@ -853,6 +853,51 @@
 			<params>
 				<param value="request:session_id"/>
 			</params>
+			<report>
+				<column heading="Time"/>
+				<column heading="Event"/>
+				<column heading="Details"/>
+				<column index="3" heading="Scope"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Time'
+
+					}
+					1 => {
+						head => 'Event'
+
+					}
+					2 => {
+						head => 'Details'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => {
+							_DEFAULT => '#4#'
+							insurance => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							invoice => 'Claim <A HREF='/invoice/#4#/summary' STYLE="text-decoration:none">#4#</A>'
+							invoice_item => 'Claim <A HREF='/invoice/#4#' STYLE="text-decoration:none">#4#</A>'
+							offering_catalog => 'FeeSchedule <A HREF='/search/catalog/detail/#4#/' STYLE="text-decoration:none">#4#</A>'
+							offering_catalog_entry => 'FeeSchedule <A HREF='/search/catalog/detail/#4#/ ' STYLE="text-decoration:none">#4#</A>'
+							org => 'Organization <A HREF='/org/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							org_attribute => 'Organization <A HREF='/org/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							person => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							person_address => 'Person <A HREF='/person/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							person_attribute => 'Person <A HREF='/person/#4#/profile ' STYLE="text-decoration:none">#4#</A>'
+							person_medication => 'Person <A HREF='/person/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+							transaction => 'Person <A HREF='/person/#4#/profile' STYLE="text-decoration:none">#4#</A>'
+
+						}
+						head => 'Scope'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selSessionPhysicians">
@@ -942,6 +987,66 @@ SELECT * FROM (
 			order by s.statement_id desc
 			) WHERE ROWNUM &lt; 11
 			
+			<report>
+				<column index="9" heading="Payer"/>
+				<column heading="Patient" url="/person/#&{?}#/account"/>
+				<column heading="Send Date"/>
+				<column heading="Ack Date"/>
+				<column heading="Billing Org"/>
+				<column heading="Status"/>
+				<column type="currency" heading="Amount Due"/>
+				<column heading="Claim Id(s)"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '9'
+						dataFmt => {
+							0 => '<A HREF='/person/#0#/account' title='View #0# Account'>#0#</A>'
+							1 => '<A HREF='/person/#0#/account' title='View #0# Account'>#0#</A>'
+							2 => '<A HREF='/org/#8#/account' title='View #8# Account'>#8#</A>'
+							3 => '<A HREF='/org/#8#/account' title='View #8# Account'>#8#</A>'
+							_DEFAULT => '#0#'
+
+						}
+						head => 'Payer'
+
+					}
+					1 => {
+						head => 'Patient'
+						hint => 'View #&{?}# Account'
+						url => '/person/#&{?}#/account'
+
+					}
+					2 => {
+						head => 'Send Date'
+
+					}
+					3 => {
+						head => 'Ack Date'
+
+					}
+					4 => {
+						head => 'Billing Org'
+
+					}
+					5 => {
+						head => 'Status'
+
+					}
+					6 => {
+						dformat => 'currency'
+						head => 'Amount Due'
+
+					}
+					7 => {
+						head => 'Claim Id(s)'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selTaxIdType">
@@ -991,6 +1096,30 @@ SELECT * FROM (
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column index="0" heading="Name"/>
+				<column index="1" heading="Address"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<IMG SRC="/resources/icons/address.gif">'
+
+					}
+					1 => {
+						colIdx => '0'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '1'
+						head => 'Address'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_Alerts">
@@ -1006,6 +1135,20 @@ SELECT * FROM (
 			<params>
 				<param value="request:trans_owner_id"/>
 			</params>
+			<report>
+				<column heading="Alerts"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '<B>#&{?}#</B><br/> #1#'
+						head => 'Alerts'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_ContactMethods">
@@ -1024,6 +1167,47 @@ SELECT * FROM (
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Name"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+
+					}
+					1 => {
+						comments => 'The type of contact method (phone, fax, etc)'
+						dataFmt => {
+
+						}
+						head => 'Type'
+
+					}
+					2 => {
+						dAlign => 'RIGHT'
+						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						head => 'Name'
+
+					}
+					3 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_ContactMethods_And_Addresses">
@@ -1051,6 +1235,47 @@ SELECT * FROM (
 				<param value="request:parent_id"/>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="P"/>
+				<column heading="Type"/>
+				<column heading="Name"/>
+				<column heading="Value"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						comments => 'Boolean value indicating whether the contact method is a preferred method or not'
+						dataFmt => {
+							0 => ''
+							1 => '<IMG SRC="/resources/icons/checkmark.gif">'
+
+						}
+						hHint => 'Preferred Method'
+						head => 'P'
+
+					}
+					1 => {
+						comments => 'The type of contact method (phone, fax, etc)'
+						dataFmt => {
+
+						}
+						head => 'Type'
+
+					}
+					2 => {
+						dAlign => 'RIGHT'
+						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						head => 'Name'
+
+					}
+					3 => {
+						head => 'Value'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_EmergencyAssociations">
@@ -1063,6 +1288,20 @@ SELECT * FROM (
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="emergency"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:0}: #1#  (#2#)'
+						head => 'emergency'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_EmploymentAssociations">
@@ -1076,6 +1315,20 @@ SELECT * FROM (
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="employment"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:0}: #1# - #2#'
+						head => 'employment'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_Person_FamilyAssociations">
@@ -1088,6 +1341,20 @@ SELECT * FROM (
 			<params>
 				<param value="request:parent_id"/>
 			</params>
+			<report>
+				<column heading="familyAssociations"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dataFmt => '&{fmt_stripLeadingPath:0}: #1#  (#2#)'
+						head => 'familyAssociations'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selssn">

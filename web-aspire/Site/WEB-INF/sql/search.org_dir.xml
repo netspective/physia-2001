@@ -95,6 +95,82 @@
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_cityzip_like">
@@ -185,6 +261,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_provider">
@@ -275,6 +427,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_provider_like">
@@ -365,6 +593,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_providername">
@@ -455,6 +759,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_providername_like">
@@ -545,6 +925,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_state_like">
@@ -636,6 +1092,82 @@
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_statecity_like">
@@ -727,6 +1259,82 @@
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_statecityzip">
@@ -818,6 +1426,82 @@
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_statecityzip_like">
@@ -908,6 +1592,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_statezip_like">
@@ -998,6 +1758,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_taxid">
@@ -1088,6 +1924,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_taxid_like">
@@ -1178,6 +2090,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_vendor">
@@ -1268,6 +2256,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_vendor_like">
@@ -1358,6 +2422,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_zip_like">
@@ -1448,6 +2588,82 @@
 			<params>
 				<param value="request:owner_org_id"/>
 			</params>
+			<report>
+				<column heading="Code" url="javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Provider Name"/>
+				<column heading="Category"/>
+				<column heading="City"/>
+				<column heading="State"/>
+				<column heading="Zip Code"/>
+				<column heading="Tax ID"/>
+				<column heading="Street"/>
+				<column heading="Phone"/>
+				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')"/>
+				<column heading="Type"/>
+				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#13#/profile')"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Code'
+						url => 'javascript:if(isLookupWindow()) populateControl('#0#', true); else window.location.href = '/org/#0#/profile';'
+
+					}
+					1 => {
+						head => 'Provider Name'
+
+					}
+					2 => {
+						head => 'Category'
+
+					}
+					3 => {
+						head => 'City'
+
+					}
+					4 => {
+						head => 'State'
+
+					}
+					5 => {
+						head => 'Zip Code'
+
+					}
+					6 => {
+						head => 'Tax ID'
+
+					}
+					7 => {
+						dataFmt => '#8#'
+						head => 'Street'
+
+					}
+					8 => {
+						dataFmt => '#9#'
+						head => 'Phone'
+
+					}
+					9 => {
+						dataFmt => '#11#'
+						head => 'Fee Schedule'
+						url => 'javascript:doActionPopup('/org/#0#/catalog/#10#/#11#')'
+
+					}
+					10 => {
+						dataFmt => '#12#'
+						head => 'Type'
+
+					}
+					11 => {
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						head => 'Parent Provider'
+						url => 'javascript:doActionPopup('/org/#13#/profile')'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

@@ -40,6 +40,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_description">
@@ -77,6 +136,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_description_like">
@@ -114,6 +241,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_detail">
@@ -144,6 +339,77 @@
 			<params>
 				<param value="request:catalog_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="Type"/>
+				<column heading="Code"/>
+				<column heading="Modifier"/>
+				<column heading="Description"/>
+				<column type="currency" heading="Price"/>
+				<column heading="UOH"/>
+				<column index="9" heading="Name"/>
+				<column index="10" heading=""/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'center'
+						head => 'ID'
+						options => '1'
+						tDataFmt => '&{count:0} Entries'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)'
+
+					}
+					1 => {
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Code'
+
+					}
+					3 => {
+						head => 'Modifier'
+
+					}
+					4 => {
+						head => 'Description'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Price'
+						tAlign => 'RIGHT'
+						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						head => 'UOH'
+						hint => 'Units'
+
+					}
+					7 => {
+						colIdx => '9'
+						head => 'Name'
+
+					}
+					8 => {
+						colIdx => '10'
+						dAlign => 'center'
+						head => ''
+
+					}
+
+				}
+				stdIcons => {
+					addUrlFmt => '/org/#session.org_id#/dlg-add-catalog-item/#param.search_expression#'
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_detail_org">
@@ -174,6 +440,90 @@
 			<params>
 				<param value="request:catalog_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="/org/#session.org_id#/dlg-update-catalog-item/#0#"/>
+				<column heading="Type"/>
+				<column heading="Code"/>
+				<column heading="Modifier"/>
+				<column heading="Description"/>
+				<column type="currency" heading="Price"/>
+				<column heading="UOH"/>
+				<column heading="" url="/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#"/>
+				<column index="10" heading=""/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<b style="font-size:10pt">#param.catalog_id# (Fee Schedule ID #param.internal_catalog_id#)</b> <br>
+					<a href='/org/#session.org_id#/dlg-add-catalog/#param.internal_catalog_id#'>Add Fee Schedule</a> |
+					<a href='/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#'>Add Item</a>
+				'
+
+						}
+
+					}
+
+				}
+				columnDefn => {
+					0 => {
+						dAlign => 'center'
+						head => 'ID'
+						options => '1'
+						tDataFmt => '&{count:0} Entries'
+						url => '/org/#session.org_id#/dlg-update-catalog-item/#0#'
+
+					}
+					1 => {
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Code'
+
+					}
+					3 => {
+						head => 'Modifier'
+
+					}
+					4 => {
+						head => 'Description'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Price'
+						tAlign => 'RIGHT'
+						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						head => 'UOH'
+						hint => 'Units'
+
+					}
+					7 => {
+						head => ''
+						hint => 'Add Child Entry'
+						url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#'
+
+					}
+					8 => {
+						colIdx => '10'
+						dAlign => 'center'
+						head => ''
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_detailname">
@@ -201,6 +551,77 @@
 			AND	oce.entry_type = catalog_entry_type.id
 			ORDER BY entry_type, code, modifier
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="Type"/>
+				<column heading="Code"/>
+				<column heading="Modifier"/>
+				<column heading="Description"/>
+				<column type="currency" heading="Price"/>
+				<column heading="UOH"/>
+				<column index="9" heading="Name"/>
+				<column index="10" heading=""/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'center'
+						head => 'ID'
+						options => '1'
+						tDataFmt => '&{count:0} Entries'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)'
+
+					}
+					1 => {
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Code'
+
+					}
+					3 => {
+						head => 'Modifier'
+
+					}
+					4 => {
+						head => 'Description'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Price'
+						tAlign => 'RIGHT'
+						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						head => 'UOH'
+						hint => 'Units'
+
+					}
+					7 => {
+						colIdx => '9'
+						head => 'Name'
+
+					}
+					8 => {
+						colIdx => '10'
+						dAlign => 'center'
+						head => ''
+
+					}
+
+				}
+				stdIcons => {
+					addUrlFmt => '/org/#session.org_id#/dlg-add-catalog-item/#param.search_expression#'
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_id">
@@ -238,6 +659,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_id_like">
@@ -275,6 +764,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_items_all">
@@ -294,6 +851,77 @@
 			<params>
 				<param value="request:catalog_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="Type"/>
+				<column heading="Code"/>
+				<column heading="Modifier"/>
+				<column heading="Description"/>
+				<column type="currency" heading="Price"/>
+				<column heading="UOH"/>
+				<column index="9" heading="Name"/>
+				<column index="10" heading=""/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						dAlign => 'center'
+						head => 'ID'
+						options => '1'
+						tDataFmt => '&{count:0} Entries'
+						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)'
+
+					}
+					1 => {
+						head => 'Type'
+
+					}
+					2 => {
+						head => 'Code'
+
+					}
+					3 => {
+						head => 'Modifier'
+
+					}
+					4 => {
+						head => 'Description'
+
+					}
+					5 => {
+						dformat => 'currency'
+						head => 'Price'
+						tAlign => 'RIGHT'
+						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+
+					}
+					6 => {
+						dAlign => 'CENTER'
+						head => 'UOH'
+						hint => 'Units'
+
+					}
+					7 => {
+						colIdx => '9'
+						head => 'Name'
+
+					}
+					8 => {
+						colIdx => '10'
+						dAlign => 'center'
+						head => ''
+
+					}
+
+				}
+				stdIcons => {
+					addUrlFmt => '/org/#session.org_id#/dlg-add-catalog-item/#param.search_expression#'
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_name">
@@ -331,6 +959,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_name_like">
@@ -368,6 +1064,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_nameordescr">
@@ -405,6 +1169,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalog_nameordescr_like">
@@ -442,6 +1274,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalogs_all">
@@ -478,6 +1378,74 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						dAlign => 'CENTER'
+						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						hVAlign => 'BOTTOM'
+						head => 'Action'
+						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_catalogs_all_org">
@@ -514,6 +1482,78 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="/org/#session.org_id#/catalog/#5#/#0#"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+				<column index="6" heading="" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '
+					<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+					<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+					<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
+				'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						dataFmt => '&{level_indent:0}#0#'
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => '/org/#session.org_id#/catalog/#5#/#0#'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+					4 => {
+						colIdx => '6'
+						hVAlign => 'BOTTOM'
+						head => ''
+						hint => 'Add Child Schedule'
+						url => '/org/#session.org_id#/dlg-add-catalog/#5#'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_description">
@@ -551,6 +1591,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_description_like">
@@ -588,6 +1687,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_id">
@@ -625,6 +1783,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_id_like">
@@ -662,6 +1879,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_name">
@@ -699,6 +1975,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_name_like">
@@ -736,6 +2071,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_nameordescr">
@@ -773,6 +2167,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_name_catalog_nameordescr_like">
@@ -810,6 +2263,65 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<report>
+				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
+				<column heading="Name /<BR>Description"/>
+				<column heading="Contract"/>
+				<column index="1" heading="Entries"/>
+			</report>
+			<!--
+				banner => {
+					actionRows => {
+						0 => {
+							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							url => '/org/#session.org_id#/dlg-add-catalog'
+
+						}
+
+					}
+
+				}
+				bullets => '/org/#session.org_id#/dlg-update-catalog/#5#'
+				columnDefn => {
+					0 => {
+						hVAlign => 'BOTTOM'
+						head => 'ID'
+						hint => 'Fee Schedule ID #5#'
+						options => '1'
+						tDataFmt => '&{count:0} Schedules'
+						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+
+					}
+					1 => {
+						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						hVAlign => 'BOTTOM'
+						head => 'Name /<BR>Description'
+
+					}
+					2 => {
+						dataFmt => '#7#'
+						hVAlign => 'BOTTOM'
+						head => 'Contract'
+
+					}
+					3 => {
+						colIdx => '1'
+						dAlign => 'CENTER'
+						hVAlign => 'BOTTOM'
+						head => 'Entries'
+						summarize => 'sum'
+						tAlign => 'CENTER'
+
+					}
+
+				}
+				stdIcons => {
+					delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#'
+					updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#'
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

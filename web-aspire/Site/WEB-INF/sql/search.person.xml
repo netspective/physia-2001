@@ -49,6 +49,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_associate">
@@ -95,6 +153,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_insured-Person">
@@ -141,6 +257,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like">
@@ -186,6 +360,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_associate">
@@ -232,6 +464,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_insured-Person">
@@ -278,6 +568,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_nurse">
@@ -324,6 +672,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_patient">
@@ -370,6 +776,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_physician">
@@ -416,6 +880,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_physician-ref">
@@ -462,6 +984,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_referring-Doctor">
@@ -508,6 +1088,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_like_staff">
@@ -554,6 +1192,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_nurse">
@@ -600,6 +1296,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_patient">
@@ -646,6 +1400,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_physician">
@@ -692,6 +1504,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_physician-ref">
@@ -738,6 +1608,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_referring-Doctor">
@@ -784,6 +1712,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_account_staff">
@@ -830,6 +1816,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname">
@@ -875,6 +1919,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_associate">
@@ -921,6 +2023,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_insured-Person">
@@ -967,6 +2127,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like">
@@ -1012,6 +2230,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_associate">
@@ -1058,6 +2334,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_insured-Person">
@@ -1104,6 +2438,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_nurse">
@@ -1150,6 +2542,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_patient">
@@ -1196,6 +2646,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_physician">
@@ -1242,6 +2750,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_physician-ref">
@@ -1288,6 +2854,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_referring-Doctor">
@@ -1334,6 +2958,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_like_staff">
@@ -1380,6 +3062,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_nurse">
@@ -1426,6 +3166,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_patient">
@@ -1472,6 +3270,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_physician">
@@ -1518,6 +3374,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_physician-ref">
@@ -1564,6 +3478,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_referring-Doctor">
@@ -1610,6 +3582,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_anyname_staff">
@@ -1656,6 +3686,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart">
@@ -1701,6 +3789,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_associate">
@@ -1747,6 +3893,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_insured-Person">
@@ -1793,6 +3997,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like">
@@ -1838,6 +4100,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_associate">
@@ -1884,6 +4204,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_insured-Person">
@@ -1930,6 +4308,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_nurse">
@@ -1976,6 +4412,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_patient">
@@ -2022,6 +4516,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_physician">
@@ -2068,6 +4620,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_physician-ref">
@@ -2114,6 +4724,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_referring-Doctor">
@@ -2160,6 +4828,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_like_staff">
@@ -2206,6 +4932,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_nurse">
@@ -2252,6 +5036,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_patient">
@@ -2298,6 +5140,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_physician">
@@ -2344,6 +5244,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_physician-ref">
@@ -2390,6 +5348,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_referring-Doctor">
@@ -2436,6 +5452,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_chart_staff">
@@ -2482,6 +5556,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob">
@@ -2527,6 +5659,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_associate">
@@ -2573,6 +5763,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_insured-Person">
@@ -2619,6 +5867,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like">
@@ -2664,6 +5970,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_associate">
@@ -2710,6 +6074,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_insured-Person">
@@ -2756,6 +6178,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_nurse">
@@ -2802,6 +6282,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_patient">
@@ -2848,6 +6386,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_physician">
@@ -2894,6 +6490,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_physician-ref">
@@ -2940,6 +6594,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_referring-Doctor">
@@ -2986,6 +6698,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_like_staff">
@@ -3032,6 +6802,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_nurse">
@@ -3078,6 +6906,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_patient">
@@ -3124,6 +7010,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_physician">
@@ -3170,6 +7114,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_physician-ref">
@@ -3216,6 +7218,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_referring-Doctor">
@@ -3262,6 +7322,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_dob_staff">
@@ -3308,6 +7426,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id">
@@ -3354,6 +7530,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_associate">
@@ -3401,6 +7635,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_insured-Person">
@@ -3448,6 +7740,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like">
@@ -3493,6 +7843,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_associate">
@@ -3539,6 +7947,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_insured-Person">
@@ -3585,6 +8051,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_nurse">
@@ -3631,6 +8155,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_patient">
@@ -3677,6 +8259,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_physician">
@@ -3723,6 +8363,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_physician-ref">
@@ -3769,6 +8467,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_referring-Doctor">
@@ -3815,6 +8571,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_like_staff">
@@ -3861,6 +8675,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_nurse">
@@ -3908,6 +8780,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_patient">
@@ -3955,6 +8885,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_physician">
@@ -4002,6 +8990,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_physician-ref">
@@ -4049,6 +9095,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_referring-Doctor">
@@ -4096,6 +9200,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_id_staff">
@@ -4143,6 +9305,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:person_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname">
@@ -4188,6 +9408,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_associate">
@@ -4234,6 +9512,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_insured-Person">
@@ -4280,6 +9616,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like">
@@ -4325,6 +9719,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_associate">
@@ -4371,6 +9823,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_insured-Person">
@@ -4417,6 +9927,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_nurse">
@@ -4463,6 +10031,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_patient">
@@ -4509,6 +10135,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_physician">
@@ -4555,6 +10239,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_physician-ref">
@@ -4601,6 +10343,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_referring-Doctor">
@@ -4647,6 +10447,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_like_staff">
@@ -4693,6 +10551,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_nurse">
@@ -4739,6 +10655,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_patient">
@@ -4785,6 +10759,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_physician">
@@ -4831,6 +10863,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_physician-ref">
@@ -4877,6 +10967,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_referring-Doctor">
@@ -4923,6 +11071,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_lastname_staff">
@@ -4969,6 +11175,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone">
@@ -5015,6 +11279,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_associate">
@@ -5062,6 +11384,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_insured-Person">
@@ -5109,6 +11489,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like">
@@ -5154,6 +11592,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_associate">
@@ -5200,6 +11696,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_insured-Person">
@@ -5246,6 +11800,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_nurse">
@@ -5292,6 +11904,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_patient">
@@ -5338,6 +12008,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_physician">
@@ -5384,6 +12112,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_physician-ref">
@@ -5430,6 +12216,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_referring-Doctor">
@@ -5476,6 +12320,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_like_staff">
@@ -5522,6 +12424,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_nurse">
@@ -5569,6 +12529,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_patient">
@@ -5616,6 +12634,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_physician">
@@ -5663,6 +12739,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_physician-ref">
@@ -5710,6 +12844,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_referring-Doctor">
@@ -5757,6 +12949,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_phone_staff">
@@ -5804,6 +13054,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:value_text"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn">
@@ -5850,6 +13158,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_associate">
@@ -5897,6 +13263,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_insured-Person">
@@ -5944,6 +13368,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like">
@@ -5989,6 +13471,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_associate">
@@ -6035,6 +13575,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_insured-Person">
@@ -6081,6 +13679,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_nurse">
@@ -6127,6 +13783,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_patient">
@@ -6173,6 +13887,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_physician">
@@ -6219,6 +13991,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_physician-ref">
@@ -6265,6 +14095,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_referring-Doctor">
@@ -6311,6 +14199,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_like_staff">
@@ -6357,6 +14303,64 @@
 			<params>
 				<param value="request:org_internal_id"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_nurse">
@@ -6404,6 +14408,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_patient">
@@ -6451,6 +14513,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_physician">
@@ -6498,6 +14618,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_physician-ref">
@@ -6545,6 +14723,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_referring-Doctor">
@@ -6592,6 +14828,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_ssn_staff">
@@ -6639,6 +14933,64 @@
 				<param value="request:org_internal_id"/>
 				<param value="request:ssn"/>
 			</params>
+			<report>
+				<column heading="ID" url="javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					"/>
+				<column heading="Last Name"/>
+				<column heading="First Name"/>
+				<column heading="SSN"/>
+				<column heading="Date of Birth"/>
+				<column heading="Home Phone"/>
+				<column heading="Account"/>
+				<column heading="Chart"/>
+				<column heading="Type"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'ID'
+						url => 'javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					'
+
+					}
+					1 => {
+						head => 'Last Name'
+
+					}
+					2 => {
+						head => 'First Name'
+
+					}
+					3 => {
+						head => 'SSN'
+
+					}
+					4 => {
+						head => 'Date of Birth'
+
+					}
+					5 => {
+						head => 'Home Phone'
+
+					}
+					6 => {
+						head => 'Account'
+
+					}
+					7 => {
+						head => 'Chart'
+
+					}
+					8 => {
+						head => 'Type'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

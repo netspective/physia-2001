@@ -39,6 +39,79 @@
 			and (ins.product_name = ? or ? is null)
 			order by code
 
+			<report>
+				<column index="0" heading="Service Date"/>
+				<column index="1" heading="Payment Date"/>
+				<column index="2" heading="Product ID"/>
+				<column index="3" heading="Invoice ID"/>
+				<column index="4" heading="CPT Code"/>
+				<column index="5" type="currency" heading="Amount<br>Expected"/>
+				<column index="6" type="currency" heading="Amount<br>Paid"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						dataFmt => '#0#'
+						hAlign => 'center'
+						head => 'Service Date'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						hAlign => 'center'
+						head => 'Payment Date'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						hAlign => 'center'
+						head => 'Product ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'right'
+						dataFmt => '<A HREF = "/invoice/#3#/summary">#3#</A>'
+						hAlign => 'center'
+						head => 'Invoice ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'left'
+						dataFmt => '#4#'
+						hAlign => 'center'
+						head => 'CPT Code'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'right'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Expected'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Paid'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selCompliantInvoicesByProductName">
@@ -74,6 +147,79 @@
 			and (ins.product_name = ? or ? is null)
 			order by product_name
 
+			<report>
+				<column index="0" heading="Service Date"/>
+				<column index="1" heading="Payment Date"/>
+				<column index="2" heading="Product ID"/>
+				<column index="3" heading="Invoice ID"/>
+				<column index="4" heading="CPT Code"/>
+				<column index="5" type="currency" heading="Amount<br>Expected"/>
+				<column index="6" type="currency" heading="Amount<br>Paid"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						dataFmt => '#0#'
+						hAlign => 'center'
+						head => 'Service Date'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						hAlign => 'center'
+						head => 'Payment Date'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						hAlign => 'center'
+						head => 'Product ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'right'
+						dataFmt => '<A HREF = "/invoice/#3#/summary">#3#</A>'
+						hAlign => 'center'
+						head => 'Invoice ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'left'
+						dataFmt => '#4#'
+						hAlign => 'center'
+						head => 'CPT Code'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'right'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Expected'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Paid'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="selCompliantInvoicesByServiceDate">
@@ -109,6 +255,79 @@
 			and (ins.product_name = ? or ? is null)
 			order by service_date
 
+			<report>
+				<column index="0" heading="Service Date"/>
+				<column index="1" heading="Payment Date"/>
+				<column index="2" heading="Product ID"/>
+				<column index="3" heading="Invoice ID"/>
+				<column index="4" heading="CPT Code"/>
+				<column index="5" type="currency" heading="Amount<br>Expected"/>
+				<column index="6" type="currency" heading="Amount<br>Paid"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dAlign => 'center'
+						dataFmt => '#0#'
+						hAlign => 'center'
+						head => 'Service Date'
+
+					}
+					1 => {
+						colIdx => '1'
+						dAlign => 'center'
+						dataFmt => '#1#'
+						hAlign => 'center'
+						head => 'Payment Date'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '#2#'
+						hAlign => 'center'
+						head => 'Product ID'
+
+					}
+					3 => {
+						colIdx => '3'
+						dAlign => 'right'
+						dataFmt => '<A HREF = "/invoice/#3#/summary">#3#</A>'
+						hAlign => 'center'
+						head => 'Invoice ID'
+
+					}
+					4 => {
+						colIdx => '4'
+						dAlign => 'left'
+						dataFmt => '#4#'
+						hAlign => 'center'
+						head => 'CPT Code'
+
+					}
+					5 => {
+						colIdx => '5'
+						dAlign => 'right'
+						dataFmt => '#5#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Expected'
+
+					}
+					6 => {
+						colIdx => '6'
+						dAlign => 'right'
+						dataFmt => '#6#'
+						dformat => 'currency'
+						hAlign => 'center'
+						head => 'Amount<br>Paid'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 	</sql-statements>

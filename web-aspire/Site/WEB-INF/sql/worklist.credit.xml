@@ -74,6 +74,53 @@
 			and (ins.product_name = ? OR ? is NULL)
 			order by age desc
 			
+			<report>
+				<column index="0" heading="Patient ID"/>
+				<column index="1" heading="Name"/>
+				<column index="2" heading="Invoice ID"/>
+				<column index="3" type="currency" heading="Credit Balace"/>
+				<column index="4" heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Patient ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '<A HREF = "/invoice/#2#/summary">#2#</A>'
+						head => 'Invoice ID'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Credit Balace'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_invoice_credit_balance_patient">
@@ -93,6 +140,53 @@
 			and (ins.product_name = ? OR ? is NULL)
 			order by client_id	
 			
+			<report>
+				<column index="0" heading="Patient ID"/>
+				<column index="1" heading="Name"/>
+				<column index="2" heading="Invoice ID"/>
+				<column index="3" type="currency" heading="Credit Balace"/>
+				<column index="4" heading="Age"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						colIdx => '0'
+						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						head => 'Patient ID'
+
+					}
+					1 => {
+						colIdx => '1'
+						dataFmt => '#1#'
+						head => 'Name'
+
+					}
+					2 => {
+						colIdx => '2'
+						dAlign => 'left'
+						dataFmt => '<A HREF = "/invoice/#2#/summary">#2#</A>'
+						head => 'Invoice ID'
+						tAlign => 'left'
+
+					}
+					3 => {
+						colIdx => '3'
+						dataFmt => '#3#'
+						dformat => 'currency'
+						head => 'Credit Balace'
+						summarize => 'sum'
+
+					}
+					4 => {
+						colIdx => '4'
+						dataFmt => '#4#'
+						head => 'Age'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_worklist_credit">

@@ -80,6 +80,27 @@
 			<params>
 				<param value="request:owner_id"/>
 			</params>
+			<report>
+				<column heading="Claims" url="javascript:doActionPopup("#hrefSelfPopup#&detail=payer&payer=#&{?}#")"/>
+				<column heading="Count"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Claims'
+						hint => 'View Details'
+						url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=payer&payer=#&{?}#")'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_payer_type">

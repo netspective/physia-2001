@@ -24,6 +24,36 @@
 			and view_init &gt; trunc(sysdate) + ?
 			order by view_count DESC
 			
+			<report>
+				<column heading="Target" url="#4#"/>
+				<column heading="Count"/>
+				<column heading="Init View"/>
+				<column heading="Last View"/>
+			</report>
+			<!--
+				columnDefn => {
+					0 => {
+						head => 'Target'
+						url => '#4#'
+
+					}
+					1 => {
+						dAlign => 'right'
+						head => 'Count'
+
+					}
+					2 => {
+						head => 'Init View'
+
+					}
+					3 => {
+						head => 'Last View'
+
+					}
+
+				}
+
+			-->
 		</statement>
 
 		<statement name="sel_SessionInfo">
