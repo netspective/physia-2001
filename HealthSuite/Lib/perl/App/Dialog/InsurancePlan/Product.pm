@@ -169,7 +169,7 @@ sub populateData
 		}
 
 	#If this product is not owned by this org then make dialog view only
-	$self->setDialogviewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
+	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
 	
 	
 	my $selInsOrgData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
