@@ -154,6 +154,7 @@ use App::Dialog::HealthMaintenance;
 use App::Dialog::ApptType;
 use App::Dialog::Training;
 use App::Dialog::ResponsibleParty;
+use App::Dialog::Attribute::MiscNotes;
 
 ##############################################################################
 # Global variables that map (using a system-wide ID) unique text to specific
@@ -540,6 +541,7 @@ $SEARCH_CLASSES = {
 					_arl_modify => ['ins_internal_id'],
 					_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
 	'health-rule' => {_class => 'App::Dialog::HealthMaintenance', heading => '$Command Health Maintenance Rule', _arl => ['rule_id']},
+	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
 
 	'procedure' => 'App::Dialog::Procedure',
 	'adjustment' => 'App::Dialog::Adjustment',
