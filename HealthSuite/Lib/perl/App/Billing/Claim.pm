@@ -108,6 +108,7 @@ sub new
 	$params{totalItems} = undef;
 	$params{insType} = undef;
 	$params{providerEMCId} = undef;
+	$params{invoiceDate} = undef;
 
 	return bless \%params, $type; #binding the param hash with class reference
 }
@@ -130,6 +131,18 @@ sub getEMCId
 	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
 	$self->{providerEMCId} = ((grep{$_ eq $self->{insType}} @payerCodes) ? $ids[$self->{insType}] : $self->{payToProvider}->getPIN());
 	return $self->{providerEMCId};
+}
+
+sub setInvoiceDate
+{
+	my ($self, $value) = @_;
+	$self->{invoiceDate} = $value;
+}
+
+sub getInvoiceDate
+{
+	my $self = shift;
+	return $self->{invoiceDate};
 }
 
 sub setTransProviderId

@@ -44,8 +44,8 @@ use constant FORM_HEIGHT => 661.5;
 use constant LINE_SPACING => 22.5;
 use constant MEDICARE_EXTRA_SPACE => 4.5;
 use constant STARTX_BOX3_SPACE => 205;    # DISTANCE B/W STARTING X AND BOX3
-use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A
-use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E
+use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A 
+use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E 
 use constant STARTX_BOX24ADATE_SPACE => 67; # DISTANCE B/W STARTING X AND BOX24AD
 use constant STARTX_BOX24B_SPACE => 127; # DISTANCE B/W STARTING X AND BOX24B
 use constant STARTX_BOX24C_SPACE => 149; # DISTANCE B/W STARTING X AND BOX24C
@@ -57,17 +57,17 @@ use constant STARTX_BOX24H_SPACE => 436; # DISTANCE B/W STARTING X AND BOX24H
 use constant STARTX_BOX24I_SPACE => 459; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24J_SPACE => 478; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24K_SPACE => 500; # DISTANCE B/W STARTING X AND BOX24J
-use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A
-use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A
-use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A
-use constant BLACK_DASH => 4.5; #
-use constant WHITE_DASH => 1.125; #
-use constant CELL_PADDING_Y => 1.125; #
-use constant CELL_PADDING_X => 2.25; #
+use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A 
+use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A 
+use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A 
+use constant BLACK_DASH => 4.5; # 
+use constant WHITE_DASH => 1.125; # 
+use constant CELL_PADDING_Y => 1.125; # 
+use constant CELL_PADDING_X => 2.25; # 
 use constant DATA_PADDING_X => 9;
 use constant BOX24_HEIGHT => 8;
 
-use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE
+use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE 
 
 use constant DATA_RED => 0.0;
 use constant DATA_GREEN => 0.0;
@@ -85,6 +85,7 @@ sub populate
 
 	pdflib::PDF_setrgbcolor($p, DATA_RED, DATA_GREEN, DATA_BLUE);
 	$self->box1ClaimData($p, $Claim, $cordinates);
+	$self->carrierData($p, $Claim, $cordinates);
 	$self->box1aClaimData($p, $Claim, $cordinates);
 	$self->box2ClaimData($p, $Claim, $cordinates);
 	$self->box3ClaimData($p, $Claim, $cordinates);
@@ -96,6 +97,11 @@ sub populate
 	$self->box7aClaimData($p, $Claim, $cordinates);
 	$self->box7bClaimData($p, $Claim, $cordinates);
 	$self->box11ClaimData($p, $Claim, $cordinates);
+	$self->box11dClaimData($p, $Claim, $cordinates);
+
+	$self->box12ClaimData($p, $Claim, $cordinates);
+	$self->box13ClaimData($p, $Claim, $cordinates);
+
 	$self->box15ClaimData($p, $Claim, $cordinates);
 #	$self->box22ClaimData($p, $Claim, $cordinates);
 	my $dg = $self->box24ClaimData($p, $Claim, $cordinates, $procesedProc);
@@ -135,7 +141,7 @@ sub box3ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth());
+	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth()); 
 
 	my $temp =
 		 {
@@ -246,6 +252,20 @@ sub box11ClaimData
 
 }
 
+
+sub box11dClaimData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box11dCordinates = $cordinates->{box9d};
+	my $box11dY = $box11dCordinates->[1];
+	my $box11dX = $box11dCordinates->[0] + STARTX_BOX1A_SPACE;
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	pdflib::PDF_show_xy($p , 'X', $box11dX + CELL_PADDING_X + 50 + CHECKED_BOX_X, $cordinates->{box12}->[1] + 1 + CHECKED_BOX_Y);
+	pdflib::PDF_stroke($p);
+}
+
 sub box29ClaimData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
@@ -253,19 +273,35 @@ sub box29ClaimData
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-#	my @amount  = split (/\./ , abs($claim->getAmountPaid));
-
+	
 	pdflib::PDF_show_xy($p , "0", $box29X + 45 - pdflib::PDF_stringwidth($p ,"0", $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , "00", $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 
 }
 
+sub carrierData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	my $address = $claim->{payer}->getAddress;
+
+	if ($address ne "")
+	{
+#		pdflib::PDF_show_xy($p , $payer->getName, START_X + 250, START_Y + FORM_HEIGHT + 51);
+		pdflib::PDF_show_xy($p , $address->getAddress1, START_X + 250, START_Y + FORM_HEIGHT + 51 - FORM_FONT_SIZE);
+		pdflib::PDF_show_xy($p , $address->getCity . " " . $address->getState . " " . $address->getZipCode , START_X + 250, START_Y + FORM_HEIGHT + 51 - 2 * FORM_FONT_SIZE);
+		pdflib::PDF_stroke($p);
+	}
+}	
+
 @CHANGELOG =
-(
+( 
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 #	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],

@@ -158,11 +158,14 @@ sub new
 		physicianGrp => undef,
 		physicianPin => undef,
 		transProviderName => undef,
+		providerSignatureDate => undef,
 		signatureInsured => undef,
 		signaturePatient => undef,
 		signaturePatientDate => undef,
+		payerName => undef,
+		payerAddress => undef,
+		
 	};
-
 	return bless \%params, $type;
 }
 
@@ -177,6 +180,7 @@ sub populateTemplate
 	$self->populateOrganization($claim);
 	$self->populateTreatment($claim);
 	$self->populateClaim($claim);
+	$self->populatePayer($claim);
 	my $tb = $self->populateProcedures($claim, $procesedProc);
 	$self->populateDiagnosis($claim, $tb);
 	$self->concatSpace();
@@ -232,9 +236,10 @@ sub populatePatient
 	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";	
 	$data->{patientStatusStudentFullTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(FULL-TIME\)|F|0/ ? "checked" : "";
 	$data->{patientStatusStudentPartTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(PART-TIME\)|P|1/ ? "checked" : "";
-	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "";
-	$data->{signaturePatientDate} = uc($patient->getSignatureDate())
-};
+	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "Signature on File";
+#	$data->{signaturePatientDate} = uc(uc($patient->getSignature()) =~ /C|S|B|P/ ? $patient->getSignatureDate(): "")
+	$data->{signaturePatientDate} = uc($claim->getInvoiceDate);
+}
 
 sub populateInsured
 {
@@ -243,7 +248,7 @@ sub populateInsured
 	my $insured = $claim->{insured}->[$claimType];
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
-
+    
 	$data->{insuredName} = $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
 	$data->{insuredDateOfBirth} = $insured->getDateOfBirth(DATEFORMAT_USA);
 	$data->{insuredSexM} = $insured->getSex() eq 'M' ? "Checked" : "";
@@ -260,8 +265,8 @@ sub populateInsured
 	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;	
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupName;
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
-	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "";
-};
+	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
+}
 
 sub populateOtherInsured
 {
@@ -274,7 +279,6 @@ sub populateOtherInsured
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
 		
-#		if (($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName ) && ($insured2->getInsurancePlanOrProgramName ne ""))
 		if (($insured2->getInsurancePlanOrProgramName ne ""))
 		{
 			$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
@@ -287,17 +291,16 @@ sub populateOtherInsured
 			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupName;
 			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo;
 		}
-		else 
-		{
-			if (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
+		elsif (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
 			{
 				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
-#				$data->{otherInsuredName} = "none";
 			}
-		}
-
+		elsif (($insured2->getInsurancePlanOrProgramName eq ""))
+			{
+				$data->{insuredAnotherHealthBenefitPlanN} =  "Checked" ;
+			}
 	}
-};
+}
 
 sub populatePhysician
 {
@@ -380,7 +383,7 @@ sub populateClaim
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 	$data->{claimAcceptAssignmentN} = uc($claim->getAcceptAssignment) eq 'N' ? "Checked" : "";
-	$data->{claimAcceptAssignmentY} = uc($claim->getAcceptAssignment) eq 'Y' ? "Checked" : "";
+	$data->{claimAcceptAssignmentY} = (uc($claim->getAcceptAssignment) eq 'Y') || ($claim->getAcceptAssignment eq '') ? "Checked" : "";
 	$data->{claimConditionRelatedToEmploymentPatientY} = uc($claim->getConditionRelatedToEmployment) eq 'Y' ? "Checked" : "";
 	$data->{claimConditionRelatedToEmploymentPatientN} = uc($claim->getConditionRelatedToEmployment) eq 'N' ? "Checked" : "";
 	$data->{claimConditionRelatedToAutoAccidentY} = uc($claim->getConditionRelatedToAutoAccident) eq 'Y' ? "Checked" : "";
@@ -399,8 +402,21 @@ sub populateClaim
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
 	$data->{claimTotalCharge} = $claim->getTotalCharge;
 	$data->{transProviderName} = $claim->getTransProviderName();
+	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
+
 }
 
+sub populatePayer
+{
+	my ($self, $claim) = @_;
+	my $claimType = $claim->getClaimType();
+	my $payer = $claim->{policy}->[$claimType];
+	my $payerAddress = $payer->getAddress();
+	my $data = $self->{data};
+    
+#    $data->{payerName} = $payer->getName();
+    $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
+}
 sub populateProcedures
 {
 	my ($self, $claim, $procesedProc) = @_;

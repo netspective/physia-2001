@@ -1426,7 +1426,7 @@ sub getId()
 {
 	my $self = shift;
 
-	return "NSF_OUTPUT";
+	return "ENVOY_NSF_OUTPUT";
 }
 
 sub getName

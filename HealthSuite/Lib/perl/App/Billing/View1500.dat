@@ -160,6 +160,7 @@
 
   <body>
     <form>
+      <p align="right"> <strong> {$payerName} <br> {$payerAddress} <strong> </p>
       <div align="center">
         <table id="main" border="0" cellspacing="0" cellpadding="0">
           <tr>
@@ -423,24 +424,29 @@
                   <td class="r b" colspan ="2">
                     <table class="cell" border="0" cellspacing="0" cellpadding="0">
                       <tr class="cell">
-                        <td class="cell" align="center" colspan="2"><b>READ BACK OF FORM BEFORE COMPLETING &amp SIGNING THIS FORM.<b></td>
+                        <td class="cell" align="center" colspan="3"><b>READ BACK OF FORM BEFORE COMPLETING &amp SIGNING THIS FORM.<b></td>
                       </tr>
                       <tr class="cell">
                         <td class="cell">12.&nbsp</td>
-                        <td>PATIENT'S OR AUTHORIZED PERSON'S SIGNATURE I authorize the release of any medical or other information necessary
+                        <td colspan="2">PATIENT'S OR AUTHORIZED PERSON'S SIGNATURE I authorize the release of any medical or other information necessary
                             to process this claim. I also request payment of government benefits either to myself or to the party who accepts assignment below.
                         </td>
                       </tr>
                       <tr class="cell">
                         <td class="cell"> &nbsp &nbsp</td>
                         <td class="cell">
-                          <strong> &nbsp &nbsp &nbsp {$signaturePatient} &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp {$signaturePatientDate}<strong>
+                          <strong> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp {$signaturePatient} &nbsp &nbsp <strong>
+                        </td>
+                        <td class="cell">
+                          <strong> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp{$signaturePatientDate}<strong>
                         </td>
                       </tr>
                       <tr class="cell">
                         <td class="cell" colspan="2">
-                          SIGNED _____________________________________________________________
-                          &nbsp &nbsp DATE____________________
+                          SIGNED __________________________________________________
+                        </td>
+                        <td class="cell">
+                          &nbsp &nbsp DATE___________________
                         </td>
                       </tr>
                     </table>
@@ -1031,7 +1037,7 @@
                             <tr class="cell">
                               <td class="cell">&nbsp</td>
                               <td class="cell"><strong>{$transProviderName} <strong></td>
-                              <td class="cell">&nbsp</td>
+                              <td class="cell">&nbsp &nbsp <strong>{$providerSignatureDate}<strong></td>
                             </tr>
                             <tr class="cell">
                               <td class="cell">&nbsp</td>

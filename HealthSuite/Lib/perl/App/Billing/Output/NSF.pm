@@ -14,7 +14,10 @@ use App::Billing::Claims;
 use App::Billing::Output::File::NSF;
 use App::Billing::Output::Validate::EnvoyPayer;
 use App::Billing::Output::Validate::NSF;
+use App::Billing::Output::Validate::PerSe;
+use App::Billing::Output::Validate::THIN;
 use App::Billing::Output::Strip;
+
 
 use vars qw(@ISA);
 
@@ -94,10 +97,22 @@ sub processClaims
 
 sub registerValidators
 {
-	 my ($self, $validators) = @_;
-	
-     $validators->register(new App::Billing::Output::Validate::EnvoyPayer);
-     $validators->register(new App::Billing::Output::Validate::NSF);
+	 my ($self, $validators, $nsfType) = @_;
+	 
+	 if($nsfType eq NSF_ENVOY)
+	 {
+	     $validators->register(new App::Billing::Output::Validate::EnvoyPayer);
+	     $validators->register(new App::Billing::Output::Validate::NSF);
+     }
+     elsif($nsfType eq NSF_HALLEY)
+     {
+     	$validators->register(new App::Billing::Output::Validate::PerSe);
+     }
+     elsif($nsfType eq NSF_THIN)
+     {
+     	$validators->register(new App::Billing::Output::Validate::THIN);
+     }
+     
 }
 
 #sub getPayerName
