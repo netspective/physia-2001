@@ -31,6 +31,7 @@
 		
 		<deliverable id="937">
 			Updated the 'Catalog' tab in 'insurance orgs' to showup only the fee-schedules that are related to that insurance org.
+			NOTE: Fixed this reopened bug to get the correct entries count in the FeeSchedule list of the Catalog tab in an Insurance Org.
 		</deliverable>
 		
 		<deliverable id="952">
@@ -226,6 +227,8 @@
 		<deliverable id="1470">
 			UI: Added a new person-type called 'Insured Person' for 'Personal Insurance Coverage' dialog and 
 			    added link called 'Insured Persons' in the lookups of Main menu.
+			NOTE: Fixed the reopened bug to showup the correct dialog (ie, Add New Insured Person) when the InsuredPerson
+				field is left blank and the RelationshipTo Insured field is other than self
 		</deliverable>
 
 		<deliverable id="1475">
