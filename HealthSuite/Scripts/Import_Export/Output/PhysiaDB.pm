@@ -11,7 +11,7 @@ use base qw(Driver::Output::PhysiaDB);
 use App::Universal;
 
 my $mainOrgInternalId;
-my $crUserId  = 'IMPORT_FKM';
+my $crUserId  = 'IMPORT_PHYSIA_T';
 my $CHECKDIR=`pwd`;
 chomp $CHECKDIR;
 
@@ -87,7 +87,7 @@ sub loadInsuranceData
 				owner_org_id => $mainOrgInternalId, 
 				ins_org_id => $org->id,
 				ins_type => $insuranceProduct->productType,
-			);					
+			);				
 			$insuranceProduct->id($insIntId);
 			$self->schemaAction($flags,
 				'Insurance_Address', $command,
@@ -361,12 +361,13 @@ sub loadPersonData
 	my $mName = $personData->nameMiddle;
 	my $lName = $personData->nameLast;	
 	
+
+	#If person should not be loaded then return
+	return 1 if ($personData->loadIndicator eq 'S');
+
 	#Get person ID
 	my $personId = $STMTMGR_EXTERNAL->getSingleValue($context,STMTMGRFLAG_DYNAMICSQL,"select create_unique_person_id(:1,:2,:3) from dual",$fName,$mName,$lName);
 	my $type = ref $personData;
-
-	#If person should not be loaded then return
-	return if $personData->loadIndicator eq 'S';
 	
 	#create Core Person Record
 	$self->schemaAction(
@@ -376,6 +377,7 @@ sub loadPersonData
 			name_first => $personData->nameFirst,
 			name_middle => $personData->nameMiddle,
 			name_last => $personData->nameLast,
+			name_suffix =>$personData->nameSuffix,
 			date_of_birth => $personData->dob,
 			ssn => $personData->ssn,
 			gender => $personData->gender,
@@ -395,7 +397,7 @@ sub loadPersonData
 			city => $personData->homeAddress->city,
 			state => $personData->homeAddress->state,
 			zip => $personData->homeAddress->zipCode,
-		); 
+		)if $personData->homeAddress; 
 		
 	#Create Phone
 	$self->schemaAction(
@@ -418,6 +420,8 @@ sub loadPersonData
 	#Only for Patients
 	if($type eq 'App::DataModel::Patient')
 	{
+	
+		
 		#Create Employment Record
 		if($personData->employment)
 		{
@@ -448,33 +452,54 @@ sub loadPersonData
 			value_text => $personData->chartNumber,
 		) if defined $personData->chartNumber;	
 
+		my $careProv = $personData->careProvider(0);
+		$self->schemaAction($flags,
+			'Person_Attribute',	$command,
+			parent_id => $personData->id,
+			value_type => App::Universal::ATTRTYPE_PROVIDER,
+			value_text =>$careProv->id,
+			value_int => 1,
+			_debug => 0
+		) if $careProv;
 
 		my $size = $personData->insurance_size;				
 		for (my $loop=0;$loop<=$size;$loop++)
 		{
 		
+			
 			#Coverage Record
 			my $coverage = $personData->insurance($loop);			
 			my $insuranceProduct = $coverage->insuranceProduct;
 			my $insurancePlan = $coverage->insurancePlan;
 			my $insOrg = $insuranceProduct->insOrg;
+
+			my $id =  $insuranceProduct->id;
 			#Create Insurance Coverage Record				
 			my $insIntId = $self->schemaAction($flags,
 				'Insurance', $command,
 				cr_user_id => $crUserId,
-				parent_ins_id			=> $insurancePlan->id || $insuranceProduct->id,
+				parent_ins_id			=> $insurancePlan ? $insurancePlan->id : $insuranceProduct->id,
 				product_name			=> $insuranceProduct->productName,
-				plan_name			=> $insurancePlan->planName,
+				plan_name			=> $insurancePlan ? $insurancePlan->planName : undef,
 				record_type			=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
 				owner_person_id			=> $personData->id,
 				ins_org_id			=> $insOrg->id,
 				owner_org_id			=> $mainOrgInternalId,
 				bill_sequence			=> $coverage->sequence,
-				ins_type			=> $insuranceProduct->productType,
+				
+				##
+				##Change This Line Here
+				ins_type			=> 2,#$insuranceProduct->productType,
+				
 				group_name			=> $coverage->groupName,
 				group_number			=> $coverage->groupNumber,
 				member_number			=> $coverage->memberNumber,
-				);		
+				rel_to_insured => App::Universal::INSURED_SELF, 
+				coverage_begin_date		=> $coverage->coverageDate ? $coverage->coverageDate->beginDate : undef,
+				coverage_end_date		=> $coverage->coverageDate ? $coverage->coverageDate->endDate : undef,				
+				insured_id => $personData->id
+				);	
+			$coverage->id(	$insIntId);
 		}
 	}
 	
@@ -562,7 +587,7 @@ sub PersonData
 	$self->reportStatus("Loading Patient Data.......");	
 	while($personData)
 	{
-		$self->loadPersonData($personData);
+		$self->loadPersonData($personData);		
 		$personData=$collection->getNextPersonOfType('Patient');	
 		$patCount++;
 	}	
