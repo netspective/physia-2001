@@ -20,6 +20,7 @@ sub new
 	
 	$self->{name} = undef;
 	$self->{id} = undef;
+	$self->{grp} = undef;
 	$self->{address} = undef;
 	$self->{federalTaxId} = undef;	
 	$self->{specialityId} = undef;
@@ -46,6 +47,20 @@ sub getOrganizationType
 {
 	my $self = shift;
 	return $self->{organizationType};
+}
+
+sub setGRP
+{
+	my ($self,$value) = @_;
+	
+	$self->{grp} = $value;
+}
+
+sub getGRP
+{
+	my $self = shift;
+	
+	return $self->{grp};
 }
 
 sub getFederalTaxId
@@ -93,7 +108,6 @@ sub setAddress
 {
 	my ($self,$value) = @_;
 	$self->{address} = $value;
-
 }
 
 sub setId
@@ -106,6 +120,16 @@ sub getId
 {
 	my $self = shift;
 	return $self->{id};
+}
+
+sub printVal
+{
+	my ($self) = @_;
+	foreach my $key (keys(%$self))
+	{
+		print " patient $key = " . $self->{$key} . " \n";
+	}
+
 }
 
 1;

@@ -2500,99 +2500,6 @@ sub box23ClaimData
 	pdflib::PDF_stroke($p);
 }
 
-sub box24ClaimDataPre
-{ 
-	my ($self, $p, $claim, $cordinates)  = @_;
- 	my $box24Cordinates = $cordinates->{box24HeadA};
-	my $box24X = $box24Cordinates->[0]; 
-
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
-	die "Couldn't set font"  if ($font == -1);
-	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $y;
-	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
-	my $i =0;
-	my $procedure;
-	my @ys = ($cordinates->{box24_2}->[1], $cordinates->{box24_3}->[1], $cordinates->{box24_4}->[1], $cordinates->{box24_5}->[1], $cordinates->{box24_6}->[1], $cordinates->{box25}->[1]);
-	my $diagnosisMap = {};
-	my $ptr;
-    my $cod;
-	if ( ($claim->{'diagnosis'}->[0]) ne "")
-	{
-		$diagnosisMap->{$claim->{'diagnosis'}->[0]->getDiagnosis()} = 1 
-		if defined ($claim->{'diagnosis'}->[0]->getDiagnosis);
-	}
-	if ( ($claim->{'diagnosis'}->[1]) ne "")
-	{
-		$diagnosisMap->{$claim->{'diagnosis'}->[1]->getDiagnosis()} = 2 
-		if defined ($claim->{'diagnosis'}->[1]->getDiagnosis);
-	}
-	if ( ($claim->{'diagnosis'}->[2]) ne "")
-	{
-		$diagnosisMap->{$claim->{'diagnosis'}->[2]->getDiagnosis()} = 3 
-		if defined ($claim->{'diagnosis'}->[2]->getDiagnosis);
-	}
-	if ( ($claim->{'diagnosis'}->[3]) ne "")
-	{
-		$diagnosisMap->{$claim->{'diagnosis'}->[3]->getDiagnosis()} = 4 
-		if defined ($claim->{'diagnosis'}->[3]->getDiagnosis);
-	}
-	my $procedures = $claim->{procedures};
-	my $mj;
-	my $sortedCharges = $self->feeSort($claim);
-	my $amount = $sortedCharges->{'sorted amount'};
-	
-	for ($i =0; $i <= $#$procedures;$i++)
-	{
-#		$sortedCharges->{$amount->[$i]}; procedure no.
-
-		$y = $ys[$i];
-		$procedure = $claim->{procedures}->[$sortedCharges->{$amount->[$i]}];
-		if ($procedure ne "")
-		{
-			my $date  = $self->returnDate($procedure->getDateOfServiceFrom()); 
-			pdflib::PDF_show_xy($p, $date->[0], $box24X + 8, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[1], $box24X + 26, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[2], $box24X + 46, $y + 6);
-		
-			$date  = $self->returnDate($procedure->getDateOfServiceTo()); 
-			pdflib::PDF_show_xy($p, $date->[0], $box24X + STARTX_BOX24ADATE_SPACE + 2, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[1], $box24X + STARTX_BOX24ADATE_SPACE + 22, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[2], $box24X + STARTX_BOX24ADATE_SPACE + 40, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getPlaceOfService(), $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 7, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getTypeOfService(), $box24X + STARTX_BOX24C_SPACE + CELL_PADDING_X + 4, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getCPT(), $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 10, $y + 6);
-			my @modifier = split (/ /, $procedure->getModifier());
-			pdflib::PDF_show_xy($p, $modifier[0], $box24X + STARTX_BOX24D_SPACE + 55, $y + 6);
-			for ($mj = 1; $mj <= $#modifier; $mj++)
-			{
-				pdflib::PDF_show_xy($p, $modifier[1], $box24X + STARTX_BOX24D_SPACE + 75 + ($mj-1) * 12, $y + 6);
-			}
-
-##
-			$cod = $procedure->getDiagnosis;
-		    $cod =~ s/ //g;
-			my @diagCodes = split(/,/, $cod);
-			for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
-			{
-				$ptr = $ptr . $diagnosisMap->{$diagCodes[$diagnosisCount]} . " "  ;
-			}
-		
-			pdflib::PDF_show_xy($p , $ptr , $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $y + 6);
-			$ptr = "";
-			my @amount  = split (/\./ , $procedure->getCharges());
-		
-			pdflib::PDF_show_xy($p , $amount[0], START_X + STARTX_BOX24FC_SPACE - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) - 4, $y + 6);
-			pdflib::PDF_show_xy($p , $amount[1], START_X + STARTX_BOX24G_SPACE - pdflib::PDF_stringwidth($p ,$amount[1], $font, DATA_FONT_SIZE) - 4, $y + 6);
-			pdflib::PDF_show_xy($p , substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3), $box24X + STARTX_BOX24H_SPACE - 17, $y + 6);
-			pdflib::PDF_show_xy($p , $procedure->getEmergency(), $box24X + STARTX_BOX24I_SPACE + 6, $y + 6);
-			pdflib::PDF_stroke($p);
-		}
-	}
-
-
-}
-
 sub box24ClaimData
 { 
 	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
@@ -2670,75 +2577,6 @@ sub box24ClaimData
 	return $tb;
 }
 
-sub box24ClaimDataPre1
-{ 
-	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
- 	my $box24Cordinates = $cordinates->{box24HeadA};
-	my $box24X = $box24Cordinates->[0]; 
-
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
-	die "Couldn't set font"  if ($font == -1);
-	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $y;
-	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
-	my $i =0;
-	my $procedure;
-	my @ys = ($cordinates->{box24_2}->[1], $cordinates->{box24_3}->[1], $cordinates->{box24_4}->[1], $cordinates->{box24_5}->[1], $cordinates->{box24_6}->[1], $cordinates->{box25}->[1]);
-	my $diagnosisMap = {};
-	my $ptr;
-    my $cod;
-	my $tb = $self->diagnosisTable($claim, $procesedProc);
-	my $procedures = $claim->{procedures};
-	my $mj;
-	my $sortedCharges = $self->feeSort($claim);
-	my $amount = $sortedCharges->{'sorted amount'};
-	my $procedurest = $tb->[1];
-	for ($i =0; $i <= $#$procedurest;$i++)
-	{
-#		$sortedCharges->{$amount->[$i]}; procedure no.
-
-		$y = $ys[$i];
-#		$procedure = $claim->{procedures}->[$sortedCharges->{$amount->[$i]}];
-		$procedure = $claim->{procedures}->[$procedurest->[$i]];
-		if ($procedure ne "")
-		{
-			my $date  = $self->returnDate($procedure->getDateOfServiceFrom()); 
-			pdflib::PDF_show_xy($p, $date->[0], $box24X + 8, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[1], $box24X + 26, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[2], $box24X + 46, $y + 6);
-		
-			$date  = $self->returnDate($procedure->getDateOfServiceTo()); 
-			pdflib::PDF_show_xy($p, $date->[0], $box24X + STARTX_BOX24ADATE_SPACE + 2, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[1], $box24X + STARTX_BOX24ADATE_SPACE + 22, $y + 6);
-			pdflib::PDF_show_xy($p, $date->[2], $box24X + STARTX_BOX24ADATE_SPACE + 40, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getPlaceOfService(), $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 7, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getTypeOfService(), $box24X + STARTX_BOX24C_SPACE + CELL_PADDING_X + 4, $y + 6);
-			pdflib::PDF_show_xy($p, $procedure->getCPT(), $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 10, $y + 6);
-			my @modifier = split (/ /, $procedure->getModifier());
-			pdflib::PDF_show_xy($p, $modifier[0], $box24X + STARTX_BOX24D_SPACE + 55, $y + 6);
-			for ($mj = 1; $mj <= $#modifier; $mj++)
-			{
-				pdflib::PDF_show_xy($p, $modifier[1], $box24X + STARTX_BOX24D_SPACE + 75 + ($mj-1) * 12, $y + 6);
-			}
-			$cod = $procedure->getDiagnosis;
-			$cod =~ s/ //g;
-			my @diagCodes = split(/,/, $cod);
-			for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
-			{
-				$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . " "  ;
-			}
-			pdflib::PDF_show_xy($p , $ptr , $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $y + 6);
-			$ptr = "";
-			my @amount  = split (/\./ , $procedure->getCharges());
-			pdflib::PDF_show_xy($p , $amount[0], START_X + STARTX_BOX24FC_SPACE - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) - 4, $y + 6);
-			pdflib::PDF_show_xy($p , $amount[1], START_X + STARTX_BOX24G_SPACE - pdflib::PDF_stringwidth($p ,$amount[1], $font, DATA_FONT_SIZE) - 4, $y + 6);
-			pdflib::PDF_show_xy($p , substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3), $box24X + STARTX_BOX24H_SPACE - 17, $y + 6);
-			pdflib::PDF_show_xy($p , $procedure->getEmergency(), $box24X + STARTX_BOX24I_SPACE + 6, $y + 6);
-			pdflib::PDF_stroke($p);
-		}
-	}
-	return $tb;
-}
 
 sub box25ClaimData
 {
@@ -2891,15 +2729,15 @@ sub box33ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $physician = $claim->{renderingProvider};
+	my $physician = $claim->{payToOrganization};
 	my $add = $physician->getAddress();
 
 	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
 	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 5.2 * FORM_FONT_SIZE);
 #	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 6.3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $add->getCity() . "    " . $add->getState() . "    " . $add->getZipCode(), $box33X + CELL_PADDING_X + 10, $box33Y - 7.4 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
-	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+#	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
+#	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
 	pdflib::PDF_stroke($p);
 	
 }
@@ -2935,6 +2773,7 @@ sub diagnosisTable
 	my $tempCount;
 	
 	my $procedures = $claim->{procedures};
+
 	for my $i (0..$#$procedures)
 	{
 		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
@@ -2968,23 +2807,6 @@ sub diagnosisTable
 		}
 	}
 	return 	[\%diagTable, \@targetproc];
-}
-
-sub feeSortPre1
-{
-	my ($self, $claim) = @_;
-
-	my $procedures = $claim->{procedures};
-	my %charges;
-	my	$procedure;
-	for my $i (0..$#$procedures)
-	{
-		$procedure = $procedures->[$i];	
-		$charges{$procedure->getCharges()} = $i;
-	}
-	my @as = sort {$b <=> $a} keys %charges;
-	$charges{'sorted amount'} = \@as;
-	return \%charges;
 }
 
 sub feeSort
@@ -3040,7 +2862,7 @@ sub setPrimaryProcedure
 	{
 		my $temp = $claim->{procedures}->[0];
 		$claim->{procedures}->[0] = $claim->{procedures}->[$primaryProcedure];
-		$claim->{procedures}->[$primaryProcedure] = $claim->{procedures}->[0]
+		$claim->{procedures}->[$primaryProcedure] = $temp;
 	}
 	return  $primaryProcedure;
 }

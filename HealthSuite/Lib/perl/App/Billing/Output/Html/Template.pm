@@ -295,7 +295,7 @@ sub populateOtherInsured
 sub populatePhysician
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getRenderingProvider();
+	my $physician = $claim->getPayToOrganization();
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 
@@ -303,9 +303,9 @@ sub populatePhysician
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
 	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
-	$data->{physicianTaxTypeIdEin} = uc($physician->getTaxTypeId) eq 'E' ? "Checked" : "";
-	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
-	$data->{physicianPin} = $physician->getPIN;
+#	$data->{physicianTaxTypeIdEin} = uc($physician->getTaxTypeId) eq 'E' ? "Checked" : "";
+#	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
+#	$data->{physicianPin} = $physician->getPIN;
 	$data->{physicianGrp} = $physician->getGRP;
 }
 

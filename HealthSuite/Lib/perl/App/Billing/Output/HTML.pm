@@ -48,23 +48,12 @@ sub createHTML
 	close CLAIMFILE;
 }
 
-sub generateHTMLpre
-{
-	my ($self, $claim, $tempPath) = @_;
-	my $htmlTemplate = new App::Billing::Output::Html::Template();
-	$htmlTemplate->populateTemplate($claim);
-	$tempPath = $tempPath eq "" ? 'C:\\hsc-live\\View1500.dat' : $tempPath;
-	my $template = new Text::Template(SOURCE => $tempPath);
-	my $html = $template->fill_in(HASH => $htmlTemplate->{data});
-	return $html;
-}
-
 sub generateHTML
 {
 	my ($self, $claim, $tempPath) = @_;
-	my $procesedProc = [];
 	my $htmlTemplate = new App::Billing::Output::Html::Template();
 	my @html;
+	my $procesedProc = [];
 	$tempPath = $tempPath eq "" ? 'C:\\hsc-live\\View1500.dat' : $tempPath;
 	my $once = 0;
 	my $template = new Text::Template(SOURCE => $tempPath);
@@ -114,7 +103,7 @@ sub setPrimaryProcedure
 	{
 		my $temp = $claim->{procedures}->[0];
 		$claim->{procedures}->[0] = $claim->{procedures}->[$primaryProcedure];
-		$claim->{procedures}->[$primaryProcedure] = $claim->{procedures}->[0]
+		$claim->{procedures}->[$primaryProcedure] = $temp;
 	}
 	return  $primaryProcedure;
 }
