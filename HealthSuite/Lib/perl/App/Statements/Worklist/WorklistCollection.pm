@@ -1030,7 +1030,14 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	},
 	
 	'sel_claim_statuses' => qq{
-		select id, caption from Invoice_Status order by id
+		select id, caption 
+		from Invoice_Status 
+		where not id in 
+		(
+			@{[App::Universal::INVOICESTATUS_INCOMPLETE]}, @{[App::Universal::INVOICESTATUS_PENDING]},
+			@{[App::Universal::INVOICESTATUS_INTNLAPPRV]}, @{[App::Universal::INVOICESTATUS_EXTNLAPPRV]}
+		)
+		order by id
 	},
 	
 	'sel_worklist_claim_status' => qq{
