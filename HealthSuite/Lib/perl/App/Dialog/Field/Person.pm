@@ -296,7 +296,7 @@ sub isValid
 			if ($self->{useShortForm})
 			{
 				my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson/$id');};
-				$doesntExistMsg .= qq{<a href="$createPersonHref">Person</a> };
+				$doesntExistMsg .= qq{<a href="$createPersonHref">Patient</a> };
 			}
 			else
 			{
@@ -348,7 +348,7 @@ sub isValid
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
-	my $html;	
+	my $html;
 	if ((grep {$_ eq 'Patient'} @{$self->{types}})||$self->{incSimpleName})
 	{
 		#$page->addError("Include");
@@ -358,7 +358,7 @@ sub getHtml
 		$self->{postHtml} =qq{<INPUT TYPE="HIDDEN" NAME="_f_$self->{name}_simple_name_h"  TYPE='text' size=30 STYLE="color:red" VALUE='FRANK MAJOR'>
 			<SPAN ID="_f_$self->{name}_simple_name_s">$patData </SPAN>};
 	}
-	$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);	
+	$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);
 	return $html;
 };
 
