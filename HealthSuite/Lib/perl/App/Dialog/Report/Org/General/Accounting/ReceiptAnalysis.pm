@@ -45,7 +45,10 @@ sub new
 				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
 			),
 
-			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
+			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID',
+			name => 'org_id'),
+
+			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID',
 				name => 'ins_org_id',
 				addType => 'insurance',
 			),
@@ -109,7 +112,10 @@ sub execute
 	
 	my $insOrgInternalId;
 	$insOrgInternalId = $STMTMGR_ORG->getSingleValue($page,STMTMGRFLAG_NONE,'selOrgId', $page->session('org_internal_id'), $page->field('ins_org_id')) if $page->field('ins_org_id');
-		
+
+	my $facilityId;
+	$facilityId = $STMTMGR_ORG->getSingleValue($page,STMTMGRFLAG_NONE,'selOrgId', $page->session('org_internal_id'), $page->field('org_id')) if $page->field('org_id');
+	
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 	if($reportEndDate eq $reportBeginDate)
@@ -125,10 +131,12 @@ sub execute
 			[
 			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },
 			{ colIdx => 1, ,hAlign=>'left',head => 'Category' ,groupBy => '#1#'},
-			{ colIdx => 2, ,hAlign=>'left',head => 'Tranaction Type',groupBy => '#2#' },
+			{ colIdx => 2, ,hAlign=>'left',head => 'Transaction Type',groupBy => '#2#' },
 			{ colIdx => 3,,hAlign=>'left', head => 'Payer Name',groupBy => 'Sub-Total'  },
 			{ colIdx => 4, head => 'Month Rcpt',  summarize => 'sum',dformat => 'currency' },
 			{ colIdx => 5, head => 'Year Rcpt',summarize => 'sum',dformat => 'currency' },
+			{ colIdx => 6, head => 'Month Refund',  summarize => 'sum',dformat => 'currency' },
+			{ colIdx => 7, head => 'Year Refund',summarize => 'sum',dformat => 'currency' },
 		],
 		};
 	}
@@ -141,12 +149,15 @@ sub execute
 				[
 			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },
 			{ colIdx => 1, ,hAlign=>'left',head => 'Category' ,groupBy => '#1#'},
-			{ colIdx => 2, ,hAlign=>'left',head => 'Tranaction Type',groupBy => '#2#' },
+			{ colIdx => 2, ,hAlign=>'left',head => 'Transaction Type',groupBy => '#2#' },
 			{ colIdx => 3,,hAlign=>'left', head => 'Payer Name',groupBy => 'Sub-Total'  },
-			{ colIdx => 6, head => 'Batch Date' },
-			{ colIdx => 7, head => 'Batch Date Rcpt', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 8, head => 'Batch Date' },
+			{ colIdx => 9, head => 'Batch Date Rcpt', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 10, head => 'Batch Date Refund', summarize => 'sum', dformat => 'currency' },
 			{ colIdx => 4, head => 'Month Rcpt',  summarize => 'sum',dformat => 'currency' },
 			{ colIdx => 5, head => 'Year Rcpt',summarize => 'sum',dformat => 'currency' },
+			{ colIdx => 6, head => 'Month Refund',  summarize => 'sum',dformat => 'currency' },
+			{ colIdx => 7, head => 'Year Refund',summarize => 'sum',dformat => 'currency' },
 			],
 		};
 	}
@@ -181,12 +192,12 @@ sub execute
 	if($totalReport)
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceiptTotal',
-		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId);
+		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId, $facilityId);
 	}
 	else
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceipt',
-			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId);
+			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId,$insOrgInternalId, $facilityId);
 	}
 	my @data = ();
 	foreach (@$rcpt)
@@ -217,8 +228,11 @@ sub execute
 			$_->{payer_id},
 			$_->{month_rcpt},
 			$_->{year_rcpt},
+			$_->{month_refund},
+			$_->{year_refund},
 			$_->{batch_date},
 			$_->{batch_rcpt},
+			$_->{batch_refund},
 		);
 		push(@data, \@rowData);
 	}
@@ -230,6 +244,8 @@ sub execute
 	my $Constraints = [
 	{ Name => "Batch Report Date ", Value => $page->field('batch_begin_date') ."  ".$reportEndDate},
 	{ Name=> "Physician ID ", Value => $provider },
+	{ Name=> "Site Org ID ", Value => $orgInternalId },
+	{ Name=> "Insurance Org ID ", Value => $insOrgInternalId },
 	{ Name=> "Payment Type ", Value => $receipt },
 	{ Name=> "Batch ID ", Value => $batch_id },
 	{ Name=> "Totals Report ", Value => ($totalReport) ? 'Yes' : 'No' },

@@ -175,19 +175,32 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
 							(nvl(insurance_pay,0)+nvl(person_pay,0)),
 					 0)
-				     ) as batch_rcpt
+				     ) as batch_rcpt,
+				sum(nvl(ic.refund,0)) as year_refund,
+				sum(decode(
+					   trunc(ic.invoice_date,'MM'),
+					    trunc(to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM'),
+				     		(nvl(ic.refund,0)),
+				     	 0)
+				     ) as month_refund,
+				sum(decode(
+						ic.invoice_date,
+						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
+							(nvl(ic.refund,0)),
+					 0)
+				     ) as batch_refund
 			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
 			WHERE 	(:1 IS NULL OR provider = :1)
 			AND	(:3 IS NULL OR batch_id = :3)
 			AND	ic.invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
-			AND	ic.payer_type is not null
 			AND	ic.owner_org_id = :6
 			AND	p.person_id (+)= ic.provider
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
 			AND (:7 IS NULL OR ic.payer_id = :7)
+			AND (:8 IS NULL OR ic.facility = :8)
 			GROUP BY p.simple_name,pm.caption,
 				ic.payer_type,	ic.payer_id,
 				ic.pay_type
@@ -208,7 +221,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					    to_date(:5,'MM/DD/YYYY'),
 				     		(nvl(unit_cost,0)),
 				     	 0)
-				     ) as batch_rcpt
+				     ) as batch_rcpt,
+				0 as year_refund,
+				0 as month_refund,
+				0 as batch_refund
 			FROM 	transaction t,trans_attribute  ta,person p,org
 			WHERE	t.trans_id = ta.parent_id
 			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
@@ -223,13 +239,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	p.person_id (+)= t.provider_id
 			AND	t.receiver_id =org.org_internal_id
 			AND	org.owner_org_id = :6
-			AND :7 IS NULL
+			AND (:8 IS NULL OR t.service_facility_id = :8)
 			GROUP BY p.simple_name,
 				nvl(data_text_b,data_text_a)
 			ORDER BY 1,4,3,5
 
 		},
 	},
+#			AND	ic.payer_type is not null
 
 
 	#This query has a distinct because a patient could be on multiple billing cycles
@@ -392,19 +409,32 @@ aic.batch_id,
 						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
 							(nvl(insurance_pay,0)+nvl(person_pay,0)),
 					 0)
-				     ) as batch_rcpt
+				     ) as batch_rcpt,
+				sum(nvl(ic.refund,0)) as year_refund,
+				sum(decode(
+					   trunc(ic.invoice_date,'MM'),
+					    trunc(to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM'),
+				     		(nvl(ic.refund,0)),
+				     	 0)
+				     ) as month_refund,
+				sum(decode(
+						ic.invoice_date,
+						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
+							(nvl(ic.refund,0)),
+					 0)
+				     ) as batch_refund
 			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
 			WHERE 	(:1 IS NULL OR provider = :1)
 			AND	(:3 IS NULL OR batch_id = :3)
 			AND	ic.invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
-			AND	ic.payer_type is not null
 			AND	ic.owner_org_id = :6
 			AND	p.person_id (+)= ic.provider
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
 			AND (:7 IS NULL OR ic.payer_id = :7)
+			AND (:8 IS NULL OR ic.facility = :8)
 			GROUP BY  pm.caption,
 				ic.payer_type,
 				ic.pay_type
@@ -425,7 +455,10 @@ aic.batch_id,
 					    to_date(:5,'MM/DD/YYYY'),
 				     		(nvl(unit_cost,0)),
 				     	 0)
-				     ) as batch_rcpt
+				     ) as batch_rcpt,
+				0 as year_refund,
+				0 as month_refund,
+				0 as batch_refund
 			FROM 	transaction t,trans_attribute  ta,person p
 			WHERE	t.trans_id = ta.parent_id
 			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
@@ -438,12 +471,13 @@ aic.batch_id,
 			AND 	to_date(:5,'MM/DD/YYYY')
 			AND	provider_id is not null
 			AND	p.person_id (+)= t.provider_id
-			AND :7 IS NULL
+			AND (:8 IS NULL OR t.service_facility_id = :8)
 			GROUP BY 'ALL'
 			ORDER BY 1,3,4,5
 
 		},
 	},
+#			AND	ic.payer_type is not null
 
 
 	'selParentInvoicebyId'=>
@@ -895,7 +929,7 @@ aic.batch_id,
 			AND	a.invoice_status <> 15
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
-			AND EXISTS 
+			AND EXISTS
 			(
 				SELECT	b.person_id
 				FROM	agedpayments b
