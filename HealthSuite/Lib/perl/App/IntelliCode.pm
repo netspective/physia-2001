@@ -193,7 +193,7 @@ sub validateDiags
 	for (@{$diagsRef})
 	{
 		my $icd = uc($_);
-
+		
 		unless ($ICD_CACHE{$icd}->{icd})
 		{
 			$ICD_CACHE{$icd} = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
@@ -217,7 +217,7 @@ sub validateDiags
 			}
 		}
 
-		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDICD], $icd)) unless ($ICD_CACHE{$icd});
+		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDICD], $icd)) unless ($ICD_CACHE{$icd}->{icd});
 		push(@$errorRef, sprintf("Can not perform crosswalk check for ICD $icd (error loading set)")) if $CPT_CACHE{$icd}->{flags} & ICDFLAG_INVALIDCPTLIST;
 	}
 }
@@ -263,7 +263,7 @@ sub validateProcs
 			}
 		}
 
-		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDCPT], $cpt)) unless ($CPT_CACHE{$cpt});
+		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDCPT], $cpt)) unless ($CPT_CACHE{$cpt}->{cpt});
 		push(@$errorRef, sprintf("Can not check comprehensive compounds CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDCOMPOUNDLIST;
 		push(@$errorRef, sprintf("Can not check mutually exclusive CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDMUTEXCLLIST;
 	}
