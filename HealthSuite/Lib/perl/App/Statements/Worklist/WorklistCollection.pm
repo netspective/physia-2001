@@ -33,6 +33,58 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 
 ########################
 
+	'selAccountInfoById' =>qq
+	{
+  		SELECT 	trans_id,
+  			data_num_a as invoice_id ,
+  			(SELECT trans_id FROM transaction 
+			 WHERE 	trans_owner_id = :1 
+			 AND	provider_id = :2
+			 AND	trans_status =$ACTIVE	
+			 AND 	trans_type = $ACCOUNT_RECK_DATE 	
+			 ) as trans_reck_id,
+			 provider_id
+		FROM 	transaction 
+		WHERE	trans_owner_id = :1 
+		AND	provider_id = :2
+		AND	trans_owner_type= 0
+		AND	trans_type = $ACCOUNT_OWNER
+		AND	trans_subtype = 'Owner'
+		AND	trans_status =$ACTIVE	
+
+	},
+	'selCollectionRecordById'=>qq
+	{
+		SELECT 	trans_id
+		FROM	transaction
+		WHERE	provider_id = :2
+		AND	trans_owner_id = :1
+		AND	trans_owner_type= 0
+		AND	trans_type = $ACCOUNT_OWNER
+		AND	trans_subtype = 'Owner'
+		AND	trans_status =$ACTIVE	
+		AND	data_num_a = :3
+	},
+	'delTransferColl' => qq
+	{
+		UPDATE 	transaction
+		SET 	trans_status = $INACTIVE,
+			trans_subtype = 'Account Closed',
+			trans_status_reason = :1
+		WHERE	trans_id in
+		(SELECT parent_id
+		 FROM 	transaction t, trans_attribute ta
+		 WHERE 	ta.parent_id = t,trans_id
+		 AND	t.trans_subtype = 'Account Transfered'
+		 AND	t.trans_status = $ACTIVE
+		 AND	t.trans_type = $ACCOUNT_OWNER
+		 AND	trans_owner_id = :2
+			AND trans_status = $ACTIVE
+			AND trans_type = $ACCOUNT_OWNER
+			AND provider_id = :3
+		)
+	},
+	
 	'selInColl' =>qq
 	{
 		SELECT	distinct trans_owner_id
@@ -46,14 +98,38 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 
 	'selReckInfoById' => qq
 	{
-		SELECT 	trans_begin_stamp , trans_id  
+		SELECT 	trans_begin_stamp as reck_date , trans_id as reck_id 
 		FROM 	transaction 
 		WHERE 	trans_id = :1
 	},
+
+	'selReckInfoByOwner' => qq
+	{
+		SELECT 	trans_begin_stamp as reck_date , trans_id as reck_id 
+		FROM 	transaction 
+		WHERE 	trans_owner_id = :1
+		AND 	trans_type (+)= $ACCOUNT_RECK_DATE 
+		AND 	provider_id (+)= :2	
+		AND 	trans_status (+)= $ACTIVE
+	},
+
+	'delCollectionById'=>qq
+	{
+		UPDATE 	transaction
+		SET 	trans_subtype = 'Account Transfered',
+			caption ='Transfer Account',
+			trans_status_reason = :1
+		WHERE	trans_owner_id = :2
+		AND 	trans_status = $ACTIVE
+		AND 	trans_type = $ACCOUNT_OWNER
+		AND 	provider_id = :3
+	
+	},
+
 	'closeCollectionById' => qq
 	{
 		UPDATE 	transaction
-		SET 	trans_status = 3,
+		SET 	trans_status = $INACTIVE,
 			trans_subtype = 'Account Closed',
 			trans_status_reason = :1
 		WHERE	trans_owner_id = :2
@@ -64,11 +140,11 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	
 	'delReckDateById' =>qq
 	{
-		update transaction 
-		set trans_status = $INACTIVE
-		where trans_type = $ACCOUNT_RECK_DATE and
-		trans_owner_id = :1 and
-		provider_id = :2		
+		UPDATE 	transaction 
+		SET 	trans_status = $INACTIVE
+		WHERE 	trans_type = $ACCOUNT_RECK_DATE 
+		AND	trans_owner_id = :1 
+		AND	provider_id = :2		
 	},
 	
 	#The data 01/31/1800 is used to make sure the dates sort correctly
@@ -76,7 +152,13 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	{			
 	
 		
-		SELECT	p.person_id ,NULL as reason
+		SELECT	p.person_id ,NULL as reason,
+			i.invoice_id,i.balance,round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) as age,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			   ii.item_type in (0,1,2) )
+			) as description ,
+			to_number(NULL) as trans_id
 		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
 			person_attribute pl,person_attribute pa, person_attribute pb,
 			transaction t, invoice i, invoice_billing ib, person_org_category pog
@@ -103,7 +185,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			AND 	trans_status = $ACTIVE
 			AND 	provider_id = :1
 			AND	trans_owner_id = i.client_id
-			AND	trans_owner_id = p.person_id			
+			AND	trans_owner_id = p.person_id	
+			AND	data_num_a = i.invoice_id
 		)		
 		AND	i.main_transaction = t.trans_id
 		AND	i.client_id = p.person_id
@@ -129,13 +212,22 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			     )
 			)			
 		UNION
-		SELECT 	t.trans_owner_id  as person_id	,		
-			t.trans_status_reason as reason		
-		FROM 	transaction t 
+		SELECT 	distinct t.trans_owner_id  as person_id	,		
+			t.trans_status_reason as reason,	
+			i.invoice_id, 
+			i.balance,
+			round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) as age,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			   ii.item_type in (0,1,2) )
+			) as description,
+			t.trans_id as trans_id
+		FROM 	transaction t ,invoice i
 		WHERE 	t.trans_type = $ACCOUNT_OWNER
 		AND 	t.trans_status = $ACTIVE
 		AND 	t.trans_subtype = 'Owner'
 		AND	t.provider_id = :1
+		AND	t.data_num_a = i.invoice_id
 		AND NOT EXISTS
 		(SELECT tr.trans_owner_id
 		FROM 	transaction tr
@@ -165,53 +257,79 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND 	t.trans_owner_id = :1
 		AND 	t.trans_subtype = 'Owner'
 		AND	t.provider_id = :2
+		AND	t.data_num_a = :3
 		AND 	tr.trans_owner_id (+) = t.trans_owner_id
 		AND 	tr.trans_type (+)= $ACCOUNT_RECK_DATE 
 		AND 	tr.provider_id (+)= :2	
-		AND 	tr.trans_status (+)= $ACTIVE
+		AND 	tr.trans_status (+)= $ACTIVE		
 	},
 	'selNextApptById' => qq
 	{
-			select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
-			from event e, event_attribute ea
-			where ea.item_name = 'Appointment/Attendee/Patient' and value_text = :1 and
-			ea.parent_id = e.event_id and
-			e.start_time - to_date(:2,'MM/DD/YYYY') >=0
+		select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+		from event e, event_attribute ea
+		where ea.item_name = 'Appointment/Attendee/Patient' and value_text = :1 and
+		ea.parent_id = e.event_id and
+		e.start_time - to_date(:2,'MM/DD/YYYY') >=0
 	},
 	
 	'delAccountNotesById' =>qq
 	{
-		update transaction set trans_status = $INACTIVE
-		where provider_id = :1 and
-		trans_owner_id = :2 and
-		trans_type=$ACCOUNT_NOTES
+		UPDATE 	transaction set trans_status = $INACTIVE
+		WHERE	provider_id = :1 
+		AND	trans_owner_id = :2 
+		AND	trans_type=$ACCOUNT_NOTES
 	},	
+	'selAccountTransferIdById' =>qq	
+	{
+		SELECT 	item_id,parent_id as trans_id
+		FROM 	transaction t, trans_attribute ta
+		WHERE 	t.trans_owner_id =:1
+		AND	t.trans_type = $ACCOUNT_OWNER
+		AND	t.trans_subtype = 'Account Transfered'
+		AND	t.trans_status =$ACTIVE
+		AND	ta.parent_id = t.trans_id
+		AND	ta.value_text = :2
+		AND	ta.value_textb = :1
+	},
+	'TransHistoryRecord' =>qq
+	{
+		INSERT INTO  Trans_Attribute (parent_id, item_type,item_name,value_type,value_text,cr_session_id,
+					 cr_user_id,cr_org_internal_id,value_int)		
+		SELECT	trans_id,1,'Account/Transfer/History',0,:3,:4,:5,:6,data_num_a
+		FROM	transaction
+		WHERE	trans_owner_id = :1 
+		AND	provider_id = :2
+		AND	trans_owner_type= 0
+		AND	trans_type = $ACCOUNT_OWNER
+		AND	trans_subtype = 'Owner'
+		AND	trans_status =$ACTIVE	;
+
+	},
 	'TranCollectionById' =>qq
 	{
 	
 		INSERT INTO TRANSACTION	(trans_owner_id,caption,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
 					 trans_subtype,trans_status,initiator_type,initiator_id,billing_facility_id,cr_session_id,
-					 cr_user_id,cr_org_internal_id,trans_status_reason) 
+					 cr_user_id,cr_org_internal_id,trans_status_reason,data_num_a) 
   		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
-		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7
+		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7,data_num_a
 		FROM 	transaction
 		WHERE	trans_owner_id = :1 
 		AND	provider_id = :2
 		AND	trans_owner_type= 0
 		AND	trans_type = $ACCOUNT_OWNER
 		AND	trans_subtype = 'Owner'
-		AND	trans_status =$ACTIVE		
-		MINUS
-		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
-		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7
-		FROM 	transaction
-		WHERE	trans_owner_id = :1 
-		AND	provider_id = :3
-		AND	trans_owner_type= 0
-		AND	trans_type = $ACCOUNT_OWNER
-		AND	trans_subtype = 'Owner'
-		AND	trans_status =$ACTIVE				
-		       
+		AND	trans_status =$ACTIVE	
+		AND NOT EXIST
+		(SELECT trans_owner_id
+		 FROM transaction
+		 WHERE	trans_owner_id = :1 
+		 AND	provider_id = :3
+		 AND	trans_owner_type= 0
+		 AND	trans_type = $ACCOUNT_OWNER
+		 AND	trans_subtype = 'Owner'
+		 AND	trans_status =$ACTIVE				
+		)       
 	},
 	'TranAccountNotesById' =>qq
 	{
