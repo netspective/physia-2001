@@ -28,8 +28,9 @@ use constant FONT_NAME => 'Helvetica';
 use constant BOLD_FONT_NAME =>  FONT_NAME . '-Bold';
 use constant SPC => " ";
 use constant TOP_PADDING => 12;
-use constant DATA_FONT_COLOR => '0,0,0';
-use constant REPORT_COLOR => '0,0,0';
+use constant DATA_FONT_COLOR => '0,0.5,1';
+use constant HEADING_FONT_COLOR => '0.5,0.5,0.5';
+use constant REPORT_COLOR => '0,0,0.5';
 use constant DATA_FONT_SIZE => 10;
 use constant PAGE_HEIGHT => 792;
 use constant PAGE_WIDTH => 612;
@@ -67,6 +68,10 @@ sub printSingle
 {
 	my($self, $prescription, $p, $report, $x, $y) = @_;
 
+
+	my $physician = $prescription->{physician}->getName;
+	my $physicianDEA = $prescription->{physician}->getDEA;
+
 	my $drugs = $prescription->{drugs};
 	my $allDrugs = $drugs->getDrug();
 	for my $i (0..$#$allDrugs)
@@ -80,7 +85,7 @@ sub printSingle
 		my $drugY = $patientY - 4 * LINE_HEIGHT;
 		my $doseX = $patientX + .30 * BOX_WIDTH;
 		my $quantityX = $patientX + .55 * BOX_WIDTH;
-		my $sigY = $drugY - 2 * LINE_HEIGHT;
+		my $sigY = $drugY - 3 * LINE_HEIGHT;
 		my $labelY = $sigY - 3 * LINE_HEIGHT;
 		my $refillX = $patientX + .60 * BOX_WIDTH;
 		my $signatureY = $labelY - 3 * LINE_HEIGHT;
@@ -91,16 +96,63 @@ sub printSingle
 		$self->printLabel($p, $quantityX, $drugY, $report, 'Quantity &/or Duration');
 		$self->printLabel($p, $patientX, $sigY, $report, 'Sig:');
 
-		$self->printLabel($p, $patientX, $labelY, $report, 'Label no ___ yes ___');
-		$self->printLabel($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Label in Spanish _______');
-		$self->printLabel($p, $refillX, $labelY, $report, 'Refill no ___ yes ___ # _____');
+		$self->printData($p, $patientX, $drugY, $report, $drug->getDrugName, 0, 15);
+		$self->printData($p, $doseX, $drugY, $report, $drug->getDose, 0, 15);
+		$self->printData($p, $quantityX, $drugY, $report, $drug->getQuantity, 0, 15);
+		$self->printData($p, $quantityX, $drugY, $report, $drug->getDuration . " " . $drug->getDurationUnits, 60, 15);
+		$self->printData($p, $patientX, $sigY, $report, $drug->getSig, 0, 15);
 
-		$self->printLabel($p, $patientX, $signatureY, $report, 'Signature _________________________');
-		$self->printLabel($p, $quantityX, $signatureY, $report, '___________________________');
-		$self->printLabel($p, $patientX, $deaY, $report, 'DEA # ______________________________');
+		$self->printLabel($p, $patientX, $labelY, $report, 'Label: No ___ Yes ___');
+		$self->printLabel($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Label in Spanish: ');
+		$self->printLabel($p, $refillX, $labelY, $report, 'Refill: No ___ Yes ___ # _____');
 
-		$self->printLabel($p, $patientX + 55, $signatureY - 11, $report, 'Substitution Permitted');
-		$self->printLabel($p, $quantityX, $signatureY - 11, $report, '   No Substitution');
+		if($drug->getLabel() == 1)
+		{
+			$self->printData($p, $patientX, $labelY, $report, 'X', 90, 0);
+		}
+		else
+		{
+			$self->printData($p, $patientX, $labelY, $report, 'X', 50, 0);
+		}
+
+		if($drug->getNumRefills() != 0)
+		{
+			$self->printData($p, $refillX, $labelY, $report, 'X', 85, 0);
+			$self->printData($p, $refillX, $labelY, $report, $drug->getNumRefills(), 120, 0);
+		}
+		else
+		{
+			$self->printData($p, $refillX, $labelY, $report, 'X', 45, 0);
+		}
+
+		if($drug->getLabelSpanish() == 1)
+		{
+			$self->printData($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Yes', 90, 0);
+		}
+		else
+		{
+			$self->printData($p, $patientX, $labelY - LINE_HEIGHT, $report, 'No', 90, 0);
+		}
+
+		$self->printLabel($p, $patientX, $signatureY, $report, 'Signature');
+		$self->printLabel($p, $patientX + 50, $signatureY, $report, '_________________________');
+		$self->printLabel($p, $patientX + 50, $signatureY - 10, $report, 'Substitution Permitted');
+		$self->printLabel($p, $quantityX,     $signatureY, $report, '_________________________');
+		$self->printLabel($p, $quantityX,     $signatureY - 10, $report, 'No Substitution');
+
+		$self->printLabel($p, $patientX, $deaY, $report, 'DEA #: ');
+
+		$self->printData($p, $patientX, $deaY, $report, $physicianDEA, 40, 0);
+
+		if($drug->getAllowSubstitution() == 1)
+		{
+			$self->printData($p, $patientX + 50, $signatureY, $report, $physician, 0, 0);
+		}
+		else
+		{
+			$self->printData($p, $quantityX, $signatureY, $report, $physician, 0, 0);
+		}
+
 
 		$report->endPage($p);
 
@@ -155,29 +207,28 @@ sub printHeader
 
 	for my $i(0..$#arrData)
 	{
-#		my $j = pdflib::PDF_stringwidth($p, $arrData[$i], FONT_NAME, 7);
-		$self->printData($p, $x, $y, $report, $arrData[$i],
-			BOX_WIDTH/2 ,
-			TOP_PADDING + $i * LINE_HEIGHT);
+		my $font = pdflib::PDF_findfont($p,  BOLD_FONT_NAME, 'default' ,0);
+		my $length = pdflib::PDF_stringwidth($p, $arrData[$i], BOLD_FONT_NAME, DATA_FONT_SIZE);
+		$self->printHeading($p, $x, $y, $report, $arrData[$i], (BOX_WIDTH - $length) / 2, TOP_PADDING + $i * LINE_HEIGHT);
 	}
 
 	my $patientX = $x + LEFT_PADDING;
 	my $patientY = $y - ($#arrData + 3) * LINE_HEIGHT;
 	my $dateX = $patientX + .75 * BOX_WIDTH;
-	$self->printLabel($p, $patientX, $patientY, $report, 'Patient Name ' . '_' x  int((.54 * BOX_WIDTH)/5));
-	$self->printLabel($p, $dateX, $patientY, $report, 'Date ' . '_' x  int((.13 * BOX_WIDTH)/5) );
-	$self->printLabel($p, $patientX, $patientY - LINE_HEIGHT, $report, 'Address ' . '_' x  int((.58 * BOX_WIDTH)/5));
-	$self->printLabel($p, $dateX, $patientY - LINE_HEIGHT, $report, 'Phone # ' . '_' x int((.10 * BOX_WIDTH)/5));
+	$self->printLabel($p, $patientX, $patientY, $report, 'Patient Name: '); # . '_' x  int((.54 * BOX_WIDTH)/5));
+	$self->printLabel($p, $dateX, $patientY, $report, 'Date: '); # . '_' x  int((.13 * BOX_WIDTH)/5) );
+	$self->printLabel($p, $patientX, $patientY - LINE_HEIGHT, $report, 'Address: '); # . '_' x  int((.58 * BOX_WIDTH)/5));
+	$self->printLabel($p, $dateX, $patientY - LINE_HEIGHT, $report, 'Phone #: '); # . '_' x int((.10 * BOX_WIDTH)/5));
 
 	$self->printData($p, $patientX, $patientY, $report, $prescription->{patient}->getName, 70, 0);
-	$self->printData($p, $dateX, $patientY, $report, $prescription->getDate(1), 24, 0 );
+	$self->printData($p, $dateX, $patientY, $report, $prescription->getDate(1), 45, 0 );
 	my $patientAddress = $prescription->{patient}->{address}->getAddress1 . " " .
 						$prescription->{patient}->{address}->getAddress2 . " " .
-						$prescription->{patient}->{address}->getCity . " " .
-						$prescription->{patient}->{address}->getState . " " .
+						$prescription->{patient}->{address}->getCity . ", " .
+						$prescription->{patient}->{address}->getState . ". " .
 						$prescription->{patient}->{address}->getZipCode;
-	$self->printData($p, $patientX, $patientY - LINE_HEIGHT, $report, $patientAddress, 50,0);
-	$self->printData($p, $dateX, $patientY - LINE_HEIGHT, $report, $prescription->{patient}->{address}->getTelephoneNo(1), 40, 0);
+	$self->printData($p, $patientX, $patientY - LINE_HEIGHT, $report, $patientAddress, 70,0);
+	$self->printData($p, $dateX, $patientY - LINE_HEIGHT, $report, $prescription->{patient}->{address}->getTelephoneNo(1), 45, 0);
 
 	return ($patientX, $patientY);
 }
@@ -213,7 +264,7 @@ sub printFooter
 	my $signatureY = $spanishY - LINE_HEIGHT;
 	my $deaX = $x + 0.55 * BOX_WIDTH;
 
-	$self->printLabel($p, $x, $spanishY, $report, 'Label in Spanish _______');
+	$self->printLabel($p, $x, $spanishY, $report, 'Label in Spanish: ');
 	$self->printLabel($p, $x, $signatureY, $report, 'Signature _______________________');
 	$self->printLabel($p, $deaX, $signatureY, $report, 'DEA # _________________________');
 
@@ -249,5 +300,22 @@ sub printData
 	};
 	$report->drawText($p, $properties);
 }
+
+sub printHeading
+{
+	my($self, $p, $x, $y, $report, $data, $xPadding, $yPadding) = @_;
+
+	my $properties =
+	{
+		'text' => $data,
+		'fontName' => BOLD_FONT_NAME,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => HEADING_FONT_COLOR,
+		'x' => $x + $xPadding,
+		'y' => $y - $yPadding
+	};
+	$report->drawText($p, $properties);
+}
+
 
 1;
