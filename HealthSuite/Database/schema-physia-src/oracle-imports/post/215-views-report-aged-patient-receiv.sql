@@ -1,17 +1,12 @@
 create or replace view agedpayments as
 SELECT 	i.client_id as person_ID , (i.invoice_id),
-	decode(round((sysdate-ia.value_date)*6/181),0,ii.balance,0) as balance_0,
-	decode(round((sysdate-ia.value_date)*6/181),1,ii.balance,0) as balance_31,
-	decode(round((sysdate-ia.value_date)*6/181),2,ii.balance,0) as balance_61,
-	decode(round((sysdate-ia.value_date)*6/181),3,ii.balance,0) as balance_91,
-	decode(round((sysdate-ia.value_date)*6/181),4,ii.balance,0) as balance_121,			
-	decode(round((sysdate-ia.value_date)*6/181),0,0,1,0,2,0,3,0,4,0,ii.balance) as balance_151,
-	decode(round((sysdate-ia.value_date)*6/181),0,ii.balance,0) +
-	decode(round((sysdate-ia.value_date)*6/181),1,ii.balance,0) +
-	decode(round((sysdate-ia.value_date)*6/181),2,ii.balance,0) +
-	decode(round((sysdate-ia.value_date)*6/181),3,ii.balance,0) +
-	decode(round((sysdate-ia.value_date)*6/181),4,ii.balance,0) +
-	decode(round((sysdate-ia.value_date)*6/181),0,0,1,0,2,0,3,0,4,0,ii.balance) as total_pending,
+	decode(trunc((sysdate-ia.value_date)*6/181),0,ii.balance,0) as balance_0,
+	decode(trunc((sysdate-ia.value_date)*6/181),1,ii.balance,0) as balance_31,
+	decode(trunc((sysdate-ia.value_date)*6/181),2,ii.balance,0) as balance_61,
+	decode(trunc((sysdate-ia.value_date)*6/181),3,ii.balance,0) as balance_91,
+	decode(trunc((sysdate-ia.value_date)*6/181),4,ii.balance,0) as balance_121,			
+	decode(trunc((sysdate-ia.value_date)*6/181),0,0,1,0,2,0,3,0,4,0,ii.balance) as balance_151,
+	ii.balance as total_pending,
 	ib.bill_party_type,
 	ib.invoice_item_id,
 	ii.item_type,
