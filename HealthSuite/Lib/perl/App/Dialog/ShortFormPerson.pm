@@ -45,10 +45,11 @@ sub new
 		new App::Dialog::Field::Person::ID::New(caption => 'Person / Patient ID', 
 			name => 'person_id',
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, 
-			options => FLDFLAG_REQUIRED,
-			hints => '',
+		#	options => FLDFLAG_REQUIRED,
+		#	hints => '',
 			postHtml => qq{&nbsp; <a href="javascript:doActionPopup('/lookup/person');">Lookup Persons</a>},
 		),
+		
 		new App::Dialog::Field::Person::Name(),
 		
 		new CGI::Dialog::Field(caption => 'Gender',

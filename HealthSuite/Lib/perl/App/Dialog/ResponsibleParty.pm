@@ -43,7 +43,8 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
-		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'resp_party_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, types => ['Guarantor'], options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'person_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, types => ['Guarantor'],),
+		#options => FLDFLAG_REQUIRED),
 		#new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
 		new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
@@ -73,7 +74,7 @@ sub makeStateChanges
 
 	if($partyName && $command eq 'add')
 	{
-		$page->field('resp_party_id', $partyName);
+		$page->field('person_id', $partyName);
 	}
 }
 
@@ -87,7 +88,7 @@ sub populateData
 	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $partyId = $personInfo->{'person_id'};
-	$page->field('resp_party_id', $partyId);
+	$page->field('person_id', $partyId);
 	my $parentId = $page->param('person_id');
 	my $relationName = 'Guarantor';
 	my $respData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $relationName);
@@ -107,7 +108,7 @@ sub execute
 {
 	my ($self, $page, $command, $flags, $member) = @_;
 
-	my $personId = $page->field('resp_party_id');
+	my $personId = $page->field('person_id');
 	my $intOrgId = $page->session('org_internal_id');
 
 	$page->schemaAction(

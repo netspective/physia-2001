@@ -78,7 +78,7 @@ sub new
 			types => ['Patient'],
 			size => 32,
 			useShortForm => 1,
-			options => FLDFLAG_REQUIRED
+			#options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Patient Type',
 			type => 'enum',
@@ -276,6 +276,14 @@ sub populateData_reschedule
 sub customValidate
 {
 	my ($self, $page) = @_;
+	
+	if ($page->field('attendee_id') eq '')
+	{
+		my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson',null,null,['_f_person_id'],['_f_attendee_id']);" ;
+		my $invMsg = qq{<a href="$createPersonHref">Create Patient</a> };
+		my $attendee_id = $self->getField('attendee_id');
+		$attendee_id->invalidate($page, $invMsg)
+	}
 
 	if ($page->field('conflict_check'))
 	{
