@@ -90,7 +90,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,										 # payee number
 	$spaces, 										 # med reserve
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,7),  # halley payer id
-	$$refClaimInsured->getMedigapNo(),	# medigap id
+	substr($refClaimInsured->getMedigapNo(),0,9),	# medigap id
 	),
 	NSF_THIN . "" =>
 	sprintf("%-3s%-2s%-17s%-1s%-1s%2s%-5s%-4s%-33s%-20s%-33s%-1s%-15s%-15s%-1s%-1s%-2s%-25s%-20s%-12s%-1s%-3s%-1s%-8s%-1s%-1s%-7s%-25s%-25s%-1s%-1s%-33s",
