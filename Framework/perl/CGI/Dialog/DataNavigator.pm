@@ -3,7 +3,7 @@ package CGI::Dialog::DataNavigator;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog);
 
@@ -34,7 +34,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'sort_column',),
 		new CGI::Dialog::Field(type => 'hidden', name => 'sort_order', defaultValue => 'A',),
 		new CGI::Dialog::DataNavigator::Ancestors(publDefn => $self->{publDefn},),
-		new CGI::Dialog::DataNavigator::Results(publDefn => $publDefn,),
+		new CGI::Dialog::DataNavigator::Results(publDefn => $publDefn, sqlStmt => $self->{sqlStmt}, bindParams => $self->{bindParams}),
 		new CGI::Dialog::DataNavigator::MultiActions(publDefn => $publDefn,),
 		new CGI::Dialog::DataNavigator::StatusBar(publDefn => $publDefn,),
 		new CGI::Dialog::DataNavigator::JavaScript(publDefn => $publDefn),
@@ -80,7 +80,7 @@ package CGI::Dialog::DataNavigator::Results;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use Data::Publish;
 use CGI::Dialog;
 use CGI::ImageManager;
@@ -125,7 +125,7 @@ sub getHtml
 	my $queryCond = &$dnQuery($page);
 
 	# Generate the SQL and Bind Parameters
-	my ($sql, $bindParams) = $self->createStmt($page, $queryCond);
+	my ($sql, $bindParams) = $self->createStmt($page, $queryCond, $command);
 
 	# Execute the SQL
 	my $sth = $self->getStmtHandle($page, $sql, $bindParams);
@@ -141,14 +141,16 @@ sub getHtml
 		$html .= $self->getQueryHtml($page, $sth, $publDefn);
 	}
 
-	return qq{<tr><td colspan="2">$html</td></tr>};
+	return qq{
+		<tr><td colspan="2">$html</td></tr>
+	};
 }
 
 
 sub createStmt
 {
 	my $self = shift;
-	my ($page, $queryCond) = @_;
+	my ($page, $queryCond, $command) = @_;
 
 	my $startRow = 0 + $page->field('start_row');
 	$startRow = 0 if $startRow eq 'NaN' || $startRow < 0;
@@ -157,8 +159,17 @@ sub createStmt
 	$showRows = 50 if $showRows > 50;
 	my $endRow = $startRow + $showRows;
 
-	# get the SQL from GenerateQuery
-	my ($sql, $bindParams) = $queryCond->genSQL();
+	my ($sql, $bindParams);
+	
+	if ($command eq 'sql')
+	{
+		($sql, $bindParams) = ($self->{sqlStmt}, $self->{bindParams});
+	}
+	else
+	{
+		# get the SQL from GenerateQuery
+		($sql, $bindParams) = $queryCond->genSQL();
+	}
 
 	# Add the SQL wrapper to rownum restrictions
 	my $cols = join ",\n", map {"\t$_"} $queryCond->outColumns();
@@ -285,7 +296,7 @@ package CGI::Dialog::DataNavigator::Ancestors;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -338,7 +349,7 @@ package CGI::Dialog::DataNavigator::MultiActions;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -463,7 +474,7 @@ package CGI::Dialog::DataNavigator::StatusBar;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -486,7 +497,7 @@ package CGI::Dialog::DataNavigator::JavaScript;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
