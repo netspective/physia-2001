@@ -273,7 +273,7 @@ sub execute
 			#$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
 			#	[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
 			#),
-			$appts = STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
+			$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
 				$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
 			);
 		}
