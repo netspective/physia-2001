@@ -559,7 +559,7 @@ sub prepare_HtmlBlockFmtTemplate
 		#
 		$bannerFmt =~ s/\#fmtdefn\.(\w+)\#/eval("\$$1")/ge;
 	}
-
+	
 	my ($headRowFmt, $bodyRowFmt, $tailRowFmt,$subTotalRowFmt) =
 	(
 		$publFlags & PUBLFLAG_HIDEHEAD ? '' : qq{
@@ -928,6 +928,7 @@ sub createHtmlFromStatement
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data;
@@ -961,6 +962,7 @@ sub createHtmlFromStatement
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
@@ -968,12 +970,6 @@ sub createHtmlFromStatement
 					push(@outputRows, $outRow);
 				}
 			}
-
-			
-			
-			
-			
-			
 		}
 		else
 		{
@@ -992,6 +988,7 @@ sub createHtmlFromStatement
 						($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 			}
 			else
@@ -1002,6 +999,7 @@ sub createHtmlFromStatement
 					$rowNum++;
 					($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 					push(@outputRows, $outRow, $rowSepStr);
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 			}
 		}
@@ -1010,8 +1008,11 @@ sub createHtmlFromStatement
 		pop(@outputRows) if $checkDataSep && $outputRows[$#outputRows] eq $dataSepStr;
 	};
 	
-	$stmtHdl->finish();
-	undef $stmtHdl;
+	unless (defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows})
+	{
+		$stmtHdl->finish();
+		undef $stmtHdl;
+	}
 	return $@ if $@;
 	my $html = $fmt->{wrapContentOpen} . (join('', @outputRows) || $fmt->{noDataMsg}) . $fmt->{wrapContentClose};
 	$html =~ s/\#my\.(.*?)\#/$publParams->{$1}/g if $publFlags & PUBLFLAG_REPLACEDEFNVARS;
