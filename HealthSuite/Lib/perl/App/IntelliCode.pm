@@ -611,13 +611,19 @@ sub getEntry
 	my ($page, $cpt, $modifier,$serviceDate, $bufferRef, $fs,$ffsFlag) = @_;	
 	my $orgId = $page->session('org_internal_id');
 
-	my $entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selProcedureInfoByCodeModDate', $cpt, $modifier, $fs,$serviceDate);	
-	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), $entry->{data_text},$entry->{caption} ,$entry->{entry_type},
-			     $entry->{catalog_id},$ffsFlag || $entry->{flags} ]) if exists $entry->{internal_catalog_id};
+	my $entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selProcedureInfoByCodeModDate', $cpt, $modifier, $fs,$serviceDate);
+	if($entry->{internal_catalog_id})
+	{
+		push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), $entry->{data_text},$entry->{caption} ,$entry->{entry_type},
+			     $entry->{catalog_id},$ffsFlag || $entry->{flags} ]);
+	}
+	elsif($modifier)
+	{
+		$entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selProcedureInfoByCodeModDate', $cpt, undef, $fs,$serviceDate);
+		push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), $entry->{data_text},$entry->{caption} ,$entry->{entry_type},
+			     $entry->{catalog_id},$ffsFlag || $entry->{flags} ]);
+	}
 }
-
-
-
 
 sub getItemCost
 {
