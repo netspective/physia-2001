@@ -33,6 +33,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'acct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -222,6 +223,7 @@ sub populateData
 	my $guarantor = 'Guarantor';
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
 	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $guarantorName->{'value_text'});
+	$page->field('resp_item_id', $guarantorName->{'item_id'});
 
 }
 
@@ -406,10 +408,14 @@ sub handleRegistry
 	{
 		$page->redirect("/person/$personId/dlg-remove-$member/$personId");
 	}
+
+
 	else
 	{
 		$self->handlePostExecute($page, $command, $flags);
 	}
+
+
 
 
 }
@@ -447,6 +453,21 @@ sub handleAttrs
 			value_textB => $page->field('job_title') || undef,
 			_debug => 0
 			) if ($page->field('job_code') ne '' || $page->field('job_title') ne '');
+
+	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
+
+
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_id => $page->field('resp_item_id') || undef,
+			item_name => 'Guarantor' || undef,
+			value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
+			value_text => $partyName || undef,
+			value_int => 1,
+			_debug => 0
+			)if $partyName ne '';
 
 }
 

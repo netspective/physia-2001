@@ -234,20 +234,6 @@ sub execute_add
 		}
 	}
 
-	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
-	if ($partyName ne '')
-	{
-
-		$page->schemaAction(
-				'Person_Attribute', 'add',
-				parent_id => $personId || undef,
-				item_name => 'Guarantor' || undef,
-				value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
-				value_text => $partyName || undef,
-				_debug => 0
-		);
-	}
-
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
