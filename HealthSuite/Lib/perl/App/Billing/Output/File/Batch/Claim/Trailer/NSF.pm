@@ -9,8 +9,6 @@ use Carp;
 use App::Billing::Universal;
 
 
-use vars qw(@CHANGELOG);
-
 sub new
 {
 	my ($type,%params) = @_;
