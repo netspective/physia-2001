@@ -71,5 +71,33 @@
 			NOTE : Please test that close date still locks out the creation of invoice and payments correctly.
 		</deliverable>				
 		
+		<deliverable id="732">
+			Ability to add pre-payments.
+		</deliverable>				
+
+		<deliverable id="1055">
+			Redirecting insurance batch payments back to the batch dialog.
+		</deliverable>				
+
+		<deliverable id="957">
+			Two new fields added to TWCC64 dialog.
+		</deliverable>				
+
+		<deliverable id="1101">
+			Error showing long decimal number has been formatted properly and fixed.
+		</deliverable>				
+
+		<deliverable id="1131">
+			Referring physician field in add claim has been changed to a drop-down.
+		</deliverable>				
+
+		<deliverable id="1149">
+			Reversal of payments allowed at Closed status.
+		</deliverable>				
+
+		<deliverable id="1039">
+			Showing service provider on claim summary.
+		</deliverable>				
+
 	</deliverables>
 </release-notes>
