@@ -6,12 +6,14 @@ use App::Data::Obtain::Ntis::CPTinfo;
 use App::Data::Obtain::InfoX::ICDinfo;
 use App::Data::Obtain::HCFA::HCPCS;
 use App::Data::Obtain::Envoy::Payers;
+use App::Data::Obtain::ThinNet::Payers;
 use App::Data::Obtain::Perse::Epayer;
 use App::Data::Obtain::RBRVS::RVU;
 use App::Data::Obtain::RBRVS::GPCI;
 use App::Data::Obtain::EPSDT::EPSDT;
 use App::Data::Obtain::TXgulf::FeeSchedules;
 use App::Data::Obtain::EPSDT::CodeServType;
+
 
 use File::Path;
 use FindBin qw($Bin);
@@ -22,7 +24,7 @@ use File::Basename;
 use Date::Manip;
 
 $ENV{TZ} = 'EST' unless exists $ENV{TZ};
-my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'epsdt', 'rvu' . UnixDate('today', '%y'),'codeserv');
+my @allModules = ( 'icd','thin', 'cpt', 'hcpcs', 'envoy', 'epayer', 'epsdt', 'rvu' . UnixDate('today', '%y'),'codeserv');
 
 sub printUsage
 {
@@ -63,9 +65,11 @@ sub Main
 		dataSrcNtisPath => File::Spec->catfile($dataSrcPath, 'ntis'),
 		dataSrcPersePath => File::Spec->catfile($dataSrcPath, 'perse'),
 		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),
+		dataSrcServCatPath => File::Spec->catfile($dataSrcPath, 'serv_cat'),
 		rvuFile => \@rvuFile,
 		dataSrcRTXgulfPath => File::Spec->catfile($dataSrcPath, 'TXgulf'),
 		dataSrcEPSDTPath => File::Spec->catfile($dataSrcPath,'EPSDT'),
+		dataSrcThinPath=>File::Spec->catfile($dataSrcPath,'ThinNet'),
 	};
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
@@ -78,6 +82,39 @@ sub Main
 	importEPSDTInfo($properties, transformDBI => 1) if grep(/epsdt/, @modules);	
 	importCodeServTypeInfo($properties, transformDBI => 1) if grep(/codeserv/, @modules);	
 	importTXGULFfs($properties, transformDBI => 1) if grep(/tgcmgfs/, @modules);
+	#importServCat($properties, transformDBI => 1) if grep(/servcat/, @modules);
+	importThinPayers($properties, transformDBI => 1) if grep(/thin/, @modules);	
+}
+
+sub importServCat
+{
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::ServCat;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "Starting\n";
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFile => File::Spec->catfile($properties->{dataSrcServCatPath}, 'acs_serv_cat.xls'));
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_Service_Category cascade//Delete from REF_Service_Category cascade.",
+			insertStmt => "insert into REF_Service_Catergory
+				(id,name,description )
+			values (?,?,?, ?)",
+			verifyCountStmt => "select count(*) from REF_Service_Category",
+		);
+		$exporter->printErrors();
+	}
 }
 
 sub importCodeServTypeInfo
@@ -435,9 +472,48 @@ sub importEPayers
 			connect => $properties->{connectStr},
 			doBefore => "delete from REF_Epayer where psource = 2//Deleting Perse payers.",
 			insertStmt => "insert into REF_Epayer
-				(id, id2, name, psource, ptype)
-			values (?, ?, ?, ?, ?)",
+				(id,  name, psource, ptype)
+			values (?, ?, ?, ?)",
 			verifyCountStmt => "select count(*) from REF_Epayer where psource =2",
+		);
+		$exporter->printErrors();
+	}
+}
+
+sub importThinPayers
+{
+	my ($properties, %params) = @_;
+	my $dataCollection = new App::Data::Collection;
+	print "\n";
+
+	my $importer = new App::Data::Obtain::ThinNet::Payers;
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+		srcThin => File::Spec->catfile($properties->{dataSrcThinPath}, 'net_payer.dot'),
+		);
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		return;
+	}
+	undef $importer;
+	#$dataCollection->printDataSamples();
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+		#$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+		#	connect => $properties->{connectStr},
+		#	doBefore => "truncate table REF_ENVOY_PAYER//Truncating REF_ENVOY_PAYER table.",
+		#	insertStmt => "insert into REF_ENVOY_PAYER (id, name, ptype, state, flags, remarks) values (?, ?, ?, ?, ?, ?)",
+		#	verifyCountStmt => "select count(*) from REF_ENVOY_PAYER",
+		#);
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_EPAYER where psource = 3//Deleting Thin Net Payers.",
+			insertStmt => "insert into REF_EPAYER (id, name, ptype, state, flags, remarks, psource)
+				values (?, ?, ?, ?, ?, ?, 3)",
+			verifyCountStmt => "select count(*) from REF_EPAYER where psource =3",
 		);
 		$exporter->printErrors();
 	}
