@@ -623,8 +623,10 @@
 
 	<table name="Role_Name" abbrev="RoleName">
 		<column name="role_name_id" type="autoinc" primarykey="yes" descr="The primary key."/>
-		<column name="role_name" type="text" size="120" descr="The role's name."/>
+		<column name="role_name" indexed="yes" type="text" size="120" descr="The role's name."/>
 		<column name="role_status_id" lookupref="Org_Role_Status" default="0" descr="The status of the role."/>
+		<column name="caption" type="text" size="120" descr="Visiable name of the role."/>
+		<column name="description" type="text" size="255" descr="Description of role."/>
 	</table>
 
 	<table name="Person_Org_Role" abbrev="PerOrgRole" type="Audit">
