@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Statements::WorklistCollection;
+package App::Statements::Worklist::WorklistCollection;
 ##############################################################################
 
 use strict;
@@ -20,7 +20,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_WORKLIST_COLLECTION);
 @EXPORT = qw($STMTMGR_WORKLIST_COLLECTION);
 
 # -------------------------------------------------------------------------------------------
-$STMTMGR_WORKLIST_COLLECTION = new App::Statements::WorklistCollection (	
+$STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection (	
 	'del_worklist_person_assoc' => qq{
 		delete from Person_Attribute
 		where parent_id = ?
