@@ -763,8 +763,20 @@ sub setupACL
 	}
 	$getRolesSth->finish();
 
-    my $permissions = new Set::IntSpan;
+	my $defaultPermissions = new Set::IntSpan;
 	my $permIds = $self->{acl}->{permissionIds};
+	#
+	# see if there are default permissions assigned to a role in the XML file(s)
+	#
+	foreach(@$roles)
+	{
+		if(my $groupInfo = $permIds->{"group/$_"})
+		{
+			$defaultPermissions = $defaultPermissions->union($groupInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
+		}
+	}
+	
+    my $permissions = $defaultPermissions;
     my $getPermsSth = $dbh->prepare(qq{
                 select rp.role_activity_id, rp.permission_name 
 				from person_org_role por, role_permission rp
