@@ -1184,7 +1184,22 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					SELECT 	b.org_id
 					FROM org b
 					WHERE b.org_internal_id = i.ins_org_id
-				) AS org_id
+				) AS org_id,
+			guarantor_id,
+			guarantor_name,
+			guarantor_type,
+			(
+				SELECT 	b.org_id
+				FROM org b
+				WHERE b.org_internal_id = i.ins_org_id
+			) AS org_id,
+			(
+				SELECT 	g.org_id
+				FROM org g
+				WHERE guarantor_type = @{[App::Universal::GUARANTOR_ORG]}
+				AND  g.org_internal_id = i.guarantor_id
+
+			)
 			FROM 	insurance i
 			WHERE 	owner_person_id = ?
 			ORDER BY bill_sequence
@@ -1192,9 +1207,16 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Insurance Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx =>0, head => 'BillSeq', dataFmt => '<b>#0#</b> (#1#, <b>#11#</b>, #10#, End Date: #8#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#'},
-
+				{
+					colIdx => 14,
+					dataFmt => {
+						'0' => '<b>Client Billing (</b><A HREF = "/person/#12#/profile">#13#</A>, Third Party)',
+						'1' => '<A HREF = "/org/#15#/profile">#13#</A> (Third Party)',
+						''  => '<b>#0#</b> (#1#, <b>#11#</b>, #10#, End Date: #8#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#',
+					},
+				},
 		],
+
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-ins-#4#/#3#?home=#homeArl#',
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-coverage?home=#homeArl#',
