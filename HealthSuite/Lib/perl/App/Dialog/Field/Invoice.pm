@@ -827,7 +827,8 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
-	my $totalPayRcvd = $page->field('check_amount');					#total amount paid
+	my $isPayer = $page->param('isPayer');
+	my $totalPayRcvd = $page->field('check_amount') || $page->field('total_amount');
 	my $totalAmtApplied = 0;
 	my $totalInvoiceBalance = 0;
 
@@ -835,7 +836,7 @@ sub isValid
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		my $itemPayment = $page->param("_f_item_$line\_plan_paid");
+		my $itemPayment = $page->param("_f_item_$line\_plan_paid") || $page->param("_f_item_$line\_amount_applied");
 		my $itemBalance = $page->param("_f_item_$line\_item_balance");
 		$totalInvoiceBalance += $itemBalance;
 		next if $itemPayment eq '';
@@ -844,7 +845,9 @@ sub isValid
 		if($itemPayment > $totalPayRcvd)
 		{
 			my $amtDiff = $itemPayment - $totalPayRcvd;
-			$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by \$$amtDiff");
+			$isPayer eq 'insurance' ? 
+				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by \$$amtDiff") 
+				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Total Amount' by \$$amtDiff");
 		}
 
 		$totalAmtApplied += $itemPayment;
@@ -855,7 +858,9 @@ sub isValid
 	if($totalAmtApplied > $totalPayRcvd)
 	{
 		my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
-		$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.");
+		$isPayer eq 'insurance' ? 
+			$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.")
+			: $self->invalidate($page, "The total amount applied exceeds the total amount entered by \$$amtExceeded. Please reconcile.");
 	}
 	elsif($totalAmtApplied < $totalPayRcvd)
 	{
@@ -891,29 +896,33 @@ sub getHtml
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
 
-
+	#get invoice items which can have payments applied to them
 	my $linesHtml = '';
-	my $personId = $page->param('person_id') || $page->field('payer_id');
 	my $invoiceId = $page->param('invoice_id');
-	my $outstandItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+	my $isPayer = $page->param('isPayer');
+	my $outstandItems = $isPayer eq 'insurance' ?
+		$STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB)
+		: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+
+
+
 	my $totalItems = scalar(@{$outstandItems});
 	my $totalInvoiceBalance = 0;
 	for(my $line = 1; $line <= $totalItems; $line++)
 	{
 		my $item = $outstandItems->[$line-1];
-		my $itemId = $item->{item_id};
-		my $itemBalance = $item->{balance};
-		my $itemAdjs = $item->{total_adjust};
-		$totalInvoiceBalance += $itemBalance;
+		my $itemType = $item->{item_type};
+		my $itemTypeCap = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selItemTypeCaption', $itemType);
+		next if $itemType == App::Universal::INVOICEITEMTYPE_COINSURANCE 
+			|| $itemType == App::Universal::INVOICEITEMTYPE_ADJUST 
+			|| $itemType == App::Universal::INVOICEITEMTYPE_VOID;
+		next if $item->{data_text_b} eq 'void';
 
-		my $isVoided = $item->{data_text_b};
-		my $readOnly = '';
-		my $voidHtml = '';
-		if($isVoided eq 'void')
-		{
-			$readOnly = 'READONLY';
-			$voidHtml = '(void)';		
-		}
+		my $itemId = $item->{item_id};
+		my $itemCPT = $item->{code};
+		my $itemBalance = $item->{balance};
+		my $itemAdjs = $item->{total_adjust} || '0';
+		$totalInvoiceBalance += $itemBalance;
 
 		my $endDateDisplay = '';
 		if(my $endDate = $item->{service_end_date})
@@ -922,23 +931,62 @@ sub getHtml
 		}
 		my $dateDisplay = "$item->{service_begin_date} $endDateDisplay";
 
+		my $amtApplied = $page->param("_f_item_$line\_amount_applied");
+		my $planAllow = $page->param("_f_item_$line\_plan_allow");
+		my $planPaid = $page->param("_f_item_$line\_plan_paid");
+		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
+
+		#create drop-down list of writeoff_types
+		my $writeoffTypes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selWriteoffTypes');
+		my $writeoffTypesHtml = '';
+		foreach my $woType (@{$writeoffTypes})
+		{
+			my $selected = $writeoffCode == $woType->{id} ? 'SELECTED' : '';
+			$selected = $writeoffCode eq '' && $woType->{id} == App::Universal::ADJUSTWRITEOFF_FAKE_NONE ? 'SELECTED' : $selected;
+			$writeoffTypesHtml .= "<OPTION VALUE='$woType->{id}' $selected>$woType->{caption}</OPTION>";
+		}
+
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
-			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_adjustments" VALUE="$itemAdjs"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_existing_adjs" VALUE="$itemAdjs"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
 			<TR VALIGN=TOP>
-				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B> $voidHtml</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD ALIGN=RIGHT><FONT $textFontAttrs>$item->{code}</TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemCPT</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemAdjs</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT $readOnly NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_allow") ]}'></TD>
+				@{[ $isPayer eq 'insurance' ? 
+				"<TD><INPUT NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='$planAllow'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT $readOnly NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_paid") ]}'></TD>
+				<TD><INPUT NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='$planPaid'></TD>"
+				: '' ]}
+				
+				@{[ $isPayer eq 'personal' ? 
+				"<TD><INPUT NAME='_f_item_$line\_amount_applied' TYPE='text' size=10 VALUE='$amtApplied'></TD>"
+				: '' ]}
+
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT $readOnly NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
+				<TD><INPUT NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
+
+				@{[ $isPayer eq 'personal' ? 
+				"<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD>
+					<SELECT NAME='_f_item_$line\_writeoff_code' TYPE='text'>
+						$writeoffTypesHtml
+					</SELECT>
+				</TD>"
+				: '' ]}
+
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_comments' TYPE='text' size=25 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
 			</TR>
 		};
 	}
@@ -953,19 +1001,33 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Type</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>CPT</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Adjs</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Allow</FONT></TD>
+						@{[ $isPayer eq 'insurance' ? 
+						"<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Allow</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Paid</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Writeoff Amount</FONT></TD>"
+						:
+						"<TD ALIGN=CENTER><FONT $textFontAttrs>Amount Paid</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Writeoff Amount</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Writeoff Code</FONT></TD>" ]}
+						
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Comments</FONT></TD>
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
+						<TD COLSPAN=7><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalInvoiceBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
