@@ -8,14 +8,14 @@
 		<!-- Fields -->
 		<field id="person_id" caption="Person ID" join="person" column="person_id"/>
 		<field id="row_num" column="rownum"/>
-		<field id="ssn" caption="SSN" join="person" column="SSN"/>
+		<field id="ssn" caption="SSN" join="person" column="SSN" ui-datatype="ssn"/>
 		<field id="name_first" caption="First Name" join="person" column="name_first"/>
 		<field id="name_middle" caption="Middle Name" join="person" column="name_middle"/>
 		<field id="name_last" caption="Last Name" join="person" column="name_last"/>
 		<field id="name_suffix" caption="Name Suffix" join="person" column="name_suffix"/>
 		<field id="simple_name" caption="Full Name" join="person" column="simple_name"/>
-		<field id="dob" caption="Date of Birth" join="person" column="date_of_birth" ui-datatype="date"/>
-		<field id="age" caption="Age" join="person" column="age"/>
+		<field id="dob" caption="Date of Birth" join="person" column="date_of_birth" columndefn="TO_CHAR(person.date_of_birth,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="age" caption="Age" join="person" columndefn="TRUNC((SYSDATE - person.date_of_birth)/365)" ui-datatype="number"/>
 		<field id="gender" caption="Gender" join="gender" column="caption"/>
 		<field id="marital_status" caption="Marital Status" join="mstat" column="caption"/>
 		<field id="ethnicity" caption="Ethnicity" join="per_ethnicity" column="member_name"/>
@@ -24,36 +24,36 @@
 		<field id="home_address_line_2" caption="Home Address - Line 2" join="per_addr_home" column="line2"/>
 		<field id="home_address_city" caption="Home Address - City" join="per_addr_home" column="city"/>
 		<field id="home_address_state" caption="Home Address - State" join="per_addr_home" column="state"/>
-		<field id="home_address_zip" caption="Home Address - Zip Code" join="per_addr_home" column="zip"/>
+		<field id="home_address_zip" caption="Home Address - Zip Code" join="per_addr_home" column="zip" ui-datatype="zip"/>
 		<field id="work_address_line_1" caption="Work Address - Line 1" join="per_addr_work" column="line1"/>
 		<field id="work_address_line_2" caption="Work Address - Line 2" join="per_addr_work" column="line2"/>
 		<field id="work_address_city" caption="Work Address - City" join="per_addr_work" column="city"/>
 		<field id="work_address_state" caption="Work Address - State" join="per_addr_work" column="state"/>
-		<field id="work_address_zip" caption="Work Address - Zip Code" join="per_addr_work" column="zip"/>
+		<field id="work_address_zip" caption="Work Address - Zip Code" join="per_addr_work" column="zip" ui-datatype="zip"/>
 		<field id="alt_address_line_1" caption="Alternate Address - Line 1" join="per_addr_alt" column="line1"/>
 		<field id="alt_address_line_2" caption="Alternate Address - Line 2" join="per_addr_alt" column="line2"/>
 		<field id="alt_address_city" caption="Alternate Address - City" join="per_addr_alt" column="city"/>
 		<field id="alt_address_state" caption="Alternate Address - State" join="per_addr_alt" column="state"/>
-		<field id="alt_address_zip" caption="Alternate Address - Zip Code" join="per_addr_alt" column="zip"/>
+		<field id="alt_address_zip" caption="Alternate Address - Zip Code" join="per_addr_alt" column="zip" ui-datatype="zip"/>
 		<field id="any_address_line_1" caption="Any Address - Line 1" join="per_addr_any" column="line1"/>
 		<field id="any_address_line_2" caption="Any Address - Line 2" join="per_addr_any" column="line2"/>
 		<field id="any_address_city" caption="Any Address - City" join="per_addr_any" column="city"/>
 		<field id="any_address_state" caption="Any Address - State" join="per_addr_any" column="state"/>
-		<field id="any_address_zip" caption="Any Address - Zip Code" join="per_addr_any" column="zip"/>
-		<field id="home_phone" caption="Home Phone" join="per_attr_phone_home" column="value_text"/>
-		<field id="work_phone" caption="Work Phone" join="per_attr_phone_work" column="value_text"/>
-		<field id="cell_phone" caption="Cellular Phone" join="per_attr_phone_cell" column="value_text"/>
-		<field id="alt_phone" caption="Alternate Phone" join="per_attr_phone_alt" column="value_text"/>
-		<field id="any_phone" caption="Any Phone" join="per_attr_phone_any" column="value_text"/>
-		<field id="home_fax" caption="Home Fax" join="per_attr_fax_home" column="value_text"/>
-		<field id="work_fax" caption="Work Fax" join="per_attr_fax_work" column="value_text"/>
-		<field id="alt_fax" caption="Alternate Fax" join="per_attr_fax_alt" column="value_text"/>
-		<field id="any_fax" caption="Any Fax" join="per_attr_fax_any" column="value_text"/>
+		<field id="any_address_zip" caption="Any Address - Zip Code" join="per_addr_any" column="zip" ui-datatype="zip"/>
+		<field id="home_phone" caption="Home Phone" join="per_attr_phone_home" column="value_text" ui-datatype="phone"/>
+		<field id="work_phone" caption="Work Phone" join="per_attr_phone_work" column="value_text" ui-datatype="phone"/>
+		<field id="cell_phone" caption="Cellular Phone" join="per_attr_phone_cell" column="value_text" ui-datatype="phone"/>
+		<field id="alt_phone" caption="Alternate Phone" join="per_attr_phone_alt" column="value_text" ui-datatype="phone"/>
+		<field id="any_phone" caption="Any Phone" join="per_attr_phone_any" column="value_text" ui-datatype="phone"/>
+		<field id="home_fax" caption="Home Fax" join="per_attr_fax_home" column="value_text" ui-datatype="phone"/>
+		<field id="work_fax" caption="Work Fax" join="per_attr_fax_work" column="value_text" ui-datatype="phone"/>
+		<field id="alt_fax" caption="Alternate Fax" join="per_attr_fax_alt" column="value_text" ui-datatype="phone"/>
+		<field id="any_fax" caption="Any Fax" join="per_attr_fax_any" column="value_text" ui-datatype="phone"/>
 		<field id="category" caption="Category" join="per_org_category" column="category"/>
 		<field id="category_org" join="per_org_category" column="org_internal_id"/>
 		<field id="account" caption="Account #" join="per_account" column="value_text"/>
 		<field id="chart" caption="Chart #" join="per_chart" column="value_text"/>
-		<field id="created" caption="Date Created" join="person" column="cr_stamp"/>
+		<field id="created" caption="Date Created" join="person" column="cr_stamp" columndefn="TO_CHAR(person.cr_stamp, 'IYYYMMDDHHMISS')" ui-datatype="stamp"/>
 		<field id="createdby" caption="Created By" join="person" column="cr_user_id" lookup-url="/lookup/person"/>
 
 		<!-- Views -->
@@ -85,7 +85,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -100,7 +100,7 @@
 			<column id="person_id" caption="Nurse"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -118,7 +118,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -136,7 +136,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -154,7 +154,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -172,7 +172,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>
@@ -190,7 +190,7 @@
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
-			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="dob"/>
 			<column id="ssn"/>
 			<column id="home_phone"/>
 			<column id="account"/>

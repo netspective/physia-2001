@@ -13,17 +13,17 @@
 		<field id="total_cost" join="invoice" caption="Total Charges" column="total_cost" ui-datatype="currency"/>
 		<field id="total_adjust" join="invoice" caption="Total Adjustments" column="total_adjust" ui-datatype="currency"/>
 		<field id="balance" join="invoice" caption="Balance" column="balance" ui-datatype="currency"/>
-		<field id="invoice_date" join="invoice" caption="Date of Visit" column="invoice_date" ui-datatype="date"/>
+		<field id="invoice_date" join="invoice" caption="Date of Visit" column="invoice_date" columndefn="TO_CHAR(invoice.invoice_date, 'IYYYMMDD')" ui-datatype="date"/>
 		<field id="patient_id" join="invoice" caption="Patient ID" column="client_id"/>
 		<field id="submitter_id" caption="Submitter ID" join="invoice" column="submitter_id"/>
 		<field id="invoice_status" caption="Claim Status" join="inv_stat" column="caption" />
 		<field id="patient_ssn" caption="Patient SSN" join="patient" column="SSN"/>
 		<field id="patient_lastname" caption="Patient Last Name" join="patient" column="name_last"/>
-		<field id="service_begin_date" caption="Service Begin Date" join="item_servdate" column="service_begin_date" columndefn="MIN(item_servdate.service_begin_date)" ui-datatype="date"/>
-		<field id="service_end_date" caption="Service End Date" join="item_servdate" column="service_begin_date" columndefn="MAX(item_servdate.service_begin_date)" ui-datatype="date"/>
+		<field id="service_begin_date" caption="Service Begin Date" join="item_servdate" column="service_begin_date" columndefn="TO_CHAR(MIN(item_servdate.service_begin_date), 'IYYYMMDD')" groupbyexp="yes" ui-datatype="date"/>
+		<field id="service_end_date" caption="Service End Date" join="item_servdate" column="service_begin_date" columndefn="TO_CHAR(MAX(item_servdate.service_begin_date), 'IYYYMMDD')" groupbyexp="yes" ui-datatype="date"/>
 		<field id="provider_id" caption="Physician ID" join="person_provider" column="person_id"/>
 		<field id="provider_upin" caption="Physician UPIN" join="inv_attr_upin" column="value_text"/>
-		<field id="employer" caption="Employer" join="ins_employ_id" column="employer_org_id"/>
+		<field id="employer" caption="Employer" join="bill_payer_ins_emp" column="org_id"/>
 		<field id="bill_party_type" join="bill_payer" column="bill_party_type"/>
 		<field id="payer_type" caption="Payer Type" join="bill_party_type" column="caption"/>
 		<field id="payer" caption="Payer" join="bill_payer" column="bill_to_id"/>
@@ -37,15 +37,17 @@
 		<join id="item_servdate" table="invoice_item" condition="item_servdate.parent_id (+) = invoice.invoice_id"/>
 		<join id="inv_attr_upin" table="invoice_attribute" condition="inv_attr_upin.parent_id (+) = invoice.invoice_id AND inv_attr_upin.item_name (+) = 'Ref Provider/Identification'"/>
 		<join id="bill_payer" table="invoice_billing" condition="bill_payer.bill_id (+) = invoice.billing_id"/>
+		<join id="bill_payer_ins" table="insurance" requires="bill_payer" condition="bill_payer.bill_ins_id = bill_payer_ins.ins_internal_id (+)"/>
+		<join id="bill_payer_ins_emp" table="org" requires="bill_payer_ins" condition="bill_payer_ins.employer_org_id = bill_payer_ins_emp.org_internal_id (+)"/>
 		<join id="bill_party_type" table="invoice_bill_party_type" requires="bill_payer" condition="bill_party_type.id = bill_payer.bill_party_type"/>
 		<join id="bill_payer_person" table="person" requires="bill_payer" condition="bill_payer_person.person_id (+) = bill_payer.bill_to_id"/>
 		<join id="bill_payer_org" table="org" requires="bill_payer" condition="TO_CHAR(bill_payer_org.org_internal_id (+)) = bill_payer.bill_to_id"/>
 		<join id="person_provider" table="person" condition=""/>
 		
 		<!-- Views -->
-		<view id="all" distinct="yes" href="/invoice/{invoice_id}/summary">
+		<view id="all" caption="None" distinct="yes" href="/invoice/{invoice_id}/summary">
 			<column id="invoice_id"/>
-			<column id="total_items" caption="IC"/>
+			<column id="total_items"/>
 			<column id="patient_id"/>
 			<column id="provider_upin"/>
 			<column id="service_begin_date"/>
@@ -53,22 +55,11 @@
 			<column id="payer_type"/>
 			<column id="payer_person_id"/>
 			<column id="payer_org_id"/>
-			<column id="total_cost" caption="Charges"/>
-			<column id="total_adjust" caption="Adjust"/>
+			<column id="total_cost"/>
+			<column id="total_adjust"/>
 			<column id="balance"/>
 			<condition field="owner_id" comparison="is" criteria="#session.org_internal_id#"/>
 			<order-by id="invoice_id"/>
-			<group-by id="invoice_id"/>
-			<group-by id="total_items"/>
-			<group-by id="patient_id"/>
-			<group-by id="provider_upin"/>
-			<group-by id="invoice_status"/>
-			<group-by id="payer_type"/>
-			<group-by id="payer_person_id"/>
-			<group-by id="payer_org_id"/>
-			<group-by id="total_cost"/>
-			<group-by id="total_adjust"/>
-			<group-by id="balance"/>
 		</view>
 
 	</query-defn>
