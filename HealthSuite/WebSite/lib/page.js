@@ -32,6 +32,8 @@ var FLDFLAG_PERSIST = 16384;
 var FLDFLAG_HOME = 32768;
 var FLDFLAG_SORT = 65536;
 
+var OPTIONFLAG_TRANSKEY_DONT_MOVE_ON_ENTER = 1;
+
 //****************************************************************************
 // Create a list of all the URL parameters
 //****************************************************************************
@@ -215,7 +217,14 @@ function translateEnterKey(event, flags)
 	{
 		var dialog = dialogFields['dialog'];
 		var field = dialog[event.srcElement.name];
-		if(field.nextFld != null)
+		var blnMoveNextField = true;
+		
+		if (flags != null) {
+			if (flags & OPTIONFLAG_TRANSKEY_DONT_MOVE_ON_ENTER)
+				blnMoveNextField = false;
+		}
+
+		if(field.nextFld != null && blnMoveNextField)
 		{
 			var property = "document.forms.dialog."+field.nextFld;
 			if(eval(property))
