@@ -39,13 +39,15 @@ SELECT	i.invoice_id,
 	trans_type,
 	i.total_items,
 	to_number(NULL) as payer_type,
-	i.billing_id as billing_id
+	NULL as payer_id,
+	i.billing_id as billing_id,
+	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
 FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
 	AND ii.parent_id  = i.invoice_id
 	AND ia.item_name  = 'Invoice/Creation/Batch ID'		
-	AND (invoice_status !=15 or parent_invoice_id is null)
+	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
 	UNION ALL	
 SELECT	i.invoice_id,
 	(nvl(
@@ -97,13 +99,15 @@ SELECT	i.invoice_id,
 	trans_type,
 	i.total_items,
 	iia.payer_type as payer_type,
-	i.billing_id as billing_id
+	iia.payer_id as payer_id,
+	i.billing_id as billing_id,
+	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
 FROM 	invoice i ,  transaction t ,	
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
 	AND ii.parent_id  = i.invoice_id
 	AND iia.parent_id = ii.item_id
-	AND (invoice_status !=15 or parent_invoice_id is null);
+	AND NOT (invoice_status =15 AND parent_invoice_id is not null);
 			
 
 create or replace view REVENUE_COLLECTION as
