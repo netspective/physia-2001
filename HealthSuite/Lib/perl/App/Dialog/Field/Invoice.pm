@@ -863,6 +863,9 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
+	my $payType = $page->field('pay_type');
+	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY;
+
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $clientId = $page->field('client_id');
 	my $paidBy = $page->param('paidBy');
