@@ -109,7 +109,10 @@ sub new
 			type => 'memo',
 		),
 		
-		
+                new CGI::Dialog::Field::Duration(
+                        name => 'effective',
+                        caption => 'Effective Date Range',
+                ),		
 		new CGI::Dialog::Field(caption => 'RVRBS Multiplier',
 			name => 'rvrbs_multiplier',
 			type => 'float', 
@@ -183,7 +186,8 @@ sub populateData_update
 		$page->field('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN,
 		'Capitated Contract'
 	);	
-	
+	my $data_range = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'sel_Catalog_Attribute',$page->field('internal_catalog_id'),
+	App::Universal::ATTRTYPE_DATE,'Effective/Date/Range');
 	my $orgFS = $STMTMGR_CATALOG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selOrgIdLinkedFS',$page->field('internal_catalog_id'));
 	my $orgList=undef;
 	foreach my $org_fs_data (@$orgFS)
@@ -250,6 +254,8 @@ sub execute
 		description => $page->field('description') || undef,
 		rvrbs_multiplier => $page->field('rvrbs_multiplier') || undef,
 		parent_catalog_id => $page->field('parent_catalog_id') || undef,
+		effective_begin_date  =>$page->field('effective_begin_date')||undef,
+		effective_end_date => $page->field('effective_end_date') ||undef, 
 		_debug => 0
 	);
 
@@ -324,7 +330,7 @@ sub saveAttribute
 		item_name  => $itemName,
 		value_type => $valueType,
 		%data
-	);
+	);	
 
 	return $newItemId;
 }
