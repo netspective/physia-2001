@@ -147,7 +147,6 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
-						<OPTION value="/org/#param.org_id#/dlg-add-referral">Add Referral</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
@@ -260,7 +259,6 @@ sub prepare_view_profile
 					#component.stp-org.insurancePlans#<BR>
 					#component.stpt-org.healthMaintenanceRule#<BR>
 					#component.stpt-org.associatedResourcesStats#<BR>
-					#component.st-org.feeSchedule#<BR>
 					</font>
 				</TD>
 			</TR>
