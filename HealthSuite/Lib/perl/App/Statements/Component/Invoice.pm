@@ -582,9 +582,10 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				p.complete_name,
 				p2.complete_name,
 				nvl(i.total_cost, 0),
-				i.client_id
+				i.client_id,
+				p3.complete_name
 			from 	event e, transaction t, org o, transaction_type tt,
-				person p, person p1, person p2, invoice i, invoice_billing ib
+				person p, person p1, person p2, invoice i, invoice_billing ib, person p3
 			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4
 				and e.start_time <  to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :4
 				and	e.event_id = t.parent_event_id
@@ -599,6 +600,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				and ib.bill_sequence = 1
 				and ib.invoice_item_id is NULL
 				and o.owner_org_id = :3
+				and i.client_id = p3.person_id
 			UNION ALL
 			select	p1.complete_name, trunc(e.start_time - :4),
 				to_char(e.start_time - :4, 'HH12:MIAM'),
@@ -607,9 +609,10 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				t.caption, tt.caption, p.complete_name,
 				o1.name_primary,
 				nvl(i.total_cost, 0),
-				i.client_id
+				i.client_id,
+				p3.complete_name
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
-				person p, person p1, invoice i, invoice_billing ib
+				person p, person p1, invoice i, invoice_billing ib, person p3
 			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4
 				and e.start_time <  to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :4
 				and e.event_id = t.parent_event_id
@@ -624,6 +627,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				and ib.bill_sequence = 1
 				and ib.invoice_item_id is NULL
 				and o.owner_org_id = :3
+				and i.client_id = p3.person_id
 			ORDER BY  2,12
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],

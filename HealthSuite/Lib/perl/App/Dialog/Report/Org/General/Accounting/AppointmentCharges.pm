@@ -95,7 +95,7 @@ sub execute
 	my $pub = {
 		reportTitle => "Appointment Charges",
 		columnDefn => [
-			{ colIdx => 11, head => 'Patient ID', dataFmt => '#11#',},
+			{ colIdx => 11, head => 'Patient', dataFmt => '#12# <A HREF = "/person/#11#/account">#11#</A>'},
 			{ colIdx => 0, head => 'Receptionist', dataFmt => '#0#' },
 			{ colIdx => 1, head => 'Date', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Start Time', dataFmt => '#2#' },
