@@ -158,12 +158,12 @@ sub new
 			new CGI::Dialog::Field(caption => 'Remit Payer Name', name => 'remit_payer_name'),
 
 			new CGI::Dialog::Subhead(heading => 'Add Another Personal Insurance Coverage', name => 'insur_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			new CGI::Dialog::Field(
-								type => 'bool',
-								name => 'add_insurance',
-								caption => 'Add Additional Personal Insurance Coverage?',
-								style => 'check',
-								invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			#new CGI::Dialog::Field(
+			#					type => 'bool',
+			#					name => 'add_insurance',
+			#					caption => 'Add Additional Personal Insurance Coverage?',
+			#					style => 'check',
+			#					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 			new CGI::Dialog::MultiField(caption =>'InsCompanyID/ProductName/PlanName', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
@@ -248,12 +248,12 @@ sub customValidate
 	my $insOrg = $self->getField('insplan')->{fields}->[0];
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
-	my $addIns = $page->field('add_insurance');
-	if($addIns ==1 &&
-		($page->field('ins_comp') eq '' || $page->field('product') eq '' || $page->field('plan') eq ''))
-	{
-		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
-	}
+	#my $addIns = $page->field('add_insurance');
+	#if($addIns ==1 &&
+	#	($page->field('ins_comp') eq '' || $page->field('product') eq '' || $page->field('plan') eq ''))
+	#{
+	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
+	#}
 
 	my $previousSequence = $page->field('bill_seq_hidden');
 	my $nextSequence = $previousSequence + 1;
