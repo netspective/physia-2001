@@ -65,6 +65,8 @@ sub new
 		options => FLDFLAG_REQUIRED,
 		size => 32,
 		maxLength => 64,
+		useShortForm => 1,
+		incSimpleName=>1,
 	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
@@ -399,7 +401,7 @@ sub populateData_add
 
 	$page->field('appt_date_1', $appt_date);
 	$page->field('appt_time_1', $appt_time);
-	
+
 	$page->field('attendee_id', $page->param('person_id'));
 	$page->field('resource_id', $page->param('resource_id'));
 	$page->field('facility_id', $page->param('facility_id'));
@@ -690,7 +692,7 @@ sub handle_page
 	my $returnUrl = $self->getReferer($page);
 	my ($status, $person, $stamp) = App::Dialog::Encounter::checkEventStatus($self, $page, $eventId);
 
-	if ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/) 
+	if ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/)
 	{
 		$page->addContent(qq{
 			<font face=Verdana size=3>
@@ -699,7 +701,7 @@ sub handle_page
 			</font>
 		});
 	}
-	elsif ($status =~ /ed$/) 
+	elsif ($status =~ /ed$/)
 	{
 		$page->addContent(qq{
 			<font face=Verdana size=3>
@@ -708,7 +710,7 @@ sub handle_page
 			</font>
 		});
 	}
-	else 
+	else
 	{
 		$self->SUPER::handle_page($page, $command);
 	}
