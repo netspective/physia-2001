@@ -41,3 +41,7 @@ B973 - Updated code to store CAP/FFS flag correctly for Fee Schedule entries .
 B988 - Updated the url for 'Update' icon in 'My Associated Resources In Patients' component in the user's homepage
 
 B964 - Fixed the validation of the Other Relationship field on the Personal Coverage dialog
+
+B737 - Added medigap number to the Insurnace produca dialog.  Use medigap number when primary is meidcare and medigap number exist for secondary insurace on EDI to Per-Se and HFCA 1500 forms (HTML,PDF,etc).  
+
+B913 - Closed because B737 was finished
