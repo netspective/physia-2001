@@ -277,20 +277,22 @@ sub isValid
 				}
 				unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
 				{
-					$invMsg .= qq{<a href="$createPersonHref">$types</a> }
+					$invMsg .= qq{<a href="$createPersonHref">$types</a>}
 				}
 			}
 			
-#			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
-#			{
-#				if ((my $category = $self->{types}->[0]) ne 'Patient')
-#				{
-#					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
-#						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
-#						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
-#				}
-#			}
-			unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $value,$page->session('org_internal_id')))
+			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $value,
+				$page->session('org_internal_id')))
+			{
+				if ( ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
+					&& ((my $category = $self->{types}->[0]) ne 'Patient') )
+				{
+					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
+						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
+						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
+				}
+			}
+			else
 			{
 				$self->invalidate($page, $invMsg);				
 			}

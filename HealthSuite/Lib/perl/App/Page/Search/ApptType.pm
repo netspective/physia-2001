@@ -21,11 +21,11 @@ sub handleARL
 	$self->param('_pm_view', $pathItems->[0]);
 
 	unless ($self->param('searchAgain')) {
-		my $r_ids = $pathItems->[2];
-		my $facility_id = $pathItems->[3];
+		my $resource_id = $pathItems->[2];
+		my $caption = $pathItems->[3];
 
-		$self->param('r_ids', $r_ids);
-		$self->param('facility_id', $facility_id);
+		$self->param('resource_id', $resource_id);
+		$self->param('caption', $caption);
 		$self->param('searchAgain', 1);
 	}
 
@@ -56,16 +56,10 @@ sub getForm
 	return ('Lookup an appointment type', qq{
 		<CENTER>
 		<NOBR>
-		<font size=2 face='Tahoma'>	Search for </font>
-
-		<input name='r_ids' size=25 maxlength=32 value="@{[$self->param('r_ids')]}"
-			title='Resource IDs'>
-			<a href="javascript:doFindLookup(this.form, search_form.resource_id, '/lookup/person/id');">
-		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
-
-		<input name='facility_id' size=17 maxlength=32 value="@{[$self->param('facility_id')]}" title='Facility ID'>
-			<a href="javascript:doFindLookup(this.form, search_form.facility_id, '/lookup/org/id');">
-		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
+		<font size=1>	Resource: </font>
+		<input name='resource_id' size=25 maxlength=32 value="@{[$self->param('resource_id')]}">
+		<font size=1>	Caption: </font>
+		<input name='caption' size=25 maxlength=32 value="@{[$self->param('caption')]}">
 
 		<input type=hidden name='searchAgain' value="@{[$self->param('searchAgain')]}">
 		<input type=submit name="execute" value="Go">
@@ -79,7 +73,7 @@ sub execute
 {
 	my ($self, $type, $expression) = @_;
 
-	my @bindCols = ($self->param('r_ids').'%', $self->param('facility_id').'%');
+	my @bindCols = ($self->param('resource_id').'%', $self->param('caption').'%');
 
 	$self->addContent(
 	'<CENTER>',

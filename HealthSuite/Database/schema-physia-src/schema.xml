@@ -192,8 +192,8 @@
 		<column name="available" type="boolean" required="yes" descr="Is this time block Available or Unavailable for scheduling events?"/>
 		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
 		<column name="patient_types" type="text_set" size="16" abbrev="ptypes" descr="Limit this template to particular type of patient(s) -- should be one or more comma-separated items enums in Appt_Attendee_Type table"/>
-		<column name="visit_types" type="text_set" size="64" abbrev="vtypes" descr="Limit this template to particular type of visit(s) -- should be one or more comma-separated Visit-Type items enums in Transaction_Type table"/>
-		<column name="days_of_month" type="text" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
+		<column name="visit_types" type="text_set" size="1024" abbrev="vtypes" descr="Limit this template to particular type of visit(s) -- should be one or more comma-separated Visit-Type items enums in Transaction_Type table"/>
+		<column name="days_of_month" type="text" size="255" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
 		<column name="months" type="text" descr="Months specification (cron style)"/>
 		<column name="days_of_week" type="text" abbrev="dow" descr="Weekday specification (cron style)"/>
 		<column name="preferences" type="text" size="1024" descr="Any preferences noted by Physician regarding scheduling during this block of time"/>
@@ -203,12 +203,16 @@
 	<table name="Appt_Type" abbrev="ApType" parent="Reference_Item" type="Audit,Secure,Restrict_Rows">
 		<description>Appointment Type.  A template for appointments.</description>
 		<column name="appt_type_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Appt Type"/>
-		<column name="r_ids" type="text_set" required="yes" descr="Resource(s) to which the Appt Type applies"/>
+		<column name="resource_id" type="text" descr="Unique ID for a specific resource"/>
 		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the Appt Type"/>
-		<column name="effective_begin_date" type="date" descr="The effective start date this Appt Type"/>
-		<column name="effective_end_date" type="date" descr="The effective end date for this Appt TYpe"/>
-		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location to which the Appt Type applies, e.g. Office, Clinic, or Hospital"/>
 		<column name="duration" type="integer" required="yes" descr="The duration of the appointment in minutes"/>
+		<column name="lead_time" type="integer" descr="Lead time in minutes before the appointment"/>
+		<column name="lag_time" type="integer" descr="Lag time in minutes after the appointment"/>
+		<column name="back_to_back" type="boolean" descr="Back-to-Back appointment of this type allowed"/>
+		<column name="multiple" type="boolean" descr="Multiple simultaneous appointments of this type allowed"/>
+		<column name="am_limit" type="integer" descr="Limit the number of appointments of this type in AM hours"/>
+		<column name="pm_limit" type="integer" descr="Limit the number of appointments of this type in PM hours"/>
+		<column name="r_ids" type="text" size="128" descr="Additional Resource(s) required for this appointment type"/>
 	</table>
 
 	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">

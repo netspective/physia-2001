@@ -35,7 +35,8 @@ sub new
 
 	my $physField = new App::Dialog::Field::Person::ID(name => 'r_ids',
 		caption => 'Associated Resource(s)',
-		hints => 'Resource(s) and/or select Roving Physician(s)',
+		hints => 'These Resources must also be available',
+		types => ['Physician'],
 		size => 40,
 		maxLength => 255,
 		findPopupAppendValue => ',',
@@ -43,22 +44,22 @@ sub new
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
 	$self->addContent(
-		new CGI::Dialog::Subhead(heading => 'General'),
 		new CGI::Dialog::Field(name => 'appt_type_id',
 			caption => 'Appointment Type ID',
 			options => FLDFLAG_READONLY,
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 		),
-		new CGI::Dialog::Field::Duration(name => 'effective',
-			caption => 'Effective Dates',
+		new App::Dialog::Field::Person::ID(caption => 'Physician ID',
+			name => 'resource_id',
+			types => ['Physician'],
+			options => FLDFLAG_REQUIRED,
+			size => 20,
 		),
 		new CGI::Dialog::Field::TableColumn(column => 'Appt_Type.caption',
 			caption => 'Caption',
 			schema => $schema,
 			options => FLDFLAG_REQUIRED
 		),
-		
-		new CGI::Dialog::Subhead(heading => 'Specifications'),
 		new CGI::Dialog::Field(caption => 'Appointment Duration',
 			name => 'duration',
 			fKeyStmtMgr => $STMTMGR_SCHEDULING,
@@ -88,7 +89,7 @@ sub new
 			defaultValue => 1,
 		),
 		new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appointments Allowed',
-			name => 'multiple_appts',
+			name => 'multiple',
 			type => 'bool',
 			style => 'check',
 			defaultValue => 0,
@@ -96,19 +97,19 @@ sub new
 		#new CGI::Dialog::MultiField(
 		#	fields => [
 				new CGI::Dialog::Field(caption => 'AM Limits',
-					name => 'am_limits',
+					name => 'am_limit',
 					type => 'integer',
 					hints => 'Max # appointments of this type during AM hours',
 				),		
 				new CGI::Dialog::Field(caption => 'PM Limits',
-					name => 'pm_limits',
+					name => 'pm_limit',
 					type => 'integer',
 					hints => 'Max # appointments of this type during PM hours',
 				),
 		#	],
 		#),
 		
-		new CGI::Dialog::Subhead(heading => 'Associated Requirements'),
+		#new CGI::Dialog::Subhead(heading => 'Additional Resource Requirements'),
 		$physField,
 
 		new App::Dialog::Field::RovingResource(physician_field => '_f_r_ids',
@@ -152,16 +153,22 @@ sub makeStateChanges
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	if ($page->param('appt_type_id'))
+	{
+		$self->populateData_update($page, $command, $activeExecMode, $flags);
+	}
 
-	my $startDate = $page->getDate();
-	$page->field('effective_begin_date', $startDate);
 	$page->field('r_ids', $page->param('resource_id'));
 }
 
 sub populateData_update
 {	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	my $apptTypeId = $page->param('appt_type_id');
 
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+
+	my $apptTypeId = $page->param('appt_type_id');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateApptTypeDialog', $apptTypeId);
 }
@@ -180,15 +187,22 @@ sub execute
 	my $newApptTypeId = $page->schemaAction(
 		'Appt_Type', $command,
 		appt_type_id => $command eq 'add' ? undef : $apptTypeId,
-		effective_begin_date => $page->field('effective_begin_date') || undef,
-		effective_end_date => $page->field('effective_end_date') || undef,
+		
+		resource_id => $page->field ('resource_id'),
 		caption => $page->field ('caption'),
-		r_ids => $page->field ('r_ids'),
-		facility_id => $page->field ('facility_id'),
-		duration => $page->field('duration'),
+		duration => $page->field('duration') || 10,
+		lead_time => $page->field ('lead_time') || undef,
+		lag_time => $page->field ('lag_time')  || undef,
+		back_to_back => $page->field ('back_to_back') || 0,
+		multiple => $page->field ('multiple') || 0,
+		am_limit => $page->field ('am_limit') || undef,
+		pm_limit => $page->field ('pm_limit') || undef,
+		r_ids => $page->field ('r_ids') || undef,
 		_debug => 0
 	);
 
+	$page->param('_dialogreturnurl', '/search/appttype/1/%field.resource_id%')
+		if $command eq 'update' || ! $page->field('nextaction_redirecturl');
 	$self->handlePostExecute($page, $command, $flags);
 }
 

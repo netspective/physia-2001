@@ -228,10 +228,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'selPopulateApptTypeDialog' => qq{
-		select appt_type_id, caption, r_ids, facility_id,
-			to_char(effective_begin_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_begin_date,
-			to_char(effective_end_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_end_date,
-			duration
+		select appt_type_id, resource_id, caption, duration, lead_time, lag_time, back_to_back,
+			multiple, r_ids, am_limit, pm_limit
 		from Appt_Type
 		where appt_type_id = ?
 	},
@@ -283,25 +281,35 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selApptTypeInfo' =>
 	{
-		_stmtFmt => qq{
-			select appt_type_id, r_ids, facility_id, caption, duration, effective_begin_date,
-				effective_end_date
+		sqlStmt => qq{
+			select appt_type_id, resource_id, caption, duration, 
+				lead_time, lag_time, decode(back_to_back, 0, 'No', 1, 'Yes', 'No'), 
+				decode(multiple, 0, 'No', 1, 'Yes', 'No'), am_limit, pm_limit, r_ids
 			from Appt_Type
-			where r_ids like ?
-				and facility_id like ?
-			order by facility_id, r_ids, appt_type_id
+			where resource_id like ?
+				and caption like ?
+			order by caption, appt_type_id
 		},
 
 		publishDefn =>
 		{
 			columnDefn =>
 			[
-				{ head => 'ID', url => 'javascript:location.href="/org/#session.org_id#/dlg-update-appttype/#&{?}#"', hint => 'Edit Template #&{?}#'},
-				{ head => 'Resource(s)', url => 'javascript:location.href="/search/appttype/1/#&{?}#"', hint => 'View #&{?}# Templates'},
-				{ head => 'Facility', url => 'javascript:location.href="/search/appttype/1//#&{?}#"', hint => 'View #&{?}# Templates'},
+				{ head => 'ID', 
+					url => q{javascript:location.href='/org/#session.org_id#/dlg-update-appttype/#&{?}#'}, hint => 'Edit Appointment Type #&{?}#'
+				},
+				{ head => 'Resource',
+					url => q{javascript:location.href='/search/appttype/1/#&{?}#'}, hint => 'View #&{?}# Appointment Types',
+				},
 				{ head => 'Caption'},
-				{ head => 'Begin'},
-				{ head => 'End'},
+				{ head => 'Duration', dAlign => 'center'},
+				{ head => 'Lead', dAlign => 'center'},
+				{ head => 'Lag', dAlign => 'center'},
+				{ head => 'Back-to-Back', dAlign => 'center'},
+				{ head => 'Multiple', dAlign => 'center'},
+				{ head => 'AM Limit', dAlign => 'center'},
+				{ head => 'PM Limit', dAlign => 'center'},
+				{ head => 'Addl Resource(s)'},
 			],
 		}
 	},

@@ -78,6 +78,7 @@ sub new
 			types => ['Patient'],
 			size => 32,
 			useShortForm => 1,
+			hints => 'Leave blank to use ID autosuggestion feature for new patients',
 			#options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Patient Type',

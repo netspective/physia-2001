@@ -13,6 +13,7 @@ use App::Schedule::Utilities;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 use Devel::ChangeLog;
 
 use CGI::Dialog;
@@ -85,7 +86,7 @@ sub getForm
 
 		Facility(s):
 		<input name='facility_ids' id='facility_ids' size=20 maxlength=32 value="@{[$self->param('facility_ids')]}" title='Facility IDs'>
-			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',');">
+			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',', false);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		</nobr>
 		<br>
@@ -164,6 +165,13 @@ sub execute
 	my @resource_ids = split(/,/, $self->param('resource_ids'));
 	my @facility_ids = split(/,/, $self->param('facility_ids'));
 
+	my @internalOrgIds = ();
+	for (@facility_ids)
+	{
+		push(@internalOrgIds, $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
+			'selOrgId', $self->session('org_internal_id'), $_));
+	}
+	
 	my @search_start_date = Decode_Date_US($self->param('start_date')) if $self->param('start_date');
 	eval {check_date(@search_start_date);};
 	@search_start_date = Today() if $@;
@@ -173,7 +181,7 @@ sub execute
 
 	my $sa = new App::Schedule::Analyze (
 		resource_ids      => \@resource_ids,
-		facility_ids      => \@facility_ids,
+		facility_ids      => \@internalOrgIds,
 		search_start_date => \@search_start_date,
 		search_duration   => $self->param('search_duration') || 7,
 		patient_type      => $patient_type || -1,
