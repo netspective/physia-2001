@@ -443,6 +443,7 @@
 		<enum id="0">Direct</enum>
 		<enum id="1">Envoy</enum>
 		<enum id="2">Perse</enum>
+		<enum id="3">Thin Net</enum>
 	</table>
 
 	<table name="Electronic_Payer_Type" abbrev="EPayType" type="Lookup">
