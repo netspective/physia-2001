@@ -5,21 +5,22 @@ package App::Statements::Search::Code;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @EXPORT @CHANGELOG
+use vars qw(@ISA @EXPORT
 	$STMTMGR_CATALOG_CODE_SEARCH
 	$STMTMGR_CPT_CODE_SEARCH
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
-	$STMTMGR_SERVICEPLACE_CODE_SEARCH);
+	$STMTMGR_SERVICEPLACE_CODE_SEARCH
+	$STMTMGR_EPSDT_CODE_SEARCH);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw(
 	$STMTMGR_CATALOG_CODE_SEARCH
 	$STMTMGR_CPT_CODE_SEARCH
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
-	$STMTMGR_SERVICEPLACE_CODE_SEARCH);
+	$STMTMGR_SERVICEPLACE_CODE_SEARCH
+	$STMTMGR_EPSDT_CODE_SEARCH);
 
 use vars qw(
 	$STMTFMT_SEL_CATALOG_CODE
@@ -27,10 +28,20 @@ use vars qw(
 	$STMTFMT_SEL_HCPCS_CODE
 	$STMTFMT_SEL_SERVICETYPE_CODE
 	$STMTFMT_SEL_SERVICEPLACE_CODE
+	$STMTFMT_SEL_EPSDT_CODE
 	$STMTRPTDEFN_ICD
 	$STMTRPTDEFN_CPT
 	$STMTRPTDEFN_HCPCS
-	$STMTRPTDEFN_SERVCODE);
+	$STMTRPTDEFN_SERVCODE
+	$STMTRPTDEFN_EPSDT);
+
+
+
+$STMTFMT_SEL_EPSDT_CODE = qq{
+		select epsdt,name,description FROM REF_EPSDT
+		where
+			%whereCond%
+};
 
 $STMTFMT_SEL_CATALOG_CODE = qq{
 			select icd, name, descr, decode(sex, 'M','MALE', 'F','FEMALE') as sex,
@@ -134,6 +145,16 @@ $STMTRPTDEFN_SERVCODE =
 		{ head => 'Name' },
 	],
 	#rowSepStr => '',
+};
+
+$STMTRPTDEFN_EPSDT =
+{
+	columnDefn =>
+	[
+		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },	
+		#{ head => 'Name' },
+		{ head => 'Description' },
+	],	
 };
 
 
@@ -332,14 +353,34 @@ $STMTMGR_SERVICETYPE_CODE_SEARCH = new App::Statements::Search::Code(
 		},
 );
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/06/2000', 'MAF',
-		'Search/Code',
-		'Updated the Code select statements by replacing them with _stmtFmt.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'MAF',
-		'Search/Code',
-		'Created simple reports instead of using createOutput function.'],
+$STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
+	'sel_epsdt_code' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
+		whereCond => 'epsdt = ?',
+		publishDefn => $STMTRPTDEFN_EPSDT,
+	},
+
+	'sel_epsdt_description' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
+		whereCond => 'upper(desciption) = ?',
+		publishDefn => $STMTRPTDEFN_EPSDT,
+	}, 
+	'sel_epsdt_code_like' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
+		whereCond => 'epsdt like ?',
+		publishDefn => $STMTRPTDEFN_EPSDT,
+	},
+
+	'sel_epsdt_description_like' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
+		whereCond => 'upper(description) like ?',
+		publishDefn => $STMTRPTDEFN_EPSDT,
+	},
+
 );
 
 1;
