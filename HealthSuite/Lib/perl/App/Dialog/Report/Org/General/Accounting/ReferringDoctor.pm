@@ -47,6 +47,23 @@ sub new
 			style => 'check',
 			defaultValue => 0
 		),
+		new CGI::Dialog::Field(
+			name => 'printReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Print report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
+		),
+
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -67,6 +84,12 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+
+	my $reportBeginDate = $page->field('report_begin_date');
+	my $reportEndDate = $page->field('report_end_date');
+	my $serviceBeginDate = $page->field('service_begin_date');
+	my $serviceEndDate = $page->field('service_end_date');
+	my $insuranceOrg = $page->field('insurance_select');
 
 	my $pub =
 	{
@@ -176,9 +199,17 @@ sub execute
 				if ($prvDoctor ne '')
 				{
 					my @rowData1 = ("<B>Subtotal for $prvDoctor</B>", undef, undef, "<B>$patients</B>",	"<B>" . sprintf  "%3.2f%", $percent . "</B>");
+
+					my @rowData1Text = (undef, "Subtotal for $prvDoctor",  undef, "$patients",	 sprintf  "%3.2f%", $percent );
 					push(@data, \@rowData1);
+					##
+					push(@dataText, \@rowData1Text);
+					##
 					my @rowData2 = (undef, undef, undef, undef, undef);
 					push(@data, \@rowData2);
+					##
+					push(@dataText, \@rowData2);
+					##
 					$patients = 0;
 					$percent = 0;
 				}
@@ -200,9 +231,18 @@ sub execute
 		if ($prvDoctor ne '')
 		{
 			my @rowData1 = ("<B>Subtotal for $prvDoctor </B>", undef, undef, "<B>$patients</B>", "<B>" . sprintf  "%3.2f%", $percent . "</B>");
+
+			my @rowData1Text = ( undef, "Subtotal for $prvDoctor ", undef, "$patients", sprintf  "%3.2f%", $percent);
+
 			push(@data, \@rowData1);
+			##
+			push(@dataText, \@rowData1Text);
+			##
 			my @rowData2 = (undef, undef, undef, undef, undef);
 			push(@data, \@rowData2);
+			##
+			push(@dataText, \@rowData2);
+			##
 		}
 	}
 	else
@@ -230,8 +270,20 @@ sub execute
 					"<B>$groupPercent%</B>",
 					"<B>$prevCategory</B>",
 				);
-				push(@data, \@rowData);
 
+				my @rowDataText =
+				(
+					undef,
+					undef,
+					"$groupCount",
+					"$groupPercent%",
+					"$prevCategory",
+				);
+
+				push(@data, \@rowData);
+				##
+				push(@dataText, \@rowDataText);
+				##
 				my @rowDataBlank =
 				(
 					undef,
@@ -241,6 +293,9 @@ sub execute
 					undef,
 				);
 				push(@data, \@rowDataBlank);
+				##
+				push(@dataText, \@rowDataBlank);
+				##
 				$groupCount = 0;
 				$groupPercent = 0;
 
@@ -285,7 +340,20 @@ sub execute
 				"<B>$groupPercent%</B>",
 				"<B>$prevCategory</B>",
 			);
+
+			my @rowDataText =
+			(
+				undef,
+				undef,
+				"$groupCount",
+				"$groupPercent%",
+				"$prevCategory",
+			);
+
 			push(@data, \@rowData);
+			##
+			push(@dataText, \@rowDataText);
+			##
 			my @rowDataBlank =
 			(
 				undef,
@@ -295,6 +363,9 @@ sub execute
 				undef,
 			);
 			push(@data, \@rowDataBlank);
+			##
+			push(@dataText, \@rowDataBlank);
+			##
 		}
 
 	}
@@ -310,22 +381,31 @@ sub execute
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
-
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 	if($page->field('insurance_select') ne '')
 	{
 		my @rowData = (	"<B>Grand Total</B>", undef, undef, "<B>$totalPatients</B>", "<B>$patientTotalPercent</B>");
-		my @rowDataText = (	"Grand Total", undef, undef, "$totalPatients", "$patientTotalPercent");
+		my @rowDataText = (	 undef, "Grand Total", undef, "$totalPatients", "$patientTotalPercent");
 
 		push(@data, \@rowData);
 		push(@dataText, \@rowDataText);
 		$html = createHtmlFromData($page, 0, \@data, $pubOrg);
-		my $textOutputFilename = createTextRowsFromData($page, 0, \@dataText, $pubOrg);
+		$textOutputFilename = createTextRowsFromData($page, 0, \@dataText, $pubOrg);
+
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		my $Constraints = [
+		{ Name => "Start/End Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+		{ Name => "Start/End Service Date ", Value => $serviceBeginDate."  ".$serviceEndDate},
+		{ Name=> "Insurance Org ", Value => ($insuranceOrg) ? 'Yes' : 'No' },
+		{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+		{ Name=> "Printer ", Value => $printerDevice},
+		];
+		my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+		my $fileConstraint = appendLines($page, $tempDir.$textOutputFilename, $Constraints);
 
 		if ($hardCopy == 1 and $printerAvailable) {
 			my $reportOpened = 1;
-			my $tempDir = $CONFDATA_SERVER->path_temp();
 			open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 			if ($reportOpened) {
 				while (my $reportLine = <ASCIIREPORT>) {
@@ -340,16 +420,27 @@ sub execute
 	else
 	{
 		my @rowData = (	"<B>Total</B>", undef, "<B>$totalPatients</B>",	"<B>$patientTotalPercent</B>", undef);
-		my @rowDataText = (	"Total", undef, "$totalPatients", "$patientTotalPercent", undef);
+		my @rowDataText = (	'', 'Total', "$totalPatients", "$patientTotalPercent", undef);
 		push(@data, \@rowData);
 		push(@dataText, \@rowDataText);
 		$html = createHtmlFromData($page, 0, \@data, $pub);
 #		$html = $STMTMGR_REPORT_REFERRING_DOCTOR->createHtml($page, 0, 'patientCount', [$page->field('report_begin_date'), $page->field('report_end_date'), $page->field('service_begin_date'), $page->field('service_end_date')]);
 		$textOutputFilename = createTextRowsFromData($page, 0, \@dataText, $pub);
 
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		my $Constraints = [
+
+		{ Name => "Start/End Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+		{ Name => "Start/End Service Date ", Value => $serviceBeginDate."  ".$serviceEndDate},
+		{ Name=> "Insurance Org ", Value => ($insuranceOrg) ? 'Yes' : 'No' },
+		{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+		{ Name=> "Printer ", Value => $printerDevice},
+		];
+		my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+		my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 		if ($hardCopy == 1 and $printerAvailable) {
 			my $reportOpened = 1;
-			my $tempDir = $CONFDATA_SERVER->path_temp();
 			open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 			if ($reportOpened) {
 				while (my $reportLine = <ASCIIREPORT>) {

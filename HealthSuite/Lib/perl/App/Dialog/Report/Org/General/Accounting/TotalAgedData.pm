@@ -158,9 +158,19 @@ sub execute
 	#
 	#my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Patient ID ", Value => $personId},
+	{ Name => "Pyhsician ID ", Value => $providerId},
+	{ Name => "Site Organization ID ", Value => $facilityId},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {
@@ -169,6 +179,7 @@ sub execute
 		}
 		close ASCIIREPORT;
 	}
+
 
 	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
 	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;

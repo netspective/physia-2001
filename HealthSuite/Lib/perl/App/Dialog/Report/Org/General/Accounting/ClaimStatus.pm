@@ -30,7 +30,7 @@ sub new
 	$self->addContent(
 			new CGI::Dialog::Field::Duration(
 				name => 'report',
-				caption => 'Start/End Report Date',
+				caption => 'Read Batch Report Date',
 				begin_caption => 'Report Begin Date',
 				end_caption => 'Report End Date',
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -235,7 +235,16 @@ sub prepare_detail_payment
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+
+	my $reportBeginDate = $page->field('report_begin_date');
+	my $reportEndDate = $page->field('report_end_date');
+	my $serviceBeginDate = $page->field('service_begin_date');
+	my $serviceEndDate = $page->field('service_end_date');
+	my $status = join(',',  $page->field('claim_status'));
+	my $serviceId = $page->field('service_facility_id');
+
 	my $pub = {
+		reportTitle => 'Claim Status',
 		columnDefn => [
 			{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#',
 			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&payer=#0#',null,'width=800,height=600,scrollbars,resizable')},},
@@ -254,6 +263,26 @@ sub execute
 			{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },
 			{ colIdx => 12, head => 'Notes',},
 		],
+	};
+
+		my $pubText = {
+			reportTitle => 'Claim Status',
+			columnDefn => [
+				{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#',
+				url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&payer=#0#',null,'width=800,height=600,scrollbars,resizable')},},
+				{ colIdx => 1, head => 'Number Of Items',dAlign => 'center', dataFmt => '#1#' },
+				{ colIdx => 2, head => 'Client', dAlign => 'center',dataFmt => '#13# <A HREF = "/person/#2#/account">#2#</A>' },
+				{ colIdx => 3, head => 'Invoice Date', dAlign => 'center',dataFmt => '#3#' },
+				{ colIdx => 4, head => 'Invoice Status',dAlign => 'center' ,dataFmt => '#4#' },
+				{ colIdx => 5, head => 'Bill To ID', dAlign => 'center',dataFmt => '#5#' },
+				##{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 6, head => 'Total Cost', summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => 'Total Adjustment', summarize=>'sum',  dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Balance', summarize=>'sum', dataFmt => '#8#', dformat => 'currency'},
+				#{ colIdx => 9, head => 'Reference', dAlign => 'center',dataFmt => '#9#' },
+				{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },
+				{ colIdx => 12, head => 'Notes',},
+			],
 	};
 
 	my $sqlStmt = $self->buildSqlStmt($page, $flags);
@@ -298,11 +327,11 @@ sub execute
 
 	my $html = createHtmlFromData($page, 0, \@data,$pub);
 
-	my $textOutputFilename = createTextRowsFromData($page, 0,  \@data, $pub);
+	my $textOutputFilename = createTextRowsFromData($page, 0,  \@data, $pubText);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {
@@ -311,6 +340,17 @@ sub execute
 		}
 		close ASCIIREPORT;
 	}
+	my $Constraints = [
+	{ Name => "Read Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name => "Start/End Service Date ", Value => $serviceBeginDate."  ".$serviceEndDate},
+	{ Name => "Claim Selection ", Value => $page->field('product_select')},
+	{ Name => "                ", Value => $status},
+	{ Name => "Service Facility ", Value => $serviceId},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 
 	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 

@@ -39,11 +39,6 @@ sub new
 				),
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id',),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
-			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields',
-						fields => [
-			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12,options=>FLDFLAG_REQUIRED),
-			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12,options=>FLDFLAG_REQUIRED),
-			]),
 			new CGI::Dialog::Field(type => 'select',
 							style => 'radio',
 							selOptions => 'No:0;Yes:1',
@@ -90,8 +85,8 @@ sub prepare_detail_payment
 	my ($self, $page) = @_;
 	my $orgId = $page->field('org_id');
 	my $person_id = $page->field('person_id');
-	my $batch_from = $page->field('batch_id_from');
-	my $batch_to = $page->field('batch_id_to');
+	my $batch_from = undef; #$page->field('batch_id_from');
+	my $batch_to = undef; #$page->field('batch_id_to');
 	my $orgIntId = undef;
 	my $html =undef;
 	$orgIntId = $page->param('org_internal_id');
@@ -136,15 +131,15 @@ sub prepare_detail_payment
 	my $trackInvoice=undef;
 	foreach (@$daily_audit_detail)
 	{
-	
-	
+
+
 		my $parentInvoiceId = $STMTMGR_REPORT_ACCOUNTING->getSingleValue($page,STMTMGRFLAG_NONE,'selParentInvoicebyId',
 		$_->{invoice_id});
 		my $capInv = $_->{invoice_id};
 		if ($parentInvoiceId)
 		{
 			$capInv.="($parentInvoiceId)";
-		}		
+		}
 		if ($trackInvoice ne $_->{invoice_id})
 		{
 			$trackInvoice = $_->{invoice_id};
@@ -155,8 +150,8 @@ sub prepare_detail_payment
 			$_->{patient_id}='';
 			$_->{simple_name}='';
 		};
-		next if  ($_->{total_charges} ==0 && $_->{misc_charges}==0 && $_->{person_write_off}==0 && $_->{insurance_write_off}==0 && 
-			  $_->{insurance_pay} ==0 && $_->{person_pay}==0 && $_->{refund} ==0 );	
+		next if  ($_->{total_charges} ==0 && $_->{misc_charges}==0 && $_->{person_write_off}==0 && $_->{insurance_write_off}==0 &&
+			  $_->{insurance_pay} ==0 && $_->{person_pay}==0 && $_->{refund} ==0 );
 		my @rowData =
 		(
 			$capInv,
@@ -177,7 +172,7 @@ sub prepare_detail_payment
 			$_->{pay_type},
 			$_->{invoice_batch_date},
 			$_->{simple_name},
-			$_->{invoice_id},			
+			$_->{invoice_id},
 		);
 		push(@data, \@rowData);
 	}
@@ -217,8 +212,8 @@ sub execute
 	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 	my $orgId = $page->field('org_id');
 	my $person_id = $page->field('person_id')||undef;
-	my $batch_from = $page->field('batch_id_from');
-	my $batch_to = $page->field('batch_id_to')||undef;
+	my $batch_from = undef; #$page->field('batch_id_from');
+	my $batch_to = undef; #$page->field('batch_id_to')||undef;
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;
@@ -300,7 +295,7 @@ sub execute
 					last;
 				}
 			}
-						
+
 
 			my @rowData =
 			(
@@ -328,9 +323,20 @@ sub execute
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	$textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, \@data, $pub);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name => "Site Organization ID ", Value=> $orgId},
+	{ Name => "Physician ID ", Value=> $person_id},
+	{ Name=> "Include Associated Org ", Value => ($page->field('include_org')) ? 'Yes' : 'No' },
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

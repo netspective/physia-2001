@@ -36,7 +36,7 @@ sub new
 				caption => 'Batch Report Date',
 				begin_caption => 'Report Begin Date',
 				end_caption => 'Report End Date',
-				),		
+				),
 			new App::Dialog::Field::Person::ID(caption =>'Physician ID',types => ['Physician'], name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			new CGI::Dialog::Field(caption =>'Payment Type',
 					name => 'transaction_type',
@@ -46,14 +46,14 @@ sub new
 					fKeyDisplayCol => 0
 					),
 
-			new CGI::Dialog::Field(caption => 'Batch ID', size => 12,name=>'batch_id'),						
+			new CGI::Dialog::Field(caption => 'Batch ID', size => 12,name=>'batch_id'),
 			new CGI::Dialog::Field(
 				name => 'totalReport',
 				type => 'bool',
 				style => 'check',
 				caption => 'Totals Report',
 				defaultValue => 0
-			),			
+			),
 			new CGI::Dialog::Field(
 				name => 'printReport',
 				type => 'bool',
@@ -69,7 +69,7 @@ sub new
 				fKeyStmt => 'sel_org_devices',
 				fKeyDisplayCol => 0
 			),
-			
+
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -94,7 +94,7 @@ sub execute
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
-	
+
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 
@@ -109,7 +109,7 @@ sub execute
 		reportTitle => $self->heading(),
 		columnDefn =>
 			[
-			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },			
+			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },
 			{ colIdx => 1, ,hAlign=>'left',head => 'Category' ,groupBy => '#1#'},
 			{ colIdx => 2, ,hAlign=>'left',head => 'Tranaction Type',groupBy => '#2#' },
 			{ colIdx => 3,,hAlign=>'left', head => 'Payer Name',groupBy => 'Sub-Total'  },
@@ -125,25 +125,25 @@ sub execute
 			reportTitle => $self->heading(),
 			columnDefn =>
 				[
-			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },			
+			{ colIdx => 0,hAlign=>'left', head => 'Physician Name', groupBy => '#0#', dAlign => 'LEFT' },
 			{ colIdx => 1, ,hAlign=>'left',head => 'Category' ,groupBy => '#1#'},
 			{ colIdx => 2, ,hAlign=>'left',head => 'Tranaction Type',groupBy => '#2#' },
 			{ colIdx => 3,,hAlign=>'left', head => 'Payer Name',groupBy => 'Sub-Total'  },
-			{ colIdx => 6, head => 'Batch Date' },			
-			{ colIdx => 7, head => 'Batch Date Rcpt', summarize => 'sum', dformat => 'currency' },			
+			{ colIdx => 6, head => 'Batch Date' },
+			{ colIdx => 7, head => 'Batch Date Rcpt', summarize => 'sum', dformat => 'currency' },
 			{ colIdx => 4, head => 'Month Rcpt',  summarize => 'sum',dformat => 'currency' },
 			{ colIdx => 5, head => 'Year Rcpt',summarize => 'sum',dformat => 'currency' },
 			],
-		};	
+		};
 	}
 	my $orgInternalId = $page->session('org_internal_id');
-	
+
 	#Get Fiscal year for Main Org
-	my $fiscal = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selAttribute',$page->session('org_internal_id')||undef,'Fiscal Month');	
-	
+	my $fiscal = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selAttribute',$page->session('org_internal_id')||undef,'Fiscal Month');
+
 	#month is 1 less so add a 1
-	my $month = $fiscal->{value_int}+1;	
-	
+	my $month = $fiscal->{value_int}+1;
+
 	#Check if end date if less then fiscal month if so go back one year
 	my @start_Date = Decode_Date_US($reportBeginDate);
 	if ($start_Date[1] < $month)
@@ -153,42 +153,42 @@ sub execute
 	}
 	#Use Fiscal month
 	$start_Date[1] = $month;
-	
+
 	#First of first month
 	$start_Date[2] = 1;
-	
+
 	my $startDate = sprintf("%02d/%02d/%04d", $start_Date[1],$start_Date[2],$start_Date[0]);
 
 	#Convert to first day of fiscal month
 	$reportBeginDate =$startDate;
 
-	#Get Report Data 
+	#Get Report Data
 	my $rcpt;
 	if($totalReport)
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceiptTotal',
-		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId)  ;			
+		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId)  ;
 	}
 	else
 	{
 		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceipt',
-			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId);	
+			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId);
 	}
 	my @data = ();
 	foreach (@$rcpt)
 	{
-		#set batch date to report end date 
+		#set batch date to report end date
 		#if end date a begin date are the same then output batch date
  		$_->{batch_date} = $reportEndDate;
 		if($_->{payer_type} == 1)
 		{
-			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id}) unless $totalReport;	
+			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id}) unless $totalReport;
 			$_->{payer_type} = 'Insurance Receipts';
 			$_->{payer_id} = $getName->{org_id} unless $totalReport;
 		}
 		elsif($_->{payer_type}==-1)
 		{
-			$_->{payer_type} = 'Cap Insurance Receipts'; 				
+			$_->{payer_type} = 'Cap Insurance Receipts';
 		}
 		else
 		{
@@ -198,23 +198,35 @@ sub execute
 		my @rowData =
 		(
 			$_->{provider},
-			$_->{payer_type},			
+			$_->{payer_type},
 			$_->{pay_type},
-			$_->{payer_id},									
-			$_->{month_rcpt},			
+			$_->{payer_id},
+			$_->{month_rcpt},
 			$_->{year_rcpt},
 			$_->{batch_date},
 			$_->{batch_rcpt},
 		);
-		push(@data, \@rowData);		
-	}	
+		push(@data, \@rowData);
+	}
 	my $html = '<br> <b style="font-family:Helvetica; font-size:10pt">(Fiscal Range '. $reportBeginDate .' - ' . $reportEndDate . ' ) </b><br>';
 	$html .= createHtmlFromData($page, 0, \@data,$allPub);
 	my $textOutputFilename = createTextRowsFromData ($page, 0, \@data, $allPub);
-	
+
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Batch Report Date ", Value => $page->field('batch_begin_date') ."  ".$reportEndDate},
+	{ Name=> "Physician ID ", Value => $provider },
+	{ Name=> "Payment Type ", Value => $receipt },
+	{ Name=> "Batch ID ", Value => $batch_id },
+	{ Name=> "Totals Report ", Value => ($totalReport) ? 'Yes' : 'No' },
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

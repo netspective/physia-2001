@@ -79,6 +79,7 @@ sub execute
 
 	my $orgInternalId = $page->session('org_internal_id');
 	my $providerId = $page->field('person_id');
+	my $billCycle = $page->field('bill_cycle');
 
 	my $hardCopy = $page->field('printReport');
 	my $html;
@@ -117,9 +118,9 @@ sub execute
 			},
 			{ head => 'Payer Type', colIdx => 1, hAlign => 'left',},
 			{ head => 'Billing Org', colIdx => 10, hAlign => 'left',},
-			
+
 			{ head => 'Provider', colIdx => 2, hAlign => 'left',},
-			{ head => 'Patient', colIdx => 3, url => '/person/#6#/account',  hAlign => 'left', 
+			{ head => 'Patient', colIdx => 3, url => '/person/#6#/account',  hAlign => 'left',
 				hint => 'View #6# Account'
 			},
 			{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum',
@@ -224,10 +225,18 @@ sub execute
 	$html .= createHtmlFromData($page, 0,  \@sortedData, $pubDefn);
 	$textOutputFilename = createTextRowsFromData($page, 0,  \@sortedDataTextBased, $pubText);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Billing Cycle ", Value => $billCycle},
+	{ Name => "Physican ID ", Value => $providerId},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

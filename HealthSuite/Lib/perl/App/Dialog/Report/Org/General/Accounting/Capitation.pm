@@ -35,7 +35,7 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field::Duration(
 			name => 'batch',
-			caption => 'Batch Date',
+			caption => 'Read Batch Report Date',
 			begin_caption => 'Batch Begin Date',
 			end_caption => 'Batch End Date',
 		),
@@ -126,11 +126,12 @@ sub execute
 			{ colIdx => 1, head => 'Org ID',dAlign => 'left', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Product ID', dAlign => 'left',dataFmt => '#2#' },
 			{ colIdx => 3, head => 'Plan ID', dAlign => 'left',dataFmt => '#3#' },
-			{ colIdx => 4, head => 'Month', dAlign => 'left',dataFmt => '#4#' },
-			{ colIdx => 5, head => 'Monthly Ck Amt',summarize => 'sum',dformat => 'currency', dAlign => 'center',dataFmt => '#5#' },
-			{ colIdx => 6, head => 'Copay Exp',summarize => 'sum',dformat => 'currency', dAlign => 'center' ,dataFmt => '#6#' },
-			{ colIdx => 7, head => 'Copay Rcvd',summarize => 'sum',dformat => 'currency', dAlign => 'right' ,dataFmt => '#7#' },
-			{ colIdx => 8, head => '# of Pts seen',summarize => 'sum',dAlign => 'right' ,dataFmt => '#8#' },
+			{ colIdx => 4, head => '# of enrolees',dAlign => 'right' ,dataFmt => '#4#' },
+			{ colIdx => 5, head => 'Month', dAlign => 'left',dataFmt => '#5#' },
+			{ colIdx => 6, head => 'Monthly Ck Amt',summarize => 'sum',dformat => 'currency', dAlign => 'center',dataFmt => '#6#' },
+			{ colIdx => 7, head => 'Copay Exp',summarize => 'sum',dformat => 'currency', dAlign => 'center' ,dataFmt => '#7#' },
+			{ colIdx => 8, head => 'Copay Rcvd',summarize => 'sum',dformat => 'currency', dAlign => 'right' ,dataFmt => '#8#' },
+			{ colIdx => 9, head => '# of Pts seen',summarize => 'sum',dAlign => 'right' ,dataFmt => '#9#' },
 		],
 	};
 #
@@ -181,16 +182,26 @@ sub execute
 	my $physicianClause2 =qq { and t.care_provider_id = '$physicianID'} if($physicianID ne '');
 	my $orgClause2 =qq { and t.service_facility_id = $orgID} if($orgID ne '');
 
+
+
+
 	my $sqlStmt = qq {
 		select distinct
 			t.data_text_b plan,
 			t.data_text_a product,
 			t.provider_id provider,
-			o.org_internal_id org_id
+			o.org_internal_id org_id,
+			enr.enrollees
 		from
 			transaction t,
 			trans_attribute ta,
-			org o
+			org o,
+			(	select product_name, plan_name, count(*) enrollees
+				from insurance
+				where ins_type <> 7
+				and record_type = 3
+				group by product_name, plan_name
+			) enr
 		where
 			t.trans_type = 9030
 			and t.trans_status = 7
@@ -198,6 +209,7 @@ sub execute
 			and ta.item_name = 'Monthly Cap/Payment/Batch ID'
 			and t.receiver_id = o.org_internal_id
 			and o.owner_org_id = @{[ $page->session('org_internal_id')]}
+			and t.data_text_a = enr.product_name (+)
 			$batchIDClause1
 			$batchDateClause1
 			$planClause1
@@ -209,14 +221,21 @@ sub execute
 			ins.plan_name plan,
 			ins.product_name product,
 			t.care_provider_id provider,
-			t.service_facility_id org_id
+			t.service_facility_id org_id,
+			enr.enrollees
 		from
 			transaction t,
 			insurance ins,
 			invoice_billing ib,
 			invoice_attribute ia,
 			invoice_item ii,
-			invoice i
+			invoice i,
+			(	select product_name, plan_name, count(*) enrollees
+				from insurance
+				where ins_type <> 7
+				and record_type = 3
+				group by product_name, plan_name
+			) enr
 		where
 			i.invoice_subtype = 2
 			and ii.parent_id = i.invoice_id
@@ -227,6 +246,7 @@ sub execute
 			and ib.bill_ins_id = ins.ins_internal_id
 			and t.trans_id = i.main_transaction
 			and t.billing_facility_id = @{[ $page->session('org_internal_id')]}
+			and ins.product_name = enr.product_name (+)
 			$batchIDClause2
 			$batchDateClause2
 			$planClause2
@@ -249,20 +269,20 @@ sub execute
 
 		if($row->{plan} ne '')
 		{
-			$planClauseA =qq { and t.data_text_b = '$row->{plan}'};
+			$planClauseA =qq { and t.data_text_b = '$row->{plan}' };
 		}
 		else
 		{
-			$planClauseA =qq { and t.data_text_b is null};
+			$planClauseA =qq { and t.data_text_b is null };
 		}
 
 		if($row->{product} ne '')
 		{
-			$productClauseA =qq { and t.data_text_a = '$row->{product}'};
+			$productClauseA =qq { and t.data_text_a = '$row->{product}' };
 		}
 		else
 		{
-			$productClauseA =qq { and t.data_text_a is null}
+			$productClauseA =qq { and t.data_text_a is null }
 		}
 
 		if($row->{provider} ne '')
@@ -356,6 +376,8 @@ sub execute
 							m.caption
 					};
 
+
+
 		$rows1 = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$query1);
 		my (@amount, @month, @copay_expected, @copay_received, @patients_seen);
 		my ($count1, $count2);
@@ -421,6 +443,7 @@ sub execute
 			$org_id,
 			$row->{product},
 			$row->{plan},
+			($row->{enrollees} ne '' ? $row->{enrollees} : 0),
 			$month[$i],
 			$amount[$i],
 			$copay_expected[$i],
@@ -432,12 +455,26 @@ sub execute
 	};
 
 	$html = createHtmlFromData($page, 0, \@data, $pub);
-	$textOutputFilename = createTextRowsFromData($page, 0, \@data, $pub);
+	$textOutputFilename =  createTextRowsFromData($page, 0, \@data, $pub);
+
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Read Batch Report Date ", Value => $batchBeginDate."  ".$batchEndDate},
+	{ Name => "Batch ID Range ", Value => $batchIDFrom."  ".$batchIDTo},
+	{ Name => "Org ID ", Value => $orgID},
+	{ Name => "Physician ID ", Value => $physicianID},
+	{ Name => "Insurance Product ", Value => $productID},
+	{ Name => "Insurance Plan ", Value => $planID},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {
 				print $printHandle $reportLine;

@@ -158,8 +158,8 @@ sub prepare_detail_payment
 			$_->{simple_name}='';
 		};
 
-		next if  ($_->{total_charges} ==0 && $_->{misc_charges}==0 && $_->{person_write_off}==0 && $_->{insurance_write_off}==0 && 
-			  $_->{insurance_pay} ==0 && $_->{person_pay}==0 && $_->{refund} ==0 );	
+		next if  ($_->{total_charges} ==0 && $_->{misc_charges}==0 && $_->{person_write_off}==0 && $_->{insurance_write_off}==0 &&
+			  $_->{insurance_pay} ==0 && $_->{person_pay}==0 && $_->{refund} ==0 );
 
 		my @rowData =
 		(
@@ -297,9 +297,20 @@ sub execute
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	$textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, \@data, $pub);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name => "Site Organization ID ", Value=> $orgId},
+	{ Name => "Physician ID ", Value=> $person_id},
+	{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+	{ Name=> "Include Associated Org ", Value => ($page->field('include_org')) ? 'Yes' : 'No' },
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

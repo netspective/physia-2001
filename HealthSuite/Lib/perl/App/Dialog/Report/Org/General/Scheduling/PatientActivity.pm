@@ -9,7 +9,13 @@ use App::Universal;
 
 use CGI::Dialog;
 use CGI::Validator::Field;
-
+##
+#use Data::Publish;
+#use Data::TextPublish;
+#use App::Configuration;
+#use App::Device;
+#use App::Statements::Device;
+##
 use DBI::StatementManager;
 use App::Statements::Org;
 use App::Statements::Report::Scheduling;
@@ -40,11 +46,11 @@ sub new
 			name => 'facility_id',
 			options => FLDFLAG_PREPENDBLANK,
 			types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
-		),		
-		new App::Dialog::Field::Person::ID(caption =>'Physican ID', 
+		),
+		new App::Dialog::Field::Person::ID(caption =>'Physican ID',
 			name => 'resource_id',types => ['Physician'] ),
-		
-							
+
+
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -73,6 +79,19 @@ sub execute
 	my $orgInternalId =$page->session('org_internal_id');
 	my $internalFacilityId =$page->field('facility_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+
+	##
+	#my $hardCopy = $page->field('printReport');
+	#my $textOutputFilename;
+
+	# Get a printer device handle...
+	#my $printerAvailable = 1;
+	#my $printerDevice;
+	#$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	#my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	#$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+	##
 	my $html = qq{
 	<table bgcolor='#dddddd'>
 	<tr bgcolor=white><td>
@@ -92,19 +111,20 @@ sub execute
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments By Product Type</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsProduct',
 					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
-			</td>		
+			</td>
 			</tr>
 			<tr align=center valign=top>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Patients Seen By Physician</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen',
 					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
+
 			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Missing Encounters</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_missingEncounter',
 					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
-			</td>				
+			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments Scheduled</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_dateEntered',
@@ -118,10 +138,41 @@ sub execute
 
 			</tr>
 		</table>
-	</td></tr>		
+	</td></tr>
 	</table>
 	};
-
+	##
+	#my $data = $STMTMGR_REPORT_SCHEDULING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_appointments_byStatus',
+	#				[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]);
+	#my $pub = 	{
+	#	reportTitle => "Appointment Charges",
+	#	columnDefn =>
+	#		[
+	#			{head => 'Appointments',
+	#				url => q{javascript:doActionPopup(
+	#					'#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#',
+	#					null,'location,status,width=800,height=600,scrollbars,resizable')
+	#				},
+	#				hint => 'View Details'
+	#			},
+	#			{head => 'Count', dAlign => 'right',summarize=>'sum'},
+	#			],
+	#	};
+	#$textOutputFilename = createTextRowsFromData($page, 0, $data, $pub);
+	#if ($hardCopy == 1 and $printerAvailable) {
+	#	my $reportOpened = 1;
+	#	my $tempDir = $CONFDATA_SERVER->path_temp();
+	#	open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+	#	if ($reportOpened) {
+	#		while (my $reportLine = <ASCIIREPORT>) {
+	#			print $printHandle $reportLine;
+	#		}
+	#	}
+	#	close ASCIIREPORT;
+	#}
+	##
+	#return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	##
 	return $html;
 }
 
@@ -141,9 +192,9 @@ sub prepare_detail_physician
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $physician = $page->param('physician');
-	
+
 	$page->addContent("<b>Patients Seen by $physician</b><br><br>",
-		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPhysician', 
+		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPhysician',
 			[$physician, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
@@ -178,7 +229,7 @@ sub prepare_detail_product
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-	
+
 	$page->addContent("<b>$product</b><br><br>");
 
 	if ($product =~ /self-pay/i)
@@ -208,7 +259,7 @@ sub prepare_detail_missing_encounter
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-	
+
 	$page->addContent("<b>Missing Encounter ($encounterDate)</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailMissingEncounter',
 			[$encounterDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
@@ -230,7 +281,7 @@ sub prepare_detail_date_entered
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
 	$page->addContent("<b>Appointments Scheduled on $enteredDate</b><br><br>",
-		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailDateEntered', 
+		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailDateEntered',
 			[$enteredDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
@@ -249,18 +300,18 @@ sub prepare_detail_appointments
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
 	$page->addContent("<b>'$caption' Appointments</b><br><br>");
-	
+
 	if ($event_status == 3)
 	{
-		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_DetailDiscardAppointment', [$event_status, $internalFacilityId, $startDate, 
+		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE,
+			'sel_DetailDiscardAppointment', [$event_status, $internalFacilityId, $startDate,
 			$endDate, $orgInternalId, $gmtDayOffset, $resource_id],),
 		);
 	}
 	else
 	{
-		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_DetailAppointmentStatus', [$event_status, $internalFacilityId, $startDate, 
+		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE,
+			'sel_DetailAppointmentStatus', [$event_status, $internalFacilityId, $startDate,
 			$endDate, $orgInternalId, $gmtDayOffset, $resource_id],),
 		);
 	}
@@ -278,7 +329,7 @@ sub prepare_detail_patient_type
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-	
+
 	$page->addContent("<b>'$patient_type_caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPatientType',
 			[$patient_type_id, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])

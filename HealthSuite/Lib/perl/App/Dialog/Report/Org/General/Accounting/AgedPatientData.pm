@@ -133,14 +133,25 @@ sub execute
 
 	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient',$personId, $page->session('org_internal_id'),
 	$providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
-	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient',  [$personId, $page->session('org_internal_id'), 
+	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient',  [$personId, $page->session('org_internal_id'),
 	$providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
-	
+
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
+
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Patient ID ", Value => $page->field('person_id')},
+	{ Name => "Physician ID ", Value => $page->field('provider_id')},
+	{ Name => "Site Organization ID ", Value => $page->field('org_id')},
+	{ Name => "Start/End Service Date ", Value => $page->field('service_begin_date')."  ".$page->field('service_end_date')},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

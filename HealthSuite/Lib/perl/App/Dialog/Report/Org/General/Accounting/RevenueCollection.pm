@@ -242,6 +242,19 @@ sub execute
 		$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename))]} Page(s)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue Collection Report");
 
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		my $Constraints = [
+		{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+		{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+		{ Name=> "Site Organization ID ", Value => $orgId },
+		{ Name=> "Physician ID ", Value => $person_id },
+		{ Name=> "Report View ", Value => "Whole" },
+		{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+		{ Name=> "Printer ", Value => $printerDevice},
+		];
+		my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+		my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 		if ($hardCopy == 1 and $printerAvailable) {
 			my $reportOpened = 1;
 			open (ASCIIREPORT, $textOutputFilename) or $reportOpened = 0;
@@ -266,9 +279,23 @@ sub execute
 		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $collFilename))]} Page(s)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue / Collection Report");
 
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		my $Constraints = [
+		{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+		{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+		{ Name=> "Site Organization ID ", Value => $orgId },
+		{ Name=> "Physician ID ", Value => $person_id },
+		{ Name=> "Report View ", Value => "Segmented" },
+		{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+		{ Name=> "Printer ", Value => $printerDevice},
+		];
+		my $FormFeedColl = appendFormFeed($tempDir.$collFilename);
+		my $FormFeedProd = appendFormFeed($tempDir.$prodFilename);
+		my $fileConstraint = appendConstraints($page, $tempDir.$collFilename, $Constraints);
+		my $fileConstraint = appendConstraints($page, $tempDir.$prodFilename, $Constraints);
+
 		if ($hardCopy == 1 and $printerAvailable) {
 			my $reportOpened = 1;
-			my $tempDir = $CONFDATA_SERVER->path_temp();
 			open (ASCIIREPORT, $tempDir.$collFilename) or $reportOpened = 0;
 			if ($reportOpened) {
 				while (my $reportLine = <ASCIIREPORT>) {

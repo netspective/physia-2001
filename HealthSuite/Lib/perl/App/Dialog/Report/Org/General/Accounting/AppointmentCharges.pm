@@ -83,13 +83,13 @@ sub execute
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
-	
+
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
-	my $data = $STMTMGR_COMPONENT_INVOICE->getRowsAsArray($page, 0, 'invoice.appointmentCharges', 
+	my $data = $STMTMGR_COMPONENT_INVOICE->getRowsAsArray($page, 0, 'invoice.appointmentCharges',
 		$reportBeginDate, $reportEndDate, $page->session('org_internal_id'), $page->session('GMT_DAYOFFSET'));
 
-#	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, 0, 'invoice.appointmentCharges', 
+#	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, 0, 'invoice.appointmentCharges',
 #		[$reportBeginDate, $reportEndDate, $page->session('org_internal_id'), $page->session('GMT_DAYOFFSET')]);
 
 	my $pub = {
@@ -118,9 +118,11 @@ sub execute
 #		close TMPFILEHANDLE
 #	}
 
+	##
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	##
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {
@@ -129,10 +131,19 @@ sub execute
 		}
 		close ASCIIREPORT;
 	}
+	##
+	my $Constraints = [
+	{ Name => "Start/End Appointment Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+	##
 
 	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
 	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;
-	
+
 }
 
 

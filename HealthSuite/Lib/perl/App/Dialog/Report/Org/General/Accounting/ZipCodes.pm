@@ -130,6 +130,7 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+
 	my $pub = {
 		reportTitle => "Zip Code Report",
 		columnDefn => [
@@ -161,6 +162,11 @@ sub execute
 
 	my $startZipCode =  $page->field('start_zip_code');
 	my $endZipCode =  $page->field('end_zip_code');
+	my $physician_id = $page->field('provider_id');
+	my $assocprovorg = $page->field('assocprovorg_select');
+	my $insuranceOrg = $page->field('insurance_select');
+	my $primaryProduct = $page->field('primary_product');
+	my $insuranceProduct = $page->field('product_select');
 
 	my $zipCodeClause = qq{ and pad.zip between \'$startZipCode\' and \'$endZipCode\' }if($startZipCode ne '' && $endZipCode ne '');
 	$zipCodeClause =qq{ and  pad.zip = \'$endZipCode\'} if($startZipCode eq '' && $endZipCode ne '');
@@ -312,10 +318,21 @@ sub execute
 	 $html = createHtmlFromData($page, 0, \@data, $pub);
 	$textOutputFilename = createTextRowsFromData($page, 0, \@data, $pub);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Start/End ZIP Code ", Value => $startZipCode."  ".$endZipCode},
+	{ Name => "Physician ID ", Value => $physician_id},
+	{ Name => "Insurance Product ", Value => ((($insuranceProduct) ? 'Yes ' : 'No ') . "Insurance Product ") . ((($primaryProduct) ? 'Yes ' : 'No ') . "Primary Only")},
+	{ Name => "Insurance Org ", Value =>($insuranceOrg) ? 'Yes' : 'No'},
+	{ Name => "Associate Provider Org ", Value => ($assocprovorg) ? 'Yes' : 'No'},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

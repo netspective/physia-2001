@@ -33,7 +33,7 @@ sub new
 	$self->{heading} = 'Claims Status';
 
 	$self->addContent(
-		new CGI::Dialog::Field::Duration(caption => 'Invoice Dates',
+		new CGI::Dialog::Field::Duration(caption => 'Read Batch Report Date',
 			name => 'report',
 			options => FLDFLAG_REQUIRED,
 		),
@@ -313,10 +313,24 @@ sub execute
 		</tr>
 	</table>
 	};
-
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Read Batch Report Date ", Value => $startDate."  ".$endDate},
+	{ Name => "Start/End Service Date ", Value => $serviceBeginDate."  ".$serviceEndDate},
+	{ Name => "Claim Number(s) ", Value => $page->field('claim_numbers')},
+	{ Name => "Payer Type ", Value => $page->field('payer_type')},
+	{ Name => "Insurance Company ID ", Value => $page->field('ins_org_id')},
+	{ Name => "Insurance Product ", Value => $page->field('product_name')},
+	{ Name => "Insurance Plan ", Value => $page->field('plan_name')},
+	{ Name => "Physician/Provider ID  ", Value => $page->field('provider_id')},
+	{ Name => "Facility ID ", Value => $page->field('facility_id')},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

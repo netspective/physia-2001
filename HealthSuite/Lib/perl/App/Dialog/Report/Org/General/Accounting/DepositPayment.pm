@@ -233,8 +233,19 @@ $batch_from, $batch_to) ;
 	$html .= "<BR> <B>Check Payements Detail</B><BR>" . createHtmlFromData($page, 0, \@data,$pub);
 	$textCheckPayment = createTextRowsFromData($page, 0, \@data, $pub);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
 
-
+	my $Constraints = [
+	{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+	{ Name => "Physican ID ", Value => $person_id},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeedDepositSummary = appendFormFeed($tempDir.$textDepositSummary);
+	my $FormFeedCheckPayment = appendFormFeed($tempDir.$textCheckPayment);
+	my $fileConstraintDepositSummary = appendConstraints($page, $tempDir.$textDepositSummary, $Constraints);
+	my $fileConstraintCheckPayment = appendConstraints($page, $tempDir.$textCheckPayment, $Constraints);
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
 		my $tempDir = $CONFDATA_SERVER->path_temp();
@@ -250,7 +261,6 @@ $batch_from, $batch_to) ;
 ##
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textCheckPayment) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {
@@ -260,6 +270,7 @@ $batch_from, $batch_to) ;
 		close ASCIIREPORT;
 	}
 ##
+
 	return ($textDepositSummary ? qq{<a href="/temp$textDepositSummary">Printable version (Deposit Summary) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textDepositSummary))]} Page(s)
 </a> <br>} : "" ).($textCheckPayment ? qq{<a href="/temp$textCheckPayment">Printable version (Check Payements Detail) - @{[$self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textCheckPayment))]} Page(s)
 </a> <br>} : "" ).$html;

@@ -211,9 +211,21 @@ sub execute
 	$html .= createHtmlFromData($page, 0, \@data,$allPub);
 	$textOutputFilename = createTextRowsFromData($page, 0, \@data, $allPub);
 
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $Constraints = [
+	{ Name => "Batch Report Date ", Value => $page->field('batch_begin_date')."  ".$batch_to},
+	{ Name => "Service Date ", Value => $serviceBeginDate."  ".$serviceEndDate},
+	{ Name => "Site Organization ", Value => $orgIntId},
+	{ Name => "Physican ID ", Value => $personId},
+	{ Name => "CPT From/To ", Value => $cptFrom."  ".$cptTo},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
 	if ($hardCopy == 1 and $printerAvailable) {
 		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
 		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
 		if ($reportOpened) {
 			while (my $reportLine = <ASCIIREPORT>) {

@@ -10,7 +10,13 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
+
 use App::Statements::Report::ClaimStatus;
 use App::Dialog::Field::Person;
 
@@ -34,7 +40,23 @@ sub new
 			new App::Dialog::Field::Person::ID(caption => 'Staff ID',
 				name => 'staff_id',
 				options => FLDFLAG_REQUIRED,
-				types => ['Staff'])
+				types => ['Staff']
+				),
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+				),
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+				),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -92,7 +114,25 @@ sub buildSqlStmt
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+
+	my $reportBeginDate = $page->field('report_begin_date');
+	my $reportEndDate = $page->field('report_end_date');
+	my $person_id = $page->field('staff_id');
+
+	my $hardCopy = $page->field('printReport');
+	my $html;
+	my $textOutputFilename;
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $pub = {
+		reportTitle => "Staff Activity",
 		columnDefn => [
 			{ colIdx => 0, tAlign=>'left',summarize=>'count', head => 'Activity Date', hAlign => 'left', dAlign => 'left', dataFmt => '#0#'},
 			{ colIdx => 1, head => 'Caption', hAlign => 'left', dAlign => 'left', dataFmt => '#1#' },
@@ -116,8 +156,31 @@ sub execute
 		push(@data, \@rowData);
 	};
 
-	my $html = createHtmlFromData($page, 0, \@data, $pub);
-	return $html;
+	 $html = createHtmlFromData($page, 0, \@data, $pub);
+	 $textOutputFilename = createTextRowsFromData($page, 0, \@data, $pub);
+	 my $tempDir = $CONFDATA_SERVER->path_temp();
+	 my $Constraints = [
+	{ Name => "Start/End Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
+	{ Name => "Staff ID ", Value => $person_id},
+	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
+	{ Name=> "Printer ", Value => $printerDevice},
+	];
+	my $FormFeed = appendFormFeed($tempDir.$textOutputFilename);
+	my $fileConstraint = appendConstraints($page, $tempDir.$textOutputFilename, $Constraints);
+
+	 if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	#return $html;
 
 }
 
