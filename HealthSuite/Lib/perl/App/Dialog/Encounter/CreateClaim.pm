@@ -21,8 +21,8 @@ use vars qw(@ISA  %PROCENTRYABBREV %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'claim' => {
-		_arl_add => ['person_id'], 
-		_arl_modify => ['invoice_id'] 
+		_arl_add => ['person_id'],
+		_arl_modify => ['invoice_id']
 		},
 	);
 
@@ -168,6 +168,7 @@ sub execute_update
 		);
 	}
 
+	$self->handlePostExecute($page, $command, $flags);
 	#$page->endUnitWork();
 }
 
@@ -222,6 +223,9 @@ sub execute_remove
 			data_text_b => 'void',
 			_debug => 0
 		);
+
+		$self->handlePostExecute($page, $command, $flags);
+
 	}
 
 	#VOID CLAIM
@@ -244,7 +248,7 @@ sub execute_remove
 		#balance => defined $balance ? $balance : undef,
 		_debug => 0
 	);
-	
+
 
 	#CREATE NEW VOID TRANSACTION FOR VOIDED CLAIM
 	my $transType = App::Universal::TRANSTYPEACTION_VOID;
@@ -254,7 +258,7 @@ sub execute_remove
 		parent_trans_id => $page->field('trans_id') || undef,
 		parent_event_id => $page->field('parent_event_id') || undef,
 		trans_type => defined $transType ? $transType : undef,
-		trans_status => defined $transStatus ? $transStatus : undef,	
+		trans_status => defined $transStatus ? $transStatus : undef,
 		trans_status_reason => "Claim $invoiceId has been voided by $sessUser",
 		_debug => 0
 	);
