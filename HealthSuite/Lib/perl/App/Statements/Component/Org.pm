@@ -593,7 +593,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.insurancePlans' => {
 	sqlStmt => qq{
 			select o.ins_internal_id, o.parent_ins_id, o.product_name,  decode(o.record_type, 1, 'product', 2, 'plan', 3, 'coverage') as record_type,
-					o.plan_name, o.owner_org_id, cm.caption, o.ins_type,
+					o.plan_name, o.owner_org_id, o.owner_org_id, cm.caption, o.ins_type,
 					o.indiv_deductible_amt, o.family_deductible_amt, o.percentage_pay, o.copay_amt
 			from insurance o, claim_type cm
 			where o.record_type in (1, 2)
@@ -630,7 +630,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #5#, (#6#)' },
+			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #6#, (#7#)' },
 			#{ head => 'Plan', dataFmt => '#2# (#1#)' },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=/#param.arl#',
