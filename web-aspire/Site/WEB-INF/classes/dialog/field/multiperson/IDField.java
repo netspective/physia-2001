@@ -1,4 +1,4 @@
-package dialog.field.person;
+package dialog.field.multiperson;
 
 import com.xaf.form.DialogField;
 import com.xaf.form.DialogContext;
@@ -78,27 +78,36 @@ public class IDField extends DialogField {
 		StatementManager stmtMgr = StatementManagerFactory.getManager(dc.getServletContext());
 		String dataSrcId = dc.getServletContext().getInitParameter("default-data-source");
 
-		if (isPseudoResource(dc, personID)) return status;
+		// Split the main personID field into multiple comma delimited IDs and validate each one.
+		Perl5Util perlUtil = new Perl5Util();
+		personID = perlUtil.substitute("s/\\*s,\\*/,/g", personID);
 
-		try {
-			status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selRegistry", new Object[] { personID });
-		} catch (Exception e) {
-			status = false;
-		}
-		if (!status) {
-			invalidate(dc, this.getCaption(dc) + " '" + personID + "' does not exist.  Add " + personID + " as a Patient");
-			return status;
-		}
+		StringTokenizer st = new StringTokenizer(personID, ",");
 
-		// Add session:org_internal_id here.  Find out how.
-		try {
-			status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selCategory", new Object[] { personID, dc.getSession().getAttribute("org_internal_id") });
-		} catch (Exception e) {
-			status = false;
-		}
-		if (!status) {
-            invalidate(dc, "You do not have permission to select people outside of your organization");
-			return status;
+		while (st.hasMoreTokens() && status) {
+			String nextPersonID = st.nextToken();
+			if (isPseudoResource(dc, nextPersonID)) return status;
+
+			try {
+				status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selRegistry", new Object[] { nextPersonID });
+			} catch (Exception e) {
+				status = false;
+			}
+			if (!status) {
+				invalidate(dc, this.getCaption(dc) + " '" + personID + "' does not exist.  Add " + nextPersonID + " as a Patient");
+				break;
+			}
+
+			// Add session:org_internal_id here.  Find out how.
+			try {
+				status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selCategory", new Object[] { nextPersonID, dc.getSession().getAttribute("org_internal_id") });
+			} catch (Exception e) {
+				status = false;
+			}
+			if (!status) {
+				invalidate(dc, "You do not have permission to select people outside of your organization");
+				break;
+			}
 		}
 
         return status;

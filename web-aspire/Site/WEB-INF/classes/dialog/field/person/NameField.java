@@ -8,8 +8,7 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class NameField extends DialogField
-{
+public class NameField extends DialogField {
 	protected TextField lastNameField;
 	protected TextField firstNameField;
 	protected TextField middleNameField;
