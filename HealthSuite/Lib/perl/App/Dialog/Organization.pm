@@ -429,6 +429,8 @@ sub execute_add
 		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
 	}
 	
+	#Group all add transactions together
+	$page->beginUnitWork("Unable to add Organization");
 	## First create new Org record
 	my $orgIntId = $page->schemaAction(
 			'Org', $command,
@@ -630,6 +632,9 @@ sub execute_add
 	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
+	
+	$page->endUnitWork();
+	
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
@@ -653,6 +658,8 @@ sub execute_update
 		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
 	}
 	
+	#Group all update transactions together
+	$page->beginUnitWork("Unable to update Organization");
 	## First update new Org record
 	$page->schemaAction(
 			'Org', $command,
@@ -676,6 +683,7 @@ sub execute_update
 	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
+	$page->endUnitWork();
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
@@ -688,12 +696,14 @@ sub execute_remove
 	my $ownerOrg = $page->session('org_internal_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
 
+	#Group all delete transactions together
+	$page->beginUnitWork("Unable to delete Organization");
 	$page->schemaAction(
 			'Org', $command,
 			org_internal_id => $orgIntId,
 			_debug => 0
 		);
-
+	$page->endUnitWork();
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
