@@ -70,6 +70,7 @@ sub new
 		new CGI::Dialog::Field::TableColumn(
 			caption => 'Type',
 			schema => $schema,
+			name => 'trans_type',
 			column => 'Transaction.trans_type',
 			typeRange => '8000..8999',
 			onChangeJS => qq{showFieldsOnValues(event, [@{[ALERT_ACCOUNTING]}], ['data_text_a']);},
@@ -129,7 +130,7 @@ sub new
 		<!--
 		if (opObj = eval('document.dialog._f_trans_type'))
 		{
-			if (opObj.selectedIndex == 0)
+			if (opObj.value != @{[ ALERT_ACCOUNTING ]})
 			{
 				setIdDisplay('data_text_a', 'none');
 			}
