@@ -273,6 +273,93 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogSummary', [$orgId], 'panel'); },
 },
 
+#------------------------------------------------------------------------------------------------------------------------
+'org.FSCatalogInsuranceSummary' => {
+	sqlStmt => qq{
+	SELECT *
+	FROM (
+		SELECT	oc.catalog_id,
+			oc.caption,
+			--oc.description,
+			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,
+			count(oce.entry_id) entries_count,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add'
+		FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce,
+			insurance i, org o,
+			insurance_attribute ia
+		WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND ia.value_text = oc.internal_catalog_id
+			AND ia.parent_id = i.ins_internal_id
+			AND ia.item_name = 'Fee Schedule'
+			AND i.owner_org_id = :1
+			AND i.ins_org_id = o.org_internal_id
+			AND o.org_id = :2
+		GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+		ORDER BY
+			oc.catalog_id
+	)
+	WHERE rownum <= 250
+
+	},
+	sqlvar_entityName => 'Offering_Catalog',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn =>
+		{
+				bullets => '/org/#param.org_id#/dlg-update-catalog/#5#?home=#homeArl#',
+				columnDefn =>
+				[
+				{colIdx => 0,hAlign=>'left', head => 'Catalog ID',url=>qq{/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#},
+				tDataFmt => '&{count:0} Schedules',},
+				{colIdx => 1, head => 'Catalog Name', hAlign=>'left'},
+				{colIdx => 2, head => 'Contract Type',},
+				{colIdx => 3, head => 'Entries',summarize => 'sum',},
+				{colIdx =>6,url=>'/org/#session.org_id#/dlg-add-catalog/#5#' ,hint=>'Add Child Item'},
+				],
+			banner =>
+			{contentColor=>'#EEEEEE',
+
+			actionRows =>
+			[
+				{
+					caption => qq{
+						<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+						<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+						<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
+					},
+				},
+			],			},
+			stdIcons =>
+			{
+				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
+			},
+		},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => {
+			heading => 'Fee Schedules Catalogs',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId, $insOrgId) = @_; $orgId ||= $page->session('org_internal_id');$insOrgId = $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogInsuranceSummary', [$orgId, $insOrgId], 'panel'); },
+},
+
 
 #------------------------------------------------------------------------------------------------------------------------
 'org.ContractCatalogDetail' => {
