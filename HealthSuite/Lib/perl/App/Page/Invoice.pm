@@ -2077,10 +2077,16 @@ sub prepare_page_content_header
 	my $invoiceTotalAdj = $claim->{amountPaid};
 
 	#check submission order of claim
-	my $submissionOrder = '';
+	my $submissionOrder;
+	my $orderCaption;
 	if($invType == $hcfaInvoiceType)
 	{
 		$submissionOrder = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
+		my $order = $submissionOrder->{value_int};
+		$orderCaption = 'Primary' if $order == 0;
+		$orderCaption = 'Secondary' if $order == 1;
+		$orderCaption = 'Tertiary' if $order == 2;
+		$orderCaption = 'Quaternary' if $order == 3;
 	}
 
 
@@ -2115,7 +2121,7 @@ sub prepare_page_content_header
 	if($invoiceId)
 	{
 		$invoice = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAndClaimType', $invoiceId);
-		$heading = $invoice->{invoice_id} ? "Type: $invoice->{claim_type_caption}</B>, Status: $invoice->{invoice_status_caption}<BR>" : "Unknown ID: $invoiceId";
+		$heading = $invoice->{invoice_id} ? "$orderCaption Type: $invoice->{claim_type_caption}</B>, Status: $invoice->{invoice_status_caption}<BR>" : "Unknown ID: $invoiceId";
 	}
 	my $clientId = uc($invoice->{client_id});
 
