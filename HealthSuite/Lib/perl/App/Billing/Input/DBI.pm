@@ -1460,9 +1460,9 @@ sub setClaimProperties
 	$currentClaim->setPayToOrganization($payToOrganization);
 	$currentClaim->setLegalRepresentator($legalRepresentator);
 	$currentClaim->setProgramName($ins[$tempRow[5]]);
-	$currentClaim->setInvoiceSubtype($ins[$tempRow[5]]);
-	$currentClaim->setInvoiceType($ins[$tempRow[7]]);
-	$currentClaim->setTotalItems($ins[$tempRow[8]]);
+	$currentClaim->setInvoiceSubtype($tempRow[5]);
+	$currentClaim->setInvoiceType($tempRow[7]);
+	$currentClaim->setTotalItems($tempRow[8]);
 	$patient->setId($tempRow[6]);
 	my $no = $currentClaim->getClaimType;
 	my $insureds = [$insured, $insured2, $insured3, $insured4];
