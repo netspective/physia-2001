@@ -461,7 +461,7 @@ sub createAssocAPISql
 				$relPrefix = 'rel_';
 			}
 
-			my $procSpec = <<"			END_PROC_SPEC";
+			my $procSpec = qq{
 				procedure setAssoc_$parentRel$childRel(
 							p_$parentRel\_id in $table->{name}.entity_id%TYPE,
 							p_$relPrefix$childRel\_id in $table->{name}.rel_id%TYPE,
@@ -478,9 +478,9 @@ sub createAssocAPISql
 							p_class in $table->{name}.class%TYPE,
 							p_name in $table->{name}.name%TYPE) return integer;
 
-			END_PROC_SPEC
+			};
 
-			my $procBody = <<"			END_PROC_BODY";
+			my $procBody = qq{
 				procedure setAssoc_$parentRel$childRel(
 							p_$parentRel\_id in $table->{name}.entity_id%TYPE,
 							p_$relPrefix$childRel\_id in $table->{name}.rel_id%TYPE,
@@ -552,8 +552,7 @@ sub createAssocAPISql
 						return 1;
 					end if;
 				end;
-
-			END_PROC_BODY
+			};
 
 			# remove the additional tabs we added for code readability in this script
 			$procSpec =~ s/^\t\t\t\t/\t/mg;
@@ -564,7 +563,7 @@ sub createAssocAPISql
 		}
 	}
 
-	$spec .= <<"	END_SPECIAL_SPEC";
+	$spec .= qq{;
 	procedure setOwner_OrgPerson(
 				p_org_Id in $table->{name}.entity_id%TYPE,
 				p_person_Id in $table->{name}.rel_id%TYPE);
@@ -581,9 +580,9 @@ sub createAssocAPISql
 				p_org_Id in $table->{name}.entity_id%TYPE,
 				p_person_Id in $table->{name}.rel_id%TYPE) return integer;
 
-	END_SPECIAL_SPEC
+	};
 
-	$body .= <<"	END_SPECIAL_BODY";
+	$body .= qq{
 	procedure setOwner_OrgPerson(
 				p_org_Id in $table->{name}.entity_id%TYPE,
 				p_person_Id in $table->{name}.rel_id%TYPE) is
@@ -612,7 +611,7 @@ sub createAssocAPISql
 		return hasAssoc_OrgPerson(p_org_id, p_person_id, 'user', 'org_person');
 	end;
 
-	END_SPECIAL_BODY
+	};
 
 	return ($spec, $body);
 }
@@ -625,16 +624,16 @@ sub createAttributesAPISql
 
 	my @attrTypeCols = ('value_text', 'value_int', 'value_date');
 
-	my $coreProcsSpec = <<"	END_CORE_SET_PROCS_SPEC";
+	my $coreProcsSpec = qq{
 	procedure set$parentName\_TextAttribute(
 				p_parentId in $table->{name}.parent_id%TYPE,
 				p_itemName in $table->{name}.item_name%TYPE,
 				p_itemValue in $table->{name}.value_text%TYPE,
 				p_valueType in $table->{name}.value_type%TYPE := 0);
 
-	END_CORE_SET_PROCS_SPEC
+	};
 
-	my $coreProcsBody = <<"	END_CORE_SET_PROCS";
+	my $coreProcsBody = qq{
 	procedure set$parentName\_TextAttribute(
 				p_parentId in $table->{name}.parent_id%TYPE,
 				p_itemName in $table->{name}.item_name%TYPE,
@@ -662,7 +661,7 @@ sub createAttributesAPISql
 		end if;
 	end;
 
-	END_CORE_SET_PROCS
+	};
 
 	$spec = $coreProcsSpec;
 	$body = $coreProcsBody;
