@@ -13,32 +13,6 @@
 		<enum id="6">Add Provider</enum>
 	</table>
 
-	<table name="Referral_Payor" abbrev="RefPyr" type="Org_Lookup">
-		<enum id="0">Argus</enum>
-		<enum id="1">American Airlines</enum>
-		<enum id="2">City of Dallas</enum>
-		<enum id="3">City of Garland</enum>
-		<enum id="4">Pinnacol</enum>
-	</table>
-
-	<table name="Referral_Service_Type" abbrev="RefSrTp" type="Org_Lookup">
-		<enum id="0">Bone Growth Simulators</enum>
-		<enum id="1">Chiropractic Services</enum>
-		<enum id="2">CMM Units</enum>
-		<enum id="3">Diagnostic Imaging/Radiology</enum>
-		<enum id="4">Durable Medical Equipment</enum>
-	</table>
-
-	<table name="Referral_Service_Detail" abbrev="RefSrDtl" type="Org_Lookup">
-		<enum id="0">Cold Therapy Device</enum>
-		<enum id="1">Tape</enum>
-		<enum id="2">Neoprene Knee Sleeve</enum>
-		<enum id="3">Oxygen Refill</enum>
-		<enum id="4">Neoprene Knee Sleeve</enum>
-		<enum id="5">Oxygen Refill</enum>
-		<enum id="6">IV Monitoring</enum>
-		<enum id="7">Forearm Crutches</enum>
-	</table>
 
 	<table name="Referral_Result" abbrev="RefRst" type="Org_Lookup">
 		<enum id="0">Successful</enum>
