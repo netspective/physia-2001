@@ -403,7 +403,7 @@ sub assignPatientInsurance
 
 	if ($claim->getStatus() ne INVOICESTATUS_SUBMITTED)  # here populate only the current insurer for the bill
 	{
-		$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+		$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
 									ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
 									ins.ins_type, Ins.member_number
 							from org, insurance ins, invoice_billing
@@ -430,7 +430,7 @@ sub assignPatientInsurance
 		$insured->setSsn($row[9]);
 	}
 
-	$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), ins.group_number, ins.rel_to_insured, Invoice_billing.bill_sequence,
+	$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.group_number, ins.rel_to_insured, Invoice_billing.bill_sequence,
 					ins.insured_id, to_char(coverage_begin_date, \'dd-MON-yyyy\'), to_char(coverage_end_date,\'dd-MON-yyyy\'), ins.member_number
 					from org, insurance ins, invoice_billing
 					where invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
@@ -875,7 +875,7 @@ sub assignPolicy
 	else
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID, nvl(PRODUCT_NAME, PLAN_NAME)
+				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID, nvl(insurance.PLAN_NAME, insurance.PRODUCT_NAME)
 				from insurance, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.bill_ins_id = insurance.ins_internal_id
@@ -1532,7 +1532,7 @@ sub setClaimProperties
 		$currentClaim->addDiagnosis($diagnosis);
 	}
 	$currentClaim->setId($invoiceId);
-#	$currentClaim->setTotalCharge($tempRow[0]);
+	$currentClaim->setTotalInvoiceCharges($tempRow[0]);
 	$currentClaim->setStatus($tempRow[1]);
 	$currentClaim->setBalance($tempRow[3]);
 	$currentClaim->setAmountPaid($tempRow[4]);

@@ -98,6 +98,7 @@ sub new
 	$params{billSeq} = 0;
 	$params{transProviderId} = undef;
 	$params{transProviderName} = undef;
+	$params{totalInvoiceCharges} = undef;
 
 	$params{invoiceType} = undef;
 	$params{invoiceSubtype} = undef;
@@ -668,6 +669,13 @@ sub setTotalCharge
 	$self->{totalCharge} = $treat;
 }
 
+sub setTotalInvoiceCharges
+{
+	my ($self, $value) = @_;
+	$self->{totalInvoiceCharges} = $value;
+}
+
+
 sub setId
 {
 	my ($self, $value) = @_;
@@ -692,6 +700,14 @@ sub getTotalCharge
 	my ($self) = @_;
 	
 	return $self->{totalCharge};
+}
+
+
+sub getTotalInvoiceCharges
+{
+	my ($self) = @_;
+	
+	return $self->{totalInvoiceCharges};
 }
 
 sub getAmountPaid
