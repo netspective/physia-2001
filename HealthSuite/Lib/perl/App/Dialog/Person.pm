@@ -144,6 +144,12 @@ sub makeStateChanges
 	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 	my $orgIntId = $page->session('org_internal_id');
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
+	
+	my $delRec = $self->getField('delete_record');
+	if ($page->field('delete_record'))
+	{
+		$delRec->invalidate($page, "The ability to delete person records has been disabled");
+	}
 
 	if($page->param('_lcm_ispopup'))
 	{
@@ -220,7 +226,7 @@ sub populateData
 	{
 		$page->field('delete_record', 1);
 	}
-
+	
 	my $itemName = 'Patient/Account Number';
 	my $acctNum = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
 	$page->field('acct_number', $acctNum->{'value_text'});
@@ -647,6 +653,11 @@ sub execute_remove
 	my $personId = $page->field('person_id');
 	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 	my $orgIntId = $page->session('org_internal_id');
+	
+	# Disabled remove
+	$self->handlePostExecute($page, $command, $flags);
+	return '';
+	
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 
 	$page->schemaAction(
