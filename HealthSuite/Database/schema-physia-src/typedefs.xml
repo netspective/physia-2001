@@ -683,6 +683,10 @@
 				<col name="id">210</col>
 				<col name="caption">HCPCS</col>
 			</row>
+			<row>
+				<col name="id">220</col>
+				<col name="caption">EPSDT</col>
+			</row>
 		</data>
 	</table>
 
