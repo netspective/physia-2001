@@ -7,11 +7,17 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Person;
-use Devel::ChangeLog;
 
-
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
+
+sub handleARL
+{
+	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+
+	$self->setFlag(App::Page::PAGEFLAG_ISPOPUP) if $rsrc eq 'lookup';
+	return $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems);
+}
 
 sub getForm
 {
@@ -110,15 +116,5 @@ sub execute
 
 	return 1;
 }
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Person',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Person',
-		'Changed the urls from create/... to org/.... '],
-);
 
 1;

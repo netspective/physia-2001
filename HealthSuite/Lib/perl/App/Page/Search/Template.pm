@@ -27,7 +27,6 @@ sub handleARL
 		$self->param('searchAgain', 1);
 	}
 
-
 	$self->param('execute', 'Go') if $pathItems->[1];  # Auto-execute
 	return $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems);
 }
@@ -67,7 +66,7 @@ sub getForm
 
 		<input name='r_ids' size=25 maxlength=32 value="@{[$self->param('r_ids')]}"
 			title='Resource IDs'>
-			<a href="javascript:doFindLookup(this.form, search_form.resource_id, '/lookup/person/id');">
+			<a href="javascript:doFindLookup(this.form, search_form.r_ids, '/lookup/person/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
 		<input name='facility_id' size=17 maxlength=32 value="@{[$self->param('facility_id')]}" title='Facility ID'>
