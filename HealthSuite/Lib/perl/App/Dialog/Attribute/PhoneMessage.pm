@@ -4,6 +4,7 @@ package App::Dialog::Attribute::PhoneMessage;
 
 use DBI::StatementManager;
 use App::Statements::Person;
+use App::Statements::Transaction;
 use App::Universal;
 use strict;
 use Carp;
@@ -25,17 +26,25 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'value_text', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, hints => 'Message to be passed on to the requested person.'),
-		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(caption =>'Call For', name => 'parent_id', options => FLDFLAG_REQUIRED, hints => 'Person who needs to receive the message.'),	
-		new CGI::Dialog::Field(name => 'value_textb', caption => 'Comments', type => 'memo', hints => 'Comments from the user to the caller.'),
-	
+		new CGI::Dialog::Field(name => 'phonemessage', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, hints => 'Message to be passed on to the requested person.'),
+		new CGI::Dialog::Field(name => 'datecalled', caption => 'Date', type => 'date'),
+		new App::Dialog::Field::Person::ID(name => 'provider', caption =>'Call For', options => FLDFLAG_REQUIRED, hints => 'Person who needs to receive the message.'),
+		new CGI::Dialog::Field(name => 'responsemessage', caption => 'Comments', type => 'memo', hints => 'Comments from the user to the caller.'),
+		new CGI::Dialog::Field(type => 'select',
+				style => 'radio',
+				selOptions => 'Not Read;Read',
+				caption => 'Status',
+				preHtml => "<B><FONT COLOR=DARKRED>",
+				postHtml => "</FONT></B>",
+				name => 'status',
+				hints => 'Clicking on Read would make this message disappear from your voice message list.',
+				defaultValue => 'Not Read'),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
-		scope =>'person_attribute',
+		scope =>'transaction',
 		key => "#param.person_id#",
 		data => "Phone Message from <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
@@ -50,84 +59,145 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	
-	my $itemId = $page->param('item_id');
-	my $phoneInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 
-	if($phoneInfo->{value_block} == 1)
+	my $phoneStatus = '';
+	my $transId = $page->param('trans_id');
+	my $phoneInfo = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
+
+	if($phoneInfo->{trans_status}  == 4)
 	{
-		$page->field('value_text', $phoneInfo->{value_text});
-		$page->field('value_date', $phoneInfo->{value_date});
-		$page->field('parent_id', $phoneInfo->{parent_id});
-		$page->field('value_textb', $phoneInfo->{value_textb});
+		$phoneStatus = 'Read';
 	}
-	else
+	elsif ($phoneInfo->{trans_status}  == 5)
 	{
-		$page->field('value_text', $phoneInfo->{value_textb});
-		$page->field('value_date', $phoneInfo->{value_date});
-		$page->field('parent_id', $phoneInfo->{parent_id});
-		$page->field('value_textb', $phoneInfo->{value_text});	
+		$phoneStatus = 'Not Read';
 	}
-	
+
+        if($phoneInfo->{data_num_a} eq '')
+        {
+
+		$page->field('phonemessage', $phoneInfo->{data_text_b});
+		$page->field('datecalled', $phoneInfo->{trans_begin_stamp});
+		$page->field('provider', $phoneInfo->{provider_id});
+		$page->field('responsemessage', $phoneInfo->{data_text_a});
+		$page->field('status', $phoneStatus);
+	}
+	elsif($phoneInfo->{data_num_a} ne '')
+        {
+
+                $page->field('phonemessage', $phoneInfo->{data_text_a});
+                $page->field('datecalled', $phoneInfo->{trans_begin_stamp});
+                $page->field('provider', $phoneInfo->{trans_owner_id});
+                $page->field('responsemessage', $phoneInfo->{data_text_b});
+                $page->field('status', $phoneStatus);
+        }
+
 }
 
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
-	
-	$page->addDebugStmt("command is $command");
-	if($command eq 'add')
+
+	my $phoneStatus = $page->field('status') eq 'Not Read' ? 5 : 4;
+
+        if($command eq 'add')
 	{
+        	my $trans_id = $page->schemaAction(
+                        'Transaction', $command,
+                        trans_id => $page->param('trans_id') || undef,
+                        trans_owner_id => $page->param('person_id') || undef,
+                        trans_owner_type => 0,
+                        provider_id => $page->field('provider') || undef,
+                        caption =>'Phone Message',
+                        trans_type => 1000,
+                        trans_status => $phoneStatus,
+                        trans_begin_stamp => $page->field('datecalled'),
+                        data_text_a => $page->field('responsemessage') || undef,
+                        data_text_b => $page->field('phonemessage')  || undef,
+                        _debug => 0
+                );
+
 		$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $page->field('parent_id') || undef,
-			item_id => $page->param('item_id') || undef,
-			item_name =>'Phone Message',
-			value_type => 0,
-			value_text => $page->field('value_text') . '(' . $page->param('person_id') . ')' || undef,	
-			value_textB => $page->field('value_textb') || undef,	
-			value_date => $page->field('value_date') || undef,
-			value_block => 1,
-			_debug => 1
-		);
+                        'Transaction', $command,
+                        trans_id => $page->param('trans_id') || undef,
+                        trans_owner_id => $page->field('provider') || undef,
+                        trans_owner_type => 0,
+                        provider_id => $page->param('person_id') || undef,
+                        caption =>'Phone Message',
+                        trans_type => 1000,
+                        trans_status => $phoneStatus,
+                        trans_begin_stamp => $page->field('datecalled'),
+                        data_text_a => $page->field('phonemessage') || undef,
+                        data_text_b => $page->field('responsemessage')  || undef,
+			data_num_a => $trans_id,
+                        _debug => 0
+                );
+
 	}
-	else
-	{
-		$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $page->field('parent_id') || undef,
-			item_id => $page->param('item_id') || undef,
-			item_name =>'Phone Message',
-			value_type => 0,
-			value_text => $page->field('value_text') || undef,	
-			value_textB => $page->field('value_textb') || undef,	
-			value_date => $page->field('value_date') || undef,
-			value_block => 1,
-			_debug => 1
-		);	
-	}
-	
-	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $page->param('person_id') || undef,
-		item_id => $page->param('item_id') || undef,
-		item_name =>'Phone Message',
-		value_type => 0,
-		value_date => $page->field('value_date') || undef,
-		value_text => $page->field('value_textb') || undef,	
-		value_textB => $page->field('value_text') || undef,	
-		value_block => 0,		
-		_debug => 0
-	);
-	
+        elsif($command eq 'update' || $command eq 'remove')
+        {
+                my $transId = $page->param('trans_id');
+                my $phoneDataInfo = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
+                if($phoneDataInfo->{data_num_a} eq '')
+                {
+	                $page->schemaAction(
+       			     	'Transaction', $command,
+                        	trans_id => $page->param('trans_id') || undef,
+                        	trans_owner_id => $page->param('person_id') || undef,
+                        	provider_id => $page->field('provider') || undef,
+                        	trans_status => $phoneStatus,
+                        	trans_begin_stamp => $page->field('datecalled'),
+                        	data_text_a => $page->field('responsemessage') || undef,
+                        	data_text_b => $page->field('phonemessage')  || undef,
+                        	_debug => 0
+               		);
+                        my $physicianData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByData_num_a', $transId);
+	                $page->schemaAction(
+       		                'Transaction', $command,
+               		        trans_id => $physicianData->{trans_id}|| undef,
+                       		trans_owner_id => $page->field('provider') || undef,
+                        	provider_id => $page->param('person_id') || undef,
+                        	trans_status => $phoneStatus,
+                        	trans_begin_stamp => $page->field('datecalled'),
+                        	data_text_a => $page->field('phonemessage') || undef,
+                        	data_text_b => $page->field('responsemessage')  || undef,
+                        	_debug => 0
+                	);
+
+                }
+                elsif($phoneDataInfo->{data_num_a} ne '')
+                {
+                        $page->schemaAction(
+                                'Transaction', $command,
+                                trans_id => $page->param('trans_id') || undef,
+                                trans_owner_id => $page->field('provider') || undef,
+                                trans_status => $phoneStatus,
+                                trans_begin_stamp => $page->field('datecalled'),
+                                data_text_a => $page->field('phonemessage') || undef,
+                                data_text_b => $page->field('responsemessage')  || undef,
+                                _debug => 0
+                        );
+                        my $parentItemId = $phoneDataInfo->{data_num_a};
+                        my $personData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $parentItemId);
+
+
+                        $page->schemaAction(
+                                'Transaction', $command,
+                                trans_id => $personData->{trans_id} || undef,
+                                provider_id => $page->field('provider') || undef,
+                                trans_status => $phoneStatus,
+                                trans_begin_stamp => $page->field('datecalled'),
+                                data_text_a => $page->field('responsemessage') || undef,
+                                data_text_b => $page->field('phonemessage')  || undef,
+                                _debug => 0
+                        );
+
+
+                }
+
+        }
 	$self->handlePostExecute($page, $command, $flags);
-	
+
 }
-
-use constant PANEDIALOG_ATTENDANCE => 'Dialog/Pane/Phone Message';
-
-@CHANGELOG =
-(
-);
 
 1;
