@@ -159,7 +159,7 @@
 	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">
 		<description>A business action between an organization and a person, which includes details about the person at that point in time, and which may be linked to another transaction</description>
 		<column name="trans_id" type="autoinc" primarykey="yes" descr="Uniqe ID for a specific transaction"/>
-		<column name="trans_owner" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
+		<column name="trans_owner" indexed="yes" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
 		<column name="parent_event_id" indexed="yes" lookupref="Event.event_id" descr="Any parent event (like an appointment) that this transaction may belong to (as a child)"/>
 		<column name="parent_trans_id" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
 		<column name="trans_type" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
