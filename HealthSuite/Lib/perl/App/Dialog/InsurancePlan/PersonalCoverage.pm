@@ -37,8 +37,8 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'person_hidden'),
 			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
-			new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan'),
+			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct/insorgid/itemValue', findPopupControlField => '_f_ins_org_id'),
+			new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan/product/itemValue', findPopupControlField => '_f_product_name'),
 
 			new CGI::Dialog::Field::TableColumn(
 								caption => 'Insurance Sequence',
