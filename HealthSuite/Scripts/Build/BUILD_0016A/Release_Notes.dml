@@ -14,11 +14,7 @@
 		<release-date></release-date>
 	</release-info>
 
-	<deliverables>
-		<deliverable id="1470">
-			Updated the validation to showup 'Add New Insured Person' link while the 'Relation to Insured' 
-			field is other than 'Self' and if the field 'Insured Person ID' is left blank
-		</deliverable>
+	<deliverables>		
 	</deliverables>
 </release-notes>
 
