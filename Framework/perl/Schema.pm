@@ -50,7 +50,14 @@ package Column;
 ##############################################################################
 
 use strict;
-use App::Data::Manipulate;
+
+sub trim
+{
+	my $str = shift;
+	$str =~ s/^\s+//;
+	$str =~ s/\s+$//;
+	return $str;
+}
 
 sub new
 {
@@ -547,7 +554,7 @@ sub formatSqlData
 	my $data = shift;
 	
 	return unless defined $data;
-	$data = App::Data::Manipulate::trim($data);
+	$data = trim($data);
 	return undef if $data =~ /^$/;
 	return $data if $self->{sqlwritefmt} eq '$value$';
 
@@ -576,7 +583,7 @@ sub formatPlaceHolderData
 	my $data = shift;
 	
 	return unless defined $data;
-	$data = App::Data::Manipulate::trim($data);
+	$data = trim($data);
 	#Just in case a NULL is passed into a non text field change to undef place holders
 	#do not appear to like NULLs
 	$data = undef if ! m/'\$escapedTextValue\$\'/ && $data eq 'NULL';	
@@ -592,7 +599,7 @@ sub formatPlaceHolder
 	$fmt =~ s/\'\$escapedTextValue\$\'/\$value\$/;
 	$fmt =~ s/\'\$value\$\'/\$value\$/;
 	return unless defined $data;
-	$data = App::Data::Manipulate::trim($data);
+	$data = trim($data);
 	return undef if $data =~ /^$/;	
 	return $data if $self->{sqlwritefmt} eq '$value$';		
 	$fmt =~ s/\$(\w+)\$/
