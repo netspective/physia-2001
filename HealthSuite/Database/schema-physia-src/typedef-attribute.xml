@@ -165,27 +165,21 @@
 				<col name="caption">Family</col>
 				<col name="group_name">Association</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Association between patient and the family member. The fields are stored in the
-					table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in
-					item_name, phone number in value_text_B and begin date in value_date</col>
+				<col name="remarks">Association between patient and the family member. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
 			</row>
 			<row>
 				<col name="id">201</col>
 				<col name="caption">Emergency</col>
 				<col name="group_name">Association</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Association between patient and emergency contact person. The fields are stored in the
-					table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in
-					item_name, phone number in value_text_B and begin date in value_date</col>
+				<col name="remarks">Association between patient and emergency contact person. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
 			</row>
 			<row>
 				<col name="id">210</col>
 				<col name="caption">Provider</col>
 				<col name="group_name">Association</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">The care provider or physician for a patient. The fields are stored in the
-					table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in
-					item_name, phone number in value_text_B and begin date in value_date</col>
+				<col name="remarks">The care provider or physician for a patient. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
 			</row>
 			<row>
 				<col name="id">220</col>
@@ -339,87 +333,70 @@
 				<col name="caption">Preventive Care Protocol</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Preventive measure given to a patient.The fields are stored in the
-					table 'person_attribute' as follows:Measure in attr_name,last performed in
-					value_date, due in value_date_end</col>
+				<col name="remarks">Preventive measure given to a patient.The fields are stored in the table 'person_attribute' as follows:Measure in attr_name,last performed in value_date, due in value_date_end</col>
 			</row>
 			<row>
 				<col name="id">410</col>
 				<col name="caption">Medication Allergy</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">The medication for which the patient is allergitic.The fields are stored in the
-					table 'person_attribute' as follows:Medication allergy in attr_name,reaction in
-					value_text, other reaction  in value_text_B</col>
+				<col name="remarks">The medication for which the patient is allergitic.The fields are stored in the table 'person_attribute' as follows:Medication allergy in attr_name,reaction in value_text, other reaction  in value_text_B</col>
 			</row>
 			<row>
 				<col name="id">411</col>
 				<col name="caption">Environmental Allergy</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">The environment for which the patient is allergitic.The fields are stored in the
-					table 'person_attribute' as follows:Environmental allergy in attr_name,reaction in
-					value_text, other reaction  in value_text_B</col>
+				<col name="remarks">The environment for which the patient is allergitic.The fields are stored in the table 'person_attribute' as follows:Environmental allergy in attr_name,reaction in value_text, other reaction  in value_text_B</col>
 			</row>
 			<row>
 				<col name="id">412</col>
 				<col name="caption">Medication Intolerance</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">The medication for which the patient is intolerent.The fields are stored in the
-					table 'person_attribute' as follows:Medication intolerance in attr_name,reaction in
-					value_text, other reaction  in value_text_B</col>
+				<col name="remarks">The medication for which the patient is intolerent.The fields are stored in the table 'person_attribute' as follows:Medication intolerance in attr_name,reaction in value_text, other reaction  in value_text_B</col>
 			</row>
 			<row>
 				<col name="id">420</col>
 				<col name="caption">Advance Directive - Patient Ordered</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Instructions given by the patient.The fields are stored in the
-					table 'person_attribute' as follows:Directive in attr_name, date in value_date</col>
+				<col name="remarks">Instructions given by the patient.The fields are stored in the table 'person_attribute' as follows:Directive in attr_name, date in value_date</col>
 			</row>
 			<row>
 				<col name="id">421</col>
 				<col name="caption">Advance Directive - Physician Ordered</col>
 				<col name="group_name">Clinical</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Instructions given by the physician.The fields are svored in the
-					table 'person_attribute' as follows:Directive in attr_name, date in Value_date</col>
+				<col name="remarks">Instructions given by the physician.The fields are svored in the table 'person_attribute' as follows:Directive in attr_name, date in Value_date</col>
 			</row>
 			<row>
 				<col name="id">500</col>
 				<col name="caption">License</col>
 				<col name="group_name">Certificate</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Type of license for the physician.The fields are stored in the
-					table 'person_attribute' as follows:License in attr_name,number in value_text,expiration date in
-					value_dateend</col>
+				<col name="remarks">Type of license for the physician.The fields are stored in the table 'person_attribute' as follows:License in attr_name,number in value_text,expiration date in value_dateend</col>
 			</row>
 			<row>
 				<col name="id">510</col>
 				<col name="caption">State</col>
 				<col name="group_name">Certificate</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">The state license for the physician.The fields are stored in the
-					table 'person_attribute' as follows:Type in attr_name,text in value_text</col>
+				<col name="remarks">The state license for the physician.The fields are stored in the table 'person_attribute' as follows:Type in attr_name,text in value_text</col>
 			</row>
 			<row>
 				<col name="id">520</col>
 				<col name="caption">Accreditations</col>
 				<col name="group_name">Certificate</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Accreditations for the physician.The fields are stored in the
-					table 'person_attribute' as follows:Accreditation in value_text,expiration date in
-					value_dateend </col>
+				<col name="remarks">Accreditations for the physician.The fields are stored in the table 'person_attribute' as follows:Accreditation in value_text,expiration date in value_dateend </col>
 			</row>
 			<row>
 				<col name="id">530</col>
 				<col name="caption">Affiliations</col>
 				<col name="group_name">Certificate</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Affiliations for the physician.The fields are stored in the
-					table 'person_attribute' as follows:Affiliation in attr_name,other affiliations in value_text,
-					date in value_dateend</col>
+				<col name="remarks">Affiliations for the physician.The fields are stored in the table 'person_attribute' as follows:Affiliation in attr_name,other affiliations in value_text, date in value_dateend</col>
 			</row>
 			<row>
 				<col name="id">540</col>
@@ -433,8 +410,7 @@
 				<col name="caption">Licensing</col>
 				<col name="group_name">Credentials</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">License for Organizations.The fields are stored in the
-					table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+				<col name="remarks">License for Organizations.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
 			</row>
 			<row>
 				<col name="id">700</col>
@@ -448,24 +424,21 @@
 				<col name="caption">Retirement</col>
 				<col name="group_name">Benefits</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Benefits for the physician after retirement.The fields are stored in the
-					table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+				<col name="remarks">Benefits for the physician after retirement.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
 			</row>
 			<row>
 				<col name="id">720</col>
 				<col name="caption">Other</col>
 				<col name="group_name">Benefits</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Other benifits for physician.The fields are stored in the
-					table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+				<col name="remarks">Other benifits for physician.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
 			</row>
 			<row>
 				<col name="id">800</col>
 				<col name="caption">Attendance</col>
 				<col name="group_name">General</col>
 				<col name="dialog_params">type="text"</col>
-				<col name="remarks">Leave for the physician.The fields are stored in the
-					table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+				<col name="remarks">Leave for the physician.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
 			</row>
 			<row>
 				<col name="id">810</col>

@@ -256,30 +256,29 @@
 				<col name="caption">Office</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
-				<col name="remarks">Patient office visit. The reason for visit is stored in caption field</col>
+				<col name="remarks">A patient visit to an office - the reason for visit is stored in caption field</col>
 			</row>
 			<row>
 				<col name="id">2010</col>
 				<col name="caption">Clinic</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
-				<col name="remarks">Patient clinic visit. The reason for visit is stored in caption field</col>
+				<col name="remarks">A patient visit to a clinic - the reason for visit is stored in caption field</col>
 			</row>
 			<row>
 				<col name="id">2020</col>
 				<col name="caption">Hospital</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
-				<col name="remarks">Patient hospital visit. The reason for visit is stored in caption field</col>
+				<col name="remarks">A patient visit to a hospital - the reason for visit is stored in caption field</col>
 			</row>
 			<row>
 				<col name="id">2030</col>
 				<col name="caption">Facility</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
-				<col name="remarks">Patient facility visit. The reason for visit is stored in caption field</col>
+				<col name="remarks">A patient visit to a facility - the reason for visit is stored in caption field</col>
 			</row>
-
 			<row>
 				<col name="id">2040</col>
 				<col name="caption">Physical Exam</col>
@@ -293,112 +292,112 @@
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2060</col>
 				<col name="caption">Sports/School Physical</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2070</col>
 				<col name="caption">Regular Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2080</col>
 				<col name="caption">Complicated Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2090</col>
 				<col name="caption">Well Women Exam</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2100</col>
 				<col name="caption">Consultation</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2110</col>
 				<col name="caption">Injection Only</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2120</col>
 				<col name="caption">Procedure Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2130</col>
 				<col name="caption">Workmans Comp Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2140</col>
 				<col name="caption">Radiology Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2150</col>
 				<col name="caption">Lab Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2160</col>
 				<col name="caption">Counseling Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2170</col>
 				<col name="caption">Physical Therapy</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
+			</row>			
 			<row>
 				<col name="id">2180</col>
 				<col name="caption">Special Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>
-
+			</row>			
+			
 			<row>
 				<col name="id">3000</col>
 				<col name="caption">Transient</col>
 				<col name="group_name">Diagnosis</col>
 				<col name="icon_img_summ">diagnosis.gif</col>
-				<col name="remarks">Temp diagnosis. Stored in 'Transaction': provider_id, curr_onset_date, Diag in data_text_a</col>
+				<col name="remarks">Temporary diagnosis for a patient by a physician.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Date in curr_onset_date, Diagnosis in data_text_a</col>
 			</row>
 			<row>
 				<col name="id">3010</col>
 				<col name="caption">Permanent</col>
 				<col name="group_name">Diagnosis</col>
 				<col name="icon_img_summ">diagnosis.gif</col>
-				<col name="remarks">Perm diagnosis. Stored in 'Transaction': provider_id, curr_onset_date, Diag in data_text_a</col>
+				<col name="remarks">Permanent diagnosis for a patient by a physician.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Diagnosis Date in curr_onset_date, Diagnosis in data_text_a</col>
 			</row>
 			<row>
 				<col name="id">3020</col>
@@ -412,7 +411,7 @@
 				<col name="caption">Notes</col>
 				<col name="group_name">Diagnosis</col>
 				<col name="icon_img_summ">diagnosis.gif</col>
-				<col name="remarks">Physician diag notes. Stored in 'Transaction': provider_id, Date in trans_begin_stamp, Notes in data_text_a</col>
+				<col name="remarks">Notes taken by a physician during diagnosis.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Date in trans_begin_stamp, Notes in data_text_a</col>
 			</row>
 			<row>
 				<col name="id">4000</col>
@@ -521,28 +520,28 @@
 				<col name="caption">Prescription</col>
 				<col name="group_name">Medication</col>
 				<col name="icon_img_summ">prescription.gif</col>
-				<col name="remarks">Prescription medication.</col>
+				<col name="remarks">A prescription made for a patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Physician in provider_id,Name of medication oi data_text_a,Quantity in quantity,Number of refills in data_num_a,Brand name in data_flag_b,Instructions in detail, Notes in data_text_b,Print prescription in data_flag_c.</col>
 			</row>
 			<row>
 				<col name="id">7010</col>
 				<col name="caption">OTC</col>
 				<col name="group_name">Medication</col>
 				<col name="icon_img_summ">prescription.gif</col>
-				<col name="remarks">Over the counter medication.</col>
+				<col name="remarks">Over the counter medication used by the patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Name of medication oi data_text_a,Instructions in detail, Notes in data_text_b.</col>
 			</row>
 			<row>
 				<col name="id">7020</col>
 				<col name="caption">Homeopathic</col>
 				<col name="group_name">Medication</col>
 				<col name="icon_img_summ">prescription.gif</col>
-				<col name="remarks">Home made medication or remedy used by the patient.</col>
+				<col name="remarks">Home made medication or remedy used by the patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Name of medication in data_text_a,Instructions in detail, Notes in data_text_b.</col>
 			</row>
 			<row>
 				<col name="id">8000</col>
 				<col name="caption">Organization Alert</col>
 				<col name="group_name">Alert</col>
 				<col name="icon_img_summ">alert_btn.gif</col>
-				<col name="remarks">Alert for the whole organization.</col>
+				<col name="remarks">Alert for the whole organization.The fields are stored in the table 'transaction' as follows:Priority in trans_subtype,Caption in caption,Datails in detail,Staff member in initiator_id, Begin alert in trans_begin_stamp,End alert in trans_end_stamp.</col>
 			</row>
 			<row>
 				<col name="id">8010</col>
@@ -609,25 +608,25 @@
 				<col name="id">11000</col>
 				<col name="caption">Hospitalization</col>
 				<col name="group_name">Hospitalization</col>
-				<col name="remarks">General admission in the hospital.</col>
+				<col name="remarks">General admission in the hospital.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
 			</row>
 			<row>
 				<col name="id">11100</col>
 				<col name="caption">Surgery</col>
 				<col name="group_name">Hospitalization</col>
-				<col name="remarks">Admitted in the hospital for a surgery.</col>
+				<col name="remarks">Admitted in the hospital for a surgery.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
 			</row>
 			<row>
 				<col name="id">11200</col>
 				<col name="caption">Therapy</col>
 				<col name="group_name">Hospitalization</col>
-				<col name="remarks">Admitted in the hospital for therapy.</col>
+				<col name="remarks">Admitted in the hospital for therapy.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
 			</row>
 			<row>
 				<col name="id">12000</col>
 				<col name="caption">Tests</col>
 				<col name="group_name">Measurements</col>
-				<col name="remarks">Tests done on a patient and the results.</col>
+				<col name="remarks">Tests done on a patient and the results.The fields are stored in the table 'transaction' as follows:Test date in trans_begin_stamp,Height in data_text_b,Height value in data_text_a, Weight in data_text_b,Weight value in data_text_a,Diet in data_text_b,Diet value in data_text_a, Blood sugar in data_text_b,Blood sugar value in data_text_a,Blood pressure in data_text_b,Blood pressure value in data_text_a,Exercise in data_text_b,Exercise value in data_text_a,Stress in data_text_b,Stress value in data_text_a,Cholesterol in data_text_b,Cholesterol value in data_text_a</col>
 			</row>
 		</data>
 	</table>
