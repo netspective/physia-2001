@@ -987,7 +987,7 @@ sub getHtml
 		my $itemId = $item->{item_id};
 		my $itemCPT = $item->{code};
 		my $itemBalance = $item->{balance};
-		my $itemCharge = $item->{extended_cost};
+		my $itemCharge = $item->{extended_cost} || '0';
 		my $itemAdjs = $item->{total_adjust} || '0';
 		$totalInvoiceBalance += $itemBalance;
 
@@ -1033,7 +1033,7 @@ sub getHtml
 				$itemSuppressHtml
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
+				<TD ALIGN=LEFT><FONT $textFontAttrs>$itemTypeCap</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemCPT</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
