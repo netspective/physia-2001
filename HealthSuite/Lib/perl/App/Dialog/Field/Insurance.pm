@@ -28,7 +28,7 @@ sub new
 	$params{name} = 'product_name' unless $params{name};
 
 	$params{options} = 0 unless exists $params{options};
-	$params{options} |= FLDFLAG_IDENTIFIER;
+	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	$params{type} = 'text';
 	$params{size} = 16;
@@ -97,7 +97,7 @@ sub new
 	$params{name} = 'product_name' unless $params{name};
 
 	$params{options} = 0 unless exists $params{options};
-	$params{options} |= FLDFLAG_IDENTIFIER;
+	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	if($params{idEntryStyle} == IDENTRYSTYLE_SELECT)
 	{
@@ -154,7 +154,7 @@ sub new
 	$params{name} = 'plan_name' unless $params{name};
 
 	$params{options} = 0 unless exists $params{options};
-	$params{options} |= FLDFLAG_IDENTIFIER;
+	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	$params{type} = 'text';
 	$params{size} = 16;
@@ -219,7 +219,7 @@ sub new
 	$params{name} = 'plan_name' unless $params{name};
 
 	$params{options} = 0 unless exists $params{options};
-	$params{options} |= FLDFLAG_IDENTIFIER;
+	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	if($params{idEntryStyle} == IDENTRYSTYLE_SELECT)
 	{
