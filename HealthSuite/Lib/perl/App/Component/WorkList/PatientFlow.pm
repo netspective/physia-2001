@@ -341,7 +341,7 @@ sub getComponentHtml
 			$_->{parent_invoice_id} || $_->{invoice_id},
 			$_->{patient_id},
 
-			$_->{invoice_id} && $_->{inv_status} > 3 ? qq{
+			$_->{invoice_id} && $_->{balance} > 0 ? qq{
 				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">
 					Print</a>
 			}
