@@ -74,7 +74,7 @@ sub new
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
 
-		new CGI::Dialog::MultiField(caption =>'Writeoff Amount/Code',
+		new CGI::Dialog::MultiField(caption =>'Writeoff Amount/Code', name => 'writeoff_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
@@ -85,12 +85,18 @@ sub new
 							column => 'Invoice_Item_Adjust.writeoff_code',
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
+		new CGI::Dialog::Field::TableColumn(
+					caption => 'Writeoff Amount',
+					schema => $schema,
+					column => 'Invoice_Item_Adjust.writeoff_amount',
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
 
 		new CGI::Dialog::Field::TableColumn(
-							caption => 'Adjustment Codes',
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.adjust_codes',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					caption => 'Adjustment Codes',
+					schema => $schema,
+					column => 'Invoice_Item_Adjust.adjust_codes',
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo', cols => 25, rows => 4, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -121,9 +127,11 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('adjustment_amount', FLDFLAG_INVISIBLE, $isInsurance);
 	$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
+	$self->updateFieldFlags('writeoff_fields', FLDFLAG_INVISIBLE, $isInsurance);
 	
 	$self->updateFieldFlags('plan_info', FLDFLAG_INVISIBLE, $isPersonal);
 	$self->updateFieldFlags('adjust_codes', FLDFLAG_INVISIBLE, $isPersonal);
+	$self->updateFieldFlags('writeoff_amount', FLDFLAG_INVISIBLE, $isPersonal);
 }
 
 sub populateData
@@ -226,6 +234,13 @@ sub execute_add
 		my $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
 		$payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
 
+		my $writeoffAmt = $page->field('writeoff_amount');
+		my $writeoffCode = $page->field('writeoff_code');
+		if($payerIs eq 'insurance' && $writeoffAmt > 0)
+		{
+			$writeoffCode = App::Universal::ADJUSTWRITEOFF_CONTRACTAGREEMENT; 
+		}
+		
 		my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 		my $payType = $page->field('pay_type');
 		my $payMethod = $page->field('pay_method');
@@ -244,8 +259,8 @@ sub execute_add
 				pay_ref => $page->field('pay_ref') || undef,
 				payer_type => defined $payerType ? $payerType : undef,
 				payer_id => $payerId || undef,
-				writeoff_code => $page->field('writeoff_code') || undef,
-				writeoff_amount => $page->field('writeoff_amount') || undef,
+				writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
+				writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
 				net_adjust => defined $netAdjust ? $netAdjust : undef,
 				adjust_codes => $page->field('adjust_codes') || undef,
 				comments => $page->field('comments') || undef,
