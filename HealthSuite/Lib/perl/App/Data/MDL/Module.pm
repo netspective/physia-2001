@@ -10,8 +10,7 @@ use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
 use App::Statements::Catalog;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 use vars qw(@ISA @EXPORT %PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP %BILL_SEQUENCE_TYPE_MAP %DEDUCTIBLE_TYPE_MAP %INSURANCE_TYPE_MAP %BILLINGPARTY_TYPE_MAP);
 use enum qw(BITMASK:MDLFLAG_ LOGSQL SHOWSTATUS SHOWMISSINGITEMS LOGACTIVITY DEBUG);
@@ -551,7 +550,7 @@ sub importInsurance
 			if (my $insPlan = $item->{plan})
 			{
 				my $rec = $item;
-				$self->importinsPlan($flags, $insPlan, $rec, $insurance, $item->{'ins-id'}, $item->{'contact-methods'}, $insIntId);
+				$self->importinsPlan($flags, $insPlan, $rec, $insurance, $item->{'ins-id'}, $item->{'contact-methods'}, $insIntId, $primaryOrg);
 			}
 
 			#$deductflag = 0;
@@ -561,12 +560,12 @@ sub importInsurance
 
 sub importinsPlan
 {
-	my ($self, $flags, $insPlan, $rec, $insurance, $productName, $recordContactMethod, $parentInsId) = @_;
+	my ($self, $flags, $insPlan, $rec, $insurance, $productName, $recordContactMethod, $parentInsId, $primaryOrg) = @_;
 
 	#my $productName = $insurance;
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	#my $recordContactMethod = $insurance->{product}->{'contact-methods'};
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selProductRecord', $primaryOrg, $productName);
 	my $insInternalId = $recordData->{'ins_internal_id'};
 	my $feeschedule =  $STMTMGR_INSURANCE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
 	if(my $list = $insPlan)
