@@ -168,7 +168,7 @@ sub new
 		{
 			scope =>'Sch_Template',
 			key => "#field.template_id#",
-			data => "template 'Template ID <a href='/search/template'>#field.template_id#</a>'"
+			data => "template '#field.caption#' with 'Template ID <a href='/search/template'>#field.template_id#</a>'"
 		};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
