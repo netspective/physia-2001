@@ -2049,7 +2049,7 @@ sub prepare_page_content_header
 	my $twcc61Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC61/16') ? 'update' : 'add';
 	my $twcc64Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/17') ? 'update' : 'add';
 	my $twcc69Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC69/17') ? 'update' : 'add';
-	my $twcc73Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC73/') ? 'update' : 'add';
+	my $twcc73Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC73/4') ? 'update' : 'add';
 
 
 	my $invoice = undef;
@@ -2071,7 +2071,7 @@ sub prepare_page_content_header
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
 			$claimType == $workComp ? ['TWCC69 PDF', "/invoice-f/$invoiceId/twcc69pdf", 'twcc69pdf'] : undef,
-			#$claimType == $workComp ? ['TWCC73 PDF', "/invoice-f/$invoiceId/twcc73pdf", 'twcc73pdf'] : undef,
+			$claimType == $workComp ? ['TWCC73 PDF', "/invoice-f/$invoiceId/twcc73pdf", 'twcc73pdf'] : undef,
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
 			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
@@ -2123,7 +2123,7 @@ sub prepare_page_content_header
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
-						<!-- @{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc73Command-twcc73'>\u$twcc73Command TWCC Form 73</option>} : '' ]} -->
+						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc73Command-twcc73'>\u$twcc73Command TWCC Form 73</option>} : '' ]}
 						
 						<!-- <option value="/person/$clientId/account">Adjs Exist: $noAdjsExist</option>
 						<option value="/person/$clientId/account">Adjs Count: $adjCount</option>
