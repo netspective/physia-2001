@@ -265,7 +265,7 @@ sub execute
 		}
 		else
 		{
-			$productClauseB =qq { and ins.product_name = '$row->{product}'};
+			$productClauseB =qq { and ins.product_name is null};
 		}
 
 		if($row->{provider} ne '')
