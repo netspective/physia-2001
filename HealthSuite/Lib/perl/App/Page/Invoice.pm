@@ -29,7 +29,6 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
-use App::Dialog::TWCC61;
 #use App::Billing::Universal;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
@@ -51,6 +50,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'TWCC 61 PDF', name => 'twcc61pdf',},
 					{caption => 'TWCC 64 PDF', name => 'twcc64pdf',},
 					{caption => 'TWCC 69 PDF', name => 'twcc69pdf',},
+					{caption => 'TWCC 73 PDF', name => 'twcc73pdf',},
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
 					{caption => 'Envoy NSF', name => 'envoy_nsf',},
@@ -534,9 +534,9 @@ sub getProceduresHtml
 		}
 
 		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-		my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $voidItem->{placeOfService});
+		my $servPlaceCode = $voidItem->{placeOfService};
 		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
-		my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $voidItem->{typeOfService});
+		my $servTypeCode = $voidItem->{typeOfService};
 		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
 		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
 
@@ -1861,6 +1861,28 @@ sub prepare_view_twcc69pdf
 	return 1;
 }
 
+sub prepare_view_twcc73pdf
+{
+	my $self = shift;
+
+	# these values are set in "initialize()" method
+	my $claimList = $self->property('claimList');
+	my $valMgr = $self->property('valMgr');
+	my $invoiceId = $self->param('invoice_id');
+	my $pdfName = 'TWCC73.pdf';
+	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFOutputHREF, $pdfName);
+
+	eval
+	{
+		my $twccForm = new App::Billing::Output::TWCC;
+		$twccForm->processClaims($claimList, reportId => 'TWCC73', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+	};
+	$self->redirect($pdfHref);
+	$self->addError('Problem in sub prepare_view_twcc73pdf', $@) if $@;
+
+	return 1;
+}
+
 sub prepare_view_errors
 {
 	my $self = shift;
@@ -2027,6 +2049,7 @@ sub prepare_page_content_header
 	my $twcc61Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC61/16') ? 'update' : 'add';
 	my $twcc64Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/17') ? 'update' : 'add';
 	my $twcc69Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC69/17') ? 'update' : 'add';
+	my $twcc73Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC73/') ? 'update' : 'add';
 
 
 	my $invoice = undef;
@@ -2048,6 +2071,7 @@ sub prepare_page_content_header
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
 			$claimType == $workComp ? ['TWCC69 PDF', "/invoice-f/$invoiceId/twcc69pdf", 'twcc69pdf'] : undef,
+			#$claimType == $workComp ? ['TWCC73 PDF', "/invoice-f/$invoiceId/twcc73pdf", 'twcc73pdf'] : undef,
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
 			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
@@ -2099,6 +2123,7 @@ sub prepare_page_content_header
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
+						<!-- @{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc73Command-twcc73'>\u$twcc73Command TWCC Form 73</option>} : '' ]} -->
 						
 						<!-- <option value="/person/$clientId/account">Adjs Exist: $noAdjsExist</option>
 						<option value="/person/$clientId/account">Adjs Count: $adjCount</option>
