@@ -11,6 +11,9 @@ use vars qw(@ISA @EXPORT $STMTMGR_TRANSACTION);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_TRANSACTION);
 
+my $ACTIVE  = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+
 $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 	'selTransaction' => qq{
 			select provider_id, rel.caption as related_to,
@@ -193,6 +196,24 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		set trans_status = 3
 		where parent_trans_id = ?
 		},
+	'selMiscProcedureCodesById' => qq{
+		select  t.caption as name ,t.detail as description ,t.code as proc_code,
+		(select value_text from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 1) cpt_code1,
+		(select value_text from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 2) cpt_code2,
+		(select value_text from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 3) cpt_code3,
+		(select value_text from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 4) cpt_code4,
+		(select item_id from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 1) item_id1,
+		(select item_id from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 2) item_id2,
+		(select item_id from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 3) item_id3,
+		(select item_id from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 4) item_id4,
+		(select value_textB from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 1) modifier1,
+		(select value_textB from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 2) modifier2,
+		(select value_textB from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 3) modifier3,
+		(select value_textB from Trans_Attribute ta where ta.parent_id = t.trans_id and value_int = 4) modifier4				
+		from Transaction t
+		where t.trans_id = :1		
+		and trans_status = $ACTIVE
+		},		
 	#
 	# expects bind parameters:
 	#   1: user_id

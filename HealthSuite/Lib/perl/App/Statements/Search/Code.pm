@@ -12,7 +12,8 @@ use vars qw(@ISA @EXPORT
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
 	$STMTMGR_SERVICEPLACE_CODE_SEARCH
-	$STMTMGR_EPSDT_CODE_SEARCH);
+	$STMTMGR_EPSDT_CODE_SEARCH
+	$STMTMGR_MISC_PROCEDURE_CODE_SEARCH);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw(
 	$STMTMGR_CATALOG_CODE_SEARCH
@@ -20,7 +21,8 @@ use vars qw(@ISA @EXPORT
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
 	$STMTMGR_SERVICEPLACE_CODE_SEARCH
-	$STMTMGR_EPSDT_CODE_SEARCH);
+	$STMTMGR_EPSDT_CODE_SEARCH
+	$STMTMGR_MISC_PROCEDURE_CODE_SEARCH);
 
 use vars qw(
 	$STMTFMT_SEL_CATALOG_CODE
@@ -29,12 +31,22 @@ use vars qw(
 	$STMTFMT_SEL_SERVICETYPE_CODE
 	$STMTFMT_SEL_SERVICEPLACE_CODE
 	$STMTFMT_SEL_EPSDT_CODE
+	$STMTFMT_SEL_MISC_PROCEDURE
 	$STMTRPTDEFN_ICD
 	$STMTRPTDEFN_CPT
 	$STMTRPTDEFN_HCPCS
 	$STMTRPTDEFN_SERVCODE
-	$STMTRPTDEFN_EPSDT);
+	$STMTRPTDEFN_EPSDT
+	$STMTRPTDEFN_MISC_PROCEDURE);
 
+
+
+$STMTFMT_SEL_MISC_PROCEDURE = qq{
+		select code,caption,detail FROM Transaction
+		where 
+			%whereCond%
+			and trans_subtype = 'Misc Procedure Code'
+};
 
 
 $STMTFMT_SEL_EPSDT_CODE = qq{
@@ -153,6 +165,16 @@ $STMTRPTDEFN_EPSDT =
 	[
 		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },	
 		#{ head => 'Name' },
+		{ head => 'Description' },
+	],	
+};
+
+$STMTRPTDEFN_MISC_PROCEDURE =
+{
+	columnDefn =>
+	[
+		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },	
+		{ head => 'Name' },
 		{ head => 'Description' },
 	],	
 };
@@ -382,5 +404,50 @@ $STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
 	},
 
 );
+
+
+
+$STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
+	'sel_misc_procedure_code' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'code = ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	},
+
+	'sel_misc_procedure_description' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'upper(detail) = ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	}, 
+	'sel_misc_procedure_name' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'upper(caption) = ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	}, 
+	'sel_misc_procedure_code_like' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'code like ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	},
+
+	'sel_misc_procedure_description_like' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'upper(detail) like ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	},
+	'sel_misc_procedure_name_like' =>
+	{
+		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
+		whereCond => 'upper(caption) like ?',
+		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
+	},
+
+);
+
 
 1;

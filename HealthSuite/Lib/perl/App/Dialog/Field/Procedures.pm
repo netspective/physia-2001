@@ -69,6 +69,8 @@ sub isValid
 	my $charges = '';
 	my $emergency = '';
 	my %diagsSeen = ();
+	my $use_fee='';
+	my $code_type='';
 	my @defaultFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 
@@ -127,6 +129,8 @@ sub isValid
 		$units = $page->param("_f_proc_$line\_units");
 		$charges = $page->param("_f_proc_$line\_charges");
 		$emergency = $page->param("_f_proc_$line\_emg");
+		$use_fee= $page->param("_f_proc_$line\_use_fee");
+		$code_type=$page->param("_f_proc_$line\_code_type");
 
 		next if $servicedatebegin eq 'From' && $servicedateend eq 'To';
 		next if $servicedatebegin eq '' && $servicedateend eq '';
@@ -232,23 +236,36 @@ sub isValid
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 		my $svc_type=App::IntelliCode::getSvcType($page, $procedure, $modifier || undef,\@listFeeSchedules);
 		my $count_type = scalar(@$svc_type);
-		unless ($servicetype)
-		{
-			if ($count_type==1)
+		my $count=0;
+		$page->addDebugStmt("uf= $use_fee");
+		if ($servicetype eq '' ||$charges eq '')
+		{			
+			if ($count_type==1 || $use_fee ne '')
 			{
 				foreach(@$svc_type)
 				{
-					$page->param("_f_proc_$line\_service_type",$_->[1]); 	
+					if($count_type==1||$use_fee eq $count)
+					{
+						$page->param("_f_proc_$line\_service_type",$_->[1]); 	
+						$page->param("_f_proc_$line\_code_type",$_->[3]); 	
+					}
+					$count++;
 				}
 			}
 			elsif ($count_type>1)
 			{
-				my $html_svc = $self->getMultiSvcTypesHtml($page, $line, $svc_type);
+				my $html_svc = $self->getMultiSvcTypesHtml($page, $line,$procedure, $svc_type);
 				$self->invalidate($page, $html_svc);
+			}
+			else
+			{
+				#my $type = $->getField("_f_proc_$line\_procedure");
+				$self->invalidate($page,"[<B>P$line</B>]Unable to find Code '$procedure' in fee schedule(s) " . join ",",@listFeeSchedules);
 			}
 		}
 		unless ($charges)
 		{
+			$count =0;
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 			$page->param("_f_proc_active_catalogs", join(',', @allFeeSchedules));
 			
@@ -257,22 +274,27 @@ sub isValid
 
 			if($resultCount == 0)
 			{
-				$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
+				#$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
 			}
-			elsif($resultCount == 1)
+			elsif($resultCount == 1|| $use_fee ne '')
 			{
+
 				foreach (@$fsResults)
 				{
-					my $unitCost = $_->[1];
-					my $ffsFlag = $_->[2];
-					$page->param("_f_proc_$line\_charges", $unitCost);
-					$page->param("_f_proc_$line\_ffs_flag",$ffsFlag);
+					if($resultCount == 1|| $use_fee eq $count)
+					{
+						my $unitCost = $_->[1];
+						my $ffsFlag = $_->[2];
+						$page->param("_f_proc_$line\_charges", $unitCost);
+						$page->param("_f_proc_$line\_ffs_flag",$ffsFlag);
+					}
+					$count++;
 				}
 			}
 			else
 			{
-				my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
-				$self->invalidate($page, $html);
+				#my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
+				#$self->invalidate($page, $html);
 			}
 		}
 
@@ -311,24 +333,30 @@ sub getMultiPricesHtml
 	return $html;
 }
 
+
+
 sub getMultiSvcTypesHtml
 {
-	my ($self, $page, $line, $fsResults) = @_;
+	my ($self, $page,$line,$code,  $fsResults) = @_;
 
-	my $html = qq{[<B>P$line</B>] Multiple service types found.  Please select a service type for this line item.};
-	
+	my $html = qq{[<B>P$line</B>] Multiple fee schedules have code '$code'.  Please select a fee schedule to use for this item.};
+	my $count=0;
 	foreach (@$fsResults)
 	{
 		my $svc_type=$_->[1];
-		my $svc_name=$_->[2];
+		#my $svc_name=$_->[4];
+		#Use the above line if you want to see the fee schedule name instead of the fee schedule number
+		my $svc_name=$_->[0];
 		$html .= qq{
-			<input onClick="document.dialog._f_proc_$line\_service_type.value=this.value" 
-				type=radio name='_f_multi_svc_type' value=$svc_type>$svc_name
-		};
+			<input onClick="document.dialog._f_proc_$line\_use_fee.value=this.value" 
+				type=radio name='_f_multi_svc_type_$line' value=$count>$svc_name
+		};	
+		$count++;
 	}
 
 	return $html;
 }
+
 
 sub getHtml
 {
@@ -439,6 +467,10 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_actual_diags" VALUE='@{[ $page->param("_f_proc_$line\_actual_diags")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_ffs_flag" VALUE='@{[ $page->param("_f_proc_$line\_ffs_flag")]}'/>			
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_service_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_service_type")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_use_fee" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_use_fee")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_code_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_code_type")]}'/>
+
 			<TR VALIGN=TOP>
 				<SCRIPT>
 					function onChange_dosBegin_$line(event, flags)
@@ -469,7 +501,6 @@ sub getHtml
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || ($line == 1 ? 'From' : '')]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
 					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || ($line == 1 ? 'To' : '') ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_service_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_service_type")]}'/>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
 					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>

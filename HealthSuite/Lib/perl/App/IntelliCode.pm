@@ -583,7 +583,7 @@ sub getType
 	if ($modifier)
 	{
 		$entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'sel_catalogEntry_svcType_by_ccode_modifier_catalog', $cpt, $modifier, $fs
+			'sel_catalogEntry_svcType_by_code_modifier_catalog', $cpt, $modifier, $fs
 		);
 	}
 	else
@@ -591,7 +591,7 @@ sub getType
 		$entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
 			'sel_catalogEntry_svcType_by_catalog', $cpt, $fs);
 	}
-	push(@{$bufferRef}, [$fs,$entry->{data_text},$entry->{caption} ]) if exists $entry->{data_text};	
+	push(@{$bufferRef}, [$fs,$entry->{data_text},$entry->{caption} ,$entry->{entry_type},$entry->{catalog_id}]) if exists $entry->{data_text};	
 }
 
 

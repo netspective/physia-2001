@@ -259,18 +259,24 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	},
 	
 	'sel_catalogEntry_svcType_by_catalog' => qq{
-			select data_text,caption from Offering_Catalog_Entry, HCFA1500_Service_Type_Code 
-			where code = upper(?)
-				and modifier is NULL
-				and catalog_id = ?
-				and data_text = abbrev 				
+			select oc.INTERNAL_CATALOG_ID ,entry_type,oc.catalog_id,data_text,h.caption 
+			from Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
+			Offering_Catalog oc
+			where oce.code = upper(?)
+			and oce.modifier is NULL
+			and oce.catalog_id = ?
+			and oce.data_text (+) = h.abbrev 	
+			and oc.internal_catalog_id = oce.catalog_id
 	},
 	'sel_catalogEntry_svcType_by_code_modifier_catalog' => qq{
-				select data_text,caption from Offering_Catalog_Entry, HCFA1500_Service_Type_Code 
-				where code = upper(?)
-					and (modifier = ? or modifier is NULL)
-					and catalog_id = ?
-					and data_text = abbrev 				
+				select oc.INTERNAL_CATALOG_ID,entry_type,oc.catalog_id,data_text,h.caption 
+				from Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
+				Offering_Catalog oc
+				where oce.code = upper(?)
+				and (modifier = ? or modifier is NULL)
+				and oce.catalog_id = ?
+				and oce.data_text (+) = h.abbrev 	
+				and oc.internal_catalog_id = oce.catalog_id	
 	},
 );
 

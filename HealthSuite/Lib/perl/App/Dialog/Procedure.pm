@@ -37,6 +37,10 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'item_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_diags'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'data_num_a'),	#used to indicate if item is FFS (null if it isn't)
+		
+		new CGI::Dialog::Field(type => 'hidden', name => 'code_type'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'use_fee'),
+	
 
 		new CGI::Dialog::Field::Duration(
 				name => 'illness',
@@ -69,8 +73,16 @@ sub new
 				begin_caption => 'From Date',
 				end_caption => 'To Date'
 				),
-		new App::Dialog::Field::ServicePlaceType(caption => 'Service Place/Type'),
-		new App::Dialog::Field::ProcedureLine(caption => 'CPT / Modf'),
+		#new App::Dialog::Field::ServicePlaceType(caption => 'Service Place'),
+		new CGI::Dialog::Field(
+					caption => 'Service Place',
+					name => "servplace",
+					size => 6, options => FLDFLAG_REQUIRED,
+					defaultValue => 11,				
+				findPopup => '/lookup/serviceplace'),
+		new CGI::Dialog::Field(type=>'hidden', name => "servtype"),
+					
+		new App::Dialog::Field::ProcedureLine(name=>'cptModfField', caption => 'CPT / Modf'),
 		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED, name => 'procdiags'),
 
 		new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
@@ -143,12 +155,12 @@ sub makeStateChanges
 		if($numOfHashes > 0)
 		{
 			$page->field('servplace', $serviceInfo->[$idx]->{hcfa_service_place});
-			$self->setFieldFlags('servplace', FLDFLAG_READONLY);
+			#$self->setFieldFlags('servplace', FLDFLAG_READONLY);
 
-			if($page->field('servtype') eq '')
-			{
-				$page->field('servtype', $serviceInfo->[$idx]->{hcfa_service_type});
-			}
+			#if($page->field('servtype') eq '')
+			#{
+			#	$page->field('servtype', $serviceInfo->[$idx]->{hcfa_service_type});
+			#}
 
 			if($page->field('service_begin_date') eq '')
 			{
@@ -160,7 +172,7 @@ sub makeStateChanges
 				$page->field('service_end_date', $serviceInfo->[$idx]->{service_end_date});
 			}
 		}
-	}
+	}	
 }
 
 sub populateData
@@ -169,17 +181,15 @@ sub populateData
 	my $invoiceId = $page->param('invoice_id');
 
 	$page->field('claim_diags', $STMTMGR_INVOICE->getSingleValue($page, 0, 'selClaimDiags', $invoiceId));
-
 	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;	
 	$page->field('proccharge', $page->field('alt_cost'));
-	$page->field('', $page->getDate());
+	$page->field('', $page->getDate());	
 	my $sqlStampFmt = $page->defaultSqlStampFormat();
 	my $itemId = $page->param('item_id');
 
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selProcedure', $itemId);
-
+	$page->field('servtype','');	
 	if($page->field('item_type') == App::Universal::INVOICEITEMTYPE_LAB)
 	{
 		$page->field('lab_indicator', 1)
@@ -1224,30 +1234,69 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
+	my $servicetype = $page->field('servtype');
+	my $cptCode = $page->field('procedure');
+	my $modCode = $page->field('procmodifier');
+	my $use_fee = $page->field('use_fee');
+	
+	my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
+	my $svc_type = App::IntelliCode::getSvcType($page, $cptCode, $modCode, \@feeSchedules);
+	my $count_type = scalar(@$svc_type);
+	my $count=0;	
+	unless ($servicetype)
+	{
+		if ($count_type==1||$use_fee ne '')
+		{
+			foreach(@$svc_type)
+			{
+				#Store code_type and service type in hidden fields
+				if($count_type==1||$use_fee eq $count)
+				{
+					$page->field("servtype",$_->[1]); 	
+					$page->field('code_type',$_->[3]);
+				}
+			 	$count++
+			}
+		}
+		elsif ($count_type>1)
+		{
+			my $html_svc = $self->getMultiSvcTypesHtml($page,$cptCode, $svc_type);
+			#Use the service place to send error message because service type field is hidden
+			my $type = $self->getField('cptModfField')->{fields}->[0];
+			$type->invalidate($page, $html_svc);
+		}
+		else
+		{
+			my $type = $self->getField('cptModfField')->{fields}->[0];
+			$type->invalidate($page,"Unable to find Code '$cptCode' in fee schedule(s) " . join ",",@feeSchedules);
+		}
+	}
 	#GET ITEM COST FROM FEE SCHEDULE
+	$count=0;
 	if (! $page->field('proccharge') && ! $page->field('alt_cost'))
 	{
-		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];
-		my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
-		my $cptCode = $page->field('procedure');
-		my $modCode = $page->field('procmodifier');
-
+		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];				
 		my $fsResults = App::IntelliCode::getItemCost($page, $cptCode, $modCode, \@feeSchedules);
 		my $resultCount = scalar(@$fsResults);
 		if($resultCount == 0)
 		{
 			$unitCostField->invalidate($page, 'No unit cost was found');
 		}
-		elsif($resultCount == 1)
+		elsif($resultCount == 1 || $use_fee ne '')
 		{
 			foreach (@$fsResults)
 			{
-				my $unitCost = $_->[1];
-				$page->field('proccharge', $unitCost);
+				if ($count_type==1 || $use_fee eq $count)
+				{
+					my $unitCost = $_->[1];
+					$page->field('proccharge', $unitCost);
 				
-				my $isFfs = $_->[2];
-				$page->field('data_num_a', $isFfs);
+					my $isFfs = $_->[2];
+					$page->field('data_num_a', $isFfs);
+				}
+				$count++;
 			}
+			
 		}
 		else
 		{
@@ -1265,11 +1314,37 @@ sub customValidate
 			#$self->getField('alt_cost')->{selOptions} = "$costList";
 			
 			my $field = $self->getField('alt_cost');
-			my $html = $self->getMultiPricesHtml($page, $fsResults);
-			$field->invalidate($page, $html);
+			
+			#my $html = $self->getMultiPricesHtml($page, $fsResults);
+			#$field->invalidate($page, $html);
 		}
 	}
 }
+
+
+
+sub getMultiSvcTypesHtml
+{
+	my ($self, $page,$code,  $fsResults) = @_;
+
+	my $html = qq{Multiple fee schedule have code '$code'.  Please select a fee schedule to use for this item.};
+	my $count=0;
+	foreach (@$fsResults)
+	{
+		my $svc_type=$_->[1];
+		#my $svc_name=$_->[4];
+		#Use the above line if you want to see the fee schedule name instead of the fee schedule number
+		my $svc_name=$_->[0];
+		$html .= qq{
+			<input onClick="document.dialog._f_use_fee.value=this.value" 
+				type=radio name='_f_multi_svc_type' value=$count>$svc_name
+		};	
+		$count++;
+	}
+
+	return $html;
+}
+
 
 sub getMultiPricesHtml
 {
@@ -1315,6 +1390,7 @@ sub execute_addOrUpdate
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $invoiceId = $page->param('invoice_id');
 	my $itemId = $page->param('item_id');
+	my $codeType = $page->field('code_type');
 	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId) if $command eq 'update';
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_SERVICE;
@@ -1382,6 +1458,7 @@ sub execute_addOrUpdate
 			service_begin_date => $page->field('service_begin_date') || undef,
 			service_end_date => $page->field('service_end_date') || undef,
 			data_text_a => join(', ', @diagCodePointers) || undef,
+			data_text_c => $codeType||undef,
 			data_num_a => $page->field('data_num_a') || undef,
 			_debug => 0
 		);
