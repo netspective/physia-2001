@@ -11,13 +11,14 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use Date::Manip;
 use App::Statements::Person;
+use App::Statements::Catalog;
 use App::Statements::Org;
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
 my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_INTEGER;
-
+my $FS_CATALOG_TYPE = 0;
 
 %RESOURCE_MAP = (
 	'feeschedule-person' => {
@@ -78,11 +79,13 @@ sub new
 						caption => $caption,
 						type => 'text',
 						options => FLDFLAG_READONLY),
+                        new CGI::Dialog::Field(	name => 'value_int',
+						type => 'hidden',		
+						),		
                         new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
-						name => 'value_int',
-						type => 'integer',
+						name => 'catalog_id',
 						options => FLDFLAG_REQUIRED,
-						hints => 'Numeric Fee Schedule ID'),										
+						),							
 			
 		);
 
@@ -107,17 +110,20 @@ sub populateData
 		$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById',$page->param('item_id') ) if
 		$page->param('item_id');	
 	}
-	
+	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', $page->field('value_int'));	
+	$page->field('catalog_id',$catalog->{catalog_id});
 }
 
 sub customValidate
 {
 	my ($self, $page) = @_;
 	my $table = $self->{table};
-	my $field = $self->getField('value_int');
+	my $field = $self->getField('catalog_id');
 	#Check if Fee Schedule is Already assoicated with this provider/org
 	my $msg = "Fee Schedule Already Assoicated with " . $page->field('parent_id');
 	my $command = $self->getActiveCommand($page);	
+	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', $page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);	
+	$page->field('value_int',$catalog->{internal_catalog_id});	
 	return if $command eq 'update' or $command eq 'remove';
 	if($table eq 'Org_Attribute')
 	{	
@@ -130,6 +136,7 @@ sub customValidate
 		$field->invalidate($page,$msg) if $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selAttributeByIdValueIntParent',
 						$page->field('parent_id'),$page->field('value_int'),'Fee Schedule');
 	}
+
 }
 
 sub execute
