@@ -4,13 +4,12 @@ package App::Page::Search::Home;
 
 use strict;
 use App::Page::Search;
-use Devel::ChangeLog;
-use vars qw(@ISA  @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
 sub getForm
 {
-	return ('Lookup or create a record');
+	return ('Lookup or add a record');
 }
 
 sub prepare
@@ -30,20 +29,20 @@ sub prepare
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
 						<b>Lookup</b>
-						<a href="/search/person">People</a>,
+						<a href="/search/person">All Persons</a>,
 						<a href="/search/patient">Patients</a>,
-						<a href="/search/physician">Physicians</a>,
+						<a href="/search/physician">Physician/Providers</a>,
 						<a href="/search/nurse">Nurses</a>, or
 						<a href="/search/staff">Staff Members</a>.
-						<a href="/search/associate">Associate</a>.
+						<a href="/search/associate">Personnel</a>.
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD>
 						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Create</b> a new <a href="/org/#session.org_id#/dlg-add-patient">Patient</a>,
-						<a href="/org/#session.org_id#/dlg-add-physician">Physician</a>,
+						<b>Add</b> a new <a href="/org/#session.org_id#/dlg-add-patient">Patient</a>,
+						<a href="/org/#session.org_id#/dlg-add-physician">Physician/Provider</a>,
 						<a href="/org/#session.org_id#/dlg-add-nurse">Nurse</a>, or
 						<a href="/org/#session.org_id#/dlg-add-staff">Staff Member</a> record.
 					</TD>
@@ -70,12 +69,12 @@ sub prepare
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD>
 						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Create</b> a new
+						<b>Add</b> a new
 						<a href="/org/#session.org_id#/dlg-add-org-main">Main Organization</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, or
+						<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>
 						record.
 					</TD>
@@ -84,7 +83,7 @@ sub prepare
 			<P>
 			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Codes</B></FONT></TD>
+					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>References/Codes</B></FONT></TD>
 				</TR>
 				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
@@ -94,9 +93,9 @@ sub prepare
 						<a href="/search/icd">ICD-9</a>,
 						<a href="/search/cpt">CPT</a>,
 						<a href="/search/hcpcs">*HCPCS</a>,
-						<a href="/search/serviceplace">Service Place</a>, or
-						<a href="/search/servicetype">Service Type</a>
-						code(s).
+						<a href="/search/serviceplace">Service Place</a>,
+						<a href="/search/servicetype">Service Type</a>, or
+						<a href="/search/envoypayer">Envoy Payer</a>.
 					</TD>
 				</TR>
 			</TABLE>
@@ -104,7 +103,7 @@ sub prepare
 			<TD>
 			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Accounting</B></FONT></TD>
+					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Billing</B></FONT></TD>
 				</TR>
 				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
@@ -113,21 +112,19 @@ sub prepare
 						<b>Lookup</b>
 						<a href="/search/claim">Claims</a>,
 						<a href="/search/catalog">Fee Schedules</a>,
-						<a href="/search/insproduct">Insurance Product</a>, or
+						<a href="/search/insproduct">Insurance Product</a>,
 						<a href="/search/insplan">Insurance Plan</a>.
-						<a href="/search/envoypayer">Envoy Payer</a>.
-
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD>
 						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Create</b> a new
+						<b>Add</b> a new
 						<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
 						<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
 						<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
-						<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>, or
+						<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>,
 						<a href="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</a>.
 						<a href="/org/#session.org_id#/dlg-add-ins-coverage">Personal Insurance Coverage</a>.
 					</TD>
@@ -153,7 +150,7 @@ sub prepare
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD>
 						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Create</b> a new
+						<b>Add</b> a new
 						<a href="/org/#session.org_id#/dlg-add-appointment">Appointment</a>
 						<a href="/org/#session.org_id#/dlg-add-template">Schedule Template</a>, or
 						<a href="/org/#session.org_id#/dlg-add-appttype">Appointment Type</a>
@@ -168,18 +165,5 @@ sub prepare
 
 	return 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/12/2000', 'MAF',
-			'Search/Home Search',
-		'Added Service Place and Type searches to main Search page.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_NOTE, '01/12/2000', 'MAF',
-			'Search/Home Search',
-		'Corrected the create link for workers compensation.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Home Search',
-		'Changed the urls for create links in the home page'],
-);
 
 1;
