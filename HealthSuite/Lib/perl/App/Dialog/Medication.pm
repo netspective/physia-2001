@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.7 2000-12-22 05:47:50 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.8 2000-12-22 06:52:34 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -260,7 +260,6 @@ sub getSupplementaryHtml
 	});
 }
 
-
 sub makeStateChanges
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
@@ -359,7 +358,6 @@ sub makeStateChanges
 
 	}
 }
-
 
 sub populateData
 {
@@ -508,22 +506,32 @@ sub execute_approve
 	my $status = $page->field('status');
 	my $message = $status ? 'This medication/prescription has been approved.' : 'This medication/prescription has been denied';
 
-	foreach my $doc_id (@$relatedMessages)
+	if (grep {$_ eq 'Physician'} @{$page->session('categories')})
 	{
-		$page->schemaAction(
-			'Document_Attribute', 'add',
-			parent_id => $doc_id,
-			value_type => App::Universal::ATTRTYPE_TEXT,
-			item_name => 'Notes',
-			person_id => $page->session('person_id'),
-			value_int => 0,
-			value_text => $message,
-		);
+		foreach my $doc_id (@$relatedMessages)
+		{
+			$page->schemaAction(
+				'Document_Attribute', 'add',
+				parent_id => $doc_id,
+				value_type => App::Universal::ATTRTYPE_TEXT,
+				item_name => 'Notes',
+				person_id => $page->session('person_id'),
+				value_int => 0,
+				value_text => $message,
+			);
+		}
 	}
 
 	return $results;
 }
 
+sub execute_view
+{
+	my $self = shift;
+	my ($page, $command, $flags) = @_;
+
+	$self->handlePostExecute($page, $command, $flags);
+}
 
 sub sendApprovalRequest
 {
@@ -538,7 +546,7 @@ sub sendApprovalRequest
 	$msgDlg->sendMessage($page,
 		subject => 'Prescription Approval Request',
 		message => $page->session('person_id') . " is seeking approval for a prescription:\n\nPatient: $patient\nMedication: $med_name $dosage\n",
-		to => $page->field('get_approval_from'),
+		to => $page->field('get_approval_from') || $page->session('person_id'),
 		rePatient => $page->field('parent_id'),
 		permedId => $page->param('permed_id'),
 	);
