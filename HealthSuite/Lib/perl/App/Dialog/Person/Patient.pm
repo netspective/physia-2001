@@ -37,6 +37,7 @@ sub initialize
 	$self->addContent(
 			new App::Dialog::Field::Person::ID::New(caption => 'Patient/Person ID',
 							name => 'person_id',
+							types => ['Person'],
 							options => FLDFLAG_REQUIRED,
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 						postHtml => $postHtml),
@@ -52,10 +53,10 @@ sub initialize
 
 				#new CGI::Dialog::Field(caption => 'Preferred Day For Appointment', name => 'prefer_day', type => 'memo', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 
-		new CGI::Dialog::MultiField(caption =>'Responsible Party/Self', name => 'responsible', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		new CGI::Dialog::MultiField(caption =>'Responsible Party/Self', name => 'responsible', hints => "Please provide either an existing Person ID or Select 'Self'",
 				fields => [
-							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Self', type => 'bool', style => 'check', name => 'resp_self', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor']),
+							new CGI::Dialog::Field(caption => ' Self', type => 'bool', style => 'check', name => 'resp_self'),
 						]),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
