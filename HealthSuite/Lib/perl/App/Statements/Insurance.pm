@@ -44,6 +44,11 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			owner_org_id = ? AND
 			product_name = ?
 		},
+	'selInsType' => qq{
+		select ins_type	
+		from insurance 
+		where ins_internal_id = ?	
+		},
 	'selInsuranceSingleColumn' => qq{
 		SELECT ?
 		FROM insurance
