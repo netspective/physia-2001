@@ -595,32 +595,33 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
         },
 
 	'sel_daily_audit_detail' => qq{
-	SELECT	invoice_id ,
-		invoice_date as invoice_batch_date,
-		service_begin_date,
-		service_end_date,
-		provider as care_provider_id ,
-		client_id as patient_id,
-		code,
-		caption,
-		rel_diags,
+	SELECT	invoice_charges.invoice_id ,
+		invoice_charges.invoice_date as invoice_batch_date,
+		invoice_charges.service_begin_date,
+		invoice_charges.service_end_date,
+		invoice_charges.provider as care_provider_id ,
+		invoice_charges.client_id as patient_id,
+		invoice_charges.code,
+		invoice_charges.caption,
+		invoice_charges.rel_diags,
 		decode(item_type,7,0,units) as units,
 		decode(item_type,7,0,unit_cost) as unit_cost,
-		(total_charges) total_charges,
-		(misc_charges) misc_charges ,
-		(person_pay) person_pay,
-		(insurance_pay) insurance_pay,
-		(insurance_write_off) insurance_write_off,
-		(balance_transfer) balance_transfer,
-		(charge_adjust) as  charge_adjust,
-		(person_write_off) as person_write_off,
-		(refund) as refund,
-		pay_type,
+		(invoice_charges.total_charges) total_charges,
+		(invoice_charges.misc_charges) misc_charges ,
+		(invoice_charges.person_pay) person_pay,
+		(invoice_charges.insurance_pay) insurance_pay,
+		(invoice_charges.insurance_write_off) insurance_write_off,
+		(invoice_charges.balance_transfer) balance_transfer,
+		(invoice_charges.charge_adjust) as  charge_adjust,
+		(invoice_charges.person_write_off) as person_write_off,
+		(invoice_charges.refund) as refund,
+		pm.caption as pay_type ,
 		p.simple_name simple_name
-	FROM	invoice_charges,org o, person p
+	FROM	invoice_charges,org o, person p, payment_method pm
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
 		AND (provider = :3 or :3 IS NULL)
+		AND pm.id (+)= invoice_charges.pay_type
 		AND
 		(
 			(batch_id >= :4 or :4 is NULL)
@@ -681,15 +682,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	order by invoice_date asc},
 
 	'sel_monthly_audit_detail' => qq{
-	SELECT	invoice_id ,
+	SELECT	invoice_charges.invoice_id ,
 		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
-		service_begin_date,
-		service_end_date,
-		provider as care_provider_id ,
-		client_id as patient_id,
-		code,
-		caption,
-		rel_diags,
+		invoice_charges.service_begin_date,
+		invoice_charges.service_end_date,
+		invoice_charges.provider as care_provider_id ,
+		invoice_charges.client_id as patient_id,
+		invoice_charges.code,
+		invoice_charges.caption,
+		invoice_charges.rel_diags,
 		decode(item_type,7,0,units) as units,
 		decode(item_type,7,0,unit_cost) as unit_cost,
 		(total_charges) total_charges,
@@ -701,13 +702,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(charge_adjust) as  charge_adjust,
 		(person_write_off) as person_write_off,
 		(refund) as refund,
-		pay_type,
+		pm.caption as pay_type ,
 		p.simple_name
-	FROM 	invoice_charges, org o, person p
+	FROM 	invoice_charges, org o, person p,payment_method pm
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	(facility = :2 or :2 IS NULL )
+	AND 	pm.id (+)= invoice_charges.pay_type
 	AND 	(provider = :3 or :3 IS NULL)
 	AND
 		(
