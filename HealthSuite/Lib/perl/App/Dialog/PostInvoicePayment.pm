@@ -299,18 +299,6 @@ sub execute
 		);
 
 
-		#Create history attribute for this adjustment		
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
-			value_textB => "$comments " . "Batch ID: $batchID"|| undef,
-			value_date => $todaysDate,
-			_debug => 0
-		);
-
 		#Create attribute for batchId
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
@@ -324,7 +312,17 @@ sub execute
 		);
 	}
 
-
+	#Create history attribute for total payment
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
+		value_textB => "Batch ID: $batchID" || undef,
+		value_date => $todaysDate,
+		_debug => 0
+	);
 
 	#Update the invoice
 
