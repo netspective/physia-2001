@@ -116,10 +116,10 @@ sub new
 	}
 	else
 	{
-		$params{type} = 'text';
-		$params{size} = 16;
-		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/insproduct';
+		$params{type} = 'text' unless exists $params{type};
+		$params{size} = 16 unless exists $params{size};
+		$params{maxLength} = 32 unless exists $params{maxLength};
+		$params{findPopup} = '/lookup/insproduct' unless exists $params{findPopup};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -238,10 +238,10 @@ sub new
 	}
 	else
 	{
-		$params{type} = 'text';
-		$params{size} = 16;
-		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/insplan';
+		$params{type} = 'text' unless exists $params{type};
+		$params{size} = 16 unless exists $params{size};
+		$params{maxLength} = 32 unless exists $params{maxLength};
+		$params{findPopup} = '/lookup/insplan' unless exists $params{findPopup};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
