@@ -94,13 +94,13 @@ sub connectDB
 			if(! $cachedDbHdls->{$connectKey}->{dbiHdl})
 			{
 				delete $cachedDbHdls->{$connectKey};
-				$self->addError("Unable to connect to the database $self->{dbConnectParams}->{connectStr} as $self->{dbConnectParams}->{username}.");
+				die "Unable to connect to the database '$server' as '$un'.\n";
 			}
 			else
 			{
 				$cachedDbHdls->{$connectKey}->{dbms} = $dbms;
 				$cachedDbHdls->{$connectKey}->{dbserver} = $server;
-				$cachedDbHdls->{$connectKey}->{dbiHdl}->{RaiseError} = 1;
+				$cachedDbHdls->{$connectKey}->{dbiHdl}->{RaiseError} = 0;
 				$cachedDbHdls->{$connectKey}->{dbiHdl}->{LongReadLen} = 8192;
 				$cachedDbHdls->{$connectKey}->{dbiHdl}->{LongTruncOk} = 1;
 			}
@@ -308,7 +308,17 @@ sub Table::updateRec
 		};
 		if($@)
 		{
-			push(@{$errors}, "$self (updateRec DBI Error)", $@);
+			my $debugMsg = "<b>Schema Error in " . ref($self) . '::updateRec()</b><br>';
+			$debugMsg .= "<b>SQL:</b> <pre>$sql</pre>";
+			$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
+			for my $i ( 0..$#{$colValue})
+			{
+				my $value = defined $$colValue[$i] ? "'$$colValue[$i]'" : '<i>undef</i>';
+				$debugMsg .= '&nbsp;&nbsp;:' . ($i+1) . " = $value<br>";
+			}
+			$debugMsg .= '<br>';
+			$debugMsg .= "<b>DBI Error:</b> $@<br>";
+			push(@{$errors}, $debugMsg);
 		}
 		else
 		{
