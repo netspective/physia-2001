@@ -79,21 +79,46 @@ sub processClaims
     	# get the sorted collections of claims on the basis of claim Type 
     	# which could be commercial, medicare, medicaid and blue shield
     	my $claimsCollection = getClaimsCollectionForTHIN($claimsList);
-    	my $testcount  = $claimsList->getClaim();
+    	#my $testcount  = $claimsList->getClaim();
     	# creat the THIN.pm of File directory once	
     	$self->{nsfTHINFileObj} = new App::Billing::Output::File::THIN();
 
+		
+		
 		# creates logical files for multiple payers
 		foreach my $key(keys %$claimsCollection)
 		{
-			my $testKeyCount  = $claimsCollection->{$key}->getClaim();
+			my $payerType = '';
+			
+			my $selectedClaims  = $claimsCollection->{$key};
+			
 			# Sometimes there is no claim in a collection , so to avoid problems on empty
 			# claims list we ignore it
-			if ($#$testKeyCount > -1)
+			if ($#$selectedClaims > -1)
 			{
-	    		$self->{nsfTHINFileObj}->processFile(claimList => $claimsCollection->{$key}, outArray => $params{outArray}, nsfType => $params{nsfType}, payerType => $key)
+				my $tempCollection = new App::Billing::Claims;
+				
+				for my $tempClaimIndex(0..$#$selectedClaims)
+				{
+					if ($payerType eq '')
+					{
+						$payerType = $selectedClaims->[$tempClaimIndex]->{policy}->[0]->getSourceOfPayment();
+					}
+							
+					$tempCollection->addClaim($selectedClaims->[$tempClaimIndex]);	
+				}
+
+				# if still there is no source of payment then F (Commercial) will
+				# be default source of payment)
+				if (($payerType eq '') || !(grep{$_ eq $payerType} (App::Billing::Universal::THIN_COMMERCIAL, App::Billing::Universal::THIN_MEDICARE, App::Billing::Universal::THIN_MEDICAID, App::Billing::Universal::THIN_BLUESHIELD)))
+				{
+						$payerType = App::Billing::Universal::THIN_COMMERCIAL;
+				}
+					
+	    		$self->{nsfTHINFileObj}->processFile(claimList => $tempCollection, outArray => $params{outArray}, nsfType => $params{nsfType}, payerType => $payerType)
     		}
 	    }
+	    
 	    # To add new line character in the last line inserted in array
 	    $params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
     }
@@ -159,34 +184,15 @@ sub getClaimsCollectionForTHIN
 	
 	my $claims = $claimsList->getClaim(); 
 	
-	$claimsCollection->{App::Billing::Universal::THIN_MEDICARE} = new App::Billing::Claims; # C for Medicare
-	$claimsCollection->{App::Billing::Universal::THIN_MEDICAID} = new App::Billing::Claims; # D for Medicaid
-	$claimsCollection->{App::Billing::Universal::THIN_COMMERCIAL} = new App::Billing::Claims; # G BlueShield
-	$claimsCollection->{App::Billing::Universal::THIN_BLUESHIELD} = new App::Billing::Claims; # F Commercial
-
-
+    my $tempPayer = {};
+	
 	for $i (0..$#$claims)
 	{
-		my $srcOfPayment = $claims->[$i]->{policy}->[0]->getSourceOfPayment();
-		$srcOfPayment =~ s/ //g;
-		my $error = " 0";
-		if(grep{$_ eq $srcOfPayment} (App::Billing::Universal::THIN_MEDICARE, App::Billing::Universal::THIN_MEDICAID, App::Billing::Universal::THIN_COMMERCIAL, App::Billing::Universal::THIN_BLUESHIELD))
-		{
-			$claimsCollection->{$srcOfPayment}->addClaim($claims->[$i]); 
+		my $payerId = $claims->[$i]->{policy}->[0]->getPayerId();
+		push(@{$tempPayer->{$payerId}},$claims->[$i]);
+	}	
 	
-		}
-		else # default payer is commercial
-		{
-			$claimsCollection->{App::Billing::Universal::THIN_COMMERCIAL}->addClaim($claims->[$i]);		
-	
-		}
-	}
-	# make four different collections of claims on the basis of Payer which could
-	# be Commercial, Medicare, Medicaid and BlueShield
-	# return the hash in which key will be THIN_XXX (XXX could be medicare, medicaid etc.)
-	# against each key in hash there is an array of selected claims
-	
-	return $claimsCollection;
+	return $tempPayer;
 }
 
 sub createOutputFile

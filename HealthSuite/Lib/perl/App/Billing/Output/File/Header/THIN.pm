@@ -93,7 +93,7 @@ sub formatData
 	  substr($self->getDate(),0,8),
 	  substr($self->getTime(),0,6),
 	  substr($confData->{RECEIVER_ID},0,16), # receiver id
-	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
+	  substr('D',0,1),#substr($confData->{RECEIVER_TYPE_CODE},0,1),
 	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
 	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
 	  substr($confData->{TEST_PRODUCTION_INDICATOR},0,4), # test production indicator
@@ -129,7 +129,7 @@ sub formatData
 	  substr($self->getDate(),0,8),
 	  substr($self->getTime(),0,6),
 	  substr($confData->{RECEIVER_ID},0,16), # receiver id
-	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
+	  substr('G',0,1),#substr($confData->{RECEIVER_TYPE_CODE},0,1),
 	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
 	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
 	  substr($confData->{TEST_PRODUCTION_INDICATOR},0,4), # test production indicator
@@ -165,7 +165,7 @@ sub formatData
 	  substr($self->getDate(),0,8),
 	  substr($self->getTime(),0,6),
 	  substr($confData->{RECEIVER_ID},0,16), # receiver id
-	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
+	  substr('F',0,1),#substr($confData->{RECEIVER_TYPE_CODE},0,1),
 	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
 	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
 	  substr($confData->{TEST_PRODUCTION_INDICATOR},0,4), # test production indicator
@@ -201,7 +201,7 @@ sub formatData
 	  substr($self->getDate(),0,8),
 	  substr($self->getTime(),0,6),
 	  substr($confData->{RECEIVER_ID},0,16), # receiver id
-	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
+	  substr('C',0,1),#substr($confData->{RECEIVER_TYPE_CODE},0,1),
 	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
 	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
 	  substr($confData->{TEST_PRODUCTION_INDICATOR},0,4), # test production indicator

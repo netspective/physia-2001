@@ -45,9 +45,10 @@ sub formatData
 	my $spaces = ' ';
 	my $refClaimInsured = $inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}];
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
-	my $refSourceOfPayment = {'MEDICARE' => 'C', 'MEDICADE' => 'D', 'CHAMPUS' => 'H', 'CHAMPVA' => ' ', 'GROUP' => ' ', 'FECA' => ' ', 'OTHER' => 'Z'};
+	
 
     my $wasPayerMedicare = wasLastPayerMedicare($self, $flags, $inpClaim);
+    my $defaultSrcOfPmt = (($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment() eq '') ? 'F' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment());
 
 my %payerType = (THIN_MEDICARE . "" =>
 	sprintf("%-3s%-2s%-17s%1s%1s%-2s%-5s%-4s%-33s%-20s%-33s%1s%-15s%-15s%1s%1s%2s%-25s%-20s%-12s%1s%-3s%1s%-8s%1s%1s%-7s%-25s%-25s%-1s%-1s%-33s",
@@ -55,7 +56,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr($flags->{RECORDFLAGS_NONE} == 0 ? 'C' : $defaultSrcOfPmt,0,1),
 	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
@@ -90,7 +91,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr(($flags->{RECORDFLAGS_NONE} == 0) ? 'F' : $defaultSrcOfPmt,0,1),
 	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
@@ -125,7 +126,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr(($flags->{RECORDFLAGS_NONE} == 0) ? 'D' : $defaultSrcOfPmt,0,1),
 	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
@@ -160,7 +161,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr(($flags->{RECORDFLAGS_NONE} == 0) ? 'G' : $defaultSrcOfPmt,0,1),
 	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number

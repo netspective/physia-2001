@@ -157,33 +157,36 @@ sub processClaim
 
 	for my $payersLoop (1..$payerCount)
 	{
-		if(&{$recordCreationCondition->{$payerType}->{DA0}} == 1)
+		if ($tempClaim->{policy}->[$payersLoop - 1]->{name} ne '') 
 		{
-			$self->setSequenceNo($payersLoop);
-			$self->incCountXXX('dXXX');
-			$self->{DA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA0;
-    		push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
-   		}
-		if(&{$recordCreationCondition->{$payerType}->{DA1}} == 1)
-		{
-	   		$self->setSequenceNo($payersLoop);
-			$self->incCountXXX('dXXX');
-			$self->{DA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA1;
-			push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
-  		}
-		if(&{$recordCreationCondition->{$payerType}->{DA2}} == 1)
-		{
-   			$self->setSequenceNo($payersLoop);
-		   	$self->incCountXXX('dXXX');
-			$self->{DA2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA2;
-	   		push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
-		}
-		if(&{$recordCreationCondition->{$payerType}->{DA3}} == 1)
-		{
-   			$self->setSequenceNo($payersLoop);
-		   	$self->incCountXXX('dXXX');
-			$self->{DA3Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA3;
-	   		push(@$outArray,$self->{DA3Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
+			if(&{$recordCreationCondition->{$payerType}->{DA0}} == 1)
+			{
+				$self->setSequenceNo($payersLoop);
+				$self->incCountXXX('dXXX');
+				$self->{DA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA0;
+    			push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
+   			}
+			if(&{$recordCreationCondition->{$payerType}->{DA1}} == 1)
+			{
+	   			$self->setSequenceNo($payersLoop);
+				$self->incCountXXX('dXXX');
+				$self->{DA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA1;
+				push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
+  			}
+			if(&{$recordCreationCondition->{$payerType}->{DA2}} == 1)
+			{
+   				$self->setSequenceNo($payersLoop);
+		   		$self->incCountXXX('dXXX');
+				$self->{DA2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA2;
+	   			push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
+			}
+			if(&{$recordCreationCondition->{$payerType}->{DA3}} == 1)
+			{
+   				$self->setSequenceNo($payersLoop);
+		   		$self->incCountXXX('dXXX');
+				$self->{DA3Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::THIN_DA3;
+	   			push(@$outArray,$self->{DA3Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $payerType));
+			}
 		}
    } # end of for loop for payers (DAx)
 
