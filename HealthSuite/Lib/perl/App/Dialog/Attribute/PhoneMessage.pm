@@ -27,7 +27,7 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'value_text', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(caption =>'Call For', name => 'person_id', hints => 'Person who needs to receive the message.'),	
+		new App::Dialog::Field::Person::ID(caption =>'Call For', name => 'value_textb', hints => 'Person who needs to receive the message.'),	
 	);
 	
 	$self->{activityLog} =
@@ -48,6 +48,10 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	
+	my $itemId = $page->param('item_id');
+	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	
 }
 
 sub execute
@@ -63,7 +67,7 @@ sub execute
 		value_type => 0,
 		value_text => $page->field('value_text') || undef,	
 		value_date => $page->field('value_date') || undef,
-		value_textb => $page->field('person_id') || undef,		
+		value_textB => $page->field('value_textb') || undef,		
 		_debug => 0
 	);
 	return "\u$command completed.";
