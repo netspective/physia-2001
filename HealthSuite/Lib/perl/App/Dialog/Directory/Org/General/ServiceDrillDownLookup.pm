@@ -27,7 +27,11 @@ sub new
 						name => 'service',
 						options => FLDFLAG_REQUIRED,
 						size => 3,
-						maxLength => 3)
+						maxLength => 3),
+			new CGI::Dialog::Field(caption =>'State',
+						name => 'state',
+						size => 2,
+						maxLength => 2),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -46,7 +50,7 @@ sub prepare_detail_service
 	my $pub = {
 		columnDefn =>
 		[
-			{colIdx => 0, head => 'Code', url => '/org/#0#/profile'},
+			{colIdx => 0, head => 'Code', url => q{javascript:if(isLookupWindow()) populateControl('#0#', true, '#1#'); else window.location.href ='/org/#0#/profile';},},
 			{colIdx => 1,head => 'Primary Name'},
 
 		],
@@ -77,15 +81,20 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $service = $page->field('service') eq '' ? '*' : $page->field('service');
+	my $state = $page->field('state') eq '' ? '*' : $page->field('state');
 
 
-	my $serviceLike = $service =~ s/\*/%/g ? 'donlyservice' : '';
+	my $serviceLike = $service =~ s/\*/%/g ? 'service' : '';
+	my $stateLike  = $state =~ s/\*/%/g ? 'state' : '';
 	$service = uc($service);
 	my $sessionId = $page->session('org_internal_id');
-	my $like = $serviceLike ? '_like' : 'donlyservice';
-	my $appendStmtName = "sel_$serviceLike$like";
+	my $like = $serviceLike || $stateLike? '_like' : 'servicestate';
 
-	return $STMTMGR_ORG_SERVICE_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",[$service, $sessionId]);
+	#my $like = $serviceLike ? '_like' : 'donlyservice';
+	#my $appendStmtName = "sel_$serviceLike$like";
+	my $appendStmtName = "sel_donly$serviceLike$stateLike$like";
+
+	return $STMTMGR_ORG_SERVICE_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",[uc($service), uc($state), $sessionId]);
 }
 
 #						[uc($service),
