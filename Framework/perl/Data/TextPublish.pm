@@ -648,7 +648,7 @@ sub generateHeaderCallback {
 			$row ++;
 		}
 
-		$sheet->MVPrint (0, $row, $report->date(2));
+		$sheet->MVPrint (0, $row, $report->date(2)." ".$report->time(1));
 		$sheet->MVPrint ($report->width() - 10, $row, "Page ".$report->page());
 		$row ++;
 		$sheet->MVPrint (0, $row, " ");
