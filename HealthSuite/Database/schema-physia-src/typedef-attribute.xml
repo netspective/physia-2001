@@ -529,6 +529,15 @@
 				<col name="group_name">Security</col>
 				<col name="remarks">value_text is the Organization for which password applies (NULL for personal login)</col>
 			</row>
+
+			<!-- NOTE: all ids from 20000 to 20999 are used for invoice attributes -->
+			<row>
+				<col name="id">20000</col>
+				<col name="caption">Notes</col>
+				<col name="group_name">Invoice</col>
+				<col name="remarks">value_text are the notes, value_textb is the user</col>
+			</row>
+
 			<!-- NOTE: all ids at or beyond 99900 are used for "FAKE" properties at runtime so don't use them -->
 		</data>
 	</table>
