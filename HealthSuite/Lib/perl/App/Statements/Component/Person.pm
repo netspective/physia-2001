@@ -2447,7 +2447,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ head => 'My Associated Resources In Patients', dataFmt => '#0#' },
 			{ dataFmt => '<A HREF="/person/#13#/chart">#1#</A> <BR> #2#, #3# <BR> (#4#) <BR> Room: #5#  <BR> Duration of Stay: #6# <BR> Orders: #7# <BR> Procedures: #8#'},
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#homeArl#',
+		bullets => '/person/#13#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#homeArl#',
 		frame => {
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 		},
