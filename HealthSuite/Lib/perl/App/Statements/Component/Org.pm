@@ -959,6 +959,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 							where owner_org_id = :2 AND
 							org_id = :1
 			)
+			order by o.product_name,o.plan_name
 		},
 	#sqlStmt => qq{
 	#		select 	o.plan_name, o.group_number,
@@ -990,7 +991,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #13# (#7#)' },
+			{ colIdx => 0, head => 'Policy Name',dataFmt => '&{level_indent:0} #2#(#3#): #4#, #13# (#7#)' },
 			#{ head => 'Plan', dataFmt => '#2# (#1#)' },
 		],
 		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#homeArl#',
@@ -1053,7 +1054,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')]); },
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHierHtml($page, $flags, ['org.insurancePlans', 0, 1],  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	#publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHierHtml($page, $flags, ['org.insurancePlans', 0, 1],  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
