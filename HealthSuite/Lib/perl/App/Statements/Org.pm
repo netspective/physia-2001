@@ -26,6 +26,12 @@ $STMTMGR_ORG = new App::Statements::Org(
 		from org
 		where org_id = ?
 		},
+	'selPersonCategory' => qq{
+		select category
+		from person_org_category
+		where person_id = ? and org_id = ?
+		order by category
+		},
 	'selAttribute' => qq{
 		select * from org_attribute
 		where parent_id = ? and item_name = ?
