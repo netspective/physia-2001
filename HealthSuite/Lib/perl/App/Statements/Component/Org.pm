@@ -1193,20 +1193,21 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			SELECT
 				org_id,
 				name_primary,
-
-				DECODE (o.parent_org_id, '', 'Parent Org', 'Child Org')
+				org_internal_id,
+				DECODE (o.org_internal_id, (SELECT oo.parent_org_id from org oo
+					WHERE oo.org_id = :1 AND owner_org_id = :2), 'Parent Org', 'Child Org')
 			FROM  	Org o
-			WHERE  	parent_org_id =
+			WHERE  	org_internal_id =
 				(
-					SELECT org_internal_id
+					SELECT parent_org_id
 					FROM org
 					WHERE owner_org_id = :2 AND
 					org_id = :1
 				)
 			OR
-				org_internal_id =
+				parent_org_id =
 				(
-					SELECT owner_org_id
+					SELECT org_internal_id
 					FROM org
 					WHERE owner_org_id = :2 AND
 					org_id = :1
@@ -1221,10 +1222,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		columnDefn => [
 			{
-				colIdx => 2,
+				colIdx => 3,
 				dataFmt => {
-					'Parent Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #2#)",
-					'Child Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #2#)",
+					'Parent Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #3#)",
+					'Child Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #3#)",
 				},
 			},
 
@@ -1246,7 +1247,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')]); },
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
 },
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'org.closingDateInfo' => {
