@@ -86,12 +86,13 @@ sub getComponentHtml
 		columnDefn =>
 			[
 				{colIdx => 0, head => 'Patient ID', hAlign=> 'left',dAlign => 'left',dataFmt=>"<A HREF = '/person/#0#/profile'>#0#</A>",},
-				{colIdx => 1, head => 'Event Description', dAlign => 'center'},							
-				{colIdx => 2, head => 'Balance' ,dAlign => 'center',dformat => 'currency', url=>'/person/#0#/account'},
-				{colIdx => 3, head => 'Age', dAlign => 'center'},
-				{colIdx => 4, head => 'Next Appt', dAlign => 'center'},			
-				{colIdx => 5, head => 'Reck Date', dAlign => 'center'},			
-				{colIdx => 6, head => "Actions", dAlign => 'center'},			
+				{colIdx => 1, head => 'Invoice ID', hAlign=> 'left',url =>'/invoice/#1#/summary'},
+				{colIdx => 2, head => 'Event Description', dAlign => 'center'},							
+				{colIdx => 3, head => 'Balance' ,dAlign => 'center',dformat => 'currency', url=>'/person/#0#/account'},
+				{colIdx => 4, head => 'Age', dAlign => 'center'},
+				{colIdx => 5, head => 'Next Appt', dAlign => 'center'},			
+				{colIdx => 6, head => 'Reck Date', dAlign => 'center'},			
+				{colIdx => 7, head => "Actions", dAlign => 'center'},			
 			
 		],
 	};	
@@ -103,9 +104,8 @@ sub getComponentHtml
 	foreach (@$person)
 	{
 		
-		my $balance = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selectBalanceAgeById',$_->{person_id},$startDate);
-		my $trans_data = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCollectionById',$_->{person_id},$page->session('user_id'));		
-		$trans_data->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
+		my $trans_data;# = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCollectionById',$_->{person_id},$page->session('user_id'),$_->{invoice_id});		
+		$_->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
 		                trans_owner_id =>$_->{person_id} || undef,
 		                provider_id => $page->session('user_id') ||undef,
 		                trans_owner_type => 0, 
@@ -115,44 +115,34 @@ sub getComponentHtml
 		                trans_type => $ACCOUNT_OWNER,  
 		                initiator_type =>0,
 		                initiator_id =>$page->session('user_id'), 	
-		                billing_facility_id => $page->session('org_internal_id')
+		                billing_facility_id => $page->session('org_internal_id'),
+				data_num_a => $_->{invoice_id} ,
 		
-                )if (! defined $trans_data->{trans_id} &&  $fmtDate eq $todayDate);			
+                )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);			
 		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
-			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);	
-		$_->{descr} = 'Self Pay';  
-		if($_->{reason})
-		{
-			$_->{descr} = $_->{reason};  
-		}
-		elsif ($balance->{balance} < 0)
-		{
-			$_->{descr} = 'Credit';  
-		}
-		elsif($balance->{age} > 59)
-		{
-			$_->{descr} = 'Aged Claim';  		
-		}		
-		$balance->{age} = $balance->{age} >= 0 ? $balance->{age}  : 'N/A';				
-		
+			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);		
+		$_->{age} = $_->{age} >= 0 ? $_->{age}  : 'N/A';						
+		my $reckdate=$STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, 
+			STMTMGRFLAG_NONE, 'selReckInfoByOwner', $_->{person_id},$page->session('user_id'));
 		my @rowData = (							
 			$_->{person_id},
-			$_->{descr},						
-			$balance->{balance},
-			$balance->{age},
+			$_->{invoice_id},			
+			$_->{description},					
+			$_->{balance},
+			$_->{age},
 			$appt,
-			$trans_data->{reck_date},			
+			$reckdate->{reck_date},			
 			qq{<nobr>
 				<A HREF="/worklist/collection/dlg-add-account-notes/$_->{person_id}"
 					TITLE='Add Account Notes'>
 					<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$trans_data->{trans_id}"
+				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$_->{trans_id}"
 					TITLE='Transfer Patient Account'>
 					<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$trans_data->{reck_date_id}"
+				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$reckdate->{reck_id}"
 					TITLE='Add Reck Date'>
 					<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$trans_data->{trans_id}"
+				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$_->{trans_id}"
 					TITLE='Close Account'>
 					<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 			</nobr>}, 
