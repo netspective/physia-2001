@@ -86,6 +86,7 @@ sub processClaims
 	my $claimsList = $params{claimList};
 	my $claims = $params{claimList}->getClaim();
 	my $p = pdflib::PDF_new();
+	my $drawBackgroundForm = exists $params{drawBackgroundForm} ? $params{drawBackgroundForm} : 1;
 	die "PDF file name is required" unless exists $params{outFile};
 	die "Couldn't open PDF file"  if (pdflib::PDF_open_file($p, $params{outFile}) == -1);
 	pdflib::PDF_set_info($p, "Creator", "PHYSIA");
@@ -113,7 +114,7 @@ sub processClaims
 		while ($self->allProcTraverse($procesedProc,$claim) eq "0" || ($once < 1))
 			{
 				$self->newPage($p);
-				$cordinates = $self->drawForm($p);
+				$cordinates = $self->drawForm($p, $drawBackgroundForm);
 				$self->populatePDF($p,$claim, $cordinates, $procesedProc);
 				$self->endPage($p);
 				$once++;
@@ -203,73 +204,77 @@ sub closeAndDestroy
 ############### FUNCTION RELATED WITH FORM OUTLINE DRAWING #######################
 sub drawForm
 {
-	my ($self, $p)  = @_;
+	my ($self, $p, $drawBackgroundForm)  = @_;
 
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
 	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
 
-	my $cordinates = $self->drawFormOutline($p);
-	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
-	$self->drawHeader($p);
-	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	$self->box1($p, $cordinates);
-	$self->box1a($p, $cordinates);
-	$self->box2($p, $cordinates);
-	$self->box3($p, $cordinates);
-	$self->box4($p, $cordinates);
-	$self->box5($p, $cordinates);
-	$self->box5a($p, $cordinates);
-	$self->box5b($p, $cordinates);
-	$self->box6($p, $cordinates);
-	$self->box7($p, $cordinates);
-	$self->box7a($p, $cordinates);
-	$self->box7b($p, $cordinates);
-	$self->box8($p, $cordinates);
+	my $cordinates = $self->drawFormOutline($p, $drawBackgroundForm);
+	
+	if($drawBackgroundForm)
+	{
+		pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
+		# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
+		$self->drawHeader($p);
+		pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
+		$self->box1($p, $cordinates);
+		$self->box1a($p, $cordinates);
+		$self->box2($p, $cordinates);
+		$self->box3($p, $cordinates);
+		$self->box4($p, $cordinates);
+		$self->box5($p, $cordinates);
+		$self->box5a($p, $cordinates);
+		$self->box5b($p, $cordinates);
+		$self->box6($p, $cordinates);
+		$self->box7($p, $cordinates);
+		$self->box7a($p, $cordinates);
+		$self->box7b($p, $cordinates);
+		$self->box8($p, $cordinates);
 
-	$self->box9($p, $cordinates);
-	$self->box9a($p, $cordinates);
-	$self->box9b($p, $cordinates);
-	$self->box9c($p, $cordinates);
-	$self->box9d($p, $cordinates);
+		$self->box9($p, $cordinates);
+		$self->box9a($p, $cordinates);
+		$self->box9b($p, $cordinates);
+		$self->box9c($p, $cordinates);
+		$self->box9d($p, $cordinates);
 
-	$self->box10($p, $cordinates);
-	$self->box10d($p, $cordinates);
+		$self->box10($p, $cordinates);
+		$self->box10d($p, $cordinates);
 
-	$self->box11($p, $cordinates);
-	$self->box11a($p, $cordinates);
-	$self->box11b($p, $cordinates);
-	$self->box11c($p, $cordinates);
-	$self->box11d($p, $cordinates);
-	$self->box12($p, $cordinates);
-	$self->box13($p, $cordinates);
-	$self->box14($p, $cordinates);
-	$self->box15($p, $cordinates);
-	$self->box16($p, $cordinates);
-	$self->box17($p, $cordinates);
-	$self->box17a($p, $cordinates);
-	$self->box18($p, $cordinates);
-	$self->box19($p, $cordinates);
-	$self->box20($p, $cordinates);
-	$self->box21($p, $cordinates);
-	$self->box22($p, $cordinates);
-	$self->box23($p, $cordinates);
-	$self->box24($p, $cordinates);
-	$self->box25($p, $cordinates);
-	$self->box26($p, $cordinates);
-	$self->box27($p, $cordinates);
-	$self->box28($p, $cordinates);
-	$self->box29($p, $cordinates);
-	$self->box30($p, $cordinates);
-	$self->box31($p, $cordinates);
-	$self->box32($p, $cordinates);
-	$self->box33($p, $cordinates);
-#	$self->box31($p);
-#	$self->box32($p);
-#	$self->box33($p);
-#	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
-	$self->drawTrailer($p);
+		$self->box11($p, $cordinates);
+		$self->box11a($p, $cordinates);
+		$self->box11b($p, $cordinates);
+		$self->box11c($p, $cordinates);
+		$self->box11d($p, $cordinates);
+		$self->box12($p, $cordinates);
+		$self->box13($p, $cordinates);
+		$self->box14($p, $cordinates);
+		$self->box15($p, $cordinates);
+		$self->box16($p, $cordinates);
+		$self->box17($p, $cordinates);
+		$self->box17a($p, $cordinates);
+		$self->box18($p, $cordinates);
+		$self->box19($p, $cordinates);
+		$self->box20($p, $cordinates);
+		$self->box21($p, $cordinates);
+		$self->box22($p, $cordinates);
+		$self->box23($p, $cordinates);
+		$self->box24($p, $cordinates);
+		$self->box25($p, $cordinates);
+		$self->box26($p, $cordinates);
+		$self->box27($p, $cordinates);
+		$self->box28($p, $cordinates);
+		$self->box29($p, $cordinates);
+		$self->box30($p, $cordinates);
+		$self->box31($p, $cordinates);
+		$self->box32($p, $cordinates);
+		$self->box33($p, $cordinates);
+	#	$self->box31($p);
+	#	$self->box32($p);
+	#	$self->box33($p);
+	#	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
+		# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
+		$self->drawTrailer($p);
+	}
 	return $cordinates;
 }
 
@@ -349,159 +354,166 @@ sub drawTrailer
 
 sub drawFormOutline
 {
-	my ($self, $p)  = @_;
+	my ($self, $p, $drawBackgroundForm)  = @_;
 
 	my $x;
 	my $y;
 	my $cordinates ={};
 	my $upArr;
 
-	pdflib::PDF_setlinewidth($p, THICK_LINE_WIDTH);
+	if($drawBackgroundForm)
+	{
+		pdflib::PDF_setlinewidth($p, THICK_LINE_WIDTH);
 
-	$self->drawLine($p, START_X, START_Y + FORM_HEIGHT,START_X + FORM_WIDTH, START_Y + FORM_HEIGHT); # on the top
-	$self->drawLine($p, START_X, START_Y + 374,START_X + FORM_WIDTH, START_Y + 374); # middle line
-	$self->drawLine($p, START_X, START_Y ,START_X + FORM_WIDTH, START_Y ); # on the bottom
+		$self->drawLine($p, START_X, START_Y + FORM_HEIGHT,START_X + FORM_WIDTH, START_Y + FORM_HEIGHT); # on the top
+		$self->drawLine($p, START_X, START_Y + 374,START_X + FORM_WIDTH, START_Y + 374); # middle line
+		$self->drawLine($p, START_X, START_Y ,START_X + FORM_WIDTH, START_Y ); # on the bottom
 
-	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
-	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + 9, START_X + FORM_WIDTH + 6, START_Y + 370);
-	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y,START_X + FORM_WIDTH , START_Y);
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 9, START_Y + 3 , START_Y + 9]); # DOWN
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 364, START_Y + 370 , START_Y + 364]); # UP
+		pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
+		$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + 9, START_X + FORM_WIDTH + 6, START_Y + 370);
+		$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y,START_X + FORM_WIDTH , START_Y);
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 9, START_Y + 3 , START_Y + 9]); # DOWN
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 364, START_Y + 370 , START_Y + 364]); # UP
 
-	$self->drawLine($p, START_X + FORM_WIDTH + 8, START_Y + 374,START_X + FORM_WIDTH , START_Y + 374);
-	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT - 4,START_X + FORM_WIDTH + 6, START_Y + 378);
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 381, START_Y + 375 , START_Y + 381]); #DOWN
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT - 6, START_Y + FORM_HEIGHT , START_Y + FORM_HEIGHT - 6]); # UP
+		$self->drawLine($p, START_X + FORM_WIDTH + 8, START_Y + 374,START_X + FORM_WIDTH , START_Y + 374);
+		$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT - 4,START_X + FORM_WIDTH + 6, START_Y + 378);
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 381, START_Y + 375 , START_Y + 381]); #DOWN
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT - 6, START_Y + FORM_HEIGHT , START_Y + FORM_HEIGHT - 6]); # UP
 
-	$self->drawLine($p, START_X + FORM_WIDTH + 8, START_Y + FORM_HEIGHT ,START_X + FORM_WIDTH , START_Y + FORM_HEIGHT );
-	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT + 10,START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT + 68);
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT + 62, START_Y + FORM_HEIGHT + 68 , START_Y + FORM_HEIGHT + 62]); # UP
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT + 10, START_Y + FORM_HEIGHT + 4 , START_Y + FORM_HEIGHT + 10]); # DOWN
+		$self->drawLine($p, START_X + FORM_WIDTH + 8, START_Y + FORM_HEIGHT ,START_X + FORM_WIDTH , START_Y + FORM_HEIGHT );
+		$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT + 10,START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT + 68);
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT + 62, START_Y + FORM_HEIGHT + 68 , START_Y + FORM_HEIGHT + 62]); # UP
+		$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + FORM_HEIGHT + 10, START_Y + FORM_HEIGHT + 4 , START_Y + FORM_HEIGHT + 10]); # DOWN
 
-	pdflib::PDF_stroke($p);
-	pdflib::PDF_rect($p, START_X , START_Y, FORM_WIDTH, FORM_HEIGHT ); # draw  outline of form
-	pdflib::PDF_stroke($p);
+		pdflib::PDF_stroke($p);
+		pdflib::PDF_rect($p, START_X , START_Y, FORM_WIDTH, FORM_HEIGHT ); # draw  outline of form
+		pdflib::PDF_stroke($p);
+	}
 	$cordinates->{box1} = [START_X, START_Y + FORM_HEIGHT];
-	$self->drawLine($p, START_X, START_Y  + FORM_HEIGHT - LINE_SPACING -  MEDICARE_EXTRA_SPACE + 1.5, START_X + FORM_WIDTH, START_Y  + FORM_HEIGHT - LINE_SPACING - MEDICARE_EXTRA_SPACE + 1.5 );  # draw  line b/w medicare and 2
+	$self->drawLine($p, START_X, START_Y  + FORM_HEIGHT - LINE_SPACING -  MEDICARE_EXTRA_SPACE + 1.5, START_X + FORM_WIDTH, START_Y  + FORM_HEIGHT - LINE_SPACING - MEDICARE_EXTRA_SPACE + 1.5 ) if $drawBackgroundForm;  # draw  line b/w medicare and 2
 	$cordinates->{box2} = [START_X, START_Y  + FORM_HEIGHT - LINE_SPACING -  MEDICARE_EXTRA_SPACE + 1.5];
 	$y = START_Y  + FORM_HEIGHT - LINE_SPACING -  MEDICARE_EXTRA_SPACE;
-	$self->drawLine($p, START_X, $y - LINE_SPACING, START_X + FORM_WIDTH, $y - LINE_SPACING); # draw  line b/w 2 and 5
+	$self->drawLine($p, START_X, $y - LINE_SPACING, START_X + FORM_WIDTH, $y - LINE_SPACING) if $drawBackgroundForm; # draw  line b/w 2 and 5
 	$cordinates->{box5} = [START_X, $y - LINE_SPACING];
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING, START_X + FORM_WIDTH, $y - LINE_SPACING); # line b/w city and patient address
+	$self->drawLine($p, START_X, $y - LINE_SPACING, START_X + FORM_WIDTH, $y - LINE_SPACING) if $drawBackgroundForm; # line b/w city and patient address
 	$cordinates->{box5City} = [START_X, $y - LINE_SPACING];
 	$y -= LINE_SPACING;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING - 1, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING - 1); # draw partition b/w city line and zip code
+	$self->drawLine($p, START_X, $y - LINE_SPACING - 1, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING - 1) if $drawBackgroundForm; # draw partition b/w city line and zip code
 	$cordinates->{box5ZipCode} = [START_X, $y - LINE_SPACING - 1];
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING - 1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1); # draw partition b/w 7city and 7zip code
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING - 1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1) if $drawBackgroundForm; # draw partition b/w 7city and 7zip code
 	$y -= LINE_SPACING;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + FORM_WIDTH, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE); # draw partition b/w zip code and other ins. name
+	$self->drawLine($p, START_X, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + FORM_WIDTH, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE) if $drawBackgroundForm; # draw partition b/w zip code and other ins. name
 	$cordinates->{box9} = [START_X , $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE];
 	$y =$y - LINE_SPACING -  MEDICARE_EXTRA_SPACE;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING ); # draw partition b/w policy group no. and other name
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING ) if $drawBackgroundForm; # draw partition b/w policy group no. and other name
 	$cordinates->{box9a} = [START_X , $y - LINE_SPACING ];
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ); # draw partition b/w 11 FECA number and 11 Insured date of birth
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm; # draw partition b/w 11 FECA number and 11 Insured date of birth
 	$y -= LINE_SPACING;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING - 1, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING- 1); # draw partition b/w other date of birth and employer name
+	$self->drawLine($p, START_X, $y - LINE_SPACING - 1, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING- 1) if $drawBackgroundForm; # draw partition b/w other date of birth and employer name
 	$cordinates->{box9b} = [START_X , $y - LINE_SPACING - 1 ];
 
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING - 1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1); # draw partition b/w 11 date of birth  and 11 school name
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING - 1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1) if $drawBackgroundForm; # draw partition b/w 11 date of birth  and 11 school name
 	$y -= LINE_SPACING;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE); # draw partition b/w other date of birth and employer name
+	$self->drawLine($p, START_X, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE) if $drawBackgroundForm; # draw partition b/w other date of birth and employer name
 	$cordinates->{box9c} = [START_X , $y - LINE_SPACING - MEDICARE_EXTRA_SPACE ];
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE , $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + FORM_WIDTH, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE); # draw partition b/w school name  and 11c
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE , $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE, START_X + FORM_WIDTH, $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE) if $drawBackgroundForm; # draw partition b/w school name  and 11c
 	$y = $y - LINE_SPACING -  MEDICARE_EXTRA_SPACE;
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # partition b/w  9C and 9D
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # partition b/w  9C and 9D
 	$cordinates->{box9d} = [START_X , $y - LINE_SPACING ];
 
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 9d  and 12
+	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1) if $drawBackgroundForm;   # line dividing 9d  and 12
 	$cordinates->{box12} = [START_X , $y - LINE_SPACING ];
 
-	$self->drawLine($p, START_X + STARTX_BOX3_SPACE, START_Y + FORM_HEIGHT - LINE_SPACING - MEDICARE_EXTRA_SPACE + 1.5, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING - 1); #   vertical mid  line in  patient address and patient rel
+	$self->drawLine($p, START_X + STARTX_BOX3_SPACE, START_Y + FORM_HEIGHT - LINE_SPACING - MEDICARE_EXTRA_SPACE + 1.5, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING - 1) if $drawBackgroundForm; #   vertical mid  line in  patient address and patient rel
 	$y -= LINE_SPACING;
 	$y = START_Y + STARTY_MID_SPACE - 1 ;
 	$cordinates->{box14} = [START_X , $y ];
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 14  and 17
+	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1) if $drawBackgroundForm;   # line dividing 14  and 17
 	$cordinates->{box17} = [START_X , $y - LINE_SPACING - 1 ];
 	$cordinates->{box17a} = [START_X + STARTX_BOX3_SPACE - 14 , $y - LINE_SPACING - 1];
 
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING - 1 , START_X + FORM_WIDTH, $y - LINE_SPACING - 1 );   # line dividing 17  and 19
+	$self->drawLine($p, START_X, $y - LINE_SPACING - 1 , START_X + FORM_WIDTH, $y - LINE_SPACING - 1 ) if $drawBackgroundForm;   # line dividing 17  and 19
 	$cordinates->{box19} = [START_X , $y - LINE_SPACING - 1 ];
 
-	$self->drawLine($p, START_X + STARTX_BOX3_SPACE - 14, START_Y + STARTY_MID_SPACE , START_X + STARTX_BOX3_SPACE - 14, $y - LINE_SPACING - 1);   # verical line dividing 14  and 15
+	$self->drawLine($p, START_X + STARTX_BOX3_SPACE - 14, START_Y + STARTY_MID_SPACE , START_X + STARTX_BOX3_SPACE - 14, $y - LINE_SPACING - 1) if $drawBackgroundForm;   # verical line dividing 14  and 15
 	$cordinates->{box15} = [START_X + STARTX_BOX3_SPACE - 14 , START_Y + STARTY_MID_SPACE ];
 
 	$y = $y - LINE_SPACING - MEDICARE_EXTRA_SPACE;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 19  and 21
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 19  and 21
 	$cordinates->{box21} = [START_X , $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - MEDICARE_EXTRA_SPACE + 3;
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 22  and 23
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 22  and 23
 	$cordinates->{box23} = [START_X , $y - LINE_SPACING];
 
 	$y = $y -  LINE_SPACING - MEDICARE_EXTRA_SPACE + 3;
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 23  and 24F
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 23  and 24F
 	my $start24 = $y -  LINE_SPACING;
 
 	$cordinates->{box24F} = [START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING];
-	$self->drawLine($p, START_X , $y - LINE_SPACING  , START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING );   # line dividing 21  and 24
+	$self->drawLine($p, START_X , $y - LINE_SPACING  , START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 21  and 24
 	$cordinates->{box24} = [START_X , $y - LINE_SPACING];
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING - BOX24_HEIGHT, START_X + FORM_WIDTH, $y - LINE_SPACING - BOX24_HEIGHT );   # line dividing 24  and 24 HEADS
+	$self->drawLine($p, START_X, $y - LINE_SPACING - BOX24_HEIGHT, START_X + FORM_WIDTH, $y - LINE_SPACING - BOX24_HEIGHT ) if $drawBackgroundForm;   # line dividing 24  and 24 HEADS
 	$cordinates->{box24HeadA} = [START_X , $y - LINE_SPACING - BOX24_HEIGHT];
 
 	$y = $y - LINE_SPACING - BOX24_HEIGHT;
-	$self->drawLine($p, START_X, $y - LINE_SPACING + 1, START_X + FORM_WIDTH, $y - LINE_SPACING + 1 );   # line dividing 24head  and 24-1
+	$self->drawLine($p, START_X, $y - LINE_SPACING + 1, START_X + FORM_WIDTH, $y - LINE_SPACING + 1 ) if $drawBackgroundForm;   # line dividing 24head  and 24-1
 	$cordinates->{box24_1} = [START_X , $y - LINE_SPACING + 1];
 
 	my $startProcY = $y - LINE_SPACING + 1;
 	$y = $y - LINE_SPACING + MEDICARE_EXTRA_SPACE;
-	$self->drawLine($p, START_X, $y - LINE_SPACING + 1, START_X + FORM_WIDTH, $y - LINE_SPACING + 1 );   # line dividing 24-1  and 24-2
+	$self->drawLine($p, START_X, $y - LINE_SPACING + 1, START_X + FORM_WIDTH, $y - LINE_SPACING + 1 ) if $drawBackgroundForm;   # line dividing 24-1  and 24-2
 	$cordinates->{box24_2} = [START_X , $y - LINE_SPACING + 1];
 
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-2  and 24-3
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-2  and 24-3
 	$cordinates->{box24_3} = [START_X , $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - 1;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-3  and 24-4
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-3  and 24-4
 	$cordinates->{box24_4} = [START_X , $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - 1;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-4  and 24-5
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-4  and 24-5
 	$cordinates->{box24_5} = [START_X , $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - 2;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-5  and 24-6
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-5  and 24-6
 	$cordinates->{box24_6} = [START_X , $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - 1;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-6  and 25
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-6  and 25
 	$cordinates->{box25} = [START_X , $y - LINE_SPACING ];
-	$self->drawLine($p, START_X + STARTX_BOX24ADATE_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24ADATE_SPACE , $startProcY );   # line dividing 24-FROM and 24-TO
-#	$self->drawLine($p, START_X + STARTX_BOX24ADATE_SPACE, $y - LINE_SPACING , START_X  + STARTX_BOX24ADATE_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24B_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24B_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24C_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24C_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24D_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24D_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24E_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24F_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24F_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	pdflib::PDF_setdash($p, BLACK_DASH, WHITE_DASH);
-	$self->drawLine($p, START_X + STARTX_BOX24FC_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24FC_SPACE, $cordinates->{box24_1}->[1]);   # line dividing 24-FROM and 24-TO
-	pdflib::PDF_setdash($p, 0,0);
-	$self->drawLine($p, START_X + STARTX_BOX24G_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24G_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24H_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24H_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24I_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24I_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24J_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24J_SPACE, $start24);   # line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24K_SPACE, $y - 2 * LINE_SPACING - 2, START_X  + STARTX_BOX24K_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+	
+	if($drawBackgroundForm)
+	{
+		$self->drawLine($p, START_X + STARTX_BOX24ADATE_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24ADATE_SPACE , $startProcY );   # line dividing 24-FROM and 24-TO
+	#	$self->drawLine($p, START_X + STARTX_BOX24ADATE_SPACE, $y - LINE_SPACING , START_X  + STARTX_BOX24ADATE_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24B_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24B_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24C_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24C_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24D_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24D_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24E_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24F_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24F_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		pdflib::PDF_setdash($p, BLACK_DASH, WHITE_DASH);
+		$self->drawLine($p, START_X + STARTX_BOX24FC_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24FC_SPACE, $cordinates->{box24_1}->[1]);   # line dividing 24-FROM and 24-TO
+		pdflib::PDF_setdash($p, 0,0);
+		$self->drawLine($p, START_X + STARTX_BOX24G_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24G_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24H_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24H_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24I_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24I_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24J_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24J_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24K_SPACE, $y - 2 * LINE_SPACING - 2, START_X  + STARTX_BOX24K_SPACE, $start24);   # line dividing 24-FROM and 24-TO
+	}
 	$cordinates->{box27} = [START_X + STARTX_BOX27_SPACE, $y - LINE_SPACING ];
 	$cordinates->{box28} = [START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING ];
 	$cordinates->{box26} = [START_X + STARTX_BOX26_SPACE, $y - LINE_SPACING ];
@@ -509,27 +521,33 @@ sub drawFormOutline
 	$cordinates->{box30} = [START_X + STARTX_BOX24K_SPACE, $y - LINE_SPACING ];
 
 	$y = $y - LINE_SPACING - 2;
-	$self->drawLine($p, START_X + STARTX_BOX27_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX27_SPACE, $y + 2);   # line dividing 27 and 26
-	$self->drawLine($p, START_X + STARTX_BOX29_SPACE, $y - LINE_SPACING  , START_X  + STARTX_BOX29_SPACE, $y + 2);   # line dividing 29 and 28
-	$self->drawLine($p, START_X + STARTX_BOX26_SPACE, $y + 2, START_X  + STARTX_BOX26_SPACE, START_Y);   # line dividing 25 and 26
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 25  and 31
+	if($drawBackgroundForm)
+	{
+		$self->drawLine($p, START_X + STARTX_BOX27_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX27_SPACE, $y + 2);   # line dividing 27 and 26
+		$self->drawLine($p, START_X + STARTX_BOX29_SPACE, $y - LINE_SPACING  , START_X  + STARTX_BOX29_SPACE, $y + 2);   # line dividing 29 and 28
+		$self->drawLine($p, START_X + STARTX_BOX26_SPACE, $y + 2, START_X  + STARTX_BOX26_SPACE, START_Y);   # line dividing 25 and 26
+		$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 25  and 31
+	}
 	$cordinates->{box31} = [START_X, $y - LINE_SPACING ];
 	$cordinates->{box32} = [$cordinates->{box26}->[0], $y - LINE_SPACING ];
 	$cordinates->{box33} = [START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING ];
 
-	pdflib::PDF_setrgbcolor($p, FORM_BAR_RED, FORM_BAR_GREEN, FORM_BAR_BLUE);
-	pdflib::PDF_rect($p , START_X + STARTX_BOX24D_SPACE - 3.5, $y + 2.3, 7.5, $startProcY - $y - 2.5); # draw partition of thick block b c,e,f
-	pdflib::PDF_closepath_fill_stroke($p);
-	pdflib::PDF_rect($p , START_X + STARTX_BOX24E_SPACE - 5, $y + 2.3,  7.5, $startProcY - $y - 2.5);
-	pdflib::PDF_closepath_fill_stroke($p);
-	pdflib::PDF_rect($p , START_X + STARTX_BOX24F_SPACE - 5, $y + 2.3, 7.5, $startProcY - $y - 2.5);
-	pdflib::PDF_closepath_fill_stroke($p);
-	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	$self->drawLine($p, START_X + STARTX_BOX24D_SPACE, $y + 2.3, START_X  + STARTX_BOX24D_SPACE, $startProcY );   # overwrite the line dividing 24-FROM and 24-TO
-	$self->drawLine($p, START_X + STARTX_BOX24E_SPACE, $y + 2.3, START_X  + STARTX_BOX24E_SPACE, $startProcY );   # overwrite line dividing 24-FROM and 24-TO
-	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE , START_Y , START_X + STARTX_BOX1A_SPACE, START_Y + FORM_HEIGHT );   # THICK MID VERTICAL line dividing 1  and 1A
-	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
+	if($drawBackgroundForm)
+	{
+		pdflib::PDF_setrgbcolor($p, FORM_BAR_RED, FORM_BAR_GREEN, FORM_BAR_BLUE);
+		pdflib::PDF_rect($p , START_X + STARTX_BOX24D_SPACE - 3.5, $y + 2.3, 7.5, $startProcY - $y - 2.5); # draw partition of thick block b c,e,f
+		pdflib::PDF_closepath_fill_stroke($p);
+		pdflib::PDF_rect($p , START_X + STARTX_BOX24E_SPACE - 5, $y + 2.3,  7.5, $startProcY - $y - 2.5);
+		pdflib::PDF_closepath_fill_stroke($p);
+		pdflib::PDF_rect($p , START_X + STARTX_BOX24F_SPACE - 5, $y + 2.3, 7.5, $startProcY - $y - 2.5);
+		pdflib::PDF_closepath_fill_stroke($p);
+		pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
+		$self->drawLine($p, START_X + STARTX_BOX24D_SPACE, $y + 2.3, START_X  + STARTX_BOX24D_SPACE, $startProcY );   # overwrite the line dividing 24-FROM and 24-TO
+		$self->drawLine($p, START_X + STARTX_BOX24E_SPACE, $y + 2.3, START_X  + STARTX_BOX24E_SPACE, $startProcY );   # overwrite line dividing 24-FROM and 24-TO
+		pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
+		$self->drawLine($p, START_X + STARTX_BOX1A_SPACE , START_Y , START_X + STARTX_BOX1A_SPACE, START_Y + FORM_HEIGHT );   # THICK MID VERTICAL line dividing 1  and 1A
+		pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
+	}
 	return $cordinates;
 }
 

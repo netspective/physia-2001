@@ -46,6 +46,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'Summary', name => 'summary',},
 					{caption => 'HCFA 1500', name => '1500',},
 					{caption => '1500 PDF', name => '1500pdf',},
+					{caption => '1500 PDF Plain', name => '1500pdfplain',},
 					{caption => 'TWCC 61 PDF', name => 'twcc61pdf',},
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
@@ -1530,6 +1531,7 @@ sub prepare_view_1500edit
 sub prepare_view_1500pdf
 {
 	my $self = shift;
+	my $plain = shift;
 
 	$self->addLocatorLinks(['1500 PDF', '1500pdf']);
 
@@ -1537,20 +1539,26 @@ sub prepare_view_1500pdf
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
 	my $invoiceId = $self->param('invoice_id');
-	my $pdfName = "1500_$invoiceId.pdf";
+	my $pdfName = "1500@{[ $plain ? 'PP' : '' ]}_$invoiceId.pdf";
 	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFOutputHREF, $pdfName);
 
 	eval
 	{
 #		my $output = new pdflib;
 		my $output = new App::Billing::Output::PDF;
-		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList);
+		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList, drawBackgroundForm => $plain ? 0 : 1);
 	};
 	$self->redirect($pdfHref);
 	#$self->addContent("<a href='$pdfHref' target='$pdfName'>View HCFA PDF File for Claim $invoiceId</a><script>window.location.href = '$pdfHref';</script>");
 	$self->addError('Problem in sub prepare_view_1500pdf', $@) if $@;
 
 	return 1;
+}
+
+sub prepare_view_1500pdfplain
+{
+	my $self = shift;
+	$self->prepare_view_1500pdf(1);
 }
 
 sub prepare_view_twcc61pdf
@@ -1808,7 +1816,8 @@ sub prepare_page_content_header
 	my @functions = (
 			['Summary', "$urlPrefix/summary", 'summary'],
 			['HCFA 1500', "$urlPrefix/1500", '1500'],
-			['1500 PDF', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
+			['1500 PDF (PP)', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
+			['1500 PDF', "/invoice-f/$invoiceId/1500pdfplain", '1500pdfplain'],
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
 			$claimType == $workComp ? ['TWCC69 PDF', "/invoice-f/$invoiceId/twcc69pdf", 'twcc69pdf'] : undef,
