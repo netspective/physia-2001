@@ -25,6 +25,10 @@
 			AND ps.org_internal_id = ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:person_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_status_person_like">
@@ -46,6 +50,9 @@
 			AND ps.org_internal_id = ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -50,10 +50,10 @@
 			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 				<field.phone caption="Fax"  max-length="1024" name="fax">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
@@ -101,10 +101,10 @@
 			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 				<field.phone caption="Fax"  max-length="1024" name="fax">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
@@ -203,10 +203,10 @@
 			</field.composite>
 			<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
 			<field.date caption="End Date" name="coverage_end_date" size="12">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.date>
 			<field.boolean caption="Inactive Payer"  name="inactive_payer" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -224,10 +224,10 @@
 			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
 				<field.phone caption="Phone"  max-length="1024" name="phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 				<field.phone caption="Fax"  max-length="1024" name="fax">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator heading="Coverage Information" name="coverage_heading"/>
@@ -267,10 +267,10 @@
 			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 				<field.phone caption="Fax"  max-length="1024" name="fax">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.text caption="Medigap Number"  max-length="7" name="medigap_number" size="7"/>

@@ -31,7 +31,7 @@
 			<field.organization.id caption="Organization ID" max-length="16" name="org_id" size="16" required="yes"/>
 			<field.scheduling.date caption="Close Date" hint="Only batch date(s) greater than the Close Date will be valid" max-length="10" name="close_date" size="10" required="yes"/>
 			<field.boolean caption="Set Close Date"  name="create_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add,edit,delete"/>
 			</field.boolean>
 			<field.select caption="Apply to Child Organizations" required="yes" name="children" choices="Yes=1;No=0" style="radio"/>
 			<field.boolean caption="Run Close Date Report"  name="run_report" style="check"/>
@@ -129,7 +129,9 @@
 
 		<dialog name="on_call" heading="create-data-cmd-heading:On Call Note">
 			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" required="yes"/>
-			<field.person.id caption="On Call Physician ID" max-length="16" name="physician_id" size="16" required="yes"/>
+			<field.person.id caption="On Call Physician ID" max-length="16" name="physician_id" size="16" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.person.id>
 			<field.person.id caption="Patient's Regular Physician ID" max-length="16" name="reg_physician_id" size="16" />
 			<field.datetime caption="Date and Time of encounter" name="begin_stamp" size="20"/>
 			<field.select caption="Reason" prepend-blank="yes" name="reason" choices="Needs refill;Problem with medication;Having pain"/>

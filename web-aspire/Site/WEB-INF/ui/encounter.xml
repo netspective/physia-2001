@@ -90,7 +90,9 @@
 				<field.text caption="Original Reference No."  name="orig_ref"/>
 			</field.composite>
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
-			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.memo>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
 			<field.procedures caption="*" name="procedures_list" />
 
@@ -184,7 +186,9 @@
 				<field.text caption="Original Reference No."  name="orig_ref"/>
 			</field.composite>
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
-			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.memo>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
 			<field.procedures caption="*" name="procedures_list" />
 
@@ -278,7 +282,9 @@
 				<field.text caption="Original Reference No."  name="orig_ref"/>
 			</field.composite>
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
-			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.memo>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
 			<field.procedures caption="*" name="procedures_list" />
 

@@ -9,22 +9,22 @@
 		<statement name="sel_docDayStartingAR">
 			
 			select sum(balance) from Transaction, Invoice
-			where Invoice.owner_id = :1
-			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			where Invoice.owner_id = ?
+			and invoice_date &lt; to_date(?, 'MM/DD/YYYY')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			and Transaction.trans_id = Invoice.main_transaction
-			and Transaction.provider_id = :3
+			and Transaction.provider_id = ?
 			
 		</statement>
 
 		<statement name="sel_docMonthStartingAR">
 			
 			select sum(balance) from Transaction, Invoice 
-			where Invoice.owner_id = :1
-			and invoice_date &lt; to_date(:2, 'mm/yyyy')
+			where Invoice.owner_id = ?
+			and invoice_date &lt; to_date(?, 'mm/yyyy')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			and Transaction.trans_id = Invoice.main_transaction
-			and Transaction.provider_id = :3
+			and Transaction.provider_id = ?
 			
 		</statement>
 
@@ -38,10 +38,10 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
-			and real_invoice_date &lt; to_date(:2, 'MM/DD/YYYY') +1
-			and provider = :3
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') +1
+			and provider = ?
 
 		</statement>
 
@@ -55,10 +55,10 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'mm/yyyy')
-			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
-			and provider = :4		
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'mm/yyyy')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') + 1
+			and provider = ?		
 
 		</statement>
 
@@ -72,21 +72,21 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
-			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
-			and provider = :4
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') + 1
+			and provider = ?
 
 		</statement>
 
 		<statement name="sel_docYearStartingAR">
 			
 			select sum(balance) from Transaction, Invoice 
-			where Invoice.owner_id = :1
-			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			where Invoice.owner_id = ?
+			and invoice_date &lt; to_date(?, 'MM/DD/YYYY')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			and Transaction.trans_id = Invoice.main_transaction
-			and Transaction.provider_id = :3
+			and Transaction.provider_id = ?
 			
 		</statement>
 
@@ -94,7 +94,7 @@
 			
 			select to_char(value_date, 'MM/DD/YYYY') as last_close_date 
 			from Org_Attribute
-			where parent_id = :1
+			where parent_id = ?
 			and value_type = 150
 			and item_name = 'Retire Batch Date'
 			
@@ -103,8 +103,8 @@
 		<statement name="sel_orgDayStartingAR">
 			
 			select sum(balance) from Invoice
-			where owner_id = :1
-			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			where owner_id = ?
+			and invoice_date &lt; to_date(?, 'MM/DD/YYYY')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			
 		</statement>
@@ -112,8 +112,8 @@
 		<statement name="sel_orgMonthStartingAR">
 			
 			select sum(balance) from Invoice 
-			where owner_id = :1
-			and invoice_date &lt; to_date(:2, 'mm/yyyy')
+			where owner_id = ?
+			and invoice_date &lt; to_date(?, 'mm/yyyy')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			
 		</statement>
@@ -128,9 +128,9 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
-			and real_invoice_date &lt; to_date(:2, 'MM/DD/YYYY') +1
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') +1
 			
 		</statement>
 
@@ -144,9 +144,9 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'mm/yyyy')
-			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'mm/yyyy')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') + 1
 			
 		</statement>
 
@@ -160,17 +160,17 @@
 			sum(misc_charges) as misc_charges,
 			sum(refund) as refund
 			FROM Invoice_Charges
-			WHERE owner_org_id = :1
-			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
-			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			WHERE owner_org_id = ?
+			and real_invoice_date &gt;= to_date(?, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(?, 'MM/DD/YYYY') + 1
 			
 		</statement>
 
 		<statement name="sel_orgYearStartingAR">
 			
 			select sum(balance) from Invoice 
-			where owner_id = :1
-			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			where owner_id = ?
+			and invoice_date &lt; to_date(?, 'MM/DD/YYYY')
 			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 			
 		</statement>
@@ -178,9 +178,9 @@
 		<statement name="sel_providerList">
 			
 			select distinct provider from Invoice_Charges
-			where owner_org_id = :1
-			and invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
-			and invoice_date &lt; add_months(to_date(:2, 'MM/DD/YYYY'), 12)
+			where owner_org_id = ?
+			and invoice_date &gt;= to_date(?, 'MM/DD/YYYY')
+			and invoice_date &lt; add_months(to_date(?, 'MM/DD/YYYY'), 12)
 			
 		</statement>
 

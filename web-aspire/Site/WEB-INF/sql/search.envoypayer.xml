@@ -16,6 +16,9 @@
 			id = ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like">

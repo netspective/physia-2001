@@ -10,6 +10,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt1">
  
@@ -19,6 +22,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt10">
  
@@ -28,6 +34,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt11">
  
@@ -37,6 +46,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt12">
  
@@ -46,6 +58,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt13">
  
@@ -55,6 +70,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt14">
  
@@ -64,6 +82,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt15">
  
@@ -73,6 +94,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt16">
  
@@ -82,6 +106,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt17">
  
@@ -91,6 +118,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt18">
  
@@ -100,6 +130,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt19">
  
@@ -109,6 +142,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt2">
  
@@ -118,6 +154,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt20">
  
@@ -127,6 +166,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt21">
  
@@ -136,6 +178,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt22">
  
@@ -145,6 +190,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt3">
  
@@ -154,6 +202,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC', 'FACILITY/SITE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt4">
  
@@ -163,6 +214,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt5">
  
@@ -172,6 +226,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt6">
  
@@ -187,6 +244,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt8">
  
@@ -196,6 +256,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 		<statement name="stmt9">
  
@@ -205,6 +268,9 @@
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
 			order by name_primary
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 	</sql-statements>
 </xaf>

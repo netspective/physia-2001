@@ -11,7 +11,7 @@
 			select t.caption as name ,t.detail as description ,t.code as proc_code,ta.value_text as cpt_code ,
 			ta.item_id as item_id , ta.value_textB as modifier
 			FROM transaction t, trans_attribute ta
-			WHERE t.trans_id = :1
+			WHERE t.trans_id = ?
 			and trans_status=2
 			and ta.parent_id (+) = t.trans_id
 			and rownum &lt;5
@@ -26,6 +26,10 @@
 			where data_text_b = ?
 			and trans_owner_id = ?
 			
+			<params>
+				<param value="request:data_text_b"/>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selByParentIdItemName">
@@ -35,6 +39,10 @@
 			WHERE parent_id = ?
 			AND item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="selByParentTransId">
@@ -43,6 +51,9 @@
 			from transaction
 			where parent_trans_id = ?
 			
+			<params>
+				<param value="request:parent_trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selByTransId">
@@ -51,6 +62,9 @@
 			from transaction
 			where trans_id = ?
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selClaimNumByParentId">
@@ -59,6 +73,9 @@
 			FROM trans_attribute
 			WHERE parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCondition">
@@ -67,6 +84,9 @@
 			from trans_related_to
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selDataByTransTypeAndCaption">
@@ -77,13 +97,16 @@
 			AND 	trans_type = 8020
 			AND	caption = 'Deceased Patient'
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selFollowupByChildTransId">
 			
 			SELECT 	rfs.caption
 			FROM 	REFERRAL_FOLLOWUP_STATUS rfs, transaction t
-			WHERE 	t.parent_trans_id = :1
+			WHERE 	t.parent_trans_id = ?
 			AND	t.trans_status_reason = rfs.id
 			
 		</statement>
@@ -123,13 +146,17 @@
 			select count(*) from transaction
 			where trans_type between 12000 and 12999 and trans_owner_id = ? and data_text_b = ?
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+				<param value="request:data_text_b"/>
+			</params>
 		</statement>
 
 		<statement name="selMiscProcedureByCode">
 			
 			select distinct code
 			FROM transaction
-			WHERE code = :1
+			WHERE code = ?
 			and trans_type = 4000
 			and trans_subtype = 'Misc Procedure Code'
 			and trans_status = 2
@@ -144,7 +171,7 @@
 			from Transaction t, trans_attribute ta
 			where trans_status = 2
 			and ta.parent_id = t.trans_id
-			and ta.item_id = :1
+			and ta.item_id = ?
 			
 		</statement>
 
@@ -152,7 +179,7 @@
 			
 			select code
 			FROM transaction t
-			WHERE trans_id = :1
+			WHERE trans_id = ?
 			
 		</statement>
 
@@ -161,7 +188,7 @@
 			select t.caption as name ,t.detail as description ,t.code as proc_code
 			from transaction t
 			where trans_status = 2
-			and t.trans_id = :1
+			and t.trans_id = ?
 			
 		</statement>
 
@@ -178,6 +205,11 @@
 			and trans_status = 2
 			and person_id = trans_owner_id
 			
+			<params>
+				<param value="request:provider_id"/>
+				<param value="request:parent_id"/>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selNextProcedureSeq">
@@ -186,6 +218,9 @@
 			FROM trans_attribute ta where ta.parent_id = ?
 			and trans_stauts = 2
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonEncounterChildren">
@@ -209,6 +244,10 @@
 			and transaction.code = ref_icd.code (+)
 			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
 			
+			<params>
+				<param value="request:PARENT_TRANS_ID"/>
+				<param value="request:TRANS_OWNER_ID"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonEncounters">
@@ -232,6 +271,9 @@
 			and transaction.code = ref_icd.code (+)
 			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
 			
+			<params>
+				<param value="request:TRANS_OWNER_ID"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonHospitalization">
@@ -242,6 +284,10 @@
 			where trans_type between 11000 and 11999
 			and trans_owner_id = ? and trans_status = ?
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+				<param value="request:trans_status"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonMeasurements">
@@ -254,6 +300,9 @@
 			where t.data_text_b = tt.data_text_b and tt.trans_type between 12000 and 12999 and tt.trans_owner_id = ?
 			group by tt.data_text_b)
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selReferralFollowStatus">
@@ -280,7 +329,7 @@
 			to_char(trans_begin_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_begin_stamp,
 			to_char(trans_end_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_end_stamp
 			FROM 	transaction t
-			WHERE	t.parent_trans_id = :1
+			WHERE	t.parent_trans_id = ?
 			AND	t.trans_type = 6010
 			ORDER BY trans_id asc
 			
@@ -312,6 +361,9 @@
 			FROM ref_service_category
 			WHERE serv_category = ?
 			
+			<params>
+				<param value="request:serv_category"/>
+			</params>
 		</statement>
 
 		<statement name="selReferralSourceType">
@@ -349,6 +401,9 @@
 			FROM trans_attribute
 			WHERE parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selRemoveChildReferrals">
@@ -358,6 +413,9 @@
 			WHERE parent_trans_id = ?
 			AND trans_type = 6010
 			
+			<params>
+				<param value="request:parent_trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selServiceProcedureData">
@@ -372,7 +430,7 @@
 			trans_status_reason, related_data, caption, trans_substatus_reason,
 			modifier,unit_cost,quantity,trans_expire_reason
 			FROM 	transaction t
-			WHERE	t.parent_trans_id = :1
+			WHERE	t.parent_trans_id = ?
 			AND	t.trans_type = 6030
 			ORDER BY trans_id asc
 			
@@ -390,7 +448,7 @@
 			trans_status_reason, related_data, caption, trans_substatus_reason,
 			modifier,unit_cost,quantity, trans_expire_reason
 			FROM 	transaction t
-			WHERE	t.trans_id = :1
+			WHERE	t.trans_id = ?
 			AND	t.trans_type = 6030
 			ORDER BY trans_id asc
 			
@@ -407,6 +465,9 @@
 			AND tt.consult_id = ?
 			)
 			
+			<params>
+				<param value="request:consult_id"/>
+			</params>
 		</statement>
 
 		<statement name="selServiceSourceTypeByTransId">
@@ -417,6 +478,9 @@
 			WHERE t.trans_id = ?
 			AND t.caption= r.id
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTestsEncounter">
@@ -425,6 +489,9 @@
 			from transaction
 			where trans_type between 12000 and 12999 and trans_owner_id = ?
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransAddressByName">
@@ -434,6 +501,10 @@
 			WHERE parent_id = ?
 			AND address_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:address_name"/>
+			</params>
 		</statement>
 
 		<statement name="selTransAndICDNameByTransId">
@@ -443,6 +514,9 @@
 			where trans_id = ?
 			and r.icd = code
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransCreateClaim">
@@ -452,6 +526,9 @@
 			from transaction
 			where trans_id = ?
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransId">
@@ -460,6 +537,9 @@
 			from transaction
 			where parent_event_id = ?
 			
+			<params>
+				<param value="request:parent_event_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransaction">
@@ -470,6 +550,9 @@
 			where trans_id = ?
 			and transaction.related_to = rel.id
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransactionByData_num_a">
@@ -477,6 +560,9 @@
 			select * from transaction
 			where data_num_a = ?
 			
+			<params>
+				<param value="request:data_num_a"/>
+			</params>
 		</statement>
 
 		<statement name="selTransactionById">
@@ -494,6 +580,9 @@
 			from Transaction
 			where trans_id = ?
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransactionByUserAndData_num_a">
@@ -503,6 +592,10 @@
 			WHERE data_num_a = ?
 			AND trans_owner_id = ?
 			
+			<params>
+				<param value="request:data_num_a"/>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateReferralStatus">
@@ -512,6 +605,9 @@
 			WHERE trans_id = ?
 			AND trans_substatus_reason = 'Unassigned'
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateTransByParentId">
@@ -521,6 +617,11 @@
 			consult_id = ?
 			WHERE parent_trans_id = ?
 			
+			<params>
+				<param value="request:auth_ref"/>
+				<param value="request:consult_id"/>
+				<param value="request:parent_trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateTransStatus">
@@ -529,6 +630,9 @@
 			set trans_status = 3
 			where parent_trans_id = ?
 			
+			<params>
+				<param value="request:parent_trans_id"/>
+			</params>
 		</statement>
 
 		<statement name="selVisitType">

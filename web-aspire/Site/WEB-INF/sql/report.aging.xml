@@ -26,7 +26,7 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			ib.bill_to_id = :1
+			ib.bill_to_id = ?
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
@@ -71,14 +71,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			ib.bill_to_id = :1
+			ib.bill_to_id = ?
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.service_facility_id = :2
+			and t.service_facility_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -117,14 +117,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			ib.bill_to_id = :1
+			ib.bill_to_id = ?
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.care_provider_id = :2
+			and t.care_provider_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -163,14 +163,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			ib.bill_to_id = :1
+			ib.bill_to_id = ?
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.care_provider_id = :2 and t.service_facility_id = :3
+			and t.care_provider_id = ? and t.service_facility_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -209,7 +209,7 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			upper(client_id) = ? and (owner_type = 1 and owner_id = ?)
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
@@ -254,14 +254,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			upper(client_id) = ? and (owner_type = 1 and owner_id = ?)
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.service_facility_id = :3
+			and t.service_facility_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -300,14 +300,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			upper(client_id) = ? and (owner_type = 1 and owner_id = ?)
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.care_provider_id = :3
+			and t.care_provider_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -346,14 +346,14 @@
 			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
 			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
 			WHERE
-			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			upper(client_id) = ? and (owner_type = 1 and owner_id = ?)
 			AND iit.parent_id (+) = i.invoice_id
 			AND ib.bill_id (+) = i.billing_id
 			AND ist.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 			AND i.main_transaction = t.trans_id
-			and t.care_provider_id = :3 and t.service_facility_id = :4
+			and t.care_provider_id = ? and t.service_facility_id = ?
 			GROUP BY
 			i.invoice_id,
 			i.total_items,

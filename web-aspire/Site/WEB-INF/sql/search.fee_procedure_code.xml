@@ -15,6 +15,10 @@
 			AND oc.internal_catalog_id = ?
 			AND code = ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+				<param value="request:code"/>
+			</params>
 		</statement>
 
 		<statement name="sel_fee_procedure_code_like">
@@ -26,6 +30,9 @@
 			AND oc.internal_catalog_id = ?
 			AND code like ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_fee_procedure_description">
@@ -37,6 +44,9 @@
 			AND oc.internal_catalog_id = ?
 			AND UPPER(oce.description) = ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_fee_procedure_description_like">
@@ -48,6 +58,9 @@
 			AND oc.internal_catalog_id = ?
 			AND UPPER(oce.description) like ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_fee_procedure_name">
@@ -59,6 +72,9 @@
 			AND oc.internal_catalog_id = ?
 			AND UPPER(oce.name) = ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_fee_procedure_name_like">
@@ -70,6 +86,9 @@
 			AND oc.internal_catalog_id = ?
 			AND UPPER(oce.name) like ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

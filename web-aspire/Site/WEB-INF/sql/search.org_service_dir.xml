@@ -24,6 +24,9 @@
 			AND o.owner_org_id = ?
 			ORDER BY a.state, a.city
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_donlyservicestate">
@@ -44,6 +47,9 @@
 			AND o.owner_org_id = ?
 			ORDER BY a.state, a.city
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_donlyservicestate_like">
@@ -64,6 +70,9 @@
 			AND o.owner_org_id = ?
 			ORDER BY a.state, a.city
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_donlystate_like">
@@ -84,6 +93,9 @@
 			AND o.owner_org_id = ?
 			ORDER BY a.state, a.city
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_onlyservice">
@@ -146,6 +158,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_onlyservice_like">
@@ -208,6 +223,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_scity_like">
@@ -270,6 +288,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sservice_like">
@@ -332,6 +353,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sservicecity_like">
@@ -394,6 +418,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sservicestate_like">
@@ -456,6 +483,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sservicestatecity">
@@ -518,6 +548,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sservicestatecity_like">
@@ -580,6 +613,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sstate_like">
@@ -642,6 +678,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sstatecity_like">
@@ -704,6 +743,9 @@
 			AND rownum &lt;= 250
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_sub_service_search">
@@ -763,6 +805,11 @@
 			AND a.city = ?
 			ORDER BY o.org_id
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:code"/>
+				<param value="request:city"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -161,23 +161,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -203,23 +213,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -261,23 +281,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -623,23 +653,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -687,23 +727,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -722,10 +772,16 @@
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
 			</field.composite>
-			<field.address caption="Home Address" name="address" required="yes"/>
+			<field.address caption="Home Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
 			<field.composite caption="*"  name="text_field">
-				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone"/>
-				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
 
 		</dialog>
@@ -734,8 +790,7 @@
 			<field.person.id caption="Person ID" max-length="16" name="person_id" size="16" required="yes"/>
 			<field.organization.id caption="Organization ID" max-length="16" name="org_id" size="16" required="yes"/>
 			<field.text mask-entry="yes" caption="Old Password" required="yes" name="old_password">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
-			  <conditional action="invisible-when-data-cmd" data-cmd="delete"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add,delete"/>
 			</field.text>
 			<field.text mask-entry="yes" caption="Password" required="yes" name="password"/>
 			<field.text mask-entry="yes" caption="Confirm Password" required="yes" name="confirm_password"/>
@@ -760,23 +815,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -811,7 +876,7 @@
 
 		<dialog name="document" heading="document">
 			<field.text caption="doc_id" read-only="yes" name="doc_id">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.text>
 			<field.person.id caption="Owner ID" max-length="16" name="owner_id" size="16" required="yes"/>
 			<field.text caption="Name" required="yes" name="doc_name"/>
@@ -824,14 +889,14 @@
 		<dialog name="customize" heading="customize">
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Column" read-only="yes" name="column">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.text>
 			<field.person.id caption="Physician ID" hint="Physician ID or select a Roving Physician" max-length="64" name="resource_id" size="32" required="yes"/>
 			<field.rovingresource caption="Roving Physician" name="roving_physician" size="1" />
 			<field.organization.id caption="Facility" max-length="16" name="facility_id" size="16" />
 			<field.select caption="Relative Date"  name="date_offset" choices="Selected Date -3=-3,Selected Date -2=-2,Selected Date -1=-1,Selected Date=0,Selected Date +1=1,Selected Date +2=2,Selected Date +3=3"/>
 			<field.boolean caption="Remove this column"  name="remove_column" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 			<field.separator name="text_field"/>
 			<field.composite caption="Appt Sheet Start/End Hours"  name="text_field">
@@ -885,23 +950,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -928,10 +1003,10 @@
 			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 				<field.phone caption="Fax"  max-length="1024" name="fax">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 
@@ -952,23 +1027,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -1072,10 +1157,16 @@
 			<field.text hidden="yes" name="ref_phy_item_id" caption="ref_phy_item_id"/>
 			<field.person.id.new caption="Person/Patient ID" hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16" />
 			<field.person.name caption="*" max-length="-1" name="person_id" />
-			<field.address caption="Work Address" name="address" />
+			<field.address caption="Work Address" name="address" >
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Work Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Work Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
 			<field.text hidden="yes" name="phy_type_item_id" caption="phy_type_item_id"/>
 			<field.separator heading="License ID Numbers" name="id_numbers_section"/>
@@ -1083,211 +1174,315 @@
 				<field.select caption="License" prepend-blank="yes" name="id_name_1" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_1"/>
 				<field.date caption="Exp Date" name="id_exp_date_1" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_1" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_2" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_2"/>
 				<field.date caption="Exp Date" name="id_exp_date_2" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_2" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_3" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_3"/>
 				<field.date caption="Exp Date" name="id_exp_date_3" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_3" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_4" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_4"/>
 				<field.date caption="Exp Date" name="id_exp_date_4" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_4" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_5" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_5"/>
 				<field.date caption="Exp Date" name="id_exp_date_5" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_5" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_6" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_6"/>
 				<field.date caption="Exp Date" name="id_exp_date_6" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_6" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_7" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_7"/>
 				<field.date caption="Exp Date" name="id_exp_date_7" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_7" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_8" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_8"/>
 				<field.date caption="Exp Date" name="id_exp_date_8" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_8" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_9" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_9"/>
 				<field.date caption="Exp Date" name="id_exp_date_9" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_9" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_10" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_10"/>
 				<field.date caption="Exp Date" name="id_exp_date_10" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_10" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_11" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_11"/>
 				<field.date caption="Exp Date" name="id_exp_date_11" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_11" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_12" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_12"/>
 				<field.date caption="Exp Date" name="id_exp_date_12" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_12" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_13" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_13"/>
 				<field.date caption="Exp Date" name="id_exp_date_13" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_13" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_14" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_14"/>
 				<field.date caption="Exp Date" name="id_exp_date_14" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_14" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_15" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_15"/>
 				<field.date caption="Exp Date" name="id_exp_date_15" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_15" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_16" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_16"/>
 				<field.date caption="Exp Date" name="id_exp_date_16" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_16" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_17" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_17"/>
 				<field.date caption="Exp Date" name="id_exp_date_17" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_17" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_18" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_18"/>
 				<field.date caption="Exp Date" name="id_exp_date_18" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_18" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_19" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_19"/>
 				<field.date caption="Exp Date" name="id_exp_date_19" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_19" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_20" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_20"/>
 				<field.date caption="Exp Date" name="id_exp_date_20" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_20" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_21" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_21"/>
 				<field.date caption="Exp Date" name="id_exp_date_21" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_21" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_22" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_22"/>
 				<field.date caption="Exp Date" name="id_exp_date_22" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_22" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_23" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_23"/>
 				<field.date caption="Exp Date" name="id_exp_date_23" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_23" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_24" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_24"/>
 				<field.date caption="Exp Date" name="id_exp_date_24" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_24" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="id_name_25" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
 				<field.text caption="Number"  name="id_num_25"/>
 				<field.date caption="Exp Date" name="id_exp_date_25" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_25" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 			</field.composite>
 			<field.separator heading="Provider Numbers" name="provider_id_numbers_section"/>
 			<field.composite caption="*"  name="prov_id_numbers">
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_1" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_1"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_1" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_1" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_2" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_2"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_2" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_2" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_3" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_3"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_3" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_3" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_4" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_4"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_4" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_4" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_5" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_5"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_5" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_5" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_6" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_6"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_6" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_6" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_7" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_7"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_7" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_7" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_8" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_8"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_8" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_8" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_9" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_9"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_9" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_9" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_10" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_10"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_10" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_10" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_11" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_11"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_11" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_11" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_12" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_12"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_12" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_12" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_13" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_13"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_13" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_13" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_14" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_14"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_14" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_14" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_15" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_15"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_15" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_15" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_16" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_16"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_16" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_16" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_17" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_17"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_17" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_17" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_18" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_18"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_18" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_18" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_19" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_19"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_19" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_19" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_20" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_20"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_20" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_20" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_21" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_21"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_21" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_21" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_22" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_22"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_22" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_22" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_23" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_23"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_23" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_23" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_24" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_24"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_24" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_24" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 				<field.select caption="License" prepend-blank="yes" name="prov_id_name_25" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 				<field.text caption="Number"  name="prov_id_num_25"/>
 				<field.date caption="Exp Date" name="prov_id_exp_date_25" size="12"/>
-				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 			</field.composite>
 			<field.separator heading="Certification/Accreditation" name="cert_for_physician"/>
 			<field.composite caption="Specialty/Sequence"  name="specialty">
-				<field.select caption="Specialty" prepend-blank="yes" name="specialty_code" choices="query:person.selMedicalSpeciality"/>
-				<field.select caption="Specialty Sequence"  name="value_int1" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+				<field.select caption="Specialty" prepend-blank="yes" name="specialty_code" choices="query:person.selMedicalSpeciality">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
+				<field.select caption="Specialty Sequence"  name="value_int1" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.select>
 			</field.composite>
 
 		</dialog>
@@ -1381,23 +1576,33 @@
 				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
 			</field.composite>
 			<field.composite caption="*"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
-			<field.address caption="Mailing Address" name="address" required="yes"/>
-			<field.email caption="Email"  max-length="1024" name="email"/>
-			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.address caption="Mailing Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
+			<field.email caption="Email"  max-length="1024" name="email">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.email>
+			<field.uri caption="Website"  max-length="1024" name="internet">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.uri>
 			<field.composite caption="*"  name="org_contact">
 				<field.text caption="Billing Contact"  name="contact_name">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.text>
 				<field.phone caption="Phone"  max-length="1024" name="contact_phone">
-				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit"/>
 				</field.phone>
 			</field.composite>
 			<field.separator name="text_field"/>
 			<field.boolean caption="Delete record?"  name="delete_record" style="check">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.boolean>
 
 		</dialog>
@@ -1465,7 +1670,7 @@
 
 		<dialog name="template" heading="template">
 			<field.text caption="Template ID" read-only="yes" name="template_id">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.text>
 			<field.duration caption="Effective Dates" max-length="-1" name="effective" />
 			<field.memo caption="Caption" name="caption" size="24"/>
@@ -1493,7 +1698,7 @@
 
 		<dialog name="appttype" heading="appttype">
 			<field.text caption="Appointment Type ID" read-only="yes" name="appt_type_id">
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.text>
 			<field.person.id caption="Resource ID(s)" hint="Appt Type applies to these Resource(s)" max-length="255" name="r_ids" size="40" required="yes"/>
 			<field.memo caption="Caption" name="caption" size="24"/>
@@ -1565,13 +1770,13 @@
 			<field.text hidden="yes" name="fee_schedules_item_id" caption="fee_schedules_item_id"/>
 			<field.text hidden="yes" name="fee_schedules_catalog_ids" caption="fee_schedules_catalog_ids"/>
 			<field.duration caption="Illness -  Similar/Current" max-length="-1" name="illness" >
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.duration>
 			<field.duration caption="Disability -  Begin/End" max-length="-1" name="disability" >
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.duration>
 			<field.duration caption="Hospitalization -  Admit/Discharge" max-length="-1" name="hospitalization" >
-			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			  <conditional action="apply-flag" flag="invisible" data-cmd="add"/>
 			</field.duration>
 			<field.duration caption="Service Dates -  From/To" max-length="-1" name="service" />
 			<field.text hidden="yes" name="servtype" caption="servtype"/>
@@ -1638,10 +1843,16 @@
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
 			</field.composite>
-			<field.address caption="Home Address" name="address" required="yes"/>
+			<field.address caption="Home Address" name="address" required="yes">
+			  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+			</field.address>
 			<field.composite caption="*"  name="text_field">
-				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone"/>
-				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone">
+				  <conditional action="apply-flag" flag="invisible" data-cmd="edit,delete"/>
+				</field.phone>
 			</field.composite>
 
 		</dialog>

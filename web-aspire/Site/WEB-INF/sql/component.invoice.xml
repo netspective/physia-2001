@@ -14,6 +14,9 @@
 			where	insurance = ?
 			group by insurance
 			
+			<params>
+				<param value="request:insurance"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.agedInsuranceDataAll">
@@ -36,6 +39,9 @@
 			where	patient = ?
 			group by patient
 			
+			<params>
+				<param value="request:patient"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.agedPatientDataAll">
@@ -53,9 +59,9 @@
 		<statement name="invoice.appointmentCharges">
 			
 			select 	p1.simple_name,
-			trunc(e.start_time - :4),
-			to_char(e.start_time - :4, 'HH12:MIAM'),
-			to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
+			trunc(e.start_time - ?),
+			to_char(e.start_time - ?, 'HH12:MIAM'),
+			to_char(e.start_time - ? +(e.duration/1440), 'HH12:MIAM'),
 			o.name_primary,
 			e.subject,
 			t.caption,
@@ -67,8 +73,8 @@
 			p3.simple_name
 			from 	event e, transaction t, org o, transaction_type tt,
 			person p, person p1, person p2, invoice i, invoice_billing ib, person p3
-			where	e.start_time &gt;= to_date(:1, 'MM/DD/YYYY') + :4
-			and e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + 1 + :4
+			where	e.start_time &gt;= to_date(?, 'MM/DD/YYYY') + ?
+			and e.start_time &lt; to_date(?, 'MM/DD/YYYY') + 1 + ?
 			and	e.event_id = t.parent_event_id
 			and e.facility_id = o.org_internal_id
 			and t.trans_type = tt.id
@@ -81,12 +87,12 @@
 			and ib.bill_party_type in (0,1)
 			and ib.bill_sequence = 1
 			and ib.invoice_item_id is NULL
-			and o.owner_org_id = :3
+			and o.owner_org_id = ?
 			and i.client_id = p3.person_id
 			UNION ALL
-			select	p1.simple_name, trunc(e.start_time - :4),
-			to_char(e.start_time - :4, 'HH12:MIAM'),
-			to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
+			select	p1.simple_name, trunc(e.start_time - ?),
+			to_char(e.start_time - ?, 'HH12:MIAM'),
+			to_char(e.start_time - ? +(e.duration/1440), 'HH12:MIAM'),
 			o.name_primary, e.subject,
 			t.caption, tt.caption, p.simple_name,
 			o1.name_primary,
@@ -95,8 +101,8 @@
 			p3.simple_name
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
 			person p, person p1, invoice i, invoice_billing ib, person p3
-			where	e.start_time &gt;= to_date(:1, 'MM/DD/YYYY') + :4
-			and e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + 1 + :4
+			where	e.start_time &gt;= to_date(?, 'MM/DD/YYYY') + ?
+			and e.start_time &lt; to_date(?, 'MM/DD/YYYY') + 1 + ?
 			and e.event_id = t.parent_event_id
 			and e.facility_id = o.org_internal_id
 			and t.trans_type = tt.id
@@ -109,7 +115,7 @@
 			and ib.bill_party_type in (2,3)
 			and ib.bill_sequence = 1
 			and ib.invoice_item_id is NULL
-			and o.owner_org_id = :3
+			and o.owner_org_id = ?
 			and i.client_id = p3.person_id
 			ORDER BY 2,12
 			
@@ -120,7 +126,7 @@
 			select item_id, parent_id, value_text, value_textb,
 			to_char(value_date, 'MM/DD/YYYY') as value_date, value_type
 			from invoice_attribute
-			where parent_id = :1 and
+			where parent_id = ? and
 			value_type = 20000
 			order by value_date desc
 			
@@ -145,6 +151,9 @@
 			and trunc(invoice_date) between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
 			order by invoice_date DESC
 			
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.dailyAuditRecap">
@@ -166,6 +175,9 @@
 			and	org_id = ?
 			group by DAY_OF_MONTH, ORG_ID
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.financialAnalysisReport">
@@ -184,6 +196,9 @@
 			where	provider = ?
 			group by org_id, provider
 			
+			<params>
+				<param value="request:provider"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.financialAnalysisReportAll">
@@ -223,6 +238,9 @@
 			group by to_char(to_date(DAY_OF_MONTH,'mm/dd/yyyy'), 'YYYY-MON'), ORG_ID
 			order by Month
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="invoice.procAnalysis">
@@ -231,8 +249,8 @@
 			tt.caption as visit_type,
 			nvl(i.code,'UNK') as code,
 			nvl(r.name,'N/A') as proc,
-			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.units,0)) as month_to_date_units,
-			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.unit_cost,0)) as month_to_date_unit_cost,
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(?,'MM/DD/YYYY'),'MM'),i.units,0)) as month_to_date_units,
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(?,'MM/DD/YYYY'),'MM'),i.unit_cost,0)) as month_to_date_unit_cost,
 			sum(i.units) as year_to_date_units,
 			sum(i.unit_cost) as year_to_date_unit_cost
 			from invoice_charges i
@@ -241,13 +259,13 @@
 			org o
 			where r.CPT (+) = i.code
 			AND p.person_id= provider
-			AND (p.person_id = :1 OR :1 IS NULL)
-			AND trunc(i.invoice_date,'YYYY') =trunc(to_date(:2,'MM/DD/YYYY'),'YYYY')
-			AND (:3 IS NULL OR :3 = i.facility)
-			AND (:4 IS NULL OR :4 &lt;=i.code)
-			AND (:5 is NULL OR :5 &gt;=i.code)
+			AND (p.person_id = ? OR ? IS NULL)
+			AND trunc(i.invoice_date,'YYYY') =trunc(to_date(?,'MM/DD/YYYY'),'YYYY')
+			AND (? IS NULL OR ? = i.facility)
+			AND (? IS NULL OR ? &lt;=i.code)
+			AND (? is NULL OR ? &gt;=i.code)
 			AND o.org_internal_id = i.facility
-			AND o.owner_org_id = :6
+			AND o.owner_org_id = ?
 			AND t.trans_id (+)= i.trans_id
 			AND tt.id (+)= t.trans_type
 			group by r.name,p.short_sortable_name,

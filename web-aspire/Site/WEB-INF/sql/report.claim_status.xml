@@ -70,13 +70,16 @@
 			from Insurance, Invoice_Billing, Invoice_Status, Invoice
 			where Invoice.owner_id = ?
 			and Invoice.owner_type = 1
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Invoice_Status.id = Invoice.invoice_status
 			and Invoice_Billing.invoice_id = Invoice.invoice_id
 			and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
 			group by caption
 			
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_payer_type">

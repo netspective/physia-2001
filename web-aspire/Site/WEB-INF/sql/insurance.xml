@@ -8,6 +8,9 @@
 			FROM insurance_attribute
 			WHERE parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="id">
@@ -24,6 +27,9 @@
 			owner_person_id = ?
 			AND ins_type = 6
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllWrkCmpAttr">
@@ -34,6 +40,10 @@
 			value_int = ?
 			AND value_type = ?
 			
+			<params>
+				<param value="request:value_int"/>
+				<param value="request:value_type"/>
+			</params>
 		</statement>
 
 		<statement name="selChildrenPlans">
@@ -42,6 +52,9 @@
 			FROM Insurance
 			WHERE parent_ins_id = ?
 			
+			<params>
+				<param value="request:parent_ins_id"/>
+			</params>
 		</statement>
 
 		<statement name="selDeleteFeeSchedule">
@@ -53,6 +66,10 @@
 			AND item_name = 'Fee Schedule'
 			AND cr_org_internal_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:cr_org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selDoesInsSequenceExists">
@@ -63,6 +80,10 @@
 			owner_person_id = ?
 			AND bill_sequence = ?
 			
+			<params>
+				<param value="request:owner_person_id"/>
+				<param value="request:bill_sequence"/>
+			</params>
 		</statement>
 
 		<statement name="selDoesPlanExistsForPerson">
@@ -73,6 +94,10 @@
 			product_name = ?
 			AND owner_person_id = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selDoesProductExists">
@@ -84,6 +109,10 @@
 			AND ins_org_id = ?
 			AND record_type = 1
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:ins_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selEmpExistPlan">
@@ -98,6 +127,9 @@
 			AND patt.value_int = ins.ins_org_id
 			AND ins.record_type = 6
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selEmployerWorkersCompPlans">
@@ -132,6 +164,9 @@
 			)
 			)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selExistsPlanForPerson">
@@ -142,6 +177,10 @@
 			ins_type = ?
 			AND owner_person_id = ?
 			
+			<params>
+				<param value="request:ins_type"/>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selGroupInsurance">
@@ -168,6 +207,9 @@
 			o.ins_type = ct.id
 			AND o.product_name = ?
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsOrgData">
@@ -176,6 +218,9 @@
 			FROM org
 			WHERE org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsPlan">
@@ -188,6 +233,11 @@
 			AND ins_org_id = ?
 			AND record_type = 2
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:plan_name"/>
+				<param value="request:ins_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsPlanAttributesForOrg">
@@ -202,6 +252,9 @@
 			parent_id = ?
 			AND item_name like ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsSequence">
@@ -210,6 +263,9 @@
 			FROM insurance
 			WHERE owner_person_id = ?
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsType">
@@ -218,6 +274,9 @@
 			from insurance
 			where ins_internal_id = ?
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsTypeCode">
@@ -239,6 +298,9 @@
 			coverage_end_date DESC,
 			bill_sequence
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceAddr">
@@ -256,6 +318,9 @@
 			parent_id = ?
 			AND address_name = 'Billing'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceAddrWithOutColNameChanges">
@@ -272,6 +337,9 @@
 			parent_id = ?
 			AND address_name = 'Billing'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceAttr">
@@ -282,6 +350,10 @@
 			parent_id = ?
 			AND item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceAttr_Org">
@@ -291,6 +363,10 @@
 			WHERE parent_id = ?
 			AND item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceBillCaption">
@@ -299,6 +375,9 @@
 			FROM bill_sequence
 			WHERE id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByBillSequence">
@@ -309,6 +388,10 @@
 			bill_sequence = ?
 			AND owner_person_id = ?
 			
+			<params>
+				<param value="request:bill_sequence"/>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByInsOrgAndMemberNumber">
@@ -319,6 +402,10 @@
 			ins_org_id = ?
 			AND member_number = ?
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:member_number"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByInsOrgAndMemberNumberForElig">
@@ -343,6 +430,10 @@
 			AND member_number = ?
 			AND ins_type = ct.id
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:member_number"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByInsType">
@@ -353,6 +444,10 @@
 			owner_person_id = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:owner_person_id"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByOwnerAndProductName">
@@ -363,6 +458,10 @@
 			product_name = ?
 			AND owner_person_id = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByOwnerAndProductNameForElig">
@@ -387,6 +486,10 @@
 			AND owner_person_id = ?
 			AND ins_type = ct.id
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByPersonAndInsOrg">
@@ -397,6 +500,10 @@
 			owner_person_id = ?
 			AND ins_org_id = ?
 			
+			<params>
+				<param value="request:owner_person_id"/>
+				<param value="request:ins_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByPersonOwnerAndGuarantorAndInsType">
@@ -408,6 +515,11 @@
 			AND guarantor_id = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:owner_person_id"/>
+				<param value="request:guarantor_id"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceByPlanNameAndPersonAndInsType">
@@ -419,6 +531,11 @@
 			AND owner_person_id = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:plan_name"/>
+				<param value="request:owner_person_id"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceData">
@@ -427,6 +544,9 @@
 			FROM Insurance
 			WHERE ins_internal_id = ?
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceForInvoiceSubmit">
@@ -458,6 +578,9 @@
 			ins.ins_internal_id = ?
 			AND ct.id = ins_type
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceGroup">
@@ -482,6 +605,9 @@
 			i.ins_type = ct.id
 			AND i.ins_internal_id = ?
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceGroupData">
@@ -507,6 +633,9 @@
 			i.ins_type = ct.id
 			AND i.product_name = ?
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceGroupName">
@@ -515,6 +644,9 @@
 			FROM insurance
 			WHERE product_name = ?
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsurancePayerFax">
@@ -527,6 +659,9 @@
 			parent_id = ?
 			AND item_name = 'Contact Method/Fax/Primary'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsurancePayerPhone">
@@ -539,6 +674,9 @@
 			parent_id = ?
 			AND item_name = 'Contact Method/Telephone/Primary'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsurancePlanData">
@@ -549,6 +687,9 @@
 			product_name = ?
 			AND record_type in (?, ?, ?, ?)
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInsurancePlansForOrg">
@@ -577,6 +718,9 @@
 			AND record_type IN (2, 3)
 			AND NOT ins_type = 6
 			
+			<params>
+				<param value="request:ins_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuranceSingleColumn">
@@ -585,6 +729,9 @@
 			FROM insurance
 			WHERE ins_internal_id = ?
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInsuredRelation">
@@ -602,6 +749,9 @@
 			FROM insured_relationship
 			WHERE id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selIsPlanUnique">
@@ -612,6 +762,10 @@
 			product_name = ?
 			AND record_type = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:record_type"/>
+			</params>
 		</statement>
 
 		<statement name="selIsPlanWorkComp">
@@ -622,6 +776,10 @@
 			product_name = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selNewPlanExists">
@@ -633,6 +791,10 @@
 			AND owner_org_id = ?
 			AND record_type = 2
 			
+			<params>
+				<param value="request:plan_name"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selNewProductExists">
@@ -644,6 +806,10 @@
 			AND owner_org_id = ?
 			AND record_type = 1
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPatientHasPlan">
@@ -655,6 +821,11 @@
 			AND owner_person_id = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:owner_person_id"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selPatientWorkersCompPlan">
@@ -665,6 +836,9 @@
 			product_name = ?
 			AND ins_type = 6
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selPayerChoicesByOwnerPersonId">
@@ -681,7 +855,7 @@
 			claim_type ct,
 			bill_sequence bs
 			WHERE
-			i.owner_person_id = :1
+			i.owner_person_id = ?
 			AND ct.id = i.ins_type
 			AND bs.id = i.bill_sequence
 			AND i.bill_sequence IN (1,2,3,4)
@@ -696,7 +870,7 @@
 			guarantor_type
 			FROM insurance wk
 			WHERE
-			wk.owner_person_id = :1
+			wk.owner_person_id = ?
 			AND wk.ins_type = 6
 			)
 			UNION (
@@ -709,7 +883,7 @@
 			guarantor_type
 			FROM insurance
 			WHERE
-			owner_person_id = :1
+			owner_person_id = ?
 			AND ins_type = 7
 			)
 			ORDER BY bill_seq_id
@@ -742,6 +916,10 @@
 			AND ins.bill_sequence = ?
 			AND ct.id = ins_type
 			
+			<params>
+				<param value="request:owner_person_id"/>
+				<param value="request:bill_sequence"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonInsuranceId">
@@ -753,6 +931,11 @@
 			AND product_name = ?
 			AND ins_type = ?
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:product_name"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonPlanExists">
@@ -766,6 +949,13 @@
 			AND owner_person_id = ?
 			AND ins_org_id = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:plan_name"/>
+				<param value="request:record_type"/>
+				<param value="request:owner_person_id"/>
+				<param value="request:ins_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPlanByInsIdAndRecordType">
@@ -776,6 +966,10 @@
 			product_name = ?
 			AND record_type = ?
 			
+			<params>
+				<param value="request:product_name"/>
+				<param value="request:record_type"/>
+			</params>
 		</statement>
 
 		<statement name="selPlanRecord">
@@ -787,6 +981,10 @@
 			owner_org_id = ? AND
 			plan_name = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:plan_name"/>
+			</params>
 		</statement>
 
 		<statement name="selPlanRecordExists">
@@ -798,6 +996,10 @@
 			owner_org_id = ? AND
 			plan_name = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:plan_name"/>
+			</params>
 		</statement>
 
 		<statement name="selPpoHmoIndicator">
@@ -818,6 +1020,10 @@
 			owner_org_id = ? AND
 			product_name = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selProductRecordExists">
@@ -829,6 +1035,10 @@
 			owner_org_id = ? AND
 			product_name = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selSpecificWrkCmpAttr">
@@ -840,6 +1050,11 @@
 			AND value_int = ?
 			AND value_type = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:value_int"/>
+				<param value="request:value_type"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateAndAddInsSeq">
@@ -850,6 +1065,10 @@
 			ins_internal_id = ?
 			AND bill_sequence = ?
 			
+			<params>
+				<param value="request:ins_internal_id"/>
+				<param value="request:bill_sequence"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateCoverage">
@@ -864,6 +1083,14 @@
 			AND record_type = 3
 			AND owner_org_id = ?
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:product_name"/>
+				<param value="request:plan_name"/>
+				<param value="request:remit_type"/>
+				<param value="request:parent_ins_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdateInsSequence">
@@ -875,6 +1102,9 @@
 			AND bill_sequence &gt; ?
 			AND bill_sequence &lt; 5
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selUpdatePlanAndCoverage">
@@ -890,6 +1120,14 @@
 			AND record_type IN (2, 3)
 			AND owner_org_id = ?
 			
+			<params>
+				<param value="request:ins_type"/>
+				<param value="request:product_name"/>
+				<param value="request:ins_org_id"/>
+				<param value="request:product_name"/>
+				<param value="request:ins_org_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selWorkersCompPlanInfo">
@@ -907,6 +1145,9 @@
 			product_name = ?
 			AND ins_type = 6
 			
+			<params>
+				<param value="request:product_name"/>
+			</params>
 		</statement>
 
 		<statement name="selWorkersCompPlansForOrg">
@@ -925,6 +1166,10 @@
 			AND ins_type = ?
 			AND record_type in (?, ?, ?, ?)
 			
+			<params>
+				<param value="request:ins_org_id"/>
+				<param value="request:ins_type"/>
+			</params>
 		</statement>
 
 		<statement name="sel_Person_Insurance">
@@ -939,6 +1184,9 @@
 			coverage_end_date DESC,
 			bill_sequence
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

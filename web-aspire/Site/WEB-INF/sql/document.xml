@@ -30,6 +30,9 @@
 			WHERE
 			doc_id = ?
 			
+			<params>
+				<param value="request:doc_id"/>
+			</params>
 		</statement>
 
 		<statement name="selDocumentContentById">
@@ -42,13 +45,16 @@
 			WHERE
 			doc_id = ?
 			
+			<params>
+				<param value="request:doc_id"/>
+			</params>
 		</statement>
 
 		<statement name="selMessage">
 			
 			SELECT
 			Document.doc_id as message_id,
-			to_char(Document.doc_orig_stamp - :2, 'MM/DD/YYYY HH12:MI AM') AS send_on,
+			to_char(Document.doc_orig_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS send_on,
 			Document.doc_recv_stamp AS read_on,
 			Document.doc_source_id AS from_id,
 			Document.doc_name AS subject,
@@ -68,7 +74,7 @@
 			Document_Attribute attr_repatient,
 			Document
 			WHERE
-			Document.doc_id = :1
+			Document.doc_id = ?
 			AND attr_repatient.parent_id (+) = Document.doc_id
 			AND attr_repatient.value_type (+) = 331
 			AND attr_repatient.item_name (+) = 'Regarding Patient'
@@ -86,7 +92,7 @@
 			FROM
 			Document_Attribute
 			WHERE
-			parent_id = :1 AND
+			parent_id = ? AND
 			value_type = 330 AND
 			item_name = 'CC'
 			
@@ -95,17 +101,17 @@
 		<statement name="selMessageNotes">
 			
 			SELECT
-			TO_CHAR(cr_stamp -:3, 'IYYYMMDDHH24MISS') as when,
+			TO_CHAR(cr_stamp -?, 'IYYYMMDDHH24MISS') as when,
 			person_id AS person_id,
 			value_text AS notes,
 			value_int AS private
 			FROM
 			Document_Attribute
 			WHERE
-			parent_id = :1 AND
+			parent_id = ? AND
 			value_type = 0 AND
 			item_name = 'Notes' AND
-			(value_int = 0 OR person_id = :2)
+			(value_int = 0 OR person_id = ?)
 			
 		</statement>
 
@@ -116,10 +122,10 @@
 			FROM
 			Document_Attribute
 			WHERE
-			parent_id = :1 AND
+			parent_id = ? AND
 			value_type = 330 AND
 			item_name IN ('To', 'CC') AND
-			value_text = :2
+			value_text = ?
 			
 		</statement>
 
@@ -130,7 +136,7 @@
 			FROM
 			Document_Attribute
 			WHERE
-			parent_id = :1 AND
+			parent_id = ? AND
 			value_type = 330 AND
 			item_name = 'To'
 			
@@ -145,6 +151,9 @@
 			WHERE
 			doc_data_a = ?
 			
+			<params>
+				<param value="request:doc_data_a"/>
+			</params>
 		</statement>
 
 	</sql-statements>

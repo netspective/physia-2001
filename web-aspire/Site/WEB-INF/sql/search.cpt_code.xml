@@ -16,6 +16,9 @@
 			cpt = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:cpt"/>
+			</params>
 		</statement>
 
 		<statement name="sel_cpt_code_like">
@@ -112,6 +115,9 @@
 			cpt = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:cpt"/>
+			</params>
 		</statement>
 
 	</sql-statements>

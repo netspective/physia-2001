@@ -30,24 +30,24 @@
 			from person p, transaction t, invoice i,
 			(
 			select parent_id from invoice_item ii
-			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			where (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
 			and ii.item_type in (0, 1, 2)
 			and ii.data_text_b is null
 			) inv_items
-			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			where i.invoice_date between to_date(?, 'MM/DD/YYYY') and to_date(?, 'MM/DD/YYYY')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
 			and i.invoice_id = inv_items.parent_id
 			) cnt,
 			(
 			select parent_id from invoice_item ii
-			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			where (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
 			and ii.item_type in (0, 1, 2)
 			and ii.data_text_b is null
 			) inv_items
-			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			where i.invoice_date between to_date(?, 'MM/DD/YYYY') and to_date(?, 'MM/DD/YYYY')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
 			and i.invoice_id = inv_items.parent_id
@@ -63,12 +63,12 @@
 			from person p, transaction t, invoice i, org o, invoice_billing ib, insurance ins,
 			(
 			select parent_id from invoice_item ii
-			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			where (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
 			and ii.item_type in (0, 1, 2)
 			and ii.data_text_b is null
 			) inv_items
-			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			where i.invoice_date between to_date(?, 'MM/DD/YYYY') and to_date(?, 'MM/DD/YYYY')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
 			and i.billing_id = ib.bill_id
@@ -82,12 +82,12 @@
 			from person p, transaction t, invoice i, invoice_billing ib,
 			(
 			select parent_id from invoice_item ii
-			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			where (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
 			and ii.item_type in (0, 1, 2)
 			and ii.data_text_b is null
 			) inv_items
-			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			where i.invoice_date between to_date(?, 'MM/DD/YYYY') and to_date(?, 'MM/DD/YYYY')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
 			and i.billing_id = ib.bill_id
@@ -103,12 +103,12 @@
 			from person p, transaction t, invoice i,
 			(
 			select parent_id from invoice_item ii
-			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			where (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') OR ? is NULL)
 			and ii.item_type in (0, 1, 2)
 			and ii.data_text_b is null
 			) inv_items
-			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			where i.invoice_date between to_date(?, 'MM/DD/YYYY') and to_date(?, 'MM/DD/YYYY')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
 			and i.invoice_id = inv_items.parent_id

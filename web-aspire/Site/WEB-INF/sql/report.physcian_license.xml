@@ -20,7 +20,7 @@
 			person p, person_attribute pa, person_org_category poc
 			WHERE
 			p.person_id = poc.person_id
-			and poc.org_internal_id = :1
+			and poc.org_internal_id = ?
 			and p.person_id = pa.parent_id
 			and pa.value_type in (
 			500,
@@ -49,7 +49,7 @@
 			person p, person_attribute pa, person_org_category poc
 			WHERE
 			p.person_id = poc.person_id
-			and poc.org_internal_id = :1
+			and poc.org_internal_id = ?
 			and p.person_id = pa.parent_id
 			and pa.value_type in (
 			500,
@@ -60,7 +60,7 @@
 			560
 			)
 			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
-			and to_char(pa.value_dateend, 'mm/yyyy') = :2
+			and to_char(pa.value_dateend, 'mm/yyyy') = ?
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
 		</statement>
@@ -79,7 +79,7 @@
 			person p, person_attribute pa, person_org_category poc
 			WHERE
 			p.person_id = poc.person_id
-			and poc.org_internal_id = :1
+			and poc.org_internal_id = ?
 			and p.person_id = pa.parent_id
 			and pa.value_type in (
 			500,
@@ -90,7 +90,7 @@
 			560
 			)
 			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
-			and p.person_id = :2
+			and p.person_id = ?
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
 		</statement>
@@ -109,7 +109,7 @@
 			person p, person_attribute pa, person_org_category poc
 			WHERE
 			p.person_id = poc.person_id
-			and poc.org_internal_id = :1
+			and poc.org_internal_id = ?
 			and p.person_id = pa.parent_id
 			and pa.value_type in (
 			500,
@@ -120,7 +120,7 @@
 			560
 			)
 			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
-			and p.person_id = :2 and to_char(pa.value_dateend, 'mm/yyyy') = :3 
+			and p.person_id = ? and to_char(pa.value_dateend, 'mm/yyyy') = ? 
 			order by name_last, name_first, pa.name_sort, pa.item_name
 			
 		</statement>

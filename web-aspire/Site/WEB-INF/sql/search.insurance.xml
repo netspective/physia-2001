@@ -40,6 +40,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_city_insplan">
@@ -77,6 +81,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_city_insproduct">
@@ -114,6 +122,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_city_like">
@@ -150,6 +162,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_city_like_insplan">
@@ -187,6 +203,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_city_like_insproduct">
@@ -224,6 +244,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid">
@@ -260,6 +284,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid_insplan">
@@ -297,6 +325,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid_insproduct">
@@ -334,6 +366,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid_like">
@@ -370,6 +406,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid_like_insplan">
@@ -407,6 +447,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_insorgid_like_insproduct">
@@ -444,6 +488,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan">
@@ -480,6 +528,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan_insplan">
@@ -517,6 +569,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan_insproduct">
@@ -554,6 +610,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan_like">
@@ -590,6 +650,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan_like_insplan">
@@ -627,6 +691,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_plan_like_insproduct">
@@ -664,6 +732,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product">
@@ -700,6 +772,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product_insplan">
@@ -737,6 +813,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product_insproduct">
@@ -774,6 +854,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product_like">
@@ -810,6 +894,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product_like_insplan">
@@ -847,6 +935,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_product_like_insproduct">
@@ -884,6 +976,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state">
@@ -920,6 +1016,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_insplan">
@@ -957,6 +1057,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_insproduct">
@@ -994,6 +1098,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_like">
@@ -1030,6 +1138,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_like_insplan">
@@ -1067,6 +1179,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_like_insproduct">
@@ -1104,6 +1220,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street">
@@ -1140,6 +1260,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street_insplan">
@@ -1177,6 +1301,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street_insproduct">
@@ -1214,6 +1342,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street_like">
@@ -1250,6 +1382,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street_like_insplan">
@@ -1287,6 +1423,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_street_like_insproduct">
@@ -1324,6 +1464,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

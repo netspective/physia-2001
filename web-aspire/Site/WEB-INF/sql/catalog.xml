@@ -6,7 +6,7 @@
 			
 			DELETE
 			FROM	org_attribute 
-			WHERE 	value_int = :1
+			WHERE 	value_int = ?
 			AND	item_name = 'Fee Schedule'
 			
 		</statement>
@@ -15,7 +15,7 @@
 			
 			DELETE
 			FROM	person_attribute 
-			WHERE 	value_int = :1
+			WHERE 	value_int = ?
 			AND	item_name = 'Fee Schedule'
 			
 		</statement>
@@ -28,8 +28,8 @@
 			
 			SELECT	oc.internal_catalog_id
 			FROM 	offering_catalog oc, org_attribute oa
-			WHERE 	oa.parent_id = :1
-			AND	oc.catalog_type = :2
+			WHERE 	oa.parent_id = ?
+			AND	oc.catalog_type = ?
 			AND 	oa.item_name = 'Fee Schedule'
 			AND 	oa.value_int = oc.internal_catalog_id	
 			AND ROWNUM &lt;2
@@ -57,6 +57,9 @@
 			where catalog_id = ?
 			and entry_type in (?,?)
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogById">
@@ -65,14 +68,17 @@
 			from offering_catalog
 			where internal_catalog_id = ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogByOrgIdType">
 			
 			select *
 			from offering_catalog
-			where org_internal_id = :1
-			and	catalog_type = :2
+			where org_internal_id = ?
+			and	catalog_type = ?
 			
 		</statement>
 
@@ -80,9 +86,9 @@
 			
 			SELECT * 
 			FROM	Offering_Catalog
-			WHERE	org_internal_id = :1
-			AND	catalog_type = :2
-			AND 	catalog_subtype = :3
+			WHERE	org_internal_id = ?
+			AND	catalog_type = ?
+			AND 	catalog_subtype = ?
 			
 		</statement>
 
@@ -90,9 +96,9 @@
 			
 			SELECT 	*
 			FROM 	offering_catalog
-			WHERE	catalog_type = :1
-			AND	org_internal_id =:2
-			AND	catalog_id = :3
+			WHERE	catalog_type = ?
+			AND	org_internal_id =?
+			AND	catalog_id = ?
 			
 		</statement>
 
@@ -102,6 +108,9 @@
 			from catalog_entry_type
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemById">
@@ -110,6 +119,9 @@
 			from offering_catalog_entry
 			where entry_id = ?
 			
+			<params>
+				<param value="request:entry_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemByNameByType">
@@ -127,9 +139,9 @@
 			
 			SELECT entry_id
 			FROM OFFERING_CATALOG_ENTRY
-			WHERE code BETWEEN (:1) 
-			AND (:2) 
-			AND catalog_id = :3
+			WHERE code BETWEEN (?) 
+			AND (?) 
+			AND catalog_id = ?
 			AND modifier IS NULL
 			
 		</statement>
@@ -156,13 +168,16 @@
 			where oce.entry_id = ?
 			and oc.internal_catalog_id = oce.catalog_id
 			
+			<params>
+				<param value="request:entry_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemsByCatID">
 			
 			SELECT	*
 			FROM	offering_catlaog_entry
-			WHERE	catalog_id = :1
+			WHERE	catalog_id = ?
 			
 		</statement>
 
@@ -173,6 +188,9 @@
 			where code = upper(?)
 			and entry_type = ?
 			
+			<params>
+				<param value="request:entry_type"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemsByIdandType">
@@ -182,6 +200,10 @@
 			where catalog_id = ?
 			and entry_type = ?
 			
+			<params>
+				<param value="request:catalog_id"/>
+				<param value="request:entry_type"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemsByOrgIdAndCode">
@@ -196,6 +218,9 @@
 			and oce.status = 1
 			and oce.code = upper(?)
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCatalogItemsByParentItem">
@@ -204,6 +229,9 @@
 			from offering_catalog_entry
 			where parent_entry_id = ?
 			
+			<params>
+				<param value="request:parent_entry_id"/>
+			</params>
 		</statement>
 
 		<statement name="selChildrenCatalogs">
@@ -212,14 +240,17 @@
 			from offering_catalog
 			where parent_catalog_id = ?
 			
+			<params>
+				<param value="request:parent_catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCodeByOrgIdCode">
 			
 			SELECT 	oce.code,oce.catalog_id
 			FROM	offering_catalog_entry oce, offering_catalog oc
-			WHERE 	upper(oce.code)= upper(:1)
-			AND	oc.internal_catalog_id = :2
+			WHERE 	upper(oce.code)= upper(?)
+			AND	oc.internal_catalog_id = ?
 			AND	oce.catalog_id = oc.internal_catalog_id
 			
 		</statement>
@@ -228,8 +259,8 @@
 			
 			SELECT 	*
 			FROM 	offering_catalog_entry
-			WHERE 	catalog_id = :1
-			AND	modifier = :2
+			WHERE 	catalog_id = ?
+			AND	modifier = ?
 			
 		</statement>
 
@@ -239,7 +270,7 @@
 			FROM	insurance_attribute ia, offering_catalog oc
 			WHERE 	oc.internal_catalog_id= ia.value_text
 			AND	ia.item_name = 'Fee Schedule'
-			AND	ia.parent_id in (:1,:2)	
+			AND	ia.parent_id in (?,?)	
 			
 		</statement>
 
@@ -254,13 +285,13 @@
 		<statement name="selFindDescByCode">
 			
 			SELECT 	 NVL(NVL((
-			NVL((SELECT description FROM Ref_HCPCS WHERE UPPER(hcpcs) = UPPER(:1)),
-			(SELECT description FROM Ref_CPT WHERE UPPER(cpt) = UPPER(:1))
+			NVL((SELECT description FROM Ref_HCPCS WHERE UPPER(hcpcs) = UPPER(?)),
+			(SELECT description FROM Ref_CPT WHERE UPPER(cpt) = UPPER(?))
 			)),
 			(SELECT 	oce.entry_id
 			FROM 	offering_catalog oc , offering_catalog_entry oce
-			WHERE	UPPER(oce.code) = UPPER(:1)
-			AND	oc.org_internal_id = :2
+			WHERE	UPPER(oce.code) = UPPER(?)
+			AND	oc.org_internal_id = ?
 			AND	oce.catalog_id = oc.internal_catalog_id
 			AND	oc.catalog_type = 2)
 			),NULL)	as description 
@@ -370,6 +401,9 @@
 			from HCFA1500_Modifier_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericModifierCodeId">
@@ -378,6 +412,9 @@
 			from HCFA1500_Modifier_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServicePlace">
@@ -386,6 +423,9 @@
 			from HCFA1500_Service_Place_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServicePlaceByAbbr">
@@ -394,6 +434,9 @@
 			from HCFA1500_Service_Place_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServicePlaceById">
@@ -402,6 +445,9 @@
 			from HCFA1500_Service_Place_Code
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServicePlaceId">
@@ -410,6 +456,9 @@
 			from HCFA1500_Service_Place_Code
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServiceType">
@@ -418,6 +467,9 @@
 			from HCFA1500_Service_Type_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServiceTypeByAbbr">
@@ -426,6 +478,9 @@
 			from HCFA1500_Service_Type_Code
 			where abbrev = ?
 			
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServiceTypeById">
@@ -434,6 +489,9 @@
 			from HCFA1500_Service_Type_Code
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericServiceTypeId">
@@ -442,6 +500,9 @@
 			from HCFA1500_Service_Type_Code
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selInternalCatalogIdById">
@@ -450,6 +511,9 @@
 			where org_internal_id = ?
 			and upper(catalog_id) = (?)
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInternalCatalogIdByIdType">
@@ -459,6 +523,10 @@
 			and upper(catalog_id) = (?)
 			and catalog_type = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:catalog_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInternalIdByCatalog">
@@ -467,6 +535,9 @@
 			FROM offering_catalog
 			WHERE catalog_id = ?
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="selMiscProcChildren">
@@ -479,6 +550,9 @@
 			AND	oce.entry_id = oce2.parent_entry_id
 			AND	oce.code = upper(?)
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selMiscProcedureByChildId">
@@ -492,7 +566,7 @@
 			oce2.code as proc_code, 
 			oce2.description
 			FROM 	offering_catalog_entry oce , offering_catalog_entry oce2
-			WHERE	oce.entry_id= :1
+			WHERE	oce.entry_id= ?
 			AND	oce2.entry_id = oce.parent_entry_id
 			
 		</statement>
@@ -501,8 +575,8 @@
 			
 			SELECT 	oce.entry_id
 			FROM 	offering_catalog oc , offering_catalog_entry oce
-			WHERE	oce.code = :1
-			AND	oc.org_internal_id = :2
+			WHERE	oce.code = ?
+			AND	oc.org_internal_id = ?
 			AND	oce.catalog_id = oc.internal_catalog_id
 			AND	oc.catalog_type = 2
 			
@@ -512,7 +586,7 @@
 			
 			SELECT	entry_id,entry_type,code,modifier,name,description, 1 as code_level,parent_entry_id
 			FROM 	offering_catalog_entry oce
-			WHERE	oce.entry_id= :1
+			WHERE	oce.entry_id= ?
 			UNION
 			SELECT	entry_id,entry_type,code,modifier,name,description, 2 as code_level,parent_entry_id
 			FROM	offering_catalog_entry oce
@@ -520,7 +594,7 @@
 			AND	parent_entry_id IN
 			(SELECT	entry_id as code_level 
 			FROM 	offering_catalog_entry oce
-			WHERE	oce.entry_id= :1
+			WHERE	oce.entry_id= ?
 			)						
 			
 		</statement>
@@ -535,6 +609,10 @@
 			AND	oce.catalog_id = oc.internal_catalog_id
 			AND	oc.catalog_type = 2
 			
+			<params>
+				<param value="request:code"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selMiscProcedureInternalID">
@@ -543,7 +621,7 @@
 			FROM	Offering_Catalog 
 			WHERE 	caption = 'Misc Procedure Code'
 			AND	catalog_type = 2
-			AND 	org_internal_id = :1
+			AND 	org_internal_id = ?
 			
 		</statement>
 
@@ -551,7 +629,7 @@
 			
 			SELECT	code as proc_code, modifier, name, description,catalog_id
 			FROM	Offering_Catalog_Entry
-			WHERE 	entry_id = :1
+			WHERE 	entry_id = ?
 			
 		</statement>
 
@@ -561,6 +639,9 @@
 			from HCFA1500_Modifier_Code
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgIdLinkedFS">
@@ -570,7 +651,7 @@
 			WHERE 	o.org_internal_id = oa.parent_id 
 			AND	oc.internal_catalog_id= oa.value_int
 			AND	oa.item_name = 'Fee Schedule'
-			AND	oc.internal_catalog_id = :1
+			AND	oc.internal_catalog_id = ?
 			
 		</statement>
 
@@ -581,6 +662,9 @@
 			where org_internal_id = ?
 			and parent_catalog_id is NULL
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonIdLinkedFS">
@@ -589,7 +673,7 @@
 			FROM	person_attribute pa, offering_catalog oc
 			WHERE 	oc.internal_catalog_id= pa.value_int
 			AND	pa.item_name = 'Fee Schedule'
-			AND	oc.internal_catalog_id = :1
+			AND	oc.internal_catalog_id = ?
 			
 		</statement>
 
@@ -603,6 +687,11 @@
 			and cc.org_internal_id = ?
 			and oce.code = ?		
 			
+			<params>
+				<param value="request:product_ins_id"/>
+				<param value="request:org_internal_id"/>
+				<param value="request:code"/>
+			</params>
 		</statement>
 
 		<statement name="selProcedureInfoByCodeModDate">
@@ -616,11 +705,11 @@
 			oce.flags		
 			FROM	Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
 			Offering_Catalog oc
-			WHERE	oce.code = upper(:1)
-			AND	( (modifier = :2) or (:2 is NULL AND modifier is NULL))
-			AND	oce.catalog_id = :3
-			AND	(oc.effective_begin_date &lt;= to_date(:4,'MM/DD/YYYY') or oc.effective_begin_date is NULL)
-			AND 	(oc.effective_end_date &gt;= to_date(:4,'MM/DD/YYYY') or oc.effective_end_date is NULL)
+			WHERE	oce.code = upper(?)
+			AND	( (modifier = ?) or (? is NULL AND modifier is NULL))
+			AND	oce.catalog_id = ?
+			AND	(oc.effective_begin_date &lt;= to_date(?,'MM/DD/YYYY') or oc.effective_begin_date is NULL)
+			AND 	(oc.effective_end_date &gt;= to_date(?,'MM/DD/YYYY') or oc.effective_end_date is NULL)
 			AND	oce.data_text = h.abbrev (+)
 			AND	oc.internal_catalog_id = oce.catalog_id
 			
@@ -635,6 +724,9 @@
 			and rownum &lt; 16
 			order by read_count desc
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTop15CPTsByPerson">
@@ -646,6 +738,9 @@
 			and rownum &lt; 16
 			order by read_count desc
 			
+			<params>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTop15ICDsByORG">
@@ -657,6 +752,9 @@
 			and rownum &lt; 16
 			order by read_count desc
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTop15ICDsByPerson">
@@ -668,6 +766,9 @@
 			and rownum &lt; 16
 			order by read_count desc
 			
+			<params>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_Catalog_Attribute">
@@ -677,6 +778,11 @@
 			and value_type = ?
 			and item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:value_type"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ProcedureInfoByCodeMod">
@@ -690,9 +796,9 @@
 			oce.flags		
 			FROM	Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
 			Offering_Catalog oc
-			WHERE	oce.code = upper(:1)
-			AND	( (modifier = :2) or (:2 is NULL AND modifier is NULL))
-			AND	oce.catalog_id = :3
+			WHERE	oce.code = upper(?)
+			AND	( (modifier = ?) or (? is NULL AND modifier is NULL))
+			AND	oce.catalog_id = ?
 			AND	oce.data_text = h.abbrev (+)
 			AND	oc.internal_catalog_id = oce.catalog_id
 			
@@ -706,6 +812,10 @@
 			and entry_type = ?
 			and catalog_id = ?
 
+			<params>
+				<param value="request:entry_type"/>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalogEntry_by_catalogTypeCodeModifier">
@@ -716,6 +826,11 @@
 			and entry_type = ?
 			and catalog_id = ?
 
+			<params>
+				<param value="request:modifier"/>
+				<param value="request:entry_type"/>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalogEntry_by_code_catalog">
@@ -725,6 +840,9 @@
 			and modifier is NULL
 			and catalog_id = ?
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalogEntry_by_code_modifier_catalog">
@@ -734,6 +852,10 @@
 			and (modifier = ? or modifier is NULL)
 			and catalog_id = ?
 			
+			<params>
+				<param value="request:modifier"/>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalogEntry_svcType_by_catalog">
@@ -747,6 +869,9 @@
 			and oce.data_text (+) = h.abbrev
 			and oc.internal_catalog_id = oce.catalog_id
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalogEntry_svcType_by_code_modifier_catalog">
@@ -760,6 +885,10 @@
 			and oce.data_text (+) = h.abbrev
 			and oc.internal_catalog_id = oce.catalog_id
 			
+			<params>
+				<param value="request:modifier"/>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalog_by_id_orgId">
@@ -768,6 +897,10 @@
 			where catalog_id = ?
 			and org_internal_id = ?
 			
+			<params>
+				<param value="request:catalog_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_internalCatId_orgId">
@@ -778,15 +911,19 @@
 			internal_catalog_id = ?
 			AND org_internal_id = ?
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_internalCatId_orgId_type">
 			
 			SELECT 	*
 			FROM 	Offering_Catalog
-			WHERE 	internal_catalog_id = :1
-			AND 	org_internal_id = :2
-			AND	catalog_type = :3
+			WHERE 	internal_catalog_id = ?
+			AND 	org_internal_id = ?
+			AND	catalog_type = ?
 			
 		</statement>
 

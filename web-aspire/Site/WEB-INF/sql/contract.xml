@@ -10,7 +10,7 @@
 			
 			SELECT *
 			FROM contract_catalog
-			WHERE internal_contract_id = :1
+			WHERE internal_contract_id = ?
 			
 		</statement>
 
@@ -18,8 +18,8 @@
 			
 			SELECT *
 			FROM contract_catalog
-			WHERE contract_id = :1	
-			AND	org_internal_id = :2
+			WHERE contract_id = ?	
+			AND	org_internal_id = ?
 			
 		</statement>
 
@@ -28,9 +28,9 @@
 			SELECT 	contract_id,
 			internal_contract_id
 			FROM	Contract_Catalog
-			WHERE 	org_internal_id = :1
-			AND	parent_catalog_id = :2
-			AND	product_ins_id = :3			
+			WHERE 	org_internal_id = ?
+			AND	parent_catalog_id = ?
+			AND	product_ins_id = ?			
 			
 		</statement>
 
@@ -43,9 +43,9 @@
 			oce.modifier
 			FROM	Offering_catalog_entry oce,
 			Contract_Catalog cc
-			WHERE	cc.internal_contract_id = :1	
+			WHERE	cc.internal_contract_id = ?	
 			AND	cc.parent_catalog_id = oce.catalog_id
-			AND	oce.entry_id = :2									
+			AND	oce.entry_id = ?									
 			
 		</statement>
 
@@ -55,9 +55,9 @@
 			cc.internal_contract_id
 			FROM	Offering_CatEntry_Price ocp,
 			Contract_Catalog cc
-			WHERE	cc.internal_contract_id = :1	
-			AND	ocp.internal_contract_id = :1
-			AND	ocp.entry_id = :2									
+			WHERE	cc.internal_contract_id = ?	
+			AND	ocp.internal_contract_id = ?
+			AND	ocp.entry_id = ?									
 			
 		</statement>
 
@@ -77,7 +77,7 @@
 			WHERE	cc.internal_contract_id = ocp.internal_contract_id 	
 			AND	cc.parent_catalog_id = oce.catalog_id
 			AND	oce.entry_id = ocp.entry_id 
-			AND	ocp.price_id = :1
+			AND	ocp.price_id = ?
 			
 		</statement>
 

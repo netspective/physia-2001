@@ -19,6 +19,9 @@
 			icd = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:icd"/>
+			</params>
 		</statement>
 
 		<statement name="sel_icd_code">
@@ -34,6 +37,9 @@
 			icd = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:icd"/>
+			</params>
 		</statement>
 
 		<statement name="sel_icd_code_like">
@@ -64,6 +70,9 @@
 			descr = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:descr"/>
+			</params>
 		</statement>
 
 		<statement name="sel_icd_description_like">

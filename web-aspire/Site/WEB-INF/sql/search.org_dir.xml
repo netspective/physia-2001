@@ -91,6 +91,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:zip"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_cityzip_like">
@@ -178,6 +182,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_provider">
@@ -265,6 +272,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_provider_like">
@@ -352,6 +362,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_providername">
@@ -439,6 +452,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_providername_like">
@@ -526,6 +542,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_state_like">
@@ -613,6 +632,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:zip"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_statecity_like">
@@ -700,6 +723,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:zip"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_statecityzip">
@@ -787,6 +814,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:zip"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_statecityzip_like">
@@ -874,6 +905,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_statezip_like">
@@ -961,6 +995,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_taxid">
@@ -1048,6 +1085,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_taxid_like">
@@ -1135,6 +1175,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_vendor">
@@ -1222,6 +1265,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_vendor_like">
@@ -1309,6 +1355,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_zip_like">
@@ -1396,6 +1445,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

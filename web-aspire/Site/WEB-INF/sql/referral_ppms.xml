@@ -7,7 +7,7 @@
 			UPDATE Person_Referral 
 			SET referral_status = 3,
 			referral_status_date = sysdate
-			where referral_id = :1
+			where referral_id = ?
 			
 		</statement>
 
@@ -42,7 +42,7 @@
 			select
 			REQUEST_DATE,
 			REFERRAL_URGENCY,
-			:3,
+			?,
 			PERSON_ID,
 			REQUESTER_ID,
 			PRODUCT_INTERNAL_ID,
@@ -66,8 +66,8 @@
 			COMMENTS 
 			FROM Person_Referral
 			WHERE
-			referral_id = :1
-			AND user_id = :2
+			referral_id = ?
+			AND user_id = ?
 			
 		</statement>
 
@@ -75,8 +75,8 @@
 			
 			UPDATE Person_Referral_Note 
 			SET referral_notes_status = 5
-			where user_id = :1
-			and person_id = :2
+			where user_id = ?
+			and person_id = ?
 			
 		</statement>
 
@@ -88,7 +88,7 @@
 			
 			SELECT *
 			FROM person_referral
-			WHERE referral_id = :1
+			WHERE referral_id = ?
 			
 		</statement>
 
@@ -125,7 +125,7 @@
 			UPDATE Person_Referral
 			SET referral_status = 2,
 			referral_status_date = sysdate
-			where referral_id = :1
+			where referral_id = ?
 			
 		</statement>
 

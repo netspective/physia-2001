@@ -26,6 +26,10 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:code"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_code_like">
@@ -48,6 +52,9 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_description">
@@ -70,6 +77,9 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_description_like">
@@ -92,6 +102,9 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_detail">
@@ -108,6 +121,9 @@
 			AND	oce.entry_type = cet.id (+)		
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:parent_entry_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_name">
@@ -130,6 +146,9 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_misc_procedure_name_like">
@@ -152,6 +171,9 @@
 			AND 	oce.entry_type = 230
 			AND 	rownum &lt;= 250
 
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -67,6 +67,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_appointment_orderbyAccount">
@@ -130,6 +133,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_appointment_orderbyChart">
@@ -193,6 +199,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_appointment_orderbyName">
@@ -256,6 +265,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_conflict_appointments">
@@ -314,6 +326,10 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -5,10 +5,10 @@
 		<statement name="del_worklist_credit_dates">
 			
 			delete from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 150
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
@@ -16,40 +16,40 @@
 			
 			delete from Person_Attribute
 			where
-			parent_id = :1
-			and parent_org_id = :2
+			parent_id = ?
+			and parent_org_id = ?
 			and value_type = 252
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
 		<statement name="del_worklist_credit_physician">
 			
 			delete from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 250
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
 		<statement name="del_worklist_credit_products">
 			
 			delete from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 110
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
 		<statement name="del_worklist_credit_sorting">
 			
 			delete from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 110
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
@@ -67,11 +67,11 @@
 			and ins.ins_internal_id (+) = ib.bill_ins_id
 			and i.balance &lt; 0 
 			and i.invoice_status != 16
-			and (i.invoice_date &gt;= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
-			and (i.invoice_date &lt;= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
-			and (t.care_provider_id = :3 OR :3 is NULL)
-			and (t.service_facility_id = :4 OR :4 is NULL)
-			and (ins.product_name = :5 OR :5 is NULL)
+			and (i.invoice_date &gt;= to_date(?,'mm/dd/yyyy') OR ? is NULL)
+			and (i.invoice_date &lt;= to_date(?,'mm/dd/yyyy') OR ? is NULL)
+			and (t.care_provider_id = ? OR ? is NULL)
+			and (t.service_facility_id = ? OR ? is NULL)
+			and (ins.product_name = ? OR ? is NULL)
 			order by age desc
 			
 		</statement>
@@ -86,11 +86,11 @@
 			and ins.ins_internal_id (+) = ib.bill_ins_id
 			and i.balance &lt; 0 
 			and i.invoice_status != 16
-			and (i.invoice_date &gt;= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
-			and (i.invoice_date &lt;= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
-			and (t.care_provider_id = :3 OR :3 is NULL)
-			and (t.service_facility_id = :4 OR :4 is NULL)
-			and (ins.product_name = :5 OR :5 is NULL)
+			and (i.invoice_date &gt;= to_date(?,'mm/dd/yyyy') OR ? is NULL)
+			and (i.invoice_date &lt;= to_date(?,'mm/dd/yyyy') OR ? is NULL)
+			and (t.care_provider_id = ? OR ? is NULL)
+			and (t.service_facility_id = ? OR ? is NULL)
+			and (ins.product_name = ? OR ? is NULL)
 			order by client_id	
 			
 		</statement>
@@ -99,11 +99,11 @@
 			
 			select client_id, simple_name, invoice_id, balance, trunc(sysdate) - trunc(invoice.invoice_date) as age
 			from invoice, person
-			where client_id = :1
+			where client_id = ?
 			and balance &lt; 0
 			and person.person_id = invoice.client_id
-			and invoice_date between to_date(:2,'mm/dd/yyyy') and to_date(:3,'mm/dd/yyyy')
-			AND	ROWNUM&lt;=:4
+			and invoice_date between to_date(?,'mm/dd/yyyy') and to_date(?,'mm/dd/yyyy')
+			AND	ROWNUM&lt;=?
 			
 		</statement>
 
@@ -112,9 +112,9 @@
 			select 	pa.value_int
 			FROM 	Person_Attribute pa
 			WHERE	pa.value_type = 110
-			AND	parent_id = :1
-			AND	parent_org_id = :2
-			AND	item_name = :3
+			AND	parent_id = ?
+			AND	parent_org_id = ?
+			AND	item_name = ?
 			AND	value_int = -1
 			
 		</statement>
@@ -125,7 +125,7 @@
 			from claim_type ct, insurance i, org
 			where i.record_type = 1
 			AND	org.org_internal_id = i.owner_org_id
-			AND	org.owner_org_id = :1
+			AND	org.owner_org_id = ?
 			AND ct.id = i.ins_type
 			order by product_name
 			
@@ -135,7 +135,7 @@
 			
 			select count(*)
 			from invoice, person
-			where client_id = :1
+			where client_id = ?
 			and balance &lt; 0
 			and person.person_id = invoice.client_id
 			
@@ -147,10 +147,10 @@
 			to_char(value_date, 'DD-MON-YYYY') value_date,
 			to_char(value_dateend, 'DD-MON-YYYY') value_dateend
 			from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 150
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
@@ -158,20 +158,20 @@
 			
 			select value_text from Person_Attribute
 			where
-			parent_id = :1
-			and parent_org_id = :2
+			parent_id = ?
+			and parent_org_id = ?
 			and value_type = 252
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
 		<statement name="sel_worklist_credit_physician">
 			
 			select value_text from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 250
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 
@@ -180,11 +180,11 @@
 			select pa.value_int as product_id, i.product_name
 			from Person_Attribute pa, Insurance i
 			where
-			parent_id = :1
-			and parent_org_id = :2
+			parent_id = ?
+			and parent_org_id = ?
 			and i.ins_internal_id = pa.value_int
 			and pa.value_type = 110
-			and item_name = :3
+			and item_name = ?
 			order by i.product_name
 			
 		</statement>
@@ -192,10 +192,10 @@
 		<statement name="sel_worklist_credit_sorting">
 			
 			select value_int from Person_Attribute
-			where parent_id = :1
-			and parent_org_id = :2
+			where parent_id = ?
+			and parent_org_id = ?
 			and value_type = 110
-			and item_name = :3
+			and item_name = ?
 			
 		</statement>
 

@@ -46,6 +46,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_associate">
@@ -89,6 +92,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_insured-Person">
@@ -132,6 +138,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like">
@@ -174,6 +183,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_associate">
@@ -217,6 +229,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_insured-Person">
@@ -260,6 +275,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_nurse">
@@ -303,6 +321,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_patient">
@@ -346,6 +367,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_physician">
@@ -389,6 +413,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_physician-ref">
@@ -432,6 +459,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_referring-Doctor">
@@ -475,6 +505,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_like_staff">
@@ -518,6 +551,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_nurse">
@@ -561,6 +597,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_patient">
@@ -604,6 +643,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_physician">
@@ -647,6 +689,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_physician-ref">
@@ -690,6 +735,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_referring-Doctor">
@@ -733,6 +781,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_account_staff">
@@ -776,6 +827,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname">
@@ -818,6 +872,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_associate">
@@ -861,6 +918,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_insured-Person">
@@ -904,6 +964,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like">
@@ -946,6 +1009,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_associate">
@@ -989,6 +1055,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_insured-Person">
@@ -1032,6 +1101,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_nurse">
@@ -1075,6 +1147,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_patient">
@@ -1118,6 +1193,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_physician">
@@ -1161,6 +1239,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_physician-ref">
@@ -1204,6 +1285,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_referring-Doctor">
@@ -1247,6 +1331,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_like_staff">
@@ -1290,6 +1377,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_nurse">
@@ -1333,6 +1423,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_patient">
@@ -1376,6 +1469,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_physician">
@@ -1419,6 +1515,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_physician-ref">
@@ -1462,6 +1561,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_referring-Doctor">
@@ -1505,6 +1607,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_anyname_staff">
@@ -1548,6 +1653,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart">
@@ -1590,6 +1698,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_associate">
@@ -1633,6 +1744,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_insured-Person">
@@ -1676,6 +1790,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like">
@@ -1718,6 +1835,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_associate">
@@ -1761,6 +1881,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_insured-Person">
@@ -1804,6 +1927,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_nurse">
@@ -1847,6 +1973,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_patient">
@@ -1890,6 +2019,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_physician">
@@ -1933,6 +2065,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_physician-ref">
@@ -1976,6 +2111,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_referring-Doctor">
@@ -2019,6 +2157,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_like_staff">
@@ -2062,6 +2203,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_nurse">
@@ -2105,6 +2249,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_patient">
@@ -2148,6 +2295,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_physician">
@@ -2191,6 +2341,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_physician-ref">
@@ -2234,6 +2387,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_referring-Doctor">
@@ -2277,6 +2433,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_chart_staff">
@@ -2320,6 +2479,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob">
@@ -2362,6 +2524,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_associate">
@@ -2405,6 +2570,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_insured-Person">
@@ -2448,6 +2616,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like">
@@ -2490,6 +2661,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_associate">
@@ -2533,6 +2707,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_insured-Person">
@@ -2576,6 +2753,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_nurse">
@@ -2619,6 +2799,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_patient">
@@ -2662,6 +2845,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_physician">
@@ -2705,6 +2891,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_physician-ref">
@@ -2748,6 +2937,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_referring-Doctor">
@@ -2791,6 +2983,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_like_staff">
@@ -2834,6 +3029,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_nurse">
@@ -2877,6 +3075,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_patient">
@@ -2920,6 +3121,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_physician">
@@ -2963,6 +3167,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_physician-ref">
@@ -3006,6 +3213,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_referring-Doctor">
@@ -3049,6 +3259,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_dob_staff">
@@ -3092,6 +3305,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id">
@@ -3134,6 +3350,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_associate">
@@ -3177,6 +3397,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_insured-Person">
@@ -3220,6 +3444,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like">
@@ -3262,6 +3490,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_associate">
@@ -3305,6 +3536,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_insured-Person">
@@ -3348,6 +3582,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_nurse">
@@ -3391,6 +3628,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_patient">
@@ -3434,6 +3674,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_physician">
@@ -3477,6 +3720,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_physician-ref">
@@ -3520,6 +3766,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_referring-Doctor">
@@ -3563,6 +3812,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like_staff">
@@ -3606,6 +3858,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_nurse">
@@ -3649,6 +3904,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_patient">
@@ -3692,6 +3951,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_physician">
@@ -3735,6 +3998,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_physician-ref">
@@ -3778,6 +4045,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_referring-Doctor">
@@ -3821,6 +4092,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_staff">
@@ -3864,6 +4139,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname">
@@ -3906,6 +4185,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_associate">
@@ -3949,6 +4231,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_insured-Person">
@@ -3992,6 +4277,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like">
@@ -4034,6 +4322,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_associate">
@@ -4077,6 +4368,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_insured-Person">
@@ -4120,6 +4414,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_nurse">
@@ -4163,6 +4460,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_patient">
@@ -4206,6 +4506,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_physician">
@@ -4249,6 +4552,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_physician-ref">
@@ -4292,6 +4598,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_referring-Doctor">
@@ -4335,6 +4644,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_like_staff">
@@ -4378,6 +4690,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_nurse">
@@ -4421,6 +4736,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_patient">
@@ -4464,6 +4782,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_physician">
@@ -4507,6 +4828,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_physician-ref">
@@ -4550,6 +4874,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_referring-Doctor">
@@ -4593,6 +4920,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_lastname_staff">
@@ -4636,6 +4966,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone">
@@ -4678,6 +5011,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_associate">
@@ -4721,6 +5058,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_insured-Person">
@@ -4764,6 +5105,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like">
@@ -4806,6 +5151,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_associate">
@@ -4849,6 +5197,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_insured-Person">
@@ -4892,6 +5243,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_nurse">
@@ -4935,6 +5289,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_patient">
@@ -4978,6 +5335,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_physician">
@@ -5021,6 +5381,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_physician-ref">
@@ -5064,6 +5427,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_referring-Doctor">
@@ -5107,6 +5473,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_like_staff">
@@ -5150,6 +5519,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_nurse">
@@ -5193,6 +5565,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_patient">
@@ -5236,6 +5612,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_physician">
@@ -5279,6 +5659,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_physician-ref">
@@ -5322,6 +5706,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_referring-Doctor">
@@ -5365,6 +5753,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_phone_staff">
@@ -5408,6 +5800,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn">
@@ -5450,6 +5846,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_associate">
@@ -5493,6 +5893,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_insured-Person">
@@ -5536,6 +5940,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like">
@@ -5578,6 +5986,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_associate">
@@ -5621,6 +6032,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_insured-Person">
@@ -5664,6 +6078,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_nurse">
@@ -5707,6 +6124,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_patient">
@@ -5750,6 +6170,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_physician">
@@ -5793,6 +6216,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_physician-ref">
@@ -5836,6 +6262,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_referring-Doctor">
@@ -5879,6 +6308,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_like_staff">
@@ -5922,6 +6354,9 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_nurse">
@@ -5965,6 +6400,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_patient">
@@ -6008,6 +6447,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_physician">
@@ -6051,6 +6494,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_physician-ref">
@@ -6094,6 +6541,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_referring-Doctor">
@@ -6137,6 +6588,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 		<statement name="sel_ssn_staff">
@@ -6180,6 +6635,10 @@
 			)
 			WHERE rownum &lt;= 250
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:ssn"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -11,7 +11,7 @@
 			select trans_owner_id, detail,trans_id,trans_type,provider_id,
 			nvl(to_char(trans_begin_stamp, 'MM/DD/YYYY'),'No Date') as trans_begin_stamp
 			from transaction
-			where trans_owner_id = :1 and					
+			where trans_owner_id = ? and					
 			trans_status = 2 and
 			trans_type = 9500 	
 			ORDER BY 6 asc
@@ -32,9 +32,9 @@
 			trans_owner_id = iw.person_id 
 			AND	worklist_status = 'Account In Collection'
 			AND	worklist_type = 'Collection'				
-			AND 	owner_id = :1
-			AND	responsible_id = :1
-			AND 	org_internal_id = :2
+			AND 	owner_id = ?
+			AND	responsible_id = ?
+			AND 	org_internal_id = ?
 			)
 			group by simple_name,trans_owner_id
 			

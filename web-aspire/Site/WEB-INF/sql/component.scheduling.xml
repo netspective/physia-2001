@@ -10,6 +10,10 @@
 			and item_name = 'WorkList'
 			and parent_org_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="del_worklist_resources">
@@ -20,6 +24,11 @@
 			and item_name = ?
 			and parent_org_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="id">
@@ -28,15 +37,15 @@
 
 		<statement name="sel_EventAttribute">
 			
-			select * from Event_Attribute where parent_id = :1
-			and value_type = :2
+			select * from Event_Attribute where parent_id = ?
+			and value_type = ?
 			
 		</statement>
 
 		<statement name="sel_MostRecentVerify">
 			
-			select * from Sch_Verify where person_id = :1
-			and cr_stamp = (select max(cr_stamp) from Sch_Verify where person_id = :1)
+			select * from Sch_Verify where person_id = ?
+			and cr_stamp = (select max(cr_stamp) from Sch_Verify where person_id = ?)
 			
 		</statement>
 
@@ -44,7 +53,7 @@
 			
 			select nvl(sum(balance), 0)
 			from invoice
-			where client_id = :1
+			where client_id = ?
 			and invoice_status &gt; 3
 			and invoice_status != 15
 			and invoice_status != 16
@@ -60,13 +69,16 @@
 			and trans_type between 8000 and 8999
 			and trans_status = 2
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_copay">
 			
 			select Insurance.copay_amt
 			from Insurance, Invoice_Billing, Invoice
-			where Invoice.invoice_id = :1
+			where Invoice.invoice_id = ?
 			and Invoice_Billing.bill_id = Invoice.billing_id
 			and Insurance.ins_internal_id = Invoice_billing.bill_ins_id
 			
@@ -79,18 +91,21 @@
 			where parent_id = ?
 			and item_type = 3
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_detail_alerts">
 			
 			select Transaction.caption, detail, Transaction_Type.caption as trans_type, trans_subtype,
-			to_char(trans_begin_stamp - :1, 'MM/DD/YYYY'),
-			to_char(trans_end_stamp - :1, 'MM/DD/YYYY'),
+			to_char(trans_begin_stamp - ?, 'MM/DD/YYYY'),
+			to_char(trans_end_stamp - ?, 'MM/DD/YYYY'),
 			data_text_a, decode (trans_subtype, 'High', 1, 'Medium', 2, 'Low', 3, 3) as subtype_sort
 			from Transaction_Type, Transaction
 			where trans_type between 8000 and 8999
 			and trans_owner_type = 0
-			and trans_owner_id = :2
+			and trans_owner_id = ?
 			and trans_status = 2
 			and Transaction_Type.id = Transaction.trans_type
 			order by subtype_sort asc, trans_begin_stamp desc
@@ -103,9 +118,9 @@
 			patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
 			ea.value_textB as physician,
 			e.facility_id as facility,
-			decode(to_char(e.start_time - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.start_time - :1, 'hh:miam'), to_char(e.start_time - :1, 'MM/DD/YYYY hh:miam')) as appointment_time,
-			decode(to_char(e.checkin_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkin_stamp - :1, 'hh:miam'), to_char(e.checkin_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkin_time,
-			decode(to_char(e.checkout_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkout_stamp - :1, 'hh:miam'), to_char(e.checkout_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkout_time,
+			decode(to_char(e.start_time - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.start_time - ?, 'hh:miam'), to_char(e.start_time - ?, 'MM/DD/YYYY hh:miam')) as appointment_time,
+			decode(to_char(e.checkin_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkin_stamp - ?, 'hh:miam'), to_char(e.checkin_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkin_time,
+			decode(to_char(e.checkout_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkout_stamp - ?, 'hh:miam'), to_char(e.checkout_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkout_time,
 			Invoice.invoice_id,
 			patient.person_id as patient_id,
 			e.event_id,
@@ -117,7 +132,7 @@
 			from Org o, Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 			Person patient, Event_Attribute ea, Event e
 			where	
-			e.start_time between to_date(:2, 'mm/dd/yyyy hh12:miam') + :1 and to_date(:3, 'mm/dd/yyyy hh12:miam') + :1
+			e.start_time between to_date(?, 'mm/dd/yyyy hh12:miam') + ? and to_date(?, 'mm/dd/yyyy hh12:miam') + ?
 			and e.discard_type is null
 			and e.event_status in (0,1,2)
 			and ea.parent_id = e.event_id
@@ -125,17 +140,17 @@
 			and ea.value_type = 333
 			and ea.value_textB in (
 			select value_text from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 250
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and e.facility_id in (
 			select value_int from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 252
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and Transaction.parent_event_id(+) = e.event_id
 			and Invoice.main_transaction(+) = Transaction.trans_id
@@ -154,9 +169,9 @@
 			patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
 			ea.value_textB as physician,
 			e.facility_id as facility,
-			decode(to_char(e.start_time - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.start_time - :1, 'hh:miam'), to_char(e.start_time - :1, 'MM/DD/YYYY hh:miam')) as appointment_time,
-			decode(to_char(e.checkin_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkin_stamp - :1, 'hh:miam'), to_char(e.checkin_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkin_time,
-			decode(to_char(e.checkout_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkout_stamp - :1, 'hh:miam'), to_char(e.checkout_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkout_time,
+			decode(to_char(e.start_time - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.start_time - ?, 'hh:miam'), to_char(e.start_time - ?, 'MM/DD/YYYY hh:miam')) as appointment_time,
+			decode(to_char(e.checkin_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkin_stamp - ?, 'hh:miam'), to_char(e.checkin_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkin_time,
+			decode(to_char(e.checkout_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkout_stamp - ?, 'hh:miam'), to_char(e.checkout_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkout_time,
 			Invoice.invoice_id,
 			patient.person_id as patient_id,
 			e.event_id,
@@ -168,7 +183,7 @@
 			from Org o, Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 			Person patient, Event_Attribute ea, Event e
 			where	
-			e.start_time between sysdate - :6 - (:2/24/60) and sysdate - :6 + (:3/24/60)
+			e.start_time between sysdate - ? - (?/24/60) and sysdate - ? + (?/24/60)
 			and e.discard_type is null
 			and e.event_status in (0,1,2)
 			and ea.parent_id = e.event_id
@@ -176,17 +191,17 @@
 			and ea.value_type = 333
 			and ea.value_textB in (
 			select value_text from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 250
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and e.facility_id in (
 			select value_int from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 252
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and Transaction.parent_event_id(+) = e.event_id
 			and Invoice.main_transaction(+) = Transaction.trans_id
@@ -205,9 +220,9 @@
 			patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
 			ea.value_textB as physician,
 			e.facility_id as facility,
-			decode(to_char(e.start_time - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.start_time - :1, 'hh:miam'), to_char(e.start_time - :1, 'MM/DD/YYYY hh:miam')) as appointment_time,
-			decode(to_char(e.checkin_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkin_stamp - :1, 'hh:miam'), to_char(e.checkin_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkin_time,
-			decode(to_char(e.checkout_stamp - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(e.checkout_stamp - :1, 'hh:miam'), to_char(e.checkout_stamp - :1, 'MM/DD/YYYY hh:miam')) as checkout_time,
+			decode(to_char(e.start_time - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.start_time - ?, 'hh:miam'), to_char(e.start_time - ?, 'MM/DD/YYYY hh:miam')) as appointment_time,
+			decode(to_char(e.checkin_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkin_stamp - ?, 'hh:miam'), to_char(e.checkin_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkin_time,
+			decode(to_char(e.checkout_stamp - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(e.checkout_stamp - ?, 'hh:miam'), to_char(e.checkout_stamp - ?, 'MM/DD/YYYY hh:miam')) as checkout_time,
 			Invoice.invoice_id,
 			patient.person_id as patient_id,
 			e.event_id,
@@ -219,7 +234,7 @@
 			from Org o, Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 			Person patient, Event_Attribute ea, Event e
 			where	
-			e.start_time between to_date(:2, 'mm/dd/yyyy hh12:miam') + :1 and to_date(:3, 'mm/dd/yyyy hh12:miam') + :1
+			e.start_time between to_date(?, 'mm/dd/yyyy hh12:miam') + ? and to_date(?, 'mm/dd/yyyy hh12:miam') + ?
 			and e.discard_type is null
 			and e.event_status in (0,1,2)
 			and ea.parent_id = e.event_id
@@ -227,17 +242,17 @@
 			and ea.value_type = 333
 			and ea.value_textB in (
 			select value_text from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 250
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and e.facility_id in (
 			select value_int from Person_Attribute
-			where parent_id = :4
+			where parent_id = ?
 			and value_type = 252
 			and item_name = 'WorkList'
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			and Transaction.parent_event_id(+) = e.event_id
 			and Invoice.main_transaction(+) = Transaction.trans_id
@@ -254,7 +269,7 @@
 			
 			select nvl(sum(balance), 0)
 			from invoice
-			where client_id = :1
+			where client_id = ?
 			and invoice_status &gt; 3
 			and invoice_status != 15
 			and invoice_status != 16
@@ -268,24 +283,36 @@
 			select app_verified_by, app_verify_date, verify_action
 			from Sch_Verify where event_id = ?
 			
+			<params>
+				<param value="request:event_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_populateInsVerifyDialog">
 			
 			select * from Sch_Verify where event_id = ?
 			
+			<params>
+				<param value="request:event_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_populateMedVerifyDialog">
 			
 			select med_verified_by, med_verify_date from Sch_Verify where event_id = ?
 			
+			<params>
+				<param value="request:event_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_populatePersonalVerifyDialog">
 			
 			select per_verified_by, per_verify_date from Sch_Verify where event_id = ?
 			
+			<params>
+				<param value="request:event_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_verified_events">
@@ -295,8 +322,8 @@
 			(
 			select product_name || ' (Primary)'
 			from insurance
-			where owner_person_id = :2
-			and owner_org_id = :1
+			where owner_person_id = ?
+			and owner_org_id = ?
 			and bill_sequence = 1
 			and record_type = 3
 			and not ins_type = 7
@@ -307,11 +334,11 @@
 			where e.event_id = ea.parent_id
 			and (mod(trunc(ea.value_intb / 4), 2) = 1
 			or mod(trunc(ea.value_intb / 8), 2) = 1)
-			and e.owner_id = :1
+			and e.owner_id = ?
 			and e.event_status in (0, 1, 2)
 			and e.checkin_stamp is not null
 			and e.discard_type is null
-			and ea.value_text = :2
+			and ea.value_text = ?
 			order by 1, 2
 			
 		</statement>
@@ -325,6 +352,10 @@
 			and item_name = 'WorkList'
 			and parent_org_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_worklist_resources">
@@ -336,6 +367,11 @@
 			and item_name = ?
 			and parent_org_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

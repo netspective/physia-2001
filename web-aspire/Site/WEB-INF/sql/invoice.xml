@@ -9,6 +9,9 @@
 			where cpt = ?
 			and cpt in ('99201','99202','99203','99204','99205','99211','99212','99213','99214','99215')
 			
+			<params>
+				<param value="request:cpt"/>
+			</params>
 		</statement>
 
 		<statement name="delAutoWriteoffAdjustmentsForItem">
@@ -18,6 +21,9 @@
 			where parent_id = ?
 			and adjustment_type = 3
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="delInvoiceBillingParties">
@@ -27,6 +33,9 @@
 			where invoice_id = ?
 			and invoice_item_id is NULL
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="delPostSubmitAddresses">
@@ -35,6 +44,9 @@
 			from invoice_address
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="delPostSubmitAttributes">
@@ -45,12 +57,18 @@
 			and value_intB = 1
 			and item_name not like 'Invoice/TWCC%'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="delRefProviderAttrs">
 			
 			delete from invoice_attribute where parent_id = ? and item_name like 'Ref Provider/%'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="hasInvoiceItems">
@@ -58,6 +76,9 @@
 			select 1 from Invoice_Item
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="id">
@@ -81,6 +102,9 @@
 			from adjust_method
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllAttributesExclHistoryAndTransferred">
@@ -93,6 +117,9 @@
 			and NOT item_name = 'Invoice/History/Item'
 			and NOT item_name = 'Invoice/Transferred'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllHistoryItems">
@@ -104,6 +131,9 @@
 			where parent_id = ?
 			order by value_date desc, cr_stamp desc
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllInvoiceTypeForClient">
@@ -157,6 +187,9 @@
 			sf.org_id
 			ORDER BY i.invoice_id desc
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllNonVoidedInvoicesByClient">
@@ -168,6 +201,10 @@
 			and i.invoice_status != 16
 			and i.invoice_status = inv_stat.id (+)
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllNonZeroBalanceInvoicesByClient">
@@ -180,6 +217,10 @@
 			and i.invoice_status != 15
 			and i.invoice_status = inv_stat.id (+)
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAllOutstandingInvoicesByClient">
@@ -193,6 +234,10 @@
 			and i.invoice_status != 16
 			and i.invoice_status = inv_stat.id (+)
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAutoWriteoffAdjustmentsForItem">
@@ -202,6 +247,9 @@
 			where parent_id = ?
 			and adjustment_type = 3
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selBatchPaymentAttr">
@@ -212,6 +260,10 @@
 			and value_int = ?
 			and item_name = 'Invoice/Payment/Batch ID'
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:value_int"/>
+			</params>
 		</statement>
 
 		<statement name="selBeenTransferred">
@@ -221,6 +273,9 @@
 			where parent_id = ?
 			and item_name = 'Invoice/Transferred'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selClaimDiags">
@@ -228,6 +283,9 @@
 			select claim_diags from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selClaimPrintHistoryItemByUser">
@@ -241,6 +299,10 @@
 			group by
 			cr_user_id, value_text, value_textb, value_date
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:cr_user_id"/>
+			</params>
 		</statement>
 
 		<statement name="selClaimTypeCaption">
@@ -249,6 +311,9 @@
 			from claim_type
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selCreditInvoicesByClient">
@@ -258,6 +323,10 @@
 			and owner_id = ?
 			and balance &lt; 0
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selExplCodeInvItems">
@@ -271,16 +340,20 @@
 			and parent_code = ?
 			and data_text_c = 'explosion'			
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:parent_code"/>
+			</params>
 		</statement>
 
 		<statement name="selFSHierarchy">
 			
 			select per.value_int as fs, 1 as fs_order
 			from person_attribute per, org_attribute org, insurance_attribute insplan, insurance_attribute insprod
-			where per.parent_id = :1
-			and org.parent_id = :2
-			and insplan.parent_id = :3
-			and insprod.parent_id (+)= :4
+			where per.parent_id = ?
+			and org.parent_id = ?
+			and insplan.parent_id = ?
+			and insprod.parent_id (+)= ?
 			and per.item_name = 'Fee Schedule'
 			and org.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
@@ -291,9 +364,9 @@
 			UNION
 			select per.value_int as fs, 2 as fs_order
 			from person_attribute per, insurance_attribute insplan, insurance_attribute insprod
-			where per.parent_id = :1
-			and insplan.parent_id = :3
-			and insprod.parent_id (+)= :4
+			where per.parent_id = ?
+			and insplan.parent_id = ?
+			and insprod.parent_id (+)= ?
 			and per.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
 			and insprod.item_name (+)= 'Fee Schedule'
@@ -302,9 +375,9 @@
 			UNION
 			select org.value_int as fs, 3 as fs_order
 			from org_attribute org, insurance_attribute insplan, insurance_attribute insprod
-			where org.parent_id = :2
-			and insplan.parent_id = :3
-			and insprod.parent_id (+)= :4
+			where org.parent_id = ?
+			and insplan.parent_id = ?
+			and insprod.parent_id (+)= ?
 			and org.item_name = 'Fee Schedule'
 			and insplan.item_name = 'Fee Schedule'
 			and insprod.item_name (+)= 'Fee Schedule'
@@ -313,15 +386,15 @@
 			UNION
 			select to_number(insplan.value_text) as fs, 4 as fs_order
 			from insurance_attribute insplan, insurance_attribute insprod
-			where insplan.parent_id = :3
-			and insprod.parent_id (+)= :4
+			where insplan.parent_id = ?
+			and insprod.parent_id (+)= ?
 			and insplan.item_name = 'Fee Schedule'
 			and insprod.item_name (+)= 'Fee Schedule'
 			and insplan.value_text = insprod.value_text (+)
 			UNION
 			select to_number(insprod.value_text) as fs, 5 as fsOrder
 			from insurance_attribute insprod
-			where insprod.parent_id = :4
+			where insprod.parent_id = ?
 			and insprod.item_name = 'Fee Schedule'
 			ORDER BY 2 asc
 			
@@ -333,6 +406,9 @@
 			from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAddr">
@@ -342,6 +418,10 @@
 			where parent_id = ?
 			and address_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:address_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAndClaimType">
@@ -354,6 +434,9 @@
 			and i.invoice_subtype = ct.id (+)
 			and i.invoice_status = iis.id (+)
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttr">
@@ -363,6 +446,10 @@
 			where parent_id = ?
 			and item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrAssignment">
@@ -372,6 +459,9 @@
 			where parent_id = ?
 			and item_name = 'Assignment of Benefits'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrCondition">
@@ -381,6 +471,9 @@
 			where parent_id = ?
 			and item_name = 'Condition/Related To'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrDisability">
@@ -390,6 +483,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Disability/Dates'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrHospitalization">
@@ -399,6 +495,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Hospitalization/Dates'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrIllness">
@@ -408,6 +507,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Illness/Dates'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrIllnessDates">
@@ -417,6 +519,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Illness/Dates'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrInfoRelease">
@@ -426,6 +531,9 @@
 			where parent_id = ?
 			and item_name = 'Information Release/Indicator'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrPatientSign">
@@ -435,6 +543,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Signature'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrProvider">
@@ -444,6 +555,9 @@
 			where parent_id = ?
 			and item_name = 'Provider/Name/Last'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttrServFacility">
@@ -453,6 +567,9 @@
 			where parent_id = ?
 			and item_name = 'Service Provider/Facility/Service'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAttributeById">
@@ -464,6 +581,9 @@
 			from invoice_attribute
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceAuthNumber">
@@ -473,6 +593,9 @@
 			where parent_id = ?
 			and item_name = 'Prior Authorization Number'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceBillingByInvoiceIdAndBillSeq">
@@ -483,6 +606,10 @@
 			and bill_sequence = ?
 			and invoice_item_id is NULL
 			
+			<params>
+				<param value="request:invoice_id"/>
+				<param value="request:bill_sequence"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceBillingCurrent">
@@ -491,6 +618,9 @@
 			from invoice_billing
 			where bill_id = ?
 			
+			<params>
+				<param value="request:bill_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceBillingPrimary">
@@ -501,6 +631,9 @@
 			and bill_sequence = 1
 			and invoice_item_id is NULL
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceBillingRecs">
@@ -511,6 +644,9 @@
 			where invoice_id = ?
 			order by bill_sequence
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceByIdAndClient">
@@ -520,6 +656,10 @@
 			where invoice_id = ?
 			and client_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+				<param value="request:client_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceByStatusAndDateAndType">
@@ -533,6 +673,9 @@
 			and invoice_date ?
 			order by invoice_date desc
 			
+			<params>
+				<param value="request:invoice_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceByTypeAndMainTrans">
@@ -541,6 +684,10 @@
 			where invoice_type = ?
 			and main_transaction = ?
 			
+			<params>
+				<param value="request:invoice_type"/>
+				<param value="request:main_transaction"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceConditionId">
@@ -549,6 +696,9 @@
 			from trans_related_to
 			where caption = ?
 			
+			<params>
+				<param value="request:caption"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceDateDatabyID">
@@ -557,7 +707,7 @@
 			to_char(invoice_date, 'MM/DD/YYYY') as invoice_date,
 			balance
 			FROM	invoice
-			WHERE	invoice_id = :1
+			WHERE	invoice_id = ?
 			
 		</statement>
 
@@ -568,6 +718,9 @@
 			where parent_id = ?
 			and item_name = 'Patient/Deductible/Balance'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceDiags">
@@ -576,6 +729,9 @@
 			from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceIdByEventId">
@@ -586,6 +742,9 @@
 			and (t.trans_type between 2000 and 2999)
 			and t.trans_id = main_transaction
 			
+			<params>
+				<param value="request:parent_event_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceItem">
@@ -597,6 +756,9 @@
 			from invoice_item
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceItemCount">
@@ -604,6 +766,9 @@
 			select count(*) from Invoice_Item
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceItemCountByType">
@@ -612,6 +777,10 @@
 			where parent_id = ?
 			and item_type = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceItems">
@@ -623,6 +792,9 @@
 			from invoice_item
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceItemsByType">
@@ -636,6 +808,10 @@
 			and item_type = ?
 			and data_text_b is NULL
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_type"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceMainTransById">
@@ -644,6 +820,9 @@
 			from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceMedicaidResubNumber">
@@ -653,6 +832,9 @@
 			where parent_id = ?
 			and item_name = 'Medicaid/Resubmission'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceOrder">
@@ -662,6 +844,9 @@
 			where parent_id = ?
 			and item_name = 'Submission Order'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceOwner">
@@ -670,6 +855,9 @@
 			from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProcedureItemCount">
@@ -679,6 +867,9 @@
 			where parent_id = ?
 			and item_type in (?,?)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProcedureItems">
@@ -692,6 +883,9 @@
 			and item_type in (?,?)
 			and data_text_b is NULL
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProviderIdentification">
@@ -701,6 +895,9 @@
 			where parent_id = ?
 			and item_name = 'Ref Provider/Identification'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProviderNameFirst">
@@ -710,6 +907,9 @@
 			where parent_id = ?
 			and item_name = 'Ref Provider/Name/First'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProviderNameLast">
@@ -719,6 +919,9 @@
 			where parent_id = ?
 			and item_name = 'Ref Provider/Name/Last'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceProviderNameMiddle">
@@ -728,6 +931,9 @@
 			where parent_id = ?
 			and item_name = 'Ref Provider/Name/Middle'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceStatus">
@@ -736,20 +942,23 @@
 			from invoice
 			where invoice_id = ?
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoiceTransaction">
 			
 			SELECT 1
 			FROM 	transaction t
-			WHERE 	t.service_facility_id = :1
+			WHERE 	t.service_facility_id = ?
 			AND	EXISTS
 			(
 			SELECT 	1
 			FROM 	invoice i ,invoice_attribute ia
 			WHERE 	i.main_transaction = t.trans_id
-			AND	ia.value_date &gt; to_date(:2,'MM/DD/YYYY')
-			AND	ia.value_date &lt; to_date(:3,'MM/DD/YYYY')
+			AND	ia.value_date &gt; to_date(?,'MM/DD/YYYY')
+			AND	ia.value_date &lt; to_date(?,'MM/DD/YYYY')
 			AND	ia.item_name IN('Invoice/Creation/Batch ID','Invoice/Payment/Batch ID')
 			)
 			
@@ -806,6 +1015,9 @@
 			sf.org_id
 			ORDER BY i.invoice_id desc
 
+			<params>
+				<param value="request:bill_to_id"/>
+			</params>
 		</statement>
 
 		<statement name="selInvoicesByType">
@@ -813,6 +1025,9 @@
 			select * from invoice
 			where invoice_type = ?
 			
+			<params>
+				<param value="request:invoice_type"/>
+			</params>
 		</statement>
 
 		<statement name="selItemAdjustments">
@@ -829,6 +1044,9 @@
 			and iia.adjustment_type = adm.id (+)
 			and iia.pay_type = pat.id (+)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selItemAdjustmentsByInvoiceId">
@@ -842,6 +1060,9 @@
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selItemAdjustmentsByItemParent">
@@ -850,6 +1071,9 @@
 			from invoice_item_adjust
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selItemTypeCaption">
@@ -858,20 +1082,23 @@
 			from inv_item_type
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selLatestNextPayerTransferByInvoiceId">
 			
 			select iia.net_adjust, iia.adjustment_id
 			from invoice_item_adjust iia, invoice_item ii, invoice i
-			where i.invoice_id = :1
+			where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
 			and ii.item_type = 5
 			and iia.adjustment_type = 4
 			and ii.item_id = (select max(item_id) 
 			from invoice_item ii2, invoice_item_adjust iia2 
-			where i.invoice_id = :1 and i.invoice_id = ii2.parent_id and ii2.item_type = 5 and ii2.item_id = iia2.parent_id and iia2.adjustment_type = 4)
+			where i.invoice_id = ? and i.invoice_id = ii2.parent_id and ii2.item_type = 5 and ii2.item_id = iia2.parent_id and iia2.adjustment_type = 4)
 			
 		</statement>
 
@@ -879,7 +1106,7 @@
 			
 			select count(iia.adjustment_id)
 			from invoice_item_adjust iia, invoice_item ii, invoice i
-			where i.invoice_id = :1
+			where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
 			and ii.item_type = 5
@@ -938,13 +1165,16 @@
 			sf.org_id
 			ORDER BY i.invoice_id desc
 
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPaperClaims">
 			
 			SELECT Invoice.invoice_id
 			FROM Insurance, Invoice_Billing, Invoice
-			WHERE owner_id = :1
+			WHERE owner_id = ?
 			and invoice_status = 4
 			and invoice_subtype != 0
 			and invoice_subtype != 7
@@ -963,6 +1193,9 @@
 			and p2.invoice_id = p1.parent_invoice_id
 			and p3.invoice_id (+) = p2.parent_invoice_id
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPayMethodCaption">
@@ -971,6 +1204,9 @@
 			from payment_method
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selPayTypeCaption">
@@ -979,6 +1215,9 @@
 			from payment_type
 			where id = ?
 			
+			<params>
+				<param value="request:id"/>
+			</params>
 		</statement>
 
 		<statement name="selPaymentMethod">
@@ -1002,6 +1241,9 @@
 			and value_intB = 1
 			and item_name not like 'Invoice/TWCC%'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selProcedure">
@@ -1015,6 +1257,9 @@
 			from invoice_item
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selRelDiags">
@@ -1022,13 +1267,16 @@
 			select rel_diags from invoice_item
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selReverseNextPayerTransferCount">
 			
 			select count(iia.adjustment_id)
 			from invoice_item_adjust iia, invoice_item ii, invoice i
-			where i.invoice_id = :1
+			where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
 			and ii.item_type = 5
@@ -1048,6 +1296,10 @@
 			and i.invoice_subtype = 0
 			and i.invoice_status = inv_stat.id (+)
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selServiceDateRangeForAllItems">
@@ -1057,13 +1309,16 @@
 			from invoice_item
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selServiceOrgByInvoiceId">
 			
 			SELECT	t.service_facility_id
 			FROM	transaction t, invoice i
-			WHERE	i.invoice_id = :1
+			WHERE	i.invoice_id = ?
 			AND	i.main_transaction = t.trans_id
 			
 		</statement>
@@ -1084,6 +1339,10 @@
 			and invoice_status != 16
 			and invoice_status != 15
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTransferredPaymentsFromChild">
@@ -1095,6 +1354,9 @@
 			and ii.item_id = iia.parent_id
 			and iia.adjustment_type = 7
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="selWriteoffTypes">
@@ -1109,6 +1371,9 @@
 			select to_char(cr_stamp, 'MM/DD/YYYY') from Invoice_Item
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_previousBalance">
@@ -1120,6 +1385,9 @@
 			and balance &gt; 0
 			group by upper(client_id)
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -138,6 +138,9 @@
 			AND states.abbrev = LTRIM(RTRIM(upper(org_address.state)))
 			AND rownum &lt;= 250
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

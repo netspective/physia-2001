@@ -33,14 +33,14 @@
 			and o.org_internal_id = ins.ins_org_id
 			and ref_cpt.cpt = ii.code
 			and iia.plan_paid != 0
-			and (i.invoice_date &gt;= to_date(:1, 'MM/DD/YYYY') or :1 is null)
-			and (i.invoice_date &lt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
-			and (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') or :4 is null)
-			and (ii.code &gt;= :5 or :5 is null)
-			and (ii.code &lt;= :6 or :6 is null)
-			and (o.org_id = :7 or :7 is null)
-			and i.owner_id = :8
+			and (i.invoice_date &gt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (i.invoice_date &lt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.code &gt;= ? or ? is null)
+			and (ii.code &lt;= ? or ? is null)
+			and (o.org_id = ? or ? is null)
+			and i.owner_id = ?
 			GROUP BY o.name_primary, ii.code, ref_cpt.name, o.org_id
 			order by code
 
@@ -73,14 +73,14 @@
 			and o.org_internal_id = ins.ins_org_id
 			and ref_cpt.cpt = ii.code
 			and iia.plan_paid != 0
-			and (i.invoice_date &gt;= to_date(:1, 'MM/DD/YYYY') or :1 is null)
-			and (i.invoice_date &lt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
-			and (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
-			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') or :4 is null)
-			and (ii.code &gt;= :5 or :5 is null)
-			and (ii.code &lt;= :6 or :6 is null)
-			and (o.org_id = :7 or :7 is null)
-			and i.owner_id = :8
+			and (i.invoice_date &gt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (i.invoice_date &lt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.service_begin_date &gt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.service_end_date &lt;= to_date(?, 'MM/DD/YYYY') or ? is null)
+			and (ii.code &gt;= ? or ? is null)
+			and (ii.code &lt;= ? or ? is null)
+			and (o.org_id = ? or ? is null)
+			and i.owner_id = ?
 			GROUP BY o.name_primary, ii.code, ref_cpt.name, o.org_id
 			order by name_primary
 

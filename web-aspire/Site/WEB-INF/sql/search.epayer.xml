@@ -15,6 +15,9 @@
 			AND rownum &lt;= 250
 			ORDER BY name
 
+			<params>
+				<param value="request:psource"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id2">
@@ -37,6 +40,9 @@
 			AND rownum &lt;= 250
 			ORDER BY name
 
+			<params>
+				<param value="request:psource"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -9,10 +9,10 @@
 		<statement name="person.account-notes">
 			
 			SELECT * FROM (
-			select to_char(trans_begin_stamp -:2, 'MM/DD/YYYY'),
+			select to_char(trans_begin_stamp -?, 'MM/DD/YYYY'),
 			detail, trans_id, trans_type, provider_id
 			from transaction
-			where trans_owner_id = :1
+			where trans_owner_id = ?
 			and trans_status = 2
 			and trans_type = 9500
 			order by trans_id desc
@@ -47,6 +47,9 @@
 			AND i.balance &gt; 0
 			ORDER BY i.invoice_date
 			
+			<params>
+				<param value="request:client_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.activeMedications">
@@ -69,6 +72,9 @@
 			start_date DESC,
 			med_name
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.activeMedicationsOld">
@@ -92,6 +98,9 @@
 			AND tr.trans_status = 2
 			ORDER BY tr.trans_begin_stamp DESC
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.activeProblems">
@@ -121,6 +130,12 @@
 			and 	trans_status = 2
 			order by GROUP_SORT, curr_onset_date DESC
 			
+			<params>
+				<param value="request:client_id"/>
+				<param value="request:trans_owner_id"/>
+				<param value="request:trans_owner_id"/>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.additionalData">
@@ -130,6 +145,9 @@
 			where	parent_id = ?
 			and 	value_type = 820
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.addresses">
@@ -142,6 +160,9 @@
 			WHERE parent_id = ?
 			ORDER BY address_name
 
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.advancedDirectives">
@@ -151,6 +172,9 @@
 			where 	parent_id = ?
 			and 	value_type in (420, 421)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.affiliations">
@@ -160,6 +184,9 @@
 			where 	parent_id = ?
 			and 	value_type = 530
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.alerts">
@@ -181,7 +208,7 @@
 			FROM alert_priority a, transaction t
 			WHERE trans_type between 8000 and 8999
 			AND trans_owner_type = 0
-			AND trans_owner_id = :1
+			AND trans_owner_id = ?
 			AND trans_status = 2
 			AND a.caption = t.trans_subtype
 			AND NOT EXISTS (
@@ -216,6 +243,9 @@
 			start_date DESC,
 			med_name
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.allergies">
@@ -225,6 +255,9 @@
 			where 	parent_id = ?
 			and 	value_type in (410, 411, 412)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.appointmentCount">
@@ -239,6 +272,9 @@
 			AND d.id = e.discard_type
 			GROUP BY d.caption
 			
+			<params>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.associatedResources">
@@ -249,16 +285,19 @@
 			and 	value_type = 250
 			and item_name = 'Physician'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.associatedSessionPhysicians">
 			
 			select value_text as resource_id
 			from Person_Attribute
-			where parent_id = :1
+			where parent_id = ?
 			and value_type = 250
 			and item_name = 'WorkList'
-			and parent_org_id = :2
+			and parent_org_id = ?
 			order by 1
 			
 		</statement>
@@ -270,6 +309,9 @@
 			where 	parent_id = ?
 			and 	value_type = 800
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.authorization">
@@ -283,6 +325,9 @@
 			372
 			)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.benefits">
@@ -292,6 +337,9 @@
 			where 	parent_id = ?
 			and 	value_type in (700, 710, 720)
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.billinginfo">
@@ -304,6 +352,9 @@
 			and	value_type = 960
 			order by value_int
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.bloodType">
@@ -323,13 +374,16 @@
 			WHERE 	parent_id = ?
 			AND item_name = 'BloodType'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.bookmarks">
 			
 			select value_text, value_textb, parent_id, item_id
 			from person_attribute
-			where parent_id = :1
+			where parent_id = ?
 			and item_name = 'Bookmarks'
 			
 		</statement>
@@ -346,10 +400,10 @@
 			decode(p.value_int,1,', Primary Physician', ''),
 			pc.category
 			from 	person_org_category pc, person_attribute p
-			where p.parent_id = upper(:1)
+			where p.parent_id = upper(?)
 			and p.value_type = 210
 			and pc.person_id = p.value_text
-			and pc.org_internal_id = :2
+			and pc.org_internal_id = ?
 			and pc.category in ('Physician', 'Referring-Doctor')
 			
 		</statement>
@@ -368,6 +422,9 @@
 			and item_name not in('Nurse/Title', 'RN', 'Driver/License', 'Employee')
 			order by value_int
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.childReferral">
@@ -383,7 +440,7 @@
 			tr.trans_type,
 			(SELECT parent_trans_id FROM transaction where trans_id = tr.parent_trans_id)
 			FROM transaction tsr, transaction tr
-			WHERE tsr.parent_trans_id = :1
+			WHERE tsr.parent_trans_id = ?
 			AND	tr.parent_trans_id = tsr.trans_id
 			ORDER BY 1 desc
 			
@@ -396,6 +453,9 @@
 			where 	parent_id = ?
 			and 	value_type = 111111
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.contactMethods">
@@ -423,6 +483,9 @@
 			name_sort,
 			item_name
 
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.contactMethodsAndAddresses">
@@ -471,6 +534,10 @@
 			)
 			ORDER BY value_type
 
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.diagnosisSummary">
@@ -484,6 +551,9 @@
 			and ref_icd.icd (+) = member_name
 			group by member_name, name
 			
+			<params>
+				<param value="request:client_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.docPhone">
@@ -496,6 +566,9 @@
 			and trans_status = 5
 			and person.person_id = consult_id
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.docRefill">
@@ -519,6 +592,10 @@
 			and processor_id = person_id
 			and trans_status = 6
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.docResults">
@@ -550,6 +627,9 @@ select 'NOT IMPLEMENTED' from dual
 			and 	value_type = 201
 			and 	item_name not in( 'Guarantor', 'Responsible Party')
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.employmentAssociations">
@@ -560,6 +640,9 @@ select 'NOT IMPLEMENTED' from dual
 			and	pa.value_type = avt.id
 			and pa.value_type between 220 and 227
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.employmentRecord">
@@ -569,6 +652,9 @@ select 'NOT IMPLEMENTED' from dual
 			where 	parent_id = ?
 			and 	value_type = 810
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.extendedHealthCoverage">
@@ -609,6 +695,9 @@ select 'NOT IMPLEMENTED' from dual
 			WHERE 	owner_person_id = ?
 			ORDER BY bill_sequence
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.familyAssociations">
@@ -625,6 +714,9 @@ select 'NOT IMPLEMENTED' from dual
 			where	parent_id = ?
 			and	value_type = 200
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.feeschedules">
@@ -636,7 +728,7 @@ SELECT	oc.catalog_id,
 			pa.item_id
 			FROM person_attribute pa,
 			offering_catalog oc
-			WHERE pa.parent_id = :1
+			WHERE pa.parent_id = ?
 			AND	pa.item_name = 'Fee Schedule'
 			AND	pa.item_type = 0
 			AND	pa.value_type = 110
@@ -656,6 +748,9 @@ SELECT	oc.catalog_id,
 			trans_type = 9500
 			group by complete_name,trans_owner_id
 			
+			<params>
+				<param value="request:provider_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.hospitalizationSurgeriesTherapies">
@@ -668,20 +763,23 @@ SELECT	oc.catalog_id,
 			and 	trans_status = 2
 			and service_facility_id = org.org_internal_id
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.inPatient">
 			
 			select t.trans_owner_id , t.caption as room_number, initcap(p.short_sortable_name)
-			as simple_name, t.consult_id, o.name_primary, decode(to_char(t.trans_begin_stamp - :3, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(t.trans_begin_stamp - :3, 'Mon DD'), to_char(t.trans_begin_stamp - :3, 'MM/DD/YY'))
+			as simple_name, t.consult_id, o.name_primary, decode(to_char(t.trans_begin_stamp - ?, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(t.trans_begin_stamp - ?, 'Mon DD'), to_char(t.trans_begin_stamp - ?, 'MM/DD/YY'))
 			as admit_date, data_num_a
 			FROM org o, person p, transaction t
 			WHERE
 			t.trans_type BETWEEN 11000 AND 11999
-			AND	t.provider_id = :1
+			AND	t.provider_id = ?
 			AND p.person_id = t.trans_owner_id
 			AND t.trans_status = 2
-			AND t.trans_begin_stamp &gt;= to_date(:2, 'MM/DD/YYYY') - data_num_a
+			AND t.trans_begin_stamp &gt;= to_date(?, 'MM/DD/YYYY') - data_num_a
 			AND o.org_internal_id = t.service_facility_id
 			ORDER by p.name_last
 			
@@ -708,6 +806,9 @@ SELECT	oc.catalog_id,
 			start_date DESC,
 			med_name
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.insurance">
@@ -747,6 +848,9 @@ SELECT	oc.catalog_id,
 			AND owner_person_id = ?
 			ORDER BY bill_sequence
 			
+			<params>
+				<param value="request:owner_person_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.insuranceVerify">
@@ -757,7 +861,7 @@ SELECT	oc.catalog_id,
 			to_char(e.start_time, 'MM/DD/YYYY HH12:MI AM') as appt_time,
 			o.org_id, ea.value_textb as provider_id
 			from event_attribute ea, org o, event e, sch_verify s
-			where person_id = :1
+			where person_id = ?
 			and e.event_id = s.event_id
 			and o.org_internal_id = e.facility_id
 			and ea.parent_id = e.event_id
@@ -771,10 +875,10 @@ SELECT	oc.catalog_id,
 			
 			Select	lo.lab_order_id,lo.date_order,lo.provider_id, los.caption
 			FROM	org ,person_lab_order lo, lab_order_status los
-			WHERE 	owner_org_id= :1
+			WHERE 	owner_org_id= ?
 			AND	lo.lab_internal_id = org.org_internal_id
-			AND 	lo.lab_internal_id = :2
-			AND	lo.person_id = :3
+			AND 	lo.lab_internal_id = ?
+			AND	lo.person_id = ?
 			AND	los.id = lo.lab_order_status
 			order by date_order desc
 			
@@ -785,11 +889,11 @@ SELECT	oc.catalog_id,
 			Select	org_id,name_primary,org_internal_id,
 			(SELECT count (*)
 			FROM 	person_lab_order lo
-			WHERE 	lo.person_id = :2
+			WHERE 	lo.person_id = ?
 			AND	lo.lab_internal_id = org.org_internal_id
 			) as entry
 			FROM	org ,ORG_CATEGORY oc
-			WHERE 	owner_org_id= :1
+			WHERE 	owner_org_id= ?
 			AND	oc.parent_id = org.org_internal_id
 			AND	oc.member_name='Ancillary Service'
 			order by org_id
@@ -804,6 +908,9 @@ SELECT	oc.catalog_id,
 			WHERE 	parent_id = ?
 			AND	item_name = 'User/Link/Medical'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.linkNonMedicalSite">
@@ -814,24 +921,27 @@ SELECT	oc.catalog_id,
 			WHERE 	parent_id = ?
 			AND	item_name = 'User/Link/NonMedical'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.messageCounts">
 			
 SELECT doc_spec_subtype, count(*)
 			FROM document, document_attribute
-			WHERE document_attribute.value_text = :1
+			WHERE document_attribute.value_text = ?
 			AND document.doc_spec_type = 2000
 			AND document.doc_id = document_attribute.parent_id
 			AND document_attribute.item_name IN ('To', 'CC')
 			AND document_attribute.value_int = 0
-			AND document.cr_org_internal_id = :2
+			AND document.cr_org_internal_id = ?
 			GROUP BY document.doc_spec_subtype
 			union
 			SELECT '-1' as doc_spec_subtype,count (*)
 			FROM	observation
-			WHERE	observation.observer_org_id = :2
-			AND	observation.observer_id = :1
+			WHERE	observation.observer_org_id = ?
+			AND	observation.observer_id = ?
 			group by 1
 			
 		</statement>
@@ -839,12 +949,12 @@ SELECT doc_spec_subtype, count(*)
 		<statement name="person.messageRegardingPatient">
 			
 			SELECT * FROM (
-			select d.doc_name, to_char(d.doc_orig_stamp - :2, 'MM/DD/YYYY HH12:MI AM')
+			select d.doc_name, to_char(d.doc_orig_stamp - ?, 'MM/DD/YYYY HH12:MI AM')
 			as doc_orig_stamp, d.doc_source_id, d.doc_dest_ids, d.doc_spec_subtype,
 			d.doc_id
 			from document d, document_attribute da
 			where da.item_name = 'Regarding Patient'
-			and da.value_text = :1
+			and da.value_text = ?
 			and d.doc_id = da.parent_id
 			order by d.doc_orig_stamp DESC
 			)
@@ -866,11 +976,14 @@ SELECT doc_spec_subtype, count(*)
 			where 	parent_id = ?
 			and item_name = 'Misc Notes'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.myAssociatedResourceAppointments">
 			
-			select to_char(e.start_time - :1, 'hh:miam') as start_time,
+			select to_char(e.start_time - ?, 'hh:miam') as start_time,
 			ea.value_textB as resource_id,
 			patient.simple_name as patient_complete_name,
 			e.subject,
@@ -881,8 +994,8 @@ SELECT doc_spec_subtype, count(*)
 			e.event_id, patient.person_id
 			from 	Appt_Status, Appt_Attendee_type aat, Person patient, Person provider,
 			Event_Attribute ea, Appt_Type at, Event e
-			where e.start_time between to_date(:2, 'MM/DD/YYYY HH12:MI AM') + :1
-			and to_date(:3, 'MM/DD/YYYY HH12:MI AM') + :1
+			where e.start_time between to_date(?, 'MM/DD/YYYY HH12:MI AM') + ?
+			and to_date(?, 'MM/DD/YYYY HH12:MI AM') + ?
 			and e.discard_type is null
 			and e.event_status in (0,1,2)
 			and at.appt_type_id (+) = e.appt_type
@@ -891,14 +1004,14 @@ SELECT doc_spec_subtype, count(*)
 			and ea.value_text = patient.person_id
 			and ea.value_textB = provider.person_id
 			and
-			(	ea.value_textB = :4 or
+			(	ea.value_textB = ? or
 			ea.value_textB in
 			(select value_text
 			from person_attribute
-			where parent_id = :4
+			where parent_id = ?
 			and item_name = 'WorkList'
 			and value_type = 250
-			and parent_org_id = :5
+			and parent_org_id = ?
 			)
 			)
 			and aat.id = ea.value_int
@@ -910,7 +1023,7 @@ SELECT doc_spec_subtype, count(*)
 		<statement name="person.myAssociatedResourceInPatients">
 			
 			SELECT
-			decode(to_char(trans_begin_stamp - :1, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(trans_begin_stamp - :1, 'Mon DD'), to_char(trans_begin_stamp - :1, 'MM/DD/YY')),
+			decode(to_char(trans_begin_stamp - ?, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(trans_begin_stamp - ?, 'Mon DD'), to_char(trans_begin_stamp - ?, 'MM/DD/YY')),
 			initcap(simple_name) as simple_name,
 			provider_id,
 			caption as room_number,
@@ -931,14 +1044,14 @@ SELECT doc_spec_subtype, count(*)
 			trans_type BETWEEN 11000 AND 11999 AND
 			person_id = trans_owner_id AND
 			(
-			provider_id = :2 OR provider_id IN
+			provider_id = ? OR provider_id IN
 			(
 			SELECT value_text
 			FROM person_attribute
-			WHERE parent_id = :2
+			WHERE parent_id = ?
 			AND value_type = 250
 			AND item_name = 'WorkList'
-			AND parent_org_id = :3
+			AND parent_org_id = ?
 			)
 			) AND
 			trans_status = 2
@@ -950,14 +1063,14 @@ SELECT doc_spec_subtype, count(*)
 
 		<statement name="person.mySessionActivity">
 			
-			select to_char(pa.activity_stamp - :1 - :3, 'MM/DD/YYYY HH12:MI AM') as activity_stamp,
+			select to_char(pa.activity_stamp - ? - ?, 'MM/DD/YYYY HH12:MI AM') as activity_stamp,
 			sat.caption as caption,
 			pa.activity_data as data,
 			pa.action_scope as scope,
 			pa.action_key as action_key
 			from Session_Action_Type sat, perSess_Activity pa
-			where pa.person_id = :2
-			and	pa.activity_stamp &gt;= trunc(sysdate) + :1 + :3
+			where pa.person_id = ?
+			and	pa.activity_stamp &gt;= trunc(sysdate) + ? + ?
 			and	sat.id = pa.action_type
 			and 10 &gt; (
 			select count(*) from perSess_Activity pa2
@@ -976,44 +1089,47 @@ SELECT doc_spec_subtype, count(*)
 			AND value_text = org_id
 			AND item_name = 'Office Location'
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.patientAppointments">
 			
-			select 	decode(to_char(e.start_time - :1, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(e.start_time - :1, 'Mon DD'), to_char(e.start_time - :1, 'MM/DD/YY')),
-			to_char(e.start_time - :1, 'HH12:MI AM'),
+			select 	decode(to_char(e.start_time - ?, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(e.start_time - ?, 'Mon DD'), to_char(e.start_time - ?, 'MM/DD/YY')),
+			to_char(e.start_time - ?, 'HH12:MI AM'),
 			ea.value_textB,
 			e.subject,
-			to_char(e.start_time - :1, 'MM-DD-YYYY'),
+			to_char(e.start_time - ?, 'MM-DD-YYYY'),
 			1 as group_sort,
 			e.start_time as apptdate
 			from Event_Attribute ea, Event e
 			where ea.parent_id = e.event_id
 			and ea.value_type = 333
-			and ea.value_text = :2
+			and ea.value_text = ?
 			and e.event_status != 3
 			and e.start_time &gt; sysdate
 			UNION
-			select 	decode(to_char(sysdate - :1, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(sysdate - :1, 'Mon DD'), to_char(sysdate - :1, 'MM/DD/YY')),
-			to_char(sysdate - :1, 'HH12:MI AM'),
+			select 	decode(to_char(sysdate - ?, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(sysdate - ?, 'Mon DD'), to_char(sysdate - ?, 'MM/DD/YY')),
+			to_char(sysdate - ?, 'HH12:MI AM'),
 			'-',
 			'-',
-			to_char(sysdate - :1, 'MM-DD-YYYY'),
+			to_char(sysdate - ?, 'MM-DD-YYYY'),
 			2 as group_sort,
 			trunc(sysdate) as apptdate
 			from DUAL
 			UNION
-			select 	decode(to_char(e.start_time - :1, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(e.start_time - :1, 'Mon DD'), to_char(e.start_time - :1, 'MM/DD/YY')),
-			to_char(e.start_time - :1, 'HH12:MI AM'),
+			select 	decode(to_char(e.start_time - ?, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(e.start_time - ?, 'Mon DD'), to_char(e.start_time - ?, 'MM/DD/YY')),
+			to_char(e.start_time - ?, 'HH12:MI AM'),
 			ea.value_textB,
 			e.subject,
-			to_char(e.start_time - :1, 'MM-DD-YYYY'),
+			to_char(e.start_time - ?, 'MM-DD-YYYY'),
 			3 as group_sort,
 			e.start_time as apptdate
 			from Event_Attribute ea, Event e
 			where ea.parent_id = e.event_id
 			and ea.value_type = 333
-			and ea.value_text = :2
+			and ea.value_text = ?
 			and e.event_status != 3
 			and e.start_time &lt; sysdate
 			and 10 &gt; (select count(*) from Event_Attribute ea2, Event e2
@@ -1042,6 +1158,9 @@ SELECT doc_spec_subtype, count(*)
 			AND 	 p.person_id = t.consult_id
 			AND 	 g.id = p.gender
 			
+			<params>
+				<param value="request:consult_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.personCategory">
@@ -1054,6 +1173,10 @@ SELECT doc_spec_subtype, count(*)
 			and	p.person_id = pa.person_id
 			order by pa.category
 			
+			<params>
+				<param value="request:person_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.phoneMessage">
@@ -1074,6 +1197,10 @@ SELECT doc_spec_subtype, count(*)
 			and trans_status = 5
 			and trans_owner_id &lt;&gt; consult_id
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.preventiveCare">
@@ -1083,15 +1210,18 @@ SELECT doc_spec_subtype, count(*)
 			where 	parent_id = ?
 			and 	value_type = 400
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.recentlyVisitedPatients">
 			
 			select p.simple_name, pvc.view_key from PerSess_View_Count pvc,
 			person p , Person_Org_Category pog
-			where p.person_id = pvc.view_key AND pvc.person_id = :2 and
+			where p.person_id = pvc.view_key AND pvc.person_id = ? and
 			pog.person_id = p.person_id AND pog.category = 'Patient'
-			and	pvc.view_latest &gt;= trunc(sysdate) + :1
+			and	pvc.view_latest &gt;= trunc(sysdate) + ?
 			order by pvc.view_latest desc
 			
 		</statement>
@@ -1118,6 +1248,9 @@ SELECT doc_spec_subtype, count(*)
 			AND trans_type in (6010)
 			ORDER BY 3 desc
 			
+			<params>
+				<param value="request:consult_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.referralAndIntakeCount">
@@ -1129,13 +1262,16 @@ SELECT doc_spec_subtype, count(*)
 			WHERE 	consult_id = ?
 			AND trans_type in (6000, 6010)
 			
+			<params>
+				<param value="request:consult_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.refillRequest">
 			
 			SELECT count(*)
 			FROM document, document_attribute
-			WHERE document_attribute.value_text = :1
+			WHERE document_attribute.value_text = ?
 			AND document.doc_spec_type = 2000
 			AND document.doc_id = document_attribute.parent_id
 			AND document_attribute.item_name IN ('To', 'CC')
@@ -1146,15 +1282,15 @@ SELECT doc_spec_subtype, count(*)
 
 		<statement name="person.scheduleAppts">
 			
-			SELECT p.person_id, to_char(e.start_time - :1, 'hh:miam') as start_time,
+			SELECT p.person_id, to_char(e.start_time - ?, 'hh:miam') as start_time,
 			a.caption, e.subject as visit, org_id, initcap(p.short_sortable_name) as simple_name
 			FROM appt_status a, org, person p, event_attribute ePhy, event e
-			WHERE e.start_time &gt;= to_date(:3, 'MM/DD/YYYY') + :1
-			AND e.start_time &lt; to_date(:3, 'MM/DD/YYYY') + :1 + 1
+			WHERE e.start_time &gt;= to_date(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; to_date(?, 'MM/DD/YYYY') + ? + 1
 			AND e.event_status &lt; 3
 			AND ePhy.parent_id = e.event_id
 			AND ePhy.item_name = 'Appointment'
-			AND ePhy.value_textB = :2
+			AND ePhy.value_textB = ?
 			AND p.person_id = ePhy.VALUE_TEXT
 			AND org.org_internal_id = e.facility_id
 			AND a.id = e.event_status
@@ -1174,6 +1310,9 @@ SELECT doc_spec_subtype, count(*)
 			and 	rownum &lt;= 20
 			order by activity_date desc
 			
+			<params>
+				<param value="request:session_id"/>
+			</params>
 		</statement>
 
 		<statement name="person.surgicalProcedures">
@@ -1191,7 +1330,7 @@ SELECT doc_spec_subtype, count(*)
 			ref_cpt ref
 			WHERE
 			trans_type = 4050
-			AND trans_owner_id = :1
+			AND trans_owner_id = ?
 			AND t.code = ref.cpt (+)
 			AND trans_status = 2
 			ORDER BY
@@ -1207,6 +1346,9 @@ SELECT doc_spec_subtype, count(*)
 			and tm.data_text_b = tc.data_text_b
 			and tm.trans_owner_id = ?
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_referral">
@@ -1237,6 +1379,9 @@ SELECT doc_spec_subtype, count(*)
 			and aa.parent_id = t.trans_id
 			and aa.item_name = 'Referral Insurance'
 			
+			<params>
+				<param value="request:trans_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -32,32 +32,32 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
-			WHERE	e.event_status = :1
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			WHERE	e.event_status = ?
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
@@ -89,33 +89,33 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Discard_Type WHERE id = e.discard_type) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			, discard_remarks 
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
-			WHERE	e.event_status = :1
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			WHERE	e.event_status = ?
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
@@ -127,17 +127,17 @@
 			from Appt_Status, Event, Event_Attribute
 			where value_type = 333
 			and Event.event_id = Event_Attribute.parent_id
-			and (:6 is NULL or Event_Attribute.value_textb = :6)
-			and (:1 is NULL or Event.facility_id = :1)
+			and (? is NULL or Event_Attribute.value_textb = ?)
+			and (? is NULL or Event.facility_id = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = Event.facility_id
 			)
-			and Event.start_time &gt;= to_date(:2, 'MM/DD/YYYY') + :5
-			and Event.start_time &lt; to_date(:3, 'MM/DD/YYYY') + 1 + :5
+			and Event.start_time &gt;= to_date(?, 'MM/DD/YYYY') + ?
+			and Event.start_time &lt; to_date(?, 'MM/DD/YYYY') + 1 + ?
 			and Appt_Status.id = Event.event_status
 			group by caption, event_status
 			
@@ -145,22 +145,22 @@
 
 		<statement name="sel_dateEntered">
 			
-			SELECT to_char(e.scheduled_stamp -:5, 'MM/DD/YYYY'), count(*)
+			SELECT to_char(e.scheduled_stamp -?, 'MM/DD/YYYY'), count(*)
 			FROM 	Event e, Event_Attribute ea
-			WHERE	(:1 is NULL or facility_id = :1)
-			AND (:6 is NULL or ea.value_textb = :6)
+			WHERE	(? is NULL or facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND ea.value_type = 333
-			AND e.scheduled_stamp &gt;= TO_DATE(:2, 'MM/DD/YYYY') + :5
-			AND e.scheduled_stamp &lt; TO_DATE(:3, 'MM/DD/YYYY') + 1 + :5
+			AND e.scheduled_stamp &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.scheduled_stamp &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_id = ea.parent_id
-			GROUP BY to_char(e.scheduled_stamp -:5, 'MM/DD/YYYY')
+			GROUP BY to_char(e.scheduled_stamp -?, 'MM/DD/YYYY')
 			ORDER BY 1 desc
 			
 		</statement>
@@ -191,34 +191,34 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
 			WHERE	
-			e.scheduled_stamp &gt;= TO_DATE(:1, 'MM/DD/YYYY') + :6
-			and e.scheduled_stamp &lt; TO_DATE(:1, 'MM/DD/YYYY') + 1 + :6
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			e.scheduled_stamp &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			and e.scheduled_stamp &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.scheduled_stamp &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.scheduled_stamp &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.scheduled_stamp &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.scheduled_stamp &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
@@ -250,35 +250,35 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
 			WHERE	
-			e.checkin_stamp &gt;= TO_DATE(:1, 'MM/DD/YYYY') + :6
-			and e.checkin_stamp &lt; TO_DATE(:1, 'MM/DD/YYYY') + 1 + :6
+			e.checkin_stamp &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			and e.checkin_stamp &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			and e.checkout_stamp is NULL
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
@@ -311,16 +311,16 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
@@ -328,7 +328,7 @@
 			invoice i,
 			invoice_item ii
 			WHERE	ii.parent_id = i.invoice_id
-			AND ii.code = :1
+			AND ii.code = ?
 			AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void')
 			OR ii.data_text_b is NULL)
 			AND ii.item_type != 7
@@ -336,18 +336,18 @@
 			AND i.invoice_status != 16
 			AND i.parent_invoice_id is NULL
 			AND e.event_id = t.parent_event_id
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
@@ -380,16 +380,16 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
@@ -398,24 +398,24 @@
 			insurance i,
 			claim_type ct,
 			transaction t
-			WHERE		ct.caption = :1
+			WHERE		ct.caption = ?
 			AND	e.event_id = t.parent_event_id
 			AND	i.main_transaction = t.trans_id
 			AND	ib.bill_id = i.billing_id
 			AND	ib.bill_ins_id = i.ins_internal_id
 			AND	ct.id = i.ins_type
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
@@ -448,16 +448,16 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
@@ -465,24 +465,24 @@
 			invoice_billing ib,
 			claim_type ct,
 			transaction t
-			WHERE		ct.caption = :1
+			WHERE		ct.caption = ?
 			AND	e.event_id = t.parent_event_id
 			AND	i.main_transaction = t.trans_id
 			AND	ib.bill_id = i.billing_id
 			AND	ib.bill_ins_id is NULL
 			AND	ct.id = 0
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
@@ -515,32 +515,32 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
-			WHERE	ea.value_int = :1 and event_status = 2 
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			WHERE	ea.value_int = ? and event_status = 2 
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
@@ -572,32 +572,32 @@
 			WHERE org_internal_id = e.facility_id
 			) as org_name,
 			(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status,
-			TO_CHAR(e.start_time - :6, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			TO_CHAR(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') as start_time,
 			initcap(e.subject) as reason_visit,
 			e.scheduled_by_id as scheduled_by,
 			e.checkin_by_id as checkin_by,
 			e.checkout_by_id as checkout_by,
 			ea.value_text as patient_id,
 			ea.value_textb as physician_id,
-			to_char(e.scheduled_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
-			to_char(e.checkin_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
-			to_char(e.checkout_stamp - :6, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(e.scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			to_char(e.checkin_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - ?, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
 			e.event_id,
 			aat.caption
 			FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
-			WHERE	 event_status = 2 AND ea.value_textB = :1
-			AND	(:2 is NULL or e.facility_id = :2)
-			AND (:7 is NULL or ea.value_textb = :7)
+			WHERE	 event_status = 2 AND ea.value_textB = ?
+			AND	(? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :5
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND e.event_id = ea.parent_id
-			AND e.start_time &gt;= TO_DATE(:3, 'MM/DD/YYYY') + :6
-			AND e.start_time &lt; TO_DATE(:4, 'MM/DD/YYYY') + 1 + :6
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND aat.id = ea.value_int
 			ORDER BY 5, 7
 
@@ -605,25 +605,25 @@
 
 		<statement name="sel_missingEncounter">
 			
-			SELECT to_char(e.CHECKIN_STAMP - :5, 'MM/DD/YYYY'), count (*)
+			SELECT to_char(e.CHECKIN_STAMP - ?, 'MM/DD/YYYY'), count (*)
 			FROM 	Event e, Event_Attribute ea
-			WHERE	(:1 is NULL or facility_id = :1)
-			AND (:6 is NULL or ea.value_textb = :6)
+			WHERE	(? is NULL or facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND ea.value_type = 333
-			AND e.start_time &gt;= TO_DATE(:2, 'MM/DD/YYYY') + :5
-			AND e.start_time &lt; TO_DATE(:3, 'MM/DD/YYYY') + 1 + :5
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_id = ea.parent_id
 			AND e.event_status &lt; 3
 			AND e.checkin_stamp is NOT NULL
 			AND e.checkout_stamp is NULL
-			GROUP BY to_char(e.CHECKIN_STAMP - :5, 'MM/DD/YYYY')
+			GROUP BY to_char(e.CHECKIN_STAMP - ?, 'MM/DD/YYYY')
 			ORDER BY 1 desc
 			
 		</statement>
@@ -640,17 +640,17 @@
 			AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void')
 			OR ii.data_text_b is NULL)
 			AND ii.item_type != 7
-			AND (:1 is NULL or e.facility_id = :1)
-			AND (:6 is NULL or ea.value_textb = :6)
+			AND (? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 	'x'
 			FROM 	org
-			WHERE 	owner_org_id = :4
+			WHERE 	owner_org_id = ?
 			AND 	org_internal_id = e.facility_id
 			)
-			AND e.start_time &gt;= TO_DATE(:2, 'MM/DD/YYYY') + :5
-			AND e.start_time &lt; TO_DATE(:3, 'MM/DD/YYYY') + 1 + :5
+			AND e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_id = ea.parent_id
 			AND e.event_id = t.parent_event_id
 			AND e.event_status &lt; 3
@@ -674,18 +674,18 @@
 			transaction t,
 			Event_Attribute ea,
 			Event e
-			WHERE e.start_time &gt;= TO_DATE(:2, 'MM/DD/YYYY') + :5
-			AND e.start_time &lt; TO_DATE(:3, 'MM/DD/YYYY') + 1 + :5
+			WHERE e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
-			AND (:1 is NULL or e.facility_id = :1)
+			AND (? is NULL or e.facility_id = ?)
 			AND ea.parent_id = e.event_id
 			AND ea.value_type = 333
-			AND (:6 is NULL or ea.value_textb = :6)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND t.parent_event_id = e.event_id
@@ -705,18 +705,18 @@
 			transaction t,
 			Event_Attribute ea,
 			Event e
-			WHERE e.start_time &gt;= TO_DATE(:2, 'MM/DD/YYYY') + :5
-			AND	e.start_time &lt; TO_DATE(:3, 'MM/DD/YYYY') + 1 + :5
+			WHERE e.start_time &gt;= TO_DATE(?, 'MM/DD/YYYY') + ?
+			AND	e.start_time &lt; TO_DATE(?, 'MM/DD/YYYY') + 1 + ?
 			AND e.event_status &lt; 3
-			AND (:1 is NULL or e.facility_id = :1)
+			AND (? is NULL or e.facility_id = ?)
 			AND	ea.parent_id = e.event_id
 			AND ea.value_type = 333
-			AND (:6 is NULL or ea.value_textb = :6)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			AND t.parent_event_id = e.event_id
@@ -735,18 +735,18 @@
 			select value_textB as physician, count(value_textB) as count
 			from Event e, Event_Attribute ea
 			where ea.value_type = 333
-			AND (:1 is NULL or e.facility_id = :1)
-			AND (:6 is NULL or ea.value_textb = :6)
+			AND (? is NULL or e.facility_id = ?)
+			AND (? is NULL or ea.value_textb = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
 			and e.event_id = ea.parent_id
-			and e.start_time between to_date(:2 || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM') + :5
-			and to_date(:3 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM') + :5
+			and e.start_time between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM') + ?
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM') + ?
 			and e.event_status = 2
 			group by ea.value_textB
 			
@@ -758,17 +758,17 @@
 			from Appt_Attendee_Type, Event e, Event_Attribute ea
 			where ea.value_type = 333
 			and e.event_id = ea.parent_id
-			and (:6 is NULL or ea.value_textb = :6)
-			and (:1 is NULL or e.facility_id = :1)
+			and (? is NULL or ea.value_textb = ?)
+			and (? is NULL or e.facility_id = ?)
 			AND EXISTS
 			(
 			SELECT 'x'
 			FROM org
-			WHERE owner_org_id = :4
+			WHERE owner_org_id = ?
 			AND org_internal_id = e.facility_id
 			)
-			and e.start_time between to_date(:2 || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM') + :5
-			and to_date(:3 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM') + :5
+			and e.start_time between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM') + ?
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM') + ?
 			and e.event_status = 2
 			and Appt_Attendee_Type.id = ea.value_int
 			group by caption, Appt_Attendee_Type.id

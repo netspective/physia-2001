@@ -7,6 +7,11 @@
 			delete from role_permission
 			where org_internal_id = ? and role_name_id = ? and permission_name = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:role_name_id"/>
+				<param value="request:permission_name"/>
+			</params>
 		</statement>
 
 		<statement name="id">
@@ -22,6 +27,9 @@
 			and A.role_activity_id = C.id
 			order by B.role_name, A.permission_name
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selRoleIDs">
@@ -39,6 +47,11 @@
 			and A.permission_name = ?
 			and A.role_activity_id = C.id and A.role_name_id = B.role_name_id
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:role_name_id"/>
+				<param value="request:permission_name"/>
+			</params>
 		</statement>
 
 	</sql-statements>

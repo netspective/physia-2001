@@ -14,6 +14,9 @@
 			abbrev = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:abbrev"/>
+			</params>
 		</statement>
 
 		<statement name="sel_modifier_code_like">

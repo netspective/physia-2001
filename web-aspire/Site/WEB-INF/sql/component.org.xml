@@ -10,7 +10,7 @@
 			
 			Select	org_id,primary_name,org_internal_id
 			FROM	org ,ORG_CATEGORY oc
-			WHERE 	owner_org_id= :1 
+			WHERE 	owner_org_id= ? 
 			AND	oc.parent_id = org.org_internal_id
 			AND	oc.member_name='Lab'			
 			order by org_id
@@ -31,10 +31,10 @@
 			decode(ocp.price_id,NULL,'Add','Mod')
 			FROM 	Contract_Catalog con, Offering_catalog_Entry oce,
 			Offering_CatEntry_Price ocp
-			WHERE 	con.internal_contract_id = :1
+			WHERE 	con.internal_contract_id = ?
 			AND	oce.catalog_id = con.parent_catalog_id
-			AND	con.org_internal_id = :2
-			AND	ocp.internal_contract_id (+)= :1
+			AND	con.org_internal_id = ?
+			AND	ocp.internal_contract_id (+)= ?
 			AND	ocp.entry_id (+) = oce.entry_id
 			order by modifier, code
 			
@@ -50,7 +50,7 @@
 			(SELECT 0 from dual) as price_entry,
 			internal_contract_id
 			FROM 	Contract_Catalog con
-			WHERE 	org_internal_id = :1
+			WHERE 	org_internal_id = ?
 			
 		</statement>
 
@@ -73,9 +73,9 @@
 			catalog_entry_type,
 			offering_catalog_entry oce,
 			offering_catalog oc
-			WHERE	oce.catalog_id = :1
+			WHERE	oce.catalog_id = ?
 			AND	oce.catalog_id = oc.internal_catalog_id
-			AND	oc.org_internal_id = :2
+			AND	oc.org_internal_id = ?
 			AND	oce.entry_type = catalog_entry_type.id
 			ORDER BY
 			oce.entry_type,
@@ -104,7 +104,7 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
 			AND EXISTS
 			(
 			SELECT unique ia.value_text
@@ -112,9 +112,9 @@
 			WHERE ia.value_text = oc.internal_catalog_id
 			AND ia.parent_id = i.ins_internal_id
 			AND ia.item_name = 'Fee Schedule'
-			AND i.owner_org_id = :1
+			AND i.owner_org_id = ?
 			AND i.ins_org_id = o.org_internal_id
-			AND o.org_id = :2
+			AND o.org_id = ?
 			)
 			GROUP BY
 			oc.catalog_id,
@@ -150,7 +150,7 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -181,10 +181,10 @@
 			oce.data_num
 			FROM 	offering_catalog oc,org o,
 			offering_catalog_entry oce
-			WHERE 	o.owner_org_id = :2
-			AND	o.org_id = :1
+			WHERE 	o.owner_org_id = ?
+			AND	o.org_id = ?
 			AND	o.org_internal_id = oc.org_internal_id
-			AND	oc.internal_catalog_id = :3
+			AND	oc.internal_catalog_id = ?
 			AND	oce.catalog_id=oc.internal_catalog_id
 			AND	parent_entry_id is null
 			order by oce.modifier,oce.code,oce.name 
@@ -197,8 +197,8 @@
 			FROM	offering_catalog oc, org, offering_catalog_entry oce
 			WHERE	oc.catalog_type = 5
 			AND	oc.org_internal_id = org.org_internal_id
-			AND	org.org_id = :1
-			AND	org.owner_org_id = :2
+			AND	org.org_id = ?
+			AND	org.owner_org_id = ?
 			AND	oce.catalog_id (+)= oc.internal_catalog_id
 			AND	oce.parent_entry_id IS NULL
 			group by oc.catalog_id,oc.caption ,oc.internal_catalog_id
@@ -220,8 +220,8 @@
 			(
 			SELECT org_internal_id
 			FROM org
-			WHERE owner_org_id = :2 AND
-			org_id = :1
+			WHERE owner_org_id = ? AND
+			org_id = ?
 			)
 			AND	trans_type between 8000 and 8999
 			AND	trans_status = 2
@@ -237,8 +237,8 @@
 			where	parent_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			and 	value_type = 252
 			
@@ -251,8 +251,8 @@
 			where	org_internal_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			group by category, org_internal_id
 			
@@ -270,7 +270,7 @@
 			FROM
 			org_attribute
 			WHERE
-			parent_id = (SELECT org_internal_id FROM org WHERE owner_org_id = :2 AND org_id = :1) AND
+			parent_id = (SELECT org_internal_id FROM org WHERE owner_org_id = ? AND org_id = ?) AND
 			value_type = 650
 			ORDER BY
 			day
@@ -284,8 +284,8 @@
 			decode(oa.value_intb, '1','Active', 'Inactive'),
 			o.org_id, 2 as entity_type
 			from	org o, org_attribute oa
-			where	o.owner_org_id = :1
-			and o.org_id = :2
+			where	o.owner_org_id = ?
+			and o.org_id = ?
 			and	oa.parent_id = o.org_internal_id
 			and	oa.item_name = 'Organization Default Clearing House ID'
 			and	oa.value_type = 960)
@@ -295,7 +295,7 @@
 			decode(pa.value_intb,'1','Active', 'Inactive'),
 			pa.parent_id, 0 as entity_type
 			from	Person_Attribute pa, Person_Org_Category poc
-			where	poc.org_internal_id = :1
+			where	poc.org_internal_id = ?
 			and poc.category = 'Physician'
 			and	pa.parent_id = poc.person_id
 			and	pa.value_type = 960)
@@ -316,8 +316,8 @@
 			and	oc.org_internal_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			order by oce.entry_type, oce.status, oce.name, oce.code
 			
@@ -328,7 +328,7 @@
 			SELECT
 			o.org_id,
 			a.value_date,
-			DECODE (o.org_id, :1, 'Parent Org', 'Child Org') as parent_child,
+			DECODE (o.org_id, ?, 'Parent Org', 'Child Org') as parent_child,
 			oc.member_name
 			FROM 	org o, org_attribute a, org_category oc
 			WHERE 	a.parent_id = o.org_internal_id
@@ -337,7 +337,7 @@
 			(
 			SELECT o1.org_id
 			FROM org o1
-			WHERE o1.org_id = :1
+			WHERE o1.org_id = ?
 			AND ( o1.org_internal_id = o.parent_org_id OR o1.org_internal_id = o.owner_org_id OR o1.org_internal_id = o.org_internal_id )
 			)
 			AND o.org_internal_id = oc.parent_id
@@ -372,6 +372,9 @@
 			name_sort,
 			item_name
 
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="org.contactMethodsAndAddresses">
@@ -391,8 +394,8 @@
 			SELECT org_internal_id
 			FROM org
 			WHERE
-			owner_org_id = :2
-			AND	org_id = :1
+			owner_org_id = ?
+			AND	org_id = ?
 			)
 			AND	value_type IN (
 			10,
@@ -432,8 +435,8 @@
 			SELECT org_internal_id
 			FROM org
 			WHERE
-			owner_org_id = :2
-			AND	org_id = :1
+			owner_org_id = ?
+			AND	org_id = ?
 			)
 			AND	oca.caption = 	Org_address.address_name		
 			)
@@ -448,8 +451,8 @@
 			where	parent_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			and 	value_type = 600
 			
@@ -462,8 +465,8 @@
 			where 	org.parent_org_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			and 	ocat.member_name = 'Department'
 			and 	ocat.parent_id = org.org_internal_id
@@ -478,8 +481,8 @@
 			and	oc.org_internal_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			group by oc.catalog_id, oc.caption, oc.description, oc.parent_catalog_id
 			order by oc.caption
@@ -495,7 +498,7 @@ SELECT	oc.catalog_id,
 			oa.item_id
 			FROM org_attribute oa,
 			offering_catalog oc
-			WHERE oa.parent_id = :1
+			WHERE oa.parent_id = ?
 			AND	oa.item_name = 'Fee Schedule'
 			AND	oa.item_type = 0
 			AND	oa.value_type = 110
@@ -509,7 +512,7 @@ SELECT	oc.catalog_id,
 			SELECT	oce.code,oce.name,(SELECT caption FROM catalog_entry_type WHERE id = oce.entry_type), oce.entry_id,
 			oce.unit_cost
 			FROM 	offering_catalog_entry oce,offering_catalog oc
-			WHERE 	oce.catalog_id = :1
+			WHERE 	oce.catalog_id = ?
 			AND	oc.internal_catalog_id = oce.catalog_id
 			ORDER BY 1
 			
@@ -519,8 +522,8 @@ SELECT	oc.catalog_id,
 			
 			select 	name_primary, name_trade, category, tax_id, org_id, org_internal_id
 			from 	org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			
 		</statement>
@@ -532,8 +535,8 @@ SELECT	oc.catalog_id,
 			where 	org_internal_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			
 		</statement>
@@ -560,8 +563,8 @@ SELECT	oc.catalog_id,
 			claim_type,
 			org
 			WHERE
-			org.org_id = :1 AND
-			org.owner_org_id = :2 AND
+			org.org_id = ? AND
+			org.owner_org_id = ? AND
 			insurance.record_type in (1, 2) AND
 			insurance.ins_type = claim_type.id AND
 			insurance.ins_org_id = org.org_internal_id
@@ -578,22 +581,22 @@ SELECT	oc.catalog_id,
 			name_primary,
 			org_internal_id,
 			DECODE (o.org_internal_id, (SELECT oo.parent_org_id from org oo
-			WHERE oo.org_id = :1 AND owner_org_id = :2), 'Parent Org', 'Child Org')
+			WHERE oo.org_id = ? AND owner_org_id = ?), 'Parent Org', 'Child Org')
 			FROM 	Org o
 			WHERE 	org_internal_id =
 			(
 			SELECT parent_org_id
 			FROM org
-			WHERE owner_org_id = :2 AND
-			org_id = :1
+			WHERE owner_org_id = ? AND
+			org_id = ?
 			)
 			OR
 			parent_org_id =
 			(
 			SELECT org_internal_id
 			FROM org
-			WHERE owner_org_id = :2 AND
-			org_id = :1
+			WHERE owner_org_id = ? AND
+			org_id = ?
 			)
 			AND rownum &lt;= 250
 			ORDER BY org_id
@@ -603,8 +606,8 @@ SELECT	oc.catalog_id,
 		<statement name="org.location">
 			
 			select 0 as preferred, 99910 as value_type, complete_addr_html,item_id,address_name,parent_id
-			from org_address , org where org.org_id = :1
-			AND	org.owner_org_id = :2
+			from org_address , org where org.org_id = ?
+			AND	org.owner_org_id = ?
 			AND	org_address.parent_id = org.org_internal_id	
 			AND	NOT EXISTS
 			(SELECT 1 FROM Org_Contact_Addrs oac
@@ -629,8 +632,8 @@ SELECT	oc.catalog_id,
 			(
 			SELECT org_internal_id
 			FROM org
-			WHERE owner_org_id = :2 AND
-			org_id = :1
+			WHERE owner_org_id = ? AND
+			org_id = ?
 			)
 			AND item_name = 'Org Notes'
 			
@@ -643,8 +646,8 @@ SELECT	oc.catalog_id,
 			where	pa.org_internal_id =
 			(select org_internal_id
 			from org
-			where owner_org_id = :2 AND
-			org_id = :1
+			where owner_org_id = ? AND
+			org_id = ?
 			)
 			and pa.category in ('Physician', 'Nurse', 'Staff', 'Administrator', 'Superuser')
 			and	p.person_id = pa.person_id
@@ -658,7 +661,7 @@ SELECT	oc.catalog_id,
 			FROM 	offering_catalog oc, offering_catalog_entry oce,org_attribute oa,
 			offering_catalog_type oct
 			WHERE 	oce.catalog_id (+)= oc.internal_catalog_id
-			AND 	oa.parent_id = :1
+			AND 	oa.parent_id = ?
 			AND 	oa.item_name = 'Fee Schedule'
 			AND 	oa.value_int = oc.internal_catalog_id
 			AND oct.id = oc.catalog_type
@@ -670,7 +673,7 @@ SELECT	oc.catalog_id,
 			
 			SELECT	oce.code,(SELECT name FROM ref_service_category WHERE oce.code = serv_category), oce.entry_id
 			FROM 	offering_catalog_entry oce,offering_catalog oc
-			WHERE 	oce.catalog_id = :1
+			WHERE 	oce.catalog_id = ?
 			AND	oc.internal_catalog_id = oce.catalog_id
 			ORDER BY 1
 			
@@ -684,6 +687,9 @@ SELECT	oc.catalog_id,
 			and	oc.org_internal_id = ?
 			and	oc.flags = 1
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

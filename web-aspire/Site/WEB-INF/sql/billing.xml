@@ -12,6 +12,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

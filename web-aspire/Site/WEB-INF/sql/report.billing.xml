@@ -14,8 +14,8 @@
 			where Invoice_Item.code is NOT NULL
 			and Transaction.service_facility_id = ?
 			and Invoice.owner_type = 1
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Invoice_Item.parent_id = Invoice.invoice_id
 			and Invoice_Item.code = ?
 			and Transaction.trans_id = Invoice.main_transaction
@@ -23,6 +23,11 @@
 			and org.org_internal_id = Transaction.service_facility_id
 			and org.owner_org_id = ?				
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:code"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_detail_insurance">
@@ -32,8 +37,8 @@
 			provider_id, Transaction_Status.caption as status, nvl(total_cost,0), nvl(total_adjust,0), simple_name
 			from Insurance, Transaction_Status, Transaction, Invoice, Person, invoice_billing ib ,org
 			where Transaction.service_facility_id = ?
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Transaction.trans_id = Invoice.main_transaction
 			and Transaction_Status.id = Transaction.trans_status
 			and Insurance.ins_internal_id = ib.bill_ins_id
@@ -43,6 +48,11 @@
 			and org.org_internal_id = Insurance.ins_org_id 
 			and org.owner_org_id = ?
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:ins_org_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_detail_payers">
@@ -51,8 +61,8 @@
 			provider_id, Transaction_Status.caption as status, total_cost, total_adjust, simple_name
 			from Claim_Type, Transaction_Status, Transaction, Invoice, Person ,org o
 			where Transaction.service_facility_id= ?				
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Transaction.trans_id = Invoice.main_transaction
 			and Claim_Type.id = Transaction.bill_type
 			and Claim_Type.caption = ?
@@ -61,6 +71,10 @@
 			and o.owner_org_id = ?
 			and o.org_internal_id = Transaction.service_facility_id
 			
+			<params>
+				<param value="request:caption"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_detailearnings_insurance">
@@ -69,17 +83,17 @@
 			t.provider_id, Transaction_Status.caption as status, nvl(sum(total_cost),0), nvl(sum(Invoice_Item_Adjust.plan_paid),0)	,
 			p.simple_name
 			from Invoice_Item_Adjust, Invoice_Item, Invoice, Transaction t,Transaction_Status,org, person p
-			where Invoice.invoice_date between to_date(:1 || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(:2 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			where Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and t.trans_id = Invoice.main_transaction
-			and t.service_facility_id = :3
+			and t.service_facility_id = ?
 			and Invoice_Item.parent_id = Invoice.invoice_id
 			and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
-			and Invoice_Item_Adjust.payer_id = :4
+			and Invoice_Item_Adjust.payer_id = ?
 			and Transaction_Status.id = t.trans_status
-			and org.org_internal_id = :4
+			and org.org_internal_id = ?
 			and p.person_id (+) = invoice.client_id
-			and org.owner_org_id = :5
+			and org.owner_org_id = ?
 			group by org.org_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
 			t.provider_id, Transaction_Status.caption ,p.simple_name
 			
@@ -91,8 +105,8 @@
 			t.provider_id, Transaction_Status.caption as status, nvl(sum(total_cost),0), nvl(sum(Invoice_Item_Adjust.adjustment_amount),0),				
 			p.simple_name
 			from Invoice_Item_Adjust, Invoice_Item, Invoice, Transaction t,Transaction_Status, person p ,org
-			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			where Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and t.trans_id = Invoice.main_transaction
 			and t.service_facility_id = ?
 			and Invoice_Item.parent_id = Invoice.invoice_id
@@ -105,6 +119,11 @@
 			group by Invoice_Item_Adjust.payer_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
 			t.provider_id, Transaction_Status.caption , p.simple_name
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:payer_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_diagsFromInvoice_Item">
@@ -112,12 +131,15 @@
 			select rel_diags as Diagnosis
 			from Invoice_Item, Invoice
 			where rel_diags is NOT NULL
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Invoice.owner_id = ?
 			and Invoice.owner_type = 1
 			and Invoice_Item.parent_id = Invoice.invoice_id
 			
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_earningsByInsurance">
@@ -135,8 +157,8 @@
 			--select payer_id as payer, sum(plan_paid) as earning
 			select org_id as payer, sum(plan_paid) as earning ,2, null	
 			from Invoice_Item_Adjust, Invoice_Item, Invoice, org o,Transaction t
-			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			where Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and t.trans_id = Invoice.main_transaction
 			and t.service_facility_id = ?
 			and Invoice_Item.parent_id = Invoice.invoice_id
@@ -151,8 +173,8 @@
 			p.simple_name 
 			from Invoice_Item_Adjust, Invoice_Item, Invoice,Transaction t,org,
 			person p
-			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			where Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and t.trans_id = Invoice.main_transaction
 			and t.service_facility_id = ?
 			and Invoice_Item.parent_id = Invoice.invoice_id
@@ -163,6 +185,12 @@
 			and p.person_id=payer_id
 			group by payer_id,p.simple_name
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:owner_org_id"/>
+				<param value="request:service_facility_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_payers">
@@ -170,14 +198,18 @@
 			select Claim_Type.caption as payer, count(Claim_Type.id) as count
 			from Transaction, Claim_Type, Invoice, org
 			where Transaction.service_facility_id = ?				
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and Transaction.trans_id = Invoice.main_transaction
 			and Claim_Type.id = Transaction.bill_type
 			and org.org_internal_id = Transaction.service_facility_id
 			and org.owner_org_id = ?
 			group by Claim_Type.caption
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_payersByInsurance">
@@ -186,14 +218,18 @@
 			from Insurance, Invoice, Transaction t, invoice_billing ib,org
 			where t.trans_id = Invoice.main_transaction
 			and t.service_facility_id = ?
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and invoice.billing_id = ib.bill_id
 			and Insurance.ins_internal_id = ib.bill_ins_id
 			and org.org_internal_id = Insurance.ins_org_id
 			and org.owner_org_id = ?			
 			group by org.org_id,Insurance.ins_org_id
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_proceduresFromInvoice_Item">
@@ -201,8 +237,8 @@
 			select Invoice_Item.code as procedure, count(Invoice_Item.code) as count
 			from Invoice_Item, Invoice,transaction t,org 
 			where Invoice_Item.code is NOT NULL
-			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
-			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.invoice_date between to_date(? || ' 12?0 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11?9 PM', 'MM/DD/YYYY HH12:MI AM')
 			and t.trans_id = Invoice.main_transaction
 			and t.service_facility_id = ?
 			--and Invoice.owner_type = 1
@@ -211,6 +247,10 @@
 			and org.owner_org_id = ?
 			group by Invoice_Item.code
 			
+			<params>
+				<param value="request:service_facility_id"/>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

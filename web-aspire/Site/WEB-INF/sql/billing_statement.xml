@@ -34,15 +34,15 @@
 			
 			SELECT nvl(sum(balance), 0)
 			FROM Invoice_Billing, Invoice
-			WHERE client_id = :1
-			and invoice_date &gt; trunc(sysdate) - :2
-			and invoice_date &lt;= trunc(sysdate) - :3
+			WHERE client_id = ?
+			and invoice_date &gt; trunc(sysdate) - ?
+			and invoice_date &lt;= trunc(sysdate) - ?
 			and invoice_status &gt; 3
 			and invoice_status != 15
 			and invoice_status != 16
 			and invoice_subtype in (0, 7)
 			and bill_id = billing_id
-			and bill_to_id = :4
+			and bill_to_id = ?
 			
 		</statement>
 
@@ -50,7 +50,7 @@
 			
 			select value_text
 			from Org_Attribute
-			where parent_id = :1
+			where parent_id = ?
 			and value_type = 25
 			
 		</statement>
@@ -60,15 +60,15 @@
 			SELECT item_id, parent_id, value_int AS day, value_text AS name_begin, value_textb AS name_end,
 			value_intb AS balance_condition, value_float AS balance_criteria
 			FROM org_attribute
-			WHERE parent_id = :1
-			AND value_int = :2
+			WHERE parent_id = ?
+			AND value_int = ?
 			AND value_type = 650
 			
 		</statement>
 
 		<statement name="sel_internalStatementId">
 			
-			select int_statement_id from statement where statement_id = :1
+			select int_statement_id from statement where statement_id = ?
 			
 		</statement>
 
@@ -81,9 +81,9 @@
 			'MM/DD/YYYY') as ack_date, int_statement_id, ext_statement_id,
 			amount_due, inv_ids as claim_ids
 			from transmission_status, statement
-			where billto_id = :1
-			and payto_id = :2
-			and patient_id = :3
+			where billto_id = ?
+			and payto_id = ?
+			and patient_id = ?
 			and transmission_status.id (+) = statement.transmission_status
 			order by statement_id desc
 			)
@@ -96,7 +96,7 @@
 			SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
 			replace(zip, '-', null) as zip
 			FROM Org_Address, Org
-			WHERE org_internal_id = :1
+			WHERE org_internal_id = ?
 			and Org_Address.parent_id = Org.org_internal_id
 			
 		</statement>
@@ -106,9 +106,9 @@
 			SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
 			replace(zip, '-', null) as zip
 			FROM org_address, org
-			WHERE org_internal_id = :1
+			WHERE org_internal_id = ?
 			AND org_address.parent_id = org.org_internal_id
-			AND org_address.address_name = :2
+			AND org_address.address_name = ?
 			
 		</statement>
 
@@ -117,7 +117,7 @@
 			select Invoice.invoice_id, Invoice.invoice_id || ' - ' || to_char(invoice_date, 'MM/DD/YYYY')
 			|| ' - $' || to_char(Invoice.balance, '99999.99') as caption
 			from Invoice_Billing, Invoice
-			where Invoice.owner_id = :2
+			where Invoice.owner_id = ?
 			and Invoice.balance &gt; 0
 			and Invoice.invoice_status &gt; 3
 			and Invoice.invoice_status != 15
@@ -125,7 +125,7 @@
 			and Invoice.invoice_subtype in (0, 7)
 			and Invoice_Billing.bill_id = Invoice.billing_id
 			and Invoice_Billing.bill_party_type &lt; 2
-			and Invoice_Billing.bill_to_id = :1
+			and Invoice_Billing.bill_to_id = ?
 			order by invoice_id desc
 			
 		</statement>
@@ -133,11 +133,11 @@
 		<statement name="sel_paymentHistory">
 			
 SELECT * FROM (
-			select to_char(value_stamp - :3, 'MM/DD/YYYY'),
+			select to_char(value_stamp - ?, 'MM/DD/YYYY'),
 			value_float, value_text
 			from payment_history h, payment_plan p
-			where p.person_id = :1
-			and p.owner_org_id = :2
+			where p.person_id = ?
+			and p.owner_org_id = ?
 			and h.parent_id = p.plan_id
 			order by value_stamp desc
 			) WHERE ROWNUM &lt; 11
@@ -151,8 +151,8 @@ SELECT * FROM (
 			to_char(lastpay_date, 'MM/DD/YYYY' ) as lastpay_date, lastpay_amount,
 			balance, billing_org_id, inv_ids, plan_id, person_id
 			FROM Payment_Plan
-			WHERE person_id = :1
-			and owner_org_id = :2
+			WHERE person_id = ?
+			and owner_org_id = ?
 			
 		</statement>
 
@@ -164,6 +164,9 @@ SELECT * FROM (
 			WHERE person_id = ?
 			and Person_Address.parent_id = Person.person_id
 			
+			<params>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_statementClaims_perOrg">
@@ -190,7 +193,7 @@ SELECT * FROM (
 			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
 			WHERE
 			p.person_id = i.client_id
-			AND i.owner_id = :1
+			AND i.owner_id = ?
 			AND i.invoice_status &gt; 3
 			AND i.invoice_status != 15
 			AND i.invoice_status != 16
@@ -228,7 +231,7 @@ SELECT * FROM (
 			o.org_id as billing_org_id
 			FROM Org o, Person p, Payment_Plan pp
 			WHERE pp.next_due &gt; sysdate
-			and pp.owner_org_id = :1
+			and pp.owner_org_id = ?
 			and pp.balance &gt; 0
 			and p.person_id = pp.person_id
 			and (pp.laststmt_date is NULL or
@@ -262,7 +265,7 @@ SELECT * FROM (
 			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
 			WHERE
 			p.person_id = i.client_id
-			AND i.owner_id = :1
+			AND i.owner_id = ?
 			AND i.invoice_status &gt; 3
 			AND i.invoice_status != 15
 			AND i.invoice_status != 16
@@ -272,7 +275,7 @@ SELECT * FROM (
 			AND ib.bill_party_type != 3
 			AND ib.bill_to_id IS NOT NULL
 			AND t.trans_id = i.main_transaction
-			AND t.provider_id = :2
+			AND t.provider_id = ?
 			AND not exists(select 'x' from Statement s
 			where s.transmission_stamp &gt; trunc(sysdate) -14
 			and s.payto_id = t.billing_facility_id
@@ -296,7 +299,7 @@ SELECT * FROM (
 			o.org_id as billing_org_id
 			FROM Org o, Person p, Payment_Plan pp
 			WHERE pp.next_due &gt; sysdate
-			and pp.owner_org_id = :1
+			and pp.owner_org_id = ?
 			and pp.balance &gt; 0
 			and p.person_id = pp.person_id
 			and (pp.laststmt_date is NULL or
@@ -326,6 +329,9 @@ SELECT * FROM (
 			and pa.value_intb = 1)
 			order by i.invoice_id
 			
+			<params>
+				<param value="request:owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_submittedClaims_perOrg_perProvider">
@@ -336,12 +342,12 @@ SELECT * FROM (
 			4,
 			14
 			)
-			and i.owner_id = :1
+			and i.owner_id = ?
 			and i.invoice_subtype != 0
 			and i.invoice_subtype != 7
 			and i.balance &gt; 0
 			and t.trans_id = i.main_transaction
-			and t.provider_id = :2
+			and t.provider_id = ?
 			order by i.invoice_id
 			
 		</statement>
@@ -370,7 +376,7 @@ SELECT * FROM (
 			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
 			WHERE
 			p.person_id = i.client_id
-			AND i.owner_id = :1
+			AND i.owner_id = ?
 			AND i.invoice_status &gt; 3
 			AND i.invoice_status != 15
 			AND i.invoice_status != 16
@@ -402,7 +408,7 @@ SELECT * FROM (
 			o.org_id as billing_org_id
 			FROM Org o, Person p, Payment_Plan pp
 			WHERE pp.next_due &gt; sysdate
-			and pp.owner_org_id = :1
+			and pp.owner_org_id = ?
 			and pp.balance &gt; 0
 			and p.person_id = pp.person_id
 			and (pp.laststmt_date is NULL or
@@ -436,7 +442,7 @@ SELECT * FROM (
 			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
 			WHERE
 			p.person_id = i.client_id
-			AND i.owner_id = :1
+			AND i.owner_id = ?
 			AND i.invoice_status &gt; 3
 			AND i.invoice_status != 15
 			AND i.invoice_status != 16
@@ -446,7 +452,7 @@ SELECT * FROM (
 			AND ib.bill_party_type != 3
 			AND ib.bill_to_id IS NOT NULL
 			AND t.trans_id = i.main_transaction
-			AND t.provider_id = :2
+			AND t.provider_id = ?
 			AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
 			where ppii.member_name = i.invoice_id
 			)
@@ -464,7 +470,7 @@ SELECT * FROM (
 			o.org_id as billing_org_id
 			FROM Org o, Person p, Payment_Plan pp
 			WHERE pp.next_due &gt; sysdate
-			and pp.owner_org_id = :1
+			and pp.owner_org_id = ?
 			and pp.balance &gt; 0
 			and p.person_id = pp.person_id
 			and (pp.laststmt_date is NULL or

@@ -17,11 +17,11 @@
 
 		<statement name="person.mySessionViewCount">
 			
-			select view_caption, view_count, decode(to_char(view_init - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(view_init - :1, 'hh:miam'), to_char(view_init - :1, 'MM/DD/YYYY hh:miam')),	
-			decode(to_char(view_latest - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(view_latest - :1, 'hh:miam'), to_char(view_latest - :1, 'MM/DD/YYYY hh:miam')), view_arl
+			select view_caption, view_count, decode(to_char(view_init - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(view_init - ?, 'hh:miam'), to_char(view_init - ?, 'MM/DD/YYYY hh:miam')),	
+			decode(to_char(view_latest - ?, 'YYYYMMDD'), to_char(sysdate - ?, 'YYYYMMDD'), to_char(view_latest - ?, 'hh:miam'), to_char(view_latest - ?, 'MM/DD/YYYY hh:miam')), view_arl
 			from Persess_View_Count 
-			where person_id = :2
-			and view_init &gt; trunc(sysdate) + :1
+			where person_id = ?
+			and view_init &gt; trunc(sysdate) + ?
 			order by view_count DESC
 			
 		</statement>
@@ -35,6 +35,11 @@
 			and view_scope = ?
 			and view_key = ?
 			
+			<params>
+				<param value="request:person_id"/>
+				<param value="request:view_scope"/>
+				<param value="request:view_key"/>
+			</params>
 		</statement>
 
 		<statement name="upd_count">
@@ -47,6 +52,11 @@
 			and view_scope = ?
 			and view_key = ?
 			
+			<params>
+				<param value="request:person_id"/>
+				<param value="request:view_scope"/>
+				<param value="request:view_key"/>
+			</params>
 		</statement>
 
 	</sql-statements>

@@ -16,6 +16,12 @@
 			and device_association.document_type = ?
 			and device_association.person_id = ?
 			
+			<params>
+				<param value="request:device_type"/>
+				<param value="request:org_internal_id"/>
+				<param value="request:document_type"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_doctype_default_device_assoc">
@@ -28,6 +34,11 @@
 			and device_association.document_type = ?
 			and device_association.person_id is NULL
 			
+			<params>
+				<param value="request:device_type"/>
+				<param value="request:org_internal_id"/>
+				<param value="request:document_type"/>
+			</params>
 		</statement>
 
 		<statement name="sel_org_default_device_assoc">
@@ -40,6 +51,10 @@
 			and device_association.document_type is NULL
 			and device_association.person_id is NULL
 			
+			<params>
+				<param value="request:device_type"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_org_devices">
@@ -62,6 +77,11 @@
 			and device_association.document_type is NULL
 			and device_association.person_id = ?
 			
+			<params>
+				<param value="request:device_type"/>
+				<param value="request:org_internal_id"/>
+				<param value="request:person_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

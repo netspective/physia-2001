@@ -44,6 +44,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_category_like">
@@ -84,6 +87,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id">
@@ -124,6 +130,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_id_like">
@@ -164,6 +173,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_primname">
@@ -204,6 +216,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_primname_like">
@@ -244,6 +259,9 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 	</sql-statements>

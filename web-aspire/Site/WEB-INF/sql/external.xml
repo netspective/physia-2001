@@ -15,21 +15,21 @@
 			SELECT sysdate,
 			'EDI_PERSE',
 			sii.member_name,
-			:1, 
+			?, 
 			sysdate,
-			:2 			
+			? 			
 			FROM Statement s, Statement_Inv_Ids sii
 			WHERE sii.parent_id = s.statement_id
 			AND s.ack_stamp is NULL
 			AND s.transmission_status = 0
-			AND sii.parent_id = :3
-			AND s.patient_id = :4
+			AND sii.parent_id = ?
+			AND s.patient_id = ?
 			
 		</statement>
 
 		<statement name="del_InvoiceAttribute">
 			
-			delete from Invoice_History where item_id = :1
+			delete from Invoice_History where item_id = ?
 			
 		</statement>
 
@@ -40,22 +40,22 @@
 		<statement name="sel_InvoiceAttribute">
 			
 			select * from Invoice_Attribute
-			where parent_id = :1
-			and item_name = :2
-			and value_text = :3
-			and value_date = to_date(:4, 'MM/DD/YYYY')
+			where parent_id = ?
+			and item_name = ?
+			and value_text = ?
+			and value_date = to_date(?, 'MM/DD/YYYY')
 			
 		</statement>
 
 		<statement name="sel_InvoiceHistory">
 			
 			select * from Invoice_History
-			where parent_id = :1
-			and value_text = :2
-			and value_date = to_date(:3, 'MM/DD/YYYY')
+			where parent_id = ?
+			and value_text = ?
+			and value_date = to_date(?, 'MM/DD/YYYY')
 			and (value_textb is null
-			or (:4 != '%%' and value_textb is NOT NULL and value_textb like :4)
-			or (:5 != '%%' and value_textb is NOT NULL and value_textb like :5)
+			or (? != '%%' and value_textb is NOT NULL and value_textb like ?)
+			or (? != '%%' and value_textb is NOT NULL and value_textb like ?)
 			)
 			
 		</statement>
@@ -75,7 +75,7 @@
 			select item_id, value_text, to_char(value_date, 'MM/DD/YYYY') as value_date,
 			to_char(cr_stamp, 'mm/dd/yyyy hh:mi:ss pm') as cr_stamp
 			from Invoice_History
-			where item_id = :1
+			where item_id = ?
 			
 		</statement>
 
@@ -83,10 +83,10 @@
 			
 			select min(item_id)
 			from Invoice_History
-			where parent_id = :1
+			where parent_id = ?
 			and cr_user_id = 'EDI_PERSE'
-			and value_text = :2
-			and value_date = to_date(:3, 'MM/DD/YYYY')
+			and value_text = ?
+			and value_date = to_date(?, 'MM/DD/YYYY')
 			
 		</statement>
 
@@ -95,11 +95,11 @@
 			select item_id, value_text, to_char(value_date, 'MM/DD/YYYY') as value_date,
 			to_char(cr_stamp, 'mm/dd/yyyy hh:mi:ss pm') as cr_stamp
 			from Invoice_History
-			where parent_id = :1
-			and item_id &gt; :2
+			where parent_id = ?
+			and item_id &gt; ?
 			and cr_user_id = 'EDI_PERSE'
-			and value_text = :3
-			and value_date = to_date(:4, 'MM/DD/YYYY')
+			and value_text = ?
+			and value_date = to_date(?, 'MM/DD/YYYY')
 			order by item_id
 			
 		</statement>
@@ -109,11 +109,11 @@
 			UPDATE Statement
 			SET ack_stamp = sysdate,
 			transmission_status = 1,
-			ext_statement_id = :1
+			ext_statement_id = ?
 			WHERE ack_stamp is NULL
-			AND int_statement_id = :2
+			AND int_statement_id = ?
 			AND 	transmission_status = 0	
-			AND	patient_id = :3
+			AND	patient_id = ?
 			
 		</statement>
 
@@ -127,8 +127,8 @@
 			WHERE sii.parent_id = s.statement_id
 			AND s.ack_stamp is NULL
 			AND s.transmission_status = 0
-			AND s.int_statement_id = :1
-			AND s.patient_id = :2		 
+			AND s.int_statement_id = ?
+			AND s.patient_id = ?		 
 			)
 			
 		</statement>

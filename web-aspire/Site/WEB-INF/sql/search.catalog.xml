@@ -27,7 +27,7 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -63,8 +63,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.description) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.description) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -100,8 +100,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.description) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.description) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -141,6 +141,9 @@
 			code,
 			modifier
 
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalog_detail_org">
@@ -168,6 +171,9 @@
 			code,
 			modifier
 
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalog_detailname">
@@ -189,8 +195,8 @@
 			offering_catalog_entry oce,
 			offering_catalog oc
 			WHERE
-			oc.org_internal_id = :1
-			AND oc.catalog_id = :2
+			oc.org_internal_id = ?
+			AND oc.catalog_id = ?
 			AND oce.catalog_id = oc.internal_catalog_id
 			AND	oce.entry_type = catalog_entry_type.id
 			ORDER BY entry_type, code, modifier
@@ -218,8 +224,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.catalog_id) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.catalog_id) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -255,8 +261,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.catalog_id) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.catalog_id) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -285,6 +291,9 @@
 			name,
 			code
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_catalog_name">
@@ -308,8 +317,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.caption) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.caption) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -345,8 +354,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.caption) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.caption) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -382,8 +391,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND (UPPER(oc.caption) = :2 OR UPPER(oc.description) = :2)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND (UPPER(oc.caption) = ? OR UPPER(oc.description) = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -419,8 +428,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND (UPPER(oc.caption) LIKE :2 OR UPPER(oc.description) LIKE :2)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND (UPPER(oc.caption) LIKE ? OR UPPER(oc.description) LIKE ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -456,7 +465,7 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -492,7 +501,7 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -528,8 +537,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.description) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.description) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -565,8 +574,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.description) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.description) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -602,8 +611,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.catalog_id) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.catalog_id) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -639,8 +648,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.catalog_id) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.catalog_id) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -676,8 +685,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.caption) = :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.caption) = ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -713,8 +722,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND UPPER(oc.caption) LIKE :2
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND UPPER(oc.caption) LIKE ?
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -750,8 +759,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND (UPPER(oc.caption) = :2 OR UPPER(oc.description) = :2)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND (UPPER(oc.caption) = ? OR UPPER(oc.description) = ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -787,8 +796,8 @@
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND (UPPER(oc.caption) LIKE :2 OR UPPER(oc.description) LIKE :2)
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = ?)
+			AND (UPPER(oc.caption) LIKE ? OR UPPER(oc.description) LIKE ?)
 			GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,

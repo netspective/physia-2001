@@ -12,6 +12,9 @@
 			from org_address where parent_id = ?
 			order by address_name
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAlerts">
@@ -33,6 +36,9 @@
 			)
 			order by trans_begin_stamp desc
 			
+			<params>
+				<param value="request:trans_owner_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAttribute">
@@ -40,6 +46,10 @@
 			select * from org_attribute
 			where parent_id = ? and item_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+			</params>
 		</statement>
 
 		<statement name="selAttributeById">
@@ -48,15 +58,18 @@
 			from org_attribute
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selAttributeByIdValueIntParent">
 			
 			SELECT	item_id
 			FROM	Org_Attribute
-			WHERE	parent_id = :1
-			AND	value_int = :2
-			AND	item_name = :3
+			WHERE	parent_id = ?
+			AND	value_int = ?
+			AND	item_name = ?
 			
 		</statement>
 
@@ -65,6 +78,11 @@
 			select * from org_attribute
 			where parent_id = ? and item_name = ? and value_type = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+				<param value="request:value_type"/>
+			</params>
 		</statement>
 
 		<statement name="selAttributeByValueType">
@@ -72,6 +90,10 @@
 			select * from org_attribute
 			where parent_id = ? and value_type = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:value_type"/>
+			</params>
 		</statement>
 
 		<statement name="selAttributeItemDateByItemNameAndValueTypeAndParent">
@@ -81,6 +103,11 @@
 			WHERE	oa.parent_id = ? and oa.item_name = ? and oa.value_type = ?
 			AND	o.org_internal_id = oa.parent_id
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:item_name"/>
+				<param value="request:value_type"/>
+			</params>
 		</statement>
 
 		<statement name="selCategory">
@@ -89,6 +116,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selChildFacilityOrgs">
@@ -99,14 +129,17 @@
 			WHERE 	owner_org_id = ?
 			AND category IN ('Practice','Clinic','Facility/Site','Diagnostic Service','Department','Hospital','Therapeutical Services')
 			
+			<params>
+				<param value="request:owner_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selCloseDateChildParentOrgIds">
 			
 			SELECT	o.org_internal_id
 			FROM	org o,Org_Category oc
-			WHERE	o.owner_org_id = :1
-			AND	( ( (o.parent_org_id = :2 OR o.owner_org_id = :2) AND :3 = 1) OR o.org_internal_id = :2 )
+			WHERE	o.owner_org_id = ?
+			AND	( ( (o.parent_org_id = ? OR o.owner_org_id = ?) AND ? = 1) OR o.org_internal_id = ? )
 			AND	oc.parent_id = o.org_internal_id
 			AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
 			
@@ -120,6 +153,10 @@
 			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 			
+			<params>
+				<param value="request:internal_catalog_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selComponentSuperbillsByOrgIntId">
@@ -130,6 +167,9 @@
 			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selContactMethods">
@@ -139,6 +179,9 @@
 			and value_type in (10, 15, 20, 40, 50)
 			order by name_sort, item_name
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selDepartments">
@@ -148,14 +191,17 @@
 			where org.parent_org_id = ?
 			and ocat.member_name = 'Department' and ocat.parent_id = org.org_internal_id
 			
+			<params>
+				<param value="request:parent_org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selFindOrgWithMemberId">
 			
 			SELECT parent_id
 			FROM	org_category
-			WHERE	parent_id = :1
-			AND	member_name = :2
+			WHERE	parent_id = ?
+			AND	member_name = ?
 			
 		</statement>
 
@@ -165,6 +211,9 @@
 			from hlth_maint_rule
 			where rule_id = ?
 			
+			<params>
+				<param value="request:rule_id"/>
+			</params>
 		</statement>
 
 		<statement name="selId">
@@ -173,6 +222,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selMemberNames">
@@ -181,6 +233,9 @@
 			from org_category
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrg">
@@ -190,6 +245,10 @@
 			where owner_org_id = ? AND
 			org_id = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgAddressByAddrName">
@@ -199,6 +258,10 @@
 			where parent_id = ?
 			and address_name = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+				<param value="request:address_name"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgAddressById">
@@ -207,6 +270,9 @@
 			from org_address
 			where item_id = ?
 			
+			<params>
+				<param value="request:item_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgCategory">
@@ -215,6 +281,9 @@
 			from Org_Category
 			where parent_id = ?
 			
+			<params>
+				<param value="request:parent_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgCategoryRegistry">
@@ -234,6 +303,9 @@
 			) and
 			org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgEligibilityInput">
@@ -243,6 +315,9 @@
 			where org_internal_id = ?
 			order by field_order
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgIDByOrgType">
@@ -250,8 +325,8 @@
 			select distinct o.org_id,o.org_internal_id
 			FROM	org o , org_category oc
 			WHERE 	o.org_internal_id = oc.parent_id
-			AND	o.owner_org_id = :1
-			AND	oc.member_name = :2
+			AND	o.owner_org_id = ?
+			AND	oc.member_name = ?
 			
 		</statement>
 
@@ -262,13 +337,17 @@
 			where owner_org_id = ? AND
 			org_id = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOrgServiceFFSByInternalId">
 			
 			SELECT 	distinct org_internal_id,oa.value_int
 			FROM	Org_Category oc, Org o,Org_Attribute oa
-			WHERE o.owner_org_id = :1
+			WHERE o.owner_org_id = ?
 			AND	oc.parent_id = o.org_internal_id
 			AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
 			AND	oa.item_name ='Fee Schedules'
@@ -283,6 +362,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOwnerOrg">
@@ -292,6 +374,9 @@
 			where parent_org_id IS NULL AND
 			org_id = ?
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selOwnerOrgId">
@@ -301,6 +386,9 @@
 			where parent_org_id IS NULL AND
 			org_id = ?
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonBillingInfo">
@@ -315,6 +403,9 @@
 			and	pa.value_type = 960
 			order by pa.value_int
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonBillingInfoByOrgIntId">
@@ -329,6 +420,9 @@
 			and	pa.value_type = 960
 			order by pa.value_int
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selPersonCategory">
@@ -342,6 +436,11 @@
 			)
 			and org_internal_id = ?
 			
+			<params>
+				<param value="request:person_id"/>
+				<param value="request:person_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selReferralDetail">
@@ -413,6 +512,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selSuperbillInfoByCatalogID">
@@ -422,6 +524,9 @@
 			where	catalog_id = ?
 			order by entry_id
 			
+			<params>
+				<param value="request:catalog_id"/>
+			</params>
 		</statement>
 
 		<statement name="selSuperbillsByCatalogId">
@@ -432,6 +537,10 @@
 			and	oc.org_internal_id = ?
 			order by catalog_id
 			
+			<params>
+				<param value="request:catalog_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selSuperbillsByOrgIntId">
@@ -442,6 +551,9 @@
 			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTaxId">
@@ -450,6 +562,9 @@
 			from org
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selTimeMetric">
@@ -465,20 +580,24 @@
 			set owner_org_id = ?
 			where org_internal_id = ?
 			
+			<params>
+				<param value="request:owner_org_id"/>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selValueDateByItemNameAndValueTypeAndParent">
 			
 			SELECT to_char(value_date,'MM/DD/YYYY') as value_date
 			FROM org_attribute
-			WHERE parent_id = :1 and item_name = :2 and value_type = :3
+			WHERE parent_id = ? and item_name = ? and value_type = ?
 			
 		</statement>
 
 		<statement name="sel_ActiveOrgBillingIds">
 			
 			select * from org_attribute
-			where parent_id = :1
+			where parent_id = ?
 			and value_type = 960
 			and value_intb = 1
 			
@@ -487,7 +606,7 @@
 		<statement name="sel_ActivePersonBillingIds">
 			
 			select * from person_attribute
-			where parent_id = :1
+			where parent_id = ?
 			and value_type = 960
 			and value_intb = 1
 			

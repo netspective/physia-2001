@@ -10,9 +10,9 @@
 			
 			select to_char(data_date_a, 'MM/DD/YYYY') as close_date, Invoice_Worklist.*
 			from Invoice_Worklist
-			where invoice_id = :1
-			and worklist_type = :2
-			and worklist_status = :3
+			where invoice_id = ?
+			and worklist_type = ?
+			and worklist_status = ?
 			
 		</statement>
 
@@ -21,10 +21,10 @@
 			select to_char(reck_date, 'MM/DD/YYYY') as formatted_reck_date,
 			invoice_worklist.*
 			from Invoice_Worklist
-			where invoice_id = :1
-			and worklist_type = :2
-			and responsible_id = :3
-			and worklist_status = :4
+			where invoice_id = ?
+			and worklist_type = ?
+			and responsible_id = ?
+			and worklist_status = ?
 			
 		</statement>
 
