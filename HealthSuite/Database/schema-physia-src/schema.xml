@@ -365,7 +365,7 @@
 		<column name="data_date_c" type="date" descr="Extra data, dependent upon invoice item type"/>
 	</table>
 
-	<table name="Invoice_Billing" abbrev="InvBill" type="Audit,Secure">
+	<table name="Invoice_Billing" abbrev="InvBill" parent="Invoice" type="Audit,Secure">
 		<column name="bill_id" type="autoinc" primarykey="yes" descr="Unique billing identifier"/>
 		<column name="invoice_id" lookupref="Invoice.invoice_id" required="yes" descr="The invoice item for which billing information is being defined"/>
 		<column name="invoice_item_id" lookupref="Invoice_Item.item_id" descr="The invoice item for which billing information is being defined (if needed)"/>
