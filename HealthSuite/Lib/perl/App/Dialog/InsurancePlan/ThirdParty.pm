@@ -74,6 +74,7 @@ sub customValidate
 	$page->field('guarantor_id', $otherPayer);
 	my $otherPayerType = $page->field('guarantor_type');
 	my $otherPayerField = $self->getField('other_payer_fields')->{fields}->[0];
+	my $ownerOrgId = $page->session('org_internal_id');
 
 	if($otherPayerType eq 'person')
 	{
@@ -97,7 +98,7 @@ sub customValidate
 			<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
 			<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
 			})
-			unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
+			unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selOrgId', $ownerOrgId, $otherPayer);
 	}
 
 }
@@ -129,15 +130,15 @@ sub execute
 			ins_internal_id => $editInsIntId || undef,
 			record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 			owner_person_id => $page->param('person_id') || undef,
-			owner_org_id => $page->session('org_id'),
+			owner_org_id => $page->session('org_internal_id'),
 			ins_type => App::Universal::CLAIMTYPE_CLIENT || undef,
 			guarantor_id => $page->field('guarantor_id') || undef,
 			guarantor_type  => $guarantorType,
 			_debug => 0
 		);
 
-	#$self->handlePostExecute($page, $command, $flags);
-	#return '';
+	$self->handlePostExecute($page, $command, $flags);
+	return '';
 }
 
 1;
