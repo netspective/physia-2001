@@ -617,6 +617,15 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 					and t.trans_type = @{[ App::Universal::TRANSTYPE_ALERTAPPOINTMENT ]}
 			)
 	},
+
+	'sel_apptAlertFromPersonId' => qq{
+		select 'x' from transaction t
+		where t.trans_owner_id = upper(:1)
+			and t.trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
+			and t.trans_type = @{[ App::Universal::TRANSTYPE_ALERTAPPOINTMENT ]}
+			and rownum < 2
+	},
+	
 );
 
 1;

@@ -708,6 +708,16 @@ sub handle_page
 			</script>
 		}) if $patientId;
 	}
+	elsif (my $patientId = $page->param('person_id'))
+	{
+		my $apptAlertExist = $STMTMGR_SCHEDULING->recordExists($page, STMTMGRFLAG_CACHE,
+			'sel_apptAlertFromPersonId', $patientId);
+		$page->addContent(qq{
+			<script>
+				alertPopup("/popup/alerts/$patientId");
+			</script>
+		}) if $apptAlertExist;
+	}
 
 	my $returnUrl = $self->getReferer($page);
 
