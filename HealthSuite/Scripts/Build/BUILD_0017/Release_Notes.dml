@@ -113,8 +113,8 @@
 		</deliverable>
 
 		<deliverable id="1542">
-			UI : Added new Query called "IPA Financial Transaction". This allows an org to obtain financial information other main orgs that it is assoicated with.
-			[Database] : Requires the addition of three new tables to track assoication.
+			UI : Added  2 new Queries called "Associated Org Financial Transaction" , "Associated Org Invoice". This allows an org to obtain financial and invoice information from other main orgs that are  assoicated .
+			[Database] : Requires the addition of three new tables to track assoication, and need association data loaded
 		</deliverable>
 
 		<deliverable id="1544">
