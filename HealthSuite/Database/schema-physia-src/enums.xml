@@ -75,7 +75,6 @@
 	<table name="Gender" type="Enumeration">
 		<enum>Male</enum>
 		<enum>Female</enum>
-		<enum abbrev="N/A">Not applicable</enum>
 	</table>
 
 	<table name="Marital_Status" abbrev="MarStat" type="Enumeration">
