@@ -30,9 +30,9 @@ $STMTRPTDEFN_WORKLIST =
 		{colIdx => 1, head => 'ID', dAlign => 'left'},
 		{colIdx => 2, head => 'Status', dAlign => 'left'},
 		{colIdx => 3, head => 'Patient',hAlign=>'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
-		{colIdx => 4, head => 'Date of Request', dAlign => 'center'},
-		{colIdx => 5, head => 'Intake Coordinator', dAlign => 'center'},
-		{colIdx => 6, head => 'SSN', dAlign => 'center'},
+		{colIdx => 5, head => 'Date of Request', dAlign => 'center'},
+		{colIdx => 6, head => 'Intake Coordinator', dAlign => 'center'},
+		{colIdx => 7, head => 'SSN', dAlign => 'center'},
 		#{colIdx => 8, hint => 'View Account Balance', head => 'Balance', url => '/person/#10#/account', dAlign => 'right', dformat => 'currency', summarize => 'sum'},
 	],
 	bullets => '#10#',
@@ -83,6 +83,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		and aa.item_name = 'Referral Insurance'
 		and t.consult_id = p.person_id
 		and po.person_id = p.person_id
+
 		and po.org_internal_id = ?
 		and exists
 				(
