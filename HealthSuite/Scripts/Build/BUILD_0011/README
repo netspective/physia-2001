@@ -26,3 +26,11 @@ B656 - Added denied option to the status field in 'Refill Request' dialog
 B725 - Fixed the code not tho show the Primary phone in contact methods component when it is not filled while adding an Org
 
 B216 - Added the 'Hours of Operation' to showup on the profile line
+
+B969,955 modified daily and monthly audit report
+
+B951 - Changed Fee Schedule to use text instead of numeric values. 
+NOTE : Please test every where this is a link to fee schedule. See comments in bug
+
+B973 - Updated code to store CAP/FFS flag correctly for Fee Schedule entries .
+
