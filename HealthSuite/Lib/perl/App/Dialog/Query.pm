@@ -20,7 +20,7 @@ use Data::Publish;
 use Text::CSV;
 
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.6 2000-10-08 21:53:37 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.7 2000-10-13 02:07:54 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 
@@ -28,6 +28,7 @@ use vars qw(%RESOURCE_MAP);
 
 use constant MAXPARAMS => 5;
 use constant SHOWROWS => 10;
+use constant MAX_SHOWROWS => 50;
 
 
 sub new
@@ -200,6 +201,15 @@ sub new
 			selOptions => 'Web Page (HTML):html;Comma Separated Values (CSV):csv;eXtensible Markup Language (XML):xml',
 			type => 'select',
 			defaultValue => 'html',
+			onChangeJS => q{onChangeDestination();},
+		),
+		new CGI::Dialog::Field(
+			name => 'out_rows',
+			caption => 'Rows/Page',
+			selOptions => '10;20;30;40;50',
+			type => 'select',
+			defaultValue => '10',
+			onChangeJS => qq{resetStartRow();},
 		),
 		new CGI::Dialog::Field(
 			name => 'out_email',
@@ -261,7 +271,17 @@ sub new
 				grep {defined $sqlGen->comparisons($_)->{value} && $sqlGen->comparisons($_)->{value} eq ''}
 					$sqlGen->comparisons();
 
-	my $showRows = SHOWROWS;
+	my $compData = "\nvar compData = {};\n";
+	foreach (map {$sqlGen->comparisons($_)} $sqlGen->comparisons() )
+	{
+		my $exact = defined $_->{exact} && lc($_->{exact}) eq 'yes' ? 'true' : 'false';
+		my $placeholder = defined $_->{placeholder} ? $_->{placeholder} : '?';
+		my $extraParams = $placeholder =~ /\[/ ? 'true' : 'false';
+		my $minParams = $placeholder =~ s/\?//g;
+		$minParams-- if $extraParams eq 'true';
+
+		$compData .= "compData['$_->{id}'] = { 'exact' : $exact, 'minparams' : '$minParams', 'extraparams' : $extraParams };\n";
+	}
 
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
@@ -320,26 +340,122 @@ sub new
 			resetStartRow();
 		}
 
+		function validateStamp(fieldName, inStamp)
+		{
+			var a = splitOnChar(inStamp, " ");
+			var date;
+			var time;
+			var fmtMessage = fieldName + " must be entered in the correct format";
+			if (a.length < 2)
+			{
+				if (inStamp.length > 0)
+					validationError(fieldName, fmtMessage);
+				return inStamp;
+			}
+			date = validateDate(fieldName, a[0]);
+			for (var i = 2; i < a.length; i++)
+			{
+				a[1] += a[i];
+			}
+			time = validateTime(fieldName, a[1]);
+			return date + " " + time;
+		}
+
+		function validateChange_MultiDate(event, flags)
+		{
+			var inDate = event.srcElement.value;
+			var a = splitOnChar(inDate, ",");
+			var outDate = "";
+			for (var i = 0; i < a.length; i++)
+			{
+				if (outDate.length)
+					outDate += ", ";
+				outDate += validateDate(event.srcElement.name, a[i]);
+			}
+			event.srcElement.value = outDate;
+		}
+
+		function validateChange_MultiTime(event, flags)
+		{
+			var inTime = event.srcElement.value;
+			var a = splitOnChar(inTime, ",");
+			var outTime = "";
+			for (var i = 0; i < a.length; i++)
+			{
+				if (outTime.length)
+					outTime += ", ";
+				outTime += validateTime(event.srcElement.name, a[i]);
+			}
+			event.srcElement.value = outTime;
+		}
+
+		function validateChange_MultiStamp(event, flags)
+		{
+			var inStamp = event.srcElement.value;
+			var a = splitOnChar(inStamp, ",");
+			var outStamp = "";
+			for (var i = 0; i < a.length; i++)
+			{
+				if (outStamp.length)
+					outStamp += ", ";
+				outStamp += validateStamp(event.srcElement.name, a[i]);
+			}
+			event.srcElement.value = outStamp;
+		}
+
 		var fieldTypes = {$fieldTypes};
+		$compData
 
 		function onBlurCriteria(event)
 		{
 			var myValue = event.srcElement.value;
 			var result = event.srcElement.name.match(/criteria_(\\d+)/);
-			if (result != null)
+			if (result != null && myValue)
 			{
 				var fieldSelObj = eval("document.all._f_field_" + result[1]);
 				var curField = fieldSelObj.options[fieldSelObj.selectedIndex].value;
-				if (myValue && (type = eval("fieldTypes." + curField)))
+
+				var compSelObj = eval("document.all._f_comparison_" + result[1]);
+				var curComparison = compSelObj.options[compSelObj.selectedIndex].value;
+				var compare = compData[curComparison];
+				var type = eval("fieldTypes." + curField);
+
+				if (compare.exact && type)
 				{
-					if (type = 'date') validateChange_Date(event);
+					if (compare.minparams == 1 && compare.extraparams == false)
+					{
+						if (type == 'date') validateChange_Date(event);
+						if (type == 'time') validateChange_Time(event);
+						if (type == 'stamp') validateChange_Stamp(event);
+						if (type == 'float') validateChange_Float(event);
+						if (type == 'percentage') validateChange_Percentage(event);
+						if (type == 'currency') validateChange_Currency(event);
+						if (type == 'email') validateChange_EMail(event);
+						if (type == 'zip') validateChange_Zip(event);
+						if (type == 'phone') validateChange_Phone(event);
+						if (type == 'pager') validateChange_Pager(event);
+						if (type == 'url') validateChange_URL(event);
+						if (type == 'ssn') validateChange_SSN(event);
+					}
+					else
+					{
+						if (type == 'date') validateChange_MultiDate(event);
+						if (type == 'time') validateChange_MultiTime(event);
+						if (type == 'stamp') validateChange_MultiStamp(event);
+					}
 				}
 			}
 		}
 
 		function changePage(offset)
 		{
-			var rowOffset = offset * $showRows;
+			var outRowsObj = "document.all._f_out_rows";
+			var showRows = 10;
+			if (outRowsObj = eval(outRowsObj))
+			{
+				showRows = parseInt(outRowsObj.options[outRowsObj.selectedIndex].value);
+			}
+			var rowOffset = offset * showRows;
 			var fieldObj = "document.all._f_start_row";
 			if(startRow = eval(fieldObj))
 			{
@@ -380,6 +496,17 @@ sub new
 					setIdStyle('_id_out_printer', 'display', 'none');
 					setIdStyle('_id_out_email', 'display', 'none');
 					setIdStyle('_id_out_format', 'display', 'block');
+					if (formatObj = eval('document.all._f_out_format'))
+					{
+						if (formatObj.options[formatObj.selectedIndex].value == 'html')
+						{
+							setIdStyle('_id_out_rows', 'display', 'block');
+						}
+						else
+						{
+							setIdStyle('_id_out_rows', 'display', 'none');
+						}
+					}
 				}
 				else if (destObj.options[destObj.selectedIndex].text == 'Printer')
 				{
@@ -387,6 +514,7 @@ sub new
 					setIdStyle('_id_out_printer', 'display', 'block');
 					setIdStyle('_id_out_format', 'display', 'none');
 					setIdStyle('_id_out_email', 'display', 'none');
+					setIdStyle('_id_out_rows', 'display', 'none');
 				}
 				else if (destObj.options[destObj.selectedIndex].text == 'E-Mail')
 				{
@@ -394,8 +522,10 @@ sub new
 					setIdStyle('_id_out_printer', 'display', 'none');
 					setIdStyle('_id_out_format', 'display', 'block');
 					setIdStyle('_id_out_email', 'display', 'block');
+					setIdStyle('_id_out_rows', 'display', 'none');
 				}
 			}
+			resetStartRow();
 		}
 
 		// Call it at startup to initially hide fields
@@ -425,6 +555,30 @@ sub populateData
 }
 
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	my @outCols = $page->field('out_columns');
+	my @sortCols = $page->field('out_sort');
+
+	foreach my $col (@sortCols)
+	{
+		unless (grep {$_ eq $col} @outCols)
+		{
+			# This should work, but for some reason adding dialog vaidation errors causes javascript errors
+			# Need to fix this
+			#
+			#my $sortFld = $self->getField('out_sort');
+			#$sortFld->invalidate($page, "Every field you wish to sort by must also be in your list of output columns");
+			#
+			# For now simply add the missing column to the output list (Which avoids SQL errors)
+			push @outCols, $col;
+			$page->field('out_columns', @outCols);
+		}
+	}
+}
+
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -436,9 +590,15 @@ sub execute
 	my $distinct = defined $view->{distinct} ? $view->{distinct} : 0;
 	my $condition;
 
-	my $startRow = $page->field('start_row');
-	$startRow = 0 unless $startRow;
-	my $endRow = $startRow + SHOWROWS;
+	my $startRow = 0 + $page->field('start_row');
+	$startRow = 0 if $startRow eq 'NaN' || $startRow < 0;
+	my $showRows = 0 + $page->field('out_rows');
+	$showRows = 10 if $showRows eq 'NaN' || $showRows < 10;
+	$showRows = 50 if $showRows > 50;
+	my $endRow = $startRow + $showRows;
+
+	#my $startRow = 0;
+	#my $endRow = 10;
 
 	$page->property(CGI::Dialog::PAGEPROPNAME_INEXEC . '_' . $self->id(), 1);
 
@@ -451,24 +611,63 @@ sub execute
 		my $comparison = $page->field("comparison_$i");
 		my $criteria = $page->field("criteria_$i");
 		my $join = $page->field("join_$i");
+		my $options = {};
 
-		#$page->addDebugStmt("got here $field $comparison $criteria");
 		if ($field)
 		{
 			my @criteria = split /,\s*/, uc($criteria);
 			@criteria = ('') unless @criteria;
 
-			my $whereField = "UPPER({$field})";
-			if ($sqlGen->fields($field) && defined $sqlGen->fields($field)->{'ui-datatype'})
+			my $whereField = $field;
+			if (my $fieldData = $sqlGen->fields($field))
 			{
-				my $dataType = $sqlGen->fields($field)->{'ui-datatype'};
-				if ($dataType eq 'date')
+				my $condOpData = $sqlGen->comparisons($comparison);
+				my $exact = defined $condOpData->{exact} && lc($condOpData->{exact}) eq 'yes' ? 1 : 0;
+				my $dataType =  defined $fieldData->{'ui-datatype'} ? $fieldData->{'ui-datatype'} : 'text';
+
+				for ($dataType)
 				{
-					$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY')";
+					$_ eq 'text' and do {$whereField = "UPPER({$field})";last;};
+					$_ eq 'date' and do {
+						if (!$exact)
+						{
+							$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY')";
+						}
+						else
+						{
+							$options->{placeholder} = defined $condOpData->{placeholder} ? $condOpData->{placeholder} : '?';
+							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'MM/DD/YYYY')|g;
+						}
+						last;
+					};
+					$_ eq 'stamp' and do {
+						if (!$exact)
+						{
+							$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY HH:MI PM')";
+						}
+						else
+						{
+							$options->{placeholder} = defined $condOpData->{placeholder} ? $condOpData->{placeholder} : '?';
+							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'MM/DD/YYYY HH:MI PM')|g;
+						}
+						last;
+					};
+					$_ eq 'time' and do {
+						if (!$exact)
+						{
+							$whereField = "TO_CHAR({$field}, 'HH:MI PM')";
+						}
+						else
+						{
+							$options->{placeholder} = defined $condOpData->{placeholder} ? $condOpData->{placeholder} : '?';
+							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'HH:MI PM')|g;
+						}
+						last;
+					};
 				}
 
 			}
-			push @andConditions, $sqlGen->WHERE($whereField, $comparison, @criteria);
+			push @andConditions, $sqlGen->WHERE($whereField, $comparison, @criteria, $options);
 		}
 
 		if ($join ne 'AND')
@@ -499,7 +698,7 @@ sub execute
 		for ($dataFormat)
 		{
 			$_ eq 'text' && do {last;};
-			$_ eq 'date' && do {$outColumns[$i] = "TO_CHAR({$outColumns[$i]}, 'MM/DD/YYYY')"; last;};
+			#$_ eq 'date' && do {$outColumns[$i] = "TO_CHAR({$outColumns[$i]}, 'MM/DD/YYYY')"; last;};
 		}
 	}
 
@@ -589,7 +788,8 @@ sub format_html
 	my @outColumns = $page->field('out_columns');
 	my $startRow = $page->field('start_row');
 	$startRow = 0 unless $startRow;
-	my $endRow = $startRow + SHOWROWS;
+	my $showRows = $page->field('out_rows');
+	my $endRow = $startRow + $showRows;
 
 	# Create a Data::Publish format definition for the output results
 	my $publDefn = {};
@@ -626,16 +826,19 @@ sub format_html
 			for ($colData->{'ui-datatype'})
 			{
 				$_ eq 'currency' && do {$colFormat->{dformat} = 'currency'; last;};
+				$_ eq 'stamp' && do {$colFormat->{dformat} = 'stamp'; last;};
+				$_ eq 'date' && do {$colFormat->{dformat} = 'date'; last;};
+				$_ eq 'time' && do {$colFormat->{dformat} = 'time'; last;};
 			}
 		}
 
 		push @{$publDefn->{columnDefn}}, $colFormat;
 	}
 
-	$page->addDebugStmt("<pre>" . Dumper($publDefn) . "</pre>") if $page->param('_debug_dpub') == 1;
+	$page->addDebugStmt("<pre><b>Data::Publish Definition</b>\n" . Dumper($publDefn) . "</pre>") if $page->param('_debug_dpub') == 1;
 
 
-	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {maxRows => SHOWROWS}); #stmtId => $SQL,
+	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {maxRows => $showRows}); #stmtId => $SQL,
 	my $nextPageExists = $stmtHdl->fetch();
 	$stmtHdl->finish();
 
@@ -663,15 +866,15 @@ sub format_csv
 	my ($self, $page, $stmtHdl, $stmgrFlags, $destRef) = @_;
 	my $sqlGen = $self->{sqlGen};
 	my $view = $self->{view};
-	my $outColumns = [];
+	my @outColumns = $page->field('out_columns');
+	my @colData = map {$sqlGen->fields($_)} @outColumns;
+	my $colCaptions = [];
 
-	foreach my $column (@{$view->{columns}})
+	foreach my $id (@outColumns)
 	{
-		my $fieldData = $sqlGen->fields($column->{id});
-		my $id = $column->{id};
+		my $fieldData = $sqlGen->fields($id);
 		$id = $fieldData->{caption} if defined $fieldData->{caption};
-		$id = $column->{caption} if defined $column->{caption};
-		push @$outColumns, $id;
+		push @$colCaptions, $id;
 	}
 
 	my $didHeader = 0;
@@ -681,8 +884,21 @@ sub format_csv
 	{
 		unless ($didHeader)
 		{
-			$row = $outColumns;
+			$row = $colCaptions;
 			$didHeader = 1;
+		}
+		else
+		{
+			foreach my $i (0..$#{$row})
+			{
+				if (my $dataType = $colData[$i]->{'ui-datatype'})
+				{
+					if(my $fmtSub = Data::Publish->can("fmt_$dataType"))
+					{
+						$row->[$i] = &{$fmtSub}($page, $row->[$i]);
+					}
+				}
+			}
 		}
 		die "Failed to generate csv of @{$row}" unless $csvObj->combine(@{$row}[0..$#{$row}]);
 		$self->addDataToDest($destRef, $csvObj->string() . "\n");
@@ -695,7 +911,8 @@ sub format_xml
 	my ($self, $page, $stmtHdl, $stmgrFlags, $destRef) = @_;
 	my $sqlGen = $self->{sqlGen};
 	my $view = $self->{view};
-	my $outColumns = [ map {$sqlGen->fields($_->{id})->{id}} @{$view->{columns}} ];
+	my @outColumns = $page->field('out_columns');
+	my @colData = map {$sqlGen->fields($_)} @outColumns;
 
 	$self->addDataToDest($destRef, "<results>\n");
 	my $row;
@@ -707,7 +924,14 @@ sub format_xml
 		foreach my $i (0..$#{$row})
 		{
 			next unless defined $row->[$i];
-			$xml .= "\t\t<$outColumns->[$i]>$row->[$i]</$outColumns->[$i]>\n";
+			if (my $dataType = $colData[$i]->{'ui-datatype'})
+			{
+				if(my $fmtSub = Data::Publish->can("fmt_$dataType"))
+				{
+					$row->[$i] = &{$fmtSub}($page, $row->[$i]);
+				}
+			}
+			$xml .= "\t\t<$outColumns[$i]>$row->[$i]</$outColumns[$i]>\n";
 		}
 		$xml .= "\t</result>\n";
 		$self->addDataToDest($destRef, $xml);
