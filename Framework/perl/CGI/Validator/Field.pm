@@ -289,8 +289,16 @@ sub new
 		$params{regExpValidate} = $typeInfo->{regExp} if ! exists $params{regExpValidate} && $typeInfo->{regExp};
 		$params{regExpInvalidMsg} = $params{message} ? $params{message} : "$params{caption} $typeInfo->{message}";
 		$params{formatValue} = $typeInfo->{formatValue} if exists $typeInfo->{formatValue};
-		$params{onValidate} = $typeInfo->{onValidate} if exists $typeInfo->{onValidate} && ! exists $params{onValidate};
-		$params{defaultValue} = $typeInfo->{defaultValue} if exists $typeInfo->{defaultValue} && ! exists $params{defaultValue};
+		$params{onValidate} = $typeInfo->{onValidate} if exists $typeInfo->{onValidate} && ! exists $params{onValidate};		
+		#$params{defaultValue} = $typeInfo->{defaultValue} if exists $typeInfo->{defaultValue} && ! exists $params{defaultValue};
+		
+		# Check If default value exist for type and that the programmer did not provide a default value
+		if (exists $typeInfo->{defaultValue} && ! exists $params{defaultValue}) 
+		{
+			#If type is a date get the current date from the system and use that as the default date other wise
+			#use the default specified by the type
+			$params{defaultValue} = $type ne 'date' ? $typeInfo->{defaultValue} : UnixDate('today', '%m/%d/%Y'); 
+		};
 		$params{onKeyPressJS} = $typeInfo->{onKeyPressJS} if exists $typeInfo->{onKeyPressJS} && ! exists $params{onKeyPressJS};
 		$params{onBlurJS} = $typeInfo->{onBlurJS} if exists $typeInfo->{onBlurJS} && ! exists $params{onBlurJS};
 	}
