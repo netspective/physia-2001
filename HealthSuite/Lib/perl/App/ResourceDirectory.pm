@@ -540,7 +540,7 @@ $WORKLIST_CLASSES = {
 	'dept' => {_class => 'App::Dialog::Organization::Department', _arl => ['dept_id'], },
 	'appointment' => {
 		_class => 'App::Dialog::Appointment',
-		_arl_add => ['person_id'],
+		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp'],		
 		_arl_modify => ['event_id'],
 		_arl_cancel => ['event_id'],
 		_arl_noshow => ['event_id'],
