@@ -14,10 +14,10 @@ use App::Statements::Org;
 use App::Statements::Catalog;
 use App::Statements::Insurance;
 use App::Universal;
-
+use App::Statements::Invoice;
 use Date::Manip;
 use Date::Calc qw(:all);
-
+use App::IntelliCode;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
@@ -71,50 +71,93 @@ sub isValid
 	my %diagsSeen = ();
 	my $use_fee='';
 	my $code_type='';
-	my @defaultFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
+	my @defaultFeeSchedules;
 	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
-
-	#GET FEE SCHEDULE ASSOICATED WITH THE PROIVDER AND THE ORG
+	my $insurance = undef;
+	my $plan_id;
+	my $product_id;	
+	my $list=undef;
 	my @insFeeSchedules = ();
-	my $prov_fs =$STMTMGR_PERSON->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent',
-							$page->field('care_provider_id'),'Fee Schedules',0);	
-	foreach my $fs (@{$prov_fs})							
-	{
-		push(@insFeeSchedules, $fs->{value_int});
-	}
-	my $org_fs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAttributeByItemNameAndValueTypeAndParent',
-							$page->field('service_facility_id'),'Fee Schedules',0);
-	foreach my $fs (@{$org_fs})							
-	{
-		push(@insFeeSchedules, $fs->{value_int});
-	}							
-
-	# GET FEE SCHEDULES FOR PRIMARY INSURANCE IF IT WAS SELECTED ----------------------------
+	my @usedFS=();
 	my $payer = $page->field('payer');
 	my @singlePayer = split('\(', $payer);
-	my $insurance = undef;
+	
+	#GET FEE SCHEDULES ASSOICATED WITH THE PROIVDER ,THE ORG AND THE INSURANCE
+	
+	######################################################################################################################
+	#THIS IF/ELSE BLOCK NEEDS WORK TO MAKE SURE IT DETERMINES PAYER CORRECTLY
 	if($singlePayer[0] eq 'Primary')
 	{
-		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
+			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+				'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
 	}
-	elsif($singlePayer[0] eq 'Work Comp')
+	elsif ($singlePayer[0] eq 'Third-Party' || $singlePayer[0] eq 'Self-Pay' || $singlePayer[0] eq 'Third-Party Payer')
 	{
-		my @wcPlanName = split('\)', $singlePayer[1]);
-		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-			'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, App::Universal::CLAIMTYPE_WORKERSCOMP);
-	}
-
-	my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule');
-
-
-	foreach my $fs (@{$getFeeSchedsForInsur})
+		
+	}	
+	elsif($singlePayer[0] =~ m/^\d+$/)
 	{
-		push(@insFeeSchedules, $fs->{value_text});
+		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $singlePayer[0]);
 	}
+	######################################################################################################################
+	
+	#Get Parent record for coverage could be a plan or a product
+	my $coverage_id = $insurance->{'parent_ins_id'};
+	my $coverage_parent = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_id);
+	
+	
+	#If record type is product then a plan does not exist
+	if ($coverage_parent->{'record_type'} eq App::Universal::RECORDTYPE_INSURANCEPRODUCT)
+	{
+		$product_id = $coverage_parent->{'ins_internal_id'};
+		$plan_id=undef;
+	}		
+	else
+	{
 
-	# ------------------------------------------------------------------------------------------------------------------------
+		$plan_id = $coverage_parent->{'ins_internal_id'};
+		my $product_info =$STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_parent->{'parent_ins_id'});
+		$product_id = $product_info->{'ins_internal_id'};		
+	}
+	
+	#Get Fee Schedule for the Insurance, Physician, and Org (Location)
+	my $getFeeScheds = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+		'selFSHierarchy', $page->field('care_provider_id'),$page->field('service_facility_id'),$plan_id,$product_id);
+
+	#Put Fee Schedules into an Insurance array
+	my $order=$getFeeScheds->[0]->{'fs_order'} if $getFeeScheds->[0]->{'fs_order'} ;
+	foreach my $fs (@{$getFeeScheds})
+	{
+		if ($order eq $fs->{'fs_order'})
+		{
+			#Since the same FS can appear on many levels only keep the first one
+			unless (grep { $_ eq $fs->{'fs'} } @usedFS)
+			{
+				$list .= $list ? "fs->{'fs'} ," :$fs->{'fs'} ;
+				push(@usedFS,$fs->{'fs'});				
+			}
+		}
+		else
+		{
+			
+			$order = $fs->{'fs_order'};
+			push(@insFeeSchedules, $list) if $list;		
+			$list ='';
+			#Since the same FS can appear on many levels only keep the first one
+			unless (grep { $_ eq $fs->{'fs'} } @usedFS)
+			{			
+				$list = $fs->{'fs'};
+				push(@usedFS,$fs->{'fs'});
+			}
+		}
+	}
+	#Push last list values on Insurance FS
+	push(@insFeeSchedules, $list) if $list;	
+
+	#Set up default FS
+	push ( @defaultFeeSchedules, $page->param('_f_proc_default_catalog')) if $page->param('_f_proc_default_catalog');
+	
+	# ------------------------------------------------------------------------------------------------------------------------	
 	#munir's old icd validation for checking if the same icd code is entered in twice
 	foreach (@diagCodes)
 	{
@@ -135,7 +178,7 @@ sub isValid
 	{
 		$servicedatebegin = $page->param("_f_proc_$line\_dos_begin");
 		$servicedateend = $page->param("_f_proc_$line\_dos_end");
-		$servicetype = $page->param("_f_proc_$line\_service_type");
+		#$servicetype = $page->param("_f_proc_$line\_service_type");
 		$procedure = $page->param("_f_proc_$line\_procedure");
 		$modifier = $page->param("_f_proc_$line\_modifier");
 		$diags = $page->param("_f_proc_$line\_diags");
@@ -231,71 +274,81 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrgIntId);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrgIntId);
 		
-		#READ - If @allFeeSchedules line for charge is changed also change the @listFeeSchedule line		
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 		$page->param("_f_proc_active_catalogs", join(',', @listFeeSchedules));
-		my $svc_type=App::IntelliCode::getSvcType($page, $procedure, $modifier || undef,\@listFeeSchedules);
-		my $count_type = scalar(@$svc_type);
+
+		my $fs_entry=App::IntelliCode::getFSEntry($page, $procedure, $modifier || undef,\@listFeeSchedules);
+		my $count_type = scalar(@$fs_entry);
 		my $count=0;
-		#$page->addDebugStmt("uf= $use_fee");
-		if ($servicetype eq '' ||$charges eq '')
+		if ($servicetype eq '' || $charges eq '')
 		{			
-			if ($count_type==1 || $use_fee ne '')
-			{
-				foreach(@$svc_type)
+			if ($count_type==1 || ($use_fee ne '' && $count_type >=1) )
+			{		
+				foreach(@$fs_entry)
 				{
 					if($count_type==1||$use_fee eq $count)
 					{
-						$page->param("_f_proc_$line\_service_type",$_->[1]); 	
-						$page->param("_f_proc_$line\_code_type",$_->[3]); 	
+
+						#Fail Safe To make sure service type is set. 
+						#Still FS entries in database that do not have a service type
+						if(length($_->[$INTELLICODE_FS_SERV_TYPE])>0)
+						{ 	
+							$page->param("_f_proc_$line\_service_type",$_->[$INTELLICODE_FS_SERV_TYPE]);
+							$page->param("_f_proc_$line\_code_type",$_->[$INTELLICODE_FS_CODE_TYPE]); 	
+							$page->param("_f_proc_$line\_charges", $_->[$INTELLICODE_FS_COST]) if $charges eq '';
+							$page->param("_f_proc_$line\_ffs_flag",$_->[$INTELLICODE_FS_FFS_CAP]);						
+						}
+						else
+						{
+							$self->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$procedure' in fee schedule $_->[$INTELLICODE_FS_ID_NUMERIC]" );								
+						}
 					}
 					$count++;
 				}
 			}
 			elsif ($count_type>1)
 			{
-				my $html_svc = $self->getMultiSvcTypesHtml($page, $line,$procedure, $svc_type);
+				my $html_svc = $self->getMultiSvcTypesHtml($page, $line,$procedure, $fs_entry);
 				$self->invalidate($page, $html_svc);
 			}
 			else
-			{
-				#my $type = $->getField("_f_proc_$line\_procedure");
+			{				
 				$self->invalidate($page,"[<B>P$line</B>]Unable to find Code '$procedure' in fee schedule(s) " . join ",",@listFeeSchedules);
 			}
 		}
-		unless ($charges)
-		{
-			$count =0;
-			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
-			
-			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
-			my $resultCount = scalar(@$fsResults);
-
-			if($resultCount == 0)
-			{
-				#$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
-			}
-			elsif($resultCount == 1|| $use_fee ne '')
-			{
-
-				foreach (@$fsResults)
-				{
-					if($resultCount == 1|| $use_fee eq $count)
-					{
-						my $unitCost = $_->[1];
-						my $ffsFlag = $_->[2];
-						$page->param("_f_proc_$line\_charges", $unitCost);
-						$page->param("_f_proc_$line\_ffs_flag",$ffsFlag);
-					}
-					$count++;
-				}
-			}
-			else
-			{
-				#my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
-				#$self->invalidate($page, $html);
-			}
-		}
+		#unless ($charges)
+		#{
+		#	$count =0;
+		#	my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
+		#	
+		#	my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
+		#	my $resultCount = scalar(@$fsResults);
+		#
+		#	if($resultCount == 0)
+		#	{
+		#		#$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
+		#	}
+		#	elsif($resultCount == 1|| $use_fee ne '')
+		#	{
+		#
+		#		foreach (@$fsResults)
+		#		{
+		#			if($resultCount == 1|| $use_fee eq $count)
+		#			{
+		#				my $unitCost = $_->[1];
+		#				my $ffsFlag = $_->[2];
+		#				$page->param("_f_proc_$line\_charges", $unitCost);
+		#				$page->param("_f_proc_$line\_ffs_flag",$ffsFlag);
+		#			}
+		#			$count++;
+		#		}
+		#	}
+		#	else
+		#	{
+		#		#my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
+		#		#$self->invalidate($page, $html);
+		#	}
+		#}
 
 		#@errors = App::IntelliCode::validateCodes
 		#(
@@ -341,10 +394,7 @@ sub getMultiSvcTypesHtml
 	my $count=0;
 	foreach (@$fsResults)
 	{
-		my $svc_type=$_->[1];
-		#my $svc_name=$_->[4];
-		#Use the above line if you want to see the fee schedule name instead of the fee schedule number
-		my $svc_name=$_->[0];
+		my $svc_name=$_->[$INTELLICODE_FS_ID_NUMERIC];
 		$html .= qq{
 			<input onClick="document.dialog._f_proc_$line\_use_fee.value=this.value" 
 				type=radio name='_f_multi_svc_type_$line' value=$count>$svc_name
@@ -500,26 +550,21 @@ sub getHtml
 					function getFFS(event)
 					{			
 						if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Primary/)==0)
-						{						
+						{				
 							document.$dialogName._f_proc_all_catalogs.value = 
 							document.$dialogName._f_ins_ffs.value + "," +
-							document.$dialogName._f_prov_ffs.value + "," +
-							document.$dialogName._f_org_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 						else if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Work Comp/)==0)
 						{							
 							document.$dialogName._f_proc_all_catalogs.value = 
-							document.$dialogName._f_work_ffs.value + "," +
-							document.$dialogName._f_prov_ffs.value + "," +
-							document.$dialogName._f_org_ffs.value + "," +
+							document.$dialogName._f_ins_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 						else
 						{
-							document.$dialogName._f_proc_all_catalogs.value = 	
-							document.$dialogName._f_prov_ffs.value + "," +
-							document.$dialogName._f_org_ffs.value + "," +
+							document.$dialogName._f_proc_all_catalogs.value = 
+							document.$dialogName._f_ins_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 																	
