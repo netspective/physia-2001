@@ -380,6 +380,10 @@
 			Report : Changed sort order in query modified query to filter out cap payments that do not belong to the main org
 		</deliverable>
 
+		<deliverable id="1660">
+			Added provider id field to post general payment dialog for prepayments and pre-paid copay.
+		</deliverable>
+
 		<deliverable id="1663">
 			Report (aged pt recv) :  Corrected SQL to pull co-pay information and not multi count patient that have more then one role.  FIX : fixed detail report also
 		</deliverable>
@@ -391,6 +395,14 @@
 
 		<deliverable id="1676">
 			Report (total recv) :  Corrected SQL to not multi count patient that have more then one role.  FIX : fixed detail report also
+		</deliverable>
+
+		<deliverable id="1699">
+			Ignoring intellicode check when submitting self-pay and third party claims.
+		</deliverable>
+
+		<deliverable id="1709">
+			Exclude self-pay claims from paper claims.
 		</deliverable>
 
 	</deliverables>
