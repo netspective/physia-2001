@@ -3,7 +3,7 @@
 <!-- QDL Query Definition Language -->
 
 <component>
-	<query-defn id="FinancialTransactionIPA" caption="IPA Financial Transaction" db="Oracle">
+	<query-defn id="FinancialTransactionIPA" caption="Associated Org Financial Transaction" db="Oracle">
 		<!-- FIELDS -->	
 		<field id="invoice_id" join="autoinv" column="invoice_id" caption="Invoice ID"/>
 		<field id="assn_org_id" join="orgassn" column="org_internal_id"/>				
@@ -42,8 +42,8 @@
 		<field id="patient_employer_name" join="patient_employer_org" column="name_primary" caption="Patient Employer Name"/>
 		<field id="patient_guarantor_id" join="patient_attr_guarantor" column="value_text" caption="Patient Guarantor"/>
 		<field id="patient_guarantor_relation" join="patient_attr_guarantor" column="value_textb" caption="Patient Guarantor Relationship"/>
-		<field id="parent_org_id" join="parent_org" column="org_id" caption="ID Of Main Org"/>
-		<field id="parent_org_name" join="parent_org" column="name_primary" caption="Name Of Main Org"/>		
+		<field id="parent_org_id" join="parent_org" column="org_id" caption="Associated Org ID"/>
+		<field id="parent_org_name" join="parent_org" column="name_primary" caption="Associated Org Name"/>		
 		<field id="payer_person_id" join="invitem_adjust_payer_person" column="person_id" caption="Payer Person ID"/>
 		<field id="payer_person_name" join="invitem_adjust_payer_person" column="simple_name" caption="Payer Person Name"/>
 		<field id="payer_org_id" join="invitem_adjust_payer_org" column="org_id" caption="Payer Org ID"/>
@@ -52,7 +52,7 @@
 		
 		<!-- JOINS -->
 		<join id="autoinv" table="auto_invoice_chrg" />				
-		<join id="orgassn" table="Org_ASSOCIATION" requires="autoinv" condition="autoinv.owner_org_id = orgassn.assn_org_internal_id"/>				
+		<join id="orgassn" table="Org_ASSOCIATION" requires="autoinv" condition="autoinv.owner_org_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 100 or orgassn.org_assn_type = 1)"/>				
 		<join id="bill_facility_org" table="org" requires="autoinv" condition="autoinv.billing_facility_id = bill_facility_org.org_internal_id (+)"/>
 		<join id="bill_facility_addr" table="org_address" requires="bill_facility_org" condition="bill_facility_org.org_internal_id = bill_facility_addr.parent_id (+) AND bill_facility_addr.address_name (+) = 'Payment'"/>
 		<join id="srv_facility_org" table="org" requires="autoinv" condition="autoinv.billing_facility_id = srv_facility_org.org_internal_id (+)"/>
