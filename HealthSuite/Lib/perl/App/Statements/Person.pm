@@ -308,6 +308,12 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where person_id = ?
 			and org_id = ?
 	},
+	'insPersonLogin' => qq{
+		insert into Person_Login 
+		(cr_session_id, cr_stamp, cr_user_id, person_id, org_id, password, quantity)
+		values 
+		(?            , sysdate , ?         , ?        , ?     , ?       , ?)
+	},
 	'updSessionsTimeout' => qq{
 		update person_session set status = 2
 		where status = 0 and person_id = ?

@@ -97,19 +97,29 @@ sub populateData
 	
 	$page->field('person_id', $page->param('person_id')) unless $page->field('person_id');
 	$page->field('org_id', $page->param('org_id')) unless $page->field('org_id');
-
-	if($command eq 'remove')
-	{
-		$page->field('delete_record', 1);
-	}
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updPersonLogin',
-		$page->field('password'), $page->field('quantity'), $page->field('person_id'), $page->field('org_id'));
+	my $personId = $page->field('person_id');
+	my $orgId    = $page->field('org_id');
+	my $password = $page->field('password');
+	my $quantity = $page->field('quantity');
+	
+	
+	if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selLoginOrg', 
+		$personId, $orgId))
+	{
+		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updPersonLogin', 
+			$password, $quantity, $personId, $orgId);
+	}
+	else
+	{
+		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'insPersonLogin', 
+			$page->session('_session_id'), $page->session('user_id'), $personId, $orgId, $password, $quantity);
+	}
 
 	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
