@@ -86,6 +86,9 @@
 		<deliverable id="1450">
 			If invoice balance hits zero and a invoice does not have a reck date auto remove it from the collection worklist
 		</deliverable>
+		<deliverable id="1449">
+			Changed the 'Insured ID' field in the 'Personal Coverage' dialog to accept persons of type 'Patient' only.
+		</deliverable>		
 	
 	</deliverables>
 </release-notes>
