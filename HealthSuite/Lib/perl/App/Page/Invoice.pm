@@ -24,6 +24,7 @@ use App::Dialog::Adjustment;
 use App::Dialog::OnHold;
 use App::Dialog::Diagnoses;
 use App::Dialog::ClaimProblem;
+use App::Dialog::PostGeneralPayment;
 #use App::Billing::Output::tPdfCLaim;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
@@ -742,6 +743,25 @@ sub prepare_dialog_claim
 	return $self->prepare_view_summary();
 }
 
+sub prepare_dialog_postpayment
+{
+	my $self = shift;
+	my $invoiceId = $self->param('invoice_id');
+
+	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	#my ($payType, $invoiceId) = split(/,/, $dialogCmd);
+	#$self->param('invoice_id', $invoiceId);
+	$self->param('payment', $dialogCmd);
+	#$self->addDebugStmt($payType);
+
+	my $cancelUrl = "/invoice/$invoiceId/summary";
+	my $dialog = new App::Dialog::PostGeneralPayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+
+	$self->addContent('<p>');
+	return $self->prepare_view_summary();
+}
+
 #-----------------------------------------------------------------------------
 # VIEW-MANAGEMENT METHODS
 #-----------------------------------------------------------------------------
@@ -1289,7 +1309,7 @@ sub prepare_page_content_header
 						@{[ $diags eq '' && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $diags ne '' && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 						@{[ $claimType != $selfPay && $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]}
-						<option value="/invoice/$invoiceId/dialog/adjustment/personal">Post Personal Payment</option>
+						<option value="/person/$clientId/dialog/postpayment/personal,$invoiceId">Post Personal Payment</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
 						@{[ $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}

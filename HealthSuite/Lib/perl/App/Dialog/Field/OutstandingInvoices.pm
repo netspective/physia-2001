@@ -116,7 +116,7 @@ sub getHtml
 
 
 	my $linesHtml = '';
-	my $personId = $page->param('person_id');
+	my $personId = $page->param('person_id') || $page->field('payer_id');
 	my $outstandInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId);
 	my $totalInvoices = scalar(@{$outstandInvoices});
 	my $totalPatientBalance = 0;
