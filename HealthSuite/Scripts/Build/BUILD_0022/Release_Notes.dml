@@ -12,6 +12,35 @@
 		<build-manager>Lloyd Brodsky</build-manager>
 		<tested-date> TBD </tested-date>
 		<release-date>TBD </release-date>
+		<overview>
+			Build 22 is targeted at five primary items.<ol>
+			<li>Clinical Tools</li>
+			<li>Physia Mobile</li>
+			<li>First Phases of Clinical Notes</li>
+			<li>Urgently Needed PPMS Functions</li>
+			<li>Production System Bugs</li>
+			</ol>
+			Build 23 is a companion build to 22 with simular targets and timing.  <br/>
+			Build 23 is being handled by Prosys.
+		</overview>	
+		<description>
+			1) Clinical Tools <ul>
+				<li>Errors uncovered in bets</li></ul>
+			2) Physia Mobile<ul>
+				<li>Residuals from 20</li>
+				<li>Errors uncovered in alpha</li></ul>
+			3) First Phases of Clinical Notes<ul>
+				<li>Patient fixed information such as histories</li>
+				<li>Visit orented information</li>
+				<li>Clinical note writer</li></ul>
+			4) Urgently Needed PPMS Functions<ul>
+				<li>Specific sales opportunities</li>
+				<li>Management directed priorities</li></ul>
+			5) Production System Bugs<ul>
+				<li>Improper functions in critical areas</li>
+				<li>Program abnormal terminations</li>
+				<li>Problems with negative financial impact to customers</li></ul>
+		</description>	
 	</release-info>
 
 	<deliverables>
