@@ -145,7 +145,6 @@ sub execute
 		$parent_id = $page->field('parent_id');
 	}
 	my $table = $self->{table};
-	$page->addError($FS_ATTRR_TYPE);
 	$page->schemaAction(
 			$table, $command,
 			item_id => $page->param('item_id') || undef,
