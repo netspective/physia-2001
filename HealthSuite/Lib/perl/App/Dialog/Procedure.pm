@@ -167,7 +167,8 @@ sub execAction_submit
 	my $clientId = $invoice->{client_id};
 
 	my $claimType = $invoice->{invoice_subtype};
-	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $todaysStamp = $page->getTimeStamp();
 
 
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -930,7 +931,7 @@ sub execAction_submit
 					service_facility_id => $mainTransData->{service_facility_id},
 					code => $icdCode || undef,
 					provider_id => $mainTransData->{provider_id},
-					trans_begin_stamp => $todaysDate,
+					trans_begin_stamp => $todaysStamp,
 					_debug => 0
 				);
 		}
@@ -975,7 +976,7 @@ sub execute
 
 	my $sessOrg = $page->session('org_id');
 	my $sessUser = $page->session('user_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	if($page->field('lab_indicator'))
@@ -983,9 +984,13 @@ sub execute
 		$itemType = App::Universal::INVOICEITEMTYPE_LAB;
 	}
 
+	#THIS NEEDS TO BE PUT IN THE PROCEDURE DIALOG - 04-18-00 MAF
+	my @feeSchedules = $page->field('fee_schedule');
+
 	my @relDiags = $page->field('procdiags');
-	my @cptCodes = split(/,/, $page->field('procedure'));
 	my @hcpcsCode = split(/,/, $page->field('hcpcs'));
+	my $cptCode = $page->field('procedure');
+
 	my $comments = $page->field('comments');
 	my $emg = $page->field('emg') == 1 ? 1 : 0;
 	my $extCost = $page->field('proccharge') * $page->field('procunits');
@@ -995,26 +1000,12 @@ sub execute
 	## RUN INTELLICODE
 	if($command ne 'remove')
 	{
-		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
+		App::IntelliCode::incrementUsage($page, 'Cpt', $cptCode, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
 
-		my $feeSchedules = App::IntelliCode::getItemCost($page, \@cptCodes, $sessOrg, $invoice->{ins_id});
 
-		if($feeSchedules eq 'HASH')
-		{
-			foreach my $fee (@{$feeSchedules})
-			{
-				$page->addDebugStmt("Intellicode: $fee->{catalog_id}, $fee->{unit_cost}");
-			}
-		}
-		elsif($feeSchedules eq 'ARRAY')
-		{
-			foreach my $fee (@$feeSchedules)
-			{
-				$page->addDebugStmt("Intellicode: $fee->[0]");
-				$page->addDebugStmt("Intellicode: $fee->[1]");
-			}
-		}
+		my @itemCosts = App::IntelliCode::getItemCost($page, $cptCode, \@feeSchedules);
+
 	}
 
 	$page->schemaAction(
@@ -1022,7 +1013,7 @@ sub execute
 			item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			code => $page->field('procedure') || undef,
+			code => $cptCode || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
 			unit_cost => $page->field('proccharge') || undef,
