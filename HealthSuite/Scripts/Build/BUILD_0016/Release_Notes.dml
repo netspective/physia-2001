@@ -95,6 +95,12 @@
 			     Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
 			     category from the 'Person_Org_Category' table.
 		</deliverable>				
+
+		<deliverable id="1327">
+			Indicating submission order in claim summary (i.e. Primary, Secondary, etc.). Also added links to associated
+				claims through History items.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
