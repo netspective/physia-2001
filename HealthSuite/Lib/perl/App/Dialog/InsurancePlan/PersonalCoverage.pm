@@ -12,8 +12,7 @@ use App::Statements::Insurance;
 use App::Dialog::Field::Insurance;
 use CGI::Dialog;
 use App::Universal;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
@@ -261,7 +260,7 @@ sub customValidate
 				$STMTMGR_INSURANCE->execute($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $insInternalId, $previousSequence);
 
 				my $createInsCoverageHref = "'/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'";
-				$billSeq->invalidate($page, "Do u want to Create a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
+				$billSeq->invalidate($page, "Do you want to Add a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
 			}
 			else
 			{
@@ -298,12 +297,12 @@ sub customValidate
 
 	my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$pdtName');";
 	$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductHref">Create Product '$pdtName' now</a>
+			<a href="$createInsProductHref">Add Product '$pdtName' now</a>
 		}) if $doesProductExist eq '' && $pdtName ne '';
 
 	my $createInsProductPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-product?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct');";
 	$prePdtId->invalidate($page, qq{ Product Name '$preFilledProduct' does not exist in '$preFilledOrg'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductPreHref">Create Product '$preFilledProduct' now</a>
+			<a href="$createInsProductPreHref">Add Product '$preFilledProduct' now</a>
 		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
 
 	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$pdtName, $planName, $orgId);
@@ -311,12 +310,12 @@ sub customValidate
 
 	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-plan?_f_ins_org_id=$orgId&_f_product_name=$pdtName&_f_plan_name=$planName');";
 		$planId->invalidate($page, qq{ Plan Name '$planName' does not exist for the Product Name '$pdtName'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsPlanPreHref">Create Plan '$planName' now</a>
+			<a href="$createInsPlanPreHref">Add Plan '$planName' now</a>
 		}) if $planForOrgExists eq '' && $planName ne '';
 
 	my $createPreInsPlanPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-plan?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct&_f_plan_name=$preFilledPlan');";
 		$prePlanId->invalidate($page, qq{ Plan Name '$preFilledPlan' does not exist for the Product Name '$preFilledProduct'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createPreInsPlanPreHref">Create Plan '$preFilledPlan' now</a>
+			<a href="$createPreInsPlanPreHref">Add Plan '$preFilledPlan' now</a>
 		}) if $preFilledplanExists eq '' && $preFilledPlan ne '';
 
 	my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
