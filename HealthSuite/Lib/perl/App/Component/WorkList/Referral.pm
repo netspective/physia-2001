@@ -145,9 +145,6 @@ sub getComponentHtml
 				$_->{patient}
 			},
 			qq{
-				$_->{referral_type}
-			},
-			qq{
 				$_->{trans_end_stamp}
 			},
 			qq{
