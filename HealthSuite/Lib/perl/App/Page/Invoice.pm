@@ -28,6 +28,7 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
+use App::Dialog::TWCC61;
 #use App::Billing::Universal;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
@@ -1616,11 +1617,10 @@ sub getContentHandlers
 sub prepare_page_content_header
 {
 	my $self = shift;
-
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
-
 	$self->SUPER::prepare_page_content_header(@_);
 
+	my $invoiceId = $self->param('invoice_id');
 	my $sessOrg = $self->session('org_id');
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 
@@ -1632,6 +1632,7 @@ sub prepare_page_content_header
 	my $void = App::Universal::INVOICESTATUS_VOID;
 	my $closed = App::Universal::INVOICESTATUS_CLOSED;
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
+	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
 
@@ -1641,23 +1642,28 @@ sub prepare_page_content_header
 	my $claimType = $claim->getInvoiceSubtype();
 	my $totalItems = $claim->getTotalItems();
 
+	#check if any diag codes exist
 	my @allDiags = ();
 	foreach (@{$claim->{diagnosis}})
 	{
 		push(@allDiags, $_->getDiagnosis());
 	}
 
-	my $invoiceId = $self->param('invoice_id');
+
+	#check if twcc form fields exist for work comp types
+	my $twcc61Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC61/16') ? 'update' : 'add';
+	my $twcc64Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/17') ? 'update' : 'add';
+	my $twcc69Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC69/17') ? 'update' : 'add';
+
+
 	my $invoice = undef;
 	my $heading = 'No invoice_id parameter provided';
 	if($invoiceId)
 	{
 		$invoice = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAndClaimType', $invoiceId);
-		$heading = "Type: $invoice->{claim_type_caption}</B>, Status: $invoice->{invoice_status_caption}<BR>" || "Unknown ID: $invoiceId";
+		$heading = $invoice->{invoice_id} ? "Type: $invoice->{claim_type_caption}</B>, Status: $invoice->{invoice_status_caption}<BR>" : "Unknown ID: $invoiceId";
 	}
 	my $clientId = uc($invoice->{client_id});
-
-
 
 	my $urlPrefix = "/invoice/$invoiceId";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER | App::Page::MENUFLAG_TARGETTOP,
@@ -1711,6 +1717,10 @@ sub prepare_page_content_header
 						@{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
+						
+						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
+						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
+						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
 					</SELECT>
 					</FONT>
 				<TD>
