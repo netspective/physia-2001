@@ -82,9 +82,9 @@ sub writeStatementsFile
 	my $now = UnixDate('today', '%m%d%Y_%H%M');
 	my $fileName = 'phy169_' . $now . '.s01';
 
-	my $headerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-16s%-50s%-10s%-7s\n";
-	my $dataFormat = "%1s%-4s%-16s%-10s%-16s%-7s%-7s%-7s%-7s%-7s%429s\n";
-	my $footerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-50s%-7s%-7s%-7s%-7s%-7s%230s\n";
+	my $headerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-25s%-50s%-10s%-7s\n";
+	my $dataFormat = "%1s%-4s%-16s%-10s%-16s%-7s%-7s%-7s%-7s%-7s%438s\n";
+	my $footerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-50s%-7s%-7s%-7s%-7s%-7s%239s\n";
 
 	my $fileHandle = new IO::File;
 	open($fileHandle, ">$fileName") || die "Unable to open output file '$fileName': $! \n";
@@ -146,7 +146,7 @@ sub getHeaderRecord
 		@fromAddress,
 		getSendToAddress($statement->{billToId}, $statement->{billPartyType}),
 		@payToAddress,
-		$statement->{clientId},
+		$statement->{clientId} . '-' . $statement->{statementId} * 1000000,
 		$statement->{patientName},
 		$TODAY,
 		numToStr($statement->{amountDue}),
@@ -262,16 +262,21 @@ sub populateStatementsHash
 {
 	my ($claims) = @_;
 	my %statements = ();
+	my $billingEvents;
 
-	# Get a list of billingEvents for this day of the month
-	my $mday = (localtime)[3];
-	my $billingEvents = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_daysBillingEvents', $mday);
-
-	# Nothing to do if there are no billing events for today
-	unless (@$billingEvents)
+	unless ($ENV{OVERRIDE_BILLING_CYCLE} eq 'YES')
 	{
-		warn "ABORTING: No billing events found for this day of the month '$mday'\n";
-		return \%statements;
+		# Get a list of billingEvents for this day of the month
+		my $mday = (localtime)[3];
+		$billingEvents = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 
+			'sel_daysBillingEvents', $mday);
+
+		# Nothing to do if there are no billing events for today
+		unless (@$billingEvents)
+		{
+			warn "ABORTING: No billing events found for this day of the month '$mday'\n";
+			return \%statements;
+		}
 	}
 
 	for (@{$claims})
@@ -354,6 +359,8 @@ sub sendStatementToday
 {
 	my ($stmt, $events) = @_;
 
+	return 1 if $ENV{OVERRIDE_BILLING_CYCLE} eq 'YES';
+	
 	foreach my $event (@$events)
 	{
 		# Check org_internal_id of billing org

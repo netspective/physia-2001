@@ -31,7 +31,7 @@ use CommonUtils;
 	501.2 => {
 		orgId => 'CHSINC',
 		providerId => 'PSHEPARD',
-		billingId => 'she135',
+		billingId => 'she137',
 		nsfType => NSF_HALLEY,
 	},
 	
