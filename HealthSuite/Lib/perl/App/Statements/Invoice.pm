@@ -13,47 +13,78 @@ use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_
 @EXPORT = qw($STMTMGR_INVOICE);
 
 $STMTFMT_SEL_INVOICETYPE = qq{
-			SELECT
-				i.invoice_id,
-				i.total_items,
-				to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
-				ist.caption as invoice_status,
-				ib.bill_to_id,
-				i.total_cost,
-				i.total_adjust,
-				i.balance,
-				i.client_id,
-				ib.bill_to_id,
-				(
-					SELECT 	b.org_id
-					FROM org b
-					WHERE b.org_internal_id = ib.bill_to_id
-					AND ib.bill_party_type not in(@{[ App::Universal::INVOICEBILLTYPE_CLIENT]},@{[ App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON]})
-				) AS org_id,
-				ib.bill_party_type
-			FROM invoice i, invoice_status ist, invoice_billing ib
-			WHERE
-				%whereCond%
-			AND i.invoice_status = ist.id
-			AND ib.invoice_id = i.invoice_id
-			AND ib.invoice_item_id is NULL
-			AND ib.bill_sequence = 1
-			ORDER BY i.invoice_id desc
+	SELECT
+		i.invoice_id,
+		i.total_items,
+		TO_CHAR(MIN(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') AS service_begin_date,
+		ist.caption as invoice_status,
+		ib.bill_to_id,
+		i.total_cost,
+		i.total_adjust,
+		i.balance,
+		i.client_id,
+		ib.bill_to_id,
+		o.org_id,
+		ib.bill_party_type,
+		i.invoice_status as status_id,
+		i.parent_invoice_id,
+		to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
+	FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o
+	WHERE
+		%whereCond%
+	AND iit.parent_id (+) = i.invoice_id
+	AND i.invoice_status = ist.id
+	AND ib.invoice_id = i.invoice_id
+	AND ib.invoice_item_id is NULL
+	AND ib.bill_sequence = 1
+	AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+	GROUP BY
+		i.invoice_id,
+		i.total_items,
+		ist.caption,
+		i.total_cost, 
+		i.total_adjust,
+		i.balance,
+		i.client_id,
+		ib.bill_to_id,
+		o.org_id,
+		ib.bill_party_type,
+		i.invoice_status,
+		i.parent_invoice_id,
+		i.invoice_date
+	ORDER BY i.invoice_id desc
 };
+
+
 
 $STMTRPTDEFN_DEFAULT_ORG =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => 'Claim Identifier',dAlign => 'RIGHT'},
+				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => 'Created on: #14#', dAlign => 'RIGHT'},
 				{ head => 'IC' , hint => 'Claim Identifier', dAlign => 'CENTER'},
-				{ head => 'Date'},
-				{ head => 'Status'},
-				{ head => 'Client', colIdx => 11, dataFmt => {
-										'2' => '#10#',
-										'3' => '#10#',
+				{ head => 'Svc Date'},
+				{ head => 'Status', colIdx => 12, dataFmt => {
+										'0' => '#3#',
+										'1' => '#3#',
+										'2' => '#3#',
+										'3' => '#3#',
+										'4' => '#3#',
+										'5' => '#3#',
+										'6' => '#3#',
+										'7' => '#3#',
+										'8' => '#3#',
+										'9' => '#3#',
+										'10' => '#3#',
+										'11' => '#3#',
+										'12' => '#3#',
+										'13' => '#3#',
+										'14' => '#3#',
+										'15' => '#3#',
+										'16' => 'Void #13#'
 									},
 				},
+				{ head => 'Client', colIdx => 8},
 				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
@@ -65,10 +96,29 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => "Claim Identifier",dAlign => 'RIGHT'},
+				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => "Created on: #14#",dAlign => 'RIGHT'},
 				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
-				{ head => 'Date'},
-				{ head => 'Status'},
+				{ head => 'Svc Date'},
+				{ head => 'Status', colIdx => 12, dataFmt => {
+										'0' => '#3#',
+										'1' => '#3#',
+										'2' => '#3#',
+										'3' => '#3#',
+										'4' => '#3#',
+										'5' => '#3#',
+										'6' => '#3#',
+										'7' => '#3#',
+										'8' => '#3#',
+										'9' => '#3#',
+										'10' => '#3#',
+										'11' => '#3#',
+										'12' => '#3#',
+										'13' => '#3#',
+										'14' => '#3#',
+										'15' => '#3#',
+										'16' => 'Void #13#'
+									},
+				},
 				{ head => 'Payer', colIdx => 11, dataFmt => {
 										'0'  => '#4#',
 										'1'  => '#4#',
@@ -138,17 +188,18 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where balance > 0
 			and client_id = ?
 			and owner_id = ?
+			and invoice_status != 15
 			and invoice_status != 16
 		},
-	'selOutstandingInvoicesByClient' => q{
+	'selSelfPayOutstandingInvoicesByClient' => q{
 		select *
 		from invoice
-		where client_id = ?
-			and owner_id = ?
-			and balance > 0
-			and invoice_status < 4
-			and invoice_subtype = 0
+		where balance > 0
+			and client_id = ?
+			and owner_id = ?			
+			and invoice_status != 15
 			and invoice_status != 16
+			and invoice_subtype = 0
 		},
 	'selAllNonZeroBalanceInvoicesByClient' => q{
 		select * from invoice
@@ -318,10 +369,16 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and iia.adjustment_type = adm.id (+)
 		and iia.pay_type = pat.id (+)
 		},
-	'selInvoiceTypeForClient' =>
+	'selAllInvoiceTypeForClient' =>
 		{
 				_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
 				whereCond => 'upper(client_id) = ? and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
+				publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
+		},
+	'selNonVoidInvoiceTypeForClient' =>
+		{
+				_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
+				whereCond => 'upper(client_id) = ? and invoice_status != 16 and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
 				publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
 		},
 	'selInvoiceTypeForOrg' =>
