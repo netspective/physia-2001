@@ -57,6 +57,11 @@
 		<deliverable id="1048">
 			Removed the delete Icon from the 'Health Coverage' component.
 		</deliverable>		
+
+		<deliverable id="995">
+			Added more validation to give warnings if a coverage change will leave 
+			insurance coverage records out of sequence.
+		</deliverable>
 		
 	</deliverables>
 </release-notes>
