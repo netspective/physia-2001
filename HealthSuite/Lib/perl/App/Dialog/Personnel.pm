@@ -38,12 +38,13 @@ sub new
 		new App::Dialog::Field::Person::ID(
 			caption =>'Person ID',
 			name => 'person_id',
+			types => ['Physician','Nurse','Staff','Superuser','Administrator'],
 			hints => 'Please provide an existing Person ID.',
 			options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(caption => 'Category',
 			type => 'select',
-			selOptions => 'Physician;Nurse;Staff;Superuser;Administrator;Referring-Doctor',
+			selOptions => 'Physician;Nurse;Staff;Superuser;Administrator',
 			name => 'category',
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
