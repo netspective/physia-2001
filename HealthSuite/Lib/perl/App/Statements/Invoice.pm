@@ -155,6 +155,18 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
+	'selInvoiceStatus' => qq{
+		select invoice_status
+		from invoice
+		where invoice_id = ?
+		},
+	'selParentInvoices' => qq{
+		select p1.parent_invoice_id as parent1, p2.parent_invoice_id as parent2, p3.parent_invoice_id as parent3
+		from invoice p1, invoice p2, invoice p3
+		where p1.invoice_id = ?
+			and p2.invoice_id = p1.parent_invoice_id
+			and p3.invoice_id (+) = p2.parent_invoice_id
+		},
 	'selInvoiceDateDatabyID' =>qq
 		{
 			SELECT 	invoice_id,parent_invoice_id,invoice_status,
@@ -162,6 +174,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 				balance
 			FROM	invoice
 			WHERE	invoice_id = :1
+		},
+	'selBeenTransferred' => q{
+		select value_int
+		from invoice_attribute
+		where parent_id = ?
+			and item_name = 'Invoice/Transferred'
 		},
 	'selInvoiceOwner' => q{
 		select owner_id
@@ -420,6 +438,13 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_id = ?
 			and invoice_item_id is NULL
 		},
+	'selBatchPaymentAttr' => qq{
+		select *
+		from invoice_attribute
+		where parent_id = ?
+			and value_int = ?
+			and item_name = 'Invoice/Payment/Batch ID'
+		},
 	'selInvoiceAttr' => q{
 		select *
 		from invoice_attribute
@@ -468,6 +493,44 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
+		},
+	'selTransferredPaymentsFromChild' => qq{
+		select iia.net_adjust, iia.adjustment_id
+		from invoice_item_adjust iia, invoice_item ii, invoice i
+		where i.invoice_id = ?
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and iia.data_num_a = 1
+		},
+	'selNextPayerTransferCount' => qq{
+		select count(iia.adjustment_id)
+		from invoice_item_adjust iia, invoice_item ii, invoice i
+		where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 4
+		},
+	'selReverseNextPayerTransferCount' => qq{
+		select count(iia.adjustment_id)
+		from invoice_item_adjust iia, invoice_item ii, invoice i
+		where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 5
+		},
+	'selLatestNextPayerTransferByInvoiceId' => qq{
+		select iia.net_adjust, iia.adjustment_id
+		from invoice_item_adjust iia, invoice_item ii, invoice i
+		where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 4
+			and ii.item_id = (select max(item_id) 
+							from invoice_item ii2, invoice_item_adjust iia2 
+							where i.invoice_id = :1 and i.invoice_id = ii2.parent_id and ii2.item_type = 5 and ii2.item_id = iia2.parent_id and iia2.adjustment_type = 4)
 		},
 	'selItemAdjustmentsByItemParent' => q{
 		select *
@@ -544,12 +607,8 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			where id = ?
 		},
 	'selWriteoffTypes' => q{
-		select caption, id, 2 as myorder
+		select caption, id
 		from writeoff_type
-		UNION
-		(select '' as caption, -99999 as id, 1 as myorder
-			from dual)
-		order by myorder
 		},
 	'selInvoiceAttrCondition' => q{
 		select item_id as condition_item_id, value_text, value_textB
@@ -600,7 +659,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and item_name = 'Prior Authorization Number'
 		},
 	'selInvoiceMedicaidResubNumber' => q{
-		select item_id as resub_number_item_id, value_text as resub_number
+		select item_id as resub_number_item_id, value_text as resub_number, value_textb as orig_ref
 			from invoice_attribute
 			where parent_id = ?
 			and item_name = 'Medicaid/Resubmission'
@@ -751,7 +810,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT ]}
 			and Invoice_Billing.bill_id = Invoice.billing_id
 			and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
-			and Insurance.remit_type = 0
+			and (Insurance.remit_type is NULL or Insurance.remit_type = 0)
 		ORDER BY 1
 	},
 	'selInvoiceTransaction' =>qq
