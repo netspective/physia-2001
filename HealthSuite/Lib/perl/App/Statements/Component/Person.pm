@@ -3904,7 +3904,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 {
 	sqlStmt => qq
 	{
-		select value_text, value_textb, parent_id
+		select value_text, value_textb, parent_id, item_id
 		from person_attribute
 		where parent_id = :1
 		and item_name = 'Bookmarks'
@@ -3915,13 +3915,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => "#0#: <A HREF='#1#'>#1#</A>" },
+			{ head => 'Bookmarks', dataFmt => '#1#: <A HREF="#0#">#0#</A>' },
 		],
-#		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-book-marks/#2#?home=#homeArl#',
-#		frame => {
-#			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-book-marks?home=#homeArl#',
-#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-#		},
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-book-marks/#3#?home=#homeArl#',
+		frame => {
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-book-marks?home=#homeArl#',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 
 	publishDefn_panel =>
@@ -3943,13 +3943,23 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.edit',
+		frame => { heading => 'Bookmarks / HyperLinks' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-book-marks?home=#homeArl#'>Bookmarks</A> }	},
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-book-marks/#3#?home=#param.home#',
+			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-book-marks/#3#?home=#param.home#',
+		},
 	},
 
-
-	publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId] ); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId] ); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bookmarks', [$personId], 'panelTransp'); },
 
 },
 
