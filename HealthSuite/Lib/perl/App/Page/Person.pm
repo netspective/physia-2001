@@ -161,25 +161,27 @@ sub prepare_page_content_header
 		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: <A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A> ';
 	}
 
+	my $homeArl = '/' . $self->param('arl');
+	$homeArl =~ s/\?.*//;
 	my $chooseAction = '';
 	$chooseAction = qq{
 				<TD ALIGN=RIGHT>
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
-						<OPTION value="/person/$personId/dlg-add-referral">Add Service Request</OPTION>
+						<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
 						<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId">Schedule Appointment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
-						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
-						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
-						<OPTION value="/person/$personId/account?viewall=1">View All Claims</OPTION>
-						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
-						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
-						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
+						<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
+						<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
+						<OPTION value="/person/$personId/dlg-update-$category?home=$homeArl">Edit Profile</OPTION>
+						<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
+						<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
+						<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
+						<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
-						<OPTION value="/person/$personId/dlg-add-postpersonalpayment">Apply Personal Payment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
-						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>
+						<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
+						<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
+						<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
 					</SELECT>
 					</FONT>
 				<TD>

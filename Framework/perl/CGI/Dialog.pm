@@ -1858,7 +1858,7 @@ sub handlePostExecute
 	{
 		unless($flags & DLGFLAG_IGNOREREDIRECT)
 		{
-			if(my $url = ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page)))
+			if(my $url = ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page) || $page->param('home')))
 			{
 				#$page->addError("Redirecting to $url");
 				$page->redirect($url);
