@@ -136,6 +136,35 @@ sub prepareData_components
 	return $data;
 }
 
+sub prepareData_acl
+{
+	my ($self, $page) = @_;
+
+	my $acl = $page->{acl};
+	my $allPerms = '';
+	foreach my $item (sort keys %{$acl->{permissionIds}})
+	{
+		my $allowed = $page->hasPermission($item) ? '(allowed)' : '';
+		$allPerms .= ($allowed ? '<FONT COLOR=green>' : '') . "$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . " $allowed" . ($allowed ? '</FONT>' : '') . " <BR>";
+	}
+	my $allRoles = '';
+	foreach my $item (sort keys %{$acl->{roleIds}})
+	{
+		next unless $acl->{roleIds}->{$item}->[Security::AccessControl::ROLEINFOIDX_PERMISSIONS];
+		$allRoles .= "$item: " . $acl->{roleIds}->{$item}->[Security::AccessControl::ROLEINFOIDX_PERMISSIONS]->run_list() . "<BR>";
+	}
+
+	my $data = 
+		[
+			['User Roles', join(', ', @{$page->session('aclRoles')})],
+			['User Permissions', $page->{permissions}->run_list()],
+			['ACL File(s)', join(', ', $acl->{sourceFiles}->{primary}, @{$acl->{sourceFiles}->{includes}})],
+			['All Permissions', $allPerms],
+			['All Roles', $allRoles],
+		];
+	return $data;
+}
+
 sub getHtml
 {
 	my ($self, $page) = @_;
@@ -202,6 +231,12 @@ new App::Component::SDE::PageInfo(
 		id => 'sde-page-status',
 		heading => 'Status Panel',
 		source => 'status',
+	);
+
+new App::Component::SDE::PageInfo(
+		id => 'sde-page-acl',
+		heading => 'Access Control List',
+		source => 'acl',
 	);
 
 1;
