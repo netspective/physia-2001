@@ -107,6 +107,13 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		where owner_person_id = ?
 			and ins_type = ?
 		},
+	'selInsuranceByPersonOwnerOrgOwnerAndInsType' => qq{
+		select *
+		from insurance
+		where owner_person_id = ?
+			and owner_org_id = ?
+			and ins_type = ?
+		},
 	'selInsuranceGroupData' => qq{
 		select INS_ORG_ID, INS_TYPE, plan_name, GROUP_NUMBER, GROUP_NAME, POLICY_NUMBER, RECORD_TYPE,
 			INDIV_DEDUCTIBLE_AMT, FAMILY_DEDUCTIBLE_AMT, PERCENTAGE_PAY, THRESHOLD, COPAY_AMT,
@@ -174,25 +181,33 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			and address_name = 'Billing'
 		},
 	'selPayerChoicesByOwnerPersonId' => qq{
-		select plan_name, product_name, '2' as myorder
+		select i.plan_name, 'Insurance' as group_name, bs.caption as bill_seq, '1' as myorder
+		   	from insurance i, claim_type ct, bill_sequence bs
+			where i.owner_person_id = ?
+				and ct.id = i.ins_type
+				and bs.id = i.bill_sequence
+				and i.bill_sequence in (1,2,3,4)
+				and ct.group_name = 'insurance'
+		UNION
+		select wk.plan_name, 'Workers Compensation' as group_name, '' as bill_seq, '2' as myorder
+			from insurance wk
+			where wk.owner_person_id = ?
+				and wk.ins_type = 6
+		UNION
+		select owner_org_id as plan_name, 'Third-Party' as group_name, '' as bill_seq, '5' as myorder
 			from insurance
 			where owner_person_id = ?
-				and record_type = 3
-				and bill_sequence != 99
-		UNION
-		(select '' as plan_name, '' as product_name, '1' as myorder
-			from dual)
-		UNION
-		(select 'Self-pay' as plan_name, '8888888888', '3' as myorder
-			from dual)
-		UNION
-		(select 'Client Billing' as plan_name, '7777777777', '4' as myorder
-			from dual)
-		UNION
-		(select 'Other Payer' as plan_name, '9999999999', '5' as myorder
-			from dual)
-		order by myorder
+				and ins_type = 7
 		},
+
+		#UNION
+		#select 'Third-Party Other' as plan_name, 'Third-Party Other' as group_name, '' as bill_seq, '3' as myorder
+		#	from dual
+		#UNION
+		#select 'Self-Pay' as plan_name, 'Self-Pay' as group_name, '' as bill_seq, '4' as myorder
+		#	from dual
+		#order by myorder
+
 	'selAllWorkCompByOwnerId' => qq{
 		select plan_name, product_name
 			from insurance
