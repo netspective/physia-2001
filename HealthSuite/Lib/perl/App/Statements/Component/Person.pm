@@ -482,13 +482,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, consult_id
 				from  Transaction
 			where  	trans_owner_id = ?
 			and caption = 'Phone Message'
                         and data_num_a is null
                         union
-                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, consult_id
                                 from  Transaction
                         where   trans_owner_id = ?
                         and caption = 'Phone Message'
@@ -500,11 +500,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): #7# (<A HREF='/person/#5#/profile'>#5#</A>)" },
+			{ dataFmt => "<A HREF='/person/#10#/profile'>#10#</A> (#6#): #7# (<A HREF='/person/#5#/profile'>#5#</A>)" },
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#',
 		frame => {
-			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?home=#homeArl#',
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 		},
 	},
@@ -528,7 +528,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?home=#param.home#'>Phone Message</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#param.home#'>Phone Message</A> } },
 			],
 		},
 		stdIcons =>	{
@@ -2635,12 +2635,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			and e.start_time < sysdate
 		ORDER by group_sort, apptdate DESC
 	},
-	
+
 	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
 	publishDefn => {
 		columnDefn => [
 			{ head => 'Appointments', dataFmt => '<a href="javascript:location=\'/schedule/apptsheet/#5#\';">#0#</A>:' },
-			{ dataFmt => 'Scheduled with <A HREF="/person/#3#/profile">#3#</A> at #1# <BR> 
+			{ dataFmt => 'Scheduled with <A HREF="/person/#3#/profile">#3#</A> at #1# <BR>
 					Reason for Visit: #4#'},
 
 		],
