@@ -587,6 +587,7 @@ sub getFS
 	}
 	#Store FS internal id(s)
 	$page->field('ins_ffs',$fsList);
+	$page->param('_f_proc_default_catalog',$fsList) unless $page->param('_f_proc_default_catalog');
 }
 
 sub setPayerFields
