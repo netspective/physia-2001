@@ -505,12 +505,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and ii.item_id = iia.parent_id
 		},
 	'selTransferredPaymentsFromChild' => qq{
-		select iia.net_adjust, iia.adjustment_id
+		select iia.net_adjust, iia.adjustment_id, iia.data_num_a
 		from invoice_item_adjust iia, invoice_item ii, invoice i
 		where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
 			and ii.item_id = iia.parent_id
-			and iia.data_num_a = 1
+			and iia.adjustment_type = 7
 		},
 	'selNextPayerTransferCount' => qq{
 		select count(iia.adjustment_id)
