@@ -1968,7 +1968,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				[
 				{colIdx => 0, hAlign=>'left',  head => 'Catalog ID', url=>qq{/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#3#}},				
 				{colIdx => 1, hAlign=>'left',  head => 'Catalog Name',},
-				{colIdx => 2,hAlign=>'left', head => 'Entries',tDataFmt => '&{sum:1} Entries', },
+				{colIdx => 2,hAlign=>'left', head => 'Entries',tDataFmt => '&{sum:2} Entries', },
 				{head=>'Action' ,dataFmt=>'Add', url=>'/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&home=#homeArl#'},
 				],
 			banner =>
@@ -2003,9 +2003,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.LabTestDetail' => {
 	sqlStmt => qq{
 				SELECT  oce.code,
-					oce.name,
-					oce.description,
+					--oce.name,
 					oce.modifier,
+					--oce.description,
+					oce.name,
+					--oce.modifier,
+					oce.data_text,
 					oce.entry_id,
 					oce.catalog_id,
 					oce.entry_type,

@@ -28,7 +28,7 @@ $STMTMGR_LAB_TEST = new App::Statements::LabTest(
 	},
 	'selTestItems'=>qq
 	{
-		SELECT entry_id,description
+		SELECT entry_id,decode(data_text,'Panel Test','*'||name,name) ,data_text || ': ' || description
 		FROM	offering_catalog_entry
 		WHERE	catalog_id = :1
 		AND	parent_entry_id IS NULL
@@ -77,6 +77,13 @@ $STMTMGR_LAB_TEST = new App::Statements::LabTest(
 		FROM	lab_order_entry loe, offering_catalog_entry oce
 		WHERE	loe.test_entry_id = oce.entry_id
 		AND	parent_id = :1
+	},
+	'selOtherEntryLabCode'=>qq
+	{
+		SELECT 	*
+		FROM	lab_order_entry
+		WHERE	parent_id = :1
+		AND	modifier='OTHER'
 	},
 
 	'selLabOrderByID'=>qq

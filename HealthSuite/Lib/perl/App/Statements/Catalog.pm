@@ -20,6 +20,22 @@ my $SEL_CATALOG_ENTRY = qq{
 };
 
 $STMTMGR_CATALOG = new App::Statements::Catalog(
+	'selCatalogByTypeOrgId'=>qq
+	{
+		SELECT 	*
+		FROM 	offering_catalog
+		WHERE	catalog_type = :1
+		AND	org_internal_id =:2
+		AND	catalog_id = :3
+		
+	},
+	'selEntryByIdName'=>qq
+	{
+		SELECT 	*
+		FROM 	offering_catalog_entry
+		WHERE 	catalog_id = :1
+		AND	modifier = :2
+	},
 	'selInternalIdByCatalog' => qq
 	{
 		SELECT internal_catalog_id
