@@ -80,6 +80,7 @@ sub new
 			fields => [
 				new App::Dialog::Field::OrgType(
 					caption => 'Facility',
+					types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
 					name => 'facility_id'),
 
 				new CGI::Dialog::Field(name => 'available',

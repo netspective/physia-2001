@@ -46,6 +46,7 @@ sub new
 		caption => 'Facility',
 		name => 'facility_list',
 		style => 'multicheck',
+		types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
 		hints => 'Choose one or more Facilities to monitor.'
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
