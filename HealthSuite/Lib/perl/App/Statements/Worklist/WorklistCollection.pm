@@ -34,6 +34,14 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 
 ########################
 
+	'selCloseInvoiceByID'=>qq
+	{
+		SELECT trans_id,trans_invoice_id
+		FROM  transaction
+		WHERE	trans_id= :1 		
+		
+	},
+
 	'selAccountInfoById' =>qq
 	{
   		SELECT 	trans_id,
@@ -161,7 +169,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	'selWorkListPopAll' =>qq
 	{
 	SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
-					to_number(NULL) as trans_id,NULL as reck_date,to_number(NULL) as reck_id,
+					to_number(NULL) as trans_id,NULL as reck_date,
 					(
 						select min(to_char(e.start_time,'MM/DD/YYYY')) 
 						from event e, event_attribute ea
@@ -174,7 +182,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description			
+					) as description
+					
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
 				AND	upper(:2)
@@ -225,21 +234,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	ROWNUM<$COLLECTION_LIMIT
 				UNION ALL
 				SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
-					t.trans_id,
-					(	SELECT 	to_char(trans_begin_stamp,'MM/DD/YYYY') 
-						FROM 	transaction 
-						WHERE 	trans_owner_id = t.trans_owner_id
-						AND 	trans_type = 9510 
-						AND 	provider_id = t.provider_id	
-						AND 	trans_status = 2
-					)as  reck_date ,
-					(	SELECT 	trans_id 
-						FROM 	transaction 
-						WHERE 	trans_owner_id = t.trans_owner_id
-						AND 	trans_type = 9510 
-						AND 	provider_id = t.provider_id	
-						AND 	trans_status = 2
-					)as reck_id,
+					t.trans_id,to_char(trans_begin_stamp,'MM/DD/YYYY')as  reck_date ,
 					(
 						select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
 						from event e, event_attribute ea
@@ -268,7 +263,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	'selWorkListPop' =>qq
 	{
 	SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
-					to_number(NULL) as trans_id,NULL as reck_date,to_number(NULL) as reck_id,
+					to_number(NULL) as trans_id,NULL as reck_date,
 					(
 						select min(to_char(e.start_time,'MM/DD/YYYY')) 
 						from event e, event_attribute ea
@@ -281,7 +276,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description			
+					) as description
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
 				AND	upper(:2)
@@ -357,21 +352,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	ROWNUM<$COLLECTION_LIMIT
 				UNION ALL
 				SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
-					t.trans_id,
-					(	SELECT 	to_char(trans_begin_stamp,'MM/DD/YYYY') 
-						FROM 	transaction 
-						WHERE 	trans_owner_id = t.trans_owner_id
-						AND 	trans_type = 9510 
-						AND 	provider_id = t.provider_id	
-						AND 	trans_status = 2
-					)as  reck_date ,
-					(	SELECT 	trans_id 
-						FROM 	transaction 
-						WHERE 	trans_owner_id = t.trans_owner_id
-						AND 	trans_type = 9510 
-						AND 	provider_id = t.provider_id	
-						AND 	trans_status = 2
-					)as reck_id,
+					t.trans_id,to_char(trans_begin_stamp,'MM/DD/YYYY') as  reck_date ,
 					(
 						select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
 						from event e, event_attribute ea
@@ -548,6 +529,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	ta.parent_id = t.trans_id
 		AND	ta.value_text = :2
 		AND	ta.value_textb = :1
+		AND	t.trans_invoice_id = :3
 	},
 	'TransHistoryRecord' =>qq
 	{
