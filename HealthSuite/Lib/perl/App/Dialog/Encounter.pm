@@ -1448,7 +1448,7 @@ sub addProcedureItems
 
 			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 			my $totalCost = $invoice->{total_cost} + $record{extended_cost};
-			my $totalItems = $invoice->{total_items} + $record{quantity};
+			my $totalItems = $invoice->{total_items} + 1;
 			my $balance = $invoice->{balance} + $record{extended_cost};
 
 			$page->schemaAction('Invoice',
