@@ -172,6 +172,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
+						<OPTION value="/person/$personId/account?viewall=1">View All Claims</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
 						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
@@ -591,25 +592,15 @@ sub prepare_view_account
 	my $todaysDate = $self->getDate();
 	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $queryStmt = $self->param('viewall') ? 'selAllInvoiceTypeForClient' : 'selNonVoidInvoiceTypeForClient';
 
 	$self->addContent(
 		'<CENTER>',
-		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, 'selInvoiceTypeForClient',
+		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, $queryStmt,
 			[$personId, $self->session('org_internal_id')],
-			#[
-			#	['<SPAN TITLE="Claim Identifier">ID</SPAN>', '<A HREF=\'/invoice/%0\'>%0</A>', undef, 'RIGHT'],
-			#	['<SPAN TITLE="Number of Items in Claim">IC</SPAN>', undef, undef, 'CENTER'],
-			#	['Date'],
-			#	['Status'],
-			#	['Payer'],
-			#	['Reference'],
-			#	['Total', undef, undef, 'RIGHT', CREATEOUPUT_COLFLAG_CURRENCY | CREATEOUPUT_COLFLAG_SUM],
-			#	['Adjust', undef, undef, 'RIGHT', CREATEOUPUT_COLFLAG_CURRENCY | CREATEOUPUT_COLFLAG_SUM],
-			#	['Balance', undef, undef, 'RIGHT', CREATEOUPUT_COLFLAG_CURRENCY | CREATEOUPUT_COLFLAG_SUM],
-			#]
-			),
+		),
 		'</CENTER>'
-		);
+	);
 }
 
 sub prepare_view_activity
