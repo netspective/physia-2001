@@ -28,8 +28,6 @@ use vars qw(%RESOURCE_MAP);
 
 use base qw(CGI::Dialog);
 
-use constant MAX_APPTS => 4;
-
 %RESOURCE_MAP = (
 	'appointment' => {
 		_class => 'App::Dialog::Appointment',
@@ -110,7 +108,7 @@ sub new
 			name => 'appt_date_time',
 			ordinal => 0,
 		),
-		
+
 		new App::Dialog::Field::Scheduling::DateTimePlus(
 			name => 'appt_date_time_0',
 			ordinal => 0,
@@ -120,12 +118,12 @@ sub new
 			fields => [
 				new App::Dialog::Field::Scheduling::Minutes(
 					caption => 'Appt Time Minute',
-					name => 'appt_minute',
+					name => 'appt_minute_0',
 					timeField => '_f_appt_time_0'
 				),
 				new App::Dialog::Field::Scheduling::AMPM(
 					caption => 'AM PM',
-					name => 'appt_am',
+					name => 'appt_am_0',
 					timeField => '_f_appt_time_0'
 				),
 			],
@@ -134,14 +132,14 @@ sub new
 			name => 'appt_date_time_1',
 			ordinal => 1,
 		),
-		new App::Dialog::Field::Scheduling::DateTimePlus(
-			name => 'appt_date_time_2',
-			ordinal => 2,
-		),
-		new App::Dialog::Field::Scheduling::DateTimePlus(
-			name => 'appt_date_time_3',
-			ordinal => 3,
-		),
+		#new App::Dialog::Field::Scheduling::DateTimePlus(
+		#	name => 'appt_date_time_2',
+		#	ordinal => 2,
+		#),
+		#new App::Dialog::Field::Scheduling::DateTimePlus(
+		#	name => 'appt_date_time_3',
+		#	ordinal => 3,
+		#),
 		new CGI::Dialog::Field(caption => 'Check for Conflicts',
 			name => 'conflict_check',
 			type => 'bool', style => 'check', value => 1,
@@ -210,7 +208,7 @@ sub new
 		),
 
 	);
-	
+
 	$self->{activityLog} =
 	{
 		scope =>'event',
@@ -218,7 +216,7 @@ sub new
 		data => "appointment 'Event #field.event_id#' <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons);
-	
+
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
 		<!--
@@ -227,14 +225,12 @@ sub new
 			if (opObj.selectedIndex == 0)
 			{
 				setIdDisplay('appt_date_time_1', 'none');
-				setIdDisplay('appt_date_time_2', 'none');
-				setIdDisplay('appt_date_time_3', 'none');
 			}
 		}
 		// -->
 		</script>
 	});
-	
+
 	return $self;
 }
 
@@ -302,7 +298,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('verify_action', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
-	
+
 	$self->updateFieldFlags('appt_date_time', FLDFLAG_INVISIBLE, $command =~ m/^(add)$/);
 }
 
@@ -317,9 +313,7 @@ sub makeStateChanges_cancel
 
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('appt_date_time_2', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('appt_date_time_3', FLDFLAG_INVISIBLE, 1);
-	
+
 	$self->updateFieldFlags('minutes_util', FLDFLAG_INVISIBLE, 1);
 
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
@@ -344,11 +338,9 @@ sub makeStateChanges_confirm
 sub makeStateChanges_reschedule
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
-	
+
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('appt_date_time_2', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('appt_date_time_3', FLDFLAG_INVISIBLE, 1);
 }
 
 sub makeStateChanges_update
@@ -464,7 +456,7 @@ sub customValidate
 		$attendee_id->invalidate($page, $invMsg)
 	}
 
-	for (my $i=0; $i<MAX_APPTS; $i++)
+	for (my $i=0; $i<App::Universal::MAX_APPTS; $i++)
 	{
 		if ($page->field('conflict_check'))
 		{
@@ -480,15 +472,8 @@ sub customValidate
 		{
 			$page->delete("_f_parent_id_$i");
 		}
-		
-		unless ($page->field("join_$i") == 1)
-		{
-			for (my $j=$i+1; $j<MAX_APPTS; $j++)
-			{
-				$self->updateFieldFlags("appt_date_time_$j", FLDFLAG_INVISIBLE, 1);
-			}
-			last;
-		}
+
+		last unless $page->field("join_$i") == 1;
 	}
 }
 
@@ -539,11 +524,12 @@ sub validateAvailTemplate
 	my $field = $self->getField("appt_date_time_$ordinal")->{fields}->[0];
 
 	if ((!defined $availSlot->{minute_set} || !$availSlot->{minute_set}->superset($apptMinutesRange))
-		&& $page->param("_f_whatToDo_$ordinal") ne 'cancel' && $page->param("_f_whatToDo_$ordinal") ne 'override')
+		#&& $page->param("_f_whatToDo_$ordinal") ne 'cancel' && $page->param("_f_whatToDo_$ordinal") ne 'override')
+		&& !$page->field("processConflict_$ordinal"))
 	{
 		my $radio_0 = 'document.dialog._f_whatToDo_' . $ordinal . '[0]' ;
 		my $radio_1 = 'document.dialog._f_whatToDo_' . $ordinal . '[1]' ;
-		
+
 		$field->invalidate($page, qq{
 			All or Part of this time slot is not available per Templates.<br>
 			Please check @{[ join(', ', @resource_ids) ]} templates, patient types and appt types. <br>
@@ -554,6 +540,8 @@ sub validateAvailTemplate
 				<input name=_f_whatToDo_$ordinal type=radio value="cancel"
 					onClick="$radio_1.checked=true">Cancel
 		});
+		
+		$page->field("processConflict_$ordinal", 1);
 	}
 }
 
@@ -566,12 +554,12 @@ sub validateMultiAppts
 	my ($parentEventId, $patientId) = $self->findConflictEvent($page, $ordinal);
 	if ($parentEventId)
 	{
-		unless ($page->field('processConflict'))
+		unless ($page->field("processConflict_$ordinal"))
 		{
 			my $radio_0 = 'document.dialog._f_whatToDo_' . $ordinal . '[0]' ;
 			my $radio_1 = 'document.dialog._f_whatToDo_' . $ordinal . '[1]' ;
 			my $radio_2 = 'document.dialog._f_whatToDo_' . $ordinal . '[2]' ;
-			
+
 			my $field = $self->getField("appt_date_time_$ordinal")->{fields}->[0];
 			$field->invalidate($page, qq{This time slot is currently booked for $patientId.<br>
 			<u>Select action</u>: <br>
@@ -581,12 +569,10 @@ sub validateMultiAppts
 					onClick="$radio_1.checked=true"> Over-Book $personId <br>
 				<input name=_f_whatToDo_$ordinal type=radio value="cancel"
 					onClick="$radio_2.checked=true"> Cancel
-
-				<input name=_f_processConflict type=hidden value=1>
-
 			});
 
 			$page->field("parent_id_$ordinal", $parentEventId);
+			$page->field("processConflict_$ordinal", 1);
 		}
 	}
 	else
@@ -600,7 +586,7 @@ sub validateMultiAppts
 sub findConflictEvent
 {
 	my ($self, $page, $ordinal) = @_;
-	
+
 	$ordinal ||= 0;
 
 	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
@@ -722,7 +708,7 @@ sub execute
 		$self->handlePostExecute($page, $command, $flags);
 	}
 
-	for (my $i=0; $i<MAX_APPTS; $i++)
+	for (my $i=0; $i<App::Universal::MAX_APPTS; $i++)
 	{
 		my $timeStamp = $page->getTimeStamp();
 		my $start_time = $page->field("appt_date_$i") . ' '  . $page->field("appt_time_$i");
@@ -849,7 +835,7 @@ sub execute
 				$self->handleWaitingList($page, $eventId);
 			}
 		}
-		
+
 		last unless $page->field("join_$i") == 1;
 	}
 

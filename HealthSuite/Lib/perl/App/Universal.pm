@@ -10,6 +10,7 @@ use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 
 use constant SEARCH_RESULTS_LIMIT => 250;
+use constant MAX_APPTS => 2;
 
 #GUARANTOR TYPE
 use constant GUARANTOR_PERSON => 0;

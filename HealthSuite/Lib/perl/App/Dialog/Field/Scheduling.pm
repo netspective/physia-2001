@@ -42,29 +42,31 @@ sub new
 	
 	my $nextOrdinal = $params{ordinal} +1;
 
-	if ($nextOrdinal < 4)
+	if ($nextOrdinal < App::Universal::MAX_APPTS)
 	{
 		return CGI::Dialog::MultiField::new($type, %params,
 			fields => [
 				new App::Dialog::Field::Scheduling::Date(caption => "Appointment $nextOrdinal Date",
-					name => 'appt_date_' . $params{ordinal},
+					name => "appt_date_$params{ordinal}",
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Time',
-					name => 'appt_time_' . $params{ordinal},
+					name => "appt_time_$params{ordinal}",
 					type => 'time',
 					maxLength => 8,
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => undef,
-					name => 'join_' . $params{ordinal},
+					name => "join_$params{ordinal}",
 					choiceDelim =>',',
 					selOptions => q{:0, and:1},
 					type => 'select',
-					onChangeJS => qq{showFieldsOnValues(event, [1], ['appt_date_time_' + $nextOrdinal]);},
+					onChangeJS => qq{showFieldsOnValues(event, [1], ['appt_date_time_$nextOrdinal']);},
 				),
 				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
-					name => 'parent_id_'. $params{ordinal}),
+					name => "parent_id_$params{ordinal}"),
+				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+					name => "processConflict_$params{ordinal}"),
 			],
 		);
 	}
@@ -73,17 +75,19 @@ sub new
 		return CGI::Dialog::MultiField::new($type, %params,
 			fields => [
 				new App::Dialog::Field::Scheduling::Date(caption => "Appointment $nextOrdinal Date",
-					name => 'appt_date_' . $params{ordinal},
+					name => "appt_date_$params{ordinal}",
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Time',
-					name => 'appt_time_' . $params{ordinal},
+					name => "appt_time_$params{ordinal}",
 					type => 'time',
 					maxLength => 8,
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
-					name => 'parent_id_'. $params{ordinal}),
+					name => "parent_id_$params{ordinal}"),
+				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+					name => "processConflict_$params{ordinal}"),
 			],
 		);
 	}
@@ -123,20 +127,23 @@ sub new
 {
 	my ($type, %params) = @_;
 	
+	$params{ordinal} ||= 0;
 	return CGI::Dialog::MultiField::new($type, %params,
 		fields => [
 			new App::Dialog::Field::Scheduling::Date(caption => "Appointment Date",
-				name => 'appt_date_' . $params{ordinal},
+				name => "appt_date_$params{ordinal}",
 				options => FLDFLAG_REQUIRED,
 			),
 			new CGI::Dialog::Field(caption => 'Time',
-				name => 'appt_time_' . $params{ordinal},
+				name => "appt_time_$params{ordinal}",
 				type => 'time',
 				maxLength => 8,
 				options => FLDFLAG_REQUIRED,
 			),
 			new CGI::Dialog::Field(caption => undef, type => 'hidden', 
-				name => 'parent_id_'. $params{ordinal}),
+				name => "parent_id_$params{ordinal}"),
+			new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				name => "processConflict_$params{ordinal}"),
 		],
 	);
 }
