@@ -1,9 +1,20 @@
+{
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$templOutputPathId = 'tables-code';
+	$templOutputFile = "$tableName\_totals.sql";
+	
+	print STDERR "about to create template $templOutputPathId/$templOutputFile\n";
+}
+
 prompt -----------------------------------------------------------------------;
-prompt Creation of triggers for Invoice_Item
+prompt Creation of triggers for { $tableName }
 prompt -----------------------------------------------------------------------;
 
-create or replace trigger biud_inv_item
-before insert or update or delete on invoice_item   
+create or replace trigger biud_{$tableAbbrev}
+before insert or update or delete on {$tableName}
    
   begin 
   
@@ -12,14 +23,14 @@ before insert or update or delete on invoice_item
      pkg_inv_trig.v_inv_item_parent_id.delete;
      pkg_inv_trig.v_inv_item_parent_id_dist.delete;
   
-  end biud_inv_item;
+  end biud_{$tableAbbrev};
    
 /
 show errors;
 
 
-create or replace trigger biu_inv_item_row
-before insert or update on invoice_item
+create or replace trigger biu_{$tableAbbrev}_row
+before insert or update on {$tableName}
 for each row
 
   declare
@@ -32,13 +43,13 @@ for each row
       :new.balance := nvl(:new.extended_cost, 0) + nvl(:new.total_adjust, 0);
     end if;
   
-  end biu_inv_item_row;
+  end biu_{$tableAbbrev}_row;
 /
 show errors;
 
    
-create or replace trigger aiud_inv_item_row
-after insert or update or delete on invoice_item
+create or replace trigger aiud_{$tableAbbrev}_row
+after insert or update or delete on {$tableName}
 for each row
 
   declare
@@ -53,13 +64,13 @@ for each row
        pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :new.parent_id; 
      end if;
  
-   end aiud_inv_item_row;
+   end aiud_{$tableAbbrev}_row;
 /
 show errors;
    
    
-create or replace trigger aiud_inv_item
-after insert or update or delete on invoice_item   
+create or replace trigger aiud_{$tableAbbrev}
+after insert or update or delete on {$tableName}   
    
   declare
     v_parent_id invoice_item.parent_id%type;
@@ -96,6 +107,6 @@ after insert or update or delete on invoice_item
           
      end loop; 
  
-   end aiud_inv_item;   
+   end aiud_{$tableAbbrev};   
 /
 show errors;

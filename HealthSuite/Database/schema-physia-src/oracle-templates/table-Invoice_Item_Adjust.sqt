@@ -1,0 +1,96 @@
+{
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$templOutputPathId = 'tables-code';
+	$templOutputFile = "$tableName\_totals.sql";
+	
+	print STDERR "about to create template $templOutputPathId/$templOutputFile\n";
+}
+
+prompt -----------------------------------------------------------------------;
+prompt Creation of triggers for Invoice_Items_Adjust;
+prompt -----------------------------------------------------------------------;
+
+create or replace trigger biud_{$tableAbbrev}
+before insert or update or delete on {$tableName}   
+   
+  begin 
+  
+     pkg_inv_trig.v_ind_inv_item_adj := 0;
+     pkg_inv_trig.v_ind_inv_item_adj_sort := 0;
+     pkg_inv_trig.v_inv_item_adj_parent_id.delete;
+     pkg_inv_trig.v_inv_item_adj_parent_id_dist.delete;
+  
+   end biud_{$tableAbbrev};
+   
+/
+show errors;
+
+
+create or replace trigger biu_{$tableAbbrev}_row
+before insert or update on {$tableName}
+for each row
+
+  declare
+  
+  begin 
+
+    if :new.adjustment_amount is null and :new.plan_paid is null and :new.writeoff_amount is null then
+      :new.net_adjust := null;
+    else
+      :new.net_adjust := 0 - nvl(:new.adjustment_amount, 0) - nvl(:new.plan_paid, 0) - nvl(:new.writeoff_amount, 0);
+    end if;
+ 
+   end biu_{$tableAbbrev}_row;
+/
+show errors;
+
+
+create or replace trigger aiud_{$tableAbbrev}_row
+after insert or update or delete on {$tableName}
+for each row
+
+  declare
+  
+  begin 
+
+    pkg_inv_trig.v_ind_inv_item_adj := pkg_inv_trig.v_ind_inv_item_adj + 1;
+    
+    if deleting then
+      pkg_inv_trig.v_inv_item_adj_parent_id(pkg_inv_trig.v_ind_inv_item_adj) := :old.parent_id;
+     elsif inserting or updating then
+       pkg_inv_trig.v_inv_item_adj_parent_id(pkg_inv_trig.v_ind_inv_item_adj) := :new.parent_id; 
+     end if;
+ 
+   end aiud_{$tableAbbrev}_row;
+/
+show errors;
+   
+
+create or replace trigger aiud_{$tableAbbrev}
+after insert or update or delete on {$tableName}   
+   
+  declare
+    v_parent_id {$tableName}.parent_id%type;
+    v_total_adjust invoice_item.total_adjust%type;
+    
+  begin 
+  
+     pkg_inv_trig.sort_inv_item_adj; 
+  
+     for i in 1..pkg_inv_trig.v_ind_inv_item_adj_sort loop
+       v_parent_id := pkg_inv_trig.v_inv_item_adj_parent_id_dist(i);
+       select sum(net_adjust) into v_total_adjust from {$tableName} where parent_id=v_parent_id;
+       
+       update invoice_item set total_adjust = v_total_adjust,
+                               balance = extended_cost + v_total_adjust
+          where item_id = v_parent_id;
+          
+     end loop; 
+ 
+   end aiud_{$tableAbbrev};
+   
+/
+show errors;
