@@ -690,7 +690,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.personnel' => {
 	sqlStmt => qq{
-			select 	p.complete_name, pa.category, pa.person_id, pa.org_internal_id, pa.org_internal_id
+			select 	p.complete_name, lower(pa.category), pa.person_id, pa.org_internal_id, pa.org_internal_id
 			from 	person_org_category pa, person p
 			where	pa.org_internal_id =
 				(select org_internal_id
@@ -700,6 +700,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				)
 				and pa.category <> 'Patient'
 				and pa.category <> 'Guarantor'
+				and pa.category <> 'Expatient'
 				and	p.person_id = pa.person_id
 			order by pa.category, p.complete_name, pa.person_id
 		},
