@@ -1539,9 +1539,11 @@ sub getHtml
 	$cancelURL = "document.location = '$self->{cancelUrl}'" if defined $self->{cancelUrl};
 	$cancelURL = 'javascript:window.close()' if $page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	unless (defined $self->{noCancelButton} || $self->{noCancelButton})
+	unless (defined $self->{noCancelButton} || $self->{noCancelButton} || 
+		$self->{addedCancelButton})
 	{
 		push @{$self->{actions}}, {caption => 'Cancel', onClick => $cancelURL};
+		$self->{addedCancelButton} = 1;
 	}
 
 	my $tableCols = $dialog->{_tableCols};
