@@ -224,35 +224,35 @@ sub new
 				),
 			]),
 
-		new CGI::Dialog::Subhead(heading => 'On-Select'),
-		new CGI::Dialog::Field(
-			name => 'patientOnSelect',
-			caption => 'Patient',
-			choiceDelim =>',',
-			selOptions => $patientSelOptions,
-			type => 'select',
-		),
-		new CGI::Dialog::Field(
-			name => 'physicianOnSelect',
-			caption => 'Physician',
-			choiceDelim =>',',
-			selOptions => $physSelOptions,
-			type => 'select',
-		),
-		new CGI::Dialog::Field(
-			name => 'orgOnSelect',
-			caption => 'Organization',
-			choiceDelim =>',',
-			selOptions => $orgSelOptions,
-			type => 'select',
-		),
-		new CGI::Dialog::Field(
-			name => 'apptOnSelect',
-			caption => 'Appointment',
-			choiceDelim =>',',
-			selOptions => $apptSelOptions,
-			type => 'select',
-		),
+		#new CGI::Dialog::Subhead(heading => 'On-Select'),
+		#new CGI::Dialog::Field(
+		#	name => 'patientOnSelect',
+		#	caption => 'Patient',
+		#	choiceDelim =>',',
+		#	selOptions => $patientSelOptions,
+		#	type => 'select',
+		#),
+		#new CGI::Dialog::Field(
+		#	name => 'physicianOnSelect',
+		#	caption => 'Physician',
+		#	choiceDelim =>',',
+		#	selOptions => $physSelOptions,
+		#	type => 'select',
+		#),
+		#new CGI::Dialog::Field(
+		#	name => 'orgOnSelect',
+		#	caption => 'Organization',
+		#	choiceDelim =>',',
+		#	selOptions => $orgSelOptions,
+		#	type => 'select',
+		#),
+		#new CGI::Dialog::Field(
+		#	name => 'apptOnSelect',
+		#	caption => 'Appointment',
+		#	choiceDelim =>',',
+		#	selOptions => $apptSelOptions,
+		#	type => 'select',
+		#),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -421,39 +421,36 @@ sub execute
 		);
 	}
 
-	for my $itemType (@ITEM_TYPES)
-	{
-		my $itemName = 'WorklistCollection/' . "\u$itemType" . '/OnSelect';
-
-		my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selSchedulePreferences', $userId, $itemName);
-
-		my $itemID = $preference->{item_id};
-		my $command = (defined $itemID) ? 'update' : 'add';
-
-		my $name = $itemType . 'OnSelect';
-
-		$page->schemaAction(
-			'Person_Attribute', $command,
-			item_id     => $command eq 'add' ? undef : $itemID,
-			parent_id   => $userId,
-			item_name   => $itemName,
-			value_text   => $page->field($name),
-			parent_org_id => $orgIntId,
-		);
-
-		$page->session($name, $page->field($name));
-	}
+	#for my $itemType (@ITEM_TYPES)
+	#{
+	#my $itemName = 'WorklistCollection/' . "\u$itemType" . '/OnSelect';
+#
+		#my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
+		#	'selSchedulePreferences', $userId, $itemName);
+##my $itemID = $preference->{item_id};
+	#	my $command = (defined $itemID) ? 'update' : 'add';
+#
+	#	my $name = $itemType . 'OnSelect';
+#
+	#	$page->schemaAction(
+		#	'Person_Attribute', $command,
+		#	item_id     => $command eq 'add' ? undef : $itemID,
+		#	parent_id   => $userId,
+		#	item_name   => $itemName,
+		#	value_text   => $page->field($name),
+		#	parent_org_id => $orgIntId,
+		#);
+#
+		#$page->session($name, $page->field($name));
+#	}
 
 	# Add the Last-name range preference
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_lastname_range', $userId, $orgIntId);
 	my $strLastNameFrom = $page->field('LastNameFrom');
 	my $strLastNameTo = $page->field('LastNameTo');
-	$page->addDebugStmt($strLastNameTo);
 	$strLastNameFrom =~ s/\s+//g;
 	$strLastNameTo =~ s/\s+//g;
-	$page->addDebugStmt($strLastNameTo);
 	if (length $strLastNameFrom == 0 && length $strLastNameTo == 0)
 	{
 		$strLastNameFrom = undef;
