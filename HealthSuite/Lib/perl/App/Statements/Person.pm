@@ -35,6 +35,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			AND	pa.item_name ='Fee Schedules'
 			AND	pa.item_type = 0
 		},
+	'selPersonCategory' => qq{
+			SELECT category
+			FROM person_org_category
+			WHERE person_id = ?
+			AND org_internal_id = ?
+		},
+
 	'selPersonCategoryExists' => qq{
 			SELECT person_id
 			FROM person_org_category
@@ -766,6 +773,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 							'transaction' => 'Person <A HREF=\'/person/#4#/profile\' STYLE="text-decoration:none">#4#</A>',
 							'person_address' => 'Person <A HREF=\'/person/#4#/profile\' STYLE="text-decoration:none">#4#</A>',
 							'org_attribute' => 'Organization <A HREF=\'/org/#4#/profile\' STYLE="text-decoration:none">#4#</A>',
+							'person_medication' => 'Person <A HREF=\'/person/#4#/profile\' STYLE="text-decoration:none">#4#</A>',
 							'_DEFAULT' => '#4#',
 						},
 					},
