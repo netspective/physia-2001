@@ -38,6 +38,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_emp_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'assoc_phy_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'bill_provider_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -61,6 +62,8 @@ sub initialize
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Type'."
 				),
+
+		new App::Dialog::Field::Person::ID(caption => 'Doctor to bill for this provider', name => 'bill_provider'),
 
 		new CGI::Dialog::MultiField(caption =>'Job Title/Code', name => 'job_code',
 			fields => [
@@ -169,7 +172,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('begin_date', FLDFLAG_INVISIBLE, 1);
 	}
 
-	my $personId = $page->param('person_id');
+	my $personId = $command eq 'add' ? $page->field('person_id') : $page->param('person_id');
 	my $firstName = $self->getField('person_id')->{fields}->[1];
 	my $lastName = $self->getField('person_id')->{fields}->[0];
 	my $createRecField = $self->getField('create_record');
@@ -205,15 +208,37 @@ sub makeStateChanges
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 		}
 	}
-
-
 	if($personId && $command eq 'add')
 	{
 		$page->field('person_id', $personId);
-		#$self->setFieldFlags('person_id', FLDFLAG_READONLY);
 	}
 
-	#$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
+	my $phyType = $page->field('physician_type');
+	my $billProvider = 'Bill Provider';
+	my $providerId = '';
+	if ($command ne 'add')
+	{
+		my $billProviderData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $billProvider);
+		$page->field('bill_provider_item_id', $billProviderData->{'item_id'});
+		$providerId = $billProviderData->{'value_text'};
+	}
+
+	if ($phyType ne "Other Clinical Services Provider (alternate billing)" && $command eq 'add' )
+	{
+		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 1);
+	}
+	elsif ($providerId eq '' && $command ne 'add')
+	{
+		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 1);
+
+	}
+	my $billRecField = $self->getField('bill_provider');
+		my $personType = $page->field('physician_type');
+
+	if ($page->field('physician_type') eq "Other Clinical Services Provider (alternate billing)" && $page->field('bill_provider') eq '')
+	{
+		$billRecField->invalidate($page, "'$billRecField->{caption}' is a required field when the 'Person Type' is '$personType'");
+	}
 }
 
 sub populateData
@@ -299,6 +324,11 @@ sub populateData
 	$page->field('nurse_emp_item_id', $nurseEmpData->{'item_id'});
 	$page->field('emp_id', $nurseEmpData->{'value_text'});
 	$page->field('emp_exp_date', $nurseEmpData->{'value_datea'});
+
+	my $billProvider = 'Bill Provider';
+	my $billProviderData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $billProvider);
+	$page->field('bill_provider_item_id', $billProviderData->{'item_id'});
+	$page->field('bill_provider', $billProviderData->{'value_text'});
 
 	#my $assocPhysician = 'Physician';
 	#my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
@@ -636,6 +666,18 @@ sub handleAttrs
 		value_text => $page->field('chart_number') || undef,
 		_debug => 0
 	) if $page->field('chart_number') ne '';
+
+	my $commandBillProvider = $command eq 'update' &&  $page->field('bill_provider_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+		'Person_Attribute', $commandBillProvider,
+		parent_id => $personId || undef,
+		item_id => $page->field('bill_provider_item_id') || undef,
+		parent_org_id => $page->session('org_internal_id') ||undef,
+		item_name => 'Bill Provider',
+		value_type => 0,
+		value_text => $page->field('bill_provider') || undef,
+		_debug => 0
+	) if $page->field('bill_provider') ne '';
 }
 
 sub customValidate
