@@ -30,7 +30,12 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',invoiceIdFieldName=>'sel_invoice_id'),
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields', orgInternalIdFieldName => 'pay_to_org_id'),
+		new App::Dialog::Field::OrgType(
+					caption => 'Pay To Org',
+					name => 'pay_to_org_id',
+					options => FLDFLAG_REQUIRED,
+					types => "'PRACTICE', 'CLINIC', 'FACILITY/SITE'"),
 		new App::Dialog::Field::Person::ID(caption => 'Physician ID', name => 'provider_id', types => ['Physician']),
 		new App::Dialog::Field::Insurance::Product(
 			caption => 'Insurance Product',
@@ -98,7 +103,7 @@ sub execute
 		processor_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		processor_id => $sessUser || undef,
 		receiver_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
-		receiver_id => $sessOrgIntID || undef,
+		receiver_id => $page->field('pay_to_org_id') || undef,
 		unit_cost => $page->field('check_amount') || undef,
 		auth_ref => $page->field('check_number') || undef,
 		data_text_a => $page->field('product_name') || undef,
