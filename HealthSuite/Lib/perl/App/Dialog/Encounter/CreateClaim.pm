@@ -119,14 +119,12 @@ sub makeStateChanges
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
-
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
-
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
@@ -134,13 +132,46 @@ sub execute_remove
 {
 	my ($self, $page, $command, $flags) = @_;
 
+	my $sessUser = $page->session('user_id');
+	my $invoiceId = $page->param('invoice_id');
+
+	#VOID CLAIM
+	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	$page->schemaAction(
-		'Invoice', 'remove',
-		invoice_id => $page->param('invoice_id') || undef,
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
 		_debug => 0
 	);
 
-	#$self->handlePostExecute($page, $command, $flags);
+	
+	#CREATE NEW VOID TRANSACTION FOR VOIDED CLAIM
+	my $parentTransId = $page->field('trans_id');
+	my $transType = App::Universal::TRANSTYPEACTION_VOID;
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+	$page->schemaAction(
+		'Transaction', 'add',
+		parent_trans_id => $parentTransId || undef,
+		trans_type => defined $transType ? $transType : undef,
+		trans_status => defined $transStatus ? $transStatus : undef,	
+		trans_status_reason => "Claim $invoiceId has been voided by $sessUser",
+		_debug => 0
+	);
+
+
+	#ADD HISTORY ATTRIBUTE
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "Voided by $sessUser",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
 	$page->redirect('/search/claim');
 }
 
