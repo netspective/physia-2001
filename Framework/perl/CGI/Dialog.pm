@@ -88,7 +88,7 @@ sub findPopup_as_html
 		#$comboBox = "document.$dialogName.$self->{findPopupComboBox}" if $self->{findPopupComboBox};
 
 		return qq{
-			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', null, null, $controlField);"><img src='$self->{popup}->{imgsrc}' border=0></a>
+			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField);"><img src='$self->{popup}->{imgsrc}' border=0></a>
 		};
 	}
 	return '';
