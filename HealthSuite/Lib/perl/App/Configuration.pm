@@ -17,6 +17,7 @@ struct(ServerConfigData => {
 	name_Group => '$',
 	db_ConnectKey => '$',
 	db_AltConnectKeys => '%',
+	db_BlobLongReadLength => '$',
 	path_root => '$',
 	path_WebSite => '$',
 	path_temp => '$',
@@ -183,6 +184,7 @@ sub getDefaultConfig
 	{
 		$config->db_ConnectKey($dbConnectKey);
 	}
+	$config->db_BlobLongReadLength(1000000);
 	
 	$config->path_root(PATH_APPROOT);
 	$config->path_WebSite(PATH_WEBSITE);
