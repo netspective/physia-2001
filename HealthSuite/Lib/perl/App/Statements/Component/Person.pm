@@ -482,13 +482,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, consult_id
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
 				from  Transaction
 			where  	trans_owner_id = ?
 			and caption = 'Phone Message'
                         and data_num_a is null
                         union
-                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, consult_id
+                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
                                 from  Transaction
                         where   trans_owner_id = ?
                         and caption = 'Phone Message'
@@ -3022,11 +3022,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.linkNonMedicalSite'=>{
 	sqlStmt => qq{
-			SELECT  'CNN','News And Information','http://www.cnn.com',to_number(NULL) as item_id  FROM dual	
-			UNION 
-			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute 
+			SELECT  'CNN','News And Information','http://www.cnn.com',to_number(NULL) as item_id  FROM dual
+			UNION
+			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute
 			WHERE 	parent_id = ?
-			AND	item_name = 'User/Link/NonMedical'						
+			AND	item_name = 'User/Link/NonMedical'
 			},
 	publishDefn => {
 
@@ -3034,16 +3034,16 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{ dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>',},
 				{ dataFmt => '#1#',},
 				],
-				bullets => '/person/#param.person_id#/dlg-update-link-non-url/#3#',				
-			frame => {					
-					editUrl => '/person/#param.person_id#/dlg-add-link-non-url',				
+				bullets => '/person/#param.person_id#/dlg-update-link-non-url/#3#',
+			frame => {
+					editUrl => '/person/#param.person_id#/dlg-add-link-non-url',
 				},
-				
+
 			},
 	publishDefn_panel =>
 			{
 				# automatically inherits columnDefn and other items from publishDefn
-				style => 'panel',		
+				style => 'panel',
 				frame => { heading=>'Non Medical Sites', },
 			},
 	publishDefn_panelTransp =>
@@ -3051,7 +3051,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.transparent.static',
 				inherit => 'panel',
-				frame => { heading=>'Non Meidical Sites', },				
+				frame => { heading=>'Non Meidical Sites', },
 			},
 
 
@@ -3064,28 +3064,28 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.linkMedicalSite'=>{
 	sqlStmt => qq{
-			select 'PDR NET','Meidical Reference Information','http://physician.pdr.net/physician/index.htm',to_number(NULL) as item_id  FROM dual			
-			UNION 
-			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute 
+			select 'PDR NET','Meidical Reference Information','http://physician.pdr.net/physician/index.htm',to_number(NULL) as item_id  FROM dual
+			UNION
+			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute
 			WHERE 	parent_id = ?
-			AND	item_name = 'User/Link/Medical'						
-			
+			AND	item_name = 'User/Link/Medical'
+
 			},
 	publishDefn => {
 
 			columnDefn => [
 				{ dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>',},
-				{ dataFmt => '#1#',},				
+				{ dataFmt => '#1#',},
 				],
-				bullets => '/person/#param.person_id#/dlg-update-link-med-url/#3#',				
-			frame => {					
-					editUrl => '/person/#param.person_id#/dlg-add-link-med-url',				
-				},				
+				bullets => '/person/#param.person_id#/dlg-update-link-med-url/#3#',
+			frame => {
+					editUrl => '/person/#param.person_id#/dlg-add-link-med-url',
+				},
 			},
 	publishDefn_panel =>
 			{
 				# automatically inherits columnDefn and other items from publishDefn
-				style => 'panel',		
+				style => 'panel',
 				frame => { heading=>'Medical Sites', },
 			},
 	publishDefn_panelTransp =>
@@ -3093,7 +3093,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.transparent.static',
 				inherit => 'panel',
-				frame => { heading=>'Meidical Sites', },				
+				frame => { heading=>'Meidical Sites', },
 			},
 
 
@@ -3103,7 +3103,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId], 'panelTransp'); },
 },
-	
+
 'person.docSign' => {
 	sqlStmt => qq{select 'NOT IMPLEMENTED' from dual
 
@@ -3154,7 +3154,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.inPatient' => {
 	sqlStmt => qq{
-			select trans_owner_id , related_data,caption,complete_name,consult_id FROM transaction,person			
+			select trans_owner_id , related_data,caption,complete_name,consult_id FROM transaction,person
 			WHERE trans_type = @{[App::Universal::TRANSTYPE_ADMISSION]}
 			AND	provider_id = :1
 			AND person.person_id = trans_owner_id
@@ -3165,14 +3165,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				columnDefn => [
 					{ head=> 'Patient ', colIdx=>3, url => "/person/#0#/profile",hint=>"#3#",dAlign=>'left' ,hAlign=>'left'},
 					{ head=> 'Hospital Room', dataFmt=>"#1# (#2#)",dAlign=>'left',hAlign=>'left'},
-					{ head=> 'Attending MD',dataFmt=>"#4#", dAlign=>'left',hAlign=>'left'},										
+					{ head=> 'Attending MD',dataFmt=>"#4#", dAlign=>'left',hAlign=>'left'},
 				],
 			},
 			publishDefn_panel =>
 			{
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.static',
-				flags => 0,			
+				flags => 0,
 				frame => { heading => 'Inpatient'
 			},
 			},
@@ -3328,7 +3328,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		columnDefn => [
 				{ dataFmt =>qq{<A HREF = '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#'> #11#</A> : (#6#) #7# (#3#)}, },
 				],
-		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#',				
+		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#',
 	},
 	publishDefn_panel =>
 	{
@@ -3363,14 +3363,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 
 
-'person.scheduleAppts' =>{	
+'person.scheduleAppts' =>{
 
 			sqlStmt => qq{SELECT p.person_id,to_char(e.start_time, 'hh:miam') as start_time,a.caption,e.subject as visit,
 			org_id,p.complete_name
 			FROM	person p, event e, event_attribute ePhy, org,appt_status a
 			WHERE	e.event_id = ePhy.parent_id
 			AND	ePhy.item_name = 'Appointment'
-			AND	ePhy.value_textB = :1			
+			AND	ePhy.value_textB = :1
 			AND     p.person_id = ePhy.VALUE_TEXT
 			AND	org.org_internal_id (+) = facility_id
 			AND	(to_char(e.start_time,'MM/DD/YYYY') = :2 or to_char(e.start_time,'MM/DD/YYYY') != :2)
@@ -3385,14 +3385,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					{ head=>'Status' ,hAlign => 'left'},
 					{ head=> 'Reason For Visit',hAlign => 'left' },
 					{ head=> 'Facility' },
-					
+
 				],
 			},
 			publishDefn_panel =>
 			{
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.static',
-				flags => 0,			
+				flags => 0,
 				frame => { heading => qq{ Date : <INPUT size=10	 NAME="_f_x"  value="#param.timeDate#" >   <A HREF="javascript:showCalendar(_f_x);"><img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>Appointments } },
 			},
 			publishDefn_panelTransp =>
@@ -3408,11 +3408,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelEdit'); },
 			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelTransp'); },
 
-	},	
+	},
 
-	
 
-#----------------------------------------------------Doc Short Term Stuff	
+
+#----------------------------------------------------Doc Short Term Stuff
 #----------------------------------------------------------------------------------------------------------------------
 
 );
