@@ -666,7 +666,7 @@
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>
 
-	<table name="Invoice_Worklist" abbrev="InvWrk" type="Audit,Secure">
+	<table name="Invoice_Worklist" abbrev="InvWrk" type="Secure">
 		<column name="invoice_worklist_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) Invoice Worklist entry"/>		
 		<column name="owner_id" lookupref="person.person_id" descr="Person whose worklist Invoice is attached)"/>
 		<column name="person_id" lookupref="person.person_id" descr="Person ID of patient on the invoice"/>
