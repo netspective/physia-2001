@@ -40,7 +40,8 @@ FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
 	AND ii.parent_id  = i.invoice_id
-	AND ia.item_name  = 'Invoice/Creation/Batch ID'					
+	AND ia.item_name  = 'Invoice/Creation/Batch ID'		
+	AND (invoice_status !=15 or parent_invoice_id is null)
 	UNION ALL	
 SELECT	i.invoice_id,
 	(nvl(
@@ -93,7 +94,8 @@ FROM 	invoice i ,  transaction t ,
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
 	AND ii.parent_id  = i.invoice_id
-	AND iia.parent_id = ii.item_id;
+	AND iia.parent_id = ii.item_id
+	AND (invoice_status !=15 or parent_invoice_id is null);
 			
 
 create or replace view REVENUE_COLLECTION as
