@@ -505,10 +505,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and item_name = 'Patient/Illness/Dates'
 		},
 	'selAllHistoryItems' => qq{
-		select cr_stamp, cr_user_id, value_text as action, value_textB as comments, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date
-		from invoice_attribute
+		select cr_stamp, cr_user_id, value_text, value_textb, value_int, value_intb, value_float, value_floatb,
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateend,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_datea, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateb
+		from invoice_history
 		where parent_id = ?
-			and item_name = 'Invoice/History/Item'
 		order by value_date desc, cr_stamp desc
 		},
 	'selClaimPrintHistoryItemByUser' => qq{
