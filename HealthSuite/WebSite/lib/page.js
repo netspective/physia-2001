@@ -182,9 +182,9 @@ function setDialogHome()
 function populateField()
 {
 	if( eval(parent.opener.activeActionSrcControl) && eval(parent.opener.activeActionDstControl) )
-	{	
+	{
 		var srcLen = parent.opener.activeActionSrcControl.length;
-		var dstLen = parent.opener.activeActionDstControl.length;		
+		var dstLen = parent.opener.activeActionDstControl.length;
 		if (dstLen != srcLen)
 		{
 			alert("Source and Destination Arrays not the same length");
@@ -200,14 +200,14 @@ function populateField()
 					dstElement.value = srcElement.value;
 			}
 		}
-	}		
+	}
 	return true;
 }
 
 
 //Check the URL to see if the current window is a popup window
 function isPopupURL()
-{	
+{
 	var flag=false;
 	if(eval(parent.opener))
 	{
@@ -225,7 +225,7 @@ function validateOnSubmit(objForm)
 {
 	var objSelect;
 	var field;
-	
+
 	field = searchDialogFlagNoValue(FLDFLAG_REQUIRED);
 	if (field != null)
 	{
@@ -243,14 +243,14 @@ function validateOnSubmit(objForm)
 		if (field.style == "multidual")
 		{
 			objSelect = eval("document.forms.dialog."+i);
-			for (var j = 0; j < objSelect.options.length; j++) 
+			for (var j = 0; j < objSelect.options.length; j++)
 			{
 				objSelect.options[j].selected = true;
 			}
 		}
 	}
 	if (isPopupURL())
-	{	
+	{
 		populateField();
 	}
 	return true;
@@ -263,7 +263,7 @@ function translateEnterKey(event, flags)
 		var dialog = dialogFields['dialog'];
 		var field = dialog[event.srcElement.name];
 		var blnMoveNextField = true;
-		
+
 		if (flags != null) {
 			if (flags & OPTIONFLAG_TRANSKEY_DONT_MOVE_ON_ENTER)
 				blnMoveNextField = false;
@@ -320,7 +320,7 @@ function keypressAcceptAny(event, flags, acceptKeyRanges)
 
 function processKeypress_identifier(event, flags)
 {
-	if (event.keyCode) {	// IE 
+	if (event.keyCode) {	// IE
 		if (event.keyCode >= lowAlphaRange[0] && event.keyCode <= lowAlphaRange[1])
 			event.keyCode = event.keyCode - LOWER_TO_UPPER_CASE;
 	}
@@ -340,7 +340,7 @@ function processKeypress_default(event, flags)
 
 function processKeypress_float(event, flags)
 {
-	return keypressAcceptAny(event, flags, [numKeysRange, periodKeyRange]);
+	return keypressAcceptAny(event, flags, [numKeysRange, periodKeyRange, dashKeyRange]);
 }
 
 function processKeypress_integer(event, flags)
@@ -693,10 +693,24 @@ function setFocus(fieldName)
 function validateChange_Float(event, flags)
 {
 	var a = splitNotInArray(event.srcElement.value, ["."]);
-	var fmtMessage = "A number cannot contain more than one decimal point!";
-	if (a.length == 0) return true;
-	if (a.length > 1 || a[0].length > 1)
-		validationError(event.srcElement.name, fmtMessage);
+	if (a.length != 0)
+	{
+		// Check for multiple decimal points
+		if (a.length > 1 || a[0].length > 1)
+			return validationError(event.srcElement.name, "A number cannot contain more than one decimal point!");
+	}
+
+	a = splitNotInArray(event.srcElement.value, ["-"]);
+	if (a.length != 0)
+	{
+		// Check for multiple negative signs
+		if (a.length > 1 || a[0].length > 1)
+			return validationError(event.srcElement.name, "A number cannot contain more than one negative sign!");
+
+		// Check for incorrectly placed negative sign
+		if (event.srcElement.value.charAt(0) != "-")
+			return validationError(event.srcElement.name, "A number cannot have a negative sign except as the first character!");
+	}
 }
 
 function validateChange_Percentage(event, flags)
@@ -859,7 +873,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	activeFindAppendValue = appendValue;
 
 	var newArl = arl;
-	
+
 	if(controlField)
 	{
 		newArl = replaceString(arl, 'itemValue', controlField.value);
@@ -870,7 +884,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	// of the popup window to check the value of activeFindWinControl and
 	// either automatically populate the control or do something else
 	//
-	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? 
+	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ?
 		"location, width=600,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
@@ -937,7 +951,7 @@ function chooseEntry(itemValue,  actionObj, destObj, itemCategory)
 
 	if(actionObj == null)
 		actionObj = search_form.item_action_arl_select;
-	
+
 	if(destObj == null)
 		destObj = search_form.item_action_arl_dest_select;
 
@@ -970,7 +984,7 @@ function chooseItem(arlFmt, itemValue, inNewWin)
 		populateControl(itemValue, true);
 		return;
 	}
-	
+
 	if(isActionPopupWindow())
 	{
 		parent.close();
@@ -1002,13 +1016,13 @@ function chooseItem2(arlFmt, itemValue, inNewWin, features)
 	}
 
 	var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
-	
+
 	if (inNewWin == null) {
 		inNewWin = false;
 		if (search_form.item_action_arl_dest_select.selectedIndex == 1)
 			inNewWin = true;
 	}
-	
+
 	if(inNewWin) {
 		var popUpWindow = open(newArl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=440,scrollbars,resizable" : features);
 		popUpWindow.focus();
@@ -1027,7 +1041,7 @@ function chooseItemForParent(arlFmt)
 	{
 		alert('No opener Window found');
 	}
-	
+
 	parent.close();
 }
 
@@ -1035,21 +1049,21 @@ function chooseItemForParent(arlFmt)
 // Multiselect field type support function
 //****************************************************************************
 
-/* 
+/*
 Description:
-	Moves items from one select box to another. 
+	Moves items from one select box to another.
 Input:
 	strFormName = Name of the form containing the <SELECT> elements
 	strFromSelect = Name of the left or "from" select list box.
 	strToSelect = Name of the right or "to" select list box
 	blnSort = Indicates whether list box should be sorted when an item(s) is added
 
-Return:	
+Return:
 	none
 */
 function MoveSelectItems(strFormName, strFromSelect, strToSelect, blnSort) {
 	var objSelectFrom, objSelectTo;
-	
+
 	objSelectFrom = document.forms[0].elements[strFromSelect];
 	objSelectTo = document.forms[0].elements[strToSelect];
 
@@ -1070,13 +1084,13 @@ function MoveSelectItems(strFormName, strFromSelect, strToSelect, blnSort) {
 	RemoveEmpties(objSelectFrom, 0);
 }
 
-/* 
+/*
 Description:
 	Removes empty select items. This is a helper function for MoveSelectItems.
 Input:
 	objSelect = A <SELECT> object.
 	intStart = The start position (zero-based) search. Optimizes the recursion.
-Return:	
+Return:
 	none
 */
 function RemoveEmpties(objSelect, intStart)  {
@@ -1089,12 +1103,12 @@ function RemoveEmpties(objSelect, intStart)  {
 	}
 }
 
-/* 
+/*
 Description:
-	Sorts a select box. Uses a simple sort. 
+	Sorts a select box. Uses a simple sort.
 Input:
 	objSelect = A <SELECT> object.
-Return:	
+Return:
 	none
 */
 function SimpleSort(objSelect)  {
