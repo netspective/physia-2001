@@ -185,6 +185,7 @@ sub buildSqlStmt
 				(invoice.owner_id = ?)
 				AND (invoice_worklist.invoice_id = invoice.invoice_id)
 				AND (invoice_worklist.worklist_status = 'TRANSFERRED')
+				AND (invoice_worklist.worklist_type = 'CLAIMS')
 				AND (invoice_worklist.responsible_id = ?)
 				AND (invoice_billing.bill_id = invoice.billing_id)
 				AND (insurance.ins_internal_id = invoice_billing.bill_ins_id)
