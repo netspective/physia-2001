@@ -6,6 +6,7 @@ use strict;
 use Exporter;
 use Number::Format;
 use CGI::Layout;
+use App::Configuration;
 use Date::Manip;
 use Storable qw(dclone);
 
@@ -29,7 +30,6 @@ use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL
 	prepareStatementColumns
 	createHtmlFromStatement
 	createHtmlFromData
-	createTextFromData
 );
 
 use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
@@ -1413,165 +1413,6 @@ sub prepareHtmlFormElemFormat
 	my ($page, $flags, $elemDefn) = @_;
 
 
-}
-
-# This sub is used to place fields in arbitrary locations in a monospaced grid of specified size.
-# Its functionality is still considerably limited.
-# $publishDefn has the same structure as $publDefn in prepare_HtmlBlockFmtTemplate with columnDefn
-# replaced by fieldDefn.  The structure of fieldDefn is given below...
-#
-#	fieldDefn => [
-#		{ col => '10', row => '10', width => '15', colIdx => '1', align => 'RIGHT' },
-#		{ col => '15', row => '11', width => '10', colIdx => '2', align => 'CENTER' },
-#		{ col => '30', row => '10', width => '5', colIdx => '3', align => 'LEFT' },
-#		{ col => '30', row => '11', width => '10', colIdx => '4', align => 'RIGHT' }
-#	],
-#
-# The four arguments that it accepts are:
-#   $maxCols, $maxRows
-#	a string in "x,y" form which specifies the maximum number of columns and rows available to
-#	lay fields out in
-#   $publDefn
-#   $mtbDebug
-#	a number which, when nonzero, causes all debug information to be suppressed.  Otherwise, it
-#	spits out some stuff to STDOUT.  Used mainly when testing this function with a standalone
-#	driver stub
-
-# This is just a stub...
-sub createTextFromStatement {
-	return createTextFromData (@_);
-}
-
-sub createTextFromData {
-	my ($page, $flags, $data, $publDefn, $publParams) = @_;
-
-	my $mtbDebug = lc($publDefn->{mtbDebug}) || "";
-	my ($maxCols, $maxRows) = ($publDefn->{maxCols} || 80, $publDefn->{maxRows} || 66);
-
-	my ($rowIndex, $colIndex) = (0, 0);
-	my $format;
-	my $output;
-
-	my $fillerChar = ($mtbDebug eq 'full' ? "x" : ($mtbDebug eq 'less' ? "." : " "));
-	my $fillerLine = ($mtbDebug eq 'full' ? "X\n" : ($mtbDebug eq 'less' ? ".\n" : "\n"));
-
-	# Reformat incoming arguments for optimized processing...
-	my @fieldDefn =  @{$publDefn->{fieldDefn}};
-	my %newFieldDefn;
-	my %startIndex;
-
-	foreach my $thisFieldDefn (@fieldDefn) {
-		$newFieldDefn{$thisFieldDefn->{row}}{$thisFieldDefn->{col}} = {
-			width => $thisFieldDefn->{width},
-			colIdx => $thisFieldDefn->{colIdx},
-			align => $thisFieldDefn->{align} || 'LEFT',
-			type => lc($thisFieldDefn->{type}) || 'simple',
-			data => $thisFieldDefn->{data} || "",
-#			startIdx => 0,
-		};
-
-		$startIndex{$thisFieldDefn->{row}}{$thisFieldDefn->{col}} = 0;
-	}
-
-	# Process all data items one by one...
-	my $dataIndex = 0;
-	foreach my $dataItem (@{$data}) {
-		($rowIndex, $colIndex) = (1, 1);
-		# Process all non-empty rows...
-		foreach my $currentRow (sort {$a <=> $b} keys %newFieldDefn) {
-			$output .= "RowIndex: $rowIndex... Current Row: $currentRow..." if ($mtbDebug eq 'full');
-			$output .= "(padding with ".($currentRow - $rowIndex)." rows...\n" if ($mtbDebug eq 'full');
-			# If the rowIndex hasnt caught up to the next non-empty row due to intervening blank
-			# lines, help it along...
-			if ($rowIndex != $currentRow) {
-				$output .= $fillerLine x ($currentRow - $rowIndex);
-				$rowIndex = $currentRow;
-			}
-
-			# These variables need to be reinitialized to process each row...
-			$colIndex = 1;
-			my @theFields = ();
-			$format = "";
-			foreach my $currentCol (sort {$a <=> $b} keys %{$newFieldDefn{$currentRow}}) {
-				$output .= "ColIndex: $colIndex... Current Col: $currentCol..." if ($mtbDebug eq 'full');
-				$output .= "(padding with ".($currentCol - $colIndex)." cols...\n" if ($mtbDebug eq 'full');
-				# If the colIndex hasnt caught up to the next non-empty column due to intervening blank
-				# columns, help it along...
-				$format .= $fillerChar x ($currentCol - $colIndex);
-				$colIndex = $currentCol;
-
-				# Fetch current field as a hash...
-				my $currentField = $newFieldDefn {$currentRow}{$currentCol};
-#				$output .= "newFieldDefn ref = ".ref ($newFieldDefn {$currentRow}{$currentCol})."\n";
-#				$output .= "currentField ref = ".ref ($currentField)."\n";
-
-				my $formatChar;
-#				my $formatTestChar = uc($newFieldDefn{$currentRow}{$currentCol}{align});
-				my $formatTestChar = uc($currentField->{align});
-
-				if ($formatTestChar eq 'LEFT') {
-					$formatChar = '<';
-				} elsif ($formatTestChar eq 'RIGHT') {
-					$formatChar = '>';
-				} else {
-					$formatChar = '|';
-				}
-
-				$output .= "Format Char: $formatChar ($formatTestChar)\n" if ($mtbDebug eq 'full');
-				# Prepare the format string...
-				my $formatLength = $currentField->{width} - 1;
-#				$format .= '@'.($formatChar x $formatLength);
-				$format .= '^'.($formatChar x $formatLength);
-
-				# Check for a conditional element...
-				if ($currentField->{type} eq 'conditional') {
-					push @theFields, $currentField->{data}->{$dataItem->[$currentField->{colIdx}]};
-				} else {
-					push @theFields, $dataItem->[$currentField->{colIdx}];
-#					if ($currentField->{startIdx} < length $dataItem->[$currentField->{colIdx}]) {
-#						my $theField = $currentField->{startIdx} . '*' . length $dataItem->[$currentField->{colIdx}];
-#						push @theFields, $currentField->{startIdx} . " " . substr ($dataItem->[$currentField->{colIdx}], $currentField->{startIdx});
-#						$currentField->{startIdx} += $formatLength;
-#						$theField .= '*'.$currentField->{startIdx};
-#						push @theFields, $theField;
-#						$newFieldDefn {$currentRow}{$currentCol} = $currentField;
-
-#						substr ($dataItem->[$currentField->{colIdx}], 0, $formatLength = "";
-#					} else {
-#						push @theFields, "";
-#					}
-				}
-
-				# Update column index...
-				$colIndex = $colIndex + $formatLength;
-			}
-
-			$output .= "ColIndex: $colIndex... Current Col: $maxCols..." if ($mtbDebug eq 'full');
-			$output .= "(padding with ".($maxCols - $colIndex)." cols...\n" if ($mtbDebug eq 'full');
-			$format .= $fillerChar x ($maxCols - $colIndex);
-			$format .= "\n";
-
-			$output .= "---Printing format---\n" if ($mtbDebug eq 'full');
-			$output .= $format if ($mtbDebug eq 'full');
-			$output .= "---End  of  format---\n" if ($mtbDebug eq 'full');
-
-			formline $format, @theFields;
-			$output .= $^A;
-			$^A = "";
-			$rowIndex ++;
-		}
-		$output .= "RowIndex: $rowIndex... Current Row: $maxRows..." if ($mtbDebug eq 'full');
-		$output .= "(padding with ".($maxRows - $rowIndex)." rows...\n" if ($mtbDebug eq 'full');
-		$output .= $fillerLine x ($maxRows - $rowIndex + 1);
-		$rowIndex = $maxRows;
-		$dataIndex ++;
-	}
-
-	$output .= $fillerLine x ($maxRows - $rowIndex + 1);
-	$rowIndex = $maxRows;
-
-#	print $output if ($mtbDebug);
-	return $output;
 }
 
 1;
