@@ -127,7 +127,7 @@ sub buildSqlStmt
 	
 	$providerCond = qq{
 		and Transaction.trans_id = Invoice.main_transaction
-		and upper(Transaction.provider_id) = upper('')
+		and upper(Transaction.provider_id) = upper('$providerId')
 	} if $providerId;
 
 	if ($facilityId)
