@@ -3,6 +3,7 @@ package App::Dialog::InsurancePlan::PersonalCoverage;
 ##############################################################################
 use strict;
 use Carp;
+use Date::Manip;
 use DBI::StatementManager;
 use CGI::Validator::Field;
 use App::Dialog::InsurancePlan;
@@ -13,209 +14,262 @@ use App::Dialog::Field::Insurance;
 use CGI::Dialog;
 use App::Universal;
 use vars qw(@ISA %RESOURCE_MAP);
+@ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = (
 	'ins-coverage' => {
-			heading => '$Command Personal Insurance Coverage',
-			_arl_add => ['plan_name'],
-			_arl_modify => ['ins_internal_id'],
-		   	_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
-		  );
+		heading => '$Command Personal Insurance Coverage',
+		_arl_add => ['plan_name'],
+		_arl_modify => ['ins_internal_id'],
+	   	_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE,
+	   	},
+	);
 
-use Date::Manip;
 
-@ISA = qw(CGI::Dialog);
-
-my $INSURED_SELF = 1;
-my $INSURED_OTHER = 9;
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'coverage', heading => '$Command Personal Insurance Coverage');
-
-	#my $id = $self->{'id'}; 	# id = 'insur_pay' | 'personal_pay'
+	my $self = CGI::Dialog::new(@_);
 
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
-
+	
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-			new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
-			new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
-			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
-			new CGI::Dialog::Field(type => 'hidden', name => 'bill_seq_hidden'),
-			new CGI::Dialog::Field(type => 'hidden', name => 'person_hidden'),
-			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
-			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct/insorgid/itemValue', findPopupControlField => '_f_ins_org_id'),
-			new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan/product/itemValue', findPopupControlField => '_f_product_name'),
+		new App::Dialog::Field::Person::ID(
+			caption => 'Patient ID',
+			types => ['Patient'],
+			options => FLDFLAG_REQUIRED,
+			name => 'person_id'
+			),
+		new App::Dialog::Field::Insurance::Product(
+			caption => 'Insurance Product',
+			name => 'product_name',
+			findPopup => '/lookup/insproduct/insorgid',
+			),
+		new App::Dialog::Field::Insurance::Plan(
+			caption => 'Insurance Plan',
+			name => 'plan_name',
+			findPopup => '/lookup/insplan/product/itemValue',
+			findPopupControlField => '_f_product_name',
+			),
+		new CGI::Dialog::Field::TableColumn(
+			caption => 'Insurance Sequence',
+			schema => $schema,
+			column => 'Insurance.bill_sequence',
+			onValidate => \&App::Dialog::InsurancePlan::validateExistingInsSeq,
+			onValidateData => $self,
+			defaultValue => 1,
+			options => FLDFLAG_REQUIRED,
+			),
+		new CGI::Dialog::Field(
+			caption => 'Inactivate Coverage?',
+			type => 'bool',
+			name => 'create_record',
+			style => 'check',
+			options => FLDFLAG_INVISIBLE,
+			),
 
-			new CGI::Dialog::Field::TableColumn(
-								caption => 'Insurance Sequence',
-								schema => $schema,
-								column => 'Insurance.bill_sequence',
-								onValidate => \&App::Dialog::InsurancePlan::validateExistingInsSeq,
-								onValidateData => $self,
-								defaultValue => 1,
-								options => FLDFLAG_REQUIRED),
-			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',style => 'check'),
-			new CGI::Dialog::Subhead(heading => 'General Plan Information', name => 'gen_plan_heading'),
-			new CGI::Dialog::MultiField(caption =>"Insured's Employer Name/Group Number", name => 'group',
-				fields => [
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Insurance.group_name'),
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Insurance.group_number'),
-					]),
+		# General Plan Information
+		new CGI::Dialog::Subhead(
+			heading => 'General Plan Information',
+			name => 'gen_plan_heading',
+			),
+		new CGI::Dialog::Field(
+			caption => "Patient's Relationship to Insured",
+			name => 'rel_to_insured',
+			fKeyStmtMgr => $STMTMGR_INSURANCE,
+			fKeyStmt => 'selInsuredRelation',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+			options => FLDFLAG_REQUIRED | FLDFLAG_PREPENDBLANK,
+			onChangeJS => qq{showFieldsNotValues(event, [@{[App::Universal::INSURED_SELF]}], ['insured_id']); showFieldsOnValues(event, [@{[App::Universal::INSURED_OTHER]}], ['extra']);},
+			),
+		new CGI::Dialog::Field(
+			caption => 'Other Relationship',
+			name => 'extra',
+			),
+		new App::Dialog::Field::Person::ID(
+			caption => 'Insured Person ID',
+			name => 'insured_id',
+			),
+		new App::Dialog::Field::Organization::ID(
+			caption => "Employer",
+			name => "employer_org_id",
+			),
+		new CGI::Dialog::MultiField(
+			name => 'group_info',
+			fields => [
+				new CGI::Dialog::Field::TableColumn(
+					caption => "Group Name",
+					schema => $schema,
+					column => 'Insurance.group_name',
+					),
+				new CGI::Dialog::Field::TableColumn(
+					caption => "Number",
+					schema => $schema,
+					column => 'Insurance.group_number',
+					),
+				],
+			),
+		new CGI::Dialog::Field::TableColumn(
+			caption => 'Member Number',
+			schema => $schema,
+			column => 'Insurance.member_number',
+			options => FLDFLAG_REQUIRED
+			),
 
-			new CGI::Dialog::Field::TableColumn(
-							caption => 'Member Number',
-							schema => $schema,
-							column => 'Insurance.member_number',
-							options => FLDFLAG_REQUIRED),
+		# Coverage Information
+		new CGI::Dialog::Subhead(
+			heading => 'Coverage Information',
+			name => 'coverage_heading',
+			),
+		new CGI::Dialog::MultiField (
+			name => 'dates',
+			fields => [
+				new CGI::Dialog::Field(
+					caption => 'Coverage Begin Date',
+					name => 'coverage_begin_date',
+					type => 'date',
+					options => FLDFLAG_REQUIRED,
+					pastOnly => 1,
+					defaultValue => '',
+					),
+				new CGI::Dialog::Field(
+					caption => 'End Date',
+					name => 'coverage_end_date',
+					type => 'date',
+					defaultValue => '',
+					),
+				],
+			),
+		new CGI::Dialog::MultiField(
+			name => 'deduct_amts',
+			fields => [
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Individual',
+					schema => $schema,
+					column => 'Insurance.indiv_deductible_amt',
+					),
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Family Deductible Amounts',
+					schema => $schema,
+					column => 'Insurance.family_deductible_amt',
+					),
+				],
+			),
+		new CGI::Dialog::MultiField(
+			name => 'deduct_remain',
+			fields => [
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Individual',
+					schema => $schema,
+					column => 'Insurance.indiv_deduct_remain'),
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Family Deductible Amounts',
+					schema => $schema,
+				column => 'Insurance.family_deduct_remain'),
+				],
+			),
+		new CGI::Dialog::MultiField(name => 'percentage_threshold',
+			fields => [
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Percentage Pay',
+					schema => $schema,
+					column => 'Insurance.percentage_pay'),
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Threshold',
+					schema => $schema,
+					column => 'Insurance.threshold'),
+				],
+			),
+		new CGI::Dialog::Field::TableColumn(
+			caption => 'Office Visit Co-pay',
+			schema => $schema,
+			column => 'Insurance.copay_amt',
+			),
+		);
 
-			new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
-							#types => ['Patient'],
-							name => 'insured_id',
-							#options => FLDFLAG_REQUIRED
-							),
+	$self->{activityLog} =
+	{
+		scope =>'insurance',
+		key => "#field.product_name#",
+		data => "#field.product_name# Insurance coverage added for <a href='/person/#field.person_id#/profile'>#field.person_id#</a>"
+	};
 
-			new CGI::Dialog::MultiField(name => 'rel_other_rel',
-					fields => [
-						new CGI::Dialog::Field(caption => "Patient's Relationship to Insured",
-							name => 'rel_to_insured',
-							fKeyStmtMgr => $STMTMGR_INSURANCE,
-							fKeyStmt => 'selInsuredRelation',
-							fKeyDisplayCol => 1,
-							fKeyValueCol => 0,
-							options => FLDFLAG_REQUIRED,
-							defaultValue => 1
-							),
-						new CGI::Dialog::Field(caption => 'Other Relationship Name',
-							name => 'extra'
-							),
-						]),
+	$self->addFooter(
+		new CGI::Dialog::Buttons(
+			nextActions_add => [
+				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage", 1],
+				['Go to Person Profile', "/person/%field.person_id%/profile"],
+				],
+			cancelUrl => $self->{cancelUrl} || undef,
+			),
+		);
 
-			new CGI::Dialog::Subhead(heading => 'Coverage Information', name => 'coverage_heading'),
-			new CGI::Dialog::MultiField (caption => 'Coverage Begin/End Dates',	name => 'dates',
-					fields => [
-								new CGI::Dialog::Field(caption => 'Begin Date', name => 'coverage_begin_date', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1, defaultValue => ''),
-								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', defaultValue => ''),
-							]),
+# Need to find a better way to do this...
+#	$self->addPostHtml(q{<script>
+#		<!--
+#		setIdDisplay('insured_id','none');
+#		setIdDisplay('extra','none');
+#		// -->
+#	</script>});
 
-			new CGI::Dialog::MultiField(caption =>'Individual/Family Deductible Amounts', name => 'deduct_amts',
-					fields => [
-								new CGI::Dialog::Field::TableColumn(caption => 'Individual Deductible Amount',
-									schema => $schema, column => 'Insurance.indiv_deductible_amt'),
-								new CGI::Dialog::Field::TableColumn(caption => 'Family Deductible Amount',
-									schema => $schema, column => 'Insurance.family_deductible_amt'),
-					]),
-
-			new CGI::Dialog::MultiField(caption =>'Individual/Family Deductible Remaining', name => 'deduct_remain',
-					fields => [
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Insurance.indiv_deduct_remain'),
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-						column => 'Insurance.family_deduct_remain'),
-					]),
-
-			new CGI::Dialog::MultiField(caption =>'Percentage Pay/Threshold', name => 'percentage_threshold',
-				fields => [
-					new CGI::Dialog::Field::TableColumn(
-						schema => $schema,
-						column => 'Insurance.percentage_pay'),
-					new CGI::Dialog::Field::TableColumn(
-						schema => $schema,
-						column => 'Insurance.threshold'),
-				]),
-
-			new CGI::Dialog::Field::TableColumn(
-						caption => 'Office Visit Co-pay',
-						schema => $schema,
-					column => 'Insurance.copay_amt'),
-
-			new CGI::Dialog::Subhead(heading => 'Add Another Personal Insurance Coverage', name => 'insur_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-
-			new CGI::Dialog::MultiField(caption =>'InsCompanyID/ProductName/PlanName', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-							new App::Dialog::Field::Organization::ID(caption => 'Ins Company ID', name => 'ins_comp',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product', findPopup => '/lookup/insproduct', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan', findPopup => '/lookup/insplan', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
-						])
-
-			);
-
-			$self->{activityLog} =
-			{
-				scope =>'insurance',
-				key => "#field.ins_org_id#",
-				data => "Insurance '#field.product_name#' in <a href='/org/#param.ins_org_id#/profile'>#param.ins_org_id#</a>"
-			};
-
-			$self->addFooter(new CGI::Dialog::Buttons(
-							nextActions_add => [
-								['Add Another Insurance Coverage', "/person/%field.person_hidden%/dlg-add-ins-coverage?_f_product_name=%field.product%&_f_ins_org_id=%field.ins_comp%&_f_plan_name=%field.plan%", 1],
-								['Go to Person Profile', "/person/%field.person_hidden%/profile"],
-							],
-								cancelUrl => $self->{cancelUrl} || undef
-						)
-					);
-
-			return $self;
+	return $self;
 }
+
+
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	# Populating the fields while updating the dialog
+	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
+
+	my $insIntId = $page->param('ins_internal_id');
+	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId))
+	{
+		$page->addError("Insurance Internal ID '$insIntId' not found.");
+	}
+	if($page->field('employer_org_id'))
+	{
+		my $empOrgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $page->field('employer_org_id'));
+		$page->field('employer_org_id', $empOrgId);
+	}
+}
+
 
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if ($page->param('person_id') ne '');
-
-	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
-
-	if($page->param('_lcm_ispopup'))
+	if ($page->param('person_id') ne '')
 	{
-		$self->updateFieldFlags('insur_heading', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('insplan', FLDFLAG_INVISIBLE, 1);
-	}
-
-	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-	$page->field('person_hidden', $personId);
-
-	my $otherRel = $self->getField('rel_other_rel')->{fields}->[1];
-	my $relationToIns = $page->field('rel_to_insured');
-	my $otherRelation = $page->field('extra');
-	if ($relationToIns == $INSURED_OTHER && $otherRelation eq '')
-	{
-		$otherRel->invalidate($page, "When the 'Relation To Insured' is 'Other', then the 'Other Relationship Name' cannot be blank");
-	}
-
-	if ($relationToIns != $INSURED_OTHER && $otherRelation ne '')
-	{
-		$otherRel->invalidate($page, "When the 'Relation To Insured' is not 'Other', then the 'Other Relationship Name' should be blank");
+		$page->field('person_id', $page->param('person_id'));
+		$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1);
 	}
 }
+
 
 sub customValidate
 {
 	my ($self, $page) = @_;
-
+	
+	# Return if we're in remove mode
 	my $command = $self->getActiveCommand($page);
-
 	return () if $command eq 'remove';
+	
+	my $ownerOrgId = $page->session('org_internal_id');
 
+	# Validate Relationship To Insured
 	my $relToInsured = $page->field('rel_to_insured');
-	my $relToInsuredField = $self->getField('rel_other_rel')->{fields}->[0];
+	my $relToInsuredField = $self->getField('rel_to_insured');
 	my $insuredId = $page->field('insured_id');
 	my $insuredIdField = $self->getField('insured_id');
-	my $billSeq = $self->getField('bill_sequence');	
-	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-	if ($relToInsured != $INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
+	my $personId = $page->field('person_id');
+	# If the relationship is not 'SELF' and Insured Person ID is blank or same as Patient ID
+	if ($relToInsured != App::Universal::INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
 	{	
 		if($insuredId ne '')
 		{
@@ -225,258 +279,114 @@ sub customValidate
 		else
 		{
 			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient ',null,null,['_f_person_id'],['_f_insured_id']);};	
-			my $invMsg = qq{<a href="$createPersonHref">Create Insured Patient</a> };
+			my $invMsg = qq{$insuredIdField->{caption} is required when Relationship is not 'Self'.  <a href="$createPersonHref">Create A New Person ID?</a> };
 			$insuredIdField->invalidate($page, $invMsg)
 		}
 	}
-
-	elsif($relToInsured == $INSURED_SELF && ($insuredId ne $personId && $insuredId ne ''))
+	elsif($relToInsured == $App::Universal::INSURED_SELF && ($insuredId ne $personId && $insuredId ne ''))
 	{
 		$relToInsuredField->invalidate($page, "Must select '$relToInsuredField->{caption}' (other than 'Self') if '$insuredIdField->{caption}' is not '$personId'.");
 		$insuredIdField->invalidate($page, "'$insuredIdField->{caption}' must be '$personId' when selecting 'Self' in '$relToInsuredField->{caption}'");
 	}
-
-	my $insOrg = $self->getField('insplan')->{fields}->[0];
-	my $productName = $self->getField('insplan')->{fields}->[1];
-	my $PlanName = $self->getField('insplan')->{fields}->[2];
-
-	my $sequence = $page->field('bill_sequence');
-	my $previousSequence = $page->field('bill_seq_hidden');
-	my $nextSequence = $previousSequence + 1;
-	my $coverageExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $sequence);
-	my $coverageCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$sequence);
-
-	$billSeq->invalidate($page, "'$coverageCaption' Insurance already exists for '$personId' ") if ($coverageExists != 0 && $sequence <= 4 && $sequence ne $previousSequence);
-	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
-	my $seq =1;
-
-	if ($sequence <= 4)
+	# If the relationship is other, the "Other Relationship" field becomes required
+	if ($relToInsured == App::Universal::INSURED_OTHER)
 	{
-		for($seq =1; $seq < $sequence; $seq++)
+		my $otherField = $self->getField('extra');
+		$otherField->invalidate($page, "$otherField->{caption} is required when Relationship is 'Other'.");
+	}
+
+	# Validate that Insurance Product exists (if entered)
+	my $productRecord;
+	if ($page->field('product_name'))
+	{
+		$productRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgId, $page->field('product_name'));
+		if ($productRecord)
 		{
-			my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
-			my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
-			$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if ($previousInsExists != 1);
+			$page->property('productRecord', $productRecord) if defined $productRecord;
 		}
-
-		my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
-		$billSeq->invalidate($page, "'$coverageCaptionInc Insurance' cannot be replaced with '$coverageCaption Insurance' because '$coverageCaptionInc Insurance' should exist for '$personId' inorder to add '$coverageCaption Insurance'. ") if ( $sequence > $previousSequence  && $command eq 'update');
-	}
-
-
-	if ($command eq 'update' && $sequence == App::Universal::INSURANCE_INACTIVE)
-	{
-
-		if ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $nextSequence) && $nextSequence <=3)
-		{
-			my $insData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $personId, $previousSequence);
-			my $insInternalId = $page->param('ins_internal_id');
-
-			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
-
-			if($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence))
-			{
-				$STMTMGR_INSURANCE->execute($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $insInternalId, $previousSequence);
-
-				my $createInsCoverageHref = "'/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'";
-				$billSeq->invalidate($page, "Do you want to Add a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
-			}
-			else
-			{
-				unless($page->field('create_record') eq 1)
-				{
-					my $checkBox = $self->getField('create_record');
-					$checkBox->invalidate($page, "Check the 'Check Box' to Inactivate the Coverage");
-				}
-				if ($page->field('create_record') eq 1)
-				{
-					return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
-				}
-			}
-		}
-	}
-
-	elsif ($command eq 'update' && $previousSequence < 4 && $sequence > 4 && $sequence != App::Universal::INSURANCE_INACTIVE)
-	{
-		return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
-	}
-
-	my $planName = $page->field('plan_name');
-	my $pdtName = $page->field('product_name');
-	my $preFilledOrg = $page->field('ins_comp');
-	my $preFilledProduct = $page->field('product');
-	my $preFilledPlan =  $page->field('plan');
-	my $prePlanId = $self->getField('insplan')->{fields}->[1];
-	my $planId = $self->getField('plan_name');
-	my $prePdtId = $self->getField('insplan')->{fields}->[0];
-	my $productId = $self->getField('product_name');
-	my $insOrgId = $page->field('ins_org_id');
-	my $ownerOrgId = $page->session('org_internal_id');
-	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
-
-	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$pdtName, $insOrgInternalId) if $pdtName ne '';
-	my $doesPreFilledProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$preFilledProduct, $preFilledOrg) if $preFilledProduct ne '';
-
-	my $createInsProductHref = "javascript:doActionPopup('/org-p/$insOrgId/dlg-add-ins-product?_f_ins_org_id=$insOrgId&_f_product_name=$pdtName');";
-	$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$insOrgId'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductHref">Add Product '$pdtName' now</a>
-		}) if $doesProductExist eq '' && $pdtName ne '';
-
-	my $createInsProductPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-product?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct');";
-	$prePdtId->invalidate($page, qq{ Product Name '$preFilledProduct' does not exist in '$preFilledOrg'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsProductPreHref">Add Product '$preFilledProduct' now</a>
-		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
-
-	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$pdtName, $planName, $insOrgInternalId);
-	my $preFilledplanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$preFilledProduct, $preFilledPlan, $preFilledOrg);
-	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$insOrgId/dlg-add-ins-plan?_f_ins_org_id=$insOrgId&_f_product_name=$pdtName&_f_plan_name=$planName');";
-		$planId->invalidate($page, qq{ Plan Name '$planName' does not exist for the Product Name '$pdtName'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createInsPlanPreHref">Add Plan '$planName' now</a>
-		}) if $planForOrgExists eq '' && $planName ne '';
-
-	my $createPreInsPlanPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-plan?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct&_f_plan_name=$preFilledPlan');";
-		$prePlanId->invalidate($page, qq{ Plan Name '$preFilledPlan' does not exist for the Product Name '$preFilledProduct'.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createPreInsPlanPreHref">Add Plan '$preFilledPlan' now</a>
-		}) if $preFilledplanExists eq '' && $preFilledPlan ne '';
-
-	my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
-	my $insInternalId = $page->param('ins_internal_id') || undef;
-
-	my $personalCoverageData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$insInternalId);
-	my $dataOrgId = $personalCoverageData->{'ins_org_id'};
-	my $dataProductName = $personalCoverageData->{'product_name'};
-	my $dataPlanName = $personalCoverageData->{'plan_name'};
-
-	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$pdtName, $planName, $recordType, $personId, $insOrgInternalId) if !($pdtName eq $dataProductName && $dataPlanName eq $planName && $insOrgInternalId eq $dataOrgId);
-	my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
-
-	$planId->invalidate($page, "This Personal Coverage already exists for '$personId'.") if $personPlanExists ne '' ;
-	$prePlanId->invalidate($page, "This Personal Coverage already exists for '$personId'.") if $preFilledpersonPlanExists ne '';
-
-}
-
-sub populateData_add
-{
-	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
-
-	my $relationToIns = App::Universal::INSURED_SELF;
-	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-	my $seq = 0;
-	my $hiddenBillSeq = $page->field('bill_sequence');
-	if($hiddenBillSeq ne  '')
-	{
-		$page->field('bill_sequence', $hiddenBillSeq);
-	}
-	else
-	{
-		while ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, ++$seq)) {};
-
-		if ($seq > 4)
-		{
-			$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
-		}
-
 		else
 		{
-			$page->field('bill_sequence', $seq);
+			my $productField = $self->getField('product_name');
+			$productField->invalidate($page, "Insurance Product '$page->field('product_name')' does not exist");
 		}
 	}
-	my $productName = $page->field('product_name');
-	my $planName = $page->field('plan_name');
-	my $insOrgId = $page->field('ins_org_id');
-	my $ownerOrgId = $page->session('org_internal_id');
-	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
-	my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-	$STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId) if $page->field('ins_org_id') ne '';
-	my $planData = 	$STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId)if $page->field('ins_org_id') ne '';
-	my $getInsOrgInternalId = $planData->{'ins_org_id'};
-	my $getInsOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $getInsOrgInternalId);
-	$page->field('ins_org_id', $getInsOrgId->{org_id});
-	$page->field('rel_to_insured', $relationToIns);
-	$page->field('insured_id', $personId) if $relationToIns == App::Universal::INSURED_SELF;
-}
 
-sub populateData_update
-{
-	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	# Populating the fields while updating the dialog
-	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
-
-	my $insIntId = $page->param('ins_internal_id');
-	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId))
+	# Validate that Insurance Plan exists (if entered) and is a child of Insurance Product
+	my $planRecord;
+	if ($page->field('plan_name'))
 	{
-		$page->addError("Ins Internal ID '$insIntId' not found.");
+		my $planField = $self->getField('plan_name');
+		$planRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanRecord', $ownerOrgId, $page->field('plan_name'));
+		if ($planRecord)
+		{
+			$page->property('planRecord', $planRecord);
+			if ($productRecord && $planRecord->{'parent_ins_id'} != $productRecord->{'ins_internal_id'})
+			{
+				$planField->invalidate($page, "'@{[$page->field('plan_name')]}' is not a not a Plan of the '@{[$page->field('product_name')]}' Product");
+			}
+		}
+		else
+		{	
+			$planField->invalidate($page, "Insurance Plan '$page->field('plan_name')' does not exist");
+		}
 	}
-
-	my $selInsOrgData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
-	my $insOrgInternalId = $selInsOrgData->{'ins_org_id'};
-	my $insOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $insOrgInternalId);
-	$page->field('ins_org_id', $insOrgId->{org_id});
-
-	my $prevBillSeq = $page->field('bill_sequence');
-	$page->field('bill_seq_hidden', $prevBillSeq);
+	
+	# Validate that they entered either a product or a plan
+	unless($productRecord || $planRecord)
+	{
+		$self->getField('product_name')->invalidate($page, "You must enter an Insurance Product or a Plan");
+		$self->getField('plan_name')->invalidate($page, "You must enter an Insurance Product or a Plan");
+	}
 }
 
-sub populateData_remove
-{
-	populateData_update(@_);
-}
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-
-	my $productName = $page->field('product_name');
-	my $planName = $page->field('plan_name');
-	my $insOrgId = $page->field('ins_org_id');
-	my $ownerOrgId = $page->session('org_internal_id');
-	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
-
-	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId);
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
-	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
-
-	my $insType = $planData->{'ins_type'} ne '' ? $planData->{'ins_type'} : $recordData->{'ins_type'};
-	my $editInsIntId = $page->param('ins_internal_id');
-	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-
+	
+	my $ownerOrgIntId = $page->session('org_internal_id');
+	# Since Ins Plan is not required, the parent record could be a Plan or Product record	
+	my $parentRecord;
+	if ($page->field('plan_name'))
+	{
+		$parentRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanRecord', $ownerOrgIntId, $page->field('plan_name'));
+	}
+	else
+	{
+		$parentRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgIntId, $page->field('product_name'));
+	}
+	my $empOrgIntId = $page->field('employer_org_id') ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgIntId, $page->field('employer_org_id')) : undef;
 	my $insIntId = $page->schemaAction(
-				'Insurance', $command,
-				ins_internal_id => $editInsIntId || undef,
-				parent_ins_id => $parentInsId || undef,
-				product_name => $page->field('product_name') || undef,
-				plan_name => $page->field('plan_name') || undef,
-				record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
-				owner_person_id => $personId || undef,
-				ins_org_id => $insOrgInternalId || undef,
-				owner_org_id => $ownerOrgId,
-				bill_sequence => $page->field('bill_sequence') || undef,
-				ins_type => $insType || undef,
-				#fee_schedule => $page->field('fee_schedule') || undef,
-				group_name => $page->field('group_name') || undef,
-				group_number => $page->field('group_number') || undef,
-				member_number => $page->field('member_number') || undef,
-				#policy_number => $page->field('policy_number') || undef,
-				insured_id => $page->field('insured_id') || undef,
-				guarantor_id => $page->field('guarantor_id') || undef,
-				rel_to_insured => $page->field('rel_to_insured') || undef,
-				extra          => $page->field('extra') || undef,
-				indiv_deduct_remain => $page->field('indiv_deduct_remain') || undef,
-				family_deduct_remain => $page->field('family_deduct_remain') || undef,
-				copay_amt => $page->field('copay_amt') || undef,
-				coverage_begin_date => $page->field('coverage_begin_date') || undef,
-				coverage_end_date => $page->field('coverage_end_date') || undef,
-				indiv_deductible_amt => $page->field('indiv_deductible_amt') || undef,
-				family_deductible_amt => $page->field('family_deductible_amt') || undef,
-				percentage_pay => $page->field('percentage_pay') || undef,
-				threshold => $page->field('threshold') || undef,
-				_debug => 0
-			);
+		'Insurance', $command,
+		ins_internal_id			=> $page->param('ins_internal_id') || undef,
+		parent_ins_id			=> $parentRecord->{'ins_internal_id'} || undef,
+		product_name			=> $page->field('product_name') || undef,
+		plan_name				=> $page->field('plan_name') || undef,
+		record_type				=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
+		owner_person_id			=> $page->param('person_id') || $page->field('person_id') || undef,
+		ins_org_id				=> $parentRecord->{'ins_org_id'} || undef,
+		owner_org_id			=> $ownerOrgIntId,
+		bill_sequence			=> $page->field('bill_sequence'),
+		ins_type				=> $parentRecord->{'ins_type'} || undef,
+		employer_org_id			=> $empOrgIntId || undef,
+		group_name				=> $page->field('group_name') || undef,
+		group_number			=> $page->field('group_number') || undef,
+		member_number			=> $page->field('member_number') || undef,
+		insured_id				=> $page->field('insured_id') || undef,
+		guarantor_id			=> $page->field('guarantor_id') || undef,
+		rel_to_insured			=> $page->field('rel_to_insured') || undef,
+		extra					=> $page->field('extra') || undef,
+		indiv_deduct_remain		=> $page->field('indiv_deduct_remain') || undef,
+		family_deduct_remain	=> $page->field('family_deduct_remain') || undef,
+		copay_amt				=> $page->field('copay_amt') || undef,
+		coverage_begin_date		=> $page->field('coverage_begin_date') || undef,
+		coverage_end_date		=> $page->field('coverage_end_date') || undef,
+		indiv_deductible_amt	=> $page->field('indiv_deductible_amt') || undef,
+		family_deductible_amt	=> $page->field('family_deductible_amt') || undef,
+		percentage_pay			=> $page->field('percentage_pay') || undef,
+		threshold				=> $page->field('threshold') || undef,
+		_debug => 0
+		);
 
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
