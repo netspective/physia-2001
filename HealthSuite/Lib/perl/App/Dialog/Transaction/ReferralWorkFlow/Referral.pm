@@ -63,7 +63,7 @@ sub initialize
 
 		push(@request,new CGI::Dialog::Field(caption =>'Referral Type ',
 					name => "referral_type$loop",
-					#options => FLDFLAG_PREPENDBLANK,
+					options => FLDFLAG_PREPENDBLANK,
 					fKeyStmtMgr => $STMTMGR_TRANSACTION,
 					fKeyStmtFlags => STMTMGRFLAG_DYNAMICSQL,
 					fKeyStmt => $sqlStmt,
