@@ -913,10 +913,11 @@ sub hasPermission
 
 use CGI::Cookie;
 
-sub getActiveSession
+sub getActiveUser
 {
 	my %cookies = fetch CGI::Cookie;
-	my $session;
+	my $person_id;
+	my $org_id;
 
 	if(my $sessionCookie = $cookies{SESSIONID_COOKIENAME()})
 	{
@@ -929,7 +930,7 @@ sub getActiveSession
 					s.person_id AS person_id,
 					o.org_id AS org_id
 				FROM
-					session s,
+					person_session s,
 					org o
 				WHERE
 					s.org_internal_id = o.org_internal_id AND
@@ -937,7 +938,9 @@ sub getActiveSession
 					s.remote_host = ?
 			});
 			$sth->execute($sessionCookie->value(), $ENV{REMOTE_ADDR});
-			$session = $sth->fetchrow_hashref;
+			my $session = $sth->fetchrow_hashref;
+			$person_id = $session->{PERSON_ID};
+			$org_id = $session->{ORG_ID};
 		};
 		if ($@)
 		{
@@ -945,18 +948,8 @@ sub getActiveSession
 			warn $@;
 			undef $@;
 		}
-		#my ($ec, $em);
-		#my %session;
-		#tie %session, 'CGI::Session::DBI', $sessionKey,
-		#	{
-		#		dbh => $schema->{dbh},
-		#		remote_addr => $ENV{REMOTE_ADDR},
-		#		errorCode_ref => \$ec,
-		#		errorMsg_ref => \$em,
-		#	};
-		#return \%session;
 	}
-	return $session;
+	return wantarray ? ($person_id, $org_id) : $person_id;
 }
 
 1;
