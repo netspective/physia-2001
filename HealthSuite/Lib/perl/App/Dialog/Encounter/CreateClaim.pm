@@ -15,6 +15,7 @@ use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Catalog;
 use App::Universal;
+use App::InvoiceUtilities;
 use Text::Abbrev;
 
 use vars qw(@ISA  %PROCENTRYABBREV %RESOURCE_MAP);
@@ -158,33 +159,15 @@ sub execute_update
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $todaysDate = $page->getDate();
 	my $invoiceId = $page->param('invoice_id');
-	if($command eq 'update')
-	{
-	#	$page->schemaAction(
-	#		'Invoice_Attribute', 'add',
-	#		item_id => $page->field('batch_item_id') || undef,
-	#		parent_id => $invoiceId || undef,
-	#		item_name => 'Invoice/Edit/Batch ID',
-	#		value_type => defined $textValueType ? $textValueType : undef,
-	#		value_text => $batchId || undef,
-	#		value_date => $page->field('batch_date') || undef,
-	#		_debug => 0
-	#	);
 
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => 'Updated',
-			#value_textB => "Edit Batch ID: $batchId",
-			value_date => $todaysDate,
-			_debug => 0
-		);
-	}
+	#add history item
+	addHistoryItem($page, $invoiceId,
+		value_text => 'Updated',
+		value_date => $todaysDate,
+	);
+
 
 	$self->handlePostExecute($page, $command, $flags);
 	#$page->endUnitWork();
@@ -231,7 +214,6 @@ sub execute_remove
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			#balance => defined $itemBalance ? $itemBalance : undef,
 			_debug => 0
 		);
 
@@ -246,24 +228,12 @@ sub execute_remove
 
 	}
 
-	#VOID CLAIM
-	#my $totalCost = 0;
-	#my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-	#foreach my $item (@{$updatedLineItems})
-	#{
-	#	$totalCost += $item->{extended_cost};
-	#}
-
-	#my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	#my $balance = $totalCost + $invoiceInfo->{total_adjust};
 
 	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		#total_cost => defined $totalCost ? $totalCost : undef,
-		#balance => defined $balance ? $balance : undef,
 		_debug => 0
 	);
 
@@ -282,18 +252,13 @@ sub execute_remove
 	);
 
 
-	#ADD HISTORY ATTRIBUTE
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	#ADD HISTORY ITEM
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $invoiceId,
 		value_text => 'Voided claim',
 		value_date => $todaysDate,
-		_debug => 0
 	);
+
 
 	#$page->endUnitWork();
 	$page->redirect("/invoice/$invoiceId/summary");
