@@ -136,6 +136,12 @@ sub prepare_page_content_header
 	my $personId = $self->param('person_id');
 
 	my $category = lc($self->property('person_categories')->[0]) || undef;
+	# If the category isnt one of the predefined four, assume its staff.
+	my $updateCategory = $category;
+
+	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient')) {
+		$updateCategory = 'staff';
+	}
 
 	my $urlPrefix = "/person/$personId";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
@@ -175,7 +181,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId">Schedule Appointment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
 						<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
-						<OPTION value="/person/$personId/dlg-update-$category?home=$homeArl">Edit Profile</OPTION>
+						<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
 						<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
 						<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
