@@ -23,7 +23,7 @@ create or replace procedure changeDates(p_days in number,
 		
 begin
 
-        disable_triggers;
+        disable_aud_triggers;
 
         if p_days < 0 then
         	v_operation := '-';
@@ -103,7 +103,7 @@ begin
 	
 	commit;
 	
-	enable_triggers;
+	enable_aud_triggers;
 	
 /*   	UTL_FILE.FCLOSE(output_file);   */
    	
