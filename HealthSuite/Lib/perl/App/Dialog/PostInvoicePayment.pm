@@ -400,19 +400,32 @@ sub customValidate
 	my $paidBy = $page->param('paidBy');
 	if($paidBy eq 'insurance')
 	{
-		my $totalAdjsApplied = $page->field('check_amount');
+		my $totalAdjsApplied = 0;
+		my $lineCount = $page->param('_f_line_count');
+		#calculate total adjustment (plan paid and writeoff amounts)
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			my $planPaid = $page->param("_f_item_$line\_plan_paid");
+			my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
+			next if $planPaid eq '' && $writeoffAmt eq '';
+			
+			$totalAdjsApplied += ($planPaid + $writeoffAmt);
+		}
+
 		my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 		my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
 		my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
 
+		my $newBalance = $invoiceInfo->{balance} - $totalAdjsApplied;
 		my $invoiceStat = $invoiceInfo->{invoice_status};
 		if( 
-			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $invoiceInfo->{balance} > 0 && $invoiceInfo->{balance} > $totalAdjsApplied && 
+			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $newBalance > 0  && 
 			(
 				($invoiceStat >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStat <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
 				$invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||
-				$invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStat == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED
+				$invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStat == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED ||
+				$invoiceStat == App::Universal::INVOICESTATUS_CLOSED
 			) 
 		    )
 		{
