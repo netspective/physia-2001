@@ -1580,7 +1580,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.testsAndMeasurements' => {
 	sqlStmt => qq{
-			select tm.trans_owner_id, %simpleDate:tm.trans_begin_stamp%,tm.data_text_b,tm.data_text_a,tc.no_of_tests
+			select tm.trans_owner_id, to_char(tm.trans_begin_stamp, 'mm/dd/yyyy HH:MI PM'),tm.data_text_b,tm.data_text_a,tc.no_of_tests
 			from testsandmeasurements tm, testsandmeasurementscount tc
 			where tm.trans_owner_id = tc.trans_owner_id
 			and tm.data_text_b = tc.data_text_b
