@@ -1,5 +1,5 @@
 --
---  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.6 2000-06-14 15:43:09 alex_hillman Exp $
+--  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/glogin.sql,v 1.1 2000-06-14 15:42:13 alex_hillman Exp $
 --  Copyright (c) Oracle Corporation 1988, 1994, 1995.  All Rights Reserved.
 --
 --  SQL*Plus Global Login startup file.
@@ -35,4 +35,6 @@ set pagesize 24
 start get_prompt
 
 SET SERVEROUTPUT ON SIZE 1000000
+
+define _EDITOR=vi
 
