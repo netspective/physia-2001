@@ -9,7 +9,12 @@
 	</release-info>
 	
 	<deliverables>
-	
+
+		<deliverable id="359">
+			UI:  Implementation for batch paper claims and paper claim printing.  This bug
+			is really partially complete pending completion of printing device management.
+		</deliverable>
+			
 		<deliverable id="915">
 			Initial implementation of a Verifications Work List.
 		</deliverable>
@@ -95,6 +100,9 @@
 			UI: Adjustment detail popup window showing correctly for generic invoices.
 		</deliverable>
 
+		<deliverable id="1069">
+			UI: Correct Next-Actions on CheckOut dialog.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
