@@ -4,9 +4,7 @@ start tables-code/Invoice_Worklist
 start tables/Statement
 start tables-code/Statement
 
-start tables/Statement_Invoice_IDS
-start tables-code/Statement_Invoice_IDS
-
+start tables/Statement_Inv_ids
 
 start tables/Org_Association
 start tables-code/Org_Association
