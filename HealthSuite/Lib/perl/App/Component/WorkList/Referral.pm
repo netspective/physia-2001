@@ -126,7 +126,7 @@ sub getComponentHtml
 								<input type='button' value='Add Patient' onClick="javascript:clickMenuRef('org/#session.org_id#/dlg-add-patient');">
 								<input type='button' value='Edit Patient' onClick="javascript:clickMenuRef('search/patient');">
 								<input type='button' value='Edit Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
-								<input type='button' value='Add Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
+								<input type='button' value='Add Service Request' onClick="javascript:clickMenuRef('org/#session.org_id#/dlg-add-referral-person');">
 								<input type='button' value='Add Referral' onClick="javascript:clickMenuRef('worklist/referral');">
 								<input type='button' value='Edit Referral' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
 							</TD>
