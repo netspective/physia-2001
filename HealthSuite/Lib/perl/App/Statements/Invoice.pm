@@ -313,6 +313,13 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice_billing
 		where bill_id = ?
 		},
+	'selInvoiceBillingByInvoiceIdAndBillSeq' => qq{
+		select *
+		from invoice_billing
+		where invoice_id = ?
+			and bill_sequence = ?
+			and invoice_item_id is NULL
+		},
 	'selInvoiceBillingPrimary' => qq{
 		select *
 		from invoice_billing
