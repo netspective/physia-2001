@@ -24,11 +24,12 @@ while(<NSF>)
 	next unless /^FA001(.*?)\s/;
 
 	my $claimNo = $1;
+	next unless $claimNo;
+
 	push(@transmittedClaims, $claimNo);
 }
 
-my @sortedClaims = sort @transmittedClaims;
-print "@sortedClaims\n";
+my @sortedClaims = sort {$a <=> $b} @transmittedClaims;
 
 my @inStrings = ();
 for(my $i=0; $i< scalar @sortedClaims; $i += $batchSize)
@@ -47,9 +48,8 @@ for (@inStrings)
 for my $sqlStmt (@sqlStmts)
 {
 	my $sth = $dbh->prepare($sqlStmt);
-	my $result = $sth->execute();
-
 	print "$sqlStmt\n";
+	my $result = $sth->execute();
 	print "$result\n";
 
 	$sth->finish();
@@ -59,7 +59,7 @@ $dbh->disconnect();
 
 use Mail::Sendmail;
 
-my $sendMailTo = 'help@physia.com';
+my $sendMailTo = $ENV{TESTMODE} ? 'thai_nguyen@physia.com' : 'help@physia.com';
 my $user = getpwuid($>) || '';
 
 my %mail =
@@ -67,7 +67,7 @@ my %mail =
 	From => $user . '@physia.com',
 	Cc => 'thai_nguyen@physia.com',
 	Subject => "Claims Submission to Per-Se - " . `date`,
-	Message => "The following claims were submitted to Per-Se today:\n\n"
+	Message => "The following claims were submitted to Per-Se in file $nsfFileName:\n\n"
 		. "@{[ join(', ', @sortedClaims) ]}." ,
 	Smtp => 'smtp.physia.com',
 );

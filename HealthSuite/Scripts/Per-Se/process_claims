@@ -1,5 +1,5 @@
 . /etc/profile
 . $HOME/.bash_profile
 
-get_perse_report >> get_perse_report.log 2>&1
-transmit_claims >> transmit_claims.log 2>&1
+getPerseReports.pl >> getPerseReports.log 2>&1
+nsfClaims.pl db-pro_new create transmit archive >> nsfClaims.log 2>&1

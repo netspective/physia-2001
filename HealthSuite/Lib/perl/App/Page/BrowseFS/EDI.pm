@@ -18,10 +18,12 @@ sub initialize
 {
 	my $self = shift;
 	$self->SUPER::initialize(@_);
+	
+	my $orgId = $self->session('org_internal_id');
 
 	$self->setBrowseInfo(
 		heading => 'Per-Se EDI Reports',
-		rootFS => $CONFDATA_SERVER->path_PerSeEDIErrors(), 
+		rootFS => "@{[$CONFDATA_SERVER->path_PerSeEDIReports()]}/$orgId", 
 		rootURL => '/edi',
 		rootURLCaption => 'EDI',
 		rootHeading => 'EDI Data',

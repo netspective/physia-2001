@@ -35,6 +35,8 @@ struct(ServerConfigData => [
 	path_PerSeEDIDataOutgoing => '$',
 	path_PerSeEDIErrors => '$',
 	path_PerSeEDIErrorsDelim => '$',
+	path_PerSeEDIReports => '$',
+	path_PerSeEDIReportsDelim => '$',
 	path_PaperClaims => '$',
 	path_OrgLib => '$',
 	path_PersonLib => '$',
@@ -155,6 +157,8 @@ sub getDefaultConfig
 	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
+	$config->path_PerSeEDIReports(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports'));
+	$config->path_PerSeEDIReportsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports-delim'));	
 	$config->path_OrgLib(PATH_ORGLIB);
 	$config->path_PersonLib(PATH_PERSONLIB);
 
