@@ -208,9 +208,9 @@ sub execute
 			$stack .= '&nbsp;&nbsp;' . "$i - $pack line $line<br>";
 		}
 		$stack = "<b>Stack Trace:</b><br>$stack<br>";
-		$debugMsg = "<b>Statement Manager:</b> <a href='/sde/stmgr/$stmtMgrName'>$stmtMgrName</a><br>";
+		$debugMsg = "<b>Statement Manager:</b> <a href='/sde/stmgrs/$stmtMgrName'>$stmtMgrName</a><br>";
 		$debugMsg .= "<b>Statement Name:</b> ";
-		$debugMsg .= $flags & STMTMGRFLAG_DYNAMICSQL ? "$stmtName<br>" : "<a href='/sde/stmgr/$stmtMgrName/$stmtName'>$stmtName</a><br>";
+		$debugMsg .= $flags & STMTMGRFLAG_DYNAMICSQL ? "$stmtName<br>" : "<a href='/sde/stmgrs/$stmtMgrName/$stmtName'>$stmtName</a><br>";
 		$debugMsg .= "<b>Query:</b><pre>$stmt</pre>";
 		$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
 		for my $i ( 0..$#_)
