@@ -62,7 +62,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
-
+		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -475,18 +475,17 @@ sub handlePayers
 	# -----------------------------------------------------
 
 
-	my $claimType = '';
 	my $payer = $page->field('payer');
 	if($payer eq 'Self-Pay')
 	{
 		$page->field('primary_payer', $fakeProdNameSelfPay);
-		$claimType = $typeSelfPay;
+		$page->field('claim_type', $typeSelfPay);
 	}
 	elsif($payer eq 'Third-Party Payer')
 	{
 		$page->field('primary_payer', $fakeProdNameThirdParty);
 		#$page->field('third_party_payer_id', id from inserted fields goes here);
-		$claimType = $typeClient;
+		$page->field('claim_type', $typeSelfPay);
 	}
 	else
 	{
@@ -499,25 +498,25 @@ sub handlePayers
 				if($singlePayer[0] eq 'Primary')
 				{
 					my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
-					$claimType = $primIns->{ins_type};
+					$page->field('claim_type', $primIns->{ins_type});
 					$page->field('primary_payer', $primIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Secondary')
 				{
 					my $secIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $secondary, $personId);
-					#$claimType = $secIns->{ins_type};
+					#$page->field('claim_type', $secIns->{ins_type});
 					$page->field('secondary_payer', $secIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Tertiary')
 				{
 					my $tertIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $tertiary, $personId);
-					#$claimType = $tertIns->{ins_type};
+					#$page->field('claim_type', $tertIns->{ins_type});
 					$page->field('tertiary_payer', $tertIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Quaternary')
 				{
 					my $quatIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $quaternary, $personId);
-					#$claimType = $quatIns->{ins_type};
+					#$page->field('claim_type', $quatIns->{ins_type});
 					$page->field('quaternary_payer', $quatIns->{product_name});
 				}
 			}
@@ -529,38 +528,39 @@ sub handlePayers
 			{
 				my @primaryPlan = split('\)', $nonInsPayer[1]);
 				my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
-				$claimType = $primIns->{ins_type};
+				$page->field('claim_type', $primIns->{ins_type});
 				$page->field('primary_payer', $primIns->{product_name});
 			}
 			elsif($nonInsPayer[0] eq 'Work Comp')
 			{
 				my @wcPlanName = split('\)', $nonInsPayer[1]);
 				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, $typeWorkComp);
-				$claimType = $typeWorkComp;
+				$page->field('claim_type', $typeWorkComp);
 				$page->field('primary_payer', $workCompPlanInfo->{product_name});
 			}
 			elsif($nonInsPayer[0] eq 'Third-Party')
 			{
 				my @thirdPartyOrgId = split('\)', $nonInsPayer[1]);
 				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyOrgId[0], $typeClient);
-				$claimType = $typeClient;
+				$page->field('claim_type', $typeClient);
 				$page->field('primary_payer', $fakeProdNameThirdParty);
 				$page->field('third_party_payer_id', $thirdPartyPlan->{owner_org_id});
 			}
 		}
 	}
 
-	addTransactionAndInvoice($self, $page, $command, $flags, $claimType);
+	addTransactionAndInvoice($self, $page, $command, $flags);
 }
 
 sub addTransactionAndInvoice
 {
-	my ($self, $page, $command, $flags, $claimType) = @_;
+	my ($self, $page, $command, $flags) = @_;
 	$command ||= 'add';
 
 	my $sessOrg = $page->session('org_id');
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('attendee_id');
+	my $claimType = $page->field('claim_type');
 	my $editInvoiceId = $page->param('invoice_id');
 	my $editTransId = $page->field('trans_id');
 	my $timeStamp = $page->getTimeStamp();
@@ -1186,7 +1186,7 @@ sub handleBillingInfo
 	#redirect to next function according to copay due
 
 	my $copayAmt = $page->field('copay_amt');
-	if($copayAmt && ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
+	if($copayAmt && $page->field('claim_type') == App::Universal::CLAIMTYPE_HMO && ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
 	{
 		billCopay($self, $page, 'add', $flags, $invoiceId);
 	}
