@@ -106,7 +106,7 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG = qq{
 		'attr-%sqlvar_entityName%-' || value_type AS dialogid_suffix
 	FROM
 		%sqlvar_entityName%_attribute,
-		attribute_value_type avt
+		attribute_value_type avt 
 	WHERE 
 		parent_id = (
 			SELECT org_internal_id
@@ -124,6 +124,12 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG = qq{
 			@{[ App::Universal::ATTRTYPE_BILLING_PHONE ]}
 		)
 		AND	avt.id = value_type
+		AND	EXISTS
+		(	SELECT 1 FROM Org_Contact_Name ocn 
+			WHERE 	(ocn.caption = item_name AND value_type <> @{[ App::Universal::ATTRTYPE_BILLING_PHONE ]})
+			OR	(ocn.caption = value_textb and value_type = @{[ App::Universal::ATTRTYPE_BILLING_PHONE ]})
+		)
+
 	UNION ALL (
 		SELECT
 			0 AS preferred,
@@ -142,7 +148,7 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG = qq{
 			item_id,
 			address_name AS caption,
 			DECODE('%sqlvar_entityName%', 'Person', 'attr-person-', 'Org', 'attr-org-' ) || @{[ App::Universal::ATTRTYPE_FAKE_ADDRESS() ]} AS dialogid_suffix
-		FROM %sqlvar_entityName%_address
+		FROM %sqlvar_entityName%_address, Org_Contact_Addrs oca
 		WHERE
 			parent_id = (
 				SELECT org_internal_id
@@ -151,6 +157,7 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG = qq{
 					owner_org_id = :2
 					AND	org_id = :1
 			)
+		AND	oca.caption = 	%sqlvar_entityName%_address.address_name		
 	)
 	ORDER BY value_type
 };
