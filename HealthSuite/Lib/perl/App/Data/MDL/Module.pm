@@ -7,10 +7,11 @@ use App::Universal;
 use Dumpvalue;
 use DBI::StatementManager;
 use App::Statements::Insurance;
+use App::Statements::Org;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
-use vars qw(@ISA @EXPORT %PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP %BILL_SEQUENCE_TYPE_MAP %DEDUCTIBLE_TYPE_MAP %INSURANCE_TYPE_MAP);
+use vars qw(@ISA @EXPORT %PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP %BILL_SEQUENCE_TYPE_MAP %DEDUCTIBLE_TYPE_MAP %INSURANCE_TYPE_MAP %BILLINGPARTY_TYPE_MAP);
 use enum qw(BITMASK:MDLFLAG_ LOGSQL SHOWSTATUS SHOWMISSINGITEMS LOGACTIVITY DEBUG);
 use constant MDLFLAGS_VERBOSE => MDLFLAG_SHOWSTATUS | MDLFLAG_SHOWMISSINGITEMS | MDLFLAG_LOGACTIVITY;
 use constant MDLFLAGS_DEFAULT => 0;
@@ -58,7 +59,15 @@ use constant MDLFLAGS_DEFAULT => 0;
 	'Champus' => App::Universal::CLAIMTYPE_CHAMPUS,
 	'ChampVA' => App::Universal::CLAIMTYPE_CHAMPVA,
 	'WorkersComp' => App::Universal::CLAIMTYPE_WORKERSCOMP,
-	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NON_CAP
+	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NON_CAP,
+	'ThirdParty' => App::Universal::CLAIMTYPE_CLIENT
+);
+
+%BILLINGPARTY_TYPE_MAP = (
+	'client' => App::Universal::INVOICEBILLTYPE_CLIENT,
+	'person' => App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON,
+	'org' => App::Universal::INVOICEBILLTYPE_THIRDPARTYORG,
+	'insurance' => App::Universal::INVOICEBILLTYPE_THIRDPARTYINS
 );
 
 
@@ -362,6 +371,8 @@ sub importInsurance
 			my $ownerOrg = $item->{'owner-org'};
 			my $productName = $item->{'ins-id'};
 			my $planName = $item->{'policy-name'};
+			my $guarantor = $item->{guarantor};
+			my $guarantorType = $item->{'guarantor-type'};
 			my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
 			my $insInternalId = $planData->{'ins_internal_id'};
@@ -371,13 +382,13 @@ sub importInsurance
 								ins_org_id 		=> $insOrgId || undef,
 								record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 								owner_person_id => $ownerId || undef,
-								owner_org_id =>   $ownerOrg || undef,
-								guarantor_id    => $item->{guarantor} || undef,
-								guarantor_type  => $item->{'guarantor-type'} || undef,
+								owner_org_id    =>  $ownerOrg || undef,
+								guarantor_id    => $guarantor || undef,
+								guarantor_type  => $guarantorType || undef,
 								parent_ins_id 	=> $planData->{'ins_internal_id'} || undef,
 								product_name  	=> $item->{'ins-id'} || undef,
-								plan_name 		=> $item->{'policy-name'} || undef,
-								bill_sequence 	=> $BILL_SEQUENCE_TYPE_MAP{exists $item->{'bill-sequence'} ? $item->{'bill-sequence'} :''},
+								plan_name 	=> $item->{'policy-name'} || undef,
+								bill_sequence 	=> $BILL_SEQUENCE_TYPE_MAP{exists $item->{'bill-sequence'} ? $item->{'bill-sequence'} :''} || undef,
 								member_number 	=> $item->{'member-number'} || undef,
 								policy_number   => $item->{'member-number'} || undef,
 								group_name   => $item->{'group-name'} || undef,
@@ -409,11 +420,36 @@ sub importInsurance
 						item_name => 'BCBS Plan Code',
 						value_type => 0);
 
-				$self->schemaAction($flags,"Insurance_Attribute", 'add',
-						parent_id => $insIntId || undef,
-						item_name => 'Fee Schedule',
-						value_type => 0,
-						value_text => $feeschedule->{'value_text'});
+				#$self->schemaAction($flags,"Insurance_Attribute", 'add',
+				#		parent_id => $insIntId || undef,
+				#		item_name => 'Fee Schedule',
+				#		value_type => 0,
+				#		value_text => $feeschedule->{'value_text'});
+				if ($insType  == App::Universal::CLAIMTYPE_CLIENT)
+				{
+					my $dv = new Dumpvalue;
+					$dv->dumpValue($insIntId);
+					my $mailingAddress = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $guarantor, 'Mailing');
+					$self->schemaAction($flags,"Insurance_Address", 'add',
+								parent_id    => $insIntId || undef,
+								address_name => $mailingAddress->{address_name} || undef,
+								line1        => $mailingAddress->{line1} || undef,
+								line2        => $mailingAddress->{line2} || undef,
+								city         => $mailingAddress->{city} || undef,
+								country      => $mailingAddress->{country} || undef,
+								state        => $mailingAddress->{state} || undef,
+								zip          => $mailingAddress->{zip} || undef
+							);
+
+					my $billingContact = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_NONE, 'selAttribute', $guarantor, 'Primary');
+					$self->schemaAction($flags,"Insurance_Attribute", 'add',
+								parent_id => $insIntId || undef,
+								item_name => 'Contact Method/Telephone/Primary' || undef,
+								value_type => App::Universal::ATTRTYPE_PHONE || undef,
+								value_text =>  $billingContact->{value_text} || undef,
+								value_textB => 'Primary' || undef
+							);
+				}
 
 
 			#$self->_importContactMethods($flags, $item->{'contact-methods'}, $item, 'Insurance', $insIntId);
