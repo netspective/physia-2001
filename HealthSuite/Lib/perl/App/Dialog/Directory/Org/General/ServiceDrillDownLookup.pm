@@ -48,6 +48,8 @@ sub prepare_detail_service
 	my $sessionId = $page->session('org_internal_id');
 	my $html =undef;
 	my $actionURL = q{javascript:doActionPopup('/org/#9#/profile')};
+	#my $lookupFeeSched = q{javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')};
+
 
 	#$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data = ();
@@ -60,7 +62,7 @@ sub prepare_detail_service
 			{colIdx => 3,head => 'City'},
 			{colIdx => 4,head => 'Street'},
 			{colIdx => 5,head => 'Phone'},
-			{colIdx => 7,head => 'Fee Schedule', url => "/org/#0#/catalog/#6#/#7#"},
+			{colIdx => 7,head => 'Fee Schedule', url => q{javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')},},
 			{colIdx => 8,head => 'Type'},
 			{colIdx => 9,head => 'Parent Provider',  dataFmt => "<a href=\"$actionURL\" style=\"text-decoration:none\"><img src=\"/resources/images/icons/hand-pointing-to-folder-sm.gif\" border=0></a>" },
 
