@@ -435,6 +435,7 @@ sub prepare_view_profile
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
+					#component.stp-person.miscNotes#<BR>
 					<font size=1 face=arial>
 					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
 						<TR VALIGN=TOP>
@@ -457,7 +458,7 @@ sub prepare_view_profile
 						#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedSessionPhysicians#<BR>
 					#component.stp-person.benefits#</BR>
-					#component.stp-person.miscNotes#</BR>
+					
 					</font>
 				</TD>
 				<!--
