@@ -498,14 +498,15 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $html = '';
+	my $specialHdl;
 
-	my $specialHdl = "$self->{type}_as_html";
-	eval
-	{
-		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
-	};
+	#my $specialHdl = "$self->{type}_as_html";
+	#eval
+	#{
+	#	$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
+	#};
 
-	if($@)
+	unless($specialHdl = $self->can("$self->{type}_as_html"))
 	{
 		# if there was an error running a special handler, then there was no
 		# special handler so just perform default html formatting
@@ -526,6 +527,10 @@ sub getHtml
 			$html = "<input type='hidden' name='$fieldName' value='$value'>";
 			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
 		}
+	}
+	else
+	{
+		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
 	}
 
 	return $html;
