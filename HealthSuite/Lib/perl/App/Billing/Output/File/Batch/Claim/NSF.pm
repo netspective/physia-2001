@@ -28,6 +28,7 @@ sub new
 
 	$params{records} = [];
 	$params{sequenceNo} = 0;
+	$params{procedureNo} = 0;
 	$params{cXXX} = 0;
 	$params{dXXX} = 0;
 	$params{eXXX} = 0;
@@ -58,6 +59,18 @@ sub getSequenceNo
 {
 	my $self = shift;
 	return $self->{sequenceNo};
+}
+
+sub setProcedureNo
+{
+	my ($self,$no) = @_;
+	$self->{procedureNo} = $no;
+}
+
+sub getProcedureNo
+{
+	my $self = shift;
+	return $self->{procedureNo};
 }
 
 sub incCountXXX
@@ -309,13 +322,14 @@ sub processClaim
 						push(@$outArray,$self->{HA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 					}
 				}
+				$self->setProcedureNo($self->getProcedureNo()+1);
 				$self->{totalClaimCharges} +=  $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getExtendedCost();
 				$self->{totalDisallowedCostContainmentCharges} += $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getDisallowedCostContainment();
 				$self->{totalDisallowedOtherCharges} += $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getDisallowedOther();
-				$self->setSequenceNo($self->getSequenceNo()+1);
 				$self->incCountXXX('fA0XXX');
 				$self->incCountXXX('fXXX');
 			}
+			$self->setSequenceNo($self->getSequenceNo()+1);
 		}
 	}
 

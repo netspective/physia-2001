@@ -53,7 +53,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%1s%1s%1s%1s%4s%4s%1s%1s%1s%-15s%-15s%-2s%1s%7s%7s%1s%1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%2s%2s%3s%3s%-8s%3s%7s%7s%-2s%-8s%8s%-1s%-8s%7s%-1s%-12s%-9s%-1s%-1s%-7s%-14s%-1s%-1s%-1s%-1s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, 											# line item control number
 	$currentProcedure->getDateOfServiceFrom(), 			#ccyy/mm/dd Service Date from
@@ -122,7 +122,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_THIN . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%-1s%-1s%-1s%1s%4s%4s%-1s%-1s%-1s%-15s%-15s%-2s%-1s%7s%7s%-1s%-1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%3s%2s%3s%3s%-8s%3s%7s%7s%-1s%7s%7s%7s%7s%7s%-10s%-1s%-9s%-1s%-1s%-7s%-14s%-1s%-1s%-1s%-1s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, 											# line item control number
 	$currentProcedure->getDateOfServiceFrom(), 			#ccyy/mm/dd Service Date from
@@ -191,7 +191,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%1s%1s%1s%1s%4s%4s%1s%1s%1s%-15s%-15s%-2s%1s%7s%7s%1s%1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%3s%2s%3s%3s%-8s%3s%7s%7s%-81s%2s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, 											# line item control number
 	$currentProcedure->getDateOfServiceFrom(), 			#ccyy/mm/dd Service Date from
@@ -294,7 +294,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%9s%-1s%-17s%-10s%-1s%-3s%-3s%-15s%-18s%-15s%-2s%9s%-178s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, # Line item control number
 	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),  # federal tax id
@@ -314,7 +314,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%9s%-1s%-17s%-10s%-1s%-3s%-3s%-15s%-18s%-15s%-2s%9s%-178s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, # Line item control number
 	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),  # federal tax id
@@ -384,7 +384,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%7s%7s%7s%7s%-15s%-2s%-15s%-2s%4s%4s%-11s%7s%-15s%-8s%2s%1s%1s%1s%1s%1s%-15s%-9s%-33s%-30s%-30s%-20s%-9s%-9s%-3s%-1s%-1s%-2s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$self->numToStr(5,2,$zero),
@@ -423,7 +423,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_THIN . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%7s%7s%7s%7s%-15s%-2s%-15s%-2s%4s%4s%-11s%7s%-15s%-8s%2s%-1s%-1s%-1s%-1s%-1s%-15s%-9s%-33s%-30s%-30s%-20s%-9s%-10s%3s%-1s%-3s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,	# line item control no
 	$self->numToStr(5,2,$zero), #pr svc charge
@@ -461,7 +461,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%7s%7s%7s%7s%-15s%-2s%-15s%-2s%4s%4s%-11s%7s%-15s%-8s%2s%1s%1s%1s%1s%1s%-15s%-9s%-33s%-30s%-30s%-20s%-9s%-9s%-3s%-2s%-2s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$self->numToStr(5,2,$zero),
@@ -546,7 +546,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-3s%-35s%-1s%-1s%-1s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -576,7 +576,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_THIN . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-41s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -602,7 +602,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-20s%-21s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -677,7 +677,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-2s%-30s%-30s%-20s%-2s%-9s%-2s%-30s%-30s%-20s%-2s%-9s%-2s%-30s%-30s%-20s%-2s%-9s%-2s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -703,7 +703,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-2s%-30s%-30s%-20s%-2s%-9s%-2s%-30s%-30s%-20s%-2s%-9s%-2s%-30s%-30s%-20s%-2s%-9s%-2s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -779,7 +779,7 @@ sub formatData
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-9s%-15s%-2s%7s%7s%-5s%4s%-2s%-20s%-2s%-2s%-1s%-1s%-1s%8s%-50s%-1s%-1s%-1s%-1s%-2s%-4s%-1s%-1s%-133s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
@@ -811,7 +811,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-9s%-15s%-2s%7s%7s%-5s%4s%-2s%-20s%-2s%-2s%-206s',
 	$self->recordType(),
-	$self->numToStr(2,0,$container->getSequenceNo()),
+	$self->numToStr(2,0,$container->getProcedureNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces,
 	$spaces,
