@@ -12,11 +12,9 @@ use constant VALITEMIDX_ERRCODE => 2;
 use constant VALITEMIDX_MESSAGE => 3;
 use constant CONTAINS => 0;
 use constant NOT_CONTAINS => 1;
-use Devel::ChangeLog;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Validator);
-use vars qw(@CHANGELOG);
 
 
 use constant VALIDATORFLAGS_DEFAULT => 0;
@@ -45,11 +43,11 @@ sub checkAddress
 {
 	my ($self,$address,$vFlag,$claim,$parent) = @_;
 
-	if ( (($address->getAddress1() eq "") && 
-			($address->getAddress2() eq "" )) && 
-			($address->getCity() eq "") && 
-			($address->getState() eq "") && 
-			($address->getZipCode() eq "") && 
+	if ( (($address->getAddress1() eq "") &&
+			($address->getAddress2() eq "" )) &&
+			($address->getCity() eq "") &&
+			($address->getState() eq "") &&
+			($address->getZipCode() eq "") &&
 			($address->getTelephoneNo() eq ""))
 		{
 			$parent->addError($self->getId(),135, "Address is required", $claim);
@@ -59,7 +57,7 @@ sub checkAddress
 sub validateRequired
 {
 	my ($self, $vFlag, $claim, $vList,$parent) = @_;
-	
+
 	foreach my $item (@$vList)
 	{
 		my $methodName = $item->[VALITEMIDX_NAME];
@@ -78,7 +76,7 @@ sub validateRequired
 sub validateNotRequired
 {
 	my ($self, $vFlag, $claim, $vList, $parent) = @_;
-	
+
 	foreach my $item (@$vList)
 	{
 		my $methodName = $item->[VALITEMIDX_NAME];
@@ -97,10 +95,10 @@ sub checkValidValues
 {
 	my ($self,$condition,$positionFrom,$positionTo,$value,$targetObject, $fld, @values) = @_;
 	my ($tempValue, $list);
-	
+
 	# check wether the positions are given or not
 	$tempValue = (($positionFrom ne '') && ($positionTo ne '')) ? substr($value,$positionFrom-1,$positionTo):$value;
-			
+
 	$list = "(".join(")|(",@values).")";
 
 	if ($condition == CONTAINS)
@@ -108,7 +106,7 @@ sub checkValidValues
 		if (not $tempValue =~ /$list/)
 		{
 			$self->{valMgr}->addError($self->getId,' 1004 ', $fld.' Contains Invalid values ',$targetObject);
-		}	
+		}
 	}
 	else
 	{
@@ -116,15 +114,9 @@ sub checkValidValues
 		{
 			$self->{valMgr}->addError($self->getId,' 1004 ', $fld.' Contains Invalid values ',$targetObject);
 	    }
-	}  	
+	}
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI','Billing Interface/Validating HCFA 1500','HCFA: Check procedure is removed']
-);
 
 1;
 

@@ -6,9 +6,6 @@ use strict;
 use Carp;
 use App::Billing::Validator;
 use App::Billing::Validate::HCFA;
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 
 use vars qw(@ISA);
@@ -31,21 +28,21 @@ sub new
 sub getId
 {
 	my $self = shift;
-	
+
 	return 'VC01';
 }
 
 sub getName
 {
 	my $self = shift;
-	
+
 	return 'Other Validator Class';
 }
 
 sub getCallSequences
 {
 	my $self = shift;
-	
+
 	return 'Claim_Champus';
 }
 
@@ -55,7 +52,7 @@ sub validate
 
 	$self->checkGenericProperties($claim,$vFlags,$parent);
 
-	if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan) 		
+	if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan)
 	{
 		$self->checkSecondaryProperties($claim,$vFlags,$parent);
 	}
@@ -98,7 +95,7 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::Physician::getFederalTaxId,$physician,121,'Missing federal tax id'],
 		[\&App::Billing::Claim::Physician::getName ,$physician,123,'Missing Renedering provider name']
 	];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 
 	$self->checkAddress($physician->getAddress,$vFlag,$claim,$parent);
@@ -115,7 +112,7 @@ sub checkGenericProperties
 			];
 
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-	$self->checkProcedures($vFlag, $claim, $parent);	
+	$self->checkProcedures($vFlag, $claim, $parent);
 }
 
 
@@ -135,7 +132,7 @@ sub checkSecondaryProperties
 			[\&App::Billing::Claim::getAmountPaid,$insured,113,'Missing amount paid'],
 			[\&App::Billing::Claim::getAcceptAssignment,$claim,122,'Missing accept assignment'],
 			];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 }
 
@@ -162,7 +159,7 @@ sub checkProcedures
 	my $i;
 	my @pos =(11,12,21..26,31..34,50..56,61,62,65,71,81,99);
 	my @tos =(1..9,'A'..'F');
-	
+
 	my $equalMap = [
 		[\&App::Billing::Claim::Procedure::getDateOfServiceFrom,,136,'Missing service dates'],
 		[\&App::Billing::Claim::Procedure::getDateOfServiceTo,,137,'Missing service dates'],
@@ -193,7 +190,7 @@ sub checkProcedures
 		$equalMap->[8]->[1] = $procedures->[$i];
 
 		$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-		
+
 		$equalMap1->[0]->[1] = $procedures->[$i];
 		$equalMap1->[1]->[1] = $procedures->[$i];
 		$equalMap1->[2]->[1] = $procedures->[$i];
@@ -202,22 +199,9 @@ sub checkProcedures
 		$self->checkValidValues(CONTAINS,'','',$procedures->[$i]->getPlaceOfService,$claim,'Place of service', @pos);
 		$self->checkValidValues(CONTAINS,'','',$procedures->[$i]->getTypeOfService,$claim,'Place of service',@tos);
 
-	}	
+	}
 }
 
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: Care provider id replaced by Rendering provider .' ], 
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: Rendering provider address is verified .'],
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: Method check procedures is added.']
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '12/17/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: Method checkAddress validateRequired validateNotRequired checkValidValues is moved to hcfa.pm.'] ,  
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '12/18/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: careProvider object is replaced by rendering provider'] ,  
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '12/18/1999', 'SSI', 'Billing Interface/Validating HCFA 1500',	'Champus: Champus is inherited from HCFA. which is the base class for 1500 validators'] ,  
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Validating HCFA 1500','Champus: Insured getSsn is verified instead of getId'],
-
-);
 
 1;

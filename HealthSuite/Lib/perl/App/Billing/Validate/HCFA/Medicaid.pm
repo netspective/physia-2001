@@ -16,9 +16,6 @@ use constant VALITEMIDX_ERRCODE => 2;
 use constant VALITEMIDX_MESSAGE => 3;
 use constant CONTAINS => 0;
 use constant NOT_CONTAINS => 1;
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 sub new
 {
@@ -73,7 +70,7 @@ sub checkGenericProperties
 	    ,$claim->{treatment});
 
 	my $equalMap = [
-		
+
 		[\&App::Billing::Claim::Person::getDateOfBirth,$patient,125],
 		[\&App::Billing::Claim::Person::getSex,$patient,105,'Missing insured sex'],
 		[\&App::Billing::Claim::Treatment::getNameOfReferingPhysicianOrOther,$treatment,130],
@@ -85,11 +82,11 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::getAmountPaid,$claim,101,'Missing paid amount'],
 		[\&App::Billing::Claim::Physician::getName ,$physician,123,'']
 	];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 	$self->checkAddress($physician->getAddress,$vFlag,$claim,$parent);
 	$self->checkAddress($patient->{address},$vFlag,$claim,$parent);
-	
+
 	$equalMap = [
 		[\&App::Billing::Claim::Person::getSsn,$insured,100,'Missing insured Id'],
 		[\&App::Billing::Claim::Patient::getRelationshipToInsured,$patient,104,'Missing patient insured relationship'],
@@ -108,7 +105,7 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::Treatment::getResubmissionReference,$treatment,132],
 	];
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-	$self->checkProcedures($vFlag, $claim, $parent);	
+	$self->checkProcedures($vFlag, $claim, $parent);
 }
 
 
@@ -124,7 +121,7 @@ sub checkSecondaryProperties
 			[\&App::Billing::Claim::Person::getLastName,$insured,102,'Missing patient last name'],
 			[\&App::Billing::Claim::Person::getMiddleInitial,$insured,103,'Missing patient middle initial name'],
 			];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 }
 
@@ -144,12 +141,6 @@ sub checkPrimaryProperties
 
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Validating HCFA 1500','Medicaid: Insured getSsn is verified instead of getId'],
-);
 
 
 1;

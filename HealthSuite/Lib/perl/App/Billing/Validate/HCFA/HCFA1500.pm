@@ -12,11 +12,9 @@ use constant VALITEMIDX_ERRCODE => 2;
 use constant VALITEMIDX_MESSAGE => 3;
 use constant CONTAINS => 0;
 use constant NOT_CONTAINS => 1;
-use Devel::ChangeLog;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Validator);
-use vars qw(@CHANGELOG);
 
 
 use constant VALIDATORFLAGS_DEFAULT => 0;
@@ -60,8 +58,8 @@ sub validate
 {
 	my ($self, $parent, $callSeq, $vFlags, $claim) = @_;
 	$self->checkValidProcedureDiagnosis($parent, $vFlags, $claim);
-	
-	
+
+
 }
 
 sub checkValidProcedureDiagnosis
@@ -88,14 +86,9 @@ sub checkValidProcedureDiagnosis
 		}
 	}
 
-	
+
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI','Billing Interface/Validating HCFA 1500','HCFA: Check procedure is removed']
-);
 
 1;
 

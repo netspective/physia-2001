@@ -10,9 +10,6 @@ use App::Billing::Validate::HCFA;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Validate::HCFA);
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 use constant VALITEMIDX_NAME => 0;
 use constant VALITEMIDX_INSTANCE => 1;
@@ -83,20 +80,20 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::Physician::getFederalTaxId,$physician,121,'Missing federal tax id'],
 		[\&App::Billing::Claim::Physician::getName ,$physician,123,'Bill receiver name missing ']
 	];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 	$self->checkAddress($physician->getAddress,$vFlag,$claim,$parent);
 	$self->checkAddress($patient->{address},$vFlag,$claim,$parent);
 
-	if (uc($treatment->getOutsideLab()) eq 'Y') 
+	if (uc($treatment->getOutsideLab()) eq 'Y')
 		{
 			$self->validateRequired($vFlag, $claim, [[\&App::Billing::Claim::Treatment::getOutsideLabCharges,$treatment,120,'Missing outside lab charges']],$parent);
 		}
-		if ($treatment->getNameOfReferingPhysicianOrOther ne "") 
+		if ($treatment->getNameOfReferingPhysicianOrOther ne "")
 		{
 			$self->validateRequired($vFlag, $claim, [[\&App::Billing::Claim::Treatment::getIDOfReferingPhysician,$treatment,116,'Missing id of referring physician']],$parent);
 		}
-		
+
 
 	$equalMap = [
 		[\&App::Billing::Claim::Person::getFirstName,$insured,101,'insured first name not required'],
@@ -112,7 +109,7 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::getAcceptAssignment,$claim,122,'accept assignment  not required'],
 	];
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-	$self->checkProcedures($vFlag, $claim, $parent);	
+	$self->checkProcedures($vFlag, $claim, $parent);
 }
 
 
@@ -126,7 +123,7 @@ sub checkSecondaryProperties
 #	my $equalMap = [
 
 #		];
-	
+
 #	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 }
 
@@ -145,12 +142,6 @@ sub checkPrimaryProperties
 
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Validating HCFA 1500','FECA: Insured getSsn is verified instead of getId'],
-);
 
 
 1;

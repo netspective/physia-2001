@@ -6,9 +6,6 @@ use strict;
 use Carp;
 use App::Billing::Validator;
 use App::Billing::Validate::HCFA;
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 
 use vars qw(@ISA);
@@ -58,7 +55,7 @@ sub validate
 		$self->checkGenericProperties($claim,$vFlags,$parent);
 
 
- 		if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan) 		
+ 		if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan)
 		{
 			$self->checkSecondaryProperties($claim,$vFlags,$parent);
 		}
@@ -73,7 +70,7 @@ sub validate
 		$self->checkGenericBCBSProperties($claim,$vFlags,$parent);
 
 
- 		if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan) 		
+ 		if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan)
 		{
 			$self->checkSecondaryBCBSProperties($claim,$vFlags,$parent);
 		}
@@ -142,7 +139,7 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::Treatment::getResubmissionReference,$treatment,132,'Resubmission reference not required'],
 	];
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-	$self->checkProcedures($vFlag, $claim, $parent);	
+	$self->checkProcedures($vFlag, $claim, $parent);
 }
 
 
@@ -156,7 +153,7 @@ sub checkSecondaryProperties
 	my $equalMap = [
 		[\&App::Billing::Claim::getAcceptAssignment,$claim,122,'Missing accept assignment'],
 		];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 }
 
@@ -239,7 +236,7 @@ sub checkGenericBCBSProperties
 		[\&App::Billing::Claim::Treatment::getDateOfSameOrSimilarIllness,$treatment,127,'Date of similar illness not required'],
 	];
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
-	$self->checkProceduresBCBS($vFlag, $claim, $parent);	
+	$self->checkProceduresBCBS($vFlag, $claim, $parent);
 }
 
 
@@ -253,7 +250,7 @@ sub checkSecondaryBCBSProperties
 	my $equalMap = [
 		[\&App::Billing::Claim::getAmountPaid,$claim,101,'Missing paid amount']
 		];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 }
 
@@ -279,7 +276,7 @@ sub checkProceduresBCBS
 	my $procedures = $claim->{procedures};
 	my $i;
 	my @pos =(11..12,21..26,31..34,50..56,61,62,71,81,99);
- 
+
 	my $equalMap = [
 		[\&App::Billing::Claim::Procedure::getDateOfServiceFrom,,136,'Missing dates of service'],
 		[\&App::Billing::Claim::Procedure::getDateOfServiceTo,,137,'Missing dates of service'],
@@ -310,22 +307,16 @@ sub checkProceduresBCBS
 #		$equalMap->[8]->[1] = $procedures->[$i];
 
 		$self->validateRequired($vFlag, $claim, $equalMap, $parent);
-		
+
 		$equalMap1->[0]->[1] = $procedures->[$i];
 		$equalMap1->[1]->[1] = $procedures->[$i];
 		$equalMap1->[2]->[1] = $procedures->[$i];
 
 		$self->validateNotRequired($vFlag, $claim, $equalMap1,$parent);
 		$self->checkValidValues(0,'','',$procedures->[$i]->getPlaceOfService,$claim,'Place of service', @pos);
-	}	
+	}
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Validating HCFA 1500','Other: Insured getSsn is verified instead of getId'],
-);
 
 
 1;

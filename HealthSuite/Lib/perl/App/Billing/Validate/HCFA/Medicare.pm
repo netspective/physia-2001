@@ -6,9 +6,6 @@ use strict;
 use Carp;
 use App::Billing::Validator;
 use App::Billing::Validate::HCFA;
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 
 use vars qw(@ISA);
@@ -51,7 +48,7 @@ sub validate
 	$self->checkGenericProperties($claim,$vFlags,$parent);
 
 
- 	if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan) 		
+ 	if ($claim->{insured}->[0]->getAnotherHealthBenefitPlan)
 	{
 		$self->checkSecondaryProperties($claim,$vFlags,$parent);
 	}
@@ -91,7 +88,7 @@ sub checkGenericProperties
 		[\&App::Billing::Claim::getAmountPaid,$claim,101,'Missing paid amount'],
 		[\&App::Billing::Claim::Physician::getName ,$physician,123,'Missing bill receiver name']
 	];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 	$self->checkAddress($physician->getAddress,$vFlag,$claim,$parent);
 	$self->checkAddress($patient->{address},$vFlag,$claim,$parent);
@@ -112,7 +109,7 @@ sub checkGenericProperties
 
 	$self->validateNotRequired($vFlag, $claim, $equalMap, $parent);
 
-	$self->checkProcedures($vFlag, $claim, $parent);	
+	$self->checkProcedures($vFlag, $claim, $parent);
 
 
 }
@@ -135,7 +132,7 @@ sub checkSecondaryProperties
 		[\&App::Billing::Claim::Person::getSex,$insured,126, 'Missing insured sex'],
 		[\&App::Billing::Claim::Insured::getInsurancePlanOrProgramName,$insured,113,'Missing insurance plan or program name']
 	];
-	
+
 	$self->validateRequired($vFlag, $claim, $equalMap,$parent);
 	$self->checkAddress($insured->{address},$vFlag,$claim,$parent);
 }
@@ -154,7 +151,7 @@ sub checkPrimaryProperties
 		[\&App::Billing::Claim::Patient::getRelationshipToInsured,$patient,104,'Missing patient insured relationship']
 		];
 
-	
+
 	$self->validateNotRequired($vFlag, $claim, $equalMap,$parent);
 
 	if (uc($insured->getPolicyGroupOrFECANo()) ne "NONE")
@@ -163,12 +160,6 @@ sub checkPrimaryProperties
 	}
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-		[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Validating HCFA 1500','Medicare: Insured getSsn is verified instead of getId'],
-);
 
 
 1;
