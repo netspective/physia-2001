@@ -213,36 +213,42 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and address_name = ?
 		},
 	'selAllOutstandingInvoicesByClient' => q{
-		select *
-		from invoice
-		where balance > 0
-			and client_id = ?
-			and owner_id = ?
-			and invoice_status != 15
-			and invoice_status != 16
+		select i.invoice_id, i.balance, inv_stat.caption as status_caption
+		from invoice_status inv_stat, invoice i
+		where i.balance > 0
+			and i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 15
+			and i.invoice_status != 16
+			and i.invoice_status = inv_stat.id (+)
 		},
 	'selSelfPayOutstandingInvoicesByClient' => q{
-		select *
-		from invoice
-		where balance > 0
-			and client_id = ?
-			and owner_id = ?
-			and invoice_status != 15
-			and invoice_status != 16
-			and invoice_subtype = 0
+		select i.invoice_id, i.balance, inv_stat.caption as status_caption
+		from invoice_status inv_stat, invoice i
+		where i.balance > 0
+			and i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 15
+			and i.invoice_status != 16
+			and i.invoice_subtype = 0
+			and i.invoice_status = inv_stat.id (+)
 		},
 	'selAllNonZeroBalanceInvoicesByClient' => q{
-		select * from invoice
-		where client_id = ?
-			and owner_id = ?
-			and invoice_status != 16
-			and invoice_status != 15
+		select i.invoice_id, i.balance, inv_stat.caption as status_caption
+		from invoice_status inv_stat, invoice i
+		where i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 16
+			and i.invoice_status != 15
+			and i.invoice_status = inv_stat.id (+)
 		},
 	'selAllNonVoidedInvoicesByClient' => q{
-		select * from invoice
-		where client_id = ?
-			and owner_id = ?
-			and invoice_status != 16
+		select i.invoice_id, i.balance, i.invoice_status, inv_stat.caption as status_caption
+		from invoice_status inv_stat, invoice i
+		where i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 16
+			and i.invoice_status = inv_stat.id (+)
 		},
 	'selTotalPatientBalance' => qq{
 		select sum(balance)
