@@ -55,7 +55,7 @@ sub Main
 		$removedFiles = 'none (destination does not exist)';
 	}
 
-	print <<"END_MESSAGE";
+	print qq{
 Generating schema:
   perl library: $ENV{PERL5LIB}
 db destination: $connectStr
@@ -66,7 +66,7 @@ db destination: $connectStr
    destination: $destPath
  cmd processor: $cmdProcessor
 load processor: $loadProcessor
-END_MESSAGE
+};
 
 	my $schemaBldStartTime = new Benchmark;
 	my $schema = new Schema(verboseLevel => 0);
@@ -127,7 +127,7 @@ END_MESSAGE
 	my $importsCount = scalar(@imports);
 	my $warningsCount = scalar(@warnings);
 
-	print <<"END_MESSAGE";
+	print qq{
     parse time: $schemaBldTime
     total time: $runTime
  include files: $includesCount
@@ -139,7 +139,7 @@ END_MESSAGE
        imports: $importsCount
       warnings: $warningsCount
         status: processing completed
-END_MESSAGE
+};
 
 	if($warningsCount > 0)
 	{
