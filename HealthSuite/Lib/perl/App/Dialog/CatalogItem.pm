@@ -87,6 +87,16 @@ sub new
 			column => 'Offering_Catalog_Entry.description',
 			size => '50'
 		),
+		
+		new CGI::Dialog::Field(caption => 'Service Type',
+			name => 'data_text',
+			type => 'text',
+			size => 2,			
+			maxLength => 2,					
+			findPopup => '/lookup/servicetype',
+			options => FLDFLAG_REQUIRED,
+							
+		),
 		new CGI::Dialog::Field(caption => 'Status',
 			name => 'status',
 			type => 'enum',
@@ -224,8 +234,16 @@ sub customValidate
 	
 	my $code = $page->param('_f_code');
 	my $modifier = $page->param('_f_modifier');
+	my $svc_type = $page->field('data_text');
+	my $svc_field =$self->getField('data_text');
 	
 	$self->checkDupEntry($page, $fs, $entryType, $code, $modifier);
+	
+	
+	if($svc_type ne '' && not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericServiceTypeByAbbr', $svc_type)))
+	{
+		$svc_field->invalidate($page, "The service type code $svc_type is not valid. Please verify");
+	}
 	
 	if (
 		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
@@ -304,7 +322,7 @@ sub execute
 		parent_entry_id => $page->field('parent_entry_id') || undef,
 		units_avail => $page->field('units_avail') || undef,
 		flags => $page->field('flags') || 0,
-
+		data_text => $page->field('data_text') || undef,
 		#taxable => $page->field('taxable') || undef,
 		#default_units => $page->field('default_units') || undef,
 		_debug => 0
