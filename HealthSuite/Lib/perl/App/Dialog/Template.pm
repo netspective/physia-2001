@@ -71,13 +71,9 @@ sub new
 
 		new CGI::Dialog::MultiField (caption => 'Facility/Type/Status',
 			fields => [
-				new CGI::Dialog::Field(name => 'facility_id',
-					fKeyStmtMgr => $STMTMGR_SCHEDULING,
-					fKeyStmt => 'selFacilityList',
-					fKeyDisplayCol => 1,
-					fKeyValueCol => 0,
-					hints => 'Facility',
-					options => FLDFLAG_REQUIRED),
+				new App::Dialog::Field::OrgType(
+					caption => 'Facility',
+					name => 'facility_id'),
 
 				new CGI::Dialog::Field(name => 'available',
 					type => 'select',
