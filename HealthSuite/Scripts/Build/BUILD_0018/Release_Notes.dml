@@ -190,6 +190,7 @@
 		
 		<deliverable id="1745">
 			Added activity log for claims notes and claim submissions.
+			Reopened: Showing correct action now.
 		</deliverable>
 		
 		<deliverable id="1748">
@@ -321,6 +322,7 @@
 		
 		<deliverable id="1897">
 			Fixed application error occuring from add fee schedule item dialog.
+			Reopened: If fee schedule id not provided, the lookup for the parent entry returns a user friendly error.
 		</deliverable>
 
 	</deliverables>
