@@ -39,6 +39,14 @@ sub initialize
 			fKeyValueCol => 0,
 			hints => '',
 		),
+
+		new CGI::Dialog::Subhead(heading => 'Sort Order'),
+		new CGI::Dialog::Field(type => 'select',
+			style => 'radio',
+			selOptions => 'Patient Last Name:1;Claim Status:2;Claim Balance:3',
+			caption => '',
+			name => 'sorting',
+		),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -67,6 +75,11 @@ sub populateData
 		push(@claimStats, $_->{status_id});
 	}
 	$page->field('claim_status_list', @claimStats);
+
+	my $sorting = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
+		STMTMGRFLAG_NONE, 'sel_worklist_claim_status', $userId, $sessOrgId, 
+		$page->param('itemNamePrefix') . '-Sorting');
+	$page->field('sorting', $sorting->{status_id});
 	
 }
 
@@ -97,7 +110,21 @@ sub execute
 			_debug => 0
 		);
 	}
-	
+
+	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
+		'del_worklist_claim_status', $userId, $orgIntId, $page->param('itemNamePrefix') . '-Sorting');
+
+	$page->schemaAction(
+			'Person_Attribute',	'add',
+			item_id => undef,
+			parent_id => $userId,
+			parent_org_id => $orgIntId,
+			value_type => 110,
+			item_name =>  $page->param('itemNamePrefix') . '-Sorting',
+			value_int => $page->field('sorting'),
+			_debug => 0
+	);
+		
 	$self->handlePostExecute($page, $command, $flags, '/worklist/claim');
 }
 

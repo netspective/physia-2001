@@ -135,7 +135,12 @@ sub buildSqlStmt
 {
 	my ($self) = @_;
 
+	my $arrSorting = [10,5,6];
+	my $sorting = $arrSorting->[$self->getSorting() - 1];
+
 	my $sqlStmt = qq{
+		Select *
+		From (
 			SELECT
 				invoice.client_id AS patient_id,
 				invoice.invoice_id AS invoice_id,
@@ -229,6 +234,8 @@ sub buildSqlStmt
 					)
 				)
 				AND person.person_id = invoice.client_id
+			) unionized
+			ORDER BY $sorting
 	};
 
 	my $orgInternalId = $self->session('org_internal_id');
@@ -442,6 +449,16 @@ sub getServiceFacilities
 	return @facilities ? @facilities : ('');
 }
 
+sub getSorting
+{
+	my ($self) = @_;
+
+	my $sorting = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($self,	STMTMGRFLAG_NONE,
+		'sel_worklist_claim_status', $self->session('user_id'), $self->session('org_internal_id'),
+		$itemNamePrefix . '-Sorting');
+	return $sorting->{status_id};
+}
+
 sub prepare_view_setup
 {
 	my ($self) = @_;
@@ -575,6 +592,14 @@ sub __claimQuery
 		'invoice_date',
 		'member_number',
 	);
+
+	my $arrSorting = ['name_last', 'invoice_status', 'balance'];
+	my $arrOrder = ['Ascending', 'Ascending', 'Ascending'];
+	my $sorting = $self->getSorting;
+	if ($sorting ne '')
+	{
+		$query->orderBy({id => $arrSorting->[$sorting-1], order => $arrOrder->[$sorting-1]});
+	}
 
 	return $query;
 }
