@@ -254,7 +254,7 @@ sub populateData_add
 		my $personId = $page->param('person_id');			
 		my $insSequence = $page->field('bill_sequence');
 		my $newInsSequence = $insSequence + 1;
-		$insSequence > 4 ? 0 : $insSequence;
+		$newInsSequence > 4 ? 99 : $newInsSequence;
 		$page->field('bill_sequence', $newInsSequence);
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
