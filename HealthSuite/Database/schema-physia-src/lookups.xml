@@ -1412,6 +1412,18 @@
 				<col name="abbrev">EC</col>
 				<col name="result">2</col>
 			</row>
+			<row>
+				<col name="id">116</col>
+				<col name="caption">Item or service provided as routine care in an approved clinical trial</col>
+				<col name="abbrev">QV</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">117</col>
+				<col name="caption">Waived test </col>
+				<col name="abbrev">QW</col>
+				<col name="result">2</col>
+			</row>
 		</data>
 	</table>
 
