@@ -4,6 +4,10 @@ package CGI::Dialog::ContentItem;
 
 use strict;
 use CGI::Validator::Field;
+
+# See Bug 532
+use App::Page;
+
 use vars qw(@ISA);
 
 @ISA = qw(CGI::Validator::Field);
