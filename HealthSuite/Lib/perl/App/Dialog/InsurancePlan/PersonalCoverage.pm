@@ -98,6 +98,7 @@ sub new
 		new App::Dialog::Field::Organization::ID(
 			caption => "Insured Person's Employer",
 			name => "employer_org_id",
+			addType => 'employer',
 			),
 		new CGI::Dialog::MultiField(
 			name => 'group_info',
@@ -211,6 +212,7 @@ sub new
 				['Return to Previous Screen', '', 1],
 				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage"],
 				['Go to Person Profile', "/person/%field.person_id%/profile"],
+				['Go to Work List', "/person/worklist"],
 				],
 			cancelUrl => $self->{cancelUrl} || undef,
 			),

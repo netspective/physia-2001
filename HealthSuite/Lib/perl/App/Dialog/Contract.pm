@@ -36,13 +36,13 @@ sub new
 
 	delete $self->{schema};  # make sure we don't store this!
 
-	croak 'schema parameter required' unless $schema;	
-			
-	my $edit=1;			
-	$edit = 0 if ($command eq 'add'); 
+	croak 'schema parameter required' unless $schema;
+
+	my $edit=1;
+	$edit = 0 if ($command eq 'add');
 
 	$self->addContent(
-				$command,	
+				$command,
 		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 			name => 'fee_schedule_id',
 			type => 'text',
@@ -57,32 +57,32 @@ sub new
 			#findPopupControlField => '_f_ins_org_id',
 		),
 		new App::Dialog::Field::Contract::ID::New(caption => 'Contract Catalog Name',
-			name => 'contract_id', 
+			name => 'contract_id',
 			size => 20,
 			options => FLDFLAG_REQUIRED,
 			byPassEdit=>$edit,
 		),
-		new CGI::Dialog::Field(caption => 'Contract Catalog Caption', 
-			name => 'caption', 
+		new CGI::Dialog::Field(caption => 'Contract Catalog Caption',
+			name => 'caption',
 			options => FLDFLAG_REQUIRED,
 			size => 45,
 		),
-		
 
-		
+
+
 		new CGI::Dialog::Field(caption => 'Description',
 			name => 'description',
 			type => 'memo',
 		),
-			
+
 		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode',value=>$command),
-		new CGI::Dialog::Field(type => 'hidden', name => 'parent_catalog_id'),		
-		new CGI::Dialog::Field(type => 'hidden', name => 'product_ins_id'),				
-		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),			
-	
-		
+		new CGI::Dialog::Field(type => 'hidden', name => 'parent_catalog_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'product_ins_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
+
+
 	);
-	
+
 	$self->{activityLog} =
 	{
 		scope =>'Contract_catalog',
@@ -90,9 +90,10 @@ sub new
 		data => "Contract Catalog '#field.contract_id#'"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(
-		nextActions_add => [			
+		nextActions_add => [
 			['Add Another Contract Schedule', '/org/#session.org_id#/dlg-add-contract'],
-			['Show List of Contract Catalog', '/org/%session.org_id%/catalog?catalog=contract',1]			
+			['Show List of Contract Catalog', '/org/%session.org_id%/catalog?catalog=contract',1],
+			['Go to Work List', "/worklist"],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -105,7 +106,7 @@ sub populateData_add
 	$page->field('add_mode',1);
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	
+
 }
 
 sub populateData_update
@@ -124,12 +125,12 @@ sub populateData_update
 	{
 		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('parent_catalog_id')) ;
 		$page->field('fee_schedule_id',$parentCatalog->{catalog_id});
-	};	
+	};
 	#Get Text for Insurance Product ID
 	if($page->field('product_ins_id'))
 	{
 		my $insuranceData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$page->field('product_ins_id')) ;
-		$page->field('product_name',$insuranceData->{product_name});	
+		$page->field('product_name',$insuranceData->{product_name});
 	}
 }
 
@@ -144,7 +145,7 @@ sub customValidate
 	#check if Insurance Product Exists
 	#Get Insurance Product Record
 	my $productName = $page->field('product_name');
-	my $fs = $page->field('fee_schedule_id');	
+	my $fs = $page->field('fee_schedule_id');
 	my $catalog_id;
 	my $insId = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selProductRecord',$page->session('org_internal_id'),$page->field('product_name'));
 
@@ -153,13 +154,13 @@ sub customValidate
 		#Get Numeric ID of Fee Schedule Parent
 		my $fs_catalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$page->session('org_internal_id') ,$page->field('fee_schedule_id'), 0);
 		$catalog_id = $fs_catalog->{internal_catalog_id};
-		$page->field('product_ins_id',$insId->{ins_internal_id});	
-		
+		$page->field('product_ins_id',$insId->{ins_internal_id});
+
 		#Check if product and fee schedule already have a Contract
 		if($page->field('add_mode'))
 		{
 			my $recExist = $STMTMGR_CONTRACT->getRowAsHash($page,STMTMGRFLAG_NONE,'selContractMatch',$page->session('org_internal_id'),
-			$catalog_id,$insId->{ins_internal_id});		
+			$catalog_id,$insId->{ins_internal_id});
 			my $field = $self->getField('product_name');
 			$field->invalidate($page, qq{Contract Already exist for Product '$productName' and Fee Schedule  '$fs'.}) if $recExist;
 		}
@@ -167,9 +168,9 @@ sub customValidate
 	else
 	{
 		my $field = $self->getField('product_name');
-		$field->invalidate($page, qq{Insurance Product '$productName' does not exists.}) 
+		$field->invalidate($page, qq{Insurance Product '$productName' does not exists.})
 	}
-	
+
 }
 
 sub execute
@@ -178,12 +179,12 @@ sub execute
 	my $id = $self->{'id'};
 	my $orgInternalId = $page->session('org_internal_id');
 	my $orgId = $page->session('org_id');
-	my $internalContractId = $page->param('internal_contract_id');	
-	
+	my $internalContractId = $page->param('internal_contract_id');
+
 	#Get Numeric ID of Fee Schedule Parent
 	my $fs_catalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',
 		$page->session('org_internal_id') ,$page->field('fee_schedule_id'), 0);
-		
+
 	#Get Insurance Product Record
 	my $insId = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selProductRecord',$page->session('org_internal_id'),
 	$page->field('product_name'));

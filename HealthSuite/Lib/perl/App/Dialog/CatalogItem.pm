@@ -151,6 +151,7 @@ sub new
 		nextActions_add => [
 			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#", 1],
 			['Show Current Fee Schedule Item', '/org/#session.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#param.internal_catalog_id#'],
+			['Go to Work List', "/worklist"],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 

@@ -175,6 +175,7 @@ sub new
 		nextActions_update => [
 			['', '', 1],
 			['Copy as New Template', NEXTACTION_COPYASNEW],
+			['Go to Work List', "/worklist"],
 		],
 		cancelUrl => $self->{cancelUrl} || undef));
 

@@ -124,9 +124,9 @@ sub initialize
 			name => 'name_trade',
 			schema => $schema,
 			column => 'Org.name_trade'
-		),		
+		),
 	);
-	my $type=$self->{orgtype}; 
+	my $type=$self->{orgtype};
 	if ($type eq 'provider' || $type eq 'dept' ||$type eq 'main')
 	{
 		$self->addContent(
@@ -136,7 +136,7 @@ sub initialize
 			enum => 'Month',
 			fKeyOrderBy =>'id',
 			options => FLDFLAG_REQUIRED,
-			),		
+			),
 		)
 	}
 
@@ -290,7 +290,7 @@ sub initialize
 				selOptions => 'Unknown:5;Per Se:1;THINet:2;Other:3',
 				value => '5',
 			),
-		
+
 			new CGI::Dialog::Field(
 				caption => 'Clearing House Billing ID',
 				#type => 'foreignKey',
@@ -305,7 +305,7 @@ sub initialize
 				type => 'date',
 #				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			),
-	
+
 			new CGI::Dialog::Field(
 				caption => 'Active?',
 				name => 'org_billing_active',
@@ -314,7 +314,7 @@ sub initialize
 				caption => 'Active',
 				defaultValue => 0,
 			),
-			
+
 			new CGI::Dialog::Field(
 				name => 'org_billing_item_id',
 				type => 'hidden',
@@ -327,7 +327,7 @@ sub initialize
 #			selOptions => "Perse;THINet",
 #			name   => 'clear_house'
 #			),
-#			
+#
 #			new CGI::Dialog::Field(
 #			caption => 'Clearing House Billing ID',
 #			type=>'text',
@@ -451,6 +451,7 @@ sub initialize
 			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan?_f_ins_org_id=%field.org_id%"],
 			['Go to Directory', "/search/org/id/%field.org_id%"],
 			['Return to Home', "/person/#session.user_id#/home"],
+			['Go to Work List', "/worklist"],
 		],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -635,7 +636,7 @@ sub populateData
 		$page->field('org_billing_active', 0);
 		$page->field('org_billing_effective_date', $page->getDate());
 		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-		
+
 		# Update the billing record to the new style...
 #		$page->schemaAction(
 #			'Org_Attribute', 'update',
@@ -657,12 +658,12 @@ sub populateData
 	);
 	$page->field('area_served', $areaServedData->{value_text});
 	$page->field('area_served_id', $areaServedData->{item_id});
-	
+
 	$attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Fiscal Month',
 		App::Universal::ATTRTYPE_INTEGER
-	);	
-	$page->field('fiscal_month',$attribute->{value_int});	
+	);
+	$page->field('fiscal_month',$attribute->{value_int});
 }
 
 
@@ -1093,10 +1094,10 @@ sub execute_update
 		value_text => $page->field('medicare_gpci') || undef,
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
-	
+
 	saveAttribute($page, 'Org_Attribute', $orgIntId, 'Fiscal Month', App::Universal::ATTRTYPE_INTEGER,
 		value_int => $page->field('fiscal_month'),
-	);	
+	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$page->endUnitWork();

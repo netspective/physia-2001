@@ -20,8 +20,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = (
-	'appttype' => { 
-			_arl => ['appt_type_id'], 
+	'appttype' => {
+			_arl => ['appt_type_id'],
 		},
 );
 
@@ -63,9 +63,9 @@ sub new
 			options => FLDFLAG_READONLY,
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 		),
-		
+
 		$r_ids_field,
-		
+
 		new CGI::Dialog::Field::TableColumn(column => 'Appt_Type.caption',
 			caption => 'Caption',
 			schema => $schema,
@@ -79,7 +79,7 @@ sub new
 			options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::MultiField(
-			fields => [			
+			fields => [
 				new CGI::Dialog::Field(caption => 'Lead Time',
 					name => 'lead_time',
 					type => 'integer',
@@ -98,8 +98,8 @@ sub new
 			style => 'check',
 			defaultValue => 1,
 		),
-		
-		new CGI::Dialog::MultiField(name => 'simultaneous',		
+
+		new CGI::Dialog::MultiField(name => 'simultaneous',
 			fields => [
 				new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appts Limits',
 					name => 'num_sim',
@@ -121,7 +121,7 @@ sub new
 					name => 'am_limit',
 					type => 'integer',
 					hints => 'Max # appointments of this type during AM hours',
-				),		
+				),
 				new CGI::Dialog::Field(caption => 'PM Limits',
 					name => 'pm_limit',
 					type => 'integer',
@@ -134,7 +134,7 @@ sub new
 				),
 			],
 		),
-		
+
 
 		$rr_ids_field,
 
@@ -155,6 +155,7 @@ sub new
 		nextActions_update => [
 			['', '', 1],
 			['Copy as New Appointment Type', NEXTACTION_COPYASNEW],
+			['Go to Work List', "/worklist"],
 		],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -179,7 +180,7 @@ sub makeStateChanges
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	if ($page->param('appt_type_id'))
 	{
@@ -195,8 +196,8 @@ sub populateData_update
 	my $apptTypeId = $page->param('appt_type_id');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateApptTypeDialog', $apptTypeId);
-	
-	$page->field ('multiple', 1) if $page->field('num_sim') > 1;		
+
+	$page->field ('multiple', 1) if $page->field('num_sim') > 1;
 }
 
 ###############################
@@ -211,7 +212,7 @@ sub execute
 	my $timeStamp = $page->getTimeStamp();
 
 	$page->field ('multiple', 1) if $page->field('num_sim') > 1;
-	
+
 	my $newApptTypeId = $page->schemaAction(
 		'Appt_Type', $command,
 		appt_type_id => $command eq 'add' ? undef : $apptTypeId,

@@ -82,6 +82,7 @@ sub new
 							['Go to Patient Summary', NEXTACTION_PATIENTSUMMARY, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
 							['Return to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
+							['Go to Work List', "/worklist"],
 							],
 						cancelUrl => $self->{cancelUrl} || undef));
 
