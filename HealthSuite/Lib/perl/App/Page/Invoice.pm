@@ -1029,7 +1029,7 @@ sub getHistoryHtml
 	my ($self, $claim) = @_;
 
 	my $invoiceId = $self->param('invoice_id');
-	my $allStatusHistory = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selAllHistoryItems', $invoiceId);
+	#my $allStatusHistory = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selAllHistoryItems', $invoiceId);
 	my $historyItems = $claim->{invoiceHistoryItem};
 	my $historyCount = $claim->{historyCount};
 

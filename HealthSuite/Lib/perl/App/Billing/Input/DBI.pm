@@ -1755,6 +1755,7 @@ sub assignInvoiceProperties
 		select to_char(value_date, 'MM/DD/YYYY'), value_text, cr_user_id, value_textb
 		from invoice_history
 		where parent_id = $invoiceId
+		order by value_date desc, cr_stamp desc
 	};
 	my $sthHist = $self->{dbiCon}->prepare("$queryStatment");
 	$sthHist->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
