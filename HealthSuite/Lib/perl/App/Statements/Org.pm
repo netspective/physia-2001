@@ -358,6 +358,15 @@ $STMTMGR_ORG = new App::Statements::Org(
 		},
 		sqlStmtBindParamDescr => ['Catalog ID'],
 	},
+	'selSuperbillsByCatalogId' => {
+		sqlStmt => qq{
+			select	oc.internal_catalog_id
+			from	Offering_Catalog oc
+			where	oc.catalog_id = ?
+			order by catalog_id
+		},
+		sqlStmtBindParamDescr => ['Catalog ID'],
+	},
 	'sel_ActiveOrgBillingIds' => qq{
 		select * from org_attribute
 		where parent_id = :1
