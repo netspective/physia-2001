@@ -34,27 +34,27 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'ins_type'),
 
-			new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id', 
+			new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id',
 				name => 'ins_org_id',
 				options => FLDFLAG_REQUIRED
 			),
-			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', 
+			new App::Dialog::Field::Insurance::Product(caption => 'Product Name',
 				name => 'product_name',
 				size => 30,
 				options => FLDFLAG_REQUIRED,
-				findPopup => '/lookup/insproduct/insorgid/itemValue', 
+				findPopup => '/lookup/insproduct/insorgid/itemValue',
 				findPopupControlField => '_f_ins_org_id',
 			),
-			new App::Dialog::Field::Insurance::Plan::New(caption => 'Plan Name', 
+			new App::Dialog::Field::Insurance::Plan::New(caption => 'Plan Name',
 				name => 'plan_name',
 				size => 30,
-				findPopup => '/lookup/insplan/product/itemValue', 
+				findPopup => '/lookup/insplan/product/itemValue',
 				findPopupControlField => '_f_product_name',
 				options => FLDFLAG_REQUIRED,
 			),
-			new CGI::Dialog::Field(caption => 'Fee Schedule(s)', 
+			new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
 				name => 'fee_schedules',
-				
+
 				findPopupAppendValue => ',',
 				findPopup => '/lookup/catalog'
 			),
@@ -80,15 +80,15 @@ sub new
 			),
 			new CGI::Dialog::MultiField (caption => 'Plan Begin/End Dates',	name => 'dates',
 				fields => [
-					new CGI::Dialog::Field(caption => 'Begin Date', 
-						name => 'coverage_begin_date', 
-						type => 'date', 
-						options => FLDFLAG_REQUIRED, 
+					new CGI::Dialog::Field(caption => 'Begin Date',
+						name => 'coverage_begin_date',
+						type => 'date',
+						options => FLDFLAG_REQUIRED,
 						pastOnly => 1
 					),
-					new CGI::Dialog::Field(caption => 'End Date', 
-						name => 'coverage_end_date', 
-						type => 'date', 
+					new CGI::Dialog::Field(caption => 'End Date',
+						name => 'coverage_end_date',
+						type => 'date',
 						futureOnly => 1,
 						defaultValue => ''
 					),
@@ -131,7 +131,7 @@ sub new
 				name => 'remit_payer_id',
 				findPopup => '/lookup/envoypayer/id'
 			),
-			new CGI::Dialog::Field(caption => 'Remit Payer Name', 
+			new CGI::Dialog::Field(caption => 'Remit Payer Name',
 				name => 'remit_payer_name'
 			),
 
@@ -185,7 +185,7 @@ sub customValidate
 
 		my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$pdtName');";
 		$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
-				<a href="$createInsProductHref">Create Product '$pdtName' now</a>
+				<a href="$createInsProductHref">Add Product '$pdtName' now</a>
 			}) if $doesProductExist eq '' && $pdtName ne '';
 }
 
@@ -201,7 +201,7 @@ sub populateData_add
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	$page->field('product_name', $productName);
 
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selPlanByInsIdAndRecordType', $productName, $recordType);
 
 	$page->field('ins_org_id', $recordData->{'ins_org_id'});
@@ -213,21 +213,21 @@ sub populateData_add
 	my $insIntId = $recordData->{'ins_internal_id'};
 	my$planAdd = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
 
-	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Telephone/Primary', 
+	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Telephone/Primary',
 		$page->session('org_id')
 	);
 	$page->field('phone_item_id', $insPhone->{item_id});
 	$page->field('phone', $insPhone->{value_text});
 
-	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary', 
+	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary',
 		$page->session('org_id')
 	);
 	$page->field('fax_item_id', $insFax->{item_id});
 	$page->field('fax', $insFax->{value_text});
 
-	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule', $page->session('org_id')
 	);
 		my @feeList = ();
@@ -253,7 +253,7 @@ sub populateData_update
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
 	my $insIntId = $page->param('ins_internal_id');
 
-	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selInsuranceData', $insIntId))
 	{
 		$page->addError("Ins Internal ID '$insIntId' not found.");
@@ -262,23 +262,23 @@ sub populateData_update
 	$STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr',
 		$insIntId);
 
-	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Telephone/Primary', 
+	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Telephone/Primary',
 		$page->session('org_id')
 	);
 	$page->field('phone_item_id', $insPhone->{item_id});
 	$page->field('phone', $insPhone->{value_text});
 
-	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary',
 		$page->session('org_id')
 	);
 	$page->field('fax_item_id', $insFax->{item_id});
 	$page->field('fax', $insFax->{value_text});
 
-	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule', $page->session('org_id'));
-	
+
 	my @feeList = ();
 	my @feeItemList = ();
 	my $fee = '';
@@ -305,16 +305,16 @@ sub execute
 
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	my $productName = $page->field('product_name');
-	
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selPlanByInsIdAndRecordType', $productName, $recordType);
-		
+
 	my $parentInsId = $recordData->{'ins_internal_id'};
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $insType = $recordData->{'ins_type'};
 	my $insOrgId = $page->field('ins_org_id');
 	my $planName = $page->field('plan_name');
-	
+
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
 				ins_internal_id => $editInsIntId || undef,
@@ -341,7 +341,7 @@ sub execute
 	if ($command eq 'update')
 	{
 		my $insIntId = $page->param('ins_internal_id');
-		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 			'selUpdateCoverage', $insOrgId, $productName, $planName, $insIntId);
 	}
 
@@ -391,7 +391,7 @@ sub handleAttributes
 			_debug => 0
 		);
 
-	my $parentFeeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+	my $parentFeeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $parentInsId, 'Fee Schedule', $page->session('org_id'));
 		my @feeList = ();
 		my @feeItemList = ();
@@ -404,12 +404,12 @@ sub handleAttributes
 		}
 	my $feeSchedList = '';
 
-	$feeSchedList = $page->field('fee_schedules') eq '' && $command eq 'add' ? 
+	$feeSchedList = $page->field('fee_schedules') eq '' && $command eq 'add' ?
 		$page->field('fee_schedules', $fee) : $page->field('fee_schedules');
 
 	my @feeSched =split(',', $feeSchedList);
 
-	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule', 
+	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule',
 		$insIntId, $page->session('org_id'));
 
 	foreach my $fee (@feeSched)
