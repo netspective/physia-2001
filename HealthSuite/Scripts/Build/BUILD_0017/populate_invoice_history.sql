@@ -1,3 +1,5 @@
+delete from Invoice_History;
+
 insert into Invoice_History (
 	cr_stamp,
 	cr_user_id,
