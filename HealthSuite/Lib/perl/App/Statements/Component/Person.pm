@@ -1560,7 +1560,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			Person_Medication
 		WHERE
 			parent_id = ? AND
-			(end_date IS NULL OR end_date > TRUNC(sysdate))
+			(end_date IS NULL OR end_date >= TRUNC(sysdate))
 		ORDER BY
 			start_date DESC,
 			med_name
@@ -1618,6 +1618,83 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.allMedications', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId], 'panelTransp'); },
+},
+#----------------------------------------------------------------------------------------------------------------------
+'person.inactiveMedications' => {
+	sqlStmt => qq{
+		SELECT
+			permed_id,
+			med_name,
+			dose,
+			dose_units,
+			route,
+			frequency,
+			TO_CHAR(start_date, 'IYYYMMDD') as start_date,
+			TO_CHAR(end_date, 'IYYYMMDD') as end_date,
+			notes
+		FROM
+			Person_Medication
+		WHERE
+			parent_id = ? AND
+			end_date < TRUNC(sysdate)
+		ORDER BY
+			start_date DESC,
+			med_name
+	},
+	publishDefn => {
+		columnDefn => [
+			{ head => 'Medication', colIdx => 1, },
+			{ head => 'Date', colIdx => 6, dformat => 'date', },
+			{ head => 'End Date', colIdx => 7, dformat => 'date', },
+			{ head => 'Dosage', dataFmt => '#2##3#',},
+			{ head => 'Freq', colIdx => 5,},
+			{ head => 'Route', colIdx => 4, },
+			{ head => 'Notes', colIdx => 8,},
+		],
+		bullets => [
+			#'/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#homeArl#',
+			{
+				imgSrc => '/resources/widgets/mail/prescription.gif',
+				title => 'Refill Request',
+				urlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-refill-medication/#0#?home=#homeArl#',
+			}
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => {
+			heading => 'Inactive Medications',
+			#editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Inactive Medications' },
+		#banner => {
+		#	actionRows =>
+		#	[
+		#		{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-medication/#param.person_id#?home=#param.home#'>Medication</A> } },
+		#		{ caption => qq{ Prescribe <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-prescribe-medication/#param.person_id#?home=#param.home#'>Medication</A> } },
+		#	],
+		#},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inactiveMedications', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inactiveMedications', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inactiveMedications', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inactiveMedications', [$personId], 'panelTransp'); },
 },
 #----------------------------------------------------------------------------------------------------------------------
 'person.allMedications' => {
