@@ -1620,8 +1620,9 @@ sub prepare_view_submit
 	my $printFlag = $self->param('print');
 	my $patient = $claim->getCareReceiver();
 	my $patientId = $patient->getId();
+	my $claimType = $claim->getInvoiceSubtype();
 
-	if(my $errorCount = App::IntelliCode::getNSFerrorCount($self, $invoiceId, $patientId))
+	if(my $errorCount = App::IntelliCode::getNSFerrorCount($self, $invoiceId, $patientId) && ($claimType != App::Universal::CLAIMTYPE_SELFPAY && $claimType != App::Universal::CLAIMTYPE_CLIENT) )
 	{
 		$self->addContent(q{<B style='color:red'>Cannot submit claim. Please check IntelliCode errors.</B>});
 	}
