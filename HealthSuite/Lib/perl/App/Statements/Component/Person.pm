@@ -184,26 +184,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.miscNotes' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, cr_stamp
+			select 	value_type, item_id, parent_id, item_name, value_text
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'
+					
 		},
 		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
-
+		
 	publishDefn =>
 	{
-		columnDefn => [
-				{colIdx =>0, head => 'Misc Notes', dataFmt => 'Misc Notes (#5#<A HREF = "/person/#2#/profile">#2#</A>)#4#' },
-		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		columnDefn => [		
+			{ dataFmt => 'Misc Notes: #4#' },
+		],	
+		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Misc Notes' },
+		frame => { heading => 'Misc Notes !' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -226,10 +227,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
+	
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelTransp'); },
 },
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
