@@ -60,11 +60,16 @@ sub new
 				findPopupControlField => '_f_product_name',
 				options => FLDFLAG_REQUIRED,
 			),
-			new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
+			#new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
+			#	name => 'fee_schedules',
+			#	findPopupAppendValue => ',',
+			#	findPopup => '/lookup/catalog'
+			#),
+			new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 				name => 'fee_schedules',
-
-				findPopupAppendValue => ',',
-				findPopup => '/lookup/catalog'
+				type => 'integer',
+				findPopup => '/lookup/catalog',
+				hints => 'Numeric Fee Schedule ID',
 			),
 			new App::Dialog::Field::Address(caption=>'Billing Address',
 				name => 'billing_addr',
