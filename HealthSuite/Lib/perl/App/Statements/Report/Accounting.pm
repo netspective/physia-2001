@@ -691,6 +691,39 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	group by to_char(invoice_date,'MM/YYYY')
 	order by invoice_date asc},
 
+	'sel_monthly_audit_newpatient_count' => qq{
+	SELECT
+				count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
+	FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea, org o
+	WHERE 	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+	AND      e.facility_id = o.org_internal_id
+	AND      o.org_internal_id = :3
+	AND  		e.event_id = ea.parent_id
+	AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+	AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+	AND      at.id = ea.value_int
+	AND      at.caption = 'New Patient'
+	GROUP BY to_char(start_time,'MM/YYYY')
+	ORDER BY start_time asc
+	},
+
+
+	'sel_monthly_audit_estpatient_count' => qq{
+		SELECT
+					count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
+		FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea, org o
+		WHERE 	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+		AND      e.facility_id = o.org_internal_id
+		AND      o.org_internal_id = :3
+		AND  		e.event_id = ea.parent_id
+		AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+		AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+		AND      at.id = ea.value_int
+		AND      at.caption = 'Established Patient'
+		GROUP BY to_char(start_time,'MM/YYYY')
+		ORDER BY start_time asc
+	},
+
 	'sel_monthly_audit_detail' => qq{
 	SELECT	invoice_charges.invoice_id ,
 		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
