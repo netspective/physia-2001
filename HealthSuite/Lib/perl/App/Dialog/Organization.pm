@@ -534,7 +534,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_PHONE || undef,
 			value_text => $page->field('phone') || undef,
 			_debug => 0
-		);
+		) if $page->field('phone') ne '' ;
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
