@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -I.
 
 use strict;
 
@@ -23,17 +23,17 @@ use Date::Manip;
 sub main
 {
 	my @ARGV = @_;
-	
+
 	my $today = UnixDate('today', '%m%d%Y_%H%M');
-	
+
 	my $cs = shift;
 	die "Usage Example:  $0 sde_prime/sde\@sdedbs02" unless $cs;
-	
+
 	$cs =~ /(.*?)\/(.*?)\@(.*)/;
 	my ($userName, $password, $twoTask) =  ($1, $2, $3);
 
 	my $NSF_FILE_NAME = 'phy169_' . $today . '.nsf';
-	
+
 	my $claimList = new App::Billing::Claims;
 	my $valMgr = new App::Billing::Validators;
 	my $input = new App::Billing::Input::DBI;
@@ -66,11 +66,11 @@ sub main
 				if ($valMgr->haveErrors() == 0)
 				{
 					my $outResult = $output->processClaims(
-						destination => NSFDEST_FILE, 
-						outArray => \@outArray, 
-						outFile => $NSF_FILE_NAME, 
-						claimList => $claimList, 
-						validationMgr => $valMgr, 
+						destination => NSFDEST_FILE,
+						outArray => \@outArray,
+						outFile => $NSF_FILE_NAME,
+						claimList => $claimList,
+						validationMgr => $valMgr,
 						nsfType => NSF_HALLEY,
 						FLAG_STRIPDASH => '1',
 					);

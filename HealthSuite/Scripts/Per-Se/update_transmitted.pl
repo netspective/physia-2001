@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -I.
 
 use strict;
 use DBI;
@@ -14,7 +14,7 @@ open (NSF, "$nsfFileName") || die "Unable to open '$nsfFileName': $!\n";
 $cs =~ /(.*?)\/(.*?)\@(.*)/;
 my ($userName, $password, $twoTask) =  ($1, $2, $3);
 
-my $dbh = DBI->connect('dbi:Oracle:' . $twoTask, $userName, $password, 
+my $dbh = DBI->connect('dbi:Oracle:' . $twoTask, $userName, $password,
 	{ RaiseError => 1, AutoCommit => 0 }) || die "Unable To Connect to Database: $!";
 
 my @transmittedClaims = ();
@@ -22,7 +22,7 @@ while(<NSF>)
 {
 	chomp;
 	next unless /^FA001(.*?)\s/;
-	
+
 	my $claimNo = $1;
 	push(@transmittedClaims, $claimNo);
 }
@@ -48,10 +48,10 @@ for my $sqlStmt (@sqlStmts)
 {
 	my $sth = $dbh->prepare($sqlStmt);
 	my $result = $sth->execute();
-	
+
 	print "$sqlStmt\n";
 	print "$result\n";
-	
+
 	$sth->finish();
 }
 
