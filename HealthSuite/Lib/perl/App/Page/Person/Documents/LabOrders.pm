@@ -93,7 +93,7 @@ sub obsQuery
 
 
 ########################################################
-# Drill Level 1 - Observation Results
+# Drill Level 1 - Observation Single Panel Test
 ########################################################
 
 
@@ -103,7 +103,7 @@ sub obsQuery
 		{head => 'Lab Test ID.', colIdx => '#{lab_test_id}#',},
 		{head => 'Test Name', colIdx => '#{lab_test_name}#',},
 		{head => 'Test Type', colIdx => '#{test_type}#',},
-		{head => 'Test Selection', colIdx =>  '#{selection}#',},
+		{head => 'Test Selection',hint=>'#{list}#', colIdx =>  '#{selection}#',},
 	],
 	dnQuery => \&obsResultsQuery,
 	dnAncestorFmt => "Tests In Lab Order : #param.dn.obs.lab_order_id#" ,
@@ -127,6 +127,8 @@ sub obsResultsQuery
 			   'test_type',
 			   'selection',		
 			   'lab_test_entry_id',
+			   'list',
+			   'lab_entry_id',
 			   #'lab_panel_name',
 
 	);
@@ -146,7 +148,7 @@ sub obsResultsAncestorFmt
 
 
 ########################################################
-# Drill Level 2 - Observation Results History
+# Drill Level 2 - Observation Panel Test Data
 ########################################################
 
 
@@ -169,7 +171,7 @@ sub obsResultsHistQuery
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
 	#my $cond1 = $sqlGen->WHERE('org_internal_id', 'is', $self->session('org_internal_id'));
-	my $cond3 = $sqlGen->WHERE('lab_panel_parent_id', 'is', $self->param('dn.obs_results.lab_test_entry_id'));
+	my $cond3 = $sqlGen->WHERE('lab_panel_parent_id', 'is', $self->param('dn.obs_results.lab_entry_id'));
 	my $cond4 = $sqlGen->AND($cond3);
 	$cond4->outColumns(
 		'lab_panel_id',
