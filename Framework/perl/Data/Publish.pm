@@ -315,7 +315,7 @@ sub prepare_HtmlBlockFmtTemplate
 			}
 			if($_->{url})
 			{
-				$dataFmt = qq{<A HREF='$_->{url}' STYLE='text-decoration:none' @{[ $_->{hint} ? "TITLE='$_->{hint}'" : '' ]}>$dataFmt</A>};
+				$dataFmt = qq{<A HREF="$_->{url}" STYLE='text-decoration:none' @{[ $_->{hint} ? "TITLE='$_->{hint}'" : '' ]}>$dataFmt</A>};
 			}
 			elsif($_->{hint})
 			{
@@ -419,12 +419,12 @@ sub prepare_HtmlBlockFmtTemplate
 		my $hcontrol = '';
 		foreach (@{$icons->{head}})
 		{
-			$hcontrol .= "<A HREF='$_->{urlFmt}' TITLE='$_->{title}'><IMG SRC='$_->{imgSrc}' BORDER=0></A> ";
+			$hcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}"><IMG SRC="$_->{imgSrc}" BORDER=0></A> };
 		}
 		my $dcontrol = '';
 		foreach (@{$icons->{data}})
 		{
-			$dcontrol .= "<A HREF='$_->{urlFmt}' TITLE='$_->{title}'><IMG SRC='$_->{imgSrc}' BORDER=0></A> ";
+			$dcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}"><IMG SRC="$_->{imgSrc}" BORDER=0></A> };
 		}
 		$hcontrol = "<NOBR>$hcontrol</NOBR>" if $hcontrol;
 		$dcontrol = "<NOBR>$dcontrol</NOBR>" if $dcontrol;
@@ -450,7 +450,7 @@ sub prepare_HtmlBlockFmtTemplate
 		my $type = $select->{type} || 'checkbox';
 		my $name = $select->{name};
 		my $valueFmt = $select->{valueFmt} || '#0#';
-		my $control = "<INPUT TYPE=\U$type\E NAME='$name' VALUE='$valueFmt'>";
+		my $control = qq{<INPUT TYPE=\U$type\E NAME='$name' VALUE="$valueFmt">};
 
 		if($location eq 'trail')
 		{
@@ -581,18 +581,18 @@ sub prepare_HtmlBlockFmtTemplate
 		my $frameBtns = '';
 		if(exists $frameInfo->{closeUrl})
 		{
-			$frameBtns = qq{<A HREF='$frameInfo->{closeUrl}'><IMG SRC='/resources/icons/action-done.gif' BORDER=0></A>} if exists $frameInfo->{closeUrl};
+			$frameBtns = qq{<A HREF="$frameInfo->{closeUrl}"><IMG SRC="/resources/icons/action-done.gif" BORDER=0></A>} if exists $frameInfo->{closeUrl};
 		}
 		elsif(exists $frameInfo->{addUrl} && exists $frameInfo->{editUrl})
 		{
-			$frameBtns .= qq{<A HREF='$frameInfo->{addUrl}'><IMG SRC='/resources/icons/action-add.gif' BORDER=0></A> };
-			$frameBtns .= qq{<A HREF='$frameInfo->{editUrl}'><IMG SRC='/resources/icons/action-edit.gif' BORDER=0></A>};
+			$frameBtns .= qq{<A HREF="$frameInfo->{addUrl}"><IMG SRC="/resources/icons/action-add.gif" BORDER=0></A> };
+			$frameBtns .= qq{<A HREF="$frameInfo->{editUrl}"><IMG SRC="/resources/icons/action-edit.gif" BORDER=0></A>};
 		}
 		elsif(exists $frameInfo->{editUrl})
 		{
-			$frameBtns .= qq{<A HREF='$frameInfo->{editUrl}'><IMG SRC='/resources/icons/action-addedit.gif' BORDER=0></A>};
+			$frameBtns .= qq{<A HREF="$frameInfo->{editUrl}"><IMG SRC="/resources/icons/action-addedit.gif" BORDER=0></A>};
 		}
-		my $frameCaption = $frameInfo->{editUrl} ? "<A HREF='$frameInfo->{editUrl}' STYLE='$frameHeadHrefStyle'>$frameInfo->{heading}</A>" : $frameInfo->{heading};
+		my $frameCaption = $frameInfo->{editUrl} ? qq{<A HREF="$frameInfo->{editUrl}" STYLE="$frameHeadHrefStyle">$frameInfo->{heading}</A>} : $frameInfo->{heading};
 		my $frameHead = $frameBtns ?
 			qq{
 				<TD>
