@@ -121,9 +121,7 @@ sub handleARL
 	{
 		$queryTitle = "\u$queryType";
 		$self->property('ACL', "page/query/$queryType");
-		my ($fileName) = map {$_->{name}} grep {$_->{name} eq $queryType} @{$RESOURCE_MAP{query}{_views}};
-		$fileName = File::Spec->catfile($QUERYDIR, $fileName . '.qdl');
-		#$self->addDebugStmt("fileName: $fileName");
+		my ($fileName) = map {$_->{qdlFile}} grep {$_->{name} eq $queryType} @{$RESOURCE_MAP{query}{_views}};
 		if (-f $fileName)
 		{
 			$self->property('QDL', $fileName);
@@ -159,12 +157,13 @@ my @queries = grep {$_ =~ /\.qdl/ && -f "$QUERYDIR/$_"} readdir QUERYDIR;
 closedir QUERYDIR;
 foreach (sort @queries)
 {
-	my $sqlGen = new SQL::GenerateQuery(file => "$QUERYDIR/$_");
+	my $fileName = "$QUERYDIR/$_";
+	my $sqlGen = new SQL::GenerateQuery(file => $fileName);
 	my $id = $sqlGen->id();
 	next unless defined $sqlGen->{params}->{caption};
 	my $caption = $sqlGen->{params}->{caption};
 	my $icon = defined $sqlGen->{params}->{icon} ? $sqlGen->{params}->{icon} : 'images/page-icons/default';
-	push @{$RESOURCE_MAP{query}->{_views}}, {caption => $caption, name => $id, icon => $icon, };
+	push @{$RESOURCE_MAP{query}->{_views}}, {caption => $caption, name => $id, icon => $icon, qdlFile => $fileName};
 }
 
 
