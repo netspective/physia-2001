@@ -162,6 +162,11 @@
 			Added activity log for claims notes and claim submissions.
 		</deliverable>
 		
+		<deliverable id="1748">
+			Corrected Close Date Report.  Will require a Collection Worklist refresh from the front end.
+		</deliverable>
+
+		</deliverable>
 		<deliverable id="1752">
 			A component is created for Presonal Hyperlinks and Bookmarks and it is shown under Person Summary Page.
 		</deliverable>
@@ -174,6 +179,10 @@
 			A bold label of Active and Inactive is displayed in Certification component under Person Associate Page.
 		</deliverable>		
 		
+		<deliverable id="1762">
+			Show Recipients on Sent Items Mail Box.
+		</deliverable>		
+
 		<deliverable id="1766">
 			Report (Deposit Payment) : Added blank line after sub-total on the deposit summary
 		</deliverable>		
@@ -222,6 +231,14 @@
 
 		<deliverable id="1844">
 			Fixed the multiple-Cancel-buttons error.
+		</deliverable>
+
+		<deliverable id="1845">
+			Corrected time zone offset errors.
+		</deliverable>
+
+		<deliverable id="1846">
+			Fixed drop down box to pull correct Prescribe Medication dialog.
 		</deliverable>
 
 		<deliverable id="1849">
