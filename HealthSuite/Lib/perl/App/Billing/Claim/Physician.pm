@@ -45,6 +45,7 @@ sub new
 	$self->{blueShieldId} = undef;
 	$self->{workersComp} = undef;
 	$self->{professionalLicenseNo} = undef;
+	$self->{dea} = undef;
 
 	$self->{documentationIndicator} = undef;		# to be removed
 	$self->{documentationType} = undef;		# to be removed
@@ -403,6 +404,18 @@ sub setProfessionalLicenseNo
 {
 	my ($self,$value) = @_;
 	$self->{professionalLicenseNo} = $value;
+}
+
+sub getDEA
+{
+	my ($self) = @_;
+	return $self->{dea};
+}
+
+sub setDEA
+{
+	my ($self,$value) = @_;
+	$self->{dea} = $value;
 }
 
 1;
