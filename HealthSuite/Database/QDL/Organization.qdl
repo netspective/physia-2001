@@ -57,7 +57,6 @@
 
 		<!-- Styles -->
 		<output-style id="default">
-			<column id="row_number"/>
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -66,7 +65,6 @@
 			<condition field="owner_org_id" comparison="is" criteria="#session.org_internal_id#"/>
 		</output-style>
 		<output-style id="department" distinct="yes">
-			<column id="row_number"/>
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -78,7 +76,6 @@
 			</and-conditions>
 		</output-style>
 		<output-style id="employer" distinct="yes">
-			<column id="row_number"/>
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -90,7 +87,6 @@
 			</and-conditions>
 		</output-style>
 		<output-style id="insurance" distinct="yes">
-			<column id="row_number"/>
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -102,7 +98,6 @@
 			</and-conditions>
 		</output-style>
 		<output-style id="provider" distinct="yes">
-			<column id="row_number"/>
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
