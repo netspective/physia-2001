@@ -110,10 +110,29 @@ sub getComponentHtml
 
 	my @data = ();
 	my $html = qq{
-		<style>
-			a.today {text-decoration:none; font-family:Verdana; font-size:8pt}
-			strong {font-family:Tahoma; font-size:8pt; font-weight:normal}
-		</style>
+						<script language="JavaScript1.2">
+								function clickMenuRef(url)
+								{
+									var urlNext = url;
+									window.location.href= '/' + urlNext;
+								}
+						</script>
+						<TABLE>
+
+							<TR VALIGN=TOP>
+								<TD COLSPAN=2>
+									<input type="button" value="Menu" onClick="javascript:clickMenuRef('menu');">
+									<input type='button' value='Referral Followup Worklist' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
+									<input type='button' value='Lookup Patient' onClick="javascript:clickMenuRef('search/patient');">
+									<input type='button' value='Add Patient' onClick="javascript:clickMenuRef('org/#session.org_id#/dlg-add-patient');">
+									<input type='button' value='Edit Patient' onClick="javascript:clickMenuRef('search/patient');">
+									<input type='button' value='Edit Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
+									<input type='button' value='Add Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
+									<input type='button' value='Add Referral' onClick="javascript:clickMenuRef('worklist/referral');">
+									<input type='button' value='Edit Referral' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
+								</TD>
+							</TR>
+						</TABLE>
 	};
 
 	foreach (@$referralAuth)
@@ -140,6 +159,9 @@ sub getComponentHtml
 			},
 			qq{
 				$_->{first_name}
+			},
+			qq{
+				$_->{service}
 			},
 			qq{
 				$_->{follow_up}
