@@ -266,9 +266,9 @@ sub execAction_submit
 		my $personData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $clientId);
 		my $personPhone = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selHomePhone', $clientId);
 		my $personAddr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $clientId);
-		my $patSignature = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $clientId, 'Signature Source', App::Universal::ATTRTYPE_AUTHPATIENTSIGN);
-		my $provAssign = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $clientId, 'Provider Assignment', App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN);
-		my $infoRelease = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $clientId, 'Information Release', App::Universal::ATTRTYPE_AUTHINFORELEASE);
+		my $patSignature = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPATIENTSIGN);
+		my $provAssign = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN);
+		my $infoRelease = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHINFORELEASE);
 
 		$page->schemaAction(
 				'Invoice_Attribute', $command,
@@ -276,6 +276,7 @@ sub execAction_submit
 				item_name => 'Patient/Signature',
 				value_type => defined $textValueType ? $textValueType : undef,
 				value_text => $patSignature->{value_text} || undef,
+				value_textB => $patSignature->{value_textb} || undef,
 				_debug => 0
 			);
 
@@ -285,6 +286,7 @@ sub execAction_submit
 				item_name => 'Provider/Assign Indicator',
 				value_type => defined $textValueType ? $textValueType : undef,
 				value_text => $provAssign->{value_text} || undef,
+				value_textB => $provAssign->{value_textb} || undef,
 				_debug => 0
 			);
 
@@ -520,6 +522,11 @@ sub execAction_submit
 			);
 
 
+
+		# INVOICE BILLING INFORMATION
+		
+		#my $invoicePayers = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $invoiceId);
+
 		if($claimType != $selfPay)
 		{
 			##PATIENT'S INSURANCE INFO, INSURED INFO, OTHER INSURED INFO (IF ANY)
@@ -587,15 +594,15 @@ sub execAction_submit
 					_debug => 0
 				);
 
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insurance/Primary/Effective Dates',
-					value_type => defined $durationValueType ? $durationValueType : undef,
-					value_date => $personInsur->{coverage_begin_date},
-					value_dateEnd => $personInsur->{coverage_end_date},
-					_debug => 0
-				);
+			#$page->schemaAction(
+			#		'Invoice_Attribute', $command,
+			#		parent_id => $invoiceId,
+			#		item_name => 'Insurance/Primary/Effective Dates',
+			#		value_type => defined $durationValueType ? $durationValueType : undef,
+			#		value_date => $personInsur->{coverage_begin_date},
+			#		value_dateEnd => $personInsur->{coverage_end_date},
+			#		_debug => 0
+			#	);
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
@@ -842,6 +849,7 @@ sub execAction_submit
 
 
 			#Create attributes for secondary insurance (for HCFA Box 11d, 9a-d)
+
 			my $secondaryIns = App::Universal::INSURANCE_SECONDARY;
 			my $secondInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $clientId, $secondaryIns);
 			if($secondInsur->{ins_internal_id})
@@ -951,6 +959,7 @@ sub execAction_submit
 					service_facility_id => $servFacilityId,
 					code => $icdCode || undef,
 					provider_id => $mainTransData->{provider_id},
+					care_provider_id => $mainTransData->{care_provider_id},
 					trans_begin_stamp => $todaysStamp || undef,
 					_debug => 0
 				);
