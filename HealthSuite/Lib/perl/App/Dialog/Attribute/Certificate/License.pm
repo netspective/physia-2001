@@ -47,7 +47,7 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Number', name => 'value_text', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', futureOnly => 1, defaultValue => ''),
-
+		new CGI::Dialog::Field(type => 'bool', name => 'value_int', caption => 'License Required',	style => 'check'),
 	);
 
 	$self->SUPER::initialize();
