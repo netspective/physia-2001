@@ -277,11 +277,8 @@ sub getHtml
 					}
 					function onChange_procedure_$line(event, flags)
 					{
-						if($command eq 'add')
-						{
-							if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
-								document.$dialogName._f_proc_$line\_modifier.value = '';
-						}
+						if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
+							document.$dialogName._f_proc_$line\_modifier.value = '';
 					}
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
