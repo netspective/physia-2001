@@ -1,3 +1,5 @@
-45 04 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/get_reports
+00 03 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/get_reports
+00 17 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/get_reports
+00 22 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/get_reports
 00 14 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/submit_claims
 00 00 * * * $HOME/projects/HealthSuite/Scripts/Per-Se/submit_claims

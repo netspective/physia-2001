@@ -14,10 +14,6 @@ for my $dir (readdir(DIR))
 	next if $dir =~ /^\.+$/;
 	next unless -d $dir;
 
-	print "\n--------\n";
-	print "$dir\n";
-	print "--------\n";
-	
 	system(qq{
 		mkdir -p $dir/archive
 	});
