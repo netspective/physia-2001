@@ -33,6 +33,8 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
+				new CGI::Dialog::Field(type => 'hidden', name => 'pre_product_id'),
+				new CGI::Dialog::Field(type => 'hidden', name => 'pre_org_id'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
 				new App::Dialog::Field::Insurance::Product::New(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field::TableColumn(
@@ -118,7 +120,12 @@ sub populateData
 			$page->addError("Ins Internal ID '$insIntId' not found.");
 		}
 
-	 $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
+	my $preProductName = $page->field('product_name');
+	my $preOrgId = $page->field('ins_org_id');
+	$page->field('pre_product_id', $preProductName);
+	$page->field('pre_org_id', $preOrgId);
+
+	$STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
 	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Contact Method/Telephone/Primary');
 	$page->field('phone_item_id', $insPhone->{'item_id'});
 	$page->field('phone', $insPhone->{'value_text'});
@@ -148,21 +155,30 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $editInsIntId = $page->param('ins_internal_id');
+	my $productName = $page->field('product_name');
 	my $insType = $page->field('ins_type');
+	my $insOrgId = $page->field('ins_org_id');
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
 				ins_internal_id => $editInsIntId || undef,
-				product_name => $page->field('product_name') || undef,
+				product_name => $productName || undef,
 				record_type => App::Universal::RECORDTYPE_INSURANCEPRODUCT || undef,
 				#fee_schedule => $page->param('fee_schedule') || undef,
 				owner_org_id => $page->param('org_id') || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
-				ins_type => $page->field('ins_type') || undef,
+				ins_type => $insType || undef,
 				remit_type => $page->field('remit_type') || undef,
 				remit_payer_id => $page->field('remit_payer_id') || undef,
 				remit_payer_name => $page->field('remit_payer_name') || undef,
 				_debug => 0
 			);
+
+	if ($command eq 'update')
+	{
+		my $preProductName = $page->field('pre_product_id');
+		my $preOrgId = $page->field('pre_org_id');
+		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selUpdatePlanAndCoverage', $insType, $productName, $insOrgId, $preProductName, $preOrgId);
+	}
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
 
