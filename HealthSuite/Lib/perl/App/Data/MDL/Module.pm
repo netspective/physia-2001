@@ -215,6 +215,14 @@ sub itemMissingMsg
 	print STDOUT "\r$message\n" if $flags & (MDLFLAG_SHOWMISSINGITEMS);
 }
 
+sub replaceVars
+{
+	my ($self, $src) = @_;
+	my $data = ref($src) ? $src : \$src;
+	$$data =~ s/\#session.GMT_DAYOFFSET\#/0/g;
+	return ref($src) ? $data : $$data;
+}
+
 sub importStruct
 {
 	my ($self, $flags, $struct) = @_;
