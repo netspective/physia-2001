@@ -39,6 +39,7 @@ use App::Page::Schedule;
 use App::Page::SDE;
 use App::Page::Report;
 use App::Page::PatientBill;
+use App::Page::Eligibility;
 
 ##############################################################################
 # Directory of all available Worklist Page Objects
@@ -174,7 +175,9 @@ use App::Dialog::Transaction::PhoneMessage;
 use App::Dialog::Transaction::RefillRequest;
 use App::Dialog::Personnel;
 use App::Dialog::Eligibility;
-use App::Dialog::EligibilityPatient;
+use App::Dialog::Eligibility::Aetna;
+use App::Dialog::Eligibility::BCBS;
+use App::Dialog::Eligibility::Other;
 
 #use App::Dialog::UserProblems;
 use App::Dialog::WorkersComp;
@@ -272,6 +275,7 @@ $WORKLIST_CLASSES = {
 	'worklist' => $WORKLIST_CLASSES,
 	'collector' => 'App::Page::Collector',
 	'patientbill' => 'App::Page::PatientBill',
+	'eligibility' => 'App::Page::Eligibility',
 );
 
 %DIALOG_CLASSES = (
@@ -644,7 +648,9 @@ $WORKLIST_CLASSES = {
 	'referral-enquiry' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralEnquiry', transId => ['parent_trans_id'], heading => 'Referral Inquiry', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _arl_modify => ['trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_ENQUIRY()},
 
 	'eligibility' => {_class => 'App::Dialog::Eligibility', heading => '$Command Eligibility', _arl => ['org_id']},
-	'eligibilitypatient' => {_class => 'App::Dialog::EligibilityPatient', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
+	'eligibility-aetna' => {_class => 'App::Dialog::Eligibility::Aetna', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
+	'eligibility-bcbs' => {_class => 'App::Dialog::Eligibility::BCBS', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
+	'eligibility-other' => {_class => 'App::Dialog::Eligibility::Other', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
 
 );
 
