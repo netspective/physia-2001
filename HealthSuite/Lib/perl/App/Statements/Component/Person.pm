@@ -1297,6 +1297,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
 			and   pc.person_id = p.value_text
+			and   pc.org_internal_id = ?
 		},
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
@@ -1357,12 +1358,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId], 'panelTransp'); },
-	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId], 'panelStatic'); },
-	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId], 'panelInDlg'); },
+	publishComp_st => sub { my ($page, $flags, $personId, ) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId], 'panelTransp'); },
+	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId], 'panelStatic'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.careProviders', [$personId,$orgInternalId], 'panelInDlg'); },
 },
 
 
@@ -2584,7 +2585,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-nurse?home=#param.home#'>My Associated Resources Appointments</A> } },
+				{ caption => qq{ Add <A HREF= '/schedule/dlg-add-appointment?_dialogreturnurl=/person/#param.person_id#/home'>My Associated Resources Appointments</A> } },
 			],
 		},
 		stdIcons =>	{
