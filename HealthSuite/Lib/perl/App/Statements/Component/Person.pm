@@ -640,7 +640,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.insurance' => {
 	sqlStmt => qq{
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
-					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'W. Comp', 99, 'InActive'),
+					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
 					copay_amt
 			from insurance
