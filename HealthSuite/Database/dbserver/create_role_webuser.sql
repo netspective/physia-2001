@@ -1,3 +1,4 @@
+drop role webuser;
 create role webuser;
 
 grant create session to webuser;
@@ -10,5 +11,5 @@ grant create synonym to webuser;
 grant create trigger to webuser;
 grant create database link to webuser;
 
-grant select on v_$mystat;
-grant select on v_$statname;
+grant select on v_$mystat to webuser;
+grant select on v_$statname to webuser;
