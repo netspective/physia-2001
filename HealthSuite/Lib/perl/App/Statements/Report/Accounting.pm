@@ -535,13 +535,14 @@ aic.batch_id,
 					    (person_pay+insurance_pay+refund)
 					    ) as a_r,
 					to_char(invoice_date,'YYYY') as invoice_year
-				FROM 	invoice_charges, org o
+				FROM 	invoice_charges
 				WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND (facility = :3 OR :3 is NULL)
 				AND (provider =:4 OR :4 is NULL)
-				AND o.org_internal_id = invoice_charges.facility
-				AND o.owner_org_id = :5
+				--AND o.org_internal_id = invoice_charges.facility
+				--AND o.owner_org_id = :5
+				AND invoice_charges.owner_org_id = :5	
 				AND invoice_charges.invoice_id in 
 					(select parent_id from invoice_item ii 
 					where (ii.service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
