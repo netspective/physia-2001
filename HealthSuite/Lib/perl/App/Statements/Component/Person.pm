@@ -2116,20 +2116,19 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.recentlyVisitedPatients' => {
 	sqlStmt => qq{
-			select distinct e1.value_text, p.complete_name
-			from event_attribute e1,  event_attribute e2, person p
-			where e1.value_type = 331
-			and e1.parent_id in
-				( select e2.parent_id from event_attribute e2 where e2.value_text = ?
-					and e2.value_type = 332)
-			and p.person_id = e1.value_text
+			
+			select p.complete_name, pvc.view_key  from PerSess_View_Count pvc,
+						person p , Person_Org_Category  pog
+						where p.person_id = pvc.view_key AND pvc.person_id = ? and 
+						pog.person_id = p.person_id AND pog.category = 'Patient'
+						and	pvc.view_latest >= to_date(sysdate)
+			order by pvc.view_latest desc	
 
 		},
-	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
+	sqlStmtBindParamDescr => ['Person Id for PerSess_View_count table'],
 	publishDefn => {
 		columnDefn => [
-				{ head => 'Recently Visited Patients', dataFmt => '#0#<A HREF="/person/#0#/profile">(#1#)</A>' },
-
+				{ head => 'Recently Visited Patients', dataFmt => '<A HREF="/person/#1#/profile" >#1#</A> <A> (#0#)</A>' },
 			],
 	},
 	publishDefn_panel =>
@@ -2159,10 +2158,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			# delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelTransp'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
