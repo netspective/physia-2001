@@ -153,7 +153,7 @@ sub fmt_stamp
 	my $page = shift;
 	my $stamp = &ParseDate(shift);
 	my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
-	$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('TZ') );
+	$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 	return &UnixDate($stamp, $stampFormat);
 }
 
@@ -172,7 +172,7 @@ sub fmt_time
 	my $page = shift;
 	my $time = &ParseDate(shift);
 	my $timeFormat = $page->session('FORMAT_TIME') || '%r';
-	$time = Date_ConvTZ($time, 'GMT', $page->session('TZ') );
+	$time = Date_ConvTZ($time, 'GMT', $page->session('DAYLIGHT_TZ') );
 	return &UnixDate($time, $timeFormat);
 }
 
@@ -836,7 +836,7 @@ sub createHtmlFromStatement
 					{
 						my $stamp = &ParseDate($rowRef->[$_[0]]);
 						my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
-						$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('TZ') );
+						$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 						return &UnixDate($stamp, $stampFormat);
 					},
 					'fmt_date' => sub
@@ -849,7 +849,7 @@ sub createHtmlFromStatement
 					{
 						my $time = &ParseDate($rowRef->[$_[0]]);
 						my $timeFormat = $page->session('FORMAT_TIME') || '%r';
-						$time = Date_ConvTZ($time, 'GMT', $page->session('TZ') );
+						$time = Date_ConvTZ($time, 'GMT', $page->session('DAYLIGHT_TZ') );
 						return &UnixDate($time, $timeFormat);
 					},
 					'level_indent' => sub { my $level = $rowRef->[-1]; $level < 10 ? ($levIndentStr x $level) : '' },
