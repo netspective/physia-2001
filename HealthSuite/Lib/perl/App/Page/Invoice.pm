@@ -658,7 +658,7 @@ sub getProceduresHtml
 	{
 		$icdCaption .= "$diag: ";
 		my $icdInfo = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericICDCode', $diag);
-		
+
 		my $icdDescr = $icdInfo->{descr};
 		$icdDescr =~ s/\'/&quot;/g;
 		$icdCaption .= $icdDescr;
@@ -784,7 +784,7 @@ sub getItemHtml
 		next if $itemId != $claim->{otherItems}->[$itemIdx]->{itemId};
 		$otherItem = $claim->{otherItems}->[$itemIdx];
 		$itemNum = $itemIdx + 1;
-	}		
+	}
 
 	#my $itemId = $otherItem->{itemId};
 	my $itemType = $otherItem->{itemType};
@@ -1263,7 +1263,7 @@ sub prepare_view_summary
 	{
 		if($invType == $hcfaInvoiceType)
 		{
-			
+
 			my $submissionOrder = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
 			$quickLinks = qq{
 					<TR>
@@ -1288,7 +1288,7 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						<!-- @{[ $totalItems > 0 && $claimType != $selfPay && 
+						<!-- @{[ $totalItems > 0 && $claimType != $selfPay &&
 							($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
@@ -1296,7 +1296,7 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && 
+						@{[ $totalItems > 0 && $claimType != $selfPay &&
 							($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
@@ -1950,21 +1950,23 @@ sub initialize
 		);
 
 	# Check user's permission to page
+	my $invOwner = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selInvoiceOwner', $invoiceId);
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
-		unless($self->hasPermission("page/invoice/$activeView"))
+		unless($self->hasPermission("page/invoice/$activeView")  && $invOwner == $self->session('org_internal_id'))
 		{
 			$self->disable(
 					qq{
+						<b>Invoice Owner: $invOwner</b>
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/invoice/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
 		}
-	}	
+	}
 
 	return 1;
 }
@@ -2002,10 +2004,10 @@ sub prepare_page_content_header
 	my $paperPrinted = App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED;
 
 	#claim types
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;	
+	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
 	my $thirdParty = App::Universal::CLAIMTYPE_CLIENT;
-	
+
 	#invoice types
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
@@ -2061,7 +2063,7 @@ sub prepare_page_content_header
 	}
 	my $clientId = uc($invoice->{client_id});
 
-	my $urlPrefix = "/invoice/$invoiceId";	
+	my $urlPrefix = "/invoice/$invoiceId";
 	$self->{page_heading} = "Claim $invoiceId";
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/summary", 'summary'],
@@ -2078,7 +2080,7 @@ sub prepare_page_content_header
 			['Halley NSF', "$urlPrefix/halley_nsf", 'halley_nsf'],
 		];
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
-	
+
 	my $view = $self->param('_pm_view');
 	my $chooseActionMenu = '';
 	if($view eq 'envoy_nsf' || $view eq 'halley_nsf' || $view eq 'history')
@@ -2124,7 +2126,7 @@ sub prepare_page_content_header
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc73Command-twcc73'>\u$twcc73Command TWCC Form 73</option>} : '' ]}
-						
+
 						<!-- <option value="/person/$clientId/account">Adjs Exist: $noAdjsExist</option>
 						<option value="/person/$clientId/account">Adjs Count: $adjCount</option>
 						<option value="/person/$clientId/account">Adj Total: $invoiceTotalAdj</option> -->
