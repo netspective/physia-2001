@@ -29,12 +29,11 @@ sub new
 			caption => 'Report Dates',
 			options => FLDFLAG_REQUIRED
 		),
-
 		new App::Dialog::Field::Organization::ID(name => 'facility_id',
 			caption => 'Facility ID',
 			types => ['Facility'],
 			options => FLDFLAG_REQUIRED
-		),
+		),		
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -138,6 +137,12 @@ sub prepare_detail_earning
 	my $startDate   = $page->param('_f_report_begin_date');
 	my $endDate     = $page->param('_f_report_end_date');
 	my $insurance   = $page->param('insurance');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+		$page->session('org_internal_id'), $facility_id);
+	$facility_id = $orgIntId;
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+		$page->session('org_internal_id'), $insurance);
+	$insurance = $orgIntId;
 
 	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_insurance',
 		[$facility_id, $startDate, $endDate, $insurance]));
