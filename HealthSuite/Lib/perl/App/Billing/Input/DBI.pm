@@ -2207,7 +2207,7 @@ sub populateItems
 			quantity,
 			emergency,
 			rel_diags,
-			reference,
+			parent_code,
 			comments,
 			item_id,
 			extended_cost,
