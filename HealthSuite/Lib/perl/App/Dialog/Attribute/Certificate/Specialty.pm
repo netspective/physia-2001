@@ -32,7 +32,7 @@ sub initialize
 					fKeyStmt => 'selMedicalSpeciality',
 					fKeyDisplayCol => 0,
 					fKeyValueCol => 1),
-		new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int', type => 'select', selOptions => ' : 1;Primary:2;Secondary:3;Tertiary:4;Quaternary:5', value => '1')
+		new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
 	);
 
 	$self->SUPER::initialize();
