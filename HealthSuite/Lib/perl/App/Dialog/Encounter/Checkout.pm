@@ -116,11 +116,11 @@ sub execute
 	my $copay = $page->field('copay');
 	if(! $invoiceId)
 	{
-		App::Dialog::Encounter::addTransactionAndInvoice($self, $page, $command, $flags);
+		App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 	}
 	elsif($invoiceId)
 	{
-		App::Dialog::Encounter::addTransactionAndInvoice($self, $page, 'update', $flags);
+		App::Dialog::Encounter::handlePayers($self, $page, 'update', $flags);
 	}
 	#elsif($copay eq '' || $copay == 0)
 	#{

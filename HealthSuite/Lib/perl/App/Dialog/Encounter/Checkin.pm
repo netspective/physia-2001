@@ -94,7 +94,7 @@ sub execute
 		}
 
 	# Add Trans and Invoice info
-	App::Dialog::Encounter::addTransactionAndInvoice($self, $page, $command, $flags);
+	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
 #

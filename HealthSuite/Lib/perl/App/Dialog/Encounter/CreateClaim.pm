@@ -99,8 +99,7 @@ sub makeStateChanges
 	{
 		unless(my $personId = $page->param('person_id') || $page->param('attendee_id') || $page->field('attendee_id'))
 		{
-			$self->updateFieldFlags('payer_fields', FLDFLAG_INVISIBLE, 1);
-			$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
+			$self->updateFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
 			#$self->updateFieldFlags('deduct_fields', FLDFLAG_INVISIBLE, 1);
 			$self->updateFieldFlags('deduct_balance', FLDFLAG_INVISIBLE, 1);
 			$self->updateFieldFlags('primary_ins_phone', FLDFLAG_INVISIBLE, 1);
@@ -114,14 +113,14 @@ sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	App::Dialog::Encounter::addTransactionAndInvoice($self, $page, $command, $flags);
+	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	App::Dialog::Encounter::addTransactionAndInvoice($self, $page, $command, $flags);
+	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
 sub execute_remove
