@@ -82,9 +82,15 @@ sub connectDB
 		my ($un, $pw, $connectStr) = $connectKey =~ m/\s*(.*?)\/(.*?)\@(.*)\s*/;
 		if (exists $cachedDbHdls->{$connectKey})
 		{
-			delete $cachedDbHdls->{$connectKey};
 			warn "Database connection lost. Reconnecting\n";
-			# Need to send e-mail
+			
+			# Oracle bug causes core dumps on DESTORY.  Need to cache the dead connection(s)
+			my $i = 1;
+			while (exists $cachedDbHdls->{$connectKey . '-old-' . $i}) {$i++}
+			$cachedDbHdls->{$connectKey . '-old-' . $i} = $cachedDbHdls->{$connectKey};
+			
+			# Now it's safe to clear the old reference
+			delete $cachedDbHdls->{$connectKey};
 		}
 		if($un && $pw && $connectStr)
 		{
