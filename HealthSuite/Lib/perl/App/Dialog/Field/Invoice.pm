@@ -439,6 +439,7 @@ sub getHtml
 		my $invoice = $refundInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
+		my $invoiceStatus = $invoice->{invoice_status};
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -453,6 +454,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_id" VALUE="$invoiceId"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_balance" VALUE="$invoiceBalance"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_status" VALUE="$invoiceStatus"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
