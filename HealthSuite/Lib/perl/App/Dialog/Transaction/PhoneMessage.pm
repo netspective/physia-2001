@@ -16,10 +16,10 @@ use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
-%RESOURCE_MAP = ( 'phone-message' => { transType => App::Universal::TRANSTYPE_PC_TELEPHONE, 
-					heading => '$Command Phone Message', 
-					_arl => ['person_id'] , 
-					_arl_modify => ['trans_id'], 
+%RESOURCE_MAP = ( 'phone-message' => { transType => App::Universal::TRANSTYPE_PC_TELEPHONE,
+					heading => '$Command Phone Message',
+					_arl => ['person_id'] ,
+					_arl_modify => ['trans_id'],
 					_idSynonym => 'trans-' .App::Universal::TRANSTYPE_PC_TELEPHONE() },);
 
 sub new
@@ -31,10 +31,11 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'phonemessage', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, hints => 'Message to be passed on to the requested person.'),
+		new App::Dialog::Field::Person::ID(name => 'person_called', caption =>'Call From', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new App::Dialog::Field::Person::ID(name => 'provider', caption =>'Call For', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(name => 'datecalled', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(name => 'provider', caption =>'Call For', options => FLDFLAG_REQUIRED, hints => 'Person who needs to receive the message.'),
-		new CGI::Dialog::Field(name => 'responsemessage', caption => 'Comments', type => 'memo', hints => 'Comments from the user to the caller.'),
+		new CGI::Dialog::Field(name => 'phonemessage', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::Field(name => 'responsemessage', caption => 'Comments', type => 'memo',  readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
 				selOptions => 'Not Read;Read',
@@ -44,6 +45,8 @@ sub new
 				name => 'status',
 				hints => 'Clicking on Read would make this message disappear from your voice message list.',
 				defaultValue => 'Not Read'),
+		new CGI::Dialog::Field(type => 'bool', name => 'data_num_b', caption => 'Deliver With Medical Record',  readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, style => 'check'),
+
 	);
 
 	$self->{activityLog} =
@@ -58,6 +61,18 @@ sub new
 
 	return $self;
 }
+
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+	$self->setFieldFlags('datecalled', FLDFLAG_READONLY);
+	$self->updateFieldFlags('status', FLDFLAG_INVISIBLE, 1) if $command eq 'add';
+
+}
+
 
 sub populateData
 {
@@ -86,6 +101,8 @@ sub populateData
 		$page->field('provider', $phoneInfo->{provider_id});
 		$page->field('responsemessage', $phoneInfo->{data_text_a});
 		$page->field('status', $phoneStatus);
+		$page->field('data_num_b', $phoneInfo->{data_num_b});
+		$page->field('person_called', $phoneInfo->{consult_id});
 	}
 	elsif($phoneInfo->{data_num_a} ne '')
         {
@@ -95,6 +112,9 @@ sub populateData
                 $page->field('provider', $phoneInfo->{trans_owner_id});
                 $page->field('responsemessage', $phoneInfo->{data_text_b});
                 $page->field('status', $phoneStatus);
+		$page->field('data_num_b', $phoneInfo->{data_num_b});
+		$page->field('person_called', $phoneInfo->{consult_id});
+
         }
 
 }
@@ -119,6 +139,8 @@ sub execute
                         trans_begin_stamp => $page->field('datecalled'),
                         data_text_a => $page->field('responsemessage') || undef,
                         data_text_b => $page->field('phonemessage')  || undef,
+                        data_num_b   => $page->field('data_num_b')  || undef,
+                        consult_id  => $page->field('person_called') || undef,
                         _debug => 0
                 );
 
@@ -135,6 +157,8 @@ sub execute
                         data_text_a => $page->field('phonemessage') || undef,
                         data_text_b => $page->field('responsemessage')  || undef,
 			data_num_a => $trans_id,
+		        data_num_b   => $page->field('data_num_b')  || undef,
+		        consult_id  => $page->field('person_called') || undef,
                         _debug => 0
                 );
 
@@ -154,6 +178,8 @@ sub execute
                         	trans_begin_stamp => $page->field('datecalled'),
                         	data_text_a => $page->field('responsemessage') || undef,
                         	data_text_b => $page->field('phonemessage')  || undef,
+                        	data_num_b   => $page->field('data_num_b')  || undef,
+                        	consult_id  => $page->field('person_called') || undef,
                         	_debug => 0
                		);
                         my $physicianData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByData_num_a', $transId);
@@ -166,6 +192,8 @@ sub execute
                         	trans_begin_stamp => $page->field('datecalled'),
                         	data_text_a => $page->field('phonemessage') || undef,
                         	data_text_b => $page->field('responsemessage')  || undef,
+                        	data_num_b   => $page->field('data_num_b')  || undef,
+         	               consult_id  => $page->field('person_called') || undef,
                         	_debug => 0
                 	);
 
@@ -180,6 +208,8 @@ sub execute
                                 trans_begin_stamp => $page->field('datecalled'),
                                 data_text_a => $page->field('phonemessage') || undef,
                                 data_text_b => $page->field('responsemessage')  || undef,
+                                data_num_b   => $page->field('data_num_b')  || undef,
+	                        consult_id  => $page->field('person_called') || undef,
                                 _debug => 0
                         );
                         my $parentItemId = $phoneDataInfo->{data_num_a};
@@ -194,10 +224,10 @@ sub execute
                                 trans_begin_stamp => $page->field('datecalled'),
                                 data_text_a => $page->field('responsemessage') || undef,
                                 data_text_b => $page->field('phonemessage')  || undef,
+                                data_num_b   => $page->field('data_num_b')  || undef,
+ 	                       consult_id  => $page->field('person_called') || undef,
                                 _debug => 0
                         );
-
-
                 }
 
         }
