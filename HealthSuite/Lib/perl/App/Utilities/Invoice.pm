@@ -28,6 +28,7 @@ use vars qw(@EXPORT @ISA);
 	voidInvoiceItem
 	reopenInsuranceClaim
 	deleteHmoCapWriteoff
+	checkEventStatus
 	handleDataStorage
 );
 
