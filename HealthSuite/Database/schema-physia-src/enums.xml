@@ -245,12 +245,13 @@
 		<enum>Transmitted to Carrier via Paper</enum>
 		<enum>Approved External</enum>
 		<enum>Rejected External</enum>
-		<enum>Awaiting Payment</enum>
+		<enum>Awaiting Insurance Payment</enum>
 		<enum>Payments Applied</enum>
 		<enum>Appealed</enum>
 		<enum>Closed</enum>
 		<enum>Void</enum>
 		<enum>Paper Claim Printed</enum>
+		<enum>Awaiting Client Payment</enum>
 	</table>
 
 	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
