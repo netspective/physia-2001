@@ -116,7 +116,7 @@ sub new
 				# note -- the following $modNames "override" each other
 				#      -- i.e. if a person is a patient and physician, Physician overrides Patient
 				#         because it comes later in the list
-				foreach my $modName ('Patient', 'Physician')
+				foreach my $modName ('Guarantor', 'Patient', 'Staff', 'Nurse', 'Physician')
 				{
 					$findModule = "person/\l$modName" if grep { $_ eq $modName } @$types;
 				}
@@ -141,30 +141,24 @@ sub isValid
 			return 1 if $value =~ /_\d$/;
 			return 1 if $value =~ /,/;
 
-			if($self->{name} eq "party_name")
+			my $dlgName = 'patient';
+			if (my $types = $self->{types})
 			{
-				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$value');";
+				foreach my $personType ('Guarantor', 'Patient', 'Staff', 'Nurse', 'Physician')
+				{
+					$dlgName = $personType if grep { $_ eq $personType } @$types;
+				}
+				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($dlgName) . "/$value');";
+				$dlgName = "Responsible Party" if $dlgName eq "Guarantor";
 				$self->invalidate($page, qq{
 					$self->{caption} '$value' does not exist.<br>
-					<img src="/images/icons/arrow_right_red.gif">
-					<a href="$createPersonHref">Create Person ID '$value' now</a>
-					})
-					unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
-			}
-			else
-			{
-				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient/$value');";
-				$self->invalidate($page, qq{
-					$self->{caption} '$value' does not exist.<br>
-					<img src="/images/icons/arrow_right_red.gif">
-					<a href="$createPersonHref">Create Person ID '$value' now</a>
+					<img src="/resources/icons/arrow_right_red.gif">
+					<a href="$createPersonHref">Create $dlgName ID '$value' now</a>
 					})
 					unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
 			}
 		}
-
 	}
-
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
