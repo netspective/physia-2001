@@ -88,6 +88,7 @@ sub buildSqlStmt
 					and     ib.invoice_id = i.invoice_id														
 					and  	ct.id = t.bill_type	
 					and 	ib.BILL_SEQUENCE = 1 
+					and     ib.invoice_item_id is NULL
 					$dateClause
 				   };			   
 	
@@ -121,24 +122,66 @@ sub buildSqlStmt
 }
 
 
+sub getDrillDownHandlers
+{
+	return ('prepare_detail_$detail$');
+}
+
+
+
+sub prepare_detail_payment
+{
+	my ($self, $page) = @_;
+	
+	my $startDate   = $page->field('report_begin_date');
+	my $endDate     = $page->field('report_end_date');
+
+	my $sqlStmt = $self->buildSqlStmt($page);
+
+	my $publishDefn = {
+		columnDefn =>
+		[
+			{head => 'Invoice ID', colIdx => 0, dAlign => 'left',				
+			},
+			{head => 'Procedure Code', colIdx => 1, dAlign => 'center',				
+			},
+			{head => 'Payer ID', colIdx => 2, dAlign => 'center',},
+			{head => 'Payment Type', colIdx => 6, dAlign => 'center',},
+			{head => 'Payment Date', colIdx => 3, dAlign => 'center'},
+			{head => 'Authorization Number', colIdx => 4, dAlign => 'center'},
+			{head => 'Payment Amount ',tAlign => 'RIGHT',tDataFmt => '&{sum_currency:&{?}}', colIdx => 5, dAlign => 'center',dformat => 'currency'},
+			
+		],
+	};
+	my $invoice_id = $page->param('payer');		
+	$page->addContent(
+	'<b style="font-family:Helvetica; font-size:12pt">(Claim Payment Information) </b><br><br>',
+	@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_NONE, 
+	'sel_claim_detail',[$invoice_id], undef, undef, $publishDefn) || "No pay"] }				
+	);
+}
+
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $pub = {
 		columnDefn => [
-			{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#' },
+			{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#', 
+			url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=payment&payer=#0#",null,"width=800,height=600,scrollbars,resizable")',},
 			{ colIdx => 1, head => 'Number Of Items',dAlign => 'center', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Client ID', dAlign => 'center',dataFmt => '#2#' },
 			{ colIdx => 3, head => 'Invoice Date', dAlign => 'center',dataFmt => '#3#' },
 			{ colIdx => 4, head => 'Invoice Status',dAlign => 'center' ,dataFmt => '#4#' },
 			{ colIdx => 5, head => 'Bill To ID', dAlign => 'center',dataFmt => '#5#' },			
-			{ colIdx => 6, head => 'Total Cost', hAlign => 'center', dAlign => 'center', dataFmt => '#6#', dformat => 'currency' },			
-			{ colIdx => 7, head => 'Total Adjustment', dAlign =>'center', dataFmt => '#7#', dformat => 'currency' },
-			{ colIdx => 8, head => 'Balance', dAlign => 'center',dataFmt => '#8#', dformat => 'currency' },
-			{ colIdx => 9, head => 'Reference', dAlign => 'center',dataFmt => '#9#' },
-			{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },
-			#{ colIdx => 11, head => 'Bill Sequence', dAlign => 'center',dataFmt => '#11#' },
-			
+			{ colIdx => 6, head => 'Total Cost', hAlign => 'center', dAlign => 'center',
+			tAlign => 'RIGHT',tDataFmt => '&{sum_currency:&{?}}',dataFmt => '#6#', dformat => 'currency' },			
+			{ colIdx => 7, head => 'Total Adjustment', dAlign =>'center', dataFmt => '#7#', 
+			tDataFmt => '&{sum_currency:&{?}}', tAlign => 'RIGHT',dformat => 'currency' },
+			{ colIdx => 8, head => 'Balance', dAlign => 'center',dataFmt => '#8#', dformat => 'currency',
+			tDataFmt => '&{sum_currency:&{?}}', tAlign => 'RIGHT'},
+			#{ colIdx => 9, head => 'Reference', dAlign => 'center',dataFmt => '#9#' },
+			{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },			
 		],
 	};
 		
@@ -155,7 +198,7 @@ sub execute
 		$_->{invoice_status},
 		$_->{bill_to_id},
 		$_->{total_cost},
-		$_->{total_adjust},
+		$_->{total_adjust}||'0',
 		$_->{balance},
 		$_->{reference},
 		$_->{caption},
