@@ -547,6 +547,12 @@ sub detailLink
 sub incrementUsage
 {
 	my ($page, $type, $codesRef, $person_id, $org_id) = @_;
+	return;
+}
+
+sub __incrementUsage
+{
+	my ($page, $type, $codesRef, $person_id, $org_id) = @_;
 
 	my $selName1 = "sel" . ucfirst(lc($type)) . "Usage1";
 	my $selName2 = "sel" . ucfirst(lc($type)) . "Usage2";
