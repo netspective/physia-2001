@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<release-notes>
+	<release-info>
+		<build-id>15</build-id>
+		<build-manager>Robert Jenks</build-manager>
+		<tested-date></tested-date>
+		<release-date></release-date>
+	</release-info>
+
+	<deliverables>
+		<deliverable id="615">
+			Billing Statements script to be run as a cron job to create a transfer file, encrypt it,
+			and send to Perse via FTP.
+		</deliverable>
+
+		<deliverable id="1036">
+			UI:  Capture copay info when verifying insurance.
+		</deliverable>
+
+		<deliverable id="1086">
+			UI:  Insurance Verification Worklist.  Items to disappear from worklist when insurance is
+			completely verified.
+		</deliverable>
+
+	</deliverables>
+</release-notes>
