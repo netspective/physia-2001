@@ -261,7 +261,7 @@
 		<enum>Payment</enum>
 		<enum>Refund</enum>
 		<enum>Transfer</enum>
-		<enum>Auto Insurance Writeoff</enum>
+		<enum>Auto Capitated Service Adjustment</enum>
 		<enum>Transfer to Next Payer</enum>
 		<enum>Reverse Transfer to Next Payer</enum>
 		<enum>Reverse Payment</enum>
