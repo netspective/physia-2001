@@ -310,14 +310,14 @@ sub isValid
 			# Else (the person exists in our org)
 			else
 			{
-				my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $capId, $page->session('org_internal_id'));
+				#my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $capId, $page->session('org_internal_id'));
 
 				# Unless one of the person types requested matches one of the categories that this person is...
-				unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
-				{
-					my $typesStr = join(', ', @$types);
-					$self->invalidate($page, qq{'$id' is not a $typesStr in this Org.});
-				}
+				#unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
+				#{
+				#	my $typesStr = join(', ', @$types);
+				#	$self->invalidate($page, qq{'$id' is not a $typesStr in this Org.});
+				#}
 			}
 		}
 	}
