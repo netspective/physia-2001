@@ -1302,9 +1302,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider', 
+			{ head => 'CareProvider',
 				dataFmt => q{
-					<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#) 
+					<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#)
 					<A HREF ="/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#"> Sched Appointment</A>
 				},
 			},
@@ -3005,7 +3005,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#param.home#'>Referral</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#param.home#'>Service Request</A> } },
 			],
 		},
 		stdIcons =>	{
