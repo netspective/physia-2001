@@ -85,8 +85,10 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
+	my $invoiceId = $page->param('invoice_id');
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	#if param invoice id is NULL, don't want to show invoice-specific fields
-	unless($page->param('invoice_id'))
+	unless($invoiceId && $invoiceInfo->{invoice_status} != App::Universal::INVOICESTATUS_VOID)
 	{
 		$self->updateFieldFlags('visit_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('invoice_id', FLDFLAG_INVISIBLE, 1);
