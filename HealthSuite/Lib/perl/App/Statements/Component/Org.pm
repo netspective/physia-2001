@@ -1227,6 +1227,75 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 #----------------------------------------------------------------------------------------------------------------------
 
+'org.billinginfo' => {
+	sqlStmt => qq{
+			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
+				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(pa.value_textb,'1','Active','Inactive'),
+				pa.parent_id
+			from	Person_Attribute pa, Org o, Person_Org_Category poc
+			where	o.org_id = ?
+			and	pa.parent_id = poc.person_id
+			and	poc.org_internal_id = o.org_internal_id
+			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			order by pa.value_int
+		},
+	sqlStmtBindParamDescr => ['Org ID for Billing Information'],
+	publishDefn => {
+		columnDefn => [
+					{
+						colIdx => 0,
+						dataFmt => "#8# - #7# #6# ID: #2# (Exp: #5#)",
+					},
+		],
+
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		frame => {
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Billing Information' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Billing Information' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo?home=#param.home#'>Billing Info</A> } },
+		],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panelEdit'); },
+
+#	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId]); },
+#	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panel'); },
+#	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelEdit'); },
+#	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelTransp'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
 'org.insurancePlans' => {
 	sqlStmt => qq{
 			SELECT
