@@ -30,7 +30,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	{
 		SELECT id,caption
 		FROM catalog_entry_type
-		WHERE ID NOT IN (80,110,120,150,160,200)
+		WHERE ID IN (0,100,210,220,230)
 	},	
 	'selMiscProcChildren' => qq
 	{

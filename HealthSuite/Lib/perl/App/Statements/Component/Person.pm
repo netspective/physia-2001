@@ -4241,6 +4241,119 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 #----------------------------------------------------Doc Short Term Stuff
 #----------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+'person.labOrderSummary' => {
+	sqlStmt => qq{
+			Select	org_id,name_primary,org_internal_id,
+			(SELECT count (*) 
+			FROM 	lab_order lo
+			WHERE 	lo.person_id = :2
+			AND	lo.lab_internal_id = org.org_internal_id 
+			) as entry				
+			FROM	org ,ORG_CATEGORY oc
+			WHERE  	owner_org_id= :1 
+			AND	oc.parent_id = org.org_internal_id
+			AND	oc.member_name='Lab'			
+			order by org_id
+			},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => {
+	
+			frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+				},
+				columnDefn =>
+				[
+				{colIdx => 1,hint=>"Add Order Entry to #1#" , url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#',hAlign=>'left', head => 'Lab Name',},				
+				{colIdx => 3, hAlign=>'left', head => 'Patient Lab Requests'},
+				],	
+				
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => { heading => 'Lab Tests' },
+		bullets => '/person/#param.person_id#/stpe-person.labOrderDetail?id=#2#&home=#homeArl#',		
+
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},	
+	publishDefn_panelEdit =>
+	{
+		style => 'panel.edit',
+		frame => { heading => 'Lab Order Entry' },	
+				columnDefn =>
+				[
+				{colIdx => 1,hint=>"Add Order Entry to #1#" , hAlign=>'left', head => 'Lab Company',},				
+				{colIdx => 3, dAlign=>'right', head => 'Entries'},
+				{dAlign=>'right', dataFmt=>'Add', url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#', hint=>'Add Lab Order Entry'},				
+				],			
+	},
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderSummary', [$page->session('org_internal_id'),$personId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderSummary', [$page->session('org_internal_id'),$personId], 'panelTransp'); },	
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderSummary', [$page->session('org_internal_id'),$personId], 'panelEdit'); },		
+},
+#------------------------------------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------------------------------------
+'person.labOrderDetail' => {
+	sqlStmt => qq{
+			Select	lo.lab_order_id,lo.date_order,lo.provider_id, los.caption
+			FROM	org ,lab_order lo, lab_order_status los
+			WHERE  	owner_org_id= :1 
+			AND	lo.lab_internal_id = org.org_internal_id
+			AND 	lo.lab_internal_id = :2
+			AND	lo.person_id = :3
+			AND	los.id = lo.lab_order_status
+			order by date_order desc
+			},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => {
+			#bullets => ['/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-lab-order/#0#?home=#homeArl#',
+			bullets => ['/person/#param.person_id#/dlg-update-lab-order/#0#?home=#homeArl#',			
+			
+		],
+				columnDefn =>
+				[
+				{colIdx => 0, hAlign=>'left', head => 'Lab Order ID',},				
+				{colIdx => 1, hAlign=>'left', head => 'Order Date',dformat=>'date'},
+				{colIdx => 2, hAlign=>'left', head => 'Provider ID'},				
+				{colIdx => 3, hAlign=>'left', head => 'Lab Order Status'},					
+				],	
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => { heading => 'Lab Tests' },
+
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},	
+	publishDefn_panelEdit =>
+	{
+		#style => 'panel.edit',
+		frame => { heading => 'Edit Lab Order' ,
+				closeUrl => '#param.home#',
+			},	
+	
+	}	,
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderDetail', [$page->session('org_internal_id'),27960,$personId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderDetail', [$page->session('org_internal_id'),$page->param('id')||undef,$personId ], 'panelTransp'); },	
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderDetail', [$page->session('org_internal_id'),$page->param('id')||undef,$personId ], 'panelEdit'); },		
+},
+#------------------------------------------------------------------------------------------------------------------------
 
 );
 
