@@ -31,11 +31,14 @@ sub prepare_view
 
 	$self->addContent(
 		"<CENTER>
-		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
+		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=5>
 			<TR VALIGN=TOP>
 				<TD>
-					<font size=1 face=arial>
-					#component.stpt-person.account-notes#<BR>
+					#component.stp-person.account-notes#<BR>
+					</font>
+				</TD>
+				<TD>
+					#component.stp-person.insuranceVerify#<BR>
 					</font>
 				</TD>
 			</TR>

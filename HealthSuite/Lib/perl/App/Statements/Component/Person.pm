@@ -86,6 +86,59 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageRegardingPatient', [$personId, $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
 },
 
+'person.insuranceVerify' => {
+	sqlStmt => qq{
+		SELECT * FROM (
+			select s.event_id, s.person_id, s.ins_verified_by, 
+				to_char(s.ins_verify_date, '$SQLSTMT_DEFAULTDATEFORMAT') as verify_date,
+				to_char(e.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as appt_time,
+				o.org_id, ea.value_textb as provider_id
+			from event_attribute ea, org o, event e, sch_verify s
+			where person_id = :1
+				and e.event_id = s.event_id
+				and o.org_internal_id = e.facility_id
+				and ea.parent_id = e.event_id
+			order by ins_verify_date DESC
+		)
+		WHERE ROWNUM < 11
+	},
+	publishDefn =>
+	{
+		columnDefn =>
+		[
+			{head => 'Appointment Time', colIdx => 4,},
+			{head => 'Verified By', colIdx => 2, },
+			{head => 'Verify Date', colIdx => 3, },
+		],
+		bullets => '/person/#param.person_id#/dlg-view-insurance-records/#0#/#1#?home=#homeArl#',
+	},
+	publishDefn_panel =>
+	{
+		style => 'panel.static',
+		inherit => 'panel',
+		frame =>
+		{
+			heading => 'Insurance Verifications',
+			-editUrl => '',
+		},
+		flags => 0,
+	},
+	publishDefn_panelTransp =>
+	{
+		style => 'panel.transparent',
+		inherit => 'panel',
+		frame =>
+		{
+			-editUrl => '',
+		},
+
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.insuranceVerify', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.insuranceVerify', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.insuranceVerify', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.insuranceVerify', [$personId], 'panelTransp'); },
+},
+
 'person.account-notes' => {
 	sqlStmt => qq{
 		SELECT * FROM (
