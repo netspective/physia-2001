@@ -40,7 +40,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'name_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'provider_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'prev_intake_form'),
-		new CGI::Dialog::Field(caption => 'Referral ID',  name => 'ref_id', size => '6'),
+		new CGI::Dialog::Field(caption => 'Service Request ID',  name => 'ref_id', size => '6'),
 		new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id', options => FLDFLAG_REQUIRED, preHtml => qq{<a href="javascript:doActionPopup('/person/#param.person_id#/profile')">}),
 		new CGI::Dialog::Subhead(heading => 'Tracking'),
 		#new CGI::Dialog::MultiField(
@@ -111,7 +111,8 @@ sub initialize
 								fKeyDisplayCol => 1,
 								fKeyValueCol => 0),
 				]),
-
+		new CGI::Dialog::Field(caption => 'Code',  name => 'code', size => '7',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),							
 		new CGI::Dialog::Subhead(heading => 'Authorization'),
 		new CGI::Dialog::MultiField(name => 'clientid_num', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		fields => [
@@ -175,6 +176,14 @@ sub initialize
 
 		);
 
+	$self->addPostHtml(qq{
+			<script language="JavaScript1.2">
+				function clickMenu()
+				{
+					window.location.href='/menu';
+				}
+			</script>
+		});
 }
 
 sub makeStateChanges
@@ -317,6 +326,12 @@ sub populateData_update
 	$page->field('provider_id', $authData->{'data_text_c'});
 	$page->field('ref_result', $authData->{'related_data'});
 	$page->field('comments', $authData->{'display_summary'});
+	
+	#Get Code and Description from service Request
+
+	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});	
+	$page->field('code',$serviceRequest->{code});
+	$page->field('code_description',$serviceRequest->{caption});	
 }
 
 sub populateData_remove
@@ -337,6 +352,8 @@ sub handle_page_supplType_special
 	my $test = $page->param('parent_trans_id');
 	my $personId = $page->field('person_id');
 	my $transId = $command eq 'add' ? $page->param('parent_trans_id') : $parentTransId;
+
+
 	if ($personId ne '')
 	{
 		$page->param('person_id', $personId);
@@ -345,6 +362,11 @@ sub handle_page_supplType_special
 		{
 			$page->addContent(qq{
 				<TABLE>
+					<TR VALIGN=TOP>
+						<TD COLSPAN=2>
+							<a href='/org/#session.org_id#/dlg-add-patient'><input type='button' value='Add Patient'></a>
+						</TD>
+					</TR>
 					<TR VALIGN=TOP>
 						<TD COLSPAN=2>
 							<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
@@ -366,10 +388,20 @@ sub handle_page_supplType_special
 			});
 		}
 
+
 		else
 		{
 			$page->addContent(qq{
+
 				<TABLE>
+
+					<TR VALIGN=TOP>
+						<TD COLSPAN=2>
+
+							<input type="button" value="Menu" onClick="javascript:clickMenu();">
+							<a href='/org/#session.org_id#/dlg-add-patient'><input type='button' value='Add Patient'></a>
+						</TD>
+					</TR>
 					<TR VALIGN=TOP>
 						<TD COLSPAN=2>
 							<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
@@ -377,7 +409,7 @@ sub handle_page_supplType_special
 								[$transId]) ]}
 						</TD>
 					</TR>
-				<TR><TD COLSPAN=2>&nbsp;</TD></TR>
+					<TR><TD COLSPAN=2>&nbsp;</TD></TR>
 					<TR VALIGN=TOP>
 						<TD>$dlgHtml</TD>
 						<TD>
