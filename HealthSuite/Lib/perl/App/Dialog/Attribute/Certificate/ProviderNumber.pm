@@ -36,7 +36,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(
 			type => 'select',
-			selOptions => 'Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
+			selOptions => 'BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
 			caption => 'Name',
 			name => 'value_textb',
 			options => FLDFLAG_REQUIRED,
