@@ -8,3 +8,8 @@ Found Oracle bug which caused httpd core dump upon attempting to DESTROY
 a dead database connection.  Worked around problem by caching the
 dead connection and esatblishing a new connection.
 
+B891 -  "Collection worklist for zero balances"
+If a collection item does not have a reck date and the balance on the invoice is
+zero the invoice is removed from the collection worklist.  
+NOTE : If the user's  min balance values is not > 0 then zero balance invoices WILL stay
+on the worklist.  
