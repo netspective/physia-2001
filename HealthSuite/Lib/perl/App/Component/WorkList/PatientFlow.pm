@@ -169,8 +169,12 @@ sub getComponentHtml
 	{
 		if ($page->session('showTimeSelect') == 0)
 		{
+			my $standardTimeOffset = 0;
+			$standardTimeOffset = 1/24 if $page->session('TZ') ne $page->session('DAYLIGHT_TZ');
+			
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today', $gmtDayOffset,	$time1, $time2, $user_id, $orgInternalId);
+				'sel_events_worklist_today', $gmtDayOffset,	$time1, $time2, $user_id, $orgInternalId,
+				$standardTimeOffset);
 		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,

@@ -108,7 +108,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 
 		timeSelectClause => qq{
-			e.start_time between sysdate - (:2/24/60) and sysdate + (:3/24/60)
+			e.start_time between sysdate - :6 - (:2/24/60) and sysdate - :6 + (:3/24/60)
 		},
 
 		publishDefn => $STMTRPTDEFN_WORKLIST,
