@@ -22,11 +22,12 @@ use vars qw(%RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'catalog-item' => {
-		_arl_add => ['catalog_id', 'parent_entry_id'],
+		_arl_add => ['internal_catalog_id', 'parent_entry_id'],
 		_arl_modify => ['entry_id']
 	},
 );
 
+my $FS_CATALOG_TYPE = 0;
 sub new
 {
 	my $self = CGI::Dialog::new(@_);
@@ -37,12 +38,15 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
+	
+		new CGI::Dialog::Field(
+			name => 'show_cap',
+			type => 'hidden'
+		),
 		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 			name => 'catalog_id',
-			type => 'integer',
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
-			hints => 'Numeric Fee Schedule ID',
 		),
 		new CGI::Dialog::Field(caption => 'Fee Schedule Entry Type',
 			name => 'entry_type',
@@ -56,6 +60,7 @@ sub new
 			selOptions => "Capitated:0,FFS:1",
 			type => 'select',
 			style => 'radio',
+			defaultValue=>0,
 		),
 		new CGI::Dialog::MultiField(
 			name => 'code_modifier',
@@ -128,7 +133,7 @@ sub new
 			schema => $schema,
 			size => 16,
 			column => 'Offering_Catalog_Entry.parent_entry_id',
-			findPopup => '/lookup/catalog/detail/itemValue',
+			findPopup => '/lookup/catalog/detailname/itemValue',
 			findPopupControlField => '_f_catalog_id',
 			hints => 'Numeric Entry ID',
 		),
@@ -144,8 +149,8 @@ sub new
 	
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
-			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%field.catalog_id%", 1],
-			['Show Current Fee Schedule Item', '/search/catalog/detail/%field.catalog_id%'],
+			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%param.internal_catalog_id%", 1],
+			['Show Current Fee Schedule Item', '/search/catalog/detail/%param.internal_catalog_id%'],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -158,22 +163,30 @@ sub makeStateChanges_special
 	
 	my $recExist;	
 	$recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
-		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')
-		if ($page->field('catalog_id'));
+		$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')
+		if ($page->param('internal_catalog_id'));
 	
 	$self->updateFieldFlags('flags', FLDFLAG_INVISIBLE, ! $recExist->{value_int});
-	$page->field('flags', 0) unless $recExist->{value_int};
+	my $result = $recExist->{value_int} ? 1 :0;
+	$page->field('show_cap',$result);
 }
 
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	$page->field('catalog_id', $page->param('catalog_id'));	
+	if ($page->param('internal_catalog_id'))
+	{
+		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->param('internal_catalog_id')) ;
+		$page->field('catalog_id',$parentCatalog->{catalog_id});
+	}
 	$self->makeStateChanges_special($page);
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	if($page->param('parent_entry_id'))
+	{
+		my $parentEntry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('parent_entry_id')) ;	
+		$page->field('parent_entry_id', $parentEntry->{name});
+	}
 
-	$page->field('parent_entry_id', $page->param('parent_entry_id'));
 	$page->field('entry_type', 100);	
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
@@ -184,6 +197,9 @@ sub populateData_update
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	#if Entry Id then Need to set up param with internal_catalog_id
+	my $entry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('entry_id'));
+	$page->param('internal_catalog_id',$entry->{catalog_id});
 	$self->makeStateChanges_special($page);
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
@@ -191,6 +207,8 @@ sub populateData_update
 	if ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
 		'selCatalogItemById', $entryId))
 	{
+		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('catalog_id')) ;
+		$page->field('catalog_id',$parentCatalog->{catalog_id});	
 		$self->makeStateChanges_special($page);
 	}
 	else
@@ -240,9 +258,18 @@ sub customValidate
 	my $modifier = $page->param('_f_modifier');
 	my $svc_type = $page->field('data_text');
 	my $svc_field =$self->getField('data_text');
+	my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);
+	$page->param('internal_catalog_id',$parentCatalog->{internal_catalog_id});
+	$self->checkDupEntry($page, $parentCatalog->{internal_catalog_id}, $entryType, $code, $modifier);	
 	
-	$self->checkDupEntry($page, $fs, $entryType, $code, $modifier);
 	
+	#If FS is not capitated just set flags to FFS to be safe
+	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
+			$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
+
+	#$page->addError($recExist->{value_int});
+	$page->field('flags',1) unless ($recExist->{value_int});
+
 	#Attempt to determine serivce type if user does not provide one
 	if ($svc_type eq '')
 	{
@@ -337,14 +364,28 @@ sub execute
 	my $id = $self->{'id'};
 	my $orgId = $page->param('org_id');
 
+
+
+	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
+			$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
 	my $catalogType = $page->field('catalog_type');
 	my $status = $page->field('status');
 	my $costType = $page->field('cost_type');
-	my $entryType = $page->field('entry_type');
-
+	my $entryType = $page->field('entry_type');	
+	my $ffs_flag;
+#	if($page->field('show_cap'))
+#	{
+#		$flag = $page->field('flags');
+#	}
+#	else
+#	{
+#		$flag= $recExist->{value_int} ? 0: 1;
+#	}
+	$ffs_flag = defined $page->field('flags') ? $page->field('flags') : 1;
+	#$page->addError($ffs_flag);
 	my $entryId = $page->schemaAction(
 		'Offering_Catalog_Entry', $command,
-		catalog_id => $page->field('catalog_id') || undef,
+		catalog_id => $page->param('internal_catalog_id') || undef,
 		entry_id => $page->field('entry_id') || $page->param('entry_id') || undef,
 		name => $page->field('name') || undef,
 		entry_type => defined $entryType ? $entryType : undef,
@@ -356,14 +397,12 @@ sub execute
 		description => $page->field('description') || undef,
 		parent_entry_id => $page->field('parent_entry_id') || undef,
 		units_avail => $page->field('units_avail') || undef,
-		flags => $page->field('flags') || 0,
+		flags => $ffs_flag,
 		data_text => $page->field('data_text') || undef,
-		#taxable => $page->field('taxable') || undef,
-		#default_units => $page->field('default_units') || undef,
 		_debug => 0
 		);
 
-	$page->param('_dialogreturnurl', '/search/catalog/detail/%field.catalog_id%') if $command ne 'add';
+	$page->param('_dialogreturnurl', '/search/catalog/detail/%param.internal_catalog_id%') if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 

@@ -51,6 +51,7 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 );
 my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_INTEGER;
 my $FS_TEXT = 'Fee Schedule';
+my $FS_CATALOG_TYPE = 0;
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Fee Schedule');
@@ -77,12 +78,18 @@ sub new
 					),
 		new CGI::Dialog::Field(type=>'hidden',
 					name=>'phy_item_id',
-					),					
+					),	
+		new CGI::Dialog::Field(type=>'hidden',
+					name=>'phy_item_id',
+					),	
+		new CGI::Dialog::Field(caption => 'Internal Catalog ID',
+			name => 'parent_catalog_id',
+			type=>'hidden'
+		),
+		
 		new CGI::Dialog::Field(caption => 'Internal Catalog ID',
 			name => 'internal_catalog_id',
-			options => FLDFLAG_READONLY,
-			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
-			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE,
+			type=>'hidden'
 		),
 
 		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule Name',
@@ -90,7 +97,6 @@ sub new
 			size => 20,
 			options => FLDFLAG_REQUIRED,
 			postHtml => "&nbsp; <a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup Fee Schedules</a>",
-			hints => 'Textual Fee Schedule Name',
 		),
 		new CGI::Dialog::Field::TableColumn(
 			name => 'catalog_type',
@@ -121,10 +127,10 @@ sub new
 		$phy_field,
 		$org_field,		
 		new App::Dialog::Field::Catalog::ID(caption => 'Parent Fee Schedule ID',
-	      		name => 'parent_catalog_id',
-	      		type => 'integer',
+	      		name => 'parent_catalog_name',
+	      		#type => 'integer',
 	      		findPopup => '/lookup/catalog',
-	      		hints => 'Numeric Fee Schedule ID',
+	      		#hints => 'Numeric Fee Schedule ID',
 	    	),
 		new CGI::Dialog::Field(caption => 'Capitated Contract',
 			name => 'capitated_contract',
@@ -161,6 +167,11 @@ sub populateData_add
 
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	$page->field('parent_catalog_id', $page->param('parent_catalog_id'));
+	if ($page->field('parent_catalog_id'))
+	{
+		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('parent_catalog_id')) ;
+		$page->field('parent_catalog_name',$parentCatalog->{catalog_id});
+	};	
 	$page->field('add_mode', 1);
 }
 
@@ -174,8 +185,12 @@ sub populateData_update
 	if(! $STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selCatalogById',$catalogId))
 	{
 		$page->addError("Catalog ID '$catalogId' not found.");
-	}
-	
+	};
+	if ($page->field('parent_catalog_id'))
+	{
+		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('parent_catalog_id')) ;
+		$page->field('parent_catalog_name',$parentCatalog->{catalog_id});
+	};
 	if (my $decimal = $page->field('rvrbs_multiplier'))
 	{
 		$decimal =~ s/^\./0./;
@@ -243,6 +258,7 @@ sub execute
 	my $internalCatalogId = $page->field('internal_catalog_id');
 	my $phy_Id = $page->field('physician_id');
 	my $org_Id = $page->field('org_id');		
+	my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$page->session('org_internal_id'),$page->field('parent_catalog_name'),$FS_CATALOG_TYPE);
 	
 	my $newId = $page->schemaAction(
 		'Offering_Catalog', $command,
@@ -253,7 +269,7 @@ sub execute
 		caption => $page->field('caption') || undef,
 		description => $page->field('description') || undef,
 		rvrbs_multiplier => $page->field('rvrbs_multiplier') || undef,
-		parent_catalog_id => $page->field('parent_catalog_id') || undef,
+		parent_catalog_id => $parentCatalog->{internal_catalog_id} || undef,
 		effective_begin_date  =>$page->field('effective_begin_date')||undef,
 		effective_end_date => $page->field('effective_end_date') ||undef, 
 		_debug => 0
@@ -365,19 +381,19 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'checkbox_validation'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'internal_catalog_id'),
 		new App::Dialog::Field::Catalog::ID(caption => 'Existing Fee Schedule ID',
-			name => 'internal_catalog_id',
-			type => 'integer',
+			name => 'catalog_id',
+			#type => 'integer',
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
-			hints => 'Numeric Fee Schedule ID',
+			#hints => 'Numeric Fee Schedule ID',
 		),
 		new CGI::Dialog::Subhead(heading => '', name => ''),
 		
 		new App::Dialog::Field::Catalog::ID::New(caption => 'New Fee Schedule Name',
-			name => 'catalog_id',
+			name => 'new_catalog_id',
 			size => 25,
-			hints => 'Textual Name, not the numeric ID',
 			options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::Field(caption => 'New Fee Schedule Caption', 
@@ -414,9 +430,9 @@ sub checkDupName
 	my ($self, $page) = @_;
 
 	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
-		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_internal_id'));
+		'selInternalCatalogIdByIdType', $page->session('org_internal_id'),$page->field('new_catalog_id'),$FS_CATALOG_TYPE);
 
-	my $field = $self->getField('catalog_id');
+	my $field = $self->getField('new_catalog_id');
 	$field->invalidate($page, qq{Fee Schedule Name already exists for this Org.}) 
 		if $catalogExists;
 }
@@ -426,8 +442,11 @@ sub customValidate
 	my ($self, $page) = @_;
 	$self->checkDupName($page);
 
+	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', 
+			$page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);
+	$page->field('internal_catalog_id',$catalog->{internal_catalog_id});
 	my $attribute = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'sel_Catalog_Attribute', $page->field('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN,
+		'sel_Catalog_Attribute', $catalog->{internal_catalog_id}, App::Universal::ATTRTYPE_BOOLEAN,
 		'Capitated Contract');
 
 	if($attribute->{value_int} && ! $page->field('checkbox_validation'))
@@ -454,7 +473,7 @@ sub execute
 	my $newInternalCatalogId = $page->schemaAction(
 		'Offering_Catalog', 'add',
 		internal_catalog_id => undef,
-		catalog_id => $page->field('catalog_id') || undef,		
+		catalog_id => $page->field('new_catalog_id') || undef,		
 		catalog_type => 0,
 		caption => $page->field('caption') || $existingCatalog->{caption} || undef,
 		description => $page->field('description') || $existingCatalog->{description} || undef,
