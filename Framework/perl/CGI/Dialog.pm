@@ -82,10 +82,13 @@ sub findPopup_as_html
 	if(my $arl = $self->{findPopup})
 	{
 		my $controlField = '';
-		$controlField = "document.$dialogName.$self->{findPopupControlField}" if $self->{findPopupControlField};
+		$controlField = "document.$dialogName.$self->{findPopupControlField}.value" if $self->{findPopupControlField};
+
+		my $comboBox = '';
+		$comboBox = "document.$dialogName.$self->{findPopupComboBox}.options[document.$dialogName.$self->{findPopupComboBox}.selectedIndex].value" if $self->{findPopupComboBox};
 
 		return qq{
-			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', null, null, '$controlField');"><img src='$self->{popup}->{imgsrc}' border=0></a>
+			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', null, null, '$controlField', '$comboBox');"><img src='$self->{popup}->{imgsrc}' border=0></a>
 		};
 	}
 	return '';

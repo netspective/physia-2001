@@ -8,7 +8,7 @@ use DBI::StatementManager;
 
 use Data::Publish;
 
-use vars qw(@ISA @EXPORT $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGITEM_COLUMNS 
+use vars qw(@ISA @EXPORT $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGITEM_COLUMNS
 	$STMTRPTDEFN_DEFAULT $STMTRPTDEFN_DEFAULT_ITEM);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CATALOG_SEARCH);
@@ -39,7 +39,8 @@ $STMTFMT_SEL_CATALOGENTRY = qq{
 			unit_cost as Price,
 			default_units as UOH,
 			'Add',
-			parent_entry_id
+			parent_entry_id,
+			name
 		from offering_catalog_entry, catalog_entry_type
 		where 	catalog_id = ?
 			and	offering_catalog_entry.entry_type = catalog_entry_type.id
@@ -129,7 +130,8 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 				{ head => 'Modifier' },
 				{ head => 'Description' },
 				{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' },
-				{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' }
+				{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
+				{ head => 'Name', colIdx => 9},
 			],
 };
 

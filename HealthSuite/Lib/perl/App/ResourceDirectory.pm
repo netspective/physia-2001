@@ -4,7 +4,6 @@ package App::ResourceDirectory;
 
 use strict;
 use App::Universal;
-use Devel::ChangeLog;
 
 ##############################################################################
 # Directory of all available StatementManager Objects
@@ -173,9 +172,9 @@ use App::Dialog::FeeScheduleDataEntry;
 # page and dialog objects
 ##############################################################################
 
-use vars qw(@CHANGELOG %PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES 
+use vars qw(%PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES
 	%COMPONENT_CATALOG %PAGE_FLAGS %COMPONENT_CATALOG_SOURCE);
-	
+
 #
 # the following hash is create to keep track of "how" components
 # are created or accessed (for logging, debugging, etc)
@@ -216,8 +215,11 @@ $SEARCH_CLASSES = {
 	'session' => 'App::Page::Search::Session',
 	'drug' => 'App::Page::Search::Drug',
 	'icd' => 'App::Page::Search::ICD',
+	'80' => 'App::Page::Search::ICD',
 	'cpt' => 'App::Page::Search::CPT',
+	'100' => 'App::Page::Search::CPT',
 	'hcpcs' => 'App::Page::Search::HCPCS',
+	'210' => 'App::Page::Search::HCPCS',
 	'servicetype' => 'App::Page::Search::ServiceType',
 	'serviceplace' => 'App::Page::Search::ServicePlace',
 	'adhocquery' => 'App::Page::Search::AdhocQuery',
@@ -577,7 +579,7 @@ $SEARCH_CLASSES = {
 	'health-rule' => {_class => 'App::Dialog::HealthMaintenance', heading => '$Command Health Maintenance Rule', _arl => ['rule_id']},
 	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
 	'phone-message' => {_class => 'App::Dialog::Attribute::PhoneMessage', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Phone Message', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-phmsg-' .App::Universal::ATTRTYPE_TEXT() },
-	'refill-request' => {_class => 'App::Dialog::Attribute::RefillRequest', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Refill Request', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-refillreq-' .App::Universal::ATTRTYPE_TEXT() },	
+	'refill-request' => {_class => 'App::Dialog::Attribute::RefillRequest', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Refill Request', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-refillreq-' .App::Universal::ATTRTYPE_TEXT() },
 	'procedure' => 'App::Dialog::Procedure',
 	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
@@ -747,34 +749,5 @@ sub handleARL
 		$page->printContents();
 	}
 }
-
-##############################################################################
-# Change-log management functions/declarations
-##############################################################################
-
-use constant DIRECTORY_SEARCH => 'Directory/Search';
-use constant DIRECTORY_DIALOGCLASSES => 'Directory/classes';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/05/1999', 'RK',
-		DIRECTORY_SEARCH,
-		'Added Catalogitem in $SEARCH_CLASSES. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/28/1999', 'RK',
-		DIRECTORY_DIALOGCLASSES,
-		'Added assoc-family in %DIALOG_CLASSES. And updated the dialog names ( ie, dialog path from App::Dialog::Encounter for claim to App::Dialog:: Encounter::Createcalim and so on) for  claim, checkin, checkout in %DIALOG_CLASSES.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/07/1999', 'RK',
-		DIRECTORY_SEARCH,
-		'Updated the _class names in %DIALOG_CLASSES for the association related dialogs like employment, caraprovider etc.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/07/1999', 'RK',
-		DIRECTORY_SEARCH,
-		'Added differnt types of alerts in %DIALOG_CLASSES according to the trans_type.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/24/2000', 'TVN',
-		DIRECTORY_SEARCH,
-		'Added Appointment Type in $SEARCH_CLASSES. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '04/01/2000', 'TVN',
-		DIRECTORY_SEARCH,
-		'Added ResourceSelector, WorkList components and WorkList page. '],
-);
 
 1;

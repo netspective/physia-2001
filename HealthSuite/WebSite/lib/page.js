@@ -701,11 +701,6 @@ function setSelectedValue(selectObj, value)
 // Find/Lookup popup window support
 //****************************************************************************
 
-function prepare_doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
-{
-	alert("prepare_doFindLookup");
-}
-
 //
 // these are global variable used for sending information
 // to the findPopup window (they are set in doFindLookup and
@@ -716,7 +711,7 @@ var activeFindWinControl = null;
 var activeFindARL = null;
 var activeFindAppendValue = '';
 
-function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
+function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField, controlComboBox)
 {
 	if(prefill == null)
 		prefill = true;
@@ -735,8 +730,14 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 
 	if(controlField != '')
 	{
-		newArl = replaceString(arl, 'itemValue', controlField.value);
+		newArl = replaceString(arl, 'itemValue', eval(controlField));
 	}
+
+	if (controlComboBox != '')
+	{
+		newArl = replaceString(arl, 'itemValue', eval(controlComboBox));
+	}
+
 	//
 	// do the actual opening of the find popup window; it will be the job
 	// of the popup window to check the value of activeFindWinControl and
