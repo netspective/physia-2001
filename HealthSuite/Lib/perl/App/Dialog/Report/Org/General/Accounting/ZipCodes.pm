@@ -140,9 +140,9 @@ sub execute
 
 	if ($page->field('provider_id') ne '')
 	{
-		$columns = $columns . ", pph.complete_name doctor";
+		$columns = $columns . ", pph.simple_name doctor";
 		$tables = $tables . ", person pph , person_attribute pat1 " ;
-		$group = $group . ", pph.complete_name ";
+		$group = $group . ", pph.simple_name ";
 
 		$where = $where . " and p.person_id = pat1.parent_id (+)";
 		$where = $where . " and pat1.value_text = pph.person_id" ;

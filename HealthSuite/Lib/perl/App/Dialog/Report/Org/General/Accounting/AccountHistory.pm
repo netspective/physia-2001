@@ -78,7 +78,7 @@ sub execute
 	my $sqlStmt = qq{
 					select
 						distinct i.invoice_id,
-						p.complete_name doctor,
+						p.simple_name doctor,
 						i.balance balance
 					from
 						invoice i, transaction t, person p, invoice_item ii
