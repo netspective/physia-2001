@@ -29,6 +29,7 @@
 			<allow permission="dlg/password/add" />
 			<allow permission="dlg/close-date/add" />
 			<allow permission="dlg/billinginfo/add" />
+			<allow permission="dlg/change-status/add" />
 			<allow permission="dlg/feescheduledataentry/remove" />
 			<allow permission="dlg/feescheduleentry/remove" />
 			<allow permission="dlg/catalog/remove" />
@@ -50,6 +51,7 @@
 			<allow permission="dlg/password/remove" />
 			<allow permission="dlg/close-date/remove" />
 			<allow permission="dlg/billinginfo/remove" />
+			<allow permission="dlg/change-status/remove" />
 			<allow permission="dlg/feescheduledataentry/update" />
 			<allow permission="dlg/feescheduleentry/update" />
 			<allow permission="dlg/catalog/update" />
@@ -70,6 +72,7 @@
 			<allow permission="dlg/password/update" />
 			<allow permission="dlg/close-date/update" />
 			<allow permission="dlg/billinginfo/update" />
+			<allow permission="dlg/change-status/update" />
 		</permission>
 		<permission id="sde">
 			<allow permission="page/sde" />
