@@ -58,28 +58,37 @@ use vars qw(@ISA %RESOURCE_MAP);
 	},
 );
 
+
 sub initialize
 {
 	my $self = shift;
 	my $schema = $self->{schema};
-	warn ("In initialize\n");
 	croak 'schema parameter required' unless $schema;
 
-	my $orgIdCaption = $self->{orgtype} eq 'dept' ? 'Department ID' : 'Organization ID';
+	#my $orgIdCaption = $self->{orgtype} eq 'dept' ? 'Department ID' : 'Organization ID';
+	my $orgIdCaption = 'Organization ID';
+
+	$self->addContent(
+		new CGI::Dialog::Subhead(
+			heading => 'Profile Information',
+			name => 'gen_info_heading'
+		),
+	);
 
 	if ($self->{orgtype} ne 'main')
 	{
 		$self->addContent(
 			new App::Dialog::Field::Organization::ID(
 				caption => 'Parent Organization ID',
-				name => 'parent_org_id'),
+				name => 'parent_org_id'
+			),
 			new App::Dialog::Field::Organization::ID::New(
 				caption => $orgIdCaption,
 				name => 'org_id',
 				options => FLDFLAG_REQUIRED,
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
-			);
+			),
+		);
 	}
 	else
 	{
@@ -89,26 +98,36 @@ sub initialize
 				name => 'org_id',
 				options => FLDFLAG_REQUIRED,
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
-			);
+			),
+		);
 	}
 
 	$self->addContent(
-		new CGI::Dialog::Field::TableColumn(caption => 'Organization Name', name => 'name_primary',
+		new CGI::Dialog::Field::TableColumn(
+			caption => 'Organization Name',
+			name => 'name_primary',
 			schema => $schema, 
-			column => 'Org.name_primary'),
-
-		new CGI::Dialog::Field::TableColumn(caption => 'Doing Business As', name => 'name_trade',
-			schema => $schema, column => 'Org.name_trade'),
-
-		new CGI::Dialog::Subhead(heading => 'Profile Information', name => 'gen_info_heading'),
+			column => 'Org.name_primary'
+		),
+		new CGI::Dialog::Field::TableColumn(
+			caption => 'Doing Business As',
+			name => 'name_trade',
+			schema => $schema,
+			column => 'Org.name_trade'
+		),
 	);
 
 	$self->addContentOrgType($self->{orgtype});
 
 	$self->addContent(
+		new CGI::Dialog::Subhead(
+			heading => 'Contact Information',
+			name => 'contact_heading',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		),
 		new CGI::Dialog::MultiField(
 			name => 'hours_and_tzone',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'Hours of Operation',
@@ -120,38 +139,45 @@ sub initialize
 					schema => $schema,
 					column => 'Org.time_zone',
 					name => 'time_zone'),
-			]),
+			],
+		),
 		new CGI::Dialog::MultiField(
 			name => 'phone_fax',
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'Phone',
 					type=>'phone',
 					name => 'phone',
 					options => FLDFLAG_REQUIRED,
-					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				),
 				new CGI::Dialog::Field(
 					caption => 'Fax',
-					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
 					type=>'phone',
-					name => 'fax'),
-			]),
+					name => 'fax',
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				),
+			],
+		),
 		new App::Dialog::Field::Address(
 			caption=>'Mailing Address',
 			name => 'address',
 			options => FLDFLAG_REQUIRED,
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		),
 		new CGI::Dialog::Field(
 			caption => 'Email',
 			type=>'email',
 			name => 'email',
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		),
 		new CGI::Dialog::Field(
 			caption => 'Website',
 			type=>'url',
 			name => 'internet',
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		),
 		new CGI::Dialog::MultiField(
 			name => 'org_contact',
 			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
@@ -168,43 +194,62 @@ sub initialize
 			]),
 	);
 
-	if ($self->{orgtype} ne 'dept')
+	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
 				heading => 'ID Numbers',
-				name => 'ids_heading'),
+				name => 'ids_heading'
+			),
 			new CGI::Dialog::Field::TableColumn(
 				caption => 'Tax ID',
 				name => 'tax_id',
 				schema => $schema,
-				column => 'Org.tax_id'),
+				column => 'Org.tax_id'
+			),
 			new CGI::Dialog::Field(
 				caption => 'Employer ID',
-				name => 'emp_id'),
+				name => 'emp_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => 'State ID',
-				name => 'state_id'),
+				name => 'state_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => 'Medicaid ID',
-				name => 'medicaid_id'),
+				name => 'medicaid_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => "Worker's Comp ID",
-				name => 'wc_id'),
+				name => 'wc_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => 'Blue Cross-Blue Shield ID',
-				name => 'bcbs_id'),
+				name => 'bcbs_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => 'Medicare ID',
-				name => 'medicare_id'),
+				name => 'medicare_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 			new CGI::Dialog::Field(
 				caption => 'CLIA ID',
-				name => 'clia_id'),
+				name => 'clia_id',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
 		);
 	}
 	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept')
 	{
 		$self->addContent(
+			new CGI::Dialog::Subhead(
+				heading => 'Service Information',
+				name => 'service_heading'),
 			new CGI::Dialog::Field(
 				caption => 'HCFA Service Place',
 				name => 'hcfa_service_place',
@@ -226,6 +271,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Subhead(
 			heading => '',
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
 			name => ''),
 		new CGI::Dialog::Field(
 			caption => 'Delete record?',
@@ -256,11 +302,11 @@ sub initialize
 	return $self;
 }
 
+
 sub addContentOrgType
 {
 	my ($self, $type) = @_;
 	my $excludeGroups = "''";
-	warn ("In addContentOrgType\n");
 	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
@@ -297,50 +343,23 @@ sub addContentOrgType
 	return 1;
 }
 
+
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	warn ("In makeStateChanges in $command mode\n");
 	my $orgId = $page->param('org_id');
-
-	if($command eq 'update' || $command eq 'remove')
-	{
-		$self->updateFieldFlags('phone_fax', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('address', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('email', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('internet', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('ids_heading', FLDFLAG_INVISIBLE, 1);
-		#$self->updateFieldFlags('tax_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('emp_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('state_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('medicaid_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('wc_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('bcbs_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('medicare_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('clia_id', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('hours_and_tzone', FLDFLAG_INVISIBLE, 1);
-
-	}
-
-	if($orgId && $command eq 'add' && $orgId ne $page->session('org_id'))
-	{
-			#$page->field('org_id', $orgId);
-			#$self->setFieldFlags('org_id', FLDFLAG_READONLY);		
-	}
-
 	if($command eq 'remove')
 	{
 		my $deleteRecord = $self->getField('delete_record');
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Organization '$orgId'?");
 	}
-	warn ("Leaving makeStateChanges\n");
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
+
 
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	warn ("In popluate data in $command mode\n");
 
 	if($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL)
 	{
@@ -392,10 +411,10 @@ sub populateData
 	$page->field('medicare_facility_type', $attribute->{value_int});
 }
 
+
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
-	warn ("In execute_add about to $command Org record\n");
 	my @members = $page->field('member_name');
 	my $ownerOrg = $page->session('org_internal_id');
 	my $orgId = $page->field('org_id');
@@ -598,8 +617,8 @@ sub execute_add
 	$page->schemaAction(
 			'Org_Attribute', $command,
 			parent_id => $orgIntId,
-			item_name => 'Contact Information',
-			value_type => App::Universal::ATTRTYPE_BILLING_PHONE || undef,
+			item_name =>  'Contact Information',
+			value_type => App::Universal::ATTRTYPE_BILLING_PHONE,
 			value_text => $page->field('contact_phone') || undef,
 			value_textB => $page->field('contact_name') || undef,
 			_debug => 0
@@ -613,13 +632,12 @@ sub execute_add
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
-
 }
+
 
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
-	warn ("In execute_update in $command mode\n");
 	my @members = $page->field('member_name');
 	my $orgId = $page->field('org_id');
 	my $ownerOrg = $page->session('org_internal_id');
@@ -662,10 +680,10 @@ sub execute_update
 	return '';
 }
 
+
 sub execute_remove
 {
 	my ($self, $page, $command, $flags) = @_;
-	warn ("In execute_remove in $command mode\n");
 	my $orgId = $page->field('org_id');
 	my $ownerOrg = $page->session('org_internal_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
@@ -680,9 +698,9 @@ sub execute_remove
 	return '';
 }
 
+
 sub saveAttribute
 {
-	warn ("In saveAttribute\n");
 	my ($page, $table, $parentId, $itemName, $valueType, %data) = @_;
 
 	my $recExist = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
