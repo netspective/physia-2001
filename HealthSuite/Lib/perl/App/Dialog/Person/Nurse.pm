@@ -43,7 +43,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_license_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
 
-		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,),
+		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse'),
 
 		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', name=> 'nurse_license', hints => "'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'.",
 			fields => [
@@ -164,6 +164,8 @@ sub customValidate
 
 }
 
+
+
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -212,17 +214,6 @@ sub execute_add
 			value_dateA => $page->field('specialty3_exp_date') || undef,
 			_debug => 0
 	) if $page->field('specialty3') ne '';
-
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $page->field('person_id')  || undef,
-			item_name => 'Employee',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('emp_id')  || undef,
-			value_dateA=> $page->field('emp_exp_date') || undef,
-			_debug => 0
-	) if $page->field('emp_id') ne '';
 
 	$page->schemaAction(
 		'Person_Attribute',	$command,
