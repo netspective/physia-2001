@@ -42,11 +42,11 @@
 			{
 				<![CDATA[
 					out.print(
-						"<b>" + rs.getString(1) + "</b>" + "<br/>" +
+						"<b>" + rs.getString(1) + "</b>" + "<br>" +
 						rs.getString(5) + " " +  rs.getString(6) + " " + rs.getString(7) + "<br>" +
-						rs.getString(2) + "<br/>" +
-						(rs.getString(3) != null ? rs.getString(3) + " - Home <br/>" : "") +
-						(rs.getString(4) != null ? rs.getString(4) + " - Work <br/>" : "")
+						rs.getString(2) + "<br>" +
+						(rs.getString(3) != null ? rs.getString(3) + " - Home <br>" : "") +
+						(rs.getString(4) != null ? rs.getString(4) + " - Work <br>" : "")
 					);
 				]]>
 			}
@@ -111,7 +111,7 @@
 				<![CDATA[
 					out.print(
 						(rs.getString(16) != null ? "Third-Party: <b>" + rs.getString(13) + "</b>" :
-							rs.getString(6) + ": <b>" + rs.getString(3) + "</b>" + "<br/>" )
+							rs.getString(6) + ": <b>" + rs.getString(3) + "</b>" + "<br>" )
 					);
 				]]>
 			}
@@ -268,7 +268,7 @@
 			{
 				<![CDATA[
 					out.print(
-						"<li>" + rs.getString(3) + "<br/>" +
+						"<li>" + rs.getString(3) + "<br>" +
 						rs.getString(4)
 					);
 				]]>
@@ -330,7 +330,7 @@
 			{
 				<![CDATA[
 					out.print(
-						"<li>" + rs.getString(2) + "<br/>" +
+						"<li>" + rs.getString(2) + "<br>" +
 						rs.getString(6)
 					);
 				]]>

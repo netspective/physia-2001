@@ -90,10 +90,10 @@
 					" <b><a href=\"person.xtp?pid="+rs.getString(6)+"&name="+rs.getString(2)+"\">"
 						+ rs.getString(2) + "</a></b> (" +
 					rs.getString(5).substring(0, 1) +
-					")<br/><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\">" +
+					")<br><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\"><img src=\"spacer.gif\">" +
 					rs.getString(3) + " " +
 					(rs.getString(4) != null ? "(" + rs.getString(4) + ")" : "") +
-					"<br/>"
+					"<br>"
 					);
 				]]>
 			}
@@ -162,11 +162,11 @@
 				<![CDATA[
 				out.print(
 					"<b>" + rs.getString(1) + "</b>" + // Hospital
-					"<br/><b><a href=\"person.xtp?pid="+rs.getString(5)+"&name="+rs.getString(3)+"\">"+rs.getString(3)+"</a></b>" +
+					"<br><b><a href=\"person.xtp?pid="+rs.getString(5)+"&name="+rs.getString(3)+"\">"+rs.getString(3)+"</a></b>" +
 					" (" + rs.getString(4) + ")" +
-					"<br/>" + rs.getString(6) +
-					"<br/>Room: " + (rs.getString(2) != null ? rs.getString(2) : "N/A") +
-					"<br/> <br/>"
+					"<br>" + rs.getString(6) +
+					"<br>Room: " + (rs.getString(2) != null ? rs.getString(2) : "N/A") +
+					"<br> <br>"
 					);
 				]]>
 			}

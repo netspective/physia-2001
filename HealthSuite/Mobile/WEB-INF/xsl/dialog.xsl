@@ -15,7 +15,7 @@
 
 <xsl:template match="field-active-patient">
 	Patient: <jsp:expression>session.getAttribute("active-person-name")</jsp:expression>
-	<xsl:if test="not(@break) or @break = 'yes'"><br/></xsl:if>
+	<xsl:if test="not(@break) or @break = 'yes'"><![CDATA[<br>]]></xsl:if>
 </xsl:template>
 
 <xsl:template match="field-text">
@@ -28,7 +28,7 @@
 	<xsl:if test="not(@rows or @cols)">
 	<input name="{@name}" type="text" size="{@size}"/>
 	</xsl:if>
-	<xsl:if test="not(@break) or @break = 'yes'"><br/></xsl:if>
+	<xsl:if test="not(@break) or @break = 'yes'"><![CDATA[<br>]]></xsl:if>
 </xsl:template>
 
 <xsl:template match="field-date">
@@ -38,7 +38,7 @@
 	<![CDATA[
 	<input name="{@name}" type="text" size="{@size}" value="<jsp:expression>session.getAttribute("active_date_str")</jsp:expression>"/>
 	]]>
-	<xsl:if test="not(@break) or @break = 'yes'"><br/></xsl:if>
+	<xsl:if test="not(@break) or @break = 'yes'"><![CDATA[<br>]]></xsl:if>
 </xsl:template>
 
 <xsl:template match="field-bool">
@@ -46,7 +46,7 @@
 	<xsl:if test="caption | @caption">
 		<xsl:value-of select="caption | @caption"/>
 	</xsl:if>
-	<xsl:if test="not(@break) or @break = 'yes'"><br/></xsl:if>
+	<xsl:if test="not(@break) or @break = 'yes'"><![CDATA[<br>]]></xsl:if>
 </xsl:template>
 
 <xsl:template match="field-buttons">
@@ -81,7 +81,7 @@
 	</xsl:if>
 	<xsl:if test="@style = 'radio' or @style = 'check'">
 	</xsl:if>
-	<xsl:if test="not(@break) or @break = 'yes'"><br/></xsl:if>
+	<xsl:if test="not(@break) or @break = 'yes'"><![CDATA[<br>]]></xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>
