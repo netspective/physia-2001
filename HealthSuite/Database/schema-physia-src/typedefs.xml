@@ -965,7 +965,8 @@
 			</row>
 			<row>
 				<col name="id">7</col>
-				<col name="caption">Client Billing</col>
+				<col name="caption">Third-Party Payer</col>
+				<col name="group_name">third-party</col>
 			</row>
 			<row>
 				<col name="id">8</col>
