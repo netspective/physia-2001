@@ -16,11 +16,23 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-%RESOURCE_MAP = ('activeproblems-trans' => {_transType => App::Universal::TRANSTYPEDIAG_TRANSIENT,
-				heading => '$Command Transient Diagnosis',
-				_arl_add => ['person_id'],
-				_arl_remove => ['trans_id'],
-				_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_TRANSIENT() },);
+%RESOURCE_MAP = (
+	'activeproblems-trans' => {
+		transType => App::Universal::TRANSTYPEDIAG_TRANSIENT,
+		heading => '$Command Transient Diagnosis',
+		_arl_add => ['person_id'],
+		_arl_remove => ['trans_id'],
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_TRANSIENT()
+	},
+	'activeproblems-surgical' => {
+		transType => App::Universal::TRANSTYPEDIAG_SURGICAL,
+		heading => '$Command Surgical Procedure',
+		_arl_add => ['person_id'],
+		_arl_remove => ['trans_id'],
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_SURGICAL()
+	},	
+);
+
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_);
@@ -66,8 +78,9 @@ sub new
 	if($transType == $surgicalType)
 	{
 		$self->addContent(
-			new CGI::Dialog::Field(type => 'memo', name => 'data_text_a', caption => 'Notes', options => FLDFLAG_REQUIRED),
+			new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician']),
 			new CGI::Dialog::Field(caption => 'ICD Code', name => 'code'),
+			new CGI::Dialog::Field(type => 'memo', name => 'data_text_a', caption => 'Notes', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(caption => 'Surgery Date', name => 'curr_onset_date', type => 'date'),
 		);
 	}
@@ -148,4 +161,3 @@ sub execute_remove
 
 
 1;
-
