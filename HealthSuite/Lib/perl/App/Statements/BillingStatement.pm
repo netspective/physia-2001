@@ -29,10 +29,13 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 					and adjustment_type = 0
 					and payer_type = 0
 			) as patient_receipts,
-			(select complete_name from Person where person_id = Invoice.client_id) as patient_name
-		FROM Transaction, Invoice_Billing, Invoice
-		WHERE Invoice.invoice_status > 3 
-			AND Invoice.invoice_status != 15 
+			Person.complete_name AS patient_name,
+			Person.name_last AS patient_name_last
+		FROM Transaction, Invoice_Billing, Invoice, Person
+		WHERE
+			Invoice.client_id = Person.person_id
+			AND Invoice.invoice_status > 3
+			AND Invoice.invoice_status != 15
 			AND Invoice.invoice_status != 16
 			AND Invoice.invoice_date <= trunc(sysdate) - :1
 			AND Invoice.balance > 0
@@ -43,40 +46,73 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			AND Transaction.trans_id = Invoice.main_transaction
 		ORDER BY Invoice.invoice_id
 	},
-	
+
+	'sel_daysBillingEvents' => qq{
+		SELECT
+			item_id,
+			parent_id,
+			value_int AS day,
+			value_text AS name_begin,
+			value_textb AS name_end,
+			value_intb AS balance_condition,
+			value_float AS balance_criteria
+		FROM
+			org_attribute
+		WHERE
+			value_type = @{[ App::Universal::ATTRTYPE_BILLINGEVENT ]} AND
+			value_int = :1
+	},
+
 	'sel_aging' => qq{
 		SELECT nvl(sum(balance), 0)
 		FROM Invoice_Billing, Invoice
 		WHERE client_id = :1
 			and invoice_date > trunc(sysdate) - :2
 			and invoice_date <= trunc(sysdate) - :3
-			and invoice_status > 3 
-			and invoice_status != 15 
+			and invoice_status > 3
+			and invoice_status != 15
 			and invoice_status != 16
 			and invoice_subtype in (0, 7)
 			and bill_id = billing_id
 			and bill_to_id = :4
 	},
-	
+
 	'sel_orgAddress' => qq{
 		SELECT name_primary, line1, line2, city, state, replace(zip, '-', null) as zip
 		FROM Org_Address, Org
 		WHERE org_internal_id = :1
 			and Org_Address.parent_id = Org.org_internal_id
 	},
-	
+
+	'sel_orgAddressByName' => qq{
+		SELECT
+			name_primary,
+			line1,
+			line2,
+			city,
+			state,
+			replace(zip, '-', null) as zip
+		FROM
+			org_address,
+			org
+		WHERE
+			org_address.parent_id = org.org_internal_id AND
+			org_internal_id = :1 AND
+			org_address.address_name = :2
+	},
+
 	'sel_personAddress' => qq{
 		SELECT complete_name, line1, line2, city, State, replace(zip, '-', null) as zip
 		FROM Person_Address, Person
 		WHERE person_id = ?
 			and Person_Address.parent_id = Person.person_id
 	},
-	
+
 	'sel_submittedClaims_perOrg' => qq{
 		select invoice_id
 		from Invoice
 		where invoice_status in (
-				@{[ App::Universal::INVOICESTATUS_SUBMITTED]}, 
+				@{[ App::Universal::INVOICESTATUS_SUBMITTED]},
 				@{[ App::Universal::INVOICESTATUS_APPEALED]}
 			)
 			and owner_id = ?
@@ -84,12 +120,12 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
 		order by invoice_id
 	},
-	
+
 	'sel_submittedClaims_perOrg_perProvider' => qq{
 		select invoice_id
 		from Transaction, Invoice
 		where invoice_status in (
-				@{[ App::Universal::INVOICESTATUS_SUBMITTED]}, 
+				@{[ App::Universal::INVOICESTATUS_SUBMITTED]},
 				@{[ App::Universal::INVOICESTATUS_APPEALED]}
 			)
 			and Invoice.owner_id = :1
@@ -101,12 +137,12 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 
 	'sel_billingPhone' => qq{
-		select value_text 
-		from Org_Attribute 
-		where parent_id = :1 
+		select value_text
+		from Org_Attribute
+		where parent_id = :1
 			and value_type = @{[ App::Universal::ATTRTYPE_BILLING_PHONE ]}
 	}
-		
+
 );
-	
+
 1;
