@@ -299,7 +299,7 @@ sub prepareHtmlFormat
 		($wrapContentOpen, $wrapContentClose) =
 			(qq{
 				<TABLE CELLSPACING=@{[ exists $frameInfo->{borderWidth} ? $frameInfo->{borderWidth} : 1]} CELLPADDING=2 BORDER=0 BGCOLOR=@{[$frameInfo->{borderColor} || '#EEEEEE']} @{[ $layoutDefn->{width} ? "WIDTH=$layoutDefn->{width}" : '100%' ]}>
-					@{[ $formAction ? '<FORM ACTION="$formAction" METHOD="POST">' : '']}
+					@{[ $formAction ? qq{<FORM ACTION="$formAction" METHOD="POST">} : '']}
 					<TR BGCOLOR=@{[$frameInfo->{headColor} || $frameInfo->{borderColor} || '#EEEEEE']}>
 						<TD>$frameFontOpen<NOBR>$frameInfo->{heading}</NOBR>$frameFontClose</TD>
 					</TR>
@@ -327,7 +327,7 @@ sub prepareHtmlFormat
 			($wrapContentOpen, $wrapContentClose) =
 				(qq{
 					<TABLE CELLSPACING=0 CELLPADDING=2 BORDER=0 @{[ $layoutDefn->{width} ? "WIDTH=$layoutDefn->{width}" : '100%' ]}>
-						@{[ $formAction ? '<FORM ACTION="$formAction" METHOD="POST">' : '']}
+						@{[ $formAction ? qq{<FORM ACTION="$formAction" METHOD="POST">} : '']}
 						<TR>
 							<TD>
 								$bannerFmt
@@ -353,7 +353,7 @@ sub prepareHtmlFormat
 			($wrapContentOpen, $wrapContentClose) =
 				(qq{
 					<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 @{[ $layoutDefn->{width} ? "WIDTH=$layoutDefn->{width}" : '100%' ]}>
-					@{[ $formAction ? '<FORM ACTION="$formAction" METHOD="POST">' : '']}
+					@{[ $formAction ? qq{<FORM ACTION="$formAction" METHOD="POST">} : '']}
 					<TR VALIGN=TOP><TD>
 						$defaultFontOpen
 				}, qq{
