@@ -104,6 +104,11 @@ sub prepare_page_content_header
 			#['Activity', "$urlPrefix/activity", 'activity'],
 		], ' | ');
 
+	my $profileLine = '<b>Profile: </b>';
+	$profileLine .=  '&nbsp;Primary Name: #property.org_name_primary# ' if $self->property('org_name_primary');
+	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
+	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
+	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
 
 	push(@{$self->{page_content_header}},
 		qq{
@@ -129,7 +134,7 @@ sub prepare_page_content_header
 				<TD><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD>
 				<TD ALIGN=LEFT>
 					<FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">
-					Primary Name: #property.org_name_primary#, Category: #property.org_category#, Trade Name: #property.org_name_trade# , Tax ID: #property.org_tax_id#
+						$profileLine
 					</FONT>
 				</TD>
 				<TD ALIGN=RIGHT>
