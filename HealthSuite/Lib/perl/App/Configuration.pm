@@ -28,6 +28,12 @@ struct(ServerConfigData => [
 	path_AppConf => '$',
 	path_PDFOutput => '$',
 	path_PDFOutputHREF => '$',
+	path_EDIData => '$',
+	path_PerSeEDIData => '$',
+	path_PerSeEDIDataIncoming => '$',
+	path_PerSeEDIDataOutgoing => '$',
+	path_PerSeEDIErrors => '$',
+	path_PerSeEDIErrorsDelim => '$',
 
 	file_SchemaDefn => '$',
 	file_BuildLog => '$',
@@ -53,7 +59,7 @@ use constant PATH_TEMP       => File::Spec->catfile('temp');
 use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
 use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
 use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
-
+use constant PATH_EDIDATA    => File::Spec->catfile(defined $ENV{HS_EDIDATA} ? $ENV{HS_EDIDATA} : '/home/vusr_edi');
 
 # Returns true if debug mode is on
 sub debugMode
@@ -119,6 +125,13 @@ sub getDefaultConfig
 	$config->path_AppConf(PATH_APPCONF);
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
 	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
+	$config->path_EDIData(PATH_EDIDATA);
+	$config->path_PerSeEDIData(File::Spec->catfile(PATH_EDIDATA, 'per-se'));
+	$config->path_PerSeEDIDataIncoming(File::Spec->catfile($config->path_PerSeEDIData(), 'incoming'));
+	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
+	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
+	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
+
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
 	$config->file_NSFHeader(File::Spec->catfile(PATH_APPCONF, 'nsf-header-conf'));
 	$config->file_NSFCounter(File::Spec->catfile(PATH_APPCONF, 'nsf-submission-counter'));
@@ -192,7 +205,8 @@ requirePath(
 	$CONFDATA_SERVER->path_Reports,
 	$CONFDATA_SERVER->path_BillingTemplate,
 	$CONFDATA_SERVER->path_OrgReports,
-	$CONFDATA_SERVER->path_OrgDirectory,
+	$CONFDATA_SERVER->path_EDIData,
+	$CONFDATA_SERVER->path_PerSeEDIData,
 	);
 	
 1;
