@@ -461,44 +461,75 @@ function _delCPT () {
 	if (df.superbillData.selectedIndex < 0) {
 		alert ("Please select a CPT to delete.  Thank you");
 	} else {
-		var currentGroup = (df.superbillGroups.selectedIndex < 0) ? 0 : df.superbillGroups.selectedIndex;
-		var groupCPTList = _getGroupCPTList (currentGroup);
-		var deletedCPT = new Array ();
-		var newGroupCPTList = new Array ();
+		var df = document.superbillItemList;
+	
+		if (_debugFlag) {
+			alert('Text: ' + oldText + ', Value: ' + value + ', new Text: ' + text);
+		}
 		
 		for (var i = 0; i < df.superbillData.length; i ++) {
 			if (df.superbillData.options [i].selected) {
-				deletedCPT.length ++;
-				deletedCPT [deletedCPT.length - 1] = i;
+				df.superbillData.options [i] = null;
 			}
 		}
-
-		var currDeletedItemLookupIdx = 0;
-
-		for (var i = 0; i < groupCPTList.length; i ++) {
-			var _temp = groupCPTList [i];
-			var _matches = _temp.match (/(\d+)_(\d+)_(\S+)/);
-				
-			if (_matches.length && _matches [1] == currentGroup) {
-				if (_matches [2] == deletedCPT [currDeletedItemLookupIdx]) {
-					currDeletedItemLookupIdx ++;
-				} else {
-					newGroupCPTList.length ++;
-					newGroupCPTList [newGroupCPTList.length - 1] = _matches [1] + "_" + (newGroupCPTList.length - 1) + "_" + _matches [3];
-				}
-			}
-		}
+		
+		var currentGroup = (df.superbillGroups.selectedIndex < 0) ? 0 : df.superbillGroups.selectedIndex;
+		var groupCPTList = _getGroupCPTList (currentGroup);
 
 		if (_debugFlag) {
 			alert ("Group list: " + document.superbillData.groups.value);
 			alert ("CPT list: " + document.superbillData.cpts.value);
 		}
-		_updateGroupCPTList (currentGroup, newGroupCPTList);
+		_updateGroupCPTList (currentGroup, groupCPTList);
 		if (_debugFlag) {
 			alert ("Group list: " + document.superbillData.groups.value);
 			alert ("CPT list: " + document.superbillData.cpts.value);
 		}
 		_populateGroupCPT(document.superbillItemList.superbillGroups);
+	}
+}
+
+function _moveCPTUp () {
+	var df = document.superbillItemList;
+	
+	if (df.superbillData.selectedIndex > 0) {
+		var currIdx = df.superbillData.selectedIndex;
+		var newIdx = currIdx - 1;
+		
+		var tempText = df.superbillData.options [newIdx].text;
+		var tempValue = df.superbillData.options [newIdx].value;
+		
+		df.superbillData.options [newIdx].text = df.superbillData.options [currIdx].text;
+		df.superbillData.options [newIdx].value = df.superbillData.options [currIdx].value;
+		df.superbillData.options [currIdx].text = tempText;
+		df.superbillData.options [currIdx].value = tempValue;
+
+		var currentGroup = (df.superbillGroups.selectedIndex < 0) ? 0 : df.superbillGroups.selectedIndex;
+		var groupCPTList = _getGroupCPTList (currentGroup);
+		_updateGroupCPTList (currentGroup, groupCPTList);
+		df.superbillData.selectedIndex = newIdx;
+	}
+}
+
+function _moveCPTDown () {
+	var df = document.superbillItemList;
+	
+	if (df.superbillData.selectedIndex >= 0 && df.superbillData.selectedIndex < (df.superbillData.length - 1)) {
+		var currIdx = df.superbillData.selectedIndex;
+		var newIdx = currIdx + 1;
+		
+		var tempText = df.superbillData.options [newIdx].text;
+		var tempValue = df.superbillData.options [newIdx].value;
+		
+		df.superbillData.options [newIdx].text = df.superbillData.options [currIdx].text;
+		df.superbillData.options [newIdx].value = df.superbillData.options [currIdx].value;
+		df.superbillData.options [currIdx].text = tempText;
+		df.superbillData.options [currIdx].value = tempValue;
+
+		var currentGroup = (df.superbillGroups.selectedIndex < 0) ? 0 : df.superbillGroups.selectedIndex;
+		var groupCPTList = _getGroupCPTList (currentGroup);
+		_updateGroupCPTList (currentGroup, groupCPTList);
+		df.superbillData.selectedIndex = newIdx;
 	}
 }
 
