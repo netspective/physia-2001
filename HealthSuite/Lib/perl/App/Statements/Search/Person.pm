@@ -183,7 +183,7 @@ my %personTemplates = (
 #
 # HEY! If you add anything to @categories you must add the array index below
 #
-my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate');
+my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor');
 my @categorySqls = ();
 foreach my $category (@categories)
 {
@@ -194,7 +194,7 @@ foreach my $category (@categories)
 	foreach (@tmplKeys)
 	{
 		my %sqlData = %{$personTemplates{$_}};
-		$sqlData{catCond} = $category eq 'associate' ? "and cat.category in ('Physician', 'Nurse', 'Staff')" : "and cat.category = '\u$category'";
+		$sqlData{catCond} = $category eq 'associate' ? "and cat.category in ('Physician', 'Nurse', 'Staff', 'Referring-Doctor')" : "and cat.category = '\u$category'";
 		$sqls->{"$_\_$category"} = \%sqlData;
 	}
 }
@@ -207,6 +207,7 @@ $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 	%{$categorySqls[2]},
 	%{$categorySqls[3]},
 	%{$categorySqls[4]},
+	%{$categorySqls[5]},
 );
 
 1;
