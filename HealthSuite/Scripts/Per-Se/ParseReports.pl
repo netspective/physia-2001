@@ -180,7 +180,8 @@ foreach my $report (@reports)
 	print "Invoice $report->{PAT_ACTNO}: '$message' STATUS($status)\n";
 	
 	my $addedHistory = &addInvoiceHistory($page, $report->{DATE}, $report->{PAT_ACTNO}, 
-		$message, $report->{PAYER_PD});
+		$message, $report->{PAYER_PD}, $report->{TRANSSEQ});
+
 	if ($report->{PAT_ACTNO} && $status && $addedHistory)
 	{
 		&changeInvoiceStatus($page, $report->{PAT_ACTNO}, $status);
@@ -219,7 +220,7 @@ sub parseFile
 
 sub addInvoiceHistory
 {
-	my ($page, $date, $invoice, $message, $amtPaid) = @_;
+	my ($page, $date, $invoice, $message, $amtPaid, $transTrackNum) = @_;
 	
 	return 0 unless $invoice;
 	
@@ -240,6 +241,7 @@ sub addInvoiceHistory
 		parent_id => $invoice,
 		cr_user_id => 'EDI_PERSE',
 		value_text => $message,
+		value_textB => qq{Transmission Tracking Number '$transTrackNum'},
 		value_date => $date,
 		value_float => $amtPaid || undef,
 	);
