@@ -259,6 +259,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and item_name = 'Invoice/History/Item'
 		order by value_date desc, cr_stamp desc
 		},
+	'selAdjTypeCaption' => q{
+		select caption
+		from adjust_method
+			where id = ?
+		},
 	'selClaimTypeCaption' => q{
 		select caption
 		from claim_type

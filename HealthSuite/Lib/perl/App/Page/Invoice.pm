@@ -383,39 +383,14 @@ sub getProceduresHtml
 		});
 	}
 
-	#my $adjItems = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_CACHE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_ADJUST);
-	#my $totalAdjItems = scalar(@{$adjItems});
-	#foreach my $itemIdx (0..$totalAdjItems-1)
-	#{
-	#	my $itemId = $adjItems->[$itemIdx]->{item_id};
-	#	my $itemType = $adjItems->[$itemIdx]->{item_type};
-
-	#	my $itemNum = $itemIdx + 1;
-
-	#	my $itemAdjustmentTotal = $adjItems->[$itemIdx]->{balance};
-	#	$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-	#	my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
-	#	my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-	#	push(@rows, qq{
-	#		<TR>
-	#			<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Adjustment</B></TD>
-	#			<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-	#			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
-	#		</TR>
-	#		<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-	#	});
-	#}
-
-
-	#UNCOMMENT THIS AFTER PROSYS GETS THIS WORKING AGAIN AND DELETE ABOVE LOOP
-	
 	my $totalAdjItems = scalar(@{$claim->{adjItems}});
 	foreach my $itemIdx (0..$totalAdjItems-1)
 	{
 		my $adjItem = $claim->{adjItems}->[$itemIdx];
-
 		my $itemNum = $itemIdx + 1;
+
+		my $adjType = $adjItem->{adjustments}->[0]->{adjustType};
+		my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjType);
 
 		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
@@ -424,7 +399,7 @@ sub getProceduresHtml
 
 		push(@rows, qq{
 			<TR>
-				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Adjustment</TD>
+				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
