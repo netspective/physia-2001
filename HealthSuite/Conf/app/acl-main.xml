@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+<accesscontrol name="default">
+	<include file="acl-auto-permissions.xml"/>
+</accesscontrol>
