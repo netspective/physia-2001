@@ -2,6 +2,40 @@
 
 use strict;
 use DBI;
+use App::Data::Manipulate;
+
+sub getClaimDetails
+{
+	my ($dbh, $sortedClaims) = @_;
+
+	my $sqlStmt = qq{
+		select to_char(i.invoice_id, '9999999'), substr(rpad(initcap(p.complete_sortable_name), 30), 1, 30),
+			substr(rpad(initcap(nvl(o.name_primary, 'N/A')), 25), 1, 25), 
+			to_char(i.balance, '\$99999.99'), i.balance
+		from org o, person p, invoice_billing ib, invoice i
+		where i.invoice_id in (@{[ join(',', @{$sortedClaims}) ]})
+			and ib.bill_id = i.billing_id
+			and p.person_id = i.client_id
+			and to_char(o.org_internal_id (+)) = ib.bill_to_id
+	};
+
+	my $sth = $dbh->prepare($sqlStmt);
+	$sth->execute();
+	
+	my $claimDetails;
+	my $numClaims = 0;
+	my $total = 0;
+	
+	while(my $row = $sth->fetch())
+	{
+		$numClaims++;
+		$total += $row->[4];
+		$claimDetails .= "$row->[0]  $row->[1] $row->[2] $row->[3]\n";
+	}
+	
+	return ($claimDetails, $numClaims, $total);
+}
+
 
 my $batchSize = 100;
 
@@ -55,6 +89,8 @@ for my $sqlStmt (@sqlStmts)
 	$sth->finish();
 }
 
+my ($claimDetails, $numClaims, $total) = getClaimDetails($dbh, \@sortedClaims);
+
 $dbh->disconnect();
 
 use Mail::Sendmail;
@@ -68,7 +104,9 @@ my %mail =
 	Cc => 'thai_nguyen@physia.com',
 	Subject => "Claims Submission to Per-Se - " . `date`,
 	Message => "The following claims were submitted to Per-Se in file $nsfFileName:\n\n"
-		. "@{[ join(', ', @sortedClaims) ]}." ,
+		. "Number of Claims:  $numClaims\n"
+		. qq{Total Dollars:  \$@{[ App::Data::Manipulate::trim(sprintf("%9.2f", $total)) ]}\n\n}
+	 	. $claimDetails,
 	Smtp => 'smtp.physia.com',
 );
 

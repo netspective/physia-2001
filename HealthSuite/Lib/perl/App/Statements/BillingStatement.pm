@@ -179,36 +179,38 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 
 	'sel_submittedClaims_perOrg' => qq{
 		select invoice_id
-		from Transaction, Invoice
-		where invoice_status in (
+		from Transaction t, Invoice i
+		where i.invoice_status in (
 				@{[ App::Universal::INVOICESTATUS_SUBMITTED]},
 				@{[ App::Universal::INVOICESTATUS_APPEALED]}
 			)
-			and owner_id = ?
-			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
-			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
-			and Transaction.trans_id = Invoice.main_transaction
+			and i.owner_id = ?
+			and i.invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
+			and i.invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+			and i.balance > 0
+			and t.trans_id = i.main_transaction
 			and not exists (select 'x' from person_attribute pa
-				where pa.parent_id = Transaction.provider_id
+				where pa.parent_id = t.provider_id
 					and pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
 					and pa.item_name = 'Physician Clearing House ID'
 					and pa.value_intb = 1)
-		order by invoice_id
+		order by i.invoice_id
 	},
 
 	'sel_submittedClaims_perOrg_perProvider' => qq{
 		select invoice_id
-		from Transaction, Invoice
-		where invoice_status in (
+		from Transaction t, Invoice i
+		where i.invoice_status in (
 				@{[ App::Universal::INVOICESTATUS_SUBMITTED]},
 				@{[ App::Universal::INVOICESTATUS_APPEALED]}
 			)
-			and Invoice.owner_id = :1
-			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
-			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
-			and Transaction.trans_id = Invoice.main_transaction
-			and Transaction.provider_id = :2
-		order by invoice_id
+			and i.owner_id = :1
+			and i.invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
+			and i.invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+			and i.balance > 0
+			and t.trans_id = i.main_transaction
+			and t.provider_id = :2
+		order by i.invoice_id
 	},
 
 	'sel_billingPhone' => qq{
