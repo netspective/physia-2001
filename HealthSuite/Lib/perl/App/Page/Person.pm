@@ -8,6 +8,7 @@ use App::Universal;
 use Number::Format;
 use Date::Manip;
 use App::ImageManager;
+use CGI::ImageManager;
 
 use DBI::StatementManager;
 use App::Statements::Person;
@@ -38,8 +39,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Activity', name => 'activity',},
 			{caption => 'Home', name => 'home',},
 			{caption => 'Face Sheet', name => 'facesheet',},
-			{caption => 'Associate', name => 'associate',},	
-			{caption => 'Home', name=>'home',},			
+			{caption => 'Associate', name => 'associate',},
+			{caption => 'Home', name=>'home',},
 			],
 		_iconMedium => 'icon-m/person',
 		},
@@ -142,23 +143,23 @@ sub prepare_page_content_header
 	#
 	my $showSummary=0;
 	my $summaryList = 'ALL_CATEGORIES';
-	
+
 	my $showChart=0;
 	my $chartList = 'PATIENT';
-	
+
 	my $showAccount=0;
 	my $accountList = 'PATIENT|GUARANTOR';
-	
+
 	my $showActivity=0;
 	my $activityList = '';
-	
+
 	my $showAssociate=0;
 	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR';
-	
+
 	my $showHome=0;
-	
+
 	#Get Categories
-	my $categories = $self->property('person_categories');			
+	my $categories = $self->property('person_categories');
 
 	#Add all options
 	push (@$categories,'ALL_CATEGORIES');
@@ -167,20 +168,20 @@ sub prepare_page_content_header
 	$showAccount=1 if grep {uc($_)=~m/$accountList/} @$categories;
 	$showAssociate=1 if grep {uc($_)=~m/$assoicateList/} @$categories;
 	$showActivity=1 if grep {uc($_)=~m/$activityList/} @$categories;
-	
+
 	#Only show home option is person is looking at their page
 	$showHome=1 if ($personId eq $sessionUserID);
-	
+
 
 
 	$self->{page_heading} = $self->property('person_simple_name');
 	$self->{page_menu_sibling} = [
-			$showHome ? ['Home', "$urlPrefix/home",'home'] : undef,	
+			$showHome ? ['Home', "$urlPrefix/home",'home'] : undef,
 			$showSummary ? ['Summary', "$urlPrefix/profile", 'profile']: undef,
 			$showChart ? ['Chart', "$urlPrefix/chart", 'chart']: undef,
 			$showAccount ? ['Account', "$urlPrefix/account", 'account'] : undef,,
 			$showActivity ? ['Activity', "$urlPrefix/activity", 'activity'] : undef,
-			$showAssociate ? ['Associate', "$urlPrefix/associate",'associate'] : undef,		
+			$showAssociate ? ['Associate', "$urlPrefix/associate",'associate'] : undef,
 			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		];
@@ -215,54 +216,42 @@ sub prepare_page_content_header
 	my $homeArl = '/' . $self->param('arl');
 	$homeArl =~ s/\?.*//;
 	my $chooseAction = '';
-	$chooseAction = qq{
-				<TD ALIGN=RIGHT>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-						<OPTION>Choose Action</OPTION>
-						<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
-						<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId">Schedule Appointment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
-						<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
-						<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
-						<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
-						<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
-						<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
-						<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
-						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
-						<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
-						<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
-						<OPTION value="/person/$personId/dlg-add-budget?home=$homeArl">Payment Plan</OPTION>
-						<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
-					</SELECT>
-					</FONT>
-				<TD>
-	} if $self->param('_pm_view');
+	$chooseAction =
+		qq{<SELECT onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
+			<OPTION>Choose Action</OPTION>
+			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
+			<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId">Schedule Appointment</OPTION>
+			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
+			<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
+			<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
+			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
+			<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
+			<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
+			<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
+			<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
+			<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
+			<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
+			<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
+			<OPTION value="/person/$personId/dlg-add-budget?home=$homeArl">Payment Plan</OPTION>
+			<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
+		</SELECT>} if $self->param('_pm_view');
 
 	push(@{$self->{page_content_header}},
-		qq{
-		<TABLE WIDTH=100% BGCOLOR=#EEEEEE CELLSPACING=0 CELLPADDING=0 BORDER=0>
-			<TR>
-			<FORM>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD>
-				<TD ALIGN=LEFT>
-					<FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">
-					<!--
-					<A HREF="/person/$personId/dlg-add-appointment">Schedule Appointment</A> -
-					<A HREF="/person/$personId/dlg-add-claim/$personId">Add Claim</A> -
-					<A HREF="/person/$personId/dlg-add-medication-prescribe">Prescribe Meds</A>
-					-->
-						$profileLine
-					</FONT>
-				</TD>
-$chooseAction
-			</FORM>
-			</TR>
-			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
-		</TABLE>
-		},'<P>'
+		qq{<table width="100%" bgcolor="#EEEEEE" cellspacing="0" cellpadding="0" border="0"><tr><td>
+			<font face="Arial,Helvetica" size="2" style="font-family: tahoma; font-size: 8pt">
+			&nbsp; $profileLine
+			</font>
+		</td><td align="right">
+			<font face="Arial,Helvetica" size="2" style="font-family: tahoma; font-size: 8pt">
+			<form>$chooseAction
+			</font>
+		</td><tr><tr><td colspan="2">@{[
+			getImageTag('design/bar', {width => '100%', height => 1})
+		]}</td></tr><tr bgcolor="#FFFFFF"><td></form></td></tr></table>
+		},'<p>'
 	);
+
+	#getImageTag('design/bar', {width => '100%', height => 1})
 
 	return 1;
 }
@@ -629,19 +618,19 @@ sub prepare_view_associate
 				#component.stp-person.attendance#<BR>
 				#component.stp-person.certification#<BR>
 				#component.stp-person.affiliations#<BR>
-				#component.stp-person.benefits#<BR>				
+				#component.stp-person.benefits#<BR>
 				</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
-				<font size=1 face=arial>				
+				<font size=1 face=arial>
 				#component.stpt-person.feeschedules#<BR>
 				#component.stpt-person.associatedSessionPhysicians#<BR>
 				</font>
-				</TD>				
+				</TD>
 			</TR>
 		</TABLE>
-	});				
+	});
 }
 
 sub prepare_view_profile
@@ -652,10 +641,10 @@ sub prepare_view_profile
 	my $personId = $self->param('person_id');
 	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_internal_id'));
 	my $category = $personCategories->[0];
-	
+
 	my $careProvider='';
 	my $authorization='';
-	my $categories = $self->property('person_categories');	
+	my $categories = $self->property('person_categories');
 	if (grep {uc($_) eq 'PATIENT'} @$categories)
 	{
 		$careProvider = '#component.stpt-person.careProviders#<BR>' ;
@@ -673,16 +662,16 @@ sub prepare_view_profile
 					#component.stpt-person.employmentAssociations#<BR>
 					#component.stpt-person.emergencyAssociations#<BR>
 					#component.stpt-person.familyAssociations#<BR>
-					#component.stpt-person.additionalData#<BR>						
+					#component.stpt-person.additionalData#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					#component.stp-person.miscNotes#<BR>
-					#component.stp-person.alerts#<BR>							
+					#component.stp-person.alerts#<BR>
 					#component.stp-person.refillRequest#<BR>
-					#component.stp-person.phoneMessage#<BR>					
-					$authorization			
+					#component.stp-person.phoneMessage#<BR>
+					$authorization
 					</font>
 				</TD>
 
