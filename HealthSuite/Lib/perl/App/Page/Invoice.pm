@@ -50,6 +50,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => '1500 PDF', name => '1500pdf',},
 					{caption => '1500 PDF Plain', name => '1500pdfplain',},
 					{caption => 'TWCC 61 PDF', name => 'twcc61pdf',},
+					{caption => 'TWCC 64 PDF', name => 'twcc64pdf',},
+					{caption => 'TWCC 69 PDF', name => 'twcc69pdf',},
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
 					{caption => 'Envoy NSF', name => 'envoy_nsf',},
