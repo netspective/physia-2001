@@ -170,10 +170,11 @@ sub getControlBarHtml
 	my ($self) = @_;
 
 	my $selectedDate = $self->param('_seldate') || $self->session('selectedDate') || 'today';
-	$self->param('_seldate', $selectedDate);
-
 	$selectedDate = 'today' unless ParseDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
+
+	$self->param('_seldate', $selectedDate);
+	$self->session('selectedDate', $selectedDate);
 
 	my $optionIndex;
 
@@ -399,7 +400,6 @@ sub handleARL
 	{
 		$self->param('_pm_view', $pathItems->[1] || 'date');
 		$self->param('noControlBar', 1);
-		$self->param('_seldate', 'Today') unless $self->param('_seldate');
 
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
@@ -408,7 +408,6 @@ sub handleARL
 
 	$self->param('_dialogreturnurl', $baseArl);
 	$self->printContents();
-	$self->session('selectedDate', $self->param('_seldate')) if $self->param('_seldate');
 	return 0;
 }
 

@@ -61,10 +61,10 @@ sub new
 
 sub findAvailSlots
 {
-	my ($self, $page, $flag) = @_;
+	my ($self, $page, $flag, $eventId) = @_;
 
 	$flag = DEFAULT_SEARCH unless $flag;
-	my @scheduleObjects = $self->findScheduleObjects($page);
+	my @scheduleObjects = $self->findScheduleObjects($page, $eventId);
 
 	my @available_slots = ();
 
@@ -137,7 +137,7 @@ sub findUnAvailableAppointments
 
 sub findScheduleObjects
 {
-	my ($self, $page, $skipEvents) = @_;
+	my ($self, $page, $skipEvents, $eventId) = @_;
 
 	my @scheduleObjects = ();
 
@@ -155,7 +155,7 @@ sub findScheduleObjects
 			my $object = new App::Schedule::Object(
 				resource_id => $resource_id,
 				facility_id => $facility_id,
-				minute_set  => $self->buildMinuteSet($page, $resource_id, $facility_id, $skipEvents)
+				minute_set  => $self->buildMinuteSet($page, $resource_id, $facility_id, $skipEvents, $eventId)
 			);
 			push (@scheduleObjects, $object);
 		}
@@ -166,11 +166,11 @@ sub findScheduleObjects
 
 sub buildMinuteSet
 {
-	my ($self, $page, $resource_id, $facility_id, $skipEvents) = @_;
+	my ($self, $page, $resource_id, $facility_id, $skipEvents, $eventId) = @_;
 
 	my $posMinuteSet = new Set::IntSpan;
 	my $negMinuteSet = new Set::IntSpan;
-	
+
 	my $daysOffset = Date_to_Days(@{$self->{search_start_date}});
 
 	my @templates = $self->getTemplates($page, $resource_id, $facility_id);
@@ -197,7 +197,7 @@ sub buildMinuteSet
 	unless ($skipEvents)
 	{
 		my @events = ();
-		$self->findEventSlots($page, \@events, $resource_id, $facility_id);
+		$self->findEventSlots($page, \@events, $resource_id, $facility_id, $eventId);
 		for my $e (@events)
 		{
 			my $day = $e->{day} - $daysOffset;
@@ -215,7 +215,7 @@ sub buildMinuteSet
 
 sub findEventSlots
 {
-	my ($self, $page, $eventSlotsRef, $resource_id, $facility_id) = @_;
+	my ($self, $page, $eventSlotsRef, $resource_id, $facility_id, $eventId) = @_;
 
 	my @start_Date = @{$self->{search_start_date}};
 	my @end_Date   = Add_Delta_Days (@start_Date, $self->{search_duration});
@@ -237,6 +237,8 @@ sub findEventSlots
 
 	for my $event (@{$events})
 	{
+		next if $event->{event_id} == $eventId;
+
 		my @date = split (/,/, $event->{start_day});
 		my $day = Date_to_Days(@date);
 
@@ -249,11 +251,11 @@ sub findEventSlots
 		{
 			$slot->{attributes}->{$key} = Trim($event->{$key});
 		}
-		
+
 		# Store facility name instead of org_internal_id
 		$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
 			'selId', $slot->{attributes}->{facility_id});
-		
+
 		if ($event->{event_status}) {
 			$slot->{attributes}->{status} =	($event->{event_status} =~ /1/) ?
 				"Checked IN" : "Checked OUT";
@@ -329,7 +331,7 @@ sub findTemplateSlots
 				$slot->{attributes}->{templates} = \@nTemplates;
 
 				# $slot->{attributes}->{facility_id} = $templ->{facility_id};
-		
+
 				$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
 					'selId', $templ->{facility_id});
 
@@ -509,7 +511,7 @@ sub findResourceIds
 sub findFacilityIds
 {
 	my ($self, $page, $arrayRef) = @_;
-	
+
 	my $assocFacilities = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'sel_worklist_facilities', $page->session('user_id'), $page->session('org_internal_id'));
 

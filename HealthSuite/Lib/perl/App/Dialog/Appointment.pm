@@ -102,7 +102,7 @@ sub new
 			fKeyStmtMgr => $STMTMGR_SCHEDULING,
 			fKeyStmt => 'selVisitTypesDropDown',
 		),
-		
+
 		new CGI::Dialog::Field(caption => 'Reason for Visit',
 			name => 'subject',
 			size => 40,
@@ -335,7 +335,7 @@ sub populateData_reschedule
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	return unless $page->field('resource_id');
 
 	if ($page->field('attendee_id') eq '')
@@ -362,18 +362,18 @@ sub customValidate
 sub validateAvailTemplate
 {
 	my ($self, $page) = @_;
-	
+
 	my @resource_ids = ();
 	push(@resource_ids, $page->field('resource_id'));
-	
+
 	my @internalOrgIds = ($page->field('facility_id'));
 	my @search_start_date = Decode_Date_US($page->field('appt_date'));
-	
+
 	my $apptType = $page->property('apptTypeInfo');
 
 	my $rIds = $apptType->{r_ids};
 	push(@resource_ids, split(/\s*,\s*/, $rIds)) if $rIds;
-	
+
 	my $sa = new App::Schedule::Analyze (
 		resource_ids      => \@resource_ids,
 		facility_ids      => \@internalOrgIds,
@@ -382,13 +382,13 @@ sub validateAvailTemplate
 		patient_type      => defined $page->field('patient_type') ? $page->field('patient_type') : -1,
 		visit_type        => defined $page->field('visit_type') ? $page->field('visit_type') : -1
 	);
-	
+
 	my $flag = defined $rIds ? App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL
 		: App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
 
-	my @available_slots = $sa->findAvailSlots($page, $flag);
+	my @available_slots = $sa->findAvailSlots($page, $flag, $page->field('event_id'));
 	my $availSlot = $available_slots[0];
-	
+
 	my $apptBeginMinutes = hhmmAM2minutes($page->field('appt_time'));
 	my $apptEndMinutes = $apptBeginMinutes + $page->field('duration');
 	my $apptMinutesRange = "$apptBeginMinutes-$apptEndMinutes";
@@ -396,23 +396,8 @@ sub validateAvailTemplate
 	my $field = $self->getField('appt_date_time')->{fields}->[0];
 	my $personId = uc($page->field('attendee_id'));
 
-	if (defined $availSlot->{minute_set})
-	{
-		if (! $availSlot->{minute_set}->superset($apptMinutesRange) 
-			&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
-		{
-			$field->invalidate($page, qq{
-				All of Part of this time slot is not available.<br>
-				Please check @{[ join(', ', @resource_ids) ]} templates, patient types and visit types. <br>
-				<u>Select action</u>: <br>
-					<input name=_f_whatToDo type=radio value="override"
-						onClick="document.dialog._f_whatToDo[0].checked=true">Override Template.  Make appointment anyway.<br>
-					<input name=_f_whatToDo type=radio value="cancel"
-						onClick="document.dialog._f_whatToDo[1].checked=true">Cancel
-			});
-		}
-	}
-	else	
+	if ((!defined $availSlot->{minute_set} || !$availSlot->{minute_set}->superset($apptMinutesRange))
+		&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
 	{
 		$field->invalidate($page, qq{
 			All of Part of this time slot is not available.<br>
@@ -426,10 +411,11 @@ sub validateAvailTemplate
 	}
 }
 
+
 sub validateMultiAppts
 {
 	my ($self, $page) = @_;
-	
+
 	my $personId = uc($page->field('attendee_id'));
 
 	my ($parentEventId, $patientId) = $self->findConflictEvent($page);
@@ -456,7 +442,7 @@ sub validateMultiAppts
 	{
 		$page->delete('_f_parent_id');
 	}
-	
+
 	return $parentEventId;
 }
 
