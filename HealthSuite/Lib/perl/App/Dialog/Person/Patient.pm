@@ -154,6 +154,23 @@ sub initialize
 					readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE
 					),
 			]),
+		new CGI::Dialog::Subhead(
+				heading => 'Care Provider',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
+		),
+		new CGI::Dialog::MultiField(name => 'care_specialty',
+			fields => [
+				new App::Dialog::Field::Person::ID(caption =>'Care Provider ID', name => 'care_provider', types => ['Physician', 'Referring-Doctor']),
+				new CGI::Dialog::Field(caption => 'Specialty',
+									#type => 'foreignKey',
+									name => 'specialty',
+									fKeyStmtMgr => $STMTMGR_PERSON,
+									fKeyStmt => 'selMedicalSpeciality',
+									options => FLDFLAG_PREPENDBLANK,
+									fKeyDisplayCol => 0,
+									fKeyValueCol => 1
+								),
+		]),
 	);
 
 	$self->addFooter(
@@ -256,6 +273,13 @@ sub customValidate
 			$field->invalidate($page, "Enter the check-box below if you want to add the record with unknown home phone <BR><input name = '_f_create_unknown_phone' type = 'checkbox' onClick = 'document.forms.dialog._f_create_unknown_phone.checked = this.checked'>Create record with unknown home phone ");
 
 	}
+
+	my $careProvider = $self->getField('care_specialty')->{fields}->[1];
+	if ($page->field('care_provider') ne '' && $page->field('specialty') eq '')
+	{
+			$careProvider->invalidate($page, "Specialty cannot be blank when the 'Care Provider' field is entered ");
+	}
+
 }
 
 sub handlePostExecute
@@ -369,6 +393,19 @@ sub execute_add
 		trans_begin_stamp => $todaysStamp || undef,
 		_debug => 0
 	)if $page->field('home_phone') eq '' && $page->field('create_unknown_phone');
+
+	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $page->field('specialty'));
+
+	$page->schemaAction(
+		'Person_Attribute',	$command,
+		parent_id => $personId || undef,
+		item_name => $medSpecCaption || undef,
+		value_type => App::Universal::ATTRTYPE_PROVIDER || undef,
+		value_text => $page->field('care_provider') || undef,
+		value_textB => $page->field('specialty') || undef,
+		value_int => 1,
+		_debug => 0
+	) if $page->field('care_provider') ne '' ;
 
 	$self->handleContactInfo($page, $command, $flags, 'Patient');
 	$page->endUnitWork();
