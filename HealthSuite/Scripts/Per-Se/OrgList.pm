@@ -21,13 +21,16 @@ use CommonUtils;
 		nsfType => NSF_HALLEY,
 	},
 	
-	501 => {
+	501.1 => {
 		orgId => 'CHSINC',
+		providerId => 'DHOEFER',
 		billingId => 'hoe100',
 		nsfType => NSF_HALLEY,
 	},
-	501.1 => {
+
+	501.2 => {
 		orgId => 'CHSINC',
+		providerId => 'PSHEPARD',
 		billingId => 'she135',
 		nsfType => NSF_HALLEY,
 	},
@@ -37,11 +40,13 @@ use CommonUtils;
 		billingId => 'sur127',
 		nsfType => NSF_HALLEY,
 	},
+
 	749 => {
 		orgId => 'CAPSTONE',
 		billingId => 'cap137',
 		nsfType => NSF_HALLEY,
 	},
+
 	751 => {
 		orgId => 'IDAH',
 		billingId => 'inf104',

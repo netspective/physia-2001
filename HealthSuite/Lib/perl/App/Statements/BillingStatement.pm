@@ -75,10 +75,28 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	'sel_submittedClaims_perOrg' => qq{
 		select invoice_id
 		from Invoice
-		where invoice_status = @{[ App::Universal::INVOICESTATUS_SUBMITTED]}
-			and cr_org_internal_id = ?
+		where invoice_status in (
+				@{[ App::Universal::INVOICESTATUS_SUBMITTED]}, 
+				@{[ App::Universal::INVOICESTATUS_APPEALED]}
+			)
+			and owner_id = ?
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+		order by invoice_id
+	},
+	
+	'sel_submittedClaims_perOrg_perProvider' => qq{
+		select invoice_id
+		from Transaction, Invoice
+		where invoice_status in (
+				@{[ App::Universal::INVOICESTATUS_SUBMITTED]}, 
+				@{[ App::Universal::INVOICESTATUS_APPEALED]}
+			)
+			and Invoice.owner_id = :1
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+			and Transaction.trans_id = Invoice.main_transaction
+			and Transaction.provider_id = :2
 		order by invoice_id
 	},
 

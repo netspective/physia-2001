@@ -45,22 +45,35 @@ sub createNSFfiles
 	@orgsToDo = sort {$a <=> $b} keys %orgList unless @orgsToDo;
 	print "Orgs To Do = @orgsToDo \n";
 
-	for my $orgInternalId (@orgsToDo)
+	for my $orgKey (@orgsToDo)
 	{
-		my $nsfType = $orgList{$orgInternalId}->{nsfType};
-		my $claims = findSubmittedClaims($page, $orgInternalId);
-		createNSFfile($page, $orgInternalId, $nsfType, $claims) if defined $claims;
+		my $providerID;
+		my $orgInternalId = $orgKey;
+		
+		if ($orgKey =~ /(.*?)\..*/)
+		{
+			$providerID = $orgList{$orgKey}->{providerId};
+			$orgInternalId = $1;
+		}
+		my $nsfType = $orgList{$orgKey}->{nsfType};
+		my $claims = findSubmittedClaims($page, $orgInternalId, $providerID);
+		
+		eval{
+			createNSFfile($page, $orgKey, $nsfType, $claims) if defined $claims;
+		};
+		
+		print "ERROR encountered while creating NSF for Org $orgKey:\n$@\n" if $@;
 	}
 }
 
 sub createNSFfile
 {
-	my ($page, $orgInternalId, $nsfType, $claims) = @_;
+	my ($page, $orgKey, $nsfType, $claims) = @_;
 
 	my $claimList = new App::Billing::Claims;
 	my $input = new App::Billing::Input::DBI;
 
-	my $nsfFile = $orgList{$orgInternalId}->{billingId} . '_' . $now . '.nsf';
+	my $nsfFile = $orgList{$orgKey}->{billingId} . '_' . $now . '.nsf';
 
 	$input->populateClaims($claimList,
 		dbiHdl => $page->getSchema()->{dbh},
@@ -124,9 +137,11 @@ sub transmitNSFfiles
 
 sub archiveNSFfiles
 {
-	for my $orgInternalId (keys %orgList)
+	for my $orgKey (keys %orgList)
 	{
-		my $stem = $orgList{$orgInternalId}->{billingId};
+		my $stem = $orgList{$orgKey}->{billingId};
+		my $orgInternalId = $orgKey;
+		$orgInternalId =~ s/\..*//g;
 
 		system(qq{
 			cd $STAGINGDIR

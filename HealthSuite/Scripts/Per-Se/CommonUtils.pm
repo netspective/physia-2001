@@ -45,10 +45,18 @@ sub connectDB
 
 sub findSubmittedClaims
 {
-	my ($page, $orgInternalId) = @_;
+	my ($page, $orgInternalId, $providerId) = @_;
 	
-	return $STMTMGR_STATEMENTS->getSingleValueList($page, STMTMGRFLAG_NONE,
-		'sel_submittedClaims_perOrg', $orgInternalId);
+	if ($providerId)
+	{
+		return $STMTMGR_STATEMENTS->getSingleValueList($page, STMTMGRFLAG_NONE,
+			'sel_submittedClaims_perOrg_perProvider', $orgInternalId, $providerId);
+	}
+	else
+	{
+		return $STMTMGR_STATEMENTS->getSingleValueList($page, STMTMGRFLAG_NONE,
+			'sel_submittedClaims_perOrg', $orgInternalId);
+	}
 }
 
 1;

@@ -2,6 +2,7 @@
 
 use strict;
 use Date::Manip;
+use OrgList;
 
 # Config Params
 # ----------------------------------------------------------
@@ -30,28 +31,43 @@ sub archiveFiles
 	{
 		my $pgpFile = $billId{$orgInternalId} . 'ms.zip.pgp';
 		my $zipFile = $billId{$orgInternalId} . 'ms.zip';
-		my $msgFile = $billId{$orgInternalId} . '.msg';
-		my $dlmFile = $billId{$orgInternalId} . '.dlm';
-		
+
 		system(qq{
 			cd $STAGINGDIR
 			if [ -f $pgpFile ]; then
-				pgp $pgpFile
-				unzip $zipFile
-
 				mkdir -p $ARCHIVEDIR/$orgInternalId
 				mkdir -p $ARCHIVEDIR/$orgInternalId/pgp
-				mkdir -p $REPORTDIR/$orgInternalId
-				mkdir -p $REPORTDELIMDIR/$orgInternalId
 
-				mv $msgFile $REPORTDIR/$orgInternalId/$now.txt
-				mv $dlmFile $REPORTDELIMDIR/$orgInternalId/$now.csv
+				pgp $pgpFile
+				unzip $zipFile
+				
 				mv $pgpFile $ARCHIVEDIR/$orgInternalId/pgp/$now.pgp
 				mv $zipFile $ARCHIVEDIR/$orgInternalId/$now.zip
 
-				$SCRIPTDIR/ParseReports.pl $REPORTDELIMDIR/$orgInternalId/$now.csv
 			fi
 		});
+
+		for my $orgKey (keys %orgList)
+		{
+			my $orgInternalId = $orgKey;
+			$orgInternalId =~ s/\..*//g;
+
+			my $msgFile = $orgList{$orgKey}->{billingId} . '.msg';
+			my $dlmFile = $orgList{$orgKey}->{billingId} . '.dlm';
+			
+			system(qq{
+				cd $STAGINGDIR
+				if [ -f $msgFile ]; then
+					mkdir -p $REPORTDIR/$orgInternalId
+					mv $msgFile $REPORTDIR/$orgInternalId/$now.txt
+				fi
+				if [ -f $dlmFile ]; then
+					mkdir -p $REPORTDELIMDIR/$orgInternalId
+					mv $dlmFile $REPORTDELIMDIR/$orgInternalId/$now.csv
+					$SCRIPTDIR/ParseReports.pl $REPORTDELIMDIR/$orgInternalId/$now.csv
+				fi
+			});
+		}
 	}
 }
 
