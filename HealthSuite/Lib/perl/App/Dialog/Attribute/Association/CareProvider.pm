@@ -47,6 +47,7 @@ sub new
 		#new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
+	
 	$self->{activityLog} =
 	{
 		level => 1,

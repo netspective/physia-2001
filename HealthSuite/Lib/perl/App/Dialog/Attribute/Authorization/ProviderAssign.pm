@@ -37,7 +37,6 @@ sub initialize
 						attrNameFmt => 'Provider Assignment',
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
-
 	);
 
 	$self->SUPER::initialize();

@@ -35,7 +35,6 @@ sub initialize
 						attrNameFmt => 'Signature Source',
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
-
 	);
 
 	$self->SUPER::initialize();

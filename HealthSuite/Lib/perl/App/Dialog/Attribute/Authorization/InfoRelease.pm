@@ -34,7 +34,7 @@ sub initialize
 						fKeyStmtMgr => $STMTMGR_PERSON,
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
-	);
+			);
 
 	$self->SUPER::initialize();
 }

@@ -25,7 +25,7 @@ sub initialize
 	$self->heading('$Command Accreditation');
 
 	$self->addContent(
-			#new CGI::Dialog::Field(caption => 'Accreditation', name => 'value_text', options => FLDFLAG_REQUIRED),
+				#new CGI::Dialog::Field(caption => 'Accreditation', name => 'value_text', options => FLDFLAG_REQUIRED),
 			new App::Dialog::Field::Attribute::Name(
 						caption => 'Accreditation',
 						name => 'value_text',

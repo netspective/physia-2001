@@ -30,6 +30,7 @@ sub new
 		new App::Dialog::Field::Person::ID(caption => 'Employee ID', name => 'emp_id'),
 
 	);
+	
 	$self->{activityLog} =
 	{
 			level => 1,

@@ -4,7 +4,6 @@ package App::Dialog::Attribute::Certificate::State;
 
 use DBI::StatementManager;
 use App::Statements::Person;
-
 use strict;
 use Carp;
 use CGI::Dialog;
@@ -38,7 +37,7 @@ sub initialize
 			new CGI::Dialog::Field(caption => 'Number',  name => 'value_text', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', options => FLDFLAG_REQUIRED),
 	);
-
+	
 	$self->SUPER::initialize();
 }
 

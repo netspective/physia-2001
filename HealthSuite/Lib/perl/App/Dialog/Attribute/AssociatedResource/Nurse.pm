@@ -40,6 +40,7 @@ sub new
 										options => FLDFLAG_REQUIRED,
 										readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE)
 			);
+			
 		$self->{activityLog} =
 		{
 				level => 1,

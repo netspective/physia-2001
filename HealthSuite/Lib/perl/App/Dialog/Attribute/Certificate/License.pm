@@ -4,7 +4,6 @@ package App::Dialog::Attribute::Certificate::License;
 
 use DBI::StatementManager;
 use App::Statements::Person;
-
 use strict;
 use Carp;
 use CGI::Dialog;

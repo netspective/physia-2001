@@ -29,6 +29,7 @@ sub new
 	$self->addContent(
 				new App::Dialog::Field::Organization::ID(caption => 'Org ID', name => 'value_text', options => FLDFLAG_REQUIRED)
 			);
+			
 	$self->{activityLog} =
 	{
 		level => 2,
