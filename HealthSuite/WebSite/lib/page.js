@@ -288,16 +288,19 @@ function validateChange_SSN(event, flags)
 	}
 }
 
-// Brain-dead function.  "count" no implemented (always assumes 2 digit)
-// Need to fix this.
+// returns a string of exactly count characters left padding with zeros
 function padZeros(number, count)
 {
-	if (count != 2)
-		alert("Code not implemented!");
-	if (number < 10 )
-		return "0" + number.toString();
-	else
-		return number.toString();
+	var padding = "0";
+	for (var i=1; i < count; i++)
+		padding += "0";
+	if (typeof(number) == 'number')
+		number = number.toString();
+	if (number.length < count)
+		number = (padding.substring(0, (count - number.length))) + number;
+	if (number.length > count)
+		number = number.substring((number.length - count));
+	return number;
 }
 
 function validateChange_Date(event, flags)
@@ -320,7 +323,7 @@ function validateDate(fieldName, inDate)
 	var a = splitNotInArray(inDate, validNumbers);
 	for (i in a)
 	{
-		a[i] = eval(a[i]);
+		a[i] = '' + a[i];
 	}
 	if (a.length == 0)
 	{
@@ -330,15 +333,24 @@ function validateDate(fieldName, inDate)
 	}
 	if (a.length == 1)
 	{
-		if (a[0] == 0)
+		if ((a[0].length == 6) || (a[0].length == 8))
 		{
-			a[0] = currentMonth;
-			a[1] = currentDate;
+			a[2] = a[0].substring(4);
+			a[1] = a[0].substring(2,4);
+			a[0] = a[0].substring(0,2);
 		}
 		else
 		{
-			a[1] = a[0];
-			a[0] = currentMonth;
+			if (a[0] == 0)
+			{
+				a[0] = currentMonth;
+				a[1] = currentDate;
+			}
+			else
+			{
+				a[1] = a[0];
+				a[0] = currentMonth;
+			}
 		}
 	}
 	if (a.length == 2)
@@ -348,10 +360,10 @@ function validateDate(fieldName, inDate)
 		else
 			a[2] = currentYear;
 	}
-	if (parseInt(a[2]) < 100 && parseInt(a[2]) > 10)
-		a[2] = a[2] + 1900;
-	if (parseInt(a[2]) < 1000)
-		a[2] = a[2] + 2000;
+	if (a[2] < 100 && a[2] > 10)
+		a[2] = "19" + a[2];
+	if (a[2] < 1000)
+		a[2] = "20" + a[2];
 	if ( (a[0] < 1) || (a[0] > 12) )
 	{
 		validationError(fieldName, "Month value must be between 1 and 12");
@@ -360,6 +372,11 @@ function validateDate(fieldName, inDate)
 	if ( (a[1] < 1) || (a[1] > 31) )
 	{
 		validationError(fieldName, "Day value must be between 1 and 31");
+		return inDate;
+	}
+	if ( (a[2] < 1800) || (a[2] > 2999) )
+	{
+		validationError(fieldName, "Year must be between 1800 and 2999");
 		return inDate;
 	}
 	return padZeros(a[0],2) + "/" + padZeros(a[1],2) + "/" + a[2];
