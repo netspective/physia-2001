@@ -300,7 +300,7 @@ sub isValid
 		my $fs_entry=App::IntelliCode::getFSEntry($page, $procedure, $modifier || undef,$fsDate,\@listFeeSchedules);
 		my $count_type = scalar(@$fs_entry);
 		my $count=0;
-		if ($servicetype eq '' || $charges eq '')
+		if ( ($servicetype eq '' || $charges eq '') && length($page->field('payer')) >0)
 		{			
 			if ($count_type==1 || ($use_fee ne '' && $count_type >=1) )
 			{		
