@@ -457,19 +457,14 @@ sub getHtml
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('person_id');
-
-	my $bgColorAttr = '';
-	my $spacerHtml = '&nbsp;';
-	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
-	my $cptOrgHtml = '';
-	my $icdOrgHtml = '';
-	my $cptPerHtml = '';
-	my $icdPerHtml = '';
-
-	my $placeHtml = '';
-	my $serviceTypeHtml = '';
-
+	my $invoiceId = $page->param('invoice_id');
 	my $isHospClaim = $page->param('isHosp');
+
+	my $bgColorAttr;
+	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+	my $spacerHtml = '&nbsp;';
+
+	#used for hospital claims
 	my $servProviderHtml;
 	my $billProviderHtml;
 
@@ -486,30 +481,36 @@ sub getHtml
 	my $servicePlaceIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServicePlaceId');
 	my $serviceTypeIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServiceTypeId');
 
+	my $cptOrgHtml;
 	foreach my $cptOrgCode (@{$cptOrgCodes})
-		{
-			$cptOrgHtml = $cptOrgHtml . qq{ <OPTION>$cptOrgCode->{parent_id}</OPTION> };
-		}
+	{
+		$cptOrgHtml = $cptOrgHtml . qq{ <OPTION>$cptOrgCode->{parent_id}</OPTION> };
+	}
+	my $icdOrgHtml;
 	foreach my $icdOrgCode (@{$icdOrgCodes})
-		{
-			$icdOrgHtml = $icdOrgHtml . qq{ <OPTION>$icdOrgCode->{parent_id}</OPTION> };
-		}
+	{
+		$icdOrgHtml = $icdOrgHtml . qq{ <OPTION>$icdOrgCode->{parent_id}</OPTION> };
+	}
+	my $cptPerHtml;
 	foreach my $cptPerCode (@{$cptPerCodes})
-		{
-			$cptPerHtml = $cptPerHtml . qq{ <OPTION>$cptPerCode->{parent_id}</OPTION> };
-		}
+	{
+		$cptPerHtml = $cptPerHtml . qq{ <OPTION>$cptPerCode->{parent_id}</OPTION> };
+	}
+	my $icdPerHtml;
 	foreach my $icdPerCode (@{$icdPerCodes})
-		{
-			$icdPerHtml = $icdPerHtml . qq{ <OPTION>$icdPerCode->{parent_id}</OPTION> };
-		}
+	{
+		$icdPerHtml = $icdPerHtml . qq{ <OPTION>$icdPerCode->{parent_id}</OPTION> };
+	}
+	my $placeHtml;
 	foreach my $placeId (@{$servicePlaceIds})
-		{
-			$placeHtml = $placeHtml . qq{ <OPTION>$placeId->{id}</OPTION> };
-		}
+	{
+		$placeHtml = $placeHtml . qq{ <OPTION>$placeId->{id}</OPTION> };
+	}
+	my $serviceTypeHtml;
 	foreach my $serviceTypeId (@{$serviceTypeIds})
-		{
-			$serviceTypeHtml = $serviceTypeHtml . qq{ <OPTION>$serviceTypeId->{id}</OPTION> };
-		}
+	{
+		$serviceTypeHtml = $serviceTypeHtml . qq{ <OPTION>$serviceTypeId->{id}</OPTION> };
+	}
 
 	my @lineMsgs = ();
 	if(my @messages = $page->validationMessages($self->{name}))
@@ -527,20 +528,35 @@ sub getHtml
 		}
 	}
 
-	my $readOnly = '';
-	if(my $invoiceId = $page->param('invoice_id'))
+	#determine if fields should be read only (if claim is not primary, all fields except for diag codes {_f_proc_diags} are read only)
+	my $readOnly;
+	if($invoiceId)
 	{
 		my $submitOrder = $page->field('submission_order');
-		#$readOnly = $submitOrder > 0 ? 'READONLY' : '';
+		$readOnly = $submitOrder > 0 ? 'READONLY' : '';
 	}
+
 
 	my $errorMsgsHtml;
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
-	$lineCount = $isHospClaim ? 10 : $lineCount;
+
+	#determine the procedure line count
+	if($command eq 'add')
+	{
+		$lineCount = $isHospClaim ? 10 : $lineCount;
+	}
+	else
+	{
+		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+		$lineCount = scalar(@{$procedures});
+	}
+
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
+		#show the 'void' checkboxes if command is 'update'
 		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+
 
 		#create html for error messages, if any
 		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
@@ -553,9 +569,8 @@ sub getHtml
 			$numCellRowSpan = $allowComments ? 'ROWSPAN=2' : '';
 		}
 
-		#create html for provider fields if this is a hospital claim
-		#create select options for service/billing provider fields if this is a hospital claim
 
+		#create html for provider fields and select options for service/billing provider fields if this is a hospital claim
 		if($isHospClaim)
 		{
 			my $selected;
@@ -577,10 +592,12 @@ sub getHtml
 			$billProviderHtml = qq{<TD><NOBR><SELECT NAME="_f_proc_$line\_billing_provider_id">$billProviderOptionsHtml</SELECT></NOBR></TD>};
 		}
 
+
 		#create html for emg field
 		my $emg = $page->param("_f_proc_$line\_emg");
 		my $checked = $emg eq 'on' ? 'CHECKED' : '';
 		my $emgHtml = "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
+
 
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_fs_used" VALUE='@{[ $page->param("_f_proc_$line\_fs_used")]}'/>
@@ -706,10 +723,6 @@ sub getHtml
 			</TR>
 		};
 		
-		#<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2>
-		#<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
-		#<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=4 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
@@ -778,13 +791,9 @@ sub getHtml
 						<TD><FONT $textFontAttrs>Default Fee Schedule(s)</FONT></TD>
 					</TR>
 					<TR VALIGN=TOP>
-						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
+						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<!-- <TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> 
-							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
-						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						-->
 						<TD><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'>
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_default_catalog, '/lookup/catalog', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 					</TR>
