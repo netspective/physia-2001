@@ -98,6 +98,10 @@ sub new
 	$params{transProviderId} = undef;
 	$params{transProviderName} = undef;
 
+	$params{invoiceType} = undef;
+	$params{invoiceSubtype} = undef;
+	$params{totalItems} = undef;
+
 	return bless \%params, $type; #binding the param hash with class reference
 }
 	
@@ -963,6 +967,48 @@ sub setBillSeq
 	$self->{billSeq} = $value + 1;
 }
 
+sub getInvoiceType
+{
+	my ($self) = @_;
+	
+	return $self->{invoiceType};
+}
+
+sub setInvoiceType
+{
+	my ($self,$value) = @_;
+
+	$self->{invoiceType} = $value;
+}
+
+sub getInvoiceSubtype
+{
+	my ($self) = @_;
+	
+	return $self->{invoiceSubtype};
+}
+
+sub setInvoiceSubtype
+{
+	my ($self,$value) = @_;
+
+	$self->{invoiceSubtype} = $value;
+}
+
+sub getTotalItems
+{
+	my ($self) = @_;
+	
+	return $self->{totalItems};
+}
+
+sub setTotalItems
+{
+	my ($self,$value) = @_;
+
+	$self->{totalItems} = $value;
+}
+
 sub setClaimType
 {
 	my ($self,$value) = @_;
@@ -1135,6 +1181,7 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field transProviderId is added which reflect the transaction provider ID'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field billSeq is added which reflect the current submission order'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','1 is added to submission order to make it in proper bill sequence 1-4'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/23/2000', 'SY', 'Billing Interface/Main Claim Object','New fields added namely, invoiceType, invoiceSubtype and totalItems'],
 
 );
 
