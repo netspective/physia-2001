@@ -38,9 +38,16 @@ use App::Page::Person;
 use App::Page::Schedule;
 use App::Page::SDE;
 use App::Page::Report;
-use App::Page::WorkList;
-use App::Page::Collector;
 use App::Page::PatientBill;
+
+##############################################################################
+# Directory of all available Worklist Page Objects
+##############################################################################
+
+use App::Page::WorkList;
+use App::Page::WorkList::Collection;
+use App::Page::WorkList::PatientFlow;
+
 
 ##############################################################################
 # Directory of all available Search Page Objects
@@ -176,7 +183,7 @@ use App::Dialog::FeeScheduleDataEntry;
 # page and dialog objects
 ##############################################################################
 
-use vars qw(%PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES
+use vars qw(%PAGE_CLASSES $SEARCH_CLASSES $WORKLIST_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES
 	%COMPONENT_CATALOG %PAGE_FLAGS %COMPONENT_CATALOG_SOURCE);
 
 #
@@ -230,11 +237,18 @@ $SEARCH_CLASSES = {
 	'appttype' => 'App::Page::Search::ApptType',
 };
 
+$WORKLIST_CLASSES = {
+	'_default' => 'App::Page::WorkList',
+	'patientflow' => 'App::Page::Worklist::PatientFlow',
+	'collection' => 'App::Page::Worklist::Collection',
+};
+
+
+
 %PAGE_CLASSES = (
 	'logout' => 'App::Page::Redirect',
 	'home' => 'App::Page::Redirect',
 	'homeorg' => 'App::Page::Redirect',
-
 	'help' => 'App::Page::Help',
 	'invoice' => 'App::Page::Invoice',
 	'error' => 'App::Page::Error',
@@ -245,7 +259,7 @@ $SEARCH_CLASSES = {
 	'search' => $SEARCH_CLASSES,
 	'lookup' => $SEARCH_CLASSES,
 	'sde' => 'App::Page::SDE',
-	'worklist' => 'App::Page::WorkList',
+	'worklist' => $WORKLIST_CLASSES,
 	'collector' => 'App::Page::Collector',
 	'patientbill' => 'App::Page::PatientBill',
 );
