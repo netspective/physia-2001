@@ -23,6 +23,7 @@ use App::Dialog::Field::Procedures;
 use App::Universal;
 use App::Schedule::Utilities;
 use App::IntelliCode;
+use App::Component::WorkList::PatientFlow;
 
 use Date::Manip;
 use Date::Calc qw(:all);
@@ -494,12 +495,12 @@ sub populateData
 		}
 	}
 	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
-	
+
 	my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
 
 	my $verifyFlags = $eventAttribute->{value_intb};
-	
+
 	$page->field('confirmed_info', 'Yes')
 		if $verifyFlags & App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE;
 }
@@ -985,39 +986,27 @@ sub handlePayers
 	if($page->param('isHosp') == 1)
 	{
 		my $lineCount = $page->param('_f_line_count');
-		my @itemProviderIds;
+		my %uniqueClaims = ();
 		for(my $line = 1; $line <= $lineCount; $line++)
 		{
-			next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
-			next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+			my $dosBegin = $page->param("_f_proc_$line\_dos_begin");
+			my $dosEnd = $page->param("_f_proc_$line\_dos_end");
 
-			push(@itemProviderIds, $page->param("_f_proc_$line\_service_provider_id") . $page->param("_f_proc_$line\_billing_provider_id"));
-		}
+			next if $dosBegin eq 'From' || $dosEnd eq 'To';
+			next unless $dosBegin && $dosEnd;
 
-		#$page->addError("Provider IDs: @itemProviderIds");
-		my %providersSeen = ();
-		foreach (@itemProviderIds)
-		{
-			$providersSeen{$_} = 1;
-		}
+			my $servProviderId = $page->param("_f_proc_$line\_service_provider_id");
+			my $billProviderId = $page->param("_f_proc_$line\_billing_provider_id");
+			my $providerPair = $servProviderId . $billProviderId;
 
-		my $origPairs = @itemProviderIds;
-		my $filteredPairs = keys %providersSeen;
-
-		#$page->addError("Orig Pairs: $origPairs");
-		#$page->addError("Filtered Pairs: $filteredPairs");
-
-		my $servProviderId;
-		my $billProviderId;
-		for(my $line = 1; $line <= $filteredPairs; $line++)
-		{
-			$servProviderId = $page->param("_f_proc_$line\_service_provider_id");
-			$billProviderId = $page->param("_f_proc_$line\_billing_provider_id");
-
-			$page->field('care_provider_id', $servProviderId);
-			$page->field('provider_id', $billProviderId);
-			$page->field('provider_pair', $servProviderId . $billProviderId);
-			addTransactionAndInvoice($self, $page, $command, $flags);
+			unless (exists $uniqueClaims{$providerPair})
+			{
+				$uniqueClaims{$providerPair} = 1;
+				$page->field('care_provider_id', $servProviderId);
+				$page->field('provider_id', $billProviderId);
+				$page->field('provider_pair', $providerPair);
+				addTransactionAndInvoice($self, $page, $command, $flags);
+			}
 		}
 	}
 	else
@@ -2209,7 +2198,7 @@ sub customValidate
 	#					$getProcListField->invalidate($page,"[<B>P$line</B>]Procedure found in multiple fee schedules.");
 	#				}
 	#				elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
-	#				{ 	
+	#				{
 	#					$getProcListField->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
 	#				}
 	#			}
