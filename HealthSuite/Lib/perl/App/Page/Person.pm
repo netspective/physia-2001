@@ -40,7 +40,7 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
-	$self->property('person_complete_name', "Unknown ID: $personId") unless $self->property('person_complete_name');
+	$self->property('person_simple_name', "Unknown ID: $personId") unless $self->property('person_simple_name');
 	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
 
 	my $personCategory = join(', ', @$categories);
@@ -48,7 +48,7 @@ sub initialize
 
 	unless ($personId eq $userId)
 	{
-		$self->incrementViewCount($self->property('person_complete_name'), "/person/$personId/profile");
+		$self->incrementViewCount($self->property('person_simple_name'), "/person/$personId/profile");
 	}
 
 	my $guarantor = 'Guarantor';
@@ -123,7 +123,7 @@ sub prepare_page_content_header
 		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
 			<TD>
 				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/person'}<B>#property.person_complete_name#</B>
+					$IMAGETAGS{'icon-m/person'}<B>#property.person_simple_name#</B>
 				</FONT>
 			</TD>
 			<TD ALIGN=RIGHT>
