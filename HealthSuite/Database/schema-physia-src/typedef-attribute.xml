@@ -515,6 +515,12 @@
 				<col name="caption">History</col>
 				<col name="group_name">Status</col>
 			</row>
+			<row>
+				<col name="id">960</col>
+				<col name="caption">Billing Info</col>
+				<col name="group_name">Status</col>
+				<col name="remarks">value_text = billing id, value_textb = 0/1 (inactive/active), value_int = billing id type, parent_org_id = org_id for which this billing id is valid</col>
+			</row>
 
 			<!--
 				NOTE: be careful putting any ids beyond 999 because the properties
