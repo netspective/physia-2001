@@ -10,6 +10,7 @@ use App::Statements::Person;
 use App::Statements::Org;
 use App::Statements::Invoice;
 use App::Statements::Scheduling;
+use App::Statements::Component::Scheduling;
 use App::Statements::Catalog;
 use Carp;
 use CGI::Validator::Field;
@@ -466,6 +467,14 @@ sub populateData
 		}
 	}
 	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+	
+	my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
+
+	my $verifyFlags = $eventAttribute->{value_intb};
+	
+	$page->field('confirmed_info', 'Yes')
+		if $verifyFlags & App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE;
 }
 
 sub getFS

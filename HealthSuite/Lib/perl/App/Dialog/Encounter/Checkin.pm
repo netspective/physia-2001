@@ -20,6 +20,7 @@ use vars qw(%RESOURCE_MAP);
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Component::Scheduling;
 use App::Statements::Org;
 use Date::Manip;
 
@@ -109,10 +110,29 @@ sub execute
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)
-		{
-			$page->addDebugStmt('Fatal Check-in Error.<br>Event not updated; Transaction not created; Invoice not created; Copay not recorded.');
-			return 0;
-		}
+	{
+		$page->addDebugStmt('Fatal Check-in Error.<br>Event not updated; Transaction not created; Invoice not created; Copay not recorded.');
+		return 0;
+	}
+
+	my $confirmed = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
+	
+	my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
+
+	my $itemId = $eventAttribute->{item_id};
+	my $verifyFlags = $eventAttribute->{value_intb};
+	
+	$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE;
+	
+	$verifyFlags |= App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE 
+		if $confirmed;
+		
+	$page->schemaAction(
+		'Event_Attribute', 'update',
+		item_id => $itemId,
+		value_intB => $verifyFlags,
+	);
 
 	# Add Trans and Invoice info
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
