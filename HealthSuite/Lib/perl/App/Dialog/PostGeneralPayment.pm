@@ -208,7 +208,7 @@ sub execute
 			$page->schemaAction(
 				'Invoice', 'update',
 				invoice_id => $invoiceId || undef,
-				invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
+				invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED,
 				#total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 				#balance => defined $invoiceBalance ? $invoiceBalance : undef,
 				_debug => 0
