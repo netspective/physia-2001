@@ -408,6 +408,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			FROM 	referral_service_descr
 			ORDER BY caption
 		},
+'selReferralServiceType' => qq
+		{
+			SELECT name
+			FROM ref_service_category
+			WHERE serv_category = ?
+		},
 	'selTransAddressByName' => qq
 		{
 			SELECT *
@@ -454,7 +460,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			to_char(data_date_a, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_a,
 			to_char(data_date_b, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_b,
 			trans_status_reason, related_data, caption, trans_substatus_reason,
-			modifier,unit_cost,quantity
+			modifier,unit_cost,quantity, trans_expire_reason
 			FROM 	transaction t
 			WHERE	t.trans_id = :1
 			AND	t.trans_type = @{[App::Universal::TRANSTYPEPROC_SERVICE_REQUEST_PROCEDURE]}
