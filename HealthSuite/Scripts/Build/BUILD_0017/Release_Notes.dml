@@ -408,6 +408,10 @@
 			Exclude self-pay claims from paper claims.
 		</deliverable>
 
+		<deliverable id="1722">
+			On patient flow worklist, showing print option if invoice balance is greater than zero.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
