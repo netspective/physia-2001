@@ -49,10 +49,10 @@ my %pubDefn = (
 			dataFmt => qq{
 				<a href="/invoice/#{invoice_id}#/dlg-add-claim-notes"
 					title='Add Claim Notes'>$IMAGETAGS{'icons/black_n'}</a>
-				<a href="$baseArl/dlg-add-transfer-claims-wl-invoice/#{invoice_id}#" title='Transfer Invoice'>$IMAGETAGS{'icons/black_t'}</a>
+				<a href="$baseArl/dlg-add-transfer-claims-wl-invoice/#{invoice_id}#" title='Transfer Invoice #{invoice_id}#'>$IMAGETAGS{'icons/black_t'}</a>
 				<a href="$baseArl/dlg-add-reckdate-claims-wl-invoice/#{invoice_id}#" title='Recheck Date'>$IMAGETAGS{'icons/black_r'}</a>
-				<a href="/invoice/#{invoice_id}#/submit?resubmit=1" title='Re-Submit Claim'>$IMAGETAGS{'icons/black_s'}</a>
-				<a href="$baseArl/dlg-add-close-claims-wl-invoice/#{invoice_id}#" title='Close Invoice'>$IMAGETAGS{'icons/black_c'}</a>
+				<a href="$baseArl/resubmit/#{invoice_id}#" title='Re-Submit Claim #{invoice_id}#'>$IMAGETAGS{'icons/black_s'}</a>
+				<a href="$baseArl/dlg-add-close-claims-wl-invoice/#{invoice_id}#" title='Close Invoice #{invoice_id}#'>$IMAGETAGS{'icons/black_c'}</a>
 			},
 		},
 		{head => 'Patient ID', dataFmt => '<a href="/person/#{patient_id}#/account">#{patient_id}#</a>',},
@@ -91,6 +91,22 @@ sub claimQuery
 	);
 
 	return $query;
+}
+
+sub prepare_view_resubmit
+{
+	my ($self) = @_;
+	
+	my $invoiceId = $self->param('invoice_id');
+	
+	$self->addContent(qq{
+		<h3><u>Resubmit Claim</u></h3>
+		<font face=Verdana size=3>
+		This function will resubmit Claim <b>$invoiceId</b>. &nbsp;
+		Click here to <a href="/invoice/$invoiceId/submit?resubmit=1"> resubmit</a>.
+		</font>
+	});
+	return 1;
 }
 
 sub prepare_view_wl
@@ -485,6 +501,7 @@ sub handleARL
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1] || 'wl');
+		$self->param('invoice_id', $pathItems->[2]) if $pathItems->[2];
 	}
 
 	$self->param('_dialogreturnurl', $baseArl);
