@@ -8,6 +8,7 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Appointment;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 
 use Date::Manip;
 use Date::Calc qw(:all);
@@ -158,22 +159,53 @@ sub execute
 {
 	my ($self) = @_;
 
+	$self->param('search_from_date', UnixDate('today', '%m/%d/%Y')) unless $self->param('search_from_date');
+	$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y')) unless $self->param('search_to_date');
+
 	if ($self->param('unAvailEventSearch'))
 	{
-		$self->param('search_from_date', UnixDate('today', '%m/%d/%Y')) unless $self->param('search_from_date');
-		$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y')) unless $self->param('search_to_date');
 		$self->param('action', 5) unless $self->param('action');
 
 		my @resource_ids = split(/,/, $self->param('resource_id'));
 		my @facility_ids = split(/,/, $self->param('facility_id'));
+		
+		my @internalOrgIds = ();
+		for (@facility_ids)
+		{
+			my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
+				'selOrgId', $self->session('org_internal_id'), uc($_));
+			push(@internalOrgIds, $internalOrgId) if defined $internalOrgId;
+		}
 
+		unless (scalar @internalOrgIds >= 1)
+		{
+			my @orgIds = ();
+			for (@facility_ids)
+			{
+				chomp;
+				if ($_ =~ /.*\D.*/)
+				{
+					$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
+					return;
+				}
+
+				my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
+				if ($orgId)
+				{
+					push(@orgIds, $orgId);
+					push(@internalOrgIds, $_);
+				}
+				$self->param('facility_id', join(',', @orgIds));
+			}
+		}
+		
 		my @search_start_date = Decode_Date_US($self->param('search_from_date'));
 		my @search_end_date = Decode_Date_US($self->param('search_to_date'));
 		my $search_duration = Delta_Days(@search_start_date, @search_end_date);
 
 		my $sa = new App::Schedule::Analyze (
 			resource_ids      => \@resource_ids,
-			facility_ids      => \@facility_ids,
+			facility_ids      => \@internalOrgIds,
 			search_start_date => \@search_start_date,
 			search_duration   => $search_duration,
 			patient_type      => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
@@ -210,8 +242,9 @@ sub execute
 
 	else
 	{
-		my $fromDate = $self->param('search_from_date') ? $self->param('search_from_date') : '01/01/1900';
-		my $toDate = $self->param('search_to_date') ? $self->param('search_to_date') : '12/31/2099';
+		my $fromDate = $self->param('search_from_date');
+		my $toDate = $self->param('search_to_date');
+		
 		my $resourceId = $self->param('resource_id') || '*';
 		my $facilityId = $self->param('facility_id') || '*';
 		my ($apptStatusFrom, $apptStatusTo);
@@ -234,19 +267,52 @@ sub execute
 		$resourceId =~ s/\*/%/g;
 		$facilityId =~ s/\*/%/g;
 
-		my $html;
+		my $appts;
 		if ($self->param('order_by') eq 'name')
 		{
-			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
-				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
-			),
+			#$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
+			#	[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
+			#),
+			$appts = STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
+				$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+			);
 		}
 		else
 		{
-			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
-				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
-			),
+			#$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
+			#	[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
+			#),
+			$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment',
+				$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+			);
 		}
+		
+		my @data = ();
+		for (@{$appts})
+		{
+			my @rowData = (
+				$_->{simple_name},
+				$_->{start_time},
+				$_->{resource_id},
+				$_->{patient_type},
+				$_->{subject},
+				$_->{home_phone},
+				$_->{caption},
+				$_->{org_id},
+				$_->{remarks},
+				$_->{event_id},
+				$_->{scheduled_by_id},
+				$_->{scheduled_stamp},
+				$_->{patient_id},
+				$_->{chart},
+				$_->{appt_type},
+			);
+			
+			push(@data, \@rowData);
+		}
+		
+		my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Search::Appointment::STMTRPTDEFN_DEFAULT);
+		
 		
 		$self->addContent('<CENTER>', $html, '</CENTER>');
 	}

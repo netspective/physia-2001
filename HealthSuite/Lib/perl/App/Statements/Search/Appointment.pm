@@ -34,82 +34,60 @@ $STMTRPTDEFN_DEFAULT =
 			colIdx => 13,
 		},
 
-		{ head => 'Patient', 
-			colIdx => 0,
-			url => q{javascript:chooseItem('/person/#12#/profile')},
-			hint => "View #12# Profile",
-			options => PUBLCOLFLAG_DONTWRAP,
+		{
+			head => 'Details',
+			dataFmt => q{<nobr>
+				<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
+					style='text-decoration:none'>#0# (#12#)</a>
+				- #3# </nobr> <BR>
+				Home Phone: <b>#5#</b> <BR>
+				<i>#6#</i> with 
+				<a href="javascript:chooseItem('/search/appointment/#2#')" 
+					title='View #2# Appointments' style='text-decoration:none'>#2#</a>
+				at
+				<a href="javascript:chooseItem('/search/appointment//#7#')" 
+					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
+				<BR>
+				Appt Type: #14#<BR>
+				Reason for Visit: <b>#4#</b><BR>
+				#8# <br>
+				Scheduled by #10# <br>
+				on #11#
+			}
 		},
-
-		#{ head => 'Appointment',
-		#	dataFmt => '#6#',
-		#},
-
-		{ head => 'Physician',
-			colIdx => 2,
-			url => q{javascript:chooseItem('/search/appointment/#2#')},
-			hint => "View #2# Appointments",
-			#dataFmt => '#2#',
-		},
-
-		{ head => 'Facility',
-			colIdx => 7,
-			url => q{javascript:chooseItem('/search/appointment//#7#')},
-			hint => "View #7# Appointments",
-			#dataFmt => '#7#',
-		},
-
-		#{ head => 'Scheduled By',
-		#	dataFmt => '#10#',
-		#},
-
-		#{ head => 'Scheduled Date',
-		#	dataFmt => '#11#',
-		#	options => PUBLCOLFLAG_DONTWRAP,
-		#},
-
-		#{
-		#	head => 'Details',
-		#	dataFmt => q{
-		#		<a href='/person/#12#/profile' title='#12# Profile'
-		#			style='text-decoration:none'>#0#</a>
-		#		(<I>#3#</I>)<BR>
-		#		#6# with #2# at #7#<BR>
-		#		Appt Type: #5#<BR>
-		#		Subject: <b>#4#</b><BR>
-		#		#8# <br>
-		#		Scheduled by #10# <br>
-		#		on #11#
-		#	}
-		#},
 	],
 };
 
-my $APPOINTMENT_COLUMNS = 
-qq{	patient.simple_name,
-			TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
-			ep2.value_text AS resource_id,
-			aat.caption AS patient_type,
-			event.subject,
-			et.caption AS event_type,
-			stat.caption,
-			org.org_id,
-			event.remarks,
-			event.event_id,
-			scheduled_by_id,
-			TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
-			patient.person_id AS patient_id,
-			'TBD'};
+my $APPOINTMENT_COLUMNS = qq
+{	patient.simple_name,
+	TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
+	ep2.value_text AS resource_id,
+	aat.caption AS patient_type,
+	event.subject,
+	pa.value_text as home_phone,
+	stat.caption,
+	org.org_id,
+	event.remarks,
+	event.event_id,
+	scheduled_by_id,
+	TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
+	patient.person_id AS patient_id,
+	'TBD' as chart,
+	at.caption as appt_type
+};
 
-my $APPOINTMENT_TABLES = 
-qq{	person patient,
-			appt_attendee_type aat,
-			event_attribute ep2,
-			event_attribute ep1,
-			event_type et,
-			event,
-			appt_status stat,
-			org};
+my $APPOINTMENT_TABLES = qq{
+	Person patient,
+	Appt_Attendee_Type aat,
+	Event_Attribute ep2,
+	Event_Attribute ep1,
+	Event_Type et,
+	Event,
+	Appt_Status stat,
+	Org,
+	Appt_Type at,
+	Person_Attribute pa
+};
 
 my $STMTFMT_SEL_APPOINTMENT = qq{
 	SELECT *
@@ -119,9 +97,9 @@ $APPOINTMENT_COLUMNS
 		FROM
 $APPOINTMENT_TABLES
 		WHERE
-			org.org_id like ?
-			AND event.facility_id = org.org_internal_id
-			AND event.start_time BETWEEN
+			upper(Org.org_id) like upper(?)
+			AND Event.facility_id = org.org_internal_id
+			AND Event.start_time BETWEEN
 				TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
 			AND ep1.parent_id = event.event_id
@@ -129,12 +107,16 @@ $APPOINTMENT_TABLES
 			AND ep1.value_type = $EVENTATTRTYPE_PATIENT
 			AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
 			AND patient.person_id = ep1.value_text
-			AND ep2.value_text LIKE ?
-			AND event.event_status = stat.id
+			AND upper(ep2.value_text) LIKE upper(?)
+			AND Event.event_status = stat.id
 			AND stat.id BETWEEN ? and ?
 			AND aat.id = ep1.value_int
 			AND et.id = event.event_type
-			AND event.owner_id = ?
+			AND Event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id = patient.person_id (+)
+			AND pa.value_type = 10
+			AND pa.item_name = 'Home'
 		%orderBy%
 	)
 	WHERE rownum <= $LIMIT
@@ -159,6 +141,10 @@ $APPOINTMENT_TABLES
 			AND aat.id = ep1.value_int
 			AND et.id = event.event_type
 			AND event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id = patient.person_id (+)			
+			AND pa.value_type = 10
+			AND pa.item_name = 'Home'
 		%orderBy%
 	)
 	WHERE rownum <= $LIMIT

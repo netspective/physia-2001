@@ -33,7 +33,7 @@ sub defaultRowRptFormat
 		$self->{attributes}->{resource_id},
 		$self->{attributes}->{patient_type},
 		$self->{attributes}->{subject},
-		$self->{attributes}->{event_type},
+		$self->{attributes}->{home_phone},
 		$self->{attributes}->{appt_status},
 		$self->{attributes}->{facility_id},
 		$self->{attributes}->{remarks},
@@ -42,6 +42,7 @@ sub defaultRowRptFormat
 		$self->{attributes}->{scheduled_stamp},
 		$self->{attributes}->{patient_id},
 		'TBD',
+		$self->{attributes}->{appt_type},
 	);
 }
 
