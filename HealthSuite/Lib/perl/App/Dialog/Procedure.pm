@@ -1000,7 +1000,7 @@ sub execute
 	## RUN INTELLICODE
 	if($command ne 'remove')
 	{
-		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCode, $sessUser, $sessOrg);
+		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCode, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
 
 
