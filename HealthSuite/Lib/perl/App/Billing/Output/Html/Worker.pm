@@ -70,7 +70,6 @@ sub populateInsured
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
 	$data->{insuredAnotherHealthBenefitPlanN} =  "Checked" ;
-	my $claimType = $claim->getClaimType();
 	my $payer = $claim->{payer};
 	my $payerAddress = $payer->getAddress();
     $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
