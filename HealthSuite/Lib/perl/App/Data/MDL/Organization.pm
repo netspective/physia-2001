@@ -16,7 +16,7 @@ use vars qw(%SERVICE_PLACE_TYPE_MAP);
 	'Inpatient Hospital' => App::Universal::SERVICE_PLACE_INPATIENTHOSPITAL,
 	'Outpatient Hospital' => App::Universal::SERVICE_PLACE_OUTPATIENTHOSPITAL,
 	'Emergency Room Hospital' => App::Universal::SERVICE_PLACE_EMERGENCYROOM,
-	
+
 );
 
 sub new
@@ -224,8 +224,8 @@ sub importContactInfo
 				parent_id => $orgId,
 				item_name => 'Contact Information',
 				value_type => App::Universal::ATTRTYPE_TEXT,
-				value_textB => $item->{phone},
-				value_text => $item->{_text});
+				value_textB => $item->{_text},
+				value_text => $item->{phone});
 		}
 	}
 }
@@ -236,13 +236,13 @@ sub importAppointments
 	my $owner = $org;
 	my $parentId = $org->{id};
 	if(my $parent = $org->{event})
-	{	
+	{
 		$parent = [$parent] if ref $parent eq 'HASH';
 		foreach my $parent (@$parent)
-		{		
+		{
 			$self->importEvent($flags, $parent, $owner);
 		}
-		
+
 	}
 }
 
@@ -260,7 +260,7 @@ sub importOrgRegistry
 				tax_id => exists $registry->{taxid} ? $registry->{taxid} : undef,
 				category => exists $registry->{type} ? $registry->{type} : undef,
 				parent_org_id => exists $registry->{parent_org} ? $registry->{parent_org} : undef);
-				
+
 		if (my $sevice = $registry->{'service-place'})
 		{
 			$self->schemaAction($flags, 'Org_Attribute', 'add',
@@ -284,7 +284,7 @@ sub importStruct
 	#	return 0;
 	#}
 	$self->{mainStruct} = $org;
-	
+
 	$self->importOrgRegistry($flags, $org->{org_registry}, $org);
 	$self->importContactMethods($flags, $org->{'contact-methods'}, $org);
 	$self->importAssociations($flags, $org->{associations}, $org);
