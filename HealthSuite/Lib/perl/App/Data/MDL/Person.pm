@@ -14,7 +14,7 @@ use Dumpvalue;
 
 @ISA = qw(App::Data::MDL::Module App::Data::MDL::Invoice);
 
-use vars qw(%CLINICAL_ALLERGY_TYPE_MAP %CLINICAL_DIRECTIVE_TYPE_MAP %ALERT_TYPE_MAP %PERIODICITY_TYPE_MAP %BENEFITS_TYPE_MAP);
+use vars qw(%CLINICAL_ALLERGY_TYPE_MAP %CLINICAL_DIRECTIVE_TYPE_MAP %ALERT_TYPE_MAP %PERIODICITY_TYPE_MAP %BENEFITS_TYPE_MAP %ROLES_TYPE_MAP);
 
 %CLINICAL_ALLERGY_TYPE_MAP = (
 	'Medication' => App::Universal::MEDICATION_ALLERGY,
@@ -50,6 +50,12 @@ use vars qw(%CLINICAL_ALLERGY_TYPE_MAP %CLINICAL_DIRECTIVE_TYPE_MAP %ALERT_TYPE_
 	'insurance' => App::Universal::BENEFIT_INSURANCE,
 	'retirement' => App::Universal::BENEFIT_RETIREMENT,
 	'other' => App::Universal::BENEFIT_OTHER,
+);
+
+%ROLES_TYPE_MAP = (
+	'Active' => App::Universal::ROLESTATUS_ACTIVE,
+	'Suspended' => App::Universal::ROLESTATUS_INACTIVE,
+	'Inactive' => App::Universal::ROLESTATUS_SUSPENDED,
 );
 
 sub new
@@ -750,6 +756,24 @@ sub importLogins
 	}
 }
 
+sub importRoles
+{
+	my ($self,  $flags, $roles,$person) = @_;
+	my $personId = $person->{id};
+	if(my $list = $roles->{role})
+	{
+		$list = [$list] if ref $list eq 'HASH';
+		foreach my $item (@$list)
+		{
+			$self->schemaAction($flags, "Person_Org_Role", 'add',
+				person_id => $personId,
+				org_id    => $item->{'org-id'},
+				org_role  => $item->{id},
+				role_status => $ROLES_TYPE_MAP{exists $item->{status} ? $item->{status} :'Active'});
+		}
+	}
+}
+
 sub importRegistry
 {
 	my ($self, $flags, $registry, $person) = @_;
@@ -837,6 +861,7 @@ sub importStruct
 	$self->importRegistry($flags, $person->{registry}, $person);
 	$self->importLogins($flags, $person->{logins}, $person);
 	$self->importCategories($flags, $person->{categories}, $person);
+	$self->importRoles($flags, $person->{roles}, $person);
 	#$self->importPersonaldata($flags,$person->{personal},$person);
 	$self->importContactMethods($flags, $person->{'contact-methods'}, $person);
 	$self->importAssociations($flags, $person->{associations}, $person);
