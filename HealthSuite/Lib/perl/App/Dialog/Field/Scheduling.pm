@@ -143,7 +143,7 @@ package App::Dialog::Field::Scheduling::ApptType;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::Field';
+use base 'CGI::Dialog::ContentItem';
 use CGI::Dialog;
 use CGI::Validator::Field;
 
@@ -183,15 +183,35 @@ sub getHtml
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $html = '';
 
-		my $fieldName = $page->fieldPName($self->{name});
+	my $specialHdl = "$self->{type}_as_html";
 
+	if ($self->can($specialHdl))
+	{
+		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
+	}
+	else
+	{
+		# if there was an error running a special handler, then there was no
+		# special handler so just perform default html formatting
+
+		my $fieldName = $page->fieldPName($self->{name});
+		#my $value = $page->field($self->{name}) || $self->{hint};
 		my $value = (defined $page->field($self->{name})) ? $page->field($self->{name}) : $self->{hint};
 		my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 		my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
 
-		my $javaScript = $self->generateJavaScript($page);
-		my $onFocus = $self->{hint} ? " onFocus='clearField(this)'" : '';
-		$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<input $self->{READONLY} name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
+		if(! $readOnly)
+		{
+			my $javaScript = $self->generateJavaScript($page);
+			my $onFocus = $self->{hint} ? " onFocus='clearField(this)'" : '';
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<input $self->{READONLY}  name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
+		}
+		else
+		{
+			$html = qq{<input type='hidden' name='$fieldName' value="$value">};
+			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
+		}
+	}
 
 	return $html;
 }
