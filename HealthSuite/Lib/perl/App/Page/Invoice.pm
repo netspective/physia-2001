@@ -1116,13 +1116,13 @@ sub prepare_view_1500pdf
 	my $valMgr = $self->property('valMgr');
 	my $invoiceId = $self->param('invoice_id');
 	my $pdfName = "1500_$invoiceId.pdf";
-	my $pdfHref = "/temp/invoice/$pdfName";
+	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFOutputHREF, $pdfName);
 
 	eval
 	{
 #		my $output = new pdflib;
 		my $output = new App::Billing::Output::PDF;
-		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, "$pdfName"), claimList => $claimList);
+		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList);
 	};
 	$self->redirect($pdfHref);
 	#$self->addContent("<a href='$pdfHref' target='$pdfName'>View HCFA PDF File for Claim $invoiceId</a><script>window.location.href = '$pdfHref';</script>");

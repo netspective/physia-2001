@@ -24,6 +24,7 @@ struct(ServerConfigData => [
 	path_Reports => '$',
 	path_OrgReports => '$',
 	path_PDFOutput => '$',
+	path_PDFOutputHREF => '$',
 	file_SchemaDefn => '$',
 	file_AccessControlDefn => '$',
 	file_BuildLog => '$',
@@ -41,7 +42,8 @@ use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl',
 use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
-use constant PATH_TEMP       => File::Spec->catfile(PATH_WEBSITE, 'temp');
+use constant PATH_TEMP       => File::Spec->catfile('temp');
+use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
 
 sub requirePath
 {
@@ -73,13 +75,14 @@ sub getDefaultConfig
 	$config->name_Group($group);
 	$config->db_ConnectKey($dbConnectKey);
 	$config->path_root(PATH_APPROOT);
-	$config->path_temp(PATH_TEMP);
+	$config->path_temp(File::Spec->catfile(PATH_WEBSITE, PATH_TEMP));
 	$config->path_Database(PATH_DATABASE);
 	$config->path_Reports(PATH_REPORTS);
 	$config->path_SchemaSQL(File::Spec->catfile(PATH_DATABASE, 'schema-physia'));
 	$config->path_BillingTemplate(File::Spec->catfile(PATH_APPLIB, 'Billing'));
 	$config->path_OrgReports(File::Spec->catfile(PATH_REPORTS, 'Org'));
-	$config->path_PDFOutput(File::Spec->catfile(PATH_TEMP, 'invoices'));
+	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
+	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
 	$config->file_AccessControlDefn(File::Spec->catfile(PATH_APPLIB, 'Conf', 'AccessControl.xml'));
 	return $config;
