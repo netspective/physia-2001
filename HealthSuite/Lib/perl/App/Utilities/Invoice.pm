@@ -410,8 +410,13 @@ sub submitClaim
 	my $action = $submitFlag == App::Universal::RESUBMIT_SAMEPAYER ? 'Resubmitted' : 'Submitted';
 	$action = $printFlag ? 'HCFA Printed' : $action;
 	addHistoryItem($page, $invoiceId, value_text => $action);
+	
+	my $actionType = App::Universal::RESUBMIT_SAMEPAYER ? $App::Universal::DIALOG_COMMAND_ACTIVITY_MAP{resubmit} :
+		$App::Universal::DIALOG_COMMAND_ACTIVITY_MAP{submit};
 
-	$page->recordActivity(App::Universal::ACTIVITY_TYPE_RECORD, 1, 'invoice', $invoiceId, undef,"$action invoice <a href='/invoice/$invoiceId/summary'>$invoiceId</a>", $sessUserId);
+	$page->recordActivity(App::Universal::ACTIVITY_TYPE_RECORD, $actionType, 'invoice', $invoiceId, 
+		undef," invoice <a href='/invoice/$invoiceId/summary'>$invoiceId</a>", 
+		$sessUserId);
 }
 
 sub copyInvoiceForNextPayer

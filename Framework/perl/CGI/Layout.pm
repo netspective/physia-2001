@@ -320,12 +320,14 @@ sub prepareHtmlFormat
 				<TD COLSPAN=2>$bannerFmt</TD>
 			</TR>
 			} : '';
+		my $button = $frameInfo->{editUrl} ? qq{<TD ALIGN=RIGHT width=1%>$frameInfo->{editUrl}</TD>}: '';
 		($wrapContentOpen, $wrapContentClose) =
 			(qq{
 				<TABLE CELLSPACING=@{[ exists $frameInfo->{borderWidth} ? $frameInfo->{borderWidth} : 1]} CELLPADDING=2 BORDER=0 BGCOLOR=@{[$frameInfo->{borderColor} || '#EEEEEE']} @{[ $layoutDefn->{width} ? "WIDTH=$layoutDefn->{width}" : '100%' ]}>
 					@{[ $formAction ? qq{<FORM ACTION="$formAction" METHOD="POST">} : '']}
 					<TR BGCOLOR=@{[$frameInfo->{headColor} || $frameInfo->{borderColor} || '#EEEEEE']}>
 						<TD>$frameFontOpen<NOBR>$frameInfo->{heading}</NOBR>$frameFontClose</TD>
+						$button
 					</TR>
 					$frameSepRow
 					$bannerRow

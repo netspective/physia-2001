@@ -110,8 +110,9 @@ sub execute
 		);
 	}
 
-	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
-	return "\u$command completed.";
+	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	$self->handlePostExecute($page, $command, $flags);
+	#return "\u$command completed.";
 }
 
 1;

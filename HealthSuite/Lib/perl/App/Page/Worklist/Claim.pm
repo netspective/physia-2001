@@ -155,13 +155,13 @@ sub buildSqlStmt
 				AND (invoice_billing.bill_id = invoice.billing_id)
 				AND (insurance.ins_internal_id = invoice_billing.bill_ins_id)
 				AND (invoice_status.id = invoice.invoice_status)
-				AND (org.org_internal_id = invoice_billing.bill_to_id)
+				AND (to_char(org.org_internal_id) = invoice_billing.bill_to_id)
 				AND (org_attribute.parent_id = org.org_internal_id and org_attribute.value_type = 10
 					and org_attribute.item_name = 'Primary')
 				AND (transaction.trans_id = invoice.main_transaction)
 				AND (transaction.care_provider_id in (select value_text from person_attribute
 					where parent_id = ? and parent_org_id = ? and item_name = ?))
-				AND (transaction.service_facility_id in (select value_text from person_attribute
+				AND (to_char(transaction.service_facility_id) in (select value_text from person_attribute
 					where parent_id = ? and parent_org_id = ? and item_name = ?))
 				AND (invoice.invoice_status in (select value_int from person_attribute
 					where parent_id = ? and parent_org_id = ? and item_name = ?))
@@ -206,7 +206,7 @@ sub buildSqlStmt
 				AND (invoice_billing.bill_id = invoice.billing_id)
 				AND (insurance.ins_internal_id = invoice_billing.bill_ins_id)
 				AND (invoice_status.id = invoice.invoice_status)
-				AND (org.org_internal_id = invoice_billing.bill_to_id)
+				AND (to_char(org.org_internal_id) = invoice_billing.bill_to_id)
 				AND (org_attribute.parent_id = org.org_internal_id and org_attribute.value_type = 10
 					and org_attribute.item_name = 'Primary')
 				AND NOT exists (select 'x' from invoice_worklist iw where iw.invoice_id = invoice.invoice_id

@@ -645,7 +645,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+###### PROBABLY NOT USED ANY MORE #########
 'person.sessionActivity' => {
 	sqlStmt => qq{
 			select 	%simpleDate:to_char(a.activity_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT')% as activity_date,
@@ -2562,10 +2562,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 		select value_text as resource_id
 		from Person_Attribute
-		where parent_id = ?
+		where parent_id = :1
 			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 			and item_name = 'WorkList'
-			and parent_org_id = ?
+			and parent_org_id = :2
 			order by 1
 	},
 
@@ -2609,8 +2609,16 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panel'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; 
+		$personId ||= $page->param('person_id'); 
+		my $orgInternalId = $page->session('org_internal_id'); 
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId]);
+	},
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; 
+		$personId ||= $page->param('person_id'); 
+		my $orgInternalId = $page->session('org_internal_id'); 
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panel'); 
+	},
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelTransp'); },
 },
@@ -2858,14 +2866,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.mySessionActivity' => {
 	sqlStmt => qq{
-		select to_char(pa.activity_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_stamp,
+		select to_char(pa.activity_stamp - :1 - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_stamp,
 			sat.caption as caption,
 			pa.activity_data as data,
 			pa.action_scope as scope,
 			pa.action_key as action_key
 		from Session_Action_Type sat, perSess_Activity pa
 		where pa.person_id = :2
-			and	pa.activity_stamp >= trunc(sysdate) + :1
+			and	pa.activity_stamp >= trunc(sysdate) + :1 + :3
 			and	sat.id = pa.action_type
 			and 10 > (
 				select count(*) from perSess_Activity pa2
@@ -2914,28 +2922,32 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		sub {
 			my ($page, $flags, $personId) = @_;
 			$personId ||= $page->session('user_id');
+			my $standarTimeOffset = $page->session('TZ') ne $page->session('DAYLIGHT_TZ') ? 1/24 : 0;
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity',
-				[$page->session('GMT_DAYOFFSET'), $personId]);
+				[$page->session('GMT_DAYOFFSET'), $personId, $standarTimeOffset]);
 		},
 	publishComp_stp =>
 		sub {
 			my ($page, $flags, $personId) = @_;
 			$personId ||= $page->session('user_id');
+			my $standarTimeOffset = $page->session('TZ') ne $page->session('DAYLIGHT_TZ') ? 1/24 : 0;
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panel');
+				[$page->session('GMT_DAYOFFSET'), $personId, $standarTimeOffset], 'panel');
 		},
 	publishComp_stpe =>
 		sub { my ($page, $flags, $personId) = @_;
 			$personId ||= $page->session('user_id');
+			my $standarTimeOffset = $page->session('TZ') ne $page->session('DAYLIGHT_TZ') ? 1/24 : 0;
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit');
+				[$page->session('GMT_DAYOFFSET'), $personId, $standarTimeOffset], 'panelEdit');
 		},
 	publishComp_stpt =>
 		sub {
 			my ($page, $flags, $personId) = @_;
 			$personId ||= $page->session('user_id');
+			my $standarTimeOffset = $page->session('TZ') ne $page->session('DAYLIGHT_TZ') ? 1/24 : 0;
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp');
+				[$page->session('GMT_DAYOFFSET'), $personId, $standarTimeOffset], 'panelTransp');
 		},
 },
 

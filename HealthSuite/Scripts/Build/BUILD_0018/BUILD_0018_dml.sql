@@ -15,6 +15,11 @@ insert into Ethnicity (id, caption) values (5, 'Other');
 
 insert into Session_Action_Type (id, caption) values (10, 'Prescribe');
 insert into Session_Action_Type (id, caption) values (11, 'Refill');
+insert into Session_Action_Type (id, caption) values (12, 'Approve');
+insert into Session_Action_Type (id, caption) values (13, 'Deny');
+insert into Session_Action_Type (id, caption) values (14, 'Submit');
+insert into Session_Action_Type (id, caption) values (15, 'Resubmit');
+
 
 --bug unknown - Thai?
 
