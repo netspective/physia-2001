@@ -29,7 +29,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'feescheduledataentry', heading => 'Fee Schedule Data Entries');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'feescheduledataentry', heading => 'Fee Schedule Entries');
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
 
@@ -37,8 +37,8 @@ sub new
 	
 
 	$self->addContent(
-                        new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'feeschedules',types => ['FeeScheduleEntry'],hints => 'Please provide a comma separated list of fee schedules.'),
-                        new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts',hints => 'Please provide a comma separated list of cpts or cpt ranges, example:xxxxx,xxxxx-xxxxx,xxxxx,xxxxx-xxxxx.'),
+                        new CGI::Dialog::Field(caption => 'Fee Schedules', size => 70, name => 'feeschedules',types => ['FeeScheduleEntry'],hints => 'Please provide a comma separated list of fee schedules.'),
+                        new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts', size => 70, hints => 'Please provide a comma separated list of cpts or cpt ranges, example:xxxxx,xxxxx-xxxxx,xxxxx,xxxxx-xxxxx.'),
 
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -54,9 +54,12 @@ sub customValidate
 
 	my $feeschedules = $page->field('feeschedules');
 	my $feeScheduleField = $self->getField('feeschedules');
+	$feeschedules =~ s/\s//g;
 	
 	my $cpts = $page->field('listofcpts');
 	my $cptField = $self->getField('listofcpts');
+        $cpts =~ s/\s//g;
+
 	
         my @feeSchedules = split(/\s*,\s*/, $feeschedules);
         my @cptCodes = split(/\s*,\s*/, $cpts);
@@ -118,8 +121,13 @@ sub execute
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $orgId = $page->session('org_id');
+        my $feeschedules = $page->field('feeschedules');
+        $feeschedules =~ s/\s//g;
 
-	$self->handlePostExecute($page, $command, $flags, "/org/$orgId/dlg-add-feescheduleentry?_f_fs=%field.feeschedules%&_f_cpts=%field.listofcpts%");
+        my $cpts = $page->field('listofcpts');
+        $cpts =~ s/\s//g;
+
+	$self->handlePostExecute($page, $command, $flags, "/org/$orgId/dlg-add-feescheduleentry?_f_fs=$feeschedules&_f_cpts=$cpts");
 
 }
 
