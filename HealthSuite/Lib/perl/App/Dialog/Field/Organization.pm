@@ -13,12 +13,12 @@ use base qw(CGI::Dialog::Field);
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	$params{caption} = 'Organization ID' unless $params{caption};
 	$params{name} = 'org_id' unless $params{name};
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
-	$params{type} = 'identifier' unless exists $params{type};
+#	$params{type} = 'identifier' unless exists $params{type};
 	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 16 unless exists $params{maxLength};
 	$params{findPopup} = '/lookup/org/id' unless defined $params{findPopup};
@@ -52,7 +52,7 @@ sub isValid
 	my ($self, $page, $validator) = @_;
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
 	my $value = $page->field($self->{name});
-	
+
 	if ($self->SUPER::isValid($page, $validator))
 	{
 		if ($command eq 'add')
@@ -72,7 +72,7 @@ sub isValid
 sub isValidOrgId
 {
 	my ($self, $page, $value) = @_;
-	
+
 	return 1 unless $value;
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $value);
 	unless ($orgIntId)
@@ -231,11 +231,11 @@ sub new
 		select distinct org_internal_id, name_primary
 		from Org_Category, Org
 		where Org.owner_org_id = ?
-			and Org_Category.parent_id = Org.org_internal_id 
+			and Org_Category.parent_id = Org.org_internal_id
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ($params{types})
 		order by name_primary
 	};
-	
+
 	return new CGI::Dialog::Field(
 		fKeyDisplayCol => 1,
 		fKeyValueCol => 0,
@@ -264,7 +264,7 @@ use base qw(CGI::Dialog::Field);
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	$params{caption} = 'Organization ID' unless $params{caption};
 	$params{name} = 'org_id' unless $params{name};
 	$params{options} = 0 unless exists $params{options};
@@ -300,12 +300,12 @@ sub isValid
 	my ($self, $page, $validator) = @_;
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
 	my $value = $page->field($self->{name});
-	
+
 	if ($self->SUPER::isValid($page, $validator))
 	{
 		my @orgList = split(/\s*,\s*/,$value);
 		foreach my $id (@orgList)
-		{			
+		{
 			$id = uc($id);
 			$self->isValidOrgId($page,$id);
 		}
@@ -318,7 +318,7 @@ sub isValid
 sub isValidOrgId
 {
 	my ($self, $page, $value) = @_;
-	
+
 	return 1 unless $value;
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $value);
 	unless ($orgIntId)

@@ -27,7 +27,7 @@ sub new
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
 
-	$params{type} = 'identifier';
+#	$params{type} = 'identifier';
 	$params{size} = 16;
 	$params{maxLength} = 16;
 	$params{hints}="To use the ID autosuggestion feature, leave this field blank" unless exists $params{hints};
@@ -207,7 +207,7 @@ sub new
 
 	else
 	{
-		$params{type} = 'identifier' unless $params{type};
+#		$params{type} = 'identifier' unless $params{type};
 		$params{size} = 16 unless $params{size};
 		$params{maxLength} = 16 unless $params{maxLength};
 
