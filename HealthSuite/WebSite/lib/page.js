@@ -1070,8 +1070,8 @@ Return:
 function MoveSelectItems(strFormName, strFromSelect, strToSelect, blnSort) {
 	var objSelectFrom, objSelectTo;
 
-	objSelectFrom = document.forms[0].elements[strFromSelect];
-	objSelectTo = document.forms[0].elements[strToSelect];
+	objSelectFrom = document.forms.dialog.elements[strFromSelect];
+	objSelectTo = document.forms.dialog.elements[strToSelect];
 
 	var intLength = objSelectFrom.options.length;
 
