@@ -100,6 +100,11 @@
 		<deliverable id="1537">
 			Changed Envoy NSF tab to THINNet NSF in claim summary screen.
 		</deliverable>
+
+		<deliverable id="1540">
+			Now recording batch id for transfers in claim history.
+		</deliverable>
+
 		<deliverable id="1542">
 			UI : Added new Query called "IPA Financial Transaction". This allows an org to obtain financial information other main orgs that it is assoicated with.
 			[Database] : Requires the addition of three new tables to track assoication.
