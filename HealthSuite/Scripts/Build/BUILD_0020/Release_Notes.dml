@@ -67,5 +67,9 @@
 			For closed claims in insurance payment dialog, question to reopen claim and close subsequent claims comes up.
 		</deliverable>
 		
+		<deliverable id="2002">
+			Closing claims that are paid in full and where user chooses not to submit to next payer.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
