@@ -16,12 +16,12 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-my $TEXT_ATTRR_TYPE = App::Universal::ATTRTYPE_TEXT;
+my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_TEXT;#App::Universal::ATTRTYPE_FEE_SCHEDULE;
+
 
 %RESOURCE_MAP = (
 	'feeschedule-person' => {
 		valueType => App::Universal::ATTRTYPE_FEE_SCHEDULE,
-		 tableId => 'Person_Contact_Addrs',
 		 heading => '$Command Assoicated Fee Schedule',
 		 table => 'Person_Attribute',
 		 _arl => ['person_id'],
@@ -30,7 +30,6 @@ my $TEXT_ATTRR_TYPE = App::Universal::ATTRTYPE_TEXT;
 		},
 	'feeschedule-org' => {
 		valueType => App::Universal::ATTRTYPE_FEE_SCHEDULE,
-		tableId => 'Org_Contact_Addrs',
 		heading => '$Command Assoicated Fee Schedule',
 		table => 'Org_Attribute',
 		_arl => ['org_id'],
@@ -103,20 +102,43 @@ sub new
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	if($page->param('org_id'))
+	my $table = $self->{table};
+
+	$page->field('parent_id',$page->param('org_id')||$page->param('person_id'));		
+	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;	
+	if($table eq 'Org_Attribute')
 	{	
-		$page->field('parent_id',$page->param('org_id'));
+		$STMTMGR_ORG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById',$page->param('item_id') );	
+		$page->field('parent_id',$page->param('org_id')||$page->param('person_id'));		
 	}
 	else
 	{
-		$page->field('parent_id',$page->param('person_id'));
+		$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById',$page->param('item_id') ) if
+		$page->param('item_id');	
 	}
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;	
-	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById',$page->param('item_id') );
+	
 }
 
 sub customValidate
 {
+	my ($self, $page) = @_;
+	my $table = $self->{table};
+	my $field = $self->getField('value_int');
+	#Check if Fee Schedule is Already assoicated with this provider/org
+	my $msg = "Fee Schedule Already Assoicated with " . $page->field('parent_id');
+	my $command = $self->getActiveCommand($page);	
+	return if $command eq 'update' or $command eq 'remove';
+	if($table eq 'Org_Attribute')
+	{	
+		my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));		
+		$field->invalidate($page,$msg) if $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selAttributeByIdValueIntParent',
+						$parent_id,$page->field('value_int'),'Fee Schedules');
+	}
+	else
+	{
+		$field->invalidate($page,$msg) if $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selAttributeByIdValueIntParent',
+						$page->field('parent_id'),$page->field('value_int'),'Fee Schedules');
+	}
 }
 
 sub execute
@@ -138,13 +160,13 @@ sub execute
 			parent_id => $parent_id,
 			item_name => 'Fee Schedules',
 			item_type => 0,
-			value_type => $TEXT_ATTRR_TYPE,
+			value_type => $FS_ATTRR_TYPE,
 			value_int => $page->field('value_int'),
 			value_intB => $page->field('value_intb'),			
 	);
 
-	$self->handlePostExecute($page, $command, $flags);
-
+	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	return "\u$command completed.";
 }
 
 
