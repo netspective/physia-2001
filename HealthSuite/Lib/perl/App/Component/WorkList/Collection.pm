@@ -169,9 +169,9 @@ sub getComponentHtml
 
 			
                 #Remove any accounts with a balance of zero that do have a reck date and the min range value > 0
-                if($_->{balance} <= 0 && !$_->{reck_date} && $_->{min_amount} > 0  )
+                if($_->{balance} <= 0 && !defined$_->{reck_date} )
                 {
-                	#Mark record as inactive
+                    	#Mark record as inactive
 			$page->schemaAction
 			(
 				'Transaction', 'update',                        
@@ -218,7 +218,7 @@ sub getComponentHtml
 					TITLE='Close Account'>
 					<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 			</nobr>}, 
-			$_->{simple_name},
+			$_->{person_id},
 
 
 		);
