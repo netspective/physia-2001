@@ -442,7 +442,7 @@ sub importTXGULFfs
 				// delete from Offering_catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}",
 			insertStmt => "insert into Offering_Catalog_Entry
 				(catalog_id, entry_type, flags, status, code, name, default_units, cost_type, unit_cost,
-				description)
+				description, units_avail)
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
 			verifyCountStmt => "select count(*) from Offering_Catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}",
 		);
