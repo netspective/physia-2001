@@ -9,6 +9,7 @@ use base qw(App::Page::Person);
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::BillingStatement;
+use App::Statements::Component::Scheduling;
 
 use App::Universal;
 
@@ -45,6 +46,11 @@ sub prepare_view
 		<b>Last 10 Payments from @{[$self->param('person_id')]}</b>
 		@{[ $STMTMGR_STATEMENTS->createHtml($self, STMTMGRFLAG_NONE, 'sel_paymentHistory',
 			[$personId, $orgInternalId, $self->session('GMT_DAYOFFSET')],) ]}
+
+		<P>
+		<b>Insurance Verification</b>
+		@{[ $STMTMGR_COMPONENT_SCHEDULING->createHtml($self, STMTMGRFLAG_NONE, 'sel_verified_events',
+			[$orgInternalId, $personId],) ]}
 
 		</CENTER>
 	});
