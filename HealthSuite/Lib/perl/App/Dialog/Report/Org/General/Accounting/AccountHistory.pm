@@ -362,7 +362,7 @@ sub execute
 	$query = qq {select tax_id from org where org_internal_id = $orgId};
 	my $orgTax = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
 
-	$query = qq {select complete_name from person where person_id = '$patientID'};
+	$query = qq {select simple_name from person where person_id = '$patientID'};
 	my $patientName = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
 	$query = qq {select complete_addr_html from person_address where parent_id = '$patientID'};
 	my $patientAddress = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
