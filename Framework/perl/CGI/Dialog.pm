@@ -145,10 +145,12 @@ sub getHtml
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
 
+	delete $self->{postHtml} if ($self->{flags} & FLDFLAG_READONLY);
+	
 	if($self->{flags} & FLDFLAG_CUSTOMDRAW)
 	{
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
-		$html = "$self->{preHtml}$mainData $popupHtml$self->{postHtml}";
+		$html = "$self->{preHtml}$mainData $popupHtml &nbsp; &nbsp; $self->{postHtml}";
 	}
 	else
 	{
@@ -174,7 +176,7 @@ sub getHtml
 			</font>
 		</td><td>
 			<font $dialog->{bodyFontAttrs}>
-				$self->{preHtml}$mainData$popupHtml$self->{postHtml}
+				$self->{preHtml}$mainData$popupHtml &nbsp; &nbsp; $self->{postHtml}
 				$errorMsgsHtml
 				$hints
 			</font>
