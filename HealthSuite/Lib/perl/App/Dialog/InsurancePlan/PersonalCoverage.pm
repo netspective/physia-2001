@@ -438,6 +438,30 @@ sub execute
 			_debug => 0
 		);
 
+		my $insuredPerson = $page->field('insured_id');
+		my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $insuredPerson, $page->session('org_internal_id'));
+		my $insuredExist = '';
+
+		foreach my $category(@$categories)
+		{
+			$insuredExist = $category;
+			if ($category eq 'Insured-Person')
+			{
+				last;
+			}
+		}
+
+		if ($insuredExist ne 'Insured-Person')
+		{
+			$page->schemaAction(
+						'Person_Org_Category', 'add',
+						person_id => $page->field('insured_id') || undef,
+						org_internal_id => $ownerOrgIntId || undef,
+						category => 'Insured-Person' || undef,
+						_debug => 0
+			);
+		}
+
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
