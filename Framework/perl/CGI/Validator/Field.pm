@@ -20,11 +20,12 @@ use enum qw(BITMASK:FLDFLAG_
 	HOME SORT
 	PREPENDBLANK DEFAULTCAPTION
 	INLINECAPTION
+	AUTOCAP
 	);
 
 use constant FLDFLAGS_DEFAULT => FLDFLAG_TRIM;
 use constant FLDFLAGS_DISABLING_VALIDATION => FLDFLAG_INVISIBLE | FLDFLAG_READONLY;
-use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIFIER | FLDFLAG_UPPERCASE | FLDFLAG_TRIM | FLDFLAG_UCASEINITIAL | FLDFLAG_LOWERCASE | FLDFLAG_FORMATVALUE | FLDFLAG_CUSTOMVALIDATE;
+use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIFIER | FLDFLAG_UPPERCASE | FLDFLAG_TRIM | FLDFLAG_UCASEINITIAL | FLDFLAG_LOWERCASE | FLDFLAG_FORMATVALUE | FLDFLAG_CUSTOMVALIDATE | FLDFLAG_AUTOCAP;
 
 #
 # export only those flags that should be called from the outside
@@ -48,6 +49,7 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 	FLDFLAG_PREPENDBLANK
 	FLDFLAG_DEFAULTCAPTION
 	FLDFLAG_INLINECAPTION
+	FLDFLAG_AUTOCAP
 	);
 
 use constant ONKEYPRESSJS_DEFAULT    => 'return processKeypress_default(event)';
@@ -71,6 +73,9 @@ use constant ONBLUR_URL            => 'validateChange_URL(event)';
 use constant ONBLUR_LOWERCASE      => 'validateChange_LowerCase(event)';
 use constant ONBLUR_UPPERCASE      => 'validateChange_UpperCase(event)';
 use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
+use constant ONBLUR_AUTOCAP        => 'validateChange_AutoCap(event)';
+
+
 
 %VALIDATE_TYPE_DATA =
 		(
@@ -253,18 +258,6 @@ use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
 				{
 					onKeyPressJS => ONKEYPRESSJS_IDENTIFIER
 				},
-			'lowercase' =>
-				{
-					onBlurJS => ONBLUR_LOWERCASE
-				},
-			'uppercase' =>
-				{
-					onBlurJS => ONBLUR_UPPERCASE
-				},
-			'ucaseinitial' =>
-				{
-					onBlurJS => ONBLUR_UCASEINITIAL
-				}
 		);
 
 sub new
@@ -283,6 +276,13 @@ sub new
 	$params{maxLength} = -1 unless exists $params{maxLength};
 	$params{flags} = FLDFLAGS_DEFAULT unless exists $params{flags};
 
+
+	$params{onBlurJS} = ONBLUR_UPPERCASE if ($params{options} & FLDFLAG_UPPERCASE) == FLDFLAG_UPPERCASE && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_LOWERCASE if ($params{options} & FLDFLAG_LOWERCASE) == FLDFLAG_LOWERCASE && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_UCASEINITIAL if ($params{options} & FLDFLAG_UCASEINITIAL) == FLDFLAG_UCASEINITIAL && ! exists $params{onBlurJS};
+	$params{onBlurJS} = ONBLUR_AUTOCAP if ($params{options} & FLDFLAG_AUTOCAP) == FLDFLAG_AUTOCAP && ! exists $params{onBlurJS};
+
+
 	my $type = $params{type};
 	if(my $typeInfo = $VALIDATE_TYPE_DATA{$type})
 	{
@@ -291,19 +291,21 @@ sub new
 		$params{regExpValidate} = $typeInfo->{regExp} if ! exists $params{regExpValidate} && $typeInfo->{regExp};
 		$params{regExpInvalidMsg} = $params{message} ? $params{message} : "$params{caption} $typeInfo->{message}";
 		$params{formatValue} = $typeInfo->{formatValue} if exists $typeInfo->{formatValue};
-		$params{onValidate} = $typeInfo->{onValidate} if exists $typeInfo->{onValidate} && ! exists $params{onValidate};		
+		$params{onValidate} = $typeInfo->{onValidate} if exists $typeInfo->{onValidate} && ! exists $params{onValidate};
 		#$params{defaultValue} = $typeInfo->{defaultValue} if exists $typeInfo->{defaultValue} && ! exists $params{defaultValue};
-		
+
 		# Check If default value exist for type and that the programmer did not provide a default value
-		if (exists $typeInfo->{defaultValue} && ! exists $params{defaultValue}) 
+		if (exists $typeInfo->{defaultValue} && ! exists $params{defaultValue})
 		{
 			#If type is a date get the current date from the system and use that as the default date other wise
 			#use the default specified by the type
-			$params{defaultValue} = $type ne 'date' ? $typeInfo->{defaultValue} : UnixDate('today', '%m/%d/%Y'); 
+			$params{defaultValue} = $type ne 'date' ? $typeInfo->{defaultValue} : UnixDate('today', '%m/%d/%Y');
 		};
 		$params{onKeyPressJS} = $typeInfo->{onKeyPressJS} if exists $typeInfo->{onKeyPressJS} && ! exists $params{onKeyPressJS};
 		$params{onBlurJS} = $typeInfo->{onBlurJS} if exists $typeInfo->{onBlurJS} && ! exists $params{onBlurJS};
 	}
+
+
 	$params{onKeyPressJS} = ONKEYPRESSJS_DEFAULT unless exists $params{onKeyPressJS};
 	$params{size} = 24 unless $params{size};
 
@@ -638,7 +640,7 @@ sub isValid
 sub generateJavaScript
 {
 	my ($self, $page) = @_;
-	
+
 	my @jsKeys = grep {$_ =~ /JS$/} keys %{$self};
 	my @jsAttr = ();
 	foreach my $key (@jsKeys)
