@@ -745,7 +745,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#4#/#3#?home=/#param.arl#',
-		frame => {	editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#' },
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-ins-coverage?home=/#param.arl#' },
+		#frame => {	editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
