@@ -77,6 +77,7 @@ sub initialize
 				)
 
 				);
+		push (@request, new CGI::Dialog::Field(name=>"skip_field$loop", type=>'hidden'));				
 		push(@request,new CGI::Dialog::Field(name=>"procedure_id$loop", type=>'hidden'));
 	}
 
@@ -216,6 +217,7 @@ sub initialize
       	my $personSessionId = $page->session('person_id');
   	$page->field('intake_coordinator',$personSessionId);
 
+
   	my $maxrows=MAXROWS;
   	my $ServiceData=undef;
   	if ($command eq 'add' and  $page->field('person_id'))
@@ -223,7 +225,7 @@ sub initialize
   		$ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $page->field('person_id'))
   	}
  	#Populate the Procedure Information
- 	my $count=0;
+ 	my $count=1;
  	if($page->param('trans_id') ||$ServiceData )
  	{
  		my $transId =  $page->param('trans_id')|| $ServiceData->{'trans_id'};
@@ -233,13 +235,19 @@ sub initialize
   			$count++;
   		}
 	};
+	
+	#Check 
 	$count=$count||1; #always show at least one line
        	$self->addPostHtml(
        	qq{
 		<script language="JavaScript1.2">
-		for(loop=$count;loop<$maxrows;loop++)
-		{
-			setRequestStyle(loop,'none');
+		for(loop=$count;loop<$maxrows;loop++)				
+		{			
+			vals2 =    eval("document.forms.dialog._f_code"+loop+".value");
+			if(vals2.length<1)
+			{
+				setRequestStyle(loop,'none');
+			}
 		};
 		function setRequestStyle(line,styleValue)
 		{
@@ -346,30 +354,75 @@ sub initialize
   		$coordId->invalidate($page, "Coordinator field cannot be blank if the 'Status' is $status");
  	}
  	#Check to make sure that the user code provided are valid HCPS/CPT/Misc Procedure codes
+ 	my $check=0;
+ 	my $oneField=undef;
  	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
-
+		next if ($page->field("skip_field$loop"));
 		my $code = $page->field("code$loop");
+		$oneField=$self->getField("code_mod_desc$loop")->{fields}->[0] unless $oneField;
 		next unless ($code);
 		my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$code,$page->session('org_internal_id') );
 		my $field = $self->getField("code_mod_desc$loop")->{fields}->[0];
-		$field->invalidate($page, "Invoice Procedure Code '$code' ") if ($data->{description} eq '' or ! defined $data->{description});
+		if(!$page->field("referral_type$loop"))
+		{
+			my $refField = $self->getField("referral_type$loop");
+			$refField->invalidate($page, "Referral Type is a required field") 
+		}
+		if ($data->{description} eq '' or ! defined $data->{description})
+		{
+			$field->invalidate($page, "Invalid Invoice Procedure Code '$code' "); 
+
+		}
+		$check=1;
 
 	}
+	$oneField->invalidate($page, "Service Request must have at least one procedure code") unless $check ;
+
  }
 
 
  sub populateData_add
  {
-       my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	#Populate the Procedure Information
+       	my $personSessionId = $page->session('person_id');
+       	$page->field('intake_coordinator',$personSessionId);
+       	my $personId = $page->field('person_id');		
+        my $ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $personId);	
+       	my $parentTransId = $ServiceData->{'trans_id'};        
+	my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$parentTransId);      
+	my $count=0;	
+	
+	#populate a procedure information
+       	if ($serviceProcedures)
+       	{	
+		foreach (@$serviceProcedures)
+		{
+			my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$_->{code},$page->session('org_internal_id') );
+			$page->field("description$count",$data->{description});
+			$page->field("code$count",$_->{code});
+			$page->field("modf$count",$_->{modifier});
+			#$page->field("description$count",$_->{caption});
+			$page->field("comment$count",$_->{detail});
+			$page->field("charge$count",$_->{unit_cost});
+			$page->field("unit$count",$_->{quantity});
+			#$page->field("procedure_id$count",$_->{trans_id})
+			$page->field("referral_type$count",$_->{'trans_expire_reason'});;
+			$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
+			$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
+			$page->field("skip_field$count",1);
+			$self->setFieldFlags("code_mod_desc$count", FLDFLAG_READONLY);
+			$self->setFieldFlags("date_proc$count", FLDFLAG_READONLY);
+			$self->setFieldFlags("unit_charge$count", FLDFLAG_READONLY);
+			$self->setFieldFlags("comment$count", FLDFLAG_READONLY);
+			$self->setFieldFlags("description$count", FLDFLAG_READONLY);
+			$self->setFieldFlags("referral_type$count", FLDFLAG_READONLY);										
+			$count++;
+		};
+	}
+	
        return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
-
-       my $personSessionId = $page->session('person_id');
-       $page->field('intake_coordinator',$personSessionId);
-       my $personId = $page->field('person_id');
-       my $ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $personId);
-
        if ($ServiceData ne '' && $command eq 'add')
        {
 		my $icdCodes = $ServiceData->{'code'};
@@ -397,7 +450,7 @@ sub initialize
 		#$page->field('hcspcs_desc', $ServiceData->{'data_text_c'});
 		$page->field('source', $ServiceData->{'caption'});
 
-		my $parentTransId = $ServiceData->{'trans_id'};
+
 		my $insAndClaimData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $parentTransId, 'Referral Insurance');
 
 		$page->field('plan', $insAndClaimData->{'name_sort'});
@@ -436,27 +489,8 @@ sub initialize
 		$page->field('addr_city', $orgContactAddress->{'city'});
 		$page->field('addr_state', $orgContactAddress->{'state'});
 		$page->field('addr_zip', $orgContactAddress->{'zip'});
-		#Populate the Procedure Information
-		my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$parentTransId);
 
-		my $count=0;
-		foreach (@$serviceProcedures)
-		{
-			my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$_->{code},$page->session('org_internal_id') );
 
-			$page->field("description$count",$data->{description});
-			$page->field("code$count",$_->{code});
-			$page->field("modf$count",$_->{modifier});
-			#$page->field("description$count",$_->{caption});
-			$page->field("comment$count",$_->{detail});
-			$page->field("charge$count",$_->{unit_cost});
-			$page->field("unit$count",$_->{quantity});
-			#$page->field("procedure_id$count",$_->{trans_id});
-			$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
-			$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
-
-			$count++;
-		}
 	}
 }
 
@@ -744,6 +778,7 @@ sub execute
 	my $first=0;
 	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
+
 		my $code = $page->field("code$loop");
 		my $modf = $page->field("modf$loop");
 		my $desc = $page->field("description$loop");
@@ -755,6 +790,8 @@ sub execute
 		my $endDate = $page->field('date_proc'.$loop.'_end_date');
 		my $transRequestId =$page->field("procedure_id$loop");
 		next unless $code;
+		next if ($page->field("skip_field$loop"));
+		
 		#If a description is not provided try to find one
 		unless ($desc)
 		{
