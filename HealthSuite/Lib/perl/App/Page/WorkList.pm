@@ -12,6 +12,7 @@ use Devel::ChangeLog;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Page;
 use App::Statements::Search::Appointment;
 
 use App::Dialog::WorklistSetup;
@@ -100,7 +101,8 @@ sub prepare_view_recentActivity
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD colspan=5>
-					#component.stp-person.mySessionActivity#
+					#component.stp-person.mySessionActivity# <br>
+					#component.stp-person.mySessionViewCount#
 				</TD>
 			</TR>
 			<TR>
