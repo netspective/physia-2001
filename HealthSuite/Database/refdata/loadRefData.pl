@@ -13,7 +13,7 @@ use Getopt::Long;
 
 sub Main
 {
-	my $dataSrcPath = 'Q:';
+	my $dataSrcPath = 'R:';
 	#my $dataSrcPath = 'H:/HealthSuite-RefData';
 	my $properties =
 	{
@@ -23,7 +23,8 @@ sub Main
 		#connectStr => 'physia/physia@dbi:Oracle:SDEDBS01',
 		#connectStr => 'hs/hs@dbi:Oracle:HealthSuiteIvory',
 		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS01',
-		connectStr => 'sde01/sde@dbi:Oracle:SDEDBS02',
+		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS02',
+		connectStr => 'sde_prime/sde@dbi:Oracle:SDEDBS02',
 		scriptPath => $Bin,
 		dataSrcPath => 'Q:',
 		dataSrcInfoXPath => File::Spec->catfile($dataSrcPath, 'info-x'),
