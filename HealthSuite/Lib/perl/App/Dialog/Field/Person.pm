@@ -239,7 +239,7 @@ sub new
 sub isPseudoResource
 {
 	my ($self, $page, $value) = @_;
-	
+
 	if ($value =~ /_\d$/ && $self->{types} && $self->{types}->[0] eq 'Physician')
 	{
 		my $rovingHash = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
@@ -252,7 +252,7 @@ sub isPseudoResource
 		}
 		my $stem = $value;
 		$stem =~ s/_\d$//;
-		
+
 		return 1 if grep(/^${stem}$/, @rovingPhysicians);
 	}
 }
@@ -267,8 +267,8 @@ sub isValid
 	{
 		# Require one of ther person types specified or any valid person type
 		my $types = defined $self->{types} ? $self->{types} : \@PERSON_TYPES;
-		unshift @{$types}, 'Administrator' unless grep {$_ eq 'Administrator'} @{$types};
-		unshift @{$types}, 'SuperUser' unless grep {$_ eq 'Administrator'} @{$types};
+		#unshift @{$types}, 'Administrator' unless grep {$_ eq 'Administrator'} @{$types};
+		#unshift @{$types}, 'SuperUser' unless grep {$_ eq 'Administrator'} @{$types};
 
 		my @idList = split(/\s*,\s*/, $value);
 
@@ -277,7 +277,7 @@ sub isValid
 			next if $self->isPseudoResource($page, $id);
 			next unless $id;
 			my $capId = uc($id);
-						
+
 			# Build an appropriate Invalidation Message for use if the requested ID doesn't exist
 			my $doesntExistMsg = qq{$self->{caption} '$id' does not exist. &nbsp; Add '$id' as a };
 			if ($self->{useShortForm})
@@ -425,7 +425,7 @@ sub isValid
 
 		# If the person record doesn't exist (in any org)...
 		my @perList = split(/\s*,\s*/,$value);
-		foreach my $id (@perList)		
+		foreach my $id (@perList)
 		{
 			next if $id eq '';
 			$id = uc($id);
@@ -452,7 +452,7 @@ sub isValid
 			else
 			{
 				my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $id, $page->session('org_internal_id'));
-				
+
 				# Unless one of the person types requested matches one of the categories that this person is...
 				unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
 				{
@@ -461,7 +461,7 @@ sub isValid
 				}
 			}
 		}
-	}	
+	}
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
