@@ -197,7 +197,7 @@ sub prepare_page_content_header
 	my $chooseAction = '';
 	$chooseAction =
 		qq{<SELECT onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-			<OPTION>Choose Action</OPTION>
+			<OPTION selected>Choose Action</OPTION>
 			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
 			<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId/profile">Schedule Appointment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>

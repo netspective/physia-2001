@@ -25,7 +25,7 @@ $STMTFMT_SEL_PERSON = qq{
 			account.value_text as account,
 			chart.value_text as chart,
 			cat.category,
-			per.simple_name AS name
+			initcap(per.simple_name) AS name
 		FROM
 			person per,
 			person_org_category cat,
