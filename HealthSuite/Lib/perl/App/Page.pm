@@ -683,6 +683,10 @@ sub prepare_page_content_header
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
+						<A HREF="/worklist" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/schedule.gif" BORDER=0> Worklist</A>
+						<FONT COLOR=LIGHTYELLOW>
+						&nbsp;|&nbsp;
+						</FONT>
 						<A HREF="/schedule" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/schedule.gif" BORDER=0> Schedule Desk</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
