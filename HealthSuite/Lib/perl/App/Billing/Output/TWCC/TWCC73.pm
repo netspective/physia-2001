@@ -1119,7 +1119,7 @@ sub box20
 					'y' => $y
 				},
 				{
-					'text' => "Safety/driving Issues)",
+					'text' => "Safety/driving issues)",
 					'fontWidth' => 7,
 					'x' => $x + 14,
 					'y' => $y - 54
@@ -1130,7 +1130,7 @@ sub box20
 
 	my $arr = [	"Must take prescription medication(s)",
 				"Advised to take over-the-counter meds",
-				"Medication may take drowsy (possible"
+				"Medication may make drowsy (possible"
 			];
 
 	my $arrY = [18,30,42];
