@@ -43,7 +43,7 @@ sub initialize
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
 		),
 		new CGI::Dialog::Field(caption => 'Number', name => 'value_text', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', futureOnly => 1, defaultValue => ''),
+		new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', futureOnly => 0, defaultValue => ''),
 		new CGI::Dialog::Field(	name => 'name_sort',
 					caption => 'Facility ID',
 					fKeyStmtMgr => $STMTMGR_ORG,

@@ -45,7 +45,7 @@ sub initialize
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 
-			new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', options => FLDFLAG_REQUIRED, futureOnly => 1, defaultValue => ''),
+			new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', options => FLDFLAG_REQUIRED, futureOnly => 0, defaultValue => ''),
 	);
 
 	$self->SUPER::initialize();
