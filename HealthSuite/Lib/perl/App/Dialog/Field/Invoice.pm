@@ -270,7 +270,7 @@ sub getHtml
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
 	my $sessOrgIntId = $page->session('org_internal_id');
-	my $isBatch = $page->param('batch_id');
+	my $isBatch = $page->param('_p_batch_id');
 	my $outstandInvoices = $isBatch ? $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllOutstandingInvoicesByClient', $personId, $sessOrgIntId)
 								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selSelfPayOutstandingInvoicesByClient', $personId, $sessOrgIntId);
 	my $totalInvoices = scalar(@{$outstandInvoices});
@@ -280,6 +280,7 @@ sub getHtml
 		my $invoice = $outstandInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
+		my $invStatCaption = $invoice->{status_caption};
 		$totalBalance += $invoiceBalance;
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
@@ -300,6 +301,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><FONT $textFontAttrs>$invStatCaption</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -323,6 +326,8 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Status</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Payment</FONT></TD>
@@ -331,7 +336,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
+						<TD COLSPAN=7><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
@@ -440,6 +445,7 @@ sub getHtml
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
 		my $invoiceStatus = $invoice->{invoice_status};
+		my $invStatCaption = $invoice->{status_caption};
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -460,6 +466,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs> $invoiceId </TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><FONT $textFontAttrs>$invStatCaption</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -494,6 +502,8 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Status</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund</FONT></TD>
@@ -506,7 +516,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Patient's Total Balance:</b></FONT></TD>
+						<TD COLSPAN=7><FONT $textFontAttrsForTotalBalRow><b>Patient's Total Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
 						<TD COLSPAN=4><FONT $textFontAttrs>$totalPossibleRefundMsg</FONT></TD>
 					</TR>
@@ -600,6 +610,7 @@ sub getHtml
 		my $invoice = $transferInvoices->[$line-1];
 		my $invoiceId = $invoice->{invoice_id};
 		my $invoiceBalance = $invoice->{balance};
+		my $invStatCaption = $invoice->{status_caption};
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -620,6 +631,8 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><FONT $textFontAttrs>$invStatCaption</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
 			</TR>
 		};
@@ -638,11 +651,13 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Status</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
+						<TD COLSPAN=7><FONT $textFontAttrsForTotalBalRow><b>Total Patient Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
