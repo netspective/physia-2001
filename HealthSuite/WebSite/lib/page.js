@@ -269,7 +269,13 @@ function translateEnterKey(event, flags)
 				blnMoveNextField = false;
 		}
 
-		if(field.nextFld != null && blnMoveNextField)
+		if (field.type == "password")
+		{
+			if (validateOnSubmit(document.forms.dialog))
+				document.forms.dialog.submit();
+			return true;
+		}
+		else if(field.nextFld != null && blnMoveNextField)
 		{
 			var property = "document.forms.dialog."+field.nextFld;
 			if(eval(property))
@@ -286,7 +292,7 @@ function translateEnterKey(event, flags)
 					alert('Please press Tab to get to the next field ('+property+').');
 				return true;
 			}
-		}
+		}		
 	}
 	return false;
 }
