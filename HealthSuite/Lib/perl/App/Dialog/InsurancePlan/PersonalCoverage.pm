@@ -87,7 +87,8 @@ sub new
 							fKeyStmt => 'selInsuredRelation',
 							fKeyDisplayCol => 1,
 							fKeyValueCol => 0,
-							options => FLDFLAG_REQUIRED
+							options => FLDFLAG_REQUIRED,
+							defaultValue => 1
 							),
 						new CGI::Dialog::Field(caption => 'Other Relationship Name',
 							name => 'extra'
@@ -171,13 +172,6 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
 	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if ($page->param('person_id') ne '');
-	#turn guarantor id off if patient is 21 or over
-	#if(my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id'))
-	#{
-	#	my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
-	#	my $insuredId = $patientAge >= 21 ? $personId : undef;
-	#	$page->field('insured_id', $insuredId);
-	#}
 
 	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 
@@ -202,8 +196,6 @@ sub makeStateChanges
 	{
 		$otherRel->invalidate($page, "When the 'Relation To Insured' is not 'Other', then the 'Other Relationship Name' should be blank");
 	}
-
-	$page->field('insured_id', $personId) if $relationToIns == App::Universal::INSURED_SELF;
 }
 
 sub customValidate
@@ -221,14 +213,13 @@ sub customValidate
 	my $billSeq = $self->getField('bill_sequence');
 
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-
-	if ($relToInsured != 0 && ($insuredId eq $personId || $insuredId eq ''))
+	if ($relToInsured != App::Universal::INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
 	{
 		$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is '$personId'");
 		$insuredIdField->invalidate($page, "Valid insured ID is needed (other than '$personId') if '$relToInsuredField->{caption}' is other than 'Self.'");
 	}
 
-	elsif($relToInsured == 0 && ($insuredId ne $personId && $insuredId ne ''))
+	elsif($relToInsured == App::Universal::INSURED_SELF && ($insuredId ne $personId && $insuredId ne ''))
 	{
 		$relToInsuredField->invalidate($page, "Must select '$relToInsuredField->{caption}' (other than 'Self') if '$insuredIdField->{caption}' is not '$personId'.");
 		$insuredIdField->invalidate($page, "'$insuredIdField->{caption}' must be '$personId' when selecting 'Self' in '$relToInsuredField->{caption}'");
@@ -359,6 +350,7 @@ sub populateData_add
 
 	return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 
+	my $relationToIns = App::Universal::INSURED_SELF;
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 	my $seq = 0;
 	my $hiddenBillSeq = $page->field('bill_sequence');
@@ -391,7 +383,8 @@ sub populateData_add
 	my $getInsOrgInternalId = $planData->{'ins_org_id'};
 	my $getInsOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $getInsOrgInternalId);
 	$page->field('ins_org_id', $getInsOrgId->{org_id});
-
+	$page->field('rel_to_insured', $relationToIns);
+	$page->field('insured_id', $personId) if $relationToIns == App::Universal::INSURED_SELF;
 }
 
 sub populateData_update
