@@ -1297,6 +1297,31 @@ function showFieldsOnValues(event, onValues, showFields)
 }
 
 
+function showHideRows(gridName, keyField, numRows)
+{
+	for (var i=1, foundOne=false; i <= numRows; i++)
+	{
+		var selObjName = 'document.all._f_' + keyField + '_' + i;
+		var selIndex = 0;
+
+		if (selObj = eval(selObjName))
+		{
+			selIndex = selObj.selectedIndex;
+			if (foundOne)
+				selObj.selectedIndex = 0;
+		}
+
+		if (foundOne)
+			setIdStyle('_id_' + gridName + '_' + i, 'display', 'none');
+		else
+			setIdStyle('_id_' + gridName + '_' + i, 'display', 'block');
+
+		if (selIndex == 0)
+			foundOne = true;
+	}
+}
+
+
 function setIdDisplay(id, display)
 {
 	setIdStyle('_id_' + id, 'display', display);
