@@ -392,11 +392,14 @@ sub getProceduresHtml
 		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $suppressedItem->{codeType});
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
+		my $serviceFromDate = $suppressedItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$suppressedItem->{dateOfServiceFrom};
+		my $serviceToDate = $suppressedItem->getDateOfServiceTo(DATEFORMAT_USA);	#$suppressedItem->{dateOfServiceTo};
+
 		push(@rows, qq{
 			<TR bgcolor="lightsteelblue">
 				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>&nbsp;</B></FONT></TD>
 				<TD>&nbsp;</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{dateOfServiceFrom} @{[ $suppressedItem->{dateOfServiceTo} ne $suppressedItem->{dateOfServiceFrom} ? " - $suppressedItem->{dateOfServiceTo}" : '']} </TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $suppressedItem->{dateOfServiceTo} ne $suppressedItem->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
 				<TD>&nbsp;</TD>
 				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 				<TD>&nbsp;</TD>
@@ -499,11 +502,14 @@ sub getProceduresHtml
 		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $voidItem->{codeType});
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
+		my $serviceFromDate = $voidItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$voidItem->{dateOfServiceFrom};
+		my $serviceToDate = $voidItem->getDateOfServiceTo(DATEFORMAT_USA);	#$voidItem->{dateOfServiceTo};
+
 		push(@rows, qq{
 			<TR>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Void</TD>
 				<TD>&nbsp;</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$voidItem->{dateOfServiceFrom} @{[ $voidItem->{dateOfServiceTo} ne $voidItem->{dateOfServiceFrom} ? " - $voidItem->{dateOfServiceTo}" : '']} </TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $voidItem->{dateOfServiceTo} ne $voidItem->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
 				<TD>&nbsp;</TD>
 				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 				<TD>&nbsp;</TD>
@@ -744,16 +750,21 @@ sub getItemsHtml
 		{
 			$cmtRow = qq{
 				<TR>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-					<TD COLSPAN=15><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
+					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+					<TD COLSPAN=11><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
 				</TR>
 			}
 		}
 
+		my $serviceFromDate = $otherItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$otherItem->{dateOfServiceFrom};
+		my $serviceToDate = $otherItem->getDateOfServiceTo(DATEFORMAT_USA);	#$otherItem->{dateOfServiceTo};
+
 		push(@rows, qq{
 			<TR>
 				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=3><B>$itemNum</B></TD>
+				<TD>&nbsp;</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $otherItem->{dateOfServiceTo} ne $otherItem->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
+				<TD>&nbsp;</TD>
 				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{daysOrUnits}</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{cpt}</TD>
@@ -766,7 +777,7 @@ sub getItemsHtml
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			$cmtRow
-			<TR><TD COLSPAN=10><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+			<TR><TD COLSPAN=13><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
@@ -788,11 +799,11 @@ sub getItemsHtml
 
 		push(@rows, qq{
 			<TR>
-				<TD COLSPAN=3>&nbsp;</TD>
-				<TD COLSPAN=4><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjComments</TD>
+				<TD COLSPAN=2>&nbsp;</TD>
+				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjComments</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
-			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+			<TR><TD COLSPAN=13><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
@@ -817,6 +828,9 @@ sub getItemsHtml
 					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
 						<TR BGCOLOR=EEEEEE>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
+							<TD>&nbsp;</TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Dates</B></TD>
+							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Qty</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
@@ -829,8 +843,7 @@ sub getItemsHtml
 						</TR>
 						@rows
 						<TR BGCOLOR=DDEEEE>
-							<TD COLSPAN=5><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
-							<!-- <TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD> -->
+							<TD COLSPAN=8><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
 							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green"><B>$invoiceTotal</B></TD>
