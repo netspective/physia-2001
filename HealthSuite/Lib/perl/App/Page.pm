@@ -11,6 +11,7 @@ package App::Page;
 
 use strict;
 use CGI::Page;
+use CGI::ImageManager;
 use App::Universal;
 use Date::Manip;
 
@@ -518,7 +519,7 @@ sub initialize
 {
 	my $self = shift;
 	$self->addLocatorLinks(
-			['<IMG SRC="/resources/icons/home-sm.gif" BORDER=0> Home', '/home'],
+			["$IMAGETAGS{'icons/home-sm'} Home", '/home'],
 		);
 
 	$self->incrementViewCount();
@@ -531,34 +532,38 @@ sub disable
 	$self->{_disabledMsg} = shift;
 }
 
+
 sub send_page_header
 {
-	my $self = shift;
-
-	print '<head>';
-	print join(' ', @{$self->{page_head}});
-	print qq{
-		<SCRIPT SRC='/lib/page.js'></SCRIPT>
-		<SCRIPT>
-		if(typeof pageLibraryLoaded == 'undefined')
-		{
-			alert('ERROR: /lib/page.js could not be loaded');
-		}
-		</SCRIPT>
-		} if $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
-	print qq{
+	my $self = shift; 
+	my $html .= join(' ', @{$self->{page_head}});
+	if ( $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS )
+	{
+		$html .= qq{
+			<SCRIPT SRC='/lib/page.js'></SCRIPT>
+			<SCRIPT>
+			if(typeof pageLibraryLoaded == 'undefined')
+			{
+				alert('ERROR: /lib/page.js could not be loaded');
+			}
+			</SCRIPT>
+		};
+	}
+	$html .= qq{
 		<STYLE>
 			a.head { text-decoration: none; }
 			a:hover { color : red; }
 			.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat;}
 		</STYLE>
-		<TITLE>Welcome to Physia</TITLE>
+		<TITLE>[Physia] #property._title#</TITLE>
 		@{[ $self->flagIsSet(PAGEFLAG_ISFRAMESET) ? $self->getFrameSet() : '' ]}
-		</head>
 		};
 
+	$self->replaceVars(\$html);
+	print "<head>\n$html\n</head>\n";
 	return 1;
 }
+
 
 sub getFrameSet
 {
@@ -592,30 +597,8 @@ sub send_page_body
 		$html .= join('', @{$self->{page_content_footer}});
 	}
 
-	# replace page variables if there are any
-	$html =~ s/\#(\w+)\.?([\w\-\.]*)\#/
-		if(my $method = $self->can($1))
-		{
-			&$method($self, $2);
-		}
-		else
-		{
-			"method '$1' not found in $self";
-		}
-		/ge;
-
-	# in case any replacements ended up creating other variables, replace again
-	$html =~ s/\#(\w+)\.?([\w\-\.]*)\#/
-		if(my $method = $self->can($1))
-		{
-			&$method($self, $2);
-		}
-		else
-		{
-			"method '$1' not found in $self";
-		}
-		/ge;
-
+	$self->replaceVars(\$html);
+	
 	$html = $self->component('sde-page-params-and-fields') . $html if $self->param('_debug_params');
 	$html = $self->component('sde-page-fields') . $html if $self->param('_debug_fields');
 	$html = $self->component('sde-page-session') . $html if $self->param('_debug_session');
@@ -713,48 +696,77 @@ sub prepare_page_body
 sub prepare_page_content_header
 {
 	my $self = shift;
+	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
+	my $resourceMap = $self->property('resourceMap');
 
-	my $locLinksHtml = $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links} || [], ' <IMG SRC="/resources/icons/arrow-right-lblue.gif"> ', "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>");
+	my $locLinksHtml = $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links} || [], " $IMAGETAGS{'icons/arrow-right-lblue'} ", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>");
 	my $locBGColor = $colors->[THEMECOLOR_BKGND_LOCATOR];
+	if (defined $resourceMap && $self->property('_title') && $self->property('_iconMedium'))
+	{
+		my $functions = '';
+		if (defined $resourceMap->{_views}) 
+		{
+			my $menu = [];
+			my $urlPrefix = "/" . $self->param('arl_resource');
+			foreach my $view (@{$resourceMap->{_views}})
+			{
+				push @$menu, [ $view->{caption}, "$urlPrefix/$view->{name}", $view->{name} ];
+			}
+			$functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER, '_pm_view', $menu, ' | ');
+		}
+		unshift(@{$self->{page_content_header}}, qq{
+			<table width="100%" bgcolor="lightsteelblue" cellspacing="0" cellpadding="3" border="0"><tr valign="bottom"><td width="32" align="center" valign="middle">
+				$IMAGETAGS{$self->property('_iconMedium')}<br>
+			</td><td align="left" valign="middle">
+				<font face="Arial,Helvetica" size="4" color="darkred">
+					&nbsp;<B>@{[ $self->property('_title') ]}</B>
+				</font>
+			</td><td align="right" valign="middle">
+				<font face="Arial,Helvetica" size="2">
+					$functions
+				</font>
+			</td></tr></table>
+			});
+	}
 	unshift(@{$self->{page_content_header}}, qq{
 		<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
 			<TR VALIGN=CENTER BGCOLOR=#3366CC><TD><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><NOBR>
 						&nbsp;
-						<A HREF="/homeorg" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/people-list.gif" BORDER=0> #session.org_id#</A>
+						<A HREF="/homeorg" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/people-list'} #session.org_id#</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
-						<A HREF="/home" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/home-sm.gif" BORDER=0> #session.user_id#</A>
+						<A HREF="/home" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/home-sm'} #session.user_id#</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
-						<A HREF="/search" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0> Search</A>
+						<A HREF="/search" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/magnifying-glass-sm'} Search</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
-						<A HREF="/worklist" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/worklist.gif" BORDER=0> Worklist</A>
+						<A HREF="/worklist" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/worklist'} Work Lists</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
-						<A HREF="/schedule" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/schedule.gif" BORDER=0> Schedule Desk</A>
+						<A HREF="/schedule" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/schedule'} Schedule Desk</A>
 						<FONT COLOR=LIGHTYELLOW>
 						&nbsp;|&nbsp;
 						</FONT>
-						<A HREF="/logout" STYLE="text-decoration:none; color:yellow"><IMG SRC="/resources/icons/logout.gif" BORDER=0> Logout</A>
-					</NOBR></FONT></TD><TD ALIGN=RIGHT><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><A HREF="/help"><IMG SRC="/resources/icons/help_blue.gif" border=0></A><IMG SRC="/resources/design/logo-blue-sm.gif"></FONT></TD></TR>
+						<A HREF="/logout" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/logout'} Logout</A>
+					</NOBR></FONT></TD><TD ALIGN=RIGHT><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><A HREF="/help">$IMAGETAGS{'icons/help_blue'}</A>$IMAGETAGS{'design/logo-blue-sm'}</FONT></TD></TR>
 		</TABLE>
 		<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
-			<TR HEIGHT=1><TD BGCOLOR='#3366CC' COLSPAN=2><IMG SRC="/resources/design/transparent-line.gif"></TD><TD BGCOLOR=BLACK><IMG SRC="/resources/design/transparent-line.gif"></TD></TR>
+			<TR HEIGHT=1><TD BGCOLOR='#3366CC' COLSPAN=2>$IMAGETAGS{'design/transparent-line'}</TD><TD BGCOLOR=BLACK>$IMAGETAGS{'design/transparent-line'}</TD></TR>
 			<TR VALIGN=CENTER HEIGHT=22><TD BGCOLOR='#3366CC'><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=WHITE STYLE="font-size:8pt">
 						<NOBR>&nbsp; $locLinksHtml</NOBR>
 					</FONT></TD>
-				<TD ALIGN=RIGHT ROWSPAN=2 BGCOLOR='#C0C0FF' WIDTH=25 HEIGHT=22><IMG SRC="/resources/design/blue-lsteelblue-merge-round-shadow.gif"></TD>
+				<TD ALIGN=RIGHT ROWSPAN=2 BGCOLOR='#C0C0FF' WIDTH=25 HEIGHT=22>$IMAGETAGS{'design/blue-lsteelblue-merge-round-shadow'}</TD>
 				<TD ONCLICK="javascript:window.location.reload()" BGCOLOR=LIGHTSTEELBLUE ALIGN=RIGHT STYLE="border-top: 1 solid black;"><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=NAVY STYLE="font-size:8pt">
 						<NOBR>@{[ UnixDate('today', '%c') ]}&nbsp;</NOBR>
 					</FONT></TD>
 			</TR>
-			<TR HEIGHT=1><TD BGCOLOR=BLACK><IMG SRC="/resources/design/transparent-line.gif"></TD><TD BGCOLOR=LIGHTSTEELBLUE><IMG SRC="/resources/design/transparent-line.gif"></TD></TR>
+			<TR HEIGHT=1><TD BGCOLOR=BLACK>$IMAGETAGS{'design/transparent-line'}</TD><TD BGCOLOR=LIGHTSTEELBLUE>$IMAGETAGS{'design/transparent-line'}</TD></TR>
 		</TABLE>
 		});
 }
@@ -1010,14 +1022,13 @@ sub printContents
 	$self->initialize();
 	$self->prepare_page_body();
 
-	return unless $self->send_http_header();
-	return unless $self->send_page_header();
-
-	#$self->dumpParams() if $self->param('_debug_params');
-	#$self->dumpSession() if $self->param('_debug_session');
-	#$self->dumpCookies() if $self->param('_debug_cookies');
-
-	$self->send_page_body();
+	if ($self->send_http_header()) {
+		print "<html>\n";
+		if ($self->send_page_header()) {
+			$self->send_page_body()
+		}
+		print "\n</html>\n";
+	}
 }
 
 sub homeArl
