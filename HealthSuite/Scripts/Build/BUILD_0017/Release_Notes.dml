@@ -60,6 +60,8 @@
 
 		<deliverable id="945">
 			UI: Physician license expiration report.
+			NOTE: Added a new column called category in the report and changed the heading from 'Professional License'
+			      to 'Professional License Expiration'.  
 		</deliverable>
 
 		<deliverable id="963">
