@@ -287,7 +287,8 @@ sub execute
 	savePerOrgAttr ($page,$phy_Id,$org_Id,$command);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog?catalog=fee_schedule") if $command ne 'add';
-	$self->handlePostExecute($page, $command, $flags);
+	$self->handlePostExecute($page, $command, $flags, undef, "Fee Schedule $command was successful");
+	return '';
 }
 
 sub savePerOrgAttr

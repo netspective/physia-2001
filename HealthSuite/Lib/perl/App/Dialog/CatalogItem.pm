@@ -404,7 +404,8 @@ sub execute
 		);
 
 	$page->param('_dialogreturnurl', '/org/%session.org_id%/catalog?catalog=fee_schedule_detail&fee_schedule_detail=%param.internal_catalog_id%') if $command ne 'add';
-	$self->handlePostExecute($page, $command, $flags);
+	$self->handlePostExecute($page, $command, $flags, undef, "Fee Schedule Item $command was successful");
+	return '';
 }
 
 1;
