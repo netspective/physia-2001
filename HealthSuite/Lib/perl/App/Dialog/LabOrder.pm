@@ -384,11 +384,24 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 		
+
+	
+	
+
+
+	return $self;			
+};
+
+sub makeStateChanges
+{
+        my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
+
+        $self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
 	#determine how many x-ray options needed
 	
-	my $labOrderId=$GLOBAL_PAGEREF->param('lab_order_id');
-	my $countXray=$STMTMGR_LAB_TEST->getSingleValue($GLOBAL_PAGEREF,STMTMGRFLAG_NONE,'countXray',$labOrderId);
-	
+	my $labOrderId=$page->param('lab_order_id');
+	my $countXray=$STMTMGR_LAB_TEST->getSingleValue($page,STMTMGRFLAG_NONE,'countXray',$labOrderId); 
+
 	my @fields=();
 	for (my $loop=0;$loop<$countXray;$loop++)
 	{
@@ -440,21 +453,22 @@ sub new
 				),	);			
 							
 	};
-		
+	
 	$self->addContent(
 			@fields,	
 			);
-	$self->addFooter(new CGI::Dialog::Buttons( cancelUrl => $self->{cancelUrl} || undef));
+	$self->addFooter(new CGI::Dialog::Buttons( cancelUrl => $self->{cancelUrl} || undef));	
+		
+        
+}
 
-	return $self;			
-};
 
 
 sub populateData
 {
 	my ($self, $page, $command, $flags) = @_;
-	my $labOrderId=$GLOBAL_PAGEREF->param('lab_order_id');	
-	my $data=$STMTMGR_LAB_TEST->getRowsAsHashList($GLOBAL_PAGEREF,STMTMGRFLAG_NONE,'selXrayOrder',$labOrderId);	
+	my $labOrderId=$page->param('lab_order_id');	
+	my $data=$STMTMGR_LAB_TEST->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selXrayOrder',$labOrderId);	
 	my $count=0;
 	foreach(@$data)
 	{	
@@ -465,7 +479,7 @@ sub populateData
 		$field->{heading}=$_->{name};
 		
 		#Get Option for entry selLabEntryOptions
-		my $options=$STMTMGR_LAB_TEST->getRowsAsHashList($GLOBAL_PAGEREF,STMTMGRFLAG_NONE,'selLabEntryOptions',$_->{lab_entry_id}||undef);	
+		my $options=$STMTMGR_LAB_TEST->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selLabEntryOptions',$_->{lab_entry_id}||undef);	
 		foreach my $opt (@$options)
 		{
 			if($opt->{member_name}==0||$opt->{member_name}==1||$opt->{member_name}==2)
@@ -490,8 +504,8 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	
-	my $labOrderId=$GLOBAL_PAGEREF->param('lab_order_id');
-	my $countXray=$STMTMGR_LAB_TEST->getSingleValue($GLOBAL_PAGEREF,STMTMGRFLAG_NONE,'countXray',$labOrderId);	
+	my $labOrderId=$page->param('lab_order_id');
+	my $countXray=$STMTMGR_LAB_TEST->getSingleValue($page,STMTMGRFLAG_NONE,'countXray',$labOrderId);	
 	for (my $loop=0;$loop<$countXray;$loop++)
 	{
 		my $list= '';
