@@ -83,20 +83,20 @@ sub populateData
 }
 
 
-#sub _customValidate
-#{
-#	my ($self, $page) = @_;
-#
-#	my $cat = $self->getField('category');
-#	my $personId = $page->field('person_id');
-#	my $orgId = $page->field('org_id');
-#	my $category = $page->field('category');
-#	my $existCat = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selDoesCategoryExist', $personId, $orgId, $category);
-#	if ($existCat ne '')
-#	{
-#		$cat->invalidate($page, "The Category '$category' already exists for the Person '$personId'");
-#	}
-#}
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $cat = $self->getField('category');
+	my $personId = $page->field('person_id');
+	my $orgId = $page->session('org_internal_id');
+	my $category = $page->field('category');
+	my $existCat = $STMTMGR_PERSON->getSingleValue($page,STMTMGRFLAG_NONE, 'selVerifyCategory', $personId, $orgId, $category);
+	if($existCat)
+	{
+		$cat->invalidate($page, "The Category '$category' already exists for the Person '$personId'");
+	}
+}
 
 sub execute
 {
