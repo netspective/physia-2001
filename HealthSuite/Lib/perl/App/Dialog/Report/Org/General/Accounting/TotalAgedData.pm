@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Dialog::Report::Org::General::Accounting::AgedPatientData;
+package App::Dialog::Report::Org::General::Accounting::TotalAgedData;
 ##############################################################################
 
 use strict;
@@ -28,7 +28,7 @@ use vars qw(@ISA $INSTANCE);
 
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-aged-patient-data', heading => 'Aged Patient Receivables');
+	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-aged-data', heading => 'Total Aged Receivables');
 
 	$self->addContent(
 
@@ -90,7 +90,7 @@ sub getDrillDownHandlers
 	return ('prepare_detail_$detail$');
 }
 
-sub prepare_detail_aged_patient
+sub prepare_detail_aged_data
 {
 	my ($self, $page) = @_;
 #	my $person_id = $page->param('_f_person_id');
@@ -99,7 +99,7 @@ sub prepare_detail_aged_patient
 	my $provider_id = $page->param('_f_provider_id');
 	my $org_id = $page->param('_f_org_id');
 
-	$page->addContent($STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient_detail',
+	$page->addContent($STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_data_detail',
 			[$person_id, $owner_id, $provider_id, $org_id]));
 
 }
@@ -124,9 +124,9 @@ sub execute
 	my $data;
 	my $html;
 
-	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient',$personId, $page->session('org_internal_id'),
+	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
 	$providerId, $facilityId);
-	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient',  [$personId, $page->session('org_internal_id'), 
+	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_all',  [$personId, $page->session('org_internal_id'), 
 	$providerId, $facilityId]);
 	
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});

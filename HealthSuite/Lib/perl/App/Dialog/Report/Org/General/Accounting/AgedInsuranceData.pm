@@ -50,7 +50,7 @@ sub new
 		),
 
 		new App::Dialog::Field::OrgType(
-			caption => 'Org ID',
+			caption => 'Site Organization ID',
 			name => 'org_id',
 			options => FLDFLAG_PREPENDBLANK,
 			types => "'PRACTICE', 'CLINIC', 'FACILITY/SITE'"
@@ -101,26 +101,8 @@ sub prepare_detail_insurance
 	my $provider_id = $page->param('_f_provider_id');
 	my $org_id = $page->param('_f_org_id');
 
-	if ($provider_id ne '' && $org_id ne '')
-	{
-		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_prov_org',
-			[$ins_org_id, $provider_id, $org_id]));
-	}
-	elsif ($provider_id ne '')
-	{
-		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_prov',
-			[$ins_org_id, $provider_id]));
-	}
-	elsif ($org_id ne '')
-	{
-		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_org',
-			[$ins_org_id, $org_id]));
-	}
-	else
-	{
-		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins',
-			[$ins_org_id]));
-	}
+	$page->addContent($STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_detail',
+			[$org_ins_id, $page->session('org_internal_id'),$provider_id, $org_id]));
 }
 
 sub execute
@@ -144,34 +126,8 @@ sub execute
 	my $data;
 	my $html;
 
-	if(($providerId eq '') && ($facilityId eq ''))
-	{
-		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'));
-		$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId,$page->session('org_internal_id')]);
-	}
-	else
-	{
-		if($providerId ne '')
-		{
-			if($facilityId ne '')
-			{
-				$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_prov_org', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId);
-				$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_prov_org', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId]);
-			}
-			else
-			{
-				$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_prov', $orgIntId, $page->session('org_internal_id'), $providerId);
-				$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_prov', [$orgIntId, $page->session('org_internal_id'), $providerId]);
-			}
-		}
-		else
-		{
-			$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_org', $orgIntId, $page->session('org_internal_id'), $facilityId);
-			$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_org', [$orgIntId, $page->session('org_internal_id'), $facilityId]);
-		}
-	}
-
-
+	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId);
+	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId]);
 
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_insurance"});
 
