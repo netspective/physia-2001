@@ -39,7 +39,7 @@ sub customValidate
 	my $sequence = $page->field('value_int');
 	my $personId = $page->param('person_id');
 	my $specialty = $page->field('value_text');
-	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne '1';
+	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne '5';
 
 	if (($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}))
 	{
