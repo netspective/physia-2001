@@ -163,7 +163,8 @@ sub initialize
 			fields => [
 				new App::Dialog::Field::OrgType(
 							caption => 'Service Facility',
-							name => 'service_facility_id'),
+							name => 'service_facility_id',
+							types => "'CLINIC','HOSPITAL','FACILITY/SITE'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Billing Org',
 							name => 'billing_facility_id'),
@@ -247,10 +248,14 @@ sub makeStateChanges
 
 
 
-	#Populate provider id field with session org's providers
+	#Populate provider id field and org fields with session org's providers
 	my $sessOrg = $page->session('org_id');
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+	#$self->getField('org_fields')->{fields}->[0]->{sessOrg} = $sessOrg;
+	#$self->getField('org_fields')->{fields}->[1]->{sessOrg} = $sessOrg;
+	#$self->getField('org_fields')->{fields}->[2]->{sessOrg} = $sessOrg;
+
 
 
 
