@@ -259,7 +259,7 @@ sub populateInsured
 	$data->{insuredAddressTelephone} = $dataA->getTelephoneNo;
 	$data->{insuredAddressZipCode} = $dataA->getZipCode;
 	$data->{insuredAddress} = $dataA->getAddress1 . " " . $dataA->getAddress2;
-	$data->{insuredId} = $claim->{insured}->[$claimType]->getSsn();
+	$data->{insuredId} = $claim->{insured}->[$claimType]->getMemberNumber();
 	$insured = $claim->{insured}->[0];
 	$data->{insuredEmployerOrSchoolName} = $insured->getEmployerOrSchoolName;
 	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;
