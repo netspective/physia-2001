@@ -44,6 +44,9 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_product_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_org_id'),
+			
+			#Hidden field to store medigap item_id
+			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),			
 
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
 				name => 'ins_org_id',
@@ -84,6 +87,13 @@ sub new
 							invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 				]
 			),
+
+			new CGI::Dialog::Field(type=>'text',
+						caption => 'Medigap Number',
+						name => 'medigap_number',
+						size =>'7',
+						maxLength =>'7'
+						),			
 			new CGI::Dialog::Subhead(heading => 'Remittance Information',
 				name => 'remittance_heading'
 			),
@@ -171,6 +181,15 @@ sub populateData
 		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary');
 	$page->field('fax_item_id', $insFax->{'item_id'});
 	$page->field('fax', $insFax->{'value_text'});
+
+
+
+	#Obtain Medigap item_id and value from Insurance_attribute Table
+	my $medigap = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org', $insIntId, 'Medigap/Number');
+	$page->field('medigap_number_id', $medigap->{'item_id'});
+	$page->field('medigap_number', $medigap->{'value_text'});
+
 
 	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule');
@@ -268,6 +287,18 @@ sub handleAttributes
 			_debug => 0
 		);
 
+	#If the medigap_number_id field is set then this is an update to the medigap number otherwise it is an add	
+	my $command_medigap = $page->field('medigap_number_id') ? 'update' : 'add';
+	
+	#Store Medigap Number if field is populated or we have an item_id
+	$page->schemaAction(
+			'Insurance_Attribute', $command_medigap,
+			item_id =>$page->field('medigap_number_id')||undef,
+			parent_id => $insIntId || undef,
+			item_name => 'Medigap/Number',
+			value_type => $textAttrType,
+			value_text => $page->field('medigap_number') || undef,
+		)if $page->field('medigap_number') || $page->field('medigap_number_id') ;			
 
 	my @feeSched =split(',', $page->field('fee_schedules'));
 
