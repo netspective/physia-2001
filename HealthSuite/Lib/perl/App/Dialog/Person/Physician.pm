@@ -467,7 +467,7 @@ sub execute_add
 					value_textB => $page->field("$idPName") || undef,
 					name_sort  => $pFacility,
 					value_dateEnd => $page->field("$idPDate") || undef,
-					_debug => 1
+					_debug => 0
 			)if $page->field("$idPName") ne '';
 
 		}
