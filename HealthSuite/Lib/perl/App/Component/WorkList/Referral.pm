@@ -43,7 +43,7 @@ use vars qw(@ISA @ITEM_TYPES @EXPORT
 %PHYSICIAN_URLS = (
 	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
 	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
-	'Create Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Create Schedule Template'},
+	'Add Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Add Schedule Template'},
 );
 
 %ORG_URLS = (
@@ -98,7 +98,7 @@ sub getHtml
 sub getComponentHtml
 {
 	my ($self, $page) = @_;
-	
+
 	my $referrals;
 	$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_open');
 
@@ -114,22 +114,22 @@ sub getComponentHtml
 	foreach (@$referrals)
 	{
 		#$_->{checkin_time}
-	
+
 		my $referralID;
 		if ($_->{trans_id_mod} eq $_->{referral_id})
 		{
 			$referralID = '/person/' . $_->{patient_id} . '/dlg-add-trans-6010/' . $_->{trans_id_mod};
 		}
-		else 
+		else
 		{
 			$referralID = '/person/' . $_->{patient_id} . '/dlg-update-trans-6010/' . $_->{trans_id_mod};
 		}
-		
+
 		my $addCommentARL = '/person/' . $_->{patient_id} . '/dlg-add-trans-6020/' . $_->{trans_id_mod};
 
 		my @rowData = (
 			qq{
-				
+
 				<IMG VSPACE=2 HSPACE=0 ALIGN=left VALIGN=top SRC='/resources/icons/info.gif' BORDER=0 ALT='Request information'>
 			},
 			qq{
@@ -166,9 +166,9 @@ sub getComponentHtml
 
 	$html .= createHtmlFromData($page, 0, \@data, $App::Statements::Component::Referral::STMTRPTDEFN_WORKLIST);
 
-	$html .= "<i style='color=red'>No referrals data found.</i> <P>" 
+	$html .= "<i style='color=red'>No referrals data found.</i> <P>"
 		if (scalar @{$referrals} < 1);
-	
+
 	return $html;
 }
 

@@ -38,7 +38,7 @@ use vars qw(@ISA @ITEM_TYPES @EXPORT
 %PHYSICIAN_URLS = (
 	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
 	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
-	'Create Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Create Schedule Template'},
+	'Add Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Add Schedule Template'},
 );
 
 %ORG_URLS = (
@@ -62,7 +62,7 @@ $apptDefault = 'Update';
 
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'worklistCollectionSetup', 
+	my $self = CGI::Dialog::new(@_, id => 'worklistCollectionSetup',
 	heading => 'Collection Worklist Setup',
 	headColor => "LIGHTSTEELBLUE",
 	);
@@ -115,7 +115,7 @@ sub new
 		#$orgSelOptions .= "$key:$ORG_URLS{$key}->{arl},";
 		$orgSelOptions .= "$key:$key,";
 	}
-	
+
 	my $apptSelOptions;
 	for my $key (reverse sort(keys %APPT_URLS))
 	{
@@ -158,7 +158,7 @@ sub new
 			),
 
 		new CGI::Dialog::Subhead(heading => 'Patients Last Name'),
-		new CGI::Dialog::MultiField(caption =>'Enter range:', 
+		new CGI::Dialog::MultiField(caption =>'Enter range:',
 			name => 'LastNameRange',
 			hints => 'Enter only the first letter of the last name.',
 			fields => [
@@ -179,8 +179,8 @@ sub new
 			]),
 
 		new CGI::Dialog::Subhead(heading => 'Age of the Balance'),
-		new CGI::Dialog::MultiField(caption =>'Age range:', 
-			name => 'BalanceAge', 
+		new CGI::Dialog::MultiField(caption =>'Age range:',
+			name => 'BalanceAge',
 			hints => 'Enter minimum and maximum age of balance in days.',
 			fields => [
 				new CGI::Dialog::Field(
@@ -199,11 +199,11 @@ sub new
 					maxLength => 5,
 					type => 'integer',
 				),
-			]),		
+			]),
 
 		new CGI::Dialog::Subhead(heading => 'Amount of Balance'),
-		new CGI::Dialog::MultiField(caption =>'Amount range:', 
-			name => 'BalanceAmountRange', 
+		new CGI::Dialog::MultiField(caption =>'Amount range:',
+			name => 'BalanceAmountRange',
 			hints => 'Enter minimum and maximum balance amount.',
 			fields => [
 				new CGI::Dialog::Field(
@@ -256,7 +256,7 @@ sub new
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
-	
+
 	return $self;
 }
 
@@ -278,12 +278,12 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	my $userId =  $page->session('user_id');
 	my $sessOrgId = $page->session('org_id');
 
 	# Populate the selected physicians
-	my $physicianList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, 
+	my $physicianList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_associated_physicians', $userId);
 	my @physicians = ();
 	for (@$physicianList)
@@ -292,7 +292,7 @@ sub populateData
 	}
 	$page->field('physician_list', @physicians);
 
-	my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, 
+	my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId);
 	my @products = ();
 	for (@$productsList)
@@ -302,7 +302,7 @@ sub populateData
 	$page->field('products', @products);
 
 	# Populate the selected facilities
-	my $facilityList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, 
+	my $facilityList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $userId, $sessOrgId);
 	my @facilities = ();
 	for (@$facilityList)
@@ -324,7 +324,7 @@ sub populateData
 			my $itemName = 'WorklistCollection/' . "\u$itemType" . '/OnSelect';
 			my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
 				'selSchedulePreferences', $userId, $itemName);
-			
+
 			if (my $itemUrl = $preference->{resource_id})
 			{
 				$page->session($name, $itemUrl);
@@ -333,17 +333,17 @@ sub populateData
 		}
 	}
 
-	my $LastNameRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, 
+	my $LastNameRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_lastname_range', $userId, $sessOrgId);
 	$page->field('LastNameFrom', $LastNameRange->{value_text});
 	$page->field('LastNameTo', $LastNameRange->{lnameto});
-	
-	my $BalanceAgeRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, 
+
+	my $BalanceAgeRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_balance_age_range', $userId, $sessOrgId);
 	$page->field('BalanceAgeMin', $BalanceAgeRange->{value_int});
 	$page->field('BalanceAgeMax', $BalanceAgeRange->{balance_age_to});
-	
-	my $BalanceAmountRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, 
+
+	my $BalanceAmountRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_balance_amount_range', $userId, $sessOrgId);
 	$page->field('BalanceAmountMin', $BalanceAmountRange->{value_float});
 	$page->field('BalanceAmountMax', $BalanceAmountRange->{balance_amount_to});
@@ -356,11 +356,11 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $userId =  $page->session('user_id');
 	my $orgId =  $page->session('org_id') || undef;
-	
-	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE, 
+
+	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_associated_physicians', $userId, $orgId);
 	my @physicians = $page->field('physician_list');
 	for (@physicians)
@@ -394,7 +394,7 @@ sub execute
 		);
 	}
 
-	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE, 
+	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_associated_products', $userId, $orgId);
 	my @products = $page->field('products');
 	for (@products)
@@ -417,7 +417,7 @@ sub execute
 
 		my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
 			'selSchedulePreferences', $userId, $itemName);
-			
+
 		my $itemID = $preference->{item_id};
 		my $command = (defined $itemID) ? 'update' : 'add';
 
@@ -431,7 +431,7 @@ sub execute
 			value_text   => $page->field($name),
 			parent_org_id => $orgId,
 		);
-		
+
 		$page->session($name, $page->field($name));
 	}
 
@@ -462,8 +462,8 @@ sub execute
 	# Update balance age
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_balance_age_range', $userId, $orgId);
-	my $intMinAge = $page->field('BalanceAgeMin');	
-	my $intMaxAge = $page->field('BalanceAgeMax');	
+	my $intMinAge = $page->field('BalanceAgeMin');
+	my $intMaxAge = $page->field('BalanceAgeMax');
 	if (length $intMinAge == 0)
 	{
 		$intMinAge = undef;
@@ -509,7 +509,7 @@ sub execute
 		_debug => 0
 	);
 
-	$self->handlePostExecute($page, $command, $flags, '/worklist/collection');	
+	$self->handlePostExecute($page, $command, $flags, '/worklist/collection');
 }
 
 sub customValidate
@@ -518,17 +518,17 @@ sub customValidate
 
 	my ($strFrom, $strTo) = ($page->field('LastNameFrom'), $page->field('LastNameTo'));
 	my $nameRangeFields = $self->getField('LastNameRange')->{fields}->[0];
-	
+
 	# Trim the strings white space
 	$strFrom =~ s/\s+//g;
 	$strTo =~ s/\s+//g;
 
 	if ( ($strFrom eq '' && $strTo eq '') || (length $strFrom > 0 && length $strTo > 0) )
 	{
-		if ($strFrom gt $strTo) 
+		if ($strFrom gt $strTo)
 		{
 			$nameRangeFields->invalidate($page, 'Invalid Last-Name range. The value on the left must be equal to or less than the value on the right.');
-		} 
+		}
 	}
 	elsif (length $strFrom > 0 || length $strTo > 0)
 	{
@@ -536,16 +536,16 @@ sub customValidate
 		{
 			$page->field('LastNameTo', $page->field('LastNameFrom'));
 		}
-		else 
+		else
 		{
 			$page->field('LastNameFrom', $page->field('LastNameTo'));
 		}
 	}
-	
+
 	my ($intBalanceAgeMin, $intBalanceAgeMax) = ($page->field('BalanceAgeMin'), $page->field('BalanceAgeMax'));
-	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0) 
+	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0)
 	{
-		if ($intBalanceAgeMin > $intBalanceAgeMax) 
+		if ($intBalanceAgeMin > $intBalanceAgeMax)
 		{
 			my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];
 			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. The value on the left must be equal to or less than the value on the right.");
@@ -557,16 +557,16 @@ sub customValidate
 		{
 			$page->field('BalanceAgeMax', $page->field('BalanceAgeMin'));
 		}
-		else 
+		else
 		{
 			$page->field('BalanceAgeMin', $page->field('BalanceAgeMax'));
 		}
 	}
-	
+
 	my ($intBalanceAmountMin, $intBalanceAmountMax) = ($page->field('BalanceAmountMin'), $page->field('BalanceAmountMax'));
-	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0) 
+	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0)
 	{
-		if ($intBalanceAmountMin > $intBalanceAmountMax) 
+		if ($intBalanceAmountMin > $intBalanceAmountMax)
 		{
 			my $balanceAmountFields = $self->getField('BalanceAmountRange')->{fields}->[0];
 			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. The value on the left must be equal to or less than the value on the right.");
@@ -578,12 +578,12 @@ sub customValidate
 		{
 			$page->field('BalanceAmountMax', $page->field('BalanceAmountMin'));
 		}
-		else 
+		else
 		{
 			$page->field('BalanceAmountMin', $page->field('BalanceAmountMax'));
 		}
 	}
-	
+
 	#my ($strFrom, $strTo) = ($page->field('LastNameFrom'), $page->field('LastNameTo'));
 	#my $nameRangeFields = $self->getField('LastNameRange')->{fields}->[0];
 }
