@@ -26,7 +26,12 @@ use enum qw(BITMASK:TIME_ H24 H12 ONLY);
 	stamp2minutes
 	cleanup
 	validateDate
+	convertStamp
+	convertTime
+	convertStamp2Stamp
 );
+
+use constant BASE_TZ => 'GMT';
 
 use Date::Calc qw(:all);
 use Date::Manip;
@@ -34,6 +39,43 @@ use App::Schedule::Slot;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+
+sub convertStamp
+{
+	my ($hhmm, $yyyy, $mm, $dd, $fromTZ, $toTZ) = @_;
+	
+	my $stamp = ParseDate(sprintf("%04d%02d%02d%02d:%02d", $yyyy, $mm, $dd, 
+		substr($hhmm, 0, 2), substr($hhmm, 2, 2) ));
+	my $convStamp = Date_ConvTZ($stamp, $fromTZ, $toTZ);
+	return (UnixDate($convStamp, '%H%M'), split(/,/, UnixDate($convStamp, '%Y,%m,%d')));
+}
+
+sub convertStamp2Stamp
+{
+	my ($stamp, $fromTZ, $toTZ) = @_;
+	
+	$stamp =~ /(\d\d)\/(\d\d)\/(\d\d\d\d)\s(.*)/;
+	my ($mm, $dd, $yyyy, $time) = ($1, $2, $3, $4);
+	
+	my $hhmm = time2hhmm(split(/\s/, $time));
+	my $fromStamp = ParseDate(sprintf("%04d%02d%02d%02d:%02d", $yyyy, $mm, $dd, 
+		substr($hhmm, 0, 2), substr($hhmm, 2, 2) ));
+	my $convStamp = Date_ConvTZ($fromStamp, $fromTZ, $toTZ);
+	return (UnixDate($convStamp, '%m/%d/%Y %I:%M %p') );
+}
+
+sub convertTime
+{
+	my ($time, $fromTZ, $toTZ, $flag) = @_;
+	
+	return undef unless $time;
+
+	my $hhmm = ($flag & TIME_H24) ? $time : time2hhmm(split(/\s/, $time));
+	my $stamp = ParseDate(sprintf("%04d%02d%02d%02d:%02d", 2000, 01, 01, 
+		substr($hhmm, 0, 2), substr($hhmm, 2, 2) ));
+	my $convStamp = Date_ConvTZ($stamp, $fromTZ, $toTZ);
+	return (UnixDate($convStamp, '%I:%M %p'));
+}
 
 sub validateDate
 {
@@ -95,6 +137,7 @@ sub time2hhmm
 	my $hour = substr($time, 0, 2);
 	my $minu = substr($time, 3, 2);
 	$hour += 12 if ($am =~ /p/i && $hour < 12);
+	$hour = 0 if ($am =~ /a/i && $hour == 12);
 
 	return $hour . $minu;
 }

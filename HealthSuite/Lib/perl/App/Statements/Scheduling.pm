@@ -65,21 +65,11 @@ $STMTFMT_SEL_EVENTS = qq{
 		e.scheduled_by_id,
 		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
 		at.caption as appt_type,
-		e.appt_type as appt_type_id,
-		(SELECT value_text
-			FROM Person_Attribute  pa
-			WHERE pa.parent_id = patient.person_id
-				AND pa.item_name = 'Patient/Account Number'
-		) as account_number,
-		(SELECT value_text
-			FROM Person_Attribute  pa
-			WHERE pa.parent_id = patient.person_id
-				AND pa.item_name = 'Patient/Chart Number'
-		) as chart_number	
+		e.appt_type as appt_type_id
 	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient, 
 		Event_Attribute ea, Event e
-	where e.start_time >= to_date(?, 'yyyy,mm,dd')
-		and e.start_time <= to_date(?, 'yyyy,mm,dd')
+	where e.start_time >= to_date(?, 'yyyy,mm,dd') + ?
+		and e.start_time < to_date(?, 'yyyy,mm,dd') + ?
 		and e.discard_type is null
 		and e.event_status in (0,1,2)
 		%facility_clause%
@@ -113,7 +103,17 @@ $STMTRPTDEFN_TEMPLATEINFO =
 
 # -------------------------------------------------------------------------------------------
 $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
-
+	
+	# Time Zone ------------------------------------
+	
+	'sel_sysdate' => qq{
+		select to_char (sysdate, '$SQLSTMT_DEFAULTSTAMPFORMAT') from dual
+	},
+	
+	
+	
+	# -----------------------------------------------
+	
 	'sel_events_at_facility' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
@@ -163,8 +163,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 	'sel_eventInfo' => {
 		_stmtFmt => qq{
-			select event_status, checkin_by_id, checkout_by_id, %simpleStamp:checkin_stamp%
-				as checkin_stamp, %simpleStamp:checkout_stamp% as checkout_stamp
+			select event_status, checkin_by_id, checkout_by_id, to_char(checkin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp, 
+				to_char(checkout_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp
 			from Event
 			where event_id = ?
 		}

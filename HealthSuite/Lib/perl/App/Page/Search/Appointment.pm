@@ -266,6 +266,12 @@ sub execute
 		push(@resource_ids, '*') unless @resource_ids;
 		push(@facility_ids, '*') unless @facility_ids;
 		
+		my $fromTZ = App::Schedule::Utilities::BASE_TZ;
+		my $toTZ = $self->session('TZ');
+		
+		my $convFromStamp = convertStamp2Stamp($fromStamp, $toTZ, $fromTZ);
+		my $convToStamp = convertStamp2Stamp($toStamp, $toTZ, $fromTZ);
+		
 		for my $resourceId (@resource_ids)
 		{
 			$resourceId =~ s/\*/%/g;
@@ -277,14 +283,16 @@ sub execute
 				my $appts;
 				if ($self->param('order_by') eq 'name')
 				{
-					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
-						$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 
+						'sel_appointment_orderbyName', $facilityId, "$convFromStamp", "$convToStamp",
+						$resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
 					);
 				}
 				else
 				{
-					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment',
-						$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 
+						'sel_appointment', $facilityId, "$convFromStamp", "$convToStamp", $resourceId,
+						$apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
 					);
 				}
 
@@ -292,7 +300,7 @@ sub execute
 				{
 					my @rowData = (
 						$_->{simple_name},
-						$_->{start_time},
+						convertStamp2Stamp($_->{start_time}, $fromTZ, $toTZ),
 						$_->{resource_id},
 						$_->{patient_type},
 						$_->{subject},
@@ -302,7 +310,7 @@ sub execute
 						$_->{remarks},
 						$_->{event_id},
 						$_->{scheduled_by_id},
-						$_->{scheduled_stamp},
+						convertStamp2Stamp($_->{scheduled_stamp}, $fromTZ, $toTZ),
 						$_->{patient_id},
 						$_->{appt_type},
 						$_->{account_number},

@@ -15,24 +15,23 @@ use CGI::Dialog;
 use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Universal;
-use vars qw(@ISA %RESOURCE_MAP);
+use App::Schedule::Utilities;
+use Date::Manip;
 
+use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'checkout' => {
 		_arl => ['event_id']
 		},
 	);
 
-use Date::Manip;
-
-@ISA = qw(App::Dialog::Encounter);
+use base qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
 use constant NEXTACTION_PRINTRECEIPT => "/";
 use constant NEXTACTION_APPOINTMENTS => "/schedule";
 use constant NEXTACTION_WORKLIST => "/worklist";
-
 
 sub initialize
 {
@@ -103,10 +102,15 @@ sub execute
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
 
+	my $fromTZ = $page->session('TZ');
+	my $toTZ = App::Schedule::Utilities::BASE_TZ;
+
+	my $convStamp = convertStamp2Stamp($stamp, $toTZ, $fromTZ);
+	
 	if ($status eq 'out')
 	{
 		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
+			<b style="color:red">This patient has been checked-$status by $person on $convStamp.</b>
 			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
 
@@ -119,7 +123,7 @@ sub execute
 			'Event', 'update',
 			event_id => $eventId || undef,
 			event_status => $eventStatus,
-			checkout_stamp => $page->field('checkout_stamp'),
+			checkout_stamp => convertStamp2Stamp($page->field('checkout_stamp'), $fromTZ, $toTZ),
 			checkout_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
 			subject => $page->field('subject'),

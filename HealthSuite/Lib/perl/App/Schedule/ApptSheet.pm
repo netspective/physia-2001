@@ -242,12 +242,19 @@ sub getTemplateData
 	my $rowsPrinted = 0;
 	my $templatesRef = $slot->{attributes}->{templates};
 
+	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
+	my $toTZ = $page->session('TZ');
+
 	for my $t (@{$templatesRef})
 	{
 		if ($t->{available} == $available)
 		{
 			my $templateID = $t->{template_id};
-			my $templateTime = hhmm2Time($t->{start_time}) . " - " . hhmm2Time($t->{end_time});
+
+			#my $templateTime = hhmm2Time($t->{start_time}) . " - " . hhmm2Time($t->{end_time});
+			my $templateTime = convertTime($t->{start_time}, $fromTZ, $toTZ, TIME_H24) 
+				. " - " . 
+				convertTime($t->{end_time}, $fromTZ, $toTZ, TIME_H24);
 
 			my @patientTypes;
 			if (defined $t->{patient_types}) {
@@ -458,7 +465,7 @@ sub buildRows
 			my @date = Decode_Date_US($self->{inputSpec}[$col][0]);
 
 			my $am = $hour >= 12 ? 'PM' : 'AM';
-			my $hourAm = $hour == 12 ? $hour : $hour % 12;
+			my $hourAm = $hour == 12 ? $hour : $hour == 0 ? 12 : $hour % 12;
 
 			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00_%s", $date[1], $date[2], $date[0], $hourAm, $am);
 			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=500,scrollbars,resizable');";

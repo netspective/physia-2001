@@ -49,7 +49,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
 	ea.value_textB as physician,
 	e.facility_id as facility,
-	%simpleStamp:e.start_time% as appointment_time,
+	%simpleStamp:e.start_time - ?% as appointment_time,
 	%simpleStamp:e.checkin_stamp% as checkin_time,
 	%simpleStamp:e.checkout_stamp% as checkout_time,
 	Invoice.invoice_id,
@@ -108,7 +108,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 		
 		timeSelectClause => qq{
-			e.start_time between sysdate - (?/24/60) and sysdate + (?/24/60)			
+			e.start_time between sysdate + ? - (?/24/60) and sysdate + ? + (?/24/60)			
 		},
 		
 		publishDefn => $STMTRPTDEFN_WORKLIST,
@@ -122,8 +122,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 		
 		timeSelectClause => qq{
-			e.start_time between to_date(?, '$STAMPFORMAT')
-				and to_date(?, '$STAMPFORMAT')
+			e.start_time between to_date(?, '$STAMPFORMAT') and to_date(?, '$STAMPFORMAT')
 		},
 		
 		publishDefn => $STMTRPTDEFN_WORKLIST,
@@ -137,8 +136,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 		
 		timeSelectClause => qq{
-			e.start_time between to_date(?, '$STAMPFORMAT')
-				and to_date(?, '$STAMPFORMAT')
+			e.start_time between to_date(?, '$STAMPFORMAT') and to_date(?, '$STAMPFORMAT')
 		},
 		
 		publishDefn => $STMTRPTDEFN_WORKLIST,

@@ -124,7 +124,6 @@ sub new
 			caption => 'Start / End Time',
 			type => 'time',
 			options => FLDFLAG_REQUIRED,
-			#hints => '(Default to all day if time is not specified)',
 		),
 
 		new CGI::Dialog::Field(name => 'days_of_week',
@@ -224,6 +223,12 @@ sub populateData_update
   $page->field('months', split(',', $page->field('months')));
   $page->field('patient_types', split(',', $page->field('patient_types')));
   $page->field('appt_types', split(',', $page->field('appt_types')));
+  
+	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
+	my $toTZ = $page->session('TZ');
+
+	$page->field('duration_begin_time', convertTime($page->field('duration_begin_time'), $fromTZ, $toTZ));
+	$page->field('duration_end_time', convertTime($page->field('duration_end_time'), $fromTZ, $toTZ));
 }
 
 sub customValidate
@@ -275,13 +280,16 @@ sub execute
 	my $days_of_month;
 	$days_of_month = $dom_spec_set->run_list() unless $dom_spec_set->empty();
 
+	my $fromTZ = $page->session('TZ');
+	my $toTZ = App::Schedule::Utilities::BASE_TZ;
+	
 	my $newTemplateID = $page->schemaAction(
 	'Sch_Template', $command,
 	template_id => $command eq 'add' ? undef :$templateID,
 	effective_begin_date => $page->field('effective_begin_date') || undef,
 	effective_end_date => $page->field('effective_end_date') || undef,
-	start_time => $page->field ('duration_begin_time') || undef,
-	end_time => $page->field ('duration_end_time') || undef,
+	start_time => convertTime($page->field ('duration_begin_time'), $fromTZ, $toTZ) || undef,
+	end_time => convertTime($page->field ('duration_end_time'), $fromTZ, $toTZ) || undef,
 	caption => $page->field ('caption'),
 	r_ids => cleanup($page->field ('r_ids')),
 	facility_id => $page->field ('facility_id'),

@@ -8,7 +8,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use CGI::ImageManager;
 use App::Universal;
-use vars qw(@ISA);
+use Date::Manip;
 
 use DBI::StatementManager;
 use App::Statements::Person;
@@ -17,7 +17,8 @@ use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'login' => {},
 );
-@ISA = qw(CGI::Dialog);
+
+use base qw(CGI::Dialog);
 
 sub new
 {
@@ -25,26 +26,38 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(
-				name => 'person_id', caption => 'User ID',
-				onValidate => \&validateUser, onValidateData => $self,
-				options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
-				),
+			name => 'person_id', caption => 'User ID',
+			onValidate => \&validateUser, onValidateData => $self,
+			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
+		),
 		new CGI::Dialog::Field(
-				name => 'org_id', caption => 'Organization ID',
-				onValidate => \&validateOrg, onValidateData => $self,
-				options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
-				),
+			name => 'org_id', caption => 'Organization ID',
+			onValidate => \&validateOrg, onValidateData => $self,
+			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
+		),
 		new CGI::Dialog::Field(
-				name => 'password', caption => 'Password', type => 'password',
-				onValidate => \&validatePassword, onValidateData => $self,
-				options => FLDFLAG_REQUIRED | FLDFLAG_HOME,
-				),
+			name => 'password', caption => 'Password', type => 'password',
+			onValidate => \&validatePassword, onValidateData => $self,
+			options => FLDFLAG_REQUIRED | FLDFLAG_HOME,
+		),
 		new CGI::Dialog::Field(
-				name => 'clear_sessions', caption => 'Logout of all active sessions', type => 'bool', style => 'check',
-				options => FLDFLAG_INVISIBLE
-				),
+			name => 'clear_sessions', caption => 'Logout of all active sessions', type => 'bool', style => 'check',
+			options => FLDFLAG_INVISIBLE
+		),
 		new CGI::Dialog::Field(name => 'start_sep', type => 'separator'),
-		new CGI::Dialog::Field(caption => 'Start Page', name => 'nextaction_redirecturl', type => 'select', selOptions => 'Worklist:/worklist;Home:/home;Main Menu:/menu;Schedule:/schedule', options => FLDFLAG_PERSIST),
+		new CGI::Dialog::Field(caption => 'Start Page', 
+			name => 'nextaction_redirecturl', 
+			type => 'select', 
+			selOptions => 'Worklist:/worklist;Home:/home;Main Menu:/menu;Schedule:/schedule', 
+			options => FLDFLAG_PERSIST
+		),
+		new CGI::Dialog::Field(caption => 'Time Zone',
+			name => 'timezone', 
+			type => 'select', 
+			selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT', 
+			options => FLDFLAG_PERSIST
+		),
+		
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -146,6 +159,7 @@ sub execute
 	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
 	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $self->{org_internal_id});
 	my $personFlags = App::Universal::PERSONFLAG_ISPATIENT;
+
 	foreach (@$categories)
 	{
 		$personFlags |= App::Universal::PERSONFLAG_ISPATIENT if uc($_) eq 'PATIENT';
@@ -155,8 +169,21 @@ sub execute
 		$personFlags |= App::Universal::PERSONFLAG_ISCAREPROVIDER if $_ =~ /^(Physician|Nurse)$/i;
 		$personFlags |= App::Universal::PERSONFLAG_ISSTAFF if $_ =~ /^(Physician|Nurse|Staff|Administrator)$/i;
 	}
-
-	$page->createSession($personId, $self->{org_internal_id}, { org_id => $orgId, categories => $categories, personFlags => $personFlags });
+	
+	my $timezone = $page->field('timezone');
+	$ENV{TZ} = $timezone;
+	`date` =~ /.*\d\d:\d\d:\d\d\s(.*?)\s.*/;
+	my $TZ = $1;
+	
+	my $now = ParseDate('today');
+	my $gmtTime = Date_ConvTZ($now, 'GMT', $TZ);
+	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
+	
+	$page->createSession($personId, $self->{org_internal_id}, { 
+		org_id => $orgId, categories => $categories, personFlags => $personFlags,
+		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset,
+	});
+	
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 

@@ -410,6 +410,16 @@ sub populateData_update
 	my $eventId = $page->param('event_id');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateAppointmentDialog', $eventId);
+
+	my $hhmm = time2hhmm(split(/\s/, $page->field("appt_time_0")));
+	my ($mm, $dd, $yyyy) = split(/\//, $page->field("appt_date_0"));
+
+	my ($apptTime, @apptDay) = convertStamp($hhmm, $yyyy, $mm, $dd, $page->session('TZ'), 
+		App::Schedule::Utilities::BASE_TZ);
+
+	$page->field('appt_date_0', sprintf("%02d/%02d/%04d", $apptDay[1], $apptDay[2], $apptDay[0]));
+	$page->field('appt_time_0', sprintf("%s", hhmm2Time($apptTime)));
+	
 	$page->param('old_appt_date', $page->field('appt_date_0'));
 	$page->param('old_appt_time', $page->field('appt_time_0'));
 }
@@ -718,10 +728,16 @@ sub execute
 		$self->handlePostExecute($page, $command, $flags);
 	}
 
+	my $fromTZ = $page->session('TZ');
+	my $toTZ = App::Schedule::Utilities::BASE_TZ;
+
 	for (my $i=0; $i<App::Universal::MAX_APPTS; $i++)
 	{
+		my $apptStamp = $page->field("appt_date_$i") . " " . $page->field("appt_time_$i");
+		my $convApptStamp = convertStamp2Stamp($apptStamp, $fromTZ, $toTZ);
+
 		my $timeStamp = $page->getTimeStamp();
-		my $start_time = $page->field("appt_date_$i") . ' '  . $page->field("appt_time_$i");
+		my $convTimeStamp = convertStamp2Stamp($timeStamp, $fromTZ, $toTZ);
 
 		my $parentId = $page->param("_f_parent_id_$i");
 		undef $parentId if $page->field("whatToDo_$i") eq 'db';
@@ -738,11 +754,11 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $start_time,
+					start_time => $convApptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
-					scheduled_stamp => $timeStamp,
+					scheduled_stamp => $convTimeStamp,
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,
@@ -770,7 +786,7 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $start_time,
+					start_time => $convApptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
@@ -805,7 +821,7 @@ sub execute
 					event_status => 3,
 					discard_type => $discardType,
 					discard_by_id => $page->session('user_id') || undef,
-					discard_stamp => $timeStamp,
+					discard_stamp => $convTimeStamp,
 					discard_remarks => $page->field('discard_remarks') || undef,
 					_debug => 0
 				);
@@ -823,7 +839,7 @@ sub execute
 					remarks => $page->field('remarks') || undef,
 					discard_type => $discardType,
 					discard_by_id => $page->session('user_id') || undef,
-					discard_stamp => $timeStamp,
+					discard_stamp => $convTimeStamp,
 					discard_remarks => $page->field('discard_remarks') || undef,
 					_debug => 0
 				);
@@ -833,11 +849,11 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $start_time,
+					start_time => $convApptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
-					scheduled_stamp => $timeStamp,
+					scheduled_stamp => $convTimeStamp,
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,

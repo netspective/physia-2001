@@ -8,6 +8,7 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use Data::Publish;
+use App::Schedule::Utilities;
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
@@ -136,6 +137,9 @@ sub execute
 	}
 
 	my %WEEKDAYS = (1=>'Sun', 2=>'Mon', 3=>'Tue', 4=>'Wed', 5=>'Thu', 6=>'Fri', 7=>'Sat');
+	
+	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
+	my $toTZ = $self->session('TZ');
 	# --------------------------------
 
 	my $templates = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
@@ -199,8 +203,8 @@ sub execute
 			$_->{org_id},
 			$patientTypesString,
 			$apptTypesString,
-			$_->{start_time},
-			$_->{end_time},
+			convertTime($_->{start_time}, $fromTZ, $toTZ),
+			convertTime($_->{end_time}, $fromTZ, $toTZ),
 			$_->{begin_date},
 			$_->{end_date},
 			$_->{months},

@@ -20,6 +20,7 @@ use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Dialog::Field::Procedures;
 use App::Universal;
+use App::Schedule::Utilities;
 
 use Date::Manip;
 use Date::Calc qw(:all);
@@ -335,6 +336,11 @@ sub populateData
 		$page->field('parent_event_id', $eventId);
 		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 			'selEncountersCheckIn/Out', $eventId);
+
+		my $fromTZ = App::Schedule::Utilities::BASE_TZ;
+		my $toTZ = $page->session('TZ');
+		$page->field('start_time', convertStamp2Stamp($page->field('start_time'), $fromTZ, $toTZ));
+		
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
 

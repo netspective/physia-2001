@@ -9,8 +9,9 @@ use CGI::Dialog;
 use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Universal;
-use vars qw(@ISA %RESOURCE_MAP);
+use App::Schedule::Utilities;
 
+use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'checkin' => {
 		_arl => ['event_id']
@@ -21,7 +22,8 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Org;
 use Date::Manip;
-@ISA = qw(App::Dialog::Encounter);
+
+use base qw(App::Dialog::Encounter);
 
 sub initialize
 {
@@ -84,25 +86,30 @@ sub execute
 	## First, update original event record to checkin status, and any changes
 	#my $timeStamp = $page->getTimeStamp();
 
+	my $fromTZ = $page->session('TZ');
+	my $toTZ = App::Schedule::Utilities::BASE_TZ;
+
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
 
+	my $convStamp = convertStamp2Stamp($stamp, $toTZ, $fromTZ);
+	
 	if (defined $status)
 	{
 		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
+			<b style="color:red">This patient has been checked-$status by $person on $convStamp.</b>
 			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
 
 	}
-
+	
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
 	if ($page->schemaAction(
 			'Event', 'update',
 			event_id => $eventId || undef,
 			event_status => $eventStatus,
-			checkin_stamp => $page->field('checkin_stamp'),
+			checkin_stamp => convertStamp2Stamp($page->field('checkin_stamp'), $fromTZ, $toTZ),
 			checkin_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
 			subject => $page->field('subject'),
