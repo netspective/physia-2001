@@ -130,6 +130,7 @@ sub execute
 		                billing_facility_id => $page->session('org_internal_id'),
 		                trans_status_reason =>$new_msg,
 				data_num_a => $_->{invoice_id} ,		
+				trans_invoice_id => $_->{invoice_id} 				
                 	) unless $STMTMGR_WORKLIST_COLLECTION->getSingleValue($page,STMTMGRFLAG_NONE,'selCollectionRecordById',
                 		$page->param('person_id'),$page->field('transfer_id'),$_->{'invoice_id'}) ;
                 	
