@@ -1445,11 +1445,16 @@ sub addProcedureItems
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
+		my $removeProc = $page->param("_f_proc_$line\_remove");
 		my $procCommand = $command;
 		my $itemId = $page->param("_f_proc_$line\_item_id");
 		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
 		{
 			$procCommand = 'add';
+		}
+		elsif($removeProc)
+		{
+			$procCommand = 'remove';
 		}
 
 		my $cptCode = $page->param("_f_proc_$line\_procedure");
@@ -1486,7 +1491,7 @@ sub addProcedureItems
 
 
 		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-		$page->schemaAction('Invoice_Item',	$procCommand,
+		$page->schemaAction('Invoice_Item', $procCommand,
 			%record,
 			parent_id => $invoiceId,
 			_debug => 0,
@@ -1510,16 +1515,19 @@ sub addProcedureItems
 
 		my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
 		my $totalCostForInvoice = '';
+		my $totalAdjustForInvoice = '';
 		foreach my $item (@{$allInvItems})
 		{
 			$totalCostForInvoice += $item->{extended_cost};
+			$totalAdjustForInvoice += $item->{total_adjust};
 		}
 
-		my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+		my $invBalance = $totalCostForInvoice + $totalAdjustForInvoice;
 
 		$page->schemaAction('Invoice',
 			'update',
 			invoice_id => $invoiceId,
+			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
 			total_items => defined $totalItems ? $totalItems : undef,
 			balance => defined $invBalance ? $invBalance : undef
