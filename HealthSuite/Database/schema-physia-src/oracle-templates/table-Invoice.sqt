@@ -1,0 +1,40 @@
+{
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$templOutputPathId = 'tables-code';
+	$templOutputFile = "$tableName\_denorm.sql";
+	
+	print STDERR "about to create template $templOutputPathId/$templOutputFile\n";
+}
+
+prompt -----------------------------------------------------------------------;
+prompt Creation of triggers for { $tableName }
+prompt -----------------------------------------------------------------------;
+
+
+create or replace trigger au_{$tableAbbrev}_row
+after update on {$tableName}
+for each row
+
+declare
+  
+begin 
+  
+    update auto_invoice_chrg
+      set parent_invoice_id = :new.parent_invoice_id,
+          invoice_date = :new.invoice_date,
+          invoice_type = :new.invoice_type,
+          invoice_subtype = :new.invoice_subtype,
+          submitter_id = :new.submitter_id,
+          client_type = :new.client_type,
+          client_id = :new.client_id,
+          billing_id = :new.billing_id
+    where invoice_id = :new.invoice_id;
+
+end au_{$tableAbbrev}_row;
+/
+show errors;
+
+   

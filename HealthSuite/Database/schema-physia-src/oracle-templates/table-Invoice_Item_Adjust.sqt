@@ -22,6 +22,15 @@ before insert or update or delete on {$tableName}
      pkg_inv_trig.v_ind_inv_item_adj_sort := 0;
      pkg_inv_trig.v_inv_item_adj_parent_id.delete;
      pkg_inv_trig.v_inv_item_adj_parent_id_dist.delete;
+     
+     
+     if inserting then
+     
+       pkg_inv_trig.v_ind_inv_item_adj_ins := 0;
+       pkg_inv_trig.v_inv_item_adj_id_ins.delete;
+       
+     end if;
+     
   
    end biud_{$tableAbbrev};
    
@@ -60,9 +69,18 @@ for each row
     
     if deleting then
       pkg_inv_trig.v_inv_item_adj_parent_id(pkg_inv_trig.v_ind_inv_item_adj) := :old.parent_id;
-     elsif inserting or updating then
+      
+    elsif updating then
+       pkg_inv_trig.v_inv_item_adj_parent_id(pkg_inv_trig.v_ind_inv_item_adj) := :new.parent_id;
+       
+    elsif inserting then
+     
+       pkg_inv_trig.v_ind_inv_item_adj_ins := pkg_inv_trig.v_ind_inv_item_adj_ins + 1;
+       pkg_inv_trig.v_inv_item_adj_id_ins(pkg_inv_trig.v_ind_inv_item_adj_ins) := :new.adjustment_id;
+       
        pkg_inv_trig.v_inv_item_adj_parent_id(pkg_inv_trig.v_ind_inv_item_adj) := :new.parent_id; 
-     end if;
+       
+    end if;
  
    end aiud_{$tableAbbrev}_row;
 /
@@ -92,5 +110,163 @@ after insert or update or delete on {$tableName}
  
    end aiud_{$tableAbbrev};
    
+/
+show errors;
+
+/* these triggers are for denormalization */
+
+
+
+create or replace trigger au_{$tableAbbrev}_row
+after update on {$tableName}
+for each row
+
+declare
+  
+begin 
+
+    update auto_invoice_chrg
+      set pay_date = :new.pay_date,
+          writeoff_code = :new.writeoff_code,
+          writeoff_amount = :new.writeoff_amount,
+          net_adjust = :new.net_adjust,
+          payer_type = :new.payer_type, 
+          payer_id = :new.payer_id,
+          pay_type = :new.pay_type,
+          adjustment_type = :new.adjustment_type,
+          adjustment_amount = :new.adjustment_amount,
+          plan_paid = :new.plan_paid,
+          pay_method = :new.pay_method
+    where adjustment_id = :new.adjustment_id;
+
+end au_{$tableAbbrev}_row;
+/
+show errors;
+
+
+create or replace trigger ai_{$tableAbbrev}_row
+after insert on {$tableName}
+
+declare
+
+  v_adjustment_id invoice_item_adjust.adjustment_id%type;  
+  
+  v_batch_id number(16);
+  v_batch_date date;
+  
+begin 
+
+  for i in 1..pkg_inv_trig.v_ind_inv_item_adj_ins loop
+  
+    v_adjustment_id := pkg_inv_trig.v_inv_item_adj_id_ins(i);
+
+/*
+    begin
+
+       v_batch_id := null;
+       v_batch_date := null;
+
+       SELECT ia.value_date, ia.value_text into v_batch_date, v_batch_id FROM invoice_attribute ia
+       WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
+	       AND ia.value_int = v_adjustment_id;
+	     
+    exception
+      when others then null;
+    end;
+    
+*/
+
+    INSERT INTO Auto_Invoice_Chrg
+    (invoice_id,
+    trans_id,
+    adjustment_id,
+    item_id,
+    invoice_date,
+/*  batch_date,
+    batch_id,
+*/
+    caption,
+    invoice_type,
+    item_type,
+    service_facility_id,
+    billing_facility_id,
+    provider_id,
+    care_provider_id,
+    service_begin_date,
+    service_end_date,
+    code,rel_diags,
+    submitter_id,
+    client_type,
+    client_id,
+    hcfa_service_type,
+    ffs_flag,
+    writeoff_code,
+    writeoff_amount,
+    net_adjust,
+    payer_type,
+    payer_id,
+    pay_type,
+    adjustment_type,
+    adjustment_amount,
+    plan_paid,
+    pay_method,
+    owner_org_id,
+    billing_id,
+    trans_type,
+    parent_invoice_id,
+    invoice_subtype,
+    pay_date)
+    SELECT	
+        i.invoice_id,
+        t.trans_id,
+        iia.adjustment_id,
+        ii.item_id,
+        i.invoice_date,
+/*	v_batch_date,
+	v_batch_id,	
+*/
+        ii.caption,
+        i.invoice_type,
+        ii.item_type,
+        t.service_facility_id,
+        t.billing_facility_id,
+        t.provider_id,
+        t.care_provider_id,
+        ii.service_begin_date,	
+        service_end_date,
+        ii.code,rel_diags,
+        submitter_id,
+        client_type,
+        client_id,
+        hcfa_service_type,
+        nvl(ii.data_num_a,0) as ffs_cap,
+        iia.writeoff_code,
+        iia.writeoff_amount,
+        net_adjust,
+        payer_type,
+        payer_id,
+        pay_type,
+        adjustment_type,
+        adjustment_amount,
+        plan_paid,
+        pay_method,
+        o.owner_org_id,
+        i.billing_id,
+        t.trans_type,
+        i.parent_invoice_id,
+        i.invoice_subtype,
+        iia.pay_date
+    FROM invoice i ,  transaction t ,	
+	invoice_item_adjust iia , invoice_item ii, org o
+    WHERE t.trans_id = i.main_transaction 			
+	AND ii.parent_id  = i.invoice_id
+	AND iia.parent_id = ii.item_id
+	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
+	and o.org_internal_id = service_facility_id
+	and iia.adjustment_id=v_adjustment_id;
+
+   end loop; 
+
+end ai_{$tableAbbrev}_row;
 /
 show errors;

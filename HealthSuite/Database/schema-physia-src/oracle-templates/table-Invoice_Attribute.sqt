@@ -1,0 +1,48 @@
+{
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$templOutputPathId = 'tables-code';
+	$templOutputFile = "$tableName\_denorm.sql";
+	
+	print STDERR "about to create template $templOutputPathId/$templOutputFile\n";
+}
+
+prompt -----------------------------------------------------------------------;
+prompt Creation of triggers for { $tableName }
+prompt -----------------------------------------------------------------------;
+
+
+create or replace trigger aiu_{$tableAbbrev}_row
+after update or insert on {$tableName}
+for each row
+
+declare
+  
+begin 
+
+  if :new.item_name = 'Invoice/Creation/Batch ID' then
+  
+    update auto_invoice_chrg
+      set batch_date = :new.value_date,
+          batch_id = :new.value_text
+    where invoice_id = :new.parent_id and adjustment_id is null;
+    
+  elsif :new.item_name = 'Invoice/Payment/Batch ID' then
+  
+    update auto_invoice_chrg
+      set batch_date = :new.value_date,
+          batch_id = :new.value_text
+    where invoice_id = :new.parent_id and adjustment_id = :new.value_int;
+    
+  end if;
+    
+end aiu_{$tableAbbrev}_row;
+/
+show errors;
+
+
+
+
+   

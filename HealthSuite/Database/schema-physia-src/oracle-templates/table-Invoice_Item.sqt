@@ -22,6 +22,13 @@ before insert or update or delete on {$tableName}
      pkg_inv_trig.v_ind_inv_item_sort := 0;
      pkg_inv_trig.v_inv_item_parent_id.delete;
      pkg_inv_trig.v_inv_item_parent_id_dist.delete;
+     
+     if inserting then
+     
+       pkg_inv_trig.v_ind_inv_item_ins := 0;
+       pkg_inv_trig.v_inv_item_id_ins.delete;
+       
+     end if;
   
   end biud_{$tableAbbrev};
    
@@ -60,7 +67,13 @@ for each row
     
     if deleting then
       pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :old.parent_id;
-     elsif inserting or updating then
+     elsif updating then
+       pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :new.parent_id; 
+     elsif inserting then
+     
+       pkg_inv_trig.v_ind_inv_item_ins := pkg_inv_trig.v_ind_inv_item_ins + 1;     
+       pkg_inv_trig.v_inv_item_id_ins(pkg_inv_trig.v_ind_inv_item_ins) := :new.item_id;
+       
        pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :new.parent_id; 
      end if;
  
@@ -110,3 +123,133 @@ after insert or update or delete on {$tableName}
    end aiud_{$tableAbbrev};   
 /
 show errors;
+
+/* this triggers are for denormalization */
+
+create or replace trigger au_{$tableAbbrev}_row
+after update on {$tableName}
+for each row
+
+declare
+  
+begin 
+
+    update auto_invoice_chrg
+      set units = :new.quantity,
+          item_type = :new.item_type,
+          unit_cost = :new.unit_cost,
+          charges = :new.extended_cost,
+          caption = :new.caption,
+          service_begin_date = :new.service_begin_date,
+          service_end_date = :new.service_end_date, 
+          code = :new.code,
+          rel_diags = :new.rel_diags,
+          hcfa_service_type = :new.hcfa_service_type,
+          ffs_flag = nvl(:new.data_num_a, 0)
+    where item_id = :new.item_id and adjustment_id is null;
+    
+    update auto_invoice_chrg
+       set    item_type = :new.item_type,
+              caption = :new.caption,
+              service_begin_date = :new.service_begin_date,
+              service_end_date = :new.service_end_date, 
+              code = :new.code,
+              rel_diags = :new.rel_diags,
+              hcfa_service_type = :new.hcfa_service_type,
+              ffs_flag = nvl(:new.data_num_a, 0)
+    where item_id = :new.item_id and adjustment_id is not null;
+    
+end au_{$tableAbbrev}_row;
+/
+show errors;
+
+
+create or replace trigger ai_{$tableAbbrev}_row
+after insert on {$tableName}
+
+declare
+    v_item_id invoice_item.item_id%type; 
+    
+begin 
+
+     for i in 1..pkg_inv_trig.v_ind_inv_item_ins loop
+     
+       v_item_id := pkg_inv_trig.v_inv_item_id_ins(i);
+
+       INSERT INTO Auto_Invoice_Chrg
+       (invoice_id,
+       trans_id,
+       item_id,
+       invoice_date,
+       batch_date,
+       batch_id,
+       caption,
+       charges,
+       invoice_type,
+       item_type,
+       units,
+       unit_cost,
+       service_facility_id,
+       billing_facility_id,
+       provider_id,
+       care_provider_id,
+       service_begin_date,
+       service_end_date,
+       code,
+       rel_diags,
+       submitter_id,
+       client_type,
+       client_id,
+       hcfa_service_type,
+       ffs_flag,
+       owner_org_id,
+       billing_id,
+       trans_type,
+       invoice_subtype,
+       parent_invoice_id)
+       SELECT
+         i.invoice_id,
+         t.trans_id,
+         ii.item_id,
+         i.invoice_date,
+         ia.value_date,
+         ia.value_text,
+         ii.caption,
+	 extended_cost,
+	 i.invoice_type,
+	 ii.item_type,
+	 ii.quantity,
+	 ii.unit_cost,
+	 t.service_facility_id,
+	 t.billing_facility_id,
+	 t.provider_id,
+	 t.care_provider_id,
+	 ii.service_begin_date,
+	 ii.service_end_date,
+	 ii.code as code,
+	 ii.rel_diags as rel_diags,
+	 i.SUBMITTER_ID,
+	 i.client_type,
+	 i.client_id,
+	 ii.hcfa_service_type,
+	 nvl(ii.data_num_a,0) as ffs_cap,
+	 o.owner_org_id,
+	 i.billing_id,
+	 t.trans_type,
+	 i.invoice_subtype,
+	 i.parent_invoice_id	
+FROM 	invoice i,  transaction t, invoice_item ii, org o,  invoice_attribute ia 
+WHERE   t.trans_id = i.main_transaction 			
+	AND i.invoice_id = ia.parent_id(+)     
+	AND ii.parent_id  = i.invoice_id
+	AND ia.item_name(+)  = 'Invoice/Creation/Batch ID'		
+	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
+	AND o.org_internal_id = t.service_facility_id
+	AND ii.item_id = v_item_id;
+
+     end loop; 
+
+end ai_{$tableAbbrev}_row;
+/
+show errors;
+
