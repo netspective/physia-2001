@@ -222,15 +222,12 @@ sub prepare_dialog_postpayment
 	my $self = shift;
 	my $personId = $self->param('person_id');
 
-	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
-	my ($action, $invoiceId) = split(/,/, $dialogCmd);
-	$self->param('invoice_id', $invoiceId);
-	$self->param('posting_action', $action);
-	#$self->addDebugStmt($payType);
+	my $dialogCmdOrParam = $self->param('_pm_dialog_cmd') || 'add';
+	$self->param('invoice_id', $dialogCmdOrParam);
 
 	my $cancelUrl = "/person/$personId/account";
 	my $dialog = new App::Dialog::PostGeneralPayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $dialogCmd);
+	$dialog->handle_page($self, $dialogCmdOrParam);
 
 	$self->addContent('<p>');
 	return $self->prepare_view_account();
