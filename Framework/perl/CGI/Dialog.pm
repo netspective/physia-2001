@@ -31,8 +31,6 @@ sub new
 	# any HTML to put in before and after a field
 	$self->{preHtml} = '' unless $self->{preHtml};
 	$self->{postHtml} = '' unless $self->{postHtml};
-	
-	
 
 	# internal housekeeping variables
 	$self->{_spacerWidth} = 0;
@@ -497,13 +495,13 @@ sub select_as_html
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 		}
 		elsif($self->{style} eq 'multidual')
-		{		
+		{
 			my ($selectOptions, $selectOptionsSelected) = ('', '');
 			foreach (@{$choices})
 			{
 				my $lb = $_->[0] ? \$selectOptionsSelected : \$selectOptions;
 				$$lb .= "<option value=\"$_->[2]\">$_->[1]</option>";
-			}			
+			}
 			my $sorted = $self->flagIsSet(FLDFLAG_SORT) ? 'true' : 'false';
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{
 					<TABLE CELLSPACING=0 CELLPADDING=1 ALIGN=left BORDER=0>
@@ -534,6 +532,7 @@ sub select_as_html
 		{
 			my $options = '';
 			my $multiple = $self->{style} eq 'multi' ? 'multiple' : '';
+			$options .= "<option value=''></option>" if ($self->{flags} & FLDFLAG_PREPENDBLANK);
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'selected' : '';
@@ -885,12 +884,29 @@ sub getHtml
 		$errorMsgsHtml = "<font $dialog->{bodyFontErrorAttrs}>$msgsHtml</font>";
 	}
 
-	my $caption = $self->{caption};
+	# Multifield caption overrides sub field captions
+	my $caption = "";
+	if ($self->{flags} & FLDFLAG_DEFAULTCAPTION)
+	{
+		foreach(@$fields)
+		{
+			if (defined $_->{caption})
+			{
+				$caption .= " / " if ($caption);
+				$caption .= $_->{flags} & FLDFLAG_REQUIRED ? "<b>$_->{caption}</b>" : $_->{caption};
+			}
+		}
+	}
+	else
+	{
+		$caption = $self->{caption};
+		$caption = "<b>$caption</b>" if $requiredCols > 0;
+	}
+
 
 	# do some basic variable replacements
 	my $Command = "\u$command";
 	$caption =~ s/(\$\w+)/$1/eego;
-	$caption = "<b>$caption</b>" if $requiredCols > 0;
 
 	my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
 	my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
