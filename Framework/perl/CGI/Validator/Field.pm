@@ -74,8 +74,8 @@ use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
 		(
 			'float' =>
 				{
-					regExp => '^\d+(\.\d+)?$',
-					message => "has an invalid number (format is 999.999).",
+					regExp => '^\-?\d+(\.\d+)?$',
+					message => "has an invalid number (format is [-]999.999).",
 					maxLength => 16,
 					onValidate => \&validateMinMax,
 					onKeyPressJS => ONKEYPRESSJS_FLOATNUM,
@@ -109,8 +109,8 @@ use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
 				},
 			'currency' =>
 				{
-					regExp => '^\d+(\.\d\d)?$',
-					message => "has an invalid number (format is 999.99).",
+					regExp => '^\-?\d+(\.\d\d)?$',
+					message => "has an invalid number (format is [-]999.99).",
 					maxLength => 10,
 					onValidate => \&validateMinMax,
 					onKeyPressJS => ONKEYPRESSJS_FLOATNUM,
