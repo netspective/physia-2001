@@ -15,6 +15,8 @@ use DBI::StatementManager;
 use App::Statements::Component::Invoice;
 use App::Statements::Org;
 use App::Statements::Report::Accounting;
+use App::Dialog::Field::Organization;
+use App::Dialog::Field::Person;
 use Data::Publish;
 use Data::TextPublish;
 use App::Configuration;
@@ -264,11 +266,11 @@ sub execute
 		my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit',$reportBeginDate,$reportEndDate,
 		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 
-		my $count_new_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_newpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'),$gmtDayOffset);
+		my $count_new_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_newpatient_count_new',
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $person_id, $page->session('org_internal_id'));
 
-		my $count_est_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_estpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'),$gmtDayOffset);
+		my $count_est_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_estpatient_count_new',
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $person_id, $page->session('org_internal_id'));
 
 		foreach (@$daily_audit)
 		{
@@ -281,7 +283,7 @@ sub execute
 			my $estPatCount = '';
 			foreach(@$count_new_patient)
 			{
-				if ( $invoiceDate eq $_->{start_time})
+				if ( $invoiceDate eq $_->{invoice_prd})
 				{
 					$newPatCount = $_->{count};
 					last;
@@ -289,7 +291,7 @@ sub execute
 			}
 			foreach(@$count_est_patient)
 			{
-				if ($invoiceDate eq $_->{start_time})
+				if ($invoiceDate eq $_->{invoice_prd})
 				{
 					$estPatCount = $_->{count};
 					last;
