@@ -120,9 +120,13 @@ sub buildSqlStmt
 
 	if($serviceBeginDate ne '' && $serviceEndDate ne '')
 	{
-		$serviceDateClause = qq{ and i.invoice_id in (select parent_id from invoice_item ii
-							where ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
-							and ii.service_end_date <= to_date('$serviceEndDate', 'mm/dd/yyyy'))
+		$serviceDateClause = qq{ and i.invoice_id in 
+								(select parent_id from invoice_item ii
+									where ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
+									and ii.service_end_date <= to_date('$serviceEndDate', 'mm/dd/yyyy')
+									and ii.item_type in (0,1,2)
+									and ii.data_text_b is NULL
+								)
 							};
 	}
 
