@@ -94,7 +94,7 @@ $STMTFMT_SEL_ORG_DIR = qq{
 			AND (
 				 o.owner_org_id = ?
 			)
-		ORDER BY o.name_primary, o.org_id
+		ORDER BY o.org_id
 	)
 	WHERE rownum <= $LIMIT
 };
@@ -234,7 +234,7 @@ $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR = qq{
 		AND     o.owner_org_id = ?
 		AND     oc.code = ?
 		AND     a.city = ?
-		ORDER BY o.name_primary
+		ORDER BY o.org_id
 };
 
 $STMTRPTDEFN_DEFAULT =
