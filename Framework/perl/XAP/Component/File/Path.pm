@@ -201,7 +201,10 @@ sub readEntries
 			
 			$self->addPath($_, id => $_, caption => $caption, heading => $caption);
 		}
-
+	}
+	else
+	{
+		die "Path '$fsPath' is not valid";
 	}
 }
 
