@@ -30,6 +30,9 @@
 			Return to the Patient's profile page after scheduling an appointment from the
 			Care Providers Component.
 		</deliverable>
+		<deliverable id="1034">
+			Removed ability to change passwords and personnel categories from factory security settings. Now available to Administrator and Seuperuser only
+		</deliverable>
 
 	</deliverables>
 </release-notes>
