@@ -14,6 +14,12 @@ use Devel::ChangeLog;
 use App::Statements::Person;
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(CGI::Dialog);
+use constant SEQUENCE_SPECIALTY_PRIMARY => 1;
+use constant SEQUENCE_SPECIALTY_SECONDARY => 2;
+use constant SEQUENCE_SPECIALTY_TERTIARY => 3;
+use constant SEQUENCE_SPECIALTY_QUATERNARY => 4;
+use constant SEQUENCE_SPECIALTY_UNKNOWN => 5;
+
 
 sub initialize
 {
@@ -39,9 +45,9 @@ sub customValidate
 	my $sequence = $page->field('value_int');
 	my $personId = $page->param('person_id');
 	my $specialty = $page->field('value_text');
-	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne '5';
+	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne "&SEQUENCE_SPECIALTY_UNKNOWN";
 
-	if (($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}))
+	if (($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}) && $sequence >=SEQUENCE_SPECIALTY_PRIMARY && $sequence <=SEQUENCE_SPECIALTY_QUATERNARY)
 	{
 		$sName->invalidate($page, "This 'Specialty Sequence' already exists for $personId");
 	}
@@ -49,8 +55,8 @@ sub customValidate
 	my $specialtyExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtyExists', $personId, $specialty);
 
 	if (($specialtyExists->{'value_text'} eq $specialty) && ($itemId ne $specialtyExists->{'item_id'}))
-		{
-			$pId->invalidate($page, "This 'Specialty' already exists for $personId");
+	{
+		$pId->invalidate($page, "This 'Specialty' already exists for $personId");
 	}
 }
 
