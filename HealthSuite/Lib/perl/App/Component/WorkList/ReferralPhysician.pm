@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Component::WorkList::Referral;
+package App::Component::WorkList::ReferralPhysician;
 ##############################################################################
 
 use strict;
@@ -100,7 +100,9 @@ sub getComponentHtml
 	my ($self, $page) = @_;
 	
 	my $referrals;
-	$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_open');
+	my $userID = $page->session('user_id');
+	$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_physician', $userID, $userID, $userID, $userID);
+	#$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_physician', $userID, $userID);
 
 	my @data = ();
 	my $html = qq{
@@ -110,11 +112,10 @@ sub getComponentHtml
 		</style>
 	};
 #$_->{referral_id}
-
 	foreach (@$referrals)
 	{
 		#$_->{checkin_time}
-	
+		
 		my $referralID;
 		if ($_->{trans_id_mod} eq $_->{referral_id})
 		{
@@ -168,11 +169,13 @@ sub getComponentHtml
 
 	$html .= "<i style='color=red'>No referrals data found.</i> <P>" 
 		if (scalar @{$referrals} < 1);
+		
+	#$html .= $userID;
 	
 	return $html;
 }
 
 # auto-register instance
-new App::Component::WorkList::Referral(id => 'worklist-referral');
+new App::Component::WorkList::ReferralPhysician(id => 'worklist-referral-physician');
 
 1;
