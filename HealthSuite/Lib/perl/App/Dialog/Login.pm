@@ -45,19 +45,20 @@ sub new
 			options => FLDFLAG_INVISIBLE
 		),
 		new CGI::Dialog::Field(name => 'start_sep', type => 'separator'),
-		new CGI::Dialog::Field(caption => 'Start Page', 
-			name => 'nextaction_redirecturl', 
-			type => 'select', 
-			selOptions => 'Worklist:/worklist;Home:/home;Main Menu:/menu;Schedule:/schedule', 
+		new CGI::Dialog::Field(caption => 'Start Page',
+			name => 'nextaction_redirecturl',
+			type => 'select',
+			selOptions => 'Worklist:/worklist;Home:/home;Main Menu:/menu;Schedule:/schedule',
 			options => FLDFLAG_PERSIST
 		),
 		new CGI::Dialog::Field(caption => 'Time Zone',
-			name => 'timezone', 
-			type => 'select', 
-			selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT', 
+			name => 'timezone',
+			type => 'select',
+			selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT',
+			defaultValue => 'CST6CDT',
 			options => FLDFLAG_PERSIST
 		),
-		
+
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -169,21 +170,21 @@ sub execute
 		$personFlags |= App::Universal::PERSONFLAG_ISCAREPROVIDER if $_ =~ /^(Physician|Nurse)$/i;
 		$personFlags |= App::Universal::PERSONFLAG_ISSTAFF if $_ =~ /^(Physician|Nurse|Staff|Administrator)$/i;
 	}
-	
+
 	my $timezone = $page->field('timezone');
 	$ENV{TZ} = $timezone;
 	`date` =~ /.*\d\d:\d\d:\d\d\s(.*?)\s.*/;
 	my $TZ = $1;
-	
+
 	my $now = ParseDate('today');
 	my $gmtTime = Date_ConvTZ($now, 'GMT', $TZ);
 	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
-	
-	$page->createSession($personId, $self->{org_internal_id}, { 
+
+	$page->createSession($personId, $self->{org_internal_id}, {
 		org_id => $orgId, categories => $categories, personFlags => $personFlags,
 		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset,
 	});
-	
+
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 
@@ -224,7 +225,7 @@ sub handle_page
 						<p>In order to assure that your data is secure,
 						please be sure to logout of the system when you're done. In addition to
 						logging out, please close all your browser windows after you log out.</p>
-						<p><b>If you do not logout and close your browser when you're done, 
+						<p><b>If you do not logout and close your browser when you're done,
 						<font color="red">others will be able to see, modify,
 						and potentially delete your data.</font></b></p>
 						<p>All of the work you perform during this session is tracked
@@ -251,9 +252,9 @@ sub handle_page
 						<p>
 						<!--
 							<a href="/public/privacy">Privacy Statement</a>
-							| 
+							|
 							<a href="/public/security">Security Statement</a>
-							<br> 
+							<br>
 						-->
 						<br>
 						Copyright \&copy; 2000 <a href="http://www.physia.com/">Physia Corp</a> - All Rights Reserved.<br>
