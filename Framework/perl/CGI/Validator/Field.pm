@@ -48,6 +48,7 @@ use constant ONKEYPRESSJS_DEFAULT    => 'processKeypress_default(event)';
 use constant ONKEYPRESSJS_FLOATNUM   => 'processKeypress_float(event)';
 use constant ONKEYPRESSJS_INTNUM     => 'processKeypress_integer(event)';
 use constant ONKEYPRESSJS_INTDASH    => 'processKeypress_integerdash(event)';
+use constant ONKEYPRESSJS_IDENTIFIER=> 'processKeypress_identifier(event)';
 use constant ONBLUR_SSN	     	=> 'validateChange_SSN(event)';
 use constant ONBLUR_DATE           => 'validateChange_Date(event)';
 use constant ONBLUR_STAMP          => 'validateChange_Stamp(event)';
@@ -231,6 +232,10 @@ use constant ONBLUR_URL            => 'validateChange_URL(event)';
 						return $value;
 					},
 				},
+			'identifier' =>
+				{
+					onKeyPressJS => ONKEYPRESSJS_IDENTIFIER
+				}
 		);
 
 sub new
