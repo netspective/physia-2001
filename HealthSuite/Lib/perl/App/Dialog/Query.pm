@@ -4,6 +4,8 @@ package App::Dialog::Query;
 
 use strict;
 use App::Universal;
+use App::Configuration;
+use File::Temp qw(tempfile);
 use App::Page;
 use CGI::Dialog;
 use CGI::Validator::Field;
@@ -11,10 +13,16 @@ use CGI::ImageManager;
 use SQL::GenerateQuery;
 use DBI::StatementManager;
 use App::Statements::Org;
+use Data::Dumper;
+
+# Output modules
 use Data::Publish;
+use Text::CSV;
+
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.5 2000-10-05 16:30:33 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.6 2000-10-08 21:53:37 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
+
 
 %RESOURCE_MAP=();
 
@@ -24,9 +32,7 @@ use constant SHOWROWS => 10;
 
 sub new
 {
-	#389cce
-	#126A97
-	my $self = CGI::Dialog::new(@_, id => 'query', width => "100%", headColor => '#CCCCCC', bgColor => '#CCCCCC');
+	my $self = CGI::Dialog::new(@_, id => 'query', headColor => '#FFFFFF', bgColor => '#CCCCCC');
 
 	my $page = $self->{page};
 	my $sqlGen = new SQL::GenerateQuery(file => $page->property('QDL'));
@@ -34,9 +40,11 @@ sub new
 	my $viewName = $page->param('_query_view') || 'all';
 	my $view = $sqlGen->views($page->param('_query_view'));
 	$self->{view} = $view;
+	my $queryViewTitle = $view->{caption};
 	my $queryType = $page->param('_query_type');
 
-	# Add the query view menu tabs
+	# Create custom HTML for Filter Tabs
+	my $filterTabs = '';
 	if (!($page->{flags} & App::Page::PAGEFLAG_ISPOPUP))
 	{
 		my $viewMenu = [];
@@ -47,9 +55,8 @@ sub new
 		my $viewMenuHtml = $page->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
 			selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#E5E5E5', unselTextColor => '#555555', highColor => 'navy',
 			leftImage => 'images/design/tab-top-left-corner-white', rightImage => 'images/design/tab-top-right-corner-white'} );
-		$self->{viewTabs} = qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Filters:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>};
+		$self->{topHtml} = [qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Filters:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>}];
 	}
-
 
 	my $fieldSelections =
 		join ';',
@@ -66,8 +73,13 @@ sub new
 	my $gridName = 'params';
 	my $maxParams = MAXPARAMS;
 
+	push @{$page->{page_content}}, '<style> table.button {font-size: 8pt; border: 2; border-style: outset;}</style>';
+
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'start_row'),
+		new CGI::Dialog::Subhead(
+			heading => 'Query Definition',
+		),
 		new CGI::Dialog::DataGrid(
 			caption => '',
 			name => $gridName,
@@ -108,14 +120,14 @@ sub new
 					type => 'select',
 					onChangeJS => qq{resetStartRow();showHideRows('$gridName', 'join', $maxParams);},
 				},
-				{
-					_class => 'CGI::Dialog::Field',
-					_skipOnRows => [2..$maxParams],
-					name => 'submit',
-					caption => '',
-					value => 'Go',
-					type => 'submit',
-				},
+#				{
+#					_class => 'CGI::Dialog::Field',
+#					_skipOnRows => [2..$maxParams],
+#					name => 'submit',
+#					caption => '',
+#					value => 'Go',
+#					type => 'submit',
+#				},
 #				{
 #					_class => 'CGI::Dialog::Field',
 #					_skipOnRows => [2..$maxParams],
@@ -126,6 +138,109 @@ sub new
 #				},
 			],
 		),
+		new CGI::Dialog::Subhead(
+			heading => 'Result Options',
+		),
+		new CGI::Dialog::Field(
+			name => 'out_columns',
+			caption => 'Columns',
+			selOptions => $fieldSelections,
+			multiDualCaptionLeft => 'Available Columns',
+			multiDualCaptionRight => 'Output Columns',
+			width => 175,
+			size => 5,
+			style => 'multidual',
+			type => 'select',
+#			options => FLDFLAG_REQUIRED,
+		),
+		new CGI::Dialog::Field(
+			name => 'out_sort',
+			caption => 'Sorting',
+			selOptions => $fieldSelections,
+			multiDualCaptionLeft => 'Available Columns',
+			multiDualCaptionRight => 'Sort Results By',
+			width => 175,
+			size => 3,
+			style => 'multidual',
+			type => 'select',
+		),
+#		new CGI::Dialog::Field(
+#			name => 'out_group',
+#			caption => 'Grouping',
+#			selOptions => $fieldSelections,
+#			multiDualCaptionLeft => 'Available Columns',
+#			multiDualCaptionRight => 'Group Results By',
+#			width => 175,
+#			size => 3,
+#			style => 'multidual',
+#			type => 'select',
+#		),
+		new CGI::Dialog::Subhead(
+			heading => 'Output Options',
+		),
+		new CGI::Dialog::Field(
+			name => 'out_destination',
+			caption => 'Destination',
+			selOptions => 'Browser;Printer;E-Mail',
+			type => 'select',
+			defaultValue => 'Browser',
+#			options => FLDFLAG_REQUIRED,
+			onChangeJS => q{onChangeDestination();},
+		),
+		new CGI::Dialog::Field(
+			name => 'out_printer',
+			caption => 'Printer',
+			selOptions => 'Back Office Laser;Reception Desk;Medical Records 1;Medical Records 2;Lab',
+			type => 'select',
+#			options => FLDFLAG_PREPENDBLANK,
+		),
+		new CGI::Dialog::Field(
+			name => 'out_format',
+			caption => 'Format',
+			selOptions => 'Web Page (HTML):html;Comma Separated Values (CSV):csv;eXtensible Markup Language (XML):xml',
+			type => 'select',
+			defaultValue => 'html',
+		),
+		new CGI::Dialog::Field(
+			name => 'out_email',
+			caption => 'E-Mail',
+		),
+		new CGI::Dialog::Subhead(
+#			heading => qq{<table cellspacing="0" cellpadding="0" border="0"><tr><td>
+#				<font face="arial,helvetica" size=2 color=navy>
+#					<b>Saved Queries&nbsp;&nbsp;</b>
+#				</font>
+#			</td><td><table cellspacing="0" cellpadding="1" align="right" class="button"><tr><td></td><td>
+#				$IMAGETAGS{'icons/arrow-down-blue'}<br>
+#			</td><td>
+#				Show
+#			</td></tr></table></td></tr></table>},
+			heading => 'Saved Queries',
+		),
+		new CGI::Dialog::ContentItem(
+			caption => '',
+			preHtml => qq{
+				<div style="font-face: Tahoma, Ariel, Helvetica; font-size: 10pt">
+				<ul>
+					<li><i>You do not have any saved queries of this type ($queryType / $queryViewTitle).</i></li>
+				</ul>
+				</div>
+			},
+		),
+		new CGI::Dialog::ContentItem(
+			caption => '',
+			preHtml => qq{
+				<center>
+					<style>input.oksubmit {width: 75; font-weight: bold; font-size: 8pt; font-family: Tahoma, Ariel, Helvetica;}</style>
+					<input type="button" class="oksubmit" value="Ok" onClick="validateOnSubmit(document.forms.dialog);document.dialog.submit()">&nbsp;&nbsp;
+					<input type="button" class="oksubmit" value="Save" onClick="alert('Save not implemented yet')">&nbsp;&nbsp;
+					<input type="button" class="oksubmit" value="Cancel" onClick="history.back()">
+				</center>
+			},
+		),
+	);
+
+	$self->addFooter(
 	);
 
 
@@ -256,24 +371,35 @@ sub new
 
 		showHideRows('params', 'join', $maxParams);
 
-		//if (destObj = eval('document.all._f_out_destination'))
-		//{
-		//	if (destObj.options[destObj.selectedIndex].text == 'Browser')
-		//	{
-		//		setIdStyle('_id_out_printer', 'display', 'none');
-		//		setIdStyle('_id_out_email', 'display', 'none');
-		//	}
-		//	else if (destObj.options[destObj.selectedIndex].text == 'Browser')
-		//	{
-		//		setIdStyle('_id_out_format', 'display', 'none');
-		//		setIdStyle('_id_out_email', 'display', 'none');
-		//	}
-		//	else if (destObj.options[destObj.selectedIndex].text == 'E-Mail')
-		//	{
-		//		setIdStyle('_id_out_format', 'display', 'none');
-		//		setIdStyle('_id_out_printer', 'display', 'none');
-		//	}
-		//}
+		function onChangeDestination()
+		{
+			if (destObj = eval('document.all._f_out_destination'))
+			{
+				if (destObj.options[destObj.selectedIndex].text == 'Browser')
+				{
+					setIdStyle('_id_out_printer', 'display', 'none');
+					setIdStyle('_id_out_email', 'display', 'none');
+					setIdStyle('_id_out_format', 'display', 'block');
+				}
+				else if (destObj.options[destObj.selectedIndex].text == 'Printer')
+				{
+					alert ("Printer output is not yet supported. Output will still be sent to the browser.");
+					setIdStyle('_id_out_printer', 'display', 'block');
+					setIdStyle('_id_out_format', 'display', 'none');
+					setIdStyle('_id_out_email', 'display', 'none');
+				}
+				else if (destObj.options[destObj.selectedIndex].text == 'E-Mail')
+				{
+					alert ("E-Mail output is not yet supported. Output will still be sent to the browser.");
+					setIdStyle('_id_out_printer', 'display', 'none');
+					setIdStyle('_id_out_format', 'display', 'block');
+					setIdStyle('_id_out_email', 'display', 'block');
+				}
+			}
+		}
+
+		// Call it at startup to initially hide fields
+		onChangeDestination();
 
 		// -->
 		</script>
@@ -282,19 +408,30 @@ sub new
 	return $self;
 }
 
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	my $sqlGen = $self->{sqlGen};
+	my $view = $self->{view};
 
+	my @viewOutCols = map {$sqlGen->fields($_->{id})->{id}} @{$view->{columns}};
+	#$page->addDebugStmt("outCols '@viewOutCols'");
+	$page->field('out_columns', @viewOutCols) unless $page->field('out_columns');
+
+	my @viewSortCols = map {$sqlGen->fields($_->{id})->{id}} @{$view->{'order-by'}};
+	#$page->addDebugStmt("sortCols '@viewSortCols'");
+	$page->field('out_sort', @viewSortCols) unless $page->field('out_sort');
 }
+
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $sqlGen = $self->{sqlGen};
 	my $view = $self->{view};
-	my @outColumns = map {$_->{id}} @{$view->{columns}};
-	my @orderBy = map {$_->{id}} @{$view->{'order-by'}};
+	my @outColumns = $page->field('out_columns');
+	my @orderBy = $page->field('out_sort');
 	my @groupBy = map {$_->{id}} @{$view->{'group-by'}};
 	my $distinct = defined $view->{distinct} ? $view->{distinct} : 0;
 	my $condition;
@@ -318,6 +455,9 @@ sub execute
 		#$page->addDebugStmt("got here $field $comparison $criteria");
 		if ($field)
 		{
+			my @criteria = split /,\s*/, uc($criteria);
+			@criteria = ('') unless @criteria;
+
 			my $whereField = "UPPER({$field})";
 			if ($sqlGen->fields($field) && defined $sqlGen->fields($field)->{'ui-datatype'})
 			{
@@ -328,8 +468,6 @@ sub execute
 				}
 
 			}
-			my @criteria = split /,\s*/, uc($criteria);
-			@criteria = ('') unless @criteria;
 			push @andConditions, $sqlGen->WHERE($whereField, $comparison, @criteria);
 		}
 
@@ -353,6 +491,18 @@ sub execute
 		$condition = $condition ? $sqlGen->AND($view->{condition}, $condition) : $view->{condition};
 	}
 
+	# Check for special formatting field
+	for my $i (0..$#outColumns)
+	{
+		my $fieldData = $sqlGen->fields($outColumns[$i]);
+		my $dataFormat = defined $fieldData->{'ui-datatype'} ? $fieldData->{'ui-datatype'} : 'text';
+		for ($dataFormat)
+		{
+			$_ eq 'text' && do {last;};
+			$_ eq 'date' && do {$outColumns[$i] = "TO_CHAR({$outColumns[$i]}, 'MM/DD/YYYY')"; last;};
+		}
+	}
+
 	# Generate the SQL & Bind Params
 	my ($SQL, $bindParams) = $condition->genSQL(
 		outColumns => \@outColumns,
@@ -361,18 +511,88 @@ sub execute
 		distinct => $distinct);
 
 	# Wrap the SQL with an outer SQL to limit results
-	my $cols = join ",\n", map {"\t$_"} @outColumns;
-	$SQL = "SELECT * FROM (\n\nSELECT\n\trownum AS row#,\n$cols\nFROM (\n\n" . $SQL . "\n\n) WHERE rownum <= ?\n\n) WHERE row# > ?";
-	#$page->addDebugStmt("<PRE>$SQL</PRE>");
-	#return;
-	push @{$bindParams}, ($endRow+1), $startRow;
+	if ($page->field('out_format') eq 'html')
+	{
+		my $cols = join ",\n", map {"\t$_"} @outColumns;
+		$SQL = "SELECT * FROM (\n\nSELECT\n\trownum AS row#,\n$cols\nFROM (\n\n" . $SQL . "\n\n) WHERE rownum <= ?\n\n) WHERE row# > ?";
+		push @{$bindParams}, ($endRow+1), $startRow;
+	}
 
 	# Do any variable replacements in the SQL itself
 	$page->replaceVars(\$SQL);
 
 	my $stmgrFlags = STMTMGRFLAG_DYNAMICSQL | STMTMGRFLAG_REPLACEVARS;
+	my $stmtHdl;
+	eval {
+		$stmtHdl = $STMTMGR_ORG->execute($page, $stmgrFlags, $SQL, @$bindParams);
+	};
+	if ($@)
+	{
+		$page->addDebugStmt("$@");
+		$page->addDebugStmt("<pre>$SQL</pre>");
+		undef $@;
+		return;
+	}
+
+	# Create the appropriate output destination container
+	my $outDest = $page->field('out_destination');
+	my $outFormat = $page->field('out_format');
+	my $destRef;
+	my $fileName;
+	if ($outDest eq 'Printer')
+	{
+		$destRef = $page->{page_content};
+	}
+	elsif ($outDest eq 'E-Mail')
+	{
+		$destRef = $page->{page_content};
+	}
+	else # Browser by default
+	{
+		if ($outFormat ne 'html')
+		{
+			($destRef, $fileName) = tempfile('query_XXXXXX', DIR => $App::Configuration::CONFDATA_SERVER->path_temp, SUFFIX => ".$outFormat");
+		}
+		else
+		{
+			$destRef = $page->{page_content};
+		}
+	}
+
+	# Call the appropriate output formatting function
+	if (my $exSub = $self->can('format_' . $outFormat))
+	{
+		&$exSub($self, $page, $stmtHdl, $stmgrFlags, $destRef);
+	}
+	else
+	{
+		$self->format_html($page, $stmtHdl, $stmgrFlags, $destRef);
+	}
+
+	close $destRef if ref($destRef) eq 'GLOB';
+
+	# Handle the output
+	if ($fileName)
+	{
+		$fileName =~ s{.*/}{};
+		$page->redirect('/temp/' . $fileName);
+	}
+	return '';
+}
+
+
+sub format_html
+{
+	my ($self, $page, $stmtHdl, $stmgrFlags, $destRef) = @_;
+	my $sqlGen = $self->{sqlGen};
+	my $view = $self->{view};
+	my @outColumns = $page->field('out_columns');
+	my $startRow = $page->field('start_row');
+	$startRow = 0 unless $startRow;
+	my $endRow = $startRow + SHOWROWS;
+
+	# Create a Data::Publish format definition for the output results
 	my $publDefn = {};
-	my $stmtHdl = $STMTMGR_ORG->execute($page, $stmgrFlags, $SQL, @$bindParams);
 	prepareStatementColumns($page, $stmgrFlags, $stmtHdl, $publDefn);
 	$publDefn->{bodyRowAttr} = {
 		onMouseOver => q{this.style.cursor='hand';this.style.backgroundColor='#CCCCCC'},
@@ -392,13 +612,30 @@ sub execute
 			dataFmt => '<font color="NAVY">#&{?}#.</font>',
 		},
 	];
-	foreach (@outColumns)
+	foreach my $column (@outColumns)
 	{
-		my $defn = {};
-		$defn->{head} = $sqlGen->fields($_)->{caption};
-		push @{$publDefn->{columnDefn}}, $defn;
+		my $colData = $sqlGen->fields($column);
+		my $colFormat = {};
+
+		my $head = $colData->{id};
+		$head = $colData->{caption} if defined $colData->{caption};
+		$colFormat->{head} = $head;
+
+		if (defined $colData->{'ui-datatype'})
+		{
+			for ($colData->{'ui-datatype'})
+			{
+				$_ eq 'currency' && do {$colFormat->{dformat} = 'currency'; last;};
+			}
+		}
+
+		push @{$publDefn->{columnDefn}}, $colFormat;
 	}
-	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {stmtId => $SQL, maxRows => SHOWROWS});
+
+	$page->addDebugStmt("<pre>" . Dumper($publDefn) . "</pre>") if $page->param('_debug_dpub') == 1;
+
+
+	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {maxRows => SHOWROWS}); #stmtId => $SQL,
 	my $nextPageExists = $stmtHdl->fetch();
 	$stmtHdl->finish();
 
@@ -406,17 +643,89 @@ sub execute
 	$page->addContent('<br><div align="center">' . $resultHtml . '</div>');
 
 	# Add page controls below the results
-	my $pageControlHtml = '<br><center>';
-	$pageControlHtml .= qq{<a href="javascript:changePage(-1)">Prev Page</a>} unless $startRow == 0;
+	my $pageControlHtml = '<style>input.pagecontrol { font-size: 8pt; width: 75; font-family: Tahoma, Ariel, Helvetica; }</style><br><center>';
+	$pageControlHtml .= qq{<input type="button" class="pagecontrol" value="First Page" onClick="validateOnSubmit(document.forms.dialog);changePage(-999)">&nbsp;&nbsp;} if $startRow >= (2 * SHOWROWS);
+	$pageControlHtml .= qq{<input type="button" class="pagecontrol" value="Prev Page" onClick="validateOnSubmit(document.forms.dialog);changePage(-1)">} unless $startRow == 0;
 	if (defined $nextPageExists)
 	{
 		$pageControlHtml .= '&nbsp;&nbsp' if $startRow > 0;
-		$pageControlHtml .= qq{<a href="javascript:changePage(1)">Next Page</a>};
+		$pageControlHtml .= qq{<input type="button" class="pagecontrol" value="Next Page" onClick="validateOnSubmit(document.forms.dialog);changePage(1)">};
 	}
-	$pageControlHtml .= '</center>';
+	$pageControlHtml .= '</center><br><br>';
 	$page->addContent($pageControlHtml);
 
 	return '';
+}
+
+
+sub format_csv
+{
+	my ($self, $page, $stmtHdl, $stmgrFlags, $destRef) = @_;
+	my $sqlGen = $self->{sqlGen};
+	my $view = $self->{view};
+	my $outColumns = [];
+
+	foreach my $column (@{$view->{columns}})
+	{
+		my $fieldData = $sqlGen->fields($column->{id});
+		my $id = $column->{id};
+		$id = $fieldData->{caption} if defined $fieldData->{caption};
+		$id = $column->{caption} if defined $column->{caption};
+		push @$outColumns, $id;
+	}
+
+	my $didHeader = 0;
+	my $csvObj = new Text::CSV;
+	my $row;
+	while(!$didHeader || ($row = $stmtHdl->fetch()))
+	{
+		unless ($didHeader)
+		{
+			$row = $outColumns;
+			$didHeader = 1;
+		}
+		die "Failed to generate csv of @{$row}" unless $csvObj->combine(@{$row}[0..$#{$row}]);
+		$self->addDataToDest($destRef, $csvObj->string() . "\n");
+	}
+}
+
+
+sub format_xml
+{
+	my ($self, $page, $stmtHdl, $stmgrFlags, $destRef) = @_;
+	my $sqlGen = $self->{sqlGen};
+	my $view = $self->{view};
+	my $outColumns = [ map {$sqlGen->fields($_->{id})->{id}} @{$view->{columns}} ];
+
+	$self->addDataToDest($destRef, "<results>\n");
+	my $row;
+	my $rownum = 0;
+	while($row = $stmtHdl->fetch())
+	{
+		$rownum++;
+		my $xml = qq{\t<result rownum="$rownum">\n};
+		foreach my $i (0..$#{$row})
+		{
+			next unless defined $row->[$i];
+			$xml .= "\t\t<$outColumns->[$i]>$row->[$i]</$outColumns->[$i]>\n";
+		}
+		$xml .= "\t</result>\n";
+		$self->addDataToDest($destRef, $xml);
+	}
+	$self->addDataToDest($destRef, "</results>\n");
+}
+
+
+sub addDataToDest
+{
+	my ($self, $destRef, $data) = @_;
+	for (ref($destRef))
+	{
+		$_ eq 'GLOB' && do {print $destRef $data; last};
+		$_ eq 'ARRAY' && do {push @{$destRef}, $data; last};
+		$_ eq 'SCALAR' && do {$$destRef .= $data; last};
+		die "I don't know how to deal with output to a $_";
+	}
 }
 
 1;
