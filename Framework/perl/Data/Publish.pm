@@ -319,7 +319,7 @@ sub prepare_HtmlBlockFmtTemplate
 				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_NEEDSTORAGE);
 				push(@storeCols, $colIdx);
 			}
-			if($_->{url})
+		    	if($_->{url})
 			{
 				$dataFmt = qq{<A HREF="$_->{url}" STYLE='text-decoration:none' @{[ $_->{hint} ? "TITLE='$_->{hint}'" : '' ]}>$dataFmt</A>};
 			}
@@ -342,8 +342,15 @@ sub prepare_HtmlBlockFmtTemplate
 			}
 			if($tDataFmt)
 			{
-				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);
+				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);				
 				push(@storeCols, $colIdx) unless grep { $_ == $colIdx } @storeCols;
+				$tDataFmt=~ /(\d+)\,(\d+)/;
+				if($1 && $2)
+				{
+					push(@storeCols, $1) unless grep { $_ == $1 } @storeCols;				
+					push(@storeCols, $2) unless grep { $_ == $2 } @storeCols;									
+				};
+				
 			}
 			$tDataFmt ||= '&nbsp;';
 			$tDataFmt = "<NOBR>$tDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
@@ -820,6 +827,21 @@ sub createHtmlFromStatement
 						my $fmt = FORMATTER->format_price($avg, 2); 
 						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
 					},					
+					'sum_percent' => sub
+					{
+						my @position = split (',',$_[0]);
+						my $numerator = $position[0];
+						my $denominator = $position[1];
+						my $sum_numerator = 0;
+						my $sum_denominator = 0;
+						my $store_numerator =$colValuesStorage[$numerator];
+						my $store_denominator =$colValuesStorage[$denominator];
+						grep {$sum_numerator+=$_}@{$store_numerator};
+						grep {$sum_denominator+=$_}@{$store_denominator};
+						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';						
+					}										
+					
+
 						
 					
 				);
@@ -882,7 +904,7 @@ sub createHtmlFromStatement
 						$groupByTextPrev=$groupByTextCur unless defined $groupByTextPrev;
 						if ($groupByTextCur ne $groupByTextPrev)
 						{							
-							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 							my $subRow=$data;
 							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
 							push(@outputRows,$outSubTotalRow);
@@ -902,18 +924,18 @@ sub createHtmlFromStatement
 						} @colsToStore if $needStorage;
 	
 						# find the default &{name:ddd} callbacks
-						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 				}
-				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data;
 				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
 				push(@outputRows,$outSubTotalRow);
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}				
 			}
@@ -935,14 +957,14 @@ sub createHtmlFromStatement
 						} @colsToStore if $needStorage;
 				
 						# find the default &{name:ddd} callbacks
-						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 				}
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
 			}
@@ -1078,7 +1100,19 @@ sub createHtmlFromData
 						my $fmt = FORMATTER->format_price($avg, 2); 
 						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
 					},					
-										
+					'sum_percent' => sub
+					{
+						my @position = split (',',$_[0]);
+						my $numerator = $position[0];
+						my $denominator = $position[1];
+						my $sum_numerator = 0;
+						my $sum_denominator = 0;
+						my $store_numerator =$colValuesStorage[$numerator];
+						my $store_denominator =$colValuesStorage[$denominator];
+						grep {$sum_numerator+=$_}@{$store_numerator};
+						grep {$sum_denominator+=$_}@{$store_denominator};
+						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';						
+					}										
 					
 					#'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum / scalar(@{$store}); },
 					#'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum / scalar(@{$store}); my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
@@ -1148,7 +1182,7 @@ sub createHtmlFromData
 						
 						if ($groupByTextCur ne $groupByTextPrev)
 						{							
-							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 							my $subRow=$data->[$data_row];
 							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
 							push(@outputRows,$outSubTotalRow);
@@ -1168,20 +1202,20 @@ sub createHtmlFromData
 						} @colsToStore if $needStorage;
 	
 						# find the default &{name:ddd} callbacks
-						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 						
 					}
 				}
 				
-				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data->[$data_row];
 				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
 				push(@outputRows,$outSubTotalRow);
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{					
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
 			}			
@@ -1206,14 +1240,14 @@ sub createHtmlFromData
 						} @colsToStore if $needStorage;
 	
 						# find the default &{name:ddd} callbacks
-						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1'  not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 				}
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' value '$2' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
 			}
