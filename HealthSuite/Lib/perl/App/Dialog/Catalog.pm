@@ -277,6 +277,10 @@ sub populateData_update
 	}
 }
 
+sub populateData_remove
+{
+	populateData_update(@_);
+}
 
 sub execute
 {
