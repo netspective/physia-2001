@@ -86,8 +86,6 @@ sub initialize
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'License Certification',
-					type => 'select',
-					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
 					name => 'license1',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				),
@@ -109,8 +107,6 @@ sub initialize
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'License Certification',
-					type => 'select',
-					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
 					name => 'license2',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				),
@@ -132,8 +128,6 @@ sub initialize
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'License Certification',
-					type => 'select',
-					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
 					name => 'license3',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				),
@@ -248,19 +242,19 @@ sub customValidate
 	my $licenseName2 = $page->field('license2');
 	my $licenseName3 = $page->field('license3');
 	my $licenseName1 = $page->field('license1');
-	if($page->field('rn_number') ne '' && ($page->field('check_license') eq '' || $page->field('rn_number_exp_date') eq ''))
+	if($page->field('rn_number') ne '' && $page->field('rn_number_exp_date') eq '')
 	{
-		$licenseNum->invalidate($page, "'Exp Date' and 'License Required' should be entered when 'Nursing License' is entered");
+		$licenseNum->invalidate($page, "'Exp Date' should be entered when 'Nursing License' is entered");
 	}
 
-	elsif($page->field('check_license') ne '' && ($page->field('rn_number') eq '' || $page->field('rn_number_exp_date') eq ''))
+	elsif(($page->field('rn_number') eq '' && $page->field('rn_number_exp_date') ne ''))
 	{
-		$licenseNum->invalidate($page, "'Nursing License' and 'Exp Date' should be entered when 'Exp Date' is entered");
+		$licenseNum->invalidate($page, "'Nursing License' should be entered when 'Exp Date' is entered");
 	}
 
-	elsif($page->field('rn_number_exp_date') ne '' && ($page->field('rn_number') eq '' || $page->field('check_license') eq ''))
+	elsif($page->field('check_license') ne  '' && ($page->field('rn_number_exp_date') eq '' || ($page->field('rn_number') eq '')))
 	{
-		$licenseNum->invalidate($page, "'Nursing License' and 'License Required' should be entered when 'Exp Date' is entered");
+		$licenseNum->invalidate($page, "'Nursing License' and 'Exp Date' should be entered when ''License Required' is entered");
 	}
 
 	if ($licenseName2 eq $licenseName1 && $licenseName2 ne '')
