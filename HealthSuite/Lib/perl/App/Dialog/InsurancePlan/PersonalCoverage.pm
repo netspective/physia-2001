@@ -93,7 +93,7 @@ sub new
 		new App::Dialog::Field::Person::ID(
 			caption => 'Insured Person ID',
 			name => 'insured_id',
-			types => ['Patient'],
+			types => ['Insured-Person'],
 			),
 		new App::Dialog::Field::Organization::ID(
 			caption => "Insured Person's Employer",
