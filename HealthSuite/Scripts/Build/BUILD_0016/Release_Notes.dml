@@ -53,6 +53,11 @@
 			TWCC 60 Form: dialog and pdf complete.
 		</deliverable>
 
+		<deliverable id="1171">
+			UI: Added a new component called 'Appointment Discard Type Count' to give the count of 'Rescheduled', 'No Show' 
+				and 'Cancel' appointments.
+		</deliverable>		
+
 		<deliverable id="1226">
 			In the 'Care Provider' component, the 'Schedule Appt' link shows up only when the provider is a 'Physician'
 		</deliverable>
@@ -144,6 +149,10 @@
 			Reversed the sender and recipient on phone messages.
 		</deliverable>
 
+		<deliverable id="1440">
+			Added 2 more columns in the 'Monthly Audit Recap' report to showup the count of established and new patients
+		</deliverable>
+
 		<deliverable id="1451">
 			Added invoice status 'Awaiting Client Payment' and changed 'Awaiting Payment' to 'Awaiting Insurance Payment'.
 		</deliverable>
@@ -160,13 +169,25 @@
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
 		</deliverable>
-		<deliverable id="1440">
-			Added 2 more columns in the 'Monthly Audit Recap' report to showup the count of established and new patients
+
+		<deliverable id="1495">
+			Fixed case sensitivity for fee schedules in add procedure dialog.
 		</deliverable>
-		<deliverable id="1171">
-			UI: Added a new component called 'Appointment Discard Type Count' to give the count of 'Rescheduled', 'No Show' 
-				and 'Cancel' appointments.
-		</deliverable>		
+
+		<deliverable id="1496">
+			Increased default procedure entries in regular and hospital claim dialogs.
+		</deliverable>
+
+		<deliverable id="1497">
+			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
+
+<!--
+	****************************************************************************
+	DUDES, ARRANGE YOUR BUGS IN NUMERICAL ORDER. IT'S MUCH NICER TO READ !!!!
+	****************************************************************************
+-->
 
