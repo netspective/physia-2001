@@ -45,13 +45,13 @@ sub getPrinter {
 # Get a printer device name AND open a printhandle to that device... combination of prev and next
 # functions...
 sub getPrintHandle {
-	my ($page, $docType) = @_;
+	my ($page, $docType, $options) = @_;
 	
 	my $printerDevice = getPrinter ($page, $docType);
 	my $printHandle;
 	
 	if ($printerDevice) {
-		$printHandle = IO::File->new ("| lpr -P $printerDevice");
+		$printHandle = IO::File->new ("| lpr -P $printerDevice ".$options);
 	}
 	
 	return $printHandle;
@@ -59,9 +59,9 @@ sub getPrintHandle {
 
 # Create and open a printerhandle for a device previously obtained from getPrinter()
 sub openPrintHandle {
-	my ($deviceName) = @_;
+	my ($deviceName, $options) = @_;
 	
-	my $printHandle = IO::File->new ("| lpr -P $deviceName");
+	my $printHandle = IO::File->new ("| lpr -P $deviceName ".$options);
 	
 	return $printHandle;
 }
