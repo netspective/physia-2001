@@ -9,6 +9,7 @@ use App::Page;
 use App::Page::Error;
 use XML::Generator;
 use File::Spec;
+use CGI qw(unescape);
 use CGI::ImageManager;
 
 use constant RESOURCE_NAME_SEPERATOR => '-';
@@ -233,7 +234,7 @@ sub handleARL
 	$resourceId = PAGE_RESOURCE_PREFIX . $resourceId;
 	if(my $resource = $RESOURCES{$resourceId})
 	{
-		my @pathItems = split(/\//, $path);
+		my @pathItems = split(/\//, unescape($path));
 		$errorCode = handlePage($resource, $flags, $arl, $params, $resourceId, \@pathItems);
 	}
 	if($errorCode)
