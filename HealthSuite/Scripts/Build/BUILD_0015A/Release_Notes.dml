@@ -9,6 +9,15 @@
 	</release-info>
 
 	<deliverables>
+
+		<deliverable id="1263">
+			UI:  Added Patient Lookup tab to Schedule Desk.
+		</deliverable>
+
+		<deliverable id="1288">
+			UI:  Appointment Type Lookup.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
