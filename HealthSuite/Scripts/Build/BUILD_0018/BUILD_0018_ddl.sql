@@ -19,9 +19,9 @@ start pre/pkg-set
 
 --bug 1827
 
-start tables/Lab_Order
-start tables/Lab_Order_Icd
-start tables-code/Lab_Order
+start tables/Person_Lab_Order
+start tables/Person_Lab_Order_Icd
+start tables-code/Person_Lab_Order
 
 analyze table Lab_Order compute statistics for table for all indexes for all columns;
 alter table Lab_Order monitoring;
