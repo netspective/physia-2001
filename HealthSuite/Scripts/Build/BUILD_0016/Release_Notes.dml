@@ -35,7 +35,9 @@
 		<deliverable id="952">
 			New query function will handle lookup
 		</deliverable>
-
+		<deliverable id="997">
+			Shows the correct date and time in the TestsAndMeasurements dialog and component
+		</deliverable>
 		<deliverable id="1019">
 			Populating caption for epsdt and hcpcs.
 		</deliverable>
