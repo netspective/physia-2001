@@ -1002,9 +1002,8 @@ sub prepare_view_superbills
 
 		$input->populateSuperBill(
 			$superBills,
-			$self->session ('org_internal_id'),
+			$self,
 			superBillID => $superBillID,
-			dbiHdl => $self->getSchema()->{dbh}
 		);
 
 		my $theFilename .= $self->session ('org_id') . $self->session ('user_id') . time() . ".superbillSample.pdf";
