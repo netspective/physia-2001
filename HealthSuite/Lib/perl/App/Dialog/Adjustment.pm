@@ -77,7 +77,7 @@ sub new
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
 
-		new CGI::Dialog::MultiField(caption =>'Pay Method/Ref',
+		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
