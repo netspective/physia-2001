@@ -930,6 +930,19 @@ sub assignServiceFacility
 	$renderingOrganization->setTaxId($row[3]);
 	$self->populateAddress($renderingOrganization->getAddress(), "org_address", $row[2], "Mailing");
 	$self->populateContact($renderingOrganization->getAddress(), "org_attribute", $row[2], "Primary", CONTACT_METHOD_TELEPHONE);
+
+	$queryStatment = qq
+	{
+		select value_text
+		from org_attribute
+		where parent_id = $row[2]
+		and item_name = 'CLIA#'
+	};
+	$sth = $self->{dbiCon}->prepare("$queryStatment");
+	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+	@row = $sth->fetchrow_array();
+	$renderingOrganization->setCLIA($row[0]);
+
 }
 
 sub assignBillingFacility
@@ -1429,6 +1442,7 @@ sub assignInvoiceProperties
 #		'Provider/Network ID' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setNetworkId,\&App::Billing::Claim::Physician::setNetworkId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXT]],
 
 		'Service Facility/Name' => [$renderingOrganization, [\&App::Billing::Claim::Organization::setName, \&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Service Facility/CLIA' => [$renderingOrganization, \&App::Billing::Claim::Organization::setCLIA, COLUMNINDEX_VALUE_TEXT],
 
 #		'Pay To Org/Name' => [$payToOrganization, [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
 #		'Pay To Org/Phone' => [$payToOrganizationAddress, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT ],
