@@ -344,18 +344,123 @@ sub storeFacilityInfo
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
 
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $credentialsValueType = App::Universal::ATTRTYPE_CREDENTIALS;
 
 	##billing facility information
 	my $billFacilityId = $mainTransData->{billing_facility_id};
 	my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
 	my $billingFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billFacilityId);
 
+	my $employerNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Employer#', $credentialsValueType);
+	my $stateNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'State#', $credentialsValueType);
+	my $medicaidNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Medicaid#', $credentialsValueType);
+	my $wrkCompNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Workers Comp#', $credentialsValueType);
+	my $bcbsNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'BCBS#', $credentialsValueType);
+	my $medicareNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Medicare#', $credentialsValueType);
+	my $cliaNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'CLIA#', $credentialsValueType);
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
-			item_name => 'Service Provider/Facility/Billing',
+			item_name => 'Billing Facility/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $billingFacilityInfo->{name_primary} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Tax ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $billingFacilityInfo->{tax_id} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Employer Number',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $employerNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+		
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/State',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $stateNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+		
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Medicaid',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $medicaidNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Workers Comp',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $wrkCompNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+		
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/BCBS',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $bcbsNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Medicare',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $medicareNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/CLIA',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $cliaNo->{value_text} || undef,
 			value_textB => $billingFacilityInfo->{org_id} || undef,
 			value_int => $billFacilityId || undef,
 			value_intB => 1,
@@ -382,7 +487,7 @@ sub storeFacilityInfo
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
-			item_name => 'Service Provider/Facility/Service',
+			item_name => 'Service Facility/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $serviceFacilityInfo->{name_primary} || undef,
 			value_textB => $serviceFacilityInfo->{org_id} || undef,
