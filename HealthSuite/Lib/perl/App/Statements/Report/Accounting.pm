@@ -1049,7 +1049,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	FROM	invoice_charges,org o, person p, payment_method pm
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
-		AND (provider = :3 or :3 IS NULL)
+		AND (care_provider_id = :3 or :3 IS NULL)
 		AND pm.id (+)= invoice_charges.pay_type
 		AND
 		(
@@ -1077,7 +1077,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
-		AND (provider =:4 OR :4 is NULL)
+		AND (care_provider_id =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
 		AND o.org_internal_id = invoice_charges.facility
@@ -1101,7 +1101,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
-		AND (provider =:4 OR :4 is NULL)
+		AND (care_provider_id =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
 		AND o.org_internal_id = invoice_charges.facility
@@ -1190,7 +1190,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	(facility = :2 or :2 IS NULL )
 	AND 	pm.id (+)= invoice_charges.pay_type
-	AND 	(provider = :3 or :3 IS NULL)
+	AND 	(care_provider_id = :3 or :3 IS NULL)
 	AND
 		(
 			(batch_id >= :4 or :4 is NULL)
