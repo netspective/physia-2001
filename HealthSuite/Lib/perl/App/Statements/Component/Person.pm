@@ -1724,8 +1724,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
-			and     item_name != 'Nurse/Title'
-			and 	item_name != 'RN'
+			and     item_name not in('Nurse/Title', 'RN', 'Nursing/License', 'Driver/License')
 			order by value_int
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
