@@ -67,12 +67,13 @@ use constant MENU_APP_DEFAULT => [
 	["Main Menu", '/menu'],
 	["Work Lists", '/worklist'],
 	["Schedule Desk", '/schedule'],
-	["Query", '/query'],
 ];
 
 use constant MENU_APP_SUPPORT => [
-	["Help", '/help'],
-	["Logout", '/logout'],
+	['System Menu...', ''],
+	['Help', '/help'],
+	["Query", '/query'],
+	['Logout', '/logout'],
 ];
 
 # A page is comprised of the following parts:
@@ -124,7 +125,8 @@ sub new
 	$self->{page_content_footer} = [];
 
 	$self->{page_menu_app} = MENU_APP_DEFAULT;
-	$self->{page_menu_support} = MENU_APP_SUPPORT;
+	my @systemMenu = @{MENU_APP_SUPPORT()}; # Make a copy of the constant menu
+	$self->{page_menu_support} = \@systemMenu;
 	$self->{page_menu_sibling} = undef;
 	$self->{page_menu_siblingSelectorParam} = '';
 
@@ -461,7 +463,7 @@ sub getMenu_ComboBox
 		$htmlFmt =~ s/\%(\d+)/$item->[$1]/g;
 		push(@html, $htmlFmt);
 	}
-	return join('', "<SELECT name='$objName' onchange='document.location.href = this.options[this.selectedIndex].value'>", @html, '</SELECT>');
+	return join('', qq{<SELECT class="header" name="$objName" onchange="document.location.href = this.options[this.selectedIndex].value">}, @html, '</SELECT>');
 }
 
 # --- theme-management functions ----------------------------------------------
@@ -636,8 +638,14 @@ sub send_page_header
 		<STYLE>
 			a.head { text-decoration: none; }
 			a:hover { color : red; }
-			.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat;}
-			form { border: 0; margin: 0;}
+			.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat; }
+			form { border: 0; margin: 0; }
+			select { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+			select.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+			input { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+			input.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+			button { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+			button.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
 		</STYLE>
 		<TITLE>[Physia] #property._title#</TITLE>
 		@{[ $self->flagIsSet(PAGEFLAG_ISFRAMESET) ? $self->getFrameSet() : '' ]}
@@ -799,6 +807,16 @@ sub prepare_page_content_header
 	my $self = shift;
 	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
 
+	# Add items to allow org switching
+	push @{$self->{page_menu_support}}, ["SDE Page", "/sde"] if $self->hasPermission('page/sde');
+	my $currentOrgId = $self->session('org_id');
+	foreach (split(',', $self->session('validOrgs')))
+	{
+		next if $_ eq $currentOrgId;
+		push @{$self->{page_menu_support}}, ["Switch to $_", "/home?_switchTo=$_"];
+	}
+
+
 	my $resourceMap = $self->property('resourceMap');
 	unless($self->{page_menu_sibling})
 	{
@@ -836,11 +854,25 @@ sub prepare_page_content_header
 		$IMAGETAGS{'images/icons/arrow-right-lblue'}
 		@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_app}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:white' onmouseover='anchorMouseOver(this, \"yellow\")' onmouseout='anchorMouseOut(this, \"white\")'>%0</A>" ) ]}
 		</font>
-	</td><td align="right">
+	</td><td align="right" valign="middle" width="100">
+		<form>
 		<font face="tahoma,arial" size="2" style="font-size:8pt" color="yellow">
-		@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_support}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"yellow\")'>%0</A>" ) ]}
-		&nbsp;&nbsp;
+		@{[ $self->getMenu_ComboBox(MENUFLAGS_DEFAULT, undef, $self->{page_menu_support}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"yellow\")'>%0</A>" ) ]}
 		</font>
+		</form>
+	</td><td>
+		&nbsp;
+	</td><td align="right" valign="middle" width="10">
+		<table cellpadding="1" cellspacing="0" style="border: 2; border-style: outset; background-color: #EEEEEE;"></tr><td align="right" valign="bottom">
+			<font face="tahoma,arial" size="2" style="font-size:8pt" color="yellow">
+			<nobr>
+			<a href="/logout">$IMAGETAGS{'icons/small-arrow'}</a>
+			<b><a href="/logout" style="text-decoration: none; color: black" onmouseover="anchorMouseOver(this, 'red')" onmouseout=	"anchorMouseOut(this, 'black')">Logout</a></b>
+			</nobr>
+			</font>
+		</td></tr></table>
+	</td><td>
+		&nbsp;
 	</td></tr></table>
 	<table cellspacing="0" cellpadding="0" border="0" bgcolor="#353365" width="100%"><tr height="1" bgcolor="#ff9935"><td colspan="3">@{[
 		getImageTag('design/transparent-line', {width => "100%", height => 1})
