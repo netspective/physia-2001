@@ -302,10 +302,8 @@ sub prepare_view_insurance
 	if ($orgId)
 	{
 		#$self->param('catalog_id', $pathItems[3]);
-		$self->addContent(
 			$STMTMGR_COMPONENT_ORG->createHierHtml($self, STMTMGRFLAG_NONE, ['org.insurancePlans', 0, 1],
 				[$orgId]),
-		);
 	}
 	#else
 	#{
@@ -399,6 +397,17 @@ sub prepare_view_insurance
 {
 	my ($self) = @_;
 	my $orgId = $self->param('org_id');
+	$self->addContent(qq{
+		<TABLE>
+			<TR VALIGN=TOP>
+				<TD WIDTH=30%>
+					<font size=1 face=arial>
+						#component.stpt-org.billinginfo#<BR>
+					</font>
+				</TD>
+			</TR>
+		</TABLE>
+	});
 
 	return 1;
 }
