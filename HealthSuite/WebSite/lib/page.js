@@ -126,7 +126,7 @@ function searchDialogFlagNoValue(flag)
 		if (eval(element))
 		{
 			var value = eval(element+".value");
-			if ( (field.options & flag) && (value.length == 0) )
+			if ( (field.options & flag) && (typeof(value) == "string") && (value.length == 0) )
 			{
 				return i;
 			}
