@@ -11,14 +11,6 @@ use App::Statements::Search::Person;
 use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
-sub handleARL
-{
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-
-	$self->setFlag(App::Page::PAGEFLAG_ISPOPUP) if $rsrc eq 'lookup';
-	return $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems);
-}
-
 sub getForm
 {
 	my ($self, $flags) = @_;
