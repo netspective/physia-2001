@@ -64,8 +64,15 @@ sub importTransaction
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
+
+			my $serviceFacility = $item->{'service-facility-id'};
+			my $billingFacility = $item->{'billing-facility-id'};
+			my $ownerOrg = $owner->{event}->{'owner-id'};
+			my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+			my $internalServiceId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $serviceFacility);
+			my $internalBillingId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $billingFacility);
+
+
 			my $transId = $self->schemaAction($flags, "Transaction", 'add',
 				trans_owner_id => $parentId,
 				trans_status => App::Universal::TRANSSTATUS_ACTIVE,
@@ -74,8 +81,8 @@ sub importTransaction
 				trans_type => $VISIT_TYPE_MAP{exists $item->{type} ? $item->{type} : 'Office'},
 				caption => $item->{subject},
 				bill_type => $self->translateEnum($flags, "Claim_Type", $item->{'payment-type'}),
-				service_facility_id => $item->{'service-facility-id'},
-				billing_facility_id => $item->{'billing-facility-id'},
+				service_facility_id => $internalServiceId || undef,
+				billing_facility_id => $internalBillingId || undef,
 				data_text_a => $item->{'referal-physician'},
 				trans_begin_stamp =>$item->{'check-in-time'},
 				init_onset_date => $item->{'current-illness-date'},
@@ -265,11 +272,11 @@ sub importInvoice
 
 		if(my $payToOrgId = $transaction->{invoice}->{'pay-to-org'})
 		{
-			
+
 			my $payToFacility = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgId, 'Mailing');
 			my $payToFacilityName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $payToOrgId);
 			my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-			
+
 			$self->schemaAction($flags,	'Invoice_Attribute', 'add',
 					parent_id => $invoiceId,
 					item_name => 'Pay To Org/Name',
@@ -858,14 +865,19 @@ sub importClaimSubmission
 		my @icdCodes = split(', ', $invoice->{claim_diags});
 		foreach my $icdCode (@icdCodes)
 		{
+
+
+			my $billingFacilityId = $mainTransData->{billing_facility_id};
+			my $serviceFacilityId = $mainTransData->{service_facility_id};
+
 			$self->schemaAction($flags,	'Transaction', 'add',
 					trans_owner_type => App::Universal::ENTITYTYPE_PERSON,
 					trans_owner_id => $clientId,
 					parent_trans_id => $mainTransId,
 					trans_type => App::Universal::TRANSTYPEDIAG_ICD,
 					trans_status => App::Universal::TRANSSTATUS_ACTIVE,
-					billing_facility_id => $mainTransData->{billing_facility_id},
-					service_facility_id => $mainTransData->{service_facility_id},
+					billing_facility_id => $billingFacilityId,
+					service_facility_id => $serviceFacilityId,
 					code => $icdCode || undef,
 					provider_id => $mainTransData->{provider_id}
 					#trans_begin_stamp => $todaysDate
@@ -897,7 +909,7 @@ sub importProcedures
 
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
-		{			
+		{
 			my @relDiags = $item->{'icd-code'};
 			my $itemId = $self->schemaAction($flags, "Invoice_Item", 'add',
 				      	parent_id =>$parentId,
@@ -939,7 +951,7 @@ sub importcopayItem
 
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
-		{					
+		{
 			my @relDiags = $item->{'icd-code'};
 			my $itemId = $self->schemaAction($flags, "Invoice_Item", 'add',
 				      	parent_id =>$parentId,
@@ -971,7 +983,7 @@ sub importinvoiceItemAdjust
 	my $invoiceId = $invoice->{__invoice_id};
 	my $dv = new Dumpvalue;
 	$dv->dumpValue(" PROCEDURE :$itemId");
-	
+
 
 	if(my $list = $adjustment)
 	{
@@ -1077,19 +1089,22 @@ sub importEvent
 {
 	my ($self, $flags, $parent, $owner) = @_;
 
-	my $ownerId = $owner->{id};
 	if(my $item = $parent)
 	{
-			my $dv = new Dumpvalue;
-		 	$dv->dumpValue(" EVENT: $item->{'event-type'} ");
+		my $facilityId = $item->{'facility-id'};
+		my $ownerOrg = $parent->{'owner-id'};
+		my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+		my $internalFacilityId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $facilityId);
+
+
 			my $eventId = $self->schemaAction($flags, 'Event', 'add',
-				owner_id => exists $item->{'owner-id'} ? $item->{'owner-id'} : $ownerId,
+				owner_id => exists $item->{'owner-id'} ? $item->{'owner-id'} : $owner,
 				event_type => $self->translateEnum($flags, "Event_Type", $item->{'event-type'}),
 				event_status => $self->translateEnum($flags, "Appt_Status", $item->{'event-status'}),
 				subject => $item->{subject},
 				start_time => $item->{'start-time'},
 				duration => $item->{duration},
-				facility_id => $item->{'facility-id'},
+				facility_id => $internalFacilityId,
 				scheduled_by_id => $item->{'scheduled-by-id'},
 				scheduled_stamp => $item->{'scheduled-time'},
 				remarks => $item->{remarks},

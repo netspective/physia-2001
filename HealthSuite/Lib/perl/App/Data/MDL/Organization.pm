@@ -8,6 +8,8 @@ use App::Universal;
 use App::Data::MDL::Invoice;
 use DBI::StatementManager;
 use App::Statements::Person;
+use App::Statements::Org;
+
 use Date::Manip;
 use vars qw(@ISA);
 
@@ -72,14 +74,13 @@ sub new
 sub importHealthMaintenance
 {
 	my ($self, $flags, $healthRule, $org) = @_;
-	my $orgId = $org->{id};
 	if (my $list = $healthRule->{rule})
 	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
 			$self->schemaAction($flags, 'Hlth_Maint_Rule', 'add',
-						org_id => $orgId,
+						org_id => $org,
 						rule_id => $item->{'rule-id'},
 						gender => $self->translateEnum($flags, "Gender", $item->{gender}),
 						start_age => $item->{'start-age'},
@@ -111,7 +112,6 @@ sub importResources
 	#my $dv = new Dumpvalue;
 	#$dv->dumpValue($insurance);
 
-	my $ownerId = $parentStruct->{id};
 	if(my $list = $resources->{resource})
 	{
 		# in case there is only one, force it to be "multiple" to simplify coding
@@ -119,7 +119,7 @@ sub importResources
 		foreach my $item (@$list)
 		{
 			$self->schemaAction($flags, 'Resource_Item', 'add',
-				owner_id => $item->{id},
+				owner_id => $parentStruct,
 				caption => $item->{caption},
 				resource_type => $self->translateEnum($flags, "Resource_Type", $item->{resource_type}),
 				status => $item->{status},
@@ -137,8 +137,7 @@ sub importResources
 sub importGeneralInfo
 {
 	my ($self,  $flags, $generalinfo,$org) = @_;
-	my $orgId = $org->{id};
-	if(my $list = $org->{generalinfo}->{property})
+	if(my $list = $generalinfo->{property})
 	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
@@ -146,7 +145,7 @@ sub importGeneralInfo
 			my $dv = new Dumpvalue;
 			$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
-				parent_id => $orgId,
+				parent_id => $org,
 				item_name =>"$item->{name}",
 				value_type =>  App::Universal::ATTRTYPE_ORGGENERAL,
 				value_text => $item->{value});
@@ -157,7 +156,6 @@ sub importGeneralInfo
 sub importCredentials
 {
 	my ($self,  $flags, $credentials,$org) = @_;
-	my $orgId = $org->{id};
 	if(my $list = $credentials->{credential})
 	{
 
@@ -168,7 +166,7 @@ sub importCredentials
 		#my $dv = new Dumpvalue;
 		#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
-				parent_id => $orgId,
+				parent_id => $org,
 				item_name => "$item->{_text}",
 				value_type => App::Universal::ATTRTYPE_CREDENTIALS,
 				value_dateEnd =>  $item->{expires},
@@ -181,7 +179,6 @@ sub importCredentials
 sub importAssociatedOrg
 {
 	my ($self,  $flags, $assocorg,$org) = @_;
-	my $orgId = $org->{id};
 	if(my $list = $assocorg->{'assoc-org'})
 	{
 		$list = [$list] if ref $list eq 'HASH';
@@ -190,7 +187,7 @@ sub importAssociatedOrg
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
-				parent_id => $orgId,
+				parent_id => $org,
 				item_name => 'Org',
 				value_type => App::Universal::ATTRTYPE_RESOURCEORG,
 				value_text => $item->{id});
@@ -201,8 +198,7 @@ sub importAssociatedOrg
 sub importAssociatedEmp
 {
 	my ($self,  $flags, $assocemp,$org) = @_;
-	my $orgId = $org->{id};
-	if(my $list = $org->{assocemp}->{emp})
+	if(my $list = $assocemp->{emp})
 	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
@@ -210,7 +206,7 @@ sub importAssociatedEmp
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
-				parent_id => $orgId,
+				parent_id => $org,
 				item_name => 'Staff',
 				value_type => App::Universal::ATTRTYPE_RESOURCEOTHER,
 				value_text => $item->{id});
@@ -221,7 +217,6 @@ sub importAssociatedEmp
 sub importContactInfo
 {
 	my ($self,  $flags, $contactinfo,$org) = @_;
-	my $orgId = $org->{id};
 	if(my $list = $contactinfo)
 	{
 		$list = [$list] if ref $list eq 'HASH';
@@ -230,7 +225,7 @@ sub importContactInfo
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
-				parent_id => $orgId,
+				parent_id => $org,
 				item_name => 'Contact Information',
 				value_type => App::Universal::ATTRTYPE_BILLING_PHONE,
 				value_textB => $item->{_text},
@@ -243,8 +238,8 @@ sub importAppointments
 {
 	my ($self, $flags, $event, $org) = @_;
 	my $owner = $org;
-	my $parentId = $org->{id};
-	if(my $parent = $org->{event})
+	my $parentId = $org;
+	if(my $parent = $event)
 	{
 		$parent = [$parent] if ref $parent eq 'HASH';
 		foreach my $parent (@$parent)
@@ -258,7 +253,6 @@ sub importAppointments
 sub importRolePermissions
 {
 	my ($self,  $flags, $permissions,$org) = @_;
-	my $orgId = $org->{id};
 	if(my $list = $permissions->{permission})
 	{
 		$list = [$list] if ref $list eq 'HASH';
@@ -281,7 +275,7 @@ sub importRolePermissions
 			}
 			my $roleId = $roleNameId ne '' ? $roleNameId : $existRoleId;
 			$self->schemaAction($flags, "Role_Permission", 'add',
-						org_id    => $orgId,
+						org_internal_id  => $org,
 						role_name_id => $roleId,
 						permission_name  => $item->{name},
 						role_activity_id => $PERMISSION_ROLE_TYPE{exists $item->{activity} ? $item->{activity} :'Active'}
@@ -299,51 +293,54 @@ sub importOrgRegistry
 	if (my $registry = $org->{org_registry})
 	{
 		my $registryNames = $registry->{org_names};
-		$self->schemaAction($flags|MDLFLAG_LOGACTIVITY, 'Org', 'add',
-				org_id => $orgId,
-				owner_org_id => $registry->{'owner-org'},
-				name_primary => exists $registryNames->{primary} ? $registryNames->{primary} : undef,
-				name_trade => exists $registryNames->{trade} ? $registryNames->{trade} : undef,
-				tax_id => exists $registry->{taxid} ? $registry->{taxid} : undef,
-				category => exists $registry->{type} ? $registry->{type} : undef,
-				parent_org_id => exists $registry->{parent_org} ? $registry->{parent_org} : undef);
+		my $parentOrg = exists $registry->{parent_org} ? $registry->{parent_org} : '';
+		my $ownerOrg = $registry->{'owner-org'};
+		my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+		my $ownerOrgId = exists $registry->{parent_org} ? $ownerOrgIdExist : 0;
+		my $parentOrgId =  $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $parentOrg) if $registry->{parent_org} ne '';
+		my $orgPrimary = $self->schemaAction($flags, 'Org', 'add',
+						org_id => $orgId || undef,
+						owner_org_id => $ownerOrgId || undef,
+						name_primary => exists $registryNames->{primary} ? $registryNames->{primary} : undef,
+						name_trade => exists $registryNames->{trade} ? $registryNames->{trade} : undef,
+						tax_id => exists $registry->{taxid} ? $registry->{taxid} : undef,
+						category => exists $registry->{type} ? $registry->{type} : undef,
+						parent_org_id => $parentOrgId || undef
+					);
+
+		$STMTMGR_ORG->execute($self, STMTMGRFLAG_NONE, 'selUpdateOwnerOrgId', $orgPrimary, $orgPrimary) if $parentOrgId eq '';
 
 		if (my $sevice = $registry->{'service-place'})
 		{
 			$self->schemaAction($flags, 'Org_Attribute', 'add',
-							parent_id => $orgId || undef,
+							parent_id => $orgPrimary || undef,
 							item_name => 'HCFA Service Place',
 							value_type => App::Universal::ATTRTYPE_INTEGER,
 							value_text => $SERVICE_PLACE_TYPE_MAP{$sevice ? $sevice : 'Office'},
 							value_textB => $sevice
 						);
 		}
+
+		$self->importContactMethods($flags, $org->{'contact-methods'}, $orgId, $orgPrimary);
+		$self->importRolePermissions($flags, $org->{'role-permissions'}, $orgPrimary);
+		$self->importAssociations($flags, $org->{associations}, $orgPrimary);
+		$self->importInsurance($flags, $org->{'insurance-plans'}, $orgPrimary);
+		$self->importGeneralInfo($flags, $org->{generalinfo}, $orgPrimary);
+		$self->importCredentials($flags, $org->{credentials}, $orgPrimary);
+		$self->importAssociatedOrg($flags, $org->{'assoc-orgs'}, $orgPrimary);
+		$self->importAssociatedEmp($flags, $org->{'assoc-emp'}, $orgPrimary);
+		$self->importContactInfo($flags, $org->{'contact-info'}, $orgPrimary);
+		$self->importAppointments($flags, $org->{'events'}, $orgPrimary);
+		$self->importHealthMaintenance($flags, $org->{'health-maintenance'}, $orgPrimary);
 	}
+
 }
 
 sub importStruct
 {
 	my ($self, $flags, $org) = @_;
-
-	#unless($org)
-	#{
-	#	$self->addError('$org parameter is required');
-	#	return 0;
-	#}
 	$self->{mainStruct} = $org;
-
 	$self->importOrgRegistry($flags, $org->{org_registry}, $org);
-	$self->importContactMethods($flags, $org->{'contact-methods'}, $org);
-	$self->importRolePermissions($flags, $org->{'role-permissions'}, $org);
-	$self->importAssociations($flags, $org->{associations}, $org);
-	$self->importInsurance($flags, $org->{'insurance-plans'}, $org);
-	$self->importGeneralInfo($flags, $org->{generalinfo}, $org);
-	$self->importCredentials($flags, $org->{credentials}, $org);
-	$self->importAssociatedOrg($flags, $org->{'assoc-orgs'}, $org);
-	$self->importAssociatedEmp($flags, $org->{'assoc-emp'}, $org);
-	$self->importContactInfo($flags, $org->{'contact-info'}, $org);
-	$self->importAppointments($flags, $org->{'events'}, $org);
-	$self->importHealthMaintenance($flags, $org->{'health-maintenance'}, $org);
 	#$self->importResources($flags|MDLFLAG_LOGACTIVITY|MDLFLAG_SHOWMISSINGITEMS, $org->{resources}, $org);
 }
 

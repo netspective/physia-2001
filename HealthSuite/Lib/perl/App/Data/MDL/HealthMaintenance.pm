@@ -5,6 +5,8 @@ package App::Data::MDL::HealthMaintenance;
 use strict;
 use App::Universal;
 use App::Data::MDL::Module;
+use DBI::StatementManager;
+use App::Statements::Org;
 use vars qw(@ISA);
 use Dumpvalue;
 
@@ -34,18 +36,22 @@ sub new
 sub importStruct
 {
 	my ($self, $flags, $healthmaintenance) = @_;
-	$self->{mainStruct} = $healthmaintenance;	
+	$self->{mainStruct} = $healthmaintenance;
 	if(my $list = $healthmaintenance->{rule})
 	{
 		# in case there is only one, force it to be "multiple" to simplify coding
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			my $dv = new Dumpvalue;
-			$dv->dumpValue($item);
+			my $orgId = $item->{'org-id'};
+			my $ownerOrg = exists $item->{'owner-org'} ? $item->{'owner-org'} : $orgId;
+			my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+			my $internalOrgId = exists $item->{'owner-org'} ? $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $orgId) : $ownerOrgIdExist;
+
+
 			$self->schemaAction($flags, "Hlth_Maint_Rule", 'add',
 				rule_id => $item->{'rule_id'},
-				org_id => $item->{'org_id'},
+				org_internal_id => $internalOrgId,
 				gender => $self->translateEnum($flags, "Gender", $item->{gender}),
 				start_age => $item->{'start_age'} || undef,
 				end_age => $item->{'end_age'} || undef,

@@ -4,6 +4,8 @@ package App::Data::MDL::FeeSchedule;
 
 use strict;
 use App::Data::MDL::Module;
+use DBI::StatementManager;
+use App::Statements::Org;
 use vars qw(@ISA);
 use Dumpvalue;
 
@@ -59,9 +61,15 @@ sub importCatalog
 	#my $dv = new Dumpvalue;
 	#$dv->dumpValue($catalog);
 	#my $catId = $catalog->{id};
+	my $orgId = $catalog->{'org-id'};
+
+	my $ownerOrg = exists $catalog->{'owner-org'} ? $catalog->{'owner-org'} : $orgId;
+	my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+	my $internalOrgId = exists $catalog->{'owner-org'} ? $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $orgId) : $ownerOrgIdExist;
+
 	my $internalId = $self->schemaAction($flags, 'Offering_Catalog', 'add',
 				catalog_id => $catalog->{'id'} || undef,
-				org_id     => $catalog->{'org-id'} || undef,
+				org_internal_id  => $internalOrgId || undef,
 				catalog_type =>  $self->translateEnum($flags,"Offering_Catalog_Type", $catalog->{type} || 'Fee Schedule') || undef,
 				caption => $catalog->{'fee-caption'} || undef,
 				parent_catalog_id => $parentCatalog || undef,
