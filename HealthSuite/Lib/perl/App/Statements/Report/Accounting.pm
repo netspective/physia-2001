@@ -11,6 +11,57 @@ use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING );
 @EXPORT = qw($STMTMGR_REPORT_ACCOUNTING);
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
+	'sel_financial_monthly' => 
+	{
+		sqlStmt => 
+		qq
+		{
+				SELECT  to_char(invoice_date,'MONTH') as invoice_month,
+					SUM(total_charges) as total_charges,
+					SUM(misc_charges) as misc_charges,
+					SUM(person_write_off) as person_write_off,
+					SUM(insurance_write_off)as insurance_write_off,
+					SUM(total_charges+misc_charges-person_write_off-insurance_write_off) as net_charge,
+					SUM(balance_transfer) as balance_transfer,
+					SUM(person_pay) as person_pay,
+					SUM(insurance_pay) as insurance_pay,
+					SUM(refund) as refund,
+					SUM(person_pay+insurance_pay-refund) as net_rcpts,
+					SUM(total_charges+misc_charges-person_write_off-insurance_write_off +
+					    balance_transfer -
+					    (person_pay+insurance_pay-refund)
+					    ) as a_r,
+					to_char(invoice_date,'YYYY') as invoice_year
+				FROM 	invoice_charges
+				WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
+				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+				AND (facility = :3 OR :3 is NULL)
+				AND (provider =:4 OR :4 is NULL)		
+				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
+				ORDER BY 13, to_char(invoice_date,'MM')
+		},
+		sqlStmtBindParamDescr => ['To From Date, Org Insurance ID, Doc Id '],
+		publishDefn => 
+			{
+			columnDefn => 
+			[
+			{colIdx => 12, head =>'Year',groupBy=>'#12#', dAlign => 'left',},
+			{colIdx => 0, head => 'Month', dAlign => 'left',},
+			{colIdx => 1, head => 'Chrgs', dAlign => 'left',summarize => 'sum',dformat => 'currency' },
+			{colIdx => 2, head => 'Misc Chrgs',dAlign =>'left' , hAlign =>'left',summarize => 'sum',dformat => 'currency' },
+			{colIdx => 3, head => 'Chrg Adj', dAlign => 'center',summarize => 'sum',dformat => 'currency' },		
+			{colIdx => 4, head => 'Ins W/O', dAlign => 'center',summarize => 'sum',dformat => 'currency' },		
+			{colIdx => 5, head => 'Net Chrgs', dAlign => 'center',summarize => 'sum',dformat => 'currency' },			
+			{colIdx => 6, head => 'Bal Trans', dAlign => 'center',summarize => 'sum',dformat => 'currency' },						
+			{colIdx => 7, head => 'Per Rcpts',dAlign => 'center',summarize => 'sum',dformat => 'currency' },								
+			{colIdx => 8, head => 'Ins Rcpts', dAlign => 'center',summarize => 'sum',dformat => 'currency' },						
+			{colIdx => 9, head => 'Rcpt Adj', dAlign => 'center',summarize => 'sum',dformat => 'currency'},			
+			{colIdx => 10,head => 'Net Rcpts', summarize => 'sum',  dformat => 'currency' },			
+			{colIdx => 11,head => 'A/R', summarize => 'sum',  dformat => 'currency' },
+			],
+			},
+		
+	},	
 	'sel_aged_insurance' => 
 	{
 		sqlStmt => 
@@ -35,14 +86,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			columnDefn => 
 				[
 				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
-				{ colIdx => 1, head => 'Total Invoices', dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Total Pending', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 		
@@ -74,15 +125,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			columnDefn => 
 				[
 				{ colIdx => 0, head => 'Patient ID', dataFmt => '<A HREF = "/person/#0#/account">#0#</A>' },
-				{ colIdx => 1, head => 'Total Invoices', dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Co-Pay Owed', dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Total Pending', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},
@@ -137,8 +188,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(insurance_pay) insurance_pay,		
 		sum(insurance_write_off) insurance_write_off,			
 		sum(balance_transfer) balance_transfer,
-		sum(charge_adjust) as  charge_adjust
-	FROM 	invoice_charges
+		sum(charge_adjust) as  charge_adjust,
+		sum(person_write_off) as person_write_off,
+		pay_type
+	FROM	invoice_charges
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 								
 		AND (facility = :2 or :2 IS NULL )
 		AND (provider = :3 or :3 IS NULL)
@@ -158,7 +211,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		decode(item_type,7,0,units) ,
 		decode(item_type,7,0,unit_cost) ,		
 		rel_diags,
-		client_id
+		client_id,
+		pay_type
+	order by invoice_id
 	},
 	'sel_daily_audit' => qq{
 	SELECT	to_char(invoice_date,'$SQLSTMT_DEFAULTDATEFORMAT') invoice_date ,
@@ -169,12 +224,13 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(balance_transfer) balance_transfer,											
 		sum(person_pay) person_pay,
 		sum(insurance_pay) insurance_pay ,	
-		sum(person_write_off) person_write_off
+		sum(person_write_off) person_write_off,
+		sum(refund) as refund
 	FROM 	invoice_charges
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
-		AND (provider >=:4 OR :4 is NULL)
+		AND (provider =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
 		
@@ -196,7 +252,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
-		AND (provider >=:4 OR :4 is NULL)
+		AND (provider =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
 		
