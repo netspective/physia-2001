@@ -1770,7 +1770,7 @@ sub prepare_page_content_header
 	my $claimType = $claim->getInvoiceSubtype();
 	my $totalItems = $claim->getTotalItems();
 	my $invoiceBalance = $claim->{balance};
-	my $invoiceTotalAdj = $claim->{total_adjust};
+	my $invoiceTotalAdj = $claim->{amountPaid};
 
 	#check submission order of claim
 	my $submissionOrder = '';
@@ -1789,8 +1789,10 @@ sub prepare_page_content_header
 
 
 	#check if any adjustments exist for this invoice
-	my $noAdjsExist = '';
-	unless($STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selItemAdjustmentsByInvoiceId', $invoiceId))
+	my $noAdjsExist = 0;
+	my $adjustments = scalar($STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selItemAdjustmentsByInvoiceId', $invoiceId));
+	my $adjCount = scalar(@{$adjustments});
+	unless($adjCount > 0)
 	{
 		$noAdjsExist = 1;
 	}
@@ -1869,8 +1871,8 @@ sub prepare_page_content_header
 						@{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
 						@{[ $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
-						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 
 						<!-- @{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]} -->
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
@@ -1879,6 +1881,10 @@ sub prepare_page_content_header
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
+						
+						<!-- <option value="/person/$clientId/account">Adjs Exist: $noAdjsExist</option>
+						<option value="/person/$clientId/account">Adjs Count: $adjCount</option>
+						<option value="/person/$clientId/account">Adj Total: $invoiceTotalAdj</option> -->
 					</SELECT>
 					</FONT>
 				<TD>
