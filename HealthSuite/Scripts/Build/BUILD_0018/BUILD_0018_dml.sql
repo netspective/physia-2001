@@ -48,5 +48,7 @@ insert into Catalog_Entry_Type (id, caption) values (300, 'Labs');
 insert into Catalog_Entry_Type (id, caption) values (310, 'Radiology');
 insert into Catalog_Entry_Type (id, caption) values (999, 'Other');
 
+insert into Offering_Catalog_Type (id, caption) values (5, 'Lab Test');
+
 
 commit;
