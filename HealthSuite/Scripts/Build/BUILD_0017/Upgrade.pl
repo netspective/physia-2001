@@ -40,7 +40,7 @@ exit;
 
 sub runSQL
 {
-	my $sqlFile = shift;
+	my ($sqlFile, @params) = @_;
 	$sqlFile = File::Spec->catfile($BUILDIR, $sqlFile);
 	my $logFile = $sqlFile . ".log";
 
@@ -51,7 +51,10 @@ sub runSQL
 			date
 			echo "---------------------------------------"
 		) >> $logFile
-		$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
+		$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey <<-!!! >> $logFile 2>&1
+			\@ $sqlFile @params
+			exit;
+		!!!
 	});
 }
 
