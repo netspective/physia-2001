@@ -46,7 +46,7 @@ sub initialize
 		new CGI::Dialog::Field::TableColumn(caption => 'Doing Business As', name => 'name_trade',
 			schema => $schema, column => 'Org.name_trade'),
 
-		new CGI::Dialog::Subhead(heading => 'General Information', name => 'gen_info_heading'),
+		new CGI::Dialog::Subhead(heading => 'Profile Information', name => 'gen_info_heading'),
 	);
 
 	$self->addContentOrgType($self->{orgtype});
@@ -95,12 +95,12 @@ sub initialize
 	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept')
 	{
 		$self->addContent(
-			new CGI::Dialog::Field(caption => 'HCFA Service Place', 
-				name => 'hcfa_service_place', 
+			new CGI::Dialog::Field(caption => 'HCFA Service Place',
+				name => 'hcfa_service_place',
 				lookup => 'HCFA1500_Service_Place_Code'
 			),
-			new CGI::Dialog::Field(caption => 'Medicare GPCI Location', 
-				name => 'medicare_gpci', 
+			new CGI::Dialog::Field(caption => 'Medicare GPCI Location',
+				name => 'medicare_gpci',
 				findPopup => '/lookup/gpci/state/*/1',
 			),
 		);
@@ -120,7 +120,7 @@ sub initialize
 		key => "#field.org_id#",
 		data => "Organization '#field.org_id#' <a href='/org/#field.org_id#/profile'>#field.name_primary#</a>"
 	};
-	
+
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['View Org Summary', "/org/%field.org_id%/profile", 1],
@@ -247,13 +247,13 @@ sub populateData
 	}
 
 	my $attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'HCFA Service Place', 
+		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'HCFA Service Place',
 		App::Universal::ATTRTYPE_INTEGER
 	);
 	$page->field('hcfa_service_place', $attribute->{value_text});
 
 	$attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'Medicare GPCI Location', 
+		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'Medicare GPCI Location',
 		App::Universal::ATTRTYPE_TEXT
 	);
 	$page->field('medicare_gpci', $attribute->{value_text});
@@ -273,7 +273,7 @@ sub execute_add
 	}
 
 	my $orgId = $page->field('org_id');
-	
+
 	## First create new Org record
 	$page->schemaAction(
 			'Org', $command,
@@ -489,7 +489,7 @@ sub execute_update
 	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
 		value_text => $page->field('medicare_gpci'),
 	);
-	
+
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
@@ -514,13 +514,13 @@ sub execute_remove
 sub saveAttribute
 {
 	my ($page, $table, $parentId, $itemName, $valueType, %data) = @_;
-	
+
 	my $recExist = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $parentId, $itemName, $valueType);
-	
+
 	my $itemId = $recExist->{item_id};
 	my $command = $itemId ? 'update' : 'add';
-	
+
 	my $newItemId = $page->schemaAction(
 		$table, $command,
 		item_id    => $command eq 'add' ? undef : $itemId,
