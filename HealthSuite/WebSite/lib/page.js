@@ -198,20 +198,20 @@ function translateEnterKey(event, flags)
 		if(field.nextFld != null)
 		{
 			var property = "document.forms.dialog."+field.nextFld;
-			var moved = false;
 			if(eval(property))
 			{
+				var moved = false;
 				var focusMethod = eval(property+".focus");
 				if(focusMethod)
 				{
 					focusMethod();
 					moved = true;
 				}
+				event.returnValue = false;
+				if(! moved)
+					alert('Please press Tab to get to the next field ('+property+').');
+				return true;
 			}
-			event.returnValue = false;
-			if(! moved)
-				alert('Please press Tab to get to the next field ('+property+').');
-			return true;
 		}
 	}
 	return false;
