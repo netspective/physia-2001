@@ -139,9 +139,9 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 		headBgColor => '#EEEEEE',
 		headFontOpen => '<FONT FACE="Arial,Helvetica" SIZE="2" COLOR="#000000">',
 		frame => {
-			headColor => '#98ACCE',
+			headColor => '#CDD3DB',
 			borderWidth => 1,
-			borderColor => '#98ACCE',
+			borderColor => '#CDD3DB',
 			contentColor => '#FFFFFF',
 		},
 	}
@@ -842,20 +842,19 @@ sub createHtmlFromStatement
 		my $checkDataSep = $publFlags & PUBLFLAG_CHECKFORDATASEP;
 
 		# See if they want to store the row data as a javascript array of hashes
-		my $dataArrayName;
+		my $rowDataJS = '';
 		if ($publFlags & PUBLFLAG_ADDDATAJS)
 		{
 			# Create an array variable init string to put at the top of the results
-			$dataArrayName = defined $publDefn->{name} ? $publDefn->{name} : int(rand 99999);
+			my $dataArrayName = defined $publDefn->{name} ? $publDefn->{name} : int(rand 99999);
 			$dataArrayName = "publish_${dataArrayName}_rows";
 			$initArrayJS = "<script>$dataArrayName = new Array();</script>";
 
 			# Create the necessary JS code to add each rows data to the array
-			my $rowDataJS = join ',', map {"'$_' : '#{$_}#'"} @{$stmtHdl->{NAME_lc}};
+			$rowDataJS = join ',', map {"'$_' : '#{$_}#'"} @{$stmtHdl->{NAME_lc}};
 			$rowDataJS = '<script>' . $dataArrayName . "[#rowNum#] = { $rowDataJS };</script>";
 
-			# Add the row JS to the body row format
-			$bodyRowFmt .= $rowDataJS;
+			$publFlags |= PUBLFLAG_HASCALLBACKS;
 		}
 
 		# If they want to use column names then we need a cross reference hash
@@ -869,7 +868,13 @@ sub createHtmlFromStatement
 			}
 			$bodyRowFmt =~ s/\#\{(\w+)\}\#/\#$colNames{$1}\#/g;
 			$subTotalRowFmt =~ s/\#\{(\w+)\}\#/\#$colNames{$1}\#/g;
+
+			# Strip special characters from field to make it safe to use as JS data
+			$rowDataJS =~ s/\#\{(\w+)\}\#/\&\{js_safe:$colNames{$1}\}/g;
 		}
+
+		# Add the row JS to the body row format
+		$bodyRowFmt .= $rowDataJS;
 
 		#
 		# we're doing multiple loops for faster performance -- so, it may seem like code copying
@@ -959,10 +964,15 @@ sub createHtmlFromStatement
 						grep {$sum_numerator+=$_}@{$store_numerator};
 						grep {$sum_denominator+=$_}@{$store_denominator};
 						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';
-					}
-
-
-
+					},
+					'js_safe' => sub
+					{
+						my $data = $rowRef->[$_[0]];
+						$data =~ s/\'/\\\'/g;
+						$data =~ s/\r//g;
+						$data =~ s/\n//g;
+						return $data;
+					},
 
 				);
 			$callbacks{'call'} = sub { my $activeCol = shift; &{$colCallbacks[$activeCol]}($rowRef, $activeCol, $colValuesStorage[$activeCol]); };
