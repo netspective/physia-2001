@@ -16,6 +16,9 @@ use App::Universal;
 use App::Configuration;
 use Date::Manip;
 use IO::File;
+use File::Spec;
+use Time::HiRes qw(gettimeofday tv_interval);
+use CGI::Carp;
 
 use DBI::StatementManager;
 use App::Statements::Page;
@@ -90,8 +93,15 @@ use constant MENU_APP_SUPPORT => [
 sub new
 {
     my $class = shift;
+    
+    # Grab the page startup time for benchmarking purposes
+    my $startBenchmark = new Benchmark;
+    
     my $self = $class->SUPER::new(@_, flags => DEFAULT_OPTIONS);
     my %params = @_;
+    
+    $self->{startBenchmark} = $startBenchmark;
+    $self->{benchmarks} = [];
 
 	$self->{page_colors} =
 		[
@@ -580,6 +590,16 @@ sub initialize
 	$self->addLocatorLinks(
 			["$IMAGETAGS{'images/icons/home-sm'} Home", '/home'],
 		);
+	
+	# Determine where to store person/org specific temp files
+	my $personId = $self->session('person_id');
+	my $orgId = $self->session('org_id');
+	my ($pTmpDir, $pTmpUrl)	= $self->getTemp($personId, 'person');
+	my ($oTmpDir, $oTmpUrl) = $self->getTemp($orgId, 'org');
+	$self->param('person_temp_dir', $pTmpDir);
+	$self->param('person_temp_url', $pTmpUrl);
+	$self->param('org_temp_dir', $oTmpDir);
+	$self->param('org_temp_url', $oTmpUrl);
 
 	$self->incrementViewCount();
 }
@@ -614,6 +634,28 @@ sub disable
 }
 
 
+sub getChildResources
+{
+	my $self = shift;
+	my $resourceMap = shift;
+
+	my $children = {};
+	$resourceMap = $self->property('resourceMap') unless $resourceMap;
+
+	return $children unless ref($resourceMap) eq 'HASH';
+	foreach (keys %$resourceMap)
+	{
+		next if $_ =~ /^_/;
+		next unless ref($resourceMap->{$_}) eq 'HASH';
+		if (exists $resourceMap->{$_}->{_class})
+		{
+			$children->{$_} = $resourceMap->{$_};
+		}
+	}
+	return $children;
+}
+
+
 sub send_page_header
 {
 	my $self = shift;
@@ -645,6 +687,7 @@ sub send_page_header
 			select.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
 			input { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
 			input.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+			textarea { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
 			button { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
 			button.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
 		</STYLE>
@@ -682,6 +725,7 @@ sub getFrameSet
 sub send_page_body
 {
 	my $self = shift;
+	my $startTime = [gettimeofday] if $self->param('_debug_benchmarks');
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	my $flags = $self->{flags};
 
@@ -696,7 +740,9 @@ sub send_page_body
 		$html .= join('', @{$self->{page_content_footer}});
 	}
 
+	my $startRVTime = [gettimeofday] if $self->param('_debug_benchmarks');
 	$self->replaceVars(\$html);
+	push @{$self->{benchmarks}}, "<b>replaceVars() in send_page_body():</b> " . tv_interval($startRVTime) . ' seconds' if $self->param('_debug_benchmarks');
 
 	$html = $self->component('sde-page-params-and-fields') . $html if $self->param('_debug_params');
 	$html = $self->component('sde-page-fields') . $html if $self->param('_debug_fields');
@@ -721,6 +767,7 @@ sub send_page_body
 		print $html;
 		print "$fonts->[THEMEFONTTAG_PLAIN_CLOSE]</BODY>";
 	}
+	push @{$self->{benchmarks}}, "<b>send_page_body():</b> " . tv_interval($startTime) . ' seconds' if $self->param('_debug_benchmarks');
 }
 
 sub addLocatorLinks
@@ -943,7 +990,10 @@ sub component
 			$package,
 			$stmtId,
 			]);
-		return ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0);
+		my $startTime = [gettimeofday] if $self->param('_debug_benchmarks');
+		my $html = ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0);
+		push @{$self->{benchmarks}}, "<b>$resourceName:</b> " . tv_interval($startTime) . ' seconds' if $self->param('_debug_benchmarks');
+		return $html;
 	}
 	return "Component '$compId' not found";
 }
@@ -1194,9 +1244,15 @@ sub printContents
 		if ($self->send_page_header()) {
 			$self->send_page_body()
 		}
+		if ($self->param('_debug_benchmarks'))
+		{
+			push @{$self->{benchmarks}}, '<b>Entire Page:</b> ' . tv_interval($self->{startBenchmark}) . ' seconds';
+			print $self->getTextBoxHtml(heading => 'Benchmarks', messages => $self->{benchmarks});
+		}
 		print "\n</html>\n";
 	}
 }
+
 
 sub homeArl
 {
@@ -1214,6 +1270,26 @@ sub constant
 	no strict 'refs';
 	return defined &{"App::Universal::$name"} ? &{"App::Universal::$name"} : "Constant '$name' not found!";
 
+}
+
+
+sub getTemp
+{
+	my $self = shift;
+	my ($id, $type) = @_;
+	
+	my $url = File::Spec->catfile(
+		'file',
+		$type,
+		substr($id,0,1),
+		substr($id,0,2),
+		substr($id,0,3),
+		$id);
+	my $path = File::Spec->catfile(
+		$CONFDATA_SERVER->path_WebSite(),
+		$url);
+	$url = "/$url/";
+	return ($path, $url);
 }
 
 
