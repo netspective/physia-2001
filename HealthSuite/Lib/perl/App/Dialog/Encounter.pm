@@ -417,7 +417,7 @@ sub populateData
 		setInsuranceFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
 	}
 
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
 
 	#set service facility to session org
 	if(my $orgId = $page->session('org_id'))
