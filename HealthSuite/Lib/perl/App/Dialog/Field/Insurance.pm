@@ -123,6 +123,8 @@ sub new
 		$params{size} = 16 unless exists $params{size};
 		$params{maxLength} = 32 unless exists $params{maxLength};
 		$params{findPopup} = '/lookup/insproduct' unless exists $params{findPopup};
+		$params{addPopup} = "/org/#session.org_id#/dlg-add-ins-product" unless exists $params{addPopup};
+		$params{addPopupControlField} = '_f_product_name' unless exists $params{addPopupControlField};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -249,6 +251,8 @@ sub new
 		$params{size} = 16 unless exists $params{size};
 		$params{maxLength} = 32 unless exists $params{maxLength};
 		$params{findPopup} = '/lookup/insplan' unless exists $params{findPopup};
+		$params{addPopup} = "/org/#session.org_id#/dlg-add-ins-plan" unless exists $params{addPopup};
+		$params{addPopupControlField} = '_f_plan_name' unless exists $params{addPopupControlField};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }

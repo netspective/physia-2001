@@ -55,6 +55,8 @@ sub new
 	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 32 unless exists $params{maxLength};
 	$params{findPopup} = '/lookup/catalog' unless exists $params{findPopup};
+	$params{addPopup} = "/org/#session.org_id#/dlg-add-catalog" unless exists $params{addPopup};
+	$params{addPopupControlField} = '_f_catalog_id' unless exists $params{addPopupControlField};
 
 	return CGI::Dialog::Field::new($type, %params);
 }
