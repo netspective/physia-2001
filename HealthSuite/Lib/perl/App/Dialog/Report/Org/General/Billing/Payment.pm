@@ -12,6 +12,7 @@ use CGI::Validator::Field;
 
 use DBI::StatementManager;
 use App::Statements::Report::Billing;
+use App::Statements::Org;
 use Data::Publish;
 
 use vars qw(@ISA $INSTANCE);
@@ -65,6 +66,7 @@ sub execute
 	my $facility_id = $page->field('facility_id');
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $facility_id);
 
 	my $html = qq{
 	<table cellpadding=10>
@@ -73,27 +75,27 @@ sub execute
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">By Payer</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_payers',
-				[$facility_id, $startDate, $endDate]) ]}
+				[$orgIntId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">By Insurance</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_payersByInsurance',
-				[$facility_id, $startDate, $endDate]) ]}
+				[$orgIntId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Earnings</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_earningsFromItem_Adjust',
-				[$startDate, $endDate, $facility_id, $startDate, $endDate, $facility_id]) ]}
+				[$startDate, $endDate, $orgIntId, $startDate, $endDate, $facility_id]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Procedures</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_proceduresFromInvoice_Item',
-				[$startDate, $endDate, $facility_id]) ]}
+				[$startDate, $endDate, $orgIntId]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Diagnostics</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_diagsFromInvoice_Item',
-				[$startDate, $endDate, $facility_id]) ]}
+				[$startDate, $endDate, $orgIntId]) ]}
 		</td>
 
 		</tr>

@@ -11,6 +11,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 
 use DBI::StatementManager;
+use App::Statements::Org;
 use App::Statements::Report::ClaimStatus;
 use Data::Publish;
 
@@ -19,6 +20,8 @@ use vars qw(@ISA $INSTANCE);
 @ISA = qw(App::Dialog::Report);
 
 use enum qw(BITMASK:FLAG_ GETCOUNTS);
+
+my $typeOrg = App::Universal::ENTITYTYPE_ORG;
 
 sub new
 {
@@ -115,7 +118,8 @@ sub buildSqlStmt
 	my $claimNumbers = $page->param('_f_claim_numbers');
 	
 	$claimNumberCond = qq{and Invoice.invoice_id in ($claimNumbers)} if $claimNumbers;
-	$insuranceNameCond = qq{and Insurance.ins_org_id = '$insOrgId'} if $insOrgId;
+
+	$insuranceNameCond = qq{and Insurance.ins_org_id = $insOrgId} if $insOrgId;
 	$insuranceProductCond = qq{and Insurance.product_name = '$productName'}	if $productName;
 	$insurancePlanCond = qq{and Insurance.plan_name = '$planName'} if $planName;
 
@@ -193,7 +197,8 @@ sub buildSqlStmt
 	my $html = qq{
 		select $columns
 			from $transTable Insurance, Invoice_Billing, Invoice_Status, Invoice
-			where Invoice.cr_org_id = ?
+			where Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				$claimNumberCond
@@ -220,6 +225,9 @@ sub execute
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
+	my $orgId = $page->session('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
 	my $publishDefn = {
 		columnDefn =>
 		[
@@ -239,7 +247,7 @@ sub execute
 		<td>
 			@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, 
 				$sqlStmt,
-				[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+				[$orgIntId, $startDate, $endDate], undef, undef, $publishDefn) ]}
 		</td>
 		</tr>
 	</table>

@@ -5,10 +5,13 @@ package App::Statements::Report::ClaimStatus;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_RPT_CLAIM_STATUS);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_RPT_CLAIM_STATUS);
+
+my $typeOrg = App::Universal::ENTITYTYPE_ORG;
 
 $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 
@@ -16,7 +19,8 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 		sqlStmt => qq{
 			select caption as invoice, count(caption) as cnt
 			from Insurance, Invoice_Billing, Invoice_Status, Invoice
-			where Invoice.cr_org_id = ?
+			where Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Invoice_Status.id = Invoice.invoice_status
@@ -49,14 +53,15 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 
 	'sel_distinct_ins_org_id' => {
 		sqlStmt => qq{
-			select ' ' as col0, '0' as col1 from Dual
+			select ' ' as col0, 0 as col1 from Dual
 			UNION
-			select distinct ins_org_id as col0, ins_org_id as col1 from Insurance
-			where record_type = 3
+			select distinct o.org_id as col0, i.ins_org_id as col1 
+			from Insurance i, Org o
+			where record_type = 3 and i.ins_org_id = o.org_internal_id
 				and ins_org_id is not null
-		},
+			},
 	},
-	
+
 	'sel_claim_detail' =>q
 	{
 		select 

@@ -5,11 +5,15 @@ package App::Statements::Report::Billing;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_REPORT_BILLING $PUBLISH_DEFN
 );
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_REPORT_BILLING);
+
+my $typeOrg = App::Universal::ENTITYTYPE_ORG;
+
 
 $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 
@@ -17,7 +21,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		_stmtFmt => qq{
 			select Claim_Type.caption as payer, count(Claim_Type.id) as count
 			from Transaction, Claim_Type, Invoice
-			where Invoice.cr_org_internal_id = ?
+			where Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
@@ -38,7 +43,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id, bill_to_id,
 				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
 			from Claim_Type, Transaction_Status, Transaction, Invoice
-			where Invoice.cr_org_internal_id = ?
+			where Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
@@ -66,11 +72,12 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		_stmtFmt => qq{
 			select Insurance.ins_org_id as insurance, count(Insurance.ins_org_id) as count
 			from Insurance, Invoice
-			where Invoice.cr_org_id = ?
+			where Insurance.ins_org_id = ?
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and bill_to_type = 1
-				and Insurance.ins_internal_id = Invoice.ins_id
+				and Insurance.guarantor_type = $typeOrg
+				and Invoice.owner_type = $typeOrg
+				and Invoice.owner_id = Insurance.ins_org_id
 			group by Insurance.ins_org_id
 		},
 		publishDefn => 	{
@@ -87,7 +94,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			select Insurance.ins_org_id as payer, invoice_id, invoice_date, client_id, bill_to_id,
 				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
 			from Insurance, Transaction_Status, Transaction, Invoice
-			where Invoice.cr_org_id = ?
+			where Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
@@ -117,7 +125,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			from Invoice_Item_Adjust, Invoice_Item, Invoice
 			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and Invoice.cr_org_id = ?
+				and Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice_Item.parent_id = Invoice.invoice_id
 				and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
 				and Invoice_Item_Adjust.payer_type = 1
@@ -127,7 +136,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			from Invoice_Item_Adjust, Invoice_Item, Invoice
 			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and Invoice.cr_org_id = ?
+				and Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice_Item.parent_id = Invoice.invoice_id
 				and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
 				and Invoice_Item_Adjust.payer_type = 0
@@ -149,7 +159,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			where code is NOT NULL
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and Invoice.cr_org_id = ?
+				and Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice_Item.parent_id = Invoice.invoice_id
 			group by code
 		},
@@ -168,7 +179,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				client_id, provider_id
 			from Transaction, Invoice_Item, Invoice
 			where Invoice_Item.code is NOT NULL
-				and Invoice.cr_org_id = ?
+				and Invoice.owner_id = ?
+				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Invoice_Item.parent_id = Invoice.invoice_id
@@ -183,7 +195,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		where rel_diags is NOT NULL
 			and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			and Invoice.cr_org_id = ?
+			and Invoice.cr_org_internal_id = ?
 			and Invoice_Item.parent_id = Invoice.invoice_id
 	},
 
