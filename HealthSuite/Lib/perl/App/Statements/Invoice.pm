@@ -511,6 +511,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and item_name = 'Invoice/History/Item'
 		order by value_date desc, cr_stamp desc
 		},
+	'selClaimPrintHistoryItemByUser' => qq{
+		select to_char(cr_stamp, 'YYYYMMDDHH24MISS') as cr_stamp, to_char(sysdate, 'YYYYMMDDHH24MISS') as timenow, cr_user_id, value_text as action, value_textB as comments, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date
+		from invoice_attribute
+		where parent_id = ?
+			and cr_user_id = ?
+			and item_name = 'Invoice/History/Item'
+			and value_text = 'Claim printed'
+		},
 	'selAdjTypeCaption' => q{
 		select caption
 		from adjust_method
