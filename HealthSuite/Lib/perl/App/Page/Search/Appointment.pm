@@ -54,8 +54,6 @@ sub getForm
 	my ($self, $flags) = @_;
 
 	my @actionValues = (
-		"/schedule/apptsheet/confirm/%itemValue%",
-		"/schedule/apptsheet/verifyins/%itemValue%",
 		"/schedule/apptsheet/encounterCheckin/%itemValue%",
 		"/schedule/apptsheet/encounterCheckout/%itemValue%",
 		"/schedule/appointment/cancel/%itemValue%",
@@ -75,14 +73,12 @@ sub getForm
 			<FONT size=5 face='arial'>&nbsp;</FONT>
 			On Select:
 			<SELECT name="item_action_arl_select">
-				<option value="$actionValues[0]">*Confirm Appointment</option>
-				<option value="$actionValues[1]">*Verify Insurance</option>
-				<option value="$actionValues[2]">Check In</option>
-				<option value="$actionValues[3]">Check Out</option>
-				<option value="$actionValues[4]">Cancel</option>
-				<option value="$actionValues[5]">Reschedule</option>
-				<option value="$actionValues[6]">No Show</option>
-				<option value="$actionValues[7]">Edit Appointment</option>
+				<option value="$actionValues[0]">Check In</option>
+				<option value="$actionValues[1]">Check Out</option>
+				<option value="$actionValues[2]">Cancel</option>
+				<option value="$actionValues[3]">Reschedule</option>
+				<option value="$actionValues[4]">No Show</option>
+				<option value="$actionValues[5]">Edit Appointment</option>
 			</SELECT>
 
 			<SELECT name="item_action_arl_dest_select">

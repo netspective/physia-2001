@@ -212,7 +212,7 @@ sub prepare_view_handleWaitingList
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_conflict_appointments',
-			[$eventId],
+			[$eventId, $self->session('org_id')], 
 		),
 		'</CENTER>'
 	);
