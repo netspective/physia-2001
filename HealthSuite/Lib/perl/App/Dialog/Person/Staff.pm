@@ -32,7 +32,7 @@ sub initialize
 
 	#$self->heading('$Command Staff');
 	$self->addContent(
-			new App::Dialog::Field::Person::ID::New(caption => 'Staff Member ID',
+			new App::Dialog::Field::Person::ID::New(caption => 'Staff ID',
 							name => 'person_id',
 							options => FLDFLAG_REQUIRED,
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
