@@ -30,7 +30,7 @@ $STMTRPTDEFN_WORKLIST =
 		{colIdx => 1, head => 'ID', dAlign => 'left'},
 		{colIdx => 2, head => 'Status', dAlign => 'left'},
 		{colIdx => 3, head => 'Patient',hAlign=>'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
-		{colIdx => 4, head => 'Referral Type', dAlign => 'center'},
+		{colIdx => 4, head => 'Referral Type', hAlign => 'left'},
 		{colIdx => 5, head => 'Date of Request', dAlign => 'center'},
 		{colIdx => 6, head => 'Intake Coordinator', dAlign => 'center'},
 		{colIdx => 7, head => 'SSN', dAlign => 'center'},
@@ -49,7 +49,7 @@ $STMTRPTDEFN_AUTH_WORKLIST =
 		{colIdx => 3, head => 'SSN', dAlign => 'left'},
 		{colIdx => 4, head => 'Last Name', dAlign => 'left'},
 		{colIdx => 5, head => 'First Name', dAlign => 'left'},
-		{colIdx => 6, head => 'Follow Up', dAlign => 'left'},
+		{colIdx => 6, head => 'Follow Up', hAlign => 'left'},
 	],
 };
 
