@@ -123,12 +123,13 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-
 	my $userId =  $page->session('user_id');
 	#my $orgId = $page->param('org_id') || $page->session('org_id');
 	my $orgId = $page->session('org_id');
-	#my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
-	my $orgIntId = $page->param('org_id');
+	#my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
+	my $orgIntId;
+
 	my $roleID = $page->field('roleID');
 	my $roleIDOrg = $page->field('roleIDOrg');
 	my $permissionName = $page->field('permissionName');
@@ -137,6 +138,8 @@ sub execute
 
 	if ($command eq 'add')
 	{
+		$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
 		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleID, $permissionName);	# can have the same org id, role id, and permission name, but different permission, so must delete to prevent duplicates
 		$page->schemaAction('Role_Permission', 'add',
 			permission_name => $permissionName,
@@ -147,6 +150,8 @@ sub execute
 	}
 	elsif ($command eq 'update')
 	{
+		$orgIntId = $page->param('org_id');
+
 		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleIDOrg, $permissionNameOrg);
 		$page->schemaAction('Role_Permission', 'add',
 			permission_name => $permissionName,
@@ -157,6 +162,7 @@ sub execute
 	}
 	elsif ($command eq 'remove')
 	{
+		$orgIntId = $page->param('org_id');
 		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleID, $permissionName);
 	}
 
