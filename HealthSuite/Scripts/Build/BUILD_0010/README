@@ -79,6 +79,14 @@ B966 - Closed this bug as it works
 B892 - Changed the url in the 'Outstanding Balances' component in the checkin and checkout dialog page
 
 
+B858 - Matched format of Monthly Audit report with Daily Audit Report
+
+B741 - Removed Unit and Unit cost from the detail audit report and Collection % to the 
+summary daily audit report.  NOTE - this required minor change to framework should test components.
+
+B768, 857, 769,522 -  Minor Report fixes more information can be found in bugzillia
+
+
   
 
 
