@@ -1183,11 +1183,11 @@ function doActionPopup(arl, autoRefresh, features, srcControlField, dstControlFi
 	if (isActionPopupWindow())
 	{
 
-		popUpWindow = open(arl, '', "location, status, width=620, height=600, scrollbars, resizable");
+		popUpWindow = open(arl, '', features == null ? "location, status, width=620, height=600, scrollbars, resizable" : features);
 	}
 	else
 	{
-		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "location, status, width=620, height=600, scrollbars, resizable");
+		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "location, status, width=620, height=600, scrollbars, resizable" : features);
 	}
 	popUpWindow.focus();
 }

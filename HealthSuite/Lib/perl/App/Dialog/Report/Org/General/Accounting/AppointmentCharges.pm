@@ -53,7 +53,8 @@ sub execute
 	my $reportBeginDate = $page->field('daily_begin_date');
 	my $reportEndDate = $page->field('daily_end_date');
 
-	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, 0, 'invoice.appointmentCharges', [$reportBeginDate,$reportEndDate,$page->session('org_internal_id')]);
+	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, 0, 'invoice.appointmentCharges', 
+		[$reportBeginDate, $reportEndDate, $page->session('org_internal_id'), $page->session('GMT_DAYOFFSET')]);
 
 }
 

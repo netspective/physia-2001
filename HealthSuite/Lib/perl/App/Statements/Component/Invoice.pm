@@ -572,9 +572,9 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 'invoice.appointmentCharges' => {
 	sqlStmt => qq{
 			select 	p1.complete_name,
-				trunc(e.start_time),
-				to_char(e.start_time, 'HH12:MIAM'),
-				to_char(e.start_time+(e.duration/1440), 'HH12:MIAM'),
+				trunc(e.start_time - :4),
+				to_char(e.start_time - :4, 'HH12:MIAM'),
+				to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
 				o.name_primary,
 				e.subject,
 				t.caption,
@@ -585,24 +585,24 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				i.client_id
 			from 	event e, transaction t, org o, transaction_type tt,
 				person p, person p1, person p2, invoice i, invoice_billing ib
-			where 	trunc(e.start_time) >= to_date(:1, 'mm/dd/yyyy')
-			and 	trunc(e.start_time) <= to_date(:2, 'mm/dd/yyyy')
-			and	e.event_id = t.parent_event_id
-			and 	e.facility_id = o.org_internal_id
-			and	t.trans_type = tt.id
-			and	p.person_id = t.provider_id
-			and	p1.person_id = e.scheduled_by_id
-			and	t.trans_id = i.main_transaction
-			and	ib.invoice_id = i.invoice_id
-			and	ib.bill_to_id = p2.person_id
-			and  	ib.bill_party_type in (0,1)
-			and	ib.bill_sequence = 1
-			and	ib.invoice_item_id is NULL
-			and	o.owner_org_id = :3
-			union all
-			select 	p1.complete_name, trunc(e.start_time),
-				to_char(e.start_time, 'HH12:MIAM'),
-				to_char(e.start_time+(e.duration/1440), 'HH12:MIAM'),
+			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4
+				and e.start_time <  to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :4
+				and	e.event_id = t.parent_event_id
+				and e.facility_id = o.org_internal_id
+				and t.trans_type = tt.id
+				and p.person_id = t.provider_id
+				and p1.person_id = e.scheduled_by_id
+				and t.trans_id = i.main_transaction
+				and ib.invoice_id = i.invoice_id
+				and ib.bill_to_id = p2.person_id
+				and ib.bill_party_type in (0,1)
+				and ib.bill_sequence = 1
+				and ib.invoice_item_id is NULL
+				and o.owner_org_id = :3
+			UNION ALL
+			select	p1.complete_name, trunc(e.start_time - :4),
+				to_char(e.start_time - :4, 'HH12:MIAM'),
+				to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
 				o.name_primary, e.subject,
 				t.caption, tt.caption, p.complete_name,
 				o1.name_primary,
@@ -610,20 +610,20 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				i.client_id
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
 				person p, person p1, invoice i, invoice_billing ib
-			where 	trunc(e.start_time) >= to_date(:1, 'mm/dd/yyyy')
-			and 	trunc(e.start_time) <= to_date(:2, 'mm/dd/yyyy')
-			and	e.event_id = t.parent_event_id
-			and 	e.facility_id = o.org_internal_id
-			and	t.trans_type = tt.id
-			and	p.person_id = t.provider_id
-			and	p1.person_id = e.scheduled_by_id
-			and	t.trans_id = i.main_transaction
-			and	ib.invoice_id = i.invoice_id
-			and	ib.bill_to_id = o1.org_internal_id
-			and  	ib.bill_party_type in (2,3)
-			and	ib.bill_sequence = 1
-			and	ib.invoice_item_id is NULL
-			and	o.owner_org_id = :3
+			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4
+				and e.start_time <  to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :4
+				and e.event_id = t.parent_event_id
+				and e.facility_id = o.org_internal_id
+				and t.trans_type = tt.id
+				and p.person_id = t.provider_id
+				and p1.person_id = e.scheduled_by_id
+				and t.trans_id = i.main_transaction
+				and ib.invoice_id = i.invoice_id
+				and ib.bill_to_id = o1.org_internal_id
+				and ib.bill_party_type in (2,3)
+				and ib.bill_sequence = 1
+				and ib.invoice_item_id is NULL
+				and o.owner_org_id = :3
 			ORDER BY  2,12
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],
