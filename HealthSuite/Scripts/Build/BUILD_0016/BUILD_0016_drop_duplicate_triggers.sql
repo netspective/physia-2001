@@ -4,7 +4,7 @@ set echo off
 set heading off
 set termout off
 
-spool drop_invitem_triggers
+spool drop_invitem_triggers.sql
 
 Select 'drop trigger '||trigger_name||';' From user_triggers 
   where table_name in ('INVOICE_ITEM', 'INVOICE_ITEM_ADJUST');
