@@ -284,20 +284,19 @@ sub isValid
 			}
 		}
 
+		#@errors = App::IntelliCode::validateCodes
+		#(
+		#	$page, App::IntelliCode::INTELLICODEFLAG_SKIPWARNING,
+		#	sex => $gender,
+		#	dateOfBirth => $dateOfBirth,			
+		#	diags => \@actualDiagCodesForIntellicode,
+		#	procs => \@procs,
+		#);
 
-		@errors = App::IntelliCode::validateCodes
-		(
-			$page, App::IntelliCode::INTELLICODEFLAG_SKIPWARNING,
-			sex => $gender,
-			dateOfBirth => $dateOfBirth,			
-			diags => \@actualDiagCodesForIntellicode,
-			procs => \@procs,
-		);
-
-		foreach (@errors)
-		{
-			$self->invalidate($page, "[<B>P$line</B>] $_");
-		}
+		#foreach (@errors)
+		#{
+		#	$self->invalidate($page, "[<B>P$line</B>] $_");
+		#}
 	}
 
 	return @errors || $page->haveValidationErrors() ? 0 : 1;
