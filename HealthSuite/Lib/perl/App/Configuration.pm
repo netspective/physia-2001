@@ -1,25 +1,23 @@
 ##############################################################################
 package App::Configuration;
 ##############################################################################
- 
+
 use strict;
 use Exporter;
 use File::Spec;
 use Class::Struct;
+use File::Path;
 
-use vars qw(
-	@ISA @EXPORT
-	%AVAIL_HOSTS %ENV
-	$CONFDATA_SERVER
-	$SERVERCONFDATA_TYPE_PRODUCTION $SERVERCONFDATA_TYPE_DEVELOPMENT $SERVERCONFDATA_TYPE_LOCAL
-	$SERVERCONFDATA_SDE01 $SERVERCONFDATA_SDE02
-	);
+use vars qw(@ISA @EXPORT %AVAIL_CONFIGS %ENV $CONFDATA_SERVER);
 @ISA    = qw(Exporter);
 @EXPORT = qw($CONFDATA_SERVER);
 
 struct(ServerConfigData => [
+	name_Config => '$',
+	name_Group => '$',
 	db_ConnectKey => '$',
 	path_root => '$',
+	path_temp => '$',
 	path_Database => '$',
 	path_SchemaSQL => '$',
 	path_BillingTemplate => '$',
@@ -28,96 +26,108 @@ struct(ServerConfigData => [
 	path_PDFOutput => '$',
 	file_SchemaDefn => '$',
 	file_AccessControlDefn => '$',
+	file_BuildLog => '$',
 ]);
 
-use constant PATH_UNIXROOT	 => defined $ENV{HEALTHSUITE} ? $ENV{HEALTHSUITE} : '/HealthSuite';
-use constant PATH_ROOTDIR    => File::Spec->catfile($^O eq 'MSWin32' ? 'h:' : PATH_UNIXROOT);
-use constant PATH_DATABASE   => File::Spec->catfile(PATH_ROOTDIR, 'Database');
-use constant PATH_SCHEMASQL  => File::Spec->catfile(PATH_DATABASE, 'schema-physia');
-use constant PATH_APPLIB     => File::Spec->catfile(PATH_ROOTDIR, 'Lib', 'perl', 'App');
-use constant PATH_BILLTMPL   => File::Spec->catfile(PATH_APPLIB, 'Billing');
+use constant CONFIGGROUP_PRO => 'production';
+use constant CONFIGGROUP_SWDEV => 'development';
+use constant CONFIGGROUP_TEST => 'testing';
+use constant CONFIGGROUP_DEMO => 'demonstration';
+
+use constant PATH_UNIXROOT	 => defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite';
+use constant PATH_ROOTDIR    => File::Spec->catfile($^O eq 'MSWin32' ? 'h:' : '');
+use constant PATH_APPROOT	 => File::Spec->catfile($^O eq 'MSWin32' ? PATH_ROOTDIR : PATH_UNIXROOT);
+use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl', 'App');
+use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
-use constant PATH_ORGREPORTS => File::Spec->catfile(PATH_REPORTS, 'Org');
-use constant PATH_PDFOUTPUT  => File::Spec->catfile(PATH_ROOTDIR, 'WebSite', 'temp', 'invoice');
-use constant FILE_SCHEMADEFN => File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml');
-use constant FILE_ACLDEFN    => File::Spec->catfile(PATH_APPLIB, 'Conf', 'AccessControl.xml');
+use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
+use constant PATH_TEMP       => File::Spec->catfile(PATH_WEBSITE, 'temp');
 
-$SERVERCONFDATA_TYPE_PRODUCTION = new ServerConfigData;
-$SERVERCONFDATA_TYPE_PRODUCTION->db_ConnectKey('physia/physia@dbi:Oracle:Physia');
-$SERVERCONFDATA_TYPE_PRODUCTION->path_root(PATH_ROOTDIR);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_Database(PATH_DATABASE);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_SchemaSQL(PATH_SCHEMASQL);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_BillingTemplate(PATH_BILLTMPL);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_Reports(PATH_REPORTS);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_OrgReports(PATH_ORGREPORTS);
-$SERVERCONFDATA_TYPE_PRODUCTION->path_PDFOutput(PATH_PDFOUTPUT);
-$SERVERCONFDATA_TYPE_PRODUCTION->file_SchemaDefn(FILE_SCHEMADEFN);
-$SERVERCONFDATA_TYPE_PRODUCTION->file_AccessControlDefn(FILE_ACLDEFN);
+sub requirePath
+{
+	foreach (@_)
+	{
+		die "Directory " . $_ . " doesn't exist!" unless (-d $_);
+	}
+}
 
-$SERVERCONFDATA_TYPE_DEVELOPMENT = new ServerConfigData;
-$SERVERCONFDATA_TYPE_DEVELOPMENT->db_ConnectKey('physia/physia@dbi:Oracle:SDEDBS01');
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_root(PATH_ROOTDIR);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_Database(PATH_DATABASE);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_SchemaSQL(PATH_SCHEMASQL);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_BillingTemplate(PATH_BILLTMPL);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_Reports(PATH_REPORTS);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_OrgReports(PATH_ORGREPORTS);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->path_PDFOutput(PATH_PDFOUTPUT);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->file_SchemaDefn(FILE_SCHEMADEFN);
-$SERVERCONFDATA_TYPE_DEVELOPMENT->file_AccessControlDefn(FILE_ACLDEFN);
+sub createPath
+{
+	foreach (@_)
+	{
+		unless (-d $_)
+		{
+			die "Can't create directory " . $_ unless (mkpath($_));
+		}
+	}
+}
 
-$SERVERCONFDATA_SDE01 = new ServerConfigData;
-$SERVERCONFDATA_SDE01->db_ConnectKey('sde01/sde@dbi:Oracle:SDEDBS01');
-$SERVERCONFDATA_SDE01->path_root(PATH_ROOTDIR);
-$SERVERCONFDATA_SDE01->path_Database(PATH_DATABASE);
-$SERVERCONFDATA_SDE01->path_SchemaSQL(PATH_SCHEMASQL);
-$SERVERCONFDATA_SDE01->path_BillingTemplate(PATH_BILLTMPL);
-$SERVERCONFDATA_SDE01->path_Reports(PATH_REPORTS);
-$SERVERCONFDATA_SDE01->path_OrgReports(PATH_ORGREPORTS);
-$SERVERCONFDATA_SDE01->path_PDFOutput(PATH_PDFOUTPUT);
-$SERVERCONFDATA_SDE01->file_SchemaDefn(FILE_SCHEMADEFN);
-$SERVERCONFDATA_SDE01->file_AccessControlDefn(FILE_ACLDEFN);
+sub getDefaultConfig
+{
+	my ($name, $group, $dbConnectKey) = @_;
+	die '$name, $group and $dbConnectKey are required' unless $name && $group && $dbConnectKey;
 
-$SERVERCONFDATA_SDE02 = new ServerConfigData;
-$SERVERCONFDATA_SDE02->db_ConnectKey('sde_prime/sde@dbi:Oracle:SDEDBS02');
-$SERVERCONFDATA_SDE02->path_root(PATH_ROOTDIR);
-$SERVERCONFDATA_SDE02->path_Database(PATH_DATABASE);
-$SERVERCONFDATA_SDE02->path_SchemaSQL(PATH_SCHEMASQL);
-$SERVERCONFDATA_SDE02->path_BillingTemplate(PATH_BILLTMPL);
-$SERVERCONFDATA_SDE02->path_Reports(PATH_REPORTS);
-$SERVERCONFDATA_SDE02->path_OrgReports(PATH_ORGREPORTS);
-$SERVERCONFDATA_SDE02->path_PDFOutput(PATH_PDFOUTPUT);
-$SERVERCONFDATA_SDE02->file_SchemaDefn(FILE_SCHEMADEFN);
-$SERVERCONFDATA_SDE02->file_AccessControlDefn(FILE_ACLDEFN);
+	my $config = new ServerConfigData;
 
-$SERVERCONFDATA_TYPE_LOCAL = new ServerConfigData;
-$SERVERCONFDATA_TYPE_LOCAL->db_ConnectKey('hs/hs@dbi:Oracle:HealthSuiteIvory');
-$SERVERCONFDATA_TYPE_LOCAL->path_root(PATH_ROOTDIR);
-$SERVERCONFDATA_TYPE_LOCAL->path_Database(PATH_DATABASE);
-$SERVERCONFDATA_TYPE_LOCAL->path_SchemaSQL(PATH_SCHEMASQL);
-$SERVERCONFDATA_TYPE_LOCAL->path_BillingTemplate(PATH_BILLTMPL);
-$SERVERCONFDATA_TYPE_LOCAL->path_Reports(PATH_REPORTS);
-$SERVERCONFDATA_TYPE_LOCAL->path_OrgReports(PATH_ORGREPORTS);
-$SERVERCONFDATA_TYPE_LOCAL->path_PDFOutput(PATH_PDFOUTPUT);
-$SERVERCONFDATA_TYPE_LOCAL->file_SchemaDefn(FILE_SCHEMADEFN);
-$SERVERCONFDATA_TYPE_LOCAL->file_AccessControlDefn(FILE_ACLDEFN);
+	$config->name_Config($name);
+	$config->name_Group($group);
+	$config->db_ConnectKey($dbConnectKey);
+	$config->path_root(PATH_APPROOT);
+	$config->path_temp(PATH_TEMP);
+	$config->path_Database(PATH_DATABASE);
+	$config->path_Reports(PATH_REPORTS);
+	$config->path_SchemaSQL(File::Spec->catfile(PATH_DATABASE, 'schema-physia'));
+	$config->path_BillingTemplate(File::Spec->catfile(PATH_APPLIB, 'Billing'));
+	$config->path_OrgReports(File::Spec->catfile(PATH_REPORTS, 'Org'));
+	$config->path_PDFOutput(File::Spec->catfile(PATH_TEMP, 'invoices'));
+	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
+	$config->file_AccessControlDefn(File::Spec->catfile(PATH_APPLIB, 'Conf', 'AccessControl.xml'));
+	return $config;
+}
 
-%AVAIL_HOSTS =
+%AVAIL_CONFIGS =
 (
-	'DEFIANT' => $SERVERCONFDATA_TYPE_PRODUCTION,
-#	'MEDINA'  => $SERVERCONFDATA_TYPE_DEVELOPMENT,
-#	'MEDINA'  => $SERVERCONFDATA_SDE01,
-	'MEDINA'  => $SERVERCONFDATA_SDE02,
-	'MEMPHIS' => $SERVERCONFDATA_TYPE_DEVELOPMENT,
-	'CAIRO'   => $SERVERCONFDATA_TYPE_DEVELOPMENT,
-	'LIMA'    => $SERVERCONFDATA_TYPE_DEVELOPMENT,
-	'TITAN'   => $SERVERCONFDATA_TYPE_LOCAL,
-	'TOKYO.PHYSIA.COM' => $SERVERCONFDATA_SDE02,
+	# per-machine configurations go here
+	'TOKYO' => getDefaultConfig('Tokyo Main Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
+	'MEDINA' => getDefaultConfig('Medina Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
+
+	# other keyed configurations go here
+	# if a particular UNIX user needs a special configuration, use 'account-username'
+	# if a particular UNIX group needs a special configuration, use 'group-groupname'
+	'account-vusr_pm' => getDefaultConfig('PM Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
+	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 );
 
+my $userName = getpwuid($>) || '';
+my $groupName = getgrgid($)) || '';
 my $hostName = uc(`hostname`);
-chomp($hostName);
-$CONFDATA_SERVER = $AVAIL_HOSTS{$hostName};
-die "Unable to find configuration for server/host '$hostName'\n" unless $CONFDATA_SERVER;
 
+if($^O ne 'MSWin32')
+{
+	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"};
+	$CONFDATA_SERVER = $AVAIL_CONFIGS{"group-$groupName"} unless $CONFDATA_SERVER;
+}
+unless ($CONFDATA_SERVER)
+{
+	$hostName = $1 if $hostName =~ /^(\w+?)\..*$/;
+	chomp($hostName);
+	$CONFDATA_SERVER = $AVAIL_CONFIGS{$hostName};
+}
+die "Unable to find configuration for 'account-$userName', 'group-$groupName' or '$hostName'\n" unless $CONFDATA_SERVER;
+
+createPath(
+	$CONFDATA_SERVER->path_SchemaSQL,
+	$CONFDATA_SERVER->path_temp,
+	$CONFDATA_SERVER->path_PDFOutput
+	);
+requirePath(
+	$CONFDATA_SERVER->path_Database,
+	$CONFDATA_SERVER->path_Reports,
+	$CONFDATA_SERVER->path_BillingTemplate,
+	$CONFDATA_SERVER->path_OrgReports,
+	);
+print "path_Root = " . $CONFDATA_SERVER->path_root . "\n";
+print "name_Config = " . $CONFDATA_SERVER->name_Config . "\n";
+print "name_Group = " . $CONFDATA_SERVER->name_Group . "\n";
+print "db_ConnectKey = " . $CONFDATA_SERVER->db_ConnectKey . "\n";
 1;
