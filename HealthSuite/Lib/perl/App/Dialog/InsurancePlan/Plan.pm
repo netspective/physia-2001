@@ -41,7 +41,7 @@ sub new
 				#					column => 'Insurance.ins_type',
 				#					typeGroup => ['insurance', 'workers compensation']),
 
-				new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
+				new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', findPopup => '/lookup/catalog/catalog_id'),
 
 				new App::Dialog::Field::Address(caption=>'Billing Address', name => 'billing_addr',
 									options => FLDFLAG_REQUIRED),
@@ -285,12 +285,12 @@ sub execute
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
 
-	$self->handleAttributes($page, $command, $flags, $insIntId);
+	$self->handleAttributes($page, $command, $flags, $insIntId, $parentInsId);
 }
 
 sub handleAttributes
 {
-	my ($self, $page, $command, $flags, $insIntId) = @_;
+	my ($self, $page, $command, $flags, $insIntId, $parentInsId) = @_;
 
 	$page->schemaAction(
 			'Insurance_Address', $command,
@@ -329,7 +329,21 @@ sub handleAttributes
 			_debug => 0
 		);
 
-	my @feeSched =split(',', $page->field('fee_schedules'));
+	my $parentFeeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Fee Schedule');
+		my @feeList = ();
+		my @feeItemList = ();
+		my $fee = '';
+		my $feeItem = '';
+		foreach my $feeSchedule (@{$parentFeeSched})
+		{
+			push(@feeList, $feeSchedule->{'value_text'});
+			$fee = join(', ', @feeList);
+		}
+	my $feeSchedList = '';
+
+	$feeSchedList = $page->field('fee_schedules') eq '' && $command eq 'add' ? $page->field('fee_schedules', $fee) : $page->field('fee_schedules');
+
+	my @feeSched =split(',', $feeSchedList);
 
 	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule', $insIntId);
 
