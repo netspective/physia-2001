@@ -121,12 +121,12 @@ sub processClaims
 				# increamenting serial number for next File header
 				$serialNumber++;
     		}
+	    	$params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
 	    } # end of for loop
 
 	    $self->setFileSerialNumber($serialNumber);
 
 	    # To add new line character in the last line inserted in array
-	    $params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
     }
     else
     {

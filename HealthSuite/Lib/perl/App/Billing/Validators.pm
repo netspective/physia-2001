@@ -125,12 +125,12 @@ sub getDate
 {
 
 	my $self = shift;
-	
+
 	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-	
+
 	my $date = localtime();
 	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
 	my @dateStr = ($month, substr(localtime(),8,2), substr(localtime(),20,4));
@@ -140,7 +140,7 @@ sub getDate
 	$dateStr[1] =~ s/ /0/;
 
 	return $dateStr[0].$dateStr[2].$dateStr[1];
-	
+
 }
 
 
@@ -149,12 +149,12 @@ sub getDate
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
-	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+
+	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0].$temp1[1]."0" x ($lenDec - length($temp1[1]));
+	return $fg;
 }
 
 1;

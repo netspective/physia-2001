@@ -13,7 +13,7 @@ use App::Billing::Universal;
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
 
@@ -21,12 +21,12 @@ sub new
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
-	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+
+	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0].$temp1[1]."0" x ($lenDec - length($temp1[1]));
+	return $fg;
 }
 
 sub recordType
@@ -42,7 +42,7 @@ sub formatData
 	my $zeros = "0";
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
 	my $refClaimCareReceiverAddress = $refClaimCareReceiver->{address};
-		
+
 my %payerType = (THIN_MEDICARE . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-12s%1s%-3s%-8s%1s%1s%-30s%-30s%-20s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-15s%-6s%-87s",
 	$self->recordType(),
@@ -69,9 +69,9 @@ my %payerType = (THIN_MEDICARE . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	'C',  # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces, # filler
@@ -102,14 +102,14 @@ my %payerType = (THIN_MEDICARE . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	'F',      # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces,  # filler national
 	),
-	THIN_MEDICAID . "" =>	
+	THIN_MEDICAID . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-12s%1s%-3s%-8s%1s%1s%-30s%-30s%-20s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-15s%-6s%-87s",
 	$self->recordType(),
 	$spaces, # reserved filler
@@ -135,14 +135,14 @@ my %payerType = (THIN_MEDICARE . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	$spaces,  # claim editing indicator
 	'F ',     # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces, # filler
 	),
-	THIN_BLUESHIELD . "" =>	
+	THIN_BLUESHIELD . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-12s%1s%-3s%-8s%1s%1s%-30s%-30s%-20s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-15s%-6s%-87s",
 	$self->recordType(),
 	$spaces, # reserved filler
@@ -168,17 +168,17 @@ my %payerType = (THIN_MEDICARE . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	$spaces, # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces, # filler
 	)
   );
-  
+
   return $payerType{$payerType};
-	
+
 }
-	
+
 1;

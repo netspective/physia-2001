@@ -517,7 +517,7 @@ sub populateProcedure
 #	$ptr =~ s/ /,/g;
 	$ptr = substr($ptr, 0,length($ptr)-1);
 	$data->{'procedure' . $i . 'DiagnosisCodePointer'} = $ptr; # join (' ', @$ptr);
-	$data->{'procedure' . $i . 'Charges'} = $procedure->getCharges;
+	$data->{'procedure' . $i . 'Charges'} = $self->trailingZeros($procedure->getCharges);
 	$data->{'procedure' . $i . 'DaysOrUnits'} = substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3);
 	$data->{'procedure' . $i . 'Emergency'}	 = $procedure->getEmergency;
 }
@@ -586,9 +586,9 @@ sub populateFinalCharges
 	my ($self, $claim) = @_;
 	my $data = $self->{data};
 
-	$data->{claimTotalCharge} = $claim->getTotalCharge;
-	$data->{claimAmountPaid} = abs($claim->getTotalChargePaid);
-	$data->{claimBalance} = abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid));
+	$data->{claimTotalCharge} = $self->trailingZeros($claim->getTotalCharge);
+	$data->{claimAmountPaid} = $self->trailingZeros(abs($claim->getTotalChargePaid));
+	$data->{claimBalance} = $self->trailingZeros(abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid)));
 
 }
 
@@ -607,6 +607,28 @@ sub getComments
 		last if ($procedure->{comments} ne '')
 	}
 	return $comments;
+}
+
+sub trailingZeros
+{
+	my ($self, $value) = @_;
+
+	my @wholeFraction = split(/\./,$value);
+	my $fractionLength = length($wholeFraction[1]);
+	my $fraction;
+	if($fractionLength == 0)
+	{
+		$fraction = '00';
+	}
+	elsif($fractionLength == 1)
+	{
+		$fraction = $wholeFraction[1] . '0';
+	}
+	else
+	{
+		$fraction = substr($wholeFraction[1], 0, 2);
+	}
+	return $wholeFraction[0] . '.' . $fraction;
 }
 
 1;

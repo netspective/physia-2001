@@ -12,10 +12,10 @@ use App::Billing::Universal;
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
-	
+
 sub recordType
 {
 	'BA1';
@@ -24,12 +24,12 @@ sub recordType
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
-	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+
+	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0].$temp1[1]."0" x ($lenDec - length($temp1[1]));
+	return $fg;
 }
 
 
@@ -46,26 +46,26 @@ sub formatData
 	my $claimPayToOrganization = $firstClaim->{payToOrganization};
 	my $claimPayToProvider = $firstClaim->{payToProvider};
 	my $claimRenderingProvier = $firstClaim->{renderingProvider};
-	
+
 	my $claimPayToOrganizationAddress = $claimPayToOrganization->{address};
 	my $claimPayToProviderAddress = $claimPayToProvider->{address};
 	my $claimRenderingProvierAddress = $claimRenderingProvier->{address};
 	my $emcId;
 	my $taxId;
 	my $taxTypeId;
-	
+
 
 	for my $eachClaim (0..$#$inpClaim)
 	{
 		$emcId = $inpClaim->[$eachClaim]->getEMCId();
-		
+
 		if ($emcId ne "")
 		{
 			last;
 		}
 	}
 
-my %payerType = ( THIN_COMMERCIAL . "" =>		
+my %payerType = ( THIN_COMMERCIAL . "" =>
 	  sprintf("%-3s%-15s%-3s%4d%-6s%-3s%-30s%-30s%-20s%-2s%-9s%-10s%-30s%-30s%-20s%-2s%-9s%-10s%-84s",
 	  $self->recordType(),
 	  $spaces, #substr($emcId,0,15), #emc provider id
@@ -87,9 +87,9 @@ my %payerType = ( THIN_COMMERCIAL . "" =>
 	  substr($claimPayToProviderAddress->getTelephoneNo(),0,10), # prov pay to phone
 	  $spaces, # filler national
 	  ),
-	 ); 
-	 
-	 return $payerType{$payerType}; 
+	 );
+
+	 return $payerType{$payerType};
 }
 
 1;
