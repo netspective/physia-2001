@@ -1238,6 +1238,7 @@ sub handleInvoiceAttrs
 
 
 	#referring physician information
+	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delRefProviderAttrs', $invoiceId);
 	if(my $refPhysId = $page->field('ref_id'))
 	{
 		my $refPhysInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $refPhysId);
@@ -1251,7 +1252,6 @@ sub handleInvoiceAttrs
 		}
 
 		my $refPhysState = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPhysStateLicense', $refPhysId, 1);
-		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delRefProviderAttrs', $invoiceId);
 
 		$page->schemaAction(
 				'Invoice_Attribute', 'add',
