@@ -105,9 +105,7 @@ sub execute
 			checkin_stamp => $page->field('checkin_stamp'),
 			checkin_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
-			event_type => $page->field('appt_type') || 100,
 			subject => $page->field('subject') || undef,
-			duration => $page->field('duration') || 10,
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)

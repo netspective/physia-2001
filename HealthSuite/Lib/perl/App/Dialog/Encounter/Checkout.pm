@@ -122,9 +122,7 @@ sub execute
 			checkout_stamp => $page->field('checkout_stamp'),
 			checkout_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
-			event_type => $page->field('appt_type') || 100,
 			subject => $page->field('subject') || undef,
-			duration => $page->field('duration') || 10,
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)
