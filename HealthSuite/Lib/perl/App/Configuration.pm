@@ -150,7 +150,7 @@ sub getDefaultConfig
 	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
-	
+
 	if ($group eq CONFIGGROUP_PRO) {
 		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));
 	}
@@ -183,25 +183,25 @@ sub getDefaultConfig
 	'LIMA' => getDefaultConfig('Lima Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'TITAN' => getDefaultConfig('Thai Home PC Configuration', CONFIGGROUP_SOLO, 'hs/hs@dbi:Oracle:HealthSuiteIvory'),
 	'PSLINUX' => getDefaultConfig('ProSys Configuration', CONFIGGROUP_SOLO, 'physia/physia@dbi:Oracle:physia'),
-	'SILICON' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS05'),
+	'SILICON' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 
 	# other keyed configurations go here
 	# if a particular UNIX user needs a special configuration, use 'account-username'
 	# if a particular UNIX group needs a special configuration, use 'group-groupname'
-	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS05'),
-	'group-virtuser' => getDefaultConfig('Virtual User Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS05'),
+	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
+	'group-virtuser' => getDefaultConfig('Virtual User Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
-	
+
 	# configs specifically for use with $ENV{HS_CONFIG}
 	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'db-demo02' => getDefaultConfig('Demo02 Configuration', CONFIGGROUP_DEMO, 'demo02/demo@dbi:Oracle:SDEDBS02'),
 	'db-pro01' => getDefaultConfig('Production Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
-	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS05'),
-	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'sde04/sde@dbi:Oracle:SDEDBS04'),
+	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
+	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'sde04/sde@dbi:Oracle:SDEDBS05'),
 	'db-sde02' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
 	'db-pro_munir' => getDefaultConfig("Munir's Database", CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS05'),
 
@@ -270,5 +270,5 @@ requirePath(
 createLink(
 	App::Configuration::PATH_WEBSITE . '/paperclaims' => $CONFDATA_SERVER->path_PaperClaims,
 );
-	
+
 1;
