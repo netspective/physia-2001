@@ -2296,7 +2296,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ colIdx =>0, head => 'Diagnosis', dataFmt => '#1#'},
 			{ colIdx =>1, head => 'Earliest Date', dataFmt => '#2#'},
 			{ colIdx =>2, head => 'Latest Date', dataFmt => '#3#'},
-			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#'},								
+			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#', dAlign => 'CENTER'},								
 		],
 		frame => 
 		{ 
