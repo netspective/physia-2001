@@ -506,10 +506,10 @@ sub execute
 		$insertStmt = qq{
 			insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
 				catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
-				cost_type, unit_cost, description, units_avail)
+				cost_type, unit_cost, description, units_avail,data_text)
 			(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
 				entry_type, $flags, status, code, modifier, name, default_units, cost_type, unit_cost,
-				description, units_avail 
+				description, units_avail ,data_text
 			from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
 		};
 	}
@@ -518,10 +518,10 @@ sub execute
 		$insertStmt = qq{
 			insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
 				catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
-				cost_type, unit_cost, description, units_avail)
+				cost_type, unit_cost, description, units_avail,data_text)
 			(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
 				entry_type, flags, status, code, modifier, name, default_units, cost_type, unit_cost,
-				description, units_avail 
+				description, units_avail ,data_text
 			from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
 		};
 	}
