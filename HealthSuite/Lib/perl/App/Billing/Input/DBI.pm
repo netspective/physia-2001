@@ -123,7 +123,10 @@ use constant CLAIM_TYPE_CHAMPVA => 9;
 use constant CLAIM_TYPE_FECA_BLK_LUNG => 10;
 use constant CLAIM_TYPE_BCBS => 11;
 use constant CLAIM_TYPE_HMO_NONCAP => 12;
+use constant CLAIM_TYPE_MANAGED_CARE => 13;
+use constant CLAIM_TYPE_POS => 14;
 use constant CLAIM_TYPE_RAILROAD_MEDICARE => 15;
+
 
 # Invoice Item Type Constants
 use constant INVOICE_ITEM_OTHER => 0;
@@ -2062,6 +2065,8 @@ sub setClaimProperties
 	$ins[CLAIM_TYPE_FECA_BLK_LUNG] = "FECA";
 	$ins[CLAIM_TYPE_BCBS] = "OTHER";
 	$ins[CLAIM_TYPE_HMO_NONCAP] = "GROUP HEALTH PLAN";
+	$ins[CLAIM_TYPE_MANAGED_CARE] = "GROUP HEALTH PLAN";
+	$ins[CLAIM_TYPE_POS] = "GROUP HEALTH PLAN";
 	$ins[CLAIM_TYPE_RAILROAD_MEDICARE] = "OTHER";
 
 	$tempRow[2] =~ s/ //g;
