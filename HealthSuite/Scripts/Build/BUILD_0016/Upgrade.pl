@@ -27,7 +27,7 @@ system(qq{
 	./GenerateSchema.pl
 });
 
-#runSQL('BUILD_0016_main_script.sql');
+runSQL('BUILD_0016_main_script.sql');
 runSQL('BUILD_0016_load_documents_schema.sql');
 runSQL('BUILD_0016_drop_duplicate_triggers.sql');
 runSQL('BUILD_0016_views_and_ref_cpt.sql');
