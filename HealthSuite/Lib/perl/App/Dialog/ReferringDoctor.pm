@@ -189,7 +189,7 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
 							['View Referring Doctor Summary', "/person/%field.person_id%/profile", 1],
-							['Add Another Referring Doctor', "/org/#session.org_id#/dlg-add-ref-doctor"],
+							['Add Another Referring Doctor', "/org/#session.org_id#/dlg-add-referring-doctor"],
 							['Go to Search', "/search/person/id/%field.person_id%"],
 							['Return to Home', "/person/#session.user_id#/home"],
 							['Go to Work List', "/worklist"],
