@@ -71,7 +71,6 @@
 	</table>
 
 	<table name="Gender" type="Enumeration">
-		<enum>Unknown</enum>
 		<enum>Male</enum>
 		<enum>Female</enum>
 		<enum abbrev="N/A">Not applicable</enum>
@@ -269,6 +268,7 @@
 		<enum>Payment</enum>
 		<enum>Refund</enum>
 		<enum>Transfer</enum>
+		<enum>Auto Insurance Writeoff</enum>
 	</table>
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
