@@ -43,7 +43,7 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'ins_type'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'owner_org_id'),
-			
+
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id',
 				name => 'ins_org_id',
 				addType => 'insurance',
@@ -341,7 +341,7 @@ sub execute
 
 	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
 	my $planName = $page->field('plan_name');
-
+	my $remitType = $page->field('remit_type');
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
 				ins_internal_id => $editInsIntId || undef,
@@ -359,7 +359,7 @@ sub execute
 				family_deductible_amt => $page->field('family_deductible_amt') || undef,
 				percentage_pay => $page->field('percentage_pay') || undef,
 				threshold => $page->field('threshold') || undef,
-				remit_type => $page->field('remit_type') || undef,
+				remit_type => $remitType || 0,
 				remit_payer_id => $page->field('remit_payer_id') || undef,
 				remit_payer_name => $page->field('remit_payer_name') || undef,
 				_debug => 0
@@ -370,7 +370,7 @@ sub execute
 		my $insIntId = $page->param('ins_internal_id');
 
 		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selUpdateCoverage', $insOrgInternalId, $productName, $planName, $ownerOrgId, $insIntId);
+			'selUpdateCoverage', $insOrgInternalId, $productName, $planName, $remitType, $insIntId, $page->session('org_internal_id'));
 	}
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
