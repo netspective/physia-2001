@@ -146,7 +146,6 @@ use App::Dialog::InsurancePlan::NewPlan;
 use App::Dialog::Login;
 use App::Dialog::OnHold;
 use App::Dialog::Organization;
-use App::Dialog::Organization::Department;
 use App::Dialog::Person::Nurse;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
