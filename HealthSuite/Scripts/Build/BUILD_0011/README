@@ -4,5 +4,8 @@ B694 - Changed the Alerts component to display the Priority
 
 B977 -  Changed one of the names in the license drop-down list (Certification component)from EPSTD to EPSDT
 
+B974 - Fixed the code to update the chart number and account number in the 'Edit Profile' dialog
+
+B975 - Fixed code to not to show up the error message about Lastname and FirstName while editing a person's record
 
 
