@@ -64,19 +64,17 @@ sub initialize
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	my $ACL = $activeView ? "page/sde/$activeView" : "page/sde";
+	unless($self->hasPermission($ACL))
 	{
-		unless($self->hasPermission("page/sde/$activeView"))
-		{
-			$self->disable(
-					qq{
-						<br>
-						You do not have permission to view this information. 
-						Permission page/sde/$activeView is required.
+		$self->disable(
+				qq{
+					<br>
+					You do not have permission to view this information. 
+					Permission page/sde/$activeView is required.
 
-						Click <a href='javascript:history.back()'>here</a> to go back.
-					});
-		}
+					Click <a href='javascript:history.back()'>here</a> to go back.
+				});
 	}
 }
 
