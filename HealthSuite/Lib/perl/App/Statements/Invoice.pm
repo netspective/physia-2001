@@ -149,6 +149,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and (t.trans_type between 2000 and 2999)
 			and t.trans_id = main_transaction
 		},
+	'selInvoiceMainTransById' => q{
+		select main_transaction 
+		from invoice
+		where invoice_id = ?
+		},
 	'selInvoiceByTypeAndMainTrans' => q{
 		select * from invoice
 		where invoice_type = ?
