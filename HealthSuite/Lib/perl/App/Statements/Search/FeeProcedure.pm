@@ -37,7 +37,7 @@ $STMTRPTDEFN_FEE_PROCEDURE =
 	columnDefn =>
 	[
 		{ hAlign => 'LEFT',head => 'Code', 		
-		url => 'javascript:chooseEntry("#&{?}#")'},			
+		url => q{javascript:chooseEntry('#&{?}#')}},			
 		{hAlign => 'LEFT',head => 'Name'  },				
 		{hAlign => 'LEFT',colIdx=>3, head => 'Code Type' }
 	],		
