@@ -13,3 +13,4 @@ grant create database link to webuser;
 
 grant select on v_$mystat to webuser;
 grant select on v_$statname to webuser;
+grant query_rewrite to webuser;
