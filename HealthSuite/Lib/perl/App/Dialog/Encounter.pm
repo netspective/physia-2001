@@ -82,6 +82,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
 		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
+		new CGI::Dialog::Field(type => 'hidden', name => 'provider_pair'), # for hosp claims, the service and billing provider ids are concatenated and checked in the handleProcedureItems function
 
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
@@ -191,6 +192,23 @@ sub initialize
 				#			options => FLDFLAG_REQUIRED,
 				#			types => "'PRACTICE'"),
 			]),
+		new CGI::Dialog::MultiField(caption => 'Hospital/Billing Facility', name => 'hosp_org_fields',
+			hints => 'Hospital is the org in which services were rendered.<br>
+						Billing org is the org in which the billing should be tracked.',
+			fields => [
+				new App::Dialog::Field::OrgType(
+							caption => 'Hospital',
+							name => 'hospital_id',
+							options => FLDFLAG_REQUIRED,
+							types => "'HOSPITAL'"	),
+				new App::Dialog::Field::OrgType(
+							caption => 'Billing Org',
+							name => 'billing_facility_id',
+							options => FLDFLAG_REQUIRED,
+							types => "'PRACTICE'"),
+			]),
+
+
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
 
@@ -236,6 +254,8 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$command ||= 'add';
 
+	my $isHosp = $page->param('isHosp');
+
 	#keep third party other invisible unless it is chosen (see customValidate)
 	my $payer = $page->field('payer');
 	unless($payer eq 'Third-Party Payer')
@@ -255,7 +275,6 @@ sub makeStateChanges
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
 	#$self->getField('ref_id')->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Referring-Doctor'];
-
 
 
 	#Don't want to show opt proc entry when deleting
@@ -317,6 +336,7 @@ sub makeStateChanges
 		$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
 		$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('hosp_org_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
 		$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
 		$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
@@ -962,30 +982,48 @@ sub handlePayers
 	}
 
 
-	#if($page->param('isHosp') == 1)
-	#{
-	#	my $lineCount = $page->param('_f_line_count');
-	#	my @itemProviderIds;
-		#my $providerId = $page->param("_f_proc_$line\_provider_id");
-	#	for(my $line = 1; $line <= $lineCount; $line++)
-	#	{
-	#		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
-	#		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+	if($page->param('isHosp') == 1)
+	{
+		my $lineCount = $page->param('_f_line_count');
+		my @itemProviderIds;
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
+			next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
-	#		push(@itemProviderIds, $page->param("_f_proc_$line\_provider_id"));
-	#	}
+			push(@itemProviderIds, $page->param("_f_proc_$line\_service_provider_id") . $page->param("_f_proc_$line\_billing_provider_id"));
+		}
 
-		#foreach my $itemServProviderId (@itemProviderIds)
-		#{
-		#	$page->field('care_provider_id', $itemServProviderId);
-			#$page->field('provider_id', $itemBillProviderId);
-		#	addTransactionAndInvoice($self, $page, $command, $flags);
-		#}
-	#}
-	#else
-	#{
+		#$page->addError("Provider IDs: @itemProviderIds");
+		my %providersSeen = ();
+		foreach (@itemProviderIds)
+		{
+			$providersSeen{$_} = 1;
+		}
+
+		my $origPairs = @itemProviderIds;
+		my $filteredPairs = keys %providersSeen;
+
+		#$page->addError("Orig Pairs: $origPairs");
+		#$page->addError("Filtered Pairs: $filteredPairs");
+
+		my $servProviderId;
+		my $billProviderId;
+		for(my $line = 1; $line <= $filteredPairs; $line++)
+		{
+			$servProviderId = $page->param("_f_proc_$line\_service_provider_id");
+			$billProviderId = $page->param("_f_proc_$line\_billing_provider_id");
+
+			$page->field('care_provider_id', $servProviderId);
+			$page->field('provider_id', $billProviderId);
+			$page->field('provider_pair', $servProviderId . $billProviderId);
+			addTransactionAndInvoice($self, $page, $command, $flags);
+		}
+	}
+	else
+	{
 		addTransactionAndInvoice($self, $page, $command, $flags);
-	#}
+	}
 }
 
 sub addTransactionAndInvoice
@@ -1036,7 +1074,7 @@ sub addTransactionAndInvoice
 		trans_status => defined $transStatus ? $transStatus : undef,
 		parent_event_id => $page->field('parent_event_id') || $page->param('event_id') || undef,
 		caption => $page->field('subject') || undef,
-		service_facility_id => $page->field('service_facility_id') || undef,
+		service_facility_id => $page->field('service_facility_id') || $page->field('hospital_id') || undef,
 		billing_facility_id => $billingFacility || undef,
 		provider_id => $billingProvider || undef,
 		care_provider_id => $serviceProvider || undef,
@@ -1091,9 +1129,11 @@ sub handleInvoiceAttrs
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
 	$command ||= 'add';
 
+	my $sessOrgId = $page->session('org_id');
 	my $todaysDate = $page->getDate();
 	my $personId = $page->field('attendee_id');
 	my $billingFacility = $page->field('billing_facility_id');
+	my $serviceFacility = $page->field('service_facility_id') || $page->field('hospital_id');
 	my $batchId = $page->field('batch_id');
 
 	#CONSTANTS
@@ -1177,7 +1217,15 @@ sub handleInvoiceAttrs
 	if(my $refPhysId = $page->field('ref_id'))
 	{
 		my $refPhysInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $refPhysId);
-		my $refPhysUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $refPhysId, 'UPIN', App::Universal::ATTRTYPE_LICENSE);
+		#my $refPhysUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $refPhysId, 'UPIN', App::Universal::ATTRTYPE_LICENSE);
+		my $refPhysUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $refPhysId, 'UPIN', $serviceFacility);
+		my $upin = $refPhysUpin->{value_text};
+		if($upin eq '')
+		{
+			$refPhysUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $refPhysId, 'UPIN', $sessOrgId);
+			$upin = $refPhysUpin->{value_text};
+		}
+
 		my $refPhysState = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPhysStateLicense', $refPhysId, 1);
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delRefProviderAttrs', $invoiceId);
 
@@ -1842,8 +1890,14 @@ sub handleProcedureItems
 	my $servItemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
 
+	my $isHospClaim = $page->param('isHosp');
+	my $setProviderPair = $page->field('provider_pair');
+	my $servProviderId;
+	my $billProviderId;
+	my $currProviderPair;
+
 	#convert place to it's foreign key id
-	my $svcFacility = $page->field('service_facility_id');
+	my $svcFacility = $page->field('service_facility_id') || $page->field('hospital_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
 
@@ -1854,11 +1908,15 @@ sub handleProcedureItems
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
-		#my $itemProviderId;
-		#if($page->param('isHosp'))
-		#{
-		#	$itemProviderId = $page->param("_f_proc_$line\_provider_id");
-		#}
+		if($isHospClaim)
+		{
+			$servProviderId = $page->param("_f_proc_$line\_service_provider_id");
+			$billProviderId = $page->param("_f_proc_$line\_billing_provider_id");
+
+			$currProviderPair = $servProviderId . $billProviderId;
+			next unless $setProviderPair eq $currProviderPair;
+			#$page->addError("Line $line: $setProviderPair eq $currProviderPair");
+		}
 
 		my $cptCode = $page->param("_f_proc_$line\_procedure");
 		#if cpt is a misc procedure code, get children and create invoice item for each child
@@ -1926,10 +1984,9 @@ sub createExplosionItems
 {
 	my ($self, $page, $command, $line, $invoiceId, $miscProcChildren) = @_;
 
-	my $svcFacility = $page->field('service_facility_id');
+	my $svcFacility = $page->field('service_facility_id') || $page->field('hospital_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
-	my $emg = 0;
 
 	my $childCount = scalar(@{$miscProcChildren});
 	foreach my $child (@{$miscProcChildren})
@@ -1939,6 +1996,7 @@ sub createExplosionItems
 		my $modifier = $child->{modifier};
 		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 		my $quantity = $page->param("_f_proc_$line\_units");
+		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
 
 		my $fs_entry = App::IntelliCode::getFSEntry($page, $cptCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
@@ -2120,40 +2178,44 @@ sub customValidate
 
 
 	#VALIDATION OF FEE SCHED RESULTS FOR CHILDREN OF EXPLOSION CODES
-	my $lineCount = $page->param('_f_line_count');
-	my $getProcListField = $self->getField('procedures_list');
-	for(my $line = 1; $line <= $lineCount; $line++)
-	{
-		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
-		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+	#my $lineCount = $page->param('_f_line_count');
+	#my $getProcListField = $self->getField('procedures_list');
+	#if(length($page->field('payer')) >0)
+	#{
+	#	for(my $line = 1; $line <= $lineCount; $line++)
+	#	{
+	#		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
+	#		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
-		my $cptCode = $page->param("_f_proc_$line\_procedure");
-		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
-		if($miscProcChildren->[0]->{code})
-		{
-			my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
-			my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
-			foreach my $child (@{$miscProcChildren})
-			{
-				my $childCode = $child->{code};
-				my $modifier = $child->{modifier};
-				my $fs_entry = App::IntelliCode::getFSEntry($page, $childCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
-				my $count_type = scalar(@$fs_entry);
-				if ($count_type == 0)
-				{
-					$getProcListField->invalidate($page,"[<B>P$line</B>]Unable to find Code '$childCode' in fee schedule(s) " . join ",",@listFeeSchedules);
-				}
-				elsif ($count_type > 1)
-				{
-					$getProcListField->invalidate($page,"[<B>P$line</B>]Procedure found in multiple fee schedules.");
-				}
-				elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
-				{ 	
-					$getProcListField->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
-				}
-			}
-		}
-	}
+	#		my $cptCode = $page->param("_f_proc_$line\_procedure");
+	#		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
+	#		if($miscProcChildren->[0]->{code})
+	#		{
+	#			my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
+	#			my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
+				#$page->addError("encounter: @listFeeSchedules");
+	#			foreach my $child (@{$miscProcChildren})
+	#			{
+	#				my $childCode = $child->{code};
+	#				my $modifier = $child->{modifier};
+	#				my $fs_entry = App::IntelliCode::getFSEntry($page, $childCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+	#				my $count_type = scalar(@$fs_entry);
+	#				if ($count_type == 0)
+	#				{
+	#					$getProcListField->invalidate($page,"[<B>P$line</B>]Unable to find Code '$childCode' in fee schedule(s) " . join ",",@listFeeSchedules);
+	#				}
+	#				elsif ($count_type > 1)
+	#				{
+	#					$getProcListField->invalidate($page,"[<B>P$line</B>]Procedure found in multiple fee schedules.");
+	#				}
+	#				elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
+	#				{ 	
+	#					$getProcListField->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
+	#				}
+	#			}
+	#		}
+	#	}
+	#}
 }
 
 sub checkEventStatus
