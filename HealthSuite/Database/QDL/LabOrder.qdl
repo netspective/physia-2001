@@ -22,15 +22,17 @@
 		<field id="test_entry_id" join="lab_order_entry" column="test_entry_id" />		
 		<field id="test_type" join="catalog" column="caption" />
 		
-		<field id="lab_test_id" join="lab_entry" column="name" caption="Lab Company Name" />				
+		<field id="lab_test_id" join="lab_order_entry" column="lab_code" caption="Lab Company Name" />				
+		<field id="lab_entry_id" join="lab_order_entry" column="entry_id" caption="Lab Company Name" />						
 		<field id="lab_parent_id" join="lab_entry" column="parent_entry_id" />						
-		<field id="lab_test_name" join="lab_entry" column="description" caption="Lab Company Name" />				
+		<field id="lab_test_name" join="lab_order_entry" column="caption" caption="Lab Company Name" />				
 		<field id="lab_test_entry_id" join="lab_entry" column="entry_id" caption="Lab Company Name" />						
-		<field id="selection" join="lab_entry" column="modifier" caption="Lab Company Name" />				
+		<field id="selection" join="lab_order_entry" column="modifier" caption="Lab Company Name" />				
+		<field id="list" join="lab_order_entry" column="panel_test_name" caption="Lab Company Name" />						
 		
-		<field id="lab_panel_id" join="lab_panel" column="name" />				
-		<field id="lab_panel_name" join="lab_panel" column="description"/>				
-		<field id="lab_panel_price" join="lab_panel" column="unit_cost"/>			
+		<field id="lab_panel_id" join="lab_panel" column="lab_code" />				
+		<field id="lab_panel_name" join="lab_panel" column="caption"/>				
+		<field id="lab_panel_price" join="lab_panel" column="physician_cost"/>			
 		<field id="lab_panel_parent_id" join="lab_panel" column="parent_entry_id" />						
 		
 		
@@ -41,7 +43,7 @@
 		<join id="lab_order_entry" table="lab_order_entry" condition="lab_order_entry.parent_id=lab_order.lab_order_id"/>				
 		<join id="lab_entry" include="lab_order_entry" table="offering_catalog_entry" condition="lab_entry.entry_id=lab_order_entry.test_entry_id"/>						
 		<join id="lab_status" table="lab_order_status" condition="lab_status.id=lab_order.lab_order_status"/>						
-		<join id="lab_panel" include="lab_order_entry" table="offering_catalog_entry" />								
+		<join id="lab_panel" include="lab_order_entry" table="lab_order_entry" />								
 		<join id="catalog" table="offering_catalog" condition="lab_entry.catalog_id  = catalog.internal_catalog_id"/>
 		
 		
