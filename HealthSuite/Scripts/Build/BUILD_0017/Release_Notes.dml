@@ -18,7 +18,11 @@
 		<deliverable id="252">
 			UI: Added 'Go to Worklist' in all the dialogs which has a next-action drop-down list.
 		</deliverable>
-
+		
+		<deliverable id="450">
+			UI: Added the 'Fee Schedule Items' choice in the lookup drop-down list in the main menu page.
+		</deliverable>
+		
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
@@ -38,14 +42,21 @@
 			+ Daily Audit - Physician ID 
 			+ Invoices - Earning column Payer
 		</deliverable>
-
+		
+		<deliverable id="932">
+			UI: The attendance component was added in the 'Associates' tab and 'Not Yet Implemented' message was added to it.
+		</deliverable>
+		
 		<deliverable id="943">
 			UI: Simple names now showing next to all person id fields where possible.
 		</deliverable>
 
 		<deliverable id="963">
 			UI: Made the license fields in the nurse dialog to be just text fields.
-		</deliverable>
+		</deliverable>		
+		<deliverable id="1095">
+			UI: Added a new home page when the user who logged in is a 'Physician'.
+		</deliverable>			
 
 		<deliverable id="1125">
 			UI: Added a new multiField called 'Board Certification/Date' in the Physician dialog and updated the 
