@@ -1,3 +1,12 @@
+create table hds_bill as select * from sde01.hds_bill;
+create table hds_corporate as select * from SDE01.HDS_CORPORATE;
+create table hds_fees as select * from sde01.hds_fees;
+create table hds_fees_excp as select * from sde01.hds_fees_excp;
+create table hds_location as select * from sde01.hds_location;
+create table hds_services_provided as select * from sde01.hds_services_provided;
+create table hds_service_description as select * from sde01.hds_service_description;
+
+
 /* create hds tables *
 
 drop table hds_bill;
@@ -127,6 +136,9 @@ delete duplicates from bill table
 */
 
 
+   update referral_followup_status set id=22 where id=0;
+
+
    alter table org add (corp_id number(16));
    
    create index org_corp_id on org(corp_id);
@@ -188,7 +200,7 @@ delete duplicates from bill table
     'e-mail', 40, corp_e_mail
     from hds_corporate h;
     
-    
+/*    
    insert into org_attribute (cr_user_id, cr_org_internal_id, parent_id, item_name, value_type, value_block)
    select
     'ACS_Import', :ACSoii,
@@ -196,6 +208,8 @@ delete duplicates from bill table
     'notes', 5,
     to_lob(corp_notes)
     from hds_corporate h;
+    
+*/
     
     commit;
     
@@ -243,7 +257,7 @@ delete duplicates from bill table
     'e-mail', 40, loc_email
     from hds_location h;
     
-    
+ /*   
    insert into org_attribute (cr_user_id, cr_org_internal_id, parent_id, item_name, value_type, value_block)
    select
     'ACS_Import', :ACSoii,
@@ -251,7 +265,7 @@ delete duplicates from bill table
     'notes', 5,
     to_lob(loc_notes)
     from hds_location h;
-    
+ */   
     
     commit;
 
@@ -479,4 +493,52 @@ delete duplicates from bill table
    commit;
 
 
-   select org_id, count(*) from org where cr_org_internal_id=:ACSoii group by org_id having count(*)>1;   
+   select org_id, count(*) from org where cr_org_internal_id=:ACSoii group by org_id having count(*)>1;
+   
+   
+   /* additional changes from Frank */
+   
+   --Change entry_type from 100 to 210 where codes are hcpcs
+   update offering_catalog_entry
+   set entry_type = 210
+   WHERE 
+   entry_id IN
+   (
+   select oce.entry_id from offering_catalog_entry oce ,ref_hcpcs r, offering_catalog  oc
+   where oc.internal_catalog_id = oce.catalog_id and oc.org_internal_id =:ACSoii
+   and oc.catalog_type =0 and r.hcpcs = oce.code and oce.entry_type = 100
+   );
+   
+   
+   
+   -Get Name and Description for ACS Catalog Entries (HCPCS)
+   update offering_catalog_entry oce
+   SET description = 
+   (SELECT description FROM ref_hcpcs
+   WHERE hcpcs = oce.code),
+   name = 
+   (SELECT name FROM ref_hcpcs
+   WHERE hcpcs=oce.code)
+   WHERE entry_id IN
+   (
+   select oce.entry_id from offering_catalog_entry oce ,ref_hcpcs r, offering_catalog  oc
+   where oc.internal_catalog_id = oce.catalog_id and oc.org_internal_id =:ACSoii
+   and oc.catalog_type =0 and r.hcpcs = oce.code and oce.entry_type = 210
+   );
+
+
+--Get Name Description for  Catalog Entries  ACS (CPT)
+update offering_catalog_entry oce
+SET description = 
+(SELECT description FROM ref_cpt
+WHERE cpt = oce.code)
+, name = 
+(SELECT name FROM ref_cpt
+WHERE cpt=oce.code)
+WHERE entry_id IN
+(
+select oce.entry_id from offering_catalog_entry oce ,ref_cpt r, offering_catalog  oc
+where oc.internal_catalog_id = oce.catalog_id and oc.org_internal_id =:ACSoii
+and oc.catalog_type =0 and r.cpt = oce.code and oce.entry_type = 100
+);
+
