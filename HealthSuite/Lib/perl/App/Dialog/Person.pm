@@ -80,7 +80,7 @@ sub initialize
 		new App::Dialog::Field::Person::Name(),
 		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Add record', style => 'check'),
 
-		new CGI::Dialog::MultiField(caption =>'SSN / Birthdate',name => 'ssndatemf',
+		new CGI::Dialog::MultiField(name => 'ssndatemf',
 			fields => [
 				new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth',
@@ -108,7 +108,7 @@ sub initialize
 						hints => 'You may choose more than one ethnicity type.'),
 
 
-		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name'),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
 		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation', options => FLDFLAG_REQUIRED),
 		#
@@ -426,17 +426,21 @@ sub handleRegistry
 
 	my $namePrefix = '';
 
-	if($gender == $male)
+	if($gender == $male && $member eq 'Patient')
 	{
 		$namePrefix = 'Mr.';
 	}
-	elsif($gender == $female && ($maritalStatus == $married || $maritalStatus == $separated || $maritalStatus == $widowed))
+	elsif($gender == $female && ($maritalStatus == $married || $maritalStatus == $separated || $maritalStatus == $widowed) && $member eq 'Patient')
 	{
 		$namePrefix = 'Mrs.';
 	}
-	elsif($gender == $female && ($maritalStatus == $single || $maritalStatus == $divorced || $maritalStatus == $maritalUnknown || $maritalStatus == $notApplicable))
+	elsif($gender == $female && ($maritalStatus == $single || $maritalStatus == $divorced || $maritalStatus == $maritalUnknown || $maritalStatus == $notApplicable) && $member eq 'Patient')
 	{
 		$namePrefix = 'Ms.';
+	}
+	elsif($member eq 'Physician')
+	{
+		$namePrefix = 'Dr.';
 	}
 
 	my @ethnicity = $page->field('ethnicity');
@@ -479,7 +483,7 @@ sub handleRegistry
 				value_int => $orgIntId,
 				parent_org_id => $orgIntId,
 				_debug => 0
-			) if $member ne 'patient';
+			) if $member ne 'Patient';
 	}
 
 	handleAttrs($self, $page, $command, $flags, $member, $personId);
