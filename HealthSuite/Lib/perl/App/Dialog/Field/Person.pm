@@ -29,7 +29,7 @@ sub new
 
 	$params{type} = 'identifier';
 	$params{size} = 16;
-	$params{maxLength} = 32;
+	$params{maxLength} = 16;
 
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -106,7 +106,7 @@ sub new
 	{
 		$params{type} = 'identifier';
 		$params{size} = 16 unless $params{size};
-		$params{maxLength} = 32 unless $params{maxLength};
+		$params{maxLength} = 16 unless $params{maxLength};
 
 		my $lookupType = 'person';
 		if(! $params{findPopup})
