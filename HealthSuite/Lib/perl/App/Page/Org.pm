@@ -33,7 +33,8 @@ sub initialize
 
 	my $orgId = $self->param('org_id');
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'org_'], $orgId);
-	$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
+	$self->property('org_type', split(1, /,/, $self->property('org_category')));
+	#$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
 
 	#unless($orgId eq $self->session('org_id'))
 	#{
@@ -56,7 +57,16 @@ sub prepare_page_content_header
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-	my $category = defined $self->property('org_categories') ? lc($self->property('org_categories')->[0]) : undef;
+	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
+	for ($category)
+	{
+		/employer/ and do {$category = 'employer'; last};
+		/insurance/ and do {$category = 'insurance'; last};
+		/ipa/ and do {$category = 'ipa'; last};
+		/department/ and do {$category = 'dept'; last};
+		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
+
+	}
 	#Retired Pane/Org/Heading.pm
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
@@ -127,7 +137,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Create Claim</OPTION>
-						<OPTION value="/org/#param.org_id#/dlg-update-\u$category">Edit Profile</OPTION>
+						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
 					</SELECT>
 					</FONT>
