@@ -211,16 +211,15 @@ sub populateData
 
 sub execAction_submit
 {
-	my ($page, $command) = @_;
+	my ($page, $command, $invoiceId) = @_;
 	
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-
-	my $invoiceId = $page->param('invoice_id');
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $invoice->{main_transaction});
 	
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $invoice->{flags};
+	my $claimType = $invoice->{invoice_subtype};
 	unless($invoiceFlags & $attrDataFlag)
 	{
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
@@ -232,12 +231,12 @@ sub execAction_submit
 		storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
 		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);		
 
-		if($invoice->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY)
+		if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
 		{
 			storeInsuranceInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		}
 
-		if($invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_HMO)
+		if($claimType == App::Universal::CLAIMTYPE_HMO)
 		{
 			hmoCapWriteoff($page, $command, $invoiceId, $invoice, $mainTransData);
 		}
@@ -248,27 +247,30 @@ sub execAction_submit
 	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
 	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-	$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $invoiceId,
-			invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
-			submitter_id => $page->session('user_id') || undef,
-			submit_date => $todaysDate || undef,
-			flags => $invoiceFlags | $attrDataFlag,
-			_debug => 0
-	);
+	if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
+	{
+		$page->schemaAction(
+				'Invoice', 'update',
+				invoice_id => $invoiceId,
+				invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
+				submitter_id => $page->session('user_id') || undef,
+				submit_date => $todaysDate || undef,
+				flags => $invoiceFlags | $attrDataFlag,
+				_debug => 0
+		);
 
 
-	## create invoice attribute for history of invoice status
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'Submitted',
-			value_date => $todaysDate || undef,
-			_debug => 0
-	);
+		## create invoice attribute for history of invoice status
+		$page->schemaAction(
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId,
+				item_name => 'Invoice/History/Item',
+				value_type => App::Universal::ATTRTYPE_HISTORY,
+				value_text => 'Submitted',
+				value_date => $todaysDate || undef,
+				_debug => 0
+		);
+	}
 }
 
 sub hmoCapWriteoff
@@ -293,6 +295,7 @@ sub hmoCapWriteoff
 		$page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
 			parent_id => $itemId || undef,
+			#adjustment_type => App::Universal::ADJUSTMENTTYPE_AUTOINSWRITEOFF,
 			pay_date => $todaysDate,
 			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
 			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
