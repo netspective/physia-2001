@@ -161,8 +161,13 @@ sub isValid
 					})
 					unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
 			}
+
+			my $orgId = ($page->param('org_id') ne '') ? $page->param('org_id') : $page->session('org_id');
+			$self->invalidate($page, "You do not have permission to modify people outside of your organization.")
+				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgId);
 		}
 	}
+
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
