@@ -162,13 +162,6 @@
 			tabs is clicked.
 		</deliverable>
 
-		<deliverable id="1363">
-			UI: Created functionality to allow creation of a superbill.  If you go to an Organization's summary page and choose the
-			Catalog tab from there, you'll see a new catalog type which is called Superbill Catalog.  This contains all existing
-			superbill templates and allows the user to create new superbill templates.  Samples of these superbill templates can be
-			printed out as PDF files.  The user can also go ahead and edit and/or delete superbill templates.
-		</deliverable>
-
 		<deliverable id="1452">
 			Script to Parse Statement Status Reports From Per-Se and update database.  Scripts assumes the file provider from PerSe is fixed formatted.  Meaning the start column position for data fields is the same.
 			Database : requires new Statement tables
