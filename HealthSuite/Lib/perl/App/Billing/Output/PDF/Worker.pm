@@ -109,8 +109,8 @@ sub populate
 	$self->box25ClaimData($p, $Claim, $cordinates);
 	$self->box26ClaimData($p, $Claim, $cordinates);
 	$self->box27ClaimData($p, $Claim, $cordinates);
-	$self->box28ClaimData($p, $Claim, $cordinates);
-	$self->box30ClaimData($p, $Claim, $cordinates);
+	$self->box28ClaimData($p, $Claim, $cordinates, $procesedProc);
+	$self->box30ClaimData($p, $Claim, $cordinates, $procesedProc);
 	$self->box31ClaimData($p, $Claim, $cordinates);
 	$self->box32ClaimData($p, $Claim, $cordinates);
 	$self->box33ClaimData($p, $Claim, $cordinates);
