@@ -1768,6 +1768,16 @@ sub prepare_view_1500
 	$self->addContent(@$html) if $html;
 	$self->addError('Problem in sub prepare_view_1500', $@) if $@;
 
+	$self->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => App::Universal::ATTRTYPE_HISTORY,
+		value_text => 'Claim viewed',
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
 	return 1;
 }
 
@@ -1801,6 +1811,7 @@ sub prepare_view_1500pdf
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
 	my $invoiceId = $self->param('invoice_id');
+	my $sessUser = $self->session('user_id');
 	my $todaysDate = UnixDate('today', $self->defaultUnixDateFormat());
 	my $pdfName = "1500@{[ $plain ? 'PP' : '' ]}_$invoiceId.pdf";
 	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFOutputHREF, $pdfName);
@@ -1814,6 +1825,27 @@ sub prepare_view_1500pdf
 	$self->redirect($pdfHref);
 	#$self->addContent("<a href='$pdfHref' target='$pdfName'>View HCFA PDF File for Claim $invoiceId</a><script>window.location.href = '$pdfHref';</script>");
 	$self->addError('Problem in sub prepare_view_1500pdf', $@) if $@;
+
+	my $claimPrintHistoryItem = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selClaimPrintHistoryItemByUser', $invoiceId, $sessUser);
+	my $timeDiff = $claimPrintHistoryItem->{timenow} - $claimPrintHistoryItem->{cr_stamp};
+
+	#$self->addError("Cr User Id: $claimPrintHistoryItem->{cr_user_id}");
+	#$self->addError("Session User Id: $sessUser");
+	#$self->addError("Time Now: $claimPrintHistoryItem->{timenow}");
+	#$self->addError("Cr Stamp: $claimPrintHistoryItem->{cr_stamp}");
+	#$self->addError("Time Diff: $timeDiff");
+
+	return 1 if $claimPrintHistoryItem->{cr_user_id} eq $sessUser && $timeDiff < 10;
+
+	$self->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => App::Universal::ATTRTYPE_HISTORY,
+		value_text => 'Claim printed',
+		value_date => $todaysDate,
+		_debug => 0
+	);
 
 	return 1;
 }
@@ -2130,8 +2162,8 @@ sub prepare_page_content_header
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/summary", 'summary'],
 			['HCFA 1500', "$urlPrefix/1500", '1500'],
-			['1500 PDF (PP)', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
-			['1500 PDF', "/invoice-f/$invoiceId/1500pdfplain", '1500pdfplain'],
+			['1500 PDF (PP)', "/invoice/$invoiceId/1500pdf", '1500pdf'],
+			['1500 PDF', "/invoice/$invoiceId/1500pdfplain", '1500pdfplain'],
 			$claimType == $workComp ? ['TWCC60 PDF', "/invoice-f/$invoiceId/twcc60pdf", 'twcc60pdf'] : undef,
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
