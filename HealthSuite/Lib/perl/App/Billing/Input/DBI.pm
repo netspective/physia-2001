@@ -1438,7 +1438,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/BCBS/Plan Code' => [$insured4, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/E-Remitter ID' => [$payer4, \&App::Billing::Claim::Payer::setPayerId, COLUMNINDEX_VALUE_TEXT],
 
-		'Invoice/TWCC61/16' => [$treatment, [\&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEEND, COLUMNINDEX_VALUE_DATEA]],
+		'Invoice/TWCC61/16' => [$treatment, [\&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEEND, COLUMNINDEX_VALUE_DATEA]],
 		'Invoice/TWCC61/17' => [$treatment, \&App::Billing::Claim::Treatment::setInjuryHistory, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/18' => [$treatment, \&App::Billing::Claim::Treatment::setPastMedicalHistory, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/19' => [$treatment, \&App::Billing::Claim::Treatment::setClinicalFindings, COLUMNINDEX_VALUE_TEXT],
