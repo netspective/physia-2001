@@ -17,6 +17,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 	'search/staff' => {},
 	'search/nurse' => {},
 	'search/associate' => {},
+	'search/referring-Doctor' => {},
 	);
 
 sub getForm
