@@ -354,6 +354,7 @@ sub addTransactionAndInvoice
 		service_facility_id => $page->field('owner_id') || undef,
 		billing_facility_id => $page->field('owner_id') || undef,
 		provider_id => $page->field('provider_id') || undef,
+		care_provider_id => $page->field('provider_id') || undef,
 		trans_owner_type => defined $personType ? $personType : undef,
 		trans_owner_id => $personId || undef,
 		initiator_type => defined $personType ? $personType : undef,
