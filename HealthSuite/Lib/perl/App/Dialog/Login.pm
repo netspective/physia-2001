@@ -31,10 +31,11 @@ sub new
 				options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
 				),
 		new CGI::Dialog::Field(
-				caption => 'Login Type',
+				caption => 'Login As',
 				name => 'categories',
 				type => 'select',
-				options => FLDFLAG_REQUIRED
+				onValidate => \&validateLoginType, onValidateData => $self,
+				options => FLDFLAG_REQUIRED | FLDFLAG_PERSIST,
 				),
 		new CGI::Dialog::Field(
 				name => 'password', caption => 'Password', type => 'password',
@@ -120,6 +121,29 @@ sub validatePassword
 	}
 }
 
+sub validateLoginType
+{
+	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
+
+	my $personId = uc($page->field('person_id'));
+	my $orgId = uc($page->field('org_id'));
+	my $loginType = $page->field('categories');
+	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
+	my $ok = 0;
+	foreach (@{$categories})
+	{
+		$page->addDebugStmt("loginType = [$loginType] and category = [$_]");
+		if ($_ eq $loginType)
+		{
+			$ok = 1;
+			last;
+		}
+	}
+	$page->addDebugStmt("ok = [$ok]");
+	return ("Login Type not valid for $personId in $orgId") unless $ok;
+	return();
+}
+
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
@@ -128,22 +152,7 @@ sub makeStateChanges
 	$page->property('login_status', App::Page::LOGINSTATUS_DIALOG);
 	$self->setFieldFlags('clear_sessions', FLDFLAG_INVISIBLE);
 	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
-	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
-	my @loginTypes = '';
-	foreach my $category(@{$categories})
-	{
-		push(@loginTypes, $category);
-	}
-	my $cat = join(';', @loginTypes);
-	$self->getField('categories')->{selOptions} = "$cat";
-
-	my $catId = $self->getField('categories');
-	$self->setFieldFlags('categories', FLDFLAG_INVISIBLE);
-	if ($categories->[1] ne '')
-	{
-		$self->updateFieldFlags('categories', FLDFLAG_INVISIBLE, 0);
-		$catId->invalidate($page, "Please select a Login Type")if ($page->field('categories') eq '');
-	}
+	$self->populateLoginTypes($page) if ($personId && $orgId);
 	#
 	# show the "start" selection box if the destination page is the home page or the
 	# logout page
@@ -157,6 +166,34 @@ sub makeStateChanges
 	$self->updateFieldFlags('start_sep', FLDFLAG_INVISIBLE, $hideStartInfo);
 	$self->updateFieldFlags('nextaction_redirecturl', FLDFLAG_INVISIBLE, $hideStartInfo);
 	$page->field('nextaction_redirecturl', '/' . $page->param('arl')) if $hideStartInfo;
+}
+
+sub populateLoginTypes
+{
+	my ($self, $page) = @_;
+	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
+	if ($personId && $orgId)
+	{
+		my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
+		my @loginTypes = '';
+		foreach my $category(@{$categories})
+		{
+			push(@loginTypes, $category);
+		}
+		$self->getField('categories')->{selOptions} = join ';', @loginTypes;
+		return 1 if scalar @{$categories} > 1;
+		return 0;
+	}
+	# it's ok, we don't have a person_id or org_id yet
+	$self->setFieldFlags('categories', FLDFLAG_INVISIBLE);
+	return 1;
+}
+
+sub populateValues
+{
+	my ($self, $page) = @_;
+	$self->SUPER::populateValues($page);
+	$self->populateLoginTypes($page);
 }
 
 sub execute
