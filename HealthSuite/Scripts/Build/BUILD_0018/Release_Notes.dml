@@ -393,6 +393,7 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 
 		<deliverable id="1903">
 			First dose and ongoing fields added to prescription dialog.
+			Reopened: Fixed fields as specified.
 		</deliverable>
 
 		<deliverable id="1905">
@@ -434,6 +435,10 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 
 		<deliverable id="1960">
 			Fixed invalid physician id error on appointment dialog.
+		</deliverable>
+
+		<deliverable id="1966">
+			Removed sales units field and fixed pin# problem in medication dialog.
 		</deliverable>
 
 	</deliverables>
