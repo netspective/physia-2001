@@ -96,7 +96,8 @@ sub execute
 	open (TMPFILEHANDLE, ">$tempDir$theFilename") or $tempFileOpened = 0;
 	open (TMPDATAHANDLE, ">$tempDir$theDataFilename") or $dataFileOpened = 0;
 	
-	$superbillData = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_patient_superbill_info', $startDate);
+	$superbillData = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 
+		'sel_patient_superbill_info', $startDate, $page->session('GMT_DAYOFFSET'));
 
 	foreach my $superbillPatientInfo (@{$superbillData}) {
 		my $patientID = $superbillPatientInfo->[8];
@@ -121,7 +122,8 @@ sub execute
 		}
 	}
 
-	$textOutput = createTextFromData($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
+	$textOutput = createTextFromData($page, STMTMGRFLAG_NONE, $superbillData, 
+		$STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
 #	$textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
 
 	if ($tempFileOpened) {
@@ -143,7 +145,8 @@ sub execute
 		$printHandle->close;
 	}
 
-	my $html = createHtmlFromData ($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
+	my $html = createHtmlFromData ($page, STMTMGRFLAG_NONE, $superbillData, 
+		$STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
 
 	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
 #	return ($textOutputFilename ? qq{<a href="$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
