@@ -130,7 +130,8 @@ sub handle_page
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+	$self->SUPER::customValidate($page);
+
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $confirmYes = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $patientId = $page->field('attendee_id');
