@@ -13,4 +13,5 @@ B647 - Added pay to org to associate it with the batch id information
 B591 - Allowing association of an alternate billing provider for a service provider in Add Physician dialog. 
 	Claims has been modified to accept this.
 
+[No Bug] - Added capability to make upto 4 multiple appointments at a time.
 

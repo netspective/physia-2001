@@ -3,12 +3,13 @@ package App::Dialog::Field::Scheduling::Date;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::Field';
+use base qw{CGI::Dialog::Field};
 
 sub new
 {
 	my ($type, %params) = @_;
 	$params{size} = 10 unless $params{size};
+	$params{maxLength} = 10 unless $params{maxLength};
 	$params{type} = 'date' unless $params{type};
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -27,31 +28,65 @@ sub findPopup_as_html
 }
 
 ##############################################################################
-package App::Dialog::Field::Scheduling::DateTime;
+package App::Dialog::Field::Scheduling::DateTimePlus;
 ##############################################################################
 
 use strict;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use base 'CGI::Dialog::MultiField';
+use base qw{CGI::Dialog::MultiField};
 
 sub new
 {
 	my ($type, %params) = @_;
+	
+	my $nextOrdinal = $params{ordinal} +1;
 
-	return CGI::Dialog::MultiField::new($type, %params,
-		fields => [
-			new App::Dialog::Field::Scheduling::Date(
-				name => 'appt_date_' . $params{ordinal},
-				options => FLDFLAG_REQUIRED,
-			),
-			new CGI::Dialog::Field(
-				name => 'appt_time_' . $params{ordinal},
-				type => 'time',
-				options => FLDFLAG_REQUIRED,
-			),
-		],
-	);
+	if ($nextOrdinal < 4)
+	{
+		return CGI::Dialog::MultiField::new($type, %params,
+			fields => [
+				new App::Dialog::Field::Scheduling::Date(caption => "Appointment $nextOrdinal Date",
+					name => 'appt_date_' . $params{ordinal},
+					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(caption => 'Time',
+					name => 'appt_time_' . $params{ordinal},
+					type => 'time',
+					maxLength => 8,
+					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(caption => undef,
+					name => 'join_' . $params{ordinal},
+					choiceDelim =>',',
+					selOptions => q{:0, and:1},
+					type => 'select',
+					onChangeJS => qq{showFieldsOnValues(event, [1], ['appt_date_time_' + $nextOrdinal]);},
+				),
+				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+					name => 'parent_id_'. $params{ordinal}),
+			],
+		);
+	}
+	else
+	{
+		return CGI::Dialog::MultiField::new($type, %params,
+			fields => [
+				new App::Dialog::Field::Scheduling::Date(caption => "Appointment $nextOrdinal Date",
+					name => 'appt_date_' . $params{ordinal},
+					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(caption => 'Time',
+					name => 'appt_time_' . $params{ordinal},
+					type => 'time',
+					maxLength => 8,
+					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+					name => 'parent_id_'. $params{ordinal}),
+			],
+		);
+	}
 }
 
 sub findPopup_as_html
@@ -64,7 +99,9 @@ sub findPopup_as_html
 	return qq{
 		<a href="javascript:doFindLookup(this.form, document.dialog._f_$dateField,
 			'/lookup/apptslot/' + document.dialog._f_resource_id.value +	','
-			+ document.dialog._f_facility_id.value + ',,' + document.dialog._f_duration.value
+			+ document.dialog._f_facility_id.value 
+			+ ',' + substitute(document.dialog._f_$dateField.value, '/', '-')
+			+ ',' + document.dialog._f_duration.value
 			+ ',' + document.dialog._f_patient_type.value + ',' + document.dialog._f_appt_type.value
 			+ '/1', null, false, 'location, status, width=700,height=600,scrollbars,resizable',
 			null, document.dialog._f_$timeField);">
@@ -74,11 +111,49 @@ sub findPopup_as_html
 }
 
 ##############################################################################
+package App::Dialog::Field::Scheduling::DateTimeOnly;
+##############################################################################
+
+use strict;
+use CGI::Dialog;
+use CGI::Validator::Field;
+use base qw{CGI::Dialog::MultiField};
+
+sub new
+{
+	my ($type, %params) = @_;
+	
+	return CGI::Dialog::MultiField::new($type, %params,
+		fields => [
+			new App::Dialog::Field::Scheduling::Date(caption => "Appointment Date",
+				name => 'appt_date_' . $params{ordinal},
+				options => FLDFLAG_REQUIRED,
+			),
+			new CGI::Dialog::Field(caption => 'Time',
+				name => 'appt_time_' . $params{ordinal},
+				type => 'time',
+				maxLength => 8,
+				options => FLDFLAG_REQUIRED,
+			),
+			new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				name => 'parent_id_'. $params{ordinal}),
+		],
+	);
+}
+
+sub findPopup_as_html
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	return App::Dialog::Field::Scheduling::DateTimePlus::findPopup_as_html
+		($self, $page, $dialog, $command, $dlgFlags);
+}
+
+##############################################################################
 package App::Dialog::Field::Scheduling::Minutes;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::ContentItem';
+use base qw{CGI::Dialog::ContentItem};
 
 sub new
 {
@@ -113,7 +188,7 @@ package App::Dialog::Field::Scheduling::Hours;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::ContentItem';
+use base qw{CGI::Dialog::ContentItem};
 
 sub new
 {
@@ -149,7 +224,7 @@ package App::Dialog::Field::Scheduling::AMPM;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::ContentItem';
+use base qw{CGI::Dialog::ContentItem};
 
 sub new
 {
@@ -184,7 +259,7 @@ package App::Dialog::Field::Scheduling::ApptType;
 ##############################################################################
 
 use strict;
-use base 'CGI::Dialog::ContentItem';
+use base qw{CGI::Dialog::ContentItem};
 use CGI::Dialog;
 use CGI::Validator::Field;
 

@@ -268,8 +268,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selPopulateAppointmentDialog' => qq{
 		select e.event_id, e.facility_id, e.event_status, e.event_type, e.subject,
-			to_char(e.start_time, '$SQLSTMT_DEFAULTDATEFORMAT') as appt_date,
-			to_char(e.start_time, '$timeFormat') as appt_time,
+			to_char(e.start_time, '$SQLSTMT_DEFAULTDATEFORMAT') as appt_date_0,
+			to_char(e.start_time, '$timeFormat') as appt_time_0,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
 			ea.value_text as attendee_id,

@@ -1258,6 +1258,13 @@ function setField(_field, _value, _re, _default)
 	}
 }
 
+function substitute(str, oldStr, newStr)
+{
+	var oldString = new String(str);
+	var regExp = new RegExp(oldStr, 'g');
+	var newString = oldString.replace(regExp, newStr);
+	return newString;
+}
 
 //****************************************************************************
 // Cross-Browser Dynamic HTML Utilities
