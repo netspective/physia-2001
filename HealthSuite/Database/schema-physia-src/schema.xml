@@ -60,9 +60,9 @@
 	<table name="PerSess_Activity" abbrev="SesAct">
 		<description>All the activities undertaken by a user during a session</description>
 		<column name="session_id" parentref="Person_Session.session_id" indexed="yes" descr="The session ID for the activity"/>
-		<column name="person_id" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
+		<column name="person_id" indexed="yes" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
 		<column name="activity_type" lookupref="Session_Activity_Type" required="yes" descr="The type of activity undertaken"/>
-		<column name="activity_stamp" type="stamp" required="yes" default="sysdate" descr="The date/time the activity was undertaken"/>
+		<column name="activity_stamp" indexed="yes" type="stamp" required="yes" default="sysdate" descr="The date/time the activity was undertaken"/>
 		<column name="action_type" lookupref="Session_Action_Type" required="yes" descr="The type of action undertaken"/>
 		<column name="action_scope" type="text" size="48" descr="The general scope of the change (for showing a menu, etc) -- like person, org, etc."/>
 		<column name="action_key" type="text" size="48" descr="The key for the record/thing that was the focus of the activity"/>
@@ -165,7 +165,7 @@
 		<column name="trans_owner" indexed="yes" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
 		<column name="parent_event_id" indexed="yes" lookupref="Event.event_id" descr="Any parent event (like an appointment) that this transaction may belong to (as a child)"/>
 		<column name="parent_trans_id" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
-		<column name="trans_type" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
+		<column name="trans_type" indexed="yes" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
 		<column name="trans_subtype" type="text" descr="Any other type information specific to Trans_Type"/>
 		<column name="trans_status" lookupref="Transaction_Status.id" required="yes" default="0" descr="The current status of this transaction (inactive, active, other, etc)"/>
 		<column name="trans_status_reason" type="text" size="128" descr="The reason the transaction is in its current status"/>
