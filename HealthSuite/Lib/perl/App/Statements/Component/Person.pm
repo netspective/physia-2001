@@ -121,7 +121,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#6#/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#6#/#4#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#5#/#3#?home=#param.home#',
 		},
 		#stdIcons =>	{
 		#	updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-address-person/#2#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-address-person/#2#?home=#param.home#',
