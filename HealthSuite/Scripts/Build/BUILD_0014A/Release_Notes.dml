@@ -56,15 +56,7 @@
 		<deliverable id="1292">
 			Void checkboxes showing in update claim dialog again.
 		</deliverable>
-		<deliverable id="1294">
-			Billing name/contact error fixed in checkout.
-		</deliverable>
-		<deliverable id="1140">
-			Batch id in checkout no longer prefilled with creation batch id from checkin. Batch id in checkin removed.
-		</deliverable>
-		<deliverable id="1150">
-			Explosion code pricing has been fixed.
-		</deliverable>
+
 
 	</deliverables>
 </release-notes>
