@@ -183,8 +183,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_URL()
 		},
 	'contact-orgbilling' => {
-		heading => '$Command Billing Contact Information',
-		propNameCaption => 'Name',
+		heading => '$Command Billing Contact',
+		propNameCaption => 'Type',
 		propValueCaption => 'Phone',
 		propValueType => 'phone',
 		propValueSize => 24,
@@ -201,13 +201,12 @@ use vars qw(@ISA %RESOURCE_MAP);
 sub initialize
 {
 	my $self = shift;
-
 	my $attrNameCaption = $self->{propNameCaption};
 	my $attrNameLookup = $self->{propNameLookup};
 	my $prefFlagCaption = $self->{prefFlgCaption};
 	my $entityType = $self->{entityType};
 
-	my $nameField =	$attrNameLookup ?
+	$self->addContent( $attrNameLookup ?
 		new App::Dialog::Field::Attribute::Name(
 				name => 'attr_name',
 				lookup => $attrNameLookup,
@@ -220,34 +219,54 @@ sub initialize
 		new App::Dialog::Field::Attribute::Name(
 				name => 'attr_name',
 				caption => $attrNameCaption,
-				#priKey => 1,
 				attrNameFmt => "#field.attr_name#",
 				fKeyStmtMgr => $entityType eq 'person' ? $STMTMGR_PERSON : $STMTMGR_ORG,
 				valueType => $self->{valueType},
-				selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent');
-
-	$self->addContent(
-		$nameField,
-		new CGI::Dialog::Field(
-				type => $self->{propValueType},
-				name => 'value_text',
-				caption => $self->{propValueCaption},
-				size => $self->{propValueSize},
-				options => FLDFLAG_REQUIRED),
+				selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent')
 	);
-
-	if($prefFlagCaption)
+	if ($self->{valueType} == App::Universal::ATTRTYPE_BILLING_PHONE)
 	{
 		$self->addContent(
-			new CGI::Dialog::Field(type => 'bool',
-						caption => $prefFlagCaption,
-						style => 'check',
-						name => 'preferred_flag')
+			new CGI::Dialog::Field(
+				name => 'value_textB',
+				caption => 'Name',
+				type => 'text',
+			),
 		);
 	}
+	$self->addContent(
+		new CGI::Dialog::Field(
+			type => $self->{propValueType},
+			name => 'value_text',
+			caption => $self->{propValueCaption},
+			size => $self->{propValueSize},
+			options => FLDFLAG_REQUIRED
+		),
+	);
+	if ($prefFlagCaption)
+	{
+		$self->addContent(
+			new CGI::Dialog::Field(
+				type => 'bool',
+				caption => $prefFlagCaption,
+				style => 'check',
+				name => 'preferred_flag')
+		);
+	}
+	$self->addFooter(
+		new CGI::Dialog::Buttons(
+			cancelUrl => $self->{cancelUrl} || undef,
+		),
+	);
+}
 
-	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+	
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+	$self->updateFieldFlags('attr_name', FLDFLAG_INVISIBLE, 1) if $self->{valueType} eq App::Universal::ATTRTYPE_BILLING_PHONE;
 }
 
 sub customValidate
@@ -257,10 +276,9 @@ sub customValidate
 	if($page->param('org_id'))
 	{
 		my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
-		my $valueType = $self->{valueType};
 		my $billType = App::Universal::ATTRTYPE_BILLING_PHONE;
 		my $billingExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
-		if($command eq 'add' && $billingExists eq 1 && $valueType eq $billType)
+		if($command eq 'add' && $billingExists eq 1 && $self->{valueType} eq $billType)
 		{
 			my $billing = $self->getField('attr_name');
 			$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
@@ -268,17 +286,6 @@ sub customValidate
 	}
 }
 
-#THIS IS FOR URLs
-#sub populateDialogData
-#{
-#	my ($self, $page, $dialog, $command, $activeExecMode, $flags) = @_;
-
-#	if($flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL)
-#	{
-#		$self->getPage()->field('value_text', 'http://');
-#	}
-#	$self->SUPER::populateDialogData($page, $dialog, $command, $activeExecMode, $flags);
-#}
 
 sub populateData
 {
@@ -290,6 +297,7 @@ sub populateData
 	my $data = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 	$page->field('attr_name', $data->{item_name});
 	$page->field('value_text', $data->{value_text});
+	$page->field('value_textB', $data->{value_textb});
 	$page->field('preferred_flag', 1) if $data->{value_int};
 }
 
@@ -333,12 +341,14 @@ sub execute_add
 		item_name => $itemName || undef,
 		value_type => defined $valueType ? $valueType : undef,
 		value_text => $page->field('value_text') || undef,
+		value_textB => $page->field('value_textB') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
 		_debug => 0
 	);
 
 	return "\u$command completed.";
 }
+
 
 sub execute_update
 {
@@ -357,13 +367,14 @@ sub execute_update
 		$tableName, 'update',
 		item_id => $page->param('item_id') || undef,
 		value_text => $page->field('value_text') || undef,
-		value_textB => $page->field('attr_name') || undef,
+		value_textB => $page->field('value_textB') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
 		_debug => 0
 	);
 
 	return "\u$command completed.";
 }
+
 
 sub execute_remove
 {
@@ -388,5 +399,6 @@ sub execute_remove
 
 	return "\u$command completed.";
 }
+
 
 1;
