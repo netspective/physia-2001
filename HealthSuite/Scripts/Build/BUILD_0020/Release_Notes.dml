@@ -37,6 +37,14 @@
 	</release-info>
 
 	<deliverables>
+		<deliverable id="1894">
+			Changed Time Zone text on Org Profile.
+		</deliverable>
+
+		<deliverable id="1902">
+			Added secondary Lookup window (lookup from a lookup window).
+		</deliverable>
+
 		<deliverable id="1954">
 			Showing all line items when editing a claim.
 		</deliverable>
