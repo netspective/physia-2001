@@ -34,9 +34,10 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 	},
 
 	'sel_claim_status' => qq{
-		select -1 as id, 'All Claims' as caption from Dual
+		select -1 as id, 'All Claims' as caption , 2 as sort_field 2 from Dual
 		UNION
-		select id, caption from Invoice_Status
+		select id, caption, 1 as sort_field from Invoice_Status
+		order by 3,2 asc
 	},
 	
 	'sel_payer_type' => qq{
