@@ -97,7 +97,7 @@ sub getComponentHtml
 	};	
 
 
-	my $person = $STMTMGR_WORKLIST_COLLECTION ->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPerCollByIdDate',$page->session('user_id'),$startDate);
+	my $person = $STMTMGR_WORKLIST_COLLECTION ->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPerCollByIdDate',$page->session('user_id'),$startDate,$page->session('org_internal_id'));
 	
 	
 	foreach (@$person)
@@ -105,7 +105,7 @@ sub getComponentHtml
 		
 		my $balance = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selectBalanceAgeById',$_->{person_id},$startDate);
 		my $trans_data = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCollectionById',$_->{person_id},$page->session('user_id'));		
-		$_->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
+		$trans_data->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
 		                trans_owner_id =>$_->{person_id} || undef,
 		                provider_id => $page->session('user_id') ||undef,
 		                trans_owner_type => 0, 
@@ -114,7 +114,8 @@ sub getComponentHtml
 		                trans_status =>$ACTIVE,
 		                trans_type => $ACCOUNT_OWNER,  
 		                initiator_type =>0,
-		                initiator_id =>$page->session('user_id') 		                
+		                initiator_id =>$page->session('user_id'), 	
+		                billing_facility_id => $page->session('org_internal_id')
 		
                 )if (! defined $trans_data->{trans_id} &&  $fmtDate eq $todayDate);			
 		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
