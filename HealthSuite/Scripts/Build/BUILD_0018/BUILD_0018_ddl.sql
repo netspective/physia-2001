@@ -63,8 +63,12 @@ alter table Document_AUD Add (DOC_DEST_IDS VARCHAR2(1024));
 start tables-code/Document
 
 
---bug 1863
+--bug 1863 and 1913
 
 alter table person_medication add (sale_units varchar2(32));
 alter table person_medication_aud add (sale_units varchar2(32));
+
+alter table person_medication modify (dose number(20,6), quantity number(20,6));
+alter table person_medication_aud modify (dose number(20,6), quantity number(20,6));
+
 start tables-code/Person_Medication
