@@ -93,7 +93,7 @@ $STMTMGR_LAB_TEST = new App::Statements::LabTest(
 	'selLabOrderByID'=>qq
 	{
 		SELECT 	l.*, o.org_id ,o.name_primary
-		FROM 	lab_order l, org o
+		FROM 	person_lab_order l, org o
 		WHERE 	lab_order_id = :1
 		AND	l.lab_internal_id = o.org_internal_id
 	},
