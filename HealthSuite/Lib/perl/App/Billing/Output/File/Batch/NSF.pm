@@ -4,10 +4,15 @@ package App::Billing::Output::File::Batch::NSF;
 
 use strict;
 use Carp;
+
+
+
+
 use App::Billing::Output::File::Batch::Claim::NSF;
 use App::Billing::Output::File::Batch::Header::NSF1;
 use App::Billing::Output::File::Batch::Header::NSF2;
 use App::Billing::Output::File::Batch::Trailer::NSF;
+
 
 sub new
 {
@@ -73,7 +78,7 @@ sub processBatch
 	$self->{yXXX}=0;
 
 	
-	$self->prepareBatchHeader($tempClaims,$params{outArray});
+	$self->prepareBatchHeader($tempClaims,$params{outArray}, $params{nsfType});
 		
 	$self->{nsfClaimObjs} = new App::Billing::Output::File::Batch::Claim::NSF();
 			
@@ -81,7 +86,7 @@ sub processBatch
 	{				
 		if ($tempClaimValue ne undef) 
 		{
-			$self->{nsfClaimObjs}->processClaim($tempClaims->[$tempClaimValue],$params{outArray});
+			$self->{nsfClaimObjs}->processClaim($tempClaims->[$tempClaimValue],$params{outArray}, $params{nsfType});
 			
 			$self->{batchServiceLineCount} += $self->{nsfClaimObjs}->getCountXXX('fA0XXX');
 			$self->{batchRecordCount} += $self->{nsfClaimObjs}->getCountXXX();
@@ -96,35 +101,35 @@ sub processBatch
 
 	
 		
-	$self->prepareBatchTrailer($tempClaims,$params{outArray});
+	$self->prepareBatchTrailer($tempClaims,$params{outArray}, $params{nsfType});
 	
 	
 }
 
 sub prepareBatchHeader
 {
-	my ($self,$tempClaims,$outArray) = @_;
+	my ($self,$tempClaims,$outArray, $nsfType) = @_;
 			
 	$self->incCountXXX('bXXX');
 	$self->{nsfBatchHeader1Obj} = new App::Billing::Output::File::Batch::Header::NSF1;
-	push(@$outArray,$self->{nsfBatchHeader1Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims));	
+	push(@$outArray,$self->{nsfBatchHeader1Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims, $nsfType));	
 	
     $self->incCountXXX('bXXX');
  	$self->{nsfBatchHeader2Obj} = new App::Billing::Output::File::Batch::Header::NSF2;
- 	push(@$outArray,$self->{nsfBatchHeader2Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims));
+ 	push(@$outArray,$self->{nsfBatchHeader2Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims, $nsfType));
  	
 	$self->{batchRecordCount} += $self->getCountXXX('bXXX');
 }
 
 sub prepareBatchTrailer
 {
-	my ($self,$tempClaims,$outArray) = @_;
+	my ($self,$tempClaims,$outArray, $nsfType) = @_;
 
 	$self->incCountXXX('yXXX');
 	
 	$self->{batchRecordCount} += $self->getCountXXX('yXXX');
 	$self->{nsfBatchTrailerObj} = new App::Billing::Output::File::Batch::Trailer::NSF;
-    push(@$outArray,$self->{nsfBatchTrailerObj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims));
+    push(@$outArray,$self->{nsfBatchTrailerObj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaims, $nsfType));
 	
 }
 

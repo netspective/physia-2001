@@ -2,8 +2,13 @@
 package App::Billing::Output::File::Batch::Trailer::NSF;
 ###################################################################################
 
-use strict;
+#use strict;
 use Carp;
+use vars qw(@CHANGELOG);
+
+# for exporting NSF Constants
+use App::Billing::Universal;
+
 
 sub new
 {
@@ -36,12 +41,29 @@ sub numToStr
 
 sub formatData
 {
-	my ($self, $container, $flags, $inpClaim) = @_;
+	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
 	my $claimPayToProvider = $firstClaim->{payToProvider};
 
-	return sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-114s%9s",
+my %nsfType = ( NSF_HALLEY . "" =>
+	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-123s",
+	  $self->recordType(),
+	  $spaces, #emc provider id
+	  $self->batchType(),
+	  $self->numToStr(4,0,$container->getSequenceNo()),
+	  $spaces, # batch id
+	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),
+	  $spaces, # reserved filler
+	  $self->numToStr(7,0,$container->{batchServiceLineCount}),
+	  $self->numToStr(7,0,$container->{batchRecordCount}),
+	  $self->numToStr(7,0,$container->{batchClaimCount}),
+	  $self->numToStr(7,2,$container->{batchTotalCharges}),
+	  $spaces, # filler national
+	  $spaces, # filler local
+	  ),
+	  NSF_ENVOY . "" =>		  
+  	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-114s%9s",
 	  $self->recordType(),
 	  $spaces, #emc provider id
 	  $self->batchType(),
@@ -56,7 +78,19 @@ sub formatData
 	  $spaces, # filler national
 	  $spaces, # filler local
 	  $self->numToStr(9,0,'0')
-	  );
+	  )
+   );
+   
+   	return $nsfType{$nsfType};
 }
+
+@CHANGELOG = 
+(
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/30/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'The format method of YA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
+);
+	
+
 
 1;

@@ -4,7 +4,13 @@ package App::Billing::Output::File::Batch::Header::NSF1;
 
 use strict;
 use Carp;
+
+
 use Devel::ChangeLog;
+
+# for exporting NSF Constants
+use App::Billing::Universal;
+
 
 use vars qw(@CHANGELOG);
 
@@ -39,15 +45,46 @@ sub batchType
 
 sub formatData
 {
-	my ($self, $container, $flags, $inpClaim) = @_;
+	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
 	my $claimPayToProvider = $firstClaim->{payToProvider};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
 
 	
-		
-	return sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-12s%1s%1s",
+my %nsfType = ( NSF_HALLEY . "" =>		
+	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-14s",
+	  $self->recordType(),
+	  $spaces, # group provider id
+	  $self->batchType(),
+	  $self->numToStr(4,0,$container->getSequenceNo()),
+	  $spaces, # batch id
+  	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+	  substr($claimPayToProvider->getSiteId(),0,6), # site id
+	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
+	  $spaces, # reserved filler 
+	  $spaces, # reserved filler
+	  $spaces, # reserved filler
+      $spaces, # reserved filler
+	  $spaces, # reserved filler
+	  $spaces, # reserved filler
+	  $spaces, # commercial no.
+	  $spaces, # provider XTID
+	  $spaces, # other no2.
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,18),
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getLastName() : $spaces,0,20),
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getFirstName() : $spaces,0,10),
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getMiddleInitial() : $spaces,0,1),
+	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
+	  $spaces, # speciality license code
+	  $spaces, # state license number
+	  $spaces, # dentist license number
+	  $spaces, # anesthesia license number
+	  $spaces, # reserved filler
+	  $spaces, # filler local
+	  ),
+	  NSF_ENVOY . "" =>
+	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-12s%1s%1s",
 	  $self->recordType(),
 	  $spaces, # emc provider id
 	  $self->batchType(),
@@ -78,7 +115,10 @@ sub formatData
 	  $spaces, # filler local
 	  $spaces, # reserved filler
 	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? 'N' : 'Y',0,1)
-	  );
+	  )	
+   );
+   	
+   	return $nsfType{$nsfType};
 }
 
 @CHANGELOG =
@@ -93,7 +133,12 @@ sub formatData
 	'Tax Id Type conversion has been removed from BA0, now on Claim object will perform this conversion'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/04/2000', 'AUF',
 	'Billing Interface/Output NSF Object',
-	'Function numstr has been replaced with substr function for Provider Tax Id in BA0']
+	'Function numstr has been replaced with substr function for Provider Tax Id in BA0'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/30/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'The format method of BA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
+
+	
 	
 );
 

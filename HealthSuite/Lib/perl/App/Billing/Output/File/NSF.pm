@@ -4,15 +4,21 @@ package App::Billing::Output::File::NSF;
 
 use strict;
 use Carp;
+
+
+
 use App::Billing::Claims;
 use App::Billing::Output::File::Batch::NSF;
 use App::Billing::Output::File::Header::NSF;
 use App::Billing::Output::File::Trailer::NSF;
 
+use File::Spec;
+
+
 sub new
 {
 	my ($type,%params) = @_;
-		
+
 	return bless \%params,$type;
 }
 
@@ -22,53 +28,55 @@ sub processFile
 	my $strRef;
 	my $batchWiseClaimsCollection;
 	my $confData;
-	
+
 	# get claims from Claims collection and put it in claims array
 	my $tempClaims = $params{claimList}->getClaim();
-			
+
 	$self->{batches} = [];
 	$self->{batchesIndex}= 0;
 	$self->{nsfBatchObjs} = [];
 	$self->{nsfBatchObjsIndex} = 0;
 	$self->{batchWiseClaims} = [];
-	$self->{batchWiseClaimsIndex} = 0;	
-	
-	$self->{fileServiceLineCount} = 0;	
-	$self->{fileRecordCount} = 0;	
-	$self->{fileClaimCount} = 0;	
-	$self->{batchCount} = 0;	
+	$self->{batchWiseClaimsIndex} = 0;
+
+	$self->{fileServiceLineCount} = 0;
+	$self->{fileRecordCount} = 0;
+	$self->{fileClaimCount} = 0;
+	$self->{batchCount} = 0;
 	$self->{fileTotalCharges} = 0;
-	$self->{batchSequenceNo} = 0;	
-	
+	$self->{batchSequenceNo} = 0;
+
 	$self->makeBatches($tempClaims);
 	$self->makeSelectedClaimsList($tempClaims);
 	my $st =$params{claimList}->getStatistics;
 
+	my $nsfConfFile = $params{nsfConfFile};
+	my $nsfCounterFile = $params{nsfCounterFile};
 
-	
-	$confData = $self->readFile();
-		
-	$self->prepareFileHeader($confData, $tempClaims,$params{outArray});
+	$confData = $self->readFile($nsfConfFile, $nsfCounterFile);
+
+
+	$self->prepareFileHeader($confData, $tempClaims,$params{outArray}, $params{nsfType});
 
 	my $tempBatchList =   $self->{batchWiseClaims};
-	
-		 	
+
+
 	$self->{nsfBatchObjs} = new App::Billing::Output::File::Batch::NSF();
 
-		
+
 	for $batchWiseClaimsCollection (0..$#$tempBatchList)
 	{
 		my $test = $tempBatchList->[$batchWiseClaimsCollection]->getClaim();
-			
-		$self->{nsfBatchObjs}->processBatch(batchSequenceNo => $self->generateBatchSequenceNo(),claimList => $tempBatchList->[$batchWiseClaimsCollection], outArray => $params{outArray});
-		$self->{fileServiceLineCount} +=	$self->{nsfBatchObjs}->{batchServiceLineCount}; 
+
+		$self->{nsfBatchObjs}->processBatch(batchSequenceNo => $self->generateBatchSequenceNo(),claimList => $tempBatchList->[$batchWiseClaimsCollection], outArray => $params{outArray}, nsfType => $params{nsfType});
+		$self->{fileServiceLineCount} +=	$self->{nsfBatchObjs}->{batchServiceLineCount};
 		$self->{fileRecordCount} += $self->{nsfBatchObjs}->{batchRecorCount};
 		$self->{fileClaimCount} += $self->{nsfBatchObjs}->{batchClaimCount};
 		$self->{batchCount}++;
 		$self->{fileTotalCharges} += $self->{nsfBatchObjs}->{batchTotalCharges};
 	}
 
-	$self->prepareFileTrailer($confData, $tempClaims,$params{outArray});
+	$self->prepareFileTrailer($confData, $tempClaims,$params{outArray}, $params{nsfType});
 
 }
 
@@ -81,18 +89,18 @@ sub generateBatchSequenceNo
 
 sub prepareFileHeader
 {
-	my ($self, $confData, $tempClaims, $outArray) = @_;
-	
+	my ($self, $confData, $tempClaims, $outArray, $nsfType) = @_;
+
 	$self->{fileHeaderObj} = new App::Billing::Output::File::Header::NSF;
-	push(@$outArray,$self->{fileHeaderObj}->formatData($confData,$self,'0',$tempClaims));
+	push(@$outArray,$self->{fileHeaderObj}->formatData($confData,$self,'0',$tempClaims, $nsfType));
 }
 
 sub prepareFileTrailer
 {
-	my ($self,$confData, $tempClaims,$outArray) = @_;	
-		
+	my ($self,$confData, $tempClaims,$outArray, $nsfType) = @_;
+
 	$self->{fileTrailerObj} =  new App::Billing::Output::File::Trailer::NSF;
-	push(@$outArray,$self->{fileTrailerObj}->formatData($confData,$self,{RECORDFLAGS_NONE => 0}, $tempClaims)); 
+	push(@$outArray,$self->{fileTrailerObj}->formatData($confData,$self,{RECORDFLAGS_NONE => 0}, $tempClaims, $nsfType));
 }
 
 # this method will search all the claims and make an array and each element contains
@@ -103,12 +111,12 @@ sub makeBatches
 {
 	my ($self,$claims) = @_;
 	my ($providerID,$claimValue);
-	
-	
+
+
 	# fetch each element i.e. claim from claims array one by one
 	for $claimValue (0..$#$claims)
 	{
-		
+
 		# get the providerID from claim
 		$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
 		# add it in array without duplication
@@ -116,24 +124,24 @@ sub makeBatches
 		{
 			$self->{batches}->[$self->{batchesIndex}++] = $providerID;
 		}
-	
+
 
 	}
 }
 
 
-# this method will create collections of selected claims according to their 
+# this method will create collections of selected claims according to their
 # respective batches
 # it will accept Claims list which is same passed to processFile
 sub makeSelectedClaimsList
 {
 	my ($self,$claims) = @_;
 	my ($batchValue,$claim,$selectedClaims,$providerID);
-	
+
 	# get reference of batches array
 	my $tempBatches = $self->{batches};
-	
-	# if due to non-existence of ProviederID batches does not exist then  
+
+	# if due to non-existence of ProviederID batches does not exist then
 	# put the in one collection
 	if ($#$tempBatches == -1)
 	{
@@ -145,17 +153,17 @@ sub makeSelectedClaimsList
 		{
 			$selectedClaims->addClaim($claim);
 		}
-			
+
 		# when list of selected claims is complete add its reference in array
 		$self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $selectedClaims;
-	}		
+	}
 	else
 	{
 	# if batches exist then
 	# get element from batches one by one
 		foreach $batchValue (@$tempBatches)
 		{
-		
+
 			# create a new Claims object
 			$selectedClaims = new App::Billing::Claims;
 
@@ -164,7 +172,7 @@ sub makeSelectedClaimsList
 			{
 				# get providerId from claim
 				$providerID = $claim->{payToProvider}->getFederalTaxId();
-				
+
 				# check it against batch element value
 				if ($providerID eq $batchValue)
 				{
@@ -172,7 +180,7 @@ sub makeSelectedClaimsList
 					$selectedClaims->addClaim($claim);
 				}
 			}
-		
+
 			# when list of selected claims is complete add its reference in array
 			$self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $selectedClaims;
 		} # loop back to create another selected claims list and store it in array
@@ -191,7 +199,7 @@ sub checkForDuplicate
 			return	1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -208,12 +216,12 @@ sub getDate
 {
 
 	my $self = shift;
-	
+
 	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-	
+
 	my $date = localtime();
 	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
 	my @dateStr = ($month, substr(localtime(),8,2), substr(localtime(),20,4));
@@ -223,7 +231,7 @@ sub getDate
 	$dateStr[1] =~ s/ /0/;
 
 	return $dateStr[0].$dateStr[2].$dateStr[1];
-	
+
 }
 
 
@@ -231,63 +239,70 @@ sub getDate
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
+
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 
 sub readFile
 {
-    
-    my $self = shift;   
+
+	my $self = shift;
 	my ($hash,$value,$key,$tempSerial);
 	my $params1 = {};
-	
-	open(CONF,"conf.txt");
-	my $abc='abc';
-	while ($abc ne '')
+#File::Spec->catfile($CONFDATA_SERVER->path_NSFConf, 'nsf-header-conf.txt')
+	my $fileName = ''; #NSF_CONF_FILE;
+	if(open(CONF,$fileName))
 	{
-		$abc = (<CONF>);
-	
-		chop $abc;
-		($hash,$value) = split(/=/,$abc);
-			$params1->{$hash} = $value;
+		my $abc='abc';
+		while ($abc ne '')
+		{
+			$abc = (<CONF>);
 
+			chop $abc;
+			($hash,$value) = split(/=/,$abc);
+				$params1->{$hash} = $value;
+
+		}
+		close(CONF);
 	}
-	close(CONF);
-	
+	else {
+		$fileName =~ s/(.*)\/(.*)\//$2/;
+		$params1->{ADDRESS_2} = "$fileName";
+	}
+
 	open(CONFNEW,">conf.txt");
 
 	foreach $key (keys %$params1)
 	{
-			
+
 		if ($key ne '')
 		{
 			if($key eq 'SUBMISSION_SERIAL_NO')
 			{
 				$tempSerial = $params1->{$key} + 1;
 				print CONFNEW "$key=$tempSerial\n";
-				
+
 			}
 			else
 			{
-				print CONFNEW "$key=$params1->{$key}\n";	
+				print CONFNEW "$key=$params1->{$key}\n";
 			}
 		}
-	
+
 	 }
 
 	 close(CONFNEW);
 
-	
+
 	open(VALID,">>valid.txt");
 	print VALID $self->getDate,",",$params1->{SUBMISSION_SERIAL_NO},"\n";
 	close(VALID);
-		
+
 	return $params1;
 }
 

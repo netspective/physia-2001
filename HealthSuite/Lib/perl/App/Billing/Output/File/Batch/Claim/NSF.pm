@@ -6,6 +6,12 @@ use strict;
 use Carp;
 use Devel::ChangeLog;
 
+
+
+# for exporting NSF Constants
+use App::Billing::Universal;
+
+
 use App::Billing::Output::File::Batch::Claim::Record::NSF::D;
 use App::Billing::Output::File::Batch::Claim::Record::NSF::E;
 use App::Billing::Output::File::Batch::Claim::Record::NSF::F;
@@ -84,7 +90,7 @@ sub getCountXXX
 
 sub processClaim
 {
-	my ($self,$tempClaim,$outArray) = @_;
+	my ($self,$tempClaim,$outArray, $nsfType) = @_;
 	
 	$self->{sequenceNo} = 0;
 	$self->{cXXX} = 0;
@@ -106,7 +112,7 @@ sub processClaim
 
 	$self->setSequenceNo(1);
 	$self->incCountXXX('cXXX');
-	$self->prepareClaimHeader($tempClaim,$outArray);
+	$self->prepareClaimHeader($tempClaim,$outArray, $nsfType);
 	
 	
 	my $payerCount = $tempClaim->getClaimType() + 1;
@@ -116,13 +122,13 @@ sub processClaim
 		$self->setSequenceNo($payersLoop);
 		$self->incCountXXX('dXXX');
 		$self->{DA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA0;
-    	push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim));
+    	push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
    	
    
    		$self->setSequenceNo($payersLoop);
 		$self->incCountXXX('dXXX');
 		$self->{DA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA1;
-		push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim));
+		push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
    
 		if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
 		($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
@@ -133,23 +139,23 @@ sub processClaim
    			$self->setSequenceNo($payersLoop);
 		   	$self->incCountXXX('dXXX');
 			$self->{DA2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA2;
-	   		 push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim));
+	   		 push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
 		}
    	
-	   if (($tempClaim->getFilingIndicator() =~ /['M','P']/ ) ||
-    	   ($tempClaim->getSourceOfPayment() =~ /['G','P']/))
+	   if ((($tempClaim->getFilingIndicator() =~ /['M','P']/ ) ||
+    	   ($tempClaim->getSourceOfPayment() =~ /['G','P']/)) && ($nsfType == NSF_ENVOY))
 	   { 
     		$self->setSequenceNo($payersLoop);
     		$self->incCountXXX('dXXX');
 		 	$self->{DAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DAat;
-		    push(@$outArray,$self->{DAatObj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim));
+		    push(@$outArray,$self->{DAatObj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
 	   }
    }
    
    	$self->setSequenceNo(1);
    	$self->incCountXXX('eXXX');
 	$self->{EA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA0;
-    push(@$outArray,$self->{EA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    push(@$outArray,$self->{EA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 	
 	if($tempClaim->{procedures}->[0] ne "")
 	{
@@ -158,7 +164,7 @@ sub processClaim
 		   	$self->setSequenceNo(1);
    			$self->incCountXXX('eXXX');
 			$self->{EA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA1;
-	    	push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+	    	push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
     	}	
     }
     else
@@ -168,27 +174,37 @@ sub processClaim
 		   		$self->setSequenceNo(1);
    				$self->incCountXXX('eXXX');
 				$self->{EA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA1;
-	    		push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+	    		push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
     		}	
 	}
 
-   	$self->setSequenceNo(1);
-   	$self->incCountXXX('eXXX');
-	$self->{EAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EAat;
-    push(@$outArray,$self->{EAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+	if ($nsfType == NSF_ENVOY)
+	{
+	   	$self->setSequenceNo(1);
+   		$self->incCountXXX('eXXX');
+		$self->{EAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EAat;
+    	push(@$outArray,$self->{EAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+   	}
 
 
    	$self->setSequenceNo(1);
    	$self->{FA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FA0;
-   	$self->{FAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FAat;
+	if ($nsfType == NSF_ENVOY)
+	{
+	   	$self->{FAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FAat;
+    }
+    
    	my $proceduresCount = $tempClaim->{procedures};
    	if($#$proceduresCount > -1)
    	{
 	   	for my $i (0..$#$proceduresCount)
    		{
    		
-	    	push(@$outArray,$self->{FA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
-		    push(@$outArray,$self->{FAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+	    	push(@$outArray,$self->{FA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+    		if ($nsfType == NSF_ENVOY)
+			{
+			    push(@$outArray,$self->{FAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+		    }
 	    
 	    
 #		    $self->{totalClaimCharges} +=  $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getCharges();
@@ -205,71 +221,71 @@ sub processClaim
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('fXXX');
 	# $self->{FB0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB0;
-    # push(@$outArray,$self->{FB0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{FB0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('fXXX');
 	# $self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
-    # push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('fXXX');
 	# $self->{FB2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB2;
-    # push(@$outArray,$self->{FB2Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{FB2Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('fXXX');
 	# $self->{FE0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FE0;
-    # push(@$outArray,$self->{FE0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{FE0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('gXXX');
 	# $self->{GC0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::GC0;
-    # push(@$outArray,$self->{GC0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{GC0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('gXXX');
 	# $self->{GDatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::GDat;
-    # push(@$outArray,$self->{GDatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{GDatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 
 
    	# $self->setSequenceNo(1);
    	# $self->incCountXXX('hXXX');
 	# $self->{HA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::HA0;
-    # push(@$outArray,$self->{HA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim));
+    # push(@$outArray,$self->{HA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 	
 	$self->setSequenceNo(1);
 	$self->incCountXXX('xXXX');
-	$self->prepareClaimTrailer($tempClaim,$outArray);
+	$self->prepareClaimTrailer($tempClaim,$outArray, $nsfType);
 	# print "Claim says records count = ",$self->getCountXXX(),"\n";
 }
 
 
 sub prepareClaimHeader
 {
-	my ($self,$tempClaim,$outArray) = @_;
+	my ($self,$tempClaim,$outArray, $nsfType) = @_;
 				
 	$self->{nsfClaimHeader1Obj} = new App::Billing::Output::File::Batch::Claim::Header::NSF1;
-	push(@$outArray,$self->{nsfClaimHeader1Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim));	
+	push(@$outArray,$self->{nsfClaimHeader1Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim, $nsfType));	
 	
  	# $self->{nsfClaimHeader2Obj} = new App::Billing::Output::File::Batch::Claim::Header::NSF2;
-	# push(@$outArray,$self->{nsfClaimHeader2Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim));
+	# push(@$outArray,$self->{nsfClaimHeader2Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim, $nsfType));
 	
 	if(($tempClaim->{careReceiver}->getDateOfDeath() ne '') || ($tempClaim->{careReceiver}->getlegalIndicator() eq 'Y'))
 	{
 		$self->{nsfClaimHeader3Obj} = new App::Billing::Output::File::Batch::Claim::Header::NSF3;
-		push(@$outArray,$self->{nsfClaimHeader3Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim));
+		push(@$outArray,$self->{nsfClaimHeader3Obj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim, $nsfType));
 	}		
 	
 }
 
 sub prepareClaimTrailer
 {
-	my ($self,$tempClaim,$outArray) = @_;
+	my ($self,$tempClaim,$outArray, $nsfType) = @_;
 	
 	$self->{nsfClaimTrailerObj} = new App::Billing::Output::File::Batch::Claim::Trailer::NSF;
-	push(@$outArray,$self->{nsfClaimTrailerObj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim));
+	push(@$outArray,$self->{nsfClaimTrailerObj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim, $nsfType));
 		
 }
 

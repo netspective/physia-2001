@@ -18,11 +18,10 @@ use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Output::Driver);
 
-# use App::Billing::Output::NSFConstant;
+# for exporting NSF Constants
+use App::Billing::Universal;
 
 
-use constant NSFDEST_ARRAY => 0;
-use constant NSFDEST_FILE => 1;
 
 
 
@@ -65,8 +64,8 @@ sub processClaims
 	
  
 	
-#	$self->{nsfFileObj} = new App::Billing::Output::File::NSF();
-#	$self->{nsfFileObj}->processFile(claimList => $claimsList, outArray => $params{outArray}, nsfType => $params{nsfType});
+	$self->{nsfFileObj} = new App::Billing::Output::File::NSF();
+	$self->{nsfFileObj}->processFile(claimList => $claimsList, outArray => $params{outArray}, nsfType => $params{nsfType});
 	
 	if ($params{destination} == NSFDEST_FILE)
 	{
