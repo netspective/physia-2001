@@ -1635,8 +1635,7 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Post Insurance Payment</option>" : '' ]}
-						<!-- <option value="/person/$clientId/dlg-add-postbatchpayment?_p_isBatch=1">Post Batch Personal Payments</option> -->
-						<option value="/person/$clientId/dlg-add-postpayment">Post Personal Payment</option>
+						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>

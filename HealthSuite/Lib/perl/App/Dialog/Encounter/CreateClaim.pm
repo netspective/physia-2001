@@ -35,7 +35,7 @@ use Devel::ChangeLog;
 use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure/add";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
-use constant NEXTACTION_POSTPAYMENT => "/invoice/%param.invoice_id%/dlg-add-postpayment";
+use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
 use constant NEXTACTION_CREATECLAIM => "/org/#session.org_id#/dlg-add-claim";
 use constant NEXTACTION_WORKLIST => "/worklist";
 

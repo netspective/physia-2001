@@ -174,8 +174,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
 						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
-						<!-- <OPTION value="/person/$personId/dlg-add-postbatchpayment">Post Batch Personal Payments</OPTION> -->
-						<OPTION value="/person/$personId/dlg-add-postpayment">Apply Personal Payment</OPTION>
+						<OPTION value="/person/$personId/dlg-add-postpersonalpayment">Apply Personal Payment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
 						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>
 						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
