@@ -106,8 +106,8 @@ sub prepare_detail_physician
 	my $physician   = $page->param('physician');
 
 	$page->addContent("<b>Patients Seen by $physician</b><br><br>",
-		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPhysician',
-			[$physician, $facility_id, $startDate, $endDate])
+		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
+			'sel_detailPatientsSeenByPhysician', [$physician, $facility_id, $startDate, $endDate])
 	);
 }
 
@@ -115,14 +115,15 @@ sub prepare_detail_appointments
 {
 	my ($self, $page) = @_;
 	my $facility_id  = $page->param('_f_facility_id');
-	my $startDate    = $page->param('_f_report_begin_date');
-	my $endDate      = $page->param('_f_report_end_date');
+	my $startDate    = $page->param('_f_report_begin_date') . ' 12:00 AM';
+	my $endDate      = $page->param('_f_report_end_date')   . ' 11:59 PM';
 	my $event_status = $page->param('event_status');
 	my $caption      = $page->param('caption');
 
 	$page->addContent("<b>'$caption' Appointments</b><br><br>",
 		$STMTMGR_APPOINTMENT_SEARCH->createHtml($page, STMTMGRFLAG_NONE, 'sel_appointment',
-			[$facility_id, '01/01/1999 12:00 AM', '01/01/2002 11:59 PM', '%', $event_status, $event_status],
+			[$facility_id, $startDate, $endDate, '%', $event_status, 
+			$event_status, $page->session('org_id')],
 		),
 	);
 }
@@ -135,7 +136,6 @@ sub prepare_detail_patient_type
 	my $endDate     = $page->param('_f_report_end_date');
 	my $patient_type_id  = $page->param('patient_type_id');
 	my $patient_type_caption = $page->param('patient_type_caption');
-
 
 	$page->addContent(
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPatientType',

@@ -25,7 +25,7 @@ my $BASE_SQL = qq{
 my $PUBLISH_DEFN = {
 	columnDefn =>
 	[
-		{ head => 'ID', url => qq{javascript:chooseItem("/search/gpci/id/#&{?}#", "#&{?}#")} },
+		{ head => 'ID', url => qq{javascript:chooseItem("/search/gpci/id/#&{?}#", "#&{?}#", false)} },
 		{ head => 'Begin', colIdx => 1},
 		{ head => 'End', colIdx => 2},
 		{ head => 'Locality', colIdx => 3},

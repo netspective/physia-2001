@@ -61,12 +61,6 @@ sub new
 				column => 'Insurance.ins_type',
 				typeGroup => ['insurance', 'workers compensation']
 			),
-			#new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
-			#	name => 'fee_schedules',
-			#	size => 24,
-			#	findPopupAppendValue => ',',
-			#	findPopup => '/lookup/catalog',
-			#),
 			new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 				name => 'fee_schedules',
 				type => 'integer',
@@ -93,16 +87,22 @@ sub new
 			new CGI::Dialog::Subhead(heading => 'Remittance Information',
 				name => 'remittance_heading'
 			),
-			new CGI::Dialog::Field::TableColumn(caption => 'Remittance Type',
+			new CGI::Dialog::Field(caption => 'Remittance Type',
 				name => 'remit_type',
-				schema => $schema,
-				column => 'Insurance.Remit_Type'
+				#schema => $schema,
+				#column => 'Insurance.Remit_Type'
+				choiceDelim =>',',
+				selOptions => "Paper:0,Electronic:1",
+				type => 'select',
 			),
 			new CGI::Dialog::Field(caption => 'E-Remittance Payer ID',
 				name => 'remit_payer_id',
 				hints=> '(Only for non-Paper types)',
-				findPopup => '/lookup/envoypayer/id'),
-			new CGI::Dialog::Field(caption => 'Remit Payer Name', name => 'remit_payer_name')
+				findPopup => '/lookup/epayer'
+			),
+			new CGI::Dialog::Field(caption => 'Remit Payer Name', 
+				name => 'remit_payer_name'
+			),
 		);
 
 		$self->{activityLog} =

@@ -34,11 +34,11 @@ sub obtain
 	while (<PERSE>)
 	{
 		chomp;
-		my ($id, $name, $id2) = split(/,/);
+		my ($id, $name, $id2) = split(/\s*,\s*/);
 		
 		push(@$data, [
-			$id,
-			($id2 =~ /N\/A/i) ? undef : $id2,
+			App::Data::Manipulate::trim($id),
+			($id2 =~ /N\/A/i) ? undef : App::Data::Manipulate::trim($id2),
 			$name,
 			2, # pSource = Perse
 			($id2 =~ /N\/A/i) ? PAYERTYPE_NON_COMMERCIAL : PAYERTYPE_COMMERCIAL,

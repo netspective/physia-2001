@@ -1019,6 +1019,11 @@
 				<col name="caption">Paper</col>
 			</row>
 			<row>
+				<col name="id">1</col>
+				<col name="caption">Electronic</col>
+			</row>
+			
+			<row>
 				<col name="id">1100</col>
 				<col name="caption">Envoy Commercial - Medical</col>
 			</row>

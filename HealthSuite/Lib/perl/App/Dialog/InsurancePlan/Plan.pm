@@ -134,15 +134,18 @@ sub new
 			new CGI::Dialog::Subhead(heading => 'Remittance Information',
 				name => 'remittance_heading'
 			),
-			new CGI::Dialog::Field::TableColumn(caption => 'Remittance Type',
+			new CGI::Dialog::Field(caption => 'Remittance Type',
 				name => 'remit_type',
-				schema => $schema,
-				column => 'Insurance.Remit_Type'
+				#schema => $schema,
+				#column => 'Insurance.Remit_Type'
+				choiceDelim =>',',
+				selOptions => "Paper:0,Electronic:1",
+				type => 'select',
 			),
 			new CGI::Dialog::Field(caption => 'E-Remittance Payer ID',
 				hints=> '(Only for non-Paper types)',
 				name => 'remit_payer_id',
-				findPopup => '/lookup/envoypayer/id'
+				findPopup => '/lookup/epayer'
 			),
 			new CGI::Dialog::Field(caption => 'Remit Payer Name',
 				name => 'remit_payer_name'

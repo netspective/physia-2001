@@ -95,11 +95,12 @@ sub prepare
 						<b>Lookup</b>
 						<a href="/search/icd">ICD-9</a>,
 						<a href="/search/cpt">CPT</a>,
-						<a href="/search/hcpcs">*HCPCS</a>,
+						<a href="/search/hcpcs">HCPCS</a>,
 						<a href="/search/epsdt">EPSDT</a>,
 						<a href="/search/serviceplace">Service Place</a>,
-						<a href="/search/servicetype">Service Type</a>, or
-						<a href="/search/envoypayer">Envoy Payer</a>.
+						<a href="/search/servicetype">Service Type</a>,
+						<a href="/search/gpci">GPCI</a>, or
+						<a href="/search/epayer">E-Remit Payer</a>.
 					</TD>
 				</TR>
 			</TABLE>
