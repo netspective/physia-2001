@@ -85,7 +85,7 @@ sub execute
 					where
 						i.main_transaction = t.trans_id
 						and t.care_provider_id = p.person_id
-						and i.invoice_status <> 16
+						and not (i.invoice_status = 16)
 						and i.client_id = '$patientID'
 						and i.invoice_id = ii.parent_id
 						and ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
@@ -118,7 +118,6 @@ sub execute
 						where
 							ii.parent_id = $row->{invoice_id}
 							and ii.item_type <> 7
-							and ii.item_type <> 5
 							and ii.data_text_b is null
 						union
 
