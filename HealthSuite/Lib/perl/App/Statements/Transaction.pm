@@ -207,6 +207,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		set trans_status = 3
 		where parent_trans_id = ?
 	},
+'selByDataTextB' => qq{
+		select *
+		from transaction
+		where data_text_b = ?
+		and   trans_owner_id = ?
+	},
 
 
 	####################################################################
@@ -496,7 +502,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			SELECT 	rfs.caption
 			FROM 	REFERRAL_FOLLOWUP_STATUS rfs, transaction t
 			WHERE 	t.parent_trans_id =  :1
-			AND	t.trans_status_reason = rfs.id			
+			AND	t.trans_status_reason = rfs.id
 		},
 );
 
