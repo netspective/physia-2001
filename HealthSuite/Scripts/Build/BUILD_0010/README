@@ -33,7 +33,7 @@ B633 - Deleted the validation for TaxID field so that it doesn't inherit it's pa
 
 B673 - Added validation to the person dialog not to display the Prefix as Mr, Mrs or Ms when the category is other than Patient
 
-B745 -  Change the url in NextAction under Nurse dialog to take to the worklist
+B745 - Change the url in NextAction under Nurse dialog to take to the worklist
 
 B900 - Changed the "Health Coverage" component to display the Third-Party info in the checkin and checkout dialog page
 
@@ -42,8 +42,27 @@ to show up date and time in the 'Phone Message' dialog
 
 B723 - Added the patient's authorization as 'Authorization form for HCFA' as the default one while creating a patient record
 
-B931 -  Added date fields for all the dialogs in the 'Authorization' component
+B931 - Added date fields for all the dialogs in the 'Authorization' component
 
+B714 - Can now add alphanumeric modifier codes in creation of claim. New modifiers have been added to database.
+
+B894 - Service place code now automatically pulling from the code that was associated with the service org when the org was created.
+
+B953 - Correct Batch Payment information is now there for secondary claims. Should fix reports.
+
+B547 - Drop down for pay method now has 'Travelers Check' as option.
+
+B864 - Insurance/Personal payment posting errors no longer show inappropriately.
+
+Prosys Bugs
+
+B361 - Need to setup TWCC forms 61,64 and 69 - ssn and employer information showing now. word wrapping turned on.
+
+B704 - Tax id inheritance completed.
+
+B419 - TWCC number assigned is now being populated correctly.
+
+End Prosys Bugs
 
   
 
