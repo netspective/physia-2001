@@ -1444,7 +1444,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			addUrl => '/org/#param.org_id#/superbills?action=new',
 		},
 		stdIcons =>	{
-			delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
+			#delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
 		},
 	},
 	publishDefn_panelTransp =>
