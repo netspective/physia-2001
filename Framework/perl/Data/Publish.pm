@@ -836,6 +836,7 @@ sub createHtmlFromStatement
 			}
 			else
 			{
+				
 				while($rowRef = $stmtHdl->fetch())
 				{
 					$rowNum++;
@@ -848,7 +849,9 @@ sub createHtmlFromStatement
 		# don't end the output with a separator
 		pop(@outputRows) if $checkDataSep && $outputRows[$#outputRows] eq $dataSepStr;
 	};
-
+	
+	$stmtHdl->finish();
+	undef $stmtHdl;
 	return $@ if $@;
 	my $html = $fmt->{wrapContentOpen} . (join('', @outputRows) || $fmt->{noDataMsg}) . $fmt->{wrapContentClose};
 	$html =~ s/\#my\.(.*?)\#/$publParams->{$1}/g if $publFlags & PUBLFLAG_REPLACEDEFNVARS;
