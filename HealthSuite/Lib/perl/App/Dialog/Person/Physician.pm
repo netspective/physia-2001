@@ -26,6 +26,8 @@ sub initialize
 {
 	my $self = shift;
 
+	my $postHtml = "<a href=\"javascript:doActionPopup('/lookup/person');\">Lookup existing person</a>";
+
 	$self->heading('$Command Physician/Provider');
 	$self->addContent(
 			new App::Dialog::Field::Person::ID::New(caption => 'Physician/Provider ID',

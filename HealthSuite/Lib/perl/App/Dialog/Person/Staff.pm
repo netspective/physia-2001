@@ -30,6 +30,8 @@ sub initialize
 {
 	my $self = shift;
 
+	my $postHtml = "<a href=\"javascript:doActionPopup('/lookup/person');\">Lookup existing person</a>";
+
 	#$self->heading('$Command Staff');
 	$self->addContent(
 			new App::Dialog::Field::Person::ID::New(caption => 'Staff ID',
