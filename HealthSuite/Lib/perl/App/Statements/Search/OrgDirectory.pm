@@ -34,6 +34,7 @@ $STMTFMT_SEL_ORG_DIR = qq{
 		WHERE
 			cat.parent_id = o.org_internal_id
 			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Billing'
 			AND	cat.member_name = t.caption
 			AND	cat.member_name = (
 				SELECT caption
