@@ -53,6 +53,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'TWCC 73 PDF', name => 'twcc73pdf',},
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
+					{caption => 'Notes', name => 'notes',},
 					{caption => 'Envoy NSF', name => 'envoy_nsf',},
 					{caption => 'Halley NSF', name => 'halley_nsf',},
 					{caption => 'Dialog', name => 'dialog',},
@@ -1653,6 +1654,29 @@ sub prepare_view_history
 	return $self->prepare_view_summary();
 }
 
+sub prepare_view_notes
+{
+	my $self = shift;
+
+	my $claim = $self->property('activeClaim');
+
+	push(@{$self->{page_content}}, qq{
+		<CENTER>
+		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
+			<TR VALIGN=TOP>
+				<TD>
+					<font size=1 face=arial>
+					#component.stpt-invoice.claim-notes#<BR>
+					</font>
+				</TD>
+			</TR>
+		</TABLE>
+		</CENTER>
+	});
+
+	return $self->prepare_view_summary();
+}
+
 sub prepare_view_envoy_nsf
 {
 	my $self = shift;
@@ -2076,6 +2100,7 @@ sub prepare_page_content_header
 			$claimType == $workComp ? ['TWCC73 PDF', "/invoice-f/$invoiceId/twcc73pdf", 'twcc73pdf'] : undef,
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
+			['Notes', "$urlPrefix/notes", 'notes'],
 			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
 			['Halley NSF', "$urlPrefix/halley_nsf", 'halley_nsf'],
 		];
