@@ -1215,8 +1215,10 @@ sub prepare_view_summary
 
 	my $claim = $self->property('activeClaim');
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
-	my $provider = $self->getPersonHtml($claim->{renderingProvider});
-	my $service = $self->getOrgHtml($claim->{renderingOrganization});
+	my $provider = $self->getPersonHtml($claim->{payToProvider});
+	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
+	my $serviceOrg = $self->getOrgHtml($claim->{renderingOrganization});
+	my $billingOrg = $self->getOrgHtml($claim->{payToOrganization});
 	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{insurancePlanOrProgramName});
 	my $invStatus = $claim->getStatus();
 	my $invType = $claim->getInvoiceType();
@@ -1383,7 +1385,7 @@ sub prepare_view_summary
 			</TR>
 			<TR VALIGN=TOP>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$patient</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$provider<br><br>$service</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceProvider<br><br>$provider<br><br>$serviceOrg</TD>
 				@{[ $claimType != $selfPay ? $payerPane : '' ]}
 			</TR>
 		</TABLE>
@@ -1606,6 +1608,7 @@ sub prepare_view_submit
 	my $invoiceId = $self->param('invoice_id');
 	my $claim = $self->property('activeClaim');
 	my $resubmitFlag = $self->param('resubmit');
+	my $printFlag = $self->param('print');
 	my $patient = $claim->getCareReceiver();
 	my $patientId = $patient->getId();
 
@@ -1618,11 +1621,18 @@ sub prepare_view_submit
 		my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
 		eval
 		{
-			$invoiceId = &{$handler}($self, 'add', $invoiceId, $resubmitFlag);
+			$invoiceId = &{$handler}($self, 'add', $invoiceId, $resubmitFlag, $printFlag);
 		};
 		$self->addError($@) if $@;
 
-		$self->redirect("/invoice/$invoiceId/summary");
+		if($printFlag)
+		{
+			$self->redirect("/invoice-f/$invoiceId/1500pdfplain");
+		}
+		else
+		{
+			$self->redirect("/invoice/$invoiceId/summary");
+		}
 	}
 }
 
