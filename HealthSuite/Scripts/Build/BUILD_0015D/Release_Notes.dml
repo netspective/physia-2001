@@ -24,6 +24,10 @@
 			Corrected Patient Activity Report
 		</deliverable>
 
+		<deliverable>
+			Added Net Adjustment, Plan Paid, and Plan Allows to Financial Transaction query
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
