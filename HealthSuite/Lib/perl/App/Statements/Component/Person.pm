@@ -482,20 +482,22 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
-				from  Transaction
-			where  	trans_owner_id = ?
+		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), 
+			caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
+		from Transaction
+		where trans_owner_id = ?
 			and caption = 'Phone Message'
-                        and data_num_a is null
-                        union
-                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
-                                from  Transaction
-                        where   trans_owner_id = ?
-                        and caption = 'Phone Message'
-                        and data_num_a is not null
-                        and trans_status = 5
-                        and trans_owner_id <> consult_id
-		},
+			and data_num_a is null
+		UNION
+		select trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), 
+			caption, provider_id, data_text_c, data_text_a, data_text_b, cr_user_id, consult_id
+		from Transaction
+		where trans_owner_id = ?
+		and caption = 'Phone Message'
+		and data_num_a is not null
+		and trans_status = 5
+		and trans_owner_id <> consult_id
+	},
 		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
 
 	publishDefn =>
