@@ -242,7 +242,8 @@
 		</deliverable>	
 		
 		<deliverable id="1776">
-			The medication dialog now show the allergy component (and others) while adding a new med
+			The medication dialog now show the allergy component (and others) while adding a new med.
+			Option for 'other' has been added with text field for units, frequency, prn, and sale units fields.
 		</deliverable>
 
 		<deliverable id="1790">
@@ -353,8 +354,20 @@
 			Misc notes now adding properly from add patient dialog.
 		</deliverable>
 
+		<deliverable id="1899">
+			Prescribed by field has been added to medication dialog.
+		</deliverable>
+
 		<deliverable id="1901">
 			Report (DAR MAR)   Fixed the Net Chrgs column in the DAR and MAR
+		</deliverable>
+
+		<deliverable id="1903">
+			First dose and ongoing fields added to prescription dialog.
+		</deliverable>
+
+		<deliverable id="1908">
+			Label, spanish label, sig, and signature fields have been added to medication dialog.
 		</deliverable>
 
 		<deliverable id="1910">
