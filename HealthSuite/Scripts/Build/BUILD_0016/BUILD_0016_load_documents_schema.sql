@@ -1,43 +1,43 @@
-start schema-physia/tables/Document_Specification
-start schema-physia/tables-code/Document_Specification
-start schema-physia/data/Document_Specification
+start tables/Document_Specification
+start tables-code/Document_Specification
+start data/Document_Specification
 
-start schema-physia/tables/Document_Event_Type
-start schema-physia/tables-code/Document_Event_Type
-start schema-physia/data/Document_Event_Type
+start tables/Document_Event_Type
+start tables-code/Document_Event_Type
+start data/Document_Event_Type
 
-start schema-physia/tables/Document_Source_Type
-start schema-physia/tables-code/Document_Source_Type
-start schema-physia/data/Document_Source_Type
+start tables/Document_Source_Type
+start tables-code/Document_Source_Type
+start data/Document_Source_Type
 
-start schema-physia/tables/Document_Association_Type
-start schema-physia/tables-code/Document_Association_Type
-start schema-physia/data/Document_Association_Type
+start tables/Document_Association_Type
+start tables-code/Document_Association_Type
+start data/Document_Association_Type
 
-start schema-physia/tables/Document_Association_Status
-start schema-physia/tables-code/Document_Association_Status
-start schema-physia/data/Document_Association_Status
+start tables/Document_Association_Status
+start tables-code/Document_Association_Status
+start data/Document_Association_Status
 
-start schema-physia/tables/Document
-start schema-physia/tables-code/Document
+start tables/Document
+start tables-code/Document
 
-start schema-physia/tables/Document_Association
-start schema-physia/tables-code/Document_Association
+start tables/Document_Association
+start tables-code/Document_Association
 
-start schema-physia/tables/Document_Attribute
-start schema-physia/tables-code/Document_Attribute
+start tables/Document_Attribute
+start tables-code/Document_Attribute
 
-start schema-physia/tables/Document_Keyword
-start schema-physia/tables-code/Document_Keyword
+start tables/Document_Keyword
+start tables-code/Document_Keyword
 
-start schema-physia/tables/Observation
-start schema-physia/tables-code/Observation
+start tables/Observation
+start tables-code/Observation
 
-start schema-physia/tables/Observation_Result
-start schema-physia/tables-code/Observation_Result
+start tables/Observation_Result
+start tables-code/Observation_Result
 
-start schema-physia/tables/Document_Event
-start schema-physia/tables-code/Document_Event
+start tables/Document_Event
+start tables-code/Document_Event
 
 alter table Transaction add ( PARENT_DOC_ID NUMBER(16) );
 
