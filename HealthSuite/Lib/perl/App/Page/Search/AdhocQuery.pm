@@ -35,9 +35,16 @@ sub execute
 {
 	my ($self) = @_;
 
-	$self->addContent(
-		$STMTMGR_SCHEDULING->createHtml($self, STMTMGRFLAG_DYNAMICSQL, $self->param('query')),
-	);
+	my $query = App::Data::Manipulate::trim($self->param('query'));
+	
+	if ($query =~ /^alter/i || $query =~ /^select/i)
+	{
+		$self->addContent($STMTMGR_SCHEDULING->createHtml($self, STMTMGRFLAG_DYNAMICSQL, $query));
+	}
+	else
+	{
+		$self->addContent("<b style='color:red'>Sorry.  Can't execute that command.</b>");
+	}
 
 	return 1;
 }
