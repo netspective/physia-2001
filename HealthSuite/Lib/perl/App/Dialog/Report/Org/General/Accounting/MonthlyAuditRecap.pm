@@ -151,8 +151,9 @@ sub execute
 			{ colIdx => 6, head => 'Ins Rcpts', summarize => 'sum', dataFmt => '#9#', dformat => 'currency' },
 			{ colIdx => 7, head => 'Ins Wrt-Off', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },
-			{ colIdx => 9, head => 'Per Wrt-Off', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },			
-			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dataFmt => '#10#', dformat => 'currency' },
+			{ colIdx => 9, head => 'Per Wrt-Off', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },		
+			{ colIdx => 10, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },	
+			{ colIdx => 11, head =>'Ttl Rcpts', summarize => 'sum', dataFmt => '#10#', dformat => 'currency' },
 		],
 	};		
 	my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit',$reportBeginDate,$reportEndDate,
@@ -173,7 +174,8 @@ sub execute
 			$_->{insurance_write_off},						
 			$_->{person_pay},
 			$_->{person_write_off},			
-			$_->{person_pay} + $_->{insurance_pay},
+			$_->{refund},
+			$_->{person_pay} + $_->{insurance_pay} + $_->{refund},
 		);
 		push(@data, \@rowData);
 	}
