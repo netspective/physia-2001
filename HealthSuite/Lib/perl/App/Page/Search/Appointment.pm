@@ -203,7 +203,7 @@ sub execute
 		$self->addContent(
 			'<CENTER>',
 			$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_conflict_appointments',
-				[$eventId],
+				[$eventId, $self->session('org_id')],
 			),
 			'</CENTER>'
 		);
@@ -239,13 +239,13 @@ sub execute
 		if ($self->param('order_by') eq 'name')
 		{
 			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
-				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo],
+				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_id')]
 			),
 		}
 		else
 		{
 			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
-				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo],
+				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_id')]
 			),
 		}
 		
