@@ -242,24 +242,11 @@ sub findEventSlots
 		my $minute_range = hhmm2minutes($event->{start_minute}) . "-" . $end_minute;
 		$slot->{minute_set} = new Set::IntSpan ("$minute_range");
 
-		$slot->{attributes}->{short_patient_name} = Trim($event->{short_patient_name});
-		$slot->{attributes}->{patient_complete_name} = Trim($event->{patient_complete_name});
-		$slot->{attributes}->{patient_id} = Trim($event->{patient_id});
-		$slot->{attributes}->{event_id} = Trim($event->{event_id});
-		$slot->{attributes}->{parent_id} = Trim($event->{parent_id});
-
-		$slot->{attributes}->{subject} = Trim($event->{subject});
-		$slot->{attributes}->{event_type} = Trim($event->{event_type});
-		$slot->{attributes}->{patient_type} = Trim($event->{patient_type});
-		$slot->{attributes}->{remarks} = Trim($event->{remarks});
-		$slot->{attributes}->{duration} = $event->{duration};
-		$slot->{attributes}->{facility_id} = $event->{facility_id};
-		$slot->{attributes}->{resource_id} = $event->{resource_id};
-		$slot->{attributes}->{appt_status} = $event->{appt_status};
-
-		$slot->{attributes}->{scheduled_by_id} = $event->{scheduled_by_id};
-		$slot->{attributes}->{scheduled_stamp} = $event->{scheduled_stamp};
-
+		for my $key (keys %{$event})
+		{
+			$slot->{attributes}->{$key} = Trim($event->{$key});
+		}
+		
 		if ($event->{event_status}) {
 			$slot->{attributes}->{status} =	($event->{event_status} =~ /1/) ?
 				"Checked IN" : "Checked OUT";
