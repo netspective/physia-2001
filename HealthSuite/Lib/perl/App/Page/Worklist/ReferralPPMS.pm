@@ -73,16 +73,16 @@ my $itemNamePrefix = 'Referral-Worklist-Setup';
 			{head => "Actions", dAlign => 'left' ,
 			   dataFmt => qq{
 					<A HREF=""
-						TITLE='Add Account Notes'>
+						TITLE='Add Referral Notes'>
 						<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
 					<A HREF=""
-						TITLE='Transfer Patient Account'>
+						TITLE='Transfer Referral to another person'>
 						<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
 					<A HREF=""
-						TITLE='Add Reck Date'>
+						TITLE='Add Recheck Date'>
 						<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
 					<A HREF=""
-						TITLE='Close Account'>
+						TITLE='Close Referral'>
 						<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 					},
 
