@@ -206,9 +206,10 @@ sub executePrePayment
 		'Transaction', 'add',
 		trans_type => App::Universal::TRANSTYPEACTION_PAYMENT,
 		trans_status => defined $transStatus ? $transStatus : undef,
-	#	service_facility_id => $page->field('service_facility_id') || undef,
-	#	billing_facility_id => $billingFacility || undef,
+		service_facility_id => $sessOrgIntId || undef,
+		billing_facility_id => $sessOrgIntId || undef,
 	#	provider_id => $billingProvider || undef,
+	#	care_provider_id => $billingProvider || undef,
 		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		trans_owner_id => $payerId || undef,
 		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
@@ -223,12 +224,12 @@ sub executePrePayment
 
 	#add invoice
 	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
-	my $claimType = App::Universal::INVOICESTATUS_PAYAPPLIED;
+	my $invoiceStatus = App::Universal::INVOICESTATUS_CREATED;
 	my $invoiceId = $page->schemaAction(
 		'Invoice', 'add',
 		invoice_type => defined $invoiceType ? $invoiceType : undef,
 		invoice_subtype => App::Universal::CLAIMTYPE_SELFPAY,
-		invoice_status => defined $claimType ? $claimType : undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
 		invoice_date => $page->getDate() || undef,
 		submitter_id => $page->session('user_id') || undef,
 		main_transaction => $transId || undef,
