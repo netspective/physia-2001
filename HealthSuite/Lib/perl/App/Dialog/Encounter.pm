@@ -107,11 +107,15 @@ sub initialize
 
 
 		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
-		
+
 		new CGI::Dialog::MultiField(caption => 'Payer for Today ID/Type', name => 'other_payer_fields',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Payer for Today ID', name => 'other_payer_id'),
-				new CGI::Dialog::Field(type => 'select', selOptions => 'Person;Organization', caption => 'Payer for Today Type', name => 'other_payer_type'),
+				new CGI::Dialog::Field(
+						caption => 'Payer for Today ID', 
+						name => 'other_payer_id', 
+						findPopup => '/lookup/itemValue', 
+						findPopupControlField => '_f_other_payer_type'),
+				new CGI::Dialog::Field(type => 'select', selOptions => 'Person:person;Organization:org', caption => 'Payer for Today Type', name => 'other_payer_type'),
 			]),
 
 
@@ -506,7 +510,7 @@ sub handlePayers
 		my $addr = undef;
 		my $insPhone = undef;
 		my $guarantorType = undef;
-		if($otherPayerType eq 'Person')
+		if($otherPayerType eq 'person')
 		{
 			$guarantorType = App::Universal::ENTITYTYPE_PERSON;
 			$addr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $otherPayerId);
@@ -632,7 +636,7 @@ sub handlePayers
 				$page->field('primary_payer', $fakeProdNameThirdParty);
 				$page->field('third_party_payer_id', $thirdPartyPlan->{guarantor_id});
 				$thirdPartyPlan->{guarantor_type} == App::Universal::ENTITYTYPE_PERSON ? 
-					$page->field('third_party_payer_type', 'Person') : $page->field('third_party_payer_type', 'Org');
+					$page->field('third_party_payer_type', 'person') : $page->field('third_party_payer_type', 'Org');
 			}
 		}
 	}
@@ -1073,7 +1077,7 @@ sub handleBillingInfo
 			my $thirdPartyId = $page->field('third_party_payer_id');
 			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
 
-			$billParty = $page->field('third_party_payer_type') eq 'Person' ? $billPartyTypePerson : $billPartyTypeOrg;
+			$billParty = $page->field('third_party_payer_type') eq 'person' ? $billPartyTypePerson : $billPartyTypeOrg;
 			$billToId = $thirdPartyId;
 			$billInsId = $insInfo->{ins_internal_id};
 			#$billAmt = '';
@@ -1507,7 +1511,7 @@ sub customValidate
 		{
 			$otherPayerField->invalidate($page, "Please provide existing Id for 'Third-Party'");
 		}
-		elsif($otherPayerType eq 'Person')
+		elsif($otherPayerType eq 'person')
 		{
 			my $createHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$otherPayer');";
 			$otherPayerField->invalidate($page, qq{
@@ -1517,7 +1521,7 @@ sub customValidate
 				})
 				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
 		}
-		elsif($otherPayerType eq 'Organization')
+		elsif($otherPayerType eq 'org')
 		{
 			my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
 			my $createOrgHrefPost = "/$otherPayer');";
