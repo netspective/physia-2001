@@ -103,6 +103,8 @@ sub prepare_page_content_header
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
 			['Add Appointment', "$urlPrefix/dlg-add-appointment", ''],
+			['Refills', "$urlPrefix/dlg-add-refill-request", ''],
+			['Voice Msgs', "$urlPrefix/dlg-add-phone-message", ''],			
 		], ' | ');
 
 
@@ -147,6 +149,8 @@ sub prepare_page_content_header
 						<!-- <OPTION value="/person/$personId/dlg-add-invoice">Create Invoice</OPTION> -->
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
+						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
+						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
 						<OPTION value="/person/$personId/dialog/postpayment/personal">Apply Payment</OPTION>
 						<OPTION value="/person/$personId/dialog/postrefund/refund">Post Refund</OPTION>
