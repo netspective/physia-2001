@@ -4,10 +4,10 @@
 <schema name="lab_test">
 	<include file="generic-datatypes.xml"/>	
 	
-	<table name="Lab_Order" abbrev="LabOrd" type="Audit,Secure">
+	<table name="Person_Lab_Order" abbrev="PLabOrd" type="Audit,Secure">
 		<description>Contains Lab order request for a patient</description>
 		<column name="lab_order_id" type="autoinc" primarykey="yes" descr="Unique Lab Order ID"/>
-		<column name="person_id" lookupref="person.person_id"  indexed="yes" descr="Person ID of patient the Lab Order is created"/>	
+		<column name="person_id"  parentref="Person.person_id" indexed="yes" descr="Person ID of patient the Lab Order is created"/>	
 		<column name="date_order" type="stamp"  indexed="yes"  descr="Date and Time Lab order was requested"/>			
 		<column name="date_done" type="stamp" descr="Date and Time Lab order was finished"/>	
 		<column name="provider_id" lookupref="person.person_id"  indexed="yes" descr="Person ID of patient the Lab Order is created"/>	
@@ -51,7 +51,7 @@
 	<table name="Lab_Order_Entry" abbrev="LabOrdEnt" type="Audit,Secure">
 		<description>Contains Lab order Entry request for a patient</description>
 		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique Lab Order ID"/>
-		<column name="parent_id" parentref="lab_order.lab_order_id" descr="Unique Lab Order ID"/>				
+		<column name="parent_id" parentref="person_lab_order.lab_order_id" descr="Unique Lab Order ID"/>				
 		<column name="test_entry_id" lookupref="offering_catalog_entry.entry_id" descr="Unique Lab Order ID"/>						
 		<column name="options" abbrev="o" type="text_set" descr="List of options for this test"/>								
 	</table>		
