@@ -21,6 +21,7 @@ use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Dialog::Field::Procedures;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Schedule::Utilities;
 use App::IntelliCode;
 use App::Component::WorkList::PatientFlow;
@@ -700,7 +701,7 @@ sub voidInvoicePostSubmit
 
 	#In this case, all of the submitted claims information (which includes the transaction, invoice, invoice_items, and invoice_billing and excludes adjustments) is replicated
 	#into a voided claim where it's parent is the submitted claim and where the new transaction is of type 'VOID' and it's parent is the submitted claim's transaction.
-	#History attributes are created for both claims at the end.
+	#History items are created for both claims at the end.
 
 
 	my $sessOrgIntId = $page->session('org_internal_id');
@@ -822,28 +823,17 @@ sub voidInvoicePostSubmit
 		);
 	}
 
-	#add history attribute for void copy
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	#add history item for void copy
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $invoiceId,
 		value_text => "This invoice is a voided copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
-	#add history attribute for original (submitted) copy
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $oldInvoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	#add history item for original (submitted) copy
+	addHistoryItem($page, $invoiceId,
 		value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a voided copy of this invoice",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
 	#void original claim
@@ -1174,7 +1164,6 @@ sub handleInvoiceAttrs
 	my $boolValueType = App::Universal::ATTRTYPE_BOOLEAN;
 	my $currencyValueType = App::Universal::ATTRTYPE_CURRENCY;
 	my $durationValueType = App::Universal::ATTRTYPE_DURATION;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 
 	## Then, create invoice attribute indicating that this is the first (primary) claim
@@ -1202,29 +1191,19 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		addHistoryItem($page, $invoiceId,
 			value_text => 'Created',
 			value_textB => "Creation Batch ID: $batchId",
 			value_date => $todaysDate,
-			_debug => 0
 		);
 	}
 
 	if(my $onHold = $page->field('on_hold'))
 	{
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		addHistoryItem($page, $invoiceId,
 			value_text => 'On Hold',
 			value_textB => $onHold,
 			value_date => $todaysDate,
-			_debug => 0
 		);
 	}
 
@@ -1439,45 +1418,6 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	#my $payToOrgIntId = $page->field('billing_facility_id');
-	#my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
-	#my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-	#my $payToOrgId = $payToFacilityInfo->{org_id};
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Name',
-	#		value_type => defined $textValueType ? $textValueType : undef,
-	#		value_text => $payToFacilityInfo->{name_primary} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
-
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_tax_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Tax ID',
-	#		value_type => defined $textValueType ? $textValueType : undef,
-	#		value_text => $payToFacilityInfo->{tax_id} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
-
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_phone_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Phone',
-	#		value_type => defined $phoneValueType ? $phoneValueType : undef,
-	#		value_text => $payToFacilityPhone->{value_text} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
 
 	my $activeCatalogs = uc($page->param('_f_proc_active_catalogs'));
 	my $defaultCatalogs = uc($page->param('_f_proc_default_catalog'));
@@ -1497,25 +1437,14 @@ sub handleInvoiceAttrs
 	if($invoiceFlags & $attrDataFlag)
 	{
 		my $oldInvoiceId = $page->field('old_invoice_id');
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		addHistoryItem($page, $invoiceId,
 			value_text => "This invoice is a new copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A> which has been submitted and voided",
-			#value_textB => $page->field('comments') || undef,
 			value_date => $todaysDate,
-			_debug => 0
 		);
 
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $oldInvoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		addHistoryItem($page, $invoiceId,
 			value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice",
 			value_date => $todaysDate,
-			_debug => 0
 		);
 
 		#update original claim - make it's parent_invoice the new invoice
@@ -2183,15 +2112,10 @@ sub voidProcedureItem
 		);
 
 
-	## ADD HISTORY ATTRIBUTE
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => "Voided $cptCode",
-			value_date => $todaysDate || undef,
-			_debug => 0
+	## add history item
+	addHistoryItem($page, $invoiceId,
+		value_text => "Voided $cptCode",
+		value_date => $todaysDate,
 	);
 }
 
