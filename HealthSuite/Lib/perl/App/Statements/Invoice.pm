@@ -7,23 +7,38 @@ use Exporter;
 use DBI::StatementManager;
 use App::Universal;
 
-use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_DEFAULT_ORG 
+use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_DEFAULT_ORG
 	$STMTRPTDEFN_DEFAULT_PERSON $PATIENT_BILL_PUBLISH_DEFN);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_INVOICE);
 
 $STMTFMT_SEL_INVOICETYPE = qq{
-			select i.invoice_id, i.total_items, to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
-					ist.caption as invoice_status, ib.bill_to_id, i.total_cost,
-					i.total_adjust, i.balance, i.client_id, ib.bill_to_id
-			from invoice i, invoice_status ist, invoice_billing ib
-			where
+			SELECT
+				i.invoice_id,
+				i.total_items,
+				to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
+				ist.caption as invoice_status,
+				ib.bill_to_id,
+				i.total_cost,
+				i.total_adjust,
+				i.balance,
+				i.client_id,
+				ib.bill_to_id,
+				(
+					SELECT 	b.org_id
+					FROM org b
+					WHERE b.org_internal_id = ib.bill_to_id
+					AND ib.bill_party_type not in(@{[ App::Universal::INVOICEBILLTYPE_CLIENT]},@{[ App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON]})
+				) AS org_id,
+				ib.bill_party_type
+			FROM invoice i, invoice_status ist, invoice_billing ib
+			WHERE
 				%whereCond%
-				and i.invoice_status = ist.id
-				and ib.invoice_id = i.invoice_id
-				and ib.invoice_item_id is NULL
-				and ib.bill_sequence = 1
-				order by i.invoice_id desc
+			AND i.invoice_status = ist.id
+			AND ib.invoice_id = i.invoice_id
+			AND ib.invoice_item_id is NULL
+			AND ib.bill_sequence = 1
+			ORDER BY i.invoice_id desc
 };
 
 $STMTRPTDEFN_DEFAULT_ORG =
@@ -34,7 +49,11 @@ $STMTRPTDEFN_DEFAULT_ORG =
 				{ head => 'IC' , hint => 'Claim Identifier', dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
-				{ head => 'Client'},
+				{ head => 'Client', colIdx => 11, dataFmt => {
+										'2' => '#10#',
+										'3' => '#10#',
+									},
+				},
 				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
@@ -50,7 +69,13 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
-				{ head => 'Payer'},
+				{ head => 'Payer', colIdx => 11, dataFmt => {
+										'0'  => '#4#',
+										'1'  => '#4#',
+										'2' => '#10#',
+										'3' => '#10#',
+									},
+				},
 				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
@@ -102,7 +127,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and address_name = ?
 		},
 	'selAllOutstandingInvoicesByClient' => q{
-		select * 
+		select *
 		from invoice
 		where balance > 0
 			and client_id = ?
@@ -110,7 +135,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and invoice_status != 16
 		},
 	'selOutstandingInvoicesByClient' => q{
-		select * 
+		select *
 		from invoice
 		where client_id = ?
 			and owner_id = ?
@@ -145,7 +170,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select *
 		from invoice
 		where invoice_id = ?
-			and client_id = ?	
+			and client_id = ?
 		},
 	'selInvoiceAndClaimType' => q{
 		select 	i.invoice_status, iis.caption as invoice_status_caption,
@@ -157,7 +182,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and i.invoice_status = iis.id
 		},
 	'selInvoiceItem' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
 			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
 			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
@@ -165,7 +190,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where item_id = ?
 		},
 	'selInvoiceItems' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
 			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
 			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
@@ -173,7 +198,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 		},
 	'selInvoiceProcedureItems' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
 			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
 			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
@@ -216,7 +241,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and invoice_item_id is NULL
 		},
 	'selInvoiceBillingRecs' => qq{
-		select bill_id, invoice_id, invoice_item_id, assoc_bill_id, bill_sequence, bill_party_type, bill_to_id, bill_ins_id, bill_amount, 
+		select bill_id, invoice_id, invoice_item_id, assoc_bill_id, bill_sequence, bill_party_type, bill_to_id, bill_ins_id, bill_amount,
 			bill_pct, to_char(bill_date, '$SQLSTMT_DEFAULTDATEFORMAT') as bill_date, bill_status, bill_result
 		from invoice_billing
 		where invoice_id = ?
@@ -255,9 +280,9 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		},
 	'selItemAdjustments' => q{
 		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
-			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount, 
+			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount,
 			adjust_codes, net_adjust, data_text_a,
-			pat.caption as pay_type, adm.caption as adjustment_type, 
+			pat.caption as pay_type, adm.caption as adjustment_type,
 			pam.caption as pay_method, wt.caption as writeoff_code
 		from invoice_item_adjust iia, adjust_method adm, payment_type pat, payment_method pam, writeoff_type wt
 		where iia.parent_id = ?
@@ -276,7 +301,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		{
 			_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
 			whereCond => ' ib.bill_to_id = ?',
-			publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
+			publishDefn => $STMTRPTDEFN_DEFAULT_ORG,
 		},
 	'selInvoiceAttrServFacility' => q{
 		select value_text as name_primary, value_textb as service_facility_id
@@ -322,7 +347,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select caption, id, 2 as myorder
 		from writeoff_type
 		UNION
-		(select '' as caption, -99999 as id, 1 as myorder 
+		(select '' as caption, -99999 as id, 1 as myorder
 			from dual)
 		order by myorder
 		},
@@ -422,7 +447,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		},
 	'selProcedure' => qq{
 		select item_type, code as procedure, code_type, modifier as procmodifier, unit_cost as proccharge,
-				quantity as procunits, emergency as emg, comments, flags, 
+				quantity as procunits, emergency as emg, comments, flags,
 				data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
 				rel_diags as procdiags, hcfa_service_place as servplace, hcfa_service_type as servtype,
 				to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
@@ -444,7 +469,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select to_char(cr_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') from Invoice_Item
 		where item_id = ?
 	},
-			
+
 );
 
 
