@@ -60,5 +60,16 @@
 		<deliverable id="360">
 			 UI: Now the 'Begin Date' and 'End Date' will showup in the 'Health Coverage' component
 		</deliverable>		
+		<deliverable id="1141">
+			Added missing encounter to the patient actvity report.  Also changed Facility ID to a drop down menu. 	
+		</deliverable>		
+		<deliverable id="1045">
+			Correct calculations  on receipt analysis and added more filter fields to the report
+		</deliverable>		
+		<deliverable id="1061">
+			Added validation to the close date dialog that warns user if selected close date is not the next close date in sequence for the org.
+			NOTE : Please test that close date still locks out the creation of invoice and payments correctly.
+		</deliverable>				
+		
 	</deliverables>
 </release-notes>
