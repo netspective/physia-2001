@@ -1677,7 +1677,7 @@ sub assignInvoiceProperties
 	{
 		select *
 		from invoice_billing
-		where invoice_id = $invoiceId
+		where invoice_id = $invoiceId and invoice_item_id is NULL
 		order by bill_sequence
 	};
 	my $sthPayer = $self->{dbiCon}->prepare("$queryStatment");
@@ -1732,6 +1732,7 @@ sub assignInvoiceProperties
 				}
 			}
 			$payers[$payerCount]->setPayerId($remitPayerId);
+
 		}
 	}
 
