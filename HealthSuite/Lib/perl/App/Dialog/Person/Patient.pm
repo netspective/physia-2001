@@ -71,12 +71,12 @@ sub initialize
 		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => '', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::Subhead(heading => 'Insurance', name => 'insur_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(
-								type => 'bool',
-								name => 'add_insurance',
-								caption => 'Add Personal Insurance Coverage?',
-								style => 'check',
-								invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		#new CGI::Dialog::Field(
+		#						type => 'bool',
+		#						name => 'add_insurance',
+		#						caption => 'Add Personal Insurance Coverage?',
+		#						style => 'check',
+		#						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::MultiField(caption =>'Ins CompanyID/Product Name/Plan Name', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
@@ -137,12 +137,12 @@ sub customValidate
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
 
-	my $addIns = $page->field('add_insurance');
-	if($addIns ==1 &&
-		($page->field('ins_org_id') eq '' || $page->field('product_name') eq '' || $page->field('plan_name') eq ''))
-	{
-		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
-	}
+	#my $addIns = $page->field('add_insurance');
+	#if($addIns ==1 &&
+	#	($page->field('ins_org_id') eq '' || $page->field('product_name') eq '' || $page->field('plan_name') eq ''))
+	#{
+	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
+	#}
 }
 
 sub execute_add
