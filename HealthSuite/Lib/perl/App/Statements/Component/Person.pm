@@ -453,6 +453,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			where	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_EMERGENCY ]}
 			and 	item_name != 'Guarantor'
+			and 	item_name != 'Responsible Party'
 		},
 				#UNION ALL
 			#					select 0 as value_type, 1 as item_id, 'a' as item_name, value_text as value_text, 'b' as value_textb, person_id
@@ -2225,13 +2226,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.recentlyVisitedPatients' => {
 	sqlStmt => qq{
-			
+
 			select p.complete_name, pvc.view_key  from PerSess_View_Count pvc,
 						person p , Person_Org_Category  pog
-						where p.person_id = pvc.view_key AND pvc.person_id = ? and 
+						where p.person_id = pvc.view_key AND pvc.person_id = ? and
 						pog.person_id = p.person_id AND pog.category = 'Patient'
 						and	pvc.view_latest >= to_date(sysdate)
-			order by pvc.view_latest desc	
+			order by pvc.view_latest desc
 
 		},
 	sqlStmtBindParamDescr => ['Person Id for PerSess_View_count table'],
