@@ -10,6 +10,7 @@ use Data::Publish;
 use App::Statements::Component;
 use App::Statements::Org;
 use App::Statements::Catalog;
+use App::Statements::Contract;
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 use vars qw(
@@ -145,6 +146,288 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	$page->param('sc_internal_catalog_id',$sc_internal_catalog_id);
 	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panelEdit'); },
 },
+#------------------------------------------------------------------------------------------------------------------------
+'org.ContractCatalogSummary' => {
+	sqlStmt => qq{
+			SELECT	con.contract_id, 
+				con.caption,
+				(SELECT catalog_id from offering_catalog oc WHERE oc.internal_catalog_id = con.parent_catalog_id) as catalog_id,
+				(SELECT product_name FROM Insurance WHERE ins_internal_id = con.product_ins_id) as product_name,
+				(SELECT count (*) FROM offering_catalog_entry where catalog_id = con.parent_catalog_id) as code_entry,
+				(SELECT 0 from dual) as price_entry,
+				internal_contract_id
+			FROM 	Contract_Catalog con
+			WHERE 	org_internal_id = :1
+	},
+	sqlvar_entityName => 'Contract_Catalog',
+	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
+	publishDefn => {
+				bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
+				columnDefn => 
+				[
+				{colIdx => 0, tDataFmt => '&{count:0} Contracts', head => 'Contract ID',url=>qq{/org/#param.org_id#/catalog?catalog=contract_detail&contract_detail=#6#}},
+				{colIdx => 1, head => 'Contract Name', },				
+				{colIdx => 2, head => 'Fee Schedule ID',},
+				{colIdx => 3, head => 'Insurance Product'},
+				{colIdx => 4, head => 'Entries',summarize => 'sum' },
+				],
+			banner =>
+			{
+				actionRows =>
+				[
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Contract Catalog</A> } },
+				],
+				contentColor=>'#EEEEEE',				
+			},	
+
+		
+			},	
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		contentColor=>'#EEEEEE',			
+		frame => {
+			heading => 'Contract Catalogs',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},			
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogSummary', [$orgId], 'panel'); },			
+},
+#------------------------------------------------------------------------------------------------------------------------
+'org.FSCatalogSummary' => {
+	sqlStmt => qq{
+	SELECT *
+	FROM (
+		SELECT	oc.catalog_id,			
+			oc.caption,
+			--oc.description,
+			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,		
+			count(oce.entry_id) entries_count,			
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add'		
+		FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+		WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id 
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)			
+		GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+		ORDER BY
+			oc.catalog_id
+	)
+	WHERE rownum <= 250
+
+	},
+	sqlvar_entityName => 'Offering_Catalog',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => 
+		{
+				bullets => '/org/#param.org_id#/dlg-update-catalog/#5#?home=#homeArl#',
+				columnDefn => 
+				[
+				{colIdx => 0,hAlign=>'left', head => 'Catalog ID',url=>qq{/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#},
+				tDataFmt => '&{count:0} Schedules',},
+				{colIdx => 1, head => 'Catalog Name', hAlign=>'left'},				
+				{colIdx => 2, head => 'Contract Type',},
+				{colIdx => 3, head => 'Entries',summarize => 'sum',},
+				{colIdx =>6,url=>'/org/#session.org_id#/dlg-add-catalog/#5#' ,hint=>'Add Child Item'},
+				],
+			banner =>
+			{contentColor=>'#EEEEEE',
+			
+			actionRows =>
+			[
+				{
+					caption => qq{ 
+						<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+						<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+						<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
+					},
+				},
+			],			},	
+			stdIcons =>
+			{
+				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
+			},				
+		},	
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => {
+			heading => 'Fee Schedules Catalogs',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},			
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogSummary', [$orgId], 'panel'); },			
+},
+
+
+#------------------------------------------------------------------------------------------------------------------------
+'org.ContractCatalogDetail' => {
+	sqlStmt => qq{
+			SELECT	code,
+				modifier,
+				(SELECT caption FROM Catalog_Entry_Type  WHERE id = oce.entry_type) as type,
+				name,
+				(expected_cost) as  exp_cost,
+				(allowed_cost) as all_cost,
+				oce.entry_id,
+				con.internal_contract_id,
+				ocp.price_id,
+				decode(ocp.price_id,NULL,'Add','Mod')
+			FROM 	Contract_Catalog con, Offering_catalog_Entry oce,
+				Offering_CatEntry_Price ocp
+			WHERE 	con.internal_contract_id = :1
+			AND	oce.catalog_id = con.parent_catalog_id
+			AND	con.org_internal_id = :2	
+			AND	ocp.internal_contract_id (+)= :1
+			AND	ocp.entry_id (+) = oce.entry_id 
+			},
+	sqlvar_entityName => 'Contract_Catalog',
+	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
+	publishDefn => {				
+				columnDefn => 
+				[
+				{colIdx => 0, head => 'Code',tDataFmt =>'&{count:0} Entries'},
+				{colIdx => 1, head => 'Modifier', },				
+				{colIdx => 2, head => 'Type',dAlign=>'left',hAlign=>'left'},
+				{colIdx => 3, head => 'Name',hAlign=>'left'},
+				{colIdx => 4, head => 'Expected Price', dformat => 'currency',summarize => 'sum'},
+				{colIdx => 5, head => 'Allowed Price', dformat => 'currency',summarize => 'sum'},	
+				{colIdx => 9,head=>'Actions',
+						dataFmt => {
+								'Mod' => qq{<A HREF="/org/#param.org_id#/dlg-update-contract-item/#8#"
+					TITLE='Modify Contract Price'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A> 
+					<A HREF="/org/#param.org_id#/dlg-remove-contract-item/#8#"
+										TITLE='Delete Contract Price'>
+					<img src="/resources/icons/black_d.gif" BORDER=0></A> 
+									  },									
+								'Add' => qq{<A HREF="/org/#param.org_id#/dlg-add-contract-item/#7#/#6#"
+					TITLE='Add Contract Price'>
+					<IMG SRC="/resources/icons/black_a.gif" BORDER=0></A>}
+							   },
+				},
+				#{head =>'Actions',dataFmt=>qq{<A HREF="/org/#param.org_id#/dlg-add-contract-item/#7#/#6#"
+				#	TITLE='Add Contract Price'>
+				#	<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>}}
+				],
+#			banner =>
+#			{
+#				actionRows =>
+#				[
+#				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Contract Catalog</A> } },
+#				],
+#			},				
+			},	
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => {
+			heading => '#param.contract_id# : Contract Entries ',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},			
+	publishComp_stp => sub { my ($page, $flags, $contract_id,$org_id) = @_;$org_id = $page->session('org_internal_id');
+	$contract_id = $page->param('contract_detail');	
+	#Get Contract ID
+	my $catalog = $STMTMGR_CONTRACT->getRowAsHash($page,STMTMGRFLAG_NONE,'selContractByID',$contract_id);	
+	$page->param('contract_id',$catalog->{contract_id});
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogDetail', [$contract_id,$org_id], 'panel'); },			
+},
+
+#------------------------------------------------------------------------------------------------------------------------
+'org.FSCatalogDetail' => {
+	sqlStmt => qq{
+			SELECT
+				code AS code,
+				modifier AS modifier,				
+				catalog_entry_type.caption AS Type,
+				name,
+				--description AS description,
+				DECODE(flags, 0, NULL, '(FFS)'),				
+				unit_cost AS price,
+				--default_units AS uoh,
+				'Add',
+				parent_entry_id,
+				entry_id AS ID,
+				oc.internal_catalog_id
+			FROM
+				catalog_entry_type,
+				offering_catalog_entry oce,
+				offering_catalog oc
+			WHERE	oce.catalog_id = :1
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.org_internal_id = :2
+			AND	oce.entry_type = catalog_entry_type.id
+			ORDER BY
+				entry_type,
+				code,
+				modifier
+		},
+	sqlvar_entityName => 'Contract_Catalog',
+	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
+	publishDefn => {				
+				columnDefn => 
+				[
+				{colIdx => 0, hAlign =>'left',head => 'Code',tDataFmt => '&{count:0} Entries'},
+				{colIdx => 1, hAlign =>'left', head => 'Modifier', },				
+				{colIdx => 2, head => 'Procedure Type',dAlign=>'left',hAlign=>'left'},
+				{colIdx => 3, head => 'Name',hAlign=>'left'},
+				{colIdx => 4, head => 'Contract Type',dAlign=>'left',hAlign=>'left'},				
+				{colIdx => 5, head => 'Price', dformat => 'currency',summarize => 'sum'},
+				{colIdx => 5, head => 'Actions', dataFmt=>
+					q{
+						<A HREF="/org/#param.org_id#/dlg-add-catalog-item/#9#/#8#"
+						TITLE='Add Child Item'>
+						<img src="/resources/icons/black_a.gif" BORDER=0></A> 					
+						<A HREF="/org/#param.org_id#/dlg-update-catalog-item/#8#"
+						TITLE='Modify Item'>
+						<img src="/resources/icons/black_m.gif" BORDER=0></A> 
+						<A HREF="/org/#param.org_id#/dlg-remove-catalog-item/#8#"
+											TITLE='Delete Item'>
+						<img src="/resources/icons/black_d.gif" BORDER=0></A> 
+									  }				
+				},				
+				],
+			banner =>
+			{contentColor=>'#EEEEEE',	
+				actionRows =>
+				[
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.fee_schedule_detail#?home=#homeArl#'>Fee Schedule Item</A> } },
+				],
+			},				
+			},	
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		frame => {
+			heading => '#param.catalog_id#  : Fee Schedule Entries ',
+					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},			
+	publishComp_stp => sub { my ($page, $flags, $contract_id,$org_id) = @_; $org_id = $page->session('org_internal_id'); $contract_id = $page->param('fee_schedule_detail'); 
+	#Get Fee Schedule Catalog ID
+	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$contract_id);
+	$page->param('catalog_id',$catalog->{catalog_id});
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogDetail', [$contract_id,$org_id], 'panel'); },			
+},
+
+
 #----------------------------------------------------------------------------------------------------------------------
 'org.fsCatalogEntry' => {
 	sqlStmt => qq{
