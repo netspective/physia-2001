@@ -276,7 +276,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			FROM 	invoice_charges
 			WHERE 	invoice_date >= to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	invoice_date < to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
-			AND	owner_org_id = :3				
+			AND	owner_org_id = :3
 		}
 	},
 	'sel_financial_monthly' =>
@@ -350,7 +350,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	a.bill_party_type  in (2,3)
 			AND	a.bill_plain = org.org_internal_id
 			AND	org.owner_org_id = :2
-			AND 	(:3 IS NULL OR care_provider_id = :3) 
+			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND 	a.invoice_status <> 15
 			AND	entire_invoice_balance <> 0
@@ -381,7 +381,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 
 	'sel_aged_insurance_detail' =>
 	{
-		sqlStmt => 		
+		sqlStmt =>
 		qq
 		{
 			SELECT
@@ -398,7 +398,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			WHERE	(a.bill_to_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (2,3)
-			AND 	a.balance <> 0		
+			AND 	a.balance <> 0
 			AND 	ist.id = a.invoice_status
 			AND	a.bill_plain = org.org_internal_id
 			AND	org.owner_org_id = :2
@@ -406,8 +406,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id
-			having sum(balance)<> 0			
-		},		
+			having sum(balance)<> 0
+		},
 		publishDefn =>
 			{
 				columnDefn =>
@@ -489,20 +489,20 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_121),
 				sum(balance_151),
 				--sum(decode(item_type,3,total_pending,0)),
-				sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),											
-				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),					
-				sum(total_pending)								
+				sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),
+				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),
+				sum(total_pending)
 			FROM	agedpayments a, person p,person_org_category poc
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			--AND	bill_party_type in (0,1)
 			AND	entire_invoice_balance <> 0
-			AND 	p.person_id = a.person_id			
+			AND 	p.person_id = a.person_id
 			AND	a.person_id = poc.person_id
 			AND	poc.org_internal_id  = :2
 			AND	a.invoice_status <> 15
 			AND 	(:3 IS NULL OR care_provider_id = :3)
-			AND	(:4 IS NULL OR service_facility_id = :4)	
+			AND	(:4 IS NULL OR service_facility_id = :4)
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
@@ -524,9 +524,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
 				{ colIdx => 9, head => 'Total Balance', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
 				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
-				{ colIdx => 11, head => 'Total Amount', summarize=>'sum',dataFmt => '#11#', dAlign => 'center', dformat => 'currency' },				
+				{ colIdx => 11, head => 'Total Amount', summarize=>'sum',dataFmt => '#11#', dAlign => 'center', dformat => 'currency' },
 				],
-			},	
+			},
 	},
 
 	'sel_aged_patient' =>
@@ -551,12 +551,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
 			AND	entire_invoice_balance <> 0
-			AND 	p.person_id = a.person_id			
+			AND 	p.person_id = a.person_id
 			AND	a.person_id = poc.person_id
 			AND	poc.org_internal_id  = :2
 			AND	a.invoice_status <> 15
 			AND 	(:3 IS NULL OR care_provider_id = :3)
-			AND	(:4 IS NULL OR service_facility_id = :4)	
+			AND	(:4 IS NULL OR service_facility_id = :4)
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
@@ -597,12 +597,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(nvl(a.total_adjust,0)),
 				sum(nvl(a.balance,0))
 			FROM	agedpayments a, person p,
-				invoice_status ist ,person_org_category poc				
+				invoice_status ist ,person_org_category poc
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
 			AND 	a.balance <> 0
-			AND 	p.person_id = a.person_id			
+			AND 	p.person_id = a.person_id
 			AND 	ist.id = a.invoice_status
 			AND	a.person_id = poc.person_id
 			AND	poc.org_internal_id  = :2
@@ -668,11 +668,11 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(nvl(a.total_adjust,0)),
 				sum(nvl(a.balance,0))
 			FROM	agedpayments a, person p,
-				invoice_status ist ,person_org_category poc				
+				invoice_status ist ,person_org_category poc
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND 	a.balance <> 0
-			AND 	p.person_id = a.person_id			
+			AND 	p.person_id = a.person_id
 			AND 	ist.id = a.invoice_status
 			AND	a.person_id = poc.person_id
 			AND	poc.org_internal_id  = :2
@@ -680,7 +680,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
-			having sum(balance)<> 0						
+			having sum(balance)<> 0
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
@@ -929,14 +929,21 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	'sel_monthly_audit_newpatient_count' => qq{
 	SELECT
 				count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
-	FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea, org o
+	FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea
 	WHERE 	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-	AND      e.facility_id = o.org_internal_id
-	AND      o.org_internal_id = :3
+	AND  		e.facility_id = :3
+	AND EXISTS
+				(
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
+				)
 	AND  		e.event_id = ea.parent_id
 	AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND      at.id = ea.value_int
+	AND      e.event_status in (1,2)
 	AND      at.caption = 'New Patient'
 	GROUP BY to_char(start_time,'MM/YYYY')
 	ORDER BY start_time asc
@@ -946,14 +953,21 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	'sel_monthly_audit_estpatient_count' => qq{
 		SELECT
 					count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
-		FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea, org o
+		FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea
 		WHERE 	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-		AND      e.facility_id = o.org_internal_id
-		AND      o.org_internal_id = :3
+		AND  		e.facility_id = :3
+		AND EXISTS
+				(
+						SELECT 'x'
+						FROM org
+						WHERE owner_org_id = :4
+						AND org_internal_id = e.facility_id
+				)
 		AND  		e.event_id = ea.parent_id
 		AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND      at.id = ea.value_int
+		AND      e.event_status in (1,2)
 		AND      at.caption = 'Established Patient'
 		GROUP BY to_char(start_time,'MM/YYYY')
 		ORDER BY start_time asc
