@@ -73,10 +73,10 @@ sub new
 							column => 'Insurance.member_number',
 							options => FLDFLAG_REQUIRED),
 
-			new CGI::Dialog::Field::TableColumn(
-							caption => 'Policy Number',
-							schema => $schema,
-							column => 'Insurance.policy_number'),
+			#new CGI::Dialog::Field::TableColumn(
+			#				caption => 'Policy Number',
+			#				schema => $schema,
+			#				column => 'Insurance.policy_number'),
 
 
 			#new CGI::Dialog::MultiField(caption =>'Insured/Guarantor ID', name => 'insured_guarantor_ids',
@@ -411,7 +411,7 @@ sub execute
 				group_name => $page->field('group_name') || undef,
 				group_number => $page->field('group_number') || undef,
 				member_number => $page->field('member_number') || undef,
-				policy_number => $page->field('policy_number') || undef,
+				#policy_number => $page->field('policy_number') || undef,
 				insured_id => $page->field('insured_id') || undef,
 				guarantor_id => $page->field('guarantor_id') || undef,
 				rel_to_insured => $page->field('rel_to_insured') || undef,
