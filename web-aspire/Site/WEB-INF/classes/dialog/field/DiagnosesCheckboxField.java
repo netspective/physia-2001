@@ -44,7 +44,7 @@ public class DiagnosesCheckboxField extends DialogField {
 		StatementManager stmtMgr = dc.getStatementManager();
 		String dataSrcId = dc.getServletContext().getInitParameter("default-data-source");
 
-		QueryResultsListValue qrlv = new QueryResultsListValue("query:/selClaimDiags?" + dc.getServletContext().getAttribute("invoice_id"), dataSrcId, "");
+		QueryResultsListValue qrlv = new QueryResultsListValue("query:/invoice.selClaimDiags?" + dc.getServletContext().getAttribute("invoice_id"), dataSrcId, "invoice.selClaimDiags");
 		diagnosesField.setDefaultListValue(qrlv);
 	}
 

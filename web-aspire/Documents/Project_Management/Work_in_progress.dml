@@ -82,7 +82,50 @@
 					<task><name>Identify all field types used in ASPire (list of ref of all $field objects with dupes removed).</name><completed>100</completed></task>
 					<task><name>Identify common field types that don't exist in XAF that ASPire needs (float, integer, etc).</name><completed>100</completed></task>
 					<task><name>Identify all iHOS/ASPire attributes that are not being generated in XAF (preHtml, postHtml, etc).</name></task>
-					<task><name>Translate all <i>special</i> field types that exist in ASPire to XAF field types (IDs, Insurance, Procedures, etc)</name></task>
+					<task><name>Translate all <i>special</i> field types that exist in ASPire to XAF field types (IDs, Insurance, Procedures, etc)</name>
+						<task><name>App::Dialog::Field::Address</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::AllInvoices</name></task>
+						<task><name>App::Dialog::Field::Association</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Attribute::Name</name></task>
+						<task><name>App::Dialog::Field::BatchDateID</name></task>
+						<task><name>App::Dialog::Field::Catalog::ID</name></task>
+						<task><name>App::Dialog::Field::Catalog::ID::New</name></task>
+						<task><name>App::Dialog::Field::Diagnoses</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::DiagnosesCheckbox</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::FeeScheduleMatrix</name></task>
+						<task><name>App::Dialog::Field::Insurance::Plan</name></task>
+						<task><name>App::Dialog::Field::Insurance::Plan::New</name></task>
+						<task><name>App::Dialog::Field::Insurance::Product</name></task>
+						<task><name>App::Dialog::Field::Insurance::Product::New</name></task>
+						<task><name>App::Dialog::Field::InvoiceItems</name></task>
+						<task><name>App::Dialog::Field::MultiOrg::ID</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::MultiPerson::ID</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Organization::ID</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Organization::ID::New</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::OutstandingInvoices</name></task>
+						<task><name>App::Dialog::Field::OutstandingItems</name></task>
+						<task><name>App::Dialog::Field::Person::ID</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Person::ID::New</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Person::Name</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::ProcedureChargeUnits</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::ProcedureLine</name><completed>100</completed></task>
+						<task><name>App::Dialog::Field::Procedures</name></task>
+						<task><name>App::Dialog::Field::RefundInvoices</name></task>
+						<task><name>App::Dialog::Field::RovingResource</name></task>
+						<task><name>App::Dialog::Field::Scheduling::AMPM</name></task>
+						<task><name>App::Dialog::Field::Scheduling::Date</name></task>
+						<task><name>App::Dialog::Field::Scheduling::DateTimeOnly</name></task>
+						<task><name>App::Dialog::Field::Scheduling::DateTimePlus</name></task>
+						<task><name>App::Dialog::Field::Scheduling::Minutes</name></task>
+						<task><name>App::Dialog::Field::TWCC60</name></task>
+						<task><name>App::Dialog::Message::Notes</name></task>
+						<task><name>CGI::Dialog::DataGrid</name></task>
+						<task><name>CGI::Dialog::Field</name></task>
+						<task><name>CGI::Dialog::Field::Duration</name></task>
+						<task><name>CGI::Dialog::Field::TableColumn</name></task>
+						<task><name>CGI::Dialog::MultiField</name></task>
+						<task><name>CGI::Dialog::Subhead</name><completed>100</completed></task>
+					</task>
 					<task><name>Identify all field attributes that have anything with a dollar ($) sign -- these will need to be replaced with XAF equivalents after further analysis (like $Command and $command).</name><completed>100</completed></task>
 					<task><name>Try and figure out the difference between <i>hint</i> and <i>hints</i> attributes in iHOS and create equivalents in XAF.</name><completed>100</completed></task>
 					<task><name>Add all popup/lookup buttons and URLs.</name></task>
