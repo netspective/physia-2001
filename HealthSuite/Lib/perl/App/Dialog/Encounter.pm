@@ -1727,7 +1727,7 @@ sub handleHmoCapChanges
 		#delete copay item if claim is updated to a non-cap claim type
 		if($copayItemId && $copayItem->{data_text_b} ne 'void')
 		{
-			voidInvoiceItem($page, $invoiceId, $copayItemId);
+			voidInvoiceItem($page, $copayItemId);
 		}
 	}
 	elsif($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
@@ -1844,7 +1844,7 @@ sub handleProcedureItems
 				my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
 				foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
 				{
-					voidInvoiceItem($page, $invoiceId, $prevExplCodeItem->{item_id});
+					voidInvoiceItem($page, $prevExplCodeItem->{item_id});
 				}
 				$command = 'add';
 			}
@@ -1857,7 +1857,7 @@ sub handleProcedureItems
 			my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
 			foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
 			{
-				voidInvoiceItem($page, $invoiceId, $prevExplCodeItem->{item_id});
+				voidInvoiceItem($page, $prevExplCodeItem->{item_id});
 			}
 			$command = 'add';
 		}
@@ -1869,13 +1869,13 @@ sub handleProcedureItems
 				my $explCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $cptCode);
 				foreach my $explCodeItem (@{$explCodeInvItems})
 				{
-					voidInvoiceItem($page, $invoiceId, $explCodeItem->{item_id});
+					voidInvoiceItem($page, $explCodeItem->{item_id});
 				}
 				next;
 			}
 			else
 			{
-				voidInvoiceItem($page, $invoiceId, $itemId);
+				voidInvoiceItem($page, $itemId);
 				next;
 			}
 		}

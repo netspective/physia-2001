@@ -425,7 +425,7 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $invoiceId = $page->param('invoice_id');
-	voidInvoiceItem($page, $invoiceId, $page->param('item_id'));
+	voidInvoiceItem($page, $page->param('item_id'));
 	$page->redirect("/invoice/$invoiceId/summary");
 }
 
