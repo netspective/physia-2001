@@ -12,51 +12,60 @@ use base qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_STATEMENTS);
 
 my $SELECT_OUTSTANDING_CLAIMS = qq{
-	SELECT Invoice.invoice_id, bill_to_id, billing_facility_id, provider_id, care_provider_id,
-		client_id, total_cost, total_adjust, balance,
-		to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, bill_party_type,
+	SELECT i.invoice_id, ib.bill_to_id, t.billing_facility_id, t.provider_id, t.care_provider_id,
+		i.client_id, i.total_cost, i.total_adjust, i.balance,
+		to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, ib.bill_party_type,
 		(select nvl(sum(net_adjust), 0)
 			from Invoice_Item_Adjust
-			where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
 				and adjustment_type = 0
 				and payer_type != 0
 		) as insurance_receipts,
 		(select nvl(sum(net_adjust), 0)
 			from Invoice_Item_Adjust
-			where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
 				and adjustment_type = 0
 				and payer_type = 0
 		) as patient_receipts,
-		Person.complete_name AS patient_name,
-		Person.name_last AS patient_name_last
-	FROM Transaction, Invoice_Billing, Invoice, Person
+		p.complete_name AS patient_name,
+		p.name_last AS patient_name_last,
+		'claim' as statement_type
+	FROM Transaction t, Invoice_Billing ib, Invoice i, Person p
 	WHERE
-		Person.person_id = Invoice.client_id
-		AND Invoice.owner_id = ?
-		AND Invoice.invoice_status > 3
-		AND Invoice.invoice_status != 15
-		AND Invoice.invoice_status != 16
-		AND Invoice.balance > 0
-		AND Invoice.invoice_subtype in (0, 7)
-		AND Invoice_Billing.bill_id = Invoice.billing_id
-		AND Invoice_Billing.bill_party_type != 3
-		AND Invoice_Billing.bill_to_id IS NOT NULL
-		AND Transaction.trans_id = Invoice.main_transaction
+		p.person_id = i.client_id
+		AND i.owner_id = :1
+		AND i.invoice_status > 3
+		AND i.invoice_status != 15
+		AND i.invoice_status != 16
+		AND i.balance > 0
+		AND i.invoice_subtype in (0, 7)
+		AND ib.bill_id = i.billing_id
+		AND ib.bill_party_type != 3
+		AND ib.bill_to_id IS NOT NULL
+		AND t.trans_id = i.main_transaction
 		%ProviderClause%
+		%ExcludeAlreadySentClause%
+		AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
+			where ppii.member_name = i.invoice_id
+		)
 	UNION
-	SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, billing_org_id as 
+	SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
 		billing_facility_id, 'Payment Plan' as provider_id, null as care_provider_id,
-		pp.person_id as client_id, 0 as total_cost, 0 as total_adjust, pp.balance,
-		to_char(first_due, 'SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, 0 as bill_party_type,
-		0 as insurance_receipts, sum(payments) as patient_receipts, p.complete_name AS 
-		patient_name, p.name_last AS patient_name_last
+		pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
+		to_char(pp.first_due, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, 0 as bill_party_type,
+		0 as insurance_receipts,
+		(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
+		as patient_receipts,
+		p.complete_name as patient_name, p.name_last as patient_name_last,
+		'payplan' as statement_type
 	FROM Person p, Payment_Plan pp
 	WHERE pp.next_due > sysdate
+		and pp.owner_org_id = :1
 		and pp.balance > 0
 		and p.person_id = pp.person_id
-		and not exists (select 'x' from Statement where)
-	
-	ORDER BY Invoice.invoice_id
+		and (pp.laststmt_date is NULL or
+			(pp.laststmt_date is NOT NULL and pp.laststmt_date < trunc(sysdate) -14)
+		)
 };
 
 $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
@@ -64,16 +73,30 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	'sel_statementClaims_perOrg' => {
 		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
 		ProviderClause => qq{AND not exists (select 'x' from person_attribute pa
-			where pa.parent_id = Transaction.provider_id
+			where pa.parent_id = t.provider_id
 				and pa.value_type = 960
 				and pa.value_intb = 1
+			)
+		},
+		ExcludeAlreadySentClause => qq{AND not exists(select 'x' from Statement s
+			where s.transmission_stamp > trunc(sysdate) -14
+				and s.payto_id = t.billing_facility_id
+				and s.billto_id = ib.bill_to_id
+				and s.patient_id = i.client_id
 			)
 		},
 	},
 
 	'sel_statementClaims_perOrg_perProvider' => {
 		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
-		ProviderClause => qq{AND Transaction.provider_id = ?},
+		ProviderClause => qq{AND t.provider_id = :2},
+		ExcludeAlreadySentClause => qq{AND not exists(select 'x' from Statement s
+			where s.transmission_stamp > trunc(sysdate) -14
+				and s.payto_id = t.billing_facility_id
+				and s.billto_id = ib.bill_to_id
+				and s.patient_id = i.client_id
+			)
+		},
 	},
 
 	'sel_BillingIds' => qq{
@@ -141,7 +164,8 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 
 	'sel_personAddress' => qq{
-		SELECT complete_name, line1, line2, city, State, replace(zip, '-', null) as zip
+		SELECT complete_name, line1, line2, city, State, replace(zip, '-', null) as zip,
+			simple_name
 		FROM Person_Address, Person
 		WHERE person_id = ?
 			and Person_Address.parent_id = Person.person_id
@@ -206,13 +230,28 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	'sel_paymentPlan' => qq{
 		select plan_id, person_id, payment_cycle, payment_min, to_char(first_due, '$SQLSTMT_DEFAULTDATEFORMAT')
 			as first_due, balance, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
-			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date, 
+			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date,
 			billing_org_id, inv_ids
 		from Payment_Plan
 		where person_id = :1
 			and owner_org_id = :2
 	},
-	
+
+	'sel_last4Statements' => qq{
+		select * from
+		(
+			select patient_id, to_char(transmission_stamp, '$SQLSTMT_DEFAULTDATEFORMAT')
+				as transmission_date, transmission_status, to_char(ack_stamp,
+				'$SQLSTMT_DEFAULTDATEFORMAT') as ack_date, int_statement_id, ext_statement_id,
+				amount_due, inv_ids
+			from statement
+			where billto_id = :1
+				and payto_id = :2
+				and patient_id = :3
+			order by statement_id desc
+		)
+		where rownum < 5
+	},
 );
 
 1;

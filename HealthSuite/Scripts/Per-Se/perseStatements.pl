@@ -1,22 +1,15 @@
 #!/usr/bin/perl -I.
 
 ##############################################################################
-package InvoiceObject;
-##############################################################################
-
-sub new
-{
-	my ($type, %params) = @_;
-	return bless \%params, $type;
-}
-
-1;
-
-##############################################################################
 package Main;
 ##############################################################################
 
 use strict;
+
+use Date::Manip;
+use IO::File;
+use Dumpvalue;
+use Getopt::Long;
 
 use Schema::API;
 use App::Data::MDL::Module;
@@ -27,20 +20,22 @@ use vars qw($page $sqlPlusKey);
 
 use DBI::StatementManager;
 use App::Statements::BillingStatement;
-
-use Date::Manip;
-use IO::File;
-
-use Dumpvalue;
+use App::Utilities::Statement;
 
 use CommonUtils;
 use OrgList;
 
-use Getopt::Long;
-
 my $TODAY = UnixDate('today', '%m/%d/%Y');
 my $currencyFormat = "\$%.2f";
 my $MESSAGE = "Client Billing Statement Transmitted to Per-Se";
+
+# Config Params
+# ----------------------------------------------------------
+my $EDIHOST = $ENV{TESTMODE} ? 'gamma' : 'depot.medaphis.com';
+my $STATEMENTDIR = '$HOME/statements';
+my $STMT_OUTGOINGDIR = $STATEMENTDIR . '/outgoing';
+my $SCRIPTDIR = '$HOME/projects/HealthSuite/Scripts/Per-Se';
+# ----------------------------------------------------------
 
 #########
 # main
@@ -65,15 +60,16 @@ my @whatToDo = split(/\s*,\s*/, $actions);
 @whatToDo = ('create') unless @whatToDo;
 print "What To Do = @whatToDo \n";
 
-createStatementsFile(@orgsToDo) if grep(/create/, @whatToDo);
+createStatementFiles(@orgsToDo) if grep(/create/, @whatToDo);
+transmitStatementFiles() if grep(/transmit/, @whatToDo);
+archiveStatementFiles() if grep(/archive/, @whatToDo);
 exit;
 
 ############
 # end main
 ############
 
-
-sub createStatementsFile
+sub createStatementFiles
 {
 	my (@orgsToDo) = @_;
 
@@ -90,32 +86,26 @@ sub createStatementsFile
 
 		my $outstandingClaims;
 
-		if ($providerId)
-		{
+		if ($providerId) {
 			$outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
 				'sel_statementClaims_perOrg_perProvider', $orgInternalId, $providerId);
-		}
-		else
-		{
+		} else {
 			$outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
 				'sel_statementClaims_perOrg', $orgInternalId);
 		}
 
 		print "\n";
-		unless (@$outstandingClaims)
-		{
+		unless (@$outstandingClaims) {
 			warn "No outstanding claims found for Org $orgKey\n";
 			next;
-		}
-		else
-		{
+		} else {
 			warn @$outstandingClaims . " outstanding claims found for Org $orgKey\n";
 		}
 
-		my $statements = populateStatementsHash($outstandingClaims, $orgInternalId);
+		my $statements = App::Utilities::Statement::populateStatementsHash($page, $outstandingClaims, 
+			$orgInternalId);
 
-		unless (%{$statements})
-		{
+		unless (%{$statements}) {
 			warn "No statements to send today for Org $orgKey\n";
 			next;
 		}
@@ -126,30 +116,6 @@ sub createStatementsFile
 		my $fileName = $orgList{$orgKey}->{billingId} . '_' . $now . '.s01';
 		writeStatementsFile($statements, $fileName, $orgInternalId, $stamp);
 	}
-}
-
-sub recordStatement
-{
-	my ($statement, $orgInternalId, $stamp) = @_;
-
-	my @invoiceIds = ();
-	for (@{$statement->{invoices}})
-	{
-		push(@invoiceIds, $_->{invoiceId});
-	}
-
-	return $page->schemaAction(0, 'Statement', 'add',
-		cr_user_id => 'STATEMENTS_CRON',
-		cr_org_internal_id => $orgInternalId || undef,
-		payto_id => $statement->{payToId},
-		billto_id => $statement->{billToId},
-		billto_type => $statement->{billPartyType},
-		patient_id => $statement->{clientId},
-		statement_source => 2,
-		transmission_stamp => $stamp,
-		amount_due => $statement->{amountDue},
-		inv_ids => join(',', @invoiceIds),
-	);
 }
 
 sub writeStatementsFile
@@ -190,6 +156,38 @@ sub writeStatementsFile
 		my $dv = new Dumpvalue;
 		$dv->dumpValue($statements);
 	}
+}
+
+sub recordStatement
+{
+	my ($statement, $orgInternalId, $stamp) = @_;
+
+	if (my $planId = $statement->{paymentPlan})
+	{
+		$page->schemaAction(0, 'Payment_Plan', 'update',
+			plan_id => $planId,
+			laststmt_date => $TODAY,
+		);
+	}
+	
+	my @invoiceIds = ();
+	for (@{$statement->{invoices}})
+	{
+		push(@invoiceIds, $_->{invoiceId});
+	}
+
+	return $page->schemaAction(0, 'Statement', 'add',
+		cr_user_id => 'STATEMENTS_CRON',
+		cr_org_internal_id => $orgInternalId || undef,
+		payto_id => $statement->{payToId},
+		billto_id => $statement->{billToId},
+		billto_type => $statement->{billPartyType},
+		patient_id => $statement->{clientId},
+		statement_source => 2,
+		transmission_stamp => $stamp,
+		amount_due => $statement->{amountDue},
+		inv_ids => join(',', @invoiceIds),
+	);
 }
 
 sub writeRecord
@@ -337,131 +335,68 @@ sub getSendToAddress
 	return $billPartyType < 2 ? getPersonAddress($billToId) : getOrgAddress($billToId, 'Mailing');
 }
 
-sub populateStatementsHash
+
+sub transmitStatementFiles
 {
-	my ($claims, $orgInternalId) = @_;
-	my %statements = ();
-	my $billingEvents;
+	my $ftpCommands = qq{
+		ftp $EDIHOST << !!!
+	};
 
-	unless ($ENV{OVERRIDE_BILLING_CYCLE} eq 'YES')
-	{
-		# Get a list of billingEvents for this day of the month
-		my $mday = (localtime)[3];
-		$billingEvents = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
-			'sel_daysBillingEvents', $orgInternalId, $mday);
+	my @files = ();
 
-		# Nothing to do if there are no billing events for today
-		unless (@$billingEvents)
-		{
-			warn "ABORTING: No billing events found for this day of the month '$mday'\n";
-			return \%statements;
-		}
+	opendir(DIR, ".") || die "Can't opendir HOME/statements: $!\n";
+  for my $file (readdir(DIR))
+  {
+		next unless $file =~ /\.s01$/;
+		push(@files, $file);
+		my $pgpFile = $file . '.pgp';
+		$ftpCommands .= qq{put $pgpFile $file\n};
 	}
 
-	for (@{$claims})
+	unless (@files)
 	{
-		unless($_->{billing_facility_id})
-		{
-			print qq{Skipping Claim $_->{invoice_id}: Billing Facility ID '$_->{billing_facility_id}' is Invalid.\n};
-			next;
-		}
-		my $key = $_->{billing_facility_id} . '_' . $_->{bill_to_id} . '_' . $_->{client_id};
-
-		$statements{$key}->{billToId} = $_->{bill_to_id};
-		$statements{$key}->{payToId} = $_->{billing_facility_id};
-		$statements{$key}->{clientId} = $_->{client_id};
-
-		$statements{$key}->{billingProviderId} = $_->{provider_id};
-		$statements{$key}->{careProviderId} = $_->{care_provider_id};
-
-		$statements{$key}->{billPartyType} = $_->{bill_party_type};
-		$statements{$key}->{patientName} = $_->{patient_name};
-		$statements{$key}->{patientLastName} = $_->{patient_name_last};
-
-		my $totalCost = defined $_->{total_cost} ? $_->{total_cost} : 0;
-		my $balance = defined $_->{balance} ? $_->{balance} : 0;
-		my $patientReceipts = defined $_->{patient_receipts} ? $_->{patient_receipts} : 0;
-		my $insuranceReceipts = defined $_->{insurance_receipts} ? $_->{insurance_receipts} : 0;
-		my $totalAdjust = defined $_->{total_adjust} ? $_->{total_adjust} : 0;
-
-		my $invObject = new InvoiceObject(
-			invoiceId => $_->{invoice_id},
-			invoiceDate => $_->{invoice_date},
-			careProviderId => $_->{care_provider_id},
-			totalCost => $totalCost,
-			totalAdjust => $totalAdjust < 0 ? $totalAdjust * (-1) : $totalAdjust,
-			insuranceReceipts => $insuranceReceipts < 0 ? $insuranceReceipts * (-1) : $insuranceReceipts,
-			patientReceipts => $patientReceipts < 0 ? $patientReceipts * (-1) : $patientReceipts,
-			balance => $balance,
-		);
-
-		push(@{$statements{$key}->{invoices}}, $invObject);
+		print "No '.s01' file found to transmit -- " . `date`;
+		return;
 	}
 
-	my @keys = sort keys %statements;
+	$ftpCommands .= qq{dir
+		bye
+	!!!
+	};
 
-	for my $key (@keys)
-	{
-		unless (sendStatementToday($statements{$key}, $billingEvents, $orgInternalId))
-		{
-			# This statement doesn't get sent today
-			delete $statements{$key};
-			next;
-		}
-
-		my $clientId = $statements{$key}->{clientId};
-		my $billToId = $statements{$key}->{billToId};
-
-		$statements{$key}->{agingCurrent} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-			'sel_aging', $clientId, 30, 0, $billToId);
-
-		$statements{$key}->{aging30} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-			'sel_aging', $clientId, 60, 30, $billToId);
-
-		$statements{$key}->{aging60} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-			'sel_aging', $clientId, 90, 60, $billToId);
-
-		$statements{$key}->{aging90} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-			'sel_aging', $clientId, 120, 90, $billToId);
-
-		$statements{$key}->{aging120} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-			'sel_aging', $clientId, 10950, 120, $billToId);
-
-		$statements{$key}->{amountDue} = $statements{$key}->{agingCurrent} + $statements{$key}->{aging30} +
-			$statements{$key}->{aging60} + $statements{$key}->{aging90} + $statements{$key}->{aging120};
-	}
-
-	return \%statements;
+	system(qq{
+		cd $STATEMENTDIR
+		for f in *s01; do
+			\$HOME/bin/encrypt \$f
+		done
+		$ftpCommands
+	});
 }
 
-sub sendStatementToday
+sub archiveStatementFiles
 {
-	my ($stmt, $events, $orgInternalId) = @_;
-
-	return 1 if $ENV{OVERRIDE_BILLING_CYCLE} eq 'YES';
-
-	foreach my $event (@$events)
+	for my $orgKey (keys %orgList)
 	{
-		# Check org_internal_id of billing org
-		next unless $orgInternalId == $event->{parent_id};
+		my $stem = $orgList{$orgKey}->{billingId};
+		my $orgInternalId = $orgKey;
+		$orgInternalId =~ s/\..*//g;
 
-		# Check name
-		next if uc(substr($stmt->{patientLastName}, 0, 1)) lt $event->{name_begin};
-		next if uc(substr($stmt->{patientLastName}, 0, 1)) gt $event->{name_end};
+		system(qq{
+			cd $STATEMENTDIR
+			mkdir -p $STMT_OUTGOINGDIR/$orgInternalId
 
-		# Check balance
-		next if $event->{balance_condition} > 0 && $stmt->{amountDue} < $event->{balance_criteria};
-		next if $event->{balance_condition} < 0 && $stmt->{amountDue} > $event->{balance_criteria};
-		next if $event->{balance_condition} == 0 && $stmt->{amountDue} != $event->{balance_criteria};
-
-		# We have a winner
-		warn "Sending statement for billing org '$stmt->{payToId}' last name '$stmt->{patientLastName}' balance '\$$stmt->{amountDue}'\n";
-		return 1;
+			for f in $stem*s01; do
+				if [ -f \$f ]; then
+					mv \$f $STMT_OUTGOINGDIR/$orgInternalId
+				fi
+			done
+			for f in $stem*pgp; do
+				if [ -f \$f ]; then
+					rm -f \$f 
+				fi
+			done
+		});
 	}
-
-	# Bummer dude, no billing event matches this statement
-	warn "No billing event rule matched billing org '$stmt->{payToId}' last name '$stmt->{patientLastName}' balance '\$$stmt->{amountDue}'\n";
-	return 0;
 }
 
 sub addInvoiceHistory
@@ -470,7 +405,7 @@ sub addInvoiceHistory
 
 	return $page->schemaAction(0, 'Invoice_History', 'add',
 		parent_id => $invoiceId,
-		cr_user_id => 'EDI_PERSE',
+		cr_user_id => 'STATEMENTS_CRON',
 		value_text => $message,
 		value_textB => $fileName,
 		value_date => $TODAY,
