@@ -131,6 +131,7 @@ sub execute
 	
 	if ($command eq 'add')
 	{
+		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgId, $roleID, $permissionName);	# can have the same org id, role id, and permission name, but different permission, so must delete to prevent duplicates
 		$page->schemaAction('Role_Permission', 'add',
 			permission_name => $permissionName,
 			role_name_id => $roleID,
