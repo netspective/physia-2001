@@ -1,2 +1,28 @@
 Made responsible party and relationship to insured fields in Add Person mandatory
 Made the DOB as a required field and changed the options in Gender field for Person dialog
+
+B795 - Personal Insurance Coverage Sequence
+Updated the validation to be sure that person already has any prerequisite
+coverage sequences. I.E. Do they have Primary before adding Secondary?
+
+B8 - Added Chart Number and Account Number to the Person Search/Lookup
+
+B99 - Made Person Search/Lookups consistently sorted by last name, then 
+first.  The only exception is a search based on Person ID, in which
+case the results are sorted by the IDs.
+
+B859 - Updated the Misc Notes component to fix a bad link on the edit bullet
+
+B711 - The dialogs chosen from the Person page's CHOOSE ACTION list
+will now return the user to the page they started from when then 
+exit the dialog.
+
+B797 - Bad Link in "My Associated Resources In-Patients
+Fixed the incorrect link go to the appropriate transaction dialog/record
+
+B862 - Corrected misspellings
+
+B236 - Added in-line captions to the city, state, and zip parts of
+all address fields
+
+
