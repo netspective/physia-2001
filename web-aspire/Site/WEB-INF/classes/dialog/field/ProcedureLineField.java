@@ -8,8 +8,10 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class ProcedureLineField extends DialogField
-{
+public class ProcedureLineField extends DialogField {
+	protected TextField procedureLineField;
+	protected TextField procedureModifierField;
+
 	public ProcedureLineField()
 	{
 		super();
@@ -18,24 +20,29 @@ public class ProcedureLineField extends DialogField
 	public ProcedureLineField(String aName, String aCaption)
 	{
 		super(aName, aCaption);
+		createFields ();
 	}
+
+	public TextField getProcedureField() { return procedureLineField; }
+	public TextField getProcedureModifierField() { return procedureModifierField; }
 
 	public void importFromXml(Element elem)
 	{
 		super.importFromXml(elem);
+		createFields ();
 	}
 
-	public boolean isValid(DialogContext dc)
+	private void createFields ()
 	{
-		return super.isValid (dc);
-	}
+		procedureLineField = new TextField("procedure", "Procedure");
+		procedureLineField.setSize (8);
+		procedureLineField.setFlag (DialogField.FLDFLAG_REQUIRED);
 
-	public boolean needsValidation (DialogContext dc)
-	{
-		return true;
-	}
+		procedureModifierField = new TextField("procmodifier", "Modifier");
+		procedureModifierField.setSize(4);
 
-	private void createFields (String captionPrefix)
-	{
+		/* Add fields to the composite */
+		addChildField(procedureLineField);
+		addChildField(procedureModifierField);
 	}
 }

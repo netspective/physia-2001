@@ -8,8 +8,9 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class DiagnosesField extends DialogField
-{
+public class DiagnosesField extends DialogField {
+    protected TextField placeHolderField;
+
 	public DiagnosesField()
 	{
 		super();
@@ -18,24 +19,20 @@ public class DiagnosesField extends DialogField
 	public DiagnosesField(String aName, String aCaption)
 	{
 		super(aName, aCaption);
+		createFields (aName, aCaption);
 	}
 
 	public void importFromXml(Element elem)
 	{
 		super.importFromXml(elem);
+
+		createFields ("diagcodes", "Diagnoses Codes");
 	}
 
-	public boolean isValid(DialogContext dc)
+	private void createFields (String theName, String theCaption)
 	{
-		return super.isValid (dc);
-	}
-
-	public boolean needsValidation (DialogContext dc)
-	{
-		return true;
-	}
-
-	private void createFields (String captionPrefix)
-	{
+		placeHolderField = new TextField(theName, theCaption);
+		/* Add fields to the composite */
+		addChildField(placeHolderField);
 	}
 }
