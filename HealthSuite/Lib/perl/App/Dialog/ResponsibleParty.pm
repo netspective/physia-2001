@@ -26,7 +26,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'responsibleparty', heading => 'Responsible Party');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'guarantor', heading => 'Responsible Party');
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
 
@@ -34,7 +34,7 @@ sub new
 
 
 	$self->addContent(
-		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'resp_party_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'resp_party_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
 		new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
@@ -60,6 +60,26 @@ sub makeStateChanges
 	if($partyName && $command eq 'add')
 	{
 		$page->field('resp_party_id', $partyName);
+	}
+}
+
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+
+	my $personId = $page->param('person_id');
+	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
+	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
+	my $partyId = $personInfo->{'person_id'};
+	$page->field('resp_party_id', $partyId);
+
+
+
+	if($command eq 'remove')
+	{
+		$page->field('delete_record', 1);
 	}
 }
 
