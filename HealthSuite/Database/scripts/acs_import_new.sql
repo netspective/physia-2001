@@ -1,3 +1,116 @@
+/* create hds tables *
+
+drop table hds_bill;
+drop table hds_corporate;
+drop table hds_location;
+drop table hds_fees;
+drop table hds_service_description;
+
+
+create table hds_bill
+( bill_id number(16),
+  corp_id number(16),
+  provider_id varchar2(50),
+  bill_name varchar2(30),
+  bill_dated date,
+  bill_notes varchar2(50),
+  loc_id number(16),
+  bill_address varchar2(50),
+  bill_state varchar2(2),
+  bill_city varchar2(20),
+  bill_zip varchar2(15),
+  bill_num varchar2(20),
+  bill_phone varchar2(20),
+  bill_fax varchar2(20)
+);
+
+
+
+create table hds_corporate
+( corp_id number(16),
+  provider_id varchar2(50),
+  corp_name varchar2(56),
+  corp_address varchar2(50),
+  corp_city varchar2(40),
+  corp_state varchar2(2),
+  corp_zip varchar2(15),
+  corp_fax varchar2(20),
+  corp_e_mail varchar2(20),
+  corp_phone varchar2(20),
+  category_id varchar2(3),
+  category varchar2(20),
+  corp_tax_id varchar2(20),
+  corp_notes long
+);
+
+
+create table hds_location
+( loc_id number(16),
+  corp_id number(16),
+  provider_id varchar2(50),
+  loc_name varchar2(30),
+  loc_address varchar2(50),
+  loc_city varchar2(20),
+  loc_county varchar2(20),
+  loc_state varchar2(2),
+  loc_zip varchar2(15),
+  loc_fax varchar2(20),
+  loc_email varchar2(20),
+  loc_phone varchar2(20),
+  loc_notes long,
+  loc_tax_id varchar2(20),
+  category_id varchar2(3),
+  category varchar2(20)
+);
+
+
+create table hds_fees
+( fee_id number(16),
+  corp_id number(16),
+  provider_id varchar2(50),
+  fee_cpt varchar2(10),
+  fee number(10,2),
+  effective date,
+  term date,
+  date_date date,
+  loc_id number(16),
+  fee_comments varchar2(50)
+);
+
+
+create table hds_fees_excp
+( fee_id number(16),
+  corp_id number(16),
+  provider_id varchar2(50),
+  fee_cpt varchar2(10),
+  fee number(10,2),
+  effective date,
+  term date,
+  date_date date,
+  loc_id number(16),
+  fee_comments varchar2(50)
+);
+
+
+
+create table hds_service_description
+( services_id number(16),
+  service_code varchar2(5),
+  description varchar2(60)
+);
+
+
+create table hds_services_provided
+( ser_provided_id number(16),
+  corp_id number(16),
+  loc_id number(16),
+  services_id number(16)
+);
+
+
+
+
+
 /* Create oracle tables from access tables.
    Clean them - check if there are records with duplicate provider_id - saw them in bill table - 
 */
