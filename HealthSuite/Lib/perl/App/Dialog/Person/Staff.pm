@@ -30,7 +30,7 @@ sub initialize
 {
 	my $self = shift;
 
-	$self->heading('$Command Staff');
+	#$self->heading('$Command Staff');
 
 	$self->SUPER::initialize();
 	$self->addContent(
@@ -89,11 +89,11 @@ sub initialize
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);	
+	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);	
+	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
 	my $personId = $page->param('person_id');
 
 	if($command eq 'remove')
