@@ -56,7 +56,7 @@ sub getForm
 		<NOBR>
 		Find:
 		<select name="search_status" style="color: darkred">
-			<option value="all" selected>All</option>
+			<option value="all">All</option>
 			<option value="0">Created</option>
 			<!-- <option value="2">Pending</option> -->
 			<option value="3">On Hold</option>			
@@ -66,11 +66,12 @@ sub getForm
 			<option value="16">Voided</option>
 		</select>
 		<script>
-			setSelectedValue(document.search_form.search_status, '@{[ $self->param('search_status') || 0 ]}');
+			setSelectedValue(document.search_form.search_status, '@{[ $self->param('search_status') ]}');
 		</script>
 		<select name="search_type" style="color: darkred">
 			<option value="id">Claim #</option>
-			<option value="patientid" selected>Patient ID</option>
+			<option value="patientid">Patient ID</option>
+			<option value="lastname">Patient Last Name</option>
 			<option value="ssn">Patient SSN</option>
 			<option value="date">Date of Visit</option>
 			<option value="servicedate">Service Date</option>

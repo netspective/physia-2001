@@ -131,6 +131,20 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 			whereCond => 'i.client_id like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	'sel_lastname' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => 'i.client_id = person_id and name_last = ?',
+			tables => ', person',
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_lastname_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => 'i.client_id = person_id and name_last like ?',
+			tables => ', person',
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
 	'sel_ssn' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
@@ -234,6 +248,20 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
 			whereCond => 'i.invoice_status = ? and i.client_id like ?',
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_lastname_status' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => 'i.invoice_status = ? and i.client_id = person_id and name_last = ?',
+			tables => ', person',
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_lastname_status_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => 'i.invoice_status = ? and i.client_id = person_id and name_last like ?',
+			tables => ', person',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn_status' =>
