@@ -19,31 +19,32 @@ use Date::Manip;
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'product', heading => '$Command Insurance Product');
-	
+
 		#my $id = $self->{'id'}; 	# id = 'insur_pay' | 'personal_pay'
-	
+
 		my $schema = $self->{schema};
 		delete $self->{schema};  # make sure we don't store this!
-	
+
 		croak 'schema parameter required' unless $schema;
-	
-		$self->addContent(	
+
+		$self->addContent(
 				new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
-				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),					
-				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED),				
+				new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
+				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
+				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field::TableColumn(
 									caption => 'Product Type',
 									schema => $schema,
 									column => 'Insurance.ins_type',
 									typeGroup => ['insurance', 'workers compensation']),
-									
-				new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
-									
+
+				new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', findPopup => '/lookup/catalog/catalog_id'),
+
 				new App::Dialog::Field::Address(caption=>'Billing Address', name => 'billing_addr',
 									options => FLDFLAG_REQUIRED),
-									
+
 				new CGI::Dialog::MultiField(caption =>'Phone/Fax', name => 'phone_fax',
 					fields => [
 							new CGI::Dialog::Field(type=>'phone',
@@ -56,8 +57,8 @@ sub new
 									name => 'fax',
 									invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 				]),
-				
-				new CGI::Dialog::Subhead(heading => 'Remittance Information', name => 'remittance_heading'),	
+
+				new CGI::Dialog::Subhead(heading => 'Remittance Information', name => 'remittance_heading'),
 				new CGI::Dialog::Field::TableColumn(caption => 'Remittance Type',
 							name => 'remit_type',
 							schema => $schema,
@@ -81,7 +82,7 @@ sub new
 									['Add Insurance Plan', "/org/%param.org_id%/dlg-add-ins-plan?_f_product_name=%field.product_name%", 1],
 									['Add Another Insurance Product', "/org/%param.org_id%/dlg-add-ins-product"],
 									['Go to Org Profile', "/org/%param.org_id%/profile"],
-								],								
+								],
 									cancelUrl => $self->{cancelUrl} || undef
 							)
 						);
@@ -92,17 +93,17 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 
-	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);	
-	
-	
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+
 	my $insOrgId =  $page->field('org_id');
 	my $category = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selMemberNames', $insOrgId);
-	
+
 	foreach my $cat (@{$category})
-	{		
+	{
 		$cat->{'member_name'} eq 'Insurance' ? $page->field('ins_org_id', $insOrgId) : $page->field('ins_org_id', '');
 	}
-			
+
 }
 
 sub populateData
@@ -115,32 +116,44 @@ sub populateData
 		{
 			$page->addError("Ins Internal ID '$insIntId' not found.");
 		}
-	
-	 $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);	
+
+	 $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
 	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Contact Method/Telephone/Primary');
 	$page->field('phone_item_id', $insPhone->{'item_id'});
 	$page->field('phone', $insPhone->{'value_text'});
-	
+
 	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Contact Method/Fax/Primary');
 	$page->field('fax_item_id', $insFax->{'item_id'});
 	$page->field('fax', $insFax->{'value_text'});
 
-	
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Fee Schedule');
+	my @feeList = ();
+	my @feeItemList = ();
+	my $fee = '';
+	my $feeItem = '';
+	foreach my $feeSchedule (@{$feeSched})
+	{
+		push (@feeItemList, $feeSchedule->{'item_id'});
+		push(@feeList, $feeSchedule->{'value_text'});
+		$fee = join(', ', @feeList);
+		$feeItem = join(', ', @feeItemList);
+	}
+
+	$page->field('fee_schedules', $fee);
 }
 
 sub execute
 {
-	my ($self, $page, $command, $flags) = @_;	
-	
+	my ($self, $page, $command, $flags) = @_;
+
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $insType = $page->field('ins_type');
-	$page->addDebugStmt("INS TYPE: $insType");
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
 				ins_internal_id => $editInsIntId || undef,
 				product_name => $page->field('product_name') || undef,
 				record_type => App::Universal::RECORDTYPE_INSURANCEPRODUCT || undef,
-				fee_schedule => $page->param('fee_schedule') || undef,
+				#fee_schedule => $page->param('fee_schedule') || undef,
 				owner_org_id => $page->param('org_id') || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
 				ins_type => $page->field('ins_type') || undef,
@@ -148,10 +161,10 @@ sub execute
 				remit_payer_id => $page->field('remit_payer_id') || undef,
 				remit_payer_name => $page->field('remit_payer_name') || undef,
 				_debug => 0
-			);	
-			
+			);
+
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
-		
+
 	$self->handleAttributes($page, $command, $flags, $insIntId);
 }
 
@@ -174,7 +187,7 @@ sub handleAttributes
 
 	my $textAttrType = App::Universal::ATTRTYPE_TEXT;
 	my $phoneAttrType = App::Universal::ATTRTYPE_PHONE;
-	my $faxAttrType = App::Universal::ATTRTYPE_FAX;	
+	my $faxAttrType = App::Universal::ATTRTYPE_FAX;
 
 	$page->schemaAction(
 			'Insurance_Attribute', $command,
@@ -195,7 +208,25 @@ sub handleAttributes
 			value_text => $page->field('fax') || undef,
 			_debug => 0
 		);
-		
+
+
+	my @feeSched =split(',', $page->field('fee_schedules'));
+
+	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule', $insIntId);
+
+	foreach my $fee (@feeSched)
+	{
+		$page->schemaAction(
+			'Insurance_Attribute', 'add',
+			item_id => $page->field('fee_item_id') || undef,
+			parent_id => $insIntId || undef,
+			item_name => 'Fee Schedule' || undef,
+			value_text => $fee || undef,
+			value_type => 0,
+			_debug => 0
+		);
+	}
+
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }

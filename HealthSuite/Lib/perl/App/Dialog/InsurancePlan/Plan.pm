@@ -186,6 +186,21 @@ sub populateData_add
 	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Contact Method/Fax/Primary');
 	$page->field('fax_item_id', $insFax->{item_id});
 	$page->field('fax', $insFax->{value_text});
+
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Fee Schedule');
+		my @feeList = ();
+		my @feeItemList = ();
+		my $fee = '';
+		my $feeItem = '';
+		foreach my $feeSchedule (@{$feeSched})
+		{
+			push (@feeItemList, $feeSchedule->{'item_id'});
+			push(@feeList, $feeSchedule->{'value_text'});
+			$fee = join(', ', @feeList);
+			$feeItem = join(', ', @feeItemList);
+		}
+
+	$page->field('fee_schedules', $fee);
 }
 
 sub populateData_update
@@ -211,7 +226,20 @@ sub populateData_update
 	$page->field('fax_item_id', $insFax->{item_id});
 	$page->field('fax', $insFax->{value_text});
 
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insIntId, 'Fee Schedule');
+		my @feeList = ();
+		my @feeItemList = ();
+		my $fee = '';
+		my $feeItem = '';
+		foreach my $feeSchedule (@{$feeSched})
+		{
+			push (@feeItemList, $feeSchedule->{'item_id'});
+			push(@feeList, $feeSchedule->{'value_text'});
+			$fee = join(', ', @feeList);
+			$feeItem = join(', ', @feeItemList);
+		}
 
+	$page->field('fee_schedules', $fee);
 }
 
 sub populateData_remove
@@ -241,7 +269,7 @@ sub execute
 				owner_org_id => $page->param('org_id') || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
 				ins_type => defined $insType ? $insType : undef,
-				fee_schedule => $page->field('fee_schedule') || undef,
+				#fee_schedule => $page->field('fee_schedule') || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,
 				coverage_end_date => $page->field('coverage_end_date') || undef,
 				copay_amt => $page->field('copay_amt') || undef,
@@ -300,6 +328,23 @@ sub handleAttributes
 			value_text => $page->field('fax') || undef,
 			_debug => 0
 		);
+
+	my @feeSched =split(',', $page->field('fee_schedules'));
+
+	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule', $insIntId);
+
+	foreach my $fee (@feeSched)
+	{
+		$page->schemaAction(
+			'Insurance_Attribute', 'add',
+			item_id => $page->field('fee_item_id') || undef,
+			parent_id => $insIntId || undef,
+			item_name => 'Fee Schedule' || undef,
+			value_text => $fee || undef,
+			value_type => 0,
+			_debug => 0
+		);
+	}
 
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
