@@ -10,7 +10,7 @@ class 'App::DataModel::Base' =>
 {
 	id =>{type=>'$',post=>q{$id = uc($id);}},
 	sourceId=> '$',
-	loadIndicator=>'$', #S = skip, D = delete , I = Insert , U = update 
+	loadIndicator=>{type=>'$',default =>"'I'",}, #S = skip, D = delete , I = Insert , U = update 
 	'&equalSourceId'=>q{return 0 unless  ($_[0] && $sourceId);  ($_[0] eq $sourceId) ? return 1 : return 0;},
 };
 
@@ -101,7 +101,15 @@ subclass 'App::DataModel::Entities'=>
 					$position++;
 				}
 				return undef; 
-			       },			       
+			       },	
+	'&objExists'	=>q{
+				foreach  my $entity (&all)
+				{
+					return $entity if $entity eq $_[0];
+				}
+				return undef;					
+			},
+			
 			
 }, -parent => 'App::DataModel::Base';	
 	
@@ -115,9 +123,17 @@ subclass 'App::DataModel::People' =>
 	'&add_personnel' =>q{
 				my $person=$_[0];
 				my $org =$_[1];
-				&add_all($person);	
+				&add_all($person); 
 				$org->add_personnel($person) if $org;					
 			    },
+	'&add_category' =>q{
+				my $person=$_[0];
+				my $org =$_[1];
+				$org->add_personnel($person) if $org;						
+				},
+	'&personExists' =>q{	
+				
+				},
 }, -parent => 'App::DataModel::Entities';
 
 
