@@ -39,15 +39,15 @@ sub initialize
 	{
 		my $next=$loop+1;
 		push(@request,new CGI::Dialog::Field::Duration(caption=>'Date From/To',name=>"date_proc$loop"));
-		push(@request,new CGI::Dialog::MultiField(caption=>'Code/Modf/Descrption',name=>"code_mod_desc$loop",
+		push(@request,new CGI::Dialog::MultiField(caption=>'Code/Modf',name=>"code_mod_desc$loop",
 					fields=>[
 						new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9,name=>"code$loop",findPopup => '/lookup/cpt',
 							#onChangeJS=>"setRequestStyle($next,'block');"
 							),
-						new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf$loop"),					
-						new CGI::Dialog::Field(caption=>'Description', type=>'text',size=>30,name=>"description$loop"),										
+						new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf$loop"),																			
 						],
 						));
+		push(@request,new CGI::Dialog::Field(caption=>'Description', type=>'memo',name=>"description$loop",rows=>2,cols=>45));							
 		push(@request,new CGI::Dialog::MultiField(caption=>'Units/Charge',name=>"unit_charge$loop",
 					fields=>[
 						new CGI::Dialog::Field(caption=>'Units',type=>'integer',size=>5,name=>"unit$loop"),
@@ -56,7 +56,7 @@ sub initialize
 						));
 		push(@request,new CGI::Dialog::Field(name=>"comment$loop", caption=>'Comments',type=>'text',size=>55,
 				postHtml=>qq{<A HREF = javascript:setRequestStyle($next,'block');>$IMAGETAGS{'icons/arrow-down-blue'}</A>
-						}
+						<BR> </BR>}
 				)
 				
 				);			
@@ -144,14 +144,14 @@ sub initialize
 							['View Summary', "/org/%param.org_id%/profile"],
 							['Go to Service Request Work List', "/worklist/referral"],
 							['Go to Referral Work List', "/worklist/referral/?user=physician",1],
-							#['Go to Referral Form', "/org/%session.org_id%/dlg-add-trans-6010/%field.parent_referral_id%", 1],
+							['Go to Referral Form', "/org/%session.org_id%/dlg-update-trans-6010/%param.refer_id%", 1],
 							['Go to Menu', "/worklist/menu"],
 							],
 						nextActions_update => [
 							['View Summary', "/person/%param.person_id%/profile"],
 							['Go to Service Request Work List', "/worklist/referral", 1],
 							['Go to Referral Work List', "/worklist/referral/?user=physician"],
-							#['Go to Referral Form', "/org/%session.org_id%/dlg-add-trans-6010/%param.trans_id%"],
+							['Go to Referral Form', "/person/%field.person_id%/dlg-update-trans-6010/%param.refer_id%"],
 							['Go to Menu', "/worklist/menu"],
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
@@ -198,7 +198,8 @@ sub initialize
 			setIdDisplay("code_mod_desc"+line,styleValue);
 			setIdDisplay("date_proc"+line,styleValue);
 			setIdDisplay("unit_charge"+line,styleValue);		
-			setIdDisplay("comment"+line,styleValue);							
+			setIdDisplay("comment"+line,styleValue);	
+			setIdDisplay("description"+line,styleValue);
 		}
 		</script>
 	});
@@ -560,6 +561,7 @@ sub execute
 
 
 	my $transProcedure = App::Universal::TRANSTYPEPROC_SERVICE_REQUEST_PROCEDURE;
+	my $first=0;
 	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
 		my $code = $page->field("code$loop");
@@ -609,7 +611,7 @@ sub execute
 		#Populate the Procedure Information
 		#Create Referral for each service request line Copy information from request to referral
 		my $transTypeRef = App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION;
-		$page->schemaAction
+		my $referId = $page->schemaAction
 		(
 			'Transaction' , $transRef->{trans_id} ? 'update' : 'add',
 			parent_trans_id => $transRequestId ||$transService  ,
@@ -626,7 +628,8 @@ sub execute
 			initiator_id           => $page->session('org_id'),
 			data_text_a=>$parentTransId,
 		);
-		
+		$page->param('refer_id',$transRef->{trans_id} || $referId) unless $first;
+		$first++;
 	}	
 
 	if ($command eq 'update')
