@@ -168,6 +168,8 @@ package App::Dialog::Field::OrgType;
 use strict;
 use CGI::Dialog;
 use CGI::Validator::Field;
+use DBI::StatementManager;
+use App::Statements::Org;
 
 use vars qw(@ISA);
 
@@ -177,6 +179,8 @@ sub new
 {
 	my ($type, %params) = @_;
 
+	$params{types} = "'CLINIC', 'FACILITY/SITE'" unless $params{types};
+
 	return CGI::Dialog::Field::new(
 				$type,
 				type => 'foreignKey',
@@ -184,7 +188,7 @@ sub new
 				fKeySelCols => "distinct o.org_id, o.name_primary",
 				fKeyDisplayCol => 1,
 				fKeyValueCol => 0,
-				fKeyWhere => "o.org_id=oset.parent_id and ltrim(rtrim(UPPER(oset.MEMBER_NAME))) in ('FACILITY','FACILITY/SITE','CLINIC')",
+				fKeyWhere => "o.org_id=oset.parent_id and ltrim(rtrim(UPPER(oset.MEMBER_NAME))) in ($params{types})",
 				options => FLDFLAG_REQUIRED,
 				%params);
 }
