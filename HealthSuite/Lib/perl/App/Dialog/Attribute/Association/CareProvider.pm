@@ -72,7 +72,7 @@ sub customValidate
 	my $physicianId = $page->field('value_text');
 	my $personId = $page->param('person_id');
 	my $specialty = $page->field('value_textb');
-	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPhysicainSpecialty', $personId, $physicianId, $specialty);
+	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPhysicianSpecialty', $personId, $physicianId, $specialty);
 	if (($sequenceExists->{'value_textb'} eq $specialty) && ($itemId ne $sequenceExists->{'item_id'}))
 	{
 		$sName->invalidate($page, "This $sName->{caption} already exists for the Physician '$physicianId'");
