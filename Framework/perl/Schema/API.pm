@@ -247,7 +247,8 @@ sub Table::insertRec
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
-	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
+	my $ret_value = $autoIncPriKeyValue ? $autoIncPriKeyValue : 1;
+	return $ret_value unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
 	{
