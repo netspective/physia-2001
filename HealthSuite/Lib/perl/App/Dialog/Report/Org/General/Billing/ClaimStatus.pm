@@ -286,7 +286,7 @@ sub prepare_detail_status
 
 	my $sqlStmt = $self->buildSqlStmt($page);
 
-	my $publishDefn = {
+	my $pub = {
 		columnDefn =>
 		[
 			{head => 'Bill To',groupBy=>'#2#' ,sAlign=>'left',colIdx => 2, dAlign => 'left',hAlign=>'left'},
@@ -294,18 +294,12 @@ sub prepare_detail_status
 				url => q{javascript:chooseItemForParent('/invoice/#7#/summary') },
 				hint => 'View Invoice Summary',
 			},
-			#{head => 'Inquiry', colIdx => 7, dAlign => 'center',
-			#	dataFmt => q{<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0>},
-				#url => q{javascript:chooseItemForParent('/invoice/#7#/dlg-add-claim-inquiry') },
-				#hint => 'Add Inquiry Notes for Claim #7#',
-			#},
 			{head => 'Patient ID', colIdx => 8, dAlign => 'center',
 				url => q{javascript:chooseItemForParent('/person/#8#/account')},
 				hint => 'View #8# Account',
 			},
 			{head => 'Invoice Date', colIdx => 0,},
 			{head => 'Submit Date', colIdx => 1,},
-			#{head => 'Bill To', ,colIdx => 2, dAlign => 'center'},
 			{head => 'Insurance Product', colIdx => 3, dAlign => 'center'},
 			{head => 'Insurance Plan', colIdx => 4, dAlign => 'center'},
 			{head => 'Total Charge', colIdx => 5, 
@@ -313,17 +307,48 @@ sub prepare_detail_status
 				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
 			},
 			{head => 'Total Adjust', colIdx => 6, 
-				dformat => 'currency', tAlign => 'RIGHT', summarize=>'sum',
-				#tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+				dformat => 'currency', tAlign => 'RIGHT', summarize=>'sum', 
 			},
 			{head =>'Contact Number' , colIdx =>9},
+			{head =>'Notes' , colIdx =>10},			
 		],
 	};
 	
-	$page->addContent('<b style="font-family:Helvetica; font-size:12pt">('. $page->param('status_caption') . ' Claims) </b><br><br>',
-		@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, #| STMTMGRFLAG_DEBUG,
-		$sqlStmt,	[$page->session('org_internal_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
-	);
+	my @data = ();
+	my $claimStatus = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt,$page->session('org_internal_id'), $startDate, $endDate);
+	foreach (@$claimStatus)
+	{
+		my $sqlStmtNote = qq{select value_text from invoice_attribute where item_name ='Invoice/History/Item' and cr_user_id = 'EDI_PERSE' AND
+					parent_id = $_->{invoice_id} and rownum < 6 order by item_id asc};
+		my $getEDINotes = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmtNote);
+		my $notes='';
+		foreach my $value (@$getEDINotes)
+		{
+			$notes .= "<b>Note :</b> $value->{value_text} </br>";
+		}	
+		my @rowData = (
+		$_->{invoice_date},		
+		$_->{submit_date},
+		$_->{bill_to_id},
+		$_->{insurance_product},
+		$_->{insurance_plan},
+		$_->{total_charge},
+		$_->{total_adjust},
+		$_->{invoice_id},
+		$_->{client_id},
+		$_->{phone_number},
+		$notes);
+		push(@data, \@rowData);
+	};
+	
+	my $caption =$page->param('status_caption');
+	my $html =qq{<b style="font-family:Helvetica; font-size:12pt">('$caption' Claims) </b><br><br>};
+	$html .= createHtmlFromData($page, 0, \@data,$pub);		
+	#$page->addContent('<b style="font-family:Helvetica; font-size:12pt">('. $page->param('status_caption') . ' Claims) </b><br><br>',
+	#	@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, #| STMTMGRFLAG_DEBUG,
+	#	$sqlStmt,	[$page->session('org_internal_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+	#);
+	$page->addContent($html);
 }
 
 

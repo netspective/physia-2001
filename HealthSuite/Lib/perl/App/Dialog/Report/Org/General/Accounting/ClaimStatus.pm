@@ -29,16 +29,36 @@ sub new
 				end_caption => 'Report End Date',
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
-				),				
+				),			
+			new CGI::Dialog::Field(type => 'select',
+							defaultValue=>'0', 
+							selOptions=>"Selected:0;All:1", 
+							name => 'product_select', 
+							caption => 'Claim Selection',
+							hints=>"Select 'All' to search all claim statuses",
+							onChangeJS => qq{showFieldsOnValues(event, [0], ['claim_status']);},
+							),					
 			new CGI::Dialog::Field(name => 'claim_status',
 				caption => 'Claim Status',
+				style => 'multidual',
+				type => 'select',
+				caption => '',
+				multiDualCaptionLeft => 'Claim Status',
+				multiDualCaptionRight => 'Selected Status',
+				width => '200',
+				size => '8',				
 				fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,									
 				fKeyStmt => 'sel_claim_status_used',
 				fKeyDisplayCol => 0,
 				fKeyValueCol => 1,
-				style => 'multicheck',	
+				#style => 'multicheck',	
 				defaultValue => 0
 				),
+			new App::Dialog::Field::OrgType(
+							caption => 'Service Facility',
+							name => 'service_facility_id',
+							options => FLDFLAG_PREPENDBLANK,
+							types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),				
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -53,6 +73,7 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('report_begin_date', $startDate);
 	$page->field('report_end_date', $startDate);
+	$page->field('product_select',0);
 }
 
 sub customValidate
@@ -60,7 +81,7 @@ sub customValidate
 	my ($self, $page) = @_;
 	my $status = join(',',  $page->field('claim_status'));
 	my $statusField = $self->getField('claim_status');
-	$statusField->invalidate($page, "Claim status not selected.  To view all claim status select 'All Claims'.") if $status eq ''; 
+	$statusField->invalidate($page, "Claim status not selected.  To view all claim status select 'All Claims'.") if $status eq '' && !$page->field('product_select'); 
 }
 
 sub buildSqlStmt
@@ -71,12 +92,15 @@ sub buildSqlStmt
 	my $reportEndDate = $page->field('report_end_date');
 	my $status = join(',',  $page->field('claim_status'));		
 	my $orgId = $page->session('org_internal_id');
+	my $serviceId = $page->field('service_facility_id');
 	my $statusClause='';	
-	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) ;		   
-	my $dateClause ;
+	my $serviceClause='';
+	my $dateClause ;	
+	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && $status;		   
 	$dateClause =qq{ and  trunc(i.invoice_date) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
+	$serviceClause =qq{ and t.service_facility_id = $serviceId} if $serviceId;
 	my $orderBy = qq{order by i.invoice_date desc , i.invoice_id asc };
 
 	my $whereClause = qq{where $statusClause
@@ -90,6 +114,7 @@ sub buildSqlStmt
 					and 	ib.BILL_SEQUENCE = 1 
 					and     ib.invoice_item_id is NULL
 					$dateClause
+					$serviceClause
 				   };			   
 	my $columns = qq{i.invoice_id,
 			i.total_items, i.client_id,
@@ -181,14 +206,23 @@ sub execute
 			tDataFmt => '&{sum_currency:&{?}}', tAlign => 'RIGHT'},
 			#{ colIdx => 9, head => 'Reference', dAlign => 'center',dataFmt => '#9#' },
 			{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },			
+			{ colIdx => 12, head => 'Notes',},			
 		],
 	};
 		
-	my $sqlStmt = $self->buildSqlStmt($page, $flags);			
+	my $sqlStmt = $self->buildSqlStmt($page, $flags);	
 	my $claimStatus = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
 	my @data = ();	
 	foreach (@$claimStatus)
 	{
+		my $sqlStmtNote = qq{select value_text from invoice_attribute where item_name ='Invoice/History/Item' and cr_user_id = 'EDI_PERSE' AND
+					parent_id = $_->{invoice_id} and rownum < 6 order by item_id asc};
+		my $getEDINotes = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmtNote);
+		my $notes='';
+		foreach my $value (@$getEDINotes)
+		{
+			$notes .= "<b>Note :</b> $value->{value_text} </br>";
+		}
 		my @rowData = (
 		$_->{invoice_id},		
 		$_->{total_items}||'0',
@@ -201,7 +235,8 @@ sub execute
 		$_->{balance},
 		$_->{reference},
 		$_->{caption},
-		$_->{cap});
+		$_->{cap},
+		$notes);
 		push(@data, \@rowData);
 	};
 	
