@@ -443,38 +443,51 @@ sub populateData
 			setPayerFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
 		}
 	}
-	getOrgPersonFFS($self,$page);
 	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
 }
 
-#Gets the FS for all Orgs and Providers That could be assoicated with this claim
-#This information is used by Procedure.pm so the correct Lookup FS will appear
-sub getOrgPersonFFS
+sub getFS
 {
-	my ($self,$page) = @_;
-	my @fsProv=();
-	my @fsOrg=();	
-	my $provider = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPersonServiceFFSByInternalId', 
-				$page->session('org_internal_id'));
-
-	foreach my $prov (@{$provider})
+	my ($self,$page,@planIds) = @_;
+	my $product_id;
+	my $plan_id;
+	my $fsList=undef;
+	foreach my $id (@planIds)
 	{
-		push(@fsProv,$prov->{value_int});
-	}	
-	my $org = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selOrgServiceFFSByInternalId',$page->session('org_internal_id'));
-
-	foreach my $prov (@{$org})
-	{
-		push(@fsOrg,$prov->{value_int});
-
-	}
-	my $org_list = join ',',@fsOrg;
-	my $prov_list = join',',@fsProv;
-	$page->field('org_ffs',$org_list);
-	$page->field('prov_ffs',$prov_list);
+		#
+		#Get Parent Id for Plan
+		my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $id);
+		
+		#Get Parent record for coverage could be a plan or a product
+		my $coverage_id = $insurance->{'parent_ins_id'};
+		my $coverage_parent = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_id);
+		
+		#If record type is product then a plan does not exist
+		if ($coverage_parent->{'record_type'} eq App::Universal::RECORDTYPE_INSURANCEPRODUCT)
+		{
+			$product_id = $coverage_parent->{'ins_internal_id'};
+			$plan_id=undef;
+		}		
+		#Otherwise get the product info
+		else
+		{
 	
+			$plan_id = $coverage_parent->{'ins_internal_id'};
+			#Get Parent of Plan which will be the product
+			my $product_info =$STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_parent->{'parent_ins_id'});
+			$product_id = $product_info->{'ins_internal_id'};		
+		}		
+		
+		#Get Fee Schedule Internal ID for the Insurance
+		my $getFeeScheds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selFSLinkedProductPlan', $plan_id,$product_id);			
+		foreach my $fs (@{$getFeeScheds})
+		{			
+			$fsList .= $fsList ? ",$fs->{'internal_catalog_id'}" : $fs->{'internal_catalog_id'} ;	
+		}
+	}
+	#Store FS internal id(s)
+	$page->field('ins_ffs',$fsList);
 }
-
 
 sub setPayerFields
 {
@@ -486,11 +499,8 @@ sub setPayerFields
 	my @insurPlans = ();
 	my @wkCompPlans = ();
 	my @thirdParties = ();
+	my @planIds  = ();
 	my $insurance;
-	my $getFeeSchedsForInsur;
-	my $workFees;
-	my $insFees;
-	my @insFFS = ();
 	my $ins_type;
 	foreach my $ins (@{$payers})
 	{
@@ -502,6 +512,9 @@ sub setPayerFields
 			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
 			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);					
 			$ins_type="$ins->{bill_seq}";
+			
+			#Added to store plan internal Ids for getFS
+			push(@planIds,$insurance->{'ins_internal_id'});
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
@@ -512,6 +525,9 @@ sub setPayerFields
 			'selInsuranceByPlanNameAndPersonAndInsType', $ins->{plan_name}, $personId,
 			App::Universal::CLAIMTYPE_WORKERSCOMP);
 			$ins_type="Work Comp";
+			
+			#Added to store plan internal Ids for getFS
+			push(@planIds,$insurance->{'ins_internal_id'});			
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
@@ -523,28 +539,11 @@ sub setPayerFields
 				$thirdPartyId = $org->{org_id};
 			}
 			push(@thirdParties, "$ins->{group_name}($thirdPartyId)");
-		}
-		
-		#
-		#Determine Numeric value of fee schedule
-		$getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule') if $insurance;
-		
-		@insFFS = ();
-		foreach my $fs (@{$getFeeSchedsForInsur})
-		{
-			push(@insFFS, $fs->{value_text});
-		}
-		if ($ins_type eq 'Primary')
-		{
-			$insFees .=   join ",",@insFFS ;
-		}
-		elsif ($ins_type eq 'Work Comp')
-		{
-			$workFees .=  join ",",@insFFS ;
-		}
+		}		
 	}
 
+	#get Fee Schedules for Insurance and Work Comps Plan
+	getFS($self,$page,@planIds);
 	my @payerList = ();
 
 	my $insurances = join(' / ', @insurPlans) if @insurPlans;
@@ -571,8 +570,6 @@ sub setPayerFields
 
 	my $payer = $page->field('payer');
 	$page->field('payer', $payer);
-	$page->field('work_ffs',$workFees);
-	$page->field('ins_ffs',$insFees);
 
 	my $patientId = $page->field('attendee_id');
 	$page->field('old_person_id', $patientId);
