@@ -741,6 +741,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		 	product_name = ?
 		 	AND ins_org_id = ?
 		 	AND record_type IN (2, 3)
+		 	AND owner_org_id = ?
 	},
 	'selUpdateCoverage' => qq{
 		 UPDATE insurance
@@ -748,8 +749,10 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		 	ins_org_id = ?,
 		 	product_name = ?,
 		 	plan_name = ?,
-		 	owner_org_id = ?
+		 	remit_type = ?
 		 WHERE parent_ins_id = ?
+		 AND record_type = @{[App::Universal::RECORDTYPE_PERSONALCOVERAGE]}
+		 AND owner_org_id = ?
 	},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {
