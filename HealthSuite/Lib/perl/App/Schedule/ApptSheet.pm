@@ -285,6 +285,9 @@ sub getTemplateData
 				@months = "All";
 			}
 
+			$t->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+				'selId', $t->{facility_id});
+
 			my $templateTitle = "Template $t->{template_id} -- $t->{caption}\n";
 			$templateTitle .= "Facility ID: $t->{facility_id} \n";
 			$templateTitle .= "Days of Week: @{[ join(', ', @daysOfWeek) ]} \n";
@@ -384,10 +387,9 @@ sub buildHeader
 								<option value='/search/appointment/$resource_id/$org_id/2/$dashDate/$dashDate'>Block Cancel</option>
 								<option value='/search/appointment/$resource_id/$org_id/3/$dashDate/$dashDate'>Block Reschedule</option>
 								<option value='/schedule/dlg-add-appointment//$resource_id/$facility_id/'>Add Appointment</option>
-								<option value='#'>*Verify Insurance</option>
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
 								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Add Template</option>
-								<option value='/search/template/$resource_id,$facility_id/1'>View Templates</option>
+								<option value='/search/template//$resource_id/$org_id'>View Templates</option>
 								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate'>Print Schedule</option>
 								$customizeOption
 							</select>

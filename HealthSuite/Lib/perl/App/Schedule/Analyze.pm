@@ -309,7 +309,12 @@ sub findTemplateSlots
 				$$posDaysSetRef->insert($day);
 				push(@pTemplates, $templ);
 				$slot->{attributes}->{templates} = \@pTemplates;
-				$slot->{attributes}->{facility_id} = $templ->{facility_id};
+
+				# $slot->{attributes}->{facility_id} = $templ->{facility_id};
+
+				$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+					'selId', $templ->{facility_id});
+
 				$slot->{attributes}->{resource_id} = $templ->{resource_id};
 				push (@$posSlotsRef, $slot);
 
@@ -320,7 +325,12 @@ sub findTemplateSlots
 				$$negDaysSetRef->insert($day);
 				push(@nTemplates, $templ);
 				$slot->{attributes}->{templates} = \@nTemplates;
-				$slot->{attributes}->{facility_id} = $templ->{facility_id};
+
+				# $slot->{attributes}->{facility_id} = $templ->{facility_id};
+		
+				$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+					'selId', $templ->{facility_id});
+
 				$slot->{attributes}->{resource_id} = $templ->{resource_id};
 				push (@$negSlotsRef, $slot);
 

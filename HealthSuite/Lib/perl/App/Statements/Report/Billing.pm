@@ -32,7 +32,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Payer', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=payer&payer=#&{?}#")', hint => 'View Details' },
+					{head => 'Payer', url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=payer&payer=#&{?}#')}, hint => 'View Details' },
 					{head => 'Count', dAlign => 'right'},
 				],
 		},
@@ -40,7 +40,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 
 	'sel_detail_payers' => {
 		_stmtFmt => qq{
-			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id, bill_to_id,
+			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id,
 				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
 			from Claim_Type, Transaction_Status, Transaction, Invoice
 			where Invoice.owner_id = ?
@@ -59,11 +59,10 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 					{colIdx => 1, head => 'Invoice'},
 					{colIdx => 2, head => 'Date'},
 					{colIdx => 3, head => 'Patient'},
-					{colIdx => 4, head => 'Bill to'},
-					{colIdx => 5, head => 'Provider'},
-					{colIdx => 6, head => 'Status'},
-					{colIdx => 7, head => 'Total cost', dformat => 'currency', dAlign => 'right'},
-					{colIdx => 8, head => 'Total adjust', dformat => 'currency', dAlign => 'right'},
+					{colIdx => 4, head => 'Provider'},
+					{colIdx => 5, head => 'Status'},
+					{colIdx => 6, head => 'Total cost', dformat => 'currency', dAlign => 'right'},
+					{colIdx => 7, head => 'Total adjust', dformat => 'currency', dAlign => 'right'},
 				],
 		},
 	},
@@ -83,7 +82,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Insurance', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=insurance&insurance=#&{?}#")', hint => 'View Details' },
+					{head => 'Insurance', url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&insurance=#&{?}#')}, hint => 'View Details' },
 					{head => 'Count', dAlign => 'right'},
 				],
 		},
@@ -167,7 +166,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Procedure', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=cpt&code=#&{?}#")', hint => 'View Details' },
+					{head => 'Procedure', url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=cpt&code=#&{?}#')}, hint => 'View Details' },
 					{head => 'Count', dAlign => 'right'},
 				],
 		},
@@ -214,7 +213,7 @@ $PUBLISH_DEFN =
 {
 	columnDefn =>
 	[
-		{head => 'Link',  dataFmt => '#0#',  url => 'javascript:doActionPopup("/reportDetails/#&{?}#")', hint => 'View Details' },
+		{head => 'Link',  dataFmt => '#0#',  url => q{javascript:doActionPopup('/reportDetails/#&{?}#')}, hint => 'View Details' },
 		{head => 'Count', dataFmt => '#1#', dAlign => 'right'},
 	],
 };

@@ -46,6 +46,7 @@ sub new
 			name => 'person_id',
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, 
 			options => FLDFLAG_REQUIRED,
+			hints => '',
 			postHtml => qq{&nbsp; <a href="javascript:doActionPopup('/lookup/person');">Lookup Persons</a>},
 		),
 		new App::Dialog::Field::Person::Name(),
