@@ -82,7 +82,7 @@ sub prepare_page_content_header
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			['Profile', "$urlPrefix/profile", 'profile'],
+			['Summary', "$urlPrefix/profile", 'profile'],
 			['Chart', "$urlPrefix/chart", 'chart'],
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
@@ -128,7 +128,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-claim">Create Claim</OPTION>
-						<OPTION value="/person/$personId/dlg-update-$category">Edit Registry</OPTION>
+						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
 						<OPTION value="/person/$personId/dialog/postpayment/personal">Apply Payment</OPTION>
@@ -155,7 +155,7 @@ sub prepare_page_content_header_home
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			['Profile', "$urlPrefix/profile", 'profile'],
+			['Summary', "$urlPrefix/profile", 'profile'],
 			['Chart', "$urlPrefix/chart", 'chart'],
 			['Account', "$urlPrefix/account", 'account'],
 			['Session', "$urlPrefix/session", 'session'],
@@ -359,7 +359,7 @@ sub prepare_view_profile
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Profile', 'profile']);
+	$self->addLocatorLinks(['Summary', 'profile']);
 	my $personId = $self->param('person_id');
 	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id'));
 	my $category = $personCategories->[0];
