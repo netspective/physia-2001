@@ -18,10 +18,10 @@ sub prepare_view_alerts
 {
 	my ($self) = @_;
 	my $patientId = $self->param('person_id');
-	
-	my $html = $STMTMGR_COMPONENT_SCHEDULING->createHtml($self, STMTMGRFLAG_NONE, 
+
+	my $html = $STMTMGR_COMPONENT_SCHEDULING->createHtml($self, STMTMGRFLAG_NONE,
 		'sel_detail_alerts',	[$self->session('GMT_DAYOFFSET'), $patientId],);
-		
+
 	my $patient = $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonData',
 		$patientId);
 
@@ -29,7 +29,7 @@ sub prepare_view_alerts
 		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 width=100%>
 			<TR>
 				<TD>
-					<b style="color:darkgreen">@{[$patient->{complete_name}]} - ($patientId)</b>
+					<b style="color:darkgreen">@{[$patient->{simple_name}]} - ($patientId)</b>
 				</TD>
 				<TD align=right>
 					<a href='javascript:window.close()'><img src='/resources/icons/done.gif' border=0></a>
@@ -37,7 +37,7 @@ sub prepare_view_alerts
 			</TR>
 			<TR>
 				<TD>
-					$html				
+					$html
 				</TD>
 			</TR>
 		</TABLE>
