@@ -5,6 +5,7 @@ package App::Dialog::Transaction::PhoneMessage;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Transaction;
+use App::Statements::Device;
 use App::Universal;
 use strict;
 use Carp;
@@ -12,6 +13,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
+use App::Device;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
@@ -48,7 +50,14 @@ sub new
 				hints => 'Clicking on Read would make this message disappear from your voice message list.',
 				defaultValue => 'Not Read'),
 		new CGI::Dialog::Field(type => 'bool', name => 'data_num_b', caption => 'Deliver With Medical Record',  readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, style => 'check'),
-
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
+		),
 	);
 
 	$self->{activityLog} =
@@ -135,6 +144,19 @@ sub execute
 	my $phoneStatus = $page->field('status') eq 'Not Read' ? 5 : 4;
 	my $status =  $page->field('status', $phoneStatus);
 	my $userId = $page->session('user_id');
+	my $printerName = $page->field('printerQueue');
+	
+	my $printerMessage = "--------------------------------------------\n";
+	$printerMessage .= "Phone Message \n";
+	$printerMessage .= "--------------------------------------------\n";
+	$printerMessage .= "To: ".$page->field('person_called')."\n";
+	$printerMessage .= "From: ".$page->field('provider')."\n";
+	$printerMessage .= "Time: ".$page->field('time')."\n";
+	$printerMessage .= "Message:\n".$page->field('phone_message')."\n";
+	$printerMessage .= "--------------------------------------------\n\n";
+	
+	App::Device::echoToPrinter ($printerName, $printerMessage) unless ($printerName eq '');
+	
         if($command eq 'add')
 	{
         	my $trans_id = $page->schemaAction(
