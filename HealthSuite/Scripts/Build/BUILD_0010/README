@@ -66,6 +66,8 @@ B704 - Tax id inheritance completed.
 
 B419 - TWCC number assigned is now being populated correctly.
 
+B948 - Payer for secondary claims is showing up on invoice summary.
+
 End Prosys Bugs
 
 B171 - Prevent processing invalid Orgs on arl.
