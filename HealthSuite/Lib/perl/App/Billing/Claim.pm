@@ -108,6 +108,7 @@ sub new
 	$params{transProviderId} = undef;
 	$params{transProviderName} = undef;
 	$params{totalInvoiceCharges} = undef;
+	$params{flags} = undef;
 
 	$params{invoiceType} = undef;
 	$params{invoiceSubtype} = undef;
@@ -162,6 +163,18 @@ sub getInvoiceDate
 {
 	my $self = shift;
 	return $self->{invoiceDate};
+}
+
+sub setFlags
+{
+	my ($self, $value) = @_;
+	$self->{flags} = $value;
+}
+
+sub getFlags
+{
+	my $self = shift;
+	return $self->{flags};
 }
 
 sub setTWCC73
