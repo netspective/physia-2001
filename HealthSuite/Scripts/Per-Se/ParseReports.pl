@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -I.
 
 # PerSe's REPORT field indicates "T0XS" where: 
 #	T = Report Type
