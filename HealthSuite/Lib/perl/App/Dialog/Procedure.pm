@@ -611,6 +611,8 @@ sub storeInsuranceInfo
 	{
 		my $partyType = $payer->{bill_party_type};
 		my $insIntId = $payer->{bill_ins_id};
+
+		next if $partyType == App::Universal::INVOICEBILLTYPE_CLIENT;	#don't want to continue because this type is a self-pay
 	
 		my $payerBillSeq = 'Primary' if $payer->{bill_sequence} == App::Universal::PAYER_PRIMARY;
 		$payerBillSeq = 'Secondary' if $payer->{bill_sequence} == App::Universal::PAYER_SECONDARY;
@@ -621,7 +623,7 @@ sub storeInsuranceInfo
 		{
 			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
 			my $parentInsId = $thirdPartyInsur->{parent_ins_id};
-			my $thirdPartyId = $thirdPartyInsur->{owner_org_id};
+			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
 			
 			my $thirdPartyName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $thirdPartyId);
 			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
@@ -659,9 +661,48 @@ sub storeInsuranceInfo
 				);
 		
 		}
-		#elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON)
-		#{
-		#}
+		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON)
+		{
+			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
+			my $parentInsId = $thirdPartyInsur->{parent_ins_id};
+			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
+
+			my $thirdPartyName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
+			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
+			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Third-Party/Person/Name',
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $thirdPartyName || undef,
+					value_textB => $thirdPartyId || undef,
+					_debug => 0
+				);
+		
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Third-Party/Person/Phone',
+					value_type => defined $phoneValueType ? $phoneValueType : undef,
+					value_text => $thirdPartyPhone->{phone} || undef,
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Address', $command,
+					parent_id => $invoiceId,
+					address_name => 'Third-Party',
+					line1 => $thirdPartyAddr->{line1} || undef,
+					line2 => $thirdPartyAddr->{line2} || undef,
+					city => $thirdPartyAddr->{city} || undef,
+					state => $thirdPartyAddr->{state} || undef,
+					zip => $thirdPartyAddr->{zip} || undef,
+					_debug => 0
+				);
+		
+		}
 		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS)
 		{
 			my $personInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $insIntId);
@@ -858,13 +899,14 @@ sub storeInsuranceInfo
 
 			#Insured Information --------------------
 			my $insuredData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $personInsur->{insured_id});
+			my $insuredId = $insuredData->{person_id};
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{complete_name} || undef,
-					value_textB => $insuredData->{person_id} || undef,
+					value_textB => $insuredId || undef,
 					_debug => 0
 				);
 
@@ -874,6 +916,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Name/Last",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_last} || undef,
+					value_textB => $insuredId || undef,
 					_debug => 0
 				);
 
@@ -883,6 +926,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Name/First",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_first} || undef,
+					value_textB => $insuredId || undef,
 					_debug => 0
 				);
 
@@ -892,6 +936,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Name/Middle",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_middle} || undef,
+					value_textB => $insuredId || undef,
 					_debug => 0
 				) if $insuredData->{name_middle} ne '';
 
