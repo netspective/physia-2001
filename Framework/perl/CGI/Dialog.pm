@@ -500,12 +500,12 @@ sub getHtml
 	my $html = '';
 
 	my $specialHdl = "$self->{type}_as_html";
-	eval
+
+	if ($self->can($specialHdl))
 	{
 		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
-	};
-
-	if($@)
+	}
+	else
 	{
 		# if there was an error running a special handler, then there was no
 		# special handler so just perform default html formatting
