@@ -142,6 +142,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
+	'selInvoiceOwner' => q{
+		select owner_id
+		from invoice
+		where invoice_id = ?
+		},
 	'selInvoiceIdByEventId' => q{
 		select invoice_id
 		from invoice, transaction t
@@ -150,7 +155,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and t.trans_id = main_transaction
 		},
 	'selInvoiceMainTransById' => q{
-		select main_transaction 
+		select main_transaction
 		from invoice
 		where invoice_id = ?
 		},
@@ -337,7 +342,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	'selAllAttributesExclHistory' => qq{
 		select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB, value_block,
 			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateEnd,
-			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB			
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB
 		from invoice_attribute
 		where parent_id = ?
 			and NOT item_name = 'Invoice/History/Item'
@@ -674,13 +679,13 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select 'Payment'
 		from dual
 	},
-	
+
 	'selPaperClaims' => qq{
 		SELECT invoice_id
 		FROM Invoice
 		WHERE owner_id = :1
 			and invoice_status = @{[ App::Universal::INVOICESTATUS_SUBMITTED ]}
-			and invoice_subtype in (@{[ App::Universal::CLAIMTYPE_SELFPAY ]}, 
+			and invoice_subtype in (@{[ App::Universal::CLAIMTYPE_SELFPAY ]},
 				@{[ App::Universal::CLAIMTYPE_CLIENT ]})
 	UNION
 		SELECT Invoice.invoice_id
@@ -698,7 +703,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	{
 		SELECT  1
 		FROM 	transaction t
-		WHERE 	t.service_facility_id = :1	
+		WHERE 	t.service_facility_id = :1
 		AND	EXISTS
 		(
 			SELECT 	1
@@ -710,7 +715,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		)
 
 	}
-	
+
 );
 
 
