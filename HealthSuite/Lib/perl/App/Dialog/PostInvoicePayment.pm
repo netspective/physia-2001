@@ -168,7 +168,7 @@ sub populateData
 	my $clientId = $invoiceInfo->{client_id};
 	$page->field('client_id', $clientId);
 	my $paidBy = $page->param('paidBy');
-	if($paidBy eq 'insurance')
+	if($paidBy eq 'insurance' || $invoiceInfo->{invoice_type} == App::Universal::INVOICETYPE_SERVICE)
 	{
 		my $currentPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
 		my $billToId = $currentPayer->{bill_to_id};
