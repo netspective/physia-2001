@@ -65,6 +65,15 @@
 			Populate DA2 records of the NSF file with the Insured address.  Bug left open pending test results.
 		</deliverable>
 
+		<deliverable id="1146">
+			Statements will now be sent based on the schedule defined by the Billing Org's "Billing Events" component.
+			WARNING: If the billing org for an invoice/statement doesn't have anything setup for "Billing Events"
+			statements will NOT be sent.  Likewise, statements that don't match any rule in "Billing Events" for the
+			billing org will not be sent.
+			When a statement is sent, each invoice on the statement will have a new history item called
+			"Client Billing Statement Transmitted to Per-Se".  Look on invoice 482 in test for an example.
+		</deliverable>
+
 		<deliverable id="1296">
 			Price for just code is being looked up when the code/modifier price is not found.
 		</deliverable>
