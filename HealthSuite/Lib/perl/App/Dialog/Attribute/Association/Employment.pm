@@ -49,6 +49,7 @@ sub new
 	$self->addContent(
 		new App::Dialog::Field::Organization::ID(
 			caption =>'Employer ID',
+			addType => 'employer',
 			name => 'rel_id'
 		),
 		new CGI::Dialog::Field(
