@@ -64,7 +64,7 @@ sub prepare
 						<a href="/search/org">Departments</a>,
 						<a href="/search/org">Associated Providers</a>,
 						<a href="/search/org">Employers</a>,
-						<a href="/search/org">Insururs</a>, or
+						<a href="/search/org">Insurers</a>, or
 						<a href="/search/org">IPAs</a>.
 					</TD>
 				</TR>
