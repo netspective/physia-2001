@@ -262,7 +262,7 @@ sub execute_add
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
-			category => join(', ', @members) || undef,
+			category => join(',', @members) || undef,
 			_debug => 0
 		);
 
@@ -456,7 +456,7 @@ sub execute_update
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
-			category => join(', ', @members) || undef,
+			category => join(',', @members) || undef,
 			_debug => 0
 		);
 
