@@ -15,6 +15,14 @@
 			using a parameter that contains a space (like looking up an Ins Plan using an Ins 
 			product with a space in it.  This fix could potentially effect the entire application
 		</deliverable>
+		
+		<deliverable id="1202">
+			Initial Implementation of Close Date Report
+		</deliverable>
+
+		<deliverable id="1425">
+			Corrected Patient Activity Report
+		</deliverable>
 
 	</deliverables>
 </release-notes>
