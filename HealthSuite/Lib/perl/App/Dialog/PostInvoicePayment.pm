@@ -80,11 +80,7 @@ sub new
 				name => 'pay_type',
 				caption => 'Payment Type',
 				enum => 'Payment_Type',
-				options => FLDFLAG_REQUIRED | FLDFLAG_PREPENDBLANK,
-				onChangeJS => qq{showFieldsOnValues(event, [@{[App::Universal::ADJUSTMENTPAYTYPE_PREPAY]}], ['prepay_comments']);  },
 				),
-
-		new CGI::Dialog::Field(caption => 'Reason for Pre-payment', name => 'prepay_comments', size => 50),
 
 		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code', name => 'pay_method_fields',
 			fields => [
@@ -103,13 +99,24 @@ sub new
 		new CGI::Dialog::Subhead(heading => 'Outstanding Items', name => 'outstanding_heading'),
 		new App::Dialog::Field::OutstandingItems(name =>'outstanding_items_list'),
 	);
+
+	#$self->addFooter(new CGI::Dialog::Buttons(
+	#					name => 'next_action',
+	#					nextActions_add => [
+	#						['Submit to Next Payer (Electronically)', "/invoice/%param.invoice_id%/submit?resubmit=2", 1],
+	#						['Submit to Next Payer (Print HCFA)', "/invoice/%param.invoice_id%/submit?resubmit=2&print=1"],
+	#						['Return to Claim Summary', "/invoice/%param.invoice_id%/summary"],
+	#					],
+	#					cancelUrl => $self->{cancelUrl} || undef));
+
+	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+
 	$self->{activityLog} =
 	{
 		scope =>'invoice',
 		key => "#param.invoice_id#",
 		data => "postinspayment claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
 	};
-	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
 }
@@ -144,6 +151,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_items_list', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('next_action', FLDFLAG_INVISIBLE, 1);
 	}
      	elsif($invoiceId)
 	{
@@ -153,6 +161,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
 		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, $isInsurance);
+		$self->updateFieldFlags('next_action', FLDFLAG_INVISIBLE, $isPersonal);
 	}
 
 	my $batchId = $page->param('_p_batch_id') || $page->field('batch_id');
@@ -162,7 +171,7 @@ sub makeStateChanges
 #		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
 
-	$self->getField('pay_type')->{fKeyWhere} = "group_name is NULL or group_name = '$paidBy'";
+	$self->getField('pay_type')->{fKeyWhere} = "caption != 'Pre-payment' and (group_name is NULL or group_name = '$paidBy')";
 }
 
 sub populateData
@@ -213,32 +222,6 @@ sub populateData
 	}
 }
 
-sub customValidate
-{
-	my ($self, $page) = @_;
-
-
-	#Invalidate if Pre-payment is selected and total amount is applied to line items. Pre-payments become their own  line item. This only occurs for personal payments.
-	my $payType = $page->field('pay_type');
-	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY)
-	{
-		my $appliedExists;
-		my $payTypeField = $self->getField('pay_type');
-		my $lineCount = $page->param('_f_line_count');
-		for(my $line = 1; $line <= $lineCount; $line++)
-		{
-			my $amtApplied = $page->param("_f_item_$line\_amount_applied");
-			my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
-			if($writeoffAmt ne '' || $amtApplied ne '')
-			{
-				$appliedExists = 1;
-			}
-		}
-		
-		$payTypeField->invalidate($page, "Cannot apply 'Pre-payment' to 'Outstanding Items'") if $appliedExists;
-	}
-}
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -261,63 +244,9 @@ sub execute
 
 	my $totalAmtRecvd = $page->field('total_amount') || $page->field('check_amount') || 0;
 
-	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal')
-	{
-		my $itemId = $page->schemaAction(
-			'Invoice_Item', 'add',
-			parent_id => $invoiceId,
-			item_type => App::Universal::INVOICEITEMTYPE_ADJUST,
-			_debug => 0
-		);
-
-		my $prepayComments = $page->field('prepay_comments');
-		my $adjItemId = $page->schemaAction(
-			'Invoice_Item_Adjust', 'add',
-			adjustment_type => defined $adjType ? $adjType : undef,
-			adjustment_amount => defined $totalAmtRecvd ? $totalAmtRecvd : undef,
-			parent_id => $itemId || undef,
-			pay_date => $todaysDate || undef,
-			pay_method => defined $payMethod ? $payMethod : undef,
-			pay_ref => $payRef || undef,
-			payer_type => defined $payerType ? $payerType : undef,
-			payer_id => $payerId || undef,
-			pay_type => defined $payType ? $payType : undef,
-			comments => $prepayComments || undef,
-			_debug => 0
-		);
-
-		#Create history attribute for this adjustment
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => "Pre-payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
-			value_textB => "$prepayComments " . "Batch ID: $batchID"|| undef,
-			value_date => $todaysDate,
-			_debug => 0
-		);
-
-		#Create attribute for batchId
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Payment/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $batchID || undef,
-			value_date => $batchDate || undef,
-			value_int => $adjItemId || undef,
-			_debug => 0
-		);
-	}
-
-
-
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		next if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal';
-
 		my $itemId = $page->param("_f_item_$line\_item_id");
 
 		#update item if it is being suppressed
@@ -428,6 +357,7 @@ sub execute
 	}
 	else
 	{
+		#$self->handlePostExecute($page, $command, $flags);
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
 }
