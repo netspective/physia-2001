@@ -194,8 +194,7 @@ sub prepare_page_content_header
 	my $category = lc($self->property('person_categories')->[0]) || undef;
 	# If the category isnt one of the predefined four, assume its staff.
 	my $updateCategory = $category;
-
-	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient') or ($category eq 'referring-doctor')) {
+	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient') or ($category eq 'referring-doctor') or ($category eq 'guarantor')) {
 		$updateCategory = 'staff';
 	}
 
