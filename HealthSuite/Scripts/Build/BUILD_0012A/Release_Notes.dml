@@ -7,8 +7,13 @@
 		<tested-date></tested-date>
 		<release-date></release-date>
 	</release-info>
-	
-	<deliverables>
 
+
+	<deliverables>
+		<deliverable id="1061">
+			Modified query to improve collection worklist performance.  Also limited the output on the worklist to 250 invoices.  
+			Once an invoice is closed, given a future reck date or transferred to a new collector there will be space for a new invoice 
+			(if one is available).  Approximate time to display 250 invoices is 25 seconds. 
+		</deliverable>	
 	</deliverables>
 </release-notes>
