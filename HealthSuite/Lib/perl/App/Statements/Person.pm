@@ -258,6 +258,27 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
+	'updClearPrimaryPhysician' => qq{
+			update person_attribute
+			set value_int = ''
+			where value_type = 210
+				and item_id = ?
+		},
+	'selPhysicainSpecialty' => qq{
+					select value_textB, item_id
+					from person_attribute
+					where value_type = 210
+					and parent_id = ?
+					and value_text = ?
+					and value_textB = ?
+		},
+	'selSpecialtySequence' => qq{
+				select value_intB
+				from person_attribute
+				where value_type = 210
+				and parent_id = ?
+				and value_intB = ?
+		},
 	'selEmploymentStatus' => qq{
 		select caption
 			from attribute_value_type
