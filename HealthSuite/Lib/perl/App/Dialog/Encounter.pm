@@ -124,8 +124,13 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Payer for Today', name => 'other_payer'),
 
-		new CGI::Dialog::Field(type => 'currency', caption => 'Deductible Balance', name => 'deduct_balance'),
+		#new CGI::Dialog::MultiField(caption => 'Deductible Balance/Insurance Phone', name => 'deduct_fields',
+		#	fields => [
+				new CGI::Dialog::Field(type => 'currency', caption => 'Deductible Balance', name => 'deduct_balance'),
+		#		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
+		#	]),
 
+		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
 
 		new CGI::Dialog::MultiField(caption => 'Provider Service/Billing', name => 'provider_fields',
 			fields => [
@@ -150,6 +155,9 @@ sub initialize
 			]),
 
 		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To',
+			hints => 'Service Org is the org in which services were given.<br>
+						Billing org is the org in which the billing should be tracked.<br>
+						Pay To org is the org which should receive payment.',
 			fields => [
 				new App::Dialog::Field::OrgType(
 							caption => 'Service Facility',
@@ -333,10 +341,6 @@ sub populateData
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
 			$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});
 			$page->param("_f_proc_$line\_emg", $procedures->[$idx]->{emergency});
-			#if($procedures->[$idx]->{emergency})
-			#{
-			#	$page->param("_f_proc_$line\_emg", 'on');
-			#}
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
 		}
 
@@ -465,13 +469,16 @@ sub setInsuranceFields
 			$page->field('copay_amt', $primInsurance->{copay_amt});
 			$primInsurance->{indiv_deduct_remain} ? $page->field('deduct_balance', $primInsurance->{indiv_deduct_remain}) : $page->field('deduct_balance', $primInsurance->{family_deduct_remain});
 
+			my $primInsPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceAttr', $primInsurance->{ins_internal_id}, 'Contact Method/Telephone/Primary');
+			$page->field('primary_ins_phone', $primInsPhone->{value_text});
+
 			my $primInsFeeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInsuranceAttr', $primInsurance->{ins_internal_id}, 'Fee Schedule');
 			my @schedules = ();
 			foreach (@{$primInsFeeSched})
 			{
 				push(@schedules, $_->{value_text});
 			}
-			join(@schedules, ', ');
+			join(@schedules, ', ') if @schedules;
 			$page->param('_f_proc_default_catalog', $schedules[0]);
 			#$page->addDebugStmt("$schedules[0]");
 		}
