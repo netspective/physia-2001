@@ -7,8 +7,11 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Org;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/org' => {},
+	);
 
 sub getForm
 {
