@@ -28,9 +28,20 @@
 		<deliverable id="1556">
 			UI: Added the appointments component in the summary page and changed the default next action for 
 			    Patient/Person Lookup to show the 'Summary Page'.
-                </deliverable>                
-
-
+                </deliverable>
+                <deliverable id="1262">
+			UI: The Electronic Billing Information component has now been moved form the Insurance tab
+			    of an organization to the Clearing House tab.
+			UI: Adding/Editing a Billing Information from an Org's Clearing House tab changes the
+			    org-wide clearing house information
+			UI: Adding/Editing a Billing Information from a Person's Associate tab changes that person's
+			    clearing house information only.
+                </deliverable>
+                
+                <deliverable id="1511">
+			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
+			    not those of the current user of the app.
+                </deliverable>
 	</deliverables>
 </release-notes>
 
