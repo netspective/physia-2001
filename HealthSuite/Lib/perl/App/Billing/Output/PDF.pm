@@ -2371,10 +2371,17 @@ sub box17ClaimData
 	my $box17Y = $box17Cordinates->[1];
 	my $box17X = $box17Cordinates->[0];
 
+	my $providerName = "";
+
+	if($claim->{treatment}->getRefProviderLastName ne "")
+	{
+		$providerName = $claim->{treatment}->getRefProviderLastName . ", " . $claim->{treatment}->getRefProviderFirstName  . " " . $claim->{treatment}->getRefProviderMiName;
+	}
+
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{treatment}->getRefProviderLastName . ", " . $claim->{treatment}->getRefProviderFirstName  . " " . $claim->{treatment}->getRefProviderMiName, $box17X + CELL_PADDING_X + DATA_PADDING_X, $box17Y - 3 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $providerName, $box17X + CELL_PADDING_X + DATA_PADDING_X, $box17Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
