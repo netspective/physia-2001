@@ -378,7 +378,27 @@ sub populateTreatment
 	$data->{treatmentOutsideLabCharges} = $treatment->getOutsideLabCharges;
 	$data->{treatmentPriorAuthorizationNo} = $treatment->getPriorAuthorizationNo;
 	$data->{treatmentResubmissionReference} = $treatment->getResubmissionReference;
-
+	if(uc($claim->getProgramName) eq 'MEDICARE')
+	{
+		my $populateCLIA = 0;
+		my $proceduresCount = $claim->{procedures};
+		if($#$proceduresCount > -1)
+		{
+			for my $i (0..$#$proceduresCount)
+			{
+				my $procedure = $claim->getProcedure($i);
+				if(uc($procedure->getItemStatus) ne "VOID")
+				{
+					my $CPT = $procedure->getCPT();
+					if(($CPT >= 80000) && ($CPT >= 89999))
+					{
+						$populateCLIA = 1;
+					}
+				}
+			}
+		}
+		$data->{treatmentPriorAuthorizationNo} = $claim->{renderingOrganization}->getCLIA;
+	}
 }
 
 sub populateDiagnosis
@@ -447,6 +467,7 @@ sub populatePayer
     $data->{payerName} = $payer->getName();
     $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
 }
+
 sub populateProcedures
 {
 	my ($self, $claim, $procesedProc) = @_;
