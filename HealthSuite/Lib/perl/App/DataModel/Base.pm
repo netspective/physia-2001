@@ -42,6 +42,8 @@ subclass 'App::DataModel::Collection' =>
 	##################################################
 	#Get Person objects in collection
 	##################################################	
+	'&getFirstPerson'=>q{return &people->getFirst();},
+	'&getNextPersong'=>q{return &people->getNext();},	
 	'&getFirstPersonOfType'=>q{return &people->getFirstOfType($_[0]);},			
 	'&getNextPersonOfType'=>q{ return &people->getNextOfType($_[0]);},				
 	
@@ -225,8 +227,15 @@ subclass 'App::DataModel::Patient' =>
 				my $coverage=$_[0];
 				my $plan=$_[1];
 				my $product=$_[2];	
+
 				if($coverage)
 				{
+					unless (defined $coverage->sequence)
+					{
+						my $size =&insurance_size+2;
+						$coverage->sequence($size);					
+					};
+
 					&add_insurance($coverage);
 					my $ptr=&last_insurance;
 					$ptr->insuranceProduct($product) if ($product);
