@@ -254,15 +254,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		rel_diags,
 		decode(item_type,7,0,units) as units,
 		decode(item_type,7,0,unit_cost) as unit_cost,
-		sum(total_charges) total_charges,
-		sum(misc_charges) misc_charges ,
-		sum(person_pay) person_pay,
-		sum(insurance_pay) insurance_pay,
-		sum(insurance_write_off) insurance_write_off,
-		sum(balance_transfer) balance_transfer,
-		sum(charge_adjust) as  charge_adjust,
-		sum(person_write_off) as person_write_off,
-		sum(refund) as refund,		
+		(total_charges) total_charges,
+		(misc_charges) misc_charges ,
+		(person_pay) person_pay,
+		(insurance_pay) insurance_pay,
+		(insurance_write_off) insurance_write_off,
+		(balance_transfer) balance_transfer,
+		(charge_adjust) as  charge_adjust,
+		(person_write_off) as person_write_off,
+		(refund) as refund,		
 		pay_type
 	FROM	invoice_charges,org o
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -276,18 +276,6 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		)
 		AND o.org_internal_id = invoice_charges.facility
 		AND o.owner_org_id = :6
-	group by invoice_id ,
-		invoice_date,
-		service_begin_date,
-		service_end_date,
-		provider ,
-		code,
-		caption,
-		decode(item_type,7,0,units) ,
-		decode(item_type,7,0,unit_cost) ,
-		rel_diags,
-		client_id,
-		pay_type
 	order by invoice_id
 	},
 	'sel_daily_audit' => qq{
@@ -349,40 +337,30 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		rel_diags,
 		decode(item_type,7,0,units) as units,
 		decode(item_type,7,0,unit_cost) as unit_cost,
-		sum(total_charges) total_charges,
-		sum(misc_charges) misc_charges ,
-		sum(person_pay) person_pay,
-		sum(insurance_pay) insurance_pay,
-		sum(insurance_write_off) insurance_write_off,
-		sum(balance_transfer) balance_transfer,
-		sum(charge_adjust) as  charge_adjust,
-		sum(person_write_off) as person_write_off,
-		sum(refund) as refund,		
+		(total_charges) total_charges,
+		(misc_charges) misc_charges ,
+		(person_pay) person_pay,
+		(insurance_pay) insurance_pay,
+		(insurance_write_off) insurance_write_off,
+		(balance_transfer) balance_transfer,
+		(charge_adjust) as  charge_adjust,
+		(person_write_off) as person_write_off,
+		(refund) as refund,		
 		pay_type
 	FROM 	invoice_charges, org o
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
-		AND (facility = :2 or :2 IS NULL )
-		AND (provider = :3 or :3 IS NULL)
-		AND
+	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
+	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')	
+	AND 	(facility = :2 or :2 IS NULL )
+	AND 	(provider = :3 or :3 IS NULL)
+	AND
 		(
 			(batch_id >= :4 or :4 is NULL)
 			AND
 			(batch_id <= :5  or :5 is NULL)
 		)
-		AND o.org_internal_id = invoice_charges.facility
-		AND o.owner_org_id = :6
-	group by invoice_id ,
-		invoice_date ,
-		service_begin_date,
-		service_end_date,
-		provider ,
-		code,
-		caption,
-		decode(item_type,7,0,units) ,
-		decode(item_type,7,0,unit_cost) ,
-		rel_diags,
-		client_id,				
-		pay_type
+	AND 	o.org_internal_id = invoice_charges.facility
+	AND 	o.owner_org_id = :6
 	ORDER BY  invoice_id
 	},
 
