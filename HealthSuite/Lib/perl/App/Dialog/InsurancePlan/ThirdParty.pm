@@ -113,7 +113,14 @@ sub populateData
 	my $thirdPartyType = $thirdParty->{guarantor_type};
 	my $guarantorType = $thirdPartyType eq 1 ? 'org' : 'person';
 	$page->field('guarantor_type', $guarantorType);
-	$page->field('guarantor_id', $thirdParty->{guarantor_id});
+	my $insOrgId = '';
+
+	if ($guarantorType eq 'org')
+	{
+		$insOrgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $thirdParty->{guarantor_id});
+	}
+
+	$guarantorType eq 'person' ? $page->field('guarantor_id', $thirdParty->{guarantor_id}) : $page->field('guarantor_id', $insOrgId);
 }
 
 sub execute
@@ -123,7 +130,10 @@ sub execute
 
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $otherPayerType = $page->field('guarantor_type');
+	my $insOrgInternalId = '';
+	my $ownerOrgId = $page->session('org_internal_id');
 	my $guarantorType = $otherPayerType eq 'person' ? App::Universal::ENTITYTYPE_PERSON : App::Universal::ENTITYTYPE_ORG;
+	my $guarantor = $otherPayerType eq 'person' ? $page->field('guarantor_id') : $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $page->field('guarantor_id'));
 
 	$page->schemaAction(
 			'Insurance', $command,
@@ -132,7 +142,7 @@ sub execute
 			owner_person_id => $page->param('person_id') || undef,
 			owner_org_id => $page->session('org_internal_id'),
 			ins_type => App::Universal::CLAIMTYPE_CLIENT || undef,
-			guarantor_id => $page->field('guarantor_id') || undef,
+			guarantor_id => $guarantor || undef,
 			guarantor_type  => $guarantorType,
 			_debug => 0
 		);
