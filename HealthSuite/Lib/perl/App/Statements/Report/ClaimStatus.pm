@@ -69,6 +69,18 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 				and ins_org_id is not null
 			},
 	},
+	'sel_distinct_ins_org_id_by_id' => {
+		sqlStmt => qq{
+			select ' ' as col0, 0 as col1 from Dual
+			UNION
+			select distinct o.org_id as col0, i.ins_org_id as col1 
+			from Insurance i, Org o
+			where record_type = 3 and i.ins_org_id = o.org_internal_id
+			and ins_org_id is not null
+			AND o.owner_org_id = to_number(?)
+			
+			},
+	},	
 
 	'sel_claim_detail' =>q
 	{
