@@ -291,8 +291,12 @@
 		</deliverable>			
 
 		<deliverable id="1621">
-			 Updated the url for 'Edit Profile' for an Insured-person to showup the correct dialog.
-		</deliverable>			
+			Updated the url for 'Edit Profile' for an Insured-person to showup the correct dialog.
+		</deliverable>
+		
+		<deliverable id="1622">
+			Fixed a problem in query where you couldn't link to the Fee Schedule Item search
+		</deliverable>
 
 		<deliverable id="1623">
 			 Updated the url for 'Go to Worklist' under 'Next Action' in 'Add Patient, Physician, staff  and Referring Doctor' dialogs.
