@@ -154,6 +154,7 @@ WHERE 	NOT (invoice_status =15 AND parent_invoice_id is not null);
 
 create or replace view REVENUE_COLLECTION as
 select  ic.provider,
+	ic.care_provider_id,
         ic.invoice_id,
         ic.invoice_date,
         decode(ic.ffs_cap,1,decode(h.ABBREV,'04',0,'05',0,(ic.total_charges)),0) as ffs_prof,
@@ -185,6 +186,7 @@ WHERE   hcfa_service_type= h.id(+)
 AND	i.invoice_id = ic.invoice_id
 UNION ALL	
 SELECT  provider_id as provider,
+	provider_id as care_provider_id, 
 	to_number(NULL)as invoice_id,
 	(SELECT value_date FROM trans_attribute ia WHERE ia.item_name = 'Monthly Cap/Payment/Batch ID' 
 	 AND parent_id = t.trans_id) as invoice_date,
@@ -209,7 +211,8 @@ SELECT  provider_id as provider,
 	to_number(null) as invoice_type,
 	(SELECT to_number(receiver_id) FROM transaction tt WHERE tt.trans_id = t.trans_id) as facility,
 	null as submitted_id,
-	null as batch_id,
+	(SELECT value_text FROM trans_attribute ia WHERE ia.item_name = 'Monthly Cap/Payment/Batch ID' 
+	 AND parent_id = t.trans_id) as batch_id,
 	to_number(null) as trans_type,
 	0 as refund
 FROM	transaction t
