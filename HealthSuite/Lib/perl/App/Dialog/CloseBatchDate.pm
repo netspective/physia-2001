@@ -37,16 +37,23 @@ sub new
 	$self->addContent(
 			new App::Dialog::Field::Organization::ID(
 					caption => 'Organization ID',
-					name => 'org_id',
-					options => FLDFLAG_READONLY,
+					name => 'org_id',	
+					options=>FLDFLAG_REQUIRED
 			),
 			new CGI::Dialog::Field(name => 'close_date', 
-						caption => 'Close Date',
-						futureOnly => 1,
+						caption => 'Close Date',						
 						type => 'date',
 						options=>FLDFLAG_REQUIRED,
-						hints=>'Only batch date(s) greater than the Close Date will be valid',),																
-
+						hints=>'Only batch date(s) greater than the Close Date will be valid',
+						defaultValue=>''),																
+			new CGI::Dialog::Field(type => 'select',
+							style => 'radio',
+							selOptions => 'Yes:1;No:0',
+							caption => 'Apply to Child Organizations',
+							preHtml => "<B><FONT COLOR=DARKRED>",
+							postHtml => "</FONT></B>",
+							name => 'childern',options=>FLDFLAG_REQUIRED,
+				defaultValue => '0',)
 																	
 		);
 		$self->{activityLog} =
@@ -65,31 +72,31 @@ sub populateData
 	my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));		
 	$page->field('org_id',$page->param('org_id'));
 	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;	
-	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $parent_id,'Retire Batch Date',$TEXT_ATTRR_TYPE);
-	if($item)
-	{
-		$page->param('item_id',$item->{item_id});
-		$page->field('close_type',$item->{value_int});
-		$page->field('close_date',$item->{value_date});
-	}	
 }
 
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;	
-	my $parent_id;
-	$parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));		
-	$command = $page->param('item_id') ? 'update' : 'add' ;
-	$page->schemaAction(
-			'Org_Attribute', $command,
-			item_id => $page->param('item_id') || undef,
-			parent_id => $parent_id,
-			item_name => 'Retire Batch Date',
-			item_type => 0,
-			value_type => $TEXT_ATTRR_TYPE,
-			#value_int => $page->field('close_type'),
-			value_date => $page->field('close_date')
-	);
+	my $childern = $page->field('childern');
+	my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->field('org_id'));		
+	
+	
+	my $children_orgs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCloseDateChildParentOrgIds',$page->session('org_internal_id'),$parent_id,$childern );
+	foreach (@$children_orgs)
+	{		
+		#Check if Org Id already has a close batch date	
+		my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $_->{org_internal_id},'Retire Batch Date',$TEXT_ATTRR_TYPE);
+		$command = $item->{item_id} ? 'update' : 'add' ;
+		$page->schemaAction(
+				'Org_Attribute', $command,
+				item_id => $item->{item_id}|| undef,
+				parent_id => $_->{org_internal_id},
+				item_name => 'Retire Batch Date',
+				item_type => 0,
+				value_type => $TEXT_ATTRR_TYPE,
+				value_date => $page->field('close_date')
+			);
+	}
 	$self->handlePostExecute($page, $command, $flags);	
 	
 }
