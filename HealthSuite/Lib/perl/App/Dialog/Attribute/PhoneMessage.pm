@@ -25,9 +25,11 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'value_text', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(name => 'value_text', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, hints => 'Message to be passed on to the requested person.'),
 		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(caption =>'Call For', name => 'value_textb', hints => 'Person who needs to receive the message.'),	
+		new App::Dialog::Field::Person::ID(caption =>'Call For', name => 'parent_id', options => FLDFLAG_REQUIRED, hints => 'Person who needs to receive the message.'),	
+		new CGI::Dialog::Field(name => 'value_textb', caption => 'Comments', type => 'memo', hints => 'Comments from the user to the caller.'),
+	
 	);
 	
 	$self->{activityLog} =
@@ -50,7 +52,22 @@ sub populateData
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 	
 	my $itemId = $page->param('item_id');
-	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	my $phoneInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+
+	if($phoneInfo->{value_block} == 1)
+	{
+		$page->field('value_text', $phoneInfo->{value_text});
+		$page->field('value_date', $phoneInfo->{value_date});
+		$page->field('parent_id', $phoneInfo->{parent_id});
+		$page->field('value_textb', $phoneInfo->{value_textb});
+	}
+	else
+	{
+		$page->field('value_text', $phoneInfo->{value_textb});
+		$page->field('value_date', $phoneInfo->{value_date});
+		$page->field('parent_id', $phoneInfo->{parent_id});
+		$page->field('value_textb', $phoneInfo->{value_text});	
+	}
 	
 }
 
@@ -58,6 +75,37 @@ sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 	
+	$page->addDebugStmt("command is $command");
+	if($command eq 'add')
+	{
+		$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $page->field('parent_id') || undef,
+			item_id => $page->param('item_id') || undef,
+			item_name =>'Phone Message',
+			value_type => 0,
+			value_text => $page->field('value_text') . '(' . $page->param('person_id') . ')' || undef,	
+			value_textB => $page->field('value_textb') || undef,	
+			value_date => $page->field('value_date') || undef,
+			value_block => 1,
+			_debug => 1
+		);
+	}
+	else
+	{
+		$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $page->field('parent_id') || undef,
+			item_id => $page->param('item_id') || undef,
+			item_name =>'Phone Message',
+			value_type => 0,
+			value_text => $page->field('value_text') || undef,	
+			value_textB => $page->field('value_textb') || undef,	
+			value_date => $page->field('value_date') || undef,
+			value_block => 1,
+			_debug => 1
+		);	
+	}
 	
 	$page->schemaAction(
 		'Person_Attribute', $command,
@@ -65,11 +113,13 @@ sub execute
 		item_id => $page->param('item_id') || undef,
 		item_name =>'Phone Message',
 		value_type => 0,
-		value_text => $page->field('value_text') || undef,	
 		value_date => $page->field('value_date') || undef,
-		value_textB => $page->field('value_textb') || undef,		
+		value_text => $page->field('value_textb') || undef,	
+		value_textB => $page->field('value_text') || undef,	
+		value_block => 0,		
 		_debug => 0
 	);
+	
 	$self->handlePostExecute($page, $command, $flags);
 	
 }
