@@ -21,7 +21,8 @@
 				<li>Clinical tools</li>
 				<li>Clinical notes (as much as can be done)</li>
 				<li>Mobile (initial pieces)</li>
-			</ul>2) Remedial repairs
+			</ul>
+			<ul>2) Remedial repairs
 				<li>Reporting errors</li>
 				<li>Functions which abnormally terminate</li>
 				<li>Errors in calculations</li>
