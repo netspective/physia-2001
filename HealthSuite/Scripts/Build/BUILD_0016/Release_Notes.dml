@@ -123,6 +123,10 @@
 			Added invoice status 'Awaiting Client Payment' and changed 'Awaiting Payment' to 'Awaiting Insurance Payment'.
 		</deliverable>
 
+		<deliverable id="1456">
+			Added statuses to conditions for asking if user wants to submit to next payer.
+		</deliverable>
+
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
 		</deliverable>
