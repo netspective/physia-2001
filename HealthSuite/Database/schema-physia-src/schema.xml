@@ -273,6 +273,7 @@
 		<column name="org_id" lookupref="Org.org_id" descr="The entity that owns the catalog"/>
 		<column name="parent_catalog_id" selfref="Offering_Catalog.catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
 		<column name="description" type="text" size="1024" descr="Detailed description of the catalog"/>
+		<column name="effective" type="duration" descr="The effective date(s) of the catalog"/>
 	</table>
 
 	<table name="Offering_Catalog_Entry" abbrev="OCatEnt" type="Audit,Secure">
@@ -293,6 +294,7 @@
 		<column name="description" type="text" size="1024" descr="The description of the item (overrides REF_CPT, REF_ICD, REF_HCPCS if not null)"/>
 		<column name="taxable" type="boolean" descr="Whether or not the item is taxed"/>
 		<column name="units_avail" type="longint" descr="The number of units on-hand (if it's an inventory item)"/>
+		<column name="effective" type="duration" descr="The effective date(s) of the catalog entry"/>
 		<column name="data_text" type="text" size="64" descr="Any extra data needed for this item"/>
 		<column name="data_num" type="float" descr="Any extra data needed for this item"/>
 		<column name="data_date" type="date" descr="Any extra data needed for this item"/>
