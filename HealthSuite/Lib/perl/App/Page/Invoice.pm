@@ -2156,7 +2156,6 @@ sub prepare_page_content_header
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
-						<option value="/invoice/$invoiceId/dlg-add-printclaim">View/Print Claim</option>
 						<option value="/person/$clientId/account">View All Claims for this Patient</option>
 
 						@{[ $invType == $hcfaInvoiceType && ($submissionOrder->{value_int} == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
