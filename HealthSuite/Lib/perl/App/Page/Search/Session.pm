@@ -25,10 +25,10 @@ sub getForm
 			<SELECT name="item_action_arl_select">
 				<option value="/person/%itemValue%/profile">View Summary</option>
 				<option value="/person/%itemValue%/dlg-add-appointment">Schedule Appointment</option>
-				<option value="/person/%itemValue%/dlg-add-claim">Create Claim</option>
+				<option value="/person/%itemValue%/dlg-add-claim">Add Claim</option>
 				<option value="/person/%itemValue%/update">Edit Registry</option>
 				<option value="/person/%itemValue%/pane/Person::Medications?_paneredirect=/person/%itemValue%/chart">Prescribe Medication</option>
-				<option value="/person/%itemValue%/pane/Person::Problems?_paneredirect=/person/%itemValue%/chart">Create Note</option>
+				<option value="/person/%itemValue%/pane/Person::Problems?_paneredirect=/person/%itemValue%/chart">Add Note</option>
 				<option value="/person/%itemValue%/account">Apply Payment</option>
 				<option value="/person/%itemValue%/account">View Account</option>
 				<option value="/person/%itemValue%/remove">Delete Record</option>

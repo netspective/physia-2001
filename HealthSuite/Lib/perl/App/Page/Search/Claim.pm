@@ -42,7 +42,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<select name="create_newrec_select" style="color: green" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-				<option>Create New Claim</option>
+				<option>Add New Claim</option>
 				<option value="/org/#session.org_id#/dlg-add-invoice">Claim</option>
 			</select>
 		};
@@ -79,7 +79,7 @@ sub getForm
 		<input name="search_expression" value="@{[$self->param('search_expression')]}">
 		<input type=submit name="execute" value="Go">
 		</NOBR>
-		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : ' | <a href="/org/#session.org_id#/dlg-add-claim">Create Claim</a>' ]}
+		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : ' | <a href="/org/#session.org_id#/dlg-add-claim">Add Claim</a>' ]}
 		$itemFns
 		</CENTER>
 	});

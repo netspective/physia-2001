@@ -25,10 +25,10 @@ sub getForm
 			<SELECT name="item_action_arl_select">
 				<option value="/person/%itemValue%/profile">View Summary</option>
 				<option value="/person/%itemValue%/dlg-add-appointment">Schedule Appointment</option>
-				<option value="/person/%itemValue%/dlg-add-claim">Create Claim</option>
+				<option value="/person/%itemValue%/dlg-add-claim">Add Claim</option>
 				<option value="/person/%itemValue%/update">Edit Registry</option>
 				<option value="/person/%itemValue%/dlg-add-medication-prescribe">Prescribe Medication</option>
-				<!-- <option value="/person/%itemValue%/dlg-add-">Create Note</OPTION> -->
+				<!-- <option value="/person/%itemValue%/dlg-add-">Add Note</OPTION> -->
 				<option value="/person/%itemValue%/account">Apply Payment</option>
 				<option value="/person/%itemValue%/account">View Account</option>
 				<option value="/person/%itemValue%/remove">Delete Record</option>
@@ -44,7 +44,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<select name="create_newrec_select" style="color: green" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-				<option>Create New Record</option>
+				<option>Add New Record</option>
 				<option value="/org/#session.org_id#/dlg-add-patient">Patient</option>
 				<option value="/org/#session.org_id#/dlg-add-physician">Physician</option>
 				<option value="/org/#session.org_id#/dlg-add-nurse">Nurse</option>

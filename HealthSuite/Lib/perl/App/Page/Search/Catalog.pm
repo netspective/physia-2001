@@ -34,7 +34,7 @@ sub getForm
 		<input name="search_expression" value="@{[$self->param('search_expression')]}">
 		<input type=submit name="execute" value="Go">
 		</NOBR>
-		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : " | <a href=$dialogARL>Create New Fee Schedule</a>" ]}
+		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : " | <a href=$dialogARL>Add New Fee Schedule</a>" ]}
 		</CENTER>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');
@@ -72,7 +72,7 @@ sub execute_detail
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
-				'sel_catalog_detail',	[uc($expression), $self->param('org_id') 
+				'sel_catalog_detail',	[uc($expression), $self->param('org_id')
 				|| $self->session('org_id')],
 		),
 		'</CENTER>'

@@ -7,9 +7,8 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Insurance;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
 sub getForm
@@ -26,8 +25,8 @@ sub getForm
 			<SELECT name="item_action_arl_select">
 				<option value="/org/%itemValue%/profile">View Summary</option>
 				<option value="/org/%itemValue%/update">Edit Registry</option>
-				<option value="/org/#session.org_id#/dlg-add-ins-product">Create Insurance Product</option>
-				<option value="/org/#session.org_id#/dlg-add-ins-plan">Create Insurance Plan</option>
+				<option value="/org/%itemValue%/dlg-add-ins-product">Add Insurance Product</option>
+				<option value="/org/%itemValue%/dlg-add-ins-plan">Add Insurance Plan</option>
 				<option value="/org/%itemValue%/remove">Delete Record</option>
 			</SELECT>
 			<SELECT name="item_action_arl_dest_select">
@@ -41,7 +40,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<select name="create_newrec_select" style="color: green" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-				<option>Create New Record</option>
+				<option>Add New Record</option>
 				<option value="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</option>
 				<option value="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</option>
 			</select>
@@ -86,10 +85,10 @@ sub execute
 		$_ eq 'insurance' and do {last};
 		$category = "_$_";
 	}
-	
+
 	#$expression =~ s/%20/ /g;
 	#$self->param('search_expression', $expression);
-	
+
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category",
@@ -106,14 +105,5 @@ sub execute
 
 	return 1;
 }
-@CHANGELOG =
-(
 
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Insurance',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Insurance',
-		'Changed the urls from create/... to org/.... '],
-);
 1;

@@ -7,14 +7,13 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Org;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
 sub getForm
 {
 	my ($self, $flags) = @_;
-	
+
 
 	my ($createFns, $itemFns) = ('', '');
 	if($self->param('execute') && ! ($flags & (SEARCHFLAG_LOOKUPWINDOW | SEARCHFLAG_SEARCHBAR)))
@@ -26,8 +25,8 @@ sub getForm
 			<SELECT name="item_action_arl_select">
 				<option value="/org/%itemValue%/profile">View Summary</option>
 				<option value="/org/%itemValue%/dlg-update-org-%itemCategory%">Edit Profile</option>
-				<option value="/org/%itemValue%/dlg-add-ins-newplan">Create Insurance Plan</option>
-				<option value="/org/%itemValue%/dlg-add-ins-workerscomp">Create Workers Compensation Plan</option>
+				<option value="/org/%itemValue%/dlg-add-ins-product">Add Insurance Product</option>
+				<option value="/org/%itemValue%/dlg-add-ins-plan">Add Insurance Plan</option>
 				<option value="/org/%itemValue%/remove">Delete Record</option>
 			</SELECT>
 			<SELECT name="item_action_arl_dest_select">
@@ -41,7 +40,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<select name="create_newrec_select" style="color: green" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-				<option>Create New Record</option>
+				<option>Add New Record</option>
 				<option value="/org/#session.org_id#/dlg-add-org-main">Main</option>
 				<option value="/org/#session.org_id#/dlg-add-org-dept">Department</option>
 				<option value="/org/#session.org_id#/dlg-add-org-provider">Provider</option>
@@ -91,14 +90,5 @@ sub execute
 
 	return 1;
 }
-@CHANGELOG =
-(
 
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Org',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Org',
-		'Changed the urls from create/... to org/.... '],
-);
 1;

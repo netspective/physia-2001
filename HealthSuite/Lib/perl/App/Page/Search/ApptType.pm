@@ -40,7 +40,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<font size=2 face='Tahoma'>&nbsp &nbsp
-			<a href="/org/#session.org_id#/dlg-add-appttype">Create Appointment Type</a>
+			<a href="/org/#session.org_id#/dlg-add-appttype">Add Appointment Type</a>
 			</font>
 		};
 	}
