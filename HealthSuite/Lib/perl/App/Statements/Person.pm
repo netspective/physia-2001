@@ -134,6 +134,12 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where parent_id = ?
 		and value_type = 210
 		},
+	'selPrimaryPhysicianOrProvider' => qq{
+		select * from person_attribute
+		where parent_id = ?
+		and value_type = 210
+		and value_int = 1
+		},
 	'selEmploymentAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
