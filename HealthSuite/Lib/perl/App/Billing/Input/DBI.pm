@@ -417,7 +417,7 @@ sub assignPatientInsurance
 		$queryStatment = "select bill_party_type from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE = $no";
 		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 		# do the execute statement
-		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		#$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
 		if ($row[0] eq BILL_PARTY_TYPE_INSURANCE)
 		{
