@@ -34,6 +34,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'acct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -225,6 +226,10 @@ sub populateData
 	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $guarantorName->{'value_text'});
 	$page->field('resp_item_id', $guarantorName->{'item_id'});
 
+	my $bloodType = 'BloodType';
+	my $bloodTypecap =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $bloodType);
+	$page->field('blood_item_id', $bloodTypecap->{'item_id'});
+	$page->field('blood_type', $bloodTypecap->{'value_text'});
 }
 
 sub handleContactInfo
@@ -412,7 +417,7 @@ sub handleRegistry
 
 	else
 	{
-		$self->handlePostExecute($page, $command, $flags);
+		$page->redirect("/person/$personId/profile");
 	}
 
 
@@ -468,6 +473,16 @@ sub handleAttrs
 			value_int => 1,
 			_debug => 0
 			)if $partyName ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_id => $page->field('blood_item_id') || undef,
+			item_name => 'BloodType' || undef,
+			value_type => 0,
+			value_text => $page->field('blood_type') || undef,
+			_debug => 0
+		);
 
 }
 
