@@ -145,7 +145,7 @@ sub execute
 	my $status =  $page->field('status', $phoneStatus);
 	my $userId = $page->session('user_id');
 	my $printerName = $page->field('printerQueue');
-	
+
 	my $printerMessage = "--------------------------------------------\n";
 	$printerMessage .= "Phone Message \n";
 	$printerMessage .= "--------------------------------------------\n";
@@ -154,9 +154,9 @@ sub execute
 	$printerMessage .= "Time: ".$page->field('time')."\n";
 	$printerMessage .= "Message:\n".$page->field('phone_message')."\n";
 	$printerMessage .= "--------------------------------------------\n\n";
-	
+
 	App::Device::echoToPrinter ($printerName, $printerMessage) unless ($printerName eq '');
-	
+
         if($command eq 'add')
 	{
         	my $trans_id = $page->schemaAction(
@@ -242,8 +242,10 @@ sub execute
                         	_debug => 0
                		);
                         my $physicianData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByData_num_a', $transId);
+			my $personCommand = $physicianData->{trans_id} ne '' ? $command : 'add';
+
 	                $page->schemaAction(
-       		                'Transaction', $command,
+       		                'Transaction', $personCommand,
                		        trans_id => $physicianData->{trans_id}|| undef,
                        		trans_owner_id => $page->field('provider') || undef,
                         	provider_id => $page->field('provider') || undef,
@@ -259,9 +261,9 @@ sub execute
                 	);
 
                         my $userData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByUserAndData_num_a', $transId, $userId);
-
+			my $userCommand = $userData->{trans_id} ne '' ? $command : 'add';
 			$page->schemaAction(
-				'Transaction', $command,
+				'Transaction', $userCommand,
 				trans_id => $userData->{trans_id}|| undef,
 				trans_owner_id => $userId || undef,
 				provider_id => $page->field('provider') || undef,
@@ -294,9 +296,9 @@ sub execute
 			);
 			my $user = $page->param('person_id') ne $userId ? $userId : $page->field('provider');
 			my $userData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByUserAndData_num_a', "$phoneDataInfo->{data_num_a}", $user);
-
+			my $userCommand = $userData->{trans_id} ne '' ? $command : 'add';
 			$page->schemaAction(
-				'Transaction', $command,
+				'Transaction', $userCommand,
 				trans_id => $userData->{trans_id}|| undef,
 				trans_owner_id => $user || undef,
 				provider_id => $page->field('provider') || undef,
@@ -312,9 +314,10 @@ sub execute
 
                         my $parentItemId = $phoneDataInfo->{data_num_a};
                         my $personData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $parentItemId);
+			my $personCommand = $personData->{trans_id} ne '' ? $command : 'add';
 
                         $page->schemaAction(
-                                'Transaction', $command,
+                                'Transaction', $personCommand,
                                 trans_id => $personData->{trans_id} || undef,
                                 trans_owner_id => $page->field('person_called') || undef,
                                 provider_id => $page->field('provider') || undef,
