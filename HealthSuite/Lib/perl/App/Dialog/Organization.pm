@@ -127,7 +127,7 @@ sub initialize
 		),
 	);
 
-	if ($self->{orgtype} eq 'assoc-provider')
+	if ($self->{orgtype} eq 'dir-entry')
 		{
 			$self->addContent(
 				new CGI::Dialog::Field(
@@ -140,7 +140,9 @@ sub initialize
 								options => FLDFLAG_REQUIRED,
 								invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE
 							),
+				new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Add record', style => 'check'),
 			);
+
 	}
 
 	$self->addContentOrgType($self->{orgtype});
@@ -226,7 +228,7 @@ sub initialize
 			),
 		);
 	}
-	if ($self->{orgtype} eq 'assoc-provider')
+	if ($self->{orgtype} eq 'dir-entry')
 	{
 		$self->addContent(
 			new App::Dialog::Field::Address(
@@ -278,7 +280,7 @@ sub initialize
 		);
 	}
 
-	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'assoc-provider')
+	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dir-entry')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -328,7 +330,7 @@ sub initialize
 			),
 		);
 	}
-	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'assoc-provider')
+	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'dir-entry')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -352,7 +354,7 @@ sub initialize
 		);
 	}
 
-	if ($self->{orgtype} eq 'assoc-provider')
+	if ($self->{orgtype} eq 'dir-entry')
 	{
 		$self->addContent(
 			new CGI::Dialog::Field(
@@ -445,12 +447,35 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 	my $orgId = $page->param('org_id');
+
 	if($command eq 'remove')
 	{
 		my $deleteRecord = $self->getField('delete_record');
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Organization '$orgId'?");
 	}
+
+	my $orgType = $page->field('member_name');
+	my $parentOrgId = $page->field('parent_org_id');
+	my $sessionOrgId = $page->session('org_id');
+	my $createRecField = $self->getField('create_record');
+
+	if ($self->{orgtype} eq 'dir-entry' && $command eq 'add' &&  $orgType eq 'Location' && $parentOrgId eq $sessionOrgId)
+	{
+		$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
+		unless ($page->field('create_record'))
+		{
+			$createRecField->invalidate($page, "'Org Type is 'Location', but you haven't changed the 'Parent Organization ID' to the  main org this location belongs to. Please change the 'Org Type to 'Main' or change the 'Parent Organization ID' to the main org to which this location belongs.(OR) If you still want to add the record, enter the check-box 'Add Record'.");
+		}
+	}
+
+	else
+	{
+		$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+	}
+
+
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
 }
 
 
