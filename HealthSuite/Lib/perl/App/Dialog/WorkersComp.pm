@@ -139,6 +139,7 @@ sub execute_add
 			'Insurance', 'add',
 			ins_id => $insId || undef,
 			ins_org_id => $insOrgId || undef,
+			owner_org_id => $page->session('org_id'),
 			ins_type => App::Universal::CLAIMTYPE_WORKERSCOMP || undef,
 			remit_type => defined $remitType ? $remitType : undef,
 			remit_payer_id => $page->field('remit_payer_id') || undef,

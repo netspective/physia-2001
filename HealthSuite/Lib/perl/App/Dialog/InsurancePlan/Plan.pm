@@ -330,7 +330,7 @@ sub execute
 				product_name => $productName || undef,
 				plan_name => $planName || undef,
 				record_type => App::Universal::RECORDTYPE_INSURANCEPLAN || undef,
-				owner_org_id => $page->param('org_id') || undef,
+				owner_org_id => $page->session('org_id'),
 				ins_org_id => $insOrgId || undef,
 				ins_type => $insType || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,

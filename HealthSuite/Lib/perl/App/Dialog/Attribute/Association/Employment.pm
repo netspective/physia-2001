@@ -127,6 +127,7 @@ sub execute
 						ins_id => $insId || undef,
 						parent_ins_id => $workCompPlan->{value_int} || undef,
 						owner_id => $personId || undef,
+						owner_org_id => $page->session('org_id'),
 						ins_org_id => $workCompPlanInfo->{ins_org_id} || undef,
 						ins_type => defined $insType ? $insType : undef,
 						remit_type => defined $remitType ? $remitType : undef,

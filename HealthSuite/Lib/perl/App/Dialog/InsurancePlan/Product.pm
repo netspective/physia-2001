@@ -197,7 +197,7 @@ sub execute
 		product_name => $productName || undef,
 		record_type => App::Universal::RECORDTYPE_INSURANCEPRODUCT || undef,
 		#fee_schedule => $page->param('fee_schedule') || undef,
-		owner_org_id => $page->param('org_id') || undef,
+		owner_org_id => $page->session('org_id'),
 		ins_org_id => $page->field('ins_org_id') || undef,
 		ins_type => $insType || undef,
 		remit_type => $page->field('remit_type') || undef,

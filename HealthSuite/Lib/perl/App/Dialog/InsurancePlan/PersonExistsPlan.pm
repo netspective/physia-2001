@@ -185,6 +185,7 @@ sub execute
 			ins_id => $insId,
 			parent_ins_id => $planData->{ins_internal_id} || undef,
 			owner_id => $personId || undef,
+			owner_org_id => $page->session('org_id'),
 			ins_org_id => $planData->{ins_org_id} || undef,
 			record_type => defined $recordType ? $recordType : undef,
 			ins_type => defined $insType ? $insType : undef,

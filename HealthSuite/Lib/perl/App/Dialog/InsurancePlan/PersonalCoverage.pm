@@ -428,6 +428,7 @@ sub execute
 				record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 				owner_person_id => $personId || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
+				owner_org_id => $page->session('org_id'),
 				bill_sequence => $page->field('bill_sequence') || undef,
 				ins_type => $insType || undef,
 				#fee_schedule => $page->field('fee_schedule') || undef,
