@@ -2280,8 +2280,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.diagnosisSummary' => {
 	sqlStmt => qq{
-			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yy') as earliest_date,
-			       to_char(min(trans_begin_stamp), 'mm/dd/yy') as latest_date, count(member_name) as num_times
+			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yyyy') as earliest_date,
+			       to_char(min(trans_begin_stamp), 'mm/dd/yyyy') as latest_date, count(member_name) as num_times
 			from   ref_icd, invoice_claim_diags,transaction, invoice
 			where  client_id = ?
 			and    trans_id = main_transaction
@@ -2294,16 +2294,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		columnDefn =>
 		[
-			{ colIdx =>0, head => 'Code', dataFmt => '#0#'},
-			{ colIdx =>0, head => 'Diagnosis', dataFmt => '#1#'},
-			{ colIdx =>1, head => 'Earliest Date', dataFmt => '#2#'},
-			{ colIdx =>2, head => 'Latest Date', dataFmt => '#3#'},
-			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#', dAlign => 'CENTER'},
+			{ head => 'Diagnosis Summary', dataFmt => '<b>ICD: </b>#0#<br><b>ICD: </b>Diagnosis: #1#<br><b>Earliest Date: </b>#2#<br><b>Latest Date: </b>#3#<br><b>Diagnosed Times: </b>#4#<br><br>'},
 		],
-		frame =>
-		{
-				heading => 'Diagnosis Summary'
-		},
 	},
 	publishDefn_panel =>
 	{
@@ -2312,7 +2304,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		inherit => 'panel',
 		frame =>
 		{
-				heading => ''
+				heading => 'Diagnosis Summary'
 		},
 	},
 	publishDefn_panelTransp =>
