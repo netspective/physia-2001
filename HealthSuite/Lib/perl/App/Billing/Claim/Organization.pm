@@ -10,6 +10,7 @@ package App::Billing::Claim::Organization;
 use strict;
 
 use App::Billing::Claim::Entity;
+use App::Billing::Universal;
 
 use vars qw(@ISA);
 
@@ -24,7 +25,6 @@ sub new
 	$self->{id} = undef;
 	$self->{grp} = undef;
 	$self->{address} = undef;
-	$self->{federalTaxId} = undef;
 	$self->{specialityId} = undef;
 	$self->{organizationType} = undef;
 	$self->{type} = undef;
@@ -37,6 +37,7 @@ sub new
 	$self->{uPin} = undef;
 	$self->{taxId} = undef;
 	$self->{taxTypeId} = undef;
+	$self->{insType} = undef;
 
 	return bless $self, $type;
 }
@@ -46,6 +47,18 @@ sub property
 	my ($self, $name, $value) = @_;
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
+}
+
+sub setInsType
+{
+	my ($self, $value) = @_;
+	$self->{insType} = $value;
+}
+
+sub getInsType
+{
+	my $self = shift;
+	return $self->{insType};
 }
 
 sub setTaxTypeId
@@ -196,14 +209,13 @@ sub setGRP
 sub getGRP
 {
 	my $self = shift;
-
-	return $self->{grp};
-}
-
-sub getFederalTaxId
-{
-	my $self = shift;
-	return ($self->{federalTaxId} eq "" ? $self->{taxId} : $self->{federalTaxId});
+	my @ids;
+	$ids[MEDICARE]= $self->getMedicareId();
+	$ids[MEDICAID]= $self->getMedicaidId();
+	my @payerCodes =(MEDICARE, MEDICAID);
+	my $tempInsType = $self->{insType};
+	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{grp});
+	return $temp;
 }
 
 sub getName
@@ -234,12 +246,6 @@ sub setName
 {
 	my ($self,$value) = @_;
 	$self->{name} = $value;
-}
-
-sub setFederalTaxId
-{
-	my ($self,$value) = @_;
-	$self->{federalTaxId} = $value;
 }
 
 sub setAddress

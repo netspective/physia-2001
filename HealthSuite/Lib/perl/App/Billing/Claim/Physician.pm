@@ -23,30 +23,33 @@ sub new
 	my ($type) = shift;
 	my $self = new App::Billing::Claim::Person(@_);
 
-	$self->{pin} = undef;
-	$self->{grp} = undef;		# to be removed
 	$self->{name} = undef;
-#	$self->{contact} = undef;		# to be removed
-	$self->{federalTaxId} = undef;
+
+	$self->{pin} = undef;
+	$self->{taxId} = undef;
+	$self->{insType} = undef;
+	$self->{providerId} = undef;
 	$self->{assignIndicator} = undef;
 	$self->{signatureIndicator} = undef;
 	$self->{signatureDate} = undef;
-	$self->{documentationIndicator} = undef;
-	$self->{documentationType} = undef;
-	$self->{siteId} = undef;		# to be removed
 	$self->{specialityId} = undef;
+	$self->{qualification} = undef;
+
 	$self->{taxTypeId} = undef;
 	$self->{medicareId} = undef;
 	$self->{medicaidId} = undef;
 	$self->{champusId} = undef;
-	$self->{networkId} = undef;		# to be removed
-	$self->{qualification} = undef;
+	$self->{railroadId} = undef;
+	$self->{epsdtId} = undef;
 	$self->{blueShieldId} = undef;
-	$self->{idIndicator} = undef;		# to be removed
-	$self->{providerId} = undef;
-	$self->{insType} = undef;
 	$self->{workersComp} = undef;
 	$self->{professionalLicenseNo} = undef;
+
+	$self->{documentationIndicator} = undef;		# to be removed
+	$self->{documentationType} = undef;		# to be removed
+	$self->{siteId} = undef;		# to be removed
+	$self->{networkId} = undef;		# to be removed
+	$self->{idIndicator} = undef;		# to be removed
 
 	return bless $self, $type;
 }
@@ -61,6 +64,30 @@ sub setWorkersComp
 {
 	my ($self,$value) = @_;
 	$self->{workersComp} = $value;
+}
+
+sub getEPSDT
+{
+	my ($self) = @_;
+	return $self->{epsdtId};
+}
+
+sub setEPSDT
+{
+	my ($self,$value) = @_;
+	$self->{epsdtId} = $value;
+}
+
+sub getRailroadID
+{
+	my ($self) = @_;
+	return $self->{railroadId};
+}
+
+sub setRailroadID
+{
+	my ($self,$value) = @_;
+	$self->{railroadId} = $value;
 }
 
 sub setInsType
@@ -299,10 +326,10 @@ sub setContact_old
 	$self->{contact} = $value;
 }
 
-sub setFederalTaxId
+sub setTaxId
 {
 	my ($self,$value) = @_;
-	$self->{federalTaxId} = $value;
+	$self->{taxId} = $value;
 }
 
 sub getPIN
@@ -336,10 +363,10 @@ sub getContact_old
 	return $self->{contact};
 }
 
-sub getFederalTaxId
+sub getTaxId
 {
 	my ($self) = @_;
-	return $self->{federalTaxId};
+	return $self->{taxId};
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
