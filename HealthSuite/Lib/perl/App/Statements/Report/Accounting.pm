@@ -15,7 +15,9 @@ my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT;
 
 $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 {
-	SELECT 	a.person_id person_ID ,
+	SELECT
+		p.simple_name person_name,
+		a.person_id person_ID ,
 		count(distinct a.invoice_id),
 		sum(balance_0),
 		sum(balance_31),
@@ -24,8 +26,7 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 		sum(balance_121),
 		sum(balance_151),
 		sum(decode(item_type,3,total_pending,0)),
-		sum(total_pending),
-		p.simple_name person_name
+		sum(total_pending)
 	FROM	agedpayments a, person p, transaction t, invoice i
 	WHERE	(a.person_id = :1 or :1 is NULL)
 	AND 	(a.invoice_item_id is NULL  or a.item_type in (3) )
@@ -436,8 +437,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt =>
 		qq
 		{
-			SELECT 	a.person_id person_ID ,
-			count(distinct invoice_id),
+			SELECT
+				p.simple_name person_name,
+				a.person_id person_ID,
+				count(distinct invoice_id),
 				sum(balance_0),
 				sum(balance_31),
 				sum(balance_61),
@@ -445,8 +448,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_121),
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
-				sum(total_pending),
-				p.simple_name person_name
+				sum(total_pending)
 			FROM	agedpayments a, person p
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
@@ -468,17 +470,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
-#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
-				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 0, head => 'Patient Name', dataFmt => '#0#'},
+				{ colIdx => 1, head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},
@@ -493,17 +495,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
-				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 0, head => 'Patient Name', dataFmt => '#0#' },
+				{ colIdx => 1, head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},
@@ -518,17 +520,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
-				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 0, head => 'Patient Name', dataFmt => '#0#'},
+				{ colIdx => 1, head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},
@@ -543,17 +545,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
-				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
-				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
-				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
-				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
-				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
-				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
-				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
-				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 0, head => 'Patient Name', dataFmt => '#0#'},
+				{ colIdx => 1, head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
+				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '61 - 90', summarize=>'sum',dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},

@@ -572,7 +572,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 
 'invoice.appointmentCharges' => {
 	sqlStmt => qq{
-			select 	p1.complete_name,
+			select 	p1.simple_name,
 				trunc(e.start_time - :4),
 				to_char(e.start_time - :4, 'HH12:MIAM'),
 				to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
@@ -580,8 +580,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				e.subject,
 				t.caption,
 				tt.caption,
-				p.complete_name,
-				p2.complete_name,
+				p.simple_name,
+				p2.simple_name,
 				nvl(i.total_cost, 0),
 				i.client_id,
 				p3.simple_name
@@ -603,11 +603,11 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				and o.owner_org_id = :3
 				and i.client_id = p3.person_id
 			UNION ALL
-			select	p1.complete_name, trunc(e.start_time - :4),
+			select	p1.simple_name, trunc(e.start_time - :4),
 				to_char(e.start_time - :4, 'HH12:MIAM'),
 				to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
 				o.name_primary, e.subject,
-				t.caption, tt.caption, p.complete_name,
+				t.caption, tt.caption, p.simple_name,
 				o1.name_primary,
 				nvl(i.total_cost, 0),
 				i.client_id,

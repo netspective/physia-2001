@@ -47,7 +47,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where person_id = ?
 		},
 	'selPersonSimpleNameById' => qq{
-			select complete_name from person where person_id = ?
+			select simple_name from person where person_id = ?
 		},
 	'selRegistry' => qq{
 		select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
