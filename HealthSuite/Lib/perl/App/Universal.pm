@@ -16,13 +16,25 @@ use constant ROLE_GRANT => 0;
 use constant ROLE_REVOKE => 1;
 
 #RELATIONSHIP TO INSURED
-use constant INSURED_SELF => 0;
-use constant INSURED_SPOUSE => 10;
-use constant INSURED_PARENT => 11;
-use constant INSURED_CHILD => 12;
-use constant INSURED_EMPLOYER => 50;
-use constant INSURED_OTHER => 99;
-
+use constant INSURED_SELF => 1;
+use constant INSURED_SPOUSE => 2;
+use constant INSURED_CHILD_FINANCIALRESP => 3;
+use constant INSURED_CHILD_NOFINANCIALRESP => 4;
+use constant INSURED_STEPCHILD => 5;
+use constant INSURED_FOSTERCHILD => 6;
+use constant INSURED_WARDOFCOURT => 7;
+use constant INSURED_EMPLOYEE => 8;
+use constant INSURED_OTHER => 9;
+use constant INSURED_HANDICAPPED_DEPENDENT => 10;
+use constant INSURED_ORGANDONOR => 11;
+use constant INSURED_CADAVERDONOR => 12;
+use constant INSURED_GRANDCHILD => 13;
+use constant INSURED_NIECE_NEPHEW => 14;
+use constant INSURED_INJURED_PLAINTIFF => 15;
+use constant INSURED_SPONSORED_DEPENDENT => 16;
+use constant INSURED_MINORDEPEND_OF_MINORDEPEND => 17;
+use constant INSURED_PARENT => 18;
+use constant INSURED_GRANDPARENT => 19;
 
 #SPECIALTY SEQUENCE
 use constant SPECIALTY_PRIMARY =>1;
