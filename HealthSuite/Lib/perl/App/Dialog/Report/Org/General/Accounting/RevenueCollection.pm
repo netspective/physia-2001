@@ -99,8 +99,8 @@ sub execute
 			{ colIdx => 12, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 13, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
 			{ colIdx => 14, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 15, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },			
-			{ colIdx => 16, head =>'% To Gross', },	
+			{ colIdx => 15, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },	
+			{ colIdx => 16, head =>'% To Gross', tDataFmt=> '&{sum_percent:15,10}'},	
 			{ colIdx => 17 ,head =>'Hospital Visits', summarize => 'sum',  },				
 			{ colIdx => 18, head =>'Office Visits', summarize => 'sum',  },			
 			{ colIdx => 19, head =>'Avg Chrg per Visit', summarize => 'sum',  dformat => 'currency' },	
@@ -134,7 +134,7 @@ sub execute
 				{ colIdx => 3, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
 				{ colIdx => 4, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
 				{ colIdx => 5, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },			
-				{ colIdx => 6, head =>'% To Gross', dAlign=>'Right' },
+				{ colIdx => 6, head =>'% To Gross', tDataFmt=> '&{sum_percent:5,10}', dAlign=>'Right' },
 				{ colIdx => 7 ,head =>'Hospital Visits', summarize => 'sum',  },			
 				{ colIdx => 8, head =>'Office Visits', summarize => 'sum',  },			
 				{ colIdx => 9, head =>'Avg Chrg per Visit',  dformat => 'currency' },			
@@ -153,7 +153,7 @@ sub execute
 		$_->{total_prof_prod} = $_->{ffs_prof} + $_->{cap_ffs_prof};
 		$_->{grand_total_prod} = $_->{total_non_cap_prod} +$_->{total_cap_prod};
 		$_->{net_recpts} = $_->{ffs_pmt} + $_->{cap_pmt} ;
-		$_->{gross_per} = sprintf  "%2.2f", ($_->{net_recpts} / $_->{grand_total_prod} )*100 if $_->{grand_total_prod} > 0;
+		$_->{gross_per} = sprintf  "%3.2f", ($_->{net_recpts} / $_->{grand_total_prod} )*100 if $_->{grand_total_prod} > 0;
 		$_->{chrg_per_visit} = $_->{visits} / $_->{grand_total_prod} if  $_->{grand_total_prod} >0;
 		$_->{prof_pmts} = $_->{net_recpts} - $_->{ancill_pmt} ;
 		$_->{avg_cost_vist} = $_->{grand_total_prod} / $_->{office_visit} if $_->{office_visit} > 0;
@@ -179,15 +179,15 @@ sub execute
 			$_->{ffs_pmt},
 			$_->{cap_pmt},
 			$_->{net_recpts},
-			$_->{gross_per}||0,
+			$_->{gross_per}||'0.00',
 			$_->{hospital_visit},			
 			$_->{office_visit},
-			$_->{avg_cost_vist}||'0'
-
+			$_->{avg_cost_vist}||'0',
+			$_->{grand_total_prod},			
 		);
 		if ($format_report != 0)
 		{
-			push(@data,[@rowData, @rowData2[1..9] ]);	
+			push(@data,[@rowData, @rowData2[1..scalar(@rowData2)] ]);	
 		}
 		else
 		{

@@ -38,7 +38,16 @@ sub new
 						fields => [
 			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
 			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
+			
 			]),
+			new CGI::Dialog::Field(type => 'select',
+							style => 'radio',
+							selOptions => 'No:0;Yes:1',
+							caption => 'Include Associated Orgs: ',
+							preHtml => "<B><FONT COLOR=DARKRED>",
+							postHtml => "</FONT></B>",
+							name => 'include_org',options=>FLDFLAG_REQUIRED,
+				defaultValue => '0',),				
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -63,9 +72,10 @@ sub prepare_detail_payment
 	my $person_id = $page->field('person_id');
 	my $batch_from = $page->field('batch_id_from');
 	my $batch_to = $page->field('batch_id_to');
+	my $include_org =$page->field('include_org');
 	my $orgIntId = undef;
 	my $html =undef;	
-	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
+	$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
 
 	my $pub = {			
 		columnDefn =>
@@ -84,9 +94,9 @@ sub prepare_detail_payment
 			{colIdx => 11,head => 'Ins W/O', summarize => 'sum',  dformat => 'currency' },
 			{colIdx => 12,head => 'Ins Rcpts', summarize => 'sum',  dformat => 'currency' },
 			{colIdx => 13,head => 'Per Rcpts', summarize => 'sum',  dformat => 'currency' },						
-			{colIdx => 14,head => 'Payment Type', dAlign => 'center',},
-			{colIdx => 15,head => 'Units', sAlign=>'center',dAlign => 'center',tAlign =>'center',summarize => 'sum'},			
-			{colIdx => 16,head => 'Unit Cost', sAlign=>'center',dAlign => 'center',tAlign =>'center',summarize => 'sum',dformat => 'currency'},			
+			{colIdx => 14,head => 'Refund', summarize => 'sum',  dformat => 'currency',},						
+			{colIdx => 15,head => 'Payment Type', dAlign => 'center',},
+
 		],
 	};
 	my $batch_date = $page->param('batch_date');	
@@ -112,9 +122,8 @@ sub prepare_detail_payment
 			$_->{insurance_write_off},									
 			$_->{insurance_pay},								
 			$_->{person_pay},
-			$_->{pay_type},
-			$_->{units}||0,
-			$_->{unit_cost}||0,
+			$_->{refund},
+			$_->{pay_type}
 		);
 		push(@data, \@rowData);
 	}
@@ -140,15 +149,18 @@ sub execute
 	my $person_id = $page->field('person_id')||undef;
 	my $batch_from = $page->field('batch_id_from')||undef;
 	my $batch_to = $page->field('batch_id_to')||undef;
-	my $orgIntId = undef;
+	my $orgResult = undef;
+	my $include_org =$page->field('include_org') ;
+	my $orgIntId;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;	
 	my $html;
 	my $pub ={ 
 		columnDefn =>
 			[
+			{ colIdx =>13 , groupBy=>'#13#', head=>'Facility',hAlign=>'LEFT'},
 			{ colIdx => 0 ,head => 'Batch Date', dataFmt => '#0#', dAlign => 'RIGHT' ,
-			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&batch_date=#0#',null,'width=900,height=600,scrollbars,resizable')}},
+			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&batch_date=#0#&org_internal_id=#14#',null,'width=900,height=600,scrollbars,resizable')}},
 			{ colIdx => 1, head => 'Chrgs', summarize => 'sum', dataFmt => '#2#', dformat => 'currency' },
 			{ colIdx => 2, head => 'Misc Chrgs', summarize => 'sum', dataFmt => '#3#', dformat => 'currency' },
 			{ colIdx => 3, head => 'Per W/O', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },			
@@ -159,31 +171,42 @@ sub execute
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },			
 			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },			
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
 		],
 	};		
-	my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_daily_audit',$reportBeginDate,$reportEndDate,
-	,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 	my @data = ();	
-	foreach (@$daily_audit)
+	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildernOrgs', 
+			$page->session('org_internal_id'),$orgIntId, $include_org) if $orgId;
+	foreach my $orgValue (@$orgResult)
 	{
-				
-		my @rowData = 
-		(	
-			$_->{invoice_date},
-			$_->{total_charges},
-			$_->{misc_charges},			
-			$_->{person_write_off},			
-			$_->{insurance_write_off},						
-			$_->{total_charges} + $_->{misc_charges} + $_->{charge_adjust}, #Net Charges						
-			$_->{balance_transfer},								
-			$_->{insurance_pay},								
-			$_->{person_pay},
-			$_->{refund},
-			$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
-		);
-		push(@data, \@rowData);
+		my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_daily_audit',$reportBeginDate,$reportEndDate,
+		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
+		foreach (@$daily_audit)
+		{
+			$_->{tlt_rcpts}=$_->{person_pay} + $_->{insurance_pay} - $_->{refund};
+			$_->{tlt_chrgs}=$_->{total_charges}+$_->{misc_charges};		
+			$_->{collection_per} = $_->{tlt_chrgs} > 0 ? sprintf  "%3.2f", ($_->{tlt_rcpts} / $_->{tlt_chrgs} )*100 : '0.00' ;		
+			my @rowData = 
+			(	
+				$_->{invoice_date},
+				$_->{total_charges},
+				$_->{misc_charges},			
+				$_->{person_write_off},			
+				$_->{insurance_write_off},						
+				$_->{total_charges} + $_->{misc_charges} + $_->{charge_adjust}, #Net Charges						
+				$_->{balance_transfer},								
+				$_->{insurance_pay},								
+				$_->{person_pay},
+				$_->{refund},
+				$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
+				$_->{collection_per},
+				$_->{tlt_chrgs},
+				$orgValue->{org_id},
+				$orgValue->{org_internal_id}
+			);
+			push(@data, \@rowData);
+		}
 	}
-	
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	return $html
 }
