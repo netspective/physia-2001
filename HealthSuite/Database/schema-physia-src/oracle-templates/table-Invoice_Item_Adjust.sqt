@@ -262,7 +262,6 @@ begin
     WHERE t.trans_id = i.main_transaction 			
 	AND ii.parent_id  = i.invoice_id
 	AND iia.parent_id = ii.item_id
-	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
 	and iia.adjustment_id=v_adjustment_id;
 
    end loop; 
