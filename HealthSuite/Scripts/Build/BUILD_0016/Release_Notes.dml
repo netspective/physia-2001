@@ -119,6 +119,10 @@
 			Reversed the sender and recipient on phone messages.
 		</deliverable>
 
+		<deliverable id="1451">
+			Added invoice status 'Awaiting Client Payment' and changed 'Awaiting Payment' to 'Awaiting Insurance Payment'.
+		</deliverable>
+
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
 		</deliverable>
