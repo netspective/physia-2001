@@ -170,8 +170,8 @@ sub populateData
 
 	#If this product is not owned by this org then make dialog view only
 	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
-	
-	
+
+
 	my $selInsOrgData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
 	my $insOrgInternalId = $selInsOrgData->{'ins_org_id'};
 	my $insOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $insOrgInternalId);
@@ -238,7 +238,7 @@ sub execute
 		owner_org_id => $page->session('org_internal_id'),
 		ins_org_id => $insOrgInternalId || undef,
 		ins_type => $insType || undef,
-		remit_type => $page->field('remit_type') || undef,
+		remit_type => $page->field('remit_type') || 0,
 		remit_payer_id => $page->field('remit_payer_id') || undef,
 		remit_payer_name => $page->field('remit_payer_name') || undef,
 		_debug => 0
@@ -250,7 +250,7 @@ sub execute
 		my $preOrgId = $page->field('pre_org_id');
 		my $preInsOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $preOrgId);
 
-		my $updateData = $STMTMGR_INSURANCE->execute($page, STMTMGRFLAG_NONE, 'selUpdatePlanAndCoverage', $insType, $productName, $insOrgInternalId, $preProductName, $preInsOrgInternalId);
+		my $updateData = $STMTMGR_INSURANCE->execute($page, STMTMGRFLAG_NONE, 'selUpdatePlanAndCoverage', $insType, $productName, $insOrgInternalId, $preProductName, $preInsOrgInternalId, $page->session('org_internal_id'));
 	}
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
