@@ -22,6 +22,7 @@
 		<deliverable id="273">
 			Patient bill now showing adjustments as line items with relevant information. 
 			Also, print option added to pt worklist for claims with no charges.
+			Additional: Reverted back to old payment dialog code to remove cc# and exp date fields.
 		</deliverable>
 	
 		<deliverable id="713">
