@@ -1096,6 +1096,16 @@
 				<col name="caption">HMO(non-cap)</col>
 				<col name="group_name">insurance</col>
 			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">MC(managed care choice)</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">POS(point of service)</col>
+				<col name="group_name">insurance</col>
+			</row>
 		</data>
 	</table>
 
