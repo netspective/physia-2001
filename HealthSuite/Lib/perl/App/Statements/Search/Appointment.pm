@@ -169,7 +169,7 @@ $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(
 	{
 		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
-		orderBy => 'ORDER BY patient.name_last, patient.name_first, patient.name_middle',
+		orderBy => 'ORDER BY upper(patient.name_last), upper(patient.name_first), upper(patient.name_middle)',
 	},
 
 );
