@@ -88,6 +88,7 @@ sub populateData
 	{
 		$phoneStatus = 'Read';
 	}
+
 	elsif ($phoneInfo->{trans_status}  == 5)
 	{
 		$phoneStatus = 'Not Read';
@@ -116,14 +117,15 @@ sub populateData
 		$page->field('person_called', $phoneInfo->{consult_id});
 
         }
-
 }
 
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 
+	$page->field('status', 'Not Read')if $command eq 'add';
 	my $phoneStatus = $page->field('status') eq 'Not Read' ? 5 : 4;
+	my $status =  $page->field('status', $phoneStatus);
 
         if($command eq 'add')
 	{
