@@ -198,27 +198,6 @@ sub getComponentHtml
 			};
 		}
 
-		if ($_->{checkin_time} || $_->{checkout_time})
-		{
-			$checkinMinutes  = stamp2minutes($_->{checkin_time});
-			$waitMinutes = $checkinMinutes - $apptMinutes;
-			$waitMinutes = 'early' if $waitMinutes < 0;
-		}
-
-		if ($_->{checkout_time})
-		{
-			$checkoutMinutes = stamp2minutes($_->{checkout_time});
-			$visitMinutes = $checkoutMinutes - $checkinMinutes;
-			$visitMinutes = 'early' if $visitMinutes < 0;
-		}
-
-		my $deadBeatBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
-			STMTMGRFLAG_NONE, 'sel_deadBeatBalance', $_->{patient_id});
-
-		my $copay;
-		$copay = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page,
-			STMTMGRFLAG_NONE, 'sel_copayInfo', $_->{invoice_id}) if $_->{invoice_id};
-
 		my $patientHref = $PATIENT_URLS{$page->session('patientOnSelect')}->{arl};
 		$patientHref =~ s/itemValue/$_->{patient_id}/;
 		my $physicianHref = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{arl};

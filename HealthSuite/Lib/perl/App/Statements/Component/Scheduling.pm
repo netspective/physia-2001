@@ -29,11 +29,19 @@ $STMTRPTDEFN_WORKLIST =
 		{colIdx => 4, head => 'Checkin', dAlign => 'center'},
 		{colIdx => 5, head => 'Checkout', dAlign => 'center'},
 		{colIdx => 6, head => 'Claim', dAlign => 'center'},
-		{colIdx => 7, head => 'Due', hHint => 'Copay due by patient for this visit', url => '/invoice/#9#/dialog/adjustment/personal,#11#', 
-			hint => "Copay due for this visit.\nClick to apply payment.", 
-			dAlign => 'right', dformat => 'currency', summarize => 'sum'},
-		{colIdx => 8, hint => 'View Account Balance', head => 'Balance', url => '/person/#10#/account', dAlign => 'right', dformat => 'currency', summarize => 'sum'},
-		{colIdx => 12, head => 'Action'},
+		{colIdx => 7, head => 'OV Copay', 
+			hHint => 'Copay due by patient for this visit', 
+			dAlign => 'right', dformat => 'currency', summarize => 'sum'
+		},
+		{colIdx => 8, head => 'Account Balance', hint => 'View Account Balance',
+			url => '/person/#10#/account',
+			dAlign => 'right', dformat => 'currency', summarize => 'sum'
+		},
+		{colIdx => 12, head => 'Patient Balance', hint => 'View Account Balance',
+			url => '/person/#10#/account',
+			dAlign => 'right', dformat => 'currency', summarize => 'sum'
+		},
+		{colIdx => 11, head => 'Action'},
 	],
 };
 
@@ -136,11 +144,25 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	},
 
 # ---------------------------------------------------------------------------------
-	'sel_deadBeatBalance' => qq{
-			select sum(balance)
-			from invoice
-			where client_id = ?
-				and balance > 0
+	'sel_accountBalance' => qq{
+		select nvl(sum(balance), 0)
+		from invoice
+		where client_id = :1
+			and invoice_status > 3
+			and invoice_status != 15
+			and invoice_status != 16
+			and balance > 0
+	},
+	
+	'sel_patientBalance' => qq{
+		select nvl(sum(balance), 0)
+		from invoice
+		where client_id = :1
+			and invoice_status > 3
+			and invoice_status != 15
+			and invoice_status != 16
+			and invoice_subtype = 0
+			and balance > 0
 	},
 
 	'sel_copayInfo' => qq{
@@ -148,6 +170,14 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			from Invoice_Item
 			where parent_id = ?
 			and item_type = 3
+	},
+	
+	'sel_copay' => qq{
+		select Insurance.copay_amt 
+		from Insurance, Invoice_Billing, Invoice
+		where Invoice.invoice_id = :1
+			and Invoice_Billing.bill_id = Invoice.billing_id
+			and Insurance.ins_internal_id = Invoice_billing.bill_ins_id
 	},
 	
 	'del_worklist_resources' => qq{

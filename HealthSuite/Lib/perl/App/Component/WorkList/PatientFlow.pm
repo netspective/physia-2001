@@ -21,7 +21,7 @@ use CGI::ImageManager;
 use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL
 	INSURANCE_COMPLETE INSURANCE_PARTIAL MEDICAL PERSONAL);
 
-use vars qw(@ISA %RESOURCE_MAP @EXPORT
+use vars qw(%RESOURCE_MAP @EXPORT
 	@ITEM_TYPES
 	%PATIENT_URLS
 	%PHYSICIAN_URLS
@@ -32,7 +32,9 @@ use vars qw(@ISA %RESOURCE_MAP @EXPORT
 	$orgDefault
 	$apptDefault
 );
-@ISA   = qw(CGI::Component Exporter);
+
+use base qw(CGI::Component Exporter);
+
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
 my $arlPrefix = '/worklist/patientflow';
@@ -218,13 +220,16 @@ sub getComponentHtml
 			$visitMinutes = 'early' if $visitMinutes < 0;
 		}
 
-		my $deadBeatBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
-			STMTMGRFLAG_NONE, 'sel_deadBeatBalance', $_->{patient_id});
+		my $accountBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
+			STMTMGRFLAG_NONE, 'sel_accountBalance', $_->{patient_id});
+		
+		my $patientBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
+			STMTMGRFLAG_NONE, 'sel_patientBalance', $_->{patient_id});
 
 		my $copay;
-		$copay = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page,
-			STMTMGRFLAG_NONE, 'sel_copayInfo', $_->{invoice_id}) if $_->{invoice_id};
-
+		$copay = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
+			STMTMGRFLAG_NONE, 'sel_copay', $_->{invoice_id}) if $_->{invoice_id};
+		
 		my $patientHref = $PATIENT_URLS{$page->session('patientOnSelect')}->{arl};
 		$patientHref =~ s/itemValue/$_->{patient_id}/;
 		my $physicianHref = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{arl};
@@ -319,18 +324,19 @@ sub getComponentHtml
 			}
 				: undef,
 
-			$_->{invoice_id} ? $copay->{balance} : undef,
+			$_->{invoice_id} ? $copay : undef,
 
-			$deadBeatBalance,
+			$accountBalance,
 			$_->{invoice_id},
 			$_->{patient_id},
-			$copay->{item_id},
 
 			$_->{invoice_id} ? qq{
 				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">
 					Print</a>
 			}
 				: undef,
+				
+			$patientBalance,
 		);
 
 		push(@data, \@rowData);

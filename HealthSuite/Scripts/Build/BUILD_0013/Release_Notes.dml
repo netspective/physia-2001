@@ -9,95 +9,116 @@
 	</release-info>
 	
 	<deliverables>
-		<deliverable id="901">
-			UI:  Return to Checkin Dialog after adding a Health Coverage record at Checkin.
+	
+		<deliverable id="1149">
+			Reversal of payments allowed at Closed status.
+		</deliverable>				
+
+		<deliverable id="1141">
+			Added missing encounter to the patient actvity report.  Also changed Facility ID to a drop down menu. 	
+		</deliverable>		
+	
+		<deliverable id="1131">
+			Referring physician field in add claim has been changed to a drop-down.
+		</deliverable>
+		
+		<deliverable id="1128">
+			UI:  Added a new field called 'Clearing House ID' in the MainOrg dialog and it is displayed in the profile header'.
+		</deliverable>	
+
+		<deliverable id="1111">
+			UI: On the person page, editing person profile works.
 		</deliverable>
 
-		<deliverable id="978">
-			UI:  Added a new field called 'Gender' in the 'Responsible party' dialog.
+		<deliverable id="1101">
+			Error showing long decimal number has been formatted properly and fixed.
 		</deliverable>
 
 		<deliverable id="1083">
 			This depends on bug 995 which was fixed in the build_12 patch
 		</deliverable>
-		<deliverable id="1033">
-			Change field calculation in Revenue/Collection see bug 1033 for comments
-		</deliverable>
+
+		<deliverable id="1071">
+			UI:  Pickup copay info for both HMO CAP and PPO.  Added Patient Balance column.  Relabel
+			the Due column to OV Copay.
+		</deliverable>	
+		
 		<deliverable id="1066">
 			If close date is not the next date in sequence a warning is generated and the 
 			user will be asked to select a check box if they still want to close the date.
 			Also need to re-test that the close date will lock out invoice creation, posting of payments.
 		</deliverable>
-		<deliverable id="461">
-			UI:  Added a new dialog for 'Referring Doctor' and added a link in the Main menu to add the 'Referring Doctor'.
-		</deliverable>
-		<deliverable id="1026">
-			UI:  Added a new component called 'Closing Date Information' in the Org Profile'.
-		</deliverable>	
-		<deliverable id="788">
-			UI:  Added a new option called 'Unemployed' in the 'Employment' drop-down list'.
-		</deliverable>	
-		<deliverable id="1128">
-			UI:  Added a new field called 'Clearing House ID' in the MainOrg dialog and it is displayed in the profile header'.
-		</deliverable>	
-		<deliverable id="934">
-			UI:  Added few more options in the 'Blood Type' drop-down list field and added a new component called 
-			     'Blood Type' in the 'Chart' page.
-		</deliverable>	
-		<deliverable id="435">
-			UI: Added a printer drop down box in the Add Phone Message dialog that allows you to print a copy of the phone message to a user specified printer in the Org.
-		</deliverable>	
-		<deliverable id="468">
-			UI:  Added a multifield in the update Patient dialog to add 'Patient deceased and date'. 
-			     This added information about deceased patient can be viewed in the 'Alert' component.
-		</deliverable>	
-		<deliverable id="1111">
-			UI: On the person page, editing person profile works.
-		</deliverable>
-		<deliverable id="1049">
-			 Fixed the code to update a phone message.
-		</deliverable>
-		<deliverable id="360">
-			 UI: Now the 'Begin Date' and 'End Date' will showup in the 'Health Coverage' component
-		</deliverable>		
-		<deliverable id="1141">
-			Added missing encounter to the patient actvity report.  Also changed Facility ID to a drop down menu. 	
-		</deliverable>		
-		<deliverable id="1045">
-			Correct calculations  on receipt analysis and added more filter fields to the report
-		</deliverable>		
+
 		<deliverable id="1061">
 			Added validation to the close date dialog that warns user if selected close date is not the next close date in sequence for the org.
 			NOTE : Please test that close date still locks out the creation of invoice and payments correctly.
-		</deliverable>				
-		
-		<deliverable id="732">
-			Ability to add pre-payments.
 		</deliverable>				
 
 		<deliverable id="1055">
 			Redirecting insurance batch payments back to the batch dialog.
 		</deliverable>				
+		
+		<deliverable id="1049">
+			 Fixed the code to update a phone message.
+		</deliverable>
+
+		<deliverable id="1045">
+			Correct calculations  on receipt analysis and added more filter fields to the report
+		</deliverable>		
+
+		<deliverable id="1039">
+			Showing service provider on claim summary.
+		</deliverable>				
+		
+		<deliverable id="1033">
+			Change field calculation in Revenue/Collection see bug 1033 for comments
+		</deliverable>
+
+		<deliverable id="1026">
+			UI:  Added a new component called 'Closing Date Information' in the Org Profile'.
+		</deliverable>	
+
+		<deliverable id="978">
+			UI:  Added a new field called 'Gender' in the 'Responsible party' dialog.
+		</deliverable>
 
 		<deliverable id="957">
 			Two new fields added to TWCC64 dialog.
 		</deliverable>				
 
-		<deliverable id="1101">
-			Error showing long decimal number has been formatted properly and fixed.
-		</deliverable>				
+		<deliverable id="934">
+			UI:  Added few more options in the 'Blood Type' drop-down list field and added a new component called 
+			     'Blood Type' in the 'Chart' page.
+		</deliverable>	
+		
+		<deliverable id="901">
+			UI:  Return to Checkin Dialog after adding a Health Coverage record at Checkin.
+		</deliverable>
 
-		<deliverable id="1131">
-			Referring physician field in add claim has been changed to a drop-down.
-		</deliverable>				
+		<deliverable id="788">
+			UI:  Added a new option called 'Unemployed' in the 'Employment' drop-down list'.
+		</deliverable>	
 
-		<deliverable id="1149">
-			Reversal of payments allowed at Closed status.
+		<deliverable id="732">
+			Ability to add pre-payments.
 		</deliverable>				
+		
+		<deliverable id="468">
+			UI:  Added a multifield in the update Patient dialog to add 'Patient deceased and date'. 
+			     This added information about deceased patient can be viewed in the 'Alert' component.
+		</deliverable>	
+		
+		<deliverable id="461">
+			UI:  Added a new dialog for 'Referring Doctor' and added a link in the Main menu to add the 'Referring Doctor'.
+		</deliverable>
 
-		<deliverable id="1039">
-			Showing service provider on claim summary.
-		</deliverable>				
+		<deliverable id="435">
+			UI: Added a printer drop down box in the Add Phone Message dialog that allows you to print a copy of the phone message to a user specified printer in the Org.
+		</deliverable>	
+		
+		<deliverable id="360">
+			 UI: Now the 'Begin Date' and 'End Date' will showup in the 'Health Coverage' component
+		</deliverable>		
 
 	</deliverables>
 </release-notes>
