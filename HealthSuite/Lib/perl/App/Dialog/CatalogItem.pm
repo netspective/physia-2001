@@ -18,6 +18,37 @@ use Date::Manip;
 use base 'CGI::Dialog';
 use vars qw(%RESOURCE_MAP);
 
+
+#MAPS RANGE OF CPTs to service codes at some point this should be moved into the database
+my @CPT_SERVTYPE_RANGE =
+(
+	{ min_value =>'10000',	 max_value =>'69999',	 serv_code =>'02',},
+	{ min_value =>'70000',	 max_value =>'79999',	 serv_code =>'04',},
+	{ min_value =>'80000',	 max_value =>'89999',	 serv_code =>'05',},
+	{ min_value =>'99002',	 max_value =>'99090',	 serv_code =>'01',},
+	{ min_value =>'99150',	 max_value =>'99183',	 serv_code =>'01',},
+	{ min_value =>'99190',	 max_value =>'99239',	 serv_code =>'01',},
+	{ min_value =>'90699',	 max_value =>'90915',	 serv_code =>'01',},	
+	{ min_value =>'99241',	 max_value =>'99275',	 serv_code =>'03',},
+	{ min_value =>'99281',	 max_value =>'99456',	 serv_code =>'01',},
+	{ min_value =>'95805',	 max_value =>'95999',	 serv_code =>'05',},
+	{ min_value =>'99000',	 max_value =>'99001',	 serv_code =>'05',},
+	{ min_value =>'94680',	 max_value =>'95082',	 serv_code =>'05',},
+	{ min_value =>'95105',	 max_value =>'95180',	 serv_code =>'01',},
+	{ min_value =>'93501',	 max_value =>'93652',	 serv_code =>'02',},	
+);
+
+#MAPS RANGE OF HCPCS to service codes at some point this should be moved into the database
+my @HCPCS_SERVTYPE_RANGE=
+(
+	{ min_value =>'A0000',	 max_value =>'E9999',	 serv_code =>'09',},
+	{ min_value =>'K0110',	 max_value =>'K0411',	 serv_code =>'09',},
+);
+
+
+
+
+
 %RESOURCE_MAP = (
 	'catalog-item' => {
 		_arl_add => ['catalog_id', 'parent_entry_id'],
@@ -94,8 +125,8 @@ sub new
 			type => 'text',
 			size => 2,			
 			maxLength => 2,					
-			findPopup => '/lookup/servicetype',
-			options => FLDFLAG_REQUIRED,
+			findPopup => '/lookup/servicetype',			
+			#options => FLDFLAG_REQUIRED,
 							
 		),
 		new CGI::Dialog::Field(caption => 'Status',
@@ -226,6 +257,7 @@ sub checkDupEntry
 	}
 }
 
+
 sub customValidate
 {
 	my ($self, $page) = @_;
@@ -239,6 +271,50 @@ sub customValidate
 	my $svc_field =$self->getField('data_text');
 	
 	$self->checkDupEntry($page, $fs, $entryType, $code, $modifier);
+	
+	#Attempt to determine serivce type if user does not provide one
+	if ($svc_type eq '')
+	{
+		#CPT CODE TYPE
+		if ($entryType == App::Universal::CATALOGENTRYTYPE_CPT) 
+		{
+			foreach my $range (@CPT_SERVTYPE_RANGE)
+			{
+				if($code le $range->{max_value} &&$code ge $range->{min_value})
+				{
+					$svc_type = $range->{serv_code};
+					last;
+				}
+			}
+		}
+		
+		#EPSDT CODE TYPE
+		elsif ($entryType == App::Universal::CATALOGENTRYTYPE_EPSDT)
+		{
+			$svc_type = 'S';
+		}
+		
+		#HCPCS CODE TYPE
+		elsif ($entryType == App::Universal::CATALOGENTRYTYPE_HCPCS)
+		{
+			foreach my $range (@HCPCS_SERVTYPE_RANGE)
+			{
+				if($code le $range->{max_value} && $code ge $range->{min_value})
+				{					
+					$svc_type = $range->{serv_code};			
+					last;
+				}
+			}		
+		}
+		
+		#
+		#Autofill service type if we were able to determine it
+		$page->field('data_text',$svc_type);
+		my $itemNameField = $self->getField('data_text');
+		$itemNameField->invalidate($page, qq{
+		@{[ $svc_type ? "Autofilled Service Type" : "Unable to find a Service Type for code '$code'" ]}
+		});					
+	}
 	
 	
 	if($svc_type ne '' && not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericServiceTypeByAbbr', $svc_type)))
