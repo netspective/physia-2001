@@ -25,4 +25,28 @@ B862 - Corrected misspellings
 B236 - Added in-line captions to the city, state, and zip parts of
 all address fields
 
+B216 - Changed the "Hours Of Operation" field in Org dialog to be editable
+
+B725 - Made the 'Phone Number' and "Address" field to be not required ones in the Insurance Org dialog
+
+B633 - Deleted the validation for TaxID field so that it doesn't inherit it's parent's TaxID if it is left blank
+
+B673 - Added validation to the person dialog not to display the Prefix as Mr, Mrs or Ms when the category is other than Patient
+
+B745 -  Change the url in NextAction under Nurse dialog to take to the worklist
+
+B900 - Changed the "Health Coverage" component to display the Third-Party info in the checkin and checkout dialog page
+
+B701 - Added a new transaction for 'Phone Message' component to display the info in the user summary page and added a field 
+to show up date and time in the 'Phone Message' dialog
+
+B723 - Added the patient's authorization as 'Authorization form for HCFA' as the default one while creating a patient record
+
+B931 -  Added date fields for all the dialogs in the 'Authorization' component
+
+
+  
+
+
+
 
