@@ -23,6 +23,7 @@ struct(ServerConfigData => [
 	path_BillingTemplate => '$',
 	path_Reports => '$',
 	path_OrgReports => '$',
+	path_OrgDirectory => '$',
 	path_Conf => '$',
 	path_AppConf => '$',
 	path_PDFOutput => '$',
@@ -46,6 +47,7 @@ use constant PATH_APPROOT    => File::Spec->catfile(defined $ENV{HS_HOME} ? $ENV
 use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl', 'App');
 use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
+use constant PATH_DIRECTORY	 => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Directory');
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
 use constant PATH_TEMP       => File::Spec->catfile('temp');
 use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
@@ -112,6 +114,7 @@ sub getDefaultConfig
 	$config->path_SchemaSQL(File::Spec->catfile(PATH_DATABASE, 'schema-physia'));
 	$config->path_BillingTemplate(File::Spec->catfile(PATH_APPLIB, 'Billing'));
 	$config->path_OrgReports(File::Spec->catfile(PATH_REPORTS, 'Org'));
+	$config->path_OrgDirectory(File::Spec->catfile(PATH_DIRECTORY, 'Org'));
 	$config->path_Conf(PATH_CONF);
 	$config->path_AppConf(PATH_APPCONF);
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
@@ -189,6 +192,7 @@ requirePath(
 	$CONFDATA_SERVER->path_Reports,
 	$CONFDATA_SERVER->path_BillingTemplate,
 	$CONFDATA_SERVER->path_OrgReports,
+	$CONFDATA_SERVER->path_OrgDirectory,
 	);
 	
 1;
