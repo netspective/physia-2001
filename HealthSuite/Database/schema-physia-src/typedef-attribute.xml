@@ -84,6 +84,13 @@
 				<col name="remarks">Data type for pager number.Stored in value_text in person_attribute table</col>
 			</row>
 			<row>
+				<col name="id">25</col>
+				<col name="caption">Billing Phone</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="phone"</col>
+				<col name="remarks">Data type for phone number. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
 				<col name="id">30</col>
 				<col name="caption">ZIP Code</col>
 				<col name="group_name">Text</col>
