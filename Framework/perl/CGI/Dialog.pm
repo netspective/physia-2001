@@ -174,8 +174,7 @@ sub getHtml
 			</font>
 		</td><td>
 			<font $dialog->{bodyFontAttrs}>
-				$self->{preHtml}
-				$mainData $popupHtml $self->{postHtml}
+				$self->{preHtml}$mainData$popupHtml$self->{postHtml}
 				$errorMsgsHtml
 				$hints
 			</font>
@@ -360,7 +359,19 @@ sub memo_as_html
 	my $value = $page->field($self->{name});
 	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 	my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
-	return $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $readOnly ? $page->field($self->{name}) : "<textarea name='$fieldName' cols=$self->{cols} rows=$self->{rows} wrap='$self->{wrap}' $required>$value</textarea>");
+	
+	if ($readOnly)
+	{
+		$value =~ s/\n/<br>/g;
+		my $width = $self->{cols} * 6;
+		$value = '<div style="width: ' . $width . 'px; border: 2px; border-style: outset; padding: 5px;">' . $value . '</div>';
+	}
+	else
+	{
+		$value = "<textarea name='$fieldName' cols=$self->{cols} rows=$self->{rows} wrap='$self->{wrap}' $required>$value</textarea>";
+	}
+	
+	return $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
 }
 
 sub bool_as_html
@@ -1865,6 +1876,7 @@ sub clearFieldFlags
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
+	
 
 	foreach(@{$self->{content}})
 	{
