@@ -173,7 +173,7 @@ sub getHeaderTrailerData
 	$params1->{REGION} = '';
 	$params1->{CONTACT} = '';
 	$params1->{TELEPHONE_NUMBER} = '2814476800';
-	$params1->{RECEIVER_ID} = $tempClaims->[0]->{policy}->[0]->getPayerId();
+	$params1->{RECEIVER_ID} = substr($tempClaims->[0]->{policy}->[0]->getPayerId(),0,5);
 	$params1->{RECEIVER_TYPE_CODE} = $tempClaims->[0]->{policy}->[0]->getSourceOfPayment(); #'F';
 	$params1->{VERSION_CODE_NATIONAL} = '00301';
 	$params1->{VERSION_CODE_LOCAL} = '00301';
