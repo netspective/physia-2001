@@ -24,7 +24,8 @@ sub Main
 		#connectStr => 'hs/hs@dbi:Oracle:HealthSuiteIvory',
 		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS01',
 		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS02',
-		connectStr => 'sde_prime/sde@dbi:Oracle:SDEDBS02',
+		#connectStr => 'sde_prime/sde@dbi:Oracle:SDEDBS02',
+		connectStr => 'demo01/demo@dbi:Oracle:SDEDBS02',
 		scriptPath => $Bin,
 		dataSrcPath => 'Q:',
 		dataSrcInfoXPath => File::Spec->catfile($dataSrcPath, 'info-x'),
@@ -34,9 +35,9 @@ sub Main
 	};
 
 	importICDInfo($properties, transformDBI => 1);
-	importCPTInfo($properties, transformDBI => 1);
-	importHCPCSInfo($properties, transformDBI => 1);
-	importEnvoyPayers($properties);
+	#importCPTInfo($properties, transformDBI => 1);
+	#importHCPCSInfo($properties, transformDBI => 1);
+	#importEnvoyPayers($properties);
 }
 
 sub importCPTInfo
