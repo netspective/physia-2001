@@ -222,6 +222,17 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_id = ?
 		order by bill_sequence
 		},
+	'delPostSubmitAttributes' => q{
+		delete
+		from invoice_attribute
+		where parent_id = ?
+			and value_intB = 1
+		},
+	'delPostSubmitAddresses' => q{
+		delete
+		from invoice_address
+		where parent_id = ?
+		},
 	'delInvoiceBillingParties' => q{
 		delete
 		from invoice_billing
