@@ -219,6 +219,10 @@ sub populateData
 	#$page->field('physician_type', @phyType);
 	#$page->field('phy_type_item_id', $physicianType->{'item_id'});
 
+	my $guarantor = 'Guarantor';
+	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
+	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $guarantorName->{'value_text'});
+
 }
 
 sub handleContactInfo
