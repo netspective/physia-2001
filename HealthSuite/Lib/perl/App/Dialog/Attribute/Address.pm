@@ -109,7 +109,6 @@ sub populateData
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $table = $self->{table};
-	my $parentId = $page->param('person_id') || $page->param('org_id');
 	my $addrId = $page->param('item_id');
 
 	if ($table eq 'Person_Address')
@@ -120,16 +119,19 @@ sub populateData
 	{
 		$STMTMGR_ORG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selOrgAddressById', $addrId);
 	}
-
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-
+	my $parentId = $page->param('person_id');
+	if ($page->param('org_id'))
+	{
+		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
+	}
 	$page->schemaAction(
 		$self->{table}, $command,
-		parent_id => $page->param('person_id') || $page->param('org_id'),
+		parent_id => $parentId,
 		address_name => $page->field('address_name'),
 		item_id => $page->param('item_id') || undef,
 		line1 => $page->field('line1'),
