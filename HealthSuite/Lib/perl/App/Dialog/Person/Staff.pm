@@ -31,7 +31,13 @@ sub initialize
 	my $self = shift;
 
 	#$self->heading('$Command Staff');
-
+	$self->addContent(
+			new App::Dialog::Field::Person::ID::New(caption => 'Staff Member ID',
+							name => 'person_id',
+							options => FLDFLAG_REQUIRED,
+							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+						postHtml => $postHtml),
+			);
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::MultiField(caption =>'Employee ID/Exp Date',
