@@ -610,6 +610,7 @@ sub prepare_HtmlBlockFmtTemplate
 	#
 	my $dataSepStr = exists $publDefn->{dataSepStr} ? $publDefn->{dataSepStr} : "<TR><TD COLSPAN=$outColsCount><HR SIZE=1 COLOR=SILVER WIDTH=100%></TD></TR>";
 	my $rowSepStr = exists $publDefn->{rowSepStr} ? $publDefn->{rowSepStr} : "<TR><TD COLSPAN=$outColsCount><IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1></TD></TR>";
+	my $groupBySepStr = exists $publDefn->{groupBySepStr} ? $publDefn->{groupBySepStr} : "";
 	my $bannerFmt = '';
 	if(my $bannerInfo = $publDefn->{banner})
 	{
@@ -677,6 +678,7 @@ sub prepare_HtmlBlockFmtTemplate
 				<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{tailBgColor} || 'DCDCDC ' ]}>
 					$sSpacer @{[ join('', @subTotalCols) ]}
 				</TR>
+				$groupBySepStr				
 		},
 
 	);
