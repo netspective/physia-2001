@@ -47,6 +47,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'HCFA 1500', name => '1500',},
 					{caption => '1500 PDF', name => '1500pdf',},
 					{caption => '1500 PDF Plain', name => '1500pdfplain',},
+					{caption => 'TWCC 60 PDF', name => 'twcc60pdf',},
 					{caption => 'TWCC 61 PDF', name => 'twcc61pdf',},
 					{caption => 'TWCC 64 PDF', name => 'twcc64pdf',},
 					{caption => 'TWCC 69 PDF', name => 'twcc69pdf',},
@@ -1819,6 +1820,28 @@ sub prepare_view_1500pdfplain
 	$self->prepare_view_1500pdf(1);
 }
 
+sub prepare_view_twcc60pdf
+{
+	my $self = shift;
+
+	# these values are set in "initialize()" method
+	my $claimList = $self->property('claimList');
+	my $valMgr = $self->property('valMgr');
+	my $invoiceId = $self->param('invoice_id');
+	my $pdfName = 'TWCC60.pdf';
+	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFOutputHREF, $pdfName);
+
+	eval
+	{
+		my $twccForm = new App::Billing::Output::TWCC;
+		$twccForm->processClaims($claimList, reportId => 'TWCC60', outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName));
+	};
+	$self->redirect($pdfHref);
+	$self->addError('Problem in sub prepare_view_twcc60pdf', $@) if $@;
+
+	return 1;
+}
+
 sub prepare_view_twcc61pdf
 {
 	my $self = shift;
@@ -2072,6 +2095,7 @@ sub prepare_page_content_header
 
 
 	#check if twcc form fields exist for work comp types
+	my $twcc60Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC60/1') ? 'update' : 'add';
 	my $twcc61Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC61/16') ? 'update' : 'add';
 	my $twcc64Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/17') ? 'update' : 'add';
 	my $twcc69Command = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC69/17') ? 'update' : 'add';
@@ -2094,6 +2118,7 @@ sub prepare_page_content_header
 			['HCFA 1500', "$urlPrefix/1500", '1500'],
 			['1500 PDF (PP)', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
 			['1500 PDF', "/invoice-f/$invoiceId/1500pdfplain", '1500pdfplain'],
+			$claimType == $workComp ? ['TWCC60 PDF', "/invoice-f/$invoiceId/twcc60pdf", 'twcc60pdf'] : undef,
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
 			$claimType == $workComp ? ['TWCC69 PDF', "/invoice-f/$invoiceId/twcc69pdf", 'twcc69pdf'] : undef,
@@ -2147,6 +2172,7 @@ sub prepare_page_content_header
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
 
+						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc60Command-twcc60'>\u$twcc60Command TWCC Form 60</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
