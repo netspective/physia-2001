@@ -66,35 +66,37 @@ sub execute
 		<tr align=center valign=top>
 
 		<td>
-			<b style="font-size:8pt; font-family:Tahoma">By Payer</b>
+			<b style="font-size:8pt; font-family:Tahoma">By Payer Type</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_payers',
-				[$orgIntId, $startDate, $endDate]) ]}
+				[$orgIntId, $startDate, $endDate,$page->session('org_internal_id')]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">By Insurance</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_payersByInsurance',
-				[$orgIntId, $startDate, $endDate]) ]}
+				[$orgIntId, $startDate, $endDate,$page->session('org_internal_id')]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Earnings</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_earningsFromItem_Adjust',
-				[$startDate, $endDate, $orgIntId, $startDate, $endDate, $facility_id]) ]}
+				[$startDate, $endDate, $orgIntId,$page->session('org_internal_id'), $startDate, $endDate, $orgIntId,
+				$page->session('org_internal_id')]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Procedures</b>
 			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_proceduresFromInvoice_Item',
-				[$startDate, $endDate, $orgIntId]) ]}
+				[$startDate, $endDate, $orgIntId,$page->session('org_internal_id')]) ]}
 		</td>
-		<td>
-			<b style="font-size:8pt; font-family:Tahoma">Diagnostics</b>
-			@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_diagsFromInvoice_Item',
-				[$startDate, $endDate, $orgIntId]) ]}
-		</td>
+
 
 		</tr>
 	</table>
 	};
 
+		#<td>
+		#	<b style="font-size:8pt; font-family:Tahoma">Diagnostics</b>
+		#	@{[ $STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_diagsFromInvoice_Item',
+		#		[$startDate, $endDate, $orgIntId]) ]}
+		#</td>
 	return $html;
 }
 
@@ -115,7 +117,7 @@ sub prepare_detail_payer
 		$page->session('org_internal_id'), $facility_id);
 
 	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_payers',
-		[$internalFacilityId, $startDate, $endDate, $payer]));
+		[$internalFacilityId, $startDate, $endDate, $payer,$page->session('org_internal_id'),]));
 }
 
 sub prepare_detail_insurance
@@ -126,8 +128,14 @@ sub prepare_detail_insurance
 	my $endDate     = $page->param('_f_report_end_date');
 	my $insurance   = $page->param('insurance');
 
+	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId',
+		$page->session('org_internal_id'), $facility_id);
+		
+	my $internalInusranceId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId',
+		$page->session('org_internal_id'), $insurance);
+		
 	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_insurance',
-		[$facility_id, $startDate, $endDate, $insurance]));
+		[$internalFacilityId, $startDate, $endDate, $internalInusranceId,$page->session('org_internal_id')]));
 }
 
 sub prepare_detail_earning
@@ -142,10 +150,17 @@ sub prepare_detail_earning
 	$facility_id = $orgIntId;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
 		$page->session('org_internal_id'), $insurance);
-	$insurance = $orgIntId;
-
-	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_insurance',
-		[$facility_id, $startDate, $endDate, $insurance]));
+	my $type = $page->param('type');
+	if($type == 1)
+	{
+		$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailearnings_person',
+			[ $startDate, $endDate,$facility_id, $insurance,$page->session('org_internal_id')]));
+	}
+	else
+	{
+		$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailearnings_insurance',
+			[ $startDate, $endDate,$facility_id, $orgIntId,$page->session('org_internal_id')]));	
+	}
 }
 
 sub prepare_detail_cpt
@@ -160,7 +175,7 @@ sub prepare_detail_cpt
 		$page->session('org_internal_id'), $facility_id);
 	
 	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailProcedures',
-		[$internalFacilityId, $startDate, $endDate, $code]));
+		[$internalFacilityId, $startDate, $endDate, $code,$page->session('org_internal_id')]));
 }
 
 # create a new instance which will automatically add it to the directory of
