@@ -389,8 +389,8 @@ sub setInsuranceFields
 	my $tertiary = App::Universal::INSURANCE_TERTIARY;
 
 	#fake product names
-	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
+	my $fakeProdNameThirdParty = App::Universal::INSURANCE_FAKE_CLIENTBILL;
+	my $fakeProdNameSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
 
 	# -------------------------------------------------------------------------
 
@@ -467,8 +467,8 @@ sub handlePayers
 	my $typeClient = App::Universal::CLAIMTYPE_CLIENT;
 
 	#fake values for self-pay and third party payers
-	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
+	my $fakeProdNameThirdParty = App::Universal::INSURANCE_FAKE_CLIENTBILL;
+	my $fakeProdNameSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
 
 	# -----------------------------------------------------
 
@@ -477,12 +477,12 @@ sub handlePayers
 	my $payer = $page->field('payer');
 	if($payer eq 'Self-Pay')
 	{
-		$page->field('primary_payer', $fakeInsIdSelfPay);
+		$page->field('primary_payer', $fakeProdNameSelfPay);
 		$claimType = $typeSelfPay;
 	}
 	elsif($payer eq 'Third-Party Payer')
 	{
-		$page->field('primary_payer', $fakeInsIdClientBill);
+		$page->field('primary_payer', $fakeProdNameThirdParty);
 		#$page->field('third_party_payer_id', id from inserted fields goes here);
 		$claimType = $typeClient;
 	}
@@ -542,7 +542,7 @@ sub handlePayers
 				my @thirdPartyOrgId = split('\)', $nonInsPayer[1]);
 				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyOrgId[0], $typeClient);
 				$claimType = $typeClient;
-				$page->field('primary_payer', $fakeInsIdClientBill);
+				$page->field('primary_payer', $fakeProdNameThirdParty);
 				$page->field('third_party_payer_id', $thirdPartyPlan->{owner_org_id});
 			}
 		}
@@ -911,7 +911,7 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	addProcedureItems($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
+	addProcedureItems($self, $page, $command, $flags, $invoiceId);
 
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
 }
@@ -925,8 +925,8 @@ sub handleBillingInfo
 	#CONSTANTS ---------------------------------------------------------------
 
 	#fake values for self-pay and third party payers
-	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
+	my $fakeProdNameThirdParty = App::Universal::INSURANCE_FAKE_CLIENTBILL;
+	my $fakeProdNameSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
 
 	#bill party types
 	my $billPartyTypeClient = App::Universal::INVOICEBILLTYPE_CLIENT;
@@ -955,7 +955,7 @@ sub handleBillingInfo
 		my $billStatus = '';
 		my $billResult = '';
 
-		if($primPayer == $fakeInsIdSelfPay)
+		if($primPayer == $fakeProdNameSelfPay)
 		{
 			$billParty = $billPartyTypeClient;
 			$billToId = $personId;
@@ -965,7 +965,7 @@ sub handleBillingInfo
 			#$billStatus = '';
 			#$billResult = '';
 		}
-		elsif($primPayer == $fakeInsIdClientBill)
+		elsif($primPayer == $fakeProdNameThirdParty)
 		{
 			#my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
 
@@ -1142,7 +1142,7 @@ sub handleBillingInfo
 
 	#------BY DEFAULT, ADD SELF-PAY AS THE LAST POSSIBLE PAYER IF IT HAS NOT ALREADY BEEN SELECTED
 
-	if($primPayer != $fakeInsIdSelfPay && $quatPayer eq '')
+	if($primPayer != $fakeProdNameSelfPay && $quatPayer eq '')
 	{
 		my $billParty = '';
 		my $billToId = '';
@@ -1339,24 +1339,47 @@ sub addProcedureItems
 			$record{data_num_c} = $itemSeq || undef;
 
 
-			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-			my $totalCost = $invoice->{total_cost} + $record{extended_cost};
-			my $totalItems = $invoice->{total_items} + 1;
-			my $balance = $invoice->{balance} + $record{extended_cost};
-
-			$page->schemaAction('Invoice',
-					'update',
-					invoice_id => $invoiceId,
-					total_cost => $totalCost,
-					total_items => $totalItems,
-					balance => $balance);
-
 			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
 			$page->schemaAction('Invoice_Item',	$command,
 					%record,
 					parent_id => $invoiceId,
 					_debug => 0,
 					);
+
+
+
+
+			#UPDATE INVOICE
+
+			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+
+			my $totalItems = $invoice->{total_items};
+			if($command eq 'add')
+			{
+				$totalItems = $invoice->{total_items} + 1;
+			}
+			elsif($command eq 'remove')
+			{
+				$totalItems = $invoice->{total_items} - 1;
+			}
+
+			my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+			my $totalCostForInvoice = '';
+			foreach my $item (@{$allInvItems})
+			{
+				$totalCostForInvoice += $item->{extended_cost};
+			}
+
+			my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+
+			$page->schemaAction('Invoice',
+					'update',
+					invoice_id => $invoiceId,
+					total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+					total_items => defined $totalItems ? $totalItems : undef,
+					balance => defined $invBalance ? $invBalance : undef
+				);
+
 
 	}
 }
