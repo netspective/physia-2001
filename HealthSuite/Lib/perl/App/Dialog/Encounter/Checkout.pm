@@ -95,7 +95,7 @@ sub makeStateChanges
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	$page->beginUnitWork("Unable to checkout patient");
+	#$page->beginUnitWork("Unable to checkout patient");
 
 	my $eventId = $page->field('event_id');
 	
@@ -138,13 +138,13 @@ sub execute
 	{
 		App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 		
-		$page->endUnitWork();
+		#$page->endUnitWork();
 	}
 	elsif($invoiceId)
 	{
 		App::Dialog::Encounter::handlePayers($self, $page, 'update', $flags);
 		
-		$page->endUnitWork();
+		#$page->endUnitWork();
 	}
 }
 

@@ -126,27 +126,27 @@ sub makeStateChanges
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
-	$page->beginUnitWork("Unable to add claim");
+	#$page->beginUnitWork("Unable to add claim");
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 
-	$page->endUnitWork();
+	#$page->endUnitWork();
 }
 
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
-	$page->beginUnitWork("Unable to update claim");
+	#$page->beginUnitWork("Unable to update claim");
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 
-	$page->endUnitWork();
+	#$page->endUnitWork();
 }
 
 sub execute_remove
 {
 	my ($self, $page, $command, $flags) = @_;
-	$page->beginUnitWork("Unable to void claim");
+	#$page->beginUnitWork("Unable to void claim");
 
 	my $sessUser = $page->session('user_id');
 	my $invoiceId = $page->param('invoice_id');
@@ -244,7 +244,7 @@ sub execute_remove
 		_debug => 0
 	);
 
-	$page->endUnitWork();
+	#$page->endUnitWork();
 	$page->redirect("/invoice/$invoiceId/summary");
 }
 
