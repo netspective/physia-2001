@@ -25,7 +25,8 @@ use vars qw(@ISA %RESOURCE_MAP );
 		_class => new App::Component::WorkList::Collection(),
 		},
 	);
-
+my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
+my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
 sub initialize
 {
 	my ($self, $page) = @_;
@@ -51,6 +52,7 @@ sub getComponentHtml
 	
 	my $selectedDate = $page->param('_seldate') || 'today';
 	$selectedDate = 'today' unless ParseDate($selectedDate);
+	my $todayDate =  UnixDate('today','%m/%d/%Y');
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
 	my $facility_id = $page->session('org_id');
@@ -78,12 +80,7 @@ sub getComponentHtml
 	my $endTime   = $startDate . " $time2";
 
 	my @data = ();
-	my $html;# = qq{
-		#<style>
-		#	a.today {text-decoration:none; font-family:Verdana; font-size:8pt}
-		#	strong {font-family:Tahoma; font-size:8pt; font-weight:normal}
-		#</style>
-		#};
+	my $html;
 	my $pub =
 	{
 		columnDefn =>
@@ -102,41 +99,55 @@ sub getComponentHtml
 
 	my $person = $STMTMGR_WORKLIST_COLLECTION ->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPerCollByIdDate',$page->session('user_id'),$startDate);
 	
+	
 	foreach (@$person)
 	{
 		
-		next if $_->{trans_subtype} ne 'Owner';
-		#MARK RECORD AS ACCOUNT CONTACT FOR $page->session('user_id');
-		#my $upd = $STMTMGR_		
+		my $balance = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selectBalanceAgeById',$_->{person_id},$startDate);
+		my $trans_data = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCollectionById',$_->{person_id},$page->session('user_id'));		
+		$_->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
+		                trans_owner_id =>$_->{person_id} || undef,
+		                provider_id => $page->session('user_id') ||undef,
+		                trans_owner_type => 0, 
+		                 caption =>'Account Owner',
+		                trans_subtype =>'Owner',
+		                trans_status =>$ACTIVE,
+		                trans_type => $ACCOUNT_OWNER,  
+		                initiator_type =>0,
+		                initiator_id =>$page->session('user_id') 		                
+		
+                )if (! defined $trans_data->{trans_id} &&  $fmtDate eq $todayDate);			
 		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
-			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);
-		
-			
-		my $reck = $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, 
-			STMTMGRFLAG_NONE, 'selReckDateById', $_->{person_id},$page->session('user_id'));
-		
-		my $account = $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page,STMTMGRFLAG_NONE, 'selAccBalAgeById',$startDate,$_->{person_id}); 
-		$account->{age}="N/A" if $account->{age} <0;
-		$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'insAccountOwner',$_->{person_id},$page->session('user_id'),$page->session('org_id')) if ! defined $_->{trans_subtype}; 				
+			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);	
+		$_->{descr} = 'Self Pay';  
+		if ($balance->{balance} < 0)
+		{
+			$_->{descr} = 'Credit';  
+		}
+		elsif($balance->{age} > 59)
+		{
+			$_->{descr} = 'Aged Claim';  		
+		}		
+		$balance->{age} = $balance->{age} >= 0 ? $balance->{age}  : 'N/A';				
 		
 		my @rowData = (							
 			$_->{person_id},
-			'Self-Pay',						
-			$account->{balance},
-			$account->{age},
+			$_->{descr},						
+			$balance->{balance},
+			$balance->{age},
 			$appt,
-			$reck->{trans_begin_stamp},
+			$trans_data->{reck_date},			
 			qq{<nobr>
 				<A HREF="/worklist/collection/dlg-add-account-notes/$_->{person_id}"
 					TITLE='Add Account Notes'>
 					<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$_->{trans_id}"
+				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$trans_data->{trans_id}"
 					TITLE='Transfer Patient Account'>
 					<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$reck->{trans_id}"
+				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$trans_data->{reck_date_id}"
 					TITLE='Add Reck Date'>
 					<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$_->{trans_id}"
+				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$trans_data->{trans_id}"
 					TITLE='Close Account'>
 					<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 			</nobr>}, 
@@ -149,7 +160,7 @@ sub getComponentHtml
 
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 
-	$html .= "<i style='color=red'>No Collection data found.  Please setup Resource and Facility selections.</i> <P>" 
+	$html = "<i style='color=red'>No Collection data found.  Please setup Resource and Facility selections.</i> <P>" 
 		if (scalar @{$person} < 1);
 
 	return $html;
