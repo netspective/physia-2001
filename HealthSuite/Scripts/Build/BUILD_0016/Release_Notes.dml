@@ -65,6 +65,9 @@
 		<deliverable id="1437">
 			Reversed the sender and recipient on phone messages.
 		</deliverable>
+		<deliverable id="1297">
+			Report (financial analysis report) :  Changed calc for A/R column
+		</deliverable>
 
 	</deliverables>
 </release-notes>
