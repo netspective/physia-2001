@@ -136,8 +136,8 @@ delete duplicates from bill table
    org_internal_id of ACS - ACSoii
 */
 
-   insert into org (cr_user_id, org_id, name_primary)
-   values ('ACS Import', 'ACS', 'ACS Main');
+   insert into org (cr_user_id, org_id, name_primary, category)
+   values ('ACS Import', 'ACS', 'ACS Main', 'Other');
    
    update org set owner_org_id=org_internal_id, cr_org_internal_id=org_internal_id
      where org_id='ACS' and parent_org_id is null;
