@@ -180,7 +180,7 @@ sub initialize
 
 	new CGI::Dialog::Field(caption =>'Source of Service Request',
 					name => 'source',
-					#options => FLDFLAG_PREPENDBLANK,
+					options => FLDFLAG_PREPENDBLANK,
 					fKeyStmtMgr => $STMTMGR_TRANSACTION,
 					fKeyStmt => 'selReferralSourceType',
 					fKeyDisplayCol => 1,

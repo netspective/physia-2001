@@ -539,14 +539,14 @@ sub execute
 				_debug => 0
 		);
 
-	$page->field('prev_intake_form', $newTransId);
+	$page->field('prev_intake_form', $page->param('trans_id') || $newTransId);
 
 	my $prdCommand = $page->field('provider_item_id') eq '' ? 'add' : $command;
 
 	$page->schemaAction(
 			'Trans_Attribute',
 			$prdCommand,
-			parent_id => $newTransId,
+			parent_id => $page->param('trans_id') || $newTransId,
 			item_name => 'Provider Phone',
 			item_id => $page->field('provider_item_id') || undef,
 			value_type => App::Universal::ATTRTYPE_TEXT,
