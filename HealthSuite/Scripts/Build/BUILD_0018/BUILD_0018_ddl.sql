@@ -23,10 +23,10 @@ start tables/Person_Lab_Order
 start tables/Person_Lab_Order_Icd
 start tables-code/Person_Lab_Order
 
-analyze table Lab_Order compute statistics for table for all indexes for all columns;
-alter table Lab_Order monitoring;
-analyze table Lab_Order_Icd compute statistics for table for all indexes for all columns;
-alter table Lab_Order_Icd monitoring;
+analyze table Person_Lab_Order compute statistics for table for all indexes for all columns;
+alter table Person_Lab_Order monitoring;
+analyze table Person_Lab_Order_Icd compute statistics for table for all indexes for all columns;
+alter table Person_Lab_Order_Icd monitoring;
 
 
 start tables/Lab_Order_Entry
@@ -60,6 +60,9 @@ alter table Lab_Order_Transmission monitoring;
 
 alter table Document Add (DOC_DEST_IDS VARCHAR2(1024));
 alter table Document_Aud Add (DOC_DEST_IDS VARCHAR2(1024));
+
+analyze table Document compute statistics for table for all indexes for all columns;
+
 start tables-code/Document
 
 
@@ -83,12 +86,50 @@ alter table person_medication_aud drop (label_in_spanish);
 alter table person_medication_aud drop (label);
 alter table person_medication_aud add (label varchar2(32));
 
+analyze table Person_Medication compute statistics for table for all indexes for all columns;
+
 start tables-code/Person_Medication
 
 start tables/Medication_Record_Type
 start data/Medication_Record_Type
 
+analyze table Medication_Record_Type compute statistics for table for all indexes for all columns;
+alter table Medication_Record_Type monitoring;
+
 
 -- Semnet loading
 
 start pre/create_unique_person_id
+
+
+--bug 642
+
+start tables/Person_Referral
+start tables/Person_Referral_Rel_diags
+start tables-code/Person_Referral
+
+analyze table Person_Referral compute statistics for table for all indexes for all columns;
+alter table Person_Referral monitoring;
+analyze table Person_Referral_Rel_diags compute statistics for table for all indexes for all columns;
+alter table Person_Referral_Rel_diags monitoring;
+
+
+start tables/Referral_Communication
+start data/Referral_Communication
+
+analyze table Referral_Communication compute statistics for table for all indexes for all columns;
+alter table Referral_Communication monitoring;
+
+
+start tables/Referral_Type
+start data/Referral_Type
+
+analyze table Referral_Type compute statistics for table for all indexes for all columns;
+alter table Referral_Type monitoring;
+
+start tables/Referral_Status
+start data/Referral_Status
+
+analyze table Referral_Status compute statistics for table for all indexes for all columns;
+alter table Referral_Status monitoring;
+
