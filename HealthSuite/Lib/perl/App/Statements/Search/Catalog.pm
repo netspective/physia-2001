@@ -136,6 +136,7 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 			{
 				caption => qq{<b style="font-size:10pt">#param.catalog_id#</b> <br>
 					<a href='/org/#session.org_id#/dlg-add-catalog/#param.catalog_id#'>Add Fee Schedule</a> |
+					<a href='/org/#session.org_id#/dlg-add-catalog-copy/#param.catalog_id#'>Copy Fee Schedule</a> |										
 					<a href='/org/#session.org_id#/dlg-add-catalog-item/#param.catalog_id#'>Add Item</a>
 				},
 				#url => '/org/#session.org_id#/dlg-add-catalog-item'
