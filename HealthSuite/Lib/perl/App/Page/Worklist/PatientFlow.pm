@@ -20,10 +20,14 @@ use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'worklist/patientflow' => {
 		_views => [
-			{caption => 'Today', name => 'date',},
+			{caption => '#param._seldate#', name => 'date',},
 			{caption => 'Recent Activity', name => 'recentActivity',},
 			{caption => 'Setup', name => 'setup',},
 			],
+		_title => 'Patient Flow Work List',
+		_iconSmall => 'icons/worklist',
+		_iconMedium => 'icons/pencil',
+		_iconLarge => 'icons/pencil',
 		},
 	);
 
@@ -155,46 +159,8 @@ sub prepare_page_content_header
 	my $self = shift;
 
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
-	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
-
 	$self->SUPER::prepare_page_content_header(@_);
-
-	my $heading = "Patient Flow Work List";
-	my $dateTitle = decodeDate($self->param('_seldate'));
-
-	my $urlPrefix = "/worklist/patientflow";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
-			[$dateTitle, "$urlPrefix/date", 'date'],
-			['Recent Activity', "$urlPrefix/recentActivity", 'recentActivity'],
-			['Setup', "$urlPrefix/setup", 'setup', ],
-
-		], ' | ');
-
-	push(@{$self->{page_content_header}},
-	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
-
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
-		unless ($self->param('noControlBar'));
-
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) unless ($self->param('noControlBar'));
 	return 1;
 }
 
@@ -432,6 +398,7 @@ sub handleARL
 	{
 		$self->param('_pm_view', $pathItems->[1] || 'date');
 		$self->param('noControlBar', 1);
+		$self->param('_seldate', 'Today') unless $self->param('_seldate');
 
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
