@@ -153,7 +153,7 @@ sub new
 				size => '5',
 				fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
 				fKeyStmt => 'sel_worklist_available_products',
-				#fKeyStmtBindSession => ['ins_internal_id'],
+				fKeyStmtBindSession => ['org_internal_id'],
 				hints => ''
 			),
 
@@ -181,23 +181,23 @@ sub new
 		new CGI::Dialog::Subhead(heading => 'Age of the Balance'),
 		new CGI::Dialog::MultiField(caption =>'Age range:',
 			name => 'BalanceAge',
-			hints => 'Enter minimum and maximum age of balance in days.',
+			hints => 'Enter minimum and maximum age of balance in days.',			
 			fields => [
 				new CGI::Dialog::Field(
 					name => 'BalanceAgeMin',
 					caption => 'Age greater than:',
-					choiceDelim =>',',
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
+					minValue=>1,
 				),
 				new CGI::Dialog::Field(
 					name => 'BalanceAgeMax',
 					caption => 'Age less than:',
-					choiceDelim =>',',
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
+					minValue=>1,
 				),
 			]),
 
@@ -209,50 +209,21 @@ sub new
 				new CGI::Dialog::Field(
 					name => 'BalanceAmountMin',
 					caption => 'Amounts over:',
-					choiceDelim =>',',
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
+					minValue=>1,					
 				),
 				new CGI::Dialog::Field(
 					name => 'BalanceAmountMax',
 					caption => 'Amounts under:',
-					choiceDelim => ',',
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
+					minValue=>1,					
 				),
 			]),
 
-		#new CGI::Dialog::Subhead(heading => 'On-Select'),
-		#new CGI::Dialog::Field(
-		#	name => 'patientOnSelect',
-		#	caption => 'Patient',
-		#	choiceDelim =>',',
-		#	selOptions => $patientSelOptions,
-		#	type => 'select',
-		#),
-		#new CGI::Dialog::Field(
-		#	name => 'physicianOnSelect',
-		#	caption => 'Physician',
-		#	choiceDelim =>',',
-		#	selOptions => $physSelOptions,
-		#	type => 'select',
-		#),
-		#new CGI::Dialog::Field(
-		#	name => 'orgOnSelect',
-		#	caption => 'Organization',
-		#	choiceDelim =>',',
-		#	selOptions => $orgSelOptions,
-		#	type => 'select',
-		#),
-		#new CGI::Dialog::Field(
-		#	name => 'apptOnSelect',
-		#	caption => 'Appointment',
-		#	choiceDelim =>',',
-		#	selOptions => $apptSelOptions,
-		#	type => 'select',
-		#),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -421,28 +392,6 @@ sub execute
 		);
 	}
 
-	#for my $itemType (@ITEM_TYPES)
-	#{
-	#my $itemName = 'WorklistCollection/' . "\u$itemType" . '/OnSelect';
-#
-		#my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
-		#	'selSchedulePreferences', $userId, $itemName);
-##my $itemID = $preference->{item_id};
-	#	my $command = (defined $itemID) ? 'update' : 'add';
-#
-	#	my $name = $itemType . 'OnSelect';
-#
-	#	$page->schemaAction(
-		#	'Person_Attribute', $command,
-		#	item_id     => $command eq 'add' ? undef : $itemID,
-		#	parent_id   => $userId,
-		#	item_name   => $itemName,
-		#	value_text   => $page->field($name),
-		#	parent_org_id => $orgIntId,
-		#);
-#
-		#$page->session($name, $page->field($name));
-#	}
 
 	# Add the Last-name range preference
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
@@ -539,20 +488,33 @@ sub customValidate
 	my ($intBalanceAgeMin, $intBalanceAgeMax) = ($page->field('BalanceAgeMin'), $page->field('BalanceAgeMax'));
 	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0)
 	{
+		my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];	
 		if ($intBalanceAgeMin > $intBalanceAgeMax)
 		{
-			my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];
+
 			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. The value on the left must be equal to or less than the value on the right.");
 		}
-	}	
+		if ($intBalanceAgeMin == 0 || $intBalanceAgeMax == 0)		
+		{
+			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. Min and Max value must be greater than 0.");		
+		}
+	}
+	
 	my ($intBalanceAmountMin, $intBalanceAmountMax) = ($page->field('BalanceAmountMin'), $page->field('BalanceAmountMax'));
 	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0)
 	{
+		my $balanceAmountFields = $self->getField('BalanceAmountRange')->{fields}->[0];
 		if ($intBalanceAmountMin > $intBalanceAmountMax)
 		{
-			my $balanceAmountFields = $self->getField('BalanceAmountRange')->{fields}->[0];
+
 			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. The value on the left must be equal to or less than the value on the right.");
 		}
+		if ($intBalanceAmountMin == 0 || $intBalanceAmountMax == 0)
+		{
+
+			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. Min and Max value must be greater than 0.");
+		}
+		
 	}
 }
 
