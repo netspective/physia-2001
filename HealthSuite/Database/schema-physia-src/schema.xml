@@ -92,7 +92,7 @@
 		<column name="tax_id" type="text" descr="Tax ID"/>
 		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
 		<column name="name_trade" type="text" size="128" descr="Trade name of organization"/>
-		<column name="time_zone" type="text" size="20" descr="Time zone that the organization operates in"/>
+		<column name="time_zone" type="text" size="10" descr="Time zone that the organization operates in"/>
 	</table>
 
 	<table name="Person_Org_Category" abbrev="PerOCatg" type="Audit,Secure">
@@ -314,6 +314,16 @@
 		<column name="data_text_c" type="text" size="128" descr="Extra data"/>
 	</table>
 
+	<table name="Invoice_Budget" abbrev="InvBdgt" parent="Invoice" type="Audit,Secure">
+		<column name="budget_id" type="autoinc" primarykey="yes" desc="Unique ID for specific budget record"/>
+		<column name="payment_cycle" type="integer" desc="Number of days between each required budget payment"/>
+		<column name="payment_min" type="currency" desc="Minimum amount of each payment"/>
+		<column name="first_due" type="date" desc="Date first payment is due"/>
+		<column name="payment_balance" type="currency" desc="Balance remaining on current cycle's payment"/>
+		<column name="num_payments" type="integer" desc="Number of payments already made"/>
+		<column name="next_due" type="date" desc="Due date of next payment"/>
+	</table>
+
 	<table name="Invoice_Item" abbrev="InvItem" type="Audit,Secure,">
 		<description>An individual line item on a invoice</description>
 		<column name="item_id" type="autoinc" primarykey="yes" descr="Unique ID for specific invoice line item record"/>
@@ -375,14 +385,20 @@
 		<column name="bill_result" type="text" size="128" descr="Result of the latest bill"/>
 	</table>
 
-	<table name="Invoice_Budget" abbrev="InvBudget" parent="Invoice" type="Audit,Secure">
-		<column name="budget_id" type="autoinc" primarykey="yes" desc="Unique ID for specific budget record"/>
-		<column name="payment_cycle" type="integer" desc="Number of days between each required budget payment"/>
-		<column name="payment_min" type="currency" desc="Minimum amount of each payment"/>
-		<column name="first_due" type="date" desc="Date first payment is due"/>
-		<column name="payment_balance" type="currency" desc="Balance remaining on current cycle's payment"/>
-		<column name="num_payments" type="integer" desc="Number of payments already made"/>
-		<column name="next_due" type="date" desc="Due date of next payment"/>
+	<table name="Invoice_History" abbrev="InvHist" parent="Invoice" type="Audit,Secure">
+		<description>A history of events for an Invoice.</description>
+		<column name="item_id" type="autoinc" primarykey="yes" descr="The unique item identification"/>
+		<column name="parent_id" lookupref="Invoice.invoice_id" indexed="yes" required="yes" descr="The owner of the item"/>
+		<column name="value_text" type="text" size="512" indexed="yes" descr="For 'Text' usage"/>
+		<column name="value_textB" type="text" size="512" indexed="yes" descr="For generic use"/>
+		<column name="value_int" type="longint" descr="For use in 'Integer' and 'Boolean' types"/>
+		<column name="value_intB" type="longint" descr="For generic use"/>
+		<column name="value_float" type="float" descr="For use in 'Float' type"/>
+		<column name="value_floatB" type="float" descr="For generic use"/>
+		<column name="value_date" type="date" indexed="yes" descr="For use in 'Date' and 'Duration' (the starting duration) types"/>
+		<column name="value_dateEnd" type="date" descr="For use in 'Duration' type the ending duration"/>
+		<column name="value_dateA" type="date" descr="For generic use, also used in 'Certificate' type"/>
+		<column name="value_dateB" type="date" descr="For generic use, also used in 'Certificate' type"/>
 	</table>
 
 	<table name="Invoice_Item_Adjust" abbrev="InvItmAdj" type="Audit,Secure">
