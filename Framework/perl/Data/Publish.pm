@@ -62,7 +62,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 			contentColor => '#FFFFFF',
 			heading => 'No Heading Provided',
 			width => '100%',
-			editUrl => './stpe-#my.stmtId#?home=/#param.arl#',
+#			editUrl => './stpe-#my.stmtId#?home=/#param.arl#',
 		},
 	},
 
@@ -71,7 +71,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 		inherit => 'panel',
 		frame =>
 		{
-			editUrl => '../stpe-#my.stmtId#?home=/#param.arl#',
+#			editUrl => '../stpe-#my.stmtId#?home=/#param.arl#',
 		},
 	},
 
@@ -98,6 +98,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 		frame =>
 		{
 			frameFontOpen => '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=YELLOW><B>',
+			frameHeadHrefStyle => 'text-decoration:none; color: yellow',
 			headColor => 'darkred',
 			borderColor => 'red',
 			closeUrl => '#param.home#',
@@ -121,7 +122,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 			contentColor => '#FFFFFF',
 			heading => 'No Heading Provided',
 			frameSepCellFmt => "<IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1>",
-			editUrl => './stpe-#my.stmtId#?home=/#param.arl#',
+#			editUrl => './stpe-#my.stmtId#?home=/#param.arl#',
 			width => '100%',
 		},
 	},
@@ -419,12 +420,18 @@ sub prepare_HtmlBlockFmtTemplate
 		my $hcontrol = '';
 		foreach (@{$icons->{head}})
 		{
-			$hcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}"><IMG SRC="$_->{imgSrc}" BORDER=0></A> };
+			$hcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}">} if $_->{urlFmt};
+			$hcontrol .= qq{<IMG SRC="$_->{imgSrc}" BORDER=0>};
+			$hcontrol .= qq{</A>} if $_->{urlFmt};;
+			$hcontrol .= ' ';
 		}
 		my $dcontrol = '';
 		foreach (@{$icons->{data}})
 		{
-			$dcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}"><IMG SRC="$_->{imgSrc}" BORDER=0></A> };
+			$dcontrol .= qq{<A HREF="$_->{urlFmt}" TITLE="$_->{title}">} if $_->{urlFmt};
+			$dcontrol .= qq{<IMG SRC="$_->{imgSrc}" BORDER=0>};
+			$dcontrol .= qq{</A>} if $_->{urlFmt};
+			$dcontrol .= ' ';
 		}
 		$hcontrol = "<NOBR>$hcontrol</NOBR>" if $hcontrol;
 		$dcontrol = "<NOBR>$dcontrol</NOBR>" if $dcontrol;
