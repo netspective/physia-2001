@@ -52,7 +52,7 @@ sub handleARL
 	$self->param('_pm_view', $pathItems->[1]);
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
+	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('worklist_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
