@@ -16,6 +16,7 @@ use App::Statements::Report::Accounting;
 use App::Statements::Org;
 use App::Statements::Device;
 use Data::Publish;
+use Data::TextPublish;
 use App::Configuration;
 use App::Device;
 
@@ -25,7 +26,7 @@ use vars qw(@ISA $INSTANCE);
 
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'test_sj', heading => 'Superbills');
+	my $self = App::Dialog::Report::new(@_, id => 'superbills', heading => 'Superbills');
 
 	$self->addContent(
 	
@@ -75,6 +76,7 @@ sub execute
 	# Data placeholders...
 	my $superbillData;
 	my $textOutput;
+#	my $textOutputFilename;
 
 	# Get a printer device handle...
 	my $printerAvailable = 1;
@@ -86,10 +88,13 @@ sub execute
 
 	# Create a filename and the corresponding file...
 	my $tempFileOpened = 1;
+	my $dataFileOpened = 1;
 	my $tempDir = $CONFDATA_SERVER->path_temp();
 	my $theFilename .= "/" . $page->session ('org_id') . $page->session ('user_id') . time() . ".txt";
+	my $theDataFilename .= "/" . $page->session ('org_id') . $page->session ('user_id') . time() . ".data.txt";
 	
 	open (TMPFILEHANDLE, ">$tempDir$theFilename") or $tempFileOpened = 0;
+	open (TMPDATAHANDLE, ">$tempDir$theDataFilename") or $dataFileOpened = 0;
 	
 	$superbillData = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_patient_superbill_info', $startDate);
 
@@ -117,9 +122,20 @@ sub execute
 	}
 
 	$textOutput = createTextFromData($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
+#	$textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
+
 	if ($tempFileOpened) {
 		print TMPFILEHANDLE $textOutput;
 		close TMPFILEHANDLE
+	}
+	
+	if ($dataFileOpened) {
+		# Dump data out to the file separating each field with a |
+		foreach my $superbillDataRow (@{$superbillData}) {
+			my $superbillDataRowFields = join "|", @{$superbillDataRow};
+			print TMPDATAHANDLE $superbillDataRowFields, "\n";
+		}
+		close TMPDATAHANDLE;
 	}
 
 	if ($hardCopy == 1 and $printerAvailable) {
@@ -129,8 +145,8 @@ sub execute
 
 	my $html = createHtmlFromData ($page, STMTMGRFLAG_NONE, $superbillData, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_patient_superbill_info"});
 
-#	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
-	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . $html;
+	return ($tempFileOpened ? qq{<a href="/temp$theFilename">Printable version</a> <br>} : "" ) . qq{<br><b>Printer Device: </b> oki<br><b>printerAvailable: </b> $printerAvailable<br>} . $html;
+#	return ($textOutputFilename ? qq{<a href="$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 }
 
 # create a new instance which will automatically add it to the directory of
