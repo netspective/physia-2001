@@ -1317,43 +1317,6 @@ sub billCopay
 	$self->handlePostExecute($page, $command, $flags);
 }
 
-sub __payCopay
-{
-	my ($self, $page, $command, $flags, $invoiceId) = @_;
-
-	my $invoiceItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
-
-	my $todaysDate = $page->getDate();
-	my $personId = $page->field('attendee_id');
-	my $personType = App::Universal::ENTITYTYPE_PERSON;
-	my $copay = $page->field('copay');
-	my $copayAmt = $page->field('copay_amt');
-
-	my $adjustType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-	my $netAdjust = 0 - $copay;
-	my $payMethod = $page->field('pay_method');
-	$page->schemaAction(
-		'Invoice_Item_Adjust', 'add',
-		adjustment_type => defined $adjustType ? $adjustType : undef,
-		adjustment_amount => defined $copay ? $copay : undef,
-		payer_type => defined $personType ? $personType : undef,
-		payer_id => $personId || undef,
-		parent_id => $invoiceItem->{item_id} || undef,
-		copay => defined $copay ? $copay : undef,
-		submit_date => $todaysDate || undef,
-		pay_date => $todaysDate || undef,
-		pay_type => App::Universal::ADJUSTMENTPAYTYPE_COPAY || undef,
-		pay_method => defined $payMethod ? $payMethod : undef,
-		pay_ref => $page->field('check_number') || undef,
-		net_adjust => defined $netAdjust ? $netAdjust : undef,
-		_debug => 0
-	);
-
-	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
-	$page->param('invoice_id', $invoiceId) if $command eq 'add';
-	$self->handlePostExecute($page, $command, $flags);
-}
-
 sub addProcedureItems
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
