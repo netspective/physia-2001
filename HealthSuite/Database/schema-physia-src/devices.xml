@@ -20,23 +20,46 @@
 		<column name="device_type" lookupref="Device_Type" descr="Device Type, look in Device_Type table"/>
 		<column name="host_name" type="text" size="128" descr="The hostname of the computer this device is connected to."/>
 		<column name="device_name" type="text" size="128" descr="The name this device is referred to as."/>
-		<column name="device_descr" type="text" size="256" descr="A brief description of the device e.g. location etc"/>
+		<column name="device_descr" type="text" size="256" descr="Device manufacturer, model etc"/>
+		<column name="device_location" type="text" size="256" descr="Physical device location"/>
 		<data>
 			<row>
 				<col name="device_id">0</col>
 				<col name="device_type">0</col>
 				<col name="host_name">63.96.146.118</col>
-				<col name="device_name">dotMatrix</col>
-				<col name="device_descr">The dot matrix printer in the next Qube.</col>
+				<col name="device_name">oki</col>
+				<col name="device_descr">OKI Microline 390 Turbo</col>
+				<col name="device_location">Attached to Titanium</col>
 			</row>
 			<row>
 				<col name="device_id">1</col>
 				<col name="device_type">0</col>
 				<col name="host_name">63.96.146.118</col>
-				<col name="device_name">TQPrinters</col>
-				<col name="device_descr">Both CUPS printers in Physia TQ.</col>
+				<col name="device_name">mercury</col>
+				<col name="device_descr">HP Laserjet 4050 PS</col>
+				<col name="device_location">Physia TQ - Next to conference room</col>
+			</row>
+			<row>
+				<col name="device_id">2</col>
+				<col name="device_type">0</col>
+				<col name="host_name">204.2.61.253</col>
+				<col name="device_name">houstonLaser</col>
+				<col name="device_descr">HP Laserjet 4050 PS</col>
+				<col name="device_location">Physia HQ - Location Unknown</col>
+			</row>
+			<row>
+				<col name="device_id">3</col>
+				<col name="device_type">0</col>
+				<col name="host_name">204.2.61.253</col>
+				<col name="device_name">houstonOKI</col>
+				<col name="device_descr">OKI Microline 390 Turbo</col>
+				<col name="device_location">Physia HQ - Location Unknown</col>
 			</row>
 		</data>
+	</table>
+
+	<table name="Device_Attribute" abbrev="DevAttr" type="Attribute">
+		<param name="parentref">Device_Specification.device_id</param>
 	</table>
 	
 	<table name="Device_Association" abbrev="DevAssoc">
@@ -63,14 +86,14 @@
 			</row>
 			<row>
 				<col name="device_assoc_id">2</col>
-				<col name="device_id">0</col>
+				<col name="device_id">2</col>
 				<col name="org_internal_id">1</col>
 				<col name="document_type">NULL</col>
 				<col name="person_id">SJONES</col>
 			</row>
 			<row>
 				<col name="device_assoc_id">3</col>
-				<col name="device_id">1</col>
+				<col name="device_id">3</col>
 				<col name="org_internal_id">1</col>
 				<col name="document_type">0</col>
 				<col name="person_id">NULL</col>
