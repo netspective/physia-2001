@@ -662,6 +662,7 @@ sub prepare_view_profile
 					#component.stpt-person.employmentAssociations#<BR>
 					#component.stpt-person.emergencyAssociations#<BR>
 					#component.stpt-person.familyAssociations#<BR>
+					#component.stpt-person.personCategory#<BR>
 					#component.stpt-person.additionalData#<BR>
 					</font>
 				</TD>
