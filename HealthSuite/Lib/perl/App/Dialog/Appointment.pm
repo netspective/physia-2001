@@ -76,6 +76,7 @@ sub new
 			name => 'attendee_id',
 			size => 25,
 			useShortForm => 1,
+			type => 'text',
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
 			#options => FLDFLAG_REQUIRED
 		),
@@ -302,7 +303,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|confirm)$/);
 	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update|confirm)$/);
 	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add|confirm)$/);
-	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^(update|confirm)$/);
+	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command !~ m/^(add)$/);
 
 	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
@@ -314,7 +315,6 @@ sub makeStateChanges
 sub makeStateChanges_cancel
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
-	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('patient_type', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('appt_type', FLDFLAG_READONLY, 1);
 
