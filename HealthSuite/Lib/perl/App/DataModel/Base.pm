@@ -137,7 +137,12 @@ subclass 'App::DataModel::Organizations' =>
 				$org->ownerOrg($ownerOrg) if $ownerOrg;
 				&add_all($org) if $org;
 			 },
-
+	'&addInsuranceProduct'=>q{
+				my $org=$_[0];
+				my $insProd=$_[1];
+				$org->add_insuranceProduct($insProd);
+				$insProd->insOrg($org);
+			},
 }, -parent => 'App::DataModel::Entities';
 
 
@@ -305,7 +310,7 @@ subclass 'App::DataModel::MainOrg' =>
 {
 	ids=>'App::DataModel::IDNumbers',	
 	childrenOrgs=>'@App::DataModel::Organization',
-	personnel=>'@App::DataModel::Person',
+	personnel=>'@App::DataModel::Person',	
 }, -parent => 'App::DataModel::Organization';
 
 
