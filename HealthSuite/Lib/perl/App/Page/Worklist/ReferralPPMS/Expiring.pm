@@ -30,14 +30,14 @@ use vars qw(
 
 %RESOURCE_MAP = (
 	'worklist/referralppms/expiring' => {
-		_idSynonym => '_expiration',
+		_idSynonym => ['_expiring'],
 		_title => 'Expiration Referrals',
 		_iconSmall => 'images/page-icons/worklist-patient-flow',
 		_iconMedium => 'images/page-icons/worklist-patient-flow',
 		_iconLarge => 'images/page-icons/worklist-patient-flow',
 		_tabcaption => 'Expiration Referrals',
 		_views => [
-				{caption => 'Work List' , name => 'wl',},
+				{caption => 'Work List' , name => 'expiring',},
 				{caption => 'Setup', name => 'setup',},
 			],
 		},
@@ -229,7 +229,7 @@ sub getExpiryDays
 ########################################################
 # Expiry view
 ########################################################
-sub prepare_view
+sub prepare_view_expiring
 {
 	my $self = shift;
 

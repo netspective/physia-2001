@@ -18,32 +18,31 @@ use constant BASEARL => '/worklist/referralppms';
 			_iconMedium =>'images/page-icons/worklist-patient-flow',
 			_iconLarge => 'images/page-icons/worklist-patient-flow',
 			_views => [
-				{caption => 'Work List' , name => 'wl',},
+				{caption => 'Work List' , name => 'main',},
 				{caption => 'Setup', name => 'setup',},
-				],
+			],
 	},
 );
 
 
-sub prepare_view_wl
-{
-	my ($self) = @;
-#	$self->addContent("Referrals Work Lists");
-}
+#sub prepare_view_main
+#{
+#	my ($self) = @;
+#}
 
 
 ########################################################
 # Worklist Setup View
 ########################################################
-sub prepare_view_setup
-{
-	my ($self) = @_;
-
-	my $dialog = new App::Dialog::WorklistSetup::ReferralPPMS(schema => $self->{schema});
-	$self->addContent('<br>');
-	$dialog->handle_page($self, 'add');
-	return 1;
-}
+#sub prepare_view_setup
+#{
+#	my ($self) = @_;
+#
+#	my $dialog = new App::Dialog::WorklistSetup::ReferralPPMS(schema => $self->{schema});
+#	$self->addContent('<br>');
+#	$dialog->handle_page($self, 'add');
+#	return 1;
+#}
 
 
 ########################################################
@@ -94,8 +93,7 @@ sub handleARL
 
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
-		$self->param('_pm_view', $pathItems->[1] || 'wl');
-#		$self->param('noControlBar', 1);
+		$self->param('_pm_view', $pathItems->[1] || 'main');
 
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
@@ -106,7 +104,7 @@ sub handleARL
 
 	my $menu = ($self->{page_menu_sibling} = []);
 	my $resourceMap = %RESOURCE_MAP->{'worklist/referralppms'};
-	my $urlPrefix = "/" . $self->param('arl_resource');
+	my $urlPrefix = BASEARL; #"/" . $self->param('arl_resource');
 	foreach my $view (@{$resourceMap->{_views}})
 	{
 		push @$menu, [ $view->{caption}, "$urlPrefix/$view->{name}", $view->{name} ];
@@ -128,8 +126,7 @@ sub handleARL
 
 sub getContentHandlers
 {
-	return ('prepare_view');
-#	return ('prepare_view_$_pm_view=wl$');
+	return ('prepare_view_$_pm_view=main$');
 }
 
 
