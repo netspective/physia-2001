@@ -12,6 +12,8 @@
 		<deliverable id="978">
 			UI:  Added a new field called 'Gender' in the 'Responsible party' dialog.
 		</deliverable>
-
+		<deliverable id="1083">
+			This depends on bug 995 which was fixed in the build_12 patch
+		</deliverable>
 	</deliverables>
 </release-notes>
