@@ -638,6 +638,7 @@
 		<column name="service" type="duration" descr="For HCFA 1500, the service start/end date(s)"/>
 		<column name="code" type="text" size="32" descr="Usually a CPT code or code for the service/product"/>				
 		<column name="rel_diags" type="text" size="255" descr="Related diagnosis codes (comma-separated)"/>
+		<column name="caption" type="text" size="96" descr="The description that should be shown on the invoice/bill for this invoice_item"/>
 		<column name="submitter_id" lookupref="person.person_id" descr="The person who is creating/submitting the invoice"/>
 		<column name="client" type="entity" descr="Information about which entity that received the products/service"/>
 		<column name="hcfa_service_type" lookupref="HCFA1500_Service_Type_Code" descr="HCFA code for what service took place"/>
