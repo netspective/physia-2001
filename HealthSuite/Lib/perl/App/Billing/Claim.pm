@@ -128,7 +128,7 @@ sub getEMCId
 	$ids[MEDICAID]= $self->{payToOrganization}->getMedicaidId();
 	$ids[WORKERSCOMP]= $self->{payToOrganization}->getWorkersComp();
 	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
-	$self->{providerEMCId} = (($self->{insType} =~ /[@payerCodes]/) ? $ids[$self->{insType}] : $self->{renderingProvider}->getPIN());
+	$self->{providerEMCId} = ((grep{$_ eq $self->{insType}} @payerCodes) ? $ids[$self->{insType}] : $self->{payToProvider}->getPIN());
 	return $self->{providerEMCId};
 }
 

@@ -1257,6 +1257,7 @@ sub assignInvoiceProperties
 		'Provider/Medicare' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setMedicareId, \&App::Billing::Claim::Physician::setMedicareId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Medicaid' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setMedicaidId, \&App::Billing::Claim::Physician::setMedicaidId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Champus' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setChampusId,\&App::Billing::Claim::Physician::setChampusId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Workers Comp' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setWorkersComp,\&App::Billing::Claim::Physician::setChampusId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Specialty' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSpecialityId,\&App::Billing::Claim::Physician::setSpecialityId], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
 		'TPO Participation/Indicator' => [$patient, \&App::Billing::Claim::Patient::setTPO, COLUMNINDEX_VALUE_TEXT],
 		'Patient/Legal Rep/Indicator' => [ $patient, \&App::Billing::Claim::Patient::setlegalIndicator, COLUMNINDEX_VALUE_TEXT],
@@ -1647,6 +1648,8 @@ sub setClaimProperties
 	$currentClaim->setLegalRepresentator($legalRepresentator);
 	$currentClaim->setProgramName($ins[$tempRow[5]]);
 	$currentClaim->setInvoiceSubtype($tempRow[5]);
+	$currentClaim->{renderingProvider}->setInsType($tempRow[5]);
+	$currentClaim->{payToProvider}->setInsType($tempRow[5]);
 	$currentClaim->setInsType($tempRow[5]);
 	$currentClaim->setInvoiceType($tempRow[7]);
 	$currentClaim->setTotalItems($tempRow[8]);

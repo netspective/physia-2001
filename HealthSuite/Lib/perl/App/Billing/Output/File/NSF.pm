@@ -133,9 +133,11 @@ sub makeBatches
 	
 	for $claimValue (0..$#$claims)
 	{
+    	my $claimType = $claims->[$claimValue]->getInsType();
+    	
 	   if ($self->{nsfType} == NSF_HALLEY)
 	   {
-			 my $claimType = $claims->[$claimValue]->getInsType();
+	 
 			 if( grep{$_ eq $claimType} @payerCodes)
 			 {
 				 $self->{payerClaimsBatch}->{$claimType}->addClaim($claims->[$claimValue]);
@@ -145,9 +147,15 @@ sub makeBatches
 				# get the providerID from claim
 				#$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
 				$providerID = $claims->[$claimValue]->getEMCId();
-
+				
+				$providerID =~ s/ //g;
+				if ($providerID eq '')
+				{
+						$providerID = 'BLANK';
+				}
+			
 				# add it in array without duplication
-				if ($self->checkForDuplicate($providerID) eq 0)
+				if ($self->checkForDuplicate($providerID) eq 0) 
 				{
 					$self->{batches}->[$self->{batchesIndex}++] = $providerID;
 				}
@@ -181,6 +189,9 @@ sub makeSelectedClaimsList
 	
 	# get reference of batches array
 	my $tempBatches = $self->{batches};
+	# fetch each element i.e. claim from claims array one by one
+	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
+	
 
 	# Following lines will add batches which were made on the basis of payers	
 	foreach my $payerKey(keys %{$self->{payerClaimsBatch}})
@@ -202,7 +213,12 @@ sub makeSelectedClaimsList
 		# get element from claims array one by one i.e. one claim at a time
 		foreach $claim (@$claims)
 		{
-			$selectedClaims->addClaim($claim);
+			my $claimType = $claim->getInsType();
+			if (!(grep{$_ eq $claimType} @payerCodes))
+			{
+				$selectedClaims->addClaim($claim);
+			}
+
 		}
 			
 		# when list of selected claims is complete add its reference in array
@@ -226,14 +242,24 @@ sub makeSelectedClaimsList
 			     {
 					#$providerID = $claim->{payToProvider}->getFederalTaxId();
 					$providerID = $claim->getEMCId();
+					
+					$providerID =~ s/ //g;
+					if ($providerID eq "")
+					{
+						$providerID = 'BLANK';
+					}
 				}
 				elsif($self->{nsfType} == NSF_ENVOY)
 				{
 					$providerID = $claim->{payToProvider}->getFederalTaxId();
 				}
-				
+		
+				my $claimType = $claim->getInsType();
+	 
+			 		
 				# check it against batch element value
-				if ($providerID eq $batchValue)
+				if (($providerID eq $batchValue) && (!(grep{$_ eq $claimType} @payerCodes)))
+
 				{
 					# if it is then add that claim in selected list
 					$selectedClaims->addClaim($claim);

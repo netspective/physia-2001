@@ -5,6 +5,7 @@ package App::Billing::Claim::Physician;
 use strict;
 use App::Billing::Claim::Entity;
 use App::Billing::Claim::Person;
+use App::Billing::Universal;
 use Devel::ChangeLog;
 use vars qw(@CHANGELOG);
 use vars qw(@ISA);
@@ -39,16 +40,48 @@ sub new
 	$self->{blueShieldId} = undef;
 	$self->{idIndicator} = undef;
 	$self->{providerId} = undef;
- 
+	$self->{insType} = undef;
+	$self->{workersComp} = undef;
+	
 	return bless $self, $type;
 }
 
+sub getWorkersComp
+{
+	my ($self) = @_;
+	return $self->{workersComp};
+}
+
+sub setWorkersComp
+{
+	my ($self,$value) = @_;
+	$self->{workersComp} = $value;
+}
+
+sub setInsType
+{
+	my ($self, $value) = @_;
+	$self->{insType} = $value;
+}
+
+sub getInsType
+{
+	my $self = shift;
+	return $self->{insType};
+}
 
 sub getProviderId
 {
 	my $self = shift;
 	
-	return $self->{pin};
+	my @ids;
+	$ids[MEDICARE]= $self->getMedicareId();
+	$ids[MEDICAID]= $self->getMedicaidId();
+	$ids[WORKERSCOMP]= $self->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
+	my $tempInsType = $self->{insType};
+	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
+	return $temp;
 }
 
 sub setDocumentationType
@@ -334,9 +367,16 @@ sub setFederalTaxId
 	
 sub getPIN
 {
-	my ($self) = @_;
-	
-	return $self->{pin};
+	my $self = shift;
+	my @ids;
+	$ids[MEDICARE]= $self->getMedicareId();
+	$ids[MEDICAID]= $self->getMedicaidId();
+	$ids[WORKERSCOMP]= $self->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
+	my $tempInsType = $self->{insType};
+
+	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
+	return $temp;
 }
 
 sub getName
