@@ -202,6 +202,10 @@
 			    as an 'Insured-Person' in the Person_Org_Category table and it will show up in the InsuredPerson's lookup.			
 		</deliverable>
 
+		<deliverable id="1583">
+			Migrated all invoice history attributes to new invoice_history table.
+		</deliverable>
+
 		<deliverable id="1589">
 			UI : Changed Product, Plan and Personal Coverage to appear with all data in read only mode (user can not change data) if the product/plan/personal coverage record is owner by the IPA and the user is an IPA member.
 			NOTE : This change could impact the way the product plan and personal coverage dialog work when used in normal edit . add mode.  Also should test claim creation to make sure correct personal coverage record appears.			
