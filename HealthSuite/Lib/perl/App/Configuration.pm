@@ -203,6 +203,7 @@ sub getDefaultConfig
 	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS05'),
 	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'sde04/sde@dbi:Oracle:SDEDBS04'),
 	'db-sde02' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
+	'db-pro_munir' => getDefaultConfig("Munir's Database", CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS05'),
 
 	# New SUN Databases
 	'db-sun-pro01' => getDefaultConfig('SUN Production Configuration 01', CONFIGGROUP_PRO, 'pro01/pro@dbi:Oracle:PRO-DBS-A'),
