@@ -29,6 +29,12 @@ $STMTMGR_ORG = new App::Statements::Org(
 		from org
 		where org_internal_id = ?
 		},
+	'selCloseDateChildParentOrgIds' =>qq{
+		SELECT	org_internal_id
+		FROM	org
+		WHERE	owner_org_id = :1 
+		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 )
+	},
 	'selOwnerOrg' => qq{
 		select *
 		from org
