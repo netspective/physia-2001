@@ -315,10 +315,10 @@ sub prepare_TableStruct
 		my $curData = undef;
 		queryToHtmlTable($self, "select * from $table->{name} where rownum < 250", \$curData);
 
-		my $selectAll = $self->escape("select * from $table->{name}");
+		my $defaultQuery = $self->escape("select * from $table->{name} where rownum < 250");
 		$html .= qq{
 			<table border=0 cellspacing=0>$rows</table>
-			<h1>$table->{name} <a href='table/$table->{name}?query=$selectAll'>Data</a></h1>
+			<h1>$table->{name} <a href='table/$table->{name}?query=$defaultQuery'>Data</a></h1>
 			$curData
 			};
 
