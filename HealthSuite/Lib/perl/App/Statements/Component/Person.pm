@@ -2253,7 +2253,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		columnDefn => [
 					{
 						colIdx => 0,
-						dataFmt => "#7# #6# ID: #2# (Exp: #5#)",
+						dataFmt => "#7# #6# ID: #2# (Eff: #5#)",
 					},
 		],
 

@@ -1335,7 +1335,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		columnDefn => [
 					{
 						colIdx => 0,
-						dataFmt => "#8# - #7# #6# ID: #2# (Exp: #5#)",
+						dataFmt => "#8# - #7# #6# ID: #2# (Eff: #5#)",
 					},
 		],
 
