@@ -103,20 +103,14 @@ sub initialize
 				]),
 
 		new CGI::Dialog::Field(caption => 'Associated Physician Name',
-												#type => 'foreignKey',
-												name => 'value_text',
-												#fKeyTable => 'person p, person_org_category pcat',
-												#fKeySelCols => "distinct p.person_id, p.complete_name",
-												#fKeyDisplayCol => 1,
-												#fKeyValueCol => 0,
-												options => FLDFLAG_PREPENDBLANK,
-												fKeyStmtMgr => $STMTMGR_PERSON,
-												fKeyStmt => 'selAssocNurse',
-												fKeyDisplayCol => 1,
-												fKeyValueCol => 0
-												#fKeyStmtBindPageParams => "$sessOrgId"
-												),
-												#fKeyWhere => "p.person_id=pcat.person_id and pcat.org_id='$sessOrg' and category='Physician'",
+					name => 'value_text',
+					options => FLDFLAG_PREPENDBLANK,
+					fKeyStmtMgr => $STMTMGR_PERSON,
+					fKeyStmt => 'selAssocNurse',
+					fKeyDisplayCol => 1,
+					fKeyValueCol => 0,
+					defaultValue => ''
+					),
 
 		new CGI::Dialog::Field(
 						type => 'bool',
