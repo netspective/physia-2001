@@ -293,7 +293,7 @@ sub selfHiddenFormFields
     {
 		push(@hiddens, "<INPUT TYPE='HIDDEN' NAME='$_' VALUE='$replaceParams{$_}'>") if defined $replaceParams{$_};
 	}
-
+	
 	join("\n", @hiddens);
 }
 
@@ -536,6 +536,7 @@ sub executeSql
 	if($@||!$rc)
 	{
 		$self->addError(join ("<br>",$@,$self->{db}->errstr));
+		$@ = undef;
 		return 0;
 	}
 	return $rc;
@@ -790,6 +791,7 @@ sub establishSession
 			# using errorCode_ref and errorMsg_ref, CGI::Session::DBI will fill the messages appropriately
 			#$self->{sessError} = $@;
 			#$self->addError('Session Error: ' . $@);
+			$@ = undef;
 			return $self->sessionStatus(SESSIONTYPE_SESSIONERROR);
 		}
 		else
