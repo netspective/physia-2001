@@ -41,7 +41,16 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $invoiceId = $page->param('invoice_id');
-	placeOnHold($page, $invoiceId, $page->param('transferred'));
+	my $status = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceStatus', $invoiceId);
+
+	if($status == App::Universal::INVOICESTATUS_CLOSED)
+	{
+		reopenInsuranceClaim($page, $invoiceId);
+	}
+	else
+	{
+		placeOnHold($page, $invoiceId, $page->param('transferred'));
+	}
 
 	$page->redirect("/invoice/$invoiceId/summary");
 }
