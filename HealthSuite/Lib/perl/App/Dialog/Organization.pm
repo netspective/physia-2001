@@ -343,7 +343,9 @@ sub initialize
 			),
 		);
 	}
-	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'dir-entry' || $type eq 'pharmacy')
+
+	#if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'dir-entry' || $type eq 'pharmacy')
+	if (grep {$_ eq $self->{orgtype}} ('main', 'practice', 'provider', 'dept', 'dir-entry', 'pharmacy'))
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -403,7 +405,7 @@ sub initialize
 	my @addAction = (['View Org Summary', "/org/%field.org_id%/profile", 1]);
 	push (@addAction ,['Add Ancillary Location', "/org/%field.org_id%/dlg-add-ancillary-location?_f_org_id=%field.org_id%"]) if ($self->{orgtype} eq 'ancillary');
 	push @addAction ,(
-			
+
 			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product?_f_ins_org_id=%field.org_id%"],
 			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan?_f_ins_org_id=%field.org_id%"],
 			['Go to Directory', "/search/org/id/%field.org_id%"],
