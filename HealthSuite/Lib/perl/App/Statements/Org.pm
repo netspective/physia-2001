@@ -37,6 +37,13 @@ $STMTMGR_ORG = new App::Statements::Org(
 		AND	oc.parent_id = o.org_internal_id
 		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
 	},
+	'selFindOrgWithMemberId'=>qq
+	{
+		SELECT parent_id
+		FROM	org_category
+		WHERE	parent_id = :1
+		AND	member_name = :2
+	},
 	'selOwnerOrg' => qq{
 		select *
 		from org
