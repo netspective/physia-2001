@@ -21,6 +21,7 @@ $STMTMGR_DOCUMENT = new App::Statements::Document(
 			Document.doc_name AS subject,
 			Document.doc_content_small AS message,
 			Document.doc_data_a AS permed_id,
+			Document.doc_data_b AS priority,
 			attr_repatient.value_text AS repatient_id,
 			attr_repatient.value_int AS deliver_records,
 			attr_repatient.value_textB AS return_phone,
