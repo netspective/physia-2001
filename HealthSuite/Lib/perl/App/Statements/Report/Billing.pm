@@ -91,17 +91,19 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 
 	'sel_detail_insurance' => {
 		_stmtFmt => qq{
-			select Insurance.ins_org_id as payer, invoice_id, invoice_date, client_id, bill_to_id,
+			select Insurance.ins_org_id as payer, invoice.invoice_id, invoice_date, client_id, bill_to_id,
 				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, complete_name
-			from Insurance, Transaction_Status, Transaction, Invoice, Person
+			from Insurance, Transaction_Status, Transaction, Invoice, Person, invoice_billing ib
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
 				and Transaction_Status.id = Transaction.trans_status
-				and Insurance.ins_internal_id = Invoice.ins_id
-				and Insurance.ins_org_id = ?
+				--and Insurance.ins_internal_id = Invoice.ins_id
+				and Insurance.ins_internal_id = ib.bill_ins_id
+				and invoice.billing_id = ib.bill_id
+				and Insurance.ins_org_id  = ?
 				and Invoice.client_id = Person.person_id
 		},
 		publishDefn => 	{
@@ -122,8 +124,9 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 
 	'sel_earningsFromItem_Adjust' => {
 		_stmtFmt => qq{
-			select payer_id as payer, sum(plan_paid) as earning
-			from Invoice_Item_Adjust, Invoice_Item, Invoice
+			--select payer_id as payer, sum(plan_paid) as earning
+			select org_id as payer, sum(plan_paid) as earning			
+			from Invoice_Item_Adjust, Invoice_Item, Invoice, org o
 			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Invoice.owner_id = ?
@@ -131,7 +134,9 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and Invoice_Item.parent_id = Invoice.invoice_id
 				and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
 				and Invoice_Item_Adjust.payer_type = 1
-			group by payer_id
+				and o.org_internal_id = payer_id
+			--group by payer_id
+			group by org_id
 			UNION
 			select 'Others' as payer_id, sum(total_cost) as earning
 			from Invoice_Item_Adjust, Invoice_Item, Invoice
@@ -147,7 +152,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Payer', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=earning&insurance=#&{?}#")', hint => 'View Details' },
+					{head => 'Payer', url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#&{?}#')}, hint => 'View Details' },
 					{head => 'Earning', dAlign => 'right', dformat => 'currency'},
 				],
 		},
