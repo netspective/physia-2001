@@ -57,6 +57,21 @@
 		<deliverable id="1393">
 			Changed Fee Schedule Copy so it copied the Service Type.
 		</deliverable>		
+
+
+		<deliverable id="1150">
+			Problem with fee schedules and explosion codes fixed.
+		</deliverable>		
+		<deliverable id="1384">
+			Prefilling plan allow in insurance payment dialog.
+		</deliverable>		
+		<deliverable id="1225">
+			Add claim dialog handles adding hospital claims now.
+		</deliverable>		
+		<deliverable id="460">
+			Report for patient account history created.
+		</deliverable>		
+
 	</deliverables>
 </release-notes>
 
