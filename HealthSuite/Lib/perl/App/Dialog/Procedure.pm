@@ -1061,14 +1061,14 @@ sub execute
 		$totalCostForInvoice += $item->{extended_cost};
 	}
 
-	$balance = $totalCostForInvoice + $invoice->{total_adjust};
+	my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
 
 	$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId || undef,
 			total_items => defined $totalItems ? $totalItems : undef,
 			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-			balance => defined $balance ? $balance : undef,
+			balance => defined $invBalance ? $invBalance : undef,
 			_debug => 0
 		);
 
