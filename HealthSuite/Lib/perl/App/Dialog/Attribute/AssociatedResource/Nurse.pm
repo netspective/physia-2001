@@ -89,7 +89,7 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	my $sessOrgId = $page->session('org_id');
+	my $sessOrgId = $page->session('org_internal_id');
 	$self->getField('value_text')->{fKeyStmtBindPageParams} = $sessOrgId;
 }
 
@@ -112,7 +112,7 @@ sub execute
 		item_id => $page->param('item_id') || undef,
 		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 		value_text => $page->field('value_text') || undef,
-		#parent_org_id => $page->session('org_id') || undef,
+		parent_org_id => $page->session('org_internal_id') || undef,
 		_debug => 0
 	);
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);

@@ -95,7 +95,7 @@ sub customValidate
 
 	elsif($table eq 'Org_Address')
 	{
-		my $parentId = $page->param('org_id');
+		my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
 		return $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $parentId, $addressName) ?
 			$dialogItem->invalidate($page, "The '$addressName' address already exists for $parentId.") :
 			();

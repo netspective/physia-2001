@@ -78,7 +78,7 @@ sub execute
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $page->param('person_id'),
-		parent_org_id => $page->session('org_id') || undef,
+		parent_org_id => $page->session('org_internal_id') || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name => $itemName || undef,
 		value_type => $valueType || undef,

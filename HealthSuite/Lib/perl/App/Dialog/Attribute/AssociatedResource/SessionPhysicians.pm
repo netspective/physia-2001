@@ -93,7 +93,7 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	my $sessOrgId = $page->session('org_id');
+	my $sessOrgId = $page->session('org_internal_id');
 	$self->getField('value_text')->{fKeyStmtBindPageParams} = $sessOrgId;
 }
 
@@ -125,7 +125,7 @@ sub execute
 		'Person_Attribute',	$command,
 		item_id => $command eq 'add' ? undef : $itemId,
 		parent_id => $page->param('person_id'),
-		parent_org_id => $page->session('org_id') || undef,
+		parent_org_id => $page->session('org_internal_id') || undef,
 		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 		item_name => 'SessionPhysicians',
 		value_text => $physiciansString,
@@ -145,7 +145,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $page->session('org_id') || undef,
+			parent_org_id => $page->session('org_internal_id') || undef,
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 			item_name => 'Physician',
 			value_text => $_,

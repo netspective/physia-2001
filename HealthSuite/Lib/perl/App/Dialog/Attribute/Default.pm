@@ -254,15 +254,17 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 	my $command = $self->getActiveCommand($page);
-	my $billing = $self->getField('attr_name');
-	my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
-	my $valueType = $self->{valueType};
-	my $billType = App::Universal::ATTRTYPE_BILLING_PHONE;
-	my $billingExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
-	if($command eq 'add' && $billingExists eq 1 && $valueType eq $billType)
+	if($page->param('org_id'))
 	{
-
-		$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
+		my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
+		my $valueType = $self->{valueType};
+		my $billType = App::Universal::ATTRTYPE_BILLING_PHONE;
+		my $billingExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
+		if($command eq 'add' && $billingExists eq 1 && $valueType eq $billType)
+		{
+			my $billing = $self->getField('attr_name');
+			$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
+		}
 	}
 }
 
@@ -345,14 +347,10 @@ sub execute_update
 	my $prefFlag = $page->field('preferred_flag') eq '' ? 0 : 1;
 
 	#get table name
-	my $tableName = '';
+	my $tableName = 'Org_Attribute';
 	if($page->param('person_id'))
 	{
 		$tableName = 'Person_Attribute';
-	}
-	else
-	{
-		$tableName = 'Org_Attribute';
 	}
 
 	$page->schemaAction(

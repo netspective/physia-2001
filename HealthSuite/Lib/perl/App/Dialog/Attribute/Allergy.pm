@@ -23,6 +23,22 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl_modify => ['item_id'],
 		_idSynonym => 'attr-' .App::Universal::MEDICATION_ALLERGY()
 		},
+	'allergy-environmental' => {
+		valueType => App::Universal::ENVIRONMENTAL_ALLERGY,
+		group => 'Environmental Allergy',
+		heading => '$Command Environmental Allergy',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' . App::Universal::ENVIRONMENTAL_ALLERGY(),
+		},
+	'allergy-intolerance' => {
+		valueType => App::Universal::MEDICATION_INTOLERANCE,
+		group => 'Medication Intolerance',
+		heading => '$Command Medication Intolerance',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' . App::Universal::MEDICATION_INTOLERANCE(),
+		},
 );
 
 sub new
