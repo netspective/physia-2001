@@ -126,7 +126,27 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $personId = $page->param('person_id');
-	my $occupation = $page->field('rel_type') eq '' ? 'Unknown' : $page->field('rel_type');
+	my $valueType = $page->field('value_type');
+	my $relType = $page->field('rel_type');
+	my $occupation = '';
+
+	if($valueType eq App::Universal::ATTRTYPE_RETIRED || $valueType eq App::Universal::ATTRTYPE_UNEMPLOYED || $valueType eq App::Universal::ATTRTYPE_STUDENTFULL || $valueType eq App::Universal::ATTRTYPE_STUDENTPART)
+	{
+		$occupation = '';
+	}
+
+	elsif($relType eq '')
+	{
+		$occupation = 'Unknown';
+	}
+
+	else
+	{
+		$occupation = $relType;
+	}
+
+	#my $occupation = $relType eq '' &&	($valueType ne App::Universal::ATTRTYPE_RETIRED || $valueType ne App::Universal::ATTRTYPE_UNEMPLOYED)	? 'Unknown' : $relType;
+
 	$occupation = "\u$occupation";
 
 	my $relId = $page->field('rel_id');
@@ -137,7 +157,7 @@ sub execute
 		item_id => $page->param('item_id') || undef,
 		parent_id => $personId || undef,
 		item_name => $occupation || undef,
-		value_type => $page->field('value_type') || undef,
+		value_type => $valueType || undef,
 		value_int => $relIntId || undef,
 		value_text => $relId || undef,
 		value_textB => $page->field('phone_number') || undef,
