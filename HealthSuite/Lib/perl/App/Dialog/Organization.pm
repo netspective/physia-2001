@@ -429,8 +429,8 @@ sub execute_add
 			parent_id => $page->field('org_id'),
 			item_name => 'Contact Information',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->field('contact_name') || undef,
-			value_textB => $page->field('contact_phone') || undef,
+			value_text => $page->field('contact_phone') || undef,
+			value_textB => $page->field('contact_name') || undef,
 			_debug => 0
 		)if $page->field('contact_phone') ne '';
 
