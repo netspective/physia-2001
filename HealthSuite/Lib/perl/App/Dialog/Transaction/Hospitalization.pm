@@ -39,6 +39,7 @@ sub new
 			column => 'Transaction.trans_type', typeRange => '11000..11999'),
 		new CGI::Dialog::Field(name => 'trans_begin_stamp', caption => 'Date Of Admission', type => 'date', options => FLDFLAG_REQUIRED,defaultValue => '', futureOnly => 0),
 		new CGI::Dialog::Field(name => 'related_data', caption => 'Hospital Name',options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(name => 'patient_id', caption => 'Patient ID', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'caption', caption => 'Room Number'),
 		new CGI::Dialog::Field(name => 'trans_status_reason', caption => 'Reason For Admission', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician'], options => FLDFLAG_REQUIRED, incSimpleName=>1),
@@ -60,6 +61,18 @@ sub new
 	return $self;
 }
 
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+	my $returnUrl = $page->referer();
+	unless($returnUrl =~ /home$/)
+	{
+		$self->setFieldFlags('patient_id', FLDFLAG_INVISIBLE, 1);
+	}
+}
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
@@ -74,9 +87,10 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	my $transaction = $self->{transaction};
+
 	my $transId = $page->param('_trne_trans_id') || $page->param('trans_id');
-	my $personId = $page->param('person_id');
+	my $personId = $page->field('patient_id') || $page->param('person_id');
+
 	my $transStatus = $command eq 'remove' ? App::Universal::TRANSSTATUS_INACTIVE : App::Universal::TRANSSTATUS_ACTIVE;
 		# don't actually delete any trans records
 	$command = $command eq 'remove' ? 'update' : $command;
@@ -87,7 +101,7 @@ sub execute
 			'Transaction',
 			$command,
 			trans_owner_type => defined $transOwnerType ? $transOwnerType : undef,
-			trans_owner_id => $page->param('person_id'),
+			trans_owner_id => $personId,
 			trans_id => $transId || undef,
 			trans_type => $page->field('trans_type') || undef,
 			trans_status => $transStatus,
