@@ -228,8 +228,6 @@ sub changeInvoiceStatus
 {
 	my ($page, $invoice, $status) = @_;
 
-	print "Invoice ID: $invoice\n";
-	
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoice);
 	
 	return if $invoiceInfo->{invoice_status} == App::Universal::INVOICESTATUS_VOID
