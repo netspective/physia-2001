@@ -57,7 +57,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
 	substr($flags->{RECORDFLAGS_NONE} == 0 ? 'C' : $defaultSrcOfPmt,0,1),
-	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
+	substr((($flags->{RECORDFLAGS_NONE} == 0) && ($inpClaim->getFilingIndicator() eq 'P')) ? 'MP': (($inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}]->getMedigapNo() eq '') ? 'SP' : 'MG'),0,2),   # $refClaimInsured->getTypeCode() insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName(),0,33),
