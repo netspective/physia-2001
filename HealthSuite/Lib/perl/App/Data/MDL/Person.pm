@@ -6,6 +6,8 @@ use strict;
 use App::Data::MDL::Module;
 use App::Data::MDL::Invoice;
 use App::Universal;
+use DBI::StatementManager;
+use App::Statements::Catalog;
 use Date::Manip;
 use vars qw(@ISA);
 use Dumpvalue;
@@ -193,7 +195,9 @@ sub importPreventivecare
 	my $parentId = $person->{id};
 	if(my $list = $preventivecare->{measure})
 	{
-
+	 	my $cptCode = $item->{cpt};
+		my $cptData = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		my $cptCodeName = $cptName->{'name'} ne '' ? $cptName->{'name'} : '';
 		# in case there is only one, force it to be "multiple" to simplify coding
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
@@ -202,6 +206,8 @@ sub importPreventivecare
 				parent_id => $parentId,
 				item_name => "$item->{_text}",
 				value_type => App::Universal::PREVENTIVE_CARE,
+				value_text => $item->{cpt},
+				value_textB => $cptCodeName,
 				value_date =>  $item->{lastperformed},
 				value_dateEnd => $item->{nextdue});
 		}
