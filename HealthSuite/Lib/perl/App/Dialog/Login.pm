@@ -9,7 +9,7 @@ use CGI::Validator::Field;
 use CGI::ImageManager;
 use App::Universal;
 use Date::Manip;
-use SDE::CVS ('$Id: Login.pm,v 1.20 2000-11-06 14:56:50 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Login.pm,v 1.21 2001-01-10 18:26:05 thai_nguyen Exp $', '$Name:  $');
 use App::Configuration;
 
 use DBI::StatementManager;
@@ -175,10 +175,12 @@ sub execute
 	my $now = ParseDate('today');
 	my $gmtTime = Date_ConvTZ($now, 'GMT', $daylightTZ);
 	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
+	my $standardTimeOffset = $daylightTZ eq $TZ ? 0 : 1/24;
 
 	$page->createSession($personId, $defaultOrgIntId, {
 		org_id => $defaultOrg, categories => $categories, personFlags => $personFlags,
 		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset, DAYLIGHT_TZ => $daylightTZ,
+		STANDARD_TIME_OFFSET => $standardTimeOffset,
 		validOrgs => join(',',@$validOrgs), defaultOrg => $defaultOrg,
 	});
 
