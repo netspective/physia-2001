@@ -305,21 +305,48 @@ sub getProceduresHtml
 	{
 		my $copayItem = $claim->{copayItems}->[$itemIdx];
 		my $itemId = $copayItem->{itemId};
+		my $itemType = $copayItem->{itemType};
 		my $itemNum = $itemIdx + 1;
 
 		my $itemExtCost = $copayItem->{extendedCost};
 		$itemExtCost = $formatter->format_price($itemExtCost);
 		my $itemAdjustmentTotal = $copayItem->{totalAdjustments};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx');";
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
 		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 		push(@rows, qq{
 			<TR>
 				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Copay - $copayItem->{comments}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD> -->
+				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
+			</TR>
+			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+		});
+	}
+
+	my $coinsuranceItems = scalar(@{$claim->{coInsuranceItems}});
+	foreach my $itemIdx (0..$coinsuranceItems-1)
+	{
+		my $coinsuranceItem = $claim->{coinsuranceItems}->[$itemIdx];
+		my $itemId = $coinsuranceItem->{itemId};
+		my $itemType = $coinsuranceItem->{itemType};
+		my $itemNum = $itemIdx + 1;
+
+		my $itemExtCost = $coinsuranceItem->{extendedCost};
+		$itemExtCost = $formatter->format_price($itemExtCost);
+		my $itemAdjustmentTotal = $coinsuranceItem->{totalAdjustments};
+		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
+		push(@rows, qq{
+			<TR>
+				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Coinsurance - $coinsuranceItem->{comments}</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
+				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
@@ -329,6 +356,8 @@ sub getProceduresHtml
 	foreach my $itemIdx (0..$totalOtherItems-1)
 	{
 		my $otherItem = $claim->{otherItems}->[$itemIdx];
+		my $itemId = $otherItem->{itemId};
+		my $itemType = $otherItem->{itemType};
 
 		my $itemNum = $itemIdx + 1;
 
@@ -336,65 +365,70 @@ sub getProceduresHtml
 		$itemExtCost = $formatter->format_price($itemExtCost);
 		my $itemAdjustmentTotal = $otherItem->{totalAdjustments};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
+		
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
 		push(@rows, qq{
 			<TR>
 				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Misc Charge - $otherItem->{comments}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
-			</TR>
-			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-		});
-	}
-
-	my $adjItems = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_CACHE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_ADJUST);
-	my $totalAdjItems = scalar(@{$adjItems});
-	foreach my $itemIdx (0..$totalAdjItems-1)
-	{
-		my $itemId = $adjItems->[$itemIdx]->{item_id};
-		my $itemType = $adjItems->[$itemIdx]->{item_type};
-
-		my $itemNum = $itemIdx + 1;
-
-		my $itemAdjustmentTotal = $adjItems->[$itemIdx]->{balance};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		push(@rows, qq{
-			<TR>
-				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Adjustment</B></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
+				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
-
-	#UNCOMMENT THIS AFTER PROSYS GETS THIS WORKING AGAIN AND DELETE ABOVE LOOP
-	
-	#my $totalAdjItems = scalar(@{$claim->{adjItems}});
+	#my $adjItems = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_CACHE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_ADJUST);
+	#my $totalAdjItems = scalar(@{$adjItems});
 	#foreach my $itemIdx (0..$totalAdjItems-1)
 	#{
-	#	my $adjItem = $claim->{adjItems}->[$itemIdx];
+	#	my $itemId = $adjItems->[$itemIdx]->{item_id};
+	#	my $itemType = $adjItems->[$itemIdx]->{item_type};
 
 	#	my $itemNum = $itemIdx + 1;
 
-	#	my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
+	#	my $itemAdjustmentTotal = $adjItems->[$itemIdx]->{balance};
 	#	$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+	#	my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
+	#	my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
 	#	push(@rows, qq{
 	#		<TR>
-	#			<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Adjustment</TD>
+	#			<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Adjustment</B></TD>
 	#			<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-	#			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
+	#			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 	#		</TR>
 	#		<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 	#	});
 	#}
+
+
+	#UNCOMMENT THIS AFTER PROSYS GETS THIS WORKING AGAIN AND DELETE ABOVE LOOP
+	
+	my $totalAdjItems = scalar(@{$claim->{adjItems}});
+	foreach my $itemIdx (0..$totalAdjItems-1)
+	{
+		my $adjItem = $claim->{adjItems}->[$itemIdx];
+
+		my $itemNum = $itemIdx + 1;
+
+		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
+		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$adjItem->{itemId},$itemIdx,$adjItem->{itemType}');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
+
+		push(@rows, qq{
+			<TR>
+				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Adjustment</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
+			</TR>
+			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+		});
+	}
 
 
 	#SIM/CURR ILLNESS DATES:
