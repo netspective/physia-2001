@@ -470,6 +470,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where item_id = ?
 	},
 
+	'checkOfficeVisitCPT' => qq{
+		select cpt
+		from ref_cpt
+		where cpt = ?
+			and cpt in ('99201','99202','99203','99204','99205','99211','99212','99213','99214','99215')	
+	},
 );
 
 

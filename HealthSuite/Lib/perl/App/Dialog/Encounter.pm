@@ -1595,9 +1595,27 @@ sub handleBillingInfo
 	my $invoiceFlags = $page->field('invoice_flags');
 
 	my $copayAmt = $page->field('copay_amt');
-	if($copayAmt && $page->field('claim_type') == App::Universal::CLAIMTYPE_HMO && ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
+	if($copayAmt && $page->field('claim_type') == App::Universal::CLAIMTYPE_HMO 
+		&& ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
 	{
-		billCopay($self, $page, 'add', $flags, $invoiceId);
+		my $lineCount = $page->param('_f_line_count');
+		my $existsOfficeVisitCPT = '';
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
+			{			
+				$existsOfficeVisitCPT = 1;
+			}		
+		}
+		
+		if($existsOfficeVisitCPT)
+		{
+			billCopay($self, $page, 'add', $flags, $invoiceId);
+		}
+		else
+		{
+			$self->handlePostExecute($page, $command, $flags);
+		}
 	}
 	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
 	{
