@@ -273,7 +273,7 @@ sub prepare_HtmlBlockFmtTemplate
 		{
 			my $hDataFmt = $_->{hDataFmt} || $_->{head};
 			$hDataFmt = qq{<NOBR>$hDataFmt</NOBR>} if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPHEAD);
-			$hCellFmt = qq{<TH ALIGN=@{[$_->{hAlign} || 'CENTER']} @{[ $_->{hHint} ? "TITLE='$_->{hHint}'" : '' ]}>$headFontOpen$hDataFmt$headFontClose</TH>};
+			$hCellFmt = qq{<TH ALIGN=@{[$_->{hAlign} || 'CENTER']} VALIGN=@{[$_->{hVAlign} || 'TOP']} @{[ $_->{hHint} ? "TITLE='$_->{hHint}'" : '' ]}>$headFontOpen$hDataFmt$headFontClose</TH>};
 		}
 		unless(defined $dCellFmt)
 		{
@@ -323,7 +323,7 @@ sub prepare_HtmlBlockFmtTemplate
 				$dataFmt = "<SPAN TITLE='$_->{hint}'>$dataFmt</SPAN>";
 			}
 			$dataFmt = "<NOBR>$dataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPBODY);
-			$dCellFmt = "<TD ALIGN=@{[$dAlign || 'LEFT']}>$bodyFontOpen$dataFmt$bodyFontClose</TD>";
+			$dCellFmt = "<TD ALIGN=@{[$dAlign || 'LEFT']} VALIGN=@{[$_->{dVAlign} || 'TOP']}>$bodyFontOpen$dataFmt$bodyFontClose</TD>";
 		}
 		unless(defined $tCellFmt)
 		{
@@ -342,7 +342,7 @@ sub prepare_HtmlBlockFmtTemplate
 			}
 			$tDataFmt ||= '&nbsp;';
 			$tDataFmt = "<NOBR>$tDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
-			$tCellFmt = "<TD ALIGN=$tAlign>$tailFontOpen$tDataFmt$tailFontClose</TD>";
+			$tCellFmt = "<TD ALIGN=$tAlign VALIGN=@{[$_->{tVAlign} || 'TOP']}>$tailFontOpen$tDataFmt$tailFontClose</TD>";
 		}
 
 		# replace &{?} with the current column's index and ## with a single pound (for recursive variables or simple # replacements)
