@@ -8,6 +8,7 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::MiscProcedure;
 use App::Statements::Transaction;
+use App::Statements::Catalog;
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
@@ -26,8 +27,9 @@ sub getForm
 	my $lookupValue;
 	if($self->param('search_type') eq 'detail')
 	{		
-		$procCode =  $STMTMGR_TRANSACTION->getSingleValue($self,STMTMGRFLAG_NONE,'selMiscProcedureByTransId',
+		my $miscProc =  $STMTMGR_CATALOG->getRowAsHash($self,STMTMGRFLAG_NONE,'selMiscProcedureNameById',
 		$self->param('search_expression')) if $self->param('search_expression');
+		$procCode = $miscProc->{proc_code};
 		#This is not the best fix but it will set the lookup value on a detail search to the parent code
 		#value
 		$heading = $procCode ? "Lookup Misc Procedure item ($procCode)" : 'Lookup Misc Procedure item';		
@@ -85,6 +87,7 @@ sub execute
 
 	my $bindParams = [uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
+	push(@$bindParams, $self->session('org_internal_id'));
 
 	$self->addContent(
 		'<CENTER>',		
