@@ -47,6 +47,10 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'History', name => 'history',},
 					{caption => 'Envoy NSF', name => 'envoy_nsf',},
 					{caption => 'Halley NSF', name => 'halley_nsf',},
+					{caption => 'Dialog', name => 'dialog',},
+					{caption => 'Submit', name => 'submit',},
+					{caption => 'Review', name => 'review',},
+					{caption => 'Intellicode', name => 'intellicode',},
 			],
 		},
 	);
@@ -142,10 +146,14 @@ sub getProcedureHtml
 	}
 
 	#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-	my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $procedure->{placeOfService});
+	my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedure->{placeOfService});
+	my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
+	my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedure->{typeOfService});
+	my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
+	my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
+
 	my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $procedure->{modifier});
 	my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $procedure->{cpt});
-
 	my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
 	push(@rows, qq{
@@ -154,7 +162,7 @@ sub getProcedureHtml
 			<TD>&nbsp;</TD>
 			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{dateOfServiceFrom} @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $procedure->{dateOfServiceTo}" : '']} </TD>
 			<TD>&nbsp;</TD>
-			<TD TITLE="$servPlaceCaption"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{placeOfService} @{[$procedure->{typeOfService} ? "($procedure->{typeOfService})" : '']}</TD>
+			<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 			<TD>&nbsp;</TD>
 			<TD TITLE="$cptAndModTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{cpt} @{[$procedure->{modifier} ? "($procedure->{modifier})" : '']}</TD>
 			<TD>&nbsp;</TD>
@@ -283,17 +291,23 @@ sub getProceduresHtml
 		}
 
 		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $procedure->{placeOfService});
+		my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedure->{placeOfService});
+		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
+		my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedure->{typeOfService});
+		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
+		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
+
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $procedure->{modifier});
 		my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $procedure->{cpt});
 		my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
+
 		push(@rows, qq{
 			<TR>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>$lineSeq</B></FONT></TD>
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{dateOfServiceFrom} @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $procedure->{dateOfServiceTo}" : '']} </TD>
 				<TD>&nbsp;</TD>
-				<TD TITLE="$servPlaceCaption"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{placeOfService} @{[$procedure->{typeOfService} ? "($procedure->{typeOfService})" : '']}</TD>
+				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 				<TD>&nbsp;</TD>
 				<TD TITLE="$cptAndModTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{cpt} @{[$procedure->{modifier} ? "($procedure->{modifier})" : '']}</TD>
 				<TD>&nbsp;</TD>
@@ -383,7 +397,12 @@ sub getProceduresHtml
 		}
 
 		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $voidItem->{placeOfService});
+		my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $voidItem->{placeOfService});
+		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
+		my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $voidItem->{typeOfService});
+		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
+		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
+
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $voidItem->{modifier});
 		my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $voidItem->{cpt});
 		my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
@@ -391,13 +410,10 @@ sub getProceduresHtml
 		push(@rows, qq{
 			<TR>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Void</TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD> -->
-
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$voidItem->{dateOfServiceFrom} @{[ $voidItem->{dateOfServiceTo} ne $voidItem->{dateOfServiceFrom} ? " - $voidItem->{dateOfServiceTo}" : '']} </TD>
 				<TD>&nbsp;</TD>
-				<TD TITLE="$servPlaceCaption"><FONT FACE="Arial,Helvetica" SIZE=2>$voidItem->{placeOfService} @{[$voidItem->{typeOfService} ? "($voidItem->{typeOfService})" : '']}</TD>
+				<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
 				<TD>&nbsp;</TD>
 				<TD TITLE="$cptAndModTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$voidItem->{cpt} @{[$voidItem->{modifier} ? "($voidItem->{modifier})" : '']}</TD>
 				<TD>&nbsp;</TD>
@@ -499,8 +515,6 @@ sub getProceduresHtml
 
 	foreach my $diag (@allDiags)
 	{
-		#next if $diag eq '';
-
 		$icdCaption .= "$diag: ";
 		my $icdInfo = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericICDCode', $diag);
 		$icdCaption .= $icdInfo->{descr};
@@ -830,7 +844,9 @@ sub getIntelliCodeResultsHtml
 # DIALOG MANAGEMENT METHODS
 #-----------------------------------------------------------------------------
 
-sub prepare_dialog_procedure	#need this
+#using these instead of dlg-add-xxx because we want to show the invoice summary under dialog, otherwise dialog is shown alone.
+
+sub prepare_dialog_procedure
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -959,7 +975,7 @@ sub prepare_dialog_adjustment
 	return 1;
 }
 
-sub prepare_dialog_diagnoses	#need this
+sub prepare_dialog_diagnoses
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -974,7 +990,7 @@ sub prepare_dialog_diagnoses	#need this
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_hold	#need this
+sub prepare_dialog_hold
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -987,7 +1003,7 @@ sub prepare_dialog_hold	#need this
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_problem	#need this
+sub prepare_dialog_problem
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -1015,13 +1031,10 @@ sub prepare_dialog_claim
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_postinvoicepayment	#need this
+sub prepare_dialog_postinvoicepayment
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
-
-	my $isPayer = $self->param('_pm_dialog_cmd');
-	$self->param('isPayer', $isPayer);
 
 	my $cancelUrl = "/invoice/$invoiceId/summary";
 	my $dialog = new App::Dialog::PostInvoicePayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
@@ -1123,14 +1136,14 @@ sub prepare_view_summary
 						@{[ $invStatus >= $submitted && $claimType != $selfPay && $invStatus != $void ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Apply Insurance Payment</a>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 
 						@{[ $invStatus != $void ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinvoicepayment/personal'>Apply Personal Payment</a>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 					</TR>
@@ -1311,7 +1324,6 @@ sub prepare_view_review
 	);
 
 	$self->redirect("/invoice/$invoiceId/summary");
-	#return $self->prepare_view_summary();
 }
 
 sub prepare_view_submit
@@ -1327,7 +1339,6 @@ sub prepare_view_submit
 	$self->addError($@) if $@;
 
 	$self->redirect("/invoice/$invoiceId/summary");
-	#return $self->prepare_view_summary();
 }
 
 sub prepare_view_history
@@ -1661,7 +1672,7 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
-						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
