@@ -232,6 +232,7 @@ sub reopenInsuranceClaim
 				adjustment_amount => $payment->{net_adjust},
 				parent_id => $itemId,
 				pay_date => $todaysDate,
+				data_num_a => defined $payment->{data_num_a} ? $payment->{data_num_a} : undef,
 				_debug => 0
 			);
 
