@@ -144,9 +144,9 @@ sub execute
 		
 		[undef, undef, undef, undef],
 		['<b>CURRENT A.R</b>', 
-			($dayStartAR + $orgDay->{total_charges} - ($orgDay->{person_pay}+$orgDay->{insurance_pay}) - $orgDay->{courtesy_adj} - $orgDay->{contractual_adj} + $orgDay->{misc_charges} - $orgDay->{refund}),
-			($monthStartAR + $orgMonth->{total_charges} - ($orgMonth->{person_pay}+$orgMonth->{insurance_pay}) - $orgMonth->{courtesy_adj} - $orgMonth->{contractual_adj} + $orgMonth->{misc_charges} - $orgMonth->{refund}),
-			($yearStartAR + $orgYear->{total_charges} - ($orgYear->{person_pay}+$orgYear->{insurance_pay}) - $orgYear->{courtesy_adj} - $orgYear->{contractual_adj} + $orgYear->{misc_charges} - $orgYear->{refund})
+			($dayStartAR + $orgDay->{total_charges} - ($orgDay->{person_pay}+$orgDay->{insurance_pay}) - $orgDay->{courtesy_adj} - $orgDay->{contractual_adj} + $orgDay->{misc_charges} + $orgDay->{refund}),
+			($monthStartAR + $orgMonth->{total_charges} - ($orgMonth->{person_pay}+$orgMonth->{insurance_pay}) - $orgMonth->{courtesy_adj} - $orgMonth->{contractual_adj} + $orgMonth->{misc_charges} + $orgMonth->{refund}),
+			($yearStartAR + $orgYear->{total_charges} - ($orgYear->{person_pay}+$orgYear->{insurance_pay}) - $orgYear->{courtesy_adj} - $orgYear->{contractual_adj} + $orgYear->{misc_charges} + $orgYear->{refund})
 		],
 	);
 
@@ -157,6 +157,7 @@ sub execute
 	
 	for my $doc (@{$providers})
 	{
+		next if $doc =~ /^\s*$/;
 		my $docName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 
 			'selPersonSimpleNameById', $doc);
 			
@@ -199,9 +200,9 @@ sub execute
 
 			[undef, undef, undef, undef],
 			['<b>CURRENT A.R</b>', 
-				($dayStartAR + $docDay->{total_charges} - ($docDay->{person_pay}+$docDay->{insurance_pay}) - $docDay->{courtesy_adj} - $docDay->{contractual_adj} + $docDay->{misc_charges} - $docDay->{refund}),
-				($monthStartAR + $docMonth->{total_charges} - ($docMonth->{person_pay}+$docMonth->{insurance_pay}) - $docMonth->{courtesy_adj} - $docMonth->{contractual_adj} + $docMonth->{misc_charges} - $docMonth->{refund}),
-				($yearStartAR + $docYear->{total_charges} - ($docYear->{person_pay}+$docYear->{insurance_pay}) - $docYear->{courtesy_adj} - $docYear->{contractual_adj} + $docYear->{misc_charges} - $docYear->{refund})
+				($dayStartAR + $docDay->{total_charges} - ($docDay->{person_pay}+$docDay->{insurance_pay}) - $docDay->{courtesy_adj} - $docDay->{contractual_adj} + $docDay->{misc_charges} + $docDay->{refund}),
+				($monthStartAR + $docMonth->{total_charges} - ($docMonth->{person_pay}+$docMonth->{insurance_pay}) - $docMonth->{courtesy_adj} - $docMonth->{contractual_adj} + $docMonth->{misc_charges} + $docMonth->{refund}),
+				($yearStartAR + $docYear->{total_charges} - ($docYear->{person_pay}+$docYear->{insurance_pay}) - $docYear->{courtesy_adj} - $docYear->{contractual_adj} + $docYear->{misc_charges} + $docYear->{refund})
 			],
 		);
 			
