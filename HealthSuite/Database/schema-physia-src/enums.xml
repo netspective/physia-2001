@@ -148,8 +148,8 @@
 		<enum id="3">Tertiary</enum>
 		<enum id="4">Quaternary</enum>
 		<enum id="5">Workers Comp</enum>
-		<enum id="6">Terminated</enum>
-		<enum id="99">Inactive</enum>
+		<enum id="98">Terminated</enum>
+		<enum id="99">InActive</enum>
 	</table>
 
 	<table name="Appt_Attendee_Type" abbrev="ApPty" type="Enumeration">
