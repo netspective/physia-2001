@@ -28,8 +28,7 @@ sub prepare_view_date
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD colspan=5>
-				<h1>Not yet implemented</h1>
-					#component.worklist#
+					#component.worklist-referral#
 				</TD>
 			</TR>
 			<TR>
