@@ -21,7 +21,7 @@
 	
 		<deliverable id="713">
 			Popup a window displaying patient alerts if patient has an Appointment Alert.
-			NOTE:  This only works when entering the Appointment Dialog or when looking
+			NOTE:  Only popup alert window when entering the Appointment Dialog or when looking
 			up a patient.
 		</deliverable>
 	
@@ -58,7 +58,8 @@
 
 		<deliverable id="1554">
 			Allow Cancel and Reschedule an appointment after checkin and automatically void the
-			created claim.  Accounted for this in the Patient Activity Report.
+			created claim.  Modify the Patient Activity Report to disregard this event as a 
+			Missing Encounter.
 		</deliverable>
 
 		<deliverable id="1580">
