@@ -39,9 +39,10 @@ $STMTMGR_REPORT_ACCOUNT_COLLECTION = new App::Statements::Report::AccountCollect
 			and t.trans_status = $ACTIVE
 			and t.trans_type in ($OWNER, $NOTES)
 			and t.trans_subtype = 'Owner'
+			and t.billing_facility_id = :3
 		},
 
-		sqlStmtBindParamDescr => ['Date Range'],
+		sqlStmtBindParamDescr => ['Date Range and Org Internal Id'],
 
 		publishDefn =>
 		{

@@ -48,8 +48,9 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $orgInternalID = $page->session('org_internal_id');
 
-	my $html = $STMTMGR_REPORT_ACCOUNT_COLLECTION->createHtml($page, STMTMGRFLAG_NONE, 'selCollectors', [$page->field('report_begin_date'), $page->field('report_end_date')]);
+	my $html = $STMTMGR_REPORT_ACCOUNT_COLLECTION->createHtml($page, STMTMGRFLAG_NONE, 'selCollectors', [$page->field('report_begin_date'), $page->field('report_end_date'), $orgInternalID]);
 	return $html;
 }
 
