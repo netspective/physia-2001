@@ -19,6 +19,7 @@ my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 
 my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
 my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+my $COLLECTION_LIMIT =251;
 
 
 
@@ -155,6 +156,114 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	provider_id = :2		
 	},
 	
+	#This Query should be the same as WorkListPop expect it does not look for products
+	
+	'selWorkListPopAll' =>qq
+	{
+	SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+					to_number(NULL) as trans_id,NULL as reck_date,to_number(NULL) as reck_id,
+					(
+						select min(to_char(e.start_time,'MM/DD/YYYY')) 
+						from event e, event_attribute ea
+						where ea.value_text = p.person_id
+						and ea.item_name = 'Appointment' 
+						and ea.value_type = 333
+						and e.event_id  = ea.parent_id
+						and e.start_time - to_date(:9,'MM/DD/YYYY') >=0			
+					)as appt,				
+					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+					   ii.item_type in (0,1,2) )
+					) as description			
+				FROM 	person p  ,invoice i 
+				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+				AND	upper(:2)
+				AND	i.client_id = p.person_id
+				AND	i.balance between (:3) 
+				AND	(:4)
+				AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+				AND	to_date(:6,'MM/DD/YYYY')		
+				AND	i.invoice_status not in (15,16)			
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM  	person_org_category poc
+					WHERE 	p.person_id = poc.person_id
+					AND	poc.org_internal_id = :7			
+				)
+				AND EXISTS
+				(
+					SELECT 	1
+					FROM 	person_attribute
+					WHERE	item_name = 'WorkList-Collection-Setup-Org'
+					AND	value_text = (select service_facility_id FROM transaction
+								WHERE trans_id= i.main_transaction)
+					AND 	parent_id = :8
+					AND	parent_org_id = :7
+				)
+				AND EXISTS
+				(
+					SELECT 	1
+					FROM	person_attribute
+					WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+					AND	value_text = (select provider_id FROM transaction
+								WHERE trans_id= i.main_transaction)
+					AND 	parent_id = :8
+					AND	parent_org_id = :7						
+				)						
+				AND NOT EXISTS
+				(
+					SELECT	1 
+					FROM	transaction
+					WHERE	trans_type = 9520
+					AND 	trans_status = 2
+					AND 	provider_id = :8
+					AND	trans_invoice_id = i.invoice_id	
+					AND 	trans_invoice_id is not NULL
+					AND	billing_facility_id = :7			
+				)	
+				AND	ROWNUM<$COLLECTION_LIMIT
+				UNION ALL
+				SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+					t.trans_id,
+					(	SELECT 	to_char(trans_begin_stamp,'MM/DD/YYYY') 
+						FROM 	transaction 
+						WHERE 	trans_owner_id = t.trans_owner_id
+						AND 	trans_type = 9510 
+						AND 	provider_id = t.provider_id	
+						AND 	trans_status = 2
+					)as  reck_date ,
+					(	SELECT 	trans_id 
+						FROM 	transaction 
+						WHERE 	trans_owner_id = t.trans_owner_id
+						AND 	trans_type = 9510 
+						AND 	provider_id = t.provider_id	
+						AND 	trans_status = 2
+					)as reck_id,
+					(
+						select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+						from event e, event_attribute ea
+						where ea.value_text = t.trans_owner_id 
+						and ea.item_name = 'Appointment' 
+						and ea.value_type = 333
+						and e.event_id  = ea.parent_id
+						and e.start_time - to_date(:9,'MM/DD/YYYY') >=0			
+					)as appt,
+					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+					   ii.item_type in (0,1,2) )
+					) as description				
+				FROM 	transaction t ,invoice i
+				WHERE 	t.trans_type = 9520
+				AND 	t.trans_status = 2
+				AND 	t.trans_subtype = 'Owner'
+				AND	t.provider_id = :8
+				AND	t.trans_invoice_id = i.invoice_id	
+				and     t.trans_invoice_id is not null
+				AND	t.billing_facility_id = :7
+				AND	ROWNUM<$COLLECTION_LIMIT
+		ORDER BY 1		
+	}, 
 	
 	'selWorkListPop' =>qq
 	{
@@ -245,6 +354,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					AND 	trans_invoice_id is not NULL
 					AND	billing_facility_id = :7			
 				)	
+				AND	ROWNUM<$COLLECTION_LIMIT
 				UNION ALL
 				SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
 					t.trans_id,
@@ -283,6 +393,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	t.trans_invoice_id = i.invoice_id	
 				and     t.trans_invoice_id is not null
 				AND	t.billing_facility_id = :7
+				AND	ROWNUM<$COLLECTION_LIMIT
 		ORDER BY 1
 	},	
 	
@@ -535,6 +646,15 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			and pa.value_type = $INT_VALUE_TYPE
 			and item_name = 'WorkList-Collection-Setup-Product'
 		order by i.product_name
+	},
+	'sel_worklist_all_products' =>qq{
+		select 	pa.value_int 
+		FROM 	Person_Attribute pa
+		WHERE	pa.value_type = $INT_VALUE_TYPE
+		AND	item_name = 'WorkList-Collection-Setup-Product'
+		AND	parent_id = :1
+		AND	parent_org_id = :2
+		AND	value_int = -1
 	},
 	'del_worklist_associated_products' => qq{
 		delete from Person_Attribute
