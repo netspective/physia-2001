@@ -22,13 +22,13 @@ sub new
 	my $schema = $self->{schema};
 
 	delete $self->{schema};  # make sure we don't store this!
-
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'value_text', caption => 'Misc Notes', type => 'memo', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
 	);
+	
 	$self->{activityLog} =
 	{
 		level => 1,
