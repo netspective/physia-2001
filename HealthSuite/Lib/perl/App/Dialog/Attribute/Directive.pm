@@ -25,13 +25,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'date', name => 'value_date', caption => 'Date',	options => FLDFLAG_REQUIRED, futureOnly => 0, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 	);
-	$self->{activityLog} =
-	{
-		level => 1,
-		scope =>'person_attribute',
-		key => "#param.person_id#",
-		data => "Advance Directive to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
-	};
+
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 }
 
