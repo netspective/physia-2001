@@ -10,9 +10,9 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
-
+use App::Statements::Invoice;
 use App::Statements::Component::Invoice;
-
+use App::Statements::Report::Accounting;
 use vars qw(@ISA $INSTANCE);
 
 @ISA = qw(App::Dialog::Report);
@@ -23,37 +23,43 @@ sub new
 
 	$self->addContent(
 			new App::Dialog::Field::Person::ID(caption =>'Provider ID', name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			new CGI::Dialog::Field(caption =>'Payment Type',
+					name => 'transaction_type',
+					options => FLDFLAG_PREPENDBLANK,
+					fKeyStmtMgr => $STMTMGR_INVOICE,
+					fKeyStmt => 'selPaymentMethod',
+					fKeyDisplayCol => 0
+					),
+			new CGI::Dialog::Field(caption =>'Begin Date',
+						type => 'date',
+						name => 'auth_date',
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+						defaultValue => '',
+						options => FLDFLAG_REQUIRED),
+
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
 }
 
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#
-#	$page->field('person_id', $page->session('person_id'));
-#}
-
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $personId = $page->field('person_id');
+	my $provider = $page->field('person_id') eq '' ? '*' : $page->field('person_id');
+	my $receipt = $page->field('transaction_type') eq '' ? '*' : $page->field('transaction_type');
+	my $begin = $page->field('auth_date');
 
+	my $providerLike = $provider =~ s/\*/%/g ? 'provider' : '';
+	my $receiptLike = $receipt =~ s/\*/%/g ? 'receipt' : '';
 
-	if ( $personId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.receiptAnalysis', [$personId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.receiptAnalysisAll');
-	}
+	my $like = $providerLike || $receiptLike ? '_like' : 'providerreceipt';
+	my $appendStmtName = "sel_$providerLike$receiptLike$like";
 
-
+	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",
+					[$begin, $begin, uc($provider), uc($receipt)]);
 
 }
 
