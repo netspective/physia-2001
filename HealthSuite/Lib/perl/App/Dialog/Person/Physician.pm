@@ -389,7 +389,8 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'BCBS',
-			value_type => 520,
+			value_type => 500,
+			value_textB => 'BCBS',
 			value_text => $page->field('bcbs_num') || undef,
 			value_dateEnd => $page->field('bcbs_exp_date') || undef,
 			_debug => 0
@@ -399,7 +400,8 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'Railroad Medicare',
-			value_type => 520,
+			value_type => 500,
+			value_textB => 'Railroad Medicare',
 			value_text => $page->field('rail_medic') || undef,
 			value_dateEnd => $page->field('rail_exp_date') || undef,
 			_debug => 0
@@ -409,7 +411,8 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'Champus',
-			value_type => 520,
+			value_type => 500,
+			value_textB => 'Champus',
 			value_text => $page->field('champus') || undef,
 			value_dateEnd => $page->field('champus_exp_date') || undef,
 			_debug => 0
@@ -419,7 +422,8 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'WC#',
-			value_type => 520,
+			value_type => 500,
+			value_textB => 'WC#',
 			value_text => $page->field('wc_num') || undef,
 			value_dateEnd => $page->field('wc_exp_date') || undef,
 			_debug => 0
@@ -429,7 +433,8 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'National Provider Identification',
-			value_type => 520,
+			value_type => 500,
+			value_textB => 'National Provider Identification',
 			value_text => $page->field('provider_identif_num') || undef,
 			value_dateEnd => $page->field('identif_exp_date') || undef,
 			_debug => 0
