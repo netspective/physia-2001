@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Invoice" db="Oracle">
+
+		<!-- Fields -->
+		<field id="invoice_id" caption="Claim #" join="invoice" column="invoice_id"/>
+		<field id="row_num" column="rownum"/>
+		<field id="owner_id" column="owner_id"/>
+		<field id="total_items" column="total_items"/>
+		<field id="total_cost" column="total_cost"/>
+		<field id="total_adjust" column="total_adjust"/>
+		<field id="balance" column="balance"/>
+		<field id="invoice_date" caption="Date of Visit" join="invoice" column="invoice_date" ui-datatype="date"/>
+		<field id="patient_id" caption="Patient ID" join="invoice" column="client_id"/>
+		<field id="submitter_id" caption="Submitter ID" join="invoice" column="submitter_id"/>
+		<field id="invoice_status" caption="Claim Status" join="inv_stat" column="caption" />
+		
+		<field id="patient_ssn" caption="Patient SSN" join="per_ssn" column="SSN"/>
+		<field id="patient_lastname" caption="Patient Last Name" join="per_lastname" column="name_last"/>
+		<field id="service_date" caption="Service Date" join="item_servdate" column="service_begin_date" ui-datatype="date"/>
+
+		<field id="provider_upin" caption="Physician UPIN" join="per_attr_upin" column="value_text"/>
+		<field id="employer" caption="Employer" join="ins_employ_id" column="employer_org_id"/>
+		<field id="payer" caption="Payer" join="bill_payer" column="bill_to_id"/>
+
+
+		<!-- Views -->
+		<join id="invoice" table="invoice" autoinclude="1"/>
+		<join id="inv_stat" table="invoice_status" condition="inv_stat.id (+) = invoice.invoice_status"/>
+		
+		<join id="per_ssn" table="person" condition="invoice.client_id = per_ssn.person_id"/>
+		<join id="per_lastname" table="person" condition="invoice.client_id = per_lastname.person_id"/>
+		<join id="item_servdate" table="invoice_item" condition="invoice.invoice_id = item_servdate.parent_id"/>
+		
+		<!-- <join id="per_attr_upin" table="person_attribute" condition=""/>
+		<join id="ins_employ_id" table="insurance" requires="bill_payer" condition="bill_payer.bill_ins_id = insurance.ins_internal_id"/> 
+		-->
+		
+		<join id="bill_payer" table="invoice_billing" condition="invoice.billing_id = bill_payer.bill_id"/>
+
+		<!-- Views -->
+		<view id="all" distinct="yes">
+			<column id="invoice_id"/>
+			<column id="total_items"/>
+			<column id="patient_id"/>
+			<!-- <column id="TO_CHAR(MIN({service_date}), 'MM/DD/YYYY')"/> -->
+			<column id="invoice_status"/>
+			<column id="payer"/>
+			<column id="total_cost"/>
+			<column id="total_adjust"/>
+			<column id="balance"/>
+			<order-by id="invoice_id"/>
+			<condition field="owner_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+
+	</query-defn>
+</component>
+
+
