@@ -163,7 +163,7 @@ sub execute
 		);
 		push(@data, \@rowData);		
 	}
-	my $html = '<br> <b style="font-family:Helvetica; font-size:12pt">(Fiscal Range '. $batch_from .' - ' . $batch_to . ' ) </b><br>';
+	my $html = '<br> <b style="font-family:Helvetica; font-size:10pt">(Fiscal Range '. $batch_from .' - ' . $batch_to . ' ) </b><br>';
 	$html .= createHtmlFromData($page, 0, \@data,$allPub);
 	return $html;
 }

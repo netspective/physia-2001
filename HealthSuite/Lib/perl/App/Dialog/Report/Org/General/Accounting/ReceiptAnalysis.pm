@@ -47,6 +47,13 @@ sub new
 
 			new CGI::Dialog::Field(caption => 'Batch ID', size => 12,name=>'batch_id'),						
 			new CGI::Dialog::Field(
+				name => 'totalReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Totals Report',
+				defaultValue => 0
+			),			
+			new CGI::Dialog::Field(
 				name => 'printReport',
 				type => 'bool',
 				style => 'check',
@@ -80,6 +87,7 @@ sub execute
 	my $reportEndDate = $page->field('batch_end_date');
 	my $inc_date=0;
 	my $hardCopy = $page->field('printReport');
+	my $totalReport = $page->field('totalReport');
 	# Get a printer device handle...
 	my $printerAvailable = 1;
 	my $printerDevice;
@@ -154,8 +162,17 @@ sub execute
 	$reportBeginDate =$startDate;
 
 	#Get Report Data 
-	my $rcpt  =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceipt',
-		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId) ;
+	my $rcpt;
+	if($totalReport)
+	{
+		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceiptTotal',
+		$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId)  ;			
+	}
+	else
+	{
+		$rcpt =  $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_providerreceipt',
+			$provider,$receipt,$batch_id,$reportBeginDate,$reportEndDate,$orgInternalId);	
+	}
 	my @data = ();
 	foreach (@$rcpt)
 	{
@@ -164,9 +181,9 @@ sub execute
  		$_->{batch_date} = $reportEndDate;
 		if($_->{payer_type} == 1)
 		{
-			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id});	
+			my $getName = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selId',$_->{payer_id}) unless $totalReport;	
 			$_->{payer_type} = 'Insurance Receipts';
-			$_->{payer_id} = $getName->{org_id};
+			$_->{payer_id} = $getName->{org_id} unless $totalReport;
 		}
 		elsif($_->{payer_type}==-1)
 		{
@@ -188,10 +205,9 @@ sub execute
 			$_->{batch_date},
 			$_->{batch_rcpt},
 		);
-		push(@data, \@rowData);			
-	}
-	
-	my $html = '<br> <b style="font-family:Helvetica; font-size:12pt">(Fiscal Range '. $reportBeginDate .' - ' . $reportEndDate . ' ) </b><br>';
+		push(@data, \@rowData);		
+	}	
+	my $html = '<br> <b style="font-family:Helvetica; font-size:10pt">(Fiscal Range '. $reportBeginDate .' - ' . $reportEndDate . ' ) </b><br>';
 	$html .= createHtmlFromData($page, 0, \@data,$allPub);
 	my $textOutputFilename = createTextRowsFromData ($page, 0, \@data, $allPub);
 	
