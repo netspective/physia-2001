@@ -26,15 +26,20 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-capitation', heading => 'Capitation/Utilization Report');
 
 	$self->addContent(
-		new App::Dialog::Field::BatchDateID(
-			caption => 'Batch ID Date',
-			name => 'batch_fields',
-			orgInternalIdFieldName => 'org_id'
+		new CGI::Dialog::Field(
+			caption => 'Batch Date',
+			name => 'batch_date',
+			type => 'date'
+			),
+		new CGI::Dialog::Field(
+			caption => 'Batch ID',
+			name => 'batch_id',
+			size => 5
 			),
 		new App::Dialog::Field::OrgType(
 			caption => 'Org ID',
 			name => 'org_id',
-			options => FLDFLAG_REQUIRED,
+			options => FLDFLAG_PREPENDBLANK,
 			types => "'PRACTICE', 'CLINIC', 'FACILITY/SITE'"
 			),
 		new App::Dialog::Field::Person::ID(
@@ -99,8 +104,7 @@ sub execute
 	my $orgID = $page->field('org_id');
 
 	my $batchIDClause1 =qq { and  ta.value_text = \'$batchID\'} if($batchID ne '');
-#	my $batchDateClause1 =qq { and ta.value_date = to_date('$batchDate', 'mm/dd/yyyy')} if($batchDate ne '');
-	my $batchDateClause1 =qq { and ta.value_date = \'$batchDate\'} if($batchDate ne '');
+	my $batchDateClause1 =qq { and ta.value_date = to_date('$batchDate', 'mm/dd/yyyy')} if($batchDate ne '');
 	my $planClause1 =qq { and t.data_text_b = \'$planID\'} if($planID ne '');
 	my $productClause1 =qq { and t.data_text_a = \'$productID\'} if($productID ne '');
 	my $physicianClause1 =qq { and t.provider_id = \'$physicianID\'} if($physicianID ne '');
@@ -113,86 +117,87 @@ sub execute
 	my $physicianClause2 =qq { and t.care_provider_id = \'$physicianID\'} if($physicianID ne '');
 	my $orgClause2 =qq { and t.service_facility_id = $orgID} if($orgID ne '');
 
-	my $sqlStmt = qq {select
-					ta.value_text batchid,
-					ta.value_date batchdate,
-					t.data_text_b plan,
-					t.data_text_a product,
-					t.provider_id provider,
-					o.org_internal_id org_id
-				from
-					transaction t,
-					trans_attribute ta,
-					org o
-				where
-					t.trans_type = 9030
-					and t.trans_status = 7
-					and t.trans_id = ta.parent_id
-					and ta.item_name = 'Monthly Cap/Payment/Batch ID'
-					and t.receiver_id = o.org_internal_id
-					$batchIDClause1
-					$batchDateClause1
-					$planClause1
-					$productClause1
-					$physicianClause1
-					$orgClause1
-				union
+	my $sqlStmt = qq {
+		select
+			ta.value_text batchid,
+			to_char(ta.value_date, 'DD-MON-YYYY') batchdate,
+			t.data_text_b plan,
+			t.data_text_a product,
+			t.provider_id provider,
+			o.org_internal_id org_id
+		from
+			transaction t,
+			trans_attribute ta,
+			org o
+		where
+			t.trans_type = 9030
+			and t.trans_status = 7
+			and t.trans_id = ta.parent_id
+			and ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			and t.receiver_id = o.org_internal_id
+			$batchIDClause1
+			$batchDateClause1
+			$planClause1
+			$productClause1
+			$physicianClause1
+			$orgClause1
+		union
+		select
+			ia.value_text batchid,
+			to_char(ia.value_date, 'DD-MON-YYYY') batchdate,
+			ins.plan_name plan,
+			ins.product_name product,
+			t.care_provider_id provider,
+			t.service_facility_id org_id
+		from
+			transaction t,
+			insurance ins,
+			invoice_billing ib,
+			invoice_attribute ia,
+			invoice_item ii,
+			invoice i
+		where
+			i.invoice_subtype = 2
+			and ii.parent_id = i.invoice_id
+			and ii.item_type = 3
+			and ia.parent_id = i.invoice_id
+			and ia.item_name = 'Invoice/Creation/Batch ID'
+			and ib.bill_id = i.billing_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and t.trans_id = i.main_transaction
+			$batchIDClause2
+			$batchDateClause2
+			$planClause2
+			$productClause2
+			$physicianClause2
+			$orgClause2
+		order by provider, org_id, product, plan
+	};
 
-				select
-					ia.value_text batchid,
-					ia.value_date batchdate,
-					ins.plan_name plan,
-					ins.product_name product,
-					t.care_provider_id provider,
-					t.service_facility_id org_id
-				from
-					transaction t,
-					insurance ins,
-					invoice_billing ib,
-					invoice_attribute ia,
-					invoice_item ii,
-					invoice i
-				where
-					i.invoice_subtype = 2
-					and ii.parent_id = i.invoice_id
-					and ii.item_type = 3
-					and ia.parent_id = i.invoice_id
-					and ia.item_name = 'Invoice/Creation/Batch ID'
-					and ib.bill_id = i.billing_id
-					and ib.bill_ins_id = ins.ins_internal_id
-					and t.trans_id = i.main_transaction
-					$batchIDClause2
-					$batchDateClause2
-					$planClause2
-					$productClause2
-					$physicianClause2
-					$orgClause2
-				};
-
-	my $activity = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
+	my $rows = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
 	my ($query0, $query1, $query2, $row0, $row1, $row2, $org_id, $amount, $month, $copay_expected, $copay_received, $patients_seen, @rowData);
 	my @data = ();
 
-	foreach my $x (@$activity)
+	foreach my $row (@$rows)
 	{
-		my $batchIDClauseA =qq { and  ta.value_text = \'$x->{batchid}\'} if($x->{batchid} ne '');
-		my $batchDateClauseA =qq { and ta.value_date = \'$x->{batchdate}\'} if($x->{batchdate} ne '');
-		my $planClauseA =qq { and t.data_textb = \'$x->{plan}\'} if($x->{plan} ne '');
-		my $productClauseA =qq { and t.data_text_a = \'$x->{product}\'} if($x->{product} ne '');
-		my $physicianClauseA =qq { and t.provider_id = \'$x->{provider}\'} if($x->{provider} ne '');
-		my $orgClauseA =qq { and t.receiver_id = $x->{org_id}} if($x->{org_id} ne '');
+		my $batchIDClauseA =qq { and  ta.value_text = \'$row->{batchid}\'} if($row->{batchid} ne '');
+		my $batchDateClauseA =qq { and ta.value_date = \'$row->{batchdate}\'} if($row->{batchdate} ne '');
+		my $planClauseA =qq { and t.data_textb = \'$row->{plan}\'} if($row->{plan} ne '');
+		my $productClauseA =qq { and t.data_text_a = \'$row->{product}\'} if($row->{product} ne '');
+		my $physicianClauseA =qq { and t.provider_id = \'$row->{provider}\'} if($row->{provider} ne '');
+		my $orgClauseA =qq { and t.receiver_id = $row->{org_id}} if($row->{org_id} ne '');
 
-		my $batchIDClauseB =qq { and  ia.value_text = \'$x->{batchid}\'} if($x->{batchid} ne '');
-		my $batchDateClauseB =qq { and ia.value_date =  \'$x->{batchdate}\'} if($x->{batchdate} ne '');
-		my $planClauseB =qq { and ins.plan_name = \'$x->{plan}\'} if($x->{plan} ne '');
-		my $productClauseB =qq { and ins.product_name = \'$x->{product}\'} if($x->{product} ne '');
-		my $physicianClauseB =qq { and t.care_provider_id = \'$x->{provider}\'} if($x->{provider} ne '');
-		my $orgClauseB =qq { and t.service_facility_id = $x->{org_id}} if($x->{org_id} ne '');
+		my $batchIDClauseB =qq { and  ia.value_text = \'$row->{batchid}\'} if($row->{batchid} ne '');
+		my $batchDateClauseB =qq { and ia.value_date =  \'$row->{batchdate}\'} if($row->{batchdate} ne '');
+		my $planClauseB =qq { and ins.plan_name = \'$row->{plan}\'} if($row->{plan} ne '');
+		my $productClauseB =qq { and ins.product_name = \'$row->{product}\'} if($row->{product} ne '');
+		my $physicianClauseB =qq { and t.care_provider_id = \'$row->{provider}\'} if($row->{provider} ne '');
+		my $orgClauseB =qq { and t.service_facility_id = $row->{org_id}} if($row->{org_id} ne '');
 
 		$query0 = qq{
 						select org_id
 						from org
-						where org_internal_id = $x->{org_id}
+						where org_internal_id = $row->{org_id}
 					};
 
 		$row0 = $STMTMGR_RPT_CLAIM_STATUS->getRowAsHash($page,STMTMGRFLAG_DYNAMICSQL,$query0);
@@ -293,10 +298,10 @@ sub execute
 		}
 
 		my @rowData = (
-		$x->{provider},
+		$row->{provider},
 		$org_id,
-		$x->{product},
-		$x->{plan},
+		$row->{product},
+		$row->{plan},
 		$month,
 		$amount,
 		$copay_expected,
