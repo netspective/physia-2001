@@ -21,7 +21,7 @@ my $CPT_CODE =App::Universal::CATALOGENTRYTYPE_CPT;
 my $HCPCS_CODE = App::Universal::CATALOGENTRYTYPE_HCPCS;
 my $MISC_CODE = App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE;
 my $CATALOG_TYPE = 2;
-my $lines=4;
+my $lines=6;
 
 %RESOURCE_MAP = (
 	'misc-procedure' => { 
@@ -60,7 +60,7 @@ sub new
 			name => 'code_modifier1',
 			fields => [
 				new CGI::Dialog::Field(caption => 'CPT',
-					name => 'cpt_code1',										
+					name => 'cpt_code1',
 					size => 10,
 					findPopup => '/lookup/cpt',
 					findPopupControlField => '_f_cpt_code1',
@@ -94,11 +94,11 @@ sub new
 							name => 'cpt_code3',												
 							size => 10,
 							findPopup => '/lookup/cpt',
-							findPopupControlField => '_f_cpt_code2',
+							findPopupControlField => '_f_cpt_code3',
 						),
 						new CGI::Dialog::Field(caption => 'Modifier',
 							name => 'modifier3',
-							size => 10,					
+							size => 10,
 						),
 					]
 		),
@@ -110,7 +110,7 @@ sub new
 							name => 'cpt_code4',												
 							size => 10,
 							findPopup => '/lookup/cpt',
-							findPopupControlField => '_f_code2',
+							findPopupControlField => '_f_code4',
 						),
 						new CGI::Dialog::Field(caption => 'Modifier',
 							name => 'modifier4',
@@ -119,7 +119,37 @@ sub new
 					]
 		),
 		
+		new CGI::Dialog::MultiField(
+					name => 'code_modifier5',
+					fields => [
+						new CGI::Dialog::Field(caption => 'CPT',
+							name => 'cpt_code5',												
+							size => 10,
+							findPopup => '/lookup/cpt',
+							findPopupControlField => '_f_code5',
+						),
+						new CGI::Dialog::Field(caption => 'Modifier',
+							name => 'modifier5',
+							size => 10,					
+						),
+					]
+		),
 		
+		new CGI::Dialog::MultiField(
+					name => 'code_modifier6',
+					fields => [
+						new CGI::Dialog::Field(caption => 'CPT',
+							name => 'cpt_code6',												
+							size => 10,
+							findPopup => '/lookup/cpt',
+							findPopupControlField => '_f_code6',
+						),
+						new CGI::Dialog::Field(caption => 'Modifier',
+							name => 'modifier6',
+							size => 10,					
+						),
+					]
+		),
 		
 		
 		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
