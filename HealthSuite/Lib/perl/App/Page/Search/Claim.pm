@@ -112,11 +112,7 @@ sub execute
 		return;
 	}
 
-	if($status eq 'incomplete')
-	{
-		$type = $type . '_incomplete';
-	}
-	elsif($status ne 'incomplete' && $status ne 'all')
+	if($status ne 'all')
 	{
 		$type = $type . '_status';
 	}
