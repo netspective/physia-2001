@@ -98,6 +98,15 @@ sub prepare_detail_payment
 	my $reportBeginDate = $page->field('batch_begin_date')||'01/01/1800';
 	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 
+	my $hardCopy = $page->field('printReport');
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $pub = {
 		columnDefn =>
 		[
@@ -162,7 +171,23 @@ sub prepare_detail_payment
 		push(@data, \@rowData);
 	}
 	
-	$html = '<b style="font-family:Helvetica; font-size:12pt">(Batch Date '. $batch_date . ' ) </b><br><br>' . createHtmlFromData($page, 0, \@data,$pub);	
+	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, \@data, $pub);
+	$html = '<b style="font-family:Helvetica; font-size:12pt">(Batch Date '. $batch_date . ' ) </b><br><br>' . createHtmlFromData($page, 0, \@data,$pub);
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+
 	$page->addContent($html);
 
 }
