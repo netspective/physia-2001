@@ -177,11 +177,19 @@ sub getActivePathContents
 {
 	my ($page, $flags, $rootFS, $rootURL, $activePath, $style, $highlight) = @_;
 	
-	my ($fsPath, $urlPath) = ($rootFS, $rootURL . '/');
+	my ($fsPath, $urlPath) = ($rootFS, $rootURL);
 	unless($flags & NAVGPATHFLAG_STAYATROOT)
 	{
 		$fsPath = File::Spec->catfile($rootFS, ref $activePath eq 'ARRAY' ? @$activePath : $activePath);
-		$urlPath = $rootURL . '/' . (ref $activePath eq 'ARRAY' ? join('/', @$activePath) : $activePath);
+		$urlPath = $rootURL;
+		if(ref $activePath eq 'ARRAY')
+		{
+			$urlPath .= '/' . join('/', @$activePath) if scalar(@$activePath);
+		}
+		else
+		{
+			$urlPath .= '/' . $activePath if $activePath;
+		}
 	}
 
 	my @items = ();
@@ -243,7 +251,7 @@ sub getActivePathContents
 				$fileName =~ s/_/ /g;
 			}
 			push(@items, 
-				[	$isDirectory ? "$urlPath$entryName" : ($fileTypeFlags & NAVGFILEFLAG_PASSTHROUGH ? 
+				[	$isDirectory ? "$urlPath/$entryName" : ($fileTypeFlags & NAVGFILEFLAG_PASSTHROUGH ? 
 					"$urlPath/$entryName" : "$urlPath?enter=$fullNameAndPath&ecaption=$fileName&eflags=$fileTypeFlags"), 
 					$fileName, $icon
 				]
@@ -348,11 +356,23 @@ sub getHtml
 	my $rootURL = $self->{rootURL} || ('/' . $page->param('arl_resource'));
 	my $fileData = getActivePathContents($page, $self->{flags}, $rootFS, $rootURL, \@activePath);
 
-	return createHtmlFromData($page, $self->{flags}, $fileData, $self->{publishDefn},
-		{ activePath => getActivePathInfo($self->{flags}, $rootFS, $rootURL, \@activePath, 
-			{ style => 'tree', rootCaption => $self->{rootCaption} }) 
+	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
+	{
+		my $html = '<ul>';
+		foreach(@$fileData)
+		{
+			$html .= "<li><a href='$_->[0]'>$_->[1]</a><br>";
 		}
-	);
+		return "$html</ul>";
+	}
+	else
+	{
+		return createHtmlFromData($page, $self->{flags}, $fileData, $self->{publishDefn},
+			{ activePath => getActivePathInfo($self->{flags}, $rootFS, $rootURL, \@activePath, 
+				{ style => 'tree', rootCaption => $self->{rootCaption} }) 
+			}
+		);
+	}
 }
 
 1;

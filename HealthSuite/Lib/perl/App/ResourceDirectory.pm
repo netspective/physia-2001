@@ -58,7 +58,7 @@ use App::Statements::Device;
 	},
 	'Dialogs' => {
 		baseDir => File::Spec->catfile($App::Configuration::CONFDATA_SERVER->path_root, 'Lib', 'perl', 'App', 'Dialog'),
-		excludeDirs => ['Report', 'Field', 'Directory'],
+		excludeDirs => ['Report', 'Field', 'Directory', 'HandHeld'],
 		prefix => DIALOG_RESOURCE_PREFIX,
 	},
 );

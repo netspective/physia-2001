@@ -726,6 +726,7 @@ sub createSession
 	$self->{session} = \%session;
 	$session{user_id} = $userId;
 	$session{org_internal_id} = $orgIntId;
+	$session{active_date} = UnixDate('today', '%m/%d/%Y');
 
 	if(ref $sessionVars eq 'HASH')
 	{

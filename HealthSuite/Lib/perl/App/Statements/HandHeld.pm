@@ -15,6 +15,7 @@ my $timeFormat = 'HH24:MI';
 
 my $BASE_APPT_SQL = qq{
 	SELECT to_char(e.start_time - :1, 'hh24:mi') as time,
+		patient.person_id as patient_id,
 		patient.short_sortable_name as patient,
 		initcap(e.subject) as reason,
 		at.caption as appt_type,

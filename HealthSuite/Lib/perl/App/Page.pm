@@ -29,7 +29,7 @@ use Schema::API;
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter CGI::Page);
 
-use enum qw(BITMASK:PAGEFLAG_ ISDISABLED ISPOPUP ISADVANCED ISFRAMESET ISFRAMEHEAD ISFRAMEBODY IGNORE_BODYHEAD IGNORE_BODYFOOT CONTENTINPANES INCLUDEDEFAULTSCRIPTS RECORD_VIEWCOUNT);
+use enum qw(BITMASK:PAGEFLAG_ ISDISABLED ISPOPUP ISADVANCED ISFRAMESET ISFRAMEHEAD ISFRAMEBODY ISHANDHELD IGNORE_BODYHEAD IGNORE_BODYFOOT CONTENTINPANES INCLUDEDEFAULTSCRIPTS RECORD_VIEWCOUNT);
 use constant DEFAULT_OPTIONS => PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
 
 @EXPORT = qw(
@@ -39,6 +39,7 @@ use constant DEFAULT_OPTIONS => PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
 	PAGEFLAG_ISFRAMESET
 	PAGEFLAG_ISFRAMEHEAD
 	PAGEFLAG_ISFRAMEBODY
+	PAGEFLAG_ISHANDHELD
 	PAGEFLAG_IGNORE_BODYHEAD
 	PAGEFLAG_IGNORE_BODYFOOT
 	PAGEFLAG_RECORD_VIEWCOUNT
@@ -600,6 +601,7 @@ sub initialize
 	$self->param('person_temp_url', $pTmpUrl);
 	$self->param('org_temp_dir', $oTmpDir);
 	$self->param('org_temp_url', $oTmpUrl);
+	$self->setFlag(PAGEFLAG_ISHANDHELD) if $self->param('arl_resource') eq 'mobile';
 
 	$self->incrementViewCount();
 }
@@ -660,40 +662,43 @@ sub send_page_header
 {
 	my $self = shift;
 	my $html .= join(' ', @{$self->{page_head}});
-	if ( $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS )
+	unless($self->flagIsSet(PAGEFLAG_ISHANDHELD))
 	{
+		if ( $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS )
+		{
+			$html .= qq{
+				<script language="JavaScript">var _version = 1.0;</script>
+				<script language="JavaScript1.1">_version = 1.1;</script>
+				<script language="JavaScript1.2">_version = 1.2;</script>
+				<script language="JavaScript1.3">_version = 1.3;</script>
+				<script language="JavaScript1.4">_version = 1.4;</script>
+				<script src='/lib/page.js' language="JavaScript1.2"></script>
+				<script>
+				if(typeof pageLibraryLoaded == 'undefined')
+				{
+					alert('ERROR: /lib/page.js could not be loaded');
+				}
+				</script>
+			};
+		}
 		$html .= qq{
-			<script language="JavaScript">var _version = 1.0;</script>
-			<script language="JavaScript1.1">_version = 1.1;</script>
-			<script language="JavaScript1.2">_version = 1.2;</script>
-			<script language="JavaScript1.3">_version = 1.3;</script>
-			<script language="JavaScript1.4">_version = 1.4;</script>
-			<script src='/lib/page.js' language="JavaScript1.2"></script>
-			<script>
-			if(typeof pageLibraryLoaded == 'undefined')
-			{
-				alert('ERROR: /lib/page.js could not be loaded');
-			}
-			</script>
-		};
+			<STYLE>
+				a.head { text-decoration: none; }
+				a:hover { color : red; }
+				.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat; }
+				form { border: 0; margin: 0; }
+				select { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+				select.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+				input { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+				input.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+				textarea { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+				button { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
+				button.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
+			</STYLE>
+			<TITLE>[Physia] #property._title#</TITLE>
+			@{[ $self->flagIsSet(PAGEFLAG_ISFRAMESET) ? $self->getFrameSet() : '' ]}
+			};
 	}
-	$html .= qq{
-		<STYLE>
-			a.head { text-decoration: none; }
-			a:hover { color : red; }
-			.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat; }
-			form { border: 0; margin: 0; }
-			select { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
-			select.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
-			input { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
-			input.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
-			textarea { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
-			button { font-size: 10pt; font-family: Tahoma, Ariel, Helvetica; }
-			button.header { font-size: 8pt; font-family: Tahoma, Ariel, Helvetica; }
-		</STYLE>
-		<TITLE>[Physia] #property._title#</TITLE>
-		@{[ $self->flagIsSet(PAGEFLAG_ISFRAMESET) ? $self->getFrameSet() : '' ]}
-		};
 
 	$self->replaceVars(\$html);
 	if (defined wantarray and wantarray eq 'TRUE') {
@@ -729,7 +734,7 @@ sub send_page_body
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	my $flags = $self->{flags};
 
-	print qq{<BODY leftmargin="0" topmargin="0" marginheight="0" marginwidth="0" bgcolor="$colors->[THEMECOLOR_BKGND_PAGE]" onload="return processOnInit()">$fonts->[THEMEFONTTAG_PLAIN_OPEN]};
+	print $flags & PAGEFLAG_ISHANDHELD ? '' : qq{<BODY leftmargin="0" topmargin="0" marginheight="0" marginwidth="0" bgcolor="$colors->[THEMECOLOR_BKGND_PAGE]" onload="return processOnInit()">$fonts->[THEMEFONTTAG_PLAIN_OPEN]};
 	my $html = '';
 	my $preliminaries = '';
 
@@ -854,6 +859,7 @@ sub prepare_page_content_header
 {
 	my $self = shift;
 	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
+	return 1 if $self->flagIsSet(PAGEFLAG_ISHANDHELD);
 
 	# Add items to allow org switching
 	push @{$self->{page_menu_support}}, ["SDE Page", "/sde"] if $self->hasPermission('page/sde');

@@ -129,11 +129,16 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags, $mainData) = @_;
 
+	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
+	{
+		return "$self->{caption}: $mainData<br>";
+	}
+	
 	my $flags = $self->{flags};
 	my $readOnly = ($flags & FLDFLAG_READONLY);
 	$mainData ||= '';
 	my $html = '';
-
+	
 	my $errorMsgsHtml = '';
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
@@ -1496,6 +1501,13 @@ sub new
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	
+	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
+	{
+		return qq{
+			<input type="submit" value="OK">
+		};
+	}
 
 	my $tableCols = $dialog->{_tableCols};
 	my $rowColor = '';
@@ -2300,6 +2312,7 @@ sub getHtml
 	$heading =~ s/(\$\w+)/$1/eego;
 
 	my $errorsHtml = '';
+	my $isHandHeld = $page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD);
 	unless($isValid)
 	{
 		$heading = "$heading (<font color=white>ERROR</font>)";
@@ -2316,7 +2329,47 @@ sub getHtml
 		};
 	}
 
-	my $dialogName = $self->formName();
+	
+	if($isHandHeld)
+	{
+		my @dlgHouskeepingHiddens = ();
+		if($flags & DLGFLAG_DATAENTRY_INITIAL)
+		{
+			my $refererFieldName = $page->fieldPName(FIELDNAME_REFERER);
+			my $actualReferer = $page->referer();
+			push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$refererFieldName" value="$actualReferer">});
+		}
+		my $formAction = "/";
+		$formAction .= $page->param('_isPopup') ? $page->param('arl_asPopup') : $page->param('arl');
+		$formAction =~ s/\?.*$//;
+		
+		foreach (@{$self->{_header}})
+		{
+			$html .= $_->getHtml($page, $self, $command, $flags);
+		}
+		foreach (@{$self->{content}})
+		{
+			next if ($_->{flags} & FLDFLAG_INVISIBLE);
+			$html .= $_->getHtml($page, $self, $command, $flags);
+		}
+		foreach (@{$self->{_footer}})
+		{
+			$html .= $_->getHtml($page, $self, $command, $flags);
+		}
+		
+		my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
+		push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$execModeFieldName" value="$newExecMode">});
+		
+		return qq{
+			<form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post">
+			@dlgHouskeepingHiddens 
+			$errorsHtml
+			$html
+			</form>		
+		}
+	}	
+	
+	my $dialogName = $self->formName();	
 	my $cols = $self->{columns};
 	my @fieldsInfoJS = ("dialogFields['$dialogName'] = {};", "var dlg_$dialogName\_fields = dialogFields['$dialogName'];");
 	$self->populateFieldInfoJS($self->{content}, \@fieldsInfoJS);

@@ -27,6 +27,7 @@ struct(ServerConfigData => [
 	path_OrgDirectory => '$',
 	path_Conf => '$',
 	path_AppConf => '$',
+	path_HandheldPages => '$',
 	# Next two for invoices...
 	path_PDFOutput => '$',
 	path_PDFOutputHREF => '$',
@@ -68,6 +69,7 @@ use constant PATH_PERSONLIB  => File::Spec->catfile(PATH_LIB, 'Person');
 use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
 use constant PATH_DIRECTORY	 => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Directory');
+use constant PATH_HANDHELD   => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'HandHeld');
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
 use constant PATH_TEMP       => File::Spec->catfile('temp');
 use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
@@ -150,6 +152,7 @@ sub getDefaultConfig
 	$config->path_temp(File::Spec->catfile(PATH_WEBSITE, PATH_TEMP));
 	$config->path_Database(PATH_DATABASE);
 	$config->path_Reports(PATH_REPORTS);
+	$config->path_HandheldPages(PATH_HANDHELD);
 	$config->path_SchemaSQL(File::Spec->catfile(PATH_DATABASE, 'schema-physia'));
 	$config->path_BillingTemplate(File::Spec->catfile(PATH_APPLIB, 'Billing'));
 	$config->path_OrgReports(File::Spec->catfile(PATH_REPORTS, 'Org'));
