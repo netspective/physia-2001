@@ -37,7 +37,9 @@ SELECT	i.invoice_id,
 	NULL as pay_type,
 	t.trans_id,
 	trans_type,
-	i.total_items
+	i.total_items,
+	to_number(NULL) as payer_type,
+	i.billing_id as billing_id
 FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
@@ -93,7 +95,9 @@ SELECT	i.invoice_id,
 	 pm.id = iia.pay_method) pay_type,
 	t.trans_id,
 	trans_type,
-	i.total_items
+	i.total_items,
+	iia.payer_type as payer_type,
+	i.billing_id as billing_id
 FROM 	invoice i ,  transaction t ,	
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
