@@ -596,6 +596,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				and p1.person_id = e.scheduled_by_id
 				and t.trans_id = i.main_transaction
 				and ib.invoice_id = i.invoice_id
+				and ib.bill_id = i.billing_id
 				and ib.bill_to_id = p2.person_id
 				and ib.bill_party_type in (0,1)
 				and ib.bill_sequence = 1
@@ -623,6 +624,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				and p1.person_id = e.scheduled_by_id
 				and t.trans_id = i.main_transaction
 				and ib.invoice_id = i.invoice_id
+				and ib.bill_id = i.billing_id
 				and ib.bill_to_id = o1.org_internal_id
 				and ib.bill_party_type in (2,3)
 				and ib.bill_sequence = 1
