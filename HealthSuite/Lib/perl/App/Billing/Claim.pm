@@ -281,7 +281,6 @@ sub setInvoiceHistoryBy
 {
 	my ($self, $value) = @_;
 	$self->{invoiceHistoryItem}->[$self->{historyCount}][2] = $value;
-	$self->{historyCount}++;
 }
 
 sub setInvoiceHistoryComments
