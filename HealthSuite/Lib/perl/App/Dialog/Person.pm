@@ -37,7 +37,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'job_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_emp_item_id'),
-
+		new CGI::Dialog::Field(type => 'hidden', name => 'assoc_phy_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -255,13 +255,6 @@ sub populateData
 	$page->field('blood_item_id', $bloodTypecap->{'item_id'});
 	$page->field('blood_type', $bloodTypecap->{'value_text'});
 
-	my $nurseLicense = 'Nursing/License';
-	my $nurseLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseLicense);
-	$page->field('nurse_license_item_id', $nurseLicenseData->{'item_id'});
-	$page->field('rn_number', $nurseLicenseData->{'value_text'});
-	$page->field('rn_number_exp_date', $nurseLicenseData->{'value_dateend'});
-	$page->field('check_license', $nurseLicenseData->{'value_int'});
-
 	my $nurseTitle = 'Nurse/Title';
 	my $nurseTitleData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseTitle);
 	$page->field('nurse_title_item_id', $nurseTitleData->{'item_id'});
@@ -285,6 +278,11 @@ sub populateData
 	$page->field('nurse_emp_item_id', $nurseEmpData->{'item_id'});
 	$page->field('emp_id', $nurseEmpData->{'value_text'});
 	$page->field('emp_exp_date', $nurseEmpData->{'value_datea'});
+
+	my $assocPhysician = 'Physician';
+	my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
+	$page->field('assoc_phy_item_id', $assocPhysicianData->{'item_id'});
+	$page->field('value_text', $assocPhysicianData->{'value_text'});
 }
 
 sub handleContactInfo
@@ -536,19 +534,7 @@ sub handleAttrs
 			_debug => 0
 		);
 
-	my $commandLicense = $command eq 'update' &&  $page->field('nurse_license_item_id') eq '' ? 'add' : $command;
-	$page->schemaAction(
-			'Person_Attribute', $commandLicense,
-			parent_id => $page->field('person_id'),
-			item_id => $page->field('nurse_license_item_id') || undef,
-			item_name => 'Nursing/License',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('rn_number')  || undef,
-			value_textB => 'Nursing/License',
-			value_dateEnd => $page->field('rn_number_exp_date') || undef,
-			value_int => $page->field('check_license')  || undef,
-			_debug => 0
-		)if $member eq 'Nurse';
+
 
 	my $commandTitle = $command eq 'update' &&  $page->field('nurse_title_item_id') eq '' ? 'add' : $command;
 	my @titles = $page->field('nurse_title');
@@ -589,7 +575,6 @@ sub handleAttrs
 	) if $member eq 'Patient';
 
 	my $commandNurseEMp = $command eq 'update' &&  $page->field('nurse_emp_item_id') eq '' ? 'add' : $command;
-
 	$page->schemaAction(
 				'Person_Attribute', $commandNurseEMp,
 				parent_id => $page->field('person_id')  || undef,
@@ -600,6 +585,17 @@ sub handleAttrs
 				value_dateA=> $page->field('emp_exp_date') || undef,
 				_debug => 0
 	) if ($page->field('emp_id') ne '' && $member eq 'Nurse');
+
+	my $command = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
+	$page->schemaAction(
+			'Person_Attribute',	$command,
+			parent_id => $page->field('person_id'),
+			item_name => 'Physician',
+			item_id   => $page->field('assoc_phy_item_id') || undef,
+			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
+			value_text => $page->field('value_text') || undef,
+			_debug => 0
+	) if $page->field('value_text') ne '';
 }
 
 sub customValidate
