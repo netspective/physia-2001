@@ -415,9 +415,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-physician?home=#param.home#'>Physician</A> }	},
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-nurse?home=#param.home#'>Nurse</A> }	},
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-staff?home=#param.home#'>Staff Member</A> }	},
+				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-personnel?home=#param.home#'>Personnel</A> }	},
+				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-physician?home=#param.home#'>Physician</A> }	},
+				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-nurse?home=#param.home#'>Nurse</A> }	},
+				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-staff?home=#param.home#'>Staff Member</A> }	},
 			],
 		},
 		stdIcons =>	{
