@@ -89,7 +89,7 @@ sub new
 			schema => $schema,
 			column => 'Offering_Catalog_Entry.name',
 			size => 40,
-			hints => 'autofill for CPT, ICD, EPSDT and HCPCS codes',
+			hints => 'autofill for CPT, EPSDT and HCPCS codes',
 		),
 		new CGI::Dialog::Field::TableColumn(caption => 'Description',
 			name => 'description',
@@ -152,7 +152,7 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#", 1],
-			['Show Current Fee Schedule Item', '/org/#session.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#param.internal_catalog_id#'],
+			['Show Current Fee Schedule Item', "/org/#session.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#param.internal_catalog_id#"],
 			['Go to Work List', "/worklist"],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
@@ -245,8 +245,13 @@ sub checkDupEntry
 		}
 
 		my $field = $self->getField('code_modifier');
-		$field->invalidate($page, qq{Entry '$code' already exists in the system for Fee Schedule '$fs'.}) if $entryExists;
+ 		if ($entryExists)
+ 		{
+			$field->invalidate($page, qq{Entry '$code' already exists in the system for Fee Schedule '$fs'.});
+			return 0;
+		}		
 	}
+	return 1;
 }
 
 
@@ -263,8 +268,9 @@ sub customValidate
 	my $svc_field =$self->getField('data_text');
 	my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);
 	$page->param('internal_catalog_id',$parentCatalog->{internal_catalog_id});
-	$self->checkDupEntry($page, $parentCatalog->{internal_catalog_id}, $entryType, $code, $modifier);
+	my $result = $self->checkDupEntry($page, $parentCatalog->{internal_catalog_id}, $entryType, $code, $modifier);
 
+	return unless $result;
 
 	#If FS is not capitated just set flags to FFS to be safe
 	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
