@@ -268,6 +268,20 @@ $STMTMGR_ORG = new App::Statements::Org(
 			caption
 		FROM Referral_Unit_Type
 	},
+	'selPersonBillingInfoByOrgIntId' => {
+		sqlStmt => qq{
+			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
+				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(pa.value_textb,'1','Active','Inactive')
+			from	Person_Attribute pa, Org o, Person_Org_Category poc
+			where	o.org_internal_id = ?
+			and	pa.parent_id = poc.person_id
+			and	poc.org_internal_id = o.org_internal_id
+			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			order by pa.value_int
+		},
+		sqlStmtBindParamDescr => ['Org ID'],
+	},
 	'selPersonBillingInfo' => {
 		sqlStmt => qq{
 			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
@@ -282,6 +296,17 @@ $STMTMGR_ORG = new App::Statements::Org(
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
 	},
+	'selSuperbillsByOrgIntId' => {
+		sqlStmt => qq{
+			select	*
+			from	Offering_Catalog oc, Org o
+			where	oc.catalog_type = 4
+			and	oc.org_internal_id = o.org_internal_id
+			and	o.org_internal_id = ?
+			order by internal_catalog_id
+		},
+		sqlStmtBindParamDescr => ['Org ID'],
+	},
 	'selSuperbillsByOrgId' => {
 		sqlStmt => qq{
 			select	*
@@ -289,6 +314,17 @@ $STMTMGR_ORG = new App::Statements::Org(
 			where	oc.catalog_type = 4
 			and	oc.org_internal_id = o.org_internal_id
 			and	o.org_id = ?
+			order by internal_catalog_id
+		},
+		sqlStmtBindParamDescr => ['Org ID'],
+	},
+	'selComponentSuperbillsByOrgIntId' => {
+		sqlStmt => qq{
+			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+			from	Offering_Catalog oc, Org o
+			where	oc.catalog_type = 4
+			and	oc.org_internal_id = o.org_internal_id
+			and	o.org_internal_id = ?
 			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
