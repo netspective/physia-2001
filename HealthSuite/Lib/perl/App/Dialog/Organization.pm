@@ -124,8 +124,21 @@ sub initialize
 			name => 'name_trade',
 			schema => $schema,
 			column => 'Org.name_trade'
-		),
+		),		
 	);
+	my $type=$self->{orgtype}; 
+	if ($type eq 'provider' || $type eq 'dept' ||$type eq 'main')
+	{
+		$self->addContent(
+		new CGI::Dialog::Field(caption => 'Fiscal Month',
+			name => 'fiscal_month',
+			type => 'enum',
+			enum => 'Month',
+			fKeyOrderBy =>'id',
+			options => FLDFLAG_REQUIRED,
+			),		
+		)
+	}
 
 	if ($self->{orgtype} eq 'dir-entry')
 		{
@@ -552,7 +565,12 @@ sub populateData
 	);
 	$page->field('area_served', $areaServedData->{value_text});
 	$page->field('area_served_id', $areaServedData->{item_id});
-
+	
+	$attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Fiscal Month',
+		App::Universal::ATTRTYPE_INTEGER
+	);	
+	$page->field('fiscal_month',$attribute->{value_int});	
 }
 
 
@@ -644,6 +662,14 @@ $page->schemaAction(
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $credentialsValueType = App::Universal::ATTRTYPE_CREDENTIALS;
 	my $generalValueType = App::Universal::ATTRTYPE_ORGGENERAL;
+
+	$page->schemaAction(
+			'Org_Attribute', $command,
+			parent_id => $orgIntId,
+			item_name => 'Fiscal Month',
+			value_type => App::Universal::ATTRTYPE_INTEGER || undef,
+			value_int => $page->field('fiscal_month') ,
+		)if $page->field('fiscal_month');
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
@@ -958,6 +984,10 @@ sub execute_update
 		value_text => $page->field('medicare_gpci') || undef,
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
+	
+	saveAttribute($page, 'Org_Attribute', $orgIntId, 'Fiscal Month', App::Universal::ATTRTYPE_INTEGER,
+		value_int => $page->field('fiscal_month'),
+	);	
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$page->endUnitWork();
