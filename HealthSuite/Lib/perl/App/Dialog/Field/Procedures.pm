@@ -106,7 +106,7 @@ sub isValid
 	
 	
 	#If record type is product then a plan does not exist
-	if ($coverage_parent->{'record_type'} eq App::Universal::RECORDTYPE_INSURANCEPRODUCT)
+	if ($coverage_parent->{'record_type'} == App::Universal::RECORDTYPE_INSURANCEPRODUCT)
 	{
 		$product_id = $coverage_parent->{'ins_internal_id'};
 		$plan_id=undef;
@@ -120,7 +120,7 @@ sub isValid
 	}
 	
 	my $care = $page->field('care_provider_id')||undef;
-	my $fac = $page->field('service_facility_id')||undef;
+	my $fac = $page->field('service_facility_id') || $page->field('hospital_id') || undef;
 	#Get Fee Schedule for the Insurance, Physician, and Org (Location)
 	my $getFeeScheds = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
 		'selFSHierarchy', $care,$fac ,$plan_id,$product_id);
@@ -311,6 +311,7 @@ sub isValid
 							$page->param("_f_proc_$line\_charges", $_->[$INTELLICODE_FS_COST]) if $charges eq '';
 							$page->param("_f_proc_$line\_ffs_flag",$_->[$INTELLICODE_FS_FFS_CAP]);
 							$page->param("_f_proc_$line\_fs_used",$_->[$INTELLICODE_FS_ID_NUMERIC]);
+							#$page->addError("fee sched: $_->[$INTELLICODE_FS_ID_NUMERIC]");
 						}
 						else
 						{
@@ -379,7 +380,56 @@ sub isValid
 		#}
 	}
 
+	explosionCodeValidate($self, $page);
+
 	return @errors || $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub explosionCodeValidate
+{
+	my ($self, $page) = @_;
+
+	my $sessOrgIntId = $page->session('org_internal_id');
+
+	#VALIDATION OF FEE SCHED RESULTS FOR CHILDREN OF EXPLOSION CODES
+	my $lineCount = $page->param('_f_line_count');
+	#my $getProcListField = $self->getField('procedures_list');
+	if(length($page->field('payer')) >0)
+	{
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
+			next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+
+			my $cptCode = $page->param("_f_proc_$line\_procedure");
+			my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
+			if($miscProcChildren->[0]->{code})
+			{
+				my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
+				my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
+				#$page->addError("encounter: @listFeeSchedules");
+				foreach my $child (@{$miscProcChildren})
+				{
+					my $childCode = $child->{code};
+					my $modifier = $child->{modifier};
+					my $fs_entry = App::IntelliCode::getFSEntry($page, $childCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+					my $count_type = scalar(@$fs_entry);
+					if ($count_type == 0)
+					{
+						$self->invalidate($page,"[<B>P$line</B>]Unable to find Code '$childCode' in fee schedule(s) " . join ",",@listFeeSchedules);
+					}
+					elsif ($count_type > 1)
+					{
+						$self->invalidate($page,"[<B>P$line</B>]Procedure found in multiple fee schedules.");
+					}
+					elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
+					{ 	
+						$self->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
+					}
+				}
+			}
+		}
+	}
 }
 
 sub getMultiPricesHtml
@@ -423,6 +473,8 @@ sub getMultiSvcTypesHtml
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
+	my $sessUser = $page->session('person_id');
 
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
@@ -435,12 +487,15 @@ sub getHtml
 	my $placeHtml = '';
 	my $serviceTypeHtml = '';
 
-	#get service place code from service facility org
-	my $sessOrgIntId = $page->session('org_internal_id');
-	my $sessUser = $page->session('person_id');
-	
+	my $isHospClaim = $page->param('isHosp');
+	my $servProviderHtml;
+	my $billProviderHtml;
+
+	#get all provider ids for session org to be used for hospital claims
+	my $providerIds = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPersonBySessionOrgAndCategory', $sessOrgIntId, 'Physician');
+
 	#two lines below have been removed. service code is being determined in encounter.pm according to the service org that was selected
-	my $svcFacility = $page->field('service_facility_id') || $sessOrgIntId;
+	my $svcFacility = $page->field('service_facility_id') || $page->field('hospital_id') || $sessOrgIntId;
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $cptOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByORG', $sessOrgIntId);
 	my $icdOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByORG', $sessOrgIntId);
@@ -499,12 +554,14 @@ sub getHtml
 		#$readOnly = $submitOrder > 0 ? 'READONLY' : '';
 	}
 
+	my $errorMsgsHtml;
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		$removeChkbox = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
-		my $errorMsgsHtml = '';
+
+		#create html for error messages, if any
 		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
 		{
 			$errorMsgsHtml = "<font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @{$lineMsgs[$line]}) . "</font>";
@@ -515,8 +572,33 @@ sub getHtml
 			$numCellRowSpan = $allowComments ? 'ROWSPAN=2' : '';
 		}
 
+		#create html for provider fields if this is a hospital claim
+		#create select options for service/billing provider fields if this is a hospital claim
+
+		if($isHospClaim)
+		{
+			my $selected;
+			my $servProviderOptionsHtml;
+			my $billProviderOptionsHtml;
+			foreach my $serviceProvId (@{$providerIds})
+			{
+				$selected = $serviceProvId->{person_id} eq $page->param("_f_proc_$line\_service_provider_id") ? 'SELECTED' : '';
+				$servProviderOptionsHtml .= qq{ <OPTION $selected>$serviceProvId->{person_id}</OPTION> };				
+			}
+
+			foreach my $billingProvId (@{$providerIds})
+			{
+				$selected = $billingProvId->{person_id} eq $page->param("_f_proc_$line\_billing_provider_id") ? 'SELECTED' : '';
+				$billProviderOptionsHtml .= qq{ <OPTION $selected>$billingProvId->{person_id}</OPTION> };				
+			}
+
+			$servProviderHtml = qq{<TD><NOBR><SELECT NAME="_f_proc_$line\_service_provider_id">$servProviderOptionsHtml</SELECT></NOBR></TD>};
+			$billProviderHtml = qq{<TD><NOBR><SELECT NAME="_f_proc_$line\_billing_provider_id">$billProviderOptionsHtml</SELECT></NOBR></TD>};
+		}
+
+		#create html for emg field
 		my $emg = $page->param("_f_proc_$line\_emg");
-		my $emgHtml = '';
+		my $emgHtml;
 		if($invoiceFlags & $attrDataFlag)
 		{
 			$emgHtml = $emg eq 'on' ? 
@@ -646,6 +728,8 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_charges' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_charges") ]}'></TD>
 				<TD><nobr>$emgHtml</nobr></TD>
+				$servProviderHtml
+				$billProviderHtml
 			</TR>
 		};
 		
@@ -705,6 +789,7 @@ sub getHtml
 	} if $allowQuickRef;
 
 	my $removeHd = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
+	my $providerHd = $isHospClaim ? qq{<TD><FONT SIZE=1>&nbsp;</FONT></TD><TD ALIGN=CENTER  COLSPAN=2><FONT $textFontAttrs>Providers<BR>Service/Billing</FONT></TD>} : '';
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
@@ -746,6 +831,9 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Units</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Charge</FONT></TD>
+						<!--<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>EMG</FONT></TD>-->
+						$providerHd
 					</TR>
 					$linesHtml
 				</TABLE>
