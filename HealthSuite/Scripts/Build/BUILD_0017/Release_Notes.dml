@@ -263,11 +263,18 @@
 		<deliverable id="1595">
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
 		</deliverable>	
+		
+		<deliverable id="1621">
+			 Updated the url for 'Edit Profile' for an Insured-person to showup the correct dialog.
+		</deliverable>			
 
 		<deliverable id="1623">
 			 Updated the url for 'Go to Worklist' under 'Next Action' in 'Add Patient, Physician, staff  and Referring Doctor' dialogs.
 		</deliverable>	
 		
+		<deliverable id="1625">
+			 UI: Deleted the search by TaxId option for Orgs as that was added previously for ACS.
+		</deliverable>			
 	</deliverables>
 </release-notes>
 
