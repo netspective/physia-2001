@@ -43,6 +43,8 @@ struct(ServerConfigData => [
 	path_PaperClaims => '$',
 	path_OrgLib => '$',
 	path_PersonLib => '$',
+	path_XMLData => '$',
+	path_XMLDataHREF => '$',
 
 	file_SchemaDefn => '$',
 	file_BuildLog => '$',
@@ -73,6 +75,7 @@ use constant PATH_OUTPUTSUPERBILLPDF  => File::Spec->catfile(PATH_TEMP, 'superbi
 use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
 use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
 use constant PATH_EDIDATA    => File::Spec->catfile(defined $ENV{HS_EDIDATA} ? $ENV{HS_EDIDATA} : '/home/vusr_edi');
+use constant PATH_XMLDATA    => File::Spec->catfile(PATH_WEBSITE, 'resources', 'data');
 
 # Returns true if debug mode is on
 sub debugMode
@@ -167,6 +170,8 @@ sub getDefaultConfig
 	$config->path_PerSeEDIReportsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports-delim'));
 	$config->path_OrgLib(PATH_ORGLIB);
 	$config->path_PersonLib(PATH_PERSONLIB);
+	$config->path_XMLData(File::Spec->catfile('', PATH_XMLDATA));
+	$config->path_XMLDataHREF(File::Spec->catfile('', PATH_XMLDATA));
 
 	if ($group eq CONFIGGROUP_PRO) {
 		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));
@@ -279,6 +284,7 @@ createPath(
 	$CONFDATA_SERVER->path_temp,
 	$CONFDATA_SERVER->path_PDFOutput,
 	$CONFDATA_SERVER->path_PDFSuperBillOutput,
+	$CONFDATA_SERVER->path_XMLData,
 );
 requirePath(
 	$CONFDATA_SERVER->path_Database,
