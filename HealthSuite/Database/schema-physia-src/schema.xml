@@ -666,13 +666,20 @@
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>
 
-	<table name="Collector_Invoice" abbrev="CollInv" type="Audit,Secure">
-		<column name="collector_id" lookupref="person.person_id" descr="Person performing the collection process )"/>
-		<column name="patient_id" lookupref="person.person_id" descr="Patient ID  )"/>
-		<column name="responsible_id" lookupref="person.person_id" descr="Responsible party ID"/>
+	<table name="Invoice_Worklist" abbrev="InvWrk" type="Audit,Secure">
+		<column name="invoice_worklist_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) Invoice Worklist entry"/>		
+		<column name="owner_id" lookupref="person.person_id" descr="Person whose worklist Invoice is attached)"/>
+		<column name="person_id" lookupref="person.person_id" descr="Person ID of patient on the invoice"/>
+		<column name="responsible_id" lookupref="person.person_id" descr="Responsible party ID for action on the invoice (collector,etc)"/>
 		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
-		<column name="reck_date" type="date" descr="The date the payment was made "/>
-		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice that is in collection "/>
+		<column name="reck_date" type="date" descr="The date the worklist item should be re-checked"/>		
+		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice on the worklist"/>
+		<column name="data_date_a" type="date" descr="Extra data, dependent upon worklist type"/>
+		<column name="data_date_b" type="date" descr="Extra data, dependent upon worklist type"/>		
+		<column name="parent_invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Parent Invoice id for invoice that is in"/>
+		<column name="worklist_status" type="text" size="30" descr="Status of Invoice on the worklist (transfered,closed,hold,etc)" />
+		<column name="worklist_type" type="text" size="30" descr="Type of Worklist Invoice will appear  on(collection,claims,etc)" />			
+		<column name="comments" type="text" size="512" descr="Comment about invoice"/>
 	</table>
 
 
