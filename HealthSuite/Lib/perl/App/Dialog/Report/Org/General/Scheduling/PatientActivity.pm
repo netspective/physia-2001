@@ -42,7 +42,7 @@ sub new
 			types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
 		),		
 		new App::Dialog::Field::Person::ID(caption =>'Physican ID', 
-						   name => 'person_id',types => ['Physician'] ),
+			name => 'resource_id',types => ['Physician'] ),
 		
 							
 	);
@@ -58,7 +58,7 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('report_begin_date', $startDate);
 	$page->field('report_end_date', $startDate);
-	$page->field('resource_id', $page->session('user_id'));
+	#$page->field('resource_id', $page->session('user_id'));
 	$page->field('facility_id', $page->session('org_id'));
 }
 
@@ -70,7 +70,6 @@ sub execute
 	my $facility_id = $page->field('facility_id');
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
-	my $person_id     = $page->field('person_id');
 	my $orgInternalId =$page->session('org_internal_id');
 	my $internalFacilityId =$page->field('facility_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
@@ -82,39 +81,39 @@ sub execute
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_appointments_byStatus',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Patients Seen By Patient Type</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen_byPatientType',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments By Product Type</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsProduct',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>		
 			</tr>
 			<tr align=center valign=top>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Patients Seen By Physician</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Missing Encounters</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_missingEncounter',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>				
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments Scheduled</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_dateEntered',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>
 			<td>
 				<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments By Procedure Code</b></nobr>
 				@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsCPT',
-					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset ]) ]}
+					[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset, $resource_id ]) ]}
 			</td>
 
 			</tr>
@@ -137,15 +136,15 @@ sub prepare_detail_physician
 	my $facility_id = $page->param('_f_facility_id');
 	my $startDate   = $page->param('_f_report_begin_date');
 	my $endDate     = $page->param('_f_report_end_date');
-	my $physician   = $page->param('physician');
-	my $person_id     = $page->field('person_id');
+	my $resource_id = $page->param('_f_resource_id');
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+	my $physician = $page->param('physician');
 	
 	$page->addContent("<b>Patients Seen by $physician</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPhysician', 
-			[$physician, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
+			[$physician, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
 
@@ -156,14 +155,14 @@ sub prepare_detail_CPT
 	my $startDate   = $page->param('_f_report_begin_date');
 	my $endDate     = $page->param('_f_report_end_date');
 	my $cpt   = $page->param('CPT');
-	my $person_id     = $page->field('person_id');
+	my $resource_id = $page->param('_f_resource_id');
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
 	$page->addContent("<b>Procedure Code '$cpt'</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsCPT',
-			[$cpt, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
+			[$cpt, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 
 }
@@ -174,17 +173,28 @@ sub prepare_detail_product
 	my $facility_id = $page->param('_f_facility_id');
 	my $startDate   = $page->param('_f_report_begin_date');
 	my $endDate     = $page->param('_f_report_end_date');
-	my $product   = $page->param('product');
-	my $person_id     = $page->field('person_id');
+	my $product     = $page->param('product');
+	my $resource_id = $page->param('_f_resource_id');
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	
-	$page->addContent("<b>$product</b><br><br>",
-		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsProduct',
-			[$product, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
-	);
+	$page->addContent("<b>$product</b><br><br>");
 
+	if ($product =~ /self-pay/i)
+	{
+		$page->addContent(
+			$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsProductSelfPay',
+				[$product, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
+		);
+	}
+	else
+	{
+		$page->addContent(
+			$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsProduct',
+				[$product, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
+		);
+	}
 }
 
 sub prepare_detail_missing_encounter
@@ -192,6 +202,7 @@ sub prepare_detail_missing_encounter
 	my ($self, $page) = @_;
 	my $encounterDate = $page->param('encounter');
 	my $facility_id  = $page->param('_f_facility_id');
+	my $resource_id  = $page->param('_f_resource_id');
 	my $startDate    = $page->param('_f_report_begin_date');
 	my $endDate      = $page->param('_f_report_end_date') ;
 	my $internalFacilityId = $page->param('_f_facility_id');
@@ -200,7 +211,7 @@ sub prepare_detail_missing_encounter
 	
 	$page->addContent("<b>Missing Encounter ($encounterDate)</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailMissingEncounter',
-			[$encounterDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
+			[$encounterDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
 
@@ -211,6 +222,7 @@ sub prepare_detail_date_entered
 
 	my $enteredDate  = $page->param('entered');
 	my $facility_id  = $page->param('_f_facility_id');
+	my $resource_id = $page->param('_f_resource_id');
 	my $startDate    = $page->param('_f_report_begin_date');
 	my $endDate      = $page->param('_f_report_end_date') ;
 	my $internalFacilityId = $page->param('_f_facility_id');
@@ -219,7 +231,7 @@ sub prepare_detail_date_entered
 
 	$page->addContent("<b>Appointments Scheduled on $enteredDate</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailDateEntered', 
-			[$enteredDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
+			[$enteredDate, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
 
@@ -231,14 +243,14 @@ sub prepare_detail_appointments
 	my $endDate      = $page->param('_f_report_end_date') ;
 	my $event_status = $page->param('event_status');
 	my $caption      = $page->param('caption');
-	my $person_id     = $page->field('person_id');
+	my $resource_id  = $page->param('_f_resource_id');
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	
 	$page->addContent("<b>'$caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_DetailAppointmentStatus',
-			[$event_status, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset],
+			[$event_status, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id],
 		),
 	);
 }
@@ -251,14 +263,14 @@ sub prepare_detail_patient_type
 	my $endDate     = $page->param('_f_report_end_date');
 	my $patient_type_id  = $page->param('patient_type_id');
 	my $patient_type_caption = $page->param('patient_type_caption');
-	my $person_id     = $page->field('person_id');
+	my $resource_id = $page->param('_f_resource_id');
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	
 	$page->addContent("<b>'$patient_type_caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPatientType',
-			[$patient_type_id, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
+			[$patient_type_id, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id])
 	);
 }
 

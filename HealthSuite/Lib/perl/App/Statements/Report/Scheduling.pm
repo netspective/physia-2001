@@ -16,7 +16,7 @@ my $TIME_FORMAT = 'HH:MI AM';
 $STMTRPTDEFN_DETAIL_APPT_SCHEDULE ={
 	columnDefn =>
 	[
-		{ head => 'Patient', colIdx=>0, hint => 'View Patient #11# Profile',
+		{ head => 'Patient', colIdx=>0, hint => 'View #17# #11# Profile',
 			url=>q{javascript:chooseItemForParent('/person/#11#/profile')},
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
@@ -71,21 +71,25 @@ $STMTFMT_DETAIL_APPT_SCHEDULE = qq{
 			to_char(e.scheduled_stamp - :6, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
 			to_char(e.checkin_stamp - :6, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
 			to_char(e.checkout_stamp - :6, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
-			e.event_id
-		FROM	Event e, Event_Attribute ea
+			e.event_id,
+			aat.caption
+		FROM	Appt_Attendee_Type aat, Event e, Event_Attribute ea
 			%fromTable%
 		WHERE	%whereCond%
-		AND	(:2 IS NULL OR facility_id = :2)
+		AND	(:2 is NULL or e.facility_id = :2)
+		AND (:7 is NULL or ea.value_textb = :7)
 		AND EXISTS
 		(
-			SELECT 	'x'
-			FROM 	org
-			WHERE 	owner_org_id = :5
-			AND 	org_internal_id = e.facility_id
+			SELECT 'x'
+			FROM org
+			WHERE owner_org_id = :5
+			AND org_internal_id = e.facility_id
 		)
-		AND	e.event_id = ea.parent_id
+		AND e.event_id = ea.parent_id
 		AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
-		AND	e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		%excludeDiscardedAppts%
+		AND aat.id = ea.value_int
 		ORDER BY 5, 7
 };
 
@@ -101,7 +105,9 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				invoice i,
 				invoice_item ii
 			WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND (:1 IS NULL OR facility_id = :1)
+				AND (ii.data_text_b != 'void' OR ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]})
+				AND (:1 is NULL or e.facility_id = :1)
+				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
 				(
 					SELECT 	'x'
@@ -113,6 +119,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND	e.event_id = ea.parent_id
 				AND	e.event_id = t.parent_event_id
+				AND e.event_status < 3
 				AND	i.main_transaction = t.trans_id
 				AND	ii.parent_id = i.invoice_id
 				AND	ii.code is not NULL
@@ -137,12 +144,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			invoice i,
 			invoice_item ii
 		},
-		whereCond =>q{ii.parent_id = i.invoice_id
+		whereCond => qq{ii.parent_id = i.invoice_id
 			AND ii.code = :1
+			AND (ii.data_text_b != 'void' OR ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]})
 			AND i.main_transaction = t.trans_id
 			AND e.event_id = t.parent_event_id
 			AND i.parent_invoice_id is NULL
 		},
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -152,13 +161,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		sqlStmt => qq{
 			SELECT 	to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
 			FROM 	Event e, Event_Attribute ea
-			WHERE	(:1 IS NULL OR facility_id = :1)
+			WHERE	(:1 is NULL or facility_id = :1)
+				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = e.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
 				)
 				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				AND	e.CHECKIN_STAMP >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
@@ -196,15 +206,16 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_dateEntered' =>
 	{
 		sqlStmt => qq{
-			SELECT to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
+			SELECT to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (e.scheduled_stamp)
 			FROM 	Event e, Event_Attribute ea
-			WHERE	(:1 IS NULL OR facility_id = :1)
+			WHERE	(:1 is NULL or facility_id = :1)
+				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = e.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
 				)
 				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				AND	e.scheduled_stamp >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
@@ -230,69 +241,120 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		whereCond => qq{
 			e.scheduled_stamp >= TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
-			and e.scheduled_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6 },
+			and e.scheduled_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6 
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
 	# -----------------------------------------------------------------------------------------
 	'sel_patientsProduct' =>{
-				sqlStmt => qq{
-				SELECT	ct.caption,count(distinct e.event_id) as count
-				FROM	Event e,
-					Event_Attribute ea,
-					transaction t,
-					invoice i,
-					invoice_billing ib,
-					insurance i,
-					claim_type ct
-				WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				and (:1 IS NULL OR facility_id = :1)
+		sqlStmt => qq{
+			SELECT	ct.caption, count(distinct e.event_id) as count
+			FROM claim_type ct,
+				insurance ins,
+				invoice_billing ib,
+				invoice i,
+				transaction t,
+				Event_Attribute ea,
+				Event e
+			WHERE e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.event_status < 3
+				AND (:1 is NULL or e.facility_id = :1)
+				AND	ea.parent_id = e.event_id
+				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = e.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
 				)
-				AND	e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND	t.parent_event_id = e.event_id
+				AND	i.main_transaction = t.trans_id
+				AND	ib.bill_id = i.billing_id
+				AND	ins.ins_internal_id = ib.bill_ins_id
+				AND	ct.id = ins.ins_type
+			GROUP BY ct.caption
+		UNION
+			SELECT	ct.caption, count(distinct e.event_id) as count
+			FROM claim_type ct,
+				insurance ins,
+				invoice_billing ib,
+				invoice i,
+				transaction t,
+				Event_Attribute ea,
+				Event e
+			WHERE e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
 				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
-				AND	e.event_id = ea.parent_id
+				AND e.event_status < 3
+				AND (:1 is NULL or e.facility_id = :1)				
+				AND	ea.parent_id = e.event_id
+				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND (:6 is NULL or ea.value_textb = :6)
+				AND EXISTS
+				(
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
+				)
+				AND	t.parent_event_id = e.event_id
+				AND	i.main_transaction = t.trans_id
+				AND	ib.bill_id = i.billing_id
+				AND	ib.bill_ins_id is NULL
+				AND	ct.id = 0
+			GROUP BY ct.caption
+		},
+		
+		publishDefn => {
+			columnDefn =>
+			[
+			{head => 'Product Name',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#',
+				null,'location,status,width=800,height=600,scrollbars,resizable')},
+				hint => 'View Details'
+			},
+			{head => 'Count', dAlign => 'right',summarize=>'sum'},
+			],
+		},
+	},
+
+	'sel_detailPatientsProduct' =>{
+		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
+			fromTable=>q	{,invoice i,
+				invoice_billing ib,
+				insurance i,
+				claim_type ct,
+				transaction t
+			},
+			whereCond=>q{	ct.caption = :1
 				AND	e.event_id = t.parent_event_id
 				AND	i.main_transaction = t.trans_id
 				AND	ib.bill_id = i.billing_id
 				AND	ib.bill_ins_id = i.ins_internal_id
 				AND	ct.id = i.ins_type
-				GROUP BY ct.caption
-				},
-				publishDefn => 	{
-					columnDefn =>
-					[
-					{head => 'Product Name',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#',
-						null,'location,status,width=800,height=600,scrollbars,resizable')},
-						hint => 'View Details'
-					},
-					{head => 'Count', dAlign => 'right',summarize=>'sum'},
-					],
-				},
+		},
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
+	},
+
+	'sel_detailPatientsProductSelfPay' =>{
+		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
+			fromTable=>q	{,invoice i,
+				invoice_billing ib,
+				claim_type ct,
+				transaction t
 			},
-
-	'sel_detailPatientsProduct' =>{
-				sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
-				fromTable=>q	{,invoice i,
-						invoice_billing ib,
-						insurance i,
-						claim_type ct,
-						transaction t
-						},
-				whereCond=>q{	ct.caption = :1
-						AND	e.event_id = t.parent_event_id
-						AND	i.main_transaction = t.trans_id
-						AND	ib.bill_id = i.billing_id
-						AND	ib.bill_ins_id = i.ins_internal_id
-						AND	ct.id = i.ins_type
-					    },
-				publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
-
+			whereCond=>q{	ct.caption = :1
+				AND	e.event_id = t.parent_event_id
+				AND	i.main_transaction = t.trans_id
+				AND	ib.bill_id = i.billing_id
+				AND	ib.bill_ins_id is NULL
+				AND	ct.id = 0
+		},
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
 	# -----------------------------------------------------------------------------------------
@@ -300,21 +362,22 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_patientsSeen' => {
 		sqlStmt => qq{
 			select value_textB as physician, count(value_textB) as count
-			from Event, Event_Attribute
-			where Event_Attribute.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				and (:1 IS NULL OR facility_id = :1)
+			from Event e, Event_Attribute ea
+			where ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND (:1 is NULL or e.facility_id = :1)
+				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = Event.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
 				)
-				and Event.event_id = Event_Attribute.parent_id
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
+				and e.event_id = ea.parent_id
+				and e.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-				and event_status in (1, 2)
-			group by value_textB
+				and e.event_status in (1, 2)
+			group by ea.value_textB
 		},
 		publishDefn => 	{
 			columnDefn =>
@@ -332,6 +395,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_detailPatientsSeenByPhysician' => {
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		whereCond =>q{ event_status in (1,2) AND ea.value_textB = :1},
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,
 
 	},
@@ -340,20 +404,21 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_patientsSeen_byPatientType' => {
 		sqlStmt => qq{
 			select caption as patient_type, count(caption) as count, Appt_Attendee_Type.id
-			from Appt_Attendee_Type, Event, Event_Attribute ea
+			from Appt_Attendee_Type, Event e, Event_Attribute ea
 			where ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				and Event.event_id = ea.parent_id
-				and (:1 IS NULL OR facility_id = :1)
+				and e.event_id = ea.parent_id
+				and (:6 is NULL or ea.value_textb = :6)
+				and (:1 is NULL or e.facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = Event.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = e.facility_id
 				)
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
+				and e.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-				and event_status in (1, 2)
+				and e.event_status in (1, 2)
 				and Appt_Attendee_Type.id = ea.value_int
 			group by caption, Appt_Attendee_Type.id
 		},
@@ -373,6 +438,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_detailPatientsSeenByPatientType' => {
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		whereCond=>q{ea.value_int = :1 and event_status in (1,2) },
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 
 	},
@@ -384,13 +450,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			from Appt_Status, Event, Event_Attribute
 			where value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				and Event.event_id = Event_Attribute.parent_id
-				and (:1 IS NULL OR facility_id = :1)
+				and (:6 is NULL or Event_Attribute.value_textb = :6)
+				and (:1 is NULL or Event.facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	'x'
-					FROM 	org
-					WHERE 	owner_org_id = :4
-					AND 	org_internal_id = Event.facility_id
+					SELECT 'x'
+					FROM org
+					WHERE owner_org_id = :4
+					AND org_internal_id = Event.facility_id
 				)
 				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 				and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
@@ -414,9 +481,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		whereCond =>q{e.event_status = :1},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,
-
 	},
-
 );
 
 1;
