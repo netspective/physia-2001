@@ -398,6 +398,7 @@ sub execute
 
 	}
 	my $empOrgIntId = $page->field('employer_org_id') ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgIntId, $page->field('employer_org_id')) : undef;
+
 	my $insIntId = $page->schemaAction(
 		'Insurance', $command,
 		ins_internal_id			=> $page->param('ins_internal_id') || undef,
@@ -427,6 +428,7 @@ sub execute
 		family_deductible_amt		=> $page->field('family_deductible_amt') || undef,
 		percentage_pay			=> $page->field('percentage_pay') || undef,
 		threshold			=> $page->field('threshold') || undef,
+		remit_type        => $parentRecord->{'remit_type'} || 0,
 		#product_ins_id                  => $productInsId || undef,
 		#plan_ins_id 			=> $planInsId || undef,
 		_debug => 0
