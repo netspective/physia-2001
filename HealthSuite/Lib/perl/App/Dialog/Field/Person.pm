@@ -51,7 +51,8 @@ sub autoSuggest
 	#First initial of first name
 	my $FIFN = substr($firstname,0,1);
 	#Last 4 digits of social security number
-	my $L4SSN = substr($ssn,(length($ssn)-4),4);
+	my $lssn = length($ssn);
+	my $L4SSN = substr($ssn,$lssn-4,4);
 	#Birthyear (last two digits of date_of_birth string)
 	my $ldob = length($DOB);
 	my $L2DOB = substr($DOB,$ldob-2,2);
@@ -66,15 +67,15 @@ sub autoSuggest
 	#Lastname + firstname
 	push (@possible, uc(substr($lastname . $firstname,0,16)));
 	#First initial + lastname + year of birth
-	push (@possible, uc($FIFN . substr($lastname,0,13) . $L2DOB)) if(defined $DOB);
+	push (@possible, uc($FIFN . substr($lastname,0,13) . $L2DOB)) if $ldob > 2;
 	#First initial + lastname + last 4 digits of social security
-	push (@possible, uc($FIFN . substr($lastname,0,12) . $L4SSN)) if(defined $ssn);
+	push (@possible, uc($FIFN . substr($lastname,0,12) . $L4SSN)) if $lssn > 2;
 	#First initial + middle initial + lastname + year of birth
-	push (@possible, uc($FIFN . $MI . substr($lastname,0,13) . $L2DOB)) if(defined $DOB);
-	#First initial + lastname + last 4 digits of social security
-	push (@possible, uc($FIFN . $MI . substr($lastname,0,12) . $L4SSN)) if(defined $ssn);
+	push (@possible, uc($FIFN . $MI . substr($lastname,0,13) . $L2DOB)) if $ldob > 2;
+	#First initial + middle initial + lastname + last 4 digits of social security
+	push (@possible, uc($FIFN . $MI . substr($lastname,0,12) . $L4SSN)) if $lssn > 2;
 	#First initial + lastname + year of birth + last 4 digits of SSN
-	push (@possible, uc($FIFN . substr($lastname,0,10) . $L2DOB . $L4SSN)) if(defined $ssn);
+	push (@possible, uc($FIFN . substr($lastname,0,10) . $L2DOB . $L4SSN)) if $lssn > 2;
 	#First initial + middle initial + lastname + 4 digit random number
 	push (@possible, uc($FIFN . $MI . substr($lastname,0,10) . int(10000*rand)));
 	push (@possible, uc($FIFN . $MI . substr($lastname,0,10) . int(10000*rand)));
