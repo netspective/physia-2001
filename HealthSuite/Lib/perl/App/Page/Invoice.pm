@@ -36,6 +36,10 @@ use App::Page::Search;
 
 use constant DATEFORMAT_USA => 1;
 use constant PHONEFORMAT_USA => 1;
+use constant NSFDEST_ARRAY => 0;
+use constant NSFDEST_FILE => 1;
+use constant DEFAULT_VFLAGS => 0;
+
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
@@ -64,10 +68,6 @@ use vars qw(@ISA %RESOURCE_MAP);
 			],
 		},
 	);
-
-use constant NSFDEST_ARRAY => 0;
-use constant NSFDEST_FILE => 1;
-use constant DEFAULT_VFLAGS => 0;
 
 
 #-----------------------------------------------------------------------------
@@ -137,187 +137,181 @@ sub getPayerHtml
 	};
 }
 
-sub getProcedureHtml
+sub createLineItemsTableHtml
 {
-	my ($self, $claim, $itemId) = @_;
+	my ($self, $claim) = @_;
+	my $invType = $claim->getInvoiceType();
+	my $isHcfa = $invType == App::Universal::INVOICETYPE_HCFACLAIM;
 	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
 
-	my $invoiceId = $self->param('invoice_id');
-	my $invStatus = $claim->getStatus();
-
 	my @rows = ();
-
-	my $lineSeq;
-	my $procedure = undef;
-	my $totalItems = scalar(@{$claim->{procedures}});
-	foreach my $itemIdx (0..$totalItems-1)
-	{
-		next if $itemId != $claim->{procedures}->[$itemIdx]->{itemId};
-		$procedure = $claim->{procedures}->[$itemIdx];
-		$lineSeq = $itemIdx + 1;
-	}
+	push(@rows, qq{ @{[ $self->createProcedureItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createSuppressedItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createCopayItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createCoinsuranceItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createAdjItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createVoidItemsHtml($claim) ]} });
+	push(@rows, qq{ @{[ $self->createOtherItemsHtml($claim) ]} });
 
 
-	#my $procedure = $claim->{procedures}->[$itemIdx];
-
-	#my $lineSeq = $itemIdx + 1;
-
-	my $emg = $procedure->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
-	#my $itemId = $procedure->{itemId};
-	my $itemType = $procedure->{itemType};
-	my $comments = $procedure->{comments};
-
-	my $itemAdjustmentTotal = $procedure->{totalAdjustments};
-	my $itemExtCost = $procedure->{extendedCost};
-
-	$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
-	$itemExtCost = $formatter->format_price($itemExtCost);
-
-	my ($cmtRow, $unitCost) = ('', '');
-	if(my $comments = $procedure->{comments})
-	{
-		$cmtRow = qq{
-			<TR>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD COLSPAN=15><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
-			</TR>
-		}
-	}
-	if($procedure->{daysOrUnits} > 1)
-	{
-		$unitCost = "<BR>(\$$procedure->{charges} x $procedure->{daysOrUnits})";
-	}
-
-	#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-	#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedure->{placeOfService});
-	my $servPlaceCode = $procedure->{placeOfService};
-	my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
-
-	#my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedure->{typeOfService});
-	my $servTypeCode = $procedure->{typeOfService};
-	my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
-
-	my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
-
-	my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $procedure->{modifier});
-	my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $procedure->{cpt});
-	my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
-
-	my $serviceFromDate;
-	my $serviceToDate;
-	if($itemType == App::Universal::INVOICEITEMTYPE_SERVICE || $itemType == App::Universal::INVOICEITEMTYPE_LAB)
-	{
-		$serviceFromDate = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);	#$otherItem->{dateOfServiceFrom};
-		$serviceToDate = $procedure->getDateOfServiceTo(DATEFORMAT_USA);	#$otherItem->{dateOfServiceTo};
-	}
-
-
-	push(@rows, qq{
-		<TR>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=3><B>$lineSeq</B></FONT></TD>
-			<TD>&nbsp;</TD>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
-			<TD>&nbsp;</TD>
-			<TD TITLE="$servPlaceAndTypeTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$servPlaceCode @{[$servTypeCode ? "($servTypeCode)" : '']}</TD>
-			<TD>&nbsp;</TD>
-			<TD TITLE="$cptAndModTitle"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{cpt} @{[$procedure->{modifier} ? "($procedure->{modifier})" : '']}</TD>
-			<TD>&nbsp;</TD>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{diagnosis}</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">$itemAdjustmentTotal</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Center">$emg</td>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{reference}</FONT></td>
-		</TR>
-		$cmtRow
-		<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-	});
-
+	my $balColor = $claim->{balance} >= 0 ? 'Green' : 'Darkred';
 	return qq{
 		<TABLE>
 			<TR VALIGN=TOP>
+				@{[ $isHcfa ? $self->createAddlHcfaHtml($claim) : '' ]}
 				<TD>
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
-						<TR BGCOLOR=EEEEEE>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Date</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Svc</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Diag</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Chg</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>EMG</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Expl Code</B></TD>
-						</TR>
+						@{[ $self->createLineItemsHeadingHtml($claim) ]}
 						@rows
+						<TR BGCOLOR=DDEEEE>
+							<TD COLSPAN=8><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>@{[ $formatter->format_price($claim->{balance}) ]}</B></FONT></TD>
+							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
+							<TD>&nbsp;</TD>
+							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green"><B>@{[ $formatter->format_price($claim->{totalInvoiceCharges}) ]}</B></TD>
+							<TD>&nbsp;</TD>
+							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>@{[ $formatter->format_price($claim->{amountPaid}) ]}</B></TD>
+							@{[ $isHcfa ? "<TD COLSPAN=4>&nbsp;</TD>" : '' ]}
+						</TR>
 					</TABLE>
 				</TD>
 			</TR>
 		</TABLE>
-		};
+	};
 }
 
-sub getProceduresHtml
+sub createAddlHcfaHtml
 {
 	my ($self, $claim) = @_;
-	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
 
-	my @rows = ();
-
-	my $created = App::Universal::INVOICESTATUS_CREATED;
-	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
-	my $pending = App::Universal::INVOICESTATUS_PENDING;
-	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
-
-	my $invoiceId = $self->param('invoice_id');
-	my $invType = $claim->getInvoiceType();
-	my $claimType = $claim->getInvoiceSubtype();
-	my $invStatus = $claim->getStatus();
-	my $totalItems = scalar(@{$claim->{procedures}});
-
-	foreach my $itemIdx (0..$totalItems-1)
+	#DIAGS AND THEIR CAPTIONS:
+	my @allDiags = ();
+	foreach (@{$claim->{diagnosis}})
 	{
-		my $procedure = $claim->{procedures}->[$itemIdx];
+		push(@allDiags, $_->getDiagnosis());
+	}
+
+	my $icdCaption;
+	foreach my $diag (@allDiags)
+	{
+		$icdCaption .= "$diag: ";
+		my $icdInfo = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericICDCode', $diag);
+
+		my $icdDescr = $icdInfo->{descr};
+		$icdDescr =~ s/\'/&quot;/g;
+		$icdCaption .= $icdDescr;
+		$icdCaption .= "\n";
+	}
+
+	return qq{
+		<TD>
+			<TABLE CELLPADDING=1 CELLSPACING=0 BGCOLOR=999999>
+				<TR VALIGN=TOP>
+					<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Current Illness</NOBR></TD>
+				</TR>
+				<TR>
+					<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $claim->{treatment}->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA) ]}</TD>
+				</TR>
+				<TR VALIGN=TOP>
+					<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Similar Illness</NOBR></TD>
+				</TR>
+				<TR>
+					<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $claim->{treatment}->getDateOfSameOrSimilarIllness(DATEFORMAT_USA) ]}</TD>
+				</TR>
+				<TR VALIGN=TOP>
+					<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Diagnoses</NOBR></TD>
+				</TR>
+				<TR>
+					<TD BGCOLOR=WHITE ALIGN=CENTER TITLE='$icdCaption'><FONT FACE="Arial,Helvetica" SIZE=2>@allDiags</TD>
+				</TR>
+			</TABLE>
+		</TD>
+	};
+}
+
+sub createLineItemsHeadingHtml
+{
+	my ($self, $claim) = @_;
+	my $invType = $claim->getInvoiceType();
+
+	if($invType == App::Universal::INVOICETYPE_HCFACLAIM)
+	{
+		return qq{
+			<TR BGCOLOR=EEEEEE>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Date</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Svc</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Diag</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Chg</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>EMG</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Expl Code</B></TD>
+			</TR>
+		};
+	}
+	elsif($invType == App::Universal::INVOICETYPE_SERVICE)
+	{
+		return qq{
+			<TR BGCOLOR=EEEEEE>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Dates</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Qty</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Description</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Charge</B></TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
+			</TR>
+		};
+	}
+}
+
+sub createProcedureItemsHtml
+{
+	my ($self, $claim, $itemId, $inactive) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $invoiceId = $self->param('invoice_id');
+	my $invStatus = $claim->getStatus();
+
+	my $procedure;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{procedures}})-1)
+	{
+		$procedure = $claim->{procedures}->[$itemIdx];
+		next if defined $itemId && $itemId != $procedure->{itemId};
+
 		my $lineSeq = $itemIdx + 1;
+
 		my $itemId = $procedure->{itemId};
-		my $itemStatus = $procedure->{itemStatus};
 		my $emg = $procedure->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
 
-		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId";
-		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId";
-		my $editProcImg = '';
-		my $voidProcImg = '';
-		if($invStatus < $submitted && $itemStatus ne 'void')
+		my $editProcImg;
+		my $voidProcImg;
+		if($invStatus < App::Universal::INVOICESTATUS_SUBMITTED && $procedure->{itemStatus} ne 'void' && ! defined $inactive)
 		{
-			$editProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
-			$voidProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
+			$editProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='/invoice/$invoiceId/dialog/procedure/update,$itemId'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
+			$voidProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='/invoice/$invoiceId/dialog/procedure/remove,$itemId'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
 		}
 
-		my $itemAdjustmentTotal = $procedure->{totalAdjustments};
-		my $itemExtCost = $procedure->{extendedCost};
+		my $itemExtCost = $formatter->format_price($procedure->{extendedCost});
+		my $itemAdjustmentTotal = $formatter->format_price($procedure->{totalAdjustments});
+		my $viewPaymentHtml = ! defined $inactive ? "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId,$itemIdx');>$itemAdjustmentTotal</a>" : $itemAdjustmentTotal;
 
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId,$itemIdx');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		$itemExtCost = $formatter->format_price($itemExtCost);
-
-		my ($cmtRow, $unitCost) = ('', '');
+		my $cmtRow;
 		if(my $comments = $procedure->{comments})
 		{
 			$cmtRow = qq{
@@ -328,20 +322,14 @@ sub getProceduresHtml
 				</TR>
 			}
 		}
-		if($procedure->{daysOrUnits} > 1)
-		{
-			$unitCost = "<BR>(\$$procedure->{charges} x $procedure->{daysOrUnits})";
-		}
 
-		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedure->{placeOfService});
+		my $unitCostHtml = $procedure->{daysOrUnits} > 1 ? qq{ <BR>(\$$procedure->{charges} x $procedure->{daysOrUnits}) } : '';
+
+		#GET CAPTION FOR SERVICE PLACE/TYPE, MODIFIER, CPT CODE
 		my $servPlaceCode = $procedure->{placeOfService};
 		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
-
-		#my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedure->{typeOfService});
 		my $servTypeCode = $procedure->{typeOfService};
 		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
-
 		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
 
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $procedure->{modifier});
@@ -350,7 +338,8 @@ sub getProceduresHtml
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
 		my $serviceFromDate = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);	#$procedure->{dateOfServiceFrom};
-		my $serviceToDate = $procedure->getDateOfServiceTo(DATEFORMAT_USA);	#$procedure->{dateOfServiceTo};
+		my $serviceToDate = $procedure->getDateOfServiceTo(DATEFORMAT_USA);		#$procedure->{dateOfServiceTo};
+
 		push(@rows, qq{
 			<TR>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>$lineSeq</B></FONT></TD>
@@ -363,7 +352,7 @@ sub getProceduresHtml
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{diagnosis}</TD>
 				<TD>&nbsp;</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCostHtml</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">$viewPaymentHtml</TD>
 				<TD>&nbsp;</TD>
@@ -376,35 +365,39 @@ sub getProceduresHtml
 		});
 	}
 
-	my $suppressedItems = scalar(@{$claim->{suppressedItems}});
-	foreach my $itemIdx (0..$suppressedItems-1)
+	return @rows;
+}
+
+sub createSuppressedItemsHtml
+{
+	my ($self, $claim, $itemId, $inactive) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $invoiceId = $self->param('invoice_id');
+	my $invStatus = $claim->getStatus();
+
+	my $suppressedItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{suppressedItems}})-1)
 	{
-		my $suppressedItem = $claim->{suppressedItems}->[$itemIdx];
-		my $lineSeq = $itemIdx + 1;
+		$suppressedItem = $claim->{suppressedItems}->[$itemIdx];
+		next if defined $itemId && $itemId != $suppressedItem->{itemId};
+
 		my $itemId = $suppressedItem->{itemId};
-		my $itemStatus = $suppressedItem->{itemStatus};
 		my $emg = $suppressedItem->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
 
-		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId";
-		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId";
-		my $editProcImg = '';
-		my $voidProcImg = '';
-		if($invStatus < $submitted && $itemStatus ne 'void')
+		my $editProcImg;
+		my $voidProcImg;
+		if($invStatus < App::Universal::INVOICESTATUS_SUBMITTED && $suppressedItem->{itemStatus} ne 'void' && ! defined $inactive)
 		{
-			$editProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
-			$voidProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
+			$editProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='/invoice/$invoiceId/dialog/procedure/update,$itemId'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
+			$voidProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='/invoice/$invoiceId/dialog/procedure/remove,$itemId'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
 		}
 
-		my $itemAdjustmentTotal = $suppressedItem->{totalAdjustments};
-		my $itemExtCost = $suppressedItem->{extendedCost};
+		my $itemExtCost = $formatter->format_price($suppressedItem->{extendedCost});
+		my $itemAdjustmentTotal = $formatter->format_price($suppressedItem->{totalAdjustments});
+		my $viewPaymentHtml = ! defined $inactive ? "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');>$itemAdjustmentTotal</a>" : $itemAdjustmentTotal;
 
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		$itemExtCost = $formatter->format_price($itemExtCost);
-
-		my ($cmtRow, $unitCost) = ('', '');
+		my $cmtRow;
 		if(my $comments = $suppressedItem->{comments})
 		{
 			$cmtRow = qq{
@@ -415,20 +408,14 @@ sub getProceduresHtml
 				</TR>
 			}
 		}
-		if($suppressedItem->{daysOrUnits} > 1)
-		{
-			$unitCost = "<BR>(\$$suppressedItem->{charges} x $suppressedItem->{daysOrUnits})";
-		}
 
-		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
-		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $suppressedItem->{placeOfService});
+		my $unitCostHtml = $suppressedItem->{daysOrUnits} > 1 ? qq{ <BR>(\$$suppressedItem->{charges} x $suppressedItem->{daysOrUnits}) } : '';
+
+		#GET CAPTION FOR SERVICE PLACE/TYPE, MODIFIER, CPT CODE
 		my $servPlaceCode = $suppressedItem->{placeOfService};
 		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
-
-		#my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $suppressedItem->{typeOfService});
 		my $servTypeCode = $suppressedItem->{typeOfService};
 		my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServiceType', $servTypeCode);
-
 		my $servPlaceAndTypeTitle = "Service Place: $servPlaceCaption" . "\n" . "Service Type: $servTypeCaption";
 
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $suppressedItem->{modifier});
@@ -437,7 +424,7 @@ sub getProceduresHtml
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
 		my $serviceFromDate = $suppressedItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$suppressedItem->{dateOfServiceFrom};
-		my $serviceToDate = $suppressedItem->getDateOfServiceTo(DATEFORMAT_USA);	#$suppressedItem->{dateOfServiceTo};
+		my $serviceToDate = $suppressedItem->getDateOfServiceTo(DATEFORMAT_USA);		#$suppressedItem->{dateOfServiceTo};
 
 		push(@rows, qq{
 			<TR bgcolor="lightsteelblue">
@@ -451,7 +438,7 @@ sub getProceduresHtml
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$suppressedItem->{diagnosis}</TD>
 				<TD>&nbsp;</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCostHtml</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">$viewPaymentHtml</TD>
 				<TD>&nbsp;</TD>
@@ -464,77 +451,122 @@ sub getProceduresHtml
 		});
 	}
 
-	my $copayItems = scalar(@{$claim->{copayItems}});
-	foreach my $itemIdx (0..$copayItems-1)
-	{
-		my $copayItem = $claim->{copayItems}->[$itemIdx];
-		my $itemId = $copayItem->{itemId};
-		my $itemType = $copayItem->{itemType};
-		my $itemNum = $itemIdx + 1;
+	return @rows;
+}
 
-		my $itemExtCost = $copayItem->{extendedCost};
-		$itemExtCost = $formatter->format_price($itemExtCost);
-		my $itemAdjustmentTotal = $copayItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
+sub createCopayItemsHtml
+{
+	my ($self, $claim, $itemId) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $invoiceId = $self->param('invoice_id');
+
+	my $copayItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{copayItems}})-1)
+	{
+		$copayItem = $claim->{copayItems}->[$itemIdx];
+		next if defined $itemId && $itemId != $copayItem->{itemId};
+
+		my $itemId = $copayItem->{itemId};
+		my $itemExtCost = $formatter->format_price($copayItem->{extendedCost});
+		my $itemAdjustmentTotal = $formatter->format_price($copayItem->{totalAdjustments});
+		my $viewPaymentHtml = "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');>$itemAdjustmentTotal</a>";
+
 		push(@rows, qq{
 			<TR>
 				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Copay - $copayItem->{comments}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
-	my $coinsuranceItems = scalar(@{$claim->{coInsuranceItems}});
-	foreach my $itemIdx (0..$coinsuranceItems-1)
-	{
-		my $coinsuranceItem = $claim->{coinsuranceItems}->[$itemIdx];
-		my $itemId = $coinsuranceItem->{itemId};
-		my $itemType = $coinsuranceItem->{itemType};
-		my $itemNum = $itemIdx + 1;
+	return @rows;
+}
 
-		my $itemExtCost = $coinsuranceItem->{extendedCost};
-		$itemExtCost = $formatter->format_price($itemExtCost);
-		my $itemAdjustmentTotal = $coinsuranceItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
+sub createCoinsuranceItemsHtml
+{
+	my ($self, $claim, $itemId) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $invoiceId = $self->param('invoice_id');
+
+	my $coinsuranceItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{coInsuranceItems}})-1)
+	{
+		$coinsuranceItem = $claim->{coInsuranceItems}->[$itemIdx];
+		next if defined $itemId && $itemId != $coinsuranceItem->{itemId};
+
+		my $itemId = $coinsuranceItem->{itemId};
+		my $itemExtCost = $formatter->format_price($coinsuranceItem->{extendedCost});
+		my $itemAdjustmentTotal = $formatter->format_price($coinsuranceItem->{totalAdjustments});
+		my $viewPaymentHtml = "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');>$itemAdjustmentTotal</a>";
+
 		push(@rows, qq{
 			<TR>
 				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Coinsurance - $coinsuranceItem->{comments}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
-	my $voidItems = scalar(@{$claim->{voidItems}});
-	foreach my $itemIdx (0..$voidItems-1)
+	return @rows;
+}
+
+sub createAdjItemsHtml
+{
+	my ($self, $claim, $itemId) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $invoiceId = $self->param('invoice_id');
+
+	my $adjItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{adjItems}})-1)
 	{
-		my $voidItem = $claim->{voidItems}->[$itemIdx];
+		$adjItem = $claim->{adjItems}->[$itemIdx];
+		next if defined $itemId && $itemId != $adjItem->{itemId};
+
+		my $itemId = $adjItem->{itemId};
+		my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjItem->{adjustments}->[0]->{adjustType});
+		my $itemAdjustmentTotal = $formatter->format_price($adjItem->{totalAdjustments});
+		my $viewPaymentHtml = "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId,$itemIdx,$adjItem->{itemType}');>$itemAdjustmentTotal</a>";
+
+		push(@rows, qq{
+			<TR>
+				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjItem->{comments}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
+			</TR>
+			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+		});
+	}
+
+	return @rows;
+}
+
+sub createVoidItemsHtml
+{
+	my ($self, $claim, $itemId) = @_;
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+
+	my $voidItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{voidItems}})-1)
+	{
+		$voidItem = $claim->{voidItems}->[$itemIdx];
+		next if defined $itemId && $itemId != $voidItem->{itemId};
+
 		my $itemId = $voidItem->{itemId};
-		my $itemType = $voidItem->{itemType};
-		my $itemNum = $itemIdx + 1;
 		my $emg = $voidItem->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
+		my $itemExtCost = $formatter->format_price($voidItem->{extendedCost});
+		my $unitCostHtml = $voidItem->{daysOrUnits} > 1 ? qq{ <BR>(\$$voidItem->{charges} x $voidItem->{daysOrUnits}) } : '';
 
-		my $itemExtCost = $voidItem->{extendedCost};
-		$itemExtCost = $formatter->format_price($itemExtCost);
-
-		my $unitCost = '';
-		if($voidItem->{daysOrUnits} > 1)
-		{
-			$unitCost = "<BR>(\$$voidItem->{charges} x $voidItem->{daysOrUnits})";
-		}
-
-		#GET CAPTION FOR SERVICE PLACE, MODIFIER, CPT CODE
+		#GET CAPTION FOR SERVICE PLACE/TYPE, MODIFIER, CPT CODE
 		my $servPlaceCode = $voidItem->{placeOfService};
 		my $servPlaceCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericServicePlace', $servPlaceCode);
 		my $servTypeCode = $voidItem->{typeOfService};
@@ -546,8 +578,8 @@ sub getProceduresHtml
 		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $voidItem->{codeType});
 		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
-		my $serviceFromDate = $voidItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$voidItem->{dateOfServiceFrom};
-		my $serviceToDate = $voidItem->getDateOfServiceTo(DATEFORMAT_USA);	#$voidItem->{dateOfServiceTo};
+		my $serviceFromDate = $voidItem->getDateOfServiceFrom(DATEFORMAT_USA);		#$voidItem->{dateOfServiceFrom};
+		my $serviceToDate = $voidItem->getDateOfServiceTo(DATEFORMAT_USA);			#$voidItem->{dateOfServiceTo};
 
 		push(@rows, qq{
 			<TR>
@@ -561,7 +593,7 @@ sub getProceduresHtml
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$voidItem->{diagnosis}</TD>
 				<TD>&nbsp;</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCostHtml</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">&nbsp;</TD>
 				<TD>&nbsp;</TD>
@@ -573,330 +605,30 @@ sub getProceduresHtml
 		});
 	}
 
-	my $totalOtherItems = scalar(@{$claim->{otherItems}});
-	foreach my $itemIdx (0..$totalOtherItems-1)
-	{
-		my $otherItem = $claim->{otherItems}->[$itemIdx];
-		my $itemId = $otherItem->{itemId};
-		my $itemType = $otherItem->{itemType};
-
-		my $itemNum = $itemIdx + 1;
-
-		my $itemExtCost = $otherItem->{extendedCost};
-		$itemExtCost = $formatter->format_price($itemExtCost);
-		my $itemAdjustmentTotal = $otherItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		my $cmtRow = '';
-		if(my $comments = $otherItem->{comments})
-		{
-			$cmtRow = qq{
-				<TR>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-					<TD COLSPAN=15><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
-				</TR>
-			}
-		}
-
-		push(@rows, qq{
-			<TR>
-				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: $otherItem->{caption}</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
-			</TR>
-			$cmtRow
-			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-		});
-	}
-
-	my $totalAdjItems = scalar(@{$claim->{adjItems}});
-	foreach my $itemIdx (0..$totalAdjItems-1)
-	{
-		my $adjItem = $claim->{adjItems}->[$itemIdx];
-		my $itemNum = $itemIdx + 1;
-
-		my $adjustment = $adjItem->{adjustments}->[0];
-		my $adjComments = $adjustment->{comments};
-		my $adjType = $adjustment->{adjustType};
-		my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjType);
-
-		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$adjItem->{itemId},$itemIdx,$adjItem->{itemType}');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		push(@rows, qq{
-			<TR>
-				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjComments</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
-			</TR>
-			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-		});
-	}
-
-
-	#SIM/CURR ILLNESS DATES:
-	my $simDate = $claim->{treatment}->getDateOfSameOrSimilarIllness(DATEFORMAT_USA);	#{dateOfSameOrSimilarIllness};
-	my $currDate = $claim->{treatment}->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA);	#{dateOfIllnessInjuryPregnancy};
-
-	#DIAGS AND THEIR CAPTIONS:
-	my @allDiags = ();
-	foreach (@{$claim->{diagnosis}})
-	{
-		push(@allDiags, $_->getDiagnosis());
-	}
-
-	my $icdCaption = '';
-
-	foreach my $diag (@allDiags)
-	{
-		$icdCaption .= "$diag: ";
-		my $icdInfo = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericICDCode', $diag);
-
-		my $icdDescr = $icdInfo->{descr};
-		$icdDescr =~ s/\'/&quot;/g;
-		$icdCaption .= $icdDescr;
-		#$icdCaption .= $icdInfo->{descr};
-		$icdCaption .= "\n";
-	}
-
-
-	#INVOICE TOTALS
-	my $invoiceTotal = $claim->{totalInvoiceCharges};
-	$invoiceTotal = $formatter->format_price($invoiceTotal);
-
-	my $invoiceAdjustmentTotal = $claim->{amountPaid};
-	$invoiceAdjustmentTotal = $formatter->format_price($invoiceAdjustmentTotal);
-
-	my $invoiceBalance = $claim->{balance};
-	$invoiceBalance = $formatter->format_price($invoiceBalance);
-	my $balColor = $invoiceBalance >= 0 ? 'Green' : 'Darkred';
-
-	return qq{
-		<TABLE>
-			<TR VALIGN=TOP>
-				<TD>
-					<TABLE CELLPADDING=1 CELLSPACING=0 BGCOLOR=999999>
-						<TR VALIGN=TOP>
-							<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Current Illness</NOBR></TD>
-						</TR>
-						<TR>
-							<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>$currDate</TD>
-						</TR>
-						<TR VALIGN=TOP>
-							<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Similar Illness</NOBR></TD>
-						</TR>
-						<TR>
-							<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>$simDate</TD>
-						</TR>
-						<TR VALIGN=TOP>
-							<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Diagnoses</NOBR></TD>
-						</TR>
-						<TR>
-							<TD BGCOLOR=WHITE ALIGN=CENTER TITLE='$icdCaption'><FONT FACE="Arial,Helvetica" SIZE=2>@allDiags</TD>
-						</TR>
-					</TABLE>
-				</TD>
-				<TD>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
-						<TR BGCOLOR=EEEEEE>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Date</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Svc</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Diag</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Chg</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>EMG</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Expl Code</B></TD>
-						</TR>
-						@rows
-						<TR BGCOLOR=DDEEEE>
-							<TD COLSPAN=7><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
-							<TD COLSPAN=2 ALIGN="Left"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green"><B>$invoiceTotal</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>$invoiceAdjustmentTotal</B></TD>
-							<TD COLSPAN=4><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>&nbsp;</B></TD>
-						</TR>
-					</TABLE>
-				</TD>
-			</TR>
-		</TABLE>
-		};
+	return @rows;
 }
 
-sub getItemHtml
+sub createOtherItemsHtml
 {
-	my ($self, $claim, $itemId) = @_;
+	my ($self, $claim, $itemId, $inactive) = @_;
 	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
-
-	my @rows = ();
-
-	my $created = App::Universal::INVOICESTATUS_CREATED;
-	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
-	my $pending = App::Universal::INVOICESTATUS_PENDING;
-	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
-
 	my $invoiceId = $self->param('invoice_id');
-	my $invType = $claim->getInvoiceType();
-	my $claimType = $claim->getInvoiceSubtype();
-	my $invStatus = $claim->getStatus();
 
-
-	my $itemNum;
-	my $otherItem = undef;
-	my $totalOtherItems = scalar(@{$claim->{otherItems}});
-	foreach my $itemIdx (0..$totalOtherItems-1)
+	my $otherItem;
+	my @rows = ();
+	foreach my $itemIdx (0..scalar(@{$claim->{otherItems}})-1)
 	{
-		next if $itemId != $claim->{otherItems}->[$itemIdx]->{itemId};
 		$otherItem = $claim->{otherItems}->[$itemIdx];
-		$itemNum = $itemIdx + 1;
-	}
+		next if defined $itemId && $itemId != $otherItem->{itemId};
 
-	#my $itemId = $otherItem->{itemId};
-	my $itemType = $otherItem->{itemType};
-
-	my $itemExtCost = $otherItem->{extendedCost};
-	$itemExtCost = $formatter->format_price($itemExtCost);
-	my $itemAdjustmentTotal = $otherItem->{totalAdjustments};
-	$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
-	my $cmtRow = '';
-	if(my $comments = $otherItem->{comments})
-	{
-		$cmtRow = qq{
-			<TR>
-				<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD COLSPAN=11><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
-			</TR>
-		}
-	}
-
-	my $serviceFromDate;
-	my $serviceToDate;
-	if($itemType == App::Universal::INVOICEITEMTYPE_INVOICE)
-	{
-		$serviceFromDate = $otherItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$otherItem->{dateOfServiceFrom};
-		$serviceToDate = $otherItem->getDateOfServiceTo(DATEFORMAT_USA);	#$otherItem->{dateOfServiceTo};
-	}
-
-	push(@rows, qq{
-		<TR>
-			<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=3><B>$itemNum</B></TD>
-			<TD>&nbsp;</TD>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceFromDate @{[ $otherItem->{dateOfServiceTo} ne $otherItem->{dateOfServiceFrom} ? " - $serviceToDate" : '']} </TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{daysOrUnits}</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{cpt}</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Left"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{caption}</TD>
-			<TD>&nbsp;</TD>
-			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
-			<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-			 <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
-		</TR>
-		$cmtRow
-		<TR><TD COLSPAN=13><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-	});
-
-
-	#INVOICE TOTALS
-	my $invoiceTotal = $claim->{totalInvoiceCharges};
-	$invoiceTotal = $formatter->format_price($invoiceTotal);
-
-	my $invoiceAdjustmentTotal = $claim->{amountPaid};
-	$invoiceAdjustmentTotal = $formatter->format_price($invoiceAdjustmentTotal);
-
-	my $invoiceBalance = $claim->{balance};
-	$invoiceBalance = $formatter->format_price($invoiceBalance);
-	my $balColor = $invoiceBalance >= 0 ? 'Green' : 'Darkred';
-
-
-	return qq{
-		<TABLE>
-			<TR VALIGN=TOP>
-				<TD>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
-						<TR BGCOLOR=EEEEEE>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Dates</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Qty</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Description</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Charge</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
-						</TR>
-						@rows
-					</TABLE>
-				</TD>
-			</TR>
-		</TABLE>
-		};
-}
-
-sub getItemsHtml
-{
-	my ($self, $claim) = @_;
-	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
-
-	my @rows = ();
-
-	my $created = App::Universal::INVOICESTATUS_CREATED;
-	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
-	my $pending = App::Universal::INVOICESTATUS_PENDING;
-	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
-
-	my $invoiceId = $self->param('invoice_id');
-	my $invType = $claim->getInvoiceType();
-	my $claimType = $claim->getInvoiceSubtype();
-	my $invStatus = $claim->getStatus();
-
-	my $totalOtherItems = scalar(@{$claim->{otherItems}});
-	foreach my $itemIdx (0..$totalOtherItems-1)
-	{
-		my $otherItem = $claim->{otherItems}->[$itemIdx];
 		my $itemId = $otherItem->{itemId};
 		my $itemType = $otherItem->{itemType};
-
 		my $itemNum = $itemIdx + 1;
+		my $itemExtCost = $formatter->format_price($otherItem->{extendedCost});
+		my $itemAdjustmentTotal = $formatter->format_price($otherItem->{totalAdjustments});
+		my $viewPaymentHtml = ! defined $inactive ? "<a href=javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId,$itemIdx,$itemType');>$itemAdjustmentTotal</a>" : $itemAdjustmentTotal;
 
-		my $itemExtCost = $otherItem->{extendedCost};
-		$itemExtCost = $formatter->format_price($itemExtCost);
-		my $itemAdjustmentTotal = $otherItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$itemId,$itemIdx,$itemType');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		my $cmtRow = '';
+		my $cmtRow;
 		if(my $comments = $otherItem->{comments})
 		{
 			$cmtRow = qq{
@@ -907,8 +639,8 @@ sub getItemsHtml
 			}
 		}
 
-		my $serviceFromDate = $otherItem->getDateOfServiceFrom(DATEFORMAT_USA);	#$otherItem->{dateOfServiceFrom};
-		my $serviceToDate = $otherItem->getDateOfServiceTo(DATEFORMAT_USA);	#$otherItem->{dateOfServiceTo};
+		my $serviceFromDate = $otherItem->getDateOfServiceFrom(DATEFORMAT_USA);		#$otherItem->{dateOfServiceFrom};
+		my $serviceToDate = $otherItem->getDateOfServiceTo(DATEFORMAT_USA);			#$otherItem->{dateOfServiceTo};
 
 		push(@rows, qq{
 			<TR>
@@ -924,7 +656,6 @@ sub getItemsHtml
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			$cmtRow
@@ -932,80 +663,7 @@ sub getItemsHtml
 		});
 	}
 
-	my $totalAdjItems = scalar(@{$claim->{adjItems}});
-	foreach my $itemIdx (0..$totalAdjItems-1)
-	{
-		my $adjItem = $claim->{adjItems}->[$itemIdx];
-		my $itemNum = $itemIdx + 1;
-
-		my $adjustment = $adjItem->{adjustments}->[0];
-		my $adjComments = $adjustment->{comments};
-		my $adjType = $adjustment->{adjustType};
-		my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjType);
-
-		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
-		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/adjustment/$adjItem->{itemId},$itemIdx,$adjItem->{itemType}');";
-		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
-
-		push(@rows, qq{
-			<TR>
-				<TD COLSPAN=2>&nbsp;</TD>
-				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjComments</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
-			</TR>
-			<TR><TD COLSPAN=13><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
-		});
-	}
-
-
-	#INVOICE TOTALS
-	my $invoiceTotal = $claim->{totalInvoiceCharges};
-	$invoiceTotal = $formatter->format_price($invoiceTotal);
-
-	my $invoiceAdjustmentTotal = $claim->{amountPaid};
-	$invoiceAdjustmentTotal = $formatter->format_price($invoiceAdjustmentTotal);
-
-	my $invoiceBalance = $claim->{balance};
-	$invoiceBalance = $formatter->format_price($invoiceBalance);
-	my $balColor = $invoiceBalance >= 0 ? 'Green' : 'Darkred';
-
-
-	return qq{
-		<TABLE>
-			<TR VALIGN=TOP>
-				<TD>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
-						<TR BGCOLOR=EEEEEE>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Dates</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Qty</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Description</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Charge</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Adj</B></TD>
-						</TR>
-						@rows
-						<TR BGCOLOR=DDEEEE>
-							<TD COLSPAN=8><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
-							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green"><B>$invoiceTotal</B></TD>
-							<TD>&nbsp;</TD>
-							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>$invoiceAdjustmentTotal</B></TD>
-						</TR>
-					</TABLE>
-				</TD>
-			</TR>
-		</TABLE>
-		};
+	return @rows;
 }
 
 sub getHistoryHtml
@@ -1013,28 +671,10 @@ sub getHistoryHtml
 	my ($self, $claim) = @_;
 
 	my $invoiceId = $self->param('invoice_id');
-	#my $allStatusHistory = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selAllHistoryItems', $invoiceId);
 	my $historyItems = $claim->{invoiceHistoryItem};
 	my $historyCount = $claim->{historyCount};
 
 	my @rows = ();
-#	foreach my $item (@{$allStatusHistory})
-#	{
-#		push(@rows, qq{
-#			<TR VALIGN=TOP>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_date}</TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_text}</TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{cr_user_id}</TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_textb}</TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#			</TR>
-#		});
-#	}
-
-
 	foreach my $idx (0..$historyCount-1)
 	{
 		push(@rows, qq{
@@ -1115,7 +755,7 @@ sub prepare_dialog_procedure
 	my ($action, $itemId) = split(/,/, $dialogCmd);
 	$self->param('item_id', $itemId);
 
-	$self->addContent('<center><p>', $self->getProceduresHtml($claim), '</p></center>');
+	$self->addContent('<center><p>', $self->createLineItemsTableHtml($claim), '</p></center>');
 
 	my $cancelUrl = "/invoice/$invoiceId/summary";
 	my $dialog = new App::Dialog::Procedure(schema => $self->getSchema(), cancelUrl => $cancelUrl);
@@ -1250,105 +890,98 @@ sub prepare_view_summary
 	{
 		if($invType == $hcfaInvoiceType)
 		{
-
 			my $submissionOrder = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
 			$quickLinks = qq{
-					<TR>
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $submissionOrder->{value_int} == 0 ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure </a>
-							</FONT>
-						</TD>" : '' ]}
+				<TR>
+					@{[ $allDiags[0] ne '' && $invStatus < $submitted && $submissionOrder->{value_int} == 0 ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure </a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && ($claimType == $selfPay || $claimType == $thirdParty) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit'>Submit Claim for Billing</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $totalItems > 0 && ($claimType == $selfPay || $claimType == $thirdParty) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/submit'>Submit Claim for Billing</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && 
-							! ($beenTransferred) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit'>Submit Claim for Transfer</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $totalItems > 0 && $claimType != $selfPay && 
+						! ($beenTransferred) && ($invStatus < $submitted || $invStatus == $paymentApplied) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/submit'>Submit Claim for Transfer</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && 
-							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
-								$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted ) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit?resubmit=2'>Resubmit Claim for Transfer</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $totalItems > 0 && $claimType != $selfPay && 
+						( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
+							$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted ) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/submit?resubmit=2'>Resubmit Claim for Transfer</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && $claimType != $selfPay && 
-							( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
-								$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted || 
-								$invStatus == $awaitInsPayment  ) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit?resubmit=3'>Submit Claim for Transfer to Next Payer</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $totalItems > 0 && $claimType != $selfPay && 
+						( ($invStatus >= $rejectInternal && $invStatus <= $paper) || ($invStatus == $onHold && $beenTransferred) || 
+							$invStatus == $rejectExternal || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) || $invStatus == $paperPrinted || 
+							$invStatus == $awaitInsPayment  ) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/submit?resubmit=3'>Submit Claim for Transfer to Next Payer</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ ($invStatus != $onHold && $invStatus < $transferred) || (! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && $invStatus == $paymentApplied) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ ($invStatus != $onHold && $invStatus < $transferred) || (! ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) && $invStatus == $paymentApplied) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $appealed || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/hold?transferred=1'>Place Claim On Hold</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $appealed || ($invStatus == $paymentApplied && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/hold?transferred=1'>Place Claim On Hold</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void && $invStatus != $awaitClientPayment && 
-							($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
-							</FONT>
-						</TD>" : '' ]}
+					@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void && $invStatus != $awaitClientPayment && 
+						($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
+						</FONT>
+					</TD>" : '' ]}
 
-						@{[ $invStatus != $void  ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
-							</FONT>
-						</TD>" : '' ]}
-					</TR>
+					@{[ $invStatus != $void  ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
+						</FONT>
+					</TD>" : '' ]}
+				</TR>
 			};
 		}
 		elsif($invType == $genericInvoiceType)
 		{
 			$quickLinks = qq{
-					<TR>
-						<!-- <TD>
-							<FONT FACE="Arial,Helvetica" SIZE=2>
-							<a href="/">Update Invoice</a>
-							</FONT>
-						</TD> -->
-
-						@{[ $invStatus != $onHold ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
-							</FONT>
-						</TD>" : '' ]}
-						@{[ $invStatus != $void  ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Payment</a>
-							</FONT>
-						</TD>" : '' ]}
-					</TR>
+				<TR>
+					@{[ $invStatus != $onHold ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
+						</FONT>
+					</TD>" : '' ]}
+					@{[ $invStatus != $void  ?
+					"<TD>
+						<FONT FACE='Arial,Helvetica' SIZE=2>
+						<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Payment</a>
+						</FONT>
+					</TD>" : '' ]}
+				</TR>
 			};
 		}
 	}
@@ -1394,7 +1027,7 @@ sub prepare_view_summary
 			<TABLE CELLSPACING=1 CELLPADDING=2 BORDER=0>$quickLinks</TABLE>
 		</p>
 		<p>
-			@{[ $invType == $hcfaInvoiceType ? $self->getProceduresHtml($claim) : $self->getItemsHtml($claim) ]}
+			@{[ $self->createLineItemsTableHtml($claim) ]}
 		</p>
 		@{[ $invType == $hcfaInvoiceType ? $intellicodeHtml : '' ]}
 	});
@@ -1408,6 +1041,7 @@ sub prepare_view_adjustment
 
 	my $adjItemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $claim = $self->property('activeClaim');
+	#my $adjustment = $claim->{procedures}->[$i]->{adjustments}->[$x]->{ column };
 
 	my $viewItem = $self->param('_pm_item');
 	my ($itemId, $idx, $itemType) = split(/,/, $viewItem);
@@ -1424,7 +1058,7 @@ sub prepare_view_adjustment
 		<TABLE WIDTH=100% BGCOLOR=BEIGE CELLSPACING=0 CELLPADDING=3 BORDER=0>
 			<TD>
 				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					<B>Adjustments for Claim $invoiceId @{[ $itemType != $adjItemType && defined $idx ? ", Procedure $procNum" : '' ]}</B>
+					<B>Adjustments for Claim $invoiceId@{[ $itemType != $adjItemType && defined $idx ? ", Procedure $procNum" : '' ]}</B>
 				</FONT>
 			</TD>
 			<TD><a href='javascript:window.close()'><img src='/resources/icons/done.gif' border=0></a></TD>
@@ -1489,7 +1123,16 @@ sub prepare_view_adjustment
 		push(@{$self->{page_content}}, qq{
 			</TABLE>
 			<BR><BR>
-			@{[ $invoice->{invoice_type} == 0 ? $self->getProcedureHtml($claim, $itemId) : $self->getItemHtml($claim, $itemId) ]}
+			<TABLE>
+				<TR VALIGN=TOP>
+					<TD>
+						<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=1>
+							@{[ $self->createLineItemsHeadingHtml($claim) ]}
+							@{[ $invoice->{invoice_type} == 0 ? $self->createProcedureItemsHtml($claim, $itemId, 1) : $self->createOtherItemsHtml($claim, $itemId, 1) ]}
+						</TABLE>
+					</TD>
+				</TR>
+			</TABLE>
 		});
 	}
 
@@ -2155,8 +1798,8 @@ sub prepare_page_content_header
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/summary", 'summary'],
 			['HCFA 1500', "$urlPrefix/1500", '1500'],
-			['1500 PDF (PP)', "/invoice/$invoiceId/1500pdf", '1500pdf'],
-			['1500 PDF', "/invoice/$invoiceId/1500pdfplain", '1500pdfplain'],
+			['1500 PDF (PP)', "$urlPrefix/1500pdf", '1500pdf'],
+			['1500 PDF', "$urlPrefix/1500pdfplain", '1500pdfplain'],
 			$claimType == $workComp ? ['TWCC60 PDF', "/invoice-f/$invoiceId/twcc60pdf", 'twcc60pdf'] : undef,
 			$claimType == $workComp ? ['TWCC61 PDF', "/invoice-f/$invoiceId/twcc61pdf", 'twcc61pdf'] : undef,
 			$claimType == $workComp ? ['TWCC64 PDF', "/invoice-f/$invoiceId/twcc64pdf", 'twcc64pdf'] : undef,
