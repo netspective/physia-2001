@@ -200,7 +200,8 @@ sub new
 	$self->addFooter(
 		new CGI::Dialog::Buttons(
 			nextActions_add => [
-				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage", 1],
+				['', '', 1],
+				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage"],
 				['Go to Person Profile', "/person/%field.person_id%/profile"],
 				],
 			cancelUrl => $self->{cancelUrl} || undef,
