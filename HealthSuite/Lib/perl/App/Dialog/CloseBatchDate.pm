@@ -10,6 +10,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
+use App::Statements::Invoice;
 use Date::Manip;
 use Date::Calc qw(:all);
 use App::Statements::Org;
@@ -63,7 +64,8 @@ sub new
 		{
 			level => 1,
 			scope =>'org_attribute',
-			key => "#param.org_id#",
+			key => "#field.org_id#",
+			data => "Create Close Date Include Childern : #field.childern#"
 		};
 		$self->addFooter(new CGI::Dialog::Buttons);
 		return $self;
@@ -109,7 +111,11 @@ sub customValidate
 
 				if(Delta_Days($closeDateArray[0],$closeDateArray[1],$closeDateArray[2],$currentDataArray[0],$currentDataArray[1],$currentDataArray[2])!=-1)
 				{
-					$closeField->invalidate($page, qq{Close date '$closeDate' is not the next date after current close date '$item->{value_date}' for $item->{org_id} }); 
+					#Check if open date has open invoice assoicated
+					my $checkRec = $STMTMGR_INVOICE->recordExists($page, STMTMGRFLAG_NONE, 'selInvoiceTransaction', $_->{org_internal_id},$item->{value_date},$closeDate);
+					my $msg = qq{Close date '$closeDate' is not the next date after current close date '$item->{value_date}' for $item->{org_id} };
+					$msg =    qq{There are transactions on the open dates between '$item->{value_date}' and '$closeDate'} if ($checkRec);					
+					$closeField->invalidate($page,$msg); 					
 					$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE,0);									
 					$one++;
 				}	
