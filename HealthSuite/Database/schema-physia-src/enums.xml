@@ -254,6 +254,8 @@
 		<enum>Pre-payment</enum>
 		<enum>Deductible</enum>
 		<enum>Post-payment</enum>
+		<enum>Denied</enum>
+		<enum>COB</enum>
 	</table>
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
