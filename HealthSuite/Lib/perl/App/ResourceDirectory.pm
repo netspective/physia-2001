@@ -579,7 +579,7 @@ $SEARCH_CLASSES = {
 					_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
 	'health-rule' => {_class => 'App::Dialog::HealthMaintenance', heading => '$Command Health Maintenance Rule', _arl => ['rule_id']},
 	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
-	'phone-message' => {_class => 'App::Dialog::Attribute::PhoneMessage', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Phone Message', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-phmsg-' .App::Universal::ATTRTYPE_TEXT() },
+	'phone-message' => {_class => 'App::Dialog::Attribute::PhoneMessage', transType => App::Universal::TRANSTYPE_PC_TELEPHONE, heading => '$Command Phone Message', _arl => ['person_id'] , _arl_modify => ['trans_id'], _idSynonym => 'trans-' .App::Universal::TRANSTYPE_PC_TELEPHONE() },
 	'refill-request' => {_class => 'App::Dialog::Attribute::RefillRequest', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Refill Request', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-refillreq-' .App::Universal::ATTRTYPE_TEXT() },
 	'procedure' => 'App::Dialog::Procedure',
 	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
