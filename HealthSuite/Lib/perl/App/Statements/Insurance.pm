@@ -362,7 +362,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 					where owner_person_id = ?
 		},
 	'selDoesInsSequenceExists' => qq{
-						select *
+						select bill_sequence
 						from insurance
 						where owner_person_id = ?
 						and bill_sequence = ?
