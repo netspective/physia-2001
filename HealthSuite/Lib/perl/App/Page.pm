@@ -67,6 +67,7 @@ use constant MENU_APP_DEFAULT => [
 	["Main Menu", '/menu'],
 	["Work Lists", '/worklist'],
 	["Schedule Desk", '/schedule'],
+	["Query", '/query'],
 ];
 
 use constant MENU_APP_SUPPORT => [
@@ -126,7 +127,7 @@ sub new
 	$self->{page_menu_support} = MENU_APP_SUPPORT;
 	$self->{page_menu_sibling} = undef;
 	$self->{page_menu_siblingSelectorParam} = '';
-	
+
 	$self->{panemgr_header} = [];
 	$self->{panemgr_columns} = [];
 	$self->{panemgr_footer} = [];
@@ -158,7 +159,7 @@ sub recordActivity
 sub getInternalOrgId
 {
 	#my ($self,$orgId,$org_internal_id) = @_;
-	#$org_internal_id = $self->session('org_internal_id') if defined $org_internal_id;	
+	#$org_internal_id = $self->session('org_internal_id') if defined $org_internal_id;
 	#return $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $org_internal_id, $orgId);
 }
 
@@ -348,36 +349,44 @@ sub getMenu_Simple
 
 sub getMenu_Tabs
 {
-	my ($self, $flags, $selectorParamName, $items) = @_;
-	return $self->getMenu_Simple($flags, $selectorParamName, $items, '', 
+	my ($self, $flags, $selectorParamName, $items, $params) = @_;
+	$params = {} unless $params;
+	my $unselColor = $params->{unselColor} || '#126A97';
+	my $unselTextColor = $params->{unselTextColor} || 'white';
+	my $selColor = $params->{selColor} || '#dddddd';
+	my $selTextColor = $params->{selTextColor} || 'navy';
+	my $leftImage = $params->{leftImage} || 'images/design/tab-top-left-corner';
+	my $rightImage = $params->{rightImage} || 'images/design/tab-top-right-corner';
+	my $highColor = $params->{highColor} || 'yellow';
+	return $self->getMenu_Simple($flags, $selectorParamName, $items, '',
 		qq{
-			<td bgcolor="#126A97" width="3" valign="top"><img src="/resources/images/design/tab-top-left-corner.gif"/></td>
-			<td bgcolor="#126A97" height="16">
+			<td bgcolor="$unselColor" width="3" valign="top">$IMAGETAGS{$leftImage}</td>
+			<td bgcolor="$unselColor" height="16">
 			<nobr>
-			<font face="tahoma,helvetica" size="2" color="white" style="font-size: 8pt;">
+			<font face="tahoma,helvetica" size="2" color="$unselTextColor" style="font-size: 8pt;">
 			&nbsp;
-			<a style="color: white; text-decoration: none" href='%1' onmouseover='anchorMouseOver(this, "yellow")' onmouseout='anchorMouseOut(this, "white")'>%0</a>
+			<a style="color: $unselTextColor; text-decoration: none" href='%1' onmouseover='anchorMouseOver(this, "$highColor")' onmouseout='anchorMouseOut(this, "$unselTextColor")'>%0</a>
 			&nbsp;
 			</font>
 			</nobr>
 			</td>
-			<td bgcolor="#126A97" width="3" valign="top"><img src="/resources/images/design/tab-top-right-corner.gif"/></td>
-			<td width="2"></td>
+			<td bgcolor="$unselColor" width="3" valign="top">$IMAGETAGS{$rightImage}</td>
+			<td width="2">@{[getImageTag('design/transparent-line', {width => "2", height => 2})]}</td>
 		},
 		qq{
-			<td bgcolor="#dddddd" width="3" valign="top"><img src="/resources/images/design/tab-top-left-corner.gif"/></td>
-			<td bgcolor="#dddddd" height="16">
+			<td bgcolor="$selColor" width="3" valign="top">$IMAGETAGS{$leftImage}</td>
+			<td bgcolor="$selColor" height="16">
 			<nobr>
-			<font face="tahoma,helvetica" size="2" color="black" style="font-size: 8pt;">
+			<font face="tahoma,helvetica" size="2" color="$selTextColor" style="font-size: 8pt;">
 			&nbsp;
-			<b><a style="color: navy; text-decoration: none" href='%1'>%0</a></b>
+			<b><a style="color: $selTextColor; text-decoration: none" href='%1'>%0</a></b>
 			&nbsp;
 			</font>
 			</font>
 			</nobr>
 			</td>
-			<td bgcolor="#dddddd" width="3" valign="top"><img src="/resources/images/design/tab-top-right-corner.gif"/></td>
-			<td width="2"></td>
+			<td bgcolor="$selColor" width="3" valign="top">$IMAGETAGS{$rightImage}</td>
+			<td width="2">@{[getImageTag('design/transparent-line', {width => "2", height => 2})]}</td>
 		});
 }
 
@@ -426,7 +435,7 @@ sub getMenu_TwoLevelTable
 		push(@rows, "<TR><TD ALIGN=RIGHT>$mainHtml</TD><TD><FONT FACE='Arial,Helvetica' SIZE=2>@{[join($separator, @html)]}</FONT></TD>");
 
 	}
-	return "<TABLE>@rows</TABLE>";
+	return qq{<TABLE BORDER="0">@rows</TABLE>};
 }
 
 sub getMenu_ComboBox
@@ -481,21 +490,21 @@ sub getTextBoxHtml
 	$params{valign} ||= 'TOP';
 	$params{falign} ||= 'CENTER';
 
-	my $headingRow = $params{heading} ? qq{
-		<tr bgcolor="$params{hcolor}" valign=top>
-			<td ALIGN=$params{halign}><font face=arial color=yellow size=2><b>$params{heading}</font></font></td>
-		</tr>
-	} : '';
-	my $subHeadRow = $params{subhead} ? qq{
-		<tr>
-			<td ALIGN=$params{shalign}><font face=arial color=navy size=2><b>$params{subhead}</b></font></td>
-		</tr>
-	} : '';
-	my $footRow = $params{footer} ? qq{
-		<tr>
-			<td ALIGN=$params{falign}><font face=arial color=darkred size=2><b>$params{footer}</b></font></td>
-		</tr>
-	} : '';
+	my $headingRow = $params{heading} ?
+		qq{<tr bgcolor="$params{hcolor}" valign=top><td ALIGN=$params{halign}>
+			<font face=arial color=yellow size=2><b>$params{heading}</font></font>
+		</td></tr>}
+		: '';
+	my $subHeadRow = $params{subhead} ?
+		qq{<tr><td ALIGN=$params{shalign}>
+			<font face=arial color=navy size=2><b>$params{subhead}</b></font>
+		</td></tr>}
+		: '';
+	my $footRow = $params{footer} ?
+		qq{<tr><td ALIGN=$params{falign}>
+		<font face=arial color=darkred size=2><b>$params{footer}</b></font>
+		</td></tr>}
+		: '';
 
 	my $message = $params{message};
 	if(ref $params{messages} eq 'ARRAY')
@@ -510,26 +519,15 @@ sub getTextBoxHtml
 			$count++;
 			$message .= "<tr BGCOLOR=$color VALIGN=TOP><td><b>$count</b></td><td ALIGN=$params{align} VALIGN=$params{valign}>$msg</td></tr>";
 		}
-		$message = "<table cellpadding=10 cellspacing=0 width=100%>$message</table>";
+		$message = qq{<table cellpadding="10" cellspacing="0" border="0" width="100%">$message</table>};
 	}
 
 	return qq{
-		<table cellspacing=2 cellpadding=0 border=0 bgcolor="$params{hcolor}" width=$params{width}>
-			$headingRow
-			<tr><td>
-			<table cellpadding=0 cellspacing=0 border=0 width=100%>
-				$subHeadRow
-				<tr>
-					<td ALIGN=$params{align}>
-						<font face=arial size=2 color=black>
-						$message
-						</font>
-					</td>
-				</tr>
-				$footRow
-			</table>
-			</tr></td>
-		</table>
+		<table cellspacing="2" cellpadding="0" border="0" bgcolor="$params{hcolor}" width="$params{width}">$headingRow<tr><td><table cellpadding="0" cellspacing="0" border="0" width="100%">$subHeadRow<tr><td ALIGN="$params{align}">
+			<font face="arial" size="2" color="black">
+			$message
+			</font>
+		</td></tr>$footRow</table></tr></td></table>
 	};
 }
 
@@ -542,16 +540,17 @@ sub getLogStructHtml
 
 	if(my $items = $struct->{_items})
 	{
-		push(@rows, '<TABLE>');
+		push(@rows, '<TABLE BORDER="0">');
 		foreach (@$items)
 		{
-			push(@rows, qq{
-				<TR VALIGN=TOP>
-					<TD><FONT SIZE=2 FACE=Arial COLOR=DARKRED>$_->[1]</TD>
-					<TD><FONT SIZE=2 FACE=Arial COLOR=999999>$_->[2]</TD>
-					<TD><FONT SIZE=2 FACE=Arial>$_->[4]</TD>
-				</TR>
-				});
+			push(@rows,
+				qq{<TR VALIGN=TOP><TD>
+					<FONT SIZE=2 FACE=Arial COLOR=DARKRED>$_->[1]
+				</TD><TD>
+					<FONT SIZE=2 FACE=Arial COLOR=999999>$_->[2]
+				</TD><TD>
+					<FONT SIZE=2 FACE=Arial>$_->[4]
+				</TD></TR>});
 		}
 		push(@rows, '</TABLE>');
 	}
@@ -574,7 +573,7 @@ sub initialize
 {
 	my $self = shift;
 	$ENV{TZ} = $self->session('timezone');
-	
+
 	$self->addLocatorLinks(
 			["$IMAGETAGS{'images/icons/home-sm'} Home", '/home'],
 		);
@@ -592,7 +591,7 @@ sub getSecurityMessage
 		<p>
 		If you believe you should have access to this page, please contact Physia Customer Service and
 		give them the following information:
-		
+
 		<p>
 		<ul>
 			<li>User ID: <font face=Courier><b>#session.user_id#</b></font></li>
@@ -607,14 +606,14 @@ sub getSecurityMessage
 sub disable
 {
 	my $self = shift;
-	$self->setFlag(PAGEFLAG_ISDISABLED);	
+	$self->setFlag(PAGEFLAG_ISDISABLED);
 	$self->{_disabledMsg} = shift() . $self->getSecurityMessage();
 }
 
 
 sub send_page_header
 {
-	my $self = shift; 
+	my $self = shift;
 	my $html .= join(' ', @{$self->{page_head}});
 	if ( $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS )
 	{
@@ -638,6 +637,7 @@ sub send_page_header
 			a.head { text-decoration: none; }
 			a:hover { color : red; }
 			.required {background-image:url(/resources/icons/triangle-northeast-red.gif); background-position:top right; background-repeat:no-repeat;}
+			form { border: 0; margin: 0;}
 		</STYLE>
 		<TITLE>[Physia] #property._title#</TITLE>
 		@{[ $self->flagIsSet(PAGEFLAG_ISFRAMESET) ? $self->getFrameSet() : '' ]}
@@ -688,7 +688,7 @@ sub send_page_body
 	}
 
 	$self->replaceVars(\$html);
-	
+
 	$html = $self->component('sde-page-params-and-fields') . $html if $self->param('_debug_params');
 	$html = $self->component('sde-page-fields') . $html if $self->param('_debug_fields');
 	$html = $self->component('sde-page-session') . $html if $self->param('_debug_session');
@@ -799,10 +799,10 @@ sub prepare_page_content_header
 	my $self = shift;
 	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
 
-	my $resourceMap = $self->property('resourceMap');	
+	my $resourceMap = $self->property('resourceMap');
 	unless($self->{page_menu_sibling})
 	{
-		if (defined $resourceMap->{_views}) 
+		if (defined $resourceMap->{_views})
 		{
 			my $menu = ($self->{page_menu_sibling} = []);
 			my $urlPrefix = "/" . $self->param('arl_resource');
@@ -813,7 +813,7 @@ sub prepare_page_content_header
 			$self->{page_menu_siblingSelectorParam} = '_pm_view';
 		}
 	}
-	
+
 	unshift(@{$self->{page_content_header}}, qq{
 	<SCRIPT>
 		function anchorMouseOver(element, color)
@@ -828,57 +828,53 @@ sub prepare_page_content_header
 			element.style.textDecoration = 'none';
 		}
 	</SCRIPT>
-	<table cellspacing="0" cellpadding="0" bgcolor="#389cce" width="100%">
-		<tr>
-		<td width="100">$IMAGETAGS{'images/design/app-corporate-logo'}</td>
-		<td>
-			<font face="tahoma,arial" size="2" style="font-size:8pt" color="white">
-			$IMAGETAGS{'images/icons/home-sm'} <a href="/home" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'><b>#session.user_id#</b></a>@<a href="/homeorg" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'>#session.org_id#</a>
-			$IMAGETAGS{'images/icons/arrow-right-lblue'}
-			@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_app}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:white' onmouseover='anchorMouseOver(this, \"yellow\")' onmouseout='anchorMouseOut(this, \"white\")'>%0</A>" ) ]}
-			</font>
-		</td>
-		<td align="right"> 
-			<font face="tahoma,arial" size="2" style="font-size:8pt" color="yellow">
-			@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_support}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"yellow\")'>%0</A>" ) ]}
-			</font>
-		</td>
-		<td width="4"></td>
-		</tr>
-	</table>
-	<table cellspacing="0" cellpadding="0" bgcolor="#353365" width="100%">
-		<tr height="1" bgcolor="#ff9935"><td colspan="3"></td></tr>
-		<tr height="4"><td colspan="3"></td></tr>
-		<tr>
-			<td width="4"></td>
-			<td valign=top>
-				<font face="tahoma,arial" size="2" style="font-size:8pt" color="#ff9935">
-				@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links}, " $IMAGETAGS{'images/design/parent-separator'} ", "<A HREF='%1' style='text-decoration:none; color:#ff9935' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"#ff9935\")'>%0</A>" ) ]}
-				</font>
-			</td>
-			<td align="right" valign="bottom" rowspan=2>
-				@{[ $self->{page_menu_sibling} ? ('<table cellspacing="0" cellpadding="0"><tr>' . $self->getMenu_Tabs(MENUFLAGS_DEFAULT, $self->{page_menu_siblingSelectorParam}, $self->{page_menu_sibling}) . '</tr></table>') : '' ]}
-			</td>
-		</tr>
-		<tr height="2" bgcolor="#353365"><td colspan="2"></td></tr>
-		<tr height="2" bgcolor="#dddddd"><td colspan="3"></td></tr>
-	</table>
-	<table cellspacing="0" cellpadding="0" bgcolor="#353365" width="100%">
-		<tr bgcolor="#dddddd">
-			<td width="4"></td>
-			<td width=15>@{[ $IMAGETAGS{$resourceMap->{_iconMedium}} || $IMAGETAGS{'images/page-icons/default'} ]}</td>
-			<td valign=center>&nbsp;<b><font face="helvetica" size="4">@{[ $self->{page_heading} || $resourceMap->{_title} ]}</font></b></td>
-			<td align="right">
-				<font face="tahoma,arial,helvetica" style="font-size: 8pt" color="navy">
-				Updated @{[ UnixDate('today', '%a %b %d %i:%M %p') ]} @{[ $self->session('TZ') ]}
-				</font>
-				&nbsp;
-			</td>
-		</tr>
-		<tr height="2" bgcolor="#dddddd"><td colspan="4"></td></tr>
-		<!-- <tr height="1" bgcolor="#ff9935"><td colspan="3"></td></tr> -->
-	</table>
-	});
+	<table cellspacing="0" cellpadding="0" border="0" bgcolor="#389cce" width="100%"><tr><td width="100">
+		$IMAGETAGS{'images/design/app-corporate-logo'}<br>
+	</td><td>
+		<font face="tahoma,arial" size="2" style="font-size:8pt" color="white">
+		$IMAGETAGS{'images/icons/home-sm'} <a href="/home" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'><b>#session.user_id#</b></a>@<a href="/homeorg" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'>#session.org_id#</a>
+		$IMAGETAGS{'images/icons/arrow-right-lblue'}
+		@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_app}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:white' onmouseover='anchorMouseOver(this, \"yellow\")' onmouseout='anchorMouseOut(this, \"white\")'>%0</A>" ) ]}
+		</font>
+	</td><td align="right">
+		<font face="tahoma,arial" size="2" style="font-size:8pt" color="yellow">
+		@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_support}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"yellow\")'>%0</A>" ) ]}
+		&nbsp;&nbsp;
+		</font>
+	</td></tr></table>
+	<table cellspacing="0" cellpadding="0" border="0" bgcolor="#353365" width="100%"><tr height="1" bgcolor="#ff9935"><td colspan="3">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td></tr><tr height="4"><td colspan="3">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td></tr><tr><td width="4">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td><td valign=top>
+		<font face="tahoma,arial" size="2" style="font-size:8pt" color="#ff9935">
+		@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links}, " $IMAGETAGS{'images/design/parent-separator'} ", "<A HREF='%1' style='text-decoration:none; color:#ff9935' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"#ff9935\")'>%0</A>" ) ]}
+		</font>
+	</td><td align="right" valign="bottom" rowspan=2>
+		@{[ $self->{page_menu_sibling} ? ('<table cellspacing="0" cellpadding="0" border="0"><tr>' . $self->getMenu_Tabs(MENUFLAGS_DEFAULT, $self->{page_menu_siblingSelectorParam}, $self->{page_menu_sibling}) . '</tr></table>') : '' ]}
+	</td></tr><tr height="2" bgcolor="#353365"><td colspan="2">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td></tr><tr height="2" bgcolor="#dddddd"><td colspan="3">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td></tr></table>
+	<table cellspacing="0" cellpadding="0" border="0" bgcolor="#353365" width="100%"><tr bgcolor="#dddddd"><td width="4">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td><td width=15>
+		@{[ $IMAGETAGS{$resourceMap->{_iconMedium}} || $IMAGETAGS{'images/page-icons/default'} ]}
+	</td><td valign=center>
+		&nbsp;<b><font face="helvetica" size="4">@{[ $self->{page_heading} || $resourceMap->{_title} ]}</font></b>
+	</td><td align="right">
+		<font face="tahoma,arial,helvetica" style="font-size: 8pt" color="navy">
+		Updated @{[ UnixDate('today', '%a %b %d %i:%M %p') ]} @{[ $self->session('TZ') ]}
+		</font>
+		&nbsp;
+	</td></tr><tr height="2" bgcolor="#dddddd"><td colspan="4">@{[
+		getImageTag('design/transparent-line', {width => "100%", height => 1})
+	]}</td></tr><!-- <tr height="1" bgcolor="#ff9935"><td colspan="3">
+		&nbsp;
+	</td></tr> --></table>});
 }
 
 sub prepare_page_content_footer
@@ -971,7 +967,7 @@ sub prepare_stdAction_dialog
 		($self->param('_dlgId'), $self->param('_dlgCmd'), $self->param('_dlgParamStartIndex'));
 	my $dlgPrefix = &App::ResourceDirectory::DIALOG_RESOURCE_PREFIX;
 	$self->addContent('<BR>');
-	
+
 	my $permissionName = "dlg/$dlgId/$dlgCmd";
 	if (!$self->hasPermission($permissionName))		# Check permission to the dialog
 	{
@@ -1051,7 +1047,7 @@ sub prepare_stdAction_component
 		my @pathItems = $self->param('arl_pathItems');
 		if($pathItems[$arlIndex] =~ /^dlg\-(.*?)\-(.*)$/)
 		{
-			
+
 			$self->prepare_stdAction_dialog($2, $1, $arlIndex+1);
 			$self->addContent('<BR><CENTER>',
 				ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0),
@@ -1181,8 +1177,8 @@ sub homeArl
 sub constant
 {
 	my ($self, $name) = @_;
-	
-	no strict 'refs';	
+
+	no strict 'refs';
 	return defined &{"App::Universal::$name"} ? &{"App::Universal::$name"} : "Constant '$name' not found!";
 
 }
