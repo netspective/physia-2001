@@ -31,6 +31,11 @@
 			when checked, sends an ASCII copy of the report to the selected printer while
 			simultaneously displaying the regular onscreen report.
 		</deliverable>	
+		<deliverable id="358">
+			Added Contract Catalog component and dialogs to app.  
+			UI : The Catalog Page now has sub-tabs for Fee Schedules and Contract and the ability to add edit.  
+			Testing of the Fee Schedules and the contracts should be done since the change could impact either
+		</deliverable>	
 
 	</deliverables>
 </release-notes>
