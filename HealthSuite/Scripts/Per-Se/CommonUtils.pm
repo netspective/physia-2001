@@ -8,6 +8,12 @@ use App::Configuration;
 use DBI::StatementManager;
 use App::Statements::BillingStatement;
 
+use constant NSFDEST_ARRAY => 0;
+use constant NSFDEST_FILE  => 1;
+use constant NSF_HALLEY    => '0';
+use constant NSF_ENVOY     => '1';
+use constant NSF_THIN      => '2';
+
 sub connectDB
 {
 	my $page = new App::Data::MDL::Module();

@@ -1,13 +1,18 @@
 
 use strict;
 
-use vars qw(%billId @EXPORT);
+use vars qw(%orgList @EXPORT);
 use base qw(Exporter);
 
-@EXPORT = qw(%billId);
+use CommonUtils;
 
-%billId = (
-	2   => 'phy169',
+@EXPORT = qw(%orgList);
+
+%orgList = (
+	2 => {
+		billingId => 'phy169',
+		nsfType => NSF_HALLEY,
+	},
 );
 
 1;

@@ -13,12 +13,6 @@ use App::Billing::Claims;
 use App::Billing::Input::DBI;
 use App::Billing::Output::NSF;
 
-use constant NSFDEST_ARRAY => 0;
-use constant NSFDEST_FILE  => 1;
-use constant NSF_HALLEY    => '0';
-use constant NSF_ENVOY     => '1';
-use constant NSF_THIN      => '2';
-
 # Config Params
 # ----------------------------------------------------------
 my $EDIHOST = $ENV{TESTMODE} ? 'gamma' : 'depot.medaphis.com';
@@ -42,21 +36,22 @@ sub createNSFfiles
 {
 	my ($page) = @_;
 
-	for my $orgInternalId (keys %billId)
+	for my $orgInternalId (keys %orgList)
 	{
+		my $nsfType = $orgList{$orgInternalId}->{nsfType};
 		my $claims = findSubmittedClaims($page, $orgInternalId);
-		createNSFfile($page, $orgInternalId, $claims) if defined $claims;
+		createNSFfile($page, $orgInternalId, $nsfType, $claims) if defined $claims;
 	}
 }
 
 sub createNSFfile
 {
-	my ($page, $orgInternalId, $claims) = @_;
+	my ($page, $orgInternalId, $nsfType, $claims) = @_;
 
 	my $claimList = new App::Billing::Claims;
 	my $input = new App::Billing::Input::DBI;
 
-	my $nsfFile = $billId{$orgInternalId} . '_' . $now . '.nsf';
+	my $nsfFile = $orgList{$orgInternalId}->{billingId} . '_' . $now . '.nsf';
 
 	$input->populateClaims($claimList,
 		dbiHdl => $page->getSchema()->{dbh},
@@ -70,7 +65,7 @@ sub createNSFfile
 		outArray => \@outArray,
 		outFile => $nsfFile,
 		claimList => $claimList,
-		nsfType => NSF_HALLEY,
+		nsfType => $nsfType,
 		FLAG_STRIPDASH => '1',
 	);
 
@@ -120,9 +115,9 @@ sub transmitNSFfiles
 
 sub archiveNSFfiles
 {
-	for my $orgInternalId (keys %billId)
+	for my $orgInternalId (keys %orgList)
 	{
-		my $stem = $billId{$orgInternalId};
+		my $stem = $orgList{$orgInternalId}->{billingId};
 
 		system(qq{
 			cd $STAGINGDIR
