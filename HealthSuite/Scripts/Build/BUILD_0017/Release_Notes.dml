@@ -313,6 +313,10 @@
 			 Fixed My Associated Resources in Patients component by correcting the dialog it calls and the query to display data.
 		</deliverable>
 
+		<deliverable id="1644">
+			Fixed permissions to allow view Physician's schedule from the Patient
+			Flow Worklist.
+		</deliverable>
 	</deliverables>
 </release-notes>
 
