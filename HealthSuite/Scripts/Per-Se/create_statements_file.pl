@@ -27,6 +27,8 @@ use App::Statements::BillingStatement;
 use Date::Manip;
 use IO::File;
 
+use Dumpvalue;
+
 my $TODAY = UnixDate('today', '%m/%d/%Y');
 my $currencyFormat = "\$%.2f";
 
@@ -85,6 +87,12 @@ sub writeStatementsFile
 		}
 		
 		writeRecord($fileHandle, $footerFormat, getFooterRecord($statement));
+	}
+	
+	if ($ENV{DEBUGMODE})
+	{
+		my $dv = new Dumpvalue;
+		$dv->dumpValue($statements);
 	}
 }
 
@@ -145,12 +153,15 @@ sub getFooterRecord
 {
 	my ($statement) = @_;
 	
+	my $billingPhone = getBillingPhone($statement->{payToId});
+	
 	return (
 		'F',
 		$statement->{statementId},
 		getPersonAddress($statement->{billingProviderId}),
 		'PAYMENT DUE UPON RECEIPT',
-		'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS',
+		$billingPhone ? "Please call $billingPhone with any questions." 
+			: 'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS',
 		numToStr($statement->{agingCurrent}),
 		numToStr($statement->{aging30}),
 		numToStr($statement->{aging60}),
@@ -160,6 +171,16 @@ sub getFooterRecord
 	);
 }
 
+sub getBillingPhone
+{
+	my ($orgInternalId) = @_;
+	
+	my $billingPhone = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_NONE, 
+		'sel_billingPhone', $orgInternalId);
+	
+	return $billingPhone;
+}
+
 sub getOrgAddress
 {
 	my ($orgInternalId) = @_;
@@ -167,7 +188,9 @@ sub getOrgAddress
 	my $org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddress', $orgInternalId);
 	if (defined $org)
 	{
-		return ($org->{name_primary} || ' ', $org->{line1} || ' ', $org->{line2} || ' ', 
+		my $primaryName = $org->{name_primary};
+		$primaryName =~ s/\s/ /g;
+		return ($primaryName || ' ', $org->{line1} || ' ', $org->{line2} || ' ', 
 			$org->{city} || ' ', $org->{state} || ' ', $org->{zip} || ' ');
 	}
 	else

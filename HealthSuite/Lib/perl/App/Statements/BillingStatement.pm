@@ -81,6 +81,13 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
 		order by invoice_id
 	},
+
+	'sel_billingPhone' => qq{
+		select value_text 
+		from Org_Attribute 
+		where parent_id = :1 
+			and value_type = @{[ App::Universal::ATTRTYPE_BILLING_PHONE ]}
+	}
 		
 );
 	
