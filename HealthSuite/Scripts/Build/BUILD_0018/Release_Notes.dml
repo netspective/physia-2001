@@ -212,6 +212,10 @@
 			Removed diagnoses dialog from claim summary.
 		</deliverable>
 
+		<deliverable id="1837">
+			Fixed misspelled field name to allow adding of a Referring Doctor.
+		</deliverable>
+
 		<deliverable id="1841">
 			Fixed code to add the ShortFormPerson record correctly.
 		</deliverable>
