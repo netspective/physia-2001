@@ -2300,7 +2300,7 @@ sub execute
 	}
 	else
 	{
-		voidProcedure($self, $page, $command, $flags);
+		voidInvoiceItem($page, $invoiceId, $page->param('item_id'));
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
 }
@@ -2524,66 +2524,6 @@ sub createExplosionItems
 				_debug => 0
 		);
 	}
-}
-
-sub voidProcedure
-{
-	my ($self, $page, $command, $flags) = @_;
-
-	my $sessUser = $page->session('user_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	my $invoiceId = $page->param('invoice_id');
-	my $itemId = $page->param('item_id');
-	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
-
-	my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
-	my $extCost = 0 - $invItem->{extended_cost};
-	my $emg = $invItem->{emergency};
-	my $cptCode = $invItem->{code};
-	my $servPlace = $invItem->{hcfa_service_place};
-	my $servType = $invItem->{hcfa_service_type};
-
-	my $voidItemId = $page->schemaAction(
-			'Invoice_Item', 'add',
-			parent_item_id => $itemId || undef,
-			parent_id => $invoiceId,
-			item_type => defined $voidItemType ? $voidItemType : undef,
-			flags => $invItem->{flags} || undef,
-			code => $cptCode || undef,
-			code_type => $invItem->{code_type} || undef,
-			caption => $invItem->{caption} || undef,
-			modifier => $invItem->{modifier} || undef,
-			rel_diags => $invItem->{rel_diags} || undef,
-			unit_cost => $invItem->{unit_cost} || undef,
-			quantity => $invItem->{quantity} || undef,
-			extended_cost => defined $extCost ? $extCost : undef,
-			emergency => defined $emg ? $emg : undef,
-			hcfa_service_place => defined $servPlace ? $servPlace : undef,
-			hcfa_service_type => defined $servType ? $servType : undef,
-			service_begin_date => $invItem->{service_begin_date} || undef,
-			service_end_date => $invItem->{service_end_date} || undef,
-			parent_code => $invItem->{parent_code} || undef,
-			data_text_a => $invItem->{data_text_a} || undef,
-			data_text_c => $invItem->{data_text_c} || undef,
-			data_num_a => $invItem->{data_num_a} || undef,
-			#data_num_b => $invItem->{data_num_b} || undef,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId || undef,
-			data_text_b => 'void',
-			_debug => 0
-		);
-
-
-
-	## ADD HISTORY ITEM
-	addHistoryItem($page, $invoiceId,
-		value_text => "Voided $cptCode",
-		value_date => $todaysDate,
-	);
 }
 
 1;

@@ -83,6 +83,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'provider_pair'), # for hosp claims, the service and billing provider ids are concatenated and checked in the handleProcedureItems function
+		new CGI::Dialog::Field(type => 'hidden', name => 'isLastHospClaim'), # for hosp claims, if last claim created, redirect to its claim summary
 
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
@@ -1030,9 +1031,16 @@ sub handlePayers
 				$page->field('care_provider_id', $servProviderId);
 				$page->field('provider_id', $billProviderId);
 				$page->field('provider_pair', $providerPair);
+				if($line == $lineCount)
+				{
+					$page->field('isLastHospClaim', 1);
+				}
 				addTransactionAndInvoice($self, $page, $command, $flags);
 			}
 		}
+
+		my $patientId = $page->field('attendee_id');
+		$page->redirect("/person/$patientId/account");
 	}
 	else
 	{
@@ -1734,7 +1742,13 @@ sub handleBillingInfo
 		);
 	}
 
-	setCurrentPayer($self, $page, $invoiceId, $billId);
+
+	#set current payer
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId,
+		billing_id => $billId,
+	);
 
 
 	#redirect to next function according to copay due
@@ -1748,62 +1762,54 @@ sub handleBillingInfo
 		#delete copay item if claim is updated to a non-cap claim type
 		if($copayItemId && $copayItem->{data_text_b} ne 'void')
 		{
-			voidProcedureItem($self, $page, $command, $flags, $invoiceId, $copayItemId);
+			voidInvoiceItem($page, $invoiceId, $copayItemId);
 		}
 	}
+	
 
-	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
+	unless($page->param('isHosp') == 1)
 	{
-		my $lineCount = $page->param('_f_line_count');
-		my $existsOfficeVisitCPT;
-		for(my $line = 1; $line <= $lineCount; $line++)
+		if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 		{
-			if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
+			my $lineCount = $page->param('_f_line_count');
+			my $existsOfficeVisitCPT;
+			for(my $line = 1; $line <= $lineCount; $line++)
 			{
-				$existsOfficeVisitCPT = 1;
+				if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
+				{
+					$existsOfficeVisitCPT = 1;
+				}
+			}
+
+			if($existsOfficeVisitCPT)
+			{
+				billCopay($self, $page, $command, $flags, $invoiceId);
+			}
+			elsif($command eq 'add')
+			{
+				$self->handlePostExecute($page, $command, $flags);
+			}
+			else
+			{
+				$page->redirect("/invoice/$invoiceId/summary");
 			}
 		}
-
-		if($existsOfficeVisitCPT)
+		elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
 		{
-			billCopay($self, $page, $command, $flags, $invoiceId);
+			if ($page->param('encounterDialog') eq 'checkout')
+			{
+				$self->handlePostExecute($page, $command, $flags);
+			}
+			else
+			{
+				$page->redirect("/invoice/$invoiceId/summary");
+			}
 		}
 		elsif($command eq 'add')
 		{
 			$self->handlePostExecute($page, $command, $flags);
 		}
-		else
-		{
-			$page->redirect("/invoice/$invoiceId/summary");
-		}
 	}
-	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
-	{
-		if ($page->param('encounterDialog') eq 'checkout')
-		{
-			$self->handlePostExecute($page, $command, $flags);
-		}
-		else
-		{
-			$page->redirect("/invoice/$invoiceId/summary");
-		}
-	}
-	elsif($command eq 'add')
-	{
-		$self->handlePostExecute($page, $command, $flags);
-	}
-}
-
-sub setCurrentPayer
-{
-	my ($self, $page, $invoiceId, $billId) = @_;
-
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		billing_id => $billId,
-	);
-
 }
 
 sub billCopay
@@ -1850,7 +1856,7 @@ sub billCopay
 	$page->param('invoice_id', $invoiceId) if $command eq 'add';
 
 	my $invoiceFlags = $page->field('invoice_flags');
-	if( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
+	if($command eq 'update' || ($command eq 'add' && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR))
 	{
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
@@ -1916,7 +1922,7 @@ sub handleProcedureItems
 				my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
 				foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
 				{
-					voidProcedureItem($self, $page, $command, $flags, $invoiceId, $prevExplCodeItem->{item_id});
+					voidInvoiceItem($page, $invoiceId, $prevExplCodeItem->{item_id});
 				}
 				$command = 'add';
 			}
@@ -1929,7 +1935,7 @@ sub handleProcedureItems
 			my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
 			foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
 			{
-				voidProcedureItem($self, $page, $command, $flags, $invoiceId, $prevExplCodeItem->{item_id});
+				voidInvoiceItem($page, $invoiceId, $prevExplCodeItem->{item_id});
 			}
 			$command = 'add';
 		}
@@ -1941,13 +1947,13 @@ sub handleProcedureItems
 				my $explCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $cptCode);
 				foreach my $explCodeItem (@{$explCodeInvItems})
 				{
-					voidProcedureItem($self, $page, $command, $flags, $invoiceId, $explCodeItem->{item_id});
+					voidInvoiceItem($page, $invoiceId, $explCodeItem->{item_id});
 				}
 				next;
 			}
 			else
 			{
-				voidProcedureItem($self, $page, $command, $flags, $invoiceId, $itemId);
+				voidInvoiceItem($page, $invoiceId, $itemId);
 				next;
 			}
 		}
@@ -2063,62 +2069,6 @@ sub handleExplosionItems
 			);
 		}
 	}
-}
-
-sub voidProcedureItem
-{
-	my ($self, $page, $command, $flags, $invoiceId, $itemId) = @_;
-
-	my $sessUser = $page->session('user_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
-
-	my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
-	my $extCost = 0 - $invItem->{extended_cost};
-	my $itemBalance = $extCost + $invItem->{total_adjust};
-	my $emg = $invItem->{emergency};
-	my $cptCode = $invItem->{code};
-	my $voidItemId = $page->schemaAction(
-			'Invoice_Item', 'add',
-			parent_item_id => $itemId || undef,
-			parent_id => $invoiceId,
-			item_type => defined $voidItemType ? $voidItemType : undef,
-			flags => $invItem->{flags} || undef,
-			code => $cptCode || undef,
-			code_type => $invItem->{code_type} || undef,
-			caption => $invItem->{caption} || undef,
-			modifier => $invItem->{modifier} || undef,
-			rel_diags => $invItem->{rel_diags} || undef,
-			unit_cost => $invItem->{unit_cost} || undef,
-			quantity => $invItem->{quantity} || undef,
-			extended_cost => defined $extCost ? $extCost : undef,
-			emergency => defined $emg ? $emg : undef,
-			#comments => $comments || undef,
-			hcfa_service_place => defined $invItem->{hcfa_service_place} ? $invItem->{hcfa_service_place} : undef,
-			hcfa_service_type => defined $invItem->{hcfa_service_type} ? $invItem->{hcfa_service_type} : undef,
-			service_begin_date => $invItem->{service_begin_date} || undef,
-			service_end_date => $invItem->{service_end_date} || undef,
-			parent_code => $invItem->{parent_code} || undef,
-			data_text_a => $invItem->{data_text_a} || undef,
-			data_text_c => $invItem->{data_text_c} || undef,
-			data_num_a => $invItem->{data_num_a} || undef,
-			#data_num_b => $invItem->{data_num_b} || undef,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId || undef,
-			data_text_b => 'void',
-			_debug => 0
-		);
-
-
-	## add history item
-	addHistoryItem($page, $invoiceId,
-		value_text => "Voided $cptCode",
-		value_date => $todaysDate,
-	);
 }
 
 sub customValidate
