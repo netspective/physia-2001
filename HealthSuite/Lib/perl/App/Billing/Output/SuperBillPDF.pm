@@ -185,7 +185,7 @@ sub box1f
 			texts =>
 				[
 					{
-						'text' => "DATE" . SPC x 20 . "TIME"  . SPC x 8 . "PATIENT"  . SPC x 80 .  "REASON",
+						'text' => "DATE" . SPC x 20 . "TIME"  . SPC x 8 . "PATIENT"  . SPC x 60 .  "REASON",
 						'fontWidth' => 6,
 						'x' => $x,
 						'y' => $y
@@ -197,6 +197,7 @@ sub box1f
 	$self->boxData($p, $x, $y, $report, $superBill->getDate, 0, 10);
 	$self->boxData($p, $x, $y, $report, $superBill->getTime, 45, 10);
 	$self->boxData($p, $x, $y, $report, $superBill->{patient}->getName, 76, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->getReason, 204, 10);
 
 }
 
@@ -209,7 +210,7 @@ sub box2f
 			texts =>
 				[
 					{
-						'text' => "  CKET" . SPC x 15 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 14 . "LOCATION"  . SPC x 59 . "DOB"  ,
+						'text' => "  CKET" . SPC x 13 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 16 . "LOCATION"  . SPC x 59 . "DOB"  ,
 						'fontWidth' => 6,
 						'x' => $x,
 						'y' => $y
@@ -218,7 +219,7 @@ sub box2f
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
 #	$self->boxData($p, $x, $y, $report, $superBill->{doctor}->getId, 45, 10);
-	$self->boxData($p, $x, $y, $report, $superBill->{doctor}->getName, 45, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{doctor}->getName, 40, 10);
 	$self->boxData($p, $x, $y, $report, $superBill->{location}->getName, 120, 10);
 	$self->boxData($p, $x, $y, $report, $superBill->{patient}->getDateOfBirth(1), 250, 10);
 

@@ -112,7 +112,8 @@ sub populateSuperBillAndPatient
 
 			$superBill->setDate($rowMain->{start_date});
 			$superBill->setTime($rowMain->{start_time});
-
+			$superBill->setReason($rowMain->{subject});
+			
 			# patient info
 
 			my $patient = new App::Billing::Claim::Person;

@@ -18,7 +18,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 		{
 			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :3, 'HH24:MI') as start_time
+				to_char(e.start_time - :3, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea
 			where e.event_id = ea.parent_id
 			and owner_id = :4
@@ -28,7 +28,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 			union
 			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :3, 'HH24:MI') as start_time
+				to_char(e.start_time - :3, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea, appt_type apt
 			where e.event_id = ea.parent_id
 			and owner_id = :4
@@ -45,7 +45,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 		{
 			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :3, 'HH24:MI') as start_time
+				to_char(e.start_time - :3, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea
 			where e.event_id = ea.parent_id
 			and owner_id = :4
@@ -56,7 +56,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 			union
 			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :3, 'HH24:MI') as start_time
+				to_char(e.start_time - :3, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea, appt_type apt
 			where e.event_id = ea.parent_id
 			and owner_id = :4
@@ -74,7 +74,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 		{
 			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :2, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :2, 'HH24:MI') as start_time
+				to_char(e.start_time - :2, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea
 			where e.event_id = :1
 			and e.event_id = ea.parent_id
@@ -83,7 +83,7 @@ $STMTMGR_REPORT_SUPERBILL = new App::Statements::Report::SuperBill (
 			union
 			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
 				to_char(e.start_time - :2, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
-				to_char(e.start_time - :2, 'HH24:MI') as start_time
+				to_char(e.start_time - :2, 'HH24:MI') as start_time, e.subject
 			from event e, event_attribute ea, appt_type apt
 			where e.event_id = :1
 			and e.event_id = ea.parent_id

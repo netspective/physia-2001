@@ -16,7 +16,8 @@ sub new
 	$params{doctor} = undef; # person object
 	$params{location} = undef; # organization object
 	$params{insurance} = undef; # organization object
-
+	$params{reason} = undef;
+	
 	$params{superBillComponents} = [];
 
 	return bless \%params, $type;
@@ -116,6 +117,18 @@ sub getInsurance
 {
 	my ($self) = @_;
 	return $self->{insurance};
+}
+
+sub setReason
+{
+	my ($self, $value) = @_;
+	$self->{reason} = $value;
+}
+
+sub getReason
+{
+	my ($self) = @_;
+	return $self->{reason};
 }
 
 sub addSuperBillComponent
