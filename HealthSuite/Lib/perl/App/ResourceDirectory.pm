@@ -79,6 +79,8 @@ use App::Component::Navigate::FileSys;
 use App::Component::WorkList;
 use App::Component::ResourceSelector;
 use App::Component::FacilitySelector;
+use App::Component::SDE;
+
 
 ##############################################################################
 # Directory of all available Dialog Objects
@@ -167,7 +169,15 @@ use App::Dialog::FeeScheduleDataEntry;
 # page and dialog objects
 ##############################################################################
 
-use vars qw(@CHANGELOG %PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES %COMPONENT_CATALOG %PAGE_FLAGS);
+use vars qw(@CHANGELOG %PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES 
+	%COMPONENT_CATALOG %PAGE_FLAGS %COMPONENT_CATALOG_SOURCE);
+	
+#
+# the following hash is create to keep track of "how" components
+# are created or accessed (for logging, debugging, etc)
+#
+%COMPONENT_CATALOG_SOURCE = (
+);
 
 %STATEMENTMGR_CLASSES = (
 	'catalog' => $STMTMGR_CATALOG,
@@ -637,6 +647,7 @@ foreach (@{$COMPONENT_CATALOG{_autoCreate}})
 			$compId = "$1-$2";
 			die "Statement '$key' creates a duplicate component ID" if exists $COMPONENT_CATALOG{$compId};
 			$COMPONENT_CATALOG{$compId} = $value;
+			$COMPONENT_CATALOG_SOURCE{$compId} = [App::Universal::COMPONENTTYPE_STATEMENT, $compId, $stmtMgr, $2];
 		}
 	}
 }
@@ -645,6 +656,7 @@ while(my($key, $value) = each %CGI::Component::DIRECTORY)
 {
 	die "Duplicate component ID '$key'" if exists $COMPONENT_CATALOG{$key};
 	$COMPONENT_CATALOG{$key} = $value;
+	$COMPONENT_CATALOG_SOURCE{$key} = [App::Universal::COMPONENTTYPE_CLASS, $key, $value];
 }
 
 ##############################################################################
