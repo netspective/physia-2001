@@ -48,7 +48,12 @@ sub populateSuperBillAndPatient
 	if($superBillID ne '')
 	{
 
-		my $orgInternalId = 2; #$page->session('org_internal_id');
+		my $orgInternalId = $params{orgInternalID};
+
+		if($orgInternalId eq '')
+		{
+			$orgInternalId = $page->session('org_internal_id');
+		}
 
 		my $orgInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'orgInfo', $orgInternalId);
 
@@ -63,7 +68,7 @@ sub populateSuperBillAndPatient
 		$superBill->setDoctor($doctor);
 		my $org = new App::Billing::Claim::Organization;
 		$superBill->setLocation($org);
-		$self->populateSuperBillComponent($superBill, $superBillID);
+		$self->populateSuperBillComponent($superBill, $superBillID, $page);
 		$superBills->addSuperBill($superBill);
 	}
 	else
