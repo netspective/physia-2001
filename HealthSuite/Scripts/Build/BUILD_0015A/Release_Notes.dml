@@ -18,6 +18,15 @@
 			UI:  Appointment Type Lookup.
 		</deliverable>
 
+		<deliverable id="1246">
+			Changed the activity logs in some of the dialogs to showup the correct message
+		</deliverable>
+
+		<deliverable id="767">
+			UI: Changed the field 'Cancel Remarks' to 'Cancel Reason' which is now a drop-downlist consisting 
+			    of the list of reasons for cancelling the appointment
+		</deliverable>		
+		
 	</deliverables>
 </release-notes>
 
