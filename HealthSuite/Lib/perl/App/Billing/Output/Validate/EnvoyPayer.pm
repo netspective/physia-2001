@@ -7,7 +7,6 @@ use vars qw(@ISA %PAYERSMAP);
 use App::Billing::Claim;
 use App::Billing::Claims;
 use App::Billing::Validator;
-use Devel::ChangeLog;
 use Benchmark;
 
 

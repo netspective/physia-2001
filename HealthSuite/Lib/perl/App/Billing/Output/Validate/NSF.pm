@@ -7,7 +7,6 @@ use App::Billing::Claim;
 use App::Billing::Claims;
 use App::Billing::Validator;
 require App::Billing::Locale::USCodes;
-use Devel::ChangeLog;
 use Benchmark;
 
 
