@@ -31,6 +31,12 @@ sub new
 				options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
 				),
 		new CGI::Dialog::Field(
+				caption => 'Login Type',
+				name => 'categories',
+				type => 'select',
+				options => FLDFLAG_REQUIRED
+				),
+		new CGI::Dialog::Field(
 				name => 'password', caption => 'Password', type => 'password',
 				onValidate => \&validatePassword, onValidateData => $self,
 				options => FLDFLAG_REQUIRED | FLDFLAG_HOME,
@@ -121,7 +127,23 @@ sub makeStateChanges
 	$page->setFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 	$page->property('login_status', App::Page::LOGINSTATUS_DIALOG);
 	$self->setFieldFlags('clear_sessions', FLDFLAG_INVISIBLE);
+	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
+	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
+	my @loginTypes = '';
+	foreach my $category(@{$categories})
+	{
+		push(@loginTypes, $category);
+	}
+	my $cat = join(';', @loginTypes);
+	$self->getField('categories')->{selOptions} = "$cat";
 
+	my $catId = $self->getField('categories');
+	$self->setFieldFlags('categories', FLDFLAG_INVISIBLE);
+	if ($categories->[1] ne '')
+	{
+		$self->updateFieldFlags('categories', FLDFLAG_INVISIBLE, 0);
+		$catId->invalidate($page, "Please select a Login Type")if ($page->field('categories') eq '');
+	}
 	#
 	# show the "start" selection box if the destination page is the home page or the
 	# logout page
@@ -143,6 +165,7 @@ sub execute
 	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
 	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
 	my $personFlags = App::Universal::PERSONFLAG_ISPATIENT;
+
 	foreach (@$categories)
 	{
 		$personFlags |= App::Universal::PERSONFLAG_ISPATIENT if uc($_) eq 'PATIENT';
@@ -153,10 +176,11 @@ sub execute
 		$personFlags |= App::Universal::PERSONFLAG_ISSTAFF if $_ =~ /^(Physician|Nurse|Staff|Administrator)$/i;
 	}
 
-	$page->createSession($personId, $orgId, { categories => $categories, personFlags => $personFlags });
+	my $loginList = $self->getField('categories')->{selOptions};
+	my $loginType = $page->field('categories');
+	$page->createSession($personId, $orgId, {loginType => $loginType, loginList => $loginList, categories => $categories, personFlags => $personFlags });
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
-
 	$self->handlePostExecute($page, $command, $flags);
 	return 'Welcome to Physia.com, ' . $page->session('user_id');
 }
