@@ -481,6 +481,7 @@ sub prepare_view_profile
 					#component.stpt-person.familyAssociations#<BR>
 					#component.stpt-person.additionalData#
 					#component.stpt-person.diagnosisSummary#<BR>
+					#component.stpt-person.feeschedules#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
