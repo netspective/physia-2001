@@ -89,7 +89,7 @@
 	</datatype>
 
 	<datatype name="datablock">
-		<sqldefn>long</sqldefn>
+		<sqldefn>clob</sqldefn>
 		<sqlwritefmt>$value$</sqlwritefmt>
 	</datatype>
 
