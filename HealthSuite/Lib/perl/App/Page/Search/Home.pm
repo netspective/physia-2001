@@ -256,9 +256,19 @@ sub prepare
 			</td><td>
 				<font face="arial,helvetica" size=2>
 					<b>Paper Claims</b>
-					<a href="/utilities" title="Create a new batch of paper claims for printing">Create new Batch</a>,
+					<a href="/utilities" title="Create a new batch of paper claims for printing">Create new Batch</a>,&nbsp;
 					<a href="/paperclaims" title="Print a batch of paper claims">Print</a>
 				</font>
+
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>EDI Reports</b>
+					<a href="/edi" title="View reports from Clearing House">View</a>
+				</font>
+
 			</td></tr></table>
 		</td></tr></table>
 
