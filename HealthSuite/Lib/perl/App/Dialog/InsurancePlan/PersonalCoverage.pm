@@ -32,7 +32,7 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
-				new App::Dialog::Field::Person::ID(caption => 'Person ID',types => ['Patient'],	name => 'person_id'),
+				new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),		
 				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
 				new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/plan_name'),
