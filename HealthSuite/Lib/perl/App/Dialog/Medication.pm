@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.8 2000-12-22 06:52:34 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.9 2000-12-22 18:43:34 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -30,35 +30,30 @@ sub new
 	my $self = CGI::Dialog::new(@_, id => 'message', heading => '$Command Medication');
 	my $mode = $self->{command};
 	$self->addContent(
-		new App::Dialog::Field::Person::ID(
+		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'parent_id',
-			caption => 'Patient ID',
 			options => FLDFLAG_REQUIRED,
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Medication',
 			name => 'med_name',
-			caption => 'Medication',
 			options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::MultiField(
 			name => 'medication_multi',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Dose',
 					name => 'dose',
-					caption => 'Dose',
 					size => 4,
 					options => FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Units',
 					name => 'dose_units',
-					caption => 'Units',
 					type => 'select',
 					selOptions => 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Route',
 					name => 'route',
-					caption => 'Route',
 					type => 'select',
 					selOptions => 'PO;chew;suck;sublingual;inhaled nasally;topically;rectally;vaginally;eyes;OD;OS;ears;SQ;IM;IV',
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
@@ -68,16 +63,14 @@ sub new
 		new CGI::Dialog::MultiField(
 			name => 'freq_prn_multi',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Frequency',
 					name => 'frequency',
-					caption => 'Frequency',
 					type => 'select',
 					selOptions => 'QD;BID;TID;QID;Q2H;Q4H;Q6H;Q8H;Q12H',
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'PRN',
 					name => 'prn',
-					caption => 'PRN',
 					type => 'select',
 					selOptions => 'Pain;Severe Pain;Nausea;Vomiting;Diarrhea;Fever;Cough;SOB;Chest Pain;Angina',
 					options => FLDFLAG_PREPENDBLANK,
@@ -87,33 +80,28 @@ sub new
 		new CGI::Dialog::MultiField(
 			name => 'dates_multi',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Start',
 					name => 'start_date',
-					caption => 'Start',
 					type => 'date',
 					options => FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'End Date',
 					name => 'end_date',
-					caption => 'End Date',
 					type => 'date',
 					defaultValue => '',
 				),
 			],
 		),
-		new CGI::Dialog::MultiField(
+		new CGI::Dialog::MultiField(caption => 'Duration',
 			name => 'duration_multi',
-			caption => 'Duration',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Duration',
 					name => 'duration',
-					caption => 'Duration',
 					size => 4,
 					#options => FLDFLAG_INLINECAPTION,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => '',
 					name => 'duration_units',
-					caption => '',
 					type => 'select',
 					selOptions => 'days;weeks;months',
 				),
@@ -122,33 +110,28 @@ sub new
 		new CGI::Dialog::MultiField(
 			name => 'quantity_refills_multi',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Quantity',
 					name => 'quantity',
-					caption => 'Quantity',
 					size => 4,
 					options => FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => '# of Refills',
 					name => 'num_refills',
-					caption => '# of Refills',
 					size => 4,
 					options => FLDFLAG_REQUIRED,
 				),
 			],
 		),
-		new CGI::Dialog::MultiField(
+		new CGI::Dialog::MultiField(caption => 'Branding',
 			name => 'branding_multi',
-			caption => 'Branding',
 			fields => [
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Generic Allowed',
 					name => 'allow_generic',
-					caption => 'Generic Allowed',
 					type => 'bool',
 					style => 'check',
 				),
-				new CGI::Dialog::Field(
+				new CGI::Dialog::Field(caption => 'Substitutions Allowed',
 					name => 'allow_substitutions',
-					caption => 'Substitutions Allowed',
 					type => 'bool',
 					style => 'check',
 				),
@@ -544,7 +527,7 @@ sub sendApprovalRequest
 
 	my $msgDlg = new App::Dialog::Message::Prescription();
 	$msgDlg->sendMessage($page,
-		subject => 'Prescription Approval Request',
+		subject => $command eq 'add' ? 'Add Medication' : 'Prescription Approval Request',
 		message => $page->session('person_id') . " is seeking approval for a prescription:\n\nPatient: $patient\nMedication: $med_name $dosage\n",
 		to => $page->field('get_approval_from') || $page->session('person_id'),
 		rePatient => $page->field('parent_id'),
