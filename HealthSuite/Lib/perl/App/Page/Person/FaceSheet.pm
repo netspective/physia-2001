@@ -8,6 +8,7 @@ use base qw(App::Page::Person);
 
 use DBI::StatementManager;
 use App::Statements::Worklist::WorklistCollection;
+use Date::Manip;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
@@ -19,7 +20,7 @@ sub prepare_view
 	my ($self) = @_;
 
 	my $personId = $self->param('person_id');
-	my $accountInfo = $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId) ? '<font color=red>(Account in Collection)</font>' : '';
+	my $accountInfo = $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId,$self->session('org_internal_id')) ? '<font color=red>(Account in Collection)</font>' : '';
 	my $content = qq{
 		<center><h2>Patient Profile Summary</h2></center>
 
