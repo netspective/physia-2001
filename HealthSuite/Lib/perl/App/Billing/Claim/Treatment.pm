@@ -4,8 +4,6 @@ package App::Billing::Claim::Treatment;
 
 use strict;
 
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
 use constant DATEFORMAT_USA => 1;
 #
 # this object encapsulates a single "treatment" item in the HCFA 1500
@@ -14,7 +12,7 @@ use constant DATEFORMAT_USA => 1;
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	$params{dateOfIllnessInjuryPregnancy} = undef;
 	$params{dateOfSameOrSimilarIllness} = undef;
 	$params{datePatientUnableToWorkFrom} = undef;
@@ -29,7 +27,7 @@ sub new
 	$params{medicaidResubmission} = undef;
 	$params{resubmissionReference} = undef;
 	$params{priorAuthorizationNo} = undef;
-	
+
 	$params{refProviderLastName} = undef;
 	$params{refProviderFirstName} = undef;
 	$params{refProviderMiName} = undef;
@@ -45,9 +43,11 @@ sub new
 	$params{clinicalFindings} = undef;
 	$params{laboratoryTests} = undef;
 	$params{treatmentPlan} = undef;
-	$params{referralInfo} = undef;
+	$params{referralInfo61} = undef;
 	$params{referralSelection} = undef;
-	$params{medications} = undef;
+	$params{referralInfo64} = undef;
+	$params{medications61} = undef;
+	$params{medications64} = undef;
 	$params{prognosis} = undef;
 	$params{dateMailedToEmployee} = undef;
 	$params{dateMailedToInsurance} = undef;
@@ -93,7 +93,7 @@ sub setReferringProvider
 sub getReferringProvider
 {
 	my ($self) = @_;
-	
+
 	return $self->{referringProvider};
 }
 
@@ -107,7 +107,7 @@ sub setReferringOrganization
 sub getReferringOrganization
 {
 	my ($self) = @_;
-	
+
 	return $self->{referringOrganization};
 }
 
@@ -234,7 +234,7 @@ sub getDatePatientUnableToWorkTo
 sub getNameOfReferingPhysicianOrOther
 {
 	my $self = shift;
-	
+
 	return $self->getRefProviderLastName . $self->getRefProviderFirstName . $self->getRefProviderMiName;
 }
 
@@ -293,7 +293,7 @@ sub setDateOfIllnessInjuryPregnancy
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-	
+
 	$self->{dateOfIllnessInjuryPregnancy} = $value;
 }
 
@@ -321,14 +321,14 @@ sub setDatePatientUnableToWorkTo
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-	
+
 	$self->{datePatientUnableToWorkTo} = $value;
 }
 
 sub setNameOfReferingPhysicianOrOther
 {
 	my ($self,$value) = @_;
-	
+
 	$self->{nameOfReferingPhysicianOrOther} = $value;
 }
 
@@ -393,7 +393,7 @@ sub convertDateToCCYYMMDD
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-						
+
 
 	$date =~ s/-//g;
 	if(length($date) == 7)
@@ -402,20 +402,20 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
+
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
@@ -471,10 +471,16 @@ sub getTreatmentPlan
 	return $self->{treatmentPlan};
 }
 
-sub getReferralInfo
+sub getReferralInfo61
 {
 	my $self = shift;
-	return $self->{referralInfo};
+	return $self->{referralInfo61};
+}
+
+sub getReferralInfo64
+{
+	my $self = shift;
+	return $self->{referralInfo64};
 }
 
 sub getReferralSelection
@@ -483,10 +489,16 @@ sub getReferralSelection
 	return $self->{referralSelection};
 }
 
-sub getMedications
+sub getMedications61
 {
 	my $self = shift;
-	return $self->{medications};
+	return $self->{medications61};
+}
+
+sub getMedications64
+{
+	my $self = shift;
+	return $self->{medications64};
 }
 
 sub getPrognosis
@@ -628,10 +640,16 @@ sub setTreatmentPlan
 	$self->{treatmentPlan} = $value;
 }
 
-sub setReferralInfo
+sub setReferralInfo61
 {
 	my ($self,$value) = @_;
-	$self->{referralInfo} = $value;
+	$self->{referralInfo61} = $value;
+}
+
+sub setReferralInfo64
+{
+	my ($self,$value) = @_;
+	$self->{referralInfo64} = $value;
 }
 
 sub setReferralSelection
@@ -640,10 +658,16 @@ sub setReferralSelection
 	$self->{referralSelection} = $value;
 }
 
-sub setMedications
+sub setMedications61
 {
 	my ($self,$value) = @_;
-	$self->{medications} = $value;
+	$self->{medications61} = $value;
+}
+
+sub setMedications64
+{
+	my ($self,$value) = @_;
+	$self->{medications64} = $value;
 }
 
 sub setPrognosis
@@ -737,15 +761,6 @@ sub setImpairmentRatingAgreement
 	$self->{impairmentRatingAgreement} = $value;
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Treatment','setSignatureDate use convertDateToCCYYMMDD  to change the date formats'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Treatment','setDateOfIllnessInjuryPregnancy, setDateOfSameOrSimilarIllness, setDatePatientUnableToWorkFrom, setDatePatientUnableToWorkTo, setHospitilizationDateFrom, setHospitilizationDateTo use convertDateToCCYYMMDD  to change the date formats'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Treatment','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to ddmmyyyy'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Treatment','getDateOfIllnessInjuryPregnancy, getDateOfSameOrSimilarIllness, getDatePatientUnableToWorkFrom, getDatePatientUnableToWorkTo, getHospitilizationDateFrom, getHospitilizationDateTo can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
-	
-);
 
 1;
 

@@ -1511,7 +1511,7 @@ sub box20Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	my $data = $claim->{treatment}->getReferralInfo;
+	my $data = $claim->{treatment}->getReferralInfo64;
 	$self->printMultiLine($p, $x, $y, $report, $data, 50, 1);
 }
 
@@ -1519,7 +1519,7 @@ sub box21Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	my $data = $claim->{treatment}->getMedications;
+	my $data = $claim->{treatment}->getMedications64;
 	$self->printMultiLine($p, $x, $y, $report, $data, 156, 2);
 }
 

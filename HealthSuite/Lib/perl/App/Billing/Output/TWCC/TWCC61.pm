@@ -1481,8 +1481,8 @@ sub box17Data
 	$arrData[2] = $claim->{treatment}->getClinicalFindings;
 	$arrData[3] = $claim->{treatment}->getLaboratoryTests;
 	$arrData[4] = $claim->{treatment}->getTreatmentPlan;
-	$arrData[5] = $claim->{treatment}->getReferralInfo;
-	$arrData[6] = $claim->{treatment}->getMedications;
+	$arrData[5] = $claim->{treatment}->getReferralInfo61;
+	$arrData[6] = $claim->{treatment}->getMedications61;
 	$arrData[7] = $claim->{treatment}->getPrognosis;
 
 

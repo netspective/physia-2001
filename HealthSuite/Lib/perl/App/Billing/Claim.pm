@@ -11,19 +11,20 @@ use App::Billing::Claim::Patient;
 use App::Billing::Claim::Physician;
 use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
-use Devel::ChangeLog;
+
 use App::Billing::Universal;
 use constant DATEFORMAT_USA => 1;
+
 # use constant MEDICARE => '4';
 # use constant MEDICAID => '5';
 
-use vars qw(@CHANGELOG);
 use enum qw(:BILLRECEIVERTYPE_ PERSON ORGANIZATION);
 
 use constant PRIMARY => 0;
 use constant SECONDARY => 1;
 use constant TERTIARY => 2;
 use constant QUATERNARY => 3;
+
 use constant BILLSEQ_PRIMARY_PAYER => 1;
 use constant BILLSEQ_SECONDARY_PAYER => 2;
 use constant BILLSEQ_TERTIARY_PAYER => 3;
@@ -34,15 +35,13 @@ sub new
 {
 	my ($type, %params) = @_;
 
-	$params{careReceiver} = undef;
+	$params{careReceiver} = undef;						# Patient
 
-	$params{payToOrganization} = undef;
-	$params{payToProvider} = undef; #$params{careProvider} = undef;
-	$params{renderingOrganization} = undef;
-	$params{renderingProvider} = undef;
-	$params{careProvider} = undef;
-
-	# $params{billReceiverType} = undef;
+	$params{payToOrganization} = undef;				# Billing Facility
+	$params{payToProvider} = undef;						# Billing Provider (Physician)
+	$params{renderingOrganization} = undef;		# Service Facility
+	$params{renderingProvider} = undef;				# Service Provider (Physician)
+	$params{careProvider} = undef;						# ???
 
 	$params{insured} = [];
 	$params{treatment} = undef;
@@ -52,7 +51,7 @@ sub new
 	$params{errors} = [];
 	$params{warnings} = [];
 	$params{legalRepresentator} = undef;
-	$params{payer} = undef; # $params{billReceiver} = undef;
+	$params{payer} = undef;
 	$params{otherItems} = [];
 	$params{copayItems} = [];
 	$params{adjItems} = [];
@@ -215,7 +214,6 @@ sub setInvoiceHistoryDate
 {
 	my ($self, $value) = @_;
 	$self->{invoiceHistoryItem}->[$self->{historyCount}][0] = $value;
-
 }
 
 
@@ -242,9 +240,8 @@ sub getHistory
 	}
 	else
 	{
-	return [[]];
+		return [[]];
 	}
-
 }
 
 sub setInvoiceHistoryItem
@@ -295,6 +292,7 @@ sub getCopayItems
 	$no =  0 + $no ;
 	return $self->{copayItems}->[$no] if defined;
 }
+
 sub getAdjItems
 {
 	my ($self, $no) = @_;
@@ -322,7 +320,6 @@ sub setBCBSPlanCode
 	$self->{bcbsPlanCode} = $value;
 }
 
-
 sub getBCBSPlanCode
 {
 	my $self = shift;
@@ -341,7 +338,6 @@ sub setConditionRelatedTo
 	$self->setConditionRelatedToEmployment( (uc($value) =~ /EMPLOYMENT/) ? 'Y' : 'N');
 	$self->setConditionRelatedToAutoAccident((uc($value) =~ /AUTO ACCIDENT/) ? 'Y': 'N');
 	$self->setConditionRelatedToOtherAccident((uc($value) =~ /OTHER ACCIDENT/) ? 'Y' : 'N');
-
 }
 
 sub getChampusSponsorBranch
@@ -349,7 +345,6 @@ sub getChampusSponsorBranch
 	my $self = shift;
 	return $self->{champusSponsorBranch};
 }
-
 
 sub setChampusSponsorGrade
 {
@@ -363,7 +358,6 @@ sub getChampusSponsorGrade
 	return $self->{champusSponsorGrade};
 }
 
-
 sub setChampusSponsorStatus
 {
 	my($self, $value) = @_;
@@ -376,9 +370,6 @@ sub getChampusSponsorStatus
 	return $self->{champusSponsorStatus};
 }
 
-
-
-
 sub setInsuranceCardEffectiveDate
 {
 	my($self, $value) = @_;
@@ -389,16 +380,13 @@ sub setInsuranceCardEffectiveDate
 sub getInsuranceCardEffectiveDate
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{insuranceCardEffectiveDate}) : $self->{insuranceCardEffectiveDate};
 }
-
 
 sub setInsuranceCardTerminationDate
 {
 	my($self, $value) = @_;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{insuranceCardTerminationDate} = $value;
 }
 
@@ -407,8 +395,6 @@ sub getInsuranceCardTerminationDate
 	my ($self, $formatIndicator) = @_;
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{insuranceCardTerminationDate}) : $self->{insuranceCardTerminationDate};
 }
-
-
 
 sub setPayer
 {
@@ -419,7 +405,6 @@ sub setPayer
 sub getPayer
 {
 	my ($self) = @_;
-
 	return $self->{payer};
 }
 
@@ -432,10 +417,8 @@ sub setLegalRepresentator
 sub getLegalRepresentator
 {
 	my ($self) = @_;
-
 	return $self->{legalRepresentator};
 }
-
 
 sub setAccidentHour
 {
@@ -446,11 +429,8 @@ sub setAccidentHour
 sub getAccidentHour
 {
 	my ($self) = @_;
-
 	return $self->{accidentHour};
 }
-
-
 
 sub setResponsibilityIndicator
 {
@@ -461,7 +441,6 @@ sub setResponsibilityIndicator
 sub getResponsibilityIndicator
 {
 	my ($self) = @_;
-
 	return $self->{responsibilityIndicator};
 }
 
@@ -474,7 +453,6 @@ sub setSourceOfPayment
 sub getSourceOfPayment
 {
 	my ($self) = @_;
-
 	return $self->{sourceOfPayment};
 }
 
@@ -487,7 +465,6 @@ sub setRemarks
 sub getRemarks
 {
 	my ($self) = @_;
-
 	return $self->{remarks};
 }
 
@@ -500,7 +477,6 @@ sub setAnesthesiaOxygenMinutes
 sub getAnesthesiaOxygenMinutes
 {
 	my ($self) = @_;
-
 	return $self->{anesthesiaOxygenMinutes};
 }
 
@@ -515,24 +491,20 @@ sub setHGBHCTDate
 sub getHGBHCTDate
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{hgbHctDate}) : $self->{hgbHctDate};
 }
 
 sub setSerumCreatineDate
 {
 	my ($self,$value) = @_;
-
 	$value =~ s/ 00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{serumCreatineDate} = $value;
 }
 
 sub getSerumCreatineDate
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{serumCreatineDate}) : $self->{serumCreatineDate};
 }
 
@@ -557,7 +529,6 @@ sub setRenderingProvider
 sub getRenderingProvider
 {
 	my ($self) = @_;
-
 	return $self->{renderingProvider};
 }
 
@@ -588,17 +559,14 @@ sub getRenderingOrganization
 sub setdateDocSent
 {
 	my ($self,$value) = @_;
-
 	$value =~ s/ 00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{dateDocSent} = $value;
 }
 
 sub getdateDocSent
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateDocSent}) : $self->{dateDocSent};
 }
 
@@ -611,7 +579,6 @@ sub setSpProgramIndicator
 sub getSpProgramIndicator
 {
 	my ($self) = @_;
-
 	return $self->{spProgramIndicator};
 }
 
@@ -624,14 +591,12 @@ sub setDisabilityType
 sub getDisabilityType
 {
 	my ($self) = @_;
-
 	return $self->{disabilityType};
 }
 
 sub setInformationReleaseDate
 {
 	my ($self, $value) = @_;
-
 	$value =~ s/ 00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
 	$self->{informationReleaseDate} = $value;
@@ -652,9 +617,7 @@ sub setInformationReleaseIndicator
 		'1' => 'Y',
 		'Yes' => 'Y',
 		'No' => 'N',
-
-		};
-
+	};
 	$self->{informationReleaseIndicator} = $temp->{$value};
 }
 
@@ -673,7 +636,6 @@ sub setSymptomExternalCause
 sub getSymptomExternalCause
 {
 	my ($self) = @_;
-
 	return $self->{symptomExternalCause};
 }
 
@@ -686,7 +648,6 @@ sub setSymptomIndicator
 sub getSymptomIndicator
 {
 	my ($self) = @_;
-
 	return $self->{symptomIndicator};
 }
 
@@ -699,7 +660,6 @@ sub setFilingIndicator
 sub getFilingIndicator
 {
 	my ($self) = @_;
-
 	return $self->{filingIndicator};
 }
 
@@ -707,16 +667,14 @@ sub setAcceptAssignment
 {
 	my ($self, $treat) = @_;
 	my $temp =
-		{
-			'0' => 'N',
-			'NO' => 'N',
-			'N' => 'N',
-			'1'  => 'Y',
-			'YES'  => 'Y',
-			'Y'  => 'Y',
-
-		};
-
+	{
+		'0' => 'N',
+		'NO' => 'N',
+		'N' => 'N',
+		'1'  => 'Y',
+		'YES'  => 'Y',
+		'Y'  => 'Y',
+	};
 	$self->{acceptAssignment} = $temp->{uc($treat)};
 }
 
@@ -753,56 +711,48 @@ sub setAmountPaid
 sub getAcceptAssignment
 {
 	my ($self) = @_;
-
 	return $self->{acceptAssignment};
 }
 
 sub getTotalCharge
 {
 	my ($self) = @_;
-
 	return $self->{totalCharge};
 }
 
 sub getTotalChargePaid
 {
 	my ($self) = @_;
-
 	return $self->{totalChargePaid};
 }
 
 sub getTotalInvoiceCharges
 {
 	my ($self) = @_;
-
 	return $self->{totalInvoiceCharges};
 }
 
 sub getAmountPaid
 {
 	my ($self) = @_;
-
 	return $self->{amountPaid};
 }
 
 sub getId
 {
 	my ($self) = @_;
-
 	return $self->{id};
 }
 
 sub setTreatment
 {
 	my ($self, $treat) = @_;
-
 	$self->{treatment} = $treat;
 }
 
 sub getTreatment
 {
 	my $self = shift;
-
 	return $self->{treatment};
 }
 
@@ -824,22 +774,17 @@ sub setPayToProvider
 	$self->{payToProvider} = $person;
 }
 
-
 sub setPayToOrganization
 {
 	my ($self, $value) = @_;
 	$self->{payToOrganization} = $value;
-
 }
-
 
 sub getPayToProvider
 {
 	my $self = shift;
 	return $self->{payToProvider};
-
 }
-
 
 sub getPayToOrganization
 {
@@ -847,17 +792,14 @@ sub getPayToOrganization
 	return $self->{payToOrganization};
 }
 
-
 sub addInsured
 {
 	my $self = shift;
-
 	my $insuredListRef = $self->{insured};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Insured objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Insured');
-
 		push(@{$insuredListRef}, $_);
 	}
 }
@@ -865,13 +807,11 @@ sub addInsured
 sub addDiagnosis
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{diagnosis};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Diagnosis objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Diagnosis');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -879,13 +819,11 @@ sub addDiagnosis
 sub addOtherItems
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{otherItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -893,13 +831,11 @@ sub addOtherItems
 sub addAdjItems
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{adjItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -907,13 +843,11 @@ sub addAdjItems
 sub addVoidItems
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{voidItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -921,22 +855,18 @@ sub addVoidItems
 sub addSuppressedItems
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{suppressedItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
 
-
 sub addPolicy
 {
 	my ($self, $payer) = @_;
-
 	my $policyListRef = $self->{policy};
 	die 'only App::Billing::Claim::Payer objects are allowed here'
 	unless $payer->isa('App::Billing::Claim::Payer');
@@ -946,13 +876,11 @@ sub addPolicy
 sub addCopayItems
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{copayItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
-			unless $_->isa('App::Billing::Claim::Procedure');
-
+		unless $_->isa('App::Billing::Claim::Procedure');
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -960,16 +888,15 @@ sub addCopayItems
 sub addCoInsurance
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{coInsuranceItems};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
+
 sub addDeductible
 {
 	my $self = shift;
@@ -978,7 +905,6 @@ sub addDeductible
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -986,13 +912,11 @@ sub addDeductible
 sub addProcedure
 {
 	my $self = shift;
-
 	my $diagListRef = $self->{procedures};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Procedure objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Procedure');
-
 		push(@{$diagListRef}, $_);
 	}
 }
@@ -1000,57 +924,47 @@ sub addProcedure
 sub setProgramName
 {
 	my ($self,$value) = @_;
-
 	$self->{programName} = $value;
 }
-
 
 sub getProgramName
 {
 	my ($self) = @_;
-
 	return $self->{programName};
 }
-
 
 sub getConditionRelatedToEmployment
 {
 	my ($self) = @_;
-
 	return $self->{conditionRelatedToEmployment};
 }
 
 sub getConditionRelatedToAutoAccident
 {
 	my ($self) = @_;
-
 	return $self->{conditionRelatedToAutoAccident};
 }
-
 
 sub getConditionRelatedToOtherAccident
 {
 	my ($self) = @_;
-
 	return $self->{conditionRelatedToOtherAccident};
 }
 
 sub getConditionRelatedToAutoAccidentPlace
 {
 	my ($self) = @_;
-
 	return $self->{conditionRelatedToAutoAccidentPlace};
 }
-
 
 sub setConditionRelatedToEmployment
 {
 	my ($self,$value) = @_;
 	my $temp =
-		{
-			'Y' => 'Y',
-			'N' => 'N',
-		};
+	{
+		'Y' => 'Y',
+		'N' => 'N',
+	};
 	$self->{conditionRelatedToEmployment} = $temp->{$value};
 }
 
@@ -1059,87 +973,75 @@ sub getClaimType
 	my ($self) = @_;
 
 	my $billSeq = [];
-			$billSeq->[BILLSEQ_PRIMARY_PAYER] = PRIMARY;
-			$billSeq->[BILLSEQ_SECONDARY_PAYER] = SECONDARY;
-			$billSeq->[BILLSEQ_TERTIARY_PAYER] =  TERTIARY;
-			$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
-
+	$billSeq->[BILLSEQ_PRIMARY_PAYER] = PRIMARY;
+	$billSeq->[BILLSEQ_SECONDARY_PAYER] = SECONDARY;
+	$billSeq->[BILLSEQ_TERTIARY_PAYER] =  TERTIARY;
+	$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
 	return $billSeq->[$self->{claimType}] + 0;
 }
 
 sub getBillSeq
 {
 	my ($self) = @_;
-
 	return $self->{billSeq} + 0;
 }
 
 sub setBillSeq
 {
 	my ($self,$value) = @_;
-
 	$self->{billSeq} = $value + 1;
 }
 
 sub getInvoiceType
 {
 	my ($self) = @_;
-
 	return $self->{invoiceType};
 }
 
 sub setInvoiceType
 {
 	my ($self,$value) = @_;
-
 	$self->{invoiceType} = $value;
 }
 
 sub getInvoiceSubtype
 {
 	my ($self) = @_;
-
 	return $self->{invoiceSubtype};
 }
 
 sub setInvoiceSubtype
 {
 	my ($self,$value) = @_;
-
 	$self->{invoiceSubtype} = $value;
 }
 
 sub getTotalItems
 {
 	my ($self) = @_;
-
 	return $self->{totalItems};
 }
 
 sub setTotalItems
 {
 	my ($self,$value) = @_;
-
 	$self->{totalItems} = $value;
 }
 
 sub setClaimType
 {
 	my ($self,$value) = @_;
-
 	$self->{claimType} = $value;
 }
-
-
 
 sub setConditionRelatedToAutoAccident
 {
 	my ($self,$value) = @_;
 	my $temp =
-		{
-			'Y' => 'Y',
-			'N' => 'N',
-		};
+	{
+		'Y' => 'Y',
+		'N' => 'N',
+	};
 	$self->{conditionRelatedToAutoAccident} = $temp->{$value};
 }
 
@@ -1147,17 +1049,16 @@ sub setConditionRelatedToOtherAccident
 {
 	my ($self,$value) = @_;
 	my $temp =
-		{
-			'Y' => 'Y',
-			'N' => 'N',
-		};
+	{
+		'Y' => 'Y',
+		'N' => 'N',
+	};
 	$self->{conditionRelatedToOtherAccident} = $temp->{$value};
 }
 
 sub setConditionRelatedToAutoAccidentPlace
 {
 	my ($self,$value) = @_;
-
 	$self->{conditionRelatedToAutoAccidentPlace} = $value;
 }
 
@@ -1183,16 +1084,14 @@ sub addError
 {
 	my ($self, $facility, $id, $msg) = @_;
 	my $info = [$facility, $id, $msg];
-
 	push(@{$self->{errors}}, $info);
 }
 
 sub haveErrors
 {
 	my $self =shift;
-
 	my $errs = $self->{errors};
-	return $#$errs  >= 0 ? 1 : 0;
+	return $#$errs >= 0 ? 1 : 0;
 }
 
 sub getErrors
@@ -1205,9 +1104,7 @@ sub getError
 {
 	my ($self, $errorIdx) = @_;
 	my $info = $self->{errors}->[$errorIdx];
-
 	return @$info if wantarray();
-
 	return "$info->[0]-$info->[1]: $info->[2]";
 }
 
@@ -1215,7 +1112,6 @@ sub addWarning
 {
 	my ($self, $facility, $id, $msg) = @_;
 	my $info = [$facility, $id, $msg];
-
 	push(@{$self->{warnings}}, $info);
 }
 
@@ -1233,21 +1129,19 @@ sub getWarning
 {
 	my ($self, $warningIdx) = @_;
 	my $info = $self->{warnings}->[$warningIdx];
-
 	return @$info if wantarray();
-
-
 	return "$info->[0]-$info->[1]: $info->[2]";
 }
 
 sub convertDateToCCYYMMDD
 {
 	my ($self, $date) = @_;
-	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
-				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
-				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
-						};
-
+	my $monthSequence =
+	{
+		JAN => '01', FEB => '02', MAR => '03', APR => '04',
+		MAY => '05', JUN => '06', JUL => '07', AUG => '08',
+		SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
+	};
 
 	$date =~ s/-//g;
 	if(length($date) == 7)
@@ -1258,13 +1152,11 @@ sub convertDateToCCYYMMDD
 	{
 		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-
 	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
@@ -1294,7 +1186,6 @@ sub printVal
 	{
 		print " patient $key = " . $self->{$key} . " \n";
 	}
-
 }
 
 1;
