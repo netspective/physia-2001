@@ -24,6 +24,7 @@ sub new
 	$self->{id} = undef;
 	$self->{firstName} = undef;
 	$self->{lastName} = undef;
+	$self->{completeName} = undef;
 	$self->{middleInitial} = undef;
 	$self->{sex} = undef;
 	$self->{address} = undef;
@@ -264,6 +265,12 @@ sub setMiddleInitial
 	$self->{middleInitial} = $value;
 }
 
+sub setName
+{
+	my ($self,$value) = @_;
+	$self->{completeName} = $value;
+}
+
 sub setAddress
 {
 	my ($self,$value) = @_;
@@ -299,6 +306,12 @@ sub getMiddleInitial
 {
 	my ($self) = @_;
 	return $self->{middleInitial};
+}
+
+sub getName
+{
+	my ($self) = @_;
+	return $self->{completeName}
 }
 
 sub getAddress
