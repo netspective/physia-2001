@@ -27,13 +27,14 @@ $SQLSTMT_CONTACTMETHODS = qq{
 			@{[ App::Universal::ATTRTYPE_FAX ]},
 			@{[ App::Universal::ATTRTYPE_PAGER ]},
 			@{[ App::Universal::ATTRTYPE_EMAIL ]},
-			@{[ App::Universal::ATTRTYPE_URL ]}
+			@{[ App::Universal::ATTRTYPE_URL ]},
+			@{[ App::Universal::ATTRTYPE_TEXT ]},
 		)
 	order by value_type, name_sort, item_name
 };
 
 $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES = qq{
-	select value_int as preferred, value_type, value_text || ' (' || item_name || ')', item_id, avt.caption as caption, 'attr-%sqlvar_entityName%-' || value_type as dialogid_suffix
+	select value_int as preferred, value_type, value_text || ' (' || item_name || ')', item_id, DECODE(avt.caption, TEXT, 'Billing', avt.caption) as caption, 'attr-%sqlvar_entityName%-' || value_type as dialogid_suffix
 	from %sqlvar_entityName%_attribute, Attribute_Value_Type avt
 	where	parent_id = ? and
 	value_type in (
@@ -41,7 +42,8 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES = qq{
 			@{[ App::Universal::ATTRTYPE_FAX ]},
 			@{[ App::Universal::ATTRTYPE_PAGER ]},
 			@{[ App::Universal::ATTRTYPE_EMAIL ]},
-			@{[ App::Universal::ATTRTYPE_URL ]}
+			@{[ App::Universal::ATTRTYPE_URL ]},
+			@{[ App::Universal::ATTRTYPE_TEXT ]},
 		) and
 			avt.id = value_type
 	UNION ALL
