@@ -303,7 +303,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Make all entries capitated',
 			type => 'select', 
 			style => 'radio', 
-			selOptions => 'Capitated:0;FFS:1;Copy As Is:2',
+			selOptions => 'Capitated;FFS;Copy As Is',
 			name => 'copy_entries_as'
 		),
 	);
@@ -323,7 +323,7 @@ sub makeStateChanges
 sub checkDupName
 {
 	my ($self, $page) = @_;
-	
+
 	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
 		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_internal_id'));
 
@@ -344,7 +344,7 @@ sub customValidate
 	if($attribute->{value_int} && ! $page->field('checkbox_validation'))
 	{
 		$self->updateFieldFlags('copy_entries_as', FLDFLAG_INVISIBLE, 0);
-		$page->field('copy_entries_as', 2);
+		$page->field('copy_entries_as', 'Copy As Is');
 		
 		my $getCapCheckboxField = $self->getField('copy_entries_as');
 		$getCapCheckboxField->invalidate($page, 'Existing Fee Schedule ID is a capitated contract. Make all items capitated?');
@@ -389,14 +389,16 @@ sub execute
 	my $internalCatalogId = $page->field('internal_catalog_id');
 	my $copyEntriesAs = $page->field('copy_entries_as');
 	my $insertStmt = '';
-	if($copyEntriesAs == 2 || ! $copyEntriesAs)
+
+	if($copyEntriesAs eq 'Capitated' || $copyEntriesAs eq 'FFS')
 	{
+		my $flags = $copyEntriesAs eq 'Capitated' ? 0 : 1;
 		$insertStmt = qq{
 			insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
 				catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
 				cost_type, unit_cost, description, units_avail)
 			(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
-				entry_type, flags, status, code, modifier, name, default_units, cost_type, unit_cost,
+				entry_type, $flags, status, code, modifier, name, default_units, cost_type, unit_cost,
 				description, units_avail 
 			from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
 		};
@@ -408,12 +410,12 @@ sub execute
 				catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
 				cost_type, unit_cost, description, units_avail)
 			(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
-				entry_type, $copyEntriesAs, status, code, modifier, name, default_units, cost_type, unit_cost,
+				entry_type, flags, status, code, modifier, name, default_units, cost_type, unit_cost,
 				description, units_avail 
 			from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
 		};
 	}
-	
+
 	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog");
 	$self->handlePostExecute($page, $command, $flags);
