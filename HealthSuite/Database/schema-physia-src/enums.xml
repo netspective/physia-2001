@@ -259,6 +259,8 @@
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
 		<enum>Discount</enum>
+		<enum>Refund</enum>
+		<enum>Credit</enum>
 		<enum>Professional Courtesy</enum>
 		<enum>Bad Debt</enum>
 		<enum>Collection Agency</enum>
@@ -275,10 +277,6 @@
 		<enum>Check</enum>
 		<enum>Money Order</enum>
 		<enum>Debit Card</enum>
-		<enum>Refund</enum>
-		<enum>Discount</enum>
-		<enum>Professional Discount</enum>
-		<enum>Credit</enum>
 		<enum>MasterCard</enum>
 		<enum>VISA</enum>
 		<enum>AMEX</enum>
