@@ -33,6 +33,15 @@
 			claims status report files from Perse.  Deleted extraneous invoice attributes.
 		</deliverable>
 
+		<deliverable id="1434">
+			ACS CHANGE : Modifed service request dialog to include Case Manager Claim Number , read only followup status , space for up to 4 ICD code
+		</deliverable>
+
+		<deliverable id="952">
+			New query function will handle lookup
+		</deliverable>
+
+
 	</deliverables>
 </release-notes>
 
