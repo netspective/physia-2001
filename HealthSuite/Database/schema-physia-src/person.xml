@@ -4,6 +4,16 @@
 <schema name="person">
 	<include file="generic-datatypes.xml"/>
 
+	<table name="Person_Referral_Note" abbrev="RefNote" type="Audit,Secure">
+		<description>Notes associated with a referral</description>
+		<column name="referral_note_id" abbrev="refNteId" type="autoinc" primarykey="yes" descr="Unique Referral Note ID"/>		
+		<column name="referral_id" parentref="Person_Referral.referral_id"  descr="Referral ID of referral notes belongs"/>				
+		<column name="person_id"  lookupref="Person.person_id" descr="Person ID of person creating the note"/>
+		<column name="note"  type="text" size="1024" descr="Referral Note"/>		
+		<column name="note_date"  type="stamp" descr="Date Of Note was taken"/>			
+		<column name="org_internal_id"  lookupref="org.org_internal_id" abbrev="insOrgIntId" descr="Org Interal ID of Main org note belongs"/>				
+	</table>
+	
 	<table name="Person_Referral" abbrev="PerRef" type="Audit,Secure">
 		<description></description>
 		<column name="referral_id" type="autoinc" primarykey="yes" descr="Unique Referral ID"/>
