@@ -265,7 +265,13 @@ sub makeStateChanges
 		$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
 	}
 
-
+	#Don't show these fields when adding a hospital claim
+	my $hospClaim = $page->param('isHosp');
+	if($hospClaim)
+	{
+		$self->updateFieldFlags('trans_type', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('provider_fields', FLDFLAG_INVISIBLE, 1);
+	}
 
 	#Billing Org Contact Information
 	if($command ne 'remove')
@@ -955,7 +961,31 @@ sub handlePayers
 		}
 	}
 
-	addTransactionAndInvoice($self, $page, $command, $flags);
+
+	#if($page->param('isHosp') == 1)
+	#{
+	#	my $lineCount = $page->param('_f_line_count');
+	#	my @itemProviderIds;
+		#my $providerId = $page->param("_f_proc_$line\_provider_id");
+	#	for(my $line = 1; $line <= $lineCount; $line++)
+	#	{
+	#		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
+	#		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+
+	#		push(@itemProviderIds, $page->param("_f_proc_$line\_provider_id"));
+	#	}
+
+		#foreach my $itemServProviderId (@itemProviderIds)
+		#{
+		#	$page->field('care_provider_id', $itemServProviderId);
+			#$page->field('provider_id', $itemBillProviderId);
+		#	addTransactionAndInvoice($self, $page, $command, $flags);
+		#}
+	#}
+	#else
+	#{
+		addTransactionAndInvoice($self, $page, $command, $flags);
+	#}
 }
 
 sub addTransactionAndInvoice
@@ -996,11 +1026,13 @@ sub addTransactionAndInvoice
 	my $billingFacility = $page->field('billing_facility_id');
 	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $relTo = $page->field('accident') == $condRelToFakeNone ? '' : $page->field('accident');
+	my $hospClaim = $page->param('isHosp');
+	my $transType = $hospClaim ? App::Universal::TRANSTYPEVISIT_HOSPITAL : $page->field('trans_type');
 
 	my $transId = $page->schemaAction(
 		'Transaction', $command,
 		trans_id => $editTransId || undef,
-		trans_type => $page->field('trans_type'),
+		trans_type => $transType,
 		trans_status => defined $transStatus ? $transStatus : undef,
 		parent_event_id => $page->field('parent_event_id') || $page->param('event_id') || undef,
 		caption => $page->field('subject') || undef,
@@ -1121,8 +1153,8 @@ sub handleInvoiceAttrs
 
 
 	my $condRelToId = $page->field('accident');
-	my $condition = '';
-	my $state = '';
+	my $condition;
+	my $state;
 	unless($condRelToId == App::Universal::CONDRELTO_FAKE_NONE)
 	{
 		$condition = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selCondition', $condRelToId);
@@ -1429,21 +1461,21 @@ sub handleBillingInfo
 
 	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delInvoiceBillingParties', $invoiceId) if $command ne 'add';
 
-	my $billId = '';
+	my $billId;
 
 	#------PRIMARY PAYER
 
 	my $primPayer = $page->field('primary_payer');
 	if($primPayer)
 	{
-		my $billParty = '';
-		my $billToId = '';
-		my $billInsId = '';
-		my $billAmt = '';
-		my $billPct = '';
-		my $billDate = '';
-		my $billStatus = '';
-		my $billResult = '';
+		my $billParty;
+		my $billToId;
+		my $billInsId;
+		my $billAmt;
+		my $billPct;
+		my $billDate;
+		my $billStatus;
+		my $billResult;
 
 		if($primPayer == $fakeProdNameSelfPay)
 		{
@@ -1507,14 +1539,14 @@ sub handleBillingInfo
 	my $secondPayer = $page->field('secondary_payer');
 	if($secondPayer ne '' && $secondPayer ne $primPayer)
 	{
-		my $billParty = '';
-		my $billToId = '';
-		my $billInsId = '';
-		my $billAmt = '';
-		my $billPct = '';
-		my $billDate = '';
-		my $billStatus = '';
-		my $billResult = '';
+		my $billParty;
+		my $billToId;
+		my $billInsId;
+		my $billAmt;
+		my $billPct;
+		my $billDate;
+		my $billStatus;
+		my $billResult;
 
 		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $secondPayer, $personId);
 		$billParty = $billPartyTypeIns;
@@ -1551,14 +1583,14 @@ sub handleBillingInfo
 	my $tertPayer = $page->field('tertiary_payer');
 	if($tertPayer ne '' && $tertPayer ne $secondPayer && $tertPayer ne $primPayer)
 	{
-		my $billParty = '';
-		my $billToId = '';
-		my $billInsId = '';
-		my $billAmt = '';
-		my $billPct = '';
-		my $billDate = '';
-		my $billStatus = '';
-		my $billResult = '';
+		my $billParty;
+		my $billToId;
+		my $billInsId;
+		my $billAmt;
+		my $billPct;
+		my $billDate;
+		my $billStatus;
+		my $billResult;
 
 		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $tertPayer, $personId);
 		$billParty = $billPartyTypeIns;
@@ -1595,14 +1627,14 @@ sub handleBillingInfo
 	my $quatPayer = $page->field('quaternary_payer');
 	if($quatPayer ne '' && $quatPayer ne $tertPayer && $quatPayer ne $secondPayer && $quatPayer ne $primPayer)
 	{
-		my $billParty = '';
-		my $billToId = '';
-		my $billInsId = '';
-		my $billAmt = '';
-		my $billPct = '';
-		my $billDate = '';
-		my $billStatus = '';
-		my $billResult = '';
+		my $billParty;
+		my $billToId;
+		my $billInsId;
+		my $billAmt;
+		my $billPct;
+		my $billDate;
+		my $billStatus;
+		my $billResult;
 
 		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $quatPayer, $personId);
 		$billParty = $billPartyTypeIns;
@@ -1636,16 +1668,16 @@ sub handleBillingInfo
 
 	if($primPayer != $fakeProdNameSelfPay && $quatPayer eq '')
 	{
-		my $billParty = '';
-		my $billToId = '';
-		my $billInsId = '';
-		my $billAmt = '';
-		my $billPct = '';
-		my $billDate = '';
-		my $billStatus = '';
-		my $billResult = '';
+		my $billParty;
+		my $billToId;
+		my $billInsId;
+		my $billAmt;
+		my $billPct;
+		my $billDate;
+		my $billStatus;
+		my $billResult;
 
-		my $lastBillSeq = '';
+		my $lastBillSeq;
 		if( ($secondPayer eq '' && $tertPayer eq '') || ($secondPayer eq $primPayer && $tertPayer eq $primPayer) )
 		{
 			$lastBillSeq = App::Universal::PAYER_SECONDARY;
@@ -1696,7 +1728,7 @@ sub handleBillingInfo
 	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 	{
 		my $lineCount = $page->param('_f_line_count');
-		my $existsOfficeVisitCPT = '';
+		my $existsOfficeVisitCPT;
 		for(my $line = 1; $line <= $lineCount; $line++)
 		{
 			if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
@@ -1707,11 +1739,15 @@ sub handleBillingInfo
 
 		if($existsOfficeVisitCPT)
 		{
-			billCopay($self, $page, 'add', $flags, $invoiceId);
+			billCopay($self, $page, $command, $flags, $invoiceId);
+		}
+		elsif($command eq 'add')
+		{
+			$self->handlePostExecute($page, $command, $flags);
 		}
 		else
 		{
-			$self->handlePostExecute($page, $command, $flags);
+			$page->redirect("/invoice/$invoiceId/summary");
 		}
 	}
 	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
@@ -1752,12 +1788,11 @@ sub billCopay
 	my $personType = App::Universal::ENTITYTYPE_PERSON;
 	my $copayAmt = $page->field('copay_amt');
 
-
 	#ADD COPAY ITEM
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_COPAY;
 	my $copayItemId = $page->schemaAction(
-		'Invoice_Item', $command,
+		'Invoice_Item', 'add',
 		parent_id => $invoiceId || undef,
 		item_type => defined $itemType ? $itemType : undef,
 		extended_cost => defined $copayAmt ? $copayAmt : undef,
@@ -1770,7 +1805,7 @@ sub billCopay
 	my $billSeq = App::Universal::PAYER_PRIMARY;
 	my $billPartyType = App::Universal::INVOICEBILLTYPE_CLIENT;
 	$page->schemaAction(
-		'Invoice_Billing', $command,
+		'Invoice_Billing', 'add',
 		invoice_id => $invoiceId || undef,
 		invoice_item_id => $copayItemId || undef,
 		bill_sequence => defined $billSeq ? $billSeq : undef,
@@ -1818,6 +1853,12 @@ sub handleProcedureItems
 	{
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+
+		#my $itemProviderId;
+		#if($page->param('isHosp'))
+		#{
+		#	$itemProviderId = $page->param("_f_proc_$line\_provider_id");
+		#}
 
 		my $cptCode = $page->param("_f_proc_$line\_procedure");
 		#if cpt is a misc procedure code, get children and create invoice item for each child
