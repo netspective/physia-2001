@@ -5,6 +5,7 @@ package App::Statements::Catalog;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_CATALOG);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -420,7 +421,6 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		AND	oc.internal_catalog_id = oce.catalog_id
 	},
 	
-	
 	#- DELETE Assoicated FS FOR Orgs and Phyisicians
 	'delOrgIdLinkedFS' =>qq
 	{
@@ -437,6 +437,77 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		WHERE 	value_int = :1
 		AND	item_name = 'Fee Schedule'
 	},	
+	
+	#
+	#SQL FOR MISC PROCEDURE
+	'selMiscProcedureById' =>qq{
+		SELECT	entry_id,entry_type,code,modifier,name,description, 1 as code_level,parent_entry_id
+		FROM 	offering_catalog_entry oce
+		WHERE	oce.entry_id= :1
+		UNION
+		SELECT	entry_id,entry_type,code,modifier,name,description, 2 as code_level,parent_entry_id
+		FROM	offering_catalog_entry oce
+		WHERE	rownum <5
+		AND	parent_entry_id IN
+		(SELECT	entry_id as code_level 
+		 FROM 	offering_catalog_entry oce
+		 WHERE	oce.entry_id= :1
+		)						
+	},			
+	'selMiscProcedureByChildId' =>qq{
+		SELECT	entry_id,entry_type,code,modifier,name,description, 1 as code_level,parent_entry_id,catalog_id
+		FROM 	offering_catalog_entry oce
+		WHERE	oce.entry_id= :1
+		UNION
+		SELECT	entry_id,entry_type,code,modifier,name,description, 2 as code_level,parent_entry_id,catalog_id
+		FROM	offering_catalog_entry oce
+		WHERE	rownum <5
+		AND	parent_entry_id IN
+		(SELECT	entry_id as code_level 
+		 FROM 	offering_catalog_entry oce
+		 WHERE	oce.entry_id= :1
+		)						
+	},		
+	'selMiscProcedureInternalID' =>qq
+	{
+		SELECT	internal_catalog_id
+		FROM	Offering_Catalog 
+		WHERE 	caption = 'Misc Procedure Code'
+		AND	catalog_type  = 2
+		AND 	org_internal_id = :1
+	},
+	'selMiscProcedureNameById' => qq
+	{
+		SELECT	code as proc_code, modifier, name, description,catalog_id
+		FROM	Offering_Catalog_Entry
+		WHERE 	entry_id = :1
+	
+	},
+	'selMiscProcedureByCode' => qq
+	{
+		SELECT 	oce.entry_id
+		FROM 	offering_catalog oc , offering_catalog_entry oce
+		WHERE	oce.code = :1
+		AND	oc.org_internal_id = :2
+		AND	oce.catalog_id = oc.internal_catalog_id
+		AND	oc.catalog_type = 2
+	},
+
+	'selMiscProcedureByChildId' =>qq
+	{
+		SELECT 	oce.entry_id as entry_id,
+			oce.code , 
+			oce.modifier,
+			oce.catalog_id, 
+			oce.parent_entry_id, 
+			oce2.name, 
+			oce2.code as proc_code, 
+			oce2.description
+		FROM 	offering_catalog_entry oce , offering_catalog_entry oce2
+		WHERE	oce.entry_id= :1
+		AND	oce2.entry_id = oce.parent_entry_id
+	}
+	
 );
 
 1;
