@@ -19,6 +19,12 @@
 			Medicaid resubmission code and original reference fields add to claim dialog and showing on HCFA.
 		</deliverable>
 	
+		<deliverable id="713">
+			Popup a window displaying patient alerts if patient has an Appointment Alert.
+			NOTE:  This only works when entering the Appointment Dialog or when looking
+			up a patient.
+		</deliverable>
+	
 		<deliverable id="896">
 			In the 'SurgicalProcedures' component, the ICD code field is changed to CPT code field. It allows you to 
 			edit the records and the CPT name is displayed in the component.
@@ -42,8 +48,25 @@
 			Fixed claim status changes.
 		</deliverable>
 
+		<deliverable id="1551">
+			Additional pertinent data columns added to Appointment Query.
+		</deliverable>
+
 		<deliverable id="1552">
 			In the 'Referring Doctor' dialog, now the phone number is stored as a work phone.
+		</deliverable>
+
+		<deliverable id="1554">
+			Allow Cancel and Reschedule an appointment after checkin and automatically void the
+			created claim.  Accounted for this in the Patient Activity Report.
+		</deliverable>
+
+		<deliverable id="1580">
+			Copied claim info to demo database.  Added EDI reports.
+		</deliverable>
+
+		<deliverable id="1582">
+			Revised Print Schedule / Appointment Search Results display.
 		</deliverable>
 
 		<deliverable id="1613">
