@@ -213,7 +213,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'bool',
 				style => 'check',
 				caption => 'Have you confirmed Personal Information/Insurance Coverage?',
-				name => 'confirmed_info'),
+				name => 'confirmed_info',
+				options => FLDFLAG_REQUIRED),
 
 
 
