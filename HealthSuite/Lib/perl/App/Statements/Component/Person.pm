@@ -2294,7 +2294,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		columnDefn =>
 		[
-			{ head => 'Diagnosis Summary', dataFmt => '<A HREF = "/search/icd/detail/#0#">(#0#)</A> #1#<br> #2#--#3#: #4#<br><br>'},
+			{ head => 'Diagnosis Summary', dataFmt => '<A HREF = "/search/icd/detail/#0#">(ICD #0#)</A> #1#<br> #2#--#3#: #4#<br><br>'},
 		],
 	},
 	publishDefn_panel =>
@@ -2312,7 +2312,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent',
-		# inherit => 'panel',
+		inherit => 'panel',
 		frame =>
 		{
 				-editUrl => '', 
