@@ -41,8 +41,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detail_payers' => {
 		_stmtFmt => qq{
 			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id,
-				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
-			from Claim_Type, Transaction_Status, Transaction, Invoice
+				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, complete_name
+			from Claim_Type, Transaction_Status, Transaction, Invoice, Person
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -51,6 +51,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and Claim_Type.id = Transaction.bill_type
 				and Claim_Type.caption = ?
 				and Transaction_Status.id = Transaction.trans_status
+				and client_id = person_id
 		},
 		publishDefn => 	{
 			columnDefn =>
@@ -58,7 +59,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 					{colIdx => 0, head => 'Payer'},
 					{colIdx => 1, head => 'Invoice'},
 					{colIdx => 2, head => 'Date'},
-					{colIdx => 3, head => 'Patient'},
+					{colIdx => 3, head => 'Patient', dataFmt => '#8# <A HREF = "/person/#3#/account">#3#</A>'},
 					{colIdx => 4, head => 'Provider'},
 					{colIdx => 5, head => 'Status'},
 					{colIdx => 6, head => 'Total cost', dformat => 'currency', dAlign => 'right'},
@@ -91,8 +92,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detail_insurance' => {
 		_stmtFmt => qq{
 			select Insurance.ins_org_id as payer, invoice_id, invoice_date, client_id, bill_to_id,
-				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
-			from Insurance, Transaction_Status, Transaction, Invoice
+				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, complete_name
+			from Insurance, Transaction_Status, Transaction, Invoice, Person
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -101,6 +102,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and Transaction_Status.id = Transaction.trans_status
 				and Insurance.ins_internal_id = Invoice.ins_id
 				and Insurance.ins_org_id = ?
+				and Invoice.client_id = Person.person_id
 		},
 		publishDefn => 	{
 			columnDefn =>
@@ -108,7 +110,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 					{colIdx => 0, head => 'Insurance'},
 					{colIdx => 1, head => 'Invoice'},
 					{colIdx => 2, head => 'Date'},
-					{colIdx => 3, head => 'Patient'},
+					{colIdx => 3, head => 'Patient', dataFmt => '#9# <A HREF = "/person/#3#/account">#3#</A>'},
 					{colIdx => 4, head => 'Bill to'},
 					{colIdx => 5, head => 'Provider'},
 					{colIdx => 6, head => 'Status'},
@@ -175,8 +177,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detailProcedures' => {
 		_stmtFmt => qq{
 			select Invoice_Item.code as procedure, Invoice_Item.modifier, invoice_id, invoice_date,
-				client_id, provider_id
-			from Transaction, Invoice_Item, Invoice
+				client_id, provider_id, complete_name
+			from Transaction, Invoice_Item, Invoice, Person
 			where Invoice_Item.code is NOT NULL
 				and Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
@@ -185,7 +187,19 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and Invoice_Item.parent_id = Invoice.invoice_id
 				and Invoice_Item.code = ?
 				and Transaction.trans_id = Invoice.main_transaction
+				and Invoice.client_id = Person.person_id
 		},
+		publishDefn => 	{
+			columnDefn =>
+				[
+					{colIdx => 0, head => 'Procedure'},
+					{colIdx => 1, head => 'Modifier'},
+					{colIdx => 2, head => 'Invoice'},
+					{colIdx => 3, head => 'Date'},
+					{colIdx => 4, head => 'Patient', dataFmt => '#6# <A HREF = "/person/#4#/account">#4#</A>'},
+					{colIdx => 5, head => 'Provider'},
+				],
+		},		
 	},
 
 	'sel_diagsFromInvoice_Item' => qq{

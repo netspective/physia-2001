@@ -104,7 +104,7 @@ sub prepare_detail_payment
 			{colIdx => 16,head => 'Batch Date', dAlign => 'left',},
 			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
 			{colIdx => 1,head => 'Physican', dAlign => 'left',},
-			{colIdx => 2,,head => 'Patient',dAlign =>'left' , hAlign =>'left'},
+			{colIdx => 2,,head => 'Patient',dAlign =>'left' , hAlign =>'left', dataFmt => '#17# <A HREF = "/person/#2#/account">#2#</A>'},
 			{colIdx => 3,head => 'Proc Code', dAlign => 'center'},		
 			{colIdx => 4,head => 'Proc Name', dAlign => 'center'},		
 			{colIdx => 5,head => 'Service From', dAlign => 'center'},			
@@ -135,6 +135,7 @@ sub prepare_detail_payment
 		{
 			$_->{care_provider_id}='';
 			$_->{patient_id}='';
+			$_->{complete_name}='';
 		};
 		
 		my @rowData = 
@@ -155,7 +156,8 @@ sub prepare_detail_payment
 			$_->{person_pay},
 			$_->{refund},
 			$_->{pay_type},
-			$_->{invoice_batch_date}
+			$_->{invoice_batch_date},
+			$_->{complete_name}
 		);
 		push(@data, \@rowData);
 	}

@@ -522,8 +522,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(charge_adjust) as  charge_adjust,
 		(person_write_off) as person_write_off,
 		(refund) as refund,
-		pay_type
-	FROM	invoice_charges,org o
+		pay_type,
+		p.complete_name
+	FROM	invoice_charges,org o, person p
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
 		AND (provider = :3 or :3 IS NULL)
@@ -535,6 +536,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		)
 		AND o.org_internal_id = invoice_charges.facility
 		AND o.owner_org_id = :6
+		AND client_id = p.person_id
 	order by invoice_id
 	},
 	'sel_daily_audit' => qq{
@@ -606,8 +608,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(charge_adjust) as  charge_adjust,
 		(person_write_off) as person_write_off,
 		(refund) as refund,
-		pay_type
-	FROM 	invoice_charges, org o
+		pay_type,
+		p.complete_name 
+	FROM 	invoice_charges, org o, person p
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -621,6 +624,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		)
 	AND 	o.org_internal_id = invoice_charges.facility
 	AND 	o.owner_org_id = :6
+	AND 	client_id = p.person_id
 	ORDER BY  invoice_date asc
 	},
 
