@@ -828,12 +828,13 @@ use Carp;
 use CGI::Validator;
 use CGI::Validator::Field;
 use CGI::Dialog;
-use DBI::StatementManager;
 
+use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Invoice;
 use App::Universal;
 
+use Number::Format;
 use Date::Manip;
 use Date::Calc qw(:all);
 
@@ -867,6 +868,9 @@ sub isValid
 	my $paidBy = $page->param('paidBy');
 	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal';
 
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	#$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $clientId = $page->field('client_id');
 	my $totalPayRcvd = $page->field('check_amount') || $page->field('total_amount');
@@ -888,17 +892,19 @@ sub isValid
 		if($itemPayment > $itemCharge && $totalPayRcvd >= 0)
 		{
 			my $difference = $itemPayment - $itemCharge;
+			$difference = $formatter->format_price($difference);
 			$paidBy eq 'insurance' ? 
-				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Charge' by \$$difference") 
-				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Charge' by \$$difference");
+				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Charge' by $difference") 
+				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Charge' by $difference");
 		}
 
 		if($itemPayment > $totalPayRcvd && $totalPayRcvd >= 0)
 		{
 			my $amtDiff = $itemPayment - $totalPayRcvd;
+			$amtDiff = $formatter->format_price($amtDiff);
 			$paidBy eq 'insurance' ? 
-				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by \$$amtDiff") 
-				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Total Amount' by \$$amtDiff");
+				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by $amtDiff") 
+				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Total Amount' by $amtDiff");
 		}
 
 		$totalAmtApplied += $itemPayment;
@@ -908,37 +914,41 @@ sub isValid
 	#validation  - no validation needed for overpayments - overpayments are allowed
 	#if($totalPayRcvd >= 0)
 	#{
-		if($totalAmtApplied > $totalPayRcvd)
+		if($totalAmtApplied - $totalPayRcvd > .01)
 		{
 			my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
+			$amtExceeded = $formatter->format_price($amtExceeded);
 			$paidBy eq 'insurance' ? 
-				$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.")
-				: $self->invalidate($page, "The total amount applied exceeds the total amount entered by \$$amtExceeded. Please reconcile.");
+				$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by $amtExceeded. Please reconcile.")
+				: $self->invalidate($page, "The total amount applied exceeds the total amount entered by $amtExceeded. Please reconcile.");
 		}
-		elsif($totalAmtApplied < $totalPayRcvd)
+		if($totalPayRcvd - $totalAmtApplied > .01)
 		{
 			my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtApplied;
-			if($totalAmtApplied < $totalInvoiceBalance)
+			$payRcvdAndPayAppliedDiff = $formatter->format_price($payRcvdAndPayAppliedDiff);
+			if($totalInvoiceBalance - $totalAmtApplied > .01)
 			{
 				my $balanceRemain = $totalInvoiceBalance - $totalAmtApplied;
-				$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+				$balanceRemain = $formatter->format_price($balanceRemain);
+				$self->invalidate($page, "Remaining balance: $balanceRemain. There is a payment remainder of $payRcvdAndPayAppliedDiff.");
 			}
 			else
 			{
-				$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+				$self->invalidate($page, "There is a payment remainder of $payRcvdAndPayAppliedDiff.");
 			}
 		}
-		elsif($totalAmtApplied > $totalPatientBalance && ! $creditWarned)
+		elsif($totalAmtApplied - $totalPatientBalance > .01 && ! $creditWarned)
 		{
 			my $credit = $totalPatientBalance - $totalAmtApplied;
+			$credit = $formatter->format_price($credit);
 			if($totalPatientBalance < 0)
 			{
 				$self->invalidate($page, "WARNING: This patient currently has a credit of \$$totalPatientBalance on their account balance. 
-									This payment will increase the credit to \$$credit. Click 'OK' to continue.");
+									This payment will increase the credit to $credit. Click 'OK' to continue.");
 			}
 			else
 			{
-				$self->invalidate($page, "WARNING: This payment will put a credit of \$$credit on this patient's account balance. Click 'OK' to continue.");
+				$self->invalidate($page, "WARNING: This payment will put a credit of $credit on this patient's account balance. Click 'OK' to continue.");
 			}
 
 			$page->field('credit_warning_flag', 1);
