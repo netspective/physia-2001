@@ -15,7 +15,8 @@
 		<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
 		<field id="start_time" caption="Appointment Time" join="event" column="start_time" columndefn="TO_CHAR(event.start_time,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
 		<field id="appt_status" caption="Appointment Status" join="appt_status" column="caption"/>
-		<field id="duration" caption="Duration" join="event" column="duration" ui-datatype="number"/>
+		<field id="duration" caption="Duration" join="event" column="duration" ui-datatype="integer"/>
+		<field id="appt_type" caption="Appointment Type" join="appt_type" column="caption"/>
 		
 		<field id="scheduled_by" caption="Scheduled By" join="event" column="scheduled_by_id"/>
 		<field id="scheduled_on" caption="Scheduled On" join="event" column="scheduled_stamp" columndefn="TO_CHAR(event.scheduled_stamp,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
@@ -48,6 +49,7 @@
 		<join id="person" table="person" condition="person.person_id = event_attr_patientid.value_text"/>
 		<join id="appt_status" table="appt_status" condition="appt_status.id = event.event_status"/>
 		<join id="appt_discard_type" table="appt_discard_type" condition="appt_discard_type.id (+) = event.discard_type"/>
+		<join id="appt_type" table="appt_type" condition="appt_type.appt_type_id (+) = event.appt_type"/>
 		
 		<!-- Views -->
 		<view id="all" distinct="yes">
@@ -55,6 +57,7 @@
 			<column id="patient_id"/>
 			<column id="patient_name"/>
 			<column id="physician_id"/>
+			<column id="appt_type"/>
 			<column id="facility_id"/>
 			<column id="account"/>
 			<column id="chart"/>
@@ -67,6 +70,7 @@
 			<column id="patient_id"/>
 			<column id="patient_name"/>
 			<column id="physician_id"/>
+			<column id="appt_type"/>
 			<column id="facility_id"/>
 			<column id="account"/>
 			<column id="chart"/>
@@ -82,6 +86,7 @@
 			<column id="patient_id"/>
 			<column id="patient_name"/>
 			<column id="physician_id"/>
+			<column id="appt_type"/>
 			<column id="facility_id"/>
 			<column id="account"/>
 			<column id="chart"/>
@@ -97,6 +102,7 @@
 			<column id="patient_id"/>
 			<column id="patient_name"/>
 			<column id="physician_id"/>
+			<column id="appt_type"/>
 			<column id="facility_id"/>
 			<column id="account"/>
 			<column id="chart"/>
@@ -112,6 +118,7 @@
 			<column id="patient_id"/>
 			<column id="patient_name"/>
 			<column id="physician_id"/>
+			<column id="appt_type"/>
 			<column id="facility_id"/>
 			<column id="account"/>
 			<column id="chart"/>
@@ -121,7 +128,6 @@
 				<condition field="appt_status" comparison="is" criteria="Discard"/>
 			</and-conditions>
 		</view>
-		
 
 	</query-defn>
 </component>
