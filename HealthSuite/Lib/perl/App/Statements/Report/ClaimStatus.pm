@@ -44,6 +44,14 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 		order by 3,2 asc
 	},
 	
+	'sel_claim_status_used' => qq{
+		select  'All Claims' as caption,-1 as id , 2 as sort_field from Dual
+		UNION
+		select  caption, id,1 as sort_field from Invoice_Status
+		WHERE ID NOT IN (1,2,6,10)
+		order by 3,2 asc
+	},	
+	
 	'sel_payer_type' => qq{
 		select 'All' as col0, -1 as col1 from Dual
 		UNION
@@ -66,7 +74,10 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 	{
 		select 
 		i.invoice_id, ii.code,
-		iia.payer_id,iia.pay_date,
+		decode(iia.payer_type,1,
+		(SELECT ORG_ID FROM ORG WHERE ORG_INTERNAL_ID = iia.payer_id
+		)
+		,iia.payer_id) as payer_id,iia.pay_date,
 		iia.pay_ref,decode(iia.adjustment_amount,NULL,0,iia.adjustment_amount)+decode(iia.plan_paid,NULL,0,iia.plan_paid),
 		nvl((select caption from payment_type pt where  pt.id = iia.pay_type ),
 		(select 'Insurance' from DUAL where iia.payer_type = 1))
