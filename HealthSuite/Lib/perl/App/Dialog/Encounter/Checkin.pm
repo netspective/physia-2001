@@ -124,6 +124,31 @@ sub handle_page
 	}
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
+	my $confirmYes = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
+	my $patientId = $page->field('attendee_id');
+	
+	if ($confirmYes)
+	{
+		my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
+
+		my $verifyFlags = $eventAttribute->{value_intb};
+		unless ($verifyFlags & App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE)
+		{
+			my $field = $self->getField('confirmed_info');
+			$field->invalidate($page, qq{Insurance Verification is incomplete.
+				Click here to <a href='/person/$patientId/dlg-verify-insurance-records/$eventId'>
+					Verify Insurance</a>
+			});
+		}
+	}
+}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;

@@ -330,6 +330,7 @@ sub makeStateChanges_cancel
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('minutes_util_0', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('minutes_util_1', FLDFLAG_INVISIBLE, 1);
 
 
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
@@ -395,11 +396,7 @@ sub populateData_add
 
 	$page->field('appt_date_1', $appt_date);
 	$page->field('appt_time_1', $appt_time);
-	$page->field('appt_date_2', $appt_date);
-	$page->field('appt_time_2', $appt_time);
-	$page->field('appt_date_3', $appt_date);
-	$page->field('appt_time_3', $appt_time);
-
+	
 	$page->field('attendee_id', $page->param('person_id'));
 	$page->field('resource_id', $page->param('resource_id'));
 	$page->field('facility_id', $page->param('facility_id'));
@@ -678,6 +675,39 @@ sub handleWaitingList
 	unless($parentEventId)
 	{
 		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_NONE, 'updParentEventToNULL', $thisEventId);
+	}
+}
+
+sub handle_page
+{
+	my ($self, $page, $command) = @_;
+
+	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
+
+	my $returnUrl = $self->getReferer($page);
+	my ($status, $person, $stamp) = App::Dialog::Encounter::checkEventStatus($self, $page, $eventId);
+
+	if ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/) 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Patient was checked-$status by <b>$person</b> on <b>$stamp</b>.<br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	elsif ($status =~ /ed$/) 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Appointment was $status by <b>$person</b> on <b>$stamp</b>. <br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	else 
+	{
+		$self->SUPER::handle_page($page, $command);
 	}
 }
 
