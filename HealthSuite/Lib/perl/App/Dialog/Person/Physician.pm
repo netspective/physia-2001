@@ -54,7 +54,7 @@ sub initialize
 				{
 					_class => 'CGI::Dialog::Field',
 					type => 'select',
-					selOptions => 'DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT',
+					selOptions => 'DEA;DPS;IRS',
 					caption => 'License',
 					name => 'id_name',
 					options => FLDFLAG_PREPENDBLANK,
@@ -98,7 +98,7 @@ sub initialize
 				{
 					_class => 'CGI::Dialog::Field',
 					type => 'select',
-					selOptions => 'Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
+					selOptions => 'BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
 					caption => 'License',
 					name => 'prov_id_name',
 					options => FLDFLAG_PREPENDBLANK,
@@ -154,7 +154,7 @@ sub initialize
 #			fKeyValueCol => 1,
 #			options => FLDFLAG_PREPENDBLANK,
 			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-	
+
 		new CGI::Dialog::Field(
 			name => 'billing_active',
 			type => 'bool',
@@ -210,6 +210,11 @@ sub initialize
 			fields => [
 				new CGI::Dialog::Field(caption => 'Affiliation', name => 'affiliation'),
 				new CGI::Dialog::Field(type => 'date', caption => 'Date', name => 'value_dateend', futureOnly => 0, defaultValue => ''),
+			]),
+		new CGI::Dialog::MultiField(caption => 'Board Certification Name/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'Board Certification Name', name => 'board_certification'),
+				new CGI::Dialog::Field(type => 'date', caption => 'Date', name => 'board_dateend', futureOnly => 0, defaultValue => ''),
 			]),
 		#new CGI::Dialog::MultiField(caption => 'Board Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		#				fields => [
@@ -307,7 +312,6 @@ sub makeStateChanges
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('ethnicity', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
@@ -441,6 +445,17 @@ sub execute_add
 			value_dateEnd => $page->field('value_dateend') ||undef,
 			_debug => 0
 	) if $affiliation ne '';
+
+	my $boardCertication = $page->field('board_certification');
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId,
+			item_name => "$boardCertication",
+			value_type => App::Universal::ATTRTYPE_BOARD_CERTIFICATION,
+			value_text => $boardCertication || undef,
+			value_dateEnd => $page->field('board_dateend') ||undef,
+			_debug => 0
+	) if $boardCertication ne '';
 
 	my $accreditation = $page->field('accreditations');
 	$page->schemaAction(
