@@ -747,8 +747,8 @@
 				<col name="id">999</col>
 				<col name="caption">Other</col>
 			</row>
-			
-			
+
+
 
 
 		</data>
@@ -1009,7 +1009,12 @@
 				<col name="id">12</col>
 				<col name="caption">Lab</col>
 				<col name="group_name">Lab</col>
-			</row>			
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Pharmacy</col>
+				<col name="group_name">provider</col>
+			</row>
 			<row>
 				<col name="id">99</col>
 				<col name="caption">other</col>
