@@ -146,17 +146,20 @@ sub handlePage
 {
 	my ($resource, $flags, $arl, $params, $resourceId, $pathItems) = @_;
 
-	if(ref $resource eq 'HASH')
+	# Dig until we find the deepest page resource available
+	my $i = 0;
+	while(ref($resource) eq 'HASH' && defined $pathItems->[$i] && defined $resource->{$pathItems->[$i]})
 	{
-		if (defined $pathItems->[0] && defined $resource->{$pathItems->[0]})
-		{
-			$resource = $resource->{$pathItems->[0]};
-			$resourceId .= "/" . $pathItems->[0];
-		}
-		elsif (defined $resource->{_default})
-		{
-			$resource = $resource->{_default};
-		}
+		$resource = $resource->{$pathItems->[$i]};
+		$resourceId = $resource->{_id};
+		$i++;
+	}
+
+	# Check to see if it has a default
+	if (ref($resource) eq 'HASH' && defined $resource->{_default})
+	{
+		$resource = $resource->{_default};
+		$resourceId = $resource->{_id};
 	}
 
 	return 'ARL-000200' unless defined $resource->{_class};
@@ -388,34 +391,40 @@ sub registerResource
 		}
 		else
 		{
-			warn "Parent resource $1 is not a hash\n";
+			die "Cannot add a sub-resource '$resourceId' to a parent resource '$1' that is not a hash\n";
 			return 0;
 		}
 	}
 
 	if ( exists $$RESOURCES{$prefix . $resourceId} )
 	{
-		warn "Cannot create duplicate resource '$prefix$resourceId'\n";
+		my $firstClass = $$RESOURCES{$prefix . $resourceId}->{_class};
+		die "Cannot create duplicate resource '$prefix$resourceId'.  Conflict between '$firstClass' and '$class'\n";
 		return 0;
 	}
 
-	# Register the resource and set class name to default if necessary
-	$$RESOURCES{$prefix . $resourceId} = $resourceData ? $resourceData : $class;
-	if (ref $resourceData eq 'HASH')
-	{
-		$resourceData->{_class} = $class unless defined $resourceData->{_class} || defined $resourceData->{_default};
-	}
+	# Make a copy of the resource data (so we don't modify the original)
+	my %resourceDataCopy = $resourceData ? %$resourceData : ( _class => $class );
+
+	# Make sure it has some class
+	$resourceDataCopy{_class} = $class unless defined $resourceDataCopy{_class} || defined $resourceDataCopy{_default};
 
 	# Add the prefix to any synonyms
-	return 1 unless ref $resourceData eq 'HASH' && defined $resourceData->{_idSynonym};
-	if (ref $resourceData->{_idSynonym} eq 'ARRAY')
+	if (defined $resourceDataCopy{_idSynonym})
 	{
-		@{$resourceData->{_idSynonym}} = addPrefix($resourceData->{_idSynonym}, $prefix);
+		if (ref $resourceDataCopy{_idSynonym} eq 'ARRAY')
+		{
+			@{$resourceDataCopy{_idSynonym}} = addPrefix($resourceDataCopy{_idSynonym}, $prefix);
+		}
+		else
+		{
+			$resourceDataCopy{_idSynonym} = addPrefix($resourceDataCopy{_idSynonym}, $prefix);
+		}
 	}
-	else
-	{
-		$resourceData->{_idSynonym} = addPrefix($resourceData->{_idSynonym}, $prefix);
-	}
+
+	# Register the resource and set class name to default if necessary
+	$$RESOURCES{$prefix . $resourceId} = \%resourceDataCopy;
+
 	return 1;
 }
 
@@ -479,6 +488,10 @@ sub addSynonyms
 	foreach my $Id (@RESOURCE_KEYS)
 	{
 		next unless ref $$RESOURCES{$Id} eq 'HASH';
+
+		# Search for nested resources
+		addSynonyms($$RESOURCES{$Id});
+
 		next unless defined $$RESOURCES{$Id}->{_idSynonym};
 		if (ref $$RESOURCES{$Id}->{_idSynonym} eq 'ARRAY')
 		{
