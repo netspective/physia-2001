@@ -28,8 +28,8 @@ $QUERYDIR = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL');
 sub prepare
 {
 	my $self = shift;
-	
-	
+
+
 	if ($self->property('QDL'))
 	{
 		unless ($self->param('_query_view'))
@@ -38,14 +38,18 @@ sub prepare
 			$self->redirect("/query/$queryType/all");
 			return;
 		}
-		my $heading = $self->{flags} & PAGEFLAG_ISPOPUP ? $self->param('_query_title') . " Query" : '';
+		my $heading = $self->{flags} & PAGEFLAG_ISPOPUP ? $self->param('_query_title') . " Query (" . $self->param('_query_view_title') . ")": '';
 		my $dialog = new App::Dialog::Query(page => $self, schema => $self->{schema}, heading => $heading);
 		$self->{queryDialog} = $dialog;
-		push @{$self->{page_content_header}}, $dialog->getHtml($self, 'add');
+
+		push @{$self->{page_content}}, $dialog->getHtml($self, 'add');
 		if ($self->field('dlg_execmode') eq 'V')
 		{
-			push @{$self->{page_content_header}}, $dialog->getHtml($self, 'add');
+			unshift @{$self->{page_content}}, $dialog->getHtml($self, 'add');
 		}
+
+		unshift @{$self->{page_content}}, $dialog->{viewTabs} if defined $dialog->{viewTabs};
+
 	}
 	else
 	{
@@ -68,7 +72,8 @@ sub initialize
 	$self->SUPER::initialize(@_);
 	$self->addLocatorLinks(['Query', '/query'],);
 	$self->addLocatorLinks([$self->param('_query_title'), '/query/#param._query_type#'],) if $self->param('_query_type');
-		
+	$self->addLocatorLinks([$self->param('_query_view_title'), '/query/#param._query_type#/#param._query_view#'],) if $self->param('_query_view');
+
 	# Check user's permission to page
 	my $activeQuery = $self->param('_query_type');
 	unless($self->hasPermission($self->property('ACL')))
@@ -76,7 +81,7 @@ sub initialize
 		$self->disable(
 				qq{
 					<br>
-					You do not have permission to view this information. 
+					You do not have permission to view this information.
 					Permission @{[ $self->property('ACL') ]} is required.
 
 					Click <a href='javascript:history.back()'>here</a> to go back.
@@ -104,23 +109,25 @@ sub handleARL
 		{
 			$self->property('QDL', $fileName);
 		}
-		$view = $pathItems->[1] || '';	
+		$view = $pathItems->[1] || '';
 	}
 	else
 	{
 		$self->property('ACL', 'page/query');
 	}
-	
+
 	my $pageTitle = "Query";
 	$pageTitle = $queryTitle . ' ' . $pageTitle if $queryTitle;
-	$pageTitle .= " (\u$view)" if $view;
+	#$pageTitle .= " (\u$view)" if $view;
 	$pageTitle =~ s/_/ /g;
-	
+
 	$self->param('_page_title', $pageTitle);
 	$self->param('_query_type', $queryType);
 	$self->param('_query_title', $queryTitle);
 	$self->param('_query_view', $view);
-	
+	$self->param('_query_view_title', "\u$view");
+	$self->param('_pm_view', $queryType);
+
 	$self->printContents();
 	return 0;
 }
