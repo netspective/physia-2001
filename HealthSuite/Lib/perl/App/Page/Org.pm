@@ -467,8 +467,6 @@ sub prepare_view_superbills
 {
 	my ($self) = @_;
 
-	#$self->addLocatorLinks(['Profile', 'profile']);
-
 	if ($self->param ('action') eq 'add') {
 		my $catalogIDExists = $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selSuperbillsByCatalogId', $self->param('catalog_id'), $self->session ('org_internal_id'));
 		my $internalCatalogID = $self->param('int_cat_id');
@@ -639,20 +637,21 @@ sub prepare_view_superbills
 			my $internalCatalogID = $self->param('int_cat_id');
 
 			if ($internalCatalogID) {
-				# First delete the old superbill...
 				my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
 
-				$self->schemaAction(
-					'Offering_Catalog', 'remove',
-					internal_catalog_id => $internalCatalogID,
-					catalog_id => $self->param('catalog_id'),
-					org_internal_id => $orgIntId,
-					caption => $self->param ('caption') || undef,
-					catalog_type => 4,
-					description => $self->param ('description'),
-					_debug => 0
-				);
+#				$self->schemaAction(
+#					'Offering_Catalog', 'remove',
+#					internal_catalog_id => $internalCatalogID,
+#					catalog_id => $self->param('catalog_id'),
+#					org_internal_id => $orgIntId,
+#					caption => $self->param ('caption') || undef,
+#					catalog_type => 4,
+#					description => $self->param ('description'),
+#					_debug => 0
+#				);
 				
+				# First delete the old superbill items...
+				# Make sure not to delete the old superbill itself!
 				for my $superbillItem (@{$superbillList}) {
 					$self->schemaAction(
 						'Offering_Catalog_Entry', 'remove',
@@ -661,16 +660,16 @@ sub prepare_view_superbills
 					);
 				}
 
-				# Then create a new superbill...
-				my $catIntId = $self->schemaAction(
-					'Offering_Catalog', 'add',
-					catalog_id => $self->param('catalog_id'),
-					org_internal_id => $orgIntId,
-					caption => $self->param ('caption') || undef,
-					catalog_type => 4,
-					description => $self->param ('description'),
-					_debug => 0
-				);
+#				# Then create a new superbill...
+#				my $catIntId = $self->schemaAction(
+#					'Offering_Catalog', 'add',
+#					catalog_id => $self->param('catalog_id'),
+#					org_internal_id => $orgIntId,
+#					caption => $self->param ('caption') || undef,
+#					catalog_type => 4,
+#					description => $self->param ('description'),
+#					_debug => 0
+#				);
 				
 				$i = 0;
 				foreach my $grp (@groupArray) {
@@ -678,7 +677,7 @@ sub prepare_view_superbills
                 
 					my $groupEntryID = $self->schemaAction (
 						'Offering_Catalog_Entry', 'add',
-						catalog_id => $catIntId,
+						catalog_id => $internalCatalogID,
 						parent_entry_id => undef,
 						entry_type => 0,
 						status => 1,
@@ -692,7 +691,7 @@ sub prepare_view_superbills
 						my ($code, $name) = split /:/, $cpt, 2;
 						$self->schemaAction (
 							'Offering_Catalog_Entry', 'add',
-							catalog_id => $catIntId,
+							catalog_id => $internalCatalogID,
 							parent_entry_id => $groupEntryID,
 							entry_type => 100,
 							status => 1,
@@ -713,6 +712,7 @@ sub prepare_view_superbills
 					caption => $self->param ('caption') || undef,
 					catalog_type => 4,
 					description => $self->param ('description'),
+					flags => 1,
 					_debug => 0
 				);
 				
@@ -1043,18 +1043,19 @@ sub prepare_view_superbills
 			my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
 
 			$self->schemaAction(
-				'Offering_Catalog', 'remove',
+				'Offering_Catalog', 'update',
 				internal_catalog_id => $internalCatalogID,
+				flags => 0,
 #				_debug => 0
 			);
 			
-			for my $superbillItem (@{$superbillList}) {
-				$self->schemaAction(
-					'Offering_Catalog_Entry', 'remove',
-					entry_id => $superbillItem->{entry_id},
+#			for my $superbillItem (@{$superbillList}) {
+#				$self->schemaAction(
+#					'Offering_Catalog_Entry', 'remove',
+#					entry_id => $superbillItem->{entry_id},
 #					_debug => 0
-				);
-			}
+#				);
+#			}
 		}
 		
 		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
