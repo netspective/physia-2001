@@ -72,6 +72,7 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+	$self->updateFieldFlags('batch_fields', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('checkout_stamp', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('claim_diags', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('procedures_heading', FLDFLAG_INVISIBLE, 1);
