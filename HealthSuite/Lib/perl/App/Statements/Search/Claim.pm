@@ -35,7 +35,7 @@ $STMTFMT_SEL_CLAIM = qq{
 			iis.caption, ib.bill_to_id, i.total_cost, 
 			i.total_adjust, i.balance, ib.bill_party_type,
 			i.invoice_date
-		order by i.invoice_id
+		order by i.invoice_id desc
 };
 
 $STMTRPTDEFN_DEFAULT =

@@ -12,7 +12,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_CATALOG);
 
 my $SEL_CATALOG_ENTRY = qq{
 	select * from Offering_Catalog_Entry
-	where code = ?
+	where code = upper(?)
 		%modifierWhereClause%
 		and entry_type = ?
 		and catalog_id = ?
@@ -50,7 +50,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selCatalogItemsByCodeAndType' => q{
 		select *
 		from offering_catalog_entry
-		where code = ?
+		where code = upper(?)
 			and entry_type = ?
 	},
 
@@ -63,7 +63,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 			and oce.cost_type != 0
 			and oce.entry_type in (0,100)
 			and oce.status = 1
-			and oce.code = ?
+			and oce.code = upper(?)
 	},
 	'selCatalogItemsByIdandType' => q{
 		select *
@@ -79,7 +79,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selGenericCPT_LikeCode' => q{
 		select cpt, name, description
 		from ref_cpt
-		where cpt like ?
+		where cpt like upper(?)
 	},
 	'selGenericCPT_LikeText' => q{
 		select cpt, name, description
@@ -89,12 +89,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selGenericCPTCode' => q{
 		select cpt, name, description
 		from ref_cpt
-		where cpt = ?
+		where cpt = upper(?)
 	},
 	'selGenericHCPCS_LikeCode' => q{
 		select hcpcs, name, description
 		from ref_hcpcs
-		where hcpcs like ?
+		where hcpcs like upper(?)
 	},
 	'selGenericHCPCS_LikeText' => q{
 		select hcpcs, name, description
@@ -104,12 +104,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selGenericHCPCSCode' => q{
 		select hcpcs, name, description
 		from ref_hcpcs
-		where hcpcs = ?
+		where hcpcs = upper(?)
 	},
 	'selGenericICD_LikeCode' => q{
 		select icd, descr
 		from ref_icd
-		where icd like ?
+		where icd like upper(?)
 	},
 	'selGenericICD_LikeText' => q{
 		select icd, descr
@@ -119,7 +119,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selGenericICDCode' => q{
 		select icd, descr
 		from ref_icd
-		where icd = ?
+		where icd = upper(?)
 	},
 	'selGenericModifier' => q{
 		select caption
@@ -233,14 +233,14 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	},
 	'sel_catalogEntry_by_code_modifier_catalog' => qq{
 		select * from Offering_Catalog_Entry
-		where code = ?
+		where code = upper(?)
 			and (modifier = ? or modifier is NULL)
 			and catalog_id = ?
 			and cr_org_id = ?
 	},
 	'sel_catalogEntry_by_code_catalog' => qq{
 		select * from Offering_Catalog_Entry
-		where code = ?
+		where code = upper(?)
 			and modifier is NULL
 			and catalog_id = ?
 			and cr_org_id = ?			

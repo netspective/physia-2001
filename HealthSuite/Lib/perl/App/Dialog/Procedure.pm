@@ -68,8 +68,16 @@ sub new
 		new App::Dialog::Field::ProcedureLine(caption => 'CPT / Modf'),
 		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED, name => 'procdiags'),
 
-		new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', options => FLDFLAG_PERSIST),
-		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units', name => 'proc_charge_fields'),
+		new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
+			name => 'fee_schedules',
+			size => 24,
+			findPopupAppendValue => ',',
+			findPopup => '/lookup/catalog',
+			options => FLDFLAG_PERSIST,
+		),
+		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units',
+			name => 'proc_charge_fields'
+		),
 
 		new CGI::Dialog::MultiField(caption => 'Units', name => 'units_emg_fields',
 			fields => [
@@ -77,7 +85,11 @@ sub new
 				new CGI::Dialog::Field(caption => 'EMG', name => 'emg', type => 'bool', style => 'check'),
 			]),
 
-		new CGI::Dialog::Field(caption => 'Please choose a unit cost', name => 'alt_cost', type => 'select', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Unit Cost',
+			name => 'alt_cost', 
+			#type => 'select',
+			#options => FLDFLAG_REQUIRED,
+		),
 
 		#new CGI::Dialog::Field(caption => 'Reference', name => 'reference'),
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo', cols => 25, rows => 4),
@@ -1216,8 +1228,7 @@ sub customValidate
 	my ($self, $page) = @_;
 
 	#GET ITEM COST FROM FEE SCHEDULE
-	my $enteredCost = $page->field('proccharge');
-	unless($enteredCost)
+	unless($page->field('proccharge'))
 	{
 		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];
 		my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
@@ -1234,9 +1245,7 @@ sub customValidate
 		{
 			foreach (@$fsResults)
 			{
-				my $fs = $_->[0];
-				my $entry = $_->[1];
-				my $unitCost = $entry->{unit_cost};
+				my $unitCost = $_->[1];
 				$page->field('proccharge', $unitCost);
 			}
 		}
@@ -1245,23 +1254,40 @@ sub customValidate
 			my @costs = ();
 			foreach (@$fsResults)
 			{
-				my $fs = $_->[0];
-				my $entry = $_->[1];
-				push(@costs, $entry->{unit_cost});
-
-				#$unitCostField->invalidate($page, "Fee Schedule '$fs' returned the unit cost: $unitCost");
+				push(@costs, $_->[1]);
 			}
 
 			$self->updateFieldFlags('alt_cost', FLDFLAG_INVISIBLE, 0);
 			$self->updateFieldFlags('units_emg_fields', FLDFLAG_INVISIBLE, 0);
 			$self->updateFieldFlags('proc_charge_fields', FLDFLAG_INVISIBLE, 1);
 
-			my $costList = join(';', @costs);
-			$self->getField('alt_cost')->{selOptions} = "$costList";
+			#my $costList = join(';', @costs);
+			#$self->getField('alt_cost')->{selOptions} = "$costList";
+			
+			my $field = $self->getField('alt_cost');
+			my $html = $self->getMultiPricesHtml($page, $fsResults);
+			$field->invalidate($page, $html);
+			
 		}
 	}
+}
 
+sub getMultiPricesHtml
+{
+	my ($self, $page, $fsResults) = @_;
 
+	my $html = qq{Multiple prices found.  Please select a price for this item.};
+	
+	foreach (@$fsResults)
+	{
+		my $cost = sprintf("%.2f", $_->[1]);
+		$html .= qq{
+			<input onClick="document.dialog._f_alt_cost.value=this.value" 
+				type=radio name='_f_multi_price' value=$cost>\$$cost
+		};
+	}
+
+	return $html;
 }
 
 sub execute

@@ -7,12 +7,17 @@ use Set::Scalar;
 use DBI::StatementManager;
 use App::Statements::IntelliCode;
 use App::Statements::Search::Code;
+use App::Statements::Org;
 use App::Statements::Catalog;
 use Date::Calc qw(:all);
+use Date::Manip;
 use App::Page::Search;
 use App::Data::Manipulate;
 
-use enum qw(BITMASK:INTELLICODEFLAG_ ICDARRAY ICDARRAYINDEX SKIPWARNING);
+use enum qw(BITMASK:INTELLICODEFLAG_ ICDARRAY ICDARRAYINDEX SKIPWARNING 
+	NON_FACILITY_PRICING
+	FACILITY_PRICING
+);
 
 use enum qw(BITMASK:AGE_ ADULT MATERNAL NEWBORN PEDIATRIC);
 use enum qw(:ICDFLAG_ INVALIDCPTLIST);
@@ -273,53 +278,6 @@ sub validateProcs
 	}
 }
 
-sub __validateProcs
-{
-	my ($page, $flags, $errorRef, %params) = @_;
-	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
-
-	for (@$procsRef)
-	{
-		my $cpt = uc($_->[0]);
-
-		unless ($CPT_CACHE{$cpt}->{cpt})
-		{
-			$CPT_CACHE{$cpt} = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
-				'selCptData', $cpt);
-
-			if ($CPT_CACHE{$cpt})
-			{
-				my $hash = $CPT_CACHE{$cpt};
-				$hash->{flags} = 0 unless exists $hash->{flags};
-				eval
-				{
-					$hash->{comprehensive_compound_cpts} = new Set::Scalar(split(',', $hash->{comprehensive_compound_cpts}));
-				};
-				if($@)
-				{
-					push(@$errorRef, "Unable to create comprehensive_compound_cpts run_list for cpt $cpt: $@");
-					$hash->{comprehensive_compound_cpts} = new Set::Scalar();
-					$hash->{flags} |= CPTFLAG_INVALIDCOMPOUNDLIST;
-				}
-				eval
-				{
-					$hash->{mutual_exclusive_cpts} = new Set::Scalar(split(',', $hash->{mutual_exclusive_cpts}));
-				};
-				if($@)
-				{
-					push(@$errorRef, "Unable to create mutual_exclusive_cpts run_list for cpt $cpt: $@");
-					$hash->{mutual_exclusive_cpts} = new Set::Scalar();
-					$hash->{flags} |= CPTFLAG_INVALIDMUTEXCLLIST;
-				}
-			}
-		}
-
-		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDCPT], $cpt)) unless ($CPT_CACHE{$cpt}->{cpt});
-		push(@$errorRef, sprintf("Can not check comprehensive compounds CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDCOMPOUNDLIST;
-		push(@$errorRef, sprintf("Can not check mutually exclusive CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDMUTEXCLLIST;
-	}
-}
-
 sub crossChecks
 {
 	my ($page, $flags, $errorRef, %params) = @_;
@@ -368,88 +326,6 @@ sub crossChecks
 		$icd = uc($icd);
 		unless ($diagReferenced{$icd} eq 'true')
 		{
-			my $icdName = $ICD_CACHE{$icd}->{name};
-			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_ICDNOTREFERENCED], detailLink('icd', $icd), $icdName));
-		}
-	}
-}
-
-sub __crossChecks
-{
-	my ($page, $flags, $errorRef, %params) = @_;
-	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
-
-	my @diagReferenced = ();
-
-	for (@$procsRef)
-	{
-		my ($cpt, $modifier) = ($_->[0], $_->[1]);
-		next unless ($CPT_CACHE{$cpt}->{cpt});
-
-		my $count = scalar(@$_);
-		my @diagsIndexes = @$_[2..($count-1)];
-
-		if (! @diagsIndexes)
-		{
-			my $diagsRef = (ref $params{diags} eq 'ARRAY') ? $params{diags} : [$params{diags}];
-			if (scalar(@$diagsRef) > 1)
-			{
-				push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_NODIAGNOSISFORPROC], $cpt)) ;
-			}
-			else
-			{
-				my $icd = $params{diags};
-				my $icdHash = $ICD_CACHE{$icd};
-				my $cptSet = $icdHash->{cpts_allowed};
-				if (defined $cptSet && (! $cptSet->member($cpt)))
-				{
-					my $cptName = $CPT_CACHE{$cpt}->{name};
-					my $icdName = $ICD_CACHE{$icd}->{name};
-					push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_PROCNOTALLOWED],
-						detailLink('cpt', $cpt), $cptName, detailLink('icd', $icd), $icdName));
-				}
-			}
-		}
-		else
-		{
-			for my $index (@diagsIndexes)
-			{
-				#my $index_1 = $index -1;
-				my $index_1 = $index;
-
-				$diagReferenced[$index_1] = 'true';
-
-				unless(ref $params{diags} eq 'ARRAY')
-				{
-					push(@$errorRef, "Diags is NOT an array reference.");
-					return;
-				}
-				unless($params{diags}->[$index_1])
-				{
-					push(@$errorRef, "No diagnoses is provided for index '$index' of the diags array.");
-					return;
-				}
-
-				my $icd = $params{diags}->[$index_1];
-				my $icdHash = $ICD_CACHE{$icd};
-				my $cptSet = $icdHash->{cpts_allowed};
-				if (defined $cptSet && (! $cptSet->member($cpt)))
-				{
-					my $cptName = $CPT_CACHE{$cpt}->{name};
-					my $icdName = $ICD_CACHE{$icd}->{name};
-					push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_PROCNOTALLOWED],
-						detailLink('cpt', $cpt), $cptName, detailLink('icd', $icd), $icdName));
-				}
-			}
-		}
-	}
-
-	my $diagsRef = (ref $params{diags} eq 'ARRAY') ? $params{diags} : [$params{diags}];
-	for my $i (0..(@$diagsRef)-1)
-	{
-		unless ($diagReferenced[$i])
-		{
-			my $icd = $diagsRef->[$i];
 			my $icdName = $ICD_CACHE{$icd}->{name};
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_ICDNOTREFERENCED], detailLink('icd', $icd), $icdName));
 		}
@@ -666,194 +542,103 @@ sub isLabProc
 
 sub getItemCost
 {
-	my ($page, $cpt, $modifier, $fsRef) = @_;
+	my ($page, $cpt, $modifier, $fsRef, $flags) = @_;
+	
+	$flags |= INTELLICODEFLAG_NON_FACILITY_PRICING 
+		unless $flags & INTELLICODEFLAG_FACILITY_PRICING;
+
 	my @buffer = ();
 
 	for my $i (0..(@$fsRef -1))
 	{
 		my $fs = $fsRef->[$i];
-
-		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
+		
+		my $entries;
+		if ($modifier)
+		{
+			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+				'sel_catalogEntry_by_code_modifier_catalog', $cpt, $modifier, $fs, 
+				$page->session('org_id')
+			);
+		}
+		else
+		{
+			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+				'sel_catalogEntry_by_code_catalog', $cpt, $fs, $page->session('org_id')
+			);
+		}
 
 		for my $entry (@{$entries})
 		{
-			push(@buffer, [$fs, $entry]);
+			push(@buffer, [$fs, sprintf("%.2f", $entry->{unit_cost}) ]);
 		}
 	}
-
+	
+	calcRVRBS($page, $cpt, $modifier, $fsRef, \@buffer, $flags) unless scalar(@buffer);
+		
 	return \@buffer;
 }
 
-sub _getItemCost
+sub calcRVRBS
 {
-	my ($page, $cpt, $modifier, $fsRef) = @_;
-	my @buffer = ();
-
-	for my $i (0..(@$fsRef -1))
+	my ($page, $cpt, $modifier, $fsRef, $bufferRef, $flags) = @_;
+	
+	my $orgId = $page->param('org_id') || $page->session('org_id');
+	my $today = UnixDate('today', '%m/%d/%Y');
+	my $gpciItemName = 'Medicare GPCI Location';
+	
+	my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute',	$orgId, $gpciItemName);
+	my $gpciId = $org->{value_text};
+	
+	my $gpci = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_gpci', $gpciId);
+	
+	my $pfs;
+	if ($modifier)
 	{
-		my $fs = $fsRef->[$i];
-
-		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
-
-		for my $entry (@{$entries})
-		{
-			push(@buffer, [$fs, $entry->{unit_cost}]);
-		}
-	}
-
-	if (scalar @buffer == 0)
-	{
-		return (2, "No price found for this Code/Modifier/Fee_Schedule combination.");
-	}
-	elsif (scalar @buffer == 1)
-	{
-		return (0, $buffer[0]->[1]);
+		$pfs = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_pfs_rvu_by_code_modifier', $cpt, $modifier, $today);
 	}
 	else
 	{
-		return (1, \@buffer);
+		$pfs = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_pfs_rvu_by_code', $cpt, $today);
 	}
-}
 
-sub __getItemCost
-{
-	my ($page, $codesRef, $orgId, $insId) = @_;
-
-	my $itemGrpType = App::Universal::CATALOGENTRYTYPE_ITEMGRP;
-	my $cptType = App::Universal::CATALOGENTRYTYPE_CPT;
-
-	my @return = ();
-
-	foreach my $code (@$codesRef)
+	my $rvrbsPrice;
+	if ($flags & INTELLICODEFLAG_NON_FACILITY_PRICING)
 	{
-		$page->addDebugStmt("Code: $code");
-		if(my $foundCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selCatalogItemsByCodeAndType', $code, $cptType))
-		{
-			my $idx = 0;
-			my @price = ();
-			foreach my $foundCode (@{$foundCodes})
-			{
-				my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
-					'selCatalogById', $foundCode->{catalog_id});
-				if($parentCatalog->{org_id} eq $orgId || $parentCatalog->{org_id} eq '')
-				{
-					$page->addDebugStmt("Orgs are the same");
-					$idx += 1;
-					if($idx > 1)
-					{
-						$page->addDebugStmt("Error: Code $code was found more than once for $orgId.");
-					}
-					else
-					{
-						@price = ($foundCode->{catalog_id}, $foundCode->{unit_cost});
-						push(@return, \@price);
-					}
-				}
-			}
-		}
+		$rvrbsPrice = (
+			($pfs->{work_rvu} * $gpci->{work}) + 
+			($pfs->{trans_non_fac_pe_rvu} * $gpci->{practice_expense}) + 
+			($pfs->{mal_practice_rvu} * $gpci->{mal_practice}) 
+		) * $pfs->{conversion_fact};
+	}
+	else
+	{
+		$rvrbsPrice = (
+			($pfs->{work_rvu} * $gpci->{work}) + 
+			($pfs->{trans_fac_pe_rvu} * $gpci->{practice_expense}) + 
+			($pfs->{mal_practice_rvu} * $gpci->{mal_practice}) 
+		) * $pfs->{conversion_fact};
+	}
+	
+	$page->addDebugStmt(
+		qq{( ($pfs->{work_rvu} * $gpci->{work}) +
+			($pfs->{trans_non_fac_pe_rvu} * $gpci->{practice_expense}) +
+			($pfs->{mal_practice_rvu} * $gpci->{mal_practice})) *$pfs->{conversion_fact}
+		},
+		$rvrbsPrice,
+	);
 
-		if(my $foundExplCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selCatalogItemsByCodeAndType', $code, $itemGrpType))
+	if ($rvrbsPrice > 0)
+	{
+		for my $fs (@{$fsRef})
 		{
-			my $idx = 0;
-			foreach my $foundExplCode (@{$foundExplCodes})
-			{
-				my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
-					'selCatalogById', $foundExplCode->{catalog_id});
-				if($parentCatalog->{org_id} eq $orgId || $parentCatalog->{org_id} eq '')
-				{
-					$idx += 1;
-					if($idx > 1)
-					{
-						$page->addDebugStmt("Error: There are $idx explosion codes for $orgId.");
-					}
-					else
-					{
-						my $explCodeEntries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selCatalogItemsByParentItem', $foundExplCode->{entry_id});
-						push(@return, $explCodeEntries);
-					}
-				}
-			}
+			my $fsHash = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogById', $fs);
+			push(@{$bufferRef}, ['RVRBS', sprintf("%.2f", $rvrbsPrice * $fsHash->{rvrbs_multiplier})]) 
+				if defined $fsHash->{rvrbs_multiplier};
 		}
 	}
-
-	return \@return;
-
-	#foreach my $code (@$codesRef)
-	#{
-	#	#parent catalog
-	#	my $catalogs = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selParentCatalogByOrgId', $org_id);
-	#	foreach my $catalog(@{$catalogs})
-	#	{
-	#		#parent catalog entries
-	#		my $parentCatalogEntries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selCPTCatalogItems', $catalog->{catalog_id}, $itemGrpType, $cptType);
-	#		foreach my $parentCatalogEntry (@{$parentCatalogEntries})
-	#		{
-	#			if($parentCatalogEntry->{entry_type} == $cptType)
-	#			{
-	#				if($parentCatalogEntry->{code} eq $code)
-	#				{
-	#					#push();
-	#				}
-	#			}
-	#			elsif($parentCatalogEntry->{entry_type} == $itemGrpType)
-	#			{
-	#				my $parentCatalogEntrysEntries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selCatalogItemsByParent', $parentCatalogEntry->{entry_id}, $itemGrpType, $cptType);
-	#				foreach my $parentCatalogEntrysEntry (@{$parentCatalogEntrysEntries})
-	#				{
-	#					if($parentCatalogEntry->{code} eq $code)
-	#					{
-	#						#push();
-	#					}
-	#				}
-	#			}
-	#		}
-	#
-	#		#parent catalog's child catalogs
-	#		my $childCatalogs = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildrenCatalogs', $catalog->{catalog_id});
-	#		foreach my $childCatalog (@{$childCatalogs})
-	#		{
-	#			#child catalog's entries
-	#			my $catItems = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selCPTCatalogItems', $childCatalog->{catalog_id}, $itemGrpType, $cptType);
-	#			foreach my $item(@{$catItems})
-	#			{
-	#				#child catalog's entries's entries
-	#				my $childCatItems = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogItemsByParent', $item->{parent_entry_id}, $itemGrpType, $cptType);
-	#			}
-	#		}
-	#	}
-	#}
 }
 
 1;
-
-#1. create tables to store crosswalk data (CD-ROM:/CPTICD1/CPT-ICD1)
-#2. create tables to store ICD edits (CD-ROM:/ICDEDITS/Icd1Edit.txt)
-#3. create tables to store CPT edits
-#   a. Comprehensive and Compound Procedures Data (Floppy:/A_CPEDIT.TXT)
-#   b. Mutually Exclusive CPTs (Floppy:/C_MEEDIT.TXT)
-#(4. in the future, well add the RBRVS data tables)
-#5. create App::Data::Obtain::XXXX for each of the new tables/files
-#6. add the new App::Data::Obtain::XXXX to p:\database\refdata\transform.pl
-
-#7. implement minimal set of features in sub validateCodes
-#8. work with munir to "wire-up" the claims front-end with the new tables, functions
-
-# this can be a scalar (if it is, then $diags must be a scalar) or a reference to an array of the following format
-# [<CPT1 or HCPCS1>, <modifier1>, <diagnosis index(es)>]
-# [<CPT2 or HCPCS2>, <modifier2>, <diagnosis index(es)>]
-
-# check for:
-# * valid ICD-9 code (from REF_ICD)
-# * valid CPT code (from REF_ICD)
-# * valid ICD-9 edits (based on sex, dateofbirth/age, etc)
-# * valid ICD-9 primary diagnosis (based on ICD Edits)
-# * valid ICD-9 modifiers (do we have the data?)
-# * valid CPT edits (based on sex, dateofbirth/age, etc) -- NTIS
-# * ICD/ICD exclusions (does one ICD exclude another?)
-# * CPT/CPT exclusions (does one CPT exclude another?)
-# * CPT/ICD exclusions (crosswalk) [diagnosis codes must support procedure codes]
-# + RBRVS data (can the dollar amount be charged for given state/procedure)

@@ -88,6 +88,29 @@ $STMTMGR_INTELLICODE = new App::Statements::IntelliCode(
 		insert into REF_HCPCS_USAGE (parent_id, person_id, org_id, read_count)
 		values (?, ?, ?, 1)
 	},
+	
+	# ----RVRBS CALCS ---------------------------------------------------------------------
+	
+	'sel_pfs_rvu_by_code_modifier' => qq{
+		select * from Ref_Pfs_Rvu 
+		where code = upper(:1)
+			and modifier = :2
+			and eff_begin_date <= to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+			and eff_end_date >= to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+	},
+
+	'sel_pfs_rvu_by_code' => qq{
+		select * from Ref_Pfs_Rvu 
+		where code = upper(:1)
+			and modifier is NULL
+			and eff_begin_date <= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+			and eff_end_date >= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+	},
+	
+	'sel_gpci' => qq{
+		select * from Ref_Gpci
+		where gpci_id = ?
+	},
 
 );
 

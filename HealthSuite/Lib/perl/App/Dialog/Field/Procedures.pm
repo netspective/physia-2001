@@ -75,8 +75,11 @@ sub isValid
 	my @singlePayer = split('\(', $payer);
 	if($singlePayer[0] eq 'Primary')
 	{
-		my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
-		my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
+		my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
+		my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+			'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
+		
 		my @primaryInsFeeScheds = ();
 		foreach my $fs (@{$getFeeSchedsForInsur})
 		{
@@ -241,15 +244,16 @@ sub isValid
 		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
 		my @cptCodes = ($procedure);
 
-		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
-		App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
+		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
+		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
 
 		if( $charges eq '' && ($feeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
 		{
 			my @allFeeSchedules = @feeSchedules ? @feeSchedules : @insFeeSchedules;
 			
-			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
+			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef,
+				\@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
 			if($resultCount == 0)
 			{
@@ -259,9 +263,7 @@ sub isValid
 			{
 				foreach (@$fsResults)
 				{
-					my $fs = $_->[0];
-					my $entry = $_->[1];
-					my $unitCost = $entry->{unit_cost};
+					my $unitCost = $_->[1];
 					$page->param("_f_proc_$line\_charges", $unitCost);
 				}
 			}
@@ -298,14 +300,14 @@ sub getMultiPricesHtml
 {
 	my ($self, $page, $line, $fsResults) = @_;
 
-	my $html = qq{[<B>P$line</B>] Multiple prices found.  Please select a charge for this line item.};
+	my $html = qq{[<B>P$line</B>] Multiple prices found.  Please select a price for this line item.};
 	
 	foreach (@$fsResults)
 	{
-		my $entry = $_->[1];
+		my $cost = sprintf("%.2f", $_->[1]);
 		$html .= qq{
 			<input onClick="document.dialog._f_proc_$line\_charges.value=this.value" 
-				type=radio name='_f_multi_price' value=@{[$entry->{unit_cost}]}>$entry->{unit_cost}
+				type=radio name='_f_multi_price' value=$cost>\$$cost
 		};
 	}
 
