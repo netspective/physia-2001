@@ -186,7 +186,7 @@ sub prepareData_components
 		{
 			if($_->[0] == App::Universal::COMPONENTTYPE_STATEMENT)
 			{
-				push(@$data, [$_->[1], "<a href='/sde/stmgr/@{[ $_->[2]->{id} ]}/@{[ $_->[3] ]}'>@{[ $_->[2]->{id} ]}</a>"]);
+				push(@$data, [$_->[1], "<a href='/sde/stmgrs/@{[ $_->[2]->{id} ]}/@{[ $_->[3] ]}'>@{[ $_->[2]->{id} ]}</a>"]);
 			}
 			else
 			{
