@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./process.pl -hl7 -file ~/public_html/hl7/*.txt ~/public_html/hl7/*.171 -verbose -test -patientid RHACKETT01 -providerid CLETO -orgid 1 -force
