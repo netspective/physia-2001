@@ -62,6 +62,10 @@
 			Note : Same dialog used for Pharmacy Location and Ancillary Location test to make sure it work correctly in both cases.
 		</deliverable>
 
+		<deliverable id="1979">
+			Load RVU 2001 data into Reference Tables.
+		</deliverable>
+
 		<deliverable id="1983">
 			Removed specified claim statuses from Claim Worklist Setup.
 		</deliverable>
@@ -75,6 +79,10 @@
 			For closed claims in insurance payment dialog, question to reopen claim and close subsequent claims comes up.
 		</deliverable>
 		
+		<deliverable id="1999">
+			Use original Invoice Date as DOS on Claim Work List.
+		</deliverable>
+
 		<deliverable id="2001">
 			For HMO auto writeoffs, using session batch id. Otherwise, using creation batch id for that invoice.
 		</deliverable>
@@ -89,6 +97,10 @@
 
 		<deliverable id="2009">
 			[UI] Service in the "OTHER" catalog  will not be shown as check boxes on the Add Ancillary Test dialog.  The user can look up the tests in the "OTHER" catalog and create a comma delimited list of test.
+		</deliverable>
+
+		<deliverable id="2011">
+			Correct error by loading RVU 2001 data into Reference tables.
 		</deliverable>
 
 	</deliverables>
