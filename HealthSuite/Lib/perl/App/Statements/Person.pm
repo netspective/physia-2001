@@ -188,17 +188,17 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selEmploymentAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
+		and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_UNEMPLOYED]}
 		},
 	'selEmpStatus' => qq{
 		select id, caption from attribute_value_type
-		where id between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
+		where id between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_UNEMPLOYED]}
 		},
 	'selEmploymentStatusCaption' => qq{
 		select value_type, value_text, value_textB, value_int, caption
 		from person_attribute, attribute_value_type
 		where parent_id = ?
-			and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
+			and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_UNEMPLOYED]}
 			and value_type = id
 		},
 	'selBloodTypeCaption' => q{
@@ -700,7 +700,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				from 	person_attribute pa, attribute_value_type avt
 				where	pa.parent_id = ?
 				and	pa.value_type = avt.id
-				and	pa.value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
+				and	pa.value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_UNEMPLOYED]}
 			},
 		sqlStmtBindParamDescr => ['Person ID'],
 		publishDefn => {
