@@ -201,7 +201,7 @@ sub populateData
 
 sub execAction_submit
 {
-	my ($page, $command, $invoiceId, $resubmitFlag) = @_;
+	my ($page, $command, $invoiceId, $resubmitFlag, $printFlag) = @_;
 
 	#if resubmitFlag == 1, submitting to same carrier
 	#if resubmitFlag == 2, submitting to next payer in invoice_billing
@@ -227,7 +227,8 @@ sub execAction_submit
 		storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
 		storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
-		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);		
+		storeServiceProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 
 		if($claimType != App::Universal::CLAIMTYPE_SELFPAY)
 		{
@@ -258,10 +259,12 @@ sub execAction_submit
 		}
 		else
 		{
+			my $invStat = $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
+			$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
 			$page->schemaAction(
 				'Invoice', 'update',
 				invoice_id => $invoiceId,
-				invoice_status => $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED,
+				invoice_status => $invStat,
 				submitter_id => $page->session('user_id') || undef,
 				submit_date => $todaysDate || undef,
 				flags => $invoiceFlags | $attrDataFlag,
@@ -269,12 +272,14 @@ sub execAction_submit
 			);
 
 			# create invoice attribute for history of invoice status
+			my $action = $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted';
+			$action = $printFlag ? 'HCFA Printed' : $action;
 			$page->schemaAction(
 				'Invoice_Attribute', 'add',
 				parent_id => $invoiceId,
 				item_name => 'Invoice/History/Item',
 				value_type => App::Universal::ATTRTYPE_HISTORY,
-				value_text => $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted',
+				value_text => $action,
 				value_date => $todaysDate || undef,
 				_debug => 0
 			);
@@ -749,17 +754,17 @@ sub storeFacilityInfo
 			_debug => 0
 		);
 
-	$page->schemaAction(
-			'Invoice_Address', $command,
-			parent_id => $invoiceId,
-			address_name => 'Pay To Org',
-			line1 => $billingFacilityPayAddr->{line1},
-			line2 => $billingFacilityPayAddr->{line2} || undef,
-			city => $billingFacilityPayAddr->{city},
-			state => $billingFacilityPayAddr->{state},
-			zip => $billingFacilityPayAddr->{zip},
-			_debug => 0
-	);
+	#$page->schemaAction(
+	#		'Invoice_Address', $command,
+	#		parent_id => $invoiceId,
+	#		address_name => 'Pay To Org',
+	#		line1 => $billingFacilityPayAddr->{line1},
+	#		line2 => $billingFacilityPayAddr->{line2} || undef,
+	#		city => $billingFacilityPayAddr->{city},
+	#		state => $billingFacilityPayAddr->{state},
+	#		zip => $billingFacilityPayAddr->{zip},
+	#		_debug => 0
+	#);
 
 
 	##SERVICE FACILITY INFORMATION
@@ -1038,6 +1043,61 @@ sub storePatientEmployment
 				);
 		}
 	}
+}
+
+sub storeServiceProviderInfo
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
+	my $sessOrgId = $page->session('org_id');
+	my $providerId = $mainTransData->{care_provider_id};
+	my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $providerId);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Name',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{complete_name} || undef,
+			value_textB => $providerId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Name/First',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_first} || undef,
+			value_textB => $providerId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Name/Middle',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_middle} || undef,
+			value_textB => $providerId || undef,
+			value_intB => 1,
+			_debug => 0
+		) if $providerInfo->{name_middle} ne '';
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Name/Last',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_last} || undef,
+			value_textB => $providerId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
 }
 
 sub storeProviderInfo
