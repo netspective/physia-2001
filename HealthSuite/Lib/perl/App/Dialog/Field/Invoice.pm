@@ -191,7 +191,7 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $payType = $page->field('pay_type');
-	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY;
+	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY || $payType == App::Universal::ADJUSTMENTPAYTYPE_COPAYPREPAY;
 
 	my $totalPayRcvd = $page->field('total_amount');					#total amount paid
 	my $totalAmtEntered = 0;
