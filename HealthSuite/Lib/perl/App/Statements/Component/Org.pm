@@ -1364,7 +1364,6 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/#7#?home=#homeArl#',
 		frame => {
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
-#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		},
 	},
 	publishDefn_panel =>
@@ -1384,7 +1383,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Clearing House Info</A> } },
+				{ caption => qq{ 
+					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Clearing House Info</A> &nbsp; &nbsp;
+					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo//0?home=#param.home#'>Individual Clearing House Info</A>
+				}},
 			],
 		},
 		stdIcons =>	{
