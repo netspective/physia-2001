@@ -63,15 +63,18 @@ alter table Document_AUD Add (DOC_DEST_IDS VARCHAR2(1024));
 start tables-code/Document
 
 
---bug 1863 and 1913
+--bug 1863, 1913, (1899, 1908, 1903 - M.F.)
 
-alter table person_medication add (sale_units varchar2(32));
-alter table person_medication_aud add (sale_units varchar2(32));
+alter table person_medication add (sale_units varchar2(32), record_type number(8), first_dose varchar2(64), ongoing number(1), sig varchar2(1024), prescribed_by varchar2(32), label number(1), label_in_spanish number(1), signed number(1));
+alter table person_medication_aud add (sale_units varchar2(32), record_type number(8), first_dose varchar2(64), ongoing number(1), sig varchar2(1024), prescribed_by varchar2(32), label number(1), label_in_spanish number(1), signed number(1));
 
 alter table person_medication modify (dose number(20,6), quantity number(20,6));
 alter table person_medication_aud modify (dose number(20,6), quantity number(20,6));
 
 start tables-code/Person_Medication
+
+start tables/Medication_Record_Type
+start tables-data/Medication_Record_Type
 
 
 -- Semnet loading
