@@ -330,9 +330,10 @@ sub populateData
 		$page->field('checkout_stamp', $page->getTimeStamp());
 		$page->field('event_id', $eventId);
 		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selEncountersCheckIn/Out', $eventId);
+		my $careProvider = $page->field('care_provider_id');
+		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
 
-		$invoiceId = $page->param('invoice_id', $STMTMGR_INVOICE->getSingleValue($page, 
-			STMTMGRFLAG_NONE, 'selInvoiceIdByEventId', $eventId));
+		$invoiceId = $page->param('invoice_id', $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceIdByEventId', $eventId));
 
 		$page->field('eventFieldsAreSet', 1);
 	}
@@ -442,14 +443,6 @@ sub populateData
 	}
 
 	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
-
-	if ($eventId)
-	{
-		my $event = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
-				'selExistingApptInfo', $eventId);
-	
-		$page->field('service_facility_id', $event->{facility_id});
-	}
 }
 
 sub setPayerFields
@@ -1207,14 +1200,14 @@ sub handleInvoiceAttrs
 			_debug => 0
 	);
 
-	my @feeSchedules = $page->param("_f_proc_active_catalogs");
+	my $feeSchedules = $page->param("_f_proc_active_catalogs");
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			item_id => $page->field('fee_schedules_item_id') || undef,
 			parent_id => $invoiceId,
 			item_name => 'Fee Schedules',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => join(',', @feeSchedules) || undef,
+			value_text => $feeSchedules || undef,
 			_debug => 0
 	);
 
@@ -1246,7 +1239,7 @@ sub handleInvoiceAttrs
 				_debug => 0
 		);
 	}
-	
+
 	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
 }
