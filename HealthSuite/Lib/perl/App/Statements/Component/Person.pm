@@ -1706,17 +1706,18 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.certification' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%
+			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%, decode(value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary')
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
 			and     item_name != 'Nurse/Title'
 			and 	item_name != 'RN'
+			order by value_int
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
 	publishDefn => {
 		columnDefn => [
-			{ dataFmt => '#2# (#4#): #3#' },
+			{ dataFmt => '#2# (#4# #5#): #3#' },
 			#{ dataFmt => '#3#' },
 			#{ colIdx => 3, head => 'Value' },
 			#{ colIdx => 4, head => 'Date', options => PUBLCOLFLAG_DONTWRAP },
