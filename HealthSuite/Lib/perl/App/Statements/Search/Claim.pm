@@ -30,7 +30,9 @@ $STMTFMT_SEL_CLAIM = qq{
 			i.balance,
 			ib.bill_party_type,
 			TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date,
-			o.org_id
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
 		FROM
 			invoice_status iis,
 			invoice i,
@@ -56,9 +58,11 @@ $STMTFMT_SEL_CLAIM = qq{
 			i.total_cost, 
 			i.total_adjust,
 			i.balance,
-			ib.bill_party_type,
+			ib.bill_party_type,			
 			i.invoice_date,
-			o.org_id
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
 		ORDER BY
 			i.invoice_id desc
 	)
@@ -85,9 +89,27 @@ $STMTRPTDEFN_DEFAULT =
 		{ head => 'ID', url => q{javascript:chooseEntry('#&{?}#')}, hint => 'Created on: #10#' },
 		{ head => 'IC' },
 		{ head => 'Patient', url => q{javascript:chooseItem('/person/#&{?}#/account')} },
-		#{ head => 'Inv Date' },
 		{ head => 'Svc Date' },
-		{ head => 'Status' },
+		{ head => 'Status', colIdx => 12, dataFmt => {
+								'0' => '#4#',
+								'1' => '#4#',
+								'2' => '#4#',
+								'3' => '#4#',
+								'4' => '#4#',
+								'5' => '#4#',
+								'6' => '#4#',
+								'7' => '#4#',
+								'8' => '#4#',
+								'9' => '#4#',
+								'10' => '#4#',
+								'11' => '#4#',
+								'12' => '#4#',
+								'13' => '#4#',
+								'14' => '#4#',
+								'15' => '#4#',
+								'16' => 'Void #13#'
+							},
+		},
 		{ head => 'Payer', colIdx => 9,
 			dataFmt =>
 			{
