@@ -182,7 +182,7 @@ sub getComponentHtml
 
 			#Obtain account/invoice information for collectors that 
 			#transferd there account to this user
-                	my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$_->{person_id},$page->session('user_id'));                	
+                	my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$_->{person_id},$page->session('user_id'),$_->{invoice_id});                	
 			foreach my $data (@$transferData)         
 	                {
 				#Mark account inactive 
@@ -211,7 +211,7 @@ sub getComponentHtml
 				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$_->{trans_id}"
 					TITLE='Transfer Patient Account'>
 					<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$_->{reck_id}"
+				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$_->{trans_id}"
 					TITLE='Add Reck Date'>
 					<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
 				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$_->{trans_id}"
