@@ -110,8 +110,7 @@
 		<column name="prescribed_by" type="text" size="32" descr="Physician who prescribed the prescription"/>
 		<column name="pharmacy_id" parentref="Org.org_internal_id" descr="Pharmacy who filled or will be filling the prescription"/>
 		<column name="status" type="integer" descr="Status of the medication relating to the person"/>
-		<column name="label" type="boolean" descr="True if a label was requested for this prescription"/>
-		<column name="label_in_spanish" type="boolean" descr="True if a label should be printed in Spanish"/>
+		<column name="label" type="text" size="32" descr="Language label should be printed in (if any) for this prescription"/>
 		<column name="signed" type="boolean" descr="True if a provider signature is on file"/>
 	</table>
 
