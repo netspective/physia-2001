@@ -1544,7 +1544,21 @@ sub handlePostExecute
 	}
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
-		unshift(@{$page->{page_head}}, qq{<script>opener.location.reload(); window.close()</script>});
+		#unshift(@{$page->{page_head}}, qq{<script>opener.location.reload(); window.close()</script>});
+		unshift(@{$page->{page_head}}, 
+			qq{
+					<script>
+						if(eval("opener.inErrorMode"))
+						{						
+							opener.focus(); window.close()
+						}
+						else
+						{
+							opener.location.reload(); window.close()
+						}
+					</script>
+			}
+		);
 		return 1;
 	}
 	if($specificRedirect)
@@ -1711,6 +1725,7 @@ sub getHtml
 		<font color=red size=+1><b>Please correct the following problems</b></font>:
 		<ul>
 			<li>$errorMsgs
+			<SCRIPT>var inErrorMode = 1;</SCRIPT>
 		</ul>
 		</font>
 		};
