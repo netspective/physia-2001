@@ -423,6 +423,7 @@ sub copyInvoiceForNextPayer
 {
 	my ($page, $command, $oldInvoiceId) = @_;
 	my $oldInvoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $oldInvoiceId);
+	my $claimOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $oldInvoiceId, 'Submission Order');
 
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
@@ -528,12 +529,12 @@ sub copyInvoiceForNextPayer
 		my $newAdjId;
 		foreach my $adjust (@{$adjustments})
 		{
-			my $adjType = $adjust->{adjustment_type};
-			next if $adjType == App::Universal::ADJUSTMENTTYPE_TRANSFERNEXTPAYER;
+			my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER_PAYMENT;
 			my $payType = $adjust->{pay_type};
 			my $payMethod = $adjust->{pay_method};
 			my $payerType = $adjust->{payer_type};
 			my $writeoffCode = $adjust->{writeoff_code};
+			my $dataNumA = $adjust->{pay_type} ? 
 			$newAdjId = $page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
 				adjustment_type => defined $adjType ? $adjType : undef,
@@ -552,7 +553,7 @@ sub copyInvoiceForNextPayer
 				comments => $adjust->{comments} || undef,
 				data_text_a => $adjust->{data_text_a} || undef,	#this field is used for authorization reference/code
 				data_date_a => $adjust->{data_date_a} || undef,	#this is used for credit card exp date
-				data_num_a => 1,			#this indicates that this adjustment came from the child invoice (ex. this adjustment came from the primary and is being copied to secondary)
+				data_num_a => $dataNumA,						#this indicates which child claim the adjustment was transferred from (ex. 1=primary, 2=secondary, etc.)
 				_debug => 0
 			);
 
