@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.9 2000-10-20 01:13:07 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.10 2000-11-06 21:14:26 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
@@ -344,7 +344,7 @@ package SQL::GenerateQuery::Condition;
 ##############################################################################
 
 use strict;
-use fields qw(sqlGen compares);
+use fields qw(sqlGen compares outColumns orderBy distinct);
 
 
 # Creates a new condition object
@@ -395,6 +395,10 @@ sub new
 	$compareHash->{fieldDefn} = $fieldDefn if defined $fieldDefn;
 	$self->{compares} = [$compareHash];
 
+	$self->{outColumns} = [];
+	$self->{orderBy} = [];
+	$self->{distinct} = 0;
+
 	bless $self, $class;
 	return $self;
 }
@@ -426,6 +430,9 @@ sub joinConditions
 
 	$self->{sqlGen} = $sqlGen;
 	$self->{compares} = [];
+	$self->{outColumns} = [];
+	$self->{orderBy} = [];
+	$self->{distinct} = 0;
 
 	# Copy the conditions into the new object
 	my $lastCond = $#conditions;
@@ -466,6 +473,61 @@ sub joinConditions
 
 	bless $self, $class;
 	return $self;
+}
+
+
+sub outColumns
+{
+	my $self = shift;
+
+	if (@_)
+	{
+		$self->{outColumns} = [];
+		foreach my $colDefn (@_)
+		{
+			if (ref $colDefn)
+			{
+				die "A column in outColumns cannot be a reference";
+			}
+			push @{$self->{outColumns}}, $colDefn;
+		}
+	}
+	return @{$self->{outColumns}};
+}
+
+
+sub orderBy
+{
+	my $self = shift;
+
+	if (@_)
+	{
+		$self->{orderBy} = [];
+		foreach my $colDefn (@_)
+		{
+			if (ref $colDefn && (ref $colDefn ne 'HASH' || ! defined $colDefn->{id}))
+			{
+				die "ColDefn '$colDefn' is not valid";
+			}
+			else
+			{
+				$colDefn = {id => $colDefn, order => 'Ascending'};
+			}
+			push @{$self->{orderBy}}, $colDefn;
+		}
+	}
+	return @{$self->{orderBy}};
+}
+
+
+sub distinct
+{
+	my $self = shift;
+	my $value = shift;
+
+	$self->{distinct} = defined $value && $value ? 1 : 0;
+
+	return $self->{distinct};
 }
 
 
@@ -561,7 +623,8 @@ sub genSQL
 	}
 
 	# Process the Output Columns
-	foreach my $field (@{$opts{outColumns}})
+	my $outColsList = defined $opts{outColumns} ? $opts{outColumns} : $self->{outColumns};
+	foreach my $field (@$outColsList)
 	{
 		my $fieldDefn;
 		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
@@ -606,19 +669,32 @@ sub genSQL
 	}
 
 	# Process the Order By
-	foreach my $field (@{$opts{orderBy}})
+	my $orderByList = defined $opts{orderBy} ? $opts{orderBy} : $self->{orderBy};
+	foreach my $field (@$orderByList)
 	{
-		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
+		if (ref $field eq 'HASH')
+		{
+			die "Order By specification is invalid" unless defined $field->{id};
+			die "Field '$field->{id}' is invalid" unless my $fieldData = $sqlGen->fields($field->{id});
+			my $fieldSpec = $fieldData->{id};
+			$fieldSpec .= " DESC" if defined $field->{order} && lc($field->{order}) =~ /^d/;
+			push @ORDER_BY, $fieldSpec;
+		}
+		elsif (! ref $field)
+		{
+			die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
 
-		# Add the selected column to the ORDER BY clause
-		push @ORDER_BY, $fieldData->{id};
+			# Add the selected column to the ORDER BY clause
+			push @ORDER_BY, $fieldData->{id};
+		}
 	}
 
 	my $SQL = '';
+	my $distinct = defined $opts{distinct} && lc($opts{distinct}) eq 'yes' ? 1 : $self->{distinct};
 
 	# SELECT
 	$SQL .= "SELECT";
-	$SQL .= " DISTINCT" if defined $opts{distinct} && lc($opts{distinct}) eq 'yes';
+	$SQL .= " DISTINCT" if $distinct;
 	$SQL .= "\n";
 	$SQL .= join ",\n", map {"\t$_"} @SELECT;
 	$SQL .= "\n";
