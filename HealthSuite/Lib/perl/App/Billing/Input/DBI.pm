@@ -2274,8 +2274,8 @@ sub populateItems
 		select
 			to_char(service_begin_date, 'DD-MON-YYYY'),
 			to_char(service_end_date, 'DD-MON-YYYY'),
-			nvl(HCFA1500_Service_Place_Code.abbrev,	@{[ DEFAULT_PLACE_OF_SERIVCE ]}) as service_place,
-			nvl(HCFA1500_Service_Type_Code.abbrev, '01') as service_type,
+			HCFA1500_Service_Place_Code.abbrev as service_place,
+			HCFA1500_Service_Type_Code.abbrev as service_type,
 			code,
 			modifier,
 			unit_cost,
