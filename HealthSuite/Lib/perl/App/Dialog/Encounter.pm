@@ -414,7 +414,7 @@ sub populateData
 		$page->field('cntrl_num_item_id', $cntrlData->{item_id});
 		$page->field('control_number', $cntrlData->{value_text});
 
-		my $billContactData = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Service Provider/Facility/Billing/Contact');
+		my $billContactData = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Billing Facility/Contact');
 		$page->field('bill_contact_item_id', $billContactData->{item_id});
 		$page->field('billing_contact', $billContactData->{value_text});
 		$page->field('billing_phone', $billContactData->{value_textb});
@@ -1200,7 +1200,7 @@ sub handleInvoiceAttrs
 			'Invoice_Attribute', $command,
 			item_id => $page->field('bill_contact_item_id') || undef,
 			parent_id => $invoiceId,
-			item_name => 'Service Provider/Facility/Billing/Contact',
+			item_name => 'Billing Facility/Contact',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $contactName || undef,
 			value_textB => $contactPhone || undef,
