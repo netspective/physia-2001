@@ -19,8 +19,7 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(CGI::Dialog);
 
 
@@ -35,10 +34,16 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
 		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'resp_party_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, types => ['Guarantor'], options => FLDFLAG_REQUIRED),
 		#new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
 		new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
+		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
+				fields => [
+						new CGI::Dialog::Field(caption => 'License Number', name => 'license_number'),
+						new CGI::Dialog::Field(caption => 'State', name => 'license_state', size => 2, maxLength => 2,)
+					]),
 		new App::Dialog::Field::Address(caption=>'Home Address', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'address'),
 		new CGI::Dialog::MultiField(caption =>'Home/Work Phone', name => 'home_work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
@@ -78,23 +83,11 @@ sub populateData
 	my $parentId = $page->param('person_id');
 	my $relationName = 'Guarantor';
 	my $respData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $relationName);
-	#$respData->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $respData->{'value_text'});
-
-	#my $relation = $respData->{'value_text'};
-	#my @itemNamefragments = split('/', $relation);
-
-	#if($itemNamefragments[0] eq 'Other')
-	#{
-	#	$page->field('rel_type', $itemNamefragments[0]);
-	#	$page->field('other_rel_type', $itemNamefragments[1]);
-	#}
-
-	#else
-	#{
-	#	$page->field('rel_type', $itemNamefragments[0]);
-	#}
-
-	#$page->field('resp_item_id', $respData->{'item_id'});
+	my $driverLicense = 'Driver/License';
+	my $driverLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $driverLicense);
+	$page->field('driver_license_item_id', $driverLicenseData->{'item_id'});
+	$page->field('license_number', $driverLicenseData->{'value_text'});
+	$page->field('license_state', $driverLicenseData->{'value_textb'});
 
 	if($command eq 'remove')
 	{
@@ -156,6 +149,18 @@ sub execute
 			org_id => $orgId || undef,
 			_debug => 0
 		);
+
+	my $commandDriverLicense = $command eq 'update' &&  $page->field('driver_license_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+				'Person_Attribute', $commandDriverLicense,
+				parent_id => $personId || undef,
+				item_id => $page->field('driver_license_item_id') || undef,
+				item_name => 'Driver/License',
+				value_type => App::Universal::ATTRTYPE_LICENSE,
+				value_text => $page->field('license_number') || undef,
+				value_textB => $page->field('license_state') || undef,
+				_debug => 0
+			) ;
 
 	#my $relType = $page->field('rel_type');
 	#my $otherRelType = $page->field('other_rel_type');
