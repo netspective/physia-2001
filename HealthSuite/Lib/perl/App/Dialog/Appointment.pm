@@ -120,7 +120,7 @@ sub new
 			name => 'appt_date_time',
 			ordinal => 0,
 		),
-		
+
 		#new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
 		#	name => 'appt_date_time',
 		#	fields => [
@@ -142,13 +142,13 @@ sub new
 		#		),
 		#	],
 		#),
-		
+
 		#new App::Dialog::Field::Scheduling::Hours(
 		#	caption => 'Appt Time Hour',
 		#	name => 'appt_hour',
 		#	timeField => '_f_appt_time_0'
 		#),
-		
+
 		new CGI::Dialog::MultiField (
 			name => 'minutes_util',
 			fields => [
@@ -215,7 +215,7 @@ sub new
 			useShortForm => 1,
 			options => FLDFLAG_REQUIRED,
 		),
-		
+
 		new App::Dialog::Field::Scheduling::Date(caption => 'Confirm Date',
 			name => 'app_verify_date',
 			type => 'date',
@@ -230,7 +230,7 @@ sub new
 			style => 'radio',
 			options => FLDFLAG_REQUIRED,
 		),
-		
+
 	);
 	$self->{activityLog} =
 	{
@@ -260,7 +260,7 @@ sub setPhysicianFields
 sub getSupplementaryHtml
 {
 	my ($self, $page, $command) = @_;
-	
+
 	return $self->SUPER::getSupplementaryHtml($page, $command) unless $command eq 'confirm';
 
 	if(my $personId = $page->field('attendee_id'))
@@ -303,14 +303,14 @@ sub makeStateChanges
 	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update|confirm)$/);
 	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add|confirm)$/);
 	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^(update|confirm)$/);
-	
+
 	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('verify_action', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
-	
-	my $fmap = $self->{fieldMap};
-	my $field = $self->{content}->[$fmap->{appt_date_time}]->{fields}->[2];
-	$field->{postHtml} = '' if $command =~ m/^(cancel|noshow|confirm)$/;
+
+	#my $fmap = $self->{fieldMap};
+	#my $field = $self->{content}->[$fmap->{appt_date_time}]->{fields}->[2];
+	#$field->{postHtml} = '' if $command =~ m/^(cancel|noshow|confirm)$/;
 }
 
 sub makeStateChanges_cancel
@@ -319,10 +319,10 @@ sub makeStateChanges_cancel
 	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('patient_type', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('appt_type', FLDFLAG_READONLY, 1);
-	
+
 	$self->updateFieldFlags('appt_date_time', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('minutes_util', FLDFLAG_INVISIBLE, 1);
-	
+
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('start_stamp', FLDFLAG_READONLY, 1);
@@ -385,10 +385,10 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $eventId = $page->param('event_id');
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateAppointmentDialog', $eventId);
-	$page->param('old_appt_date', $page->field('appt_date'));
-	$page->param('old_appt_time', $page->field('appt_time'));
+	$page->param('old_appt_date', $page->field('appt_date_0'));
+	$page->param('old_appt_time', $page->field('appt_time_0'));
 	#$page->param('_f_parent_id', $page->field('parent_id'));
 }
 
@@ -415,17 +415,17 @@ sub populateData_reschedule
 sub populateData_confirm
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	my $eventId = $page->param('event_id');
-	
+
 	$page->field('event_id', $eventId);
 	$page->field('app_verified_by', $page->session('user_id'));
-	
+
 	$page->param('_verified_', $STMTMGR_COMPONENT_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'sel_populateAppConfirmDialog', $eventId));
-	
+
 	populateData_update(@_);
 }
 
@@ -445,9 +445,9 @@ sub customValidate
 
 	if ($page->field('conflict_check'))
 	{
-		return 1 if ($page->param('old_appt_date') eq $page->field('appt_date') && 
-			$page->param('old_appt_time') eq $page->field('appt_time'));
-		
+		return 1 if ($page->param('old_appt_date') eq $page->field('appt_date_0') &&
+			$page->param('old_appt_time') eq $page->field('appt_time_0'));
+
 		unless ($self->validateMultiAppts($page))
 		{
 			$self->validateAvailTemplate($page);
@@ -467,7 +467,7 @@ sub validateAvailTemplate
 	push(@resource_ids, $page->field('resource_id'));
 
 	my @internalOrgIds = ($page->field('facility_id'));
-	my @search_start_date = Decode_Date_US($page->field('appt_date'));
+	my @search_start_date = Decode_Date_US($page->field('appt_date_0'));
 
 	my $apptType = $page->property('apptTypeInfo');
 
@@ -490,16 +490,16 @@ sub validateAvailTemplate
 
 	my $html = "<b>Available times per Templates</b>: ";
 	my $availTimes;
-	
+
 	for (@available_slots)
 	{
 		$availTimes .= "@{[ minute_set_2_string($_->{minute_set}->run_list()) ]} <br>";
 	}
-	
+
 	$availTimes = "None <br>" if $availTimes =~ /12:00 AM \- 12:00 AM/;
 	my $availSlot = $available_slots[0];
-	
-	my $apptBeginMinutes = hhmmAM2minutes($page->field('appt_time'));
+
+	my $apptBeginMinutes = hhmmAM2minutes($page->field('appt_time_0'));
 	my $apptEndMinutes = $apptBeginMinutes + $page->field('duration');
 	my $apptMinutesRange = "$apptBeginMinutes-$apptEndMinutes";
 
@@ -543,9 +543,9 @@ sub validateMultiAppts
 					onClick="document.dialog._f_whatToDo[2].checked=true"> Cancel
 
 				<input name=_f_processConflict type=hidden value=1>
-				
+
 			});
-			
+
 			$page->field('parent_id', $parentEventId);
 		}
 	}
@@ -555,7 +555,7 @@ sub validateMultiAppts
 	}
 
 	#<input name=_f_parent_id type=hidden value="$parentEventId">
-	
+
 	return $parentEventId;
 }
 
@@ -568,8 +568,8 @@ sub findConflictEvent
 	$page->property('apptTypeInfo', $apptType);
 
 	$page->field('duration', $apptType->{duration} || 10);
-	
-	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
+
+	my $start_time = $page->field('appt_date_0') . ' '  . $page->field('appt_time_0');
 	my ($startDate, $startTime, $am) = split(/ /, $start_time);
 	my $endDate   = UnixDate(DateCalc($startDate, "+1 day"), "%Y,%m,%d");
 	$startDate = UnixDate($startDate, "%Y,%m,%d");
@@ -581,7 +581,7 @@ sub findConflictEvent
 	my $endMinutes   = $startMinutes + $page->field('duration') -2;
 	my $minuteRange  = "$startMinutes-$endMinutes";
 	my $apptSlot     = new Set::IntSpan($minuteRange);
-	
+
 	my $events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selAppointmentConflictCheck', $startDate, $endDate, $page->field('facility_id'),
 			$page->field('resource_id'));
@@ -603,7 +603,7 @@ sub findConflictEvent
 			next if ($event->{parent_id});
 			next if ( $event->{appt_type} == $page->field('appt_type') && $page->field('appt_type')
 				&& $start_minute == $startMinutes -1);
-				
+
 			return ($event->{event_id}, $event->{patient_id});
 		}
 	}
@@ -643,9 +643,9 @@ sub handleWaitingList
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $eventId = $page->field('event_id');
-	
+
 	if ($command eq 'confirm')
 	{
 		my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
@@ -653,10 +653,10 @@ sub execute
 
 		my $itemId = $eventAttribute->{item_id};
 		my $verifyFlags = $eventAttribute->{value_intb};
-		
+
 		$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_COMPLETE;
 		$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_PARTIAL;
-		
+
 		$verifyFlags |= $page->field('verify_action')  eq 'Talked to Patient' ?
 			App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_COMPLETE :
 			App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_PARTIAL;
@@ -666,7 +666,7 @@ sub execute
 			item_id => $itemId,
 			value_intB => $verifyFlags,
 		);
-		
+
 	 	$page->schemaAction(
 			'Sch_Verify', $page->param('_verified_') ? 'update' : 'add',
 			event_id => $eventId,
@@ -677,13 +677,13 @@ sub execute
 			owner_org_id => $page->session('org_internal_id'),
 		);
 
-		$page->param('_dialogreturnurl', '/worklist/patientflow') 
+		$page->param('_dialogreturnurl', '/worklist/patientflow')
 			unless $page->param('_dialogreturnurl');
 		$self->handlePostExecute($page, $command, $flags);
 	}
 
 	my $timeStamp = $page->getTimeStamp();
-	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
+	my $start_time = $page->field('appt_date_0') . ' '  . $page->field('appt_time_0');
 
 	my $parentId = $page->param('_f_parent_id');
 	undef $parentId if defined $page->field('whatToDo') && $page->field('whatToDo') eq 'db';
