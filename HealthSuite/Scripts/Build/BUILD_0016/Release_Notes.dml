@@ -69,7 +69,6 @@
 			Report (financial analysis report) :  Changed calc for A/R column
 		</deliverable>
 
-
 		<deliverable id="1359">
 			New dialog asking if claim is to be viewed or printed. Accessed through choose action on claim summary.
 		</deliverable>
@@ -99,6 +98,10 @@
 		<deliverable id="1327">
 			Indicating submission order in claim summary (i.e. Primary, Secondary, etc.). Also added links to associated
 				claims through History items.
+		</deliverable>
+
+		<deliverable id="241">
+			Added 'Schedule Follow-up Appointment' to next actions in checkout dialog.
 		</deliverable>
 
 	</deliverables>
