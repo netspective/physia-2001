@@ -77,7 +77,6 @@ sub execute
 	my $cptCode = $page->field('value_text');
 	my $cptName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 	my $cptCodeName = $cptName->{'name'} ne '' ? $cptName->{'name'} : '';
-	$page->addDebugStmt("NAME : $cptCodeName");
 	$page->field('cpt_name',$cptCodeName);
 	#my $cptCodeName = $page->field('cpt_name');
 
