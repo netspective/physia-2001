@@ -44,7 +44,7 @@ sub populatePrescription
 
 		# patient info
 
-		my $patient = new App::Billing::Claim::Person;
+		my $patient = new App::Billing::Claim::Patient;
 		my $patientAddress = new App::Billing::Claim::Address;
 
 		my $patientInfo = $STMTMGR_REPORT_PRESCRIPTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'personInfo', $patientID);
@@ -74,7 +74,7 @@ sub populatePrescription
 
 		# doctor info
 
-		my $doctor = new App::Billing::Claim::Person;
+		my $doctor = new App::Billing::Claim::Physician;
 
 		my $doctorInfo = $STMTMGR_REPORT_PRESCRIPTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'personInfo', $doctorID);
 		$doctor->setLastName($doctorInfo->{name_last});
@@ -86,6 +86,9 @@ sub populatePrescription
 		$doctor->setStatus($doctorInfo->{marital_status});
 		$doctor->setSsn($doctorInfo->{ssn});
 		$doctor->setName($doctorInfo->{simple_name});
+
+		my $doctorDEAInfo = $STMTMGR_REPORT_PRESCRIPTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'physicianDEA', $doctorID);
+		$doctor->setDEA($doctorDEAInfo->{dea});
 
 		$prescription->setPhysician($doctor);
 
@@ -137,8 +140,9 @@ sub populateDrugs
 	$drug->setNumRefills($row->{num_refills});
 	$drug->setAllowSubstitution($row->{allow_substitutions});
 	$drug->setAllowGeneric($row->{allow_generic});
-	$drug->setLabel(undef);
-	$drug->setLabelSpanish(undef);
+	$drug->setLabel($row->{label});
+	$drug->setLabelSpanish($row->{label_in_spanish});
+	$drug->setSig($row->{sig});
 
 	$drugs->addDrug($drug)
 
