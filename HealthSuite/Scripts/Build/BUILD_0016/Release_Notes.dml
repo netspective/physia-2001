@@ -41,6 +41,12 @@
 			New query function will handle lookup
 		</deliverable>
 
+		<deliverable id="1457">
+			Added batch fields to post transfer dialog.
+		</deliverable>
+		<deliverable id="1340">
+			Added next actions to checkin, checkout, create claim, and post personal payment dialogs.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
