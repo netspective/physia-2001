@@ -8,6 +8,7 @@ use DBI::StatementManager;
 use App::Universal;
 use Data::Publish;
 use App::Statements::Component;
+use App::Statements::Org;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_ORG $PUBLDEFN_CONTACTMETHOD_DEFAULT
@@ -136,6 +137,79 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		[$page->param('org_id'),$page->session('org_internal_id')] ,
 		 'panelEdit'); },
 },
+#----------------------------------------------------------------------------------------------------------------------
+'org.feeschedules'=>
+{
+	sqlStmt =>qq
+	{SELECT	oc.catalog_id,
+		oc.caption,
+		oc.description,
+		oc.internal_catalog_id,
+		oa.item_id
+	FROM    org_attribute oa,
+		offering_catalog oc
+	WHERE   oa.parent_id = :1
+	AND	oa.item_name = 'Fee Schedules'
+	AND	oa.item_type = 0
+	AND	oa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
+	AND	oa.value_int = oc.internal_catalog_id 
+	ORDER BY oc.catalog_id
+	},
+	sqlvar_entityName => 'Org',
+	sqlStmtBindParamDescr => ['Org Internal ID for Fee Schedules'],
+	publishDefn => 
+	{
+		frame => 
+		{
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-feeschedule-org?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},   
+		columnDefn => 
+			[								
+			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#param.org_id#/catalog/#3#/#0#>#0#</A>'  },			
+			{colIdx => 1,  dAlign => 'left'},
+			],
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-feeschedule-org/#4#?home=#homeArl#',
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => {
+			heading => 'Associated Fee Schedules',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Associated Fee Schedule' },
+		banner => 
+		{
+			actionRows =>
+			[
+			{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-feeschedule-org?home=#param.home#'>Associated Fee Schedules</A> }, url => 'x', },
+			],
+		},
+		stdIcons =>	
+		{
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-feeschedule-org/#4#?home=#param.home#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-feeschedule-org/#4#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId  =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId  =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panelEdit'); },			
+},
+
+
 
 #----------------------------------------------------------------------------------------------------------------------
 
