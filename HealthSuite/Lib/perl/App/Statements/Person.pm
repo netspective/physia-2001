@@ -398,7 +398,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 	'updSessionsTimeoutOrg' => qq{
 		update person_session set status = 2
-		where status = 0 and person_id = ? and org_intneral_id = ?
+		where status = 0 and person_id = ? and org_internal_id = ?
 		},
 	'selSessions' => qq{
 		select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session

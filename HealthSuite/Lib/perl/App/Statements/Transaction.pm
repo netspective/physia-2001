@@ -27,15 +27,16 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id, trans_type, trans_subtype, trans_status,
 			caption, detail, code, billing_facility_id, service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
 			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to, data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
-			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT'), to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT'),
-			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT')
+			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_begin_stamp, to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp,
+			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS init_onset_date, to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS curr_onset_date,
+			trans_status_reason, related_data, caption, trans_substatus_reason
 		from transaction
 		where trans_id = ?
 		},
-        'selTransactionByData_num_a' => qq{
-                select * from transaction
-                        where data_num_a = ?
-                },
+	'selTransactionByData_num_a' => qq{
+		select * from transaction
+		where data_num_a = ?
+		},
 	'selTransAndICDNameByTransId' => qq{
 		select code, curr_onset_date, trans_id, trans_type, r.name as icdname
 			from transaction, ref_icd r
