@@ -8,11 +8,8 @@
 	session.setAttribute("tz_gmt_offset_hours", new Integer(-5));
 	session.setAttribute("tz_gmt_offset_days", new Float(-5/24));
 
-	//if(session.getAttribute("active_date_str") == null)
-	//{
-		session.setAttribute("active_date_str", "11/30/2000");
-		session.setAttribute("active_date", dateFormatShort.parse((String) session.getAttribute("active_date_str")));
-	//}
+	session.setAttribute("active_date", new java.util.Date());
+	session.setAttribute("active_date_str", dateFormatShort.format((java.util.Date) session.getAttribute("active_date")));
 </jsp:scriptlet>
 
 <img src="app-main-graphic.gif"/><br/>
