@@ -6,9 +6,13 @@ use strict;
 use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
+use CGI::ImageManager;
 use SQL::GenerateQuery;
+use DBI::StatementManager;
+use App::Statements::Org;
+use Data::Publish;
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.2 2000-09-12 15:35:09 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.3 2000-09-13 16:04:02 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 %RESOURCE_MAP=();
@@ -28,8 +32,16 @@ sub new
 	my $style = $sqlGen->style($page->param('_style'));
 	$self->{style} = $style;
 	
-	my $fieldSelections = join ';', map {$sqlGen->field($_)->{caption} . ":" . $sqlGen->field($_)->{id}} $sqlGen->field();
-	my $comparisonOps = join ';', map {$sqlGen->comparison($_)->{caption} . ":" . $sqlGen->comparison($_)->{id}} grep {$sqlGen->comparison($_)->{placeholder} !~ /\@/} $sqlGen->comparison();
+	my $fieldSelections = 
+		join ';',
+			map {$sqlGen->field($_)->{caption} . ":" . $sqlGen->field($_)->{id}}
+				grep {defined $sqlGen->field($_)->{caption}}
+					$sqlGen->field();
+	my $comparisonOps =
+		join ';',
+			map {$sqlGen->comparison($_)->{caption} . ":" . $sqlGen->comparison($_)->{id}}
+				grep {$sqlGen->comparison($_)->{placeholder} !~ /\@/}
+					$sqlGen->comparison();
 	my $joinOps = 'AND;OR';
 	
 	my $gridName = 'params';
@@ -64,6 +76,7 @@ sub new
 					name => 'criteria',
 					findPopup => '/lookup',
 					caption => 'Criteria',
+					onBlurJS => qq{onBlurCriteria(event);},
 					onChangeJS => qq{resetStartRow();},
 				},
 				{
@@ -98,8 +111,21 @@ sub new
 	
 	
 	# Setup data scructures necessary for JavaScript
-	my $fieldLookups = join ", ", map {$sqlGen->field($_)->{id} . " : '" . $sqlGen->field($_)->{'lookup-url'} . "'"} grep {exists $sqlGen->field($_)->{'lookup-url'}} $sqlGen->field();
-	my $noCriteria = join ", ", map {$sqlGen->comparison($_)->{id} . " : 1"} grep {$sqlGen->comparison($_)->{value} eq ''} $sqlGen->comparison();
+	my $fieldLookups = 
+		join ", ", 
+			map {$sqlGen->field($_)->{id} . " : '" . $sqlGen->field($_)->{'lookup-url'} . "'"} 
+				grep {exists $sqlGen->field($_)->{'lookup-url'}} 
+					$sqlGen->field();
+	my $fieldTypes = 
+		join ", ", 
+			map {$sqlGen->field($_)->{id} . " : '" . $sqlGen->field($_)->{'ui-datatype'} . "'"} 
+				grep {exists $sqlGen->field($_)->{'ui-datatype'}}
+					$sqlGen->field();
+	my $noCriteria = 
+		join ", ",
+			map {$sqlGen->comparison($_)->{id} . " : 1"}
+				grep {defined $sqlGen->comparison($_)->{value} && $sqlGen->comparison($_)->{value} eq ''}
+					$sqlGen->comparison();
 	
 	my $showRows = SHOWROWS;
 	
@@ -159,6 +185,23 @@ sub new
 			}
 			resetStartRow();
 		}
+		
+		var fieldTypes = {$fieldTypes};
+		
+		function onBlurCriteria(event)
+		{
+			var myValue = event.srcElement.value;
+			var result = event.srcElement.name.match(/criteria_(\\d+)/);
+			if (result != null)
+			{
+				var fieldSelObj = eval("document.all._f_field_" + result[1]);
+				var curField = fieldSelObj.options[fieldSelObj.selectedIndex].value;
+				if (myValue && (type = eval("fieldTypes." + curField)))
+				{
+					if (type = 'date') validateChange_Date(event);
+				}
+			}
+		}
 
 		function changePage(offset)
 		{
@@ -180,6 +223,16 @@ sub new
 			//alert('Resetting Start Row to 0');
 			if(startRow = eval(fieldObj))
 				startRow.value = 0;
+		}
+		
+		function onMouseOverRow(event)
+		{
+			event.srcElement.parentElement.parentElement.parentElement.style.backgroundColor = '#CCCCCC';
+		}
+		
+		function onMouseOutRow(event)
+		{
+			event.srcElement.parentElement.parentElement.parentElement.style.backgroundColor = '#FFFFFF';
 		}
 		
 		showHideRows('params', 'join', $maxParams);
@@ -245,8 +298,18 @@ sub execute
 		#$page->addDebugStmt("got here $field $comparison $criteria");
 		if ($field)
 		{
-			#$page->addDebugStmt("adding condition '$field $comparison $criteria'");
-			push @andConditions, $sqlGen->WHERE("upper({$field})", $comparison, uc($criteria));
+			my $whereField = "UPPER({$field})";
+			if ($sqlGen->field($field) && defined $sqlGen->field($field)->{'ui-datatype'})
+			{
+				my $dataType = $sqlGen->field($field)->{'ui-datatype'};
+				if ($dataType eq 'date')
+				{
+					$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY')";
+				}
+				
+			}
+
+			push @andConditions, $sqlGen->WHERE($whereField, $comparison, uc($criteria));
 		}
 		
 		if ($join ne 'AND')
@@ -270,23 +333,40 @@ sub execute
 	}
 	
 	# Generate the SQL & Bind Params
-	($self->{SQL}, $self->{bindParams}) = $condition->genSQL(
+	my ($SQL, $bindParams) = $condition->genSQL(
 		outColumns => \@outColumns,
 		orderBy => \@orderBy,
 		distinct => $distinct);
 		
 	# Wrap the SQL with an outer SQL to limit results
 	my $cols = join ",\n", map {"\t$_"} @outColumns;
-	$self->{SQL} = "SELECT * FROM (\n\nSELECT\n\trownum AS row_num,\n$cols\nFROM (\n\n" . $self->{SQL} . "\n\n)\n\n)\n\nWHERE row_num <= ? AND row_num > ?";
-	push @{$self->{bindParams}}, $endRow, $startRow;
+	$SQL = "SELECT * FROM (\n\nSELECT\n\trownum AS row#,\n$cols\nFROM (\n\n" . $SQL . "\n\n) WHERE rownum <= ?\n\n) WHERE row# > ?";
+	push @{$bindParams}, ($endRow+1), $startRow;
 	
-	$self->{pageControlHtml} = qq{
-		<br>
-		<center>
-			<a href="javascript:changePage(-1)">Prev Page</a>\&nbsp;\&nbsp;
-			<a href="javascript:changePage(1)">Next Page</a>
-		</center>
-		};
+	# Do any variable replacements in the SQL itself
+	$page->replaceVars(\$SQL);
+
+	my $stmgrFlags = STMTMGRFLAG_DYNAMICSQL | STMTMGRFLAG_REPLACEVARS;
+	my $publDefn = {};
+	my $stmtHdl = $STMTMGR_ORG->execute($page, $stmgrFlags, $SQL, @$bindParams);
+	prepareStatementColumns($page, $stmgrFlags, $stmtHdl, $publDefn);
+	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {stmtId => $SQL, maxRows => SHOWROWS});
+	my $nextPageExists = $stmtHdl->fetch();
+	$stmtHdl->finish();
+	
+	# Add the results table to the page	
+	$page->addContent('<br><div align="center">' . $resultHtml . '</div>');
+	
+	# Add page controls below the results
+	my $pageControlHtml = '<br><center>';
+	$pageControlHtml .= qq{<a href="javascript:changePage(-1)">Prev Page</a>} unless $startRow == 0;
+	if (defined $nextPageExists)
+	{
+		$pageControlHtml .= '&nbsp;&nbsp' if $startRow > 0;
+		$pageControlHtml .= qq{<a href="javascript:changePage(1)">Next Page</a>};
+	}
+	$pageControlHtml .= '</center>';
+	$page->addContent($pageControlHtml);
 	
 	return '';
 }
