@@ -440,7 +440,7 @@ sub importInsurance
 						parent_id => $insIntId,
 						item_name => 'Fee Schedule',
 						value_type => 0,
-						value_text => feeSch);
+						value_text => $feeSch);
 			}
 
 			#if($item->{'record-type'} eq App::Universal::RECORDTYPE_INSURANCEPLAN)
