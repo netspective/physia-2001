@@ -13,6 +13,7 @@
 var WINDOWNAME_FINDPOPUP = '_physia_findPopup';
 var WINDOWNAME_ACTIONPOPUP = '_physia_actionPopup';
 var WINDOWNAME_ALERTPOPUP = '_physia_alertPopup';
+var WINDOWNAME_FINDPOPUP2 = '_physia_findPopup2';
 
 // These constants MUST be kept identical to what is in CGI::Validator::Field
 var FLDFLAG_INVISIBLE = 1;
@@ -293,7 +294,7 @@ function translateEnterKey(event, flags)
 					alert('Please press Tab to get to the next field ('+property+').');
 				return true;
 			}
-		}		
+		}
 	}
 	return false;
 }
@@ -893,7 +894,10 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	// of the popup window to check the value of activeFindWinControl and
 	// either automatically populate the control or do something else
 	//
-	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ?
+
+	var windowName = isLookupWindow() ? WINDOWNAME_FINDPOPUP2 : WINDOWNAME_FINDPOPUP;
+
+	var popUpWindow = open(newArl, windowName, features == null ?
 		"location, status, width=600,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
@@ -903,7 +907,8 @@ function isLookupWindow()
 	// we check parent.window.name because the populateControl will be called
 	// from the "content" frame of the findPopup window
 	//
-	var flag = window.name == WINDOWNAME_FINDPOPUP && opener.activeFindWinControl != null ? true : false;
+	var flag = (window.name == WINDOWNAME_FINDPOPUP || window.name == WINDOWNAME_FINDPOPUP2)
+		&& opener.activeFindWinControl != null ? true : false;
 	//alert(parent.window.name + ' == ' + WINDOWNAME_FINDPOPUP + ': ' + parent.opener.activeFindWinControl);
 	//alert(flag);
 	return flag;
