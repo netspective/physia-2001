@@ -35,9 +35,7 @@ use constant CONFIGGROUP_SWDEV => 'development';
 use constant CONFIGGROUP_TEST => 'testing';
 use constant CONFIGGROUP_DEMO => 'demonstration';
 
-use constant PATH_UNIXROOT	 => defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite';
-use constant PATH_ROOTDIR    => File::Spec->catfile($^O eq 'MSWin32' ? 'h:' : '');
-use constant PATH_APPROOT	 => File::Spec->catfile($^O eq 'MSWin32' ? PATH_ROOTDIR : PATH_UNIXROOT);
+use constant PATH_APPROOT    => File::Spec->catfile(defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite');
 use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl', 'App');
 use constant PATH_DATABASE   => File::Spec->catfile(PATH_APPROOT, 'Database');
 use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Report');
@@ -93,6 +91,7 @@ sub getDefaultConfig
 	# per-machine configurations go here
 	'TOKYO' => getDefaultConfig('Tokyo Main Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'MEDINA' => getDefaultConfig('Medina Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
+	'LIMA' => getDefaultConfig('Lima Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 
 	# other keyed configurations go here
 	# if a particular UNIX user needs a special configuration, use 'account-username'
@@ -102,12 +101,15 @@ sub getDefaultConfig
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 );
 
-my $userName = getpwuid($>) || '';
-my $groupName = getgrgid($)) || '';
+my $userName = '';
+my $groupName = '';
 my $hostName = uc(`hostname`);
 
 if($^O ne 'MSWin32')
 {
+	my $userName = getpwuid($>) || '';
+	my $groupName = getgrgid($)) || '';
+	
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"};
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"group-$groupName"} unless $CONFDATA_SERVER;
 }
