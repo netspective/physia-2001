@@ -21,38 +21,39 @@ sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'coverage', heading => '$Command Personal Insurance Coverage');
 
-		#my $id = $self->{'id'}; 	# id = 'insur_pay' | 'personal_pay'
+	#my $id = $self->{'id'}; 	# id = 'insur_pay' | 'personal_pay'
 
-		my $schema = $self->{schema};
-		delete $self->{schema};  # make sure we don't store this!
+	my $schema = $self->{schema};
+	delete $self->{schema};  # make sure we don't store this!
 
-		croak 'schema parameter required' unless $schema;
+	croak 'schema parameter required' unless $schema;
 
-		$self->addContent(
-				new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
-				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
-				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
-				new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',	style => 'check'),
-				new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
-				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
-				new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/plan_name'),
-				#new CGI::Dialog::Field::TableColumn(
-				#					caption => 'Insurance Type',
-				#					schema => $schema,
-				#					column => 'Insurance.ins_type',
-				#					typeGroup => ['insurance', 'workers compensation']),
+	$self->addContent(
+			new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
+			new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
+			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
+			new CGI::Dialog::Field(type => 'hidden', name => 'bill_seq_hidden'),
+			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
+			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
+			new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/plan_name'),
+			#new CGI::Dialog::Field::TableColumn(
+			#					caption => 'Insurance Type',
+			#					schema => $schema,
+			#					column => 'Insurance.ins_type',
+			#					typeGroup => ['insurance', 'workers compensation']),
 
-				#new CGI::Dialog::Field(lookup => 'Bill_Sequence', caption => 'Insurance Sequence', name => 'bill_sequence', options => FLDFLAG_REQUIRED),
+			#new CGI::Dialog::Field(lookup => 'Bill_Sequence', caption => 'Insurance Sequence', name => 'bill_sequence', options => FLDFLAG_REQUIRED),
 
-				new CGI::Dialog::Field::TableColumn(
-									caption => 'Insurance Sequence',
-									schema => $schema,
-									column => 'Insurance.bill_sequence',
-									onValidate => \&App::Dialog::InsurancePlan::validateExistingInsSeq,
-									onValidateData => $self,
-									defaultValue => 1,
-									options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field::TableColumn(
+								caption => 'Insurance Sequence',
+								schema => $schema,
+								column => 'Insurance.bill_sequence',
+								onValidate => \&App::Dialog::InsurancePlan::validateExistingInsSeq,
+								onValidateData => $self,
+								defaultValue => 1,
+								options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',	style => 'check'),
 			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
 			new CGI::Dialog::Subhead(heading => 'General Plan Information', name => 'gen_plan_heading'),
 			new CGI::Dialog::MultiField(caption =>'Group Name/Group Number', name => 'group',
@@ -204,37 +205,11 @@ sub makeStateChanges
 		my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
 		#$self->updateFieldFlags('insured_guarantor_ids', FLDFLAG_INVISIBLE, $patientAge < 21 ? 0 : 1);
 		#$self->updateFieldFlags('insured_id', FLDFLAG_INVISIBLE, $patientAge < 21 ? 1 : 0);
-		my $insuredId = $patientAge < 21 ? '' : $personId;
+		my $insuredId = $patientAge >= 21 ? $personId : undef;
 		$page->field('insured_id', $insuredId);
 	}
 
 	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
-
-	my $sequence = $page->field('bill_sequence');
-	#if ($sequence eq 99)
-	#{
-		my $checkSeq = 1;
-		#for($checkSeq = 1; $checkSeq <=3; $checkSeq ++)
-		#{
-
-		#	my $doesBillSeqExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $checkSeq);
-		#	$page->addDebugStmt("REC EXISTS: $doesBillSeqExists");
-
-			#if($doesBillSeqExists eq '')
-			#{
-			#	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
-			#	my $createInsCoverageHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousBillSequence');";
-			#	$self->invalidate($page, Do u want to Inactivate the other low level Insurance Coverages? If so check the box <br><a href="$createInsCoverageHref">Or Click Here to add another Insurance Coverage of the same bill sequence</a>);
-
-			#	if($page->field(create_record, 1))
-			#	{
-			#		$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $checkSeq);
-			#	}
-
-			#}
-		#}
-	#}
-
 }
 
 sub customValidate
@@ -249,6 +224,7 @@ sub customValidate
 	my $relToInsuredField = $self->getField('rel_to_insured');
 	my $insuredId = $page->field('insured_id');
 	my $insuredIdField = $self->getField('insured_id');
+	my $billSeq = $self->getField('bill_sequence');
 
 	my $personId = $page->param('person_id');
 
@@ -274,6 +250,39 @@ sub customValidate
 		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	}
 
+	my $previousSequence = $page->field('bill_seq_hidden');
+
+	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
+	$page->addDebugStmt("HIDDEN EXISTS: $previousSequence");
+	my $sequence = $page->field('bill_sequence');
+	$page->addDebugStmt("REC EXISTS: $sequence");
+	if ($sequence == 99)
+	{
+
+		do
+		{
+			$previousSequence ++;
+			$page->addDebugStmt("REC EXISTS: $previousSequence");
+
+			if($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence))
+			{
+				$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
+				$page->field('create_record', 0);
+				my $createInsCoverageHref = "javascript:doActionPopup('/person/#param.person_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousSequence');";
+				$billSeq->invalidate($page, "Do u want to Create a New <a href='/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
+
+			}
+			if($page->field('create_record') ne '')
+			{
+				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
+			}
+			if($page->field('create_record') eq '')
+			{
+				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence);
+			}
+		}until $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence) || $previousSequence <=3;
+	}
+
 }
 
 sub populateData_add
@@ -283,26 +292,47 @@ sub populateData_add
 		return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 
 		my $personId = $page->param('person_id');
-		#my $insSequence = $page->field('bill_sequence');
-		#my $newInsSequence = $insSequence + 1;
-		#$newInsSequence > 4 ? 99 : $newInsSequence;
-		#$page->field('bill_sequence', $newInsSequence);
-
-		my $ownerId = $page->param('person_id');
-		my $billSequence = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsSequence', $ownerId);
-		foreach my $existSequence(@{$billSequence})
+		my $seq = 0;
+		my $hiddenBillSeq = $page->field('bill_sequence');
+		if($hiddenBillSeq ne  '')
 		{
-			my $sequence = $existSequence->{'bill_sequence'};
-			if ($sequence < 4)
+			$page->addDebugStmt("HIDDEN SEQ : $hiddenBillSeq");
+			$page->field('bill_sequence', $hiddenBillSeq);
+		}
+		else
+		{
+			do
 			{
-				my $newSequence = $sequence + 1;
-				$page->field('bill_sequence', $newSequence);
-			}
-			else
+				$seq++;
+
+			}until ((!$STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq)) && $seq < 4);
+
+			if ($seq > 4)
 			{
 				$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
 			}
+			else
+			{
+				$page->field('bill_sequence', $seq);
+			}
 		}
+
+
+		#my $billSequence = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsSequence', $personId);
+		#foreach my $existSequence(@{$billSequence})
+		#{
+
+		#	my $sequence = $existSequence->{'bill_sequence'};
+		#	if ($sequence < 4)
+		#	{
+		#		my $newSequence = $sequence + 1;
+		#		$page->field('bill_sequence', $newSequence);
+		#	}
+		#	else
+		#	{
+		#		$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
+		#	}
+		#}
 
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
@@ -322,6 +352,8 @@ sub populateData_update
 	{
 		$page->addError("Ins Internal ID '$insIntId' not found.");
 	}
+	my $prevBillSeq = $page->field('bill_sequence');
+	$page->field('bill_seq_hidden', $prevBillSeq);
 }
 
 sub populateData_remove
