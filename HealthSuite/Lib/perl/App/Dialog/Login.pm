@@ -198,6 +198,8 @@ sub handle_page
 					</TR>
 					<TR>
 						<TD COLSPAN=2>
+							<A HREF="https://digitalid.verisign.com/as2/1940859b9af71702c65fb7f216fe0090" TARGET="new">
+							<IMG SRC="/resources/icons/verisignsealwhite.gif" WIDTH="98" HEIGHT="100" BORDER="0" ALIGN="LEFT"></A>
 							<FONT FACE="VERDANA,ARIAL,HELVETICA" SIZE=2 COLOR=777777>
 							In order to assure that your data is secure,
 							please be sure to logout of the system when you're done. In addition to
