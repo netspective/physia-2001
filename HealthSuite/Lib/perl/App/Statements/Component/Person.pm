@@ -439,13 +439,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, 
+					provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
 				from  Transaction
 			where  	trans_owner_id = ?
 			and caption = 'Refill Request'
                         and data_num_a is null
                         union
-                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+                        select  	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, 
+                        		provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
                                 from  Transaction
                         where   trans_owner_id = ?
                         and caption = 'Refill Request'
@@ -457,7 +459,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): #7# (#3#)" },
+			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): <A HREF='/person/#11#/profile'>#11#</A> #7# (#3#)" },
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#',
 		frame => {

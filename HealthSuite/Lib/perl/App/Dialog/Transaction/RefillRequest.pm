@@ -116,13 +116,16 @@ sub execute
                         trans_id => $page->param('trans_id') || undef,
                         trans_owner_id => $page->param('person_id') || undef,
                         trans_owner_type => 0,
+                        processor_id => $page->field('filler')  || undef,
+                        processor_type => 0,
+			receiver_id => $page->param('person_id') || undef,
+			receiver_type => 0,
                         provider_id => $page->field('provider') || undef,
                         caption =>'Refill Request',
                         trans_type => 7000,
                         trans_status => $refillStatus,
                         trans_begin_stamp => $page->field('refilldate'),
                         data_text_a => $page->field('refill') || undef,
-                        data_text_b => $page->field('filler')  || undef,
                         _debug => 0
                 );
 
@@ -131,13 +134,16 @@ sub execute
                         trans_id => $page->param('trans_id') || undef,
                         trans_owner_id => $page->field('filler') || undef,
                         trans_owner_type => 0,
+                        processor_id => $page->field('filler')  || undef,
+                        processor_type => 0,
+			receiver_id => $page->param('person_id') || undef,
+			receiver_type => 0,
                         provider_id => $page->field('provider') || undef,
                         caption =>'Refill Request',
                         trans_type => 7000,
                         trans_status => $refillStatus,
                         trans_begin_stamp => $page->field('refilldate'),
                         data_text_a => $page->field('refill') || undef,
-                        data_text_b => $page->param('person_id')  || undef,
 			data_num_a => $trans_id,
                         _debug => 0
                 );
