@@ -13,7 +13,9 @@ use strict;
 use CGI::Page;
 use CGI::ImageManager;
 use App::Universal;
+use App::Configuration;
 use Date::Manip;
+use IO::File;
 
 use DBI::StatementManager;
 use App::Statements::Page;
@@ -172,7 +174,7 @@ sub incrementViewCount
 		else
 		{
 			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'ins_newKey', $sessionId, $userId, $rsrc, $paramKey,
-				$caption, $arl);
+		$caption, $arl);
 		}
 	}
 }
@@ -589,8 +591,12 @@ sub send_page_header
 		};
 
 	$self->replaceVars(\$html);
-	print "<head>\n$html\n</head>\n";
-	return 1;
+	if (defined wantarray) {
+		return "<head>\n$html\n</head>\n";
+	} else {
+		print "<head>\n$html\n</head>\n";
+		return 1;
+	}
 }
 
 
@@ -619,6 +625,8 @@ sub send_page_body
 
 	print qq{<BODY leftmargin="0" topmargin="0" marginheight="0" marginwidth="0" bgcolor="$colors->[THEMECOLOR_BKGND_PAGE]" onload="return processOnInit()">$fonts->[THEMEFONTTAG_PLAIN_OPEN]};
 	my $html = '';
+	my $preliminaries = '';
+
 	$html = join('', @{$self->{page_content_header}}) unless $flags & PAGEFLAG_ISFRAMEBODY;
 	unless($flags & PAGEFLAG_ISFRAMEHEAD)
 	{
@@ -636,10 +644,21 @@ sub send_page_body
 	$html = $self->component('sde-page-components') . $html if $self->param('_debug_comp');
 	$html = $self->component('sde-page-acl') . $html if $self->param('_debug_acl');
 
-	print $self->getTextBoxHtml(heading => 'Errors', messages => $self->{page_errors}) if $self->haveErrors();
-	print $self->getTextBoxHtml(heading => 'Debugging Statements', messages => $self->{page_debug}) if @{$self->{page_debug}};
-	print $html;
-	print "$fonts->[THEMEFONTTAG_PLAIN_CLOSE]</BODY>";
+	$preliminaries .= $self->getTextBoxHtml(heading => 'Errors', messages => $self->{page_errors}) if $self->haveErrors();
+	$preliminaries .= $self->getTextBoxHtml(heading => 'Debugging Statements', messages => $self->{page_debug}) if @{$self->{page_debug}};
+
+	if (defined wantarray) {
+		my $finalHTML = qq{<BODY leftmargin="0" topmargin="0" marginheight="0" marginwidth="0" bgcolor="$colors->[THEMECOLOR_BKGND_PAGE]" onload="return processOnInit()">$fonts->[THEMEFONTTAG_PLAIN_OPEN]};
+		$finalHTML .= $preliminaries;
+		$finalHTML .= $html;
+		$finalHTML .= "$fonts->[THEMEFONTTAG_PLAIN_CLOSE]</BODY>";
+
+		return $finalHTML;
+	} else {
+		print $preliminaries;
+		print $html;
+		print "$fonts->[THEMEFONTTAG_PLAIN_CLOSE]</BODY>";
+	}
 }
 
 sub addLocatorLinks
@@ -1056,11 +1075,39 @@ sub prepare_changes
 
 sub printContents
 {
-	my ($self) = @_;
+	my ($self, $psOptions) = @_;
+	my $html;
 
 	$self->establishSession();
 	$self->initialize();
 	$self->prepare_page_body();
+
+#	if ($psOptions) {
+		$self->setFlag (PAGEFLAG_IGNORE_BODYHEAD);
+		$self->setFlag (PAGEFLAG_IGNORE_BODYFOOT);
+
+		$html .= "<html>\n";
+		$html .= $self->send_page_header ();
+		$html .= $self->send_page_body ();
+		$html .= "\n</html>\n";
+
+		my $uniqueFilename = time ();
+		$uniqueFilename .= "_$$.html";
+
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		$uniqueFilename = $tempDir."/".$uniqueFilename;
+
+#		my $htmlPrinter = "| html2ps -L -i 0.70 > $uniqueFilename";
+		my $htmlPrinter = ">$uniqueFilename";
+
+		my $tempFileHandle = IO::File->new($htmlPrinter);
+		print $tempFileHandle $html;
+		$tempFileHandle->close;
+
+		$self->clearFlag (PAGEFLAG_IGNORE_BODYHEAD);
+		$self->clearFlag (PAGEFLAG_IGNORE_BODYFOOT);
+
+#	}
 
 	if ($self->send_http_header()) {
 		print "<html>\n";
