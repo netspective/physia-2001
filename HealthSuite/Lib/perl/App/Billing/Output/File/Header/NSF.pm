@@ -79,8 +79,7 @@ sub formatData
 my %nsfType = ( NSF_HALLEY . "" =>
 	  sprintf("%-3s%-16s%-9s%-6s%-6s%-33s%-30s%-30s%-20s%-2s%-9s%-5s%-33s%-10s%-8s%-6s%-16s%-1s%5s%5s%-4s%-8s%-1s%-16s%-1s%-5s%-2s%-2s%-28s",
 	  substr($self->recordType(),0,3),
-#	  substr($confData->{SUBMITTER_ID},0,9), # submitter id (for time being physia id is entered)
-	  substr('S03135',0,9), # submitter id (for time being physia id is entered)
+	  substr($confData->{SUBMITTER_ID},0,9), # submitter id (for time being physia id is entered)
 	  $spaces, # reserved filler
 	  $spaces, # Submitter Type
 	  substr($confData->{SUBMISSION_SERIAL_NO},0,6), # submission serial no.
@@ -112,7 +111,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  NSF_THIN . "" =>
 	  sprintf("%-3s%-16s%-9s%-6s%-6s%-33s%-30s%-30s%-20s%-2s%-9s%-5s%-33s%-10s%-8s%-6s%-16s%-1s%5s%5s%-4s%-8s%-1s%-16s%-1s%-5s%-2s%-1s%-8s%-8s%-1s%-8s%-4s",
 	  substr($self->recordType(),0,3),
-	  substr($confData->{SUBMITTER_ID},0,16), # submitter id (for time being physia id is entered)
+	  substr('S03135',0,16), # submitter id (for time being physia id is entered)
 	  $spaces, # reserved filler
 	  $spaces, # Submitter Type
 	  substr($confData->{SUBMISSION_SERIAL_NO},0,6), # submission serial no.
