@@ -80,11 +80,10 @@
 
 	<table name="Electronic_Payer_Type" abbrev="EPayType" type="Lookup">
 		<enum id="0">Non-Commercial</enum>
-		<enum id="1">BCBS</enum>
-		<enum id="2">Medicare</enum>
-		<enum id="3">Medicaid</enum>
-		<enum id="4">Commercial HCFA</enum>
-		<enum id="5">Commercial UB-92</enum>
+		<enum id="100">Commercial - Medical</enum>
+		<enum id="200">Blue Cross/Blue Shield - Medical</enum>
+		<enum id="300">Medicare - Medical</enum>
+		<enum id="400">Medicaid - Medical</enum>
 	</table>
 
 	<table name="Ethnicity" type="Lookup">

@@ -4,40 +4,56 @@ use App::Data::Obtain::Ntis::CPTinfo;
 use App::Data::Obtain::InfoX::ICDinfo;
 use App::Data::Obtain::HCFA::HCPCS;
 use App::Data::Obtain::Envoy::Payers;
+use App::Data::Obtain::Perse::Epayer;
 use App::Data::Transform::DBI;
 use File::Path;
 use FindBin qw($Bin);
 use Benchmark;
 use File::Spec;
 use Getopt::Long;
+use File::Basename;
+
+sub printUsage
+{
+	print qq{
+Usage:  @{[basename $0]} <connect string> [icd cpt hcpcs envoy epayer]
+If no module is specified, the default is to load ALL modules.
+		
+Example: @{[basename $0]} sde_prime/sde\@sdedbs02 icd cpt
+to only load icd and cpt modules.
+	};
+	exit;
+}
 
 sub Main
 {
+	my $connectString = shift;
+	my @modules = @_ ? @_ : ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer');
+		
+	printUsage() unless $connectString;
+	$connectString =~ s/\@/\@dbi:Oracle:/;
+	
 	my $dataSrcPath = 'R:';
 	#my $dataSrcPath = 'H:/HealthSuite-RefData';
 	my $properties =
 	{
 		startTime => new Benchmark,
-		#connectStr => 'hs/hs@dbi:Oracle:HealthSuiteCairo',
-		#connectStr => 'physia/physia@dbi:Oracle:Physia',
-		#connectStr => 'physia/physia@dbi:Oracle:SDEDBS01',
-		#connectStr => 'hs/hs@dbi:Oracle:HealthSuiteIvory',
-		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS01',
-		#connectStr => 'sde01/sde@dbi:Oracle:SDEDBS02',
-		#connectStr => 'sde_prime/sde@dbi:Oracle:SDEDBS02',
-		connectStr => 'demo01/demo@dbi:Oracle:SDEDBS02',
+		#connectStr => 'demo01/demo@dbi:Oracle:SDEDBS02',
+		connectStr => $connectString,
 		scriptPath => $Bin,
 		dataSrcPath => 'Q:',
 		dataSrcInfoXPath => File::Spec->catfile($dataSrcPath, 'info-x'),
 		dataSrcHCFAPath => File::Spec->catfile($dataSrcPath, 'hcfa'),
 		dataSrcEnvoyPath => File::Spec->catfile($dataSrcPath, 'envoy'),
 		dataSrcNtisPath => File::Spec->catfile($dataSrcPath, 'ntis'),
+		dataSrcPersePath => File::Spec->catfile($dataSrcPath, 'perse'),
 	};
 
-	importICDInfo($properties, transformDBI => 1);
-	#importCPTInfo($properties, transformDBI => 1);
-	#importHCPCSInfo($properties, transformDBI => 1);
-	#importEnvoyPayers($properties);
+	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
+	importCPTInfo($properties, transformDBI => 1) if grep(/cpt/, @modules);
+	importHCPCSInfo($properties, transformDBI => 1) if grep(/hcpcs/, @modules);
+	importEnvoyPayers($properties, transformDBI => 1) if grep(/envoy/, @modules);
+	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);
 }
 
 sub importCPTInfo
@@ -48,13 +64,13 @@ sub importCPTInfo
 	my $dataCollection = $params{collection} || new App::Data::Collection;
 
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
-						cptShortFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_short.txt'),
-						cptLongFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_long.txt'),
-						cpEditFile => File::Spec->catfile($properties->{dataSrcNtisPath}, 'A_cpedit.txt'),
-						meEditFile => File::Spec->catfile($properties->{dataSrcNtisPath}, 'C_meedit.txt'),
-						crosswalkFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Cpt-Icd1.txt'),
-						cptOceFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'CptOce.txt'),
-						);
+		cptShortFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_short.txt'),
+		cptLongFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_long.txt'),
+		cpEditFile => File::Spec->catfile($properties->{dataSrcNtisPath}, 'A_cpedit.txt'),
+		meEditFile => File::Spec->catfile($properties->{dataSrcNtisPath}, 'C_meedit.txt'),
+		crosswalkFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Cpt-Icd1.txt'),
+		cptOceFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'CptOce.txt'),
+	);
 	if($importer->haveErrors())
 	{
 		$importer->printErrors();
@@ -90,10 +106,10 @@ sub importICDInfo
 	my $dataCollection = $params{collection} || new App::Data::Collection;
 
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
-						icdEditFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd1Edit.txt'),
-						icdCptCrosswalkFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd1-cpt.txt'),
-						icdDescrFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd.txt'),
-						);
+		icdEditFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd1Edit.txt'),
+		icdCptCrosswalkFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd1-cpt.txt'),
+		icdDescrFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd.txt'),
+	);
 	if($importer->haveErrors())
 	{
 		$importer->printErrors();
@@ -159,7 +175,7 @@ sub importHCPCSInfo
 
 sub importEnvoyPayers
 {
-	my ($properties) = @_;
+	my ($properties, %params) = @_;
 	my $dataCollection = new App::Data::Collection;
 
 	my $payersPath = File::Spec->catfile($properties->{dataSrcEnvoyPath}, 'payers-08-13-99-msword');
@@ -178,14 +194,60 @@ sub importEnvoyPayers
 	undef $importer;
 	#$dataCollection->printDataSamples();
 
-	my $exporter = new App::Data::Transform::DBI;
-	$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+		#$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+		#	connect => $properties->{connectStr},
+		#	doBefore => "truncate table REF_ENVOY_PAYER//Truncating REF_ENVOY_PAYER table.",
+		#	insertStmt => "insert into REF_ENVOY_PAYER (id, name, ptype, state, flags, remarks) values (?, ?, ?, ?, ?, ?)",
+		#	verifyCountStmt => "select count(*) from REF_ENVOY_PAYER",
+		#);
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
 			connect => $properties->{connectStr},
-			doBefore => "truncate table REF_ENVOY_PAYER//Truncating REF_ENVOY_PAYER table.",
-			insertStmt => "insert into REF_ENVOY_PAYER (id, name, ptype, state, flags, remarks) values (?, ?, ?, ?, ?, ?)",
-			verifyCountStmt => "select count(*) from REF_ENVOY_PAYER",
-			);
-	$exporter->printErrors();
+			doBefore => "delete from REF_EPAYER where psource = 1//Deleting Envoy Payers.",
+			insertStmt => "insert into REF_EPAYER (id, name, ptype, state, flags, remarks, psource) 
+				values (?, ?, ?, ?, ?, ?, 1)",
+			verifyCountStmt => "select count(*) from REF_EPAYER where psource =1",
+		);
+		$exporter->printErrors();
+	}
 }
 
-Main();
+sub importEPayers
+{
+	my ($properties, %params) = @_;
+	my $dataCollection = new App::Data::Collection;
+	
+	my $importer = new App::Data::Obtain::Perse::Epayer;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+		ePayersFile => File::Spec->catfile($properties->{dataSrcPersePath}, 'perse_payers.csv'),
+	);
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_Epayer where psource = 2//Deleting Perse payers.",
+			insertStmt => "insert into REF_Epayer
+				(id, id2, name, psource, ptype)
+			values (?, ?, ?, ?, ?)",
+			verifyCountStmt => "select count(*) from REF_Epayer where psource =2",
+		);
+		$exporter->printErrors();
+	}
+}
+
+Main(@ARGV);
