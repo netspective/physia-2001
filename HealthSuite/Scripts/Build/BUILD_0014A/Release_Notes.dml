@@ -34,5 +34,17 @@
 		<deliverable id="1289">
 			Secure Close of Day
 		</deliverable>
+		<deliverable id="1280">
+			Update guarantor shows up the correct dialog now
+		</deliverable>		
+		<deliverable id="1281">
+			Added the same 'Mailing Address' as 'Billing Address' to showup in the contact methods component while adding a new Org
+		</deliverable>
+		<deliverable id="1284">
+			Fixed code to close the lookup window after adding ICD or CPT codes in a dialog through a lookup window
+		</deliverable>
+		<deliverable id="1285">
+			Fixed code to get the correct url while selecting the 'Edit Profile' option in the search window
+		</deliverable>		
 	</deliverables>
 </release-notes>
