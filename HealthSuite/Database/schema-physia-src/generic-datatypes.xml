@@ -76,7 +76,7 @@
 
 	<datatype name="time">
 		<sqldefn>date</sqldefn>
-		<sqlwritefmt>to_date('01/01/1900 $value$', 'MM/DD/YYYY HH:MI AM')</sqlwritefmt>
+		<sqlwritefmt>to_date('$value$', 'HH:MI AM')</sqlwritefmt>
 	</datatype>
 
 	<datatype name="socsec" type="text" size="11"/>
