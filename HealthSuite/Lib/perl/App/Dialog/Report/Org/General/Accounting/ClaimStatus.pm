@@ -71,6 +71,24 @@ sub new
 				name => 'service_facility_id',
 				options => FLDFLAG_PREPENDBLANK,
 				types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),
+
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
+
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -120,7 +138,7 @@ sub buildSqlStmt
 
 	if($serviceBeginDate ne '' && $serviceEndDate ne '')
 	{
-		$serviceDateClause = qq{ and i.invoice_id in 
+		$serviceDateClause = qq{ and i.invoice_id in
 								(select parent_id from invoice_item ii
 									where ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
 									and ii.service_end_date <= to_date('$serviceEndDate', 'mm/dd/yyyy')

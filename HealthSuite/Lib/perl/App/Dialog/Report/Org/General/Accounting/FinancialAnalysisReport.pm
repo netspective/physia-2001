@@ -47,6 +47,22 @@ sub new
 				new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
 				new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id'),
 
+				new CGI::Dialog::Field(
+					name => 'printReport',
+					type => 'bool',
+					style => 'check',
+					caption => 'Print report',
+					defaultValue => 0
+					),
+
+				new CGI::Dialog::Field(
+					caption =>'Printer',
+					name => 'printerQueue',
+					options => FLDFLAG_PREPENDBLANK,
+					fKeyStmtMgr => $STMTMGR_DEVICE,
+					fKeyStmt => 'sel_org_devices',
+					fKeyDisplayCol => 0
+				),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 	$self;
@@ -127,6 +143,7 @@ sub execute
 
 	##
 	my $pub ={
+		reportTitle => "Financial Analysis",
 		columnDefn =>
 		[
 		{colIdx => 12, head =>'Year', dAlign => 'left',},

@@ -18,7 +18,10 @@ use App::Statements::Report::PhysicianLicense;
 
 use Data::Publish;
 use App::Configuration;
+use Data::TextPublish;
+use App::Configuration;
 use App::Device;
+
 use App::Statements::Device;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Organization;
@@ -68,6 +71,22 @@ sub new
 				),
 			],
 		),
+		new CGI::Dialog::Field(
+			name => 'printReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Print report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
+			),
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -154,9 +173,43 @@ sub execute
 	}
 
 	my $pub = $STMTRPTDEFN_PHYSICIAN_LICENSE;
-	my $html = createHtmlFromData($page, 0, \@data, $pub);
+	#my $pub = {
+	#	reportTitle => "Professional License Expiration",
+	#	columnDefn => $STMTRPTDEFN_PHYSICIAN_LICENSE,
+	#};
 
-	return $html;
+	my $hardCopy = $page->field('printReport');
+	my $html;
+	my $textOutputFilename;
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
+	$html = createHtmlFromData($page, 0, \@data, $pub);
+	#
+	$pub->{ reportTitle} = "Professional License Expiration ";
+	#
+	$textOutputFilename = createTextRowsFromData($page, 0, \@data, $pub);
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+
+	#return $html;
 }
 
 # create a new instance which will automatically add it to the directory of

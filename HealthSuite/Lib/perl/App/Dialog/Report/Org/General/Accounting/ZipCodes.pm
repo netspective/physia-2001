@@ -10,7 +10,13 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
+
 use App::Statements::Person;
 use App::Statements::Report::ClaimStatus;
 
@@ -82,6 +88,22 @@ sub new
 				defaultValue => 0
 				),
 
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
 
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -109,10 +131,24 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $pub = {
+		reportTitle => "Zip Code Report",
 		columnDefn => [
 			{ colIdx => 0, head => 'Zip Code', hAlign => 'center',dAlign => 'left',dataFmt => '#0#'},
 		],
 	};
+
+	my $hardCopy = $page->field('printReport');
+	my $html;
+	my $textOutputFilename;
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 
 	my $qryStmt = qq{
 						select count(distinct person_id) total_patients
@@ -273,8 +309,25 @@ sub execute
 		push (@data, \@rowData);
 	}
 
-	my $html = createHtmlFromData($page, 0, \@data, $pub);
-	return $html;
+	 $html = createHtmlFromData($page, 0, \@data, $pub);
+	$textOutputFilename = createTextRowsFromData($page, 0, \@data, $pub);
+
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+
+	#return $html;
 
 }
 

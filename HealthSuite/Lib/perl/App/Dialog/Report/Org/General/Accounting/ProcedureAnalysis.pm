@@ -62,6 +62,23 @@ sub new
 			new CGI::Dialog::Field(caption => 'CPT From', name => 'cpt_from', size => 12),
 			new CGI::Dialog::Field(caption => 'CPT To', name => 'cpt_to', size => 12),
 				]),
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
+
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
