@@ -69,18 +69,18 @@ sub getForm
 	return ('Find next available slot', qq{
 	<CENTER>
 		<nobr>
-		Parallel Search
-		<input name='parallel_search' type=checkbox $parallelSearchChecked>
+		<label for="parallel_search">Parallel Search</label>
+		<input name='parallel_search' id="parallel_search" type=checkbox $parallelSearchChecked>
 
 		Resource(s):
-		<input name='resource_ids' size=30 maxlength=255 value="@{[$self->param('resource_ids')]}" title='Resource IDs'>
+		<input name='resource_ids' id='resource_ids' size=30 maxlength=255 value="@{[$self->param('resource_ids')]}" title='Resource IDs'>
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_ids, '/lookup/person/id', ',');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
 		&nbsp;
 
 		Facility(s):
-		<input name='facility_ids' size=20 maxlength=32 value="@{[$self->param('facility_ids')]}" title='Facility IDs'>
+		<input name='facility_ids' id='facility_ids' size=20 maxlength=32 value="@{[$self->param('facility_ids')]}" title='Facility IDs'>
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		</nobr>
@@ -91,7 +91,7 @@ sub getForm
 
 		<nobr>
 		Starting:
-		<input name='start_date' size=10 maxlength=10 title='Start Date'
+		<input name='start_date' id='start_date' size=10 maxlength=10 title='Start Date'
 			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}">
 		Duration:
 		<select name="appt_duration" style="color: darkred">
