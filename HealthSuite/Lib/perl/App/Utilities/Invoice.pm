@@ -367,6 +367,7 @@ sub submitClaim
 {
 	my ($page, $invoiceId, $submitFlag, $printFlag) = @_;
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $sessUserId = $page->session('user_id');
 
 	my $invStat = $submitFlag == App::Universal::RESUBMIT_SAMEPAYER ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
 	$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
@@ -374,7 +375,7 @@ sub submitClaim
 		'Invoice', 'update',
 		invoice_id => $invoiceId,
 		invoice_status => $invStat,
-		submitter_id => $page->session('user_id'),
+		submitter_id => $sessUserId,
 		submit_date => $todaysDate || undef,
 		_debug => 0
 	);
@@ -383,6 +384,8 @@ sub submitClaim
 	my $action = $submitFlag == App::Universal::RESUBMIT_SAMEPAYER ? 'Resubmitted' : 'Submitted';
 	$action = $printFlag ? 'HCFA Printed' : $action;
 	addHistoryItem($page, $invoiceId, value_text => $action);
+
+	$page->recordActivity(App::Universal::ACTIVITY_TYPE_RECORD, 1, 'invoice', $invoiceId, undef,"$action invoice <a href='/invoice/$invoiceId/summary'>$invoiceId</a>", $sessUserId);
 }
 
 sub copyInvoiceForNextPayer
