@@ -17,11 +17,16 @@ use App::Statements::Search::Appointment;
 use App::Statements::Component::Referral;
 
 use App::Dialog::CollectionSetup;
+use base 'App::Page::WorkList';
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
-	'worklist/referral' => { },
+	'worklist/referral' => {
+			_views => [
+				{caption => 'Today', name => 'date',},
+			],
+		},
 	);
 
 sub prepare_view_date
@@ -389,13 +394,13 @@ sub initialize
 	my $activeView = $self->param('_pm_view');
 	if ($activeView)
 	{
-		unless($self->hasPermission("page/worklist/referral/$activeView"))
+		unless($self->hasPermission("page/worklist/referral"))
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information.
-						Permission page/worklist/referral/$activeView is required.
+						Permission page/worklist/referral is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
