@@ -69,6 +69,10 @@
 			Report (financial analysis report) :  Changed calc for A/R column
 		</deliverable>
 
+		<deliverable id="1325">
+			Report (Aged Patient Receivables) : Included prepayments when calculating aged patient receivables 
+		</deliverable>
+
 		<deliverable id="1327">
 			Indicating submission order in claim summary (i.e. Primary, Secondary, etc.). Also added links to associated
 				claims through History items.
