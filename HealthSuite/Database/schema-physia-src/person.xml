@@ -26,6 +26,8 @@
 		<column name="completion_date"  type="stamp" descr="Date Of Completion"/>
 		<column name="referral_status"  lookupref="Referral_Status.id" descr="Status of Referral"/>
 		<column name="referral_status_date"  type="stamp" descr="Status of Referral"/>
+		<column name="referral_reason"  type="text" size="512" descr="Short description for annotating the reason"/>
+		<column name="comments"  type="text" size="512" descr="Referral comments"/>
 	</table>
 
 	<table name="Referral_Communication" abbrev="RefComm" type="Enumeration">
