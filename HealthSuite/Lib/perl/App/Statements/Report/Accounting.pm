@@ -265,6 +265,20 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		}
 	},
 
+	'sel_a_r_before' =>
+	{
+		sqlStmt=>
+		qq{
+			SELECT 	SUM(total_charges+misc_charges-person_write_off-insurance_write_off +
+						    balance_transfer -
+						    (person_pay+insurance_pay+refund)
+						    ) as a_r
+			FROM 	invoice_charges
+			WHERE 	invoice_date >= to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND 	invoice_date < to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	owner_org_id = :3				
+		}
+	},
 	'sel_financial_monthly' =>
 	{
 		sqlStmt =>
@@ -474,9 +488,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_91),
 				sum(balance_121),
 				sum(balance_151),
-				sum(decode(item_type,3,total_pending,0)),
-				--a.bill_party_type  in (2,3)
-				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0))
+				--sum(decode(item_type,3,total_pending,0)),
+				sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),											
+				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),					
+				sum(total_pending)								
 			FROM	agedpayments a, person p,person_org_category poc
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
@@ -507,8 +522,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 6, head => '91 - 120',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
 				{ colIdx => 7, head => '121 - 150',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
 				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
-				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
-				{ colIdx => 10, head => 'Pending Insurance', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Balance', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 11, head => 'Total Amount', summarize=>'sum',dataFmt => '#11#', dAlign => 'center', dformat => 'currency' },				
 				],
 			},	
 	},
