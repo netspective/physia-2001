@@ -195,6 +195,7 @@
 		<column name="effective" type="duration" descr="The effective date(s) of the catalog"/>
 		<column name="rvrbs_multiplier" type="float" descr="RVRBS multiplier"/>
 		<column name="sequence" type="integer" descr="The sequence number"/>
+		<column name="flags" type="longint" descr="Any flags you want to specify for this record.  Can store a maximum of 16 flags at the same time."/>
 	</table>
 
 	<include file="scheduling.xml"/>
