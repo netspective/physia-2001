@@ -615,7 +615,7 @@ sub isValid
 		$self->invalidate($page, $self->{regExpInvalidMsg});
 		$validSoFar = 0;
 	}
-	elsif(($flags & FLDFLAG_IDENTIFIER) && defined($value) && $value ne '' && $value !~ m/^[\w_\-]+$/)
+	elsif(($flags & FLDFLAG_IDENTIFIER) && defined($value) && $value ne '' && $value !~ m/^[\w_\-\.]+$/)
 	{
 		$self->invalidate($page, "$self->{caption} '$value' can only have [A-Z 0-9 _ -] characters (no spaces, tabs, commas, etc.)");
 		$validSoFar = 0;
