@@ -47,31 +47,150 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 'procAnalysis' => {
-	sqlStmt => qq{
-			select MAX((SELECT p.short_sortable_name FROM person p where p.person_id= provider)) as short_sortable_name,
-			MAX((SELECT tt.caption FROM Transaction_type tt WHERE tt.id = trans_type)) as visit_type,
-			nvl(i.code,'UNK') as code,
-			MAX(NVL((SELECT r.name FROM ref_cpt r WHERE r.cpt=i.code),'N/A')) as proc,
-			sum(i.unit_cost) as unit_cost,
-			sum(i.units) units,
-			i.invoice_date,
-			trunc(invoice_date,'MM') as month_date,
-			trunc(invoice_date,'YYYY') as year_date
-			from invoice_charges i
-			where (:1 IS NULL OR provider= :1 )
+	#sqlStmt => qq{
+	#		select MAX((SELECT p.short_sortable_name FROM person p where p.person_id= provider)) as short_sortable_name,
+	#		MAX((SELECT tt.caption FROM Transaction_type tt WHERE tt.id = trans_type)) as visit_type,
+	#		nvl(i.code,'UNK') as code,
+	#		MAX(NVL((SELECT r.name FROM ref_cpt r WHERE r.cpt=i.code),'N/A')) as proc,
+	#		sum(i.unit_cost) as unit_cost,
+	#		sum(i.units) units,
+	#		i.invoice_date,
+	#		trunc(invoice_date,'MM') as month_date,
+	#		trunc(invoice_date,'YYYY') as year_date
+	#		from invoice_charges i
+	#		where (:1 IS NULL OR provider= :1 )
+	#		AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
+	#		AND to_date(:3,'MM/DD/YYYY')
+	#		AND (:4 IS NULL OR :4 = i.facility)
+	#		AND (:5 IS NULL OR :5 <=i.code)
+	#		AND (:6 is NULL OR :6 >=i.code)
+	#		AND owner_org_id = :7
+	#		group by nvl(i.code,'UNK'),trunc(invoice_date,'MM') ,trunc(invoice_date,'YYYY') ,i.invoice_date,
+	#		provider,trans_type
+	#		order by 1,2,7 asc
+	#		},
+	sqlStmt =>qq{
+			SELECT 	p.simple_name,
+				tt.caption as visit_type,
+				NVL(i.code,'UNK') as code,
+				NVL(r.name,'N/A') as proc,
+				sum(i.unit_cost) as year_cost,
+				sum(i.units)	as year_units,
+				sum(decode(
+					   trunc(invoice_date,'MM'),
+					    trunc(to_date(:3,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM')
+				     		,i.unit_cost,
+				     	 0)
+				     ) as month_cost,
+				sum(decode(
+					   trunc(invoice_date,'MM'),
+					    trunc(to_date(:3,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM')
+				     		,i.units,
+				     	 0)
+				     ) as month_units,
+
+				sum(decode(
+					   invoice_date,
+					   to_date(:3,'$SQLSTMT_DEFAULTDATEFORMAT')
+				     		,i.unit_cost,
+				     	 0)
+				     ) as batch_cost,
+				sum(decode(
+					   invoice_date,
+					   to_date(:3,'$SQLSTMT_DEFAULTDATEFORMAT')
+				     		,i.units,
+				     	 0)
+				     ) as batch_units				     
+			FROM 	invoice_charges i, person p, transaction_type tt, ref_cpt r							
+			WHERE (:1 IS NULL OR provider= :1 )
 			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
 			AND to_date(:3,'MM/DD/YYYY')
 			AND (:4 IS NULL OR :4 = i.facility)
 			AND (:5 IS NULL OR :5 <=i.code)
 			AND (:6 is NULL OR :6 >=i.code)
 			AND owner_org_id = :7
-			group by nvl(i.code,'UNK'),trunc(invoice_date,'MM') ,trunc(invoice_date,'YYYY') ,i.invoice_date,
-			provider,trans_type
-			order by 1,2,7 asc
-			},
+			AND tt.id (+)= i.trans_type
+			AND r.cpt(+)=i.code 
+			AND p.person_id = i.provider
+			group by p.simple_name,
+				tt.caption,
+				NVL(i.code,'UNK'),
+				NVL(r.name,'N/A')
+			order by 1,2,3
+		},
 	sqlStmtBindParamDescr => ['Provider ID for yearToDateReceiptProcAnalysis View'],
 	},
-	'sel_providerreceipt' =>
+	'sel_providerreceipt'=>
+	{	sqlStmt=>
+		qq{
+			SELECT	p.simple_name as provider,
+				payer_type,
+				payer_id,
+				pay_type,
+				sum(nvl(insurance_pay,0)+nvl(person_pay,0)) as year_rcpt,
+				sum(decode(
+					   trunc(invoice_date,'MM'),
+					    trunc(to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM'),
+				     		(nvl(insurance_pay,0)+nvl(person_pay,0)),
+				     	 0)
+				     ) as month_rcpt,
+				sum(decode(
+						invoice_date,
+						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
+							(nvl(insurance_pay,0)+nvl(person_pay,0)),
+					 0)
+				     ) as batch_rcpt
+			FROM 	invoice_charges ic, person p				
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	payer_type is not null
+			AND	owner_org_id = :6	
+			AND	p.person_id (+)= ic.provider
+			GROUP BY p.simple_name,	
+				payer_type,	payer_id,
+				pay_type
+			UNION
+			SELECT	p.simple_name as provider,
+				max(-1) as payer_type,
+				nvl(data_text_b,data_text_a) as payer_id,
+				max('Check') as pay_type,
+				sum(nvl(unit_cost,0)) as year_rcpt,
+				sum(decode(
+					   trunc(value_date,'MM'),
+					    trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+				     		(nvl(unit_cost,0)),
+				     	 0)
+				     ) as month_rcpt,
+				sum(decode(
+					   value_date,
+					    to_date(:5,'MM/DD/YYYY'),
+				     		(nvl(unit_cost,0)),
+				     	 0)
+				     ) as batch_rcpt				     
+			FROM 	transaction t,trans_attribute  ta,person p
+			WHERE	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = $PAYMENT
+			AND	trans_status =$FILLED
+			AND	(:1 IS NULL OR  provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	provider_id is not null	
+			AND	p.person_id (+)= t.provider_id
+			GROUP BY p.simple_name,	
+				nvl(data_text_b,data_text_a) 				
+			ORDER BY 1,3,4,5
+
+		},
+	},
+			
+	
+	'sel_providerreceipt2' =>
 	{
 		sqlStmt=>
 		qq
