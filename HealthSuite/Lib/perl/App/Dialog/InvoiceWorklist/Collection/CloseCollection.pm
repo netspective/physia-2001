@@ -53,9 +53,9 @@ sub new
 		$self->{activityLog} =
 		{
 			level => 1,
-			scope =>'transaction',
-			key => "#param.person_id#",
-			data => "Account Notes '#field.trans_subtype#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+			scope =>'Invoice_Worklist',
+			key => "#session.person_id#",		
+			data => "Invoice <a href='/invoice/#param.invoice_id#/summary/'>#param.invoice_id#</a> closed on collector <a href='/person/#session.person_id#/profile'>#session.person_id#</a> worklist"
 		};
 		$self->addFooter(new CGI::Dialog::Buttons);
 		return $self;
@@ -73,7 +73,7 @@ sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 
-	$command = 'update';
+	#$command = 'update';
 	my $closed_by = $page->session('user_id');
 	my $del_notes  = $page->field('notes');
 	my $close_msg = "Account Closed by $closed_by";
