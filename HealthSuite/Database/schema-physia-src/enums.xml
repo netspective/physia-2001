@@ -223,6 +223,10 @@
 		<enum>Not Required</enum>
 		<enum>Active</enum>
 		<enum>Inactive</enum>
+		<enum>Read</enum>
+		<enum>Not Read</enum>
+		<enum>Pending</enum>
+		<enum>Filled</enum>
 	</table>
 
 	<table name="Invoice_Status" type="Enumeration">
@@ -242,6 +246,7 @@
 		<enum>Appealed</enum>
 		<enum>Payments Applied</enum>
 		<enum>Closed</enum>
+		<enum>Void</enum>
 	</table>
 
 	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
