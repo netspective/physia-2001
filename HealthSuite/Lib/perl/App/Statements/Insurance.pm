@@ -203,10 +203,10 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			where ins_internal_id = ?
 		},
 	'selInsuranceForInvoiceSubmit' => qq{
-		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.owner_person_id, ins.group_name, ins.group_number, ins.insured_id, ins.member_number,
-				to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') , to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') ,
-				ins.rel_to_insured, ins.record_type, ins.extra, ct.caption as claim_type
-				from insurance ins, claim_type ct
+		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.plan_name, ins.product_name, ins.owner_person_id, ins.group_name, ins.group_number, 
+				ins.insured_id, ins.member_number,	to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') , 
+				to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') , ins.rel_to_insured, ins.record_type, ins.extra, ct.caption as claim_type
+			from insurance ins, claim_type ct
 			where ins.ins_internal_id = ?
 				and ct.id = ins_type
 		},
