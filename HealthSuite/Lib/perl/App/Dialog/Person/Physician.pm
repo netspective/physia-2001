@@ -44,7 +44,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'phy_type_item_id'),
 
-		new CGI::Dialog::Subhead(heading => 'ID Numbers', name => 'id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::Subhead(heading => 'License ID Numbers', name => 'id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::DataGrid(
 			caption =>'',
 			name => 'id_numbers',
@@ -54,7 +54,7 @@ sub initialize
 				{
 					_class => 'CGI::Dialog::Field',
 					type => 'select',
-					selOptions => 'DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification;Nursing/License;Memorial Sisters Charity;EPSDT',
+					selOptions => 'DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT',
 					caption => 'License',
 					name => 'id_name',
 					options => FLDFLAG_PREPENDBLANK,
@@ -77,6 +77,50 @@ sub initialize
 					_class => 'CGI::Dialog::Field',
 					caption => 'Facility ID',
 					name => 'id_facility',
+					fKeyStmtMgr => $STMTMGR_ORG,
+					fKeyStmt => 'selChildFacilityOrgs',
+					fKeyDisplayCol => 0,
+					fKeyValueCol => 0,
+					type => 'select',
+					fKeyStmtBindSession => ['org_internal_id'],
+					options => FLDFLAG_PREPENDBLANK,
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				},
+			]),
+		new CGI::Dialog::Subhead(heading => 'Provider Numbers', name => 'provider_id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
+		new CGI::Dialog::DataGrid(
+			caption =>'',
+			name => 'prov_id_numbers',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			rows => MAXID,
+			rowFields => [
+				{
+					_class => 'CGI::Dialog::Field',
+					type => 'select',
+					selOptions => 'Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
+					caption => 'License',
+					name => 'prov_id_name',
+					options => FLDFLAG_PREPENDBLANK,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					onChangeJS => qq{showHideRows('prov_id_numbers', 'prov_id_name', @{[ MAXID ]});},
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Number',
+					name => 'prov_id_num',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					type=> 'date',
+					caption => 'Exp Date',
+					name => 'prov_id_exp_date',
+					defaultValue => '',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Facility ID',
+					name => 'prov_id_facility',
 					fKeyStmtMgr => $STMTMGR_ORG,
 					fKeyStmt => 'selChildFacilityOrgs',
 					fKeyDisplayCol => 0,
@@ -206,6 +250,7 @@ sub initialize
 		<!--
 
 		showHideRows('id_numbers', 'id_name', @{[ MAXID ]});
+		showHideRows('prov_id_numbers', 'prov_id_name', @{[ MAXID ]});
 
 		// -->
 		</script>
@@ -366,10 +411,12 @@ sub execute_add
 			_debug => 0
 	) if $accreditation ne '';
 
+
+
+	#ID Numbers
+
 	my $y = '';
-
 	for (my $x = 1; $y !=1; $x++)
-
 	{
 		my $idName = "id_name_$x";
 		my $idNum = "id_num_$x";
@@ -397,6 +444,36 @@ sub execute_add
 		$y = $page->field("$idName") ne '' ? '' : 1;
 	};
 
+	#Provider Numbers
+
+	my $q = '';
+	for (my $p = 1; $q !=1; $p++)
+	{
+		my $idPName = "prov_id_name_$p";
+		my $idPNum = "prov_id_num_$p";
+		my $idPDate = "prov_id_exp_date_$p";
+		my $idPFacility = "prov_id_facility_$p";
+		my $pFacility = $page->field("$idPFacility") ne '' ? $page->field("$idPFacility") : $page->session('org_id');
+
+		if ($idPName ne '')
+		{
+
+			$page->schemaAction(
+					'Person_Attribute', $command,
+					parent_id => $personId || undef,
+					item_name => $page->field("$idPName") || undef,
+					value_type => App::Universal::ATTRTYPE_PROVIDER_NUMBER,
+					value_text => $page->field("$idPNum") || undef,
+					value_textB => $page->field("$idPName") || undef,
+					name_sort  => $pFacility,
+					value_dateEnd => $page->field("$idPDate") || undef,
+					_debug => 1
+			)if $page->field("$idPName") ne '';
+
+		}
+
+		$q = $page->field("$idPName") ne '' ? '' : 1;
+	};
 
 	#State Licenses
 
