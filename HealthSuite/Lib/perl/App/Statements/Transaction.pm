@@ -278,6 +278,19 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				and trans_status = 2
 				and person_id = trans_owner_id
 	},
+#############################################################################
+	# SQL STATEMENT TO GET THE DECEASED PATIENT INFO
+#############################################################################
+
+	'selDataByTransTypeAndCaption' => qq
+		{
+			SELECT  trans_id
+			FROM 	transaction
+			WHERE 	trans_owner_id = ?
+			AND 	trans_type = @{[App::Universal::TRANSTYPE_ALERTPATIENT]}
+			AND	caption = 'Deceased Patient'
+		},
+
 #####################################################################
 	#SQL STAEMENTS FOR REFERRAL AUTHORIZATION INFO
 #####################################################################
