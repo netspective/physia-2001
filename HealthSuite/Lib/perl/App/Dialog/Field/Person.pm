@@ -186,6 +186,7 @@ sub new
 
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
+	$params{incSimpleName}=0 unless exists $params{incSimpleName};
 
 	if($params{idEntryStyle} == IDENTRYSTYLE_SELECT)
 	{
@@ -340,6 +341,26 @@ sub isValid
 	return $page->haveValidationErrors() ? 0 : 1;
 }
 
+
+
+#
+#Adds simple name next to patient person_id
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	my $html;	
+	if ((grep {$_ eq 'Patient'} @{$self->{types}})||$self->{incSimpleName})
+	{
+		$page->addError("Include");
+		my $value = $page->field($self->{name});
+		#Get the name for the person
+		my $patData = $STMTMGR_PERSON->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonSimpleNameById',$value);
+		$self->{postHtml} =qq{<INPUT TYPE="HIDDEN" NAME="_f_$self->{name}_simple_name_h"  TYPE='text' size=30 STYLE="color:red" VALUE='FRANK MAJOR'>
+			<SPAN ID="_f_$self->{name}_simple_name_s">$patData </SPAN>};
+	}
+	$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);	
+	return $html;
+};
 
 ##############################################################################
 package App::Dialog::Field::MultiPerson::ID;
