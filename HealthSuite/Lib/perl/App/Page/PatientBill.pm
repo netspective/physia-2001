@@ -5,6 +5,7 @@ package App::Page::PatientBill;
 use strict;
 
 use App::Page::Invoice;
+use App::Universal;
 use Devel::ChangeLog;
 use DBI::StatementManager;
 use App::Statements::Catalog;
@@ -18,6 +19,7 @@ use App::Billing::Validators;
 
 use Date::Manip;
 use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
+use constant DATEFORMAT_USA => 1;
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
@@ -31,7 +33,7 @@ sub prepare
 
 	my $claim = $self->property('activeClaim');
 	my $invoiceId = $claim->{id};
-
+	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
 	my $patientHtml = $self->getPatientHtml($claim->{careReceiver});
 	my $orgHtml = $self->getOrgHtml($claim);
 
@@ -53,10 +55,24 @@ sub prepare
 			$self->formatDate($procedure->{dateOfServiceFrom} || $procedure->{paymentDate}),
 			$description,
 			$procedure->{extendedCost} || 0,
-			$procedure->{totalAdjustments},
+			undef,
 		);
-		
+
 		push(@data, \@rowData);
+
+		for my $x (0..(@{$procedure->{adjustments}} -1))
+		{
+			my $adjustment = $procedure->{adjustments}->[$x];
+			my $payDate = $adjustment->getPayDate(DATEFORMAT_USA);
+			my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjustment->{adjustType});
+			my $payMethodCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selPayMethodCaption', $adjustment->{payMethod});
+			my $payRef = $adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_CHECK || 
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_MONEYORDER ||
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_TRAVELERSCHECK ? $adjustment->{payRef} : undef;
+			my $desrc = $payMethodCaption ? "$adjTypeCaption - $payMethodCaption $payRef" : $adjTypeCaption;
+			my @rowAdjData = ($payDate, $desrc, undef, $adjustment->{netAdjust});			
+			push(@data, \@rowAdjData);
+		}
 	}
 
 	for my $i (0..(@{$claim->{voidItems}} -1))
@@ -64,9 +80,9 @@ sub prepare
 		my $procedure = $claim->{voidItems}->[$i];
 		my @rowData = (
 			$self->formatDate($procedure->{paymentDate}),
-			$procedure->{caption} ? $procedure->{caption} . '(Voided)' : decodeType($procedure->{itemType}),
+			$procedure->{caption} ? $procedure->{caption} . ' (Voided)' : decodeType($procedure->{itemType}),			
+			undef,
 			$procedure->{extendedCost},
-			$procedure->{totalAdjustments} || 0,
 		);
 		
 		push(@data, \@rowData);
@@ -79,10 +95,24 @@ sub prepare
 			$self->formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
-			$procedure->{totalAdjustments} || 0,
+			undef,
 		);
 		
 		push(@data, \@rowData);
+
+		for my $x (0..(@{$procedure->{adjustments}} -1))
+		{
+			my $adjustment = $procedure->{adjustments}->[$x];
+			my $payDate = $adjustment->getPayDate(DATEFORMAT_USA);
+			my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjustment->{adjustType});
+			my $payMethodCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selPayMethodCaption', $adjustment->{payMethod});
+			my $payRef = $adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_CHECK || 
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_MONEYORDER ||
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_TRAVELERSCHECK ? $adjustment->{payRef} : undef;
+			my $desrc = $payMethodCaption ? "$adjTypeCaption - $payMethodCaption $payRef" : $adjTypeCaption;
+			my @rowAdjData = ($payDate, $desrc, undef, $adjustment->{netAdjust});			
+			push(@data, \@rowAdjData);
+		}
 	}
 
 	my $totalCoPay = 0;
@@ -92,14 +122,27 @@ sub prepare
 		my @rowData = (
 			$self->formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
-			#$procedure->{extendedCost},
+			$procedure->{extendedCost},
 			undef,
-			$procedure->{totalAdjustments} || 0,
 		);
 		
 		$totalCoPay += ($procedure->{extendedCost} + $procedure->{totalAdjustments});
 		
 		push(@data, \@rowData);
+
+		for my $x (0..(@{$procedure->{adjustments}} -1))
+		{
+			my $adjustment = $procedure->{adjustments}->[$x];
+			my $payDate = $adjustment->getPayDate(DATEFORMAT_USA);
+			my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjustment->{adjustType});
+			my $payMethodCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selPayMethodCaption', $adjustment->{payMethod});
+			my $payRef = $adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_CHECK || 
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_MONEYORDER ||
+						$adjustment->{payMethod} == App::Universal::ADJUSTMENTPAYMETHOD_TRAVELERSCHECK ? $adjustment->{payRef} : undef;
+			my $desrc = $payMethodCaption ? "$adjTypeCaption - $payMethodCaption $payRef" : $adjTypeCaption;
+			my @rowAdjData = ($payDate, $desrc, undef, $adjustment->{netAdjust});			
+			push(@data, \@rowAdjData);
+		}
 	}
 	
 	for my $i (0..(@{$claim->{adjItems}} -1))
@@ -300,7 +343,8 @@ sub getPatientHtml
 sub getOrgHtml
 {
 	my ($self, $claim) = @_;
-	
+
+	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
 	my $org = $claim->{renderingOrganization};
 	my $org1 = $claim->{payToOrganization};
 	
@@ -308,8 +352,8 @@ sub getOrgHtml
 	my $addr1 = $org1->{address};
 
 	return qq{
-		<b style="font-size:13pt">$org->{name}</b> <br>
-		<b>($org->{id})<br>
+		<b style="font-size:13pt">$org->{name} ($org->{id})</b><br>
+		$serviceProvider<br>
 		$addr->{address1}<br>
 		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
 		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
