@@ -125,7 +125,8 @@ sub initialize
 		nextActions_add => [
 			['View Org Summary', "/org/%field.org_id%/profile", 1],
 			['Add Another Org', "/org/#session.org_id#/dlg-add-org-$self->{orgtype}"],
-			['Add Insurance Policy', "/org/#session.org_id#/dlg-add-ins-newplan"],
+			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product"],
+			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan"],
 			['Go to Directory', "/search/org/id/%field.org_id%"],
 			['Return to Home', "/person/#session.user_id#/home"],
 		],
