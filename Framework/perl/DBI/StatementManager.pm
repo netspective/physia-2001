@@ -223,10 +223,6 @@ sub execute
 	
 	my $stmtHdl = $self->getStatementHdl($dbpage, $flags, $name);
 	
-	# Temporarily turn off DBI exceptions so we can handle the errors locally
-	# (DBI exceptions will automagically turn back on after we leave this block)
-	local $stmtHdl->{RaiseError} = 0 if $stmtHdl->{RaiseError};
-	
 	# Check for #something# replacements
 	my @params = @_;
 	if($flags & STMTMGRFLAG_REPLACEVARS)
@@ -252,13 +248,17 @@ sub execute
 	}
 	
 	# Execute the SQL & handle errors
-	$execRV = $stmtHdl->execute(@params) or die "$debugMsg$stack" . $stmtHdl->errstr();
+	eval {
+		$execRV = $stmtHdl->execute(@params) or die $stmtHdl->errstr();
+	};
 	
-	# Add the debug message if we're in debug mode
-	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
+	# Add the debug message if we're in debug mode or an error 
+	if($@ || ($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
 	{
-		$debugMsg .= "<b>Execute Result Code:</b> $execRV<br>";
-		$debugMsg .= $stack if $dbpage->param('_debug_stack');
+		$debugMsg .= "<b>Execute Result Code:</b> " . (defined $execRV ? $execRV : '<i>undef</i>') . '<br>';
+		$debugMsg .= $stack if $dbpage->param('_debug_stack') || $@;
+		$debugMsg = "$@<br><br>" . $debugMsg if $@;
+		die "$debugMsg\n" if $@;
 		$dbpage->addDebugStmt($debugMsg);
 	}
 	
