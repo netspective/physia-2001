@@ -10,7 +10,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSI
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_REPORT_ACCOUNTING );
 
-$STMTFMT_SEL_RECEIPT_ANALYSIS = qq{
+$STMTFMT_SEL_RECEIPT_ANALYSIS = qq{ 
 			select 	y.NAME,
 				y.CATEGORY_NAME,
 				y.TRANSACTION_TYPE,
@@ -22,7 +22,10 @@ $STMTFMT_SEL_RECEIPT_ANALYSIS = qq{
 			and	m.CATEGORY_NAME(+) = y.CATEGORY_NAME
 			and	m.TRANSACTION_TYPE(+) = y.TRANSACTION_TYPE
 			and 	m.PAYDATE (+) = y.PAYDATE
+			and 	m.POLICYNAME (+) = y.POLICYNAME
+			and	m.NAME (+) = y.NAME
 			and     trunc(y.PAYDATE,'YYYY') =trunc(to_date(?,'MM/DD/YYYY'),'YYYY')
+			and 	m.owner_org_id (+) = y.owner_org_id
 			and	y.owner_org_id = ?
 			and	%whereCond%
 			group by y.NAME, y.CATEGORY_NAME, y.TRANSACTION_TYPE, y.POLICYNAME
@@ -165,7 +168,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt =>
 		qq
 		{
-			SELECT 	person_id person_ID , count (distinct (invoice_id)),
+			SELECT 	person_id person_ID ,
+			count(distinct invoice_id),
 				sum(balance_0),
 				sum(balance_31),
 				sum(balance_61),
@@ -176,15 +180,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(total_pending)
 			FROM	agedpayments a
 			WHERE	(a.person_id = :1 or :1 is NULL)
-			AND 	(invoice_item_id is NULL  or item_type = 3)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
+			AND 	a.balance > 0
 			AND	person_id IN
 			(
 			 SELECT person_id
 			 FROM 	person_org_category
 			 WHERE  org_internal_id = :2
-			 )
+			 ) 
 			GROUP BY person_id
+			having sum(total_pending)> 0
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
@@ -217,24 +223,21 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
                 sum(nvl(ffs_pmt,0)) as ffs_pmt,
                 sum(nvl(cap_pmt,0)) as cap_pmt,
                 sum(nvl(ancill_pmt,0)) as ancill_pmt,
-                MIN ( (SELECT COUNT (e.event_id)
-                 FROM 	Event e, Event_Attribute ea
-                 WHERE 	ea.item_name = 'Appointment/Attendee/Physician'
-                 AND	e.event_status=2
-                 AND	e.event_type = 100
-                 AND	trunc(e.checkin_stamp) between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
-                 AND	to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
-                 AND	ea.value_text = provider
-                 AND    ea.parent_id = e.event_id
-                 ))as appt
-        FROM revenue_collection,org o
+                count((select 1 FROM dual
+                      WHERE rc.trans_type in (2000,2010,2040,2050,2060,2070,2080,2090,2100,2120,2130,2160,2170,2180)
+                     )) as office_visit,                   
+                count((select 1 FROM dual
+                      WHERE rc.trans_type in (2020)
+                     )) as hospital_visit
+                    
+        FROM 	revenue_collection rc,org o
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND (facility = :3 OR :3 is NULL)
                 AND (provider =:4 OR :4 is NULL)
                 AND (batch_id >= :5 OR :5 is NULL)
                 AND (batch_id <= :6 OR :6 is NULL)
-		AND o.org_internal_id = revenue_collection.facility
+		AND o.org_internal_id = rc.facility
 		AND o.owner_org_id = :7
         GROUP by provider
         },
@@ -259,6 +262,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(balance_transfer) balance_transfer,
 		sum(charge_adjust) as  charge_adjust,
 		sum(person_write_off) as person_write_off,
+		sum(refund) as refund,		
 		pay_type
 	FROM	invoice_charges,org o
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -296,7 +300,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(person_pay) person_pay,
 		sum(insurance_pay) insurance_pay ,
 		sum(person_write_off) person_write_off,
-		sum(refund) as refund
+		sum(refund) as refund	
 	FROM 	invoice_charges,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -335,7 +339,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 
 	'sel_monthly_audit_detail' => qq{
 	SELECT	invoice_id ,
-		to_char(invoice_date,'MM/YYYY') as invoice_batch_date,
+		invoice_date as invoice_batch_date,
 		service_begin_date,
 		service_end_date,
 		provider as care_provider_id ,
@@ -351,7 +355,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(insurance_pay) insurance_pay,
 		sum(insurance_write_off) insurance_write_off,
 		sum(balance_transfer) balance_transfer,
-		sum(charge_adjust) as  charge_adjust
+		sum(charge_adjust) as  charge_adjust,
+		sum(person_write_off) as person_write_off,
+		sum(refund) as refund,		
+		pay_type
 	FROM 	invoice_charges, org o
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 		AND (facility = :2 or :2 IS NULL )
@@ -365,7 +372,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		AND o.org_internal_id = invoice_charges.facility
 		AND o.owner_org_id = :6
 	group by invoice_id ,
-		to_char(invoice_date,'MM/YYYY') ,
+		invoice_date ,
 		service_begin_date,
 		service_end_date,
 		provider ,
@@ -374,7 +381,19 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		decode(item_type,7,0,units) ,
 		decode(item_type,7,0,unit_cost) ,
 		rel_diags,
-		client_id
+		client_id,				
+		pay_type
+	ORDER BY  invoice_id
+	},
+
+
+	'selChildernOrgs' =>qq{
+		SELECT	org_internal_id,org_id
+		FROM	org
+		WHERE	owner_org_id = :1 
+		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 OR :2 IS NULL)
+		AND	upper(category) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
+		ORDER BY org_id
 	},
 
 );
