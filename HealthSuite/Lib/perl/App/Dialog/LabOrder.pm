@@ -62,7 +62,7 @@ sub new
                         fKeyStmt => 'selAddresses',
                         fKeyDisplayCol => 1,
                         fKeyValueCol => 3,
-                        options => FLDFLAG_REQUIRED,
+                        options => FLDFLAG_PREPENDBLANK,
 		fKeyStmtBindFields=>['org_internal_id']
                 ),
 		new CGI::Dialog::MultiField(caption =>'Date/Time Ordered', name => 'order_date_time',
@@ -265,6 +265,12 @@ sub execute
 	my $ins = $page->field('ins_patient');
 	my $resultId = $page->field('result_id');
 	my $orderId = $page->field('lab_order_id');
+	
+	unless ($address_id)
+	{
+		my $addressData = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selOrgAddressByAddrName',$labInternalId,'Billing');
+		$address_id = $addressData->{'item_id'};
+	}
 	#Create Lab Order Record	
 	my $labOrderId=$page->schemaAction (
 		'Person_Lab_Order', $command,
