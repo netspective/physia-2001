@@ -416,7 +416,7 @@ use vars qw(@ISA);
 
 sub recordType
 {
-	'EA@';
+	'EA2';
 }
 
 
