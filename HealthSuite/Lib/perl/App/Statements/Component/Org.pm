@@ -664,11 +664,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			actionRows =>
 			[
 				{
-					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-product?home=#param.home#'>Insurance Product</A> },
+					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-product?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Product</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				{
-					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-plan?home=#param.home#'>Insurance Plan</A> },
+					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-plan?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Plan</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				#{
