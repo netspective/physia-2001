@@ -865,7 +865,7 @@ sub hasPermission
 
 	if ($disableSecurity)
 	{
-		$self->addContent('<h2><blink>Role-based permissions have been disabled.</blink></h2>');
+		#$self->addContent('<h2><blink>Role-based permissions have been disabled.</blink></h2>');
 		return 1;
 	}
 
