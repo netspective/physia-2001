@@ -92,7 +92,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('checkin_stamp', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('checkout_stamp', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('start_time', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('event_type', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('appt_type', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
