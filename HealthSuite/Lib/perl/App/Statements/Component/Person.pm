@@ -2052,7 +2052,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Attendance' },
+		frame => { heading => 'Attendance (Not Yet Implemented)' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -4012,6 +4012,34 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 },
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------
+
+'person.clinical' => {
+	sqlStmt => qq{
+			select 	value_type, item_id, item_name, value_text
+			from 	person_attribute
+			where 	parent_id = ?
+			and 	value_type = 111111
+		},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Clinical Records (Not Yet Implemented)' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.clinical', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.clinical', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.clinical', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.clinical', [$personId], 'panelTransp'); },
+},
+
 #----------------------------------------------------Doc Short Term Stuff
 #----------------------------------------------------------------------------------------------------------------------
 
