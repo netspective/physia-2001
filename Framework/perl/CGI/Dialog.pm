@@ -1496,15 +1496,17 @@ sub getHtml
 
 	my $resetButton = '<input type="reset" value="Reset">';
 	$resetButton = '' if $self->{type} eq 'delete';
-
 	my $fieldName = $page->fieldPName('OK');
+	my $okButton =qq{<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">};
+	$okButton = qq{<a href="$cancelURL"><img src="/resources/widgets/ok_btn.gif" border=0></a>}if $dialog->{viewOnly};
+	
 	return qq{
 		<tr><td colspan=$tableCols><font size=1>&nbsp;</font></td></tr>
 		<tr valign=center bgcolor=$rowColor>
 		<td align=center colspan=$tableCols valign=bottom>
 			$self->{preHtml}
 			$nextActions
-			<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">
+			$okButton
 			<a href="$cancelURL"><img src="/resources/widgets/cancel_btn.gif" border=0></a>
 			$self->{postHtml}
 		</td>
@@ -1573,7 +1575,8 @@ use enum qw(BITMASK:DLGFLAG_
 	ADD_DATAENTRY_INITIAL
 	UPDORREMOVE_DATAENTRY_INITIAL
 	UPDORREMOVE
-	IGNOREREDIRECT);
+	IGNOREREDIRECT
+	VIEWONLY);
 
 use constant FIELDNAME_EXECMODE => 'dlg_execmode';
 use constant FIELDNAME_REFERER  => 'dlg_referer';
@@ -1729,6 +1732,7 @@ sub new
 			captionAlign => 'left',
 			errorsHeading => 'Please review',
 			id => $class,
+			viewOnly=>0,			
 		};
 
 	$properties->{formName} = 'dialog' unless $params{formName};
@@ -1811,6 +1815,26 @@ sub updateFieldFlags
 	}
 	return undef;
 }
+
+sub setDialogViewOnly
+{
+	my ($self,$flags)  = @_;
+	my $contentList = $self->{content};
+	
+	#Change all fields on dialog to readonly
+	foreach(@$contentList)
+	{
+		my $field = $_;
+		$field->setFlag(FLDFLAG_READONLY);		
+	}	
+	
+	#Set dialog to viewonly mode
+	$self->{viewOnly}=1;	
+	
+	#Remove Add/Update part of caption from Heading
+	$self->{heading}=~s/[Update|add|Add|update]//;
+}
+
 
 sub setFieldFlags
 {
