@@ -189,6 +189,7 @@ sub execute_remove
 sub handlePayer
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $personId = $page->field('client_id');
 
@@ -202,21 +203,27 @@ sub handlePayer
 
 
 	my $payerId = $page->field('bill_to_id');
+	my $payerType = $page->field('bill_to_type');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $sessOrgIntId, $payerId) if $payerType eq 'org';
+	$payerId = $orgIntId ? $orgIntId : $payerId;
 	if($payerId eq $personId || $payerId eq '')
 	{
 		$page->field('claim_type', $typeSelfPay);
 	}
 	else
 	{
-		if(my $insurancePayer = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $payerId))
+		if(my $insurancePayer = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $orgIntId))
 		{
 			$page->field('claim_type', $insurancePayer->{ins_type});
+		}
+		elsif($STMTMGR_INSURANCE->recordExists($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, $typeClient))
+		{
+			$page->field('claim_type', $typeClient);
 		}
 		elsif(! $STMTMGR_INSURANCE->recordExists($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, $typeClient))
 		{
 			$page->field('claim_type', $typeClient);
 
-			my $payerType = $page->field('bill_to_type');
 			my $addr = undef;
 			my $insPhone = undef;
 			my $guarantorType = undef;
@@ -424,6 +431,7 @@ sub addTransactionAndInvoice
 sub handleBillingInfo
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	#delete all payers when updating or removing
 	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delInvoiceBillingParties', $invoiceId) if $command ne 'add';
@@ -440,6 +448,8 @@ sub handleBillingInfo
 	my $personId = $page->field('client_id');
 	my $payerId = $page->field('bill_to_id');
 	my $payerType = $page->field('bill_to_type');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $sessOrgIntId, $payerId) if $payerType eq 'org';
+	$payerId = $orgIntId ? $orgIntId : $payerId;
 
 	my $billParty = '';
 	my $billToId = '';
@@ -473,7 +483,7 @@ sub handleBillingInfo
 		#$billStatus = '';
 		#$billResult = '';
 	}
-	elsif(my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $payerId))
+	elsif(my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $orgIntId))
 	{
 		$billParty = $billPartyTypeInsurance;
 		$billToId = $payerId;
@@ -534,6 +544,7 @@ sub handleBillingInfo
 sub customValidate
 {
 	my ($self, $page) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $payer = $page->field('bill_to_id');
 	return () if $payer eq '';
@@ -559,6 +570,7 @@ sub customValidate
 	{
 		my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_internal_id#/dlg-add-org-";
 		my $createOrgHrefPost = "/$payer');";
+		my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $sessOrgIntId, $payer);
 
 		$payerField->invalidate($page, qq{
 			Org Id '$payer' does not exist.<br>
@@ -567,7 +579,7 @@ sub customValidate
 			<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
 			<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
 			})
-			unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $payer);
+			unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $orgIntId);
 	}
 }
 
