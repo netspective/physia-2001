@@ -251,6 +251,7 @@ sub prepare_view_profile
 					#component.stpt-org.associatedOrgs#<BR>
 					#component.stpt-org.credentials#<BR>
 					#component.stpt-org.departments#
+					#component.stpt-org.feeschedules#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=60%>
@@ -258,7 +259,7 @@ sub prepare_view_profile
 					#component.stp-org.alerts#<BR>
 					#component.stp-org.insurancePlans#<BR>
 					#component.stpt-org.healthMaintenanceRule#<BR>
-					#component.stpt-org.associatedResourcesStats#<BR>
+					#component.stpt-org.associatedResourcesStats#<BR>					
 					</font>
 				</TD>
 			</TR>
@@ -372,6 +373,7 @@ sub prepare_view_account
 
 	$self->addContent(
 		'<CENTER>',
+		'<A HREF = "/org/#param.org_id#/dlg-add-close-date">Close Batch Date</A>',
 		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, 'selInvoiceTypeForOrg',
 			[$orgIntId],
 			#[
