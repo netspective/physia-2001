@@ -50,7 +50,6 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_tax_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_phone_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_addr_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
@@ -62,6 +61,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 
+		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'secondary_payer'),
@@ -84,7 +84,7 @@ sub initialize
 
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
-			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			#readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			types => ['Patient']),
 
 
@@ -353,6 +353,7 @@ sub populateData
 	{
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 		$page->field('attendee_id', $invoiceInfo->{client_id});
+		$page->field('old_person_id', $invoiceInfo->{client_id});
 		#$page->field('reference', $invoiceInfo->{reference});
 		$page->field('current_status', $invoiceInfo->{invoice_status});
 		$page->param('_f_proc_diags', $invoiceInfo->{claim_diags});
@@ -421,9 +422,6 @@ sub populateData
 		my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
 		$page->field('pay_to_org_item_id', $payToOrg->{item_id});
 		$page->field('pay_to_org_id', $payToOrg->{value_textb});
-
-		#my $payToOrgAddr = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAddr', $invoiceId, 'Pay To Org');
-		#$page->field('pay_to_org_addr_item_id', $payToOrgAddr->{item_id});
 
 		my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
 		$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
@@ -495,7 +493,7 @@ sub setPayerFields
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
-			push(@wkCompPlans, "Work Comp($ins->{plan_name})");
+			push(@wkCompPlans, "Work Comp($ins->{plan_name}):$ins->{ins_internal_id}");
 			#Get Work Comp Insurnace Fee Schedule
 			#This code should match the code in Procedures.pm that also gets FFS for insurance 
 			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
@@ -563,7 +561,10 @@ sub setPayerFields
 	$page->field('payer', $payer);
 	$page->field('work_ffs',$workFees);
 	$page->field('ins_ffs',$insFees);
-	
+
+	my $patientId = $page->field('attendee_id');
+	$page->field('old_person_id', $patientId);
+
 }
 
 sub voidInvoicePostSubmit
@@ -876,13 +877,6 @@ sub handlePayers
 				$page->field('claim_type', $primIns->{ins_type});
 				$page->field('primary_payer', $primIns->{product_name});
 			}
-			elsif($nonInsPayer[0] eq 'Work Comp')
-			{
-				my @wcPlanName = split('\)', $nonInsPayer[1]);
-				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, $typeWorkComp);
-				$page->field('claim_type', $typeWorkComp);
-				$page->field('primary_payer', $workCompPlanInfo->{product_name});
-			}
 			elsif($nonInsPayer[0] eq 'Third-Party')
 			{
 				my @thirdPartyId = split('\)', $nonInsPayer[1]);
@@ -892,6 +886,15 @@ sub handlePayers
 				$page->field('third_party_payer_id', $thirdPartyPlan->{guarantor_id});
 				$thirdPartyPlan->{guarantor_type} == App::Universal::ENTITYTYPE_PERSON ? 
 					$page->field('third_party_payer_type', 'person') : $page->field('third_party_payer_type', 'Org');
+			}
+			#elsif($nonInsPayer[0] eq 'Work Comp')
+			else
+			{
+				my @wcPlanName = split('\)', $nonInsPayer[1]);
+				#my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, $typeWorkComp);
+				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $nonInsPayer[0]);
+				$page->field('claim_type', $typeWorkComp);
+				$page->field('primary_payer', $workCompPlanInfo->{product_name});
 			}
 		}
 	}
@@ -1944,6 +1947,15 @@ sub customValidate
 				})
 				unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selOrgId', $page->session('org_internal_id'), $otherPayer);
 		}
+	}
+
+	my $oldPersonId = $page->field('old_person_id');
+	my $personId = $page->field('attendee_id');
+	if($personId ne $oldPersonId && $oldPersonId ne '')
+	{
+		my $payerField = $self->getField('payer');
+		$payerField->invalidate($page, 'Please choose payer for new Patient ID.');
+		$page->field('old_person_id', $personId);
 	}
 }
 
