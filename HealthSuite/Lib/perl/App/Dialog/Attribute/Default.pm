@@ -125,7 +125,7 @@ sub execute_add
 		$tableName = 'Org_Attribute';
 	}
 
-	if($valueType == App::Universal::ATTRTYPE_TEXT)
+	if($valueType == App::Universal::ATTRTYPE_BILLING_PHONE)
 	{
 		$itemName = 'Contact Information';
 	}
