@@ -234,13 +234,14 @@ sub prepare_view_profile
 
 	#$self->addLocatorLinks(['Profile', 'profile']);
 
-
+	my $ancLocation =lc($self->property('org_type')) eq 'ancillary service' ? q{#component.stpt-org.labLocation#<BR>} : '';
 	$self->addContent(qq{
 		<TABLE>
 			<TR VALIGN=TOP>
 				<TD WIDTH=30%>
 					<font size=1 face=arial>
 					#component.stpt-org.contactMethodsAndAddresses#<BR>
+					$ancLocation
 					#component.stpt-org.associatedOrgs#<BR>
 					#component.stpt-org.credentials#<BR>
 					#component.stpt-org.departments#
