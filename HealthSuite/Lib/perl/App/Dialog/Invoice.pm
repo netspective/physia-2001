@@ -103,9 +103,18 @@ sub populateData
 	$page->field('owner_id', $invoiceInfo->{owner_id});
 	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
 
-	my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
-	$page->field('bill_to_id', $invoiceBilling->{bill_to_id});
-	my $billToType = $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG || $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS ? 'org' : 'person';
+	my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+	my $billToId = $invoiceBilling->{bill_to_id};
+	my $billPartyType = $invoiceBilling->{bill_party_type};
+	if($billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
+	{
+		my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
+		$billToId = $orgId->{org_id};
+	}
+
+	$page->field('bill_to_id', $billToId);
+	my $billToType = $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG || $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS 
+					? 'org' : 'person';
 	$page->field('bill_to_type', $billToType);
 
 	my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
