@@ -198,21 +198,7 @@ sub makeStateChanges
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Patient '$personId'?");
 	}
 
-	my $createRecPhoneField = $self->getField('create_unknown_phone');
-	if ($command eq 'add' && $page->field('create_unknown_phone') eq '')
-	{
-			$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 0);
-			unless ($page->field('create_unknown_phone'))
-			{
-				$createRecPhoneField->invalidate($page, "Enter the check-box below the 'Home Phone/Work Phone' field if you want to add the record with unknown phone  ");
-			}
-	}
-
-	else
-	{
-		$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
-	}
-
+	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
@@ -220,7 +206,8 @@ sub makeStateChanges
 sub customValidate
 {
 	my ($self, $page) = @_;
-
+	my $command = $self->getActiveCommand($page);
+	#return () if $command ne 'add';
 	#my $insOrg = $self->getField('insplan')->{fields}->[0];
 	#my $productName = $self->getField('insplan')->{fields}->[1];
 	#my $PlanName = $self->getField('insplan')->{fields}->[2];
@@ -261,7 +248,14 @@ sub customValidate
 		$relationship->invalidate($page, $invMsg);
 	}
 
+	my $field = $self->getField('home_work_phone')->{fields}->[0];
+	if ($command eq 'add' && $page->field('create_unknown_phone') eq '' && $page->field('home_phone') eq '')
+	{
+			#$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 0);
 
+			$field->invalidate($page, "Enter the check-box below if you want to add the record with unknown home phone <BR><input name = '_f_create_unknown_phone' type = 'checkbox' onClick = 'document.forms.dialog._f_create_unknown_phone.checked = this.checked'>Create record with unknown home phone ");
+
+	}
 }
 
 sub handlePostExecute
@@ -374,7 +368,7 @@ sub execute_add
 		initiator_type => 0,
 		trans_begin_stamp => $todaysStamp || undef,
 		_debug => 0
-	);
+	)if $page->field('home_phone') eq '' && $page->field('create_unknown_phone');
 
 	$self->handleContactInfo($page, $command, $flags, 'Patient');
 	$page->endUnitWork();
