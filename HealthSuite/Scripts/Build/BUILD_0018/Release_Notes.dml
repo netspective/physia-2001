@@ -30,6 +30,14 @@
 			edit the records and the CPT name is displayed in the component.
 		</deliverable>
 		
+		<deliverable id="1316">
+			UI :
+			 Added new Org type of Lab 
+			 Added new Catalog type of Lab Test to Orgs of Type Lab (Added Dialog for adding Lab Test to a Org Lab Catalog)
+			 Added Link to adding Lab Orders to patient Chart page (Added Dialog for creating lab order request)
+			 Added new Lab Order tab under the documents tab on the person pages
+		</deliverable>
+		
 		<deliverable id="1323">
 			If we choose retired, unemployed, student full time or student part time, the occupation will not be 
 			filled with 'Unknown'.
@@ -167,6 +175,10 @@
 
 		<deliverable id="1755">
 			A bold label of Active and Inactive is displayed in Certification component under Person Associate Page.
+		</deliverable>		
+
+		<deliverable id="1766">
+			Report (Deposit Payment) : Added blank line after sub-total on the deposit summary
 		</deliverable>		
 
 		<deliverable id="1772">
