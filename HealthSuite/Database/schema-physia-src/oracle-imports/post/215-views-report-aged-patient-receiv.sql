@@ -12,7 +12,15 @@ SELECT 	i.client_id as person_ID , (i.invoice_id),
 	ii.item_type,
 	decode(ib.bill_party_type,0,ib.bill_to_id,1,ib.bill_to_id,(select org_id FROM ORG WHERE org_internal_id = ib.bill_to_id)) as  bill_to_id,
 	ib.bill_to_id as bill_plain,
-	i.balance
+	i.invoice_status,	
+	ii.balance,
+	ii.extended_cost,
+	ii.total_adjust,
+	decode(ii.item_type,5,0,7,0,1) as item_count,
+	i.invoice_date,
+	t.care_provider_id,
+	t.service_facility_id
+	i.balance as entire_invoice_balance
 FROM	invoice i, invoice_billing ib, invoice_attribute ia, invoice_item ii,Transaction t
 WHERE	ib.invoice_id = i.invoice_id
 AND	ii.parent_id = i.invoice_id
