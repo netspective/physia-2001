@@ -161,6 +161,9 @@ sub getComponentHtml
 				$_->{first_name}
 			},
 			qq{
+				$_->{intake_coordinator}
+			},
+			qq{
 				$_->{service}
 			},
 			qq{

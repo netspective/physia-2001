@@ -106,7 +106,7 @@ sub getComponentHtml
 	my ($self, $page) = @_;
 
 	my $referralAuth;
-	$referralAuth = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referral_authorization_user', $page->session('person_id'), $page->session('org_internal_id'));
+	$referralAuth = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referral_authorization_user', $page->param('user'), $page->session('org_internal_id'));
 
 	my @data = ();
 	my $html = qq{
@@ -159,6 +159,9 @@ sub getComponentHtml
 			},
 			qq{
 				$_->{first_name}
+			},
+			qq{
+				$_->{intake_coordinator}
 			},
 			qq{
 				$_->{service}
