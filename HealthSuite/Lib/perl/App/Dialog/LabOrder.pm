@@ -250,7 +250,7 @@ sub execute
 	
 	#Create Lab Order Record	
 	my $labOrderId=$page->schemaAction (
-		'Lab_Order', $command,
+		'Person_Lab_Order', $command,
 		lab_order_id=>$orderId ,
 		person_id => $patientId,
 		lab_internal_id => $labInternalId,
