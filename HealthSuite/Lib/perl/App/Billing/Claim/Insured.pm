@@ -121,20 +121,29 @@ sub setRelationshipToPatient
 	my $temp =
 		{
 			'0' => '01',
+			'SELF' => '01',
+
+			'2' => '02',
 			'10' => '02',
+			'SPOUSE' => '02',
+
+			'3' => '03',
+			'03' => '03',
 			'12' => '03',
+			'CHILD' => '03',
+
 			'99' => '99',
 			'50' => '99',
-			'11' => '18',
-			'SELF' => '01',
-			'SPOUSE' => '02',
-			'CHILD' => '03',
 			'OTHER' => '99',
-			'PARENT' => '11',
 			'EMPLOYER' => '99',
+
+			'11' => '18',
+
+			'PARENT' => '11',
 		};
 
-	$self->{relationshipToPatient} = $temp->{uc($value)};
+#	$self->{relationshipToPatient} = $temp->{uc($value)};
+	$self->{relationshipToPatient} = length($value) == 1 ? "0" . $value : $value;
 }
 
 sub getPolicyGroupName

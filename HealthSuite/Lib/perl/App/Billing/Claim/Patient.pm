@@ -17,7 +17,7 @@ use constant DATEFORMAT_USA => 1;
 #   -- which is given in HCFA 1500 Form
 #
 
-use constant DEFAULT_RELATION_SHIP_TO_INSURED => '01'; 
+use constant DEFAULT_RELATION_SHIP_TO_INSURED => '01';
 
 sub new
 {
@@ -42,7 +42,7 @@ sub getPoNumber
 {
 
 	my $self = shift;
-	
+
 	return $self->{poNumber};
 }
 
@@ -50,7 +50,7 @@ sub setPoNumber
 {
 
 	my ($self, $value) = @_;
-	
+
 	$self->{poNumber} = $value;
 }
 
@@ -75,7 +75,7 @@ sub getTPO
 {
 
 	my $self = shift;
-	
+
 	return $self->{tpo};
 }
 
@@ -90,7 +90,7 @@ sub getlegalIndicator
 {
 
 	my $self = shift;
-	
+
 	return $self->{legalIndicator};
 }
 
@@ -106,7 +106,7 @@ sub getMultipleIndicator
 {
 
 	my $self = shift;
-	
+
 	return $self->{multipleIndicator};
 }
 
@@ -121,7 +121,7 @@ sub getSignature
 {
 
 	my $self = shift;
-	
+
 	return $self->{signature};
 }
 
@@ -147,7 +147,7 @@ sub getAccountNo
 {
 
 	my $self = shift;
-	
+
 	return $self->{accountNo};
 }
 
@@ -168,8 +168,8 @@ sub getRelationshipToInsured
 sub setRelationshipToInsured
 {
 	my ($self, $value) = @_;
-	my $temp = 
-		{ 
+	my $temp =
+		{
 			'0' => '01',
 			'10' => '02',
 			'12' => '03',
@@ -188,19 +188,20 @@ sub setRelationshipToInsured
 			'99' => '99',
 			'11' => '11',
 		};
-	
-	$self->{relationshipToInsured} = $temp->{uc($value)};
+
+#	$self->{relationshipToInsured} = $temp->{uc($value)};
+	$self->{relationshipToPatient} = length($value) == 1 ? "0" . $value : $value;
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
@@ -220,7 +221,7 @@ sub setVisitDate
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Patient','setLastSeenDate use convertDateToCCYYMMDD  to change the date formats'],

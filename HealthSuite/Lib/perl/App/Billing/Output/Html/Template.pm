@@ -231,10 +231,10 @@ sub populatePatient
 #	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /2|SPOUSE/) ? "checked" : "";
 #	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /3|5|6|CHILD/) ? "checked" : "";
 #	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /4|7|8|9|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
-	$data->{patientInsuredRelationSelf} = (uc($insured->getRelationshipToPatient) =~ /1|SELF/) ? "checked" : "";
-	$data->{patientInsuredRelationSpouse} = (uc($insured->getRelationshipToPatient) =~ /2|SPOUSE/) ? "checked" : "";
-	$data->{patientInsuredRelationChild} = (uc($insured->getRelationshipToPatient) =~ /3|5|6|CHILD/) ? "checked" : "";
-	$data->{patientInsuredRelationOther} = (uc($insured->getRelationshipToPatient) =~ /4|7|8|9|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
+	$data->{patientInsuredRelationSelf} = (uc($insured->getRelationshipToPatient) =~ /01/) ? "checked" : "";
+	$data->{patientInsuredRelationSpouse} = (uc($insured->getRelationshipToPatient) =~ /02/) ? "checked" : "";
+	$data->{patientInsuredRelationChild} = (uc($insured->getRelationshipToPatient) =~ /03|04|05|06/) ? "checked" : "";
+	$data->{patientInsuredRelationOther} = (uc($insured->getRelationshipToPatient) =~ /07|08|09|10|11|12|13|14|15|16|17|18|19|99/) ? "checked" : "";
 	$data->{patientStatusSingle} = uc(($patient->getStatus) =~ /S/) ? "checked" : "";
 	$data->{patientStatusMarried} = uc($patient->getStatus) =~ /M/ ? "checked" : "";
 	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";
