@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.22 2001-01-11 05:14:15 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.23 2001-01-11 17:26:26 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -427,9 +427,6 @@ sub makeStateChanges
 		}
 		if($command eq 'refill')
 		{
-			$self->setFieldFlags('label', FLDFLAG_INVISIBLE);
-			$self->setFieldFlags('label_language', FLDFLAG_INVISIBLE);
-			$self->setFieldFlags('other_label', FLDFLAG_INVISIBLE);
 			#$self->setFieldFlags('sale_units', FLDFLAG_INVISIBLE);
 			#$self->setFieldFlags('other_sale_units', FLDFLAG_INVISIBLE);
 		}
