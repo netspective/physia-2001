@@ -99,6 +99,8 @@ sub param
 	return undef;
 }
 
+sub getSchema {	$_[0]->{schema}; }
+
 sub schemaAction
 {
 	my $self = shift;
