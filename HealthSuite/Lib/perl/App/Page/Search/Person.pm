@@ -74,6 +74,8 @@ sub getForm
 			<option value="ssn">Social Security</option>
 			<option value="dob">Date of Birth</option>
 			<option value="phone">Phone Number</option>
+			<option value="account">Account Number</option>
+			<option value="chart">Chart Number</option>
 		</select>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');
