@@ -35,6 +35,7 @@ struct(ServerConfigData => [
 	path_PerSeEDIDataOutgoing => '$',
 	path_PerSeEDIErrors => '$',
 	path_PerSeEDIErrorsDelim => '$',
+	path_PaperClaims => '$',
 
 	file_SchemaDefn => '$',
 	file_BuildLog => '$',
@@ -135,6 +136,7 @@ sub getDefaultConfig
 	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
+	$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));
 
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
 	$config->file_NSFHeader(File::Spec->catfile(PATH_APPCONF, 'nsf-header-conf'));
@@ -236,6 +238,7 @@ requirePath(
 	$CONFDATA_SERVER->path_OrgReports,
 	$CONFDATA_SERVER->path_EDIData,
 	$CONFDATA_SERVER->path_PerSeEDIData,
+	$CONFDATA_SERVER->path_PaperClaims,
 	);
 	
 1;
