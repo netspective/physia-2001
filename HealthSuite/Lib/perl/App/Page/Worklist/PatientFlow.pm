@@ -20,7 +20,7 @@ use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'worklist/patientflow' => {
 		_views => [
-			{caption => '#param._seldate#', name => 'date',},
+			{caption => '#session.decodedDate#', name => 'date',},
 			{caption => 'Recent Activity', name => 'recentActivity',},
 			{caption => 'Setup', name => 'setup',},
 			],
@@ -175,6 +175,7 @@ sub getControlBarHtml
 
 	$self->param('_seldate', $selectedDate);
 	$self->session('selectedDate', $selectedDate);
+	$self->session('decodedDate', decodeDate($selectedDate));
 
 	my $optionIndex;
 
