@@ -33,7 +33,7 @@ use App::Dialog::PostTransfer;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
 use App::IntelliCode;
-
+use App::InvoiceUtilities;
 use App::Page::Search;
 
 use constant DATEFORMAT_USA => 1;
@@ -1038,11 +1038,11 @@ sub getHistoryHtml
 			<TR VALIGN=TOP>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_date}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{action}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_text}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{cr_user_id}</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{comments}</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$statusHistory->{value_textb}</TD>
 			</TR>
 		});
 	}
