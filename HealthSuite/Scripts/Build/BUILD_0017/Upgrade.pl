@@ -24,8 +24,7 @@ system(qq{
 	./GenerateSchema.pl
 });
 
-runSQL('BUILD_0017_invoice_worklist.sql');
-runSQL('BUILD_0017_add_indexes.sql');
+runSQL('BUILD_0017_alter_schema.sql');
 runSQL('BUILD_0017_compile_invalid_and_disabled.sql');
 
 ######## END UPGRADE SCRIPT #########
