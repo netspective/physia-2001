@@ -1802,11 +1802,20 @@ sub populateItems
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
- 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), nvl(hcfa_service_place, " . DEFAULT_PLACE_OF_SERIVCE . "), hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
- 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption, to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\'), data_text_b, code_type
- 										from invoice_item
- 										where parent_id = $invoiceId ";
-
+ 	$queryStatment = qq{
+		select to_char(service_begin_date, 'dd-MON-yyyy'), 
+			to_char(service_end_date, 'dd-MON-yyyy'), 
+			nvl(HCFA1500_Service_Place_Code.abbrev, } . DEFAULT_PLACE_OF_SERIVCE . qq{) as service_place, 
+			nvl(HCFA1500_Service_Type_Code.abbrev, }. '01' . qq{) as service_type, code, modifier, 
+			unit_cost, quantity, emergency, REL_DIAGS, reference, COMMENTS , item_id, extended_cost, 
+			balance, total_adjust, item_type, flags, invoice_item.caption, to_char(nvl(service_begin_date, 
+			cr_stamp), 'dd-MON-yyyy'), data_text_b, code_type
+ 		from HCFA1500_Service_Type_Code, HCFA1500_Service_Place_Code, invoice_item
+ 		where parent_id = $invoiceId
+ 			and HCFA1500_Service_Place_Code.id (+) = invoice_item.hcfa_service_place
+ 			and HCFA1500_Service_Type_Code.id (+)  = invoice_item.hcfa_service_type
+ 	};
+ 	
 	$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	while(@tempRow = $sth->fetchrow_array())

@@ -229,9 +229,7 @@ sub setMedicareId
 sub getMedicareId
 {
 	my ($self) = @_;
-	print "Medicare ID = $self->{medicareId}\n";	
 	return $self->{medicareId};
-
 }
 
 sub setMedicaidId
@@ -243,7 +241,6 @@ sub setMedicaidId
 sub getMedicaidId
 {
 	my ($self) = @_;
-	print "Medicaid ID = $self->{medicaidId}\n";	
 	return $self->{medicaidId};
 }
 

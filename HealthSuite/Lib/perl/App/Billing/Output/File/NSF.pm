@@ -135,7 +135,6 @@ sub makeBatches
 	   if ($self->{nsfType} == NSF_HALLEY)
 	   {
 			 my $claimType = $claims->[$claimValue]->getInsType();
-			 print "claimType = $claimType\n";
 			 if( grep{$_ eq $claimType} @payerCodes)
 			 {
 				 $self->{payerClaimsBatch}->{$claimType}->addClaim($claims->[$claimValue]);
