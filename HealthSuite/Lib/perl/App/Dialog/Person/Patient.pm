@@ -165,7 +165,7 @@ sub customValidate
 	}
 	else
 	{
-		unless($page->field('party_name') || $page->field('party_name'))
+		unless($page->field('party_name') || $page->field('resp_self'))
 		{
 			$relationship->invalidate($page, "Please provide either '$relationship->{caption}' or '$relationSelf->{caption}'");
 		}
