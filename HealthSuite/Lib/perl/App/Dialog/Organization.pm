@@ -69,6 +69,7 @@ sub initialize
 	my $orgIdCaption = 'Organization ID';
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'clear_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'business_hrs_id'),
 		new CGI::Dialog::Subhead(
 			heading => 'Profile Information',
@@ -231,6 +232,18 @@ sub initialize
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 			]),
 	);
+	if ($self->{orgtype} eq 'main')
+	{
+		$self->addContent(
+			new CGI::Dialog::Field(
+			caption => 'Clearing House ID',
+			type=>'select',
+			options => FLDFLAG_PREPENDBLANK,
+			selOptions => "Perse;THINet",
+			name   => 'clear_house'
+			),
+		);
+	}
 
 	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider')
 	{
@@ -454,6 +467,13 @@ sub populateData
 	);
 	$page->field('business_hours', $businessAttribute->{value_text});
 	$page->field('business_hrs_id', $businessAttribute->{item_id});
+
+	my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
+		App::Universal::ATTRTYPE_TEXT
+	);
+	$page->field('clear_house', $clearHouseData->{value_text});
+	$page->field('clear_item_id', $clearHouseData->{item_id});
 }
 
 
@@ -671,6 +691,15 @@ sub execute_add
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
 
+	$page->schemaAction(
+			'Org_Attribute', $command,
+			parent_id => $orgIntId,
+			item_name =>  'Clearing House ID',
+			value_type => App::Universal::ATTRTYPE_TEXT,
+			value_text => $page->field('clear_house') || undef,
+			_debug => 0
+		)if $page->field('clear_house') ne '';
+
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
 	$page->endUnitWork();
@@ -716,6 +745,17 @@ sub execute_update
 			item_name => 'Business Hours',
 			value_type => App::Universal::ATTRTYPE_ORGGENERAL,
 			value_text => $page->field('business_hours') || undef,
+			_debug => 0
+		);
+
+	my $clearHouseCommand = $page->field('clear_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+			'Org_Attribute', $clearHouseCommand,
+			parent_id => $orgIntId,
+			item_id => $page->field('clear_item_id') || undef,
+			item_name => 'Clearing House ID',
+			value_type => App::Universal::ATTRTYPE_TEXT,
+			value_text => $page->field('clear_house') || undef,
 			_debug => 0
 		);
 
