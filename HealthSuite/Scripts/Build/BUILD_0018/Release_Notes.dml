@@ -146,7 +146,7 @@
 		</deliverable>
 		
 		<deliverable id="1745">
-			Added activity log for claims notes.
+			Added activity log for claims notes and claim submissions.
 		</deliverable>
 		
 		<deliverable id="1752">
@@ -159,6 +159,10 @@
 
 		<deliverable id="1755">
 			A bold label of Active and Inactive is displayed in Certification component under Person Associate Page.
+		</deliverable>		
+
+		<deliverable id="1772">
+			Display all present and past medications when entering Edit mode of this component.
 		</deliverable>		
 
 		<deliverable id="1799">
