@@ -101,6 +101,7 @@ sub getDefaultConfig
 	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 	'group-virtuser' => getDefaultConfig('Virtual User Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
+	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 );
 
@@ -141,8 +142,4 @@ requirePath(
 	$CONFDATA_SERVER->path_BillingTemplate,
 	$CONFDATA_SERVER->path_OrgReports,
 	);
-#print "path_Root = " . $CONFDATA_SERVER->path_root . "\n";
-#print "name_Config = " . $CONFDATA_SERVER->name_Config . "\n";
-#print "name_Group = " . $CONFDATA_SERVER->name_Group . "\n";
-#print "db_ConnectKey = " . $CONFDATA_SERVER->db_ConnectKey . "\n";
 1;
