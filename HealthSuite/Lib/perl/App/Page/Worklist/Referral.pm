@@ -25,21 +25,27 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_views => [
 			{caption => 'Today', name => 'date',},
 			],
-		_iconSmall =>'images/page-icons/worklist-referral',
-		_iconMedium =>'images/page-icons/worklist-referral',
 		},
 	);
 
 sub prepare_view_date
 {
 	my ($self) = @_;
-	
+
 	my $worklistComponent;
-	if ($self->param('user') eq 'physician') 
+
+	if ($self->param('user') eq 'physician')
 	{
-		$worklistComponent = '#component.worklist-referral-physician#';
+		$worklistComponent = '#component.worklist-referral-authorization#';
 	}
-	else 
+
+
+	elsif ($self->param('user') eq $self->session('person_id'))
+	{
+		$worklistComponent = '#component.worklist-referral-authorization-user#';
+	}
+
+	else
 	{
 		$worklistComponent = '#component.worklist-referral#';
 	}
@@ -103,7 +109,7 @@ sub prepare_view_recentActivity
 sub prepare_view_setup
 {
 	my ($self) = @_;
-	
+
 	my $dialog = new App::Dialog::CollectionSetup(schema => $self->{schema});
 	$self->addContent('<br>');
 	$dialog->handle_page($self, 'add');
@@ -124,11 +130,11 @@ sub prepare_page_content_footer
 sub decodeDate
 {
 	my ($date) = @_;
-	
+
 	$date = 'today' unless ParseDate($date);
 	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
 	my @today = Today();
-	
+
 	if (Delta_Days(@date_, @today) == 0)
 	{
 		return "Today";
@@ -150,20 +156,22 @@ sub prepare_page_content_header
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
 
-	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self, 
+	$self->SUPER::prepare_page_content_header(@_);
+
+	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self,
 		STMTMGRFLAG_NONE, 'sel_personinfo', $self->session('user_id'));
 	my $userName = $userNameHash->{complete_name};
 
 
 	my $heading;
-	if ($self->param('user') eq 'physician') 
+	if ($self->param('user') eq 'physician' || $self->param('user'))
 	{
 		#$heading = $userName . ' Referral Authorization Requests Worklist';
-		$heading = 'Referral Authorization Requests Worklist';
+		$heading = 'Followup Worklist';
 	}
-	else 
+	else
 	{
-		$heading = 'Referral Authorizations Worklist';
+		$heading = 'Service Request Worklist';
 	}
 	my $dateTitle = decodeDate($self->param('_seldate'));
 
@@ -174,12 +182,32 @@ sub prepare_page_content_header
 			#[$dateTitle, "/worklist/date", 'date'],
 			#['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
 			#['Setup', "/worklist/collection/setup", 'setup', ],
-			
+
 		], ' | ');
 
-	$self->{page_heading} = $heading;
-	$self->SUPER::prepare_page_content_header(@_);
-	
+	push(@{$self->{page_content_header}},
+	qq{
+		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
+		<TR><TD>
+		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
+			<TD>
+				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
+					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
+				</FONT>
+			</TD>
+			<TD ALIGN=RIGHT>
+				<FONT FACE="Arial,Helvetica" SIZE=2>
+				$functions
+				</FONT>
+			</TD>
+		</TABLE>
+		</TD></TR>
+		</TABLE>
+	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
+
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
+		unless ($self->param('noControlBar'));
+
 	return 1;
 }
 
@@ -210,7 +238,7 @@ sub getControlBarHtml
 
 	my @dateSelected = Decode_Date_US($fmtDate);
 	my $timeFieldsHtml;
-	
+
 	if (Delta_Days(@dateSelected, Today()) == 0)
 	{
 		$self->param('Today', 1);
@@ -232,7 +260,7 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
+
 			#$time1 = $self->session('time1') || '12:00am';
 			#$time2 = $self->session('time2') || '11:59pm';
 		}
@@ -251,7 +279,7 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
+
 			#$time1 = $self->session('time1') || 30;
 			#$time2 = $self->session('time2') || 120;
 		}
@@ -307,7 +335,7 @@ sub getControlBarHtml
 		} else {
 			$time2 = $self->session('time2');
 		}
-		
+
 
 		$timeFieldsHtml = qq{
 			&nbsp; &nbsp;
@@ -320,7 +348,7 @@ sub getControlBarHtml
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input type=submit value="Go">
 		};
-		
+
 	}
 
 	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
@@ -356,7 +384,7 @@ sub getControlBarHtml
 	</TABLE>
 	<br>
 	};
-	
+
 	$html = '';
 	return $html;
 }
@@ -397,14 +425,14 @@ sub initialize
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
 		unless($self->hasPermission("page/worklist/referral/$activeView"))
 		{
 			$self->disable(
 					qq{
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/worklist/referral/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
