@@ -1031,19 +1031,69 @@ sub storeProviderInfo
 	
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
-
+	my $sessOrgId = $page->session('org_id');
 	my $providerId = $mainTransData->{provider_id};
 	my $servFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $mainTransData->{service_facility_id});
 
 	my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $providerId);
-	my $providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Tax ID', $servFacilityId);
-	my $providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'UPIN', $servFacilityId);
-	my $providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'BCBS', $servFacilityId);
-	my $providerMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicare', $servFacilityId);
-	my $providerMedicaid = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicaid', $servFacilityId);
-	my $providerChampus = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Champus', $servFacilityId);
-	my $providerWorkComp = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'WC#', $servFacilityId);
+
 	my $providerSpecialty = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Primary', App::Universal::ATTRTYPE_SPECIALTY);
+
+	my $providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Tax ID', $servFacilityId);
+	my $tax = $providerTaxId->{value_text};
+	if($tax eq '')
+	{
+		$providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Tax ID', $sessOrgId);
+		$tax = $providerTaxId->{value_text};
+	}
+
+	my $providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'UPIN', $servFacilityId);
+	my $upin = $providerUpin->{value_text};
+	if($upin eq '')
+	{
+		$providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'UPIN', $sessOrgId);
+		$upin = $providerUpin->{value_text};
+	}
+	
+	my $providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'BCBS', $servFacilityId);
+	my $bcbs = $providerBcbs->{value_text};
+	if($bcbs eq '')
+	{
+		$providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'BCBS', $sessOrgId);
+		$bcbs = $providerBcbs->{value_text};
+	}
+
+	my $providerMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicare', $servFacilityId);
+	my $medicare = $providerMedicare->{value_text};
+	if($medicare eq '')
+	{
+		$providerMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicare', $sessOrgId);
+		$medicare = $providerMedicare->{value_text};
+	}
+
+	my $providerMedicaid = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicaid', $servFacilityId);
+	my $medicaid = $providerMedicaid->{value_text};
+	if($medicaid eq '')
+	{
+		$providerMedicaid = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Medicaid', $sessOrgId);
+		$medicaid = $providerMedicaid->{value_text};
+	}
+
+	my $providerChampus = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Champus', $servFacilityId);
+	my $champus = $providerChampus->{value_text};
+	if($champus eq '')
+	{
+		$providerChampus = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Champus', $sessOrgId);
+		$champus = $providerChampus->{value_text};
+	}
+
+	my $providerWorkComp = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'WC#', $servFacilityId);
+	my $wc = $providerWorkComp->{value_text};
+	if($wc eq '')
+	{
+		$providerWorkComp = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'WC#', $sessOrgId);
+		$wc = $providerWorkComp->{value_text};
+	}
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -1092,49 +1142,10 @@ sub storeProviderInfo
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
-			item_name => 'Provider/UPIN',
-			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerUpin->{value_text} || undef,
-			value_intB => 1,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			parent_id => $invoiceId,
-			item_name => 'Provider/BCBS',
-			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerBcbs->{value_text} || undef,
-			value_intB => 1,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			parent_id => $invoiceId,
-			item_name => 'Provider/Medicare',
-			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerMedicare->{value_text} || undef,
-			value_intB => 1,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			parent_id => $invoiceId,
-			item_name => 'Provider/Medicaid',
-			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerMedicaid->{value_text} || undef,
-			value_intB => 1,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			parent_id => $invoiceId,
-			item_name => 'Provider/Champus',
-			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerChampus->{value_text} || undef,
+			item_name => 'Provider/Specialty',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerSpecialty->{value_text} || undef,
+			value_textB => $providerSpecialty->{value_textb} || undef,
 			value_intB => 1,
 			_debug => 0
 		);
@@ -1144,8 +1155,57 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Tax ID',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerTaxId->{value_text} || undef,
-			value_textB => $providerTaxId->{value_textb} || undef,
+			value_text => $tax || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/UPIN',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $upin || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/BCBS',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $bcbs || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Medicare',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $medicare || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Medicaid',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $medicaid || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Champus',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $champus || undef,
 			value_intB => 1,
 			_debug => 0
 		);
@@ -1154,19 +1214,8 @@ sub storeProviderInfo
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
 			item_name => 'Provider/Workers Comp',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerWorkComp->{value_text} || undef,
-			value_intB => 1,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			parent_id => $invoiceId,
-			item_name => 'Provider/Specialty',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerSpecialty->{value_text} || undef,
-			value_textB => $providerSpecialty->{value_textb} || undef,
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $wc || undef,
 			value_intB => 1,
 			_debug => 0
 		);
