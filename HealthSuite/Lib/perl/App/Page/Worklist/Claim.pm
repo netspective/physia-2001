@@ -71,6 +71,7 @@ my %pubDefn = (
 	],
 	dnAncestorFmt => 'Insurance Claims',
 	dnQuery => \&claimQuery,
+	dnOutRows => 20,
 );
 
 my $itemNamePrefix = 'WorkList-Claims-Setup';
@@ -135,7 +136,7 @@ sub buildSqlStmt
 {
 	my ($self) = @_;
 
-	my $arrSorting = [10,5,6];
+	my $arrSorting = [11,5,6];
 	my $sorting = $arrSorting->[$self->getSorting() - 1];
 
 	my $sqlStmt = qq{
@@ -151,7 +152,8 @@ sub buildSqlStmt
 				trunc(sysdate - invoice.invoice_date) AS invoice_age,
 				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
 				insurance.member_number AS member_number,
-				initcap(simple_name) as patient_name
+				initcap(simple_name) as patient_name,
+				name_last
 			FROM
 				person,
 				transaction,
@@ -201,7 +203,8 @@ sub buildSqlStmt
 				trunc(sysdate - invoice.invoice_date) AS invoice_age,
 				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
 				insurance.member_number AS member_number,
-				initcap(simple_name) as patient_name
+				initcap(simple_name) as patient_name,
+				name_last
 			FROM
 				person,
 				org_attribute,
