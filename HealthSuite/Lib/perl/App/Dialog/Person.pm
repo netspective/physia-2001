@@ -430,7 +430,7 @@ sub handleContactInfo
 
 	#$self->handlePostExecute($page, $command, $flags);
 
-	return '';
+	#return '';
 
 }
 
