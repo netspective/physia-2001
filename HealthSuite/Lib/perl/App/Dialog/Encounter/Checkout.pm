@@ -33,6 +33,7 @@ use constant NEXTACTION_POSTTRANSFER => "/person/%field.attendee_id%/dlg-add-pos
 use constant NEXTACTION_PRINTRECEIPT => "/";
 use constant NEXTACTION_APPOINTMENTS => "/schedule";
 use constant NEXTACTION_WORKLIST => "/worklist";
+use constant NEXTACTION_FOLLOWUPAPPT => "/worklist/patientflow/dlg-add-appointment/%field.attendee_id%/%field.care_provider_id%/%field.service_facility_id%//1/%field.appt_type%";
 
 sub initialize
 {
@@ -59,6 +60,7 @@ sub initialize
 			['Go to Patient Account', NEXTACTION_PATIENTACCT],
 			['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
 			['Go to Appointments', NEXTACTION_APPOINTMENTS],
+			['Schedule Follow-up Appointment', NEXTACTION_FOLLOWUPAPPT],
 		],
 		cancelUrl => $self->{cancelUrl} || undef)
 	);
