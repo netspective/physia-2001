@@ -284,18 +284,55 @@ sub initialize
 	{
 		$self->addContent(
 			new CGI::Dialog::Field(
-			caption => 'Clearing House ID',
-			type=>'select',
-			options => FLDFLAG_PREPENDBLANK,
-			selOptions => "Perse;THINet",
-			name   => 'clear_house'
+				caption => 'Clearing House ID Type',
+				name => 'org_billing_id_type',
+				type => 'select',
+				selOptions => 'Unknown:5;Per Se:1;THINet:2;Other:3',
+				value => '5',
+			),
+		
+			new CGI::Dialog::Field(
+				caption => 'Clearing House Billing ID',
+				#type => 'foreignKey',
+				name => 'org_billing_id',
+#				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
+
+			new CGI::Dialog::Field(
+				caption => 'Effective Date',
+				#type => 'foreignKey',
+				name => 'org_billing_effective_date',
+				type => 'date',
+#				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
+	
+			new CGI::Dialog::Field(
+				caption => 'Active?',
+				name => 'org_billing_active',
+				type => 'bool',
+				style => 'check',
+				caption => 'Active',
+				defaultValue => 0,
 			),
 			
 			new CGI::Dialog::Field(
-			caption => 'Clearing House Billing ID',
-			type=>'text',
-			name   => 'clear_house_billing_id'
+				name => 'org_billing_item_id',
+				type => 'hidden',
 			),
+
+#			new CGI::Dialog::Field(
+#			caption => 'Clearing House ID',
+#			type=>'select',
+#			options => FLDFLAG_PREPENDBLANK,
+#			selOptions => "Perse;THINet",
+#			name   => 'clear_house'
+#			),
+#			
+#			new CGI::Dialog::Field(
+#			caption => 'Clearing House Billing ID',
+#			type=>'text',
+#			name   => 'clear_house_billing_id'
+#			),
 		);
 	}
 
@@ -558,13 +595,61 @@ sub populateData
 	$page->field('business_hours', $businessAttribute->{value_text});
 	$page->field('business_hrs_id', $businessAttribute->{item_id});
 
-	my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+	# Does a new-style clearing house billing record exist for this org?
+	my $newClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
+		App::Universal::ATTRTYPE_BILLING_INFO
+	);
+	my $oldClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
 		App::Universal::ATTRTYPE_TEXT
 	);
-	$page->field('clear_house', $clearHouseData->{value_text});
-	$page->field('clear_house_billing_id', $clearHouseData->{value_textB});
-	$page->field('clear_item_id', $clearHouseData->{item_id});
+
+	my $clearHouseData;
+	if ($newClearHouseDataExists) {
+		# Read the new-style clearing house billing record...
+		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
+			App::Universal::ATTRTYPE_BILLING_INFO
+		);
+
+		# Populate the fields with data from the appropriate columns...
+		$page->field('org_billing_id_type', $clearHouseData->{value_int});
+		$page->field('org_billing_id', $clearHouseData->{value_text});
+		$page->field('org_billing_active', $clearHouseData->{value_textB});
+		$page->field('org_billing_effective_date', $clearHouseData->{value_date});
+		$page->field('org_billing_item_id', $clearHouseData->{item_id});
+	} elsif ($oldClearHouseDataExists) {
+		# Read the new-style clearing house billing record...
+		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
+			App::Universal::ATTRTYPE_TEXT
+		);
+
+		# Setup the translation mechanism for old-style fields to new-style values...
+		my %clearingHouse = ( 'perse' => 1, 'thinet' => 2 );
+
+		# Populate the fields with data from the appropriate columns...
+		$page->field('org_billing_id_type', $clearingHouse {lc ($clearHouseData->{value_text})});
+		$page->field('org_billing_id', $clearHouseData->{value_textB});
+		$page->field('org_billing_active', 0);
+		$page->field('org_billing_effective_date', $page->getDate());
+		$page->field('org_billing_item_id', $clearHouseData->{item_id});
+		
+		# Update the billing record to the new style...
+#		$page->schemaAction(
+#			'Org_Attribute', 'update',
+#			parent_id => $orgIntId,
+#			item_name => 'Organization Default Clearing House ID',
+#			item_id => $clearHouseData->{item_id} || undef,
+#			value_type => $App::Universal::ATTRTYPE_BILLING_INFO || undef,
+#			value_text => $clearHouseData->{value_textB} || undef,
+#			value_textB => '0',
+#			value_int => $clearingHouse {lc ($clearHouseData->{value_text})} || undef,
+#			value_date => $page->getDate() || undef,
+#			_debug => 0
+#		);
+	}
 
 	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Area Served',
@@ -652,7 +737,7 @@ sub execute_add
 			_debug => 0
 		) if $page->field('addr_line1') ne '' && $self->{orgtype} ne 'dir-entry';
 
-$page->schemaAction(
+	$page->schemaAction(
 			'Org_Address', $command,
 			parent_id => $orgIntId || undef,
 			address_name => 'Street',
@@ -832,14 +917,16 @@ $page->schemaAction(
 	);
 
 	$page->schemaAction(
-			'Org_Attribute', $command,
-			parent_id => $orgIntId,
-			item_name =>  'Clearing House ID',
-			value_type => App::Universal::ATTRTYPE_TEXT,
-			value_text => $page->field('clear_house') || undef,
-			value_textB => $page->field('clear_house_billing_id') || undef,
-			_debug => 0
-		)if $page->field('clear_house') ne '';
+		'Org_Attribute', $command,
+		parent_id => $orgIntId,
+		item_name => 'Organization Default Clearing House ID',
+		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
+		value_text => $page->field('org_billing_id') || undef,
+		value_textB => ($page->field('org_billing_active') ? 1 : 0),
+		value_int => $page->field('org_billing_id_type') || undef,
+		value_date => $page->field('org_billing_effective_date') || undef,
+		_debug => 0
+	) if ($page->field ('org_billing_item_id') eq '');
 
 	$page->schemaAction(
 			'Org_Address', $command,
@@ -961,17 +1048,30 @@ sub execute_update
 			_debug => 0
 		);
 
-	my $clearHouseCommand = $page->field('clear_item_id') eq '' ? 'add' : $command;
+	my $clearHouseCommand = $page->field('org_billing_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Org_Attribute', $clearHouseCommand,
-			parent_id => $orgIntId,
-			item_id => $page->field('clear_item_id') || undef,
-			item_name => 'Clearing House ID',
-			value_type => App::Universal::ATTRTYPE_TEXT,
-			value_text => $page->field('clear_house') || undef,
-			value_textB => $page->field('clear_house_billing_id') || undef,
-			_debug => 0
-		);
+		'Org_Attribute', $clearHouseCommand,
+		parent_id => $orgIntId,
+		item_id => $page->field('org_billing_item_id'),
+		item_name => 'Organization Default Clearing House ID',
+		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
+		value_text => $page->field('org_billing_id') || undef,
+		value_textB => ($page->field('org_billing_active') ? 1 : 0),
+		value_int => $page->field('org_billing_id_type') || undef,
+		value_date => $page->field('org_billing_effective_date') || undef,
+		_debug => 0
+	) unless ($page->field('org_billing_item_id') eq '');
+
+#	$page->schemaAction(
+#			'Org_Attribute', $clearHouseCommand,
+#			parent_id => $orgIntId,
+#			item_id => $page->field('clear_item_id') || undef,
+#			item_name => 'Clearing House ID',
+#			value_type => App::Universal::ATTRTYPE_TEXT,
+#			value_text => $page->field('clear_house') || undef,
+#			value_textB => $page->field('clear_house_billing_id') || undef,
+#			_debug => 0
+#		);
 
 		my $areaCommand = $page->field('area_served_id') eq '' ? 'add' : $command;
 		$page->schemaAction(
