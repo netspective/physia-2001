@@ -9,10 +9,10 @@ use File::Spec;
 use App::Configuration;
 use Data::Publish;
 use Exporter;
-use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT);
+use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT REPLACEUNDL);
 use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 @ISA   = qw(Exporter CGI::Component);
-@EXPORT = qw(NAVGPATHFLAG_STAYATROOT);
+@EXPORT = qw(NAVGPATHFLAG_STAYATROOT NAVGPATHFLAG_REPLACEUNDL);
 
 %MODULE_FILE_MAP = ();
 %FILE_MODULE_MAP = ();
@@ -32,7 +32,33 @@ use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
 			rootURL => '/report',
 			rootCaption => 'View Reports',
-			flags => NAVGPATHFLAG_STAYATROOT,
+			flags => NAVGPATHFLAG_STAYATROOT | NAVGPATHFLAG_REPLACEUNDL,
+			),
+		},
+	'navigate-directory-panel' => {
+		_class => new App::Component::Navigate::FileSys(
+			heading => 'Directory',
+			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgDirectory(), 'General'),
+			rootURL => '/directory',
+			rootCaption => 'Directory',
+			),
+		},
+	'navigate-directory-root' => {
+		_class => new App::Component::Navigate::FileSys(
+			heading => 'Directory',
+			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgDirectory(), 'General'),
+			rootURL => '/directory',
+			rootCaption => 'Directory',
+			flags => NAVGPATHFLAG_STAYATROOT | NAVGPATHFLAG_REPLACEUNDL,
+			),
+		},
+	'navigate-directory-transparent' => {
+		_class => new App::Component::Navigate::FileSys(
+			heading => 'Directory',
+			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgDirectory(), 'General'),
+			rootURL => '/directory',
+			style => 'panel.transparent',
+			rootCaption => 'Directories',
 			),
 		},
 	);
@@ -101,6 +127,7 @@ sub getActivePathInfo
 			$fsPath = File::Spec->catfile($fsPath, $_);
 			last unless -d $fsPath;
 			$urlPath .= '/' . $_;
+			s/_/ /g if $flags & NAVGPATHFLAG_REPLACEUNDL;
 			push(@items, qq{@{[ '&nbsp;&nbsp'x$level ]} <IMG SRC='/resources/icons/folder-orange-open.gif'> <A HREF='$urlPath'>$_</A>});
 			$level++;
 		}
@@ -149,9 +176,21 @@ sub getActivePathContents
 		} readdir(ACTIVEPATH);
 		closedir(ACTIVEPATH);
 
-		foreach (sort @dirs)
+		if($flags & NAVGPATHFLAG_REPLACEUNDL)
 		{
-			push(@items, ["$urlPath$_", $_, '/resources/icons/folder-orange-closed.gif']);
+			foreach (sort @dirs)
+			{
+				my $display = $_;
+				$display =~ s/_/ /g;
+				push(@items, ["$urlPath$_", $display, '/resources/icons/folder-orange-closed.gif']);
+			}
+		}
+		else
+		{
+			foreach (sort @dirs)
+			{
+				push(@items, ["$urlPath$_", $_, '/resources/icons/folder-orange-closed.gif']);
+			}
 		}
 		foreach (sort @files)
 		{
@@ -211,6 +250,7 @@ sub getActivePathContents
 sub init
 {
 	my $self = shift;
+	$self->{flags} = NAVGPATHFLAG_REPLACEUNDL unless $self->{flags};
 	$self->{publishDefn} =
 	{
 		flags => PUBLFLAG_HIDEHEAD,
@@ -219,7 +259,7 @@ sub init
 		frame =>
 		{
 			headColor => '#EEEEEE',
-			borderColor => '#CCCCCC',
+			borderColor => exists $self->{style} ? ($self->{style} eq 'panel.transparent' ? '#FFFFFF' : '#CCCCCC') : '#CCCCCC',
 			contentColor => '#FFFFFF',
 			heading => '#my.activePath#',
 			width => '100%',
