@@ -6,8 +6,8 @@
 	<table name="Org_Association" abbrev="OrgAn" type="Audit,Secure">
 		<description>Associations between Organization</description>
 		<column name="org_assn_id" type="autoinc" primarykey="yes" descr="Unique Association ID"/>
-		<column name="org_assn_status" lookupref="Document_Association_Status" indexed="yes" descr="Whether or not association is currently active"/>
-		<column name="org_assn_type" lookupref="Document_Association_Type" indexed="yes" required="yes" descr="Type of association"/>
+		<column name="org_assn_status" lookupref="Org_Association_Status" indexed="yes" descr="Whether or not association is currently active"/>
+		<column name="org_assn_type" lookupref="Org_Association_Type" indexed="yes" required="yes" descr="Type of association"/>
 		<column name="org_assn_sequence" type="integer" indexed="yes" descr="If there is more than one association, this is the sequence"/>
 		<column name="org_internal_id" parentref="org.org_internal_id" indexed="yes" required="yes" descr="Organization ID"/>
 		<column name="assn_org_internal_id" lookupref="org.org_internal_id" indexed="yes" descr="Associated Organization ID"/>
@@ -23,5 +23,7 @@
 		<enum id="1">Self</enum>		
 		<enum id="2">Parent Organization</enum>
 		<enum id="3">Child Organization</enum>
+		<enum id="100">IPA</enum>
+		<enum id="110">IPA Member</enum>
 	</table>	
 </schema>
