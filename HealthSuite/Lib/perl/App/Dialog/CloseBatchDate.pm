@@ -46,15 +46,7 @@ sub new
 						type => 'date',
 						options=>FLDFLAG_REQUIRED,
 						hints=>'Only batch date(s) greater than the Close Date will be valid',),																
-		#	new CGI::Dialog::Field(type => 'select',
-		#					style => 'radio',
-		#					selOptions => 'Creation Date:0;Payment Date:1;Both:2',
-		#					caption => 'Close ',
-		#					preHtml => "<B><FONT COLOR=DARKRED>",
-		#					postHtml => "</FONT></B>",
-		#					name => 'close_type',
-		#					defaultValue => '0',
-		#					options=>FLDFLAG_REQUIRED),
+
 																	
 		);
 		$self->{activityLog} =
@@ -71,14 +63,15 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));		
-	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $parent_id,'Retire Batch Date',$TEXT_ATTRR_TYPE);
 	$page->field('org_id',$page->param('org_id'));
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;	
+	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $parent_id,'Retire Batch Date',$TEXT_ATTRR_TYPE);
 	if($item)
 	{
 		$page->param('item_id',$item->{item_id});
 		$page->field('close_type',$item->{value_int});
 		$page->field('close_date',$item->{value_date});
-	}
+	}	
 }
 
 sub execute
@@ -97,7 +90,6 @@ sub execute
 			#value_int => $page->field('close_type'),
 			value_date => $page->field('close_date')
 	);
-
 	$self->handlePostExecute($page, $command, $flags);	
 	
 }
