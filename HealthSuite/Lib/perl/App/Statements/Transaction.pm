@@ -491,6 +491,13 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			AND	t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
 			ORDER BY trans_id asc
 		},
+	'selFollowupByChildTransId'=>qq
+		{
+			SELECT 	rfs.caption
+			FROM 	REFERRAL_FOLLOWUP_STATUS rfs, transaction t
+			WHERE 	t.parent_trans_id =  :1
+			AND	t.trans_status_reason = rfs.id			
+		},
 );
 
 
