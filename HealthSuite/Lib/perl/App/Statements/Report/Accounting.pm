@@ -439,6 +439,7 @@ aic.batch_id,
 		{SELECT invoice_id
 		FROM invoice 
 		WHERE parent_invoice_id = :1
+		AND parent_invoice_id IS NOT NULL
 		}
 	},
 
