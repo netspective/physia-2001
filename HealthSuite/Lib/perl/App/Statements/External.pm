@@ -12,7 +12,7 @@ use base qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_EXTERNAL);
 
 my $HISTORY_RECORD=App::Universal::ATTRTYPE_HISTORY;
-my $WAITING_PAYMENT = App::Universal::INVOICESTATUS_AWAITINSPAYMENT;
+my $AWAITCLIENTPAYMENT = App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT;
 
 $STMTMGR_EXTERNAL = new App::Statements::External(
 	'sel_dupHistoryItems' => qq{
@@ -80,28 +80,30 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 	{
 		UPDATE  Statement
                 SET     ack_stamp = sysdate,
-                tranmission_status  = 1,
+                transmission_status  = 1,
                 ext_statement_id = :1
                 WHERE   ack_stamp is NULL
                 AND     int_statement_id = :2
-                AND   tranmission_status  = 0		
+                AND   	transmission_status  = 0	
+                AND	patient_id = :3
 	},
 
 	'updateAckStatus'=>qq
 	{
 		UPDATE 	Invoice
-		SET	invoice_status  = $WAITING_PAYMENT
+		SET	invoice_status  = $AWAITCLIENTPAYMENT
 		WHERE	Invoice_id IN				
 		(SELECT sii.member_name 
 		 FROM Statement s, Statement_Inv_Ids sii
 		 WHERE sii.parent_id = s.statement_id
 		 AND s.ack_stamp is NULL
-		 AND s.tranmission_status  = 0
+		 AND s.transmission_status  = 0
 		 AND  s.int_statement_id = :1
+                 AND s.patient_id = :2		 
 		)
 	},
 	
-	'InsAckStatement'=>qq
+	'InsAckHistory'=>qq
 	{
 		INSERT INTO Invoice_History
 		(cr_stamp,
@@ -120,10 +122,13 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 		 FROM Statement s, Statement_Inv_Ids sii
 		 WHERE sii.parent_id = s.statement_id
 		 AND s.ack_stamp is NULL
-		 AND s.tranmission_status  = 0
+		 AND s.transmission_status  = 0
 		 AND sii.parent_id = :3
+		 AND s.patient_id = :4
 	},
 	
+	#
+	#End Statement Queries
 );
 	
 1;
