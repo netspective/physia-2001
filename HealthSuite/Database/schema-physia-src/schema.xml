@@ -84,6 +84,7 @@
 		<description>An organization, such as a physician's private practice, a hospital, or an insurance company</description>
 		<column name="org_id" type="entity_id" primarykey="yes" descr="Unique ID for company or organization"/>
 		<column name="parent_org_id" selfref="org.org_id" descr="ID for parent organization"/>
+		<column name="owner_org_id" selfref="org.org_id" descr="ID for owner(creator) of organization"/>
 		<column name="category" type="text_set" descr="Type(s) of organization [comma-separated if more than one]"/>
 		<column name="tax_id" type="text" descr="Tax ID"/>
 		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
@@ -555,43 +556,43 @@
 		<column name="src_begin_date" type="date" descr="Date at which measure is valid"/>
 		<column name="src_end_date" type="date" descr="Date at which measure is invalid"/>
 	</table>
-	
+
 	<table name="REF_PFS_RVU" >
 			<description>Contains information on services covered by the Medicare Physician Fee Schedule</description>
 			<column name="pfs_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
 			<column name="eff" type="duration" indexed="yes" descr="Date the RVU data is effective "/>
-			<column name="code" type="text" size="6" indexed="yes" descr="Actual CPT/HCPCS Code"/>		
+			<column name="code" type="text" size="6" indexed="yes" descr="Actual CPT/HCPCS Code"/>
 			<column name="modifier" type="text" size="2"  descr="Code modifier"/>
 			<column name="description" type="text" size="64" descr="Description of code"/>
 			<column name="status_code" type="text" size="2" descr="Indicates whether the code is in the fee schedule"/>
 			<column name="medicare_ind"  type="text" size="2" descr="Indicates if the RVU is used for medicare payments"/>
 			<column name="work_rvu" type="percentage" descr="RVU for physician work"/>
-			<column name="non_fac_pe_rvu" type="percentage" descr="RVU for fully-implemented resource based practice exp"/>	
-			<column name="na_ind" type="text" size="2" descr="Indicates if the procedure is rarely or never performed in non-facility setting"/>	
-			<column name="trans_non_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp"/>	
-			<column name="fac_pe_rvu" type="percentage" descr="RVU for fully implemented resource based practice exp"/>	
-			<column name="trans_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp for non-facility"/>	
-			<column name="mal_practice_rvu" type="percentage" descr="RVU for malpractice exp"/>	
-			<column name="tlt_non_fac_rvu" type="percentage" descr="Sum of work fully implemented non-facility practice expense"/>	
-			<column name="tlt_trans_non_fac_rvu" type="percentage" descr="Sum of work transitioned non-facility practice expense"/>	
-			<column name="tlt_fac_rvu" type="percentage" descr="Sum of work fully implemented based facility practice expense"/>	
-			<column name="tlt_trans_fac_rvu" type="percentage" descr="Sum of work transitioned facility practice expense"/>	
-			<column name="pc_tc_ind" type="text" size="2" descr="PC/TC indicator"/>	
-			<column name="global_surgery" type="text" size="3" descr="Time frame for surgical procedure"/>	
-			<column name="preop_percent" type="percentage" descr="Percentage for preoperative of global package"/>	
-			<column name="intraop_percent" type="percentage" descr="Percentage for intraoperative portion of global package"/>	
-			<column name="postop_percent" type="percentage" descr="Percentage for postoperative portion of global package"/>	
-			<column name="multi_procedure" type="percentage" descr="Payment adjustment rule"/>	
-			<column name="bilat_surgery" type="text" size="2" descr="Service subject to payment adjustment"/>	
-			<column name="asst_surgery" type="text" size="2" descr="Indicates if assistant at surgery is paid"/>	
-			<column name="co_surgeons" type="text" size="2" descr="Indicates if a co-surgeon is paid"/>	
-			<column name="team_surgery" type="text" size="2" descr="Indicates services for which team surgeons may be paid"/>	
-			<column name="phy_supervise" type="text" size="2" descr="Diagnostic post payment review"/>			
-			<column name="bill_med_code" type="text" size="5" descr="Code for billable medical supples"/>	
-			<column name="endo_base_code" type="text" size="5" descr="Identifies an endoscopic base code"/>	
-			<column name="conversion_fact" type="float" descr="Multiplier that transforms RVU into payment"/>			
+			<column name="non_fac_pe_rvu" type="percentage" descr="RVU for fully-implemented resource based practice exp"/>
+			<column name="na_ind" type="text" size="2" descr="Indicates if the procedure is rarely or never performed in non-facility setting"/>
+			<column name="trans_non_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp"/>
+			<column name="fac_pe_rvu" type="percentage" descr="RVU for fully implemented resource based practice exp"/>
+			<column name="trans_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp for non-facility"/>
+			<column name="mal_practice_rvu" type="percentage" descr="RVU for malpractice exp"/>
+			<column name="tlt_non_fac_rvu" type="percentage" descr="Sum of work fully implemented non-facility practice expense"/>
+			<column name="tlt_trans_non_fac_rvu" type="percentage" descr="Sum of work transitioned non-facility practice expense"/>
+			<column name="tlt_fac_rvu" type="percentage" descr="Sum of work fully implemented based facility practice expense"/>
+			<column name="tlt_trans_fac_rvu" type="percentage" descr="Sum of work transitioned facility practice expense"/>
+			<column name="pc_tc_ind" type="text" size="2" descr="PC/TC indicator"/>
+			<column name="global_surgery" type="text" size="3" descr="Time frame for surgical procedure"/>
+			<column name="preop_percent" type="percentage" descr="Percentage for preoperative of global package"/>
+			<column name="intraop_percent" type="percentage" descr="Percentage for intraoperative portion of global package"/>
+			<column name="postop_percent" type="percentage" descr="Percentage for postoperative portion of global package"/>
+			<column name="multi_procedure" type="percentage" descr="Payment adjustment rule"/>
+			<column name="bilat_surgery" type="text" size="2" descr="Service subject to payment adjustment"/>
+			<column name="asst_surgery" type="text" size="2" descr="Indicates if assistant at surgery is paid"/>
+			<column name="co_surgeons" type="text" size="2" descr="Indicates if a co-surgeon is paid"/>
+			<column name="team_surgery" type="text" size="2" descr="Indicates services for which team surgeons may be paid"/>
+			<column name="phy_supervise" type="text" size="2" descr="Diagnostic post payment review"/>
+			<column name="bill_med_code" type="text" size="5" descr="Code for billable medical supples"/>
+			<column name="endo_base_code" type="text" size="5" descr="Identifies an endoscopic base code"/>
+			<column name="conversion_fact" type="float" descr="Multiplier that transforms RVU into payment"/>
 	</table>
-	
+
 	<table name="REF_GPCI" >
 			<description>Contains the geographic practice cost index (GPCI) for every medicare locality</description>
 			<column name="gpci_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
@@ -603,7 +604,7 @@
 			<column name="county" type="text" size="256" descr="County"/>
 			<column name="work" type="float" descr="GPCI Work"/>
 			<column name="practice_expense" type="float" descr="GPCI practice expense"/>
-			<column name="mal_practice" type="float" descr="GPCI Malpractice expense"/>		
+			<column name="mal_practice" type="float" descr="GPCI Malpractice expense"/>
 	</table>
 
 	<table name="Eligibility_Source" abbrev="ElSrc">
