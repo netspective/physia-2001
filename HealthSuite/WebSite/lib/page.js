@@ -430,18 +430,18 @@ function validateDate(fieldName, inDate)
 }
 
 // Split "string" into multiple tokens at "char"
-function splitOnChar(string, char)
+function splitOnChar(strString, strDelimiter)
 {
 	var a = new Array();
 	var field = 0;
-	for (var i = 0; i < string.length; i++)
+	for (var i = 0; i < strString.length; i++)
 	{
-		if ( string.charAt(i) != char )
+		if ( strString.charAt(i) != strDelimiter )
 		{
 			if (a[field] == null)
-				a[field] = string.charAt(i);
+				a[field] = strString.charAt(i);
 			else
-				a[field] += string.charAt(i);
+				a[field] += strString.charAt(i);
 		}
 		else
 		{
@@ -452,23 +452,23 @@ function splitOnChar(string, char)
 	return a;
 }
 
-// Split "string" into multiple tokens at inverse of "array"
-function splitNotInArray(string, array)
+// Split "strString" into multiple tokens at inverse of "array"
+function splitNotInArray(strString, arrArray)
 {
 	var a = new Array();
 	var field = 0;
 	var matched;
-	for (var i = 0; i < string.length; i++)
+	for (var i = 0; i < strString.length; i++)
 	{
 		matched = 0;
-		for (k in array)
+		for (k in arrArray)
 		{
-			if (string.charAt(i) == array[k])
+			if (strString.charAt(i) == arrArray[k])
 			{
 				if (a[field] == null)
-					a[field] = string.charAt(i);
+					a[field] = strString.charAt(i);
 				else
-					a[field] += string.charAt(i);
+					a[field] += strString.charAt(i);
 				matched = 1;
 				break;
 			}
