@@ -377,6 +377,9 @@ sub prepare_HtmlBlockFmtTemplate
 			{
 				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);
 				push(@storeCols, $colIdx) unless grep { $_ == $colIdx } @storeCols;
+				#Store column just in case doing a sum_ function on other column then colIdx (example '&{sum_currency:13} when colIdx = 11)
+				$tDataFmt=~ /\:(\d+)/;				
+				push(@storeCols, $1) unless grep { $_ == $1 } @storeCols;
 				$tDataFmt=~ /(\d+)\,(\d+)/;
 				if($1 && $2)
 				{
