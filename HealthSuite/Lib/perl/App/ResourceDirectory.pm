@@ -156,7 +156,10 @@ use App::Dialog::PostTransfer;
 use App::Dialog::Procedure;
 use App::Dialog::Invoice;
 use App::Dialog::LoginType;
-use App::Dialog::Transaction::Referral;
+use App::Dialog::Transaction::ReferralWorkFlow;
+use App::Dialog::Transaction::ReferralWorkFlow::Referral;
+use App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization;
+
 #use App::Dialog::Slot;
 use App::Dialog::Template;
 use App::Dialog::Transaction::ActiveProblems;
@@ -246,6 +249,7 @@ $WORKLIST_CLASSES = {
 	'_default' => 'App::Page::Worklist::PatientFlow',
 	'patientflow' => 'App::Page::Worklist::PatientFlow',
 	'collection' => 'App::Page::Worklist::Collection',
+	'referral' => 'App::Page::Worklist::Referral',
 };
 
 %PAGE_CLASSES = (
@@ -632,7 +636,9 @@ $WORKLIST_CLASSES = {
 				heading => '$Command Password'},
 	'personnel' => {_class => 'App::Dialog::Personnel', heading => '$Command Personnel', _arl => ['person_id']},
 	'loginType' => {_class => 'App::Dialog::LoginType', heading => 'Change Login Type', _arl => ['person_id']},
-	'referral' => {_class => 'App::Dialog::Transaction::Referral', heading => 'Add Referral', _arl => ['person_id']},
+	'referral' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::Referral', heading => 'Add Referral', _arl => ['person_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL()},
+	'referral-auth' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization', transId => ['parent_trans_id'], heading => 'Add Referral Authorization', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION()},
+
 	'eligibility' => {_class => 'App::Dialog::Eligibility', heading => '$Command Eligibility', _arl => ['org_id']},
 
 );
