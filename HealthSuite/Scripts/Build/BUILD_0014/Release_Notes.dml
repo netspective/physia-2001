@@ -9,9 +9,28 @@
 	</release-info>
 
 	<deliverables>
-	<deliverable id=" 1138">
-		Added validation to display a warning message if user attempt to close a date that has prior open dates with transactions.
-        </deliverable>
+		<deliverable id="323">
+			UI: Correctly handle events across time zones.  The users will specify a Time Zone
+			upon logging in to the App.  All times displayed by the app from then on wil be in the 
+			users' local time zone.
+		</deliverable>
+
+		<deliverable id="1138">
+			Added validation to display a warning message if user attempt to close a date that has prior open dates with transactions.
+		</deliverable>
+	
+		<deliverable id="1167">
+			Claims sent to Perse and reports received from Perse will be broken down and grouped
+			by Orgs.  Implement Org lockdown for viewing of these reports.
+		</deliverable>
+		
+		<deliverable id="1183">
+			Check and update the Payer ID right before transmitting claims to Clearing Houses.
+			This is only to satisfy this bug's requirement as written.  As pointed out by Shahid,
+			other data may become stale.  These other data are not addressed by the resolution of
+			this bug.
+		</deliverable>
+		
 	
 	</deliverables>
 </release-notes>
