@@ -121,6 +121,75 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,															  # Diag Pointer - 7
 	$spaces,															  # Diag Pointer - 8
 	),
+	NSF_THIN . "" =>	
+	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%-1s%-1s%-1s%1s%4s%4s%-1s%-1s%-1s%-15s%-15s%-2s%-1s%7s%7s%-1s%-1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%3s%2s%3s%3s%-8s%3s%7s%7s%-1s%7s%7s%7s%7s%7s%-10s%-1s%-9s%-1s%-1s%-7s%-14s%-1s%-1s%-1s%-1s',
+	$self->recordType(),
+	$self->numToStr(2,0,$container->getSequenceNo()),
+	substr($Patient->getAccountNo(),0,17),
+	$spaces, 											# line item control number
+	$currentProcedure->getDateOfServiceFrom(), 			#ccyy/mm/dd Service Date from
+	$currentProcedure->getDateOfServiceTo(),			#ccyy/mm/dd Service Date To
+	sprintf("%02d", substr($currentProcedure->getPlaceOfService(),0,2)), # Place of service
+	$currentProcedure->getTypeOfService(),				# type of service
+	$currentProcedure->getCPT(),						# HCPCS Procedure Code
+	$modifier[0] ne "" ? substr($modifier[0],0,2) : $spaces, # HCPCS Modifier 1
+	$modifier[1] ne "" ? substr($modifier[1],0,2) : $spaces, # HCPCS Modifier 2	
+	$modifier[2] ne "" ? substr($modifier[2],0,2) : $spaces, # MCPCS Modifier 3
+	$zero.$self->numToStr(4,2,abs($currentProcedure->getExtendedCost())), # Line Charges
+	$diagnosis[0] ne "" ? substr($diagnosis[0],0,1) : $spaces,  # if 1 then print else space
+	$diagnosis[1] ne "" ? substr($diagnosis[1],0,1) : $spaces,  # if 1 then print else space
+	$diagnosis[2] ne "" ? substr($diagnosis[2],0,1) : $spaces,  # if 1 then print else space 
+	$diagnosis[3] ne "" ? substr($diagnosis[3],0,1) : $spaces,  # if 1 then print else space
+	$zero.$self->numToStr(2,0,$currentProcedure->getDaysOrUnits()).$zero, # units of service
+	$zero.$self->numToStr(3,0,$inpClaim->getAnesthesiaOxygenMinutes()),   # Anesthesia/Oxygen minutes
+	substr($currentProcedure->getEmergency(),0,1),						  # Emergency Indicator
+	substr($currentProcedure->getCOB(),0,1),							  # COB Indicator	
+	$spaces, 															  # HPSA Indicator	
+	substr($inpClaim->{renderingProvider}->getProviderId(),0,15),		  # Rendering Provider ID	
+	substr($inpClaim->{treatment}->getIDOfReferingPhysician(),0,15),	  # Referring Provider ID	
+	$spaces, 															  # Referring Provider State	 
+	$spaces, 															  # Purchase service indicator	
+	$self->numToStr(5,2,$currentProcedure->getDisallowedCostContainment()), 	  # Disallowed Cost containment
+	$self->numToStr(5,2,$currentProcedure->getDisallowedOther()),	  		      # Disallowed Other
+	$spaces, 															  # Review by code indicator
+	substr($inpClaim->{careReceiver}->getMultipleIndicator(),0,1),		  # multiple procedure indicator
+	$spaces, 															  # Mammography certification number
+	$spaces, 															  # Class Findings
+	$spaces,  															  # Podiatry service condition	
+	$spaces, 															  # CLIA number
+	$self->numToStr(5,2,abs($inpClaim->getAmountPaid())),					  # Primary Paid amount	
+	substr($modifier[3],0,2),											  # HCPCS Modifier 4	
+	substr($inpClaim->{renderingProvider}->getSpecialityId(),0,3), 			  # Provider Speciality	
+	$spaces, 															  # Podiatry therapy indicator	
+	$spaces, 															  # Podiatry therapy type	
+	$spaces, 															  # Hospice Employed provider indicator	
+	$inpClaim->getHGBHCTDate(),											  # HGB/HCT Date	
+	$self->numToStr(3,0,$zero),											  # Hemoglobin Result	
+	$self->numToStr(2,0,$zero),											  # Hematocrit Result
+	$self->numToStr(3,0,$zero),											  # Ptient weight
+	$self->numToStr(3,0,$zero),											  # Epoetin Dosage	
+	$inpClaim->getSerumCreatineDate(), 									  #	Serum Creatine Date
+	$self->numToStr(3,0,$zero),											  # Creatine Results	
+	$self->numToStr(5,2,$zero), 										  # Obligated to accept amount	
+	$self->numToStr(5,2,$zero), 										  # Drug discount amount
+	$spaces,															  # types of units ind
+	$spaces, 															  # approved amount
+	$spaces, 															  # paid amount	
+	$spaces, 															  # Bene Liability Amount	
+	$spaces,															  # Balance Bill limit chg	
+	$spaces,															  # limit chg percent
+	$spaces,															  # perform prov phone
+	$spaces,															  # perform prov tax type 
+	$spaces,															  # perform prov tax id
+	$spaces,															  # perform prov assign ind
+	$spaces,															  # Pretransplant indicator
+	$spaces,															  # ICD-10-PCS
+	$spaces,															  # Universal Product code
+	$spaces,															  # Diag Pointer - 5
+	$spaces,															  # Diag Pointer - 6
+	$spaces,															  # Diag Pointer - 7
+	$spaces,															  # Diag Pointer - 8
+	),
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%1s%1s%1s%1s%4s%4s%1s%1s%1s%-15s%-15s%-2s%1s%7s%7s%1s%1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%3s%2s%3s%3s%-8s%3s%7s%7s%-81s%2s',
 	$self->recordType(),
@@ -384,6 +453,44 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # Generic referring
 	$spaces  # filler-local
 	),
+	NSF_THIN . "" =>	
+	sprintf('%-3s%-2s%-17s%-17s%7s%7s%7s%7s%-15s%-2s%-15s%-2s%4s%4s%-11s%7s%-15s%-8s%2s%-1s%-1s%-1s%-1s%-1s%-15s%-9s%-33s%-30s%-30s%-20s%-9s%-10s%3s%-1s%-3s',
+	$self->recordType(),
+	$self->numToStr(2,0,$container->getSequenceNo()),
+	substr($Patient->getAccountNo(),0,17),
+	$spaces,	# line item control no
+	$self->numToStr(5,2,$zero), #pr svc charge
+	$self->numToStr(5,2,$zero), 
+	$self->numToStr(5,2,$zero), 
+	$self->numToStr(5,2,$zero), 
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$self->numToStr(4,0,$zero), 
+	$self->numToStr(4,0,$zero), 
+	$spaces,
+	$self->numToStr(5,2,$zero), 
+	$spaces,
+	$spaces,
+	$self->numToStr(2,0,$zero,), # spec pricing indicator
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$self->numToStr(3,0,$zero), 
+	$spaces, # payment type ind
+	$spaces  # filler national
+	),
 	NSF_ENVOY . "" =>
 	sprintf('%-3s%-2s%-17s%-17s%7s%7s%7s%7s%-15s%-2s%-15s%-2s%4s%4s%-11s%7s%-15s%-8s%2s%1s%1s%1s%1s%1s%-15s%-9s%-33s%-30s%-30s%-20s%-9s%-9s%-3s%-2s%-2s',
 	$self->recordType(),
@@ -507,6 +614,32 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # ACR For MII (RADCON)
 	$spaces, # CRNA Indicator
 	$spaces, # Admitting physician Ind y/n
+	),
+	NSF_THIN . "" =>	
+	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-41s',
+	$self->recordType(),
+	$self->numToStr(2,0,$container->getSequenceNo()),
+	substr($Patient->getAccountNo(),0,17),
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	substr($renderingProvider->getLastName(),0,20),
+	substr($renderingProvider->getFirstName(),0,12),
+	substr($renderingProvider->getMiddleInitial(),0,1),
+	substr($renderingProvider->getPIN(),0,6), # rendering prov UPIN
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces,
+	$spaces, # Filler national (it is of 35 characters not of 36 characters
 	),
 	NSF_ENVOY . "" =>	
 	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-20s%-21s',

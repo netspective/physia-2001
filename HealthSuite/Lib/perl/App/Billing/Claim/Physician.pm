@@ -42,6 +42,7 @@ sub new
 	$self->{providerId} = undef;
 	$self->{insType} = undef;
 	$self->{workersComp} = undef;
+	$self->{professionalLicenseNo} = undef;
 	
 	return bless $self, $type;
 }
@@ -420,6 +421,19 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 		return "";
 	}
 }
+
+sub getProfessionalLicenseNo
+{
+	my ($self) = @_;
+	return $self->{professionalLicenseNo};
+}
+
+sub setProfessionalLicenseNo
+{
+	my ($self,$value) = @_;
+	$self->{professionalLicenseNo} = $value;
+}
+
 
 @CHANGELOG =
 ( 

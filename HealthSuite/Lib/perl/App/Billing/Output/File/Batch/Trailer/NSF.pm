@@ -73,6 +73,21 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # filler national
 	  $spaces, # filler local
 	  ),
+	  NSF_THIN . "" =>
+	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-244s",
+	  $self->recordType(),
+	  substr($emcId,0,15), #emc provider id
+	  $self->batchType(),
+	  $self->numToStr(4,0,$container->getSequenceNo()), # batch no
+	  $spaces, # batch id
+	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),
+	  $spaces, # reserved filler
+	  $self->numToStr(7,0,$container->{batchServiceLineCount}),
+	  $self->numToStr(7,0,$container->{batchRecordCount}),
+	  $self->numToStr(7,0,$container->{batchClaimCount}),
+	  $self->numToStr(7,2,$container->{batchTotalCharges}),
+	  $spaces, # filler national
+	  ),
 	  NSF_ENVOY . "" =>		  
   	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-114s%9s",
 	  $self->recordType(),

@@ -71,6 +71,32 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # filler national
 	$spaces  # filler local
 	),
+	NSF_THIN . "" =>	
+	sprintf("%-3s%-2s%-17s%2s%2s%2s%2s%2s%2s%3s%-40s%7s%7s%7s%7s%7s%7s%7s%7s%7s%-16s%-103s%-61s",
+	$self->recordType(),
+	$spaces, # reserved filler
+	$inpClaim->{careReceiver}->getAccountNo(), # pat control no
+	$self->numToStr(2,0,$container->getCountXXX('cXXX')),
+	$self->numToStr(2,0,$container->getCountXXX('dXXX')),
+	$self->numToStr(2,0,$container->getCountXXX('eXXX')),
+	$self->numToStr(2,0,$container->getCountXXX('fXXX') + $container->getCountXXX('fA0XXX')),
+	$self->numToStr(2,0,$container->getCountXXX('gXXX')),
+	$self->numToStr(2,0,$container->getCountXXX('hXXX')),
+	$self->numToStr(3,0,$container->getCountXXX()),
+	$spaces, # reserved filler
+	$self->numToStr(5,2,abs($inpClaim->getTotalCharge())),
+	$self->numToStr(5,2,abs($container->{totalDisallowedCostContainmentCharges})),
+	$self->numToStr(5,2,abs($container->{totalDisallowedOtherCharges})),
+	$self->numToStr(5,2,abs($container->{totalAllowedAmount})),
+	$self->numToStr(5,2,abs($container->{totalDeductibleAmount})),
+	$self->numToStr(5,2,abs($container->{totalCoinsuranceAmount})),
+	$self->numToStr(5,2,abs($inpClaim->{payer}->getAmountPaid())), # payer total amount paid
+	$self->numToStr(5,2,abs($inpClaim->getAmountPaid())), # patient amount paid i.e. total adjusted amount from invoice
+	$self->numToStr(5,2,abs($container->{totalPurchaseServiceCharges})),
+	$spaces, # provider discount information
+	$spaces, # remarks
+	$spaces, # filler national
+	),
 	NSF_ENVOY . "" =>
 	sprintf("%-3s%-2s%-17s%2s%2s%2s%2s%2s%2s%3s%-40s%7s%7s%7s%7s%7s%7s%7s%7s%7s%-16s%-103s%-31s%-15s%15s",
 	$self->recordType(),

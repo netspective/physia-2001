@@ -33,6 +33,7 @@ sub new
 	$self->{legalRepData} = undef;
 	$self->{lastSeenDate} = undef;
 	$self->{signatureDate} = undef;
+	$self->{visitDate} = undef;
 
 	return bless $self, $type;
 }
@@ -160,6 +161,7 @@ sub setAccountNo
 sub getRelationshipToInsured
 {
 	my ($self) = @_;
+	print (($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured});
 	return ($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured};
 }
 
@@ -205,6 +207,17 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 
 }
 
+sub getVisitDate
+{
+	my $self = shift;
+	return $self->{visitDate};
+}
+
+sub setVisitDate
+{
+	my ($self, $value) = @_;
+	$self->{visitDate} = $value;
+}
 
 @CHANGELOG =
 ( 

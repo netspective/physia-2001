@@ -128,6 +128,8 @@ use constant BILLSEQ_QUATERNARY_CAPTION => 'Quaternary';
 # Default place of service for items
 use constant DEFAULT_PLACE_OF_SERIVCE => 11;
 
+use constant PROFESSIONAL_LICENSE_NO => 510;
+
 sub new
 {
 	my ($type) = shift;
@@ -303,12 +305,12 @@ sub assignPatientInfo
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
-	if($row[2])
+	if($row[2] ne "")
 	{
 		my $orgId = $row[2];
 		$patient->setEmployerOrSchoolId($orgId);
 
-		$queryStatment = "select org.org_id, org.name_primary, org.org_internal_id  from org where org_id = $orgId" ;
+		$queryStatment = "select org.org_id, org.name_primary, org.org_internal_id  from org where org.org_internal_id = $orgId" ;
 		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 		# do the execute statement
 		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -518,7 +520,7 @@ sub assignPatientInsurance
 			$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 			# do the execute statement
 			$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-
+			@row = $sth->fetchrow_array();
 			$insured = $insureds[$billSeq->[$row[3]+0]];
 			if ($insured ne "")
 			{
@@ -577,7 +579,7 @@ sub assignInsuredInfo
 					$insured->setSsn($row[6]);
 					$insured->setId($row[7]);
 
-					if ($insured->getBillSequence() ne"")
+					if ($insured->getBillSequence() ne "")
 					{
 						$queryStatment = "select attr.value_text
 							from insurance, insurance_attribute attr, invoice_billing
@@ -588,7 +590,6 @@ sub assignInsuredInfo
 								" and invoice_billing.bill_ins_id = insurance.ins_internal_id
 								and attr.parent_id = parent_ins_id
 								and attr.item_name = \'HMO-PPO/Indicator\'";
-
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
 						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -802,6 +803,14 @@ sub assignPaytoAndRendProviderInfo
 	@row = $sth->fetchrow_array();
 	$renderingProvider->setAssignIndicator($row[0]);
 	$payToProvider->setAssignIndicator($row[0]);
+	
+	$queryStatment = "select value_text from person_attribute where parent_id = \'$id\' and value_type = " . PROFESSIONAL_LICENSE_NO;
+	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	@row = $sth->fetchrow_array();
+	$renderingProvider->setProfessionalLicenseNo($row[0]);
+	$payToProvider->setProfessionalLicenseNo($row[0]);
+	
 	$claim->setRenderingProvider($renderingProvider);
 	$claim->setPayToProvider($payToProvider);
 }
@@ -1429,6 +1438,27 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/BCBS/Plan Code' => [$insured4, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/E-Remitter ID' => [$payer4, \&App::Billing::Claim::Payer::setPayerId, COLUMNINDEX_VALUE_TEXT],
 
+		'Invoice/TWCC61/16' => [$treatment, [\&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEEND, COLUMNINDEX_VALUE_DATEA]],
+		'Invoice/TWCC61/17' => [$treatment, \&App::Billing::Claim::Treatment::setInjuryHistory, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/18' => [$treatment, \&App::Billing::Claim::Treatment::setPastMedicalHistory, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/19' => [$treatment, \&App::Billing::Claim::Treatment::setClinicalFindings, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/20' => [$treatment, \&App::Billing::Claim::Treatment::setLaboratoryTests, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/21' => [$treatment, \&App::Billing::Claim::Treatment::setTreatmentPlan, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/22' => [$treatment, \&App::Billing::Claim::Treatment::setReferralInfo, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/23' => [$treatment, \&App::Billing::Claim::Treatment::setMedications, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/24' => [$treatment, \&App::Billing::Claim::Treatment::setPrognosis, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/26' => [$treatment, \&App::Billing::Claim::Treatment::setDateMailedToEmployee, COLUMNINDEX_VALUE_DATE],
+		'Invoice/TWCC61/27' => [$treatment, \&App::Billing::Claim::Treatment::setDateMailedToInsurance, COLUMNINDEX_VALUE_DATE],
+
+		'Invoice/TWCC64/17' => [$treatment, [\&App::Billing::Claim::Treatment::setActivityType, \&App::Billing::Claim::Treatment::setActivityDate, \&App::Billing::Claim::Treatment::setReasonForReport], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_INT]],
+		'Invoice/TWCC64/18' => [$treatment, \&App::Billing::Claim::Treatment::setChangeInCondition, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC64/23' => [$treatment, \&App::Billing::Claim::Treatment::setComplianceByEmployee, COLUMNINDEX_VALUE_TEXT],
+
+		'Invoice/TWCC69/17' => [$treatment, [\&App::Billing::Claim::Treatment::setMaximumImprovementDate, \&App::Billing::Claim::Treatment::setMaximumImprovement], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_INT]],
+		'Invoice/TWCC69/18' => [$treatment, \&App::Billing::Claim::Treatment::setImpairmentRating, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC69/19' => [$treatment, [\&App::Billing::Claim::Treatment::setDoctorType, \&App::Billing::Claim::Treatment::setExaminingDoctorType], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC69/22' => [$treatment, [\&App::Billing::Claim::Treatment::setMaximumImprovementAgreement, \&App::Billing::Claim::Treatment::setImpairmentRatingAgreement], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+
 	};
 
 	my $queryStatment = " select ITEM_ID, ITEM_NAME, VALUE_TEXT, VALUE_TEXTB, VALUE_INT, VALUE_INTB, VALUE_FLOAT, VALUE_FLOATB, to_char(VALUE_DATE, \'dd-MON-yyyy\'), to_char(VALUE_DATEEND, \'dd-MON-yyyy\'), to_char(VALUE_DATEA, \'dd-MON-yyyy\'), to_char(VALUE_DATEB, \'dd-MON-yyyy\') from invoice_attribute where parent_id = $invoiceId ";
@@ -1633,7 +1663,6 @@ sub setClaimProperties
 	@tempRow = $sth->fetchrow_array();
 	my $diagnosis;
 	$tempRow[2] =~ s/ //g;
-
 	my @diagnosisCodes = split (/,/, $tempRow[2]) ;
 	my $diagCount;
 	my @ins;
@@ -1725,6 +1754,8 @@ sub setClaimProperties
 		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
+	$self->populateVisitDate($invoiceId, $currentClaim, $patient);
+	$self->populateChangedTreatingDoctor($invoiceId, $currentClaim);
 }
 
 sub diagnosisPtr
@@ -1743,10 +1774,11 @@ sub diagnosisPtr
 			$count++;
 		}
 	}
+	$codes =~ s/ //g;
 	my @diagCodes = split(/,/, $codes);
 	for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 	{
-		$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . " " . $ptr;
+		$ptr =  $ptr . " " .  $diagnosisMap->{$diagCodes[$diagnosisCount]};
 	}
 	return $ptr;
 }
@@ -2077,6 +2109,53 @@ sub registerValidators
 sub getId
 {
 	'IDBI'
+}
+
+sub populateVisitDate
+{
+	my ($self, $invoiceId, $currentClaim, $patient) = @_;
+	my @tempRow;
+
+	my $queryStatment = qq{
+		select to_char(min(service_begin_date), 'mm/dd/yyyy')
+ 		from invoice_item
+ 		where parent_id = $invoiceId
+ 	 	};
+
+	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	@tempRow = $sth->fetchrow_array();
+	$patient->setVisitDate($tempRow[0]);
+	
+}
+
+sub populateChangedTreatingDoctor
+{
+	my ($self, $invoiceId, $currentClaim) = @_;
+	my $changedTreatingDoctor = new App::Billing::Claim::Physician;
+	my $changedTreatingDoctorAddress = new App::Billing::Claim::Address;
+	$changedTreatingDoctor->setType("changedTreatingDoctor");
+	$changedTreatingDoctor->setAddress($changedTreatingDoctorAddress);
+	$currentClaim->setChangedTreatingDoctor($changedTreatingDoctor);
+	
+	if ($currentClaim->{treatment}->{reasonForReport} == 3) 
+	{
+		my $id = $currentClaim->{treatment}->{activityType};
+		my $queryStatment = "select complete_name from person where person_id = \'$id\'";
+		my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		my @row = $sth->fetchrow_array();
+		$changedTreatingDoctor->setId($id);
+		$changedTreatingDoctor->setName($row[0]);
+		$queryStatment = "select line1, line2, city, state, zip, country from person_address where parent_id = \'$id\'";
+		$self->populateAddress($changedTreatingDoctorAddress, $queryStatment);
+
+		$queryStatment = "select value_text from person_attribute where parent_id = \'$id\' and value_type = " . PROFESSIONAL_LICENSE_NO;
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		$changedTreatingDoctor->setProfessionalLicenseNo($row[0]);
+	}
 }
 
 @CHANGELOG =

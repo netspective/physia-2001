@@ -108,6 +108,42 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # filler national
 	  $spaces, # filler local
 	  ),
+	  NSF_THIN . "" =>
+	  sprintf("%-3s%-16s%-9s%-6s%-6s%-33s%-30s%-30s%-20s%-2s%-9s%-5s%-33s%-10s%-8s%-6s%-16s%-1s%5s%5s%-4s%-8s%-1s%-16s%-1s%-5s%-2s%-1s%-8s%-8s%-1s%-8s%-4s",
+	  substr($self->recordType(),0,3),
+	  substr($confData->{SUBMITTER_ID},0,16), # submitter id (for time being physia id is entered)
+	  $spaces, # reserved filler
+	  $spaces, # Submitter Type
+	  substr($confData->{SUBMISSION_SERIAL_NO},0,6), # submission serial no.
+	  substr($confData->{SUBMITTER_NAME},0,33), # substr($claimCareProvider->getName(),0,33)
+	  substr($confData->{ADDRESS_1},0,30), # substr($claimCareProviderAddress->getAddress1(),0,30)
+	  substr($confData->{ADDRESS_2},0,30), # substr($claimCareProviderAddress->getAddress2(),0,30)
+	  substr($confData->{CITY},0,20), # substr($claimCareProviderAddress->getCity(),0,20)
+	  substr($confData->{STATE},0,2), # substr($claimCareProviderAddress->getState(),0,2)
+	  substr($confData->{ZIP_CODE},0,9),# substr($claimCareProviderAddress->getZipCode(),0,9)
+	  $spaces, # region
+	  substr($confData->{CONTACT},0,33), # substr($claimCareProvider->getContact(),0,33)
+	  substr($confData->{TELEPHONE_NUMBER},0,10), # substr($claimCareProviderAddress->getTelephoneNo(),0,10)
+	  substr($self->getDate(),0,8),
+	  substr($self->getTime(),0,6),
+	  substr($confData->{RECEIVER_ID},0,16), # receiver id
+	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
+	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
+	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
+	  substr($confData->{TEST_PRODUCTION_INDICATOR},0,4), # test production indicator
+	  substr($confData->{PASSWORD},0,8), # Password
+	  substr($confData->{RETRANSMISSION_STATUS},0,1), # retransmission status
+	  $spaces, # not used
+	  $spaces, # not used
+	  substr($confData->{VENDOR_SOFTWARE_VERSION},0,5), # $self->numToStr(5,0,'21'), # vendor software version
+	  substr($confData->{VENDOR_SOFTWARE_UPDATE},0,2), # $self->numToStr(2,0,'52'), # vendor software update
+	  $spaces, # cob file ind
+	  $spaces, # process from date
+	  $spaces, # process thru date
+	  $spaces, # acknowledged request  (required)
+	  $spaces, # date of receipt
+	  $spaces, # filler national
+	  ),
 		NSF_ENVOY . ""  =>	
  	  sprintf("%-3s%-16s%-9s%-6s%-6s%-33s%-30s%-30s%-20s%-2s%-9s%-5s%-33s%-10s%-8s%-6s%-5s%-11s%-1s%5s%5s%-4s%-8s%-1s%-16s%-1s%-5s%-2s%-2s%-28s",
 	  substr($self->recordType(),0,3),

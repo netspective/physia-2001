@@ -37,6 +37,34 @@ sub new
 	$params{referingPhysicianState} = undef;
 	$params{id} = undef;
 
+	$params{returnToLimitedWorkAnticipatedDate} = undef;
+	$params{maximumImpovementAnticipatedDate} = undef;
+	$params{returnToFullTimeWorkAnticipatedDate} = undef;
+	$params{injuryHistory} = undef;
+	$params{pastMedicalHistory} = undef;
+	$params{clinicalFindings} = undef;
+	$params{laboratoryTests} = undef;
+	$params{treatmentPlan} = undef;
+	$params{referralInfo} = undef;
+	$params{medications} = undef;
+	$params{prognosis} = undef;
+	$params{dateMailedToEmployee} = undef;
+	$params{dateMailedToInsurance} = undef;
+
+	$params{activityType} = undef;
+	$params{activityDate} = undef;
+	$params{reasonForReport} = undef;
+	$params{changeInCondition} = undef;
+	$params{complianceByEmployee} = undef;
+
+	$params{maximumImprovement} = undef;
+	$params{maximumImprovementDate} = undef;
+	$params{impairmentRating} = undef;
+	$params{doctorType} = undef;
+	$params{examiningDoctorType} = undef;
+	$params{MaximumImprovementAgreement} = undef;
+	$params{ImpairmentRatingAgreement} = undef;
+
 	return bless \%params, $type;
 }
 
@@ -390,6 +418,303 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	{
 		return "";
 	}
+}
+
+
+sub getReturnToLimitedWorkAnticipatedDate
+{
+	my $self = shift;
+	return $self->{returnToLimitedWorkAnticipatedDate};
+}
+
+sub getMaximumImprovementAnticipatedDate
+{
+	my $self = shift;
+	return $self->{maximumImpovementAnticipatedDate};
+}
+
+sub getReturnToFullTimeWorkAnticipatedDate
+{
+	my $self = shift;
+	return $self->{returnToFullTimeWorkAnticipatedDate};
+}
+
+sub getInjuryHistory
+{
+	my $self = shift;
+	return $self->{injuryHistory};
+}
+
+sub getPastMedicalHistory
+{
+	my $self = shift;
+	return $self->{pastMedicalHistory};
+}
+
+
+sub getClinicalFindings
+{
+	my $self = shift;
+	return $self->{clinicalFindings};
+}
+
+sub getLaboratoryTests
+{
+	my $self = shift;
+	return $self->{laboratoryTests};
+}
+
+sub getTreatmentPlan
+{
+	my $self = shift;
+	return $self->{treatmentPlan};
+}
+
+sub getReferralInfo
+{
+	my $self = shift;
+	return $self->{referralInfo};
+}
+
+sub getMedications
+{
+	my $self = shift;
+	return $self->{medications};
+}
+
+sub getPrognosis
+{
+	my $self = shift;
+	return $self->{prognosis};
+}
+
+sub getDateMailedToEmployee
+{
+	my $self = shift;
+	return $self->{dateMailedToEmployee};
+}
+
+sub getDateMailedToInsurance
+{
+	my $self = shift;
+	return $self->{dateMailedToInsurance};
+}
+
+sub getActivityType
+{
+	my $self = shift;
+	return $self->{activityType};
+}
+
+sub getActivityDate
+{
+	my $self = shift;
+	return $self->{activityDate};
+}
+
+sub getReasonForReport
+{
+	my $self = shift;
+	return $self->{reasonForReport};
+}
+
+sub getChangeInCondition
+{
+	my $self = shift;
+	return $self->{changeInCondition};
+}
+
+sub getComplianceByEmployee
+{
+	my $self = shift;
+	return $self->{complianceByEmployee};
+}
+
+sub getMaximumImprovementDate
+{
+	my $self = shift;
+	return $self->{maximumImprovementDate};
+}
+
+sub getMaximumImprovement
+{
+	my $self = shift;
+	return $self->{maximumImprovement};
+}
+
+sub getImpairmentRating
+{
+	my $self = shift;
+	return $self->{impairmentRating};
+}
+
+sub getDoctorType
+{
+	my $self = shift;
+	return $self->{doctorType};
+}
+
+
+sub getExaminingDoctorType
+{
+	my $self = shift;
+	return $self->{examiningDoctorType};
+}
+
+sub getMaximumImprovementAgreement
+{
+	my $self = shift;
+	return $self->{maximumImprovementAgreement};
+}
+
+sub getImpairmentRatingAgreement
+{
+	my $self = shift;
+	return $self->{impairmentRatingAgreement};
+}
+
+sub setReturnToLimitedWorkAnticipatedDate
+{
+	my ($self,$value) = @_;
+	$self->{returnToLimitedWorkAnticipatedDate} = $value;
+}
+
+sub setMaximumImprovementAnticipatedDate
+{
+	my ($self,$value) = @_;
+	$self->{maximumImpovementAnticipatedDate} = $value;
+}
+
+sub setReturnToFullTimeWorkAnticipatedDate
+{
+	my ($self,$value) = @_;
+	$self->{returnToFullTimeWorkAnticipatedDate} = $value;
+}
+
+sub setInjuryHistory
+{
+	my ($self,$value) = @_;
+	$self->{injuryHistory} = $value;
+}
+
+sub setPastMedicalHistory
+{
+	my ($self,$value) = @_;
+	$self->{pastMedicalHistory} = $value;
+}
+
+sub setClinicalFindings
+{
+	my ($self,$value) = @_;
+	$self->{clinicalFindings} = $value;
+}
+
+sub setLaboratoryTests
+{
+	my ($self,$value) = @_;
+	$self->{laboratoryTests} = $value;
+}
+
+sub setTreatmentPlan
+{
+	my ($self,$value) = @_;
+	$self->{treatmentPlan} = $value;
+}
+
+sub setReferralInfo
+{
+	my ($self,$value) = @_;
+	$self->{referralInfo} = $value;
+}
+
+sub setMedications
+{
+	my ($self,$value) = @_;
+	$self->{medications} = $value;
+}
+
+sub setPrognosis
+{
+	my ($self,$value) = @_;
+	$self->{prognosis} = $value;
+}
+
+sub setDateMailedToEmployee
+{
+	my ($self,$value) = @_;
+	$self->{dateMailedToEmployee} = $value;
+}
+
+sub setDateMailedToInsurance
+{
+	my ($self,$value) = @_;
+	$self->{dateMailedToInsurance} = $value;
+}
+
+sub setActivityType
+{
+	my ($self,$value) = @_;
+	$self->{activityType} = $value;
+}
+
+sub setActivityDate
+{
+	my ($self,$value) = @_;
+	$self->{activityDate} = $value;
+}
+
+sub setChangeInCondition
+{
+	my ($self,$value) = @_;
+	$self->{changeInCondition} = $value;
+}
+
+sub setComplianceByEmployee
+{
+	my ($self,$value) = @_;
+	$self->{complianceByEmployee} = $value;
+}
+
+sub setMaximumImprovement
+{
+	my ($self,$value) = @_;
+	$self->{maximumImprovement} = $value;
+}
+
+sub setMaximumImprovementDate
+{
+	my ($self,$value) = @_;
+	$self->{maximumImprovementDate} = $value;
+}
+
+sub setImpairmentRating
+{
+	my ($self,$value) = @_;
+	$self->{impairmentRating} = $value;
+}
+
+sub setDoctorType
+{
+	my ($self,$value) = @_;
+	$self->{doctorType} = $value;
+}
+
+sub setExaminingDoctorType
+{
+	my ($self,$value) = @_;
+	$self->{examiningDoctorType} = $value;
+}
+
+sub setMaximumImprovementAgreement
+{
+	my ($self,$value) = @_;
+	$self->{maximumImprovementAgreement} = $value;
+}
+
+sub setImpairmentRatingAgreement
+{
+	my ($self,$value) = @_;
+	$self->{ImpairmentRatingAgreement} = $value;
 }
 
 @CHANGELOG =

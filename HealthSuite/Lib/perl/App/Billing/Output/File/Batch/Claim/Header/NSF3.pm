@@ -63,6 +63,22 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,	# Filler National
 	$spaces		# Filler Local
 	),
+	NSF_THIN . "" =>
+	sprintf("%-3s%-2s%-17s%-20s%-12s%-1s%-30s%-30s%-20s%-2s%-9s%-10s%-164s",
+	$self->recordType(),
+	$spaces,	# Reserved Filler
+	substr($inpClaim->{careReceiver}->getAccountNo(), 0, 17), # Patient Control Number
+	substr($claimLegalRepresentator->getLastName ,0,20),    # Last name
+	substr($claimLegalRepresentator->getFirstName ,0,12),	# First Name
+	substr($claimLegalRepresentator->getMiddleInitial ,0,1),	# Middle Initial
+	substr($claimLegalRepresentatorAddress->getAddress1 ,0,30),	# Address 1
+	substr($claimLegalRepresentatorAddress->getAddress2 ,0,30),	# Address 2
+	substr($claimLegalRepresentatorAddress->getCity ,0,20), 	# City
+	substr($claimLegalRepresentatorAddress->getState() ,0,2),	# State
+	substr($claimLegalRepresentatorAddress->getZipCode() ,0,9),	# ZipCode
+	$spaces,	# Responsible Party Telephone Number
+	$spaces,	# Filler National
+	),
     NSF_ENVOY . "" =>	
 	sprintf("%-3s%-2s%-17s%-20s%-10s%-2s%1s%-18s%-12s%-18s%-12s%-15s%-5s%-2s%-9s%-10s%-82s%-82s",
 	$self->recordType(),

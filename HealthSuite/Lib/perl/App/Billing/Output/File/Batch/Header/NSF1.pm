@@ -48,9 +48,11 @@ sub formatData
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
+	
 	my $claimPayToProvider = $firstClaim->{payToOrganization};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
 	my $emcId;
+	
 	
 	for my $eachClaim (0..$#$inpClaim)
 	{
@@ -69,7 +71,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
-  	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
 	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  $spaces, # reserved filler 
@@ -93,6 +95,37 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # reserved filler
 	  $spaces, # filler local
 	  ),
+	  NSF_THIN . "" =>		
+	  sprintf("%-3s%-15s%-3s%4d%-6s%-9s%-6s%-1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%-1s%-3s%-15s%-15s%-15s%-15s%-1s%-26s",
+	  $self->recordType(),
+	  substr($emcId,0,15), # group provider id
+	  $self->batchType(),
+	  $self->numToStr(4,0,$container->getSequenceNo()), # batch no
+	  $self->numToStr(6,0,$container->getSequenceNo()),  # batch id
+  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+	  $spaces, # reserved
+	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
+	  $spaces, # national provider id
+	  substr($claimRenderingProvider->getPIN(),0,6), # prov UPIN-USIN id
+	  $spaces, # reserved filler
+      $spaces, # prov medicaid no
+	  $spaces, # prov champus no
+	  $spaces, # prov blue sheild no
+	  $spaces, # prov commercial no.
+	  $spaces, # prov no 1
+	  $spaces, # prov no 2
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,33),
+	  $spaces, #substr($claimPayToProvider->getLastName(),0,20),
+	  $spaces, #substr($claimPayToProvider->getFirstName(),0,10),
+	  $spaces, #substr($claimPayToProvider->getMiddleInitial(),0,1),
+	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
+	  $spaces, # speciality license number
+	  $spaces, # state license number
+	  $spaces, # dentist license number
+	  $spaces, # anesthesia license number
+	  $spaces, # prov participate ind
+	  $spaces, # filler national
+	  ),
 	  NSF_ENVOY . "" =>
 	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-12s%1s%1s",
 	  $self->recordType(),
@@ -100,7 +133,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
-  	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
 	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  substr((($firstClaim->getFilingIndicator() eq 'P') && ($firstClaim->getSourceOfPayment() eq 'C')) ? $claimPayToProvider->getMedicareId() : $spaces,0,10), # medicare no.

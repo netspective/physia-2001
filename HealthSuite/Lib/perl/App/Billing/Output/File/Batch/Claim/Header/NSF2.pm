@@ -60,6 +60,19 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # new patient
 	$spaces, # filler
 	),
+	NSF_THIN . "" =>
+	sprintf("%-3s%-2s%-17s%-10s%3d%7d%6d%9d%-1s%-262s",
+	$self->recordType(),
+	$spaces, # reserved filler
+	substr($inpClaim->{careReceiver}->getAccountNo(), 0, 17),
+	$spaces, # purchase order no
+	$spaces, # tribe
+	$spaces, # residency code
+	$spaces, # pat health rec
+	$spaces, # auth fac no
+	$spaces, # multi claim ind
+	$spaces, # filler national
+	),
 	NSF_ENVOY . "" =>
 	sprintf("%-3s%-2s%-17s%-10s%3d%7d%6d%-9s%1s%-262s",
 	$self->recordType(),

@@ -73,7 +73,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimCareReceiver->getDeathIndicator(), 0, 1),    # patient death indicator
 	substr(($refClaimCareReceiver->getDeathIndicator() eq 'D' ? $refClaimCareReceiver->getDateOfDeath():$spaces), 0, 1),    # patient date of death
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
-	$spaces,  # claim editing indicator
+	'F',  # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
 	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
 	$spaces,  # ORIGIN CODE	
@@ -107,6 +107,39 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # department code
 	$spaces, # filler
 	$spaces, # filler
+	),
+	NSF_THIN . "" =>
+	sprintf("%-3s%-2s%-17s%-20s%-12s%-1s%-3s%-8s%-1s%-1s%-30s%-30s%-20s%-2s%-9s%-10s%-1s%-1s%-1s%-1s%-8s%-1s%-1s%-2s%-1s%-9s%-17s%-15s%-6s%-87s",
+	$self->recordType(),
+	$spaces, # reserved filler
+	substr($refClaimCareReceiver->getAccountNo(), 0, 17), # patient control number
+	substr($refClaimCareReceiver->getLastName(), 0, 20),  # patient last name
+	substr($refClaimCareReceiver->getFirstName(), 0, 12), # patient first name
+	substr($refClaimCareReceiver->getMiddleInitial(), 0, 1), # patient middle initial
+	$spaces, # patient generation
+	substr($refClaimCareReceiver->getDateOfBirth(), 0, 8), # patient date of birth
+	substr($refClaimCareReceiver->getSex(),0,1), # patient sex
+	$spaces, # patient type of residence
+	substr($refClaimCareReceiverAddress->getAddress1(), 0, 30), # patient address 1
+	substr($refClaimCareReceiverAddress->getAddress2(), 0, 30), # patient address 2
+	substr($refClaimCareReceiverAddress->getCity(), 0, 20), # patient city
+	substr($refClaimCareReceiverAddress->getState(), 0, 2), # patient state
+	substr($refClaimCareReceiverAddress->getZipCode(), 0, 5) . $self->numToStr(9 - length($refClaimCareReceiverAddress->getZipCode()),0,"0"), # patient zip code
+	substr($refClaimCareReceiverAddress->getTelephoneNo(), 0, 10), # patient telephone no.
+	substr($refClaimCareReceiver->getStatus(), 0, 1), # patient marital status
+	substr($refClaimCareReceiver->getStudentStatus(), 0, 1), # patient student status
+	substr($refClaimCareReceiver->getEmploymentStatus(), 0, 1), # patient employement status
+	substr($refClaimCareReceiver->getDeathIndicator(), 0, 1),    # patient death indicator
+	substr(($refClaimCareReceiver->getDeathIndicator() eq 'D' ? $refClaimCareReceiver->getDateOfDeath():$spaces), 0, 8),    # patient date of death
+	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
+	$spaces,  # claim editing indicator
+	$spaces,  # TYPE OF CLAIM INDICATOR
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
+	$spaces,  # ORIGIN CODE	
+	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	$spaces,  # PROVIDER NUMBER
+	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
+	$spaces,  # filler national
 	),
 	NSF_ENVOY . "" =>	
 	sprintf("%-3s%1s%1s%-17s%-20s%-10s%-2s%1s%-3s%-8s%1s%1s%-18s%-12s%-30s%-15s%-5s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-13s%-2s%-6s%-20s%-43s%-14s%-10s",

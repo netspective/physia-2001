@@ -60,6 +60,21 @@ my %nsfType = (NSF_HALLEY . ""  =>
   	  $spaces, # filler national
 	  $spaces, # filler local
 	  )."\n",
+	  NSF_THIN . ""  =>
+	  sprintf("%-3s%-16s%-9s%-16s%7s%7s%7s%4s%11s%11s%11s%-218s",
+	  $self->recordType(),
+	  substr($confData->{SUBMITTER_ID},0,16), # submitter id (for time being physia id is entered)
+	  $spaces, # reserved filler
+	  substr($confData->{RECEIVER_ID},0,16), # receiver id
+	  $self->numToStr(7,0,$container->{fileServiceLineCount}),
+	  $self->numToStr(7,0,$container->{fileRecordCount}),
+	  $self->numToStr(7,0,$container->{fileClaimCount}),
+	  $self->numToStr(4,0,$container->{batchCount}),
+	  $self->numToStr(9,2,$container->{fileTotalCharges}),
+  	  $spaces, # file total paid amount
+  	  $spaces, # file total allowed amount
+	  $spaces, # filler national
+	  )."\n",
 	  NSF_ENVOY . "" =>
 	  sprintf("%-3s%-16s%-9s%-5s%-11s%7s%7s%7s%4s%11s%-120s%-120s",
 	  $self->recordType(),

@@ -53,6 +53,7 @@ sub processFile
 	$self->{medicareClaimsList} = new App::Billing::Claims;
 	$self->{medicaidClaimsList} = new App::Billing::Claims;
 	$self->{workerscompClaimsList} = new App::Billing::Claims;
+	
     $self->{payerClaimsBatch} = {	4 => $self->{medicareClaimsList},
 					5 => $self->{medicaidClaimsList},
 					6 => $self->{workerscompClaimsList}

@@ -115,87 +115,199 @@ sub processClaim
 	$self->prepareClaimHeader($tempClaim,$outArray, $nsfType);
 	
 	
+	my $recordCreationCondition = {NSF_ENVOY . "" => {'DA0' => sub { return 1;},
+												'DA1' => sub { return 1;},
+												'DA2' => sub { 
+		 														if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() eq $tempClaim->{payToProvider}->{address}->getCity())	&&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() eq $tempClaim->{payToProvider}->{address}->getState()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() eq $tempClaim->{payToProvider}->{address}->getZipCode())) 
+																	{
+																		return 1;
+																	} 								
+																else {return 0;}									
+										 
+															},
+												'DAat' => sub {
+															    if (($tempClaim->getFilingIndicator() =~ /['M','P']/ ) ||
+														    	   ($tempClaim->getSourceOfPayment() =~ /['G','P']/))
+														    	   {
+														    	   		return 1;
+														    	   	}
+															     else { return 0;}
+														     	},
+							 					'EA0' => sub { return 1;},
+							 					'EA1' => sub { 	
+ 																if($tempClaim->{procedures}->[0] ne "")
+																{
+																	if(($tempClaim->{treatment}->getOutsideLab() eq 'Y') || (($tempClaim->{procedures}->[0]->getPlaceOfService() ne '11') && ($tempClaim->{procedures}->[0]->getPlaceOfService() ne '12')))
+								    								{
+																		return 1;    	
+																	}
+																	else {return 0;}	
+								 								}
+														    	else
+							    								{
+																	if(($tempClaim->{treatment}->getOutsideLab() eq 'Y'))
+	    															{
+																		return 1;
+																	}
+																	else { return 0;}	
+																}
+															},
+							 					'EAat' => sub { return 1;},
+							 					'FA0' => sub { return 1;},
+							 					'FAat' => sub { return 1;},
+												'FB1' => sub { return 0;}
+ 											},	
+					 		 NSF_HALLEY . "" => {'DA0' => sub { return 1;},
+											'DA1' => sub { return 1;},
+											'DA2' => sub { 
+		 													if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() eq $tempClaim->{payToProvider}->{address}->getCity())	&&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() eq $tempClaim->{payToProvider}->{address}->getState()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() eq $tempClaim->{payToProvider}->{address}->getZipCode())) 
+																{
+																	return 1;
+																} 								
+																else {return 0;}									
+															},
+											'DAat' => sub {return 0;},
+ 											'EA0' => sub { return 1;},
+						 					'EA1' => sub { 	
+ 															if($tempClaim->{procedures}->[0] ne "")
+															{
+																if(($tempClaim->{treatment}->getOutsideLab() eq 'Y') || (($tempClaim->{procedures}->[0]->getPlaceOfService() ne '11') && ($tempClaim->{procedures}->[0]->getPlaceOfService() ne '12')))
+	    														{
+																	return 1;    	
+																}
+																else {return 0;}	
+														 	}
+							    							else
+							    							{
+																if(($tempClaim->{treatment}->getOutsideLab() eq 'Y'))
+	    														{
+																	return 1;
+																}
+																else { return 0;}	
+															}
+														},
+						 					'EAat' => sub { return 0;},
+ 											'FA0' => sub { return 1;},
+						 					'FAat' => sub { return 0;},
+						 					'FB1' => sub { return 1;}
+ 										},
+ 					NSF_THIN . "" => {'DA0' => sub { return 1;},
+									'DA1' => sub { 									
+												if(($tempClaim->getFilingIndicator() eq 'P') && ($tempClaim->getSourceOfPayment() eq 'H'))
+												{
+													return 0;
+												}
+												else
+												{
+													return 1;
+												}
+											},
+									'DA2' => sub { 
+
+	#											if(($tempClaim->{insured}->getFilingIndicator() eq 'P') && ($tempClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment() eq 'H')
+
+												if(($tempClaim->getFilingIndicator() eq 'P') && ($tempClaim->getSourceOfPayment() eq 'H'))
+												{
+													return 1;
+												}
+												else
+												{
+													return 0;
+												}
+										},
+									'DAat' => sub {return 0;},
+ 									'EA0' => sub { return 1;},
+						 			'EA1' => sub { 	return 1;},
+						 			'EAat' => sub { return 0;},
+ 									'FA0' => sub { return 1;},
+						 			'FAat' => sub { return 0;},
+						 			'FB1' => sub { return 1;}
+ 								}	
+	
+ 		 													
+ 					};				
+
+		 
+		
+								 
+	
 	my $payerCount = $tempClaim->getClaimType() + 1;
 	
+
 	for my $payersLoop (1..$payerCount)
 	{
-		$self->setSequenceNo($payersLoop);
-		$self->incCountXXX('dXXX');
-		$self->{DA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA0;
-    	push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
-   	
-   
-   		$self->setSequenceNo($payersLoop);
-		$self->incCountXXX('dXXX');
-		$self->{DA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA1;
-		push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
-   
-		if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
-		($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
-		($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() eq $tempClaim->{payToProvider}->{address}->getCity())	&&
-		($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() eq $tempClaim->{payToProvider}->{address}->getState()) &&
-		($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() eq $tempClaim->{payToProvider}->{address}->getZipCode()))
+		if(&{$recordCreationCondition->{$nsfType}->{DA0}} == 1)
+		{
+			$self->setSequenceNo($payersLoop);
+			$self->incCountXXX('dXXX');
+			$self->{DA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA0;
+    		push(@$outArray,$self->{DA0Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
+   		}
+  
+		if(&{$recordCreationCondition->{$nsfType}->{DA1}} == 1)
+		{
+	   		$self->setSequenceNo($payersLoop);
+			$self->incCountXXX('dXXX');
+			$self->{DA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA1;
+			push(@$outArray,$self->{DA1Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
+  		} 
+		if(&{$recordCreationCondition->{$nsfType}->{DA2}} == 1)
 		{
    			$self->setSequenceNo($payersLoop);
 		   	$self->incCountXXX('dXXX');
 			$self->{DA2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DA2;
-	   		 push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
+	   		push(@$outArray,$self->{DA2Obj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
 		}
-   	
-	   if ((($tempClaim->getFilingIndicator() =~ /['M','P']/ ) ||
-    	   ($tempClaim->getSourceOfPayment() =~ /['G','P']/)) && ($nsfType == NSF_ENVOY))
-	   { 
+   	   	if(&{$recordCreationCondition->{$nsfType}->{DAat}} == 1)
+		{
     		$self->setSequenceNo($payersLoop);
     		$self->incCountXXX('dXXX');
 		 	$self->{DAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::DAat;
 		    push(@$outArray,$self->{DAatObj}->formatData($self, {RECORDFLAGS_NONE => $payersLoop - 1} , $tempClaim, $nsfType));
 	   }
-   }
-   
-   	$self->setSequenceNo(1);
-   	$self->incCountXXX('eXXX');
-	$self->{EA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA0;
-    push(@$outArray,$self->{EA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+   } # end of for loop for payers (DAx)
 	
-	if($tempClaim->{procedures}->[0] ne "")
-	{
-		if(($tempClaim->{treatment}->getOutsideLab() eq 'Y') || (($tempClaim->{procedures}->[0]->getPlaceOfService() ne '11') && ($tempClaim->{procedures}->[0]->getPlaceOfService() ne '12')))
-	    {
-		   	$self->setSequenceNo(1);
-   			$self->incCountXXX('eXXX');
-			$self->{EA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA1;
-	    	push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
-    	}	
-    }
-    else
-    {
-		if(($tempClaim->{treatment}->getOutsideLab() eq 'Y'))
-	    	{
-		   		$self->setSequenceNo(1);
-   				$self->incCountXXX('eXXX');
-				$self->{EA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA1;
-	    		push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
-    		}	
-	}
-
-	if ($nsfType == NSF_ENVOY)
+   if(&{$recordCreationCondition->{$nsfType}->{EA0}} == 1)
+   {
+	   	$self->setSequenceNo(1);
+   		$self->incCountXXX('eXXX');
+		$self->{EA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA0;
+	    push(@$outArray,$self->{EA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+   }	
+   if(&{$recordCreationCondition->{$nsfType}->{EA1}} == 1)
+   {
+	   	$self->setSequenceNo(1);
+		$self->incCountXXX('eXXX');
+		$self->{EA1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EA1;
+	   	push(@$outArray,$self->{EA1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+   	}	
+	if(&{$recordCreationCondition->{$nsfType}->{EAat}} == 1)
 	{
 	   	$self->setSequenceNo(1);
    		$self->incCountXXX('eXXX');
 		$self->{EAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::EAat;
     	push(@$outArray,$self->{EAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
    	}
-
-
-   	$self->setSequenceNo(1);
-   	$self->{FA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FA0;
-	if ($nsfType == NSF_ENVOY)
+	if(&{$recordCreationCondition->{$nsfType}->{FA0}} == 1)
+	{
+	   	$self->setSequenceNo(1);
+   		$self->{FA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FA0;
+   	}
+	if(&{$recordCreationCondition->{$nsfType}->{FAat}} == 1)
 	{
 	   	$self->{FAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FAat;
     }
-    elsif($nsfType == NSF_HALLEY)
-    {
-    	$self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
+	if(&{$recordCreationCondition->{$nsfType}->{FB1}} == 1)
+	{
+	   	$self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
     }
     
    	my $proceduresCount = $tempClaim->{procedures};
@@ -204,13 +316,16 @@ sub processClaim
 	   	for my $i (0..$#$proceduresCount)
    		{
    		
-	    	push(@$outArray,$self->{FA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
-    		if ($nsfType == NSF_ENVOY)
+			if(&{$recordCreationCondition->{$nsfType}->{FA0}} == 1)
+			{
+		    	push(@$outArray,$self->{FA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+		    }
+	   		if(&{$recordCreationCondition->{$nsfType}->{FAat}} == 1)
 			{
 			    push(@$outArray,$self->{FAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 		    }
-		    elsif($nsfType == NSF_HALLEY)
-		    {
+    		if(&{$recordCreationCondition->{$nsfType}->{FB1}} == 1)
+			{
 		    	push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 			}
 	    

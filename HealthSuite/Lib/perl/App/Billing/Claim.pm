@@ -111,6 +111,8 @@ sub new
 	$params{providerEMCId} = undef;
 	$params{invoiceDate} = undef;
 
+	$params{changedTreatingDoctor} = undef;
+
 	return bless \%params, $type; #binding the param hash with class reference
 }
 	
@@ -1243,6 +1245,18 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	{
 		return "";
 	}
+}
+
+sub getChangedTreatingDoctor
+{
+	my $self = shift;
+	return $self->{changedTreatingDoctor};
+}
+
+sub setChangedTreatingDoctor
+{
+	my ($self,$value) = @_;
+	$self->{changedTreatingDoctor} = $value;
 }
 
 @CHANGELOG =
