@@ -154,7 +154,7 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
 	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
-	$profileLine .=  '&nbsp;Hours of Operation: #property.org_hrs_oper# ' if $self->property('org_hrs_oper');
+	$profileLine .=  '&nbsp;Hours of Operation: #property.org_hrs_oper# #property.org_time_zone#' if $self->property('org_hrs_oper');
 
 	my $chooseAction = '';
 	$chooseAction = qq{
