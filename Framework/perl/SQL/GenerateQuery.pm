@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.7 2000-10-10 21:21:09 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.8 2000-10-13 02:12:59 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
@@ -11,32 +11,32 @@ use vars qw(%CACHE $COMPARISONS);
 %CACHE = ();
 
 $COMPARISONS = [
-	{id => 'startswith', caption => 'starts with', operator => 'LIKE', value => '$%'},
-	{id => 'endswith', caption => 'ends with', operator => 'LIKE', value => '%$'},
-	{id => 'is', caption => 'is', operator => '='},
-	{id => 'isnot', caption => 'is not', operator => '!='},
-	{id => 'contains', caption => 'contains', operator => 'LIKE', value => '%$%' },
-	{id => 'doesnotcontain', caption => 'does not contain', operator => 'NOT LIKE', value => '%$%'},
-	{id => 'greaterthan', caption => 'greater than', operator => '>'},
-	{id => 'lessthan', caption => 'less than', operator => '<'},
-	{id => 'isdefined', caption => 'is defined', operator => 'IS NOT NULL', value => ''},
-	{id => 'isnotdefined', caption => 'is not defined', operator => 'IS NULL', value => ''},
-	{id => 'matches', caption => 'matches', operator => 'LIKE'},
-	{id => 'doesnotmatch', caption => 'does not match', operator => 'NOT LIKE'},
-	{id => 'between', caption => 'is between', operator => 'BETWEEN', placeholder => '? AND ?'},
-	{id => 'notbetween', caption => 'is not between', operator => 'NOT BETWEEN', placeholder => '? AND ?'},
-	{id => 'oneof', caption => 'is one of', operator => 'IN', placeholder => '(?[, ?]+)'},
-	{id => 'notoneof', caption => 'is not one of', operator => 'NOT IN', placeholder => '(?[, ?]+)'},
-	{id => 'gtany', caption => 'greater than any one of', operator => '> ANY', placeholder => '(?[, ?]+)'},
-	{id => 'geany', caption => 'greater than or is any one of', operator => '>= ANY', placeholder => '(?[, ?]+)'},
-	{id => 'ltany', caption => 'less than any one of', operator => '< ANY', placeholder => '(?[, ?]+)'},
-	{id => 'leany', caption => 'less than or is any one of', operator => '<= ANY', placeholder => '(?[, ?]+)'},
-	{id => 'gtall', caption => 'greater than all of', operator => '> ALL', placeholder => '(?[, ?]+)'},
-	{id => 'geall', caption => 'greater than or is all of', operator => '>= ALL', placeholder => '(?[, ?]+)'},
-	{id => 'ltall', caption => 'less than all of', operator => '< ALL', placeholder => '(?[, ?]+)'},
-	{id => 'leall', caption => 'less than or is all of', operator => '<= ALL', placeholder => '(?[, ?]+)'},
-	{id => 'exists', caption => 'exists', operator => 'EXISTS', placeholder => '@'},
-	{id => 'notexists', caption => 'does not exist', operator => 'NOT EXISTS', placeholder => '@'},
+	{id => 'startswith', caption => 'starts with', operator => 'LIKE', value => '$%', exact => 'no'},
+	{id => 'endswith', caption => 'ends with', operator => 'LIKE', value => '%$', exact => 'no'},
+	{id => 'is', caption => 'is', operator => '=', exact => 'yes'},
+	{id => 'isnot', caption => 'is not', operator => '!=', exact => 'yes'},
+	{id => 'contains', caption => 'contains', operator => 'LIKE', value => '%$%', exact => 'no' },
+	{id => 'doesnotcontain', caption => 'does not contain', operator => 'NOT LIKE', value => '%$%', exact => 'no'},
+	{id => 'greaterthan', caption => 'greater than', operator => '>', exact => 'yes'},
+	{id => 'lessthan', caption => 'less than', operator => '<', exact => 'yes'},
+	{id => 'isdefined', caption => 'is defined', operator => 'IS NOT NULL', value => '', exact => 'yes'},
+	{id => 'isnotdefined', caption => 'is not defined', operator => 'IS NULL', value => '', exact => 'yes'},
+	{id => 'matches', caption => 'matches', operator => 'LIKE', exact => 'no'},
+	{id => 'doesnotmatch', caption => 'does not match', operator => 'NOT LIKE', exact => 'no'},
+	{id => 'between', caption => 'is between', operator => 'BETWEEN', placeholder => '? AND ?', exact => 'yes'},
+	{id => 'notbetween', caption => 'is not between', operator => 'NOT BETWEEN', placeholder => '? AND ?', exact => 'yes'},
+	{id => 'oneof', caption => 'is one of', operator => 'IN', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'notoneof', caption => 'is not one of', operator => 'NOT IN', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'gtany', caption => 'greater than any one of', operator => '> ANY', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'geany', caption => 'greater than or is any one of', operator => '>= ANY', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'ltany', caption => 'less than any one of', operator => '< ANY', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'leany', caption => 'less than or is any one of', operator => '<= ANY', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'gtall', caption => 'greater than all of', operator => '> ALL', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'geall', caption => 'greater than or is all of', operator => '>= ALL', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'ltall', caption => 'less than all of', operator => '< ALL', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'leall', caption => 'less than or is all of', operator => '<= ALL', placeholder => '(?[, ?]+)', exact => 'yes'},
+	{id => 'exists', caption => 'exists', operator => 'EXISTS', placeholder => '@', exact => 'yes'},
+	{id => 'notexists', caption => 'does not exist', operator => 'NOT EXISTS', placeholder => '@', exact => 'yes'},
 ];
 
 # Turn it into a Psuedo-Hash
@@ -355,6 +355,7 @@ sub new
 	my $field = shift;
 	my $comparison = shift;
 	my @criteria = @_;
+	my $options = @criteria && ref($criteria[-1]) eq 'HASH' ? pop @criteria : {};
 	my $fieldDefn;
 
 	$class = ref($class) || $class;
@@ -364,7 +365,7 @@ sub new
 	$self->{sqlGen} = $sqlGen;
 
 	# Validate the field & get the join name
-	die "Field '$_' is invalid" unless $sqlGen->fields($field);
+	die "Field '$field' is invalid" unless $sqlGen->fields($field);
 	if ($field =~ /\{/)
 	{
 		my @fields = $field =~ /\{(\w+)\}/g;
@@ -388,6 +389,7 @@ sub new
 			criteria => \@criteria,
 			startParen => 0,
 			endParen => 0,
+			options => $options,
 			join => '',
 		};
 	$compareHash->{fieldDefn} = $fieldDefn if defined $fieldDefn;
@@ -479,6 +481,7 @@ sub genSQL
 	my @ORDER_BY = ();
 	my @GROUP_BY = ();
 	my @bindParams = ();
+	my $needGroupBy = 0;
 
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
 
@@ -507,8 +510,28 @@ sub genSQL
 
 		my $fieldData = $sqlGen->fields($field);
 		my $columnDefn = defined $fieldData->{join} ? $fieldData->{join} . "." : '';
-		$columnDefn .= defined $fieldData->{'comp-column'} ? $fieldData->{'comp-column'} : $fieldData->{column};
-		my $compData = $sqlGen->comparisons($comparison);
+		if (defined $fieldData->{column})
+		{
+			$columnDefn .= $fieldData->{column};
+		}
+		elsif (defined $fieldData->{columndefn})
+		{
+			$columnDefn = $fieldData->{columndefn};
+		}
+		else
+		{
+			die "Field must have a column or columndefn defined";
+		}
+
+
+		# Get a copy of the default comparison operator data
+		my $compData = { %{$sqlGen->comparisons($comparison)} };
+
+		# Add overridden parameters to the comparison operator data
+		foreach my $opt (keys %{$compare->{options}})
+		{
+			$compData->{$opt} = $compare->{options}->{$opt};
+		}
 
 		# Add the appropriate FROM tables and join WHERE conditions
 		$self->addTableToFROM($fieldData->{join}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{join};
@@ -563,6 +586,18 @@ sub genSQL
 			$fieldDefn =~ s/(\{\w+\})/$selectCol/;
 			$selectCol = $fieldDefn;
 		}
+
+		# See if we need to use a GROUP BY clause
+		if (defined $fieldData->{groupbyexp} && lc($fieldData->{groupbyexp}) eq 'yes')
+		{
+			$needGroupBy = 1;
+		}
+		else
+		{
+			push @GROUP_BY, $selectCol;
+		}
+
+
 		$selectCol .= " AS $field";
 		push @SELECT, $selectCol;
 
@@ -579,42 +614,12 @@ sub genSQL
 		push @ORDER_BY, $fieldData->{id};
 	}
 
-	# Process the Group By
-	foreach my $field (@{$opts{groupBy}})
-	{
-		my $fieldDefn;
-		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
-
-		# If they gave us a field wrapped in a function call
-		if ($field ne $fieldData->{id})
-		{
-			$fieldDefn = $field;
-			$field = $fieldData->{id};
-		}
-
-		# Add the selected column to the GROUP BY clause
-		my $groupCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
-		$groupCol .= $fieldData->{column};
-		if (defined $fieldData->{columndefn})
-		{
-			$groupCol = $fieldData->{columndefn};
-		}
-
-		if (defined $fieldDefn)
-		{
-			$fieldDefn =~ s/(\{\w+\})/$groupCol/;
-			$groupCol = $fieldDefn;
-		}
-
-		push @GROUP_BY, $groupCol;
-	}
-
-
 	my $SQL = '';
 
 	# SELECT
 	$SQL .= "SELECT";
-	$SQL .= defined $opts{distinct} && $opts{distinct} ? " DISTINCT\n" : "\n";
+	$SQL .= " DISTINCT" if defined $opts{distinct} && lc($opts{distinct}) eq 'yes';
+	$SQL .= "\n";
 	$SQL .= join ",\n", map {"\t$_"} @SELECT;
 	$SQL .= "\n";
 
@@ -632,7 +637,7 @@ sub genSQL
 	}
 
 	# GROUP BY
-	if (@GROUP_BY)
+	if ($needGroupBy && @GROUP_BY)
 	{
 		$SQL .= "GROUP BY\n";
 		$SQL .= join ",\n", map {"\t$_"} @GROUP_BY;
