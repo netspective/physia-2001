@@ -125,6 +125,7 @@ sub prepare_page_content_footer
 	my $self = shift;
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	return 1 if $self->param('_pm_view') eq 'setup';
+	return 1 if $self->param('_stdAction') eq 'dialog';
 
 	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
 	$self->SUPER::prepare_page_content_footer(@_);
@@ -251,7 +252,7 @@ sub getControlBarHtml
 			</SCRIPT>
 			&nbsp; &nbsp;
 			Time:
-			<SELECT name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
+			<SELECT class='controlBar' name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
 				<option value=0>Minutes before/after</option>
 				<option value=1>Range from/to</option>
 			</SELECT>
@@ -260,11 +261,11 @@ sub getControlBarHtml
 				setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
 			</script>
 
-			&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
+			&nbsp;<input class='controlBar' name=time1 size=6 value=$time1 title="$title1">
+			&nbsp;<input class='controlBar' name=time2 size=6 value=$time2 title="$title2">
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-			<input type=submit value="Go">
+			<input class='controlBar' type=submit value="Go">
 		};
 	}
 	else
@@ -289,13 +290,13 @@ sub getControlBarHtml
 		$timeFieldsHtml = qq{
 			&nbsp; &nbsp;
 			Time:
-			<INPUT name=showTimeSelect value="Range from/to" READONLY>
+			<INPUT class='controlBar' name=showTimeSelect value="Range from/to" READONLY>
 
-			&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
+			&nbsp;<input class='controlBar' name=time1 size=6 value=$time1 title="$title1">
+			&nbsp;<input class='controlBar' name=time2 size=6 value=$time2 title="$title2">
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-			<input type=submit value="Go">
+			<input class='controlBar' type=submit value="Go">
 		};
 
 	}
@@ -304,14 +305,14 @@ sub getControlBarHtml
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
 		$javascripts
 		<STYLE>
-			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-			input  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
+			select.controlBar { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
+			input.controlBar  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
 		</STYLE>
 
 		<tr>
 			<FORM name='dateForm' method=POST>
 				<td ALIGN=LEFT>
-					<SELECT onBlur="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
+					<SELECT class='controlBar' onBlur="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
@@ -320,7 +321,7 @@ sub getControlBarHtml
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
 
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
-					<INPUT size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
+					<INPUT class='controlBar' size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 
 					$timeFieldsHtml

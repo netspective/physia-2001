@@ -82,7 +82,7 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'attendee_id',
-			types => ['Patient'],
+			#types => ['Patient'],
 			size => 25,
 			useShortForm => 1,
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
@@ -396,8 +396,23 @@ sub validateAvailTemplate
 	my $field = $self->getField('appt_date_time')->{fields}->[0];
 	my $personId = uc($page->field('attendee_id'));
 
-	if (! $availSlot->{minute_set}->superset($apptMinutesRange) 
-		&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
+	if (defined $availSlot->{minute_set})
+	{
+		if (! $availSlot->{minute_set}->superset($apptMinutesRange) 
+			&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
+		{
+			$field->invalidate($page, qq{
+				All of Part of this time slot is not available.<br>
+				Please check @{[ join(', ', @resource_ids) ]} templates, patient types and visit types. <br>
+				<u>Select action</u>: <br>
+					<input name=_f_whatToDo type=radio value="override"
+						onClick="document.dialog._f_whatToDo[0].checked=true">Override Template.  Make appointment anyway.<br>
+					<input name=_f_whatToDo type=radio value="cancel"
+						onClick="document.dialog._f_whatToDo[1].checked=true">Cancel
+			});
+		}
+	}
+	else	
 	{
 		$field->invalidate($page, qq{
 			All of Part of this time slot is not available.<br>
