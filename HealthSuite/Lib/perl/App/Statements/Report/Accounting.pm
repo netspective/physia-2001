@@ -31,7 +31,7 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 	WHERE	(a.person_id = :1 or :1 is NULL)
 	AND 	(a.invoice_item_id is NULL  or a.item_type in (3) )
 	AND	a.bill_party_type in (0,1)
-	AND a.balance > 0
+	AND a.balance <> 0
 	AND p.person_id = a.person_id
 	AND	a.person_id IN
 	(
@@ -453,7 +453,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
-			AND 	a.balance > 0
+			AND 	a.balance <> 0
 			AND p.person_id = a.person_id
 			AND	a.person_id IN
 			(
@@ -470,8 +470,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient Name', dataFmt => '#0#'},
-				{ colIdx => 1, head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
+				{ colIdx => 0, hAlign=>'left',head => 'Patient Name', dataFmt => '#0#'},
+				{ colIdx => 1, hAlign=>'left', head => 'Patient ID', dataFmt => '#1#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
 				{ colIdx => 2, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#2#',dAlign =>'center' },
 				{ colIdx => 3, head => '0 - 30',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
 				{ colIdx => 4, head => '31 - 60', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
