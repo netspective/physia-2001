@@ -1699,6 +1699,7 @@ sub new
 			subheadFontsAttrs => "face='arial,helvetica' size=2 color=navy",
 			formAttrs => '',
 			captionAlign => 'left',
+			errorsHeading => 'Please review',
 			id => $class,
 		};
 
@@ -2218,7 +2219,7 @@ sub getHtml
 		$errorsHtml = qq{
 		<font $self->{bodyFontAttrs}>
 		<!---<font color=red size=+1><b>There was some incorrect data entered.</b></font><br>--->
-		<font color=red size=+1><b>Please correct the following problems</b></font>:
+		<font color=red size=+1><b>$self->{errorsHeading}</b></font>:
 		<ul>
 			<li>$errorMsgs
 			<SCRIPT>var inErrorMode = 1;</SCRIPT>
