@@ -49,6 +49,34 @@ sub update_for_scheduling
 			echo "---------------------------------------" >> $logFile
 			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
 		});
+		
+		
+		my $sqlFile = $buildDir . '/BUILD_0010_HCFA1500_Modifier_Code.sql';
+		my $logFile = $buildDir . '/BUILD_0010_HCFA1500_Modifier_Code.log';
+	
+		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
+		
+		system(qq{
+			echo "---------------------------------------" >> $logFile
+			date >> $logFile
+			echo "---------------------------------------" >> $logFile
+			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
+		});
+	
+	
+	
+		my $sqlFile = $buildDir . '/BUILD_0010_load_pre_post_code.sql';
+		my $logFile = $buildDir . '/BUILD_0010_load_pre_post_code.log';
+	
+		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
+		
+		system(qq{
+			echo "---------------------------------------" >> $logFile
+			date >> $logFile
+			echo "---------------------------------------" >> $logFile
+			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
+		});		
+		
 	}
 }
 
