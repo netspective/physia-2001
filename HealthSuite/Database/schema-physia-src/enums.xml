@@ -338,6 +338,12 @@
 		<enum>Subhead</enum>
 	</table>
 
+	<table name="Medication_Record_Type" abbrev="MedRecTy" type="Enumeration">
+		<enum>Existing</enum>		
+		<enum>Prescribe</enum>
+		<enum>Refill</enum>
+	</table>
+
 	<table name="Insurance_Record_Type" abbrev="InsRecTy" type="Enumeration">
 		<enum>Category (arbitrary grouping of other records)</enum>
 		<enum>Insurance Product (child of an insurance org)</enum>
