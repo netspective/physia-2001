@@ -128,13 +128,20 @@ sub addPopup_as_html
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags, $mainData) = @_;
-
+	my $flags = $self->{flags};
+	
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
 	{
-		return "$self->{caption}: $mainData<br>";
+		if($flags & FLDFLAG_CUSTOMDRAW)
+		{
+			return $mainData;
+		}
+		else
+		{
+			return qq{@{[ $flags & FLDFLAG_REQUIRED ? "<b>$self->{caption}</b>" : $self->{caption} ]}: $mainData<br>};
+		}
 	}
 	
-	my $flags = $self->{flags};
 	my $readOnly = ($flags & FLDFLAG_READONLY);
 	$mainData ||= '';
 	my $html = '';
@@ -1100,6 +1107,10 @@ sub getHtml
 		$caption = "<b>$caption</b>" if $requiredCols > 0;
 	}
 
+	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
+	{
+		return "$caption: $fieldsHtml<br>";
+	}
 
 	# do some basic variable replacements
 	my $Command = "\u$command";
