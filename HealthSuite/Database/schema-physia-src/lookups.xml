@@ -41,7 +41,7 @@
 		<enum id="2">Alternate</enum>
 		<enum id="4">Billing</enum>
 	</table>
-	
+
 	<table name="Person_Type" type="Lookup">
 		<enum id="0">Patient</enum>
 		<enum id="1" group_name="staff">Physician</enum>
@@ -59,7 +59,7 @@
 		<enum id="01">Self</enum>
 		<enum id="02">Spouse</enum>
 		<enum id="03">Natural/Adopted Child (Insured has Financial Responsibility)</enum>
-		<enum id="04">Natural/Adopted Child (Insured does not have Financial Responsibility)</enum>
+		<enum id="04">Natural/Adopted Child (Insured does not have Financial Resp.)</enum>
 		<enum id="05">Step Child</enum>
 		<enum id="06">Foster Child</enum>
 		<enum id="07">Ward of the Court</enum>
