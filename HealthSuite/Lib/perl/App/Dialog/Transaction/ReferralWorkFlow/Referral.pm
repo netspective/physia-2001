@@ -77,7 +77,7 @@ sub initialize
 				)
 
 				);
-		push (@request, new CGI::Dialog::Field(name=>"skip_field$loop", type=>'hidden'));				
+		push (@request, new CGI::Dialog::Field(name=>"skip_field$loop", type=>'hidden'));
 		push(@request,new CGI::Dialog::Field(name=>"procedure_id$loop", type=>'hidden'));
 	}
 
@@ -166,7 +166,10 @@ sub initialize
 		new CGI::Dialog::Field(caption =>'Date Of Request ', name => 'trans_end_stamp', type => 'date', pastOnly => 1),
 		new CGI::Dialog::MultiField(name => 'coord_status',
 			fields => [
-					new App::Dialog::Field::Person::ID(caption => 'Intake Coordinator', name => 'intake_coordinator', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					new App::Dialog::Field::Person::ID(caption => 'Intake Coordinator',
+																	name => 'intake_coordinator',
+																	readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+																	defaultValue => '#session.user_id#'),
 					new CGI::Dialog::Field(caption => 'Status',
 								name => 'status',
 								options => FLDFLAG_REQUIRED,
@@ -214,8 +217,8 @@ sub initialize
        	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
        	my  $otherPayer = $self->getField('other_payer_fields');
        	$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
-      	my $personSessionId = $page->session('person_id');
-  	$page->field('intake_coordinator',$personSessionId);
+      	#my $personSessionId = $page->session('person_id');
+  #	$page->field('intake_coordinator',$personSessionId);
 
 
   	my $maxrows=MAXROWS;
@@ -235,14 +238,14 @@ sub initialize
   			$count++;
   		}
 	};
-	
-	#Check 
+
+	#Check
 	$count=$count||1; #always show at least one line
        	$self->addPostHtml(
        	qq{
 		<script language="JavaScript1.2">
-		for(loop=$count;loop<$maxrows;loop++)				
-		{			
+		for(loop=$count;loop<$maxrows;loop++)
+		{
 			vals2 =    eval("document.forms.dialog._f_code"+loop+".value");
 			if(vals2.length<1)
 			{
@@ -367,11 +370,11 @@ sub initialize
 		if(!$page->field("referral_type$loop"))
 		{
 			my $refField = $self->getField("referral_type$loop");
-			$refField->invalidate($page, "Referral Type is a required field") 
+			$refField->invalidate($page, "Referral Type is a required field")
 		}
 		if ($data->{description} eq '' or ! defined $data->{description})
 		{
-			$field->invalidate($page, "Invalid Invoice Procedure Code '$code' "); 
+			$field->invalidate($page, "Invalid Invoice Procedure Code '$code' ");
 
 		}
 		$check=1;
@@ -387,16 +390,16 @@ sub initialize
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	#Populate the Procedure Information
        	my $personSessionId = $page->session('person_id');
-       	$page->field('intake_coordinator',$personSessionId);
-       	my $personId = $page->field('person_id');		
-        my $ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $personId);	
-       	my $parentTransId = $ServiceData->{'trans_id'};        
-	my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$parentTransId);      
-	my $count=0;	
-	
+       	#$page->field('intake_coordinator',$personSessionId);
+       	my $personId = $page->field('person_id');
+        my $ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $personId);
+       	my $parentTransId = $ServiceData->{'trans_id'};
+	my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$parentTransId);
+	my $count=0;
+
 	#populate a procedure information
        	if ($serviceProcedures)
-       	{	
+       	{
 		foreach (@$serviceProcedures)
 		{
 			my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$_->{code},$page->session('org_internal_id') );
@@ -417,11 +420,11 @@ sub initialize
 			$self->setFieldFlags("unit_charge$count", FLDFLAG_READONLY);
 			$self->setFieldFlags("comment$count", FLDFLAG_READONLY);
 			$self->setFieldFlags("description$count", FLDFLAG_READONLY);
-			$self->setFieldFlags("referral_type$count", FLDFLAG_READONLY);										
+			$self->setFieldFlags("referral_type$count", FLDFLAG_READONLY);
 			$count++;
 		};
 	}
-	
+
        return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
        if ($ServiceData ne '' && $command eq 'add')
        {
@@ -439,7 +442,7 @@ sub initialize
 
 		$page->field('trans_end_stamp', $ServiceData->{'trans_end_stamp'});
 		$page->field('trans_begin_stamp', $ServiceData->{'trans_begin_stamp'});
-		$page->field('intake_coordinator', $personSessionId);
+		$page->field('intake_coordinator', $ServiceData->{'trans_subtype'});
 		#$page->field('status', $ServiceData->{'trans_substatus_reason'});
 		#$page->field('referral_type', $ServiceData->{'trans_expire_reason'});
 		$page->field('contact_org', $ServiceData->{'modifier'});
@@ -791,7 +794,7 @@ sub execute
 		my $transRequestId =$page->field("procedure_id$loop");
 		next unless $code;
 		next if ($page->field("skip_field$loop"));
-		
+
 		#If a description is not provided try to find one
 		unless ($desc)
 		{
