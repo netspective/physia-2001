@@ -216,19 +216,15 @@ sub populateData_update
 
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $templateID = $page->param('template_id');
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,'selPopulateTemplateDialog', $templateID);
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+		'selPopulateTemplateDialog', $gmtDayOffset, $templateID);
 
   $page->field('days_of_week', split(',', $page->field('days_of_week')));
   $page->field('months', split(',', $page->field('months')));
   $page->field('patient_types', split(',', $page->field('patient_types')));
   $page->field('appt_types', split(',', $page->field('appt_types')));
-  
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
-
-	$page->field('duration_begin_time', convertTime($page->field('duration_begin_time'), $fromTZ, $toTZ));
-	$page->field('duration_end_time', convertTime($page->field('duration_end_time'), $fromTZ, $toTZ));
 }
 
 sub customValidate
@@ -280,21 +276,18 @@ sub execute
 	my $days_of_month;
 	$days_of_month = $dom_spec_set->run_list() unless $dom_spec_set->empty();
 
-	my $fromTZ = $page->session('TZ');
-	my $toTZ = App::Schedule::Utilities::BASE_TZ;
-	
 	my $newTemplateID = $page->schemaAction(
 	'Sch_Template', $command,
 	template_id => $command eq 'add' ? undef :$templateID,
 	effective_begin_date => $page->field('effective_begin_date') || undef,
 	effective_end_date => $page->field('effective_end_date') || undef,
-	start_time => convertTime($page->field ('duration_begin_time'), $fromTZ, $toTZ) || undef,
-	end_time => convertTime($page->field ('duration_end_time'), $fromTZ, $toTZ) || undef,
-	caption => $page->field ('caption'),
-	r_ids => cleanup($page->field ('r_ids')),
-	facility_id => $page->field ('facility_id'),
-	available => $page->field ('available'),
-	status => $page->field ('status'),
+	start_time => $page->field('duration_begin_time') || undef,
+	end_time => $page->field('duration_end_time') || undef,
+	caption => $page->field('caption'),
+	r_ids => cleanup($page->field('r_ids')),
+	facility_id => $page->field('facility_id'),
+	available => $page->field('available'),
+	status => $page->field('status'),
 	remarks => $page->field('remarks') || undef,
 	preferences => $page->field('preferences') || undef,
 	days_of_week => join(',',  $page->field('days_of_week')) || undef,
@@ -303,7 +296,7 @@ sub execute
 	patient_types => join(',',$page->field('patient_types')) || undef,
 	appt_types => join(',', $page->field('appt_types')) || undef,
 	owner_org_id => $page->session('org_internal_id'),
-	_debug => 0
+	_debug => 0,
 	);
 
 	$self->handlePostExecute($page, $command, $flags);

@@ -242,19 +242,12 @@ sub getTemplateData
 	my $rowsPrinted = 0;
 	my $templatesRef = $slot->{attributes}->{templates};
 
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
-
 	for my $t (@{$templatesRef})
 	{
 		if ($t->{available} == $available)
 		{
 			my $templateID = $t->{template_id};
-
-			#my $templateTime = hhmm2Time($t->{start_time}) . " - " . hhmm2Time($t->{end_time});
-			my $templateTime = convertTime($t->{start_time}, $fromTZ, $toTZ, TIME_H24) 
-				. " - " . 
-				convertTime($t->{end_time}, $fromTZ, $toTZ, TIME_H24);
+			my $templateTime = hhmm2Time($t->{start_time}) . " - " . hhmm2Time($t->{end_time});
 
 			my @patientTypes;
 			if (defined $t->{patient_types}) {
@@ -269,7 +262,7 @@ sub getTemplateData
 			if (defined $t->{appt_types}) {
 
 				for (split(/,/, $t->{appt_types})) {
-					my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 
+					my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 						'selApptTypeById', $_);
 
 					push(@apptTypes, $apptType->{caption});
@@ -565,7 +558,7 @@ sub getAppointments
 			$title .= "$slots[$i]->{attributes}->{conflict}\n";
 			$title .= "Patient Type:  $slots[$i]->{attributes}->{patient_type}\n";
 			$title .= "Appointment Type:  $slots[$i]->{attributes}->{appt_type}";
-			$title .= $slots[$i]->{attributes}->{appt_type_id} ? 
+			$title .= $slots[$i]->{attributes}->{appt_type_id} ?
 				" ($slots[$i]->{attributes}->{appt_type_id})\n" : "None\n";
 			$title .= "Reason for Visit:  $slots[$i]->{attributes}->{subject}\n";
 			$title .= "Symptoms:  $slots[$i]->{attributes}->{remarks}\n";
@@ -776,7 +769,7 @@ sub getResource_Facility
 
 	my $resource = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 'selCompleteName', $resource_id);
 	$resource = $resource_id unless $resource;
-	my $facility = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 
+	my $facility = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE,
 		'selFacilityName', $facility_id);
 
 	$facility = ($facility_id ? "**Invalid**" : "All Facilities") unless $facility;

@@ -174,9 +174,6 @@ sub buildMinuteSet
 {
 	my ($self, $page, $resource_id, $facility_id, $skipEvents, $eventId) = @_;
 
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
-
 	my $posMinuteSet = new Set::IntSpan;
 	my $negMinuteSet = new Set::IntSpan;
 
@@ -191,10 +188,10 @@ sub buildMinuteSet
 			my $day = $template_days_set->current - $daysOffset;
 			my $dayMinutes = $day * 24 *60;
 
-			my $low  = hhmmAM2minutes(convertTime($t->{start_time}, $fromTZ, $toTZ, TIME_H24)) + $dayMinutes;
-			my $high = hhmmAM2minutes(convertTime($t->{end_time}, $fromTZ, $toTZ, TIME_H24)) + $dayMinutes;
+			my $low  = hhmm2minutes($t->{start_time}) + $dayMinutes;
+			my $high = hhmm2minutes($t->{end_time}) + $dayMinutes;
 			$high += 1440 if $high < $low;
-			
+
 			if ($t->{available}) {
 				my $minute_range = $low . "-" . $high;
 				$posMinuteSet = $posMinuteSet->union($minute_range);
@@ -217,9 +214,6 @@ sub buildMinuteSet
 sub handleEventSlots
 {
 	my ($self, $page, $resource_id, $facility_id, $eventId) = @_;
-
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
 
 	my $eventsMinuteSet = new Set::IntSpan();
 	my $daysOffset = Date_to_Days(@{$self->{search_start_date}});
@@ -245,8 +239,7 @@ sub handleEventSlots
 		else
 		{
 			my $apptDuration = findApptDuration($page, $event->{appt_type_id});
-			my $startMinute  = hhmmAM2minutes(convertTime($event->{start_minute}, $fromTZ, $toTZ, TIME_H24))
-				+ $dayMinutes +1;
+			my $startMinute  = hhmm2minutes($event->{start_minute})+ $dayMinutes +1;
 			my $endMinute    = $startMinute + $apptDuration -2;
 			$eventsMinuteSet = $eventsMinuteSet->union("$startMinute-$endMinute");
 		}
@@ -266,9 +259,6 @@ sub handleEventSlots
 sub handleApptType
 {
 	my ($self, $page, $apptTypeRef, $event, $day) = @_;
-	
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
 
 	$self->populateApptTypeTracker($page, $apptTypeRef, $event, $day);
 
@@ -286,14 +276,9 @@ sub handleApptType
 	{
 		my $dayMinutes = $day * 24 *60;
 		my $apptDuration = findApptDuration($page, $event->{appt_type_id});
-		
-		my $startMinute  = hhmmAM2minutes(convertTime($event->{start_minute}, $fromTZ, $toTZ, TIME_H24))
-			+ $dayMinutes +1;
+
+		my $startMinute  = hhmm2minutes($event->{start_minute}) + $dayMinutes +1;
 		my $endMinute    = $startMinute + $apptDuration -2;
-
-		#$startMinute -= $apptType->{lead_time} if $apptType->{lead_time};
-		#$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
-
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("$startMinute-$endMinute");
 	}
 
@@ -303,9 +288,6 @@ sub handleApptType
 sub processApptTypeRules
 {
 	my ($self, $page, $apptTypeRef, $event, $day) = @_;
-
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
 
 	my $dayMinutes = $day * 24 *60;
 	my $apptTypeId = $event->{appt_type_id};
@@ -359,13 +341,8 @@ sub processApptTypeRules
 	{
 		my $dayMinutes = $day * 24 *60;
 		my $apptDuration = findApptDuration($page, $event->{appt_type_id});
-		my $startMinute  = hhmmAM2minutes(convertTime($event->{start_minute}, $fromTZ, $toTZ, TIME_H24))
-			+ $dayMinutes +1;
+		my $startMinute  = hhmm2minutes($event->{start_minute}) + $dayMinutes +1;
 		my $endMinute    = $startMinute + $apptDuration -2;
-
-		#$startMinute -= $apptType->{lead_time} if $apptType->{lead_time};
-		#$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
-
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("$startMinute-$endMinute");
 	}
 	else
@@ -449,35 +426,26 @@ sub findEventSlots
 	my $events = $self->fetchEvents($page, $resource_id, $facility_id);
 
 	@{$eventSlotsRef} = ();
-	
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
-	
+
 	for my $event (@{$events})
 	{
 		next if $event->{event_id} == $eventId;
 
-		my ($startTime, @start_day) = convertStamp($event->{start_minute}, split (/,/, $event->{start_day}), 
-			$fromTZ, $toTZ);
-		
+		my $startTime = $event->{start_minute};
+		my @start_day = split (/,/, $event->{start_day});
+
 		my $day = Date_to_Days(@start_day);
 		my $start_minute = hhmm2minutes($startTime);
 		my $end_minute = $start_minute + findApptDuration($page, $event->{appt_type_id});
-		
-		my $slot = new App::Schedule::Slot (day=>$day);		
+
+		my $slot = new App::Schedule::Slot (day=>$day);
 		$slot->{minute_set} = new Set::IntSpan ("$start_minute" . "-" . "$end_minute");
 
 		for my $key (keys %{$event})
 		{
 			$slot->{attributes}->{$key} = Trim($event->{$key});
 		}
-		
-		$slot->{attributes}->{scheduled_stamp} = convertStamp2Stamp($slot->{attributes}->{scheduled_stamp}, $fromTZ, $toTZ);
-		$slot->{attributes}->{checkin_stamp} = convertStamp2Stamp($slot->{attributes}->{checkin_stamp}, $fromTZ, $toTZ)
-			if $slot->{attributes}->{checkin_stamp};
-		$slot->{attributes}->{checkout_stamp} = convertStamp2Stamp($slot->{attributes}->{checkout_stamp}, $fromTZ, $toTZ)
-			if $slot->{attributes}->{checkout_stamp};
-		
+
 		# Store facility name instead of org_internal_id
 		$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
 			'selId', $slot->{attributes}->{facility_id});
@@ -550,19 +518,16 @@ sub fetchEvents
 	if ($flags & ANALYZEFETCHEVENTS_BYEVENTID)
 	{
 		$events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_analyze_events', $startDate, $gmtDayOffset, $endDate, $gmtDayOffset, $facility_id, 
-			$resource_id);
+			'sel_analyze_events', $gmtDayOffset, $startDate, $endDate, $facility_id, $resource_id);
 	}
 	else
 	{
 		if ($facility_id) {
 			$events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_at_facility', $startDate, $gmtDayOffset, $endDate, $gmtDayOffset, 
-				$facility_id, $resource_id);
+				'sel_events_at_facility', $gmtDayOffset, $startDate, $endDate, $facility_id, $resource_id);
 		} else {
 			$events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_any_facility', $startDate, $gmtDayOffset, $endDate, $gmtDayOffset,
-				$resource_id);
+				'sel_events_any_facility', $gmtDayOffset, $startDate, $endDate, 0, $resource_id);
 		}
 	}
 
@@ -574,15 +539,12 @@ sub findTemplateSlots
 {
 	my ($self, $page, $posSlotsRef, $negSlotsRef, $posDaysSetRef, $negDaysSetRef, @templates) = @_;
 
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $page->session('TZ');
-
 	@{$posSlotsRef} = ();
 	@{$negSlotsRef} = ();
 
 	my @pTemplates = ();
 	my @nTemplates = ();
-	
+
 	for my $templ (@templates)
 	{
 		my $template_days_set = $templ->findTemplateDays($self->{search_duration}, @{$self->{search_start_date}});
@@ -593,12 +555,12 @@ sub findTemplateSlots
 
 			if ($templ->{available}) {
 				my $slot = new App::Schedule::Slot(day=>$day);
-				
-				my $startTime = hhmmAM2minutes(convertTime($templ->{start_time}, $fromTZ, $toTZ, TIME_H24));
-				my $endTime = hhmmAM2minutes(convertTime($templ->{end_time}, $fromTZ, $toTZ, TIME_H24));
+
+				my $startTime = hhmm2minutes($templ->{start_time});
+				my $endTime = hhmm2minutes($templ->{end_time});
 				$endTime += 1440 if $endTime < $startTime;
 				$slot->{minute_set} = new Set::IntSpan ("$startTime" . "-" . "$endTime");
-				
+
 				$$posDaysSetRef->insert($day);
 				push(@pTemplates, $templ);
 				$slot->{attributes}->{templates} = \@pTemplates;
@@ -612,8 +574,9 @@ sub findTemplateSlots
 			} else { # Not available Template
 				my $slot = new App::Schedule::Slot(day=>$day);
 
-				my $startTime = hhmmAM2minutes(convertTime($templ->{start_time}, $fromTZ, $toTZ, TIME_H24));
-				my $endTime = hhmmAM2minutes(convertTime($templ->{end_time}, $fromTZ, $toTZ, TIME_H24));
+				my $startTime = hhmm2minutes($templ->{start_time});
+				my $endTime = hhmm2minutes($templ->{end_time});
+				$endTime += 1440 if $endTime < $startTime;
 				$slot->{minute_set} = new Set::IntSpan ("$startTime" . "-" . "$endTime");
 
 				$$negDaysSetRef->insert($day);
@@ -639,7 +602,7 @@ sub getTemplates
 	my ($self, $page, $resource_id, $facility_id) = @_;
 	my @templates = ();
 
-	# Query database for all templates of this resource at this facility
+	# Find all templates of this resource at this facility
 
 	my $patientTypeTable = "";
 	my $apptTypeTable = "";
@@ -650,7 +613,8 @@ sub getTemplates
 	my $patientTypeTableJoinClause = "";
 	my $apptTypeTableJoinClause = "";
 
-	my @bindParams = ($resource_id);
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+	my @bindParams = ($gmtDayOffset, $gmtDayOffset, $resource_id);
 
 	my $facilityWhereClause = "";
 	if ($facility_id)
@@ -679,8 +643,8 @@ sub getTemplates
 		select to_char(nvl(effective_begin_date,SYSDATE - $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_begin_date,
 			to_char(nvl(effective_end_date, SYSDATE + $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_end_date,
 			months, days_of_week, days_of_month,
-			to_char(nvl(start_time,trunc(sysdate)), 'hh24mi') as start_time,
-			to_char(nvl(end_time,trunc(sysdate)-1/24/3600), 'hh24mi') as end_time,
+			to_char(start_time - ?, 'hh24mi') as start_time,
+			to_char(end_time - ?, 'hh24mi') as end_time,
 			available, facility_id, template_id, caption, patient_types, appt_types,
 			Sch_Template_R_Ids.member_name as attendee_id
 		from Sch_Template, Sch_Template_R_IDs $patientTypeTable $apptTypeTable
@@ -709,8 +673,8 @@ sub getTemplates
 		select to_char(nvl(effective_begin_date,SYSDATE - $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_begin_date,
 			to_char(nvl((effective_end_date), SYSDATE + $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_end_date,
 			months, days_of_week, days_of_month,
-			to_char(nvl(start_time, trunc(sysdate)), 'hh24mi') as start_time,
-			to_char(nvl(end_time, trunc(sysdate)-1/24/3600), 'hh24mi') as end_time,
+			to_char(start_time - ?, 'hh24mi') as start_time,
+			to_char(end_time - ?, 'hh24mi') as end_time,
 			available, facility_id, template_id, caption, patient_types, appt_types,
 			Sch_Template_R_Ids.member_name as attendee_id
 		from Sch_Template, Sch_Template_R_Ids
@@ -724,7 +688,9 @@ sub getTemplates
 	my $query =  (($self->{patient_type} == ANALYZE_ALLTEMPLATES)
 		|| ($self->{appt_type}  == ANALYZE_ALLTEMPLATES)) ? $query2 : $query1;
 
-	my $schedTemplates = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_DYNAMICSQL, $query, @bindParams);
+	my $schedTemplates = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_DYNAMICSQL,
+		$query, @bindParams);
+
 	for my $t (@{$schedTemplates})
 	{
 		my @sdate = split(/,/, $t->{effective_begin_date});

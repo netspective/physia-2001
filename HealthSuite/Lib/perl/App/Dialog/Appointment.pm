@@ -408,18 +408,10 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $eventId = $page->param('event_id');
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
-		'selPopulateAppointmentDialog', $eventId);
+		'selPopulateAppointmentDialog', $gmtDayOffset, $eventId);
 
-	my $hhmm = time2hhmm(split(/\s/, $page->field("appt_time_0")));
-	my ($mm, $dd, $yyyy) = split(/\//, $page->field("appt_date_0"));
-
-	my ($apptTime, @apptDay) = convertStamp($hhmm, $yyyy, $mm, $dd, $page->session('TZ'), 
-		App::Schedule::Utilities::BASE_TZ);
-
-	$page->field('appt_date_0', sprintf("%02d/%02d/%04d", $apptDay[1], $apptDay[2], $apptDay[0]));
-	$page->field('appt_time_0', sprintf("%s", hhmm2Time($apptTime)));
-	
 	$page->param('old_appt_date', $page->field('appt_date_0'));
 	$page->param('old_appt_time', $page->field('appt_time_0'));
 }
@@ -525,7 +517,7 @@ sub validateAvailTemplate
 
 	my @available_slots = $sa->findAvailSlots($page, $flag, $page->field('event_id'));
 
-	my $html = "<b>Available times per Templates</b>: ";
+	my $html = "<b>Available times per Templates for this Resource(s) at this facility for this appt type</b>: ";
 	my $availTimes;
 
 	for (@available_slots)
@@ -543,8 +535,7 @@ sub validateAvailTemplate
 	my $field = $self->getField("appt_date_time_$ordinal")->{fields}->[0];
 
 	if ((!defined $availSlot->{minute_set} || !$availSlot->{minute_set}->superset($apptMinutesRange))
-		#&& $page->param("_f_whatToDo_$ordinal") ne 'cancel' && $page->param("_f_whatToDo_$ordinal") ne 'override')
-		&& !$page->field("processConflict_$ordinal"))
+		&& !$page->param("_f_processConflict_$ordinal"))
 	{
 		my $radio_0 = 'document.dialog._f_whatToDo_' . $ordinal . '[0]' ;
 		my $radio_1 = 'document.dialog._f_whatToDo_' . $ordinal . '[1]' ;
@@ -554,13 +545,12 @@ sub validateAvailTemplate
 			Please check @{[ join(', ', @resource_ids) ]} templates, patient types and appt types. <br>
 			$html $availTimes
 			<u>Select action</u>: <br>
-				<input name=_f_whatToDo_$ordinal type=radio value="override" CHECKED
-					onClick="$radio_0.checked=true">Override Template.  Make appointment anyway.<br>
+				<input name=_f_whatToDo_$ordinal type=radio value="override"
+					onClick="$radio_0.checked=true; document.dialog._f_processConflict_$ordinal.value=1">
+					Override Template.  Make appointment anyway.<br>
 				<input name=_f_whatToDo_$ordinal type=radio value="cancel"
-					onClick="$radio_1.checked=true">Cancel
+					onClick="$radio_1.checked=true; document.dialog._f_processConflict_$ordinal.value=1">Cancel
 		});
-
-		$page->field("processConflict_$ordinal", 1);
 	}
 }
 
@@ -573,7 +563,7 @@ sub validateMultiAppts
 	my ($parentEventId, $patientId) = $self->findConflictEvent($page, $ordinal);
 	if ($parentEventId)
 	{
-		unless ($page->field("processConflict_$ordinal"))
+		unless ($page->param("_f_processConflict_$ordinal"))
 		{
 			my $radio_0 = 'document.dialog._f_whatToDo_' . $ordinal . '[0]' ;
 			my $radio_1 = 'document.dialog._f_whatToDo_' . $ordinal . '[1]' ;
@@ -582,16 +572,15 @@ sub validateMultiAppts
 			my $field = $self->getField("appt_date_time_$ordinal")->{fields}->[0];
 			$field->invalidate($page, qq{This time slot is currently booked for $patientId.<br>
 			<u>Select action</u>: <br>
-				<input name=_f_whatToDo_$ordinal type=radio value="wl" CHECKED
-					onClick="$radio_0.checked=true"> Place $personId on Waiting List <br>
+				<input name=_f_whatToDo_$ordinal type=radio value="wl"
+					onClick="$radio_0.checked=true; document.dialog._f_processConflict_$ordinal.value=1"> Place $personId on Waiting List <br>
 				<input name=_f_whatToDo_$ordinal type=radio value="db"
-					onClick="$radio_1.checked=true"> Over-Book $personId <br>
+					onClick="$radio_1.checked=true; document.dialog._f_processConflict_$ordinal.value=1"> Over-Book $personId <br>
 				<input name=_f_whatToDo_$ordinal type=radio value="cancel"
-					onClick="$radio_2.checked=true"> Cancel
+					onClick="$radio_2.checked=true; document.dialog._f_processConflict_$ordinal.value=1"> Cancel
 			});
 
 			$page->field("parent_id_$ordinal", $parentEventId);
-			$page->field("processConflict_$ordinal", 1);
 		}
 	}
 	else
@@ -612,11 +601,12 @@ sub findConflictEvent
 		'selApptTypeById', $page->field('appt_type')) if $page->field('appt_type');
 	$page->property('apptTypeInfo', $apptType);
 
-	$page->field('duration', $apptType->{duration} ? 
+	$page->field('duration', $apptType->{duration} ?
 		($apptType->{duration} == 1 ? 2 : $apptType->{duration}) : 10);
 
-	my $start_time = $page->field("appt_date_$ordinal") . ' '  . $page->field("appt_time_$ordinal");
-	my ($startDate, $startTime, $am) = split(/ /, $start_time);
+	my $apptTime = $page->field("appt_date_$ordinal") . ' '  . $page->field("appt_time_$ordinal");
+
+	my ($startDate, $startTime, $am) = split(/ /, $apptTime);
 	my $endDate   = UnixDate(DateCalc($startDate, "+1 day"), "%Y,%m,%d");
 	$startDate = UnixDate($startDate, "%Y,%m,%d");
 
@@ -628,9 +618,10 @@ sub findConflictEvent
 	my $minuteRange  = "$startMinutes-$endMinutes";
 	my $apptSlot     = new Set::IntSpan($minuteRange);
 
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-		'selAppointmentConflictCheck', $startDate, $endDate, $page->field('facility_id'),
-			$page->field('resource_id'));
+		'selAppointmentConflictCheck', $gmtDayOffset, $gmtDayOffset, $startDate, $gmtDayOffset, 
+		$endDate, $gmtDayOffset, $page->field('facility_id'), $page->field('resource_id'));
 
 	for my $event (@$events)
 	{
@@ -728,16 +719,10 @@ sub execute
 		$self->handlePostExecute($page, $command, $flags);
 	}
 
-	my $fromTZ = $page->session('TZ');
-	my $toTZ = App::Schedule::Utilities::BASE_TZ;
-
 	for (my $i=0; $i<App::Universal::MAX_APPTS; $i++)
 	{
 		my $apptStamp = $page->field("appt_date_$i") . " " . $page->field("appt_time_$i");
-		my $convApptStamp = convertStamp2Stamp($apptStamp, $fromTZ, $toTZ);
-
 		my $timeStamp = $page->getTimeStamp();
-		my $convTimeStamp = convertStamp2Stamp($timeStamp, $fromTZ, $toTZ);
 
 		my $parentId = $page->param("_f_parent_id_$i");
 		undef $parentId if $page->field("whatToDo_$i") eq 'db';
@@ -754,11 +739,11 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $convApptStamp,
+					start_time => $apptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
-					scheduled_stamp => $convTimeStamp,
+					scheduled_stamp => $timeStamp,
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,
@@ -786,7 +771,7 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $convApptStamp,
+					start_time => $apptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
@@ -821,7 +806,7 @@ sub execute
 					event_status => 3,
 					discard_type => $discardType,
 					discard_by_id => $page->session('user_id') || undef,
-					discard_stamp => $convTimeStamp,
+					discard_stamp => $timeStamp,
 					discard_remarks => $page->field('discard_remarks') || undef,
 					_debug => 0
 				);
@@ -839,7 +824,7 @@ sub execute
 					remarks => $page->field('remarks') || undef,
 					discard_type => $discardType,
 					discard_by_id => $page->session('user_id') || undef,
-					discard_stamp => $convTimeStamp,
+					discard_stamp => $timeStamp,
 					discard_remarks => $page->field('discard_remarks') || undef,
 					_debug => 0
 				);
@@ -849,11 +834,11 @@ sub execute
 					event_type => DUMMY_EVENT_TYPE,
 					event_status => 0,
 					subject => $page->field('subject'),
-					start_time => $convApptStamp,
+					start_time => $apptStamp,
 					duration => $apptDuration,
 					facility_id => $page->field('facility_id') || undef,
 					remarks => $page->field('remarks') || undef,
-					scheduled_stamp => $convTimeStamp,
+					scheduled_stamp => $timeStamp,
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,

@@ -18,7 +18,7 @@ use Data::Publish;
 use Exporter;
 use CGI::ImageManager;
 
-use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL 
+use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL
 	INSURANCE_COMPLETE INSURANCE_PARTIAL MEDICAL PERSONAL);
 
 use vars qw(%RESOURCE_MAP @EXPORT
@@ -151,11 +151,10 @@ sub getComponentHtml
 
 	my $startTime = $startDate . " $time1";
 	my $endTime   = $startDate . " $time2";
-	
+
 	my $fromTZ = $page->session('TZ');
 	my $toTZ = App::Schedule::Utilities::BASE_TZ;
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-	my $dbDayOffset = 4/24;
 
 	my $convStartTime = convertStamp2Stamp($startTime, $fromTZ, $toTZ);
 	my $convEndTime = convertStamp2Stamp($endTime, $fromTZ, $toTZ);
@@ -167,20 +166,19 @@ sub getComponentHtml
 		if ($page->session('showTimeSelect') == 0)
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-				$dbDayOffset, $time1, $dbDayOffset, $time2, $user_id, $orgInternalId, $user_id, $orgInternalId);
+				'sel_events_worklist_today', $gmtDayOffset,	$time1, $time2, $user_id, $orgInternalId);
 		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today_byTime', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-				$convStartTime, $convEndTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
+				'sel_events_worklist_today_byTime', $gmtDayOffset, $convStartTime, $convEndTime, 
+				$user_id, $orgInternalId);
 		}
 	}
 	else
 	{
 		$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_events_worklist_not_today', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-			$convStartTime, $convEndTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
+			'sel_events_worklist_not_today', $gmtDayOffset, $convStartTime, $convEndTime, $user_id, 
+			$orgInternalId);
 	}
 
 	my @data = ();
@@ -196,12 +194,12 @@ sub getComponentHtml
 	{
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
-		
+
 		next if $oldEventId == $_->{event_id};
-		
+
 		my $alertExists = $STMTMGR_COMPONENT_SCHEDULING->recordExists($page, STMTMGRFLAG_NONE,
 			'sel_alerts', $_->{patient_id});
-		
+
 		my $alertHtml;
 		if ($alertExists) {
 			$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
@@ -227,18 +225,18 @@ sub getComponentHtml
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
 
 		my $flags = $_->{flags};
-		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ? 
-			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ? 
+		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ?
+			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ?
 			$IMAGETAGS{'icons/black_a'} : $IMAGETAGS{'icons/red_a'};
-		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ? 
+		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ?
 			$IMAGETAGS{'icons/green_i'} : $flags & VERIFYFLAG_INSURANCE_PARTIAL ?
 			$IMAGETAGS{'icons/black_i'} : $IMAGETAGS{'icons/red_i'};
-			
+
 		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/green_m'}
 			: $IMAGETAGS{'icons/red_m'};
 		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/green_p'}
 			: $IMAGETAGS{'icons/red_p'};
-			
+
 		my @rowData = (
 			qq{<nobr>
 				<A HREF='$arlPrefix/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
@@ -278,7 +276,7 @@ sub getComponentHtml
 
 				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Verify Personal Records'>$perVerifyIcon</A>
-				
+
 				<A HREF="javascript:doActionPopup('/person/$_->{patient_id}/facesheet')"
 				TITLE='Print Face Sheet'>$IMAGETAGS{'icons/black_f'}</A>
 

@@ -44,7 +44,9 @@ sub initialize
 			{
 				scope =>'person',
 				key => "#field.person_id#",
-				data => "Check-out <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> (Check-out Time: #field.checkout_stamp#)"
+				data => qq{Check-out <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>
+					<br>(Appt Time: #field.start_time#)
+				}
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -102,28 +104,20 @@ sub execute
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
 
-	my $fromTZ = $page->session('TZ');
-	my $toTZ = App::Schedule::Utilities::BASE_TZ;
-
-	my $convStamp = convertStamp2Stamp($stamp, $toTZ, $fromTZ);
-	
 	if ($status eq 'out')
 	{
 		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person on $convStamp.</b>
+			<b style="color:red">This patient has been checked-$status by $person on $stamp.</b>
 			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
-
 	}
 
-	## First, update original event record to CHECKOUT status, and any changes
-	#my $checkOutStamp = $page->getTimeStamp();
 	my $eventStatus = App::Universal::EVENTSTATUS_COMPLETE;
 	if ($page->schemaAction(
 			'Event', 'update',
 			event_id => $eventId || undef,
 			event_status => $eventStatus,
-			checkout_stamp => convertStamp2Stamp($page->field('checkout_stamp'), $fromTZ, $toTZ),
+			checkout_stamp => $page->field('checkout_stamp'),
 			checkout_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
 			subject => $page->field('subject'),

@@ -121,8 +121,9 @@ sub execute
 		$statement = 'selEffectiveTemplate';
 	}
 
-	my @bindCols = ($self->session('org_internal_id'), $self->param('r_ids').'%',
-		$self->param('facility_id').'%', @available, $template_active);
+	my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
+	my @bindCols = ($gmtDayOffset,  $gmtDayOffset, $self->session('org_internal_id'),
+		$self->param('r_ids').'%', $self->param('facility_id').'%', @available, $template_active);
 
 	$self->param('_dialogreturnurl', '/search/template');
 
@@ -137,9 +138,6 @@ sub execute
 	}
 
 	my %WEEKDAYS = (1=>'Sun', 2=>'Mon', 3=>'Tue', 4=>'Wed', 5=>'Thu', 6=>'Fri', 7=>'Sat');
-	
-	my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-	my $toTZ = $self->session('TZ');
 	# --------------------------------
 
 	my $templates = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
@@ -170,7 +168,7 @@ sub execute
 			my @decodeATypes = ();
 			for (split(/\s*,\s*/, $_->{appt_types}))
 			{
-				my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE, 
+				my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
 					'selApptTypeById', $_);
 				push(@decodeATypes, $apptType->{caption});
 			}
@@ -203,8 +201,8 @@ sub execute
 			$_->{org_id},
 			$patientTypesString,
 			$apptTypesString,
-			convertTime($_->{start_time}, $fromTZ, $toTZ),
-			convertTime($_->{end_time}, $fromTZ, $toTZ),
+			$_->{start_time},
+			$_->{end_time},
 			$_->{begin_date},
 			$_->{end_date},
 			$_->{months},
@@ -221,17 +219,17 @@ sub execute
 		columnDefn =>
 			[
 				{ head => 'ID', url => q{javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'}, hint => 'Edit Template #&{?}#'},
-				
-				{ head => 'Resource/Caption/Facility', 
+
+				{ head => 'Resource/Caption/Facility',
 					dataFmt => qq{
-						<a href="javascript:location.href='/search/template/1/#1#'" 
+						<a href="javascript:location.href='/search/template/1/#1#'"
 							title='View #1# Templates' style="text-decoration:none" >#1#</a> <br>
 						Caption: <b>#2# </b><br>
-						<a href="javascript:location.href='/search/template/1//#3#'" 
+						<a href="javascript:location.href='/search/template/1//#3#'"
 							title='View #3# Templates' style="text-decoration:none" >#3#</a> <br>
 					},
 				},
-				{ head => 'Details', 
+				{ head => 'Details',
 					dataFmt => qq{
 						<b>#13#</b>
 						<nobr>Time: <b>#6# - #7# </b></nobr><br>

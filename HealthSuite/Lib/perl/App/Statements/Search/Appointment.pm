@@ -23,7 +23,7 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 	[
-		{ head => 'Time', 
+		{ head => 'Time',
 			colIdx => 1,
 			url => q{javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()},
 			options => PUBLCOLFLAG_DONTWRAP,
@@ -40,11 +40,11 @@ $STMTRPTDEFN_DEFAULT =
 					style='text-decoration:none'>#0# (#12#)</a>
 				- #3# </nobr> <BR>
 				Home Phone: <b>#5#</b> <BR>
-				<i>#6#</i> with 
-				<a href="javascript:chooseItem('/search/appointment/#2#')" 
+				<i>#6#</i> with
+				<a href="javascript:chooseItem('/search/appointment/#2#')"
 					title='View #2# Appointments' style='text-decoration:none'>#2#</a>
 				at
-				<a href="javascript:chooseItem('/search/appointment//#7#')" 
+				<a href="javascript:chooseItem('/search/appointment//#7#')"
 					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
 				<BR>
 				Appt Type: #13#<BR>
@@ -59,7 +59,7 @@ $STMTRPTDEFN_DEFAULT =
 
 my $APPOINTMENT_COLUMNS = qq
 {	patient.simple_name,
-	TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
+	TO_CHAR(event.start_time - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
 	ea.value_textB AS resource_id,
 	aat.caption AS patient_type,
 	event.subject,
@@ -69,7 +69,7 @@ my $APPOINTMENT_COLUMNS = qq
 	event.remarks,
 	event.event_id,
 	scheduled_by_id,
-	TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
+	TO_CHAR(scheduled_stamp - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
 	patient.person_id AS patient_id,
 	at.caption as appt_type,
 	(SELECT value_text
@@ -81,7 +81,7 @@ my $APPOINTMENT_COLUMNS = qq
 		FROM Person_Attribute  pa
 		WHERE pa.parent_id = patient.person_id
 			AND pa.item_name = 'Patient/Chart Number'
-	) as chart_number	
+	) as chart_number
 };
 
 my $APPOINTMENT_TABLES = qq{
@@ -142,7 +142,7 @@ $APPOINTMENT_TABLES
 			AND aat.id = ea.value_int
 			AND event.owner_id = ?
 			AND at.appt_type_id (+) = Event.appt_type
-			AND pa.parent_id = patient.person_id (+)			
+			AND pa.parent_id = patient.person_id (+)
 			AND pa.value_type = 10
 			AND pa.item_name = 'Home'
 		%orderBy%

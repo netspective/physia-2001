@@ -40,11 +40,11 @@ $STMTMGR_PAGE = new App::Statements::Page(
 
 	'person.mySessionViewCount' => {
 		sqlStmt => qq{
-			select view_caption, view_count, %simpleStamp:view_init%,	
-				%simpleStamp:view_latest%, view_arl
+			select view_caption, view_count, %simpleStamp:view_init - :1%,	
+				%simpleStamp:view_latest - :1%, view_arl
 			from Persess_View_Count 
-			where person_id = ?
-				and view_init > trunc(sysdate)
+			where person_id = :2
+				and view_init > trunc(sysdate) + :1
 			order by view_count DESC
 		},
 		sqlStmtBindParamDescr => ['Person ID for the perSess_View_Count table '],
@@ -72,10 +72,38 @@ $STMTMGR_PAGE = new App::Statements::Page(
 			inherit => 'panel',
 		},
 
-		publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', [$personId] ); },
-		publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', [$personId], 'panel'); },
-		publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', [$personId], 'panelEdit'); },
-		publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', [$personId], 'panelTransp'); },
+		publishComp_st => 
+			sub { 
+				my ($page, $flags, $personId) = @_; 
+				$personId ||= $page->session('user_id');
+				my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+				$STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', 
+					[$gmtDayOffset, $personId]); 
+			},
+		publishComp_stp => 
+			sub { 
+				my ($page, $flags, $personId) = @_; 
+				$personId ||= $page->session('user_id');
+				my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+				$STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', 
+					[$gmtDayOffset, $personId], 'panel'); 
+			},
+		publishComp_stpe => 
+			sub { 
+				my ($page, $flags, $personId) = @_; 
+				$personId ||= $page->session('user_id');
+				my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+				$STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', 
+					[$gmtDayOffset, $personId], 'panelEdit');
+			},
+		publishComp_stpt => 
+			sub { 
+				my ($page, $flags, $personId) = @_; 
+				$personId ||= $page->session('user_id');
+				my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+				$STMTMGR_PAGE->createHtml($page, $flags, 'person.mySessionViewCount', 
+					[$gmtDayOffset, $personId], 'panelTransp'); 
+			},
 	},
 );
 	

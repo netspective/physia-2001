@@ -29,8 +29,8 @@ $STMTRPTDEFN_WORKLIST =
 		{colIdx => 4, head => 'Checkin', dAlign => 'center'},
 		{colIdx => 5, head => 'Checkout', dAlign => 'center'},
 		{colIdx => 6, head => 'Claim', dAlign => 'center'},
-		{colIdx => 7, head => 'OV Copay', 
-			hHint => 'Copay due by patient for this visit', 
+		{colIdx => 7, head => 'OV Copay',
+			hHint => 'Copay due by patient for this visit',
 			dAlign => 'right', dformat => 'currency', summarize => 'sum'
 		},
 		{colIdx => 8, head => 'Account Balance', hint => 'View Account Balance',
@@ -49,9 +49,9 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
 	ea.value_textB as physician,
 	e.facility_id as facility,
-	%simpleStamp:e.start_time - ?% as appointment_time,
-	%simpleStamp:e.checkin_stamp% as checkin_time,
-	%simpleStamp:e.checkout_stamp% as checkout_time,
+	%simpleStamp:e.start_time - :1% as appointment_time,
+	%simpleStamp:e.checkin_stamp - :1% as checkin_time,
+	%simpleStamp:e.checkout_stamp - :1% as checkout_time,
 	Invoice.invoice_id,
 	patient.person_id as patient_id,
 	e.event_id,
@@ -73,17 +73,17 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 	and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 	and ea.value_textB in (
 		select value_text from Person_Attribute
-		where parent_id = ?
+		where parent_id = :4
 			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 			and item_name = '$WORKLIST_ITEMNAME'
-			and parent_org_id = ?
+			and parent_org_id = :5
 		)
 	and e.facility_id in (
 		select value_int from Person_Attribute
-		where parent_id = ?
+		where parent_id = :4
 			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
 			and item_name = '$WORKLIST_ITEMNAME'
-			and parent_org_id = ?
+			and parent_org_id = :5
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
@@ -106,11 +106,11 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			where	$STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
 		},
-		
+
 		timeSelectClause => qq{
-			e.start_time between sysdate + ? - (?/24/60) and sysdate + ? + (?/24/60)			
+			e.start_time between sysdate + :1 - (:2/24/60) and sysdate + :1 + (:3/24/60)
 		},
-		
+
 		publishDefn => $STMTRPTDEFN_WORKLIST,
 	},
 
@@ -120,11 +120,11 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			where	$STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
 		},
-		
+
 		timeSelectClause => qq{
-			e.start_time between to_date(?, '$STAMPFORMAT') and to_date(?, '$STAMPFORMAT')
+			e.start_time between to_date(:2, '$STAMPFORMAT') and to_date(:3, '$STAMPFORMAT')
 		},
-		
+
 		publishDefn => $STMTRPTDEFN_WORKLIST,
 	},
 
@@ -134,11 +134,11 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			where	$STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
 		},
-		
+
 		timeSelectClause => qq{
-			e.start_time between to_date(?, '$STAMPFORMAT') and to_date(?, '$STAMPFORMAT')
+			e.start_time between to_date(:2, '$STAMPFORMAT') and to_date(:3, '$STAMPFORMAT')
 		},
-		
+
 		publishDefn => $STMTRPTDEFN_WORKLIST,
 	},
 
@@ -152,7 +152,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and invoice_status != 16
 			and balance > 0
 	},
-	
+
 	'sel_patientBalance' => qq{
 		select nvl(sum(balance), 0)
 		from invoice
@@ -170,15 +170,15 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			where parent_id = ?
 			and item_type = 3
 	},
-	
+
 	'sel_copay' => qq{
-		select Insurance.copay_amt 
+		select Insurance.copay_amt
 		from Insurance, Invoice_Billing, Invoice
 		where Invoice.invoice_id = :1
 			and Invoice_Billing.bill_id = Invoice.billing_id
 			and Insurance.ins_internal_id = Invoice_billing.bill_ins_id
 	},
-	
+
 	'del_worklist_resources' => qq{
 		delete from Person_Attribute
 		where parent_id = ?
@@ -186,7 +186,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and item_name = ?
 			and parent_org_id = ?
 	},
-	
+
 	'sel_worklist_resources' => qq{
 		select value_text as resource_id
 		from Person_Attribute
@@ -203,7 +203,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 	},
-	
+
 	'sel_worklist_facilities' => qq{
 		select value_int as facility_id
 		from Person_Attribute
@@ -212,7 +212,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 	},
-	
+
 	'sel_populateInsVerifyDialog' => qq{
 		select * from Sch_Verify where event_id = ?
 	},
@@ -229,7 +229,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	'sel_populateMedVerifyDialog' => qq{
 		select med_verified_by, med_verify_date from Sch_Verify where event_id = ?
 	},
-	
+
 	'sel_populatePersonalVerifyDialog' => qq{
 		select per_verified_by, per_verify_date from Sch_Verify where event_id = ?
 	},
@@ -238,26 +238,26 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		select * from Event_Attribute where parent_id = :1
 			and value_type = :2
 	},
-	
+
 	'sel_alerts' => qq{
-		select * from Transaction 
+		select * from Transaction
 		where trans_owner_id = ?
 			and trans_owner_type = @{[ App::Universal::TRANSSTATUS_DEFAULT ]}
 			and trans_type between 8000 and 8999
 			and trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
 	},
-	
+
 # ---------------------------------------------------------------------------------------
 	'sel_detail_alerts' => {
 		sqlStmt => qq{
 				select Transaction.caption, detail, Transaction_Type.caption as trans_type, trans_subtype,
-					to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'), 
-					to_char(trans_end_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'),
+					to_char(trans_begin_stamp - :1, '$SQLSTMT_DEFAULTDATEFORMAT'),
+					to_char(trans_end_stamp - :1, '$SQLSTMT_DEFAULTDATEFORMAT'),
 					data_text_a, decode (trans_subtype, 'High', 1, 'Medium', 2, 'Low', 3, 3) as subtype_sort
 				from Transaction_Type, Transaction
 				where trans_type between 8000 and 8999
 				and trans_owner_type = 0
-				and trans_owner_id = ?
+				and trans_owner_id = :2
 				and trans_status = 2
 				and Transaction_Type.id = Transaction.trans_type
 				order by subtype_sort asc, trans_begin_stamp desc
@@ -275,5 +275,5 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		},
 	},
 );
-	
+
 1;

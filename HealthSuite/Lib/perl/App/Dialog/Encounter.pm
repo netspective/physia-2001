@@ -334,13 +334,10 @@ sub populateData
 		$page->field('checkin_stamp', $page->getTimeStamp());
 		$page->field('checkout_stamp', $page->getTimeStamp());
 		$page->field('parent_event_id', $eventId);
-		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
-			'selEncountersCheckIn/Out', $eventId);
 
-		my $fromTZ = App::Schedule::Utilities::BASE_TZ;
-		my $toTZ = $page->session('TZ');
-		$page->field('start_time', convertStamp2Stamp($page->field('start_time'), $fromTZ, $toTZ));
-		
+		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
+			'selEncountersCheckIn/Out', $page->session('GMT_DAYOFFSET'), $eventId);
+
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
 
@@ -2054,7 +2051,7 @@ sub checkEventStatus
 	my ($self, $page, $eventId) = @_;
 
 	my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'sel_eventInfo', $eventId);
+		'sel_eventInfo', $page->session('GMT_DAYOFFSET'), $eventId);
 
 	my ($status, $person, $stamp);
 

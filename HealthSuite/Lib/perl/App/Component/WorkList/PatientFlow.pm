@@ -149,7 +149,9 @@ sub getComponentHtml
 	else
 	{
 		$time1 = $page->session('time1') || 30;
+		$time1 = 30 if ($time1 < 0);
 		$time2 = $page->session('time2') || 120;
+		$time2 = 120 if $time2 < 0;
 	}
 
 	my @start_Date = Decode_Date_US($fmtDate);
@@ -163,11 +165,10 @@ sub getComponentHtml
 	my $fromTZ = $page->session('TZ');
 	my $toTZ = App::Schedule::Utilities::BASE_TZ;
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
-	my $dbDayOffset = 4/24;
-	
+
 	my $convStartTime = convertStamp2Stamp($startTime, $fromTZ, $toTZ);
 	my $convEndTime = convertStamp2Stamp($endTime, $fromTZ, $toTZ);
-	
+
 	my $orgInternalId = $page->session('org_internal_id');
 	my $appts;
 	if ($page->param('Today'))
@@ -175,20 +176,19 @@ sub getComponentHtml
 		if ($page->session('showTimeSelect') == 0)
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-				$dbDayOffset, $time1, $dbDayOffset, $time2, $user_id, $orgInternalId, $user_id, $orgInternalId);
+				'sel_events_worklist_today', $gmtDayOffset,	$time1, $time2, $user_id, $orgInternalId);
 		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today_byTime', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-				$convStartTime, $convEndTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
+				'sel_events_worklist_today_byTime', $gmtDayOffset, $convStartTime, $convEndTime, 
+				$user_id, $orgInternalId);
 		}
 	}
 	else
 	{
 		$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_events_worklist_not_today', $gmtDayOffset, $gmtDayOffset, $gmtDayOffset,
-			$convStartTime, $convEndTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
+			'sel_events_worklist_not_today', $gmtDayOffset, $convStartTime, $convEndTime, $user_id, 
+			$orgInternalId);
 	}
 
 	my @data = ();
@@ -233,14 +233,14 @@ sub getComponentHtml
 
 		my $accountBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
 			STMTMGRFLAG_NONE, 'sel_accountBalance', $_->{patient_id});
-		
+
 		my $patientBalance = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
 			STMTMGRFLAG_NONE, 'sel_patientBalance', $_->{patient_id});
 
 		my $copay;
 		$copay = $STMTMGR_COMPONENT_SCHEDULING->getSingleValue($page,
 			STMTMGRFLAG_NONE, 'sel_copay', $_->{invoice_id}) if $_->{invoice_id};
-		
+
 		my $patientHref = $PATIENT_URLS{$page->session('patientOnSelect')}->{arl};
 		$patientHref =~ s/itemValue/$_->{patient_id}/;
 		my $physicianHref = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{arl};
@@ -346,7 +346,7 @@ sub getComponentHtml
 					Print</a>
 			}
 				: undef,
-				
+
 			$patientBalance,
 		);
 

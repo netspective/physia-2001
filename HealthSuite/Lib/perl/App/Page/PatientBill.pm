@@ -120,8 +120,10 @@ sub prepare
 	my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Invoice::PATIENT_BILL_PUBLISH_DEFN);
 	my $sysdate = UnixDate('today', '%m/%d/%Y');
 	
+	my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
 	my $futureAppts = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
-		'sel_futureAppointments', $claim->{careReceiver}->{id}, $self->session('org_internal_id'));
+		'sel_futureAppointments', $gmtDayOffset, $claim->{careReceiver}->{id}, 
+		$self->session('org_internal_id'));
 		
 	my $apptHtml = qq{
 		<b><u>Next Appointments</u>:</b><br>

@@ -182,14 +182,16 @@ sub getControlBarHtml
 		}
 		else
 		{
-			if (! $self->session('time1') || $self->session('time1') =~ /:/) {
+			if (! $self->session('time1') || $self->session('time1') =~ /:/ || $self->session('time1') < 0) 
+			{
 				$time1 = 30;
 				$self->session('time1', $time1);
 			} else {
 				$time1 = $self->session('time1');
 			}
 
-			if (! $self->session('time2') || $self->session('time2') =~ /:/) {
+			if (! $self->session('time2') || $self->session('time2') =~ /:/ || $self->session('time2') < 0) 
+			{
 				$time2 = 120;
 				$self->session('time2', $time2);
 			} else {

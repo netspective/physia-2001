@@ -36,7 +36,9 @@ sub initialize
 			{
 				scope =>'person',
 				key => "#field.person_id#",
-				data => "Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> (Appt Time: #field.start_time#)"
+				data => qq{Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> 
+					<br>(Appt Time: #field.start_time#)
+				}
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -83,25 +85,16 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	#$page->beginUnitWork("Unable to checkin patient");
 
-	## First, update original event record to checkin status, and any changes
-	#my $timeStamp = $page->getTimeStamp();
-
-	my $fromTZ = $page->session('TZ');
-	my $toTZ = App::Schedule::Utilities::BASE_TZ;
-
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
-
-	my $convStamp = convertStamp2Stamp($stamp, $toTZ, $fromTZ);
 	
 	if (defined $status)
 	{
 		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person on $convStamp.</b>
+			<b style="color:red">This patient has been checked-$status by $person on $stamp.</b>
 			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
-
 	}
 	
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
@@ -109,7 +102,7 @@ sub execute
 			'Event', 'update',
 			event_id => $eventId || undef,
 			event_status => $eventStatus,
-			checkin_stamp => convertStamp2Stamp($page->field('checkin_stamp'), $fromTZ, $toTZ),
+			checkin_stamp => $page->field('checkin_stamp'),
 			checkin_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
 			subject => $page->field('subject'),

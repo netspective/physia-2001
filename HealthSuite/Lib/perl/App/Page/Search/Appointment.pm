@@ -136,7 +136,7 @@ sub getForm
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',', false);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		<input type=submit name="execute" value="Go">
-		
+
 		&nbsp; &nbsp; Order by:
 		<SELECT name='order_by'>
 			<option value="time">Appointment Time</option>
@@ -147,7 +147,7 @@ sub getForm
 		</script>
 
 		<input type=hidden name='searchAgain' value="@{[$self->param('searchAgain')]}">
-		
+
 		$itemFns
 		</CENTER>
 	};
@@ -159,15 +159,15 @@ sub execute
 {
 	my ($self) = @_;
 
-	$self->param('search_from_date', UnixDate('today', '%m/%d/%Y')) 
+	$self->param('search_from_date', UnixDate('today', '%m/%d/%Y'))
 		unless validateDate($self->param('search_from_date'));
-		
-	$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y')) 
+
+	$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y'))
 		unless validateDate($self->param('search_to_date'));
 
 	my @resource_ids = split(/\s*,\s*/, cleanup($self->param('resource_ids')));
 	my @facility_ids = split(/\s*,\s*/, cleanup($self->param('facility_ids')));
-	
+
 	if ($self->param('unAvailEventSearch'))
 	{
 		$self->param('action', 5) unless $self->param('action');
@@ -233,10 +233,11 @@ sub execute
 	{
 		my $eventId = $self->param('event_id');
 
+		my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
 		$self->addContent(
 			'<CENTER>',
 			$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_conflict_appointments',
-				[$eventId, $self->session('org_internal_id')],
+				[$gmtDayOffset, $gmtDayOffset, $eventId, $self->session('org_internal_id')],
 			),
 			'</CENTER>'
 		);
@@ -246,7 +247,7 @@ sub execute
 	{
 		my $fromDate = $self->param('search_from_date');
 		my $toDate = $self->param('search_to_date');
-		
+
 		my $fromStamp = $fromDate;
 		my $toStamp   = $toDate;
 		$fromStamp =~ s/_/ /g;
@@ -262,16 +263,18 @@ sub execute
 		}
 
 		my @data = ();
-		
+
 		push(@resource_ids, '*') unless @resource_ids;
 		push(@facility_ids, '*') unless @facility_ids;
-		
+
 		my $fromTZ = App::Schedule::Utilities::BASE_TZ;
 		my $toTZ = $self->session('TZ');
-		
+
 		my $convFromStamp = convertStamp2Stamp($fromStamp, $toTZ, $fromTZ);
 		my $convToStamp = convertStamp2Stamp($toStamp, $toTZ, $fromTZ);
-		
+
+		my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
+
 		for my $resourceId (@resource_ids)
 		{
 			$resourceId =~ s/\*/%/g;
@@ -283,16 +286,18 @@ sub execute
 				my $appts;
 				if ($self->param('order_by') eq 'name')
 				{
-					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 
-						'sel_appointment_orderbyName', $facilityId, "$convFromStamp", "$convToStamp",
-						$resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+						'sel_appointment_orderbyName', $gmtDayOffset, $gmtDayOffset, $facilityId,
+						"$convFromStamp", "$convToStamp", $resourceId, $apptStatusFrom, $apptStatusTo,
+						$self->session('org_internal_id')
 					);
 				}
 				else
 				{
-					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 
-						'sel_appointment', $facilityId, "$convFromStamp", "$convToStamp", $resourceId,
-						$apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+						'sel_appointment', $gmtDayOffset, $gmtDayOffset, $facilityId, "$convFromStamp",
+						"$convToStamp", $resourceId, $apptStatusFrom, $apptStatusTo,
+						$self->session('org_internal_id')
 					);
 				}
 
@@ -300,7 +305,7 @@ sub execute
 				{
 					my @rowData = (
 						$_->{simple_name},
-						convertStamp2Stamp($_->{start_time}, $fromTZ, $toTZ),
+						$_->{start_time},
 						$_->{resource_id},
 						$_->{patient_type},
 						$_->{subject},
@@ -310,7 +315,7 @@ sub execute
 						$_->{remarks},
 						$_->{event_id},
 						$_->{scheduled_by_id},
-						convertStamp2Stamp($_->{scheduled_stamp}, $fromTZ, $toTZ),
+						$_->{scheduled_stamp},
 						$_->{patient_id},
 						$_->{appt_type},
 						$_->{account_number},
@@ -321,7 +326,7 @@ sub execute
 				}
 			}
 		}
-		
+
 		my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Search::Appointment::STMTRPTDEFN_DEFAULT);
 		$self->addContent('<CENTER>', $html, '</CENTER>');
 	}

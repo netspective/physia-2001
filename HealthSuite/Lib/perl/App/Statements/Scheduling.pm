@@ -24,8 +24,8 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 		r_ids as resources,
 		caption,
 		org_id,
-		to_char(start_time, '$timeFormat') as start_time,
-		to_char(end_time, '$timeFormat') as end_time,
+		to_char(start_time - ?, '$timeFormat') as start_time,
+		to_char(end_time - ?, '$timeFormat') as end_time,
 		to_char(effective_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
 		decode(available,0,'Not Available',1,'Available') as available,
@@ -45,8 +45,8 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 };
 
 $STMTFMT_SEL_EVENTS = qq{
-	select to_char(e.start_time, 'hh24mi') as start_minute,
-		to_char(e.start_time,'yyyy,mm,dd') as start_day,
+	select to_char(e.start_time - :1, 'hh24mi') as start_minute,
+		to_char(e.start_time - :1, 'yyyy,mm,dd') as start_day,
 		e.duration,
 		e.event_id,
 		ea.value_text as patient_id,
@@ -58,24 +58,24 @@ $STMTFMT_SEL_EVENTS = qq{
 		e.remarks,
 		e.event_status,
 		e.facility_id,
-		to_char(e.checkin_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
-		to_char(e.checkout_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
+		to_char(e.checkin_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
+		to_char(e.checkout_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
 		stat.caption as appt_status,
 		e.parent_id,
 		e.scheduled_by_id,
-		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
+		to_char(e.scheduled_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
 		at.caption as appt_type,
 		e.appt_type as appt_type_id
-	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient, 
+	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient,
 		Event_Attribute ea, Event e
-	where e.start_time >= to_date(?, 'yyyy,mm,dd') + ?
-		and e.start_time < to_date(?, 'yyyy,mm,dd') + ?
+	where e.start_time >= to_date(:2, 'yyyy,mm,dd') + :1
+		and e.start_time < to_date(:3, 'yyyy,mm,dd') + :1
 		and e.discard_type is null
 		and e.event_status in (0,1,2)
-		%facility_clause%
+		%facilityClause%
 		and ea.parent_id = e.event_id
 		and ea.value_text = patient.person_id
-		and upper(ea.value_textB) = upper(?)
+		and upper(ea.value_textB) = upper(:5)
 		and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 		and aat.id = ea.value_int
 		and stat.id = e.event_status
@@ -103,35 +103,25 @@ $STMTRPTDEFN_TEMPLATEINFO =
 
 # -------------------------------------------------------------------------------------------
 $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
-	
-	# Time Zone ------------------------------------
-	
-	'sel_sysdate' => qq{
-		select to_char (sysdate, '$SQLSTMT_DEFAULTSTAMPFORMAT') from dual
-	},
-	
-	
-	
-	# -----------------------------------------------
-	
+
 	'sel_events_at_facility' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
-		facility_clause => 'and e.facility_id = ?',
+		facilityClause => 'and e.facility_id = :4',
 		orderByClause => 'order by e.start_time, nvl(e.parent_id, 0), e.event_id',
 	},
 
 	'sel_analyze_events' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
-		facility_clause => 'and e.facility_id = ?',
+		facilityClause => 'and e.facility_id = :4',
 		orderByClause => 'order by nvl(e.parent_id, 0), e.event_id',
 	},
 
 	'sel_events_any_facility' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
-		facility_clause => undef,
+		facilityClause => 'and e.facility_id > :4',
 		orderByClause => 'order by e.start_time, nvl(e.parent_id, 0), e.event_id',
 	},
 
@@ -163,10 +153,11 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 	'sel_eventInfo' => {
 		_stmtFmt => qq{
-			select event_status, checkin_by_id, checkout_by_id, to_char(checkin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp, 
-				to_char(checkout_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp
+			select event_status, checkin_by_id, checkout_by_id, 
+				to_char(checkin_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
+				to_char(checkout_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp
 			from Event
-			where event_id = ?
+			where event_id = :2
 		}
 	},
 
@@ -187,13 +178,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selEncountersCheckIn/Out' => qq{
 		select e.event_id, e.parent_id, e.facility_id as service_facility_id, e.event_status, e.event_type, e.subject,
-			to_char(e.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
+			to_char(e.start_time - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id, at.caption as appt_type,
 			ea.value_text as attendee_id, ea.value_int as attendee_type,
 			ea.value_textB as care_provider_id, '2' as bill_type
 		from Appt_Type at, Event_Attribute ea, Event e
-		where e.event_id = ?
+		where e.event_id = :2
 			and ea.parent_id = e.event_id
 			and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 			and at.appt_type_id(+) = e.appt_type
@@ -251,10 +242,10 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			preferences, days_of_month, months, days_of_week, patient_types, appt_types,
 			to_char(effective_begin_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_begin_date,
 			to_char(effective_end_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_end_date,
-			to_char(start_time, '$timeFormat') as duration_begin_time,
-			to_char(end_time,'$timeFormat') as duration_end_time
+			to_char(start_time - :1, '$timeFormat') as duration_begin_time,
+			to_char(end_time - :1,'$timeFormat') as duration_end_time
 		from Sch_Template_R_Ids, Sch_Template
-		where template_id = ?
+		where template_id = :2
 			and parent_id = template_id
 			and rownum = 1
 	},
@@ -268,8 +259,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selPopulateAppointmentDialog' => qq{
 		select e.event_id, e.facility_id, e.event_status, e.event_type, e.subject,
-			to_char(e.start_time, '$SQLSTMT_DEFAULTDATEFORMAT') as appt_date_0,
-			to_char(e.start_time, '$timeFormat') as appt_time_0,
+			to_char(e.start_time - :1, '$SQLSTMT_DEFAULTDATEFORMAT') as appt_date_0,
+			to_char(e.start_time - :1, '$timeFormat') as appt_time_0,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
 			ea.value_text as attendee_id,
@@ -277,7 +268,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			ea.value_textB as resource_id,
 			e.appt_type, e.parent_id
 		from Event_Attribute ea, event e
-		where event_id = :1
+		where event_id = :2
 			and ea.parent_id = e.event_id
 			and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 	},
@@ -437,8 +428,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where upper(value_textB) = upper(?)
 		and parent_id in
 			(select event_id from Event
-				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT') +1
+				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT') + ?
+					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT')  + ? +1
 					and facility_id = ?
 			)
 	},
@@ -448,8 +439,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where upper(value_textB) = upper(?)
 		and parent_id in
 			(select event_id from Event
-				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT') +1
+				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT') + ?
+					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT')  + ? +1
 					and owner_id = ?
 			)
 	},
@@ -484,32 +475,32 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		from Sch_Template
 		where owner_org_id = ?
 	},
-	
+
 	'sel_resources_like' => qq{
 		select distinct member_name as person_id
 		from Sch_Template_R_Ids
 		where upper(member_name) like upper(?)
 			and parent_id in (select template_id from Sch_Template where owner_org_id = ?)
 	},
-	
+
 	'sel_facilities_like' => qq{
 		select distinct org_internal_id, org_id
 		from Org, Sch_Template
 		where upper(org_id) like upper(?)
-			and Org.org_internal_id = Sch_Template.facility_id	
+			and Org.org_internal_id = Sch_Template.facility_id
 			and Sch_Template.owner_org_id = ?
 	},
-	
+
 # -- WAITING LIST -----------------------------------------------------------------------------
 
 	'selAppointmentConflictCheck' => qq{
-		select to_char(start_time, 'hh24mi') as start_minute,
-			to_char(start_time,'yyyy,mm,dd') as start_day, duration,
+		select to_char(start_time - ?, 'hh24mi') as start_minute,
+			to_char(start_time - ?, 'yyyy,mm,dd') as start_day, duration,
 			event_id,	ea.value_text as patient_id, ea.value_textB as resource_id,
 			Event.parent_id, Event.appt_type
 		from 	Event_Attribute ea, Event
-		where start_time between to_date(?, 'yyyy,mm,dd')
-			and to_date(?, 'yyyy,mm,dd')
+		where start_time between to_date(?, 'yyyy,mm,dd') + ?
+			and to_date(?, 'yyyy,mm,dd') + ?
 			and discard_type is null
 			and event_status in (0,1,2)
 			and facility_id = ?
@@ -573,7 +564,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'sel_futureAppointments' => {
 		sqlStmt => qq{
-			select to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
+			select to_char(e.start_time - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') appt_time,
 				ea.value_textB as physician, e.subject
 			from Event_Attribute ea, Event e
 			where e.start_time > sysdate

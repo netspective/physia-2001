@@ -20,7 +20,7 @@ sub prepare_view_alerts
 	my $patientId = $self->param('person_id');
 	
 	my $html = $STMTMGR_COMPONENT_SCHEDULING->createHtml($self, STMTMGRFLAG_NONE, 
-		'sel_detail_alerts',	[$patientId],);
+		'sel_detail_alerts',	[$self->session('GMT_DAYOFFSET'), $patientId],);
 		
 	my $patient = $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonData',
 		$patientId);

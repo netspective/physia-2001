@@ -122,7 +122,7 @@ sub handleARL_appointment
 	$self->param('dialogcommand', $pathItems->[1]);
 
 	if ($pathItems->[1] =~ /add/i) {
-		my ($resource_id, $start_stamp, $facilityInternalId, $patient_type, $appt_type) = 
+		my ($resource_id, $start_stamp, $facilityInternalId, $patient_type, $appt_type) =
 			split(/,/, $pathItems->[2]);
 		$start_stamp =~ s/\-/\//g;
 		$start_stamp =~ s/_/ /g;
@@ -216,11 +216,12 @@ sub prepare_view_handleWaitingList
 	my $self = shift;
 
 	my $eventId = $self->param('curEventId');
+	my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
 
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_conflict_appointments',
-			[$eventId, $self->session('org_internal_id')],
+			[$gmtDayOffset, $gmtDayOffset, $eventId, $self->session('org_internal_id')],
 		),
 		'</CENTER>'
 	);
@@ -305,7 +306,7 @@ sub prepare_view_apptsheet
 	}
 
 	my $selectedDate;
-	
+
 	if ($self->param('_seldate'))
 	{
 		#my ($month, $day, $year) = split(/\//, $self->param('_seldate'));
@@ -314,7 +315,7 @@ sub prepare_view_apptsheet
 		#eval{
 		#	check_date($year, $month, $day);
 		#};
-		
+
 		$selectedDate =  $@ ? 'today' : $self->param('_seldate');
 		#$selectedDate = 'today' if $year < 1001;
 		$selectedDate = 'today' unless validateDate($self->param('_seldate'));
@@ -323,7 +324,7 @@ sub prepare_view_apptsheet
 	{
 		$selectedDate = $self->session('selectedDate') || 'today';
 	}
-	
+
 	my $formattedDate = UnixDate ($selectedDate, '%m/%d/%Y');
 	$self->session('selectedDate', $formattedDate);
 
@@ -620,7 +621,7 @@ sub getChooseDateOptsHtml
 		{ caption => 'Day after Tomorrow', value => DateCalc('today', '+ 2 days') },
 		{ caption => '1 Week from Today', value => DateCalc('today', '+ 1 week') },
 	);
-	
+
 	for(my $week = 2; $week <= 12; $week++)	{
 		push(@quickChooseItems, { caption => "$week Weeks from Today", value => DateCalc('today', "+ $week weeks") });
 	}
@@ -714,14 +715,14 @@ sub initialize
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
 		unless($self->hasPermission("page/schedule/$activeView"))
 		{
 			$self->disable(
 					qq{
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/schedule/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
@@ -772,7 +773,7 @@ sub saveViewPreference
 sub createDayViewPreferences
 {
 	my ($self) = @_;
-	
+
 	my $userID = $self->session('user_id');
 	my $orgInternalId  = $self->session('org_internal_id');
 	my $itemName = 'Preference/Schedule/DayView/Column';
