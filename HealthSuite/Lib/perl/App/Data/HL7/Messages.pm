@@ -107,6 +107,9 @@ sub importFile
 			chomp;
 			my $segment = new App::Data::HL7::Segment(srcString => $_);
 			
+			# ignore every segment starting with a 'Z' because these are "vendor-specific"
+			next if substr($segment->id(), 0, 1) eq 'Z';
+			
 			if($segment->id() eq 'MSH')
 			{
 				$activeMessage = new App::Data::HL7::Message;
