@@ -273,7 +273,9 @@ sub assignInvoicePreSubmit
 	$self->assignPatientInsurance($claim, $invoiceId);
 	$self->assignPatientEmployment($claim, $invoiceId);
 	$self->assignProviderInfo($claim, $invoiceId);
-	$self->assignPaytoAndRendProviderInfo($claim, $invoiceId);
+	$self->assignCareProviderInfo($claim, $invoiceId);
+#	$self->assignPaytoAndRendProviderInfo($claim, $invoiceId);
+	$self->assignPaytoRenderingCareProviderInfo($claim, $invoiceId);
 	$self->assignReferralPhysician($claim, $invoiceId);
 	$self->assignServiceFacility($claim, $invoiceId);
 	$self->assignServiceBilling($claim, $invoiceId);
@@ -822,6 +824,36 @@ sub assignProviderInfo
    $claim->setRenderingProvider($renderingProvider);
 }
 
+sub assignCareProviderInfo
+{
+	my ($self, $claim, $invoiceId) = @_;
+
+	my $careProvider = $claim->getCareProvider();
+	my $queryStatment = "select  name_last, name_middle,  name_first, person_id from person, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and person.person_id = trans.care_provider_id ";
+	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	# do the execute statement
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	my @row = $sth->fetchrow_array();
+
+	$careProvider->setLastName($row[0]);
+	$careProvider->setMiddleInitial($row[1]);
+	$careProvider->setFirstName($row[2]);
+	$careProvider->setId($row[3]);
+	my $pId = $row[3];
+	my $careProviderAddress = $careProvider->getAddress();
+	$queryStatment = "select line1, line2, city, state, zip, country	from person_address where parent_id = \'$pId\' and address_name = \'Home\'";
+	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	@row = $sth->fetchrow_array();
+	$careProviderAddress->setAddress1($row[0]);
+	$careProviderAddress->setAddress2($row[1]);
+	$careProviderAddress->setCity($row[2]);
+	$careProviderAddress->setState($row[3]);
+	$careProviderAddress->setZipCode($row[4]);
+	$careProviderAddress->setCountry($row[5]);
+
+}
+
 sub assignPaytoAndRendProviderInfo
 {
 	my ($self, $claim, $invoiceId) = @_;
@@ -907,6 +939,95 @@ sub assignPaytoAndRendProviderInfo
 	$claim->setPayToProvider($payToProvider);
 }
 
+sub assignPaytoRenderingCareProviderInfo
+{
+	my ($self, $claim, $invoiceId) = @_;
+	my $colValText = 0;
+	my $colValTextB = 1;
+	my $colAttrnName = 2;
+	my $renderingProvider = $claim->getRenderingProvider();
+	my $payToProvider = $claim->getPayToProvider();
+	my $careProvider = $claim->getCareProvider();
+	my @providers = ($renderingProvider, $payToProvider, $careProvider);
+	my $provider;
+	my $id;
+	my @row;
+	my $queryStatment;
+	my $sth;
+	foreach $provider(@providers)
+	{
+		$id = $provider->getId();
+		my $providerAddress=$provider->getAddress();
+
+		$queryStatment = "select value_text from person_attribute where parent_id = \'$id\' and value_type = " . PROFESSIONAL_LICENSE_NO;
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		$provider->setProfessionalLicenseNo($row[0]);
+#		$payToProvider->setProfessionalLicenseNo($row[0]);
+#		$careProvider->setProfessionalLicenseNo($row[0]);
+
+		my $inputMap =
+			{
+				CERTIFICATION_LICENSE . 'Tax ID' => [ [$provider, $provider], [\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId], [$colValText, $colValTextB]],
+				PHYSICIAN_SPECIALTY . 'Primary' => [ $provider,  \&App::Billing::Claim::Physician::setSpecialityId, $colValTextB],
+				CERTIFICATION_LICENSE . 'UPIN' => [ $provider, \&App::Billing::Claim::Physician::setPIN, $colValText],
+				CONTACT_METHOD_TELEPHONE . 'Work' => [ $providerAddress, \&App::Billing::Claim::Address::setTelephoneNo, $colValText],
+				'WC#' => [$provider, \&App::Billing::Claim::Physician::setWorkersComp, $colValText],
+
+			};
+		# do the execute statement
+		$queryStatment = "select value_text , value_textB, value_type || item_name  from person_attribute where parent_id = \'$id\' ";
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		while(@row = $sth->fetchrow_array())
+		{
+			if(my $attrInfo = $inputMap->{$row[$colAttrnName]})
+			{
+				my ($objInst, $method, $bindColumn) = @$attrInfo;
+				if ($objInst ne "")
+				{
+					if (ref $method eq 'ARRAY')
+					{
+						if (ref $objInst eq 'ARRAY')
+						{
+							for my $methodNum (0..$#$method)
+							{
+								my $functionRef = $method->[$methodNum];
+								&$functionRef($objInst->[$methodNum], ($row[$bindColumn->[$methodNum]]));
+							}
+						}
+						else
+							{
+								for my $methodNum (0..$#$method)
+								{
+									my $functionRef = $method->[$methodNum];
+									&$functionRef($objInst, ($row[$bindColumn->[$methodNum]]));
+								}
+							}
+					}
+					else
+						{
+							&$method($objInst, ($row[$bindColumn]));
+						}
+				  }
+			 }
+		}
+	}
+	$queryStatment = "select value_textB from person_attribute,invoice where parent_id = invoice.client_id and item_name = \'Provider Assignment\' and invoice.invoice_id = $invoiceId and value_type = " . AUTHORIZATION_PATIENT;
+	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	# do the execute statement
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	@row = $sth->fetchrow_array();
+	$renderingProvider->setAssignIndicator($row[0]);
+	$payToProvider->setAssignIndicator($row[0]);
+	$careProvider->setAssignIndicator($row[0]);
+
+
+#	$claim->setRenderingProvider($renderingProvider);
+#	$claim->setPayToProvider($payToProvider);
+}
+
 sub assignReferralPhysician
 {
 	my ($self, $claim, $invoiceId) = @_;
@@ -982,8 +1103,8 @@ sub assignTransProvider
 {
 	my ($self, $claim, $invoiceId) = @_;
 
-	my $queryStatment = " select person_id, Complete_name from person where person_id =
-											(select trans.provider_id from transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction)";
+	my $queryStatment = " select person.person_id, person.Complete_name from person where person.person_id =
+											(select trans.provider_id from transaction trans, invoice where invoice.invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction)";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1331,6 +1452,12 @@ sub assignInvoiceProperties
 	$payer3->setAddress($payer3Address);
 	my $payer4Address = new App::Billing::Claim::Address;
 	$payer4->setAddress($payer4Address);
+
+ 	my $careProvider = new App::Billing::Claim::Physician;
+	my $careProviderAddress = new App::Billing::Claim::Address;
+	$careProvider->setAddress($careProviderAddress);
+	$careProvider->setType("care provider");
+	$claim->setCareProvider($careProvider);
 
 	$payToProvider->setType("pay to");
 	$renderingProvider->setType("rendering");

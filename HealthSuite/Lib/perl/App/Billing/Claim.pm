@@ -40,7 +40,7 @@ sub new
 	$params{payToProvider} = undef; #$params{careProvider} = undef;
 	$params{renderingOrganization} = undef;
 	$params{renderingProvider} = undef;
-
+	$params{careProvider} = undef;
 
 	# $params{billReceiverType} = undef;
 
@@ -561,6 +561,17 @@ sub getRenderingProvider
 	return $self->{renderingProvider};
 }
 
+sub setCareProvider
+{
+	my ($self, $value) = @_;
+	$self->{careProvider} = $value;
+}
+
+sub getCareProvider
+{
+	my ($self) = @_;
+	return $self->{careProvider};
+}
 
 sub setRenderingOrganization
 {
