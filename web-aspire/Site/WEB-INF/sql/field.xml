@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="field">
+		<statement name="personIdPopulateQuery">
+			select distinct(person_id), category
+			from person_org_category
+			where category in ?
+		</statement>
+	</sql-statements>
+</xaf>

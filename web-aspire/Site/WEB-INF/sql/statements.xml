@@ -15,6 +15,7 @@
 	<include file="device.xml"/>
 	<include file="document.xml"/>
 	<include file="external.xml"/>
+	<include file="field.xml"/>
 	<include file="handheld.xml"/>
 	<include file="insurance.xml"/>
 	<include file="intellicode.xml"/>
