@@ -33,13 +33,13 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'acct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
-		#GENERAL INFORMATION		
-		new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
-							name => 'person_id',
-							options => FLDFLAG_REQUIRED,
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-							postHtml => $postHtml),
-							
+		#GENERAL INFORMATION
+		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
+		#					name => 'person_id',
+		#					options => FLDFLAG_REQUIRED,
+		#					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#					postHtml => $postHtml),
+
 		new CGI::Dialog::Field(name => 'nurse_title',
 						caption => 'Person Title/Job Code',
 						choiceDelim =>',',
@@ -48,7 +48,7 @@ sub initialize
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Title'."
 				),
-		
+
 		new CGI::Dialog::Field(name => 'physician_type',
 						caption => 'Person Type',
 						choiceDelim =>',',
@@ -57,13 +57,13 @@ sub initialize
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Type'."
 				),
-				
+
 		new CGI::Dialog::MultiField(caption =>'Job Title/Code', name => 'job_code',
 			fields => [
 					new CGI::Dialog::Field(caption => 'Job Title', name => 'job_title'),
 					new CGI::Dialog::Field(caption => 'Code', name => 'job_code'),
 				]),
-							
+
 		new CGI::Dialog::MultiField(caption =>'Account/Chart Number', name => 'acct_chart_num',
 			fields => [
 					new CGI::Dialog::Field(caption => 'Account Number', name => 'acct_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -112,7 +112,7 @@ sub initialize
 
 		new CGI::Dialog::Field(type => 'email', caption => 'Email', name => 'email', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		scope =>'person',
@@ -180,8 +180,8 @@ sub makeStateChanges
 		$page->field('person_id', $personId);
 		#$self->setFieldFlags('person_id', FLDFLAG_READONLY);
 	}
-	
-	$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';	
+
+	$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
 }
 
 sub populateData
@@ -194,7 +194,7 @@ sub populateData
 	my $itemName11 = 'Patient/Preferred/Day';
 	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
-	my $preferredDay = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName11);	
+	my $preferredDay = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName11);
 	$page->field('prefer_day', $preferredDay->{value_text});
 	my @ethnicity = split(', ', $personInfo->{ethnicity});
 	$page->field('ethnicity', @ethnicity);
@@ -203,28 +203,28 @@ sub populateData
 	{
 		$page->field('delete_record', 1);
 	}
-	
+
 	my $itemName = 'Patient/Account Number';
 	my $acctNum = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
-	$page->field('acct_number', $acctNum->{'value_text'});	
+	$page->field('acct_number', $acctNum->{'value_text'});
 	$page->field('acct_item_id', $acctNum->{'item_id'});
-	
+
 	my $itemName1 = 'Patient/Chart Number';
 	my $chartNum  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName1);
 	$page->field('chart_number', $chartNum->{'value_text'});
 	$page->field('chart_item_id', $chartNum->{'item_id'});
-	
+
 	#my $itemName2 = 'Nurse/Title';
 	#my $nurseTitle  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName2);
 	#$page->field('nurse_title', $nurseTitle->{'value_text'});
 	#$page->field('nurse_title_item_id', $nurseTitle->{'item_id'});
-	
+
 	#my $itemName3 = 'Physician/Type';
 	#my $physicianType  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName3);
 	#my @phyType = split(',', $physicianType->{'value_text'});
-	#$page->field('physician_type', @phyType);		
+	#$page->field('physician_type', @phyType);
 	#$page->field('phy_type_item_id', $physicianType->{'item_id'});
-	
+
 }
 
 sub handleContactInfo
@@ -400,9 +400,9 @@ sub handleRegistry
 				_debug => 0
 			) if $member ne 'patient';
 	}
-	
+
 	handleAttrs($self, $page, $command, $flags, $member, $personId);
-	
+
 	$member = lc($member);
 	if($page->field('delete_record'))
 	{
@@ -411,7 +411,7 @@ sub handleRegistry
 	else
 	{
 		$self->handlePostExecute($page, $command, $flags);
-	}	
+	}
 
 
 }
@@ -419,7 +419,7 @@ sub handleRegistry
 sub handleAttrs
 {
 	my ($self, $page, $command, $flags, $member, $personId) = @_;
-	
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
@@ -430,26 +430,26 @@ sub handleAttrs
 			value_text => $page->field('physician_type') || undef,
 			_debug => 0
 			) if $page->field('physician_type') ne '';
-		
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
-			parent_id => $personId || undef,			
+			parent_id => $personId || undef,
 			parent_org_id => $page->session('org_id') ||undef,
 			item_name => 'Misc Notes' ,
 			value_text => $page->field('misc_notes') || undef,
 			_debug => 0
 			) if $page->field('misc_notes') ne '';
-			
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
-			parent_id => $personId || undef,			
+			parent_id => $personId || undef,
 			parent_org_id => $page->session('org_id') ||undef,
 			item_name => 'Job Code' ,
 			value_text => $page->field('job_code') || undef,
 			value_textB => $page->field('job_title') || undef,
 			_debug => 0
 			) if ($page->field('job_code') ne '' || $page->field('job_title') ne '');
-	
+
 }
 
 sub customValidate
