@@ -137,6 +137,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	$command = 'add';
 
+	my $invoiceId = $page->param('invoice_id');
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
@@ -149,7 +150,6 @@ sub execute
 		{
 			my $totalAdjustForItemAndItemAdjust = 0 - $payment;
 
-			my $invoiceId = $page->param('invoice_id');
 			my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
 			my $itemSeq = $totalDummyItems + 1;
 
@@ -167,8 +167,6 @@ sub execute
 
 
 			# Create adjustment for the item
-
-			my $payerIs = $page->param('payment');
 			my $payerType = App::Universal::ENTITYTYPE_PERSON;
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
@@ -215,10 +213,7 @@ sub execute
 
 
 			#Create history attribute for this adjustment
-
-			$payerIs = "\u$payerIs";
-			my $description = "$payerIs payment/adjustment made";
-
+			my $description = "Personal payment made by $payerId";
 			$page->schemaAction(
 					'Invoice_Attribute', 'add',
 					parent_id => $invoiceId || undef,
@@ -262,8 +257,6 @@ sub execute
 
 
 			# Create adjustment for the item
-
-			my $payerIs = $page->param('payment');
 			my $payerType = App::Universal::ENTITYTYPE_PERSON;
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
@@ -304,10 +297,7 @@ sub execute
 
 
 			#Create history attribute for this adjustment
-
-			$payerIs = "\u$payerIs";
-			my $description = "$payerIs payment/adjustment made";
-
+			my $description = "Personal payment made by $payerId";
 			$page->schemaAction(
 					'Invoice_Attribute', 'add',
 					parent_id => $invoiceId || undef,
@@ -321,7 +311,7 @@ sub execute
 		}
 	}
 	
-	$self->handlePostExecute($page, $command, $flags);
+	$page->redirect("/invoice/$invoiceId/summary");
 
 }
 
