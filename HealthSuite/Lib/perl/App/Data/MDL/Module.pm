@@ -60,7 +60,7 @@ use constant MDLFLAGS_DEFAULT => 0;
 	'Champus' => App::Universal::CLAIMTYPE_CHAMPUS,
 	'ChampVA' => App::Universal::CLAIMTYPE_CHAMPVA,
 	'WorkersComp' => App::Universal::CLAIMTYPE_WORKERSCOMP,
-	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NON_CAP,
+	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NONCAP,
 	'ThirdParty' => App::Universal::CLAIMTYPE_CLIENT
 );
 
