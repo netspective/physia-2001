@@ -91,7 +91,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			WHERE 	oce.catalog_id (+)= oc.internal_catalog_id
 			AND  	oa.parent_id = :1
 			AND  	oa.item_name = 'Fee Schedule'
-			AND   	oa.value_int = oc.internal_catalog_id	
+			AND   	oa.value_int = oc.internal_catalog_id
 			AND oct.id = oc.catalog_type
 			GROUP BY oc.catalog_id,oct.caption,oc.internal_catalog_id
 	},
@@ -99,10 +99,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
 	publishDefn => {
 				bullets => '/org/#param.org_id#/catalog/#3#/#0#?home=#homeArl#',
-		
+
 				columnDefn => [
 						{dataFmt =>'#1# : #0# (#2#)  '},
-					],					
+					],
 			},
 	publishDefn_panel =>
 	{
@@ -122,21 +122,21 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishDefn_panelEdit =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
-		style => 'panel.edit',	
-		frame => { heading => 'Edit Service Catalog/Fee Schedule' },		
+		style => 'panel.edit',
+		frame => { heading => 'Edit Service Catalog/Fee Schedule' },
 		banner => {
 			actionRows =>
 			[
 			{caption =>qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog-item/#param.fs_internal_catalog_id#?home=#homeArl#'>Fee Schedule Entry</A>} },
-			{caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-service-catalog/#param.sc_internal_catalog_id#?home=#homeArl#'>Service Catalog Entry</A> },},				
+			{caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-service-catalog/#param.sc_internal_catalog_id#?home=#homeArl#'>Service Catalog Entry</A> },},
 			],
 			},
-		
-	},	
+
+	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId]); },
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panel'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.serviceCatalog', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); 
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id');
 	#Set param for fee schedule and service catalog
 	my $fs_internal_catalog_id=$STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'sel1CatalogByOrgIDType',$orgId,0);
 	my $sc_internal_catalog_id=$STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'sel1CatalogByOrgIDType',$orgId,1);
@@ -156,13 +156,13 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlvar_entityName => 'Org',
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
 	publishDefn => {
-				bullets => '/org/#param.org_id#/dlg-update-catalog-item/#3#?home=#homeArl#',		
+				bullets => '/org/#param.org_id#/dlg-update-catalog-item/#3#?home=#homeArl#',
 				columnDefn => [
-				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},							
-				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},																	
+				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},
+				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},
 				{colIdx => 2, head => 'Code Type', hAlign=>'left',dAlign => 'left'},
 				{colIdx => 4, head => 'Charge', hAlign=>'right',dAlign => 'left',dformat => 'currency' ,summarize=>'sum'},
-				
+
 ],
 			banner =>
 			{
@@ -200,7 +200,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 #----------------------------------------------------------------------------------------------------------------------
 'org.serviceCatalogEntry' => {
 	sqlStmt => qq{
-			SELECT	oce.code,(SELECT  name FROM ref_service_category WHERE oce.code = serv_category), oce.entry_id			
+			SELECT	oce.code,(SELECT  name FROM ref_service_category WHERE oce.code = serv_category), oce.entry_id
 			FROM 	offering_catalog_entry oce,offering_catalog oc
 			WHERE 	oce.catalog_id = :1
 			AND	oc.internal_catalog_id = oce.catalog_id
@@ -208,11 +208,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlvar_entityName => 'Org',
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
 	publishDefn => {
-				bullets => '/org/#param.org_id#/dlg-update-service-catalog/#2#?home=#homeArl#',		
+				bullets => '/org/#param.org_id#/dlg-update-service-catalog/#2#?home=#homeArl#',
 				columnDefn => [
-				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},							
-				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},																	
-				
+				{colIdx => 0, head => 'Code',hAlign=>'left', dAlign => 'left',tDataFmt => '&{count:0} Entries',},
+				{colIdx => 1, head => 'Name', hAlign=>'left',dAlign => 'left'},
+
 ],
 			banner =>
 			{
@@ -1142,7 +1142,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		columnDefn => [
 			{ dataFmt => 'Org Notes #4#: #5# (#6#, #7#)' },
 		],
-		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-notes/#1#?home=#homeArl#',
 		frame => {
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-notes?home=#homeArl#',
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -1168,11 +1168,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-misc-notes?home=#param.home#'>Org Notes</A> } },
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-notes?home=#param.home#'>Org Notes</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-notes/#1#?home=#param.home#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-org-notes/#1#?home=#param.home#',
 		},
 	},
 
