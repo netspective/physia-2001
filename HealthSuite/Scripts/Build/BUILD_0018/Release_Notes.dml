@@ -70,6 +70,7 @@
 		
 		<deliverable id="1447">
 			Added activity logs to showup in the 'My Recent Activity (today)' component in the user's home page.
+			NOTE: Updated the Activitylog for the ContactMethods component and the SurgicalProcedure component
 		</deliverable>
 
 		<deliverable id="1501">
