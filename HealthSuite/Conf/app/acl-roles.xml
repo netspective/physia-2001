@@ -89,5 +89,9 @@
 			<deny permission="group/data-admin"/>
 			<deny permission="group/sde" />
 		</permission>
+		<permission id="Administrator">
+			<allow permission="group/Superuser"/>
+			<deny permission="group/sde" />
+		</permission>
 	</permissions>
 </accesscontrol>
