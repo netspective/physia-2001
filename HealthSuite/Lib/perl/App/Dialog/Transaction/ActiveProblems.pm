@@ -28,7 +28,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		transType => App::Universal::TRANSTYPEDIAG_SURGICAL,
 		heading => '$Command Surgical Procedure',
 		_arl_add => ['person_id'],
-		_arl_remove => ['trans_id'],
+		_arl_modify => ['trans_id'],
 		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_SURGICAL()
 	},
 	'activeproblems-perm' => {
@@ -100,7 +100,8 @@ sub new
 	{
 		$self->addContent(
 			new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician']),
-			new CGI::Dialog::Field(caption => 'ICD Code', name => 'code'),
+			new CGI::Dialog::Field(caption=>'CPT Code', type=>'text',size=>9,name=>"code",findPopup => '/lookup/cpt'),
+			#new CGI::Dialog::Field(caption => 'ICD Code', name => 'code'),
 			new CGI::Dialog::Field(type => 'memo', name => 'data_text_a', caption => 'Notes', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(caption => 'Surgery Date', name => 'curr_onset_date', type => 'date'),
 		);
@@ -110,10 +111,11 @@ sub new
 	return $self;
 }
 
-sub populateData_remove
+sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 	my $transId = $page->param('trans_id');
 	my $transType = $self->{transType};
 	my $icdTransType = App::Universal::TRANSTYPEDIAG_ICD;
@@ -156,6 +158,35 @@ sub execute_add
 
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return 'Add completed.';
+}
+
+sub execute_update
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $personType = App::Universal::ENTITYTYPE_PERSON;
+	my $transStatusActive = App::Universal::TRANSSTATUS_ACTIVE;
+	#my @icdDiags = split(/\s*,\s*/, $page->field('code'));
+	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
+	my $transId = $page->param('trans_id');
+
+	$page->schemaAction(
+		'Transaction', 'update',
+		trans_id => $transId || undef,
+		trans_type => $self->{transType} || undef,
+		trans_status => defined $transStatusActive ? $transStatusActive : undef,
+		trans_owner_type => $personType || undef,
+		trans_owner_id => $page->param('person_id') || undef,
+		curr_onset_date => $page->field('curr_onset_date') || undef,
+		trans_begin_stamp => $todaysDate || undef,
+		provider_id => $page->field('provider_id') || undef,
+		data_text_a => $page->field('data_text_a') || undef,
+		code => $page->field('code') || undef,
+		_debug => 0
+	);
+
+	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	return 'Update completed.';
 }
 
 
