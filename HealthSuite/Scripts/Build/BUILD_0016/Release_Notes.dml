@@ -82,7 +82,10 @@
 		<deliverable id="1024">
 			On collection worklist account notes replaced Complete Name with Simple Names
 		</deliverable>
-
+		<deliverable id="none">
+			Added information about the build number, database type to the bottom of the login window 
+			to aid in troubleshooting.
+		</deliverable>
 	</deliverables>
 </release-notes>
 
