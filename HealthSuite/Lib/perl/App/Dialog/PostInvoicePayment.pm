@@ -141,6 +141,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_items_list', FLDFLAG_INVISIBLE, 1);
 	}
@@ -151,6 +152,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
+		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, $isInsurance);
 	}
 
 	my $batchId = $page->param('_p_batch_id') || $page->field('batch_id');
