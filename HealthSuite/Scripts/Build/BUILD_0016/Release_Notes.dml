@@ -70,7 +70,11 @@
 		<deliverable id="1163">
 			TWCC 60 Form: dialog and pdf complete.
 		</deliverable>
-
+		
+		<deliverable id="1169">
+			UI: Added 2 more options called 'Order by Account Number' and 'Order by Chart Number' in the appointment lookup.
+		</deliverable>
+		
 		<deliverable id="1171">
 			UI: Added a new component called 'Appointment Discard Type Count' to give the count of 'Rescheduled', 'No Show' 
 				and 'Cancel' appointments.
