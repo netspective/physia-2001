@@ -39,6 +39,12 @@
 		<deliverable id="758">
 			Faster text report printing.
 		</deliverable>
+		<deliverable id="1298">
+			Collection report
+		</deliverable>
+		<deliverable id="1038">
+			Aged Patient Reveivables and Aged Insurance Receivables additional selection constraints
+		</deliverable>
 	</deliverables>
 </release-notes>
 
