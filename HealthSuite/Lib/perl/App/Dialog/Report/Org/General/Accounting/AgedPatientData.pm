@@ -38,7 +38,7 @@ sub new
 			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::Field(
-			caption => 'Provider',
+			caption => 'Physician ID',
 			name => 'provider_id',
 			fKeyStmtMgr => $STMTMGR_PERSON,
 			fKeyStmt => 'selPersonBySessionOrgAndCategory',

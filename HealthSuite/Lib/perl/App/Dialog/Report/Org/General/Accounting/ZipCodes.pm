@@ -38,7 +38,7 @@ sub new
 				]
 			),
 			new CGI::Dialog::Field(
-				caption => 'Provider',
+				caption => 'Physician',
 				name => 'provider_id',
 				fKeyStmtMgr => $STMTMGR_PERSON,
 				fKeyStmt => 'selPersonBySessionOrgAndCategory',

@@ -36,7 +36,7 @@ sub new
 				begin_caption => 'Report Begin Date',
 				end_caption => 'Report End Date',
 				),		
-			new App::Dialog::Field::Person::ID(caption =>'Provider ID',types => ['Physician'], name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			new App::Dialog::Field::Person::ID(caption =>'Physician ID',types => ['Physician'], name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			new CGI::Dialog::Field(caption =>'Payment Type',
 					name => 'transaction_type',
 					options => FLDFLAG_PREPENDBLANK,
