@@ -204,7 +204,8 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 		</deliverable>
 		
 		<deliverable id="1748">
-			Corrected Close Date Report.  Will require a Collection Worklist refresh from the front end.
+			Corrected Close Date Report to exclude secondary invoices which have been
+			doubling the charges causing balances to be off.
 		</deliverable>
 
 		<deliverable id="1752">
