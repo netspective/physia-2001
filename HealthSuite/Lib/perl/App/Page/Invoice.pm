@@ -25,7 +25,7 @@ use App::Dialog::OnHold;
 use App::Dialog::Diagnoses;
 use App::Dialog::ClaimProblem;
 use App::Dialog::PostGeneralPayment;
-use App::Dialog::PostInsurancePayment;
+use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 #use App::Billing::Output::tPdfCLaim;
@@ -231,15 +231,15 @@ sub getProceduresHtml
 			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0></a>";
 		}
 
+		## ---Removed 'P' and replaced it with a quick link that displays all items and allows distribution of personal payment
+		#my $addPersPayHref = "/invoice/$invoiceId/dialog/adjustment/personal,$itemId";
+		#my $persPayImg = '';
+		#if($itemStatus ne 'void')
+		#{
+		#	$persPayImg = "<a href='$addPersPayHref'><font face='Arial,Helvetica' color=green size=2>P</font></a>";
+		#}
 
-		my $addPersPayHref = "/invoice/$invoiceId/dialog/adjustment/personal,$itemId";
-		my $persPayImg = '';
-		if($itemStatus ne 'void')
-		{
-			$persPayImg = "<a href='$addPersPayHref'><font face='Arial,Helvetica' color=green size=2>P</font></a>";
-		}
-
-
+		## ---Removed '$' and replaced it with a quick link that displays all items and allows distribution of insurance payment
 		#my $addInsPayHref = "/invoice/$invoiceId/dialog/adjustment/insurance,$itemId";
 		#my $insPayImg = '';
 		my $itemAdjustmentTotal = $procedure->{totalAdjustments};
@@ -278,7 +278,7 @@ sub getProceduresHtml
 		my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 		push(@rows, qq{
 			<TR>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$persPayImg&nbsp;$editProcImg&nbsp;$voidProcImg<B>$lineSeq</B></FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=3>$editProcImg&nbsp;$voidProcImg<B>$lineSeq</B></FONT></TD>
 				<TD>&nbsp;</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$procedure->{dateOfServiceFrom} @{[ $procedure->{dateOfServiceTo} ne $procedure->{dateOfServiceFrom} ? " - $procedure->{dateOfServiceTo}" : '']} </TD>
 				<TD>&nbsp;</TD>
@@ -819,7 +819,7 @@ sub getIntelliCodeResultsHtml
 # DIALOG MANAGEMENT METHODS
 #-----------------------------------------------------------------------------
 
-sub prepare_dialog_procedure
+sub prepare_dialog_procedure	#need this
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -948,7 +948,7 @@ sub prepare_dialog_adjustment
 	return 1;
 }
 
-sub prepare_dialog_diagnoses
+sub prepare_dialog_diagnoses	#need this
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -963,7 +963,7 @@ sub prepare_dialog_diagnoses
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_hold
+sub prepare_dialog_hold	#need this
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -976,7 +976,7 @@ sub prepare_dialog_hold
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_problem
+sub prepare_dialog_problem	#need this
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
@@ -1004,30 +1004,17 @@ sub prepare_dialog_claim
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_invoice
-{
-	my $self = shift;
-	my $invoiceId = $self->param('invoice_id');
-	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
-	my ($action) = split(/,/, $dialogCmd);
-
-	my $cancelUrl = "/invoice/$invoiceId/summary";
-	my $dialog = new App::Dialog::Invoice(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $action);
-
-	$self->addContent('<p>');
-	return $self->prepare_view_summary();
-}
-
-sub prepare_dialog_postinspayment
+sub prepare_dialog_postinvoicepayment	#need this
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
 
-	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	my $isPayer = $self->param('_pm_dialog_cmd');
+	$self->param('isPayer', $isPayer);
+
 	my $cancelUrl = "/invoice/$invoiceId/summary";
-	my $dialog = new App::Dialog::PostInsurancePayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $dialogCmd);
+	my $dialog = new App::Dialog::PostInvoicePayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, 'add');
 
 	$self->addContent('<p>');
 	return $self->prepare_view_summary();
@@ -1125,14 +1112,14 @@ sub prepare_view_summary
 						@{[ $invStatus >= $submitted && $claimType != $selfPay && $invStatus != $void ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/postinspayment'>Apply Insurance Payment</a>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Apply Insurance Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 
 						@{[ $invStatus != $void ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dlg-add-postpayment'>Apply Personal Payment</a>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment/personal'>Apply Personal Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 					</TR>
@@ -1603,19 +1590,18 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
-						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinspayment'>Post Insurance Payment</option>" : '' ]}
-						<!-- @{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]} -->
+						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/invoice/$invoiceId/dlg-add-postpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
 						@{[ $invType == $hcfaInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
-						@{[ $invType == $genericInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/invoice/update'>Edit Invoice</option>" : '' ]}
+						@{[ $invType == $genericInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
 						@{[ $invStatus != $onHold && $invStatus < $submitted && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dialog/invoice/remove'>Void Invoice</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 						@{[ $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
 						@{[ $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
@@ -1681,7 +1667,6 @@ sub handleARL
 	return 'UIE-003010' unless $pathItems->[0];
 
 	$self->param('invoice_id', $pathItems->[0]);
-	#$self->addError($pathItems->[0]);
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1] || 'summary') if $pathItems->[1];
