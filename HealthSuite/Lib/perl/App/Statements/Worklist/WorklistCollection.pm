@@ -257,6 +257,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	'sel_worklist_available_products' => qq{
 		select ins_internal_id as product_id, product_name 
 		from Insurance where record_type = $INSURANCE_TYPE_PRODUCT
+		order by product_name
 	},
 	'sel_worklist_associated_products' => qq{
 		select pa.value_int as product_id, i.product_name
@@ -267,6 +268,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			and i.ins_internal_id = pa.value_int
 			and pa.value_type = $INT_VALUE_TYPE
 			and item_name = 'WorkList-Collection-Setup-Product'
+		order by i.product_name
 	},
 	'del_worklist_associated_products' => qq{
 		delete from Person_Attribute
@@ -341,20 +343,22 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				and item_name = 'WorkList-Collection-Setup-Physician')
 	},
 	'sel_worklist_available_physicians' => qq{
-		select distinct p.person_id, p.complete_name
+		select distinct p.person_id, p.complete_name,p.name_last
 		from person p, person_org_category pcat
 		where p.person_id=pcat.person_id
 			and pcat.org_internal_id= ?
 			and category='Physician'
+		order by p.name_last
 	},
 	'sel_worklist_associated_physicians' => qq{
-		select pa.value_text as person_id, p.complete_name
+		select pa.value_text as person_id, p.complete_name,p.name_last
 		from Person_Attribute pa, Person p
 		where 
 			parent_id = ?
 			and p.person_id = pa.value_text
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
 			and item_name = 'WorkList-Collection-Setup-Physician'
+		order by p.name_last
 	},
 	'sel_worklist_text' => qq{
 		select value_text as resource_id
