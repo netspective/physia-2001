@@ -32,7 +32,7 @@ sub prepare_view_date
 				</TD>
 			</TR>
 			<TR>
-				<TD>&nbsp;</TD>
+				<TD colspan=5>&nbsp;</TD>
 			</TR>
 			<TR VALIGN=TOP>
 				<TD>
@@ -44,45 +44,6 @@ sub prepare_view_date
 				</TD>
 				<TD>&nbsp;</TD>
 				<TD>
-					#component.navigate-reports-root#
-				</TD>
-			</TR>
-		</TABLE>
-	});
-
-	return 1;
-}
-
-sub __prepare_view_date
-{
-	my ($self) = @_;
-
-	$self->addContent(qq{
-		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-			<TR VALIGN=TOP>
-				<TD colspan=5>
-					#component.worklist#
-				</TD>
-			</TR>
-			<TR>
-				<TD>
-					<A name=SETUP>
-					<A HREF='#TOP'><IMG SRC='/resources/icons/arrow-up-blue.gif' BORDER=0>Go to top</A>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.resourceselector# <BR>
-					#component.facilityselector# <BR>
-				</TD>
-				<TD>&nbsp</TD>
-				<TD>
-					#component.on-select#<BR>
-					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp</TD>
-				<TD>
-					#component.lookup-records#<BR>
 					#component.navigate-reports-root#
 				</TD>
 			</TR>
@@ -111,7 +72,7 @@ sub prepare_view_recentActivity
 				</TD>
 			</TR>
 			<TR>
-				<TD>&nbsp;</TD>
+				<TD colspan=5>&nbsp;</TD>
 			</TR>
 			<TR VALIGN=TOP>
 				<TD>
@@ -193,7 +154,7 @@ sub prepare_page_content_header
 		[
 			[$dateTitle, "/worklist/date", 'date'],
 			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
-			['Setup', "/collector/setup", 'setup', ],
+			['Setup', "/worklist/collection/setup", 'setup', ],
 			#['Setup', "#SETUP", 'setup'],
 			
 		], ' | ');
