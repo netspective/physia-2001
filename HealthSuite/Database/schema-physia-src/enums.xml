@@ -260,8 +260,6 @@
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
 		<enum>Discount</enum>
-		<enum>Refund</enum>
-		<enum>Credit</enum>
 		<enum>Professional Courtesy</enum>
 		<enum>Bad Debt</enum>
 		<enum>Collection Agency</enum>
