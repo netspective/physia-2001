@@ -213,12 +213,12 @@ sub execute_add
 	{
 		if($itemId eq '')
 		{
+			## Create Invoice Item, with item type = 0 (INVOICE) if no item id was passed in
+			## (adjustment is being made to entire claim)
+
 			my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 			my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
 			my $itemSeq = $totalDummyItems + 1;
-
-			## Create Invoice Item, with item type = 0 (INVOICE) if no item id was passed in
-			## (adjustment is being made to entire claim)
 
 			$itemId = $page->schemaAction(
 					'Invoice_Item', 'add',
@@ -230,7 +230,10 @@ sub execute_add
 		}
 
 
-		## Create Invoice Item Adjustments
+
+
+		#Create the adjustment for the item
+
 		my $payerIs = $page->param('payment');
 
 		my $payerId = $page->field('payer_id');
@@ -263,6 +266,11 @@ sub execute_add
 				_debug => 0
 			);
 
+
+
+
+		#Update the item that was passed in or the dummy item just created
+
 		my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
 
 		my $totalAdjustForItem = $invItem->{total_adjust} + $netAdjust;
@@ -277,6 +285,10 @@ sub execute_add
 			);
 
 
+
+
+		#Update the invoice
+
 		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 
 		my $totalAdjustForInvoice = $invoice->{total_adjust} + $netAdjust;
@@ -290,25 +302,25 @@ sub execute_add
 				_debug => 0
 			);
 
-		my $paymentBy = $page->param('payment');
-		$paymentBy = "\u$paymentBy";
 
-		my $action = '';
-		$action = "$paymentBy payment/adjustment made";
+
+		#Create history attribute for this adjustment
+
+		$payerIs = "\u$payerIs";
+		my $description = "$payerIs payment/adjustment made";
 
 		$page->schemaAction(
 				'Invoice_Attribute', 'add',
 				parent_id => $invoiceId || undef,
 				item_name => 'Invoice/History/Item',
 				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => $action,
+				value_text => $description,
 				value_textB => $page->field('comments') || undef,
 				value_date => $todaysDate,
 				_debug => 0
 			);
 	}
 
-	#$page->redirect("/invoice/$invoiceId/summary");
 	$self->handlePostExecute($page, $command, $flags);
 
 }
