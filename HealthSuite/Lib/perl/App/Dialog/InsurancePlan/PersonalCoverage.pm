@@ -32,7 +32,7 @@ sub new
 
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
-	
+
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
@@ -94,7 +94,7 @@ sub new
 			name => 'insured_id',
 			),
 		new App::Dialog::Field::Organization::ID(
-			caption => "Employer",
+			caption => "Insured Person's Employer",
 			name => "employer_org_id",
 			),
 		new CGI::Dialog::MultiField(
@@ -222,7 +222,7 @@ sub new
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	# Populating the fields while updating the dialog
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
 
@@ -249,7 +249,7 @@ sub makeStateChanges
 		$page->field('person_id', $page->param('person_id'));
 		$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1);
 	}
-	
+
 	if ($page->field('rel_to_insured') == App::Universal::INSURED_SELF)
 	{
 		$page->field('insured_id', $page->field('person_id'));
@@ -260,11 +260,11 @@ sub makeStateChanges
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	# Return if we're in remove mode
 	my $command = $self->getActiveCommand($page);
 	return () if $command eq 'remove';
-	
+
 	my $ownerOrgId = $page->session('org_internal_id');
 
 	# Validate Relationship To Insured
@@ -275,7 +275,7 @@ sub customValidate
 	my $personId = $page->field('person_id');
 	# If the relationship is not 'SELF' and Insured Person ID is blank or same as Patient ID
 	if ($relToInsured != App::Universal::INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
-	{	
+	{
 		if($insuredId ne '')
 		{
 			$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is '$personId'");
@@ -283,7 +283,7 @@ sub customValidate
 		}
 		else
 		{
-			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient ',null,null,['_f_person_id'],['_f_insured_id']);};	
+			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient ',null,null,['_f_person_id'],['_f_insured_id']);};
 			my $invMsg = qq{$insuredIdField->{caption} is required when Relationship is not 'Self'.  <a href="$createPersonHref">Create A New Person ID?</a> };
 			$insuredIdField->invalidate($page, $invMsg)
 		}
@@ -332,12 +332,12 @@ sub customValidate
 			}
 		}
 		else
-		{	
+		{
 			my $newPlanHref = "javascript:doActionPopup('/org-p/" . $page->session('org_id') . "/dlg-add-ins-plan?_f_plan_name=" . $page->field('plan_name') . "')";
 			$planField->invalidate($page, "Insurance Plan '" . $page->field('plan_name') . qq{' does not exist. <a href="$newPlanHref">Create it now?</a>});
 		}
 	}
-	
+
 	# Validate that they entered either a product or a plan
 	unless($productRecord || $planRecord)
 	{
@@ -350,9 +350,9 @@ sub customValidate
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $ownerOrgIntId = $page->session('org_internal_id');
-	# Since Ins Plan is not required, the parent record could be a Plan or Product record	
+	# Since Ins Plan is not required, the parent record could be a Plan or Product record
 	my $parentRecord;
 	if ($page->field('plan_name'))
 	{
