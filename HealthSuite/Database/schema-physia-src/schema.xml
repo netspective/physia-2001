@@ -415,7 +415,7 @@
 		<column name="pay_type" lookupref="Payment_Type" descr="The type of payment"/>
 		<column name="pay_method" lookupref="Payment_Method" descr="The method of payment"/>
 		<column name="pay_ref" type="text" size="128" descr="Any reference text that goes with pmt type (card #, check #)"/>
-		<column name="writeoff_code" type="text" size="32" descr="Any writeoffs' codes"/>
+		<column name="writeoff_code" lookupref="Writeoff_Type" descr="Any writeoffs' codes"/>
 		<column name="writeoff_amount" type="currency" descr="Any writeoffs' amounts"/>
 		<column name="adjust_codes" type="text" size="32" descr="Adjustment code(s)"/>
 		<column name="net_adjust" type="currency" calc="trigger" descr="The real adjustment (taking into account writeoff, payment, etc. maintained automatically)"/>
