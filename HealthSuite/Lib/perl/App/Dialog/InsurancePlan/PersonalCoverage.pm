@@ -39,13 +39,6 @@ sub new
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
 			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
 			new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan'),
-			#new CGI::Dialog::Field::TableColumn(
-			#					caption => 'Insurance Type',
-			#					schema => $schema,
-			#					column => 'Insurance.ins_type',
-			#					typeGroup => ['insurance', 'workers compensation']),
-
-			#new CGI::Dialog::Field(lookup => 'Bill_Sequence', caption => 'Insurance Sequence', name => 'bill_sequence', options => FLDFLAG_REQUIRED),
 
 			new CGI::Dialog::Field::TableColumn(
 								caption => 'Insurance Sequence',
@@ -56,7 +49,6 @@ sub new
 								defaultValue => 1,
 								options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',style => 'check'),
-			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
 			new CGI::Dialog::Subhead(heading => 'General Plan Information', name => 'gen_plan_heading'),
 			new CGI::Dialog::MultiField(caption =>"Insured's Employer Name/Group Number", name => 'group',
 				fields => [
@@ -74,25 +66,7 @@ sub new
 							column => 'Insurance.member_number',
 							options => FLDFLAG_REQUIRED),
 
-			#new CGI::Dialog::Field::TableColumn(
-			#				caption => 'Policy Number',
-			#				schema => $schema,
-			#				column => 'Insurance.policy_number'),
-
-
-			#new CGI::Dialog::MultiField(caption =>'Insured/Guarantor ID', name => 'insured_guarantor_ids',
-			#	fields => [
-			#			new App::Dialog::Field::Person::ID(caption => 'Insured ID',
-			#				types => ['Patient'],
-			#				name => 'insured_id',options => FLDFLAG_REQUIRED),
-
-			#			new App::Dialog::Field::Person::ID(caption => 'Guarantor ID',
-			#				types => ['Patient'],
-			#				name => 'guarantor_id',
-			#				options => FLDFLAG_REQUIRED)
-			#		]),
-
-						new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
+			new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
 							types => ['Patient'],
 							name => 'insured_id', options => FLDFLAG_REQUIRED
 							),
@@ -160,12 +134,6 @@ sub new
 			new CGI::Dialog::Field(caption => 'Remit Payer Name', name => 'remit_payer_name'),
 
 			new CGI::Dialog::Subhead(heading => 'Add Another Personal Insurance Coverage', name => 'insur_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			#new CGI::Dialog::Field(
-			#					type => 'bool',
-			#					name => 'add_insurance',
-			#					caption => 'Add Additional Personal Insurance Coverage?',
-			#					style => 'check',
-			#					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 			new CGI::Dialog::MultiField(caption =>'InsCompanyID/ProductName/PlanName', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
@@ -528,15 +496,5 @@ sub _handleAttributes
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
-
-
-use constant INSURANCEEXISTS_DIALOG => 'Dialog/New Insurance Plan';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '04/05/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		'Cleaned up dialog fields and removed makeStateChanges.'],
-);
 
 1;
