@@ -1294,7 +1294,7 @@ sub assignInvoiceProperties
 		'Billing Facility/Workers Comp' => [$payToOrganization, \&App::Billing::Claim::Organization::setWorkersComp, COLUMNINDEX_VALUE_TEXT],
 		'Billing Facility/BCBS' => [$payToOrganization, \&App::Billing::Claim::Organization::setBCBSId, COLUMNINDEX_VALUE_TEXT],
 		'Billing Facility/Railroad Medicare' => [$payToOrganization, \&App::Billing::Claim::Organization::setRailroadId, COLUMNINDEX_VALUE_TEXT],
-		'Billing Facility/Phone' => [$payToOrganizationAddress, \&App::Billing::Claim::Organization::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
+		'Billing Facility/Phone' => [$payToOrganizationAddress, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
 
 		'Claim Filing/Indicator' => [$claim, \&App::Billing::Claim::setFilingIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/History/Item' => [$claim, [\&App::Billing::Claim::setInvoiceHistoryDate, \&App::Billing::Claim::setInvoiceHistoryAction, \&App::Billing::Claim::setInvoiceHistoryComments], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
