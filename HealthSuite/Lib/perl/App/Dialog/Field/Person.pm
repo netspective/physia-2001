@@ -90,6 +90,7 @@ sub autoSuggest
 	my $count = 0;
 	my @goodones = ();
 	while ($goodcount < 3 && $count < scalar @possible) {
+		$possible[$count] =~ s/ //;
 		if (! $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $possible[$count]) ){
 			$goodones[$goodcount] = $possible[$count];
 			$goodcount = $goodcount + 1;
