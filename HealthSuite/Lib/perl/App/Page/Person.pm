@@ -100,7 +100,7 @@ sub prepare_page_content_header
 			['Chart', "$urlPrefix/chart", 'chart'],
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
-			['Add Appointment', "$urlPrefix/appointment", 'appointment'],
+			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		], ' | ');
 
 

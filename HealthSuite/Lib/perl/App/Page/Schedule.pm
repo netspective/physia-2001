@@ -508,7 +508,6 @@ sub prepare_page_content_header
 
 	#$html .= '<p>' if $page->param('dialog');
 
-
 	if ($self->param('_pm_view') =~ /apptsheet/ && ! $self->param('dialog')) {
 		my $apptSheetHeader = $self->getApptSheetHeaderHtml();
 		push(@{$self->{page_content_header}}, $apptSheetHeader);
@@ -579,12 +578,14 @@ sub getApptSheetHeaderHtml
 			</td>
 			</FORM>
 			
+			<!--- 
 			<TD align=center>
 				<img src='/resources/icons/arrow_right_red.gif'>
 				<a href="javascript:doActionPopup('/schedule-p/apptsheet', null, 'toolbar,scrollbars,resizable');" style='font-size:8pt; font-family: Tahoma'>
 				<b><nobr>Print</nobr></b></a>
 			</TD>
-
+			--->
+			
 			<FORM name="actionForm" method=POST>
 			<td ALIGN=RIGHT>
 				<input type="hidden" name="patient_id">
