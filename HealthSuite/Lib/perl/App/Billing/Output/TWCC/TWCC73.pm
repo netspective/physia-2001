@@ -169,17 +169,17 @@ sub header
 
 	my $i;
 	my $arrLeft = [
-					"Employee - You are required to report your injury to your employe within 30 days if",
+					"Employee - You are required to report your injury to your employer within 30 days if",
 					"your employer has workers' compensation insurance. You have the right to free",
-					"assisstaance from the Texas Workers' Compensation Commission and may be entitled",
+					"assistance from the Texas Workers' Compensation Commission and may be entitled",
 					"to certain medical and income benefits. For further information call your local",
 					"Commission field office or 1(800)-252-7031"
 				];
 
 	my $arrRight = [
-					"Trabajador - Es necesario que usted reporte su lesión a su empleador dentro de 30 dias a pertir",
-					"del dia en que se lesianó empleador tiene seguro de compensación para trebajadores. la",
-					"Comisión Tejana de Compensación para Trabajadores le ofrece asistencia gratuita, tambien",
+					"Trabajador - Es necesario que usted reporte su lesión a su empleador dentro de 30 dias a partir",
+					"del dia en que se lesionó, si su empleador tiene seguro de compensación para trabajadores. la",
+					"Comisión Tejana de Compensación para Trabajadores le ofrece asistencia gratuita, también",
 					"puede que usted tenga derecho a ciertos beneficios médicos y monetarios. Para mayor",
 					"información llame a la oficina local de la Comisión 1-800-252-7031."
 				];
@@ -616,7 +616,7 @@ sub box13
 					'y' => $y
 				},
 				{
-					'text' => "        through ____________ (date)",
+					'text' => "        through ____________ (date).",
 					'fontWidth' => 7,
 					'x' => $x + 15,
 					'y' => $y - 33
@@ -766,7 +766,7 @@ sub box14
 					'y' => $y
 				},
 				{
-					'text' => "Max. Hours per day:         0   2   4   6   8    Other",
+					'text' => "Max Hours per day:          0   2   4   6   8    Other",
 					'fontWidth' => 7,
 					'x' => $x + 4,
 					'y' => $y - 14
@@ -775,7 +775,7 @@ sub box14
 	};
 	$report->drawBox($p, $x, $y, BOX14_WIDTH, BOX14_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
-	$arr = ["Standing", "Sitting", "Kneeling/Suatting", "Bending/Stooping", "Pushing/Pulling", "Twisting", "Other: ___________"];
+	$arr = ["Standing", "Sitting", "Kneeling/Squatting", "Bending/Stooping", "Pushing/Pulling", "Twisting", "Other: ___________"];
 
 	for my $i(0..6)
 	{
@@ -884,7 +884,7 @@ sub box16
 					"* These restrictions are based on the doctor's best understanding of the employee's essential job functions. If a",
 					"particular restriction does not apply, it should be disregarded. If modified duty that meets these restrictions is not",
 					"available, the patient should be considered to be off work. Note these restrictions should be followed outside of work",
-					"as well as at work",
+					"as well as at work.",
 				];
 
 	for my $i(0..3)
@@ -910,14 +910,14 @@ sub box17
 		texts =>
 			[
 				{
-					'text' => "17. MOTION RESTRICTIONS (if any)",
+					'text' => "17. MOTION RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
 					'y' => $y
 				},
 				{
-					'text' => "Max. Hours per day:         0   2   4   6   8    Other",
+					'text' => "Max Hours per day:          0   2   4   6   8    Other",
 					'fontWidth' => 7,
 					'x' => $x + 4,
 					'y' => $y - 14
@@ -963,7 +963,7 @@ sub box18
 		texts =>
 			[
 				{
-					'text' => "18. LIFT/CARRY RESTRICTIONS (if any)",
+					'text' => "18. LIFT/CARRY RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1011,7 +1011,7 @@ sub box19
 		texts =>
 			[
 				{
-					'text' => "19. MISC RESTRICTIONS (if any)",
+					'text' => "19. MISC RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1026,7 +1026,7 @@ sub box19
 					"Sit/Stretch breaks of ______ per ______",
 					"Must wear splint//cast at work",
 					"Must use crutches at all times",
-					"No diving/operating/heavy equipment",
+					"No driving/operating heavy equipment",
 					"Can only drive automatic transmission",
 					"No work /",
 					"_____ hours/day work:",
@@ -1067,7 +1067,7 @@ sub box20
 		texts =>
 			[
 				{
-					'text' => "20. MEDICATIONS RESTRICTIONS (if any)",
+					'text' => "20. MEDICATIONS RESTRICTIONS (if any):",
 					'fontName' => BOLD_FONT_NAME,
 					'fontWidth' => 7,
 					'x' => $x,
@@ -1158,7 +1158,7 @@ sub box22
 	my $arr = 	[
 					"Evaluation by the treating doctor on ____________________________ (date) at ____  :  ____ am/pm",
 					"Referral to/Consult with _______________________on ____________ (date) at ____  :  ____ am/pm",
-					"Physician medicine __ X per week for __ weeks starting on __________ (date) at ____  :  ____ am/pm",
+					"Physical medicine __ X per week for __ weeks starting on __________ (date) at ____  :  ____ am/pm",
 					"Special studies (list): ____________________________ on __________ (date) at ____  :  ____ am/pm",
 					"None. This is the last scheduled visit for this problem. At this time, no further medical care is anticipated."
 				];
@@ -1257,7 +1257,7 @@ sub box26
 		texts =>
 			[
 				{
-					'text' =>  "Visit Type",
+					'text' =>  "Visit Type:",
 					'fontWidth' => 7,
 					'x' => $x,
 					'y' => $y
@@ -1294,7 +1294,7 @@ sub box27
 		texts =>
 			[
 				{
-					'text' =>  "Role of Doctor",
+					'text' =>  "Role of Doctor:",
 					'fontWidth' => 7,
 					'x' => $x,
 					'y' => $y
@@ -1352,7 +1352,7 @@ sub footer
 	{
 		'text' =>"TEXAS WORKERS' COMPENSATION COMMISSION",
 		'fontWidth' => 7,
-		'x' => $x + 348,
+		'x' => $x + 350,
 		'y' => $y
 	};
 	$report->drawText($p, $properties);
