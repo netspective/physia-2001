@@ -1171,6 +1171,22 @@ sub storeProviderInfo
 		$wc = $providerWorkComp->{value_text};
 	}
 
+	my $providerEpsdt = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'EPSDT', $servFacilityId);
+	my $epsdt = $providerEpsdt->{value_text};
+	if($epsdt eq '')
+	{
+		$providerEpsdt = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'EPSDT', $sessOrgId);
+		$epsdt = $providerEpsdt->{value_text};
+	}
+
+	my $providerRRMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Railroad Medicare', $servFacilityId);
+	my $rrMedicare = $providerRRMedicare->{value_text};
+	if($rrMedicare eq '')
+	{
+		$providerRRMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'Railroad Medicare', $sessOrgId);
+		$rrMedicare = $providerRRMedicare->{value_text};
+	}
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
@@ -1292,6 +1308,26 @@ sub storeProviderInfo
 			item_name => 'Provider/Workers Comp',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $wc || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/EPSDT',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $epsdt || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Railroad Medicare',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $rrMedicare || undef,
 			value_intB => 1,
 			_debug => 0
 		);
