@@ -25,7 +25,7 @@
 	</table>
 
 	<table name="Referral_Followup_Status" abbrev="RefFlSt" type="Org_Lookup">
-		<enum id="0">Waiting for Auth</enum>
+		<enum id="22">Waiting for Auth</enum>
 		<enum id="1">Waiting for Return call/Adjuster</enum>
 		<enum id="2">Waiting for Return call/Provider</enum>
 		<enum id="3">Waiting for Return call/Patient</enum>
