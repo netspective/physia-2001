@@ -213,7 +213,7 @@ function validateOnSubmit(objForm)
 
 function translateEnterKey(event, flags)
 {
-	if(event.keyCode == KEYCODE_ENTER)
+	if(event.keyCode == KEYCODE_ENTER || event.which == KEYCODE_ENTER)
 	{
 		var dialog = dialogFields['dialog'];
 		var field = dialog[event.srcElement.name];
@@ -248,53 +248,69 @@ function translateEnterKey(event, flags)
 
 function keypressAcceptAny(event, flags, acceptKeyRanges)
 {
+	var keyCodeValue;
+
 	if(translateEnterKey(event, flags))
 		return;
 
 	for (i in acceptKeyRanges)
 	{
+		if (event.keyCode) {
+			keyCodeValue = event.keyCode;
+		}
+		else {
+			keyCodeValue = event.which;
+		}
+
 		var keyInfo = acceptKeyRanges[i];
-		//alert(keyInfo[0] + '-' + keyInfo[1] + ': '+ event.keyCode);
-		if(event.keyCode >= keyInfo[0] && event.keyCode <= keyInfo[1])
-			return;
+		if(keyCodeValue >= keyInfo[0] && keyCodeValue <= keyInfo[1]) {
+			return true;
+		}
 	}
 
 	// if we get to here, it means we didn't accept any of the ranges
-	event.returnValue = false;
+	return false;
+
 }
 
 function processKeypress_identifier(event, flags)
 {
-	if (event.keyCode >= lowAlphaRange[0] && event.keyCode <= lowAlphaRange[1])
-		event.keyCode = event.keyCode - LOWER_TO_UPPER_CASE;
-	keypressAcceptAny(event, flags, [numKeysRange, dashKeyRange,lowAlphaRange,upperAlphaRange,underScoreKeyRange]);
+	if (event.keyCode) {	// IE 
+		if (event.keyCode >= lowAlphaRange[0] && event.keyCode <= lowAlphaRange[1])
+			event.keyCode = event.keyCode - LOWER_TO_UPPER_CASE;
+	}
+	else {	// NS
+		if (event.which >= lowAlphaRange[0] && event.which <= lowAlphaRange[1])
+			event.which = event.which - LOWER_TO_UPPER_CASE;
+	}
+	return keypressAcceptAny(event, flags, [numKeysRange, dashKeyRange,lowAlphaRange,upperAlphaRange,underScoreKeyRange]);
 }
 
 
 function processKeypress_default(event, flags)
 {
-	if(translateEnterKey(event, flags))
-		return;
+	translateEnterKey(event, flags);
+	return true;
 }
 
 function processKeypress_float(event, flags)
 {
-	keypressAcceptAny(event, flags, [numKeysRange, periodKeyRange]);
+	return keypressAcceptAny(event, flags, [numKeysRange, periodKeyRange]);
 }
 
 function processKeypress_integer(event, flags)
 {
-	keypressAcceptAny(event, flags, [numKeysRange]);
+	return keypressAcceptAny(event, flags, [numKeysRange]);
 }
 
 function processKeypress_alphaonly(event, flags)
 {
-	keypressAcceptAny(event, flags, [upperAlphaRange, lowAlphaRange]);
+	return keypressAcceptAny(event, flags, [upperAlphaRange, lowAlphaRange]);
 }
 
 function processKeypress_integerdash(event, flags)
 {
-	keypressAcceptAny(event, flags, [numKeysRange, dashKeyRange]);
+	return keypressAcceptAny(event, flags, [numKeysRange, dashKeyRange]);
 }
 
 function parseNumbers(string)
@@ -987,9 +1003,9 @@ Return:
 */
 function MoveSelectItems(strFormName, strFromSelect, strToSelect, blnSort) {
 	var objSelectFrom, objSelectTo;
-
-	objSelectFrom = document.forms[0].elements(strFromSelect);
-	objSelectTo = document.forms[0].elements(strToSelect);
+	
+	objSelectFrom = document.forms[0].elements[strFromSelect];
+	objSelectTo = document.forms[0].elements[strToSelect];
 
 	var intLength = objSelectFrom.options.length;
 
