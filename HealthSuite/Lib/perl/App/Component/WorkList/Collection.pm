@@ -27,6 +27,7 @@ use vars qw(@ISA %RESOURCE_MAP );
 	);
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
 my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
 sub initialize
 {
 	my ($self, $page) = @_;
@@ -119,11 +120,42 @@ sub getComponentHtml
 				data_num_a => $_->{invoice_id} ,
 		
                 )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);			
+                
+
 		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
 			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);		
 		$_->{age} = $_->{age} >= 0 ? $_->{age}  : 'N/A';						
 		my $reckdate=$STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, 
 			STMTMGRFLAG_NONE, 'selReckInfoByOwner', $_->{person_id},$page->session('user_id'));
+			
+                #Remove any accounts with a balance of zero that do have a reck date and the min range value > 0
+                if($_->{balance} <= 0 && !$reckdate->{reck_date} && $_->{min_amount} > 0  )
+                {
+                	#Mark record as inactive
+			$page->schemaAction
+			(
+				'Transaction', 'update',                        
+				trans_id =>$_->{trans_id},
+			        trans_status => $INACTIVE	,			
+				trans_subtype => 'Account Closed by System',			
+                	);
+
+			#Obtain account/invoice information for collectors that 
+			#transferd there account to this user
+                	my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$_->{person_id},$page->session('user_id'));                	
+			foreach my $data (@$transferData)         
+	                {
+				#Mark account inactive 
+				$page->schemaAction
+				(
+					'Transaction', 'update',                        
+					trans_id =>$data->{trans_id},
+	                		trans_status => $INACTIVE,	,			
+					trans_subtype => 'Account Closed by System',			
+	                	);                	
+	                }                	                
+                	next;
+                }
 		my @rowData = (							
 			$_->{person_id},
 			$_->{invoice_id},			
