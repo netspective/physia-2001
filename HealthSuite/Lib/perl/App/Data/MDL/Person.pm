@@ -6,6 +6,7 @@ use strict;
 use App::Data::MDL::Module;
 use App::Data::MDL::Invoice;
 use App::Universal;
+use Date::Manip;
 use vars qw(@ISA);
 use Dumpvalue;
 
@@ -173,7 +174,7 @@ sub importAllergies
 		# in case there is only one, force it to be "multiple" to simplify coding
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
-		{	
+		{
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Person_Attribute", 'add',
@@ -265,7 +266,7 @@ sub importActiveProblems
 	my ($self, $flags, $activeproblems, $person) = @_;
 
 	my $parentId = $person->{id};
-
+	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
 	if(my $list = $activeproblems->{'problem-notes'})
 	{
 		# in case there is only one, force it to be "multiple" to simplify coding
@@ -281,7 +282,8 @@ sub importActiveProblems
 				trans_type =>  App::Universal::TRANSTYPEDIAG_NOTES,
 				curr_onset_date => $item->{date},
 				data_text_a => $item->{'notes-memo'},
-				provider_id => $item->{'physician-id'});
+				provider_id => $item->{'physician-id'},
+				trans_begin_stamp => $todaysDate);
 		}
 	}
 	if(my $list = $activeproblems->{'permanent-diag'})
@@ -300,7 +302,8 @@ sub importActiveProblems
 				curr_onset_date => $item->{date},
 				provider_id => $item->{'physician-id'},
 				code => $item->{'icd-code'},
-				data_text_a => $item->{diagnosis});
+				data_text_a => $item->{diagnosis},
+				trans_begin_stamp => $todaysDate);
 		}
 	}
 	if(my $list = $activeproblems->{'transient-diag'})
@@ -319,7 +322,8 @@ sub importActiveProblems
 				curr_onset_date => $item->{date},
 				provider_id => $item->{'physician-id'},
 				code => $item->{'icd-code'},
-				data_text_a => $item->{diagnosis});
+				data_text_a => $item->{diagnosis},
+				trans_begin_stamp => $todaysDate);
 		}
 	}
 	if(my $list = $activeproblems->{'icd'})
@@ -337,7 +341,8 @@ sub importActiveProblems
 				trans_type => App::Universal::TRANSTYPEDIAG_ICD,
 				curr_onset_date => $item->{date},
 				provider_id => $item->{'physician-id'},
-				code => $item->{'icd-code'});
+				code => $item->{'icd-code'},
+				trans_begin_stamp => $todaysDate);
 		}
 	}
 }
@@ -345,7 +350,7 @@ sub importActiveProblems
 sub importCategories
 {
 	my ($self,  $flags, $categories,$person,$parentType) = @_;
-			
+
 	my $parentId = $person->{id};
 	if(my $list = $categories->{category})
 	{
@@ -358,18 +363,18 @@ sub importCategories
 				person_id => $parentId,
 				org_id => $item->{'org-id'},
 				category => $item->{_text});
-				
+
 			$self->schemaAction($flags, "Person_Attribute", 'add',
 					parent_id => $parentId,
 					item_name => $item->{_text},
 					value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 					value_text => $item->{'org-id'},
-					parent_org_id => $item->{'org-id'}) if $item->{_text} ne 'Patient';				
+					parent_org_id => $item->{'org-id'}) if $item->{_text} ne 'Patient';
 		}
-		
-		
+
+
 	}
-	
+
 }
 
 sub importAffiliations
@@ -554,7 +559,7 @@ sub importAssocSessionPhysicians
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
 			value_text => join(',' , @phys) || undef,
 			value_int => 1);
-	}	
+	}
 }
 
 sub importAssociatedNurse
@@ -722,7 +727,7 @@ sub importLogins
 	my ($self,  $flags, $logins, $person) = @_;
 	my $parentId = $person->{id};
 	if(my $list = $logins->{login})
-	{	
+	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
@@ -732,8 +737,8 @@ sub importLogins
 				person_id => $parentId,
 				org_id => $item->{'org-id'},
 				password => $item->{password},
-				quantity =>  $item->{limit} ne '' ? $item->{limit} : '1' );					
-		}		
+				quantity =>  $item->{limit} ne '' ? $item->{limit} : '1' );
+		}
 	}
 }
 
@@ -752,7 +757,7 @@ sub importRegistry
 			{
 				push(@lang, $language);
 			}
-			
+
 			#my @cat = ();
 			#my $categories = $person->{categories};
 			#$categories = [$categories] unless ref $categories eq 'ARRAY';
@@ -760,9 +765,9 @@ sub importRegistry
 			#{
 			#	push(@cat, $category);
 			#}
-	
+
 			my $registryNames = $registry->{names};
-			
+
 			$self->schemaAction($flags, 'Person', 'add',
 				person_id => $personId,
 				name_prefix => exists $registryNames->{prefix} ? $registryNames->{prefix} : undef,
@@ -778,17 +783,17 @@ sub importRegistry
 				#category => join(',', @cat) || undef,
 				language => join(',', @lang) || undef,
 				ethnicity => $registry->{ethnicity});
-				
+
 			$self->schemaAction($flags, 'Person_Attribute', 'add',
 									parent_id => $personId,
 									item_name => 'Person/Name/LastFirst',
 									value_type => 0,
 									value_int => 1
 								);
-						
-	
+
+
 	}
-	
+
 }
 
 sub importStruct
@@ -802,10 +807,10 @@ sub importStruct
 	#}
 
 	$self->{mainStruct} = $person;
-	
-	
-	
-	$self->importRegistry($flags, $person->{registry}, $person);	
+
+
+
+	$self->importRegistry($flags, $person->{registry}, $person);
 	$self->importLogins($flags, $person->{logins}, $person);
 	$self->importCategories($flags, $person->{categories}, $person);
 	#$self->importPersonaldata($flags,$person->{personal},$person);
