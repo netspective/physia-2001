@@ -248,8 +248,8 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			i.claim_diags, i.total_items, i.total_cost, i.total_adjust, i.balance, i.client_id
 		from invoice i, claim_type ct, invoice_status iis
 		where i.invoice_id = ?
-		and i.invoice_subtype = ct.id
-		and i.invoice_status = iis.id
+		and i.invoice_subtype = ct.id (+)
+		and i.invoice_status = iis.id (+)
 		},
 	'selInvoiceItem' => qq{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
