@@ -5,6 +5,7 @@ use Schema::API;
 use App::Data::MDL::Module;
 use App::Universal;
 use App::Configuration;
+use File::Spec;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
@@ -18,8 +19,9 @@ use vars qw($page $sqlPlusKey);
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
-update_for_scheduling();
-
+runSQL('BUILD_0010_scheduling.sql');
+runSQL('BUILD_0010_HCFA1500_Modifier_Code.sql');
+runSQL('BUILD_0010_load_pre_post_code.sql');
 
 ######## END UPGRADE SCRIPT #########
 
@@ -27,61 +29,24 @@ exit;
 
 # Subroutines
 
-sub update_for_scheduling
+sub runSQL
 {
-	my $count = $STMTMGR_SCHEDULING->getRowCount($page, STMTMGRFLAG_DYNAMICSQL,
-		q{select count(*) from Transaction_Type where id = 8025}
-	);
+	my $sqlFile = shift;
+	my $buildDir = `pwd`;
+	chomp $buildDir;
+	$sqlFile = File::Spec->catfile($buildDir, $sqlFile);
+	my $logFile = $sqlFile . ".log";
 
-	unless ($count)
-	{
-		my $buildDir = `pwd`;
-		chomp $buildDir;
-
-		my $sqlFile = $buildDir . '/BUILD_0010_scheduling.sql';
-		my $logFile = $buildDir . '/BUILD_0010_scheduling.log';
-	
-		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
-		
-		system(qq{
-			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
-			echo "---------------------------------------" >> $logFile
-			date >> $logFile
-			echo "---------------------------------------" >> $logFile
-			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
-		});
-		
-		
-		my $sqlFile = $buildDir . '/BUILD_0010_HCFA1500_Modifier_Code.sql';
-		my $logFile = $buildDir . '/BUILD_0010_HCFA1500_Modifier_Code.log';
-	
-		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
-		
-		system(qq{
-			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
-			echo "---------------------------------------" >> $logFile
-			date >> $logFile
-			echo "---------------------------------------" >> $logFile
-			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
-		});
-	
-	
-	
-		my $sqlFile = $buildDir . '/BUILD_0010_load_pre_post_code.sql';
-		my $logFile = $buildDir . '/BUILD_0010_load_pre_post_code.log';
-	
-		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
-		
-		system(qq{
-			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
-			echo "---------------------------------------" >> $logFile
-			date >> $logFile
-			echo "---------------------------------------" >> $logFile
-			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
-		});		
-		
-	}
+	die "Missing required '$sqlFile'. Aborted.\n" unless (-f $sqlFile);
+	system(qq{
+		cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
+		echo "---------------------------------------" >> $logFile
+		date >> $logFile
+		echo "---------------------------------------" >> $logFile
+		$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
+	});
 }
+
 
 sub connectDB
 {
