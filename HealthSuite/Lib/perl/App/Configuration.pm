@@ -96,6 +96,7 @@ sub getDefaultConfig
 	# if a particular UNIX group needs a special configuration, use 'group-groupname'
 	'account-vusr_pm' => getDefaultConfig('PM Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
+	'group-virtuser' => getDefaultConfig('Virtual User Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 );
 
 my $userName = getpwuid($>) || '';
