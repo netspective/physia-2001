@@ -54,6 +54,13 @@ sub prepare_detail_service
 		[
 			{colIdx => 0, head => 'Code', url => q{javascript:if(isLookupWindow()) populateControl('#0#', true, '#1#'); else window.location.href ='/org/#0#/profile';},},
 			{colIdx => 1,head => 'Primary Name'},
+			{colIdx => 2,head => 'State'},
+			{colIdx => 3,head => 'City'},
+			{colIdx => 4,head => 'Street'},
+			{colIdx => 5,head => 'Phone'},
+			{colIdx => 7,head => 'Fee Schedule', url => "/org/#0#/catalog/#6#/#7#"},
+			{colIdx => 8,head => 'Type'},
+
 
 		],
 	};
@@ -64,7 +71,15 @@ sub prepare_detail_service
 		my @rowData =
 		(
 			$_->{org_id},
-			$_->{name_primary}
+			$_->{name_primary},
+			$_->{state},
+			$_->{city},
+			$_->{line1},
+			$_->{value_text},
+			$_->{internal_catalog_id},
+			$_->{catalog_id},
+			$_->{type},
+
 		);
 		push(@data, \@rowData);
 	}
