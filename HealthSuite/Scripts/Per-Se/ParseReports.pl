@@ -28,6 +28,8 @@ use App::Data::MDL::Module;
 use FindBin qw($Bin);
 use App::Universal;
 use App::Configuration;
+use DBI::StatementManager;
+use App::Statements::Invoice;
 
 
 my @fields = (
@@ -66,6 +68,7 @@ if($CONFDATA_SERVER->db_ConnectKey() && $CONFDATA_SERVER->file_SchemaDefn())
 	my $connectKey = $CONFDATA_SERVER->db_ConnectKey();
 	print STDOUT "Connecting to $connectKey\n";
 	$page->{schema}->connectDB($connectKey);
+	$page->{db} = $page->{schema}->{dbh};
 }
 else
 {
@@ -89,7 +92,7 @@ foreach my $report (@reports)
 						if ($report->{ERRORFLAG} eq 'E')
 						{
 							$message .= " Error $report->{ERRORCODE}";
-							$status = App::Universal::INVOICESTATUS_EXTNLREJECT;
+							$status = App::Universal::INVOICESTATUS_INTNLREJECT;
 						}
 						else
 						{
@@ -114,7 +117,7 @@ foreach my $report (@reports)
 						if ($report->{ERRORFLAG} eq 'E')
 						{
 							$message .= " Error $report->{ERRORCODE}";
-							$status = App::Universal::INVOICESTATUS_EXTNLREJECT;
+							$status = App::Universal::INVOICESTATUS_INTNLREJECT;
 						}
 						else
 						{
@@ -224,9 +227,18 @@ sub addInvoiceHistory
 sub changeInvoiceStatus
 {
 	my ($page, $invoice, $status) = @_;
+
+	print "Invoice ID: $invoice\n";
+	
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoice);
+	
+	return if $invoiceInfo->{invoice_status} == App::Universal::INVOICESTATUS_VOID
+			|| $invoiceInfo->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED;
 	
 	return $page->schemaAction(0, 'Invoice', 'update', 
 		invoice_id => $invoice,
 		invoice_status => $status,
+		flags => App::Universal::INVOICESTATUS_INTNLREJECT || App::Universal::INVOICESTATUS_EXTNLREJECT 
+				|| App::Universal::INVOICESTATUS_AWAITPAYMENT ? 0 : $invoiceInfo->{flags},
 	);
 }
