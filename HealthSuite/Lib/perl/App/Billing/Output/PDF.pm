@@ -109,7 +109,7 @@ sub processClaims
 		else
 		{
 		my $pp = $self->setPrimaryProcedure($claim);
-		while ($self->allProcTraverse($procesedProc,$claim) eq "0" || ($once < 1))
+		while ($self->allProcTraverse($procesedProc,$claim) eq "0")
 			{
 				$self->newPage($p);
 				$cordinates = $self->drawForm($p, $drawBackgroundForm);
@@ -1659,9 +1659,9 @@ sub populatePDF
 		$self->box25ClaimData($p, $Claim, $cordinates);
 		$self->box26ClaimData($p, $Claim, $cordinates);
 		$self->box27ClaimData($p, $Claim, $cordinates);
-		$self->box28ClaimData($p, $Claim, $cordinates);
-		$self->box29ClaimData($p, $Claim, $cordinates);
-		$self->box30ClaimData($p, $Claim, $cordinates);
+		$self->box28ClaimData($p, $Claim, $cordinates, $procesedProc);
+		$self->box29ClaimData($p, $Claim, $cordinates, $procesedProc);
+		$self->box30ClaimData($p, $Claim, $cordinates, $procesedProc);
 		$self->box31ClaimData($p, $Claim, $cordinates);
 		$self->box32ClaimData($p, $Claim, $cordinates);
 		$self->box33ClaimData($p, $Claim, $cordinates);
@@ -2693,7 +2693,7 @@ sub box27ClaimData
 
 sub box28ClaimData
 {
-	my ($self, $p, $claim, $cordinates)  = @_;
+	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
 	my $box28Cordinates = $cordinates->{box28};
 	my $box28Y = $box28Cordinates->[1];
 	my $box28X = $box28Cordinates->[0];
@@ -2702,7 +2702,12 @@ sub box28ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ , $claim->getTotalCharge);
-	pdflib::PDF_show_xy($p , $amount[0] + 0, $box28X + 50 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box28Y - 3 * FORM_FONT_SIZE);
+	if ($self->allProcTraverse($procesedProc, $claim) eq "0")
+	{
+		$amount[0]="Contd..";
+		$amount[1]="  ";
+	}
+	pdflib::PDF_show_xy($p , $amount[0], $box28X + 50 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box28Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box28X + 60, $box28Y - 3 * FORM_FONT_SIZE);
 
 	pdflib::PDF_stroke($p);
@@ -2711,7 +2716,7 @@ sub box28ClaimData
 
 sub box29ClaimData
 {
-	my ($self, $p, $claim, $cordinates)  = @_;
+	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
 	my $box29Cordinates = $cordinates->{box29};
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
@@ -2720,7 +2725,12 @@ sub box29ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ , abs($claim->getTotalChargePaid));
-	pdflib::PDF_show_xy($p , $amount[0] + 0, $box29X + 45 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
+	if ($self->allProcTraverse($procesedProc, $claim) eq "0")
+	{
+		$amount[0]="Contd..";
+		$amount[1]="  ";
+	}
+	pdflib::PDF_show_xy($p , $amount[0], $box29X + 45 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
 
 	pdflib::PDF_stroke($p);
@@ -2729,7 +2739,7 @@ sub box29ClaimData
 
 sub box30ClaimData
 {
-	my ($self, $p, $claim, $cordinates)  = @_;
+	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
 	my $box30Cordinates = $cordinates->{box30};
 	my $box30Y = $box30Cordinates->[1];
 	my $box30X = $box30Cordinates->[0];
@@ -2738,7 +2748,12 @@ sub box30ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ , abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid)));
-	pdflib::PDF_show_xy($p , $amount[0] + 0, $box30X + 40 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box30Y - 3 * FORM_FONT_SIZE);
+	if ($self->allProcTraverse($procesedProc, $claim) eq "0")
+	{
+		$amount[0]="Contd";
+		$amount[1]="  ";
+	}
+	pdflib::PDF_show_xy($p , $amount[0], $box30X + 40 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box30Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box30X + 50, $box30Y - 3 * FORM_FONT_SIZE);
 
 	pdflib::PDF_stroke($p);
@@ -2797,7 +2812,10 @@ sub box33ClaimData
 	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 5.2 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $add->getCity() . "    " . $add->getState() . "    " . $add->getZipCode(), $box33X + CELL_PADDING_X + 10, $box33Y - 7.4 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
-	pdflib::PDF_show_xy($p ,$facility->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+	if($physician->getInsType() ne '99')
+	{
+		pdflib::PDF_show_xy($p ,$facility->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+	}
 	pdflib::PDF_stroke($p);
 
 }
@@ -2853,14 +2871,21 @@ sub diagnosisTable
 	my $tempCount;
 
 	my $procedures = $claim->{procedures};
-
+	for my $i (0..$#$procedures)
+	{
+		my $procedure = $procedures->[$i];
+		if (uc($procedure->getItemStatus) eq "VOID")
+		{
+			$processedProc->[$i] = 1;
+		}
+	}
 	for my $i (0..$#$procedures)
 	{
 		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
 		{
 			my $procedure = $procedures->[$i];
 			$cod = $procedure->getDiagnosis;
-		    $cod =~ s/ //g;
+			$cod =~ s/ //g;
 			my @diagCodes = split(/,/, $cod);
 			for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 			{
@@ -2917,7 +2942,7 @@ sub allProcTraverse
 	{
 		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum;
 	}
-	return $sum >= $#$procs ? 1 : 0;
+	return $sum >= ($#$procs + 1) ? 1 : 0;
 }
 
 

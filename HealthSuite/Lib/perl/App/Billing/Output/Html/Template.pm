@@ -337,7 +337,10 @@ sub populatePhysician
 	$data->{physicianTaxTypeIdEin} = $billingFacility->getTaxId ne '' ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
 	$data->{physicianPin} = $billingPhysician->getPIN;
-	$data->{physicianGrp} = $billingFacility->getGRP;
+	if($billingPhysician->getInsType() ne '99')
+	{
+		$data->{physicianGrp} = $billingFacility->getGRP;
+	}
 }
 
 sub populateOrganization
@@ -532,7 +535,7 @@ sub diagnosisTable
 	my $procedures = $claim->{procedures};
 	for my $i (0..$#$procedures)
 	{
-		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
+		if (($diag <= 4) && ($procCount <= 6) && ($processedProc->[$i] != 1))
 		{
 			my $procedure = $procedures->[$i];
 			$cod = $procedure->getDiagnosis;
