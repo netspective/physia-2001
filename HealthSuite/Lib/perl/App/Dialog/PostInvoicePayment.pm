@@ -221,13 +221,13 @@ sub execute
 		my $totalItemAdjust = $page->param("_f_item_$line\_item_existing_adjs") - $totalAdjsMade;
 		my $itemBalance = $page->param("_f_item_$line\_item_balance") - $totalAdjsMade;
 		my $itemId = $page->param("_f_item_$line\_item_id");
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId,
-			total_adjust => defined $totalItemAdjust ? $totalItemAdjust : undef,
+		#$page->schemaAction(
+		#	'Invoice_Item', 'update',
+		#	item_id => $itemId,
+			#total_adjust => defined $totalItemAdjust ? $totalItemAdjust : undef,
 			#balance => defined $itemBalance ? $itemBalance : undef,
-			_debug => 0
-		);
+		#	_debug => 0
+		#);
 
 
 		
@@ -298,10 +298,20 @@ sub execute
 
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 	my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+	my $newStatus = '';
+	if($invoiceBalance == 0)
+	{
+		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
+	}
+	else
+	{
+		$newStatus = $paidBy eq 'insurance' ? App::Universal::INVOICESTATUS_PAYAPPLIED : $invoice->{invoice_status};
+	}
+	
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
-		invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
+		invoice_status => $newStatus,
 	#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 	#	balance => defined $invoiceBalance ? $invoiceBalance : undef,
 		_debug => 0
