@@ -373,7 +373,6 @@ sub prepare_view_account
 
 	$self->addContent(
 		'<CENTER>',
-		'<A HREF = "/org/#param.org_id#/dlg-add-close-date">Close Batch Date</A>',
 		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, 'selInvoiceTypeForOrg',
 			[$orgIntId],
 			#[
