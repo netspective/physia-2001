@@ -55,7 +55,7 @@ sub new
 			fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,
 			fKeyStmt => 'sel_distinct_ins_org_id',
 			fKeyDisplayCol => 0,
-			fKeyValueCol => 1,
+			fKeyValueCol => 0,
 		),
 
 		new App::Dialog::Field::Insurance::Product(caption => 'Insurance Product',
@@ -72,7 +72,7 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'Physician/Provider ID',
 			name => 'provider_id',
-			types => ['Patient'],
+			types => ['Physician'],
 		),
 
 		new App::Dialog::Field::Organization::ID(caption => 'Facility ID',
@@ -113,8 +113,11 @@ sub buildSqlStmt
 	my $insurancePlanCond;
 	my $providerCond;
 	my $facilityCond;
+	my $insId = $page->param('_f_ins_org_id');
+	my $insOrgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+		$page->session('org_internal_id'), $insId);
 	
-	my $insOrgId = $page->param('_f_ins_org_id');
+	#my $insOrgId = $page->param('_f_ins_org_id');
 	my $productName = $page->param('_f_product_name');
 	my $planName = $page->param('_f_plan_name');
 	my $providerId = $page->param('_f_provider_id');
