@@ -102,14 +102,18 @@ sub customValidate
 		{
 			my @closeDateArray ;
 			my @currentDataArray;
-			@closeDateArray = Decode_Date_US($closeDate) if$closeDate;
-			@currentDataArray = Decode_Date_US($item->{value_date});
-			if( Delta_Days($closeDateArray[0],$closeDateArray[1],$closeDateArray[2],$currentDataArray[0],$currentDataArray[1],$currentDataArray[2])!=-1)
-			{
-				$closeField->invalidate($page, qq{Close date '$closeDate' is not the next date after current close date '$item->{value_date}' for $item->{org_id} }); 
-				$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE,0);									
-				$one++;
-			}	
+			#If there is an invalid date let the date field handle the error
+			eval{
+				@closeDateArray = Decode_Date_US($closeDate) if$closeDate;
+				@currentDataArray = Decode_Date_US($item->{value_date});
+
+				if(Delta_Days($closeDateArray[0],$closeDateArray[1],$closeDateArray[2],$currentDataArray[0],$currentDataArray[1],$currentDataArray[2])!=-1)
+				{
+					$closeField->invalidate($page, qq{Close date '$closeDate' is not the next date after current close date '$item->{value_date}' for $item->{org_id} }); 
+					$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE,0);									
+					$one++;
+				}	
+			}
 		}		
 	}
 	$setField->invalidate($page, qq{If you still want to set the close date, enter the check-box 'Set Close Date'.}) if ($one);
@@ -139,7 +143,7 @@ sub execute
 				value_date => $page->field('close_date')
 			);
 	}
-	$page->param('home','/') unless $page->param('home') ;#Return back to main menu if home value is not set
+	$page->param('home','/') unless $page->param('home') ;#Set home value if it is not set
 	$self->handlePostExecute($page, $command, $flags);	
 	
 }
