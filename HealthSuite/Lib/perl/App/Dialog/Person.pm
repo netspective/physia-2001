@@ -76,7 +76,7 @@ sub initialize
 
 		# Person::Name is a 5-part multifield, w/fields named "name_*" where * is prefix|first|middle|last|suffix
 		new App::Dialog::Field::Person::Name(),
-		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Create record',	style => 'check'),
+		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Create record', style => 'check'),
 
 		new CGI::Dialog::MultiField(caption =>'SSN / Birthdate',name => 'ssndatemf',
 			fields => [
@@ -137,8 +137,8 @@ sub makeStateChanges
 	}
 
 	my $personId = $page->param('person_id');
-	my $firstName = $self->getField('person_id')->{fields}->[0];
-	my $lastName = $self->getField('person_id')->{fields}->[2];
+	my $firstName = $self->getField('person_id')->{fields}->[1];
+	my $lastName = $self->getField('person_id')->{fields}->[0];
 	my $createRecField = $self->getField('create_record');
 
 	my $names = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName', $orgId);
