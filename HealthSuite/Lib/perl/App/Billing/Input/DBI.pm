@@ -287,17 +287,31 @@ sub assignPatientInfo
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
-	$patient->setEmployerOrSchoolId($row[0]);
+	my $orgId = $self->getOrgId($row[0]);
+	$patient->setEmployerOrSchoolId($orgId);
 
-	$queryStatment = "select org.org_id, org.name_primary  from org where org_id = \'$row[0]\' " ;
+	$queryStatment = "select org.org_id, org.name_primary  from org where org_id = \'$orgId\'" ;
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
 
 	$patient->setEmployerOrSchoolName($row[1]);
-	$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
+	$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$orgId\' and address_name = \'Mailing\'";
 	$self->populateAddress($patient->getEmployerAddress, $queryStatment);
+}
+
+sub getOrgId
+{
+	my ($self, $orgInternalId) = @_;
+
+	my $queryStatment = "select org_id from org where org_internal_id = $orgInternalId";
+	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	my @row = $sth->fetchrow_array();
+
+	return $row[0];
+	
 }
 
 sub assignPatientAddressInfo
@@ -424,7 +438,7 @@ sub assignPatientInsurance
 								and invoice_billing.invoice_item_id is NULL
 								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
 								" and invoice_billing.bill_ins_id = ins.ins_internal_id
-								and ins.ins_org_id = org.org_id
+								and ins.ins_org_id = org.org_Internal_id
 								and invoice_billing.BILL_SEQUENCE = $no";
 		}
 		else
@@ -474,7 +488,7 @@ sub assignPatientInsurance
 								and invoice_billing.invoice_item_id is NULL
 								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
 								" and invoice_billing.bill_ins_id = ins.ins_internal_id
-								and ins.ins_org_id = org.org_id
+								and ins.ins_org_id = org.org_internal_id
 								and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
 		}
 		else
@@ -587,9 +601,10 @@ sub assignInsuredInfo
 						# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
-					$insured->setEmployerOrSchoolId($row[0]);
+					my $orgId = $self->getOrgId($row[0]);
+					$insured->setEmployerOrSchoolId($orgId);
 
-					$queryStatment = "select name_primary , org_id  from org where org_id = \'$row[0]\'";
+					$queryStatment = "select name_primary , org_id  from org where org_id = \'$orgId\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -807,7 +822,7 @@ sub assignServiceFacility
 	my ($self, $claim, $invoiceId) = @_;
 
 	my $renderingOrganization = $claim->getRenderingOrganization();
-	my $queryStatment = "select org.org_id, org.name_primary from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_id = trans.service_facility_id ";
+	my $queryStatment = "select org.org_id, org.name_primary from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_Internal_id = trans.service_facility_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -848,7 +863,7 @@ sub assignServiceBilling
 {
 	my ($self, $claim, $invoiceId) = @_;
 	my $payToOrganization = $claim->getPayToOrganization();
-	my $queryStatment = "select org.org_id, org.name_primary  from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_id = trans.billing_facility_id ";
+	my $queryStatment = "select org.org_id, org.name_primary  from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_internal_id = trans.billing_facility_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	my $orgId;
 	# do the execute statement
@@ -956,8 +971,8 @@ sub assignPolicy
 				$payer->setBillSequence($row1[1]);
 				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE )
 				{
-					$insOrgId = $row1[0];
-					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_id = \'$insOrgId\'";
+					$insOrgId = $self->getOrgId($row1[0]);
+					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_Internal_id = \'$insOrgId\'";
 #					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), org_id as payer_id from org where org_id = \'$insOrgId\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
@@ -1078,7 +1093,7 @@ sub assignPolicy
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
-					my $oid = $row1[0];
+					my $oid = $self->getOrgId($row1[0]);
 					$queryStatment = "select name_primary , org_id  from org where org_id = \'$oid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
