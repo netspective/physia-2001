@@ -21,11 +21,17 @@
 		<field id="worklist_status" join="InvWork" column="worklist_status" caption="Worklist Status"/>		
 		<field id="worklist_type" join="InvWork" column="worklist_type" caption="Worklist Type"/>						
 		<field id="age" join="invoice" columndefn="trunc(sysdate) - trunc(invoice.invoice_date)" caption="Age"/>
-		<!-- Joins -->
-		<join id="InvWork" table="Invoice_Worklist" autoinclude="1"/>
-		<join id="person"  table="person" condition="person.person_id=InvWork.person_id" />	
-		<join id="invoice" table="invoice" condition="invoice.invoice_id=InvWork.invoice_id" />			
 		
+		<!-- Joins -->
+		<join id="InvWork" table="Invoice_Worklist" 
+		condition="NOT EXISTS (SELECT 1 FROM payment_plan pp,payment_plan_inv_ids  ppii
+					WHERE pp.person_id = InvWork.person_id 
+					AND   ppii.parent_id = pp.plan_id
+					AND   ppii.member_name = InvWork.invoice_id
+					AND   pp.next_due >sysdate-5
+		)" autoinclude="1"/>
+		<join id="person"  table="person" condition="person.person_id=InvWork.person_id" />	
+		<join id="invoice" table="invoice" condition="invoice.invoice_id=InvWork.invoice_id" />											
 		<!-- Views -->
 		<view id="all" caption="TEST">
 			<column id="owner_id"/>
@@ -44,6 +50,7 @@
 		</view>
 	</query-defn>
 </component>
+
 
 
 
