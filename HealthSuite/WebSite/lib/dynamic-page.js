@@ -18,6 +18,9 @@ var fieldGroupNormalsMap = null; // key is field group name, value is array of f
 var fieldOptionsCache = null;
 var activeExpandedControl = null;
 
+var __debug = true;
+var __nodebug = true;
+
 function ConditionalFieldInfo(fieldId, fieldDefn)
 {
 	this.fieldId = fieldId;
@@ -103,6 +106,37 @@ function getFieldById(id)
 		return fieldDefns.selectSingleNode("field-defn[@id = '" + id + "']");
 }
 
+function getFQNameById(id) {
+	var fieldNode = getFieldById (id);
+
+	if (__nodebug == false && __debug == true) {
+		__debug = confirm ('id = ' + id + '\nparentPrefix = ' + parentPrefix);
+	}
+
+	if (__nodebug == false && __debug == true) {
+		var _temp = fieldNode.getAttribute ('id');
+		__debug = confirm ('fieldNode.getAttribute(\'id\') = ' + _temp);
+	}
+
+	var parentNode = fieldNode.parentNode;
+	var parentPrefix = parentNode.getAttribute('id');
+	fieldNode = parentNode;
+	parentNode = fieldNode.parentNode;
+	
+	if (__nodebug == false && __debug == true) {
+		__debug = confirm ('id = ' + id + '\nparentPrefix = ' + parentPrefix);
+	}
+
+	while (parentNode.getAttribute('tagName') != 'field-defns') {
+		parentPrefix = parentNode.getAttribute('id') + '.' + parentPrefix;
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('id = ' + id + '\nparentPrefix = ' + parentPrefix);
+		}
+		fieldNode = fieldNode.parentNode;
+		parentNode = fieldNode.parentNode;
+	}
+}
+
 function getFieldSizeByType (controlType) {
 	var theSize;
 	
@@ -134,6 +168,10 @@ function addConditionalField(primaryField, dependentField, dependentFieldId)
 		info = (conditionalFieldsMap[primaryField] = new Array());		
 	}
 	info[info.length] = new ConditionalFieldInfo(dependentFieldId, dependentField);
+
+	if (__nodebug == false && __debug == true) {
+		__debug = confirm ('addConditionalField...\nprimaryField = ' + primaryField + '\ndependentField = ' + dependentField + '\ndependentFieldId = ' + dependentFieldId);
+	}
 }
 
 function getFieldOptionsCount(fieldNode)
@@ -197,10 +235,14 @@ function createFieldOptionsHtml(controlId, fieldNode, style, extraAttrs)
 
 function createTemplateHtml(template)
 {
+	__nodebug = confirm ('Press Cancel to allow some debugging popups or OK to disable all debugging popups');
 	var html = '';
 	var fieldCount = template.childNodes.length;
 	for (var i = 0; i < fieldCount; i++)
 	{
+		var childNode = template.childNodes [i];
+		if (__nodebug == false) __debug = confirm ('node: ' + childNode.getAttribute ('idref'));
+
 		html += createFieldHtml(template.childNodes[i], 0, i);
 	}
 	return html;
@@ -215,6 +257,21 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		fieldNode = getFieldById(fieldDefnId);
 		if(fieldNode == null)
 			return "field definition '" + fieldDefnId + "' was not found in " + funcName(arguments.callee);
+			
+		// Determine the parentPrefix from the idref value...
+		var _parentPrefix = fieldDefnId.replace (/\/{1}/g, '.');
+		_parentPrefix = _parentPrefix.replace (/\.?[\w\-]+$/, '');
+		
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('createFieldHtml...\n_parentPrefix = ' + _parentPrefix);
+		}
+		
+		parentPrefix = (parentPrefix && parentPrefix != '' ? parentPrefix : _parentPrefix);
+
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('createFieldHtml...\nparentPrefix = ' + parentPrefix);
+		}
+		
 	}
 	if(level == null) level = 0;
 	if(count == null) count = 0;
@@ -226,6 +283,8 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 	var sectionName = 'section' + level;
 	var sectionId = sectionName + '_' + count;
 	var fieldNodeId = fieldNode.getAttribute('id');
+//	var _parentPrefix = getFQNameById(fieldNodeId)	
+//	alert ('Creating Field ' + fieldNodeId + ' (' + fieldNode.getAttribute('type') + ')\nparent = ' + parent + '\nparentPrefix = ' + parentPrefix);
 	
 	if(fieldType == 'container' || fieldType == 'grid')
 	{
@@ -233,11 +292,14 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		var normalsHtml = '';
 		if(fieldType != 'grid')
 		{
+			if (__nodebug == false && __debug == true) {
+				__debug = confirm ('id = ' + fieldNodeId + ' (' + fieldType + ')\nparentPrefix = ' + parentPrefix);
+			}
 			var fieldCount = fieldNode.childNodes.length;
 			for (var i = 0; i < fieldCount; i++)
 			{
 				var childFieldDefn = fieldNode.childNodes[i];
-				contentsHtml += createFieldHtml(childFieldDefn, level+1, i, fieldNode, parentPrefix != null ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId);
+				contentsHtml += createFieldHtml(childFieldDefn, level+1, i, fieldNode, (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId);
 			}
 			var normalsGroup = fieldGroupNormalsMap[fieldNode.getAttribute('id')];
 			if(normalsGroup != null)
@@ -247,20 +309,31 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		}
 		else
 		{
+			if (__nodebug == false && __debug == true) {
+				__debug = confirm ('createFieldHtml (dispatching to prepare_ functions)...\nid = ' + fieldNodeId + ' (' + fieldType + ')\nparentPrefix = ' + parentPrefix);
+			}
 			contentsHtml = prepareFieldHtml_grid(fieldNode, level, count, parent, parentPrefix);
 		}
 		
-		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">';
-		html += '<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'"><span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>' + normalsHtml + '</div>';
-		html += '<div id="'+ sectionId +'_body" class="section_body" sectLevel="'+level+'" style="display:none">';
-		html += contentsHtml + '</div></div>';
+		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">\n';
+		html += '\t<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
+		html += '\t<div id="'+ sectionId +'_body" class="section_body" sectLevel="'+level+'" style="display:none">\n';
+		html += '\t\t' + contentsHtml + '\n\t</div>\n</div>\n';
 	}
 	else if (fieldType == 'text' || fieldType == 'float' || fieldType == 'percentage' || fieldType == 'currency' || fieldType == 'integer' || fieldType == 'time' || fieldType == 'date')
 	{
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('createFieldHtml (dispatching to prepare_ functions)...\nid = ' + fieldNodeId + ' (' + fieldType + ')\nparentPrefix = ' + parentPrefix);
+		}
+
 		return prepareFieldHtml_text(fieldNode, level, count, parent, parentPrefix);
 	}
 	else
 	{
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('createFieldHtml (dispatching to prepare_ functions)...\nid = ' + fieldNodeId + ' (' + fieldType + ')\nparentPrefix = ' + parentPrefix);
+		}
+
 		return eval("prepareFieldHtml_" + fieldType + "(fieldNode, level, count, parent, parentPrefix);");
 	}
 	
@@ -271,14 +344,25 @@ function prepareFieldHtml_static(fieldNode, level, count, namePrefix, style)
 {
 	var sectionName = 'section' + level;
 	var sectionId = sectionName + '_' + count;
-	return '<span '+ style +' id="'+ namePrefix +'_label" class="section_field_static">'+fieldNode.getAttribute('caption')+':</span>';
+	var fieldName = fieldNode.getAttribute ('id');
+	var style = '';
+
+	var areaClassName = 'section_field_area';
+	if(fieldNode.getAttribute('condition-field') != null)
+	{
+		areaClassName = 'section_field_area_conditional';
+		var fieldId = '_df_.' + fieldNode.getAttribute('condition-field');
+		addConditionalField(fieldId, fieldNode, fieldName);
+	}
+
+	return '<span '+ style +' id="'+ fieldName +'_area" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="' + areaClassName + '">'+fieldNode.getAttribute('caption')+'</span>';
 }
 
 function prepareFieldHtml_caption(fieldNode, level, count, namePrefix, style)
 {
 	var sectionName = 'section' + level;
 	var sectionId = sectionName + '_' + count;
-	return '<span '+ style +' id="'+ namePrefix +'_label" class="section_field_label">'+fieldNode.getAttribute('caption')+':</span>';
+	return '<span '+ style +' id="'+ namePrefix +'_label" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="section_field_label">'+fieldNode.getAttribute('caption')+':</span>';
 }
 
 function createGridFieldHtml(fieldNode)
@@ -287,14 +371,16 @@ function createGridFieldHtml(fieldNode)
 }
 
 function addGridRow(theTable, level, count, parent, namePrefix) {
+	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
 	var tableName = theTable.getAttribute ('id');
 	var matches = tableName.match (/table_(.+)/i);
 	var gridName = matches [1];
+	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
 	var gridFieldNode = getFieldById (gridName);
 	var gridId = gridFieldNode.getAttribute ('id');
 
 	var theRow = theTable.insertRow ();
-	var cellData = prepareFieldHtml_gridrowArray (gridFieldNode);
+	var cellData = prepareFieldHtml_gridrowArray (gridFieldNode, level, count, parent, namePrefix);
 	
 	for (var i = 0; i < cellData.length; i ++) {
 		var theCell = theRow.insertCell ();
@@ -303,15 +389,18 @@ function addGridRow(theTable, level, count, parent, namePrefix) {
 	}
 }
 
-function prepareFieldHtml_gridrowArray(fieldNode)
+function prepareFieldHtml_gridrowArray(fieldNode, level, count, parent, namePrefix)
 {
 	var fieldCount = fieldNode.childNodes.length;
 	var dataRowPrototype = '';
 	var dataRowArray = new Array ();
+	var parentPrefix = (namePrefix ? namePrefix + '.' : '') + fieldNode.getAttribute('id');
+	if (__nodebug == false) __debug = confirm ('prepareFieldHtml_gridRowArray...\nnamePrefix = ' + namePrefix + '\nparentPrefix = ' + parentPrefix);
+
 	for (var i = 0; i < fieldCount; i++)
 	{
 		var childFieldDefn = fieldNode.childNodes[i];
-		var widgetHtml = createFieldHtml (childFieldDefn);
+		var widgetHtml = createFieldHtml (childFieldDefn, level, count, parent, parentPrefix);
 		dataRowArray [dataRowArray.length] = widgetHtml;
 	}
 
@@ -334,19 +423,31 @@ function prepareFieldHtml_gridrow(fieldNode, level, count, parent, namePrefix)
 
 function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 {
+	var fieldNodeId = fieldNode.getAttribute ('id');
+	var fieldType = fieldNode.getAttribute ('type');
+
+	if (__nodebug == false && __debug == true) {
+		__debug = confirm ('id = ' + fieldNodeId + ' (' + fieldType + ')\nnamePrefix = ' + namePrefix);
+	}
+
 	var fieldCount = fieldNode.childNodes.length;
 	var headRow = '';
 	var dataRowPrototype = '';
+	var parentPrefix = (namePrefix ? namePrefix + '.' : '') + fieldNode.getAttribute('id');
+	var tableName = 'table_' + parentPrefix;
+
+	if (__nodebug == false) __debug = confirm ('prepareFieldHtml_grid...\nid = ' + fieldNodeId + ' (' + fieldType + ')\nnamePrefix = ' + namePrefix + '\nparentPrefix = ' + parentPrefix + '\ntableName = ' + tableName);
+	
 	for (var i = 0; i < fieldCount; i++)
 	{
 		var childFieldDefn = fieldNode.childNodes[i];
 		headRow += '<td class="section_field_grid_head">'+childFieldDefn.getAttribute('caption')+'</td>';
-		dataRowPrototype += '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn)+'</td>';
+		dataRowPrototype += '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn, level + 1, count, parent, parentPrefix)+'</td>';
 	}
-	headRow += '<td class="section_field_grid_add" onClick="addGridRow(table_' + fieldNode.getAttribute ('id') + ')">Add...</td>';
+	headRow += '<td class="section_field_grid_add" onClick="addGridRow(' + tableName + ')">Add...</td>';
 	headRow = '<tr>' + headRow + '</tr>';
 	dataRowPrototype = '<tr>' + dataRowPrototype + '</tr>';
-	return '<table id="table_' + fieldNode.getAttribute ('id') + '" class="section_field_grid">'+headRow+dataRowPrototype+'</table>';
+	return '<table id="' + tableName + '" class="section_field_grid">'+headRow+dataRowPrototype+'</table>';
 }
 
 function prepareFieldHtml_composite(fieldNode, level, count, parent, namePrefix)
@@ -356,20 +457,23 @@ function prepareFieldHtml_composite(fieldNode, level, count, parent, namePrefix)
 	var insideFields = '';
 	var addLabelStyle = 'style="vertical-align: top"';
 	var icons = '<span style="font-family: wingdings; width: 15"></span>';
+	var parentPrefix = (namePrefix ? namePrefix + '.' : '') + fieldNode.getAttribute('id');
 	
-//	alert ('composite field: ' + fieldName + ' with ' + fieldCount + ' fields...');
+	if (__nodebug == false && __debug == true) {
+		__debug = confirm ('Composite field: id = ' + fieldName + '\nnamePrefix = ' + namePrefix);
+	}
 
 	for (var i = 0; i < fieldCount; i++)
 	{
 		var childFieldDefn = fieldNode.childNodes[i];
-		insideFields += createFieldHtml(childFieldDefn, level + 1, count, fieldName, fieldName);
+		insideFields += createFieldHtml(childFieldDefn, level + 1, count, parent, parentPrefix);
 	}
 
 	var areaClassName = 'section_field_area';
 	if(fieldNode.getAttribute('condition-field') != null)
 	{
 		areaClassName = 'section_field_area_conditional';
-		var fieldId = fieldNode.getAttribute('condition-field');
+		var fieldId = '_df_.' + fieldNode.getAttribute('condition-field');
 		addConditionalField(fieldId, fieldNode, fieldName);
 	}
 
@@ -385,7 +489,7 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	
 	var fieldHtml = '';
 	var addLabelStyle = '';
-	var fieldName = namePrefix + '.' + fieldNode.getAttribute('id');
+	var fieldName = '_df_.' + namePrefix + '.' + fieldNode.getAttribute('id');
 	var parentNode = fieldNode.parentNode;
 	var parentNodeName = parentNode.getAttribute('id');
 	var parentNodeType = parentNode.getAttribute('type');
@@ -446,7 +550,7 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	if(fieldNode.getAttribute('condition-field') != null)
 	{
 		areaClassName = 'section_field_area_conditional';
-		var fieldId = fieldNode.getAttribute('condition-field');
+		var fieldId = '_df_.' + fieldNode.getAttribute('condition-field');
 		addConditionalField(fieldId, fieldNode, fieldName);
 	}
 	
@@ -465,7 +569,7 @@ function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
 	var parentNodeName = parentNode.getAttribute('id');
 	var parentNodeType = parentNode.getAttribute('type');
 	
-	var fieldName = namePrefix + '.' + fieldNode.getAttribute('id');
+	var fieldName = '_df_.' + namePrefix + '.' + fieldNode.getAttribute('id');
 	fieldControlMap[fieldName] = fieldNode;
 	
 	if (document.all[fieldNode.getAttribute ('id')]) {
@@ -489,7 +593,7 @@ function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
 	if(fieldNode.getAttribute('condition-field') != null)
 	{
 		areaClassName = 'section_field_area_conditional';
-		var fieldId = fieldNode.getAttribute('condition-field');
+		var fieldId = '_df_.' + fieldNode.getAttribute('condition-field');
 		addConditionalField(fieldId, fieldNode, fieldName);
 	}
 	
@@ -636,23 +740,27 @@ function handleEvent_onblur(control)
 
 function handleEvent_onchange(control)
 {
-//	alert('control.name = ' + control.name);
-//	alert ('control.options [control.options.selectedIndex].text = ' + control.options [control.options.selectedIndex].text);
+	if (__nodebug == false) __debug = confirm ('handleEvent_onchange\ncontrol.name = ' + control.name);
 	if(conditionalFieldsMap[control.name] != null)
 	{
+		if (__nodebug == false) __debug = confirm ('handleEvent_onchange\nconditionalFieldsMap [control.name].length = ' + conditionalFieldsMap [control.name].length);
 		var conditionalFields = conditionalFieldsMap[control.name];
 		for(var i = 0; i < conditionalFields.length; i++)
 		{
 			var fieldInfo = conditionalFields[i];
 			var fieldAreaElem = document.all.item(fieldInfo.fieldId + '_area');
+			if (__nodebug == false) __debug = confirm ('handleEvent_onchange\nfieldInfo = ' + fieldInfo + '\nfieldAreaElem = ' + fieldAreaElem);
+			if (__nodebug == false) __debug = confirm ('handleEvent_onchange\ncondition = ' + fieldInfo.fieldDefn.getAttribute('condition'));
 			if(fieldAreaElem == null) alert (fieldInfo.fieldId + '_area not found');
-			if(eval(fieldInfo.fieldDefn.getAttribute('condition')) == true)
+			if(eval(unescape(fieldInfo.fieldDefn.getAttribute('condition'))) == true)
 			{
+				if (__nodebug == false) __debug = confirm ('handleEvent_onchange\neval(condition) = true');
 				fieldAreaElem.className = 'section_field_area_conditional_expanded';
 				fieldAreaElem.style.display = '';
 			}
 			else
 			{
+				if (__nodebug == false) __debug = confirm ('handleEvent_onchange\neval(condition) = false');
 				fieldAreaElem.className = 'section_field_area_conditional';
 				fieldAreaElem.style.display = 'none';
 			}
@@ -979,5 +1087,22 @@ function date_validate(control)
 	}
 
 	return returnValue;
+}
+
+/* type=static */
+
+function static_onfocus(control)
+{
+	handleEvent_onfocus(control);
+}
+
+function static_onblur(control)
+{
+	handleEvent_onblur(control);
+}
+
+function static_onchange(control)
+{
+	handleEvent_onchange(control);
 }
 

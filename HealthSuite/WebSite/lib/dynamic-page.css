@@ -55,6 +55,11 @@ div.section_field_area_conditional_expanded
 {
 }
 
+span.section_field_area_conditional
+{
+	display: none;
+}
+
 span.section_field_label
 {
 	width: 100;
