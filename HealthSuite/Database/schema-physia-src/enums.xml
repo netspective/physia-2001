@@ -36,6 +36,8 @@
 		<enum>Cancel</enum>
 		<enum>NoShow</enum>
 		<enum>Reschedule</enum>
+		<enum>Confirm</enum>
+		<enum>Verify</enum>
 	</table>
 
 	<table name="Login_Type" abbrev="LgiType" type="Enumeration">
