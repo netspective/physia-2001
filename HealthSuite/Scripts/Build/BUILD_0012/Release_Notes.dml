@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 
-<article>
-	<section heading="Release Contents">
-		<ol>
-			<li>
-				<bug>1010</bug>
-				Fixed problem where case sensitivity was changing the sort order of
-				names like SCHMIDT and Schmidt (the previous behavior was that SCHMIDT and
-				schmidt names would show up in different parts of the list; now they show
-				up next to each other).
-			</li>
-		</ol>
-	</section>
-
-	<section heading="Database Updates">
-		None.
-	</section>
-</article>
+<release-notes>
+	<release-info>
+		<build-id>12</build-id>
+		<build-manager>Robert Jenks</build-manager>
+		<tested-date></tested-date>
+		<release-date></release-date>
+	</release-info>
+	
+	<deliverables>
+		<deliverable id="1010">
+			Fixed problem where case sensitivity was changing the sort order of
+			names like SCHMIDT and Schmidt (the previous behavior was that SCHMIDT and
+			schmidt names would show up in different parts of the list; now they show
+			up next to each other).
+		</deliverable>
+	</deliverables>
+</release-notes>
