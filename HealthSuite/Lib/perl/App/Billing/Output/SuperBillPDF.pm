@@ -209,7 +209,7 @@ sub box2f
 			texts =>
 				[
 					{
-						'text' => "  CKET" . SPC x 15 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 15 . "LOCATION"  . SPC x 60 . "DOB"  ,
+						'text' => "  CKET" . SPC x 15 . "DR.#"  . SPC x 8 . "DOCTOR" . SPC x 14 . "LOCATION"  . SPC x 59 . "DOB"  ,
 						'fontWidth' => 6,
 						'x' => $x,
 						'y' => $y
@@ -268,7 +268,7 @@ sub box4f
 	if($superBill->{patient}->getSex ne '')
 	{
 		my $xpos = ($superBill->{patient}->getSex eq 'M') ? 0 : 12 ;
-		$self->boxData($p, $x, $y, $report, "X", $xpos, 12);
+		$self->boxData($p, $x, $y, $report, "X", $xpos, 10);
 	}
 
 	my $addressText;
@@ -282,7 +282,7 @@ sub box4f
 	$self->boxData($p, $x, $y, $report, $addressText, 30, 10);
 #	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getCity, 150, 10);
 #	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getState, 180, 10);
-	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getZipCode, 240, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getZipCode, 230, 10);
 
 }
 
@@ -738,6 +738,7 @@ sub boxData
 	my $properties =
 	{
 		'text' => $data,
+		'fontName' => BOLD_FONT_NAME,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + $xPadding,
