@@ -98,6 +98,10 @@
 			Database : requires new Statement tables
 		</deliverable>
 
+		<deliverable id="1501">
+			Modified all invoice actions and invoice status changes based on Karen's word document.
+		</deliverable>
+
 		<deliverable id="1511">
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			not those of the current user of the app.
