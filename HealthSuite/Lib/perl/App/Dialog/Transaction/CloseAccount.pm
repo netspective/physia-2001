@@ -50,14 +50,14 @@ sub new
 							postHtml => "</FONT></B>",
 							name => 'notes',
 				defaultValue => '0',),
-																	
+
 		);
 		$self->{activityLog} =
 		{
 			level => 1,
 			scope =>'transaction',
 			key => "#param.person_id#",
-			data => "Accout Notes '#field.trans_subtype#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+			data => "Account Notes '#field.trans_subtype#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 		};
 		$self->addFooter(new CGI::Dialog::Buttons);
 		return $self;
@@ -72,8 +72,8 @@ sub populateData
 
 sub execute
 {
-	my ($self, $page, $command,$flags) = @_;	
-	
+	my ($self, $page, $command,$flags) = @_;
+
 	$command = 'update';
 	my $closed_by = $page->session('user_id');
 	my $del_notes  = $page->field('notes');
@@ -87,32 +87,32 @@ sub execute
 		#Mark record as inactive
 		$page->schemaAction
 			(
-			'Transaction', 'update',                        
+			'Transaction', 'update',
 			trans_id =>$page->param('trans_id'),
-			trans_status => $INACTIVE	,			
-			trans_subtype => 'Account Closed',			
+			trans_status => $INACTIVE	,
+			trans_subtype => 'Account Closed',
 			);
 		#Obtain account/invoice information for collectors that
 		#transferd there account to this user
-		my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'),$invoiceID);                	
-		foreach my $data (@$transferData)         
+		my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'),$invoiceID);
+		foreach my $data (@$transferData)
 		{
-			#Mark account inactive 
+			#Mark account inactive
 			$page->schemaAction
 				(
-				'Transaction', 'update',                        
+				'Transaction', 'update',
 				trans_id =>$data->{trans_id},
-				trans_status => $INACTIVE,	,			
-				trans_subtype => 'Account Closed',			
-				);                	
+				trans_status => $INACTIVE,	,
+				trans_subtype => 'Account Closed',
+				);
 			#Mark notes records as inactive for anyone that transfer the account to this user
 			$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$data->{'provider_id'},$page->param('person_id')) if $page->field('notes');
 		}
 		#Mark notes records inactive for current collector
-		$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $page->field('notes'); 
+		$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $page->field('notes');
 		$page->endUnitWork();
 	}
-	$self->handlePostExecute($page, $command, $flags );		
+	$self->handlePostExecute($page, $command, $flags );
 	return "\u$command completed.";
 }
 
