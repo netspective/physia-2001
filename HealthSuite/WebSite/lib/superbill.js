@@ -318,13 +318,28 @@ function _populateGroupCPT (grpWidget) {
 	}
 }
 
+function _updateGroups () {
+	var df = document.superbillItemList;
+	var currGrpList = new Array ();
+	var currGrpListAsString;
+	
+	for (var i = 0; i < df.superbillGroups.length; i ++) {
+		if (currGrpListAsString) {
+			currGrpListAsString = currGrpListAsString + ' ' + i + '_' + df.superbillGroups.options [i].text;
+		} else {
+			currGrpListAsString = i + '_' + df.superbillGroups.options [i].text;
+		}
+	}
+	
+	document.superbillData.groups.value = currGrpListAsString;
+}
+
 function _addGroupHeading () {
 	var df = document.superbillItemList;
 	
 	if (df.groupHeading.value == "") {
 		alert ("Please enter a group heading before clicking this button.  Thank you");
 	} else {
-		nestingDepth = 2;
 		df.superbillGroups.options [df.superbillGroups.length] = new Option (df.groupHeading.value, df.groupHeading.value);
 		df.superbillGroups.selectedIndex = df.superbillGroups.length - 1;
 		
@@ -530,6 +545,48 @@ function _moveCPTDown () {
 		var groupCPTList = _getGroupCPTList (currentGroup);
 		_updateGroupCPTList (currentGroup, groupCPTList);
 		df.superbillData.selectedIndex = newIdx;
+	}
+}
+
+function _moveGroupUp () {
+	var df = document.superbillItemList;
+	
+	if (df.superbillGroups.selectedIndex > 0) {
+		var currIdx = df.superbillGroups.selectedIndex;
+		var newIdx = currIdx - 1;
+		
+		var tempGrpCPTList = _getStoredGroupCPTList (newIdx);
+		var currGrpCPTList = _getGroupCPTList (currIdx);
+		
+		var tempGrpName = df.superbillGroups.options [newIdx].text;
+		df.superbillGroups.options [newIdx].text = df.superbillGroups.options [currIdx].text;
+		df.superbillGroups.options [currIdx].text = tempGrpName;
+		
+		_updateGroups ();
+		_updateGroupCPTList (currIdx, tempGrpCPTList);
+		_updateGroupCPTList (newIdx, currGrpCPTList);
+		df.superbillGroups.selectedIndex = newIdx;
+	}
+}
+
+function _moveGroupDown () {
+	var df = document.superbillItemList;
+	
+	if (df.superbillGroups.selectedIndex >= 0 && df.superbillGroups.selectedIndex < (df.superbillGroups.length - 1)) {
+		var currIdx = df.superbillGroups.selectedIndex;
+		var newIdx = currIdx + 1;
+		
+		var tempGrpCPTList = _getStoredGroupCPTList (newIdx);
+		var currGrpCPTList = _getGroupCPTList (currIdx);
+		
+		var tempGrpName = df.superbillGroups.options [newIdx].text;
+		df.superbillGroups.options [newIdx].text = df.superbillGroups.options [currIdx].text;
+		df.superbillGroups.options [currIdx].text = tempGrpName;
+		
+		_updateGroups ();
+		_updateGroupCPTList (currIdx, tempGrpCPTList);
+		_updateGroupCPTList (newIdx, currGrpCPTList);
+		df.superbillGroups.selectedIndex = newIdx;
 	}
 }
 
