@@ -33,13 +33,21 @@ sub new
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
-			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
+			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id',),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
 			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', 
 						fields => [
-			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
-			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
+			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12,options=>FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12,options=>FLDFLAG_REQUIRED),
 			]),
+			new CGI::Dialog::Field(type => 'select',
+							style => 'radio',
+							selOptions => 'No:0;Yes:1',
+							caption => 'Include Associated Orgs: ',
+							preHtml => "<B><FONT COLOR=DARKRED>",
+							postHtml => "</FONT></B>",
+							name => 'include_org',options=>FLDFLAG_REQUIRED,
+				defaultValue => '0',),			
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -53,7 +61,7 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('batch_begin_date', $page->param('_f_batch_begin_date')|| $startDate);
 	$page->field('batch_end_date', $page->param('_f_batch_begin_end')||$startDate);
-	$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
+#	$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
 }
 
 
@@ -66,7 +74,9 @@ sub prepare_detail_payment
 	my $batch_to = $page->field('batch_id_to');
 	my $orgIntId = undef;
 	my $html =undef;	
-	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
+	$orgIntId = $page->param('org_internal_id');
+	my $reportBeginDate = $page->field('batch_begin_date')||'01/01/1800';
+	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 
 	my $pub = {
 		columnDefn =>
@@ -91,7 +101,7 @@ sub prepare_detail_payment
 	};
 	my $batch_date = $page->param('batch_date');	
 	my $daily_audit_detail = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit_detail',
-		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));	
+		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'),$reportBeginDate,$reportEndDate);	
 	my @data = ();	
 	foreach (@$daily_audit_detail)
 	{	
@@ -137,18 +147,21 @@ sub execute
 	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 	my $orgId = $page->field('org_id');
 	my $person_id = $page->field('person_id')||undef;
-	my $batch_from = $page->field('batch_id_from')||undef;
+	my $batch_from = $page->field('batch_id_from');
 	my $batch_to = $page->field('batch_id_to')||undef;
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;	
+	my $include_org =$page->field('include_org') ;
 	my $html;
+	my $orgResult;
 	my $pub =
 	{
 		columnDefn =>
 			[
+			{ colIdx =>13 , groupBy=>'#13#', head=>'Facility',hAlign=>'LEFT'},
 			{ colIdx => 0, head => 'Batch Date', dataFmt => '#0#', dAlign => 'RIGHT' ,
-			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&batch_date=#0#',null,'width=900,height=600,scrollbars,resizable')}},
+			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&batch_date=#0#&org_internal_id=#14#',null,'width=900,height=600,scrollbars,resizable')}},
 			{ colIdx => 1, head => 'Chrgs', summarize => 'sum', dataFmt => '#2#', dformat => 'currency' },
 			{ colIdx => 2, head => 'Misc Chrgs', summarize => 'sum', dataFmt => '#3#', dformat => 'currency' },
 			{ colIdx => 3, head => 'Per W/O', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },			
@@ -159,35 +172,43 @@ sub execute
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },			
 			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },			
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
-			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
+			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}',sDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
 		],
 	};		
-	my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit',$reportBeginDate,$reportEndDate,
-	,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
-	my @data = ();	
-	foreach (@$daily_audit)
+	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildernOrgs', 
+			$page->session('org_internal_id'),$orgIntId, $include_org) ;
+	@data = ();				
+	foreach my $orgValue (@$orgResult)
 	{
-		$_->{tlt_rcpts}=$_->{person_pay} + $_->{insurance_pay} - $_->{refund};
-		$_->{tlt_chrgs}=$_->{total_charges}+$_->{misc_charges};		
-		$_->{collection_per} = $_->{tlt_chrgs} > 0 ? sprintf  "%3.2f", ($_->{tlt_rcpts} / $_->{tlt_chrgs} )*100 : '0.00' ;				
-		my @rowData = 
-		(	
-			$_->{invoice_date},
-			$_->{total_charges},
-			$_->{misc_charges},			
-			$_->{person_write_off},			
-			$_->{insurance_write_off},						
-			$_->{total_charges} + $_->{misc_charges} + $_->{charge_adjust}, #Net Charges						
-			$_->{balance_transfer},								
-			$_->{insurance_pay},								
-			$_->{person_pay},
-			$_->{refund},
-			$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
-			$_->{collection_per},
-			$_->{tlt_chrgs},		);
-		push(@data, \@rowData);
-	}
 	
+		my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit',$reportBeginDate,$reportEndDate,
+		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
+		foreach (@$daily_audit)
+		{
+			$_->{tlt_rcpts}=$_->{person_pay} + $_->{insurance_pay} - $_->{refund};
+			$_->{tlt_chrgs}=$_->{total_charges}+$_->{misc_charges};		
+			$_->{collection_per} = $_->{tlt_chrgs} > 0 ? sprintf  "%3.2f", ($_->{tlt_rcpts} / $_->{tlt_chrgs} )*100 : '0.00' ;				
+			my @rowData = 
+			(	
+				$_->{invoice_date},
+				$_->{total_charges},
+				$_->{misc_charges},			
+				$_->{person_write_off},			
+				$_->{insurance_write_off},						
+				$_->{total_charges} + $_->{misc_charges} + $_->{charge_adjust}, #Net Charges						
+				$_->{balance_transfer},								
+				$_->{insurance_pay},								
+				$_->{person_pay},
+				$_->{refund},
+				$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
+				$_->{collection_per},
+				$_->{tlt_chrgs},	
+				$orgValue->{org_id},
+				$orgValue->{org_internal_id}				
+				);
+			push(@data, \@rowData);
+		}
+	}	
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	return $html
 }

@@ -32,12 +32,12 @@ sub new
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
-			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id',options=>FLDFLAG_REQUIRED),
+			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
 			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', 
 						fields => [
-			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
-			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
+			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12,options=>FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12,options=>FLDFLAG_REQUIRED),
 			
 			]),
 			new CGI::Dialog::Field(type => 'select',
@@ -147,7 +147,7 @@ sub execute
 	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 	my $orgId = $page->field('org_id');
 	my $person_id = $page->field('person_id')||undef;
-	my $batch_from = $page->field('batch_id_from')||undef;
+	my $batch_from = $page->field('batch_id_from');
 	my $batch_to = $page->field('batch_id_to')||undef;
 	my $orgResult = undef;
 	my $include_org =$page->field('include_org') ;
@@ -171,12 +171,12 @@ sub execute
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },			
 			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },			
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
-			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
+			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',sAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
 		],
 	};		
 	my @data = ();	
 	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildernOrgs', 
-			$page->session('org_internal_id'),$orgIntId, $include_org) if $orgId;
+			$page->session('org_internal_id'),$orgIntId, $include_org);
 	foreach my $orgValue (@$orgResult)
 	{
 		my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_daily_audit',$reportBeginDate,$reportEndDate,
