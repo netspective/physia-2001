@@ -58,14 +58,14 @@
 				<col name="device_assoc_id">1</col>
 				<col name="device_id">1</col>
 				<col name="org_internal_id">1</col>
-				<col name="document_type"></col>
-				<col name="person_id"></col>
+				<col name="document_type">NULL</col>
+				<col name="person_id">NULL</col>
 			</row>
 			<row>
 				<col name="device_assoc_id">2</col>
 				<col name="device_id">0</col>
 				<col name="org_internal_id">1</col>
-				<col name="document_type"></col>
+				<col name="document_type">NULL</col>
 				<col name="person_id">SJONES</col>
 			</row>
 			<row>
@@ -73,7 +73,7 @@
 				<col name="device_id">1</col>
 				<col name="org_internal_id">1</col>
 				<col name="document_type">0</col>
-				<col name="person_id"></col>
+				<col name="person_id">NULL</col>
 			</row>
 		</data>
 	</table>
