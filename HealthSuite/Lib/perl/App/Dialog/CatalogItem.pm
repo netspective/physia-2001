@@ -9,7 +9,7 @@ use App::Statements::Person;
 use App::Statements::Search::Code;
 use App::Statements::Search::MiscProcedure;
 use App::Statements::IntelliCode;
-
+use App::Statements::Person;
 use Carp;
 
 use CGI::Validator::Field;
@@ -42,7 +42,7 @@ sub new
 		new CGI::Dialog::Field(
 			name => 'show_cap',
 			type => 'hidden'
-		),
+		),	
 		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 			name => 'catalog_id',
 			options => FLDFLAG_REQUIRED,
@@ -50,8 +50,10 @@ sub new
 		),
 		new CGI::Dialog::Field(caption => 'Fee Schedule Entry Type',
 			name => 'entry_type',
-			type => 'enum',
-			enum => 'Catalog_Entry_Type',
+			fKeyStmtMgr => $STMTMGR_CATALOG,
+			fKeyStmt => 'selFeeScheduleEntryTypes',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
 			options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Entry Cost Type',

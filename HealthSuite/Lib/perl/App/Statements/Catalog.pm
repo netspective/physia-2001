@@ -26,6 +26,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		FROM offering_catalog
 		WHERE catalog_id = ?
 	},
+	'selFeeScheduleEntryTypes'=>qq
+	{
+		SELECT id,caption
+		FROM catalog_entry_type
+		WHERE ID NOT IN (80,110,120,150,160,200)
+	},	
 	'selMiscProcChildren' => qq
 	{
 		SELECT 	oce2.code, oce2.modifier
