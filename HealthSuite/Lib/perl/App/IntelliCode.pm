@@ -558,6 +558,15 @@ sub incrementUsage
 
 	for my $code (@$codesRef)
 	{
+		if ($type eq 'Icd')
+		{
+			next unless $ICD_CACHE{$code}->{icd};
+		}
+		elsif ($type eq 'Cpt')
+		{
+			next unless $CPT_CACHE{$code}->{cpt};
+		}
+		
 		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName1, $code, $person_id, $org_id))
 		{
 			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName1, $code, $person_id, $org_id);
