@@ -217,6 +217,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 1);
 
 	my $personId = $page->param('person_id');
 

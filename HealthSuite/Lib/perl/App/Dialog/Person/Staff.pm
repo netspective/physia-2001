@@ -21,7 +21,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Person);
 
-%RESOURCE_MAP = ( 'staff' => { heading => '$Command Staff Member', 
+%RESOURCE_MAP = ( 'staff' => { heading => '$Command Staff Member',
 			  	_arl => ['person_id'], },);
 #sub new
 #{
@@ -108,6 +108,8 @@ sub makeStateChanges
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 1);
+
 	my $personId = $page->param('person_id');
 
 	if($command eq 'remove')
@@ -147,7 +149,7 @@ sub execute_update
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'staff';
-	$page->beginUnitWork("Unable to update Staff");	
+	$page->beginUnitWork("Unable to update Staff");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 	$page->endUnitWork();
 }
@@ -157,7 +159,7 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Staff';
-	$page->beginUnitWork("Unable to remove Staff");	
+	$page->beginUnitWork("Unable to remove Staff");
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
 	$page->endUnitWork();
 }
