@@ -107,7 +107,6 @@ sub handlePage
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
 	$page->setFlag($flags);
-	$page->parse_params($params);
 	return $page->handleARL($arl, $params, $resourceId, $pathItems);
 }
 
@@ -407,7 +406,7 @@ sub addSynonyms
 
 sub buildAccessControl
 {
-	my $gen = XML::Generator->new('escape' => 'always', 'conformance' => 'strict', 'namespace' => '');
+	my $gen = XML::Generator->new('pretty' => 4, 'escape' => 'always', 'conformance' => 'strict', 'namespace' => '');
 	my %data = ();
 
 	$data{modes} = [];
@@ -440,10 +439,24 @@ sub buildAccessControl
 						push @{$data{views}}, $gen->permission({id => $view->{name}});
 					}
 				}
-				push @{$data{$type}}, $gen->permission({id => $1}, @{$data{sub}}, @{$data{views}}, $type eq 'dlg' ? @{$data{modes}} : '');
+				if ($type eq 'dlg')
+				{
+					push @{$data{$type}}, $gen->permission({id => $1}, @{$data{sub}}, @{$data{views}}, @{$data{modes}});
+				}
+				else
+				{
+					push @{$data{$type}}, $gen->permission({id => $1}, @{$data{sub}}, @{$data{views}});
+				}
 			}
 		}
-		push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}}, $type eq 'dlg' ? @{$data{modes}} : '');
+		if ($type eq 'dlg')
+		{
+			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}}, @{$data{modes}});
+		}
+		else
+		{
+			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}});
+		}
 	}
 	my $data = '<?xml version="1.0"?>';
 	$data .= $gen->accesscontrol({name=>'auto'}, @{$data{root}});
