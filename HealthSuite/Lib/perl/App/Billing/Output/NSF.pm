@@ -101,15 +101,18 @@ sub registerValidators
 	 
 	 if($nsfType eq NSF_ENVOY)
 	 {
+	 	
 	     $validators->register(new App::Billing::Output::Validate::EnvoyPayer);
 	     $validators->register(new App::Billing::Output::Validate::NSF);
      }
      elsif($nsfType eq NSF_HALLEY)
      {
+     	
      	$validators->register(new App::Billing::Output::Validate::PerSe);
      }
      elsif($nsfType eq NSF_THIN)
      {
+     	
      	$validators->register(new App::Billing::Output::Validate::THIN);
      }
      

@@ -20,6 +20,26 @@ sub recordType
 	'DA0';
 }
 
+
+
+sub wasLastPayerMedicare
+{
+	my ($self, $flags, $inpClaim) = @_;
+	
+	#print "Payer ID is: ", $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(), "\n";
+	#print "Payer is: ", $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName , "\n";
+	
+	if ($flags->{RECORDFLAGS_NONE} > 0) 
+	{
+		my $testName = $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE} - 1]->getName();
+		if($testName eq	'Medicare')		
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 sub formatData
 {
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
@@ -28,15 +48,18 @@ sub formatData
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
 	my $refSourceOfPayment = {'MEDICARE' => 'C', 'MEDICADE' => 'D', 'CHAMPUS' => 'H', 'CHAMPVA' => ' ', 'GROUP' => ' ', 'FECA' => ' ', 'OTHER' => 'Z'};
 
+
+    my $wasPayerMedicare = wasLastPayerMedicare($self, $flags, $inpClaim);
+	
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%1s%1s%-2s%-5s%-4s%-17s%-16s%-20s%-17s%-16s%1s%-15s%-15s%1s%1s%2s%-17s%-8s%-20s%-10s%-2s%1s%-3s%1s%-8s%1s%1s%-7s%-25s%-15s%-1s%-28s%-7s%-9s",
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
-	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
+	substr(($wasPayerMedicare == 1) ? 'Z' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr(($wasPayerMedicare == 1) ? 'MG' : $refClaimInsured->getTypeCode(),0,2),   # insurance type code
+	substr(($wasPayerMedicare == 1) ? $inpClaim->{insured}->[0]->getMedigapNo() : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
  	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName,0,17),#substr($refClaimInsured->getInsurancePlanOrProgramName(),0,17),
  	$spaces,										 # payer name filler
@@ -46,7 +69,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimInsured->getHMOIndicator(),0,1), # PPO/HMO Indicator
 	substr($refClaimInsured->getHMOId(),0,15),  	 # PPO/HMO Id
 	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1),
+	substr(($wasPayerMedicare == 1) ? 'Y' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1),
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	substr($refClaimInsured->getRelationshipToPatient(),0,2),
 	substr($refClaimInsured->getMemberNumber(), 0, 17),
@@ -74,11 +97,11 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
-	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
+	substr(($wasPayerMedicare == 1) ? 'Z' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
+	substr(($wasPayerMedicare == 1) ? 'MG' : $refClaimInsured->getTypeCode(),0,2),   # insurance type code
 #	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 #	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5), # Organiation Payer Id
+	substr(($wasPayerMedicare == 1) ? $inpClaim->{insured}->[0]->getMedigapNo() : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5), # Organiation Payer Id
 # 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName,0,17),#substr($refClaimInsured->getInsurancePlanOrProgramName(),0,17),
 	$spaces, # PayerClaim Office No
 	substr($refClaimInsured->getInsurancePlanOrProgramName(),0,33), # payer name filler
@@ -86,7 +109,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # Group Name
 	substr($refClaimInsured->getHMOIndicator(),0,1), # PPO/HMO Indicator
 	substr($refClaimInsured->getHMOId(),0,15),  	 # PPO/HMO Id
-	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
+	substr(($wasPayerMedicare == 1) ? 'Y' : $inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1),
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	substr($refClaimInsured->getRelationshipToPatient(),0,2),
