@@ -174,7 +174,7 @@ sub execute
 	my ($self, $dbpage, $flags, $name) = (shift, shift, shift, shift);
 
 	my $execRV = undef;
-	if($flags & STMTMGRFLAG_DEBUG)
+	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name)
 	{
 		$dbpage->addDebugStmt("Query: <b>$name</b>");
 		unless($flags & STMTMGRFLAG_DYNAMICSQL)
