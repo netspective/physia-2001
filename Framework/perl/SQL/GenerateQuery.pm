@@ -3,9 +3,9 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.5 2000-10-05 17:02:56 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.6 2000-10-08 21:43:33 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
-use fields qw(qdlFile id fields joins views);
+use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
 
 %CACHE = ();
@@ -138,6 +138,7 @@ sub fields
 		$self->{fields}->[0]->{$newField->{id}} = $#{$self->{fields}};
 		return 1;
 	}
+	$id = $1 if $id =~ /\{(\w+)\}/;
 	return exists $self->{fields}->{$id} ? $self->{fields}->{$id} : undef;
 }
 
@@ -230,6 +231,7 @@ sub parseTags
 			if (exists $value->[0]->{id} && defined $value->[0]->{id})
 			{
 				$self->id($value->[0]->{id});
+				$self->{params} = $value->[0];
 			}
 		}
 		elsif ($tag eq 'field')
@@ -362,11 +364,11 @@ sub new
 	$self->{sqlGen} = $sqlGen;
 
 	# Validate the field & get the join name
-	unless($sqlGen->fields($field))
+	die "Field '$_' is invalid" unless $sqlGen->fields($field);
+	if ($field =~ /\{/)
 	{
 		my @fields = $field =~ /\{(\w+)\}/g;
 		die "Only one field may be specified" if $#fields;
-		die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
 		$fieldDefn = $field;
 		$field = $fields[0];
 	}
@@ -540,17 +542,16 @@ sub genSQL
 	foreach my $field (@{$opts{outColumns}})
 	{
 		my $fieldDefn;
-		unless ($sqlGen->fields($field))
-		{
-			my @fields = $field =~ /\{(\w+)\}/g;
-			die "Only one field may be specified" if $#fields;
-			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
-			$fieldDefn = $field;
-			$field = $fields[0];
-		}
-		# Add the selected columns to the SELECT clause
-		my $fieldData = $sqlGen->fields($field);
+		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
 
+		# If they gave us a field wrapped in a function call
+		if ($field ne $fieldData->{id})
+		{
+			$fieldDefn = $field;
+			$field = $fieldData->{id};
+		}
+
+		# Add the selected columns to the SELECT clause
 		my $selectCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
 		$selectCol .= $fieldData->{column};
 		if (defined $fieldData->{columndefn})
@@ -573,32 +574,26 @@ sub genSQL
 	# Process the Order By
 	foreach my $field (@{$opts{orderBy}})
 	{
-		unless ($sqlGen->fields($field))
-		{
-			my @fields = $field =~ /\{(\w+)\}/g;
-			die "Only one field may be specified" if $#fields;
-			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
-			$field = $fields[0];
-		}
+		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
 
-		push @ORDER_BY, $field;
+		# Add the selected column to the ORDER BY clause
+		push @ORDER_BY, $fieldData->{id};
 	}
 
 	# Process the Group By
 	foreach my $field (@{$opts{groupBy}})
 	{
 		my $fieldDefn;
-		unless ($sqlGen->fields($field))
-		{
-			my @fields = $field =~ /\{(\w+)\}/g;
-			die "Only one field may be specified" if $#fields;
-			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
-			$fieldDefn = $field;
-			$field = $fields[0];
-		}
-		# Add the selected columns to the SELECT clause
-		my $fieldData = $sqlGen->fields($field);
+		die "Field '$field' is invalid" unless my $fieldData = $sqlGen->fields($field);
 
+		# If they gave us a field wrapped in a function call
+		if ($field ne $fieldData->{id})
+		{
+			$fieldDefn = $field;
+			$field = $fieldData->{id};
+		}
+
+		# Add the selected column to the GROUP BY clause
 		my $groupCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
 		$groupCol .= $fieldData->{column};
 		if (defined $fieldData->{columndefn})
@@ -755,6 +750,24 @@ sub addTableToFROM
 	my ($join, $FROM, $WHERE, $bindParams) = @_;
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
 	my $joinData = $sqlGen->joins($join);
+
+	# See if this join requires any prerequisite joins
+	if (defined $joinData->{requires})
+	{
+		my $requires = $joinData->{requires};
+		if (ref($requires) eq 'ARRAY')
+		{
+			foreach (@$requires)
+			{
+				$self->addTableToFROM($_, $FROM, $WHERE, $bindParams);
+			}
+		}
+		else
+		{
+			$self->addTableToFROM($requires, $FROM, $WHERE, $bindParams);
+		}
+
+	}
 
 	# Construct a proper FROM clause member
 	my $table = $joinData->{table};
