@@ -115,9 +115,10 @@ sub execute
 	};
 
 	my $qryStmt = qq{
-						select count(person_id) total_patients
+						select count(distinct person_id) total_patients
 						from person_org_category
 						where org_internal_id = @{[ $page->session('org_internal_id') ]}
+						and category = 'Patient'
 					};
 
 	my $totalPatients = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$qryStmt);
@@ -132,8 +133,10 @@ sub execute
 	my $columns = "distinct substr(pad.zip, 1, 5) zipcode, count(p.person_id) patients";
 	my $tables = " person p, person_address pad, person_org_category poc" ;
 	my $where = " p.person_id = poc.person_id";
-	my $where = $where . " and poc.org_internal_id = " . $page->session('org_internal_id');
-	my $where = $where . " and p.person_id = pad.parent_id" . $zipCodeClause;
+	$where = $where . " and poc.org_internal_id = " . $page->session('org_internal_id');
+	$where = $where . " and poc.category = \'Patient\'";
+	$where = $where . " and pad.address_name = \'Home\'";
+	$where = $where . " and p.person_id = pad.parent_id" . $zipCodeClause;
 	my $group = "substr(pad.zip, 1, 5)";
 
 	my $columnNo = 1;
