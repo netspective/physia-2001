@@ -784,4 +784,183 @@ sub getHtml
 	};
 }
 
+##############################################################################
+package App::Dialog::Field::OutstandingItems;
+##############################################################################
+
+use strict;
+use Carp;
+use CGI::Validator;
+use CGI::Validator::Field;
+use CGI::Dialog;
+use DBI::StatementManager;
+
+use App::Statements::Person;
+use App::Statements::Invoice;
+use App::Universal;
+
+use Date::Manip;
+use Date::Calc qw(:all);
+
+use Devel::ChangeLog;
+use vars qw(@ISA @CHANGELOG);
+
+@ISA = qw(CGI::Dialog::Field);
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	$params{name} = 'invoices_list' unless exists $params{name};
+	$params{type} = 'invoices';
+	#$params{lineCount} = 4 unless exists $params{count};
+	#$params{allowComments} = 1 unless exists $params{allowComments};
+
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub needsValidation
+{
+	return 1;
+}
+
+sub isValid
+{
+	my ($self, $page, $validator, $valFlags) = @_;
+
+	my $totalPayRcvd = $page->field('check_amount');					#total amount paid
+	my $totalAmtApplied = 0;
+	my $totalInvoiceBalance = 0;
+
+	#validation for each item listed
+	my $lineCount = $page->param('_f_line_count');
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		my $itemPayment = $page->param("_f_item_$line\_plan_paid");
+		my $itemBalance = $page->param("_f_item_$line\_item_balance");
+		$totalInvoiceBalance += $itemBalance;
+		next if $itemPayment eq '';
+
+		#no validation needed for overpayments - overpayments are allowed
+		if($itemPayment > $totalPayRcvd)
+		{
+			my $amtDiff = $itemPayment - $totalPayRcvd;
+			$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by \$$amtDiff");
+		}
+
+		$totalAmtApplied += $itemPayment;
+	}
+
+
+	#validation  - no validation needed for overpayments - overpayments are allowed
+	if($totalAmtApplied > $totalPayRcvd)
+	{
+		my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
+		$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.");
+	}
+	elsif($totalAmtApplied < $totalPayRcvd)
+	{
+		my $payRcvdAndPayAppliedDiff = $totalPayRcvd - $totalAmtApplied;
+		if($totalAmtApplied < $totalInvoiceBalance)
+		{
+			my $balanceRemain = $totalInvoiceBalance - $totalAmtApplied;
+			$self->invalidate($page, "Remaining balance: \$$balanceRemain. There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+		}
+		else
+		{
+			$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
+		}
+	}
+
+	return $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $errorMsgsHtml = '';
+	my $bgColorAttr = '';
+	my $spacerHtml = '&nbsp;';
+	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+	my $textFontAttrsForTotalBalRow = 'SIZE=2 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:10pt"';
+
+	if(my @messages = $page->validationMessages($self->{name}))
+	{
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
+		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
+		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
+	}
+
+
+	my $linesHtml = '';
+	my $personId = $page->param('person_id') || $page->field('payer_id');
+	my $invoiceId = $page->param('invoice_id');
+	my $outstandItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+	my $totalItems = scalar(@{$outstandItems});
+	my $totalInvoiceBalance = 0;
+	for(my $line = 1; $line <= $totalItems; $line++)
+	{
+		my $item = $outstandItems->[$line-1];
+		my $itemId = $item->{item_id};
+		my $itemBalance = $item->{balance};
+		my $itemAdjs = $item->{total_adjust};
+		$totalInvoiceBalance += $itemBalance;
+
+		my $endDateDisplay = '';
+		if(my $endDate = $item->{service_end_date})
+		{
+			$endDateDisplay = $endDate ne  $item->{service_begin_date} ? "- $endDate" : '';
+		}
+		my $dateDisplay = "$item->{service_begin_date} $endDateDisplay";
+
+		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_adjustments" VALUE="$itemAdjs"/>
+			<TR VALIGN=TOP>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				<TD><FONT $textFontAttrs>$dateDisplay</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_allow") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_paid") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
+			</TR>
+		};
+	}
+
+	return qq{
+		<TR valign=top $bgColorAttr>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+			<TD colspan=2>
+				<TABLE CELLSPACING=0 CELLPADDING=2>
+					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalItems"/>
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Allow</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Paid</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Writeoff Amount</FONT></TD>
+					</TR>
+					$linesHtml
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Invoice Balance:</b></FONT></TD>
+						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalInvoiceBalance</b></FONT></TD>
+					</TR>
+				</TABLE>
+			</TD>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+		</TR>
+	};
+}
+
 1;
