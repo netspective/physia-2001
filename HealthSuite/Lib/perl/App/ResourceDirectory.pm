@@ -52,7 +52,7 @@ use App::Statements::Transaction;
 	},
 	'Dialogs' => {
 		baseDir => File::Spec->catfile($App::Configuration::CONFDATA_SERVER->path_root, 'Lib', 'perl', 'App', 'Dialog'),
-		excludeDirs => ['Report', 'Field'],
+		excludeDirs => ['Report', 'Field', 'Directory'],
 		prefix => DIALOG_RESOURCE_PREFIX,
 	},
 );
