@@ -12,7 +12,7 @@ use constant TWCC_FORM_FONT_WIDTH => 8;
 use constant TWCC_PADDING_LEFT => 2; # previously 5
 use constant TWCC_PADDING_TOP => 7; # previously 5
 use constant TWCC_LINE_THICKNESS => 1;
-use constant TWCC_FORM_RED => 0.7;
+use constant TWCC_FORM_RED => 0.0; # 0.7
 use constant TWCC_FORM_GREEN => 0.0;
 use constant TWCC_FORM_BLUE => 0.0;
 use constant TWCC_CHECK_BOX_WIDTH => 5;
@@ -151,8 +151,10 @@ sub setColor
 
 sub newPage
 {
-	my ($self, $p)  = @_;
-	pdflib::PDF_begin_page($p, TWCC_PAGE_WIDTH, TWCC_PAGE_HEIGHT);
+	my ($self, $p, $properties)  = @_;
+	my $pageWidth = $properties->{'pageWidth'} ne "" ? $properties->{'pageWidth'} : TWCC_PAGE_WIDTH;
+	my $pageHeight = $properties->{'pageHeight'} ne "" ? $properties->{'pageHeight'} : TWCC_PAGE_HEIGHT;
+	pdflib::PDF_begin_page($p, $pageWidth, $pageHeight);
 }
 
 sub endPage

@@ -9,6 +9,7 @@ use App::Billing::Output::TWCC::TWCC61;
 use App::Billing::Output::TWCC::TWCC64;
 use App::Billing::Output::TWCC::TWCC69;
 use App::Billing::Output::TWCC::TWCC73;
+use App::Billing::Output::TWCC::TWCC60;
 
 use pdflib 2.01;
 
@@ -42,6 +43,7 @@ sub processClaims
 	$reports{'TWCC64'}= new App::Billing::Output::TWCC::TWCC64;
 	$reports{'TWCC69'}= new App::Billing::Output::TWCC::TWCC69;
 	$reports{'TWCC73'}= new App::Billing::Output::TWCC::TWCC73;
+	$reports{'TWCC60'}= new App::Billing::Output::TWCC::TWCC60;
 
 	foreach my $claim(@$claims)
 	{
