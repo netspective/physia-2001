@@ -113,6 +113,7 @@ sub initialize
 				]),
 		new CGI::Dialog::Field(caption => 'Code',  name => 'code', size => '7',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption => 'Service Request Rate',  name => 'service_rate', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Subhead(heading => 'Authorization'),
 		new CGI::Dialog::MultiField(name => 'clientid_num', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		fields => [
@@ -333,6 +334,8 @@ sub populateData_update
 	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
 	$page->field('code',$serviceRequest->{code});
 	$page->field('code_description',$serviceRequest->{caption});
+	my $rate=$serviceRequest->{unit_cost} * $serviceRequest->{quantity};
+	$page->field('service_rate',$rate);
 }
 
 sub populateData_remove
