@@ -1949,62 +1949,32 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 #------------------------------------------------------------------------------------------------------------------------
 'org.LabTestSummary' => {
 	sqlStmt => qq{
-				SELECT('Labs'),
-				count (oce.entry_id),
-				300,internal_catalog_id,oce.entry_type
-				FROM offering_catalog oc,org o,
-				offering_catalog_entry oce
-				WHERE o.owner_org_id = :2
-				AND	o.org_id = :1
-				AND	o.org_internal_id = oc.org_internal_id
-				AND	oce.entry_type (+)= 300
-				AND	oce.catalog_id(+)=oc.internal_catalog_id
-				AND	parent_entry_id is null
-				AND	oc.catalog_type =5
-				GROUP BY internal_catalog_id,oce.entry_type
-				union
-				SELECT ('Radiology'),
-				count (oce.entry_id),
-				310,internal_catalog_id,oce.entry_type
-				FROM offering_catalog oc,org o,
-				offering_catalog_entry oce
-				WHERE o.owner_org_id = :2
-				AND	o.org_id = :1
-				AND	o.org_internal_id = oc.org_internal_id
-				AND	oce.entry_type (+)= 310
-				AND	oce.catalog_id(+)=oc.internal_catalog_id
-				AND	parent_entry_id is null
-				AND	oc.catalog_type =5
-				GROUP BY internal_catalog_id	,oce.entry_type
-				union				
-				SELECT 'Other',
-				count (oce.entry_id),
-				999,internal_catalog_id,oce.entry_type
-				FROM offering_catalog oc,org o,
-				offering_catalog_entry oce
-				WHERE o.owner_org_id = :2
-				AND	o.org_id = :1
-				AND	o.org_internal_id = oc.org_internal_id
-				AND	oce.entry_type (+)= 999
-				AND	oce.catalog_id(+)=oc.internal_catalog_id
-				AND	parent_entry_id is null
-				AND	oc.catalog_type =5
-				GROUP BY internal_catalog_id	,oce.entry_type
+			SELECT oc.catalog_id,oc.caption , count (oce.catalog_id),oc.internal_catalog_id
+			FROM	offering_catalog oc, org, offering_catalog_entry oce
+			WHERE	oc.catalog_type = 5
+			AND	oc.org_internal_id = org.org_internal_id
+			AND	org.org_id = :1
+			AND	org.owner_org_id = :2
+			AND	oce.catalog_id (+)= oc.internal_catalog_id
+			AND	oce.parent_entry_id IS NULL
+			group by oc.catalog_id,oc.caption ,oc.internal_catalog_id
 			},
 	sqlvar_entityName => 'OrgInternal ID for LAB',
 	sqlStmtBindParamDescr => ['Org Internal ID'],
 	publishDefn => {
-				#bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
+				bullets => '/org/#param.org_id#/dlg-update-test-catalog/#3#?home=#homeArl#',
 				columnDefn =>
 				[
-				{colIdx => 0, hAlign=>'left',  head => 'Test Type', url=>qq{/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#4#&id=#3#}},
-				{colIdx => 1,hAlign=>'left', head => 'Entries',tDataFmt => '&{sum:1} Entries', },
-				{head=>'Action' ,dataFmt=>'Add', url=>'/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#2#&home=#homeArl#'},
+				{colIdx => 0, hAlign=>'left',  head => 'Catalog ID', url=>qq{/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#3#}},				
+				{colIdx => 1, hAlign=>'left',  head => 'Catalog Name',},
+				{colIdx => 2,hAlign=>'left', head => 'Entries',tDataFmt => '&{sum:1} Entries', },
+				{head=>'Action' ,dataFmt=>'Add', url=>'/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&home=#homeArl#'},
 				],
 			banner =>
 			{
 				actionRows =>
 				[
+				{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-test-catalog/#param.org_id#?home=#homeArl#'>Service Catalog</A> }},	
 				#{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Lab </A> }},	
 				 #{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>X-Ray </A> }},				
 				 #{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Other </A> }},								 
@@ -2033,6 +2003,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmt => qq{
 				SELECT  oce.code,
 					oce.name,
+					oce.description,
 					oce.modifier,
 					oce.entry_id,
 					oce.catalog_id,
@@ -2044,7 +2015,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				WHERE 	o.owner_org_id = :2
 				AND	o.org_id = :1
 				AND	o.org_internal_id = oc.org_internal_id
-				AND	oce.entry_type = :3
+				AND	oc.internal_catalog_id = :3
 				AND	oce.catalog_id=oc.internal_catalog_id
 				AND	parent_entry_id is null
 		},
@@ -2054,16 +2025,16 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				#bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
 				columnDefn =>
 				[
-				{colIdx => 0, tDataFmt => '&{count:0} Tests',hAlign=>'left', head => 'Test ID'},
-				{colIdx => 1, hAlign=>'left', head => 'Test Name'},				
-				{colIdx => 2, hAlign=>'left', head => 'Selection'},					
-				{colIdx => 6, hAlign=>'left', head => 'Physician Cost',dformat=>'currency'},								
-				{colIdx => 7, hAlign=>'left', head => 'Patient Cost',dformat=>'currency'},												
-				{colIdx => 3,hAlign=>'left',head=>'Actions',
-						dataFmt => q{<A HREF="/org/#param.org_id#/dlg-update-lab-test/#3#"
+				{colIdx => 1, tDataFmt => '&{count:0} Tests',hAlign=>'left', head => 'Test ID'},
+				{colIdx => 2, hAlign=>'left', head => 'Test Name'},				
+				{colIdx => 3, hAlign=>'left', head => 'Selection'},					
+				{colIdx => 7, hAlign=>'left', head => 'Physician Cost',dformat=>'currency'},								
+				{colIdx => 8, hAlign=>'left', head => 'Patient Cost',dformat=>'currency'},												
+				{colIdx => 4,hAlign=>'left',head=>'Actions',
+						dataFmt => q{<A HREF="/org/#param.org_id#/dlg-update-lab-test/#4#"
 					TITLE='Modify Lab Test'>
 					<img src="/resources/icons/black_m.gif" BORDER=0></A>
-					<A HREF="/org/#param.org_id#/dlg-remove-lab-test/#3#"
+					<A HREF="/org/#param.org_id#/dlg-remove-lab-test/#4#"
 										TITLE='Delete Lab Test'>
 					<img src="/resources/icons/black_d.gif" BORDER=0></A> },
 				},				
@@ -2072,7 +2043,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{
 				actionRows =>
 				[
-				{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-lab-test/#param.id#?home=#homeArl#'>Test</A> }},	
+				{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-lab-test/#param.labtest_detail#?home=#homeArl#'>Test</A> }},	
 				],
 				contentColor=>'#EEEEEE',
 			},
@@ -2091,8 +2062,9 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	},
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id');  
 			#get Caption from catalog_entry_type
-			my $caption = $STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'selCatalogEntryTypeCapById',$page->param('labtest_detail')||undef);
-			$page->param('caption',$caption);
+			my $caption = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->param('labtest_detail')||undef);
+			#my $cap = 
+			$page->param('caption',$caption->{caption});
 			$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.LabTestDetail', [$orgId,$page->session('org_internal_id'),$page->param('labtest_detail')||undef], 'panel'); },
 },
 #------------------------------------------------------------------------------------------------------------------------
@@ -2142,6 +2114,70 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			},
 	},
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.AllLabOrder', [$orgId,$page->session('org_internal_id')], 'panel'); },
+},
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+'org.labLocation' => {
+	sqlStmt => qq{
+			select 0 as preferred, 99910 as value_type,  complete_addr_html,item_id,address_name,parent_id
+			from org_address , org where org.org_id = :1
+			AND	org.owner_org_id = :2
+			AND	org_address.parent_id = org.org_internal_id	
+			AND	NOT EXISTS
+			(SELECT 1 FROM Org_Contact_Addrs oac
+			WHERE org_address.address_name = oac.caption)
+			order by address_name
+			},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => 
+	{
+		columnDefn => [
+		{
+			head => 'P',dataFmt => ['', '<IMG SRC="/resources/icons/checkmark.gif">'],
+		},
+		{ head => 'Type', dataFmt => '#4#:', dAlign => 'RIGHT' },
+		{ head => 'Value' },
+	],	
+	},	
+	publishDefn_panel =>
+		{
+			bullets => '/org/#param.org_id#/dlg-update-lab-location/#3#?home=#homeArl#',
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel',
+			separateDataColIdx => 2, # when the item_name is '-' add a row separator
+			frame => {
+				heading => 'Ancillary Locations',
+				editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+		},
+		publishDefn_panelTransp =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel.transparent',
+			inherit => 'panel',
+		},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Ancillary Locations' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-lab-location?_f_org_id=#param.org_id#&home=#homeArl#'>Ancillary Location</A>								
+				},
+				}
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#4#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#1#/#4#?home=#homeArl#',
+		},
+	},		
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panelTransp'); },	
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panelEdit'); },		
 },
 #------------------------------------------------------------------------------------------------------------------------
 
