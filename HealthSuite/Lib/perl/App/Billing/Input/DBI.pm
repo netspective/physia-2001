@@ -1752,7 +1752,7 @@ sub assignInvoiceProperties
 
 	$queryStatment = qq
 	{
-		select to_char(value_date, 'DD-MON-YYYY'), value_text, cr_user_id, value_textb
+		select to_char(value_date, 'MM/DD/YYYY'), value_text, cr_user_id, value_textb
 		from invoice_history
 		where parent_id = $invoiceId
 	};
