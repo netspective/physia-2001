@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.11 2001-01-10 18:27:27 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.12 2001-01-25 16:26:53 frank_major Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -13,6 +13,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Document;
+use App::Statements::Person;
 use Date::Manip;
 use Text::Autoformat;
 use CGI::ImageManager;
@@ -450,23 +451,52 @@ sub sendMessage
 		doc_data_c => $messageData{'doc_data_c'} || undef,
 	);
 
+	#Get Message type information fro record just created
+	
 	# Add the To recipients
 	my @toRecipients = split /\,\s*/, $messageData{'to'};
 	foreach my $toRecipient (@toRecipients)
 	{
+	
+		my $setStyle=0;
+		#Get new document data
+		my $docData= $STMTMGR_DOCUMENT->getRowAsHash($page, STMTMGRFLAG_NONE,'selDocumentById',$messageId);
+		my $msgString = $docData->{doc_spec_subtype} == App::Universal::MSGSUBTYPE_PHONE_MESSAGE ? 'AUTO_FORWARD_PHONE_MSG' :
+		$docData->{doc_spec_subtype} == App::Universal::MSGSUBTYPE_PRESCRIPTION ? 'AUTO_FORWARD_PRESCRIPTION_MSG' : 'AUTO_FORWARD_INTERNAL_MSG';
+		#Check if toRecipients has the auto forward on for this type of message		
+		
+		my $auto= $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent',
+		$toRecipient,$msgString,App::Universal::ATTRTYPE_TEXT);
+		if($auto->{value_int})
+		{
+			$self->saveMessageAttribute($page, \%messageData,
+				parent_id => $messageId,
+				item_name => 'To',
+				value_type => App::Universal::ATTRTYPE_PERSON_ID,
+				value_int => $setStyle,
+				value_text => uc($auto->{value_text}),			
+			);
+			#If message has been auto forward then message to primary should not be bold
+			$setStyle = 1;
+		}
+
+		
 		$self->saveMessageAttribute($page, \%messageData,
 			parent_id => $messageId,
 			item_name => 'To',
 			value_type => App::Universal::ATTRTYPE_PERSON_ID,
-			value_int => 0,
+			value_int => $setStyle,
 			value_text => uc($toRecipient),
 		);
+
 	}
 
 	# Add the CC recipients
 	my @ccRecipients = split /\,\s*/, $messageData{'cc'};
 	foreach my $ccRecipient (@ccRecipients)
 	{
+		#Check if ccRecipients has the auto forward on for this type of message
+		
 		$self->saveMessageAttribute($page,\%messageData,
 		parent_id => $messageId,
 		item_name => 'CC',
@@ -538,7 +568,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.11 2001-01-10 18:27:27 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.12 2001-01-25 16:26:53 frank_major Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
