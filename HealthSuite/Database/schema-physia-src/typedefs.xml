@@ -593,6 +593,13 @@
 				<col name="remarks">Any medical notes made by care provider</col>
 			</row>
 			<row>
+				<col name="id">9020</col>
+				<col name="caption">Void</col>
+				<col name="group_name">Action</col>
+				<col name="icon_img_summ">notes.gif</col>
+				<col name="remarks">This type is created when voiding an invoice or claim</col>
+			</row>
+			<row>
 				<col name="id">10000</col>
 				<col name="caption">Place</col>
 				<col name="group_name">Service</col>
