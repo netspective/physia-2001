@@ -49,7 +49,7 @@ sub formatData
 my %nsfType = ( NSF_HALLEY . "" =>
 	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-123s",
 	  $self->recordType(),
-	  $spaces, #emc provider id
+	  substr($firstClaim->getEMCId(),0,15), #emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
@@ -65,7 +65,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  NSF_ENVOY . "" =>		  
   	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%7s%7s%7s%9s%-121s%-114s%9s",
 	  $self->recordType(),
-	  $spaces, #emc provider id
+	  substr($firstClaim->getEMCId(),0,15), #emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id

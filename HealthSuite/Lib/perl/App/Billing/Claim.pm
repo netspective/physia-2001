@@ -12,7 +12,10 @@ use App::Billing::Claim::Physician;
 use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
 use Devel::ChangeLog;
+use App::Billing::Universal;
 use constant DATEFORMAT_USA => 1;
+# use constant MEDICARE => '4';
+# use constant MEDICAID => '5';
 
 use vars qw(@CHANGELOG);
 use enum qw(:BILLRECEIVERTYPE_ PERSON ORGANIZATION);
@@ -103,6 +106,8 @@ sub new
 	$params{invoiceType} = undef;
 	$params{invoiceSubtype} = undef;
 	$params{totalItems} = undef;
+	$params{insType} = undef;
+	$params{providerEMCId} = undef;
 
 	return bless \%params, $type; #binding the param hash with class reference
 }
@@ -115,6 +120,16 @@ sub property
 }
 
 
+sub getEMCId
+{
+	my $self = shift;
+	my @ids;
+	$ids[MEDICARE]= $self->{renderingProvider}->getMedicareId();
+	$ids[MEDICAID]= $self->{renderingProvider}->getMedicaidId();
+	$self->{providerEMCId} = (($self->{insType} =~ /[MEDICARE,MEDICAID]/) ? $ids[$self->{insType}] : $self->{renderingProvider}->getPIN());
+	return $self->{providerEMCId};
+}
+
 sub setTransProviderId
 {
 	my ($self, $value) = @_;
@@ -125,6 +140,18 @@ sub getTransProviderId
 {
 	my $self = shift;
 	return $self->{transProviderId};
+}
+
+sub setInsType
+{
+	my ($self, $value) = @_;
+	$self->{insType} = $value;
+}
+
+sub getInsType
+{
+	my $self = shift;
+	return $self->{insType};
 }
 
 sub setTransProviderName

@@ -124,8 +124,7 @@ use constant BILLSEQ_TERTIARY_CAPTION => 'Tertiary';
 use constant BILLSEQ_QUATERNARY_CAPTION => 'Quaternary';
 
 # Default place of service for items
-#use constant DEFAULT_PLACE_OF_SERIVCE => 11;
-my $DEFAULT_PLACE_OF_SERIVCE = 11;
+use constant DEFAULT_PLACE_OF_SERIVCE => 11;
 
 sub new
 {
@@ -463,6 +462,7 @@ sub assignPatientInsurance
 		$insured->setPolicyGroupName($row[7]);
 		$insured->setBillSequence($row[2]);
 		$insured->setSsn($row[9]);
+		$claim->setInsType($row[8]);
 	}
 	if ($no ne "")
 	{
@@ -680,6 +680,7 @@ sub assignProviderInfo
 	my ($self, $claim, $invoiceId) = @_;
 
 	my $renderingProvider = $claim->getRenderingProvider();
+	my $payToProvider = $claim->getPayToProvider();
 	my $queryStatment = "select  name_last, name_middle,  name_first, person_id from person, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and person.person_id = trans.provider_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	my $orgId;
@@ -688,11 +689,16 @@ sub assignProviderInfo
 	my @row = $sth->fetchrow_array();
 
 	$renderingProvider->setLastName($row[0]);
+	$payToProvider->setLastName($row[0]);
 	$renderingProvider->setMiddleInitial($row[1]);
+	$payToProvider->setMiddleInitial($row[1]);
 	$renderingProvider->setFirstName($row[2]);
+	$payToProvider->setFirstName($row[2]);
 	$renderingProvider->setId($row[3]);
+	$payToProvider->setId($row[3]);
 	my $pId = $row[3];
 	my $renderingProviderAddress = $renderingProvider->getAddress();
+	my $payToProviderProviderAddress = $payToProvider->getAddress();
 	$queryStatment = "select line1, line2, city, state, zip, country	from person_address where parent_id = \'$pId\' and address_name = \'Home\'";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -703,6 +709,14 @@ sub assignProviderInfo
 	$renderingProviderAddress->setState($row[3]);
 	$renderingProviderAddress->setZipCode($row[4]);
 	$renderingProviderAddress->setCountry($row[5]);
+
+	$payToProviderProviderAddress->setAddress1($row[0]);
+	$payToProviderProviderAddress->setAddress2($row[1]);
+	$payToProviderProviderAddress->setCity($row[2]);
+	$payToProviderProviderAddress->setState($row[3]);
+	$payToProviderProviderAddress->setZipCode($row[4]);
+	$payToProviderProviderAddress->setCountry($row[5]);
+
 	$renderingProvider->setAddress($renderingProviderAddress);
    $claim->setRenderingProvider($renderingProvider);
 }
@@ -723,7 +737,7 @@ sub assignPaytoAndRendProviderInfo
 	my $sth;
 	foreach $provider(@providers)
 	{
-		$id = $provider->getId();
+		$id = $renderingProvider->getId();
 		my $inputMap =
 			{
 				CERTIFICATION_LICENSE . 'Tax ID' => [ [$provider, $provider], [\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId], [$colValText, $colValTextB]],
@@ -1101,7 +1115,7 @@ sub assignPolicy
 				{
 					if ($row1[0])
 					{
-						$queryStatment = "select name_primary , org_id  from org where org_internal_id = $row1[0]";
+						$queryStatment = "select name_primary , org_id, org_internal_id  from org where  org_internal_id = $row1[0]";
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
 						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1109,6 +1123,7 @@ sub assignPolicy
 
 						$payer->setId($row[1]);
 						$payer->setName($row[0]);
+						my $internalId = $row[2];
 				 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row1[0] and address_name = \'Mailing\'";
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
@@ -1230,12 +1245,12 @@ sub assignInvoiceProperties
 		'Service Provider/Facility/Service' => [[$renderingOrganization, $renderingOrganization], [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
 		'Service Provider/Facility/Billing' =>[$payToOrganization, [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Provider/Organization/Type' => [$renderingOrganization, \&App::Billing::Claim::Organization::setOrganizationType, COLUMNINDEX_VALUE_TEXT],
-		'Service Provider/Facility/Billing/Contact' => [[$renderingProvider, $renderingProviderAddress], [\&App::Billing::Claim::Physician::setContact,  \&App::Billing::Claim::Address::setTelephoneNo],[COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT]],
-		'Provider/Site ID' => [$payToProvider, \&App::Billing::Claim::Physician::setSiteId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Medicaid' => [ $payToProvider, \&App::Billing::Claim::Physician::setMedicareId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Medicaid' => [ $payToProvider, \&App::Billing::Claim::Physician::setMedicaidId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Champus' => [ $payToProvider, \&App::Billing::Claim::Physician::setChampusId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Specialty' => [ [$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSpecialityId,\&App::Billing::Claim::Physician::setSpecialityId], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
+		'Service Provider/Facility/Billing/Contact' => [[$renderingProvider, $renderingProviderAddress], [\&App::Billing::Claim::Physician::setContact, \&App::Billing::Claim::Address::setTelephoneNo],[COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Site ID' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSiteId,\&App::Billing::Claim::Physician::setSiteId],[ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Medicare' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setMedicareId, \&App::Billing::Claim::Physician::setMedicareId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Medicaid' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setMedicaidId, \&App::Billing::Claim::Physician::setMedicaidId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Champus' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setChampusId,\&App::Billing::Claim::Physician::setChampusId], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Specialty' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSpecialityId,\&App::Billing::Claim::Physician::setSpecialityId], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
 		'TPO Participation/Indicator' => [$patient, \&App::Billing::Claim::Patient::setTPO, COLUMNINDEX_VALUE_TEXT],
 		'Patient/Legal Rep/Indicator' => [ $patient, \&App::Billing::Claim::Patient::setlegalIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Multiple/Indicator' => [$patient, \&App::Billing::Claim::Patient::setMultipleIndicator, COLUMNINDEX_VALUE_TEXT],
@@ -1247,11 +1262,11 @@ sub assignInvoiceProperties
 		'Symptom/Indicator/External Cause' => [	$claim, \&App::Billing::Claim::setSymptomExternalCause, COLUMNINDEX_VALUE_TEXT],
 		'Information Release/Indicator' => [ $claim, [\&App::Billing::Claim::setInformationReleaseIndicator, \&App::Billing::Claim::setInformationReleaseDate], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_DATE]],
 		'Disability/Type' => [ $claim, \&App::Billing::Claim::setDisabilityType, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Assign Indicator' => [ $payToProvider, \&App::Billing::Claim::Physician::setAssignIndicator, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Signature/Indicator' => [$payToProvider, \&App::Billing::Claim::Physician::setSignatureIndicator, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Signature/Date' => [ $payToProvider, \&App::Billing::Claim::Physician::setSignatureDate, COLUMNINDEX_VALUE_DATE],
-		'Documentation/Indicator' => [ $payToProvider, \&App::Billing::Claim::Physician::setDocumentationIndicator, COLUMNINDEX_VALUE_TEXT],
-		'Documentation/Type' => [ $payToProvider, \&App::Billing::Claim::Physician::setDocumentationType, COLUMNINDEX_VALUE_TEXT],
+		'Provider/Assign Indicator' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setAssignIndicator, \&App::Billing::Claim::Physician::setAssignIndicator],[COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Signature/Indicator' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSignatureIndicator,\&App::Billing::Claim::Physician::setSignatureIndicator], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Signature/Date' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSignatureDate,\&App::Billing::Claim::Physician::setSignatureDate], [ COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATE]],
+		'Documentation/Indicator' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setDocumentationIndicator,\&App::Billing::Claim::Physician::setDocumentationIndicator], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Documentation/Type' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setDocumentationType,\&App::Billing::Claim::Physician::setDocumentationType], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Special Program/Indicator' => [$claim, \&App::Billing::Claim::setSpProgramIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Last Seen/Date' => [$patient, \&App::Billing::Claim::Patient::setLastSeenDate, COLUMNINDEX_VALUE_DATE],
 		'Documentation/Date' => [$claim, \&App::Billing::Claim::setdateDocSent, COLUMNINDEX_VALUE_DATE],
@@ -1261,19 +1276,19 @@ sub assignInvoiceProperties
 #		'Rendering/Provider/Tax ID' => [$renderingProvider, \&App::Billing::Claim::Physician::setFederalTaxId, COLUMNINDEX_VALUE_TEXT],
 #		'Rendering/Provider/ID' => [$renderingProvider, \&App::Billing::Claim::Physician::setProviderId, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Name Qualifier' => [$claim, \&App::Billing::Claim::setQualifier, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Name' => [$renderingProvider, \&App::Billing::Claim::Person::setId, COLUMNINDEX_VALUE_TEXTB],
-		'Provider/Name/First' => [$renderingProvider, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Name/Last' => [$renderingProvider, \&App::Billing::Claim::Person::setLastName, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Name/Middle' => [$renderingProvider, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
-		'Pay To Provider/Name/First' => [$payToProvider,\&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
-		'Pay To Provider/Name/Last' => [$payToProvider, [\&App::Billing::Claim::Person::setLastName,\&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
-		'Pay To Provider/Name/Middle' => [$payToProvider, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
-#		'Pay To Provider/Specialty' => [$payToProvider, \&App::Billing::Claim::Physician::setSpecialityId, COLUMNINDEX_VALUE_TEXTB],
-		'Provider/Network ID' => [ $renderingProvider, \&App::Billing::Claim::Physician::setNetworkId, COLUMNINDEX_VALUE_TEXT],
-		'Pay To Provider/Network ID' => [ $payToProvider, \&App::Billing::Claim::Physician::setNetworkId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Blue Shield ID' => [ $payToProvider, \&App::Billing::Claim::Physician::setBlueShieldId, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Qualification/Degree' => [ [$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setQualification, \&App::Billing::Claim::Physician::setQualification],[COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
-		'Provider/ID Indicator' => [ $payToProvider, \&App::Billing::Claim::Physician::setIdIndicator, COLUMNINDEX_VALUE_TEXT],
+		'Provider/Name' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Person::setId, \&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXTB,COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/Name/First' => [[$renderingProvider,$payToProvider], [\&App::Billing::Claim::Person::setFirstName, \&App::Billing::Claim::Person::setFirstName],[ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Name/Last' => [[$renderingProvider,$payToProvider], [\&App::Billing::Claim::Person::setLastName, \&App::Billing::Claim::Person::setLastName], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Name/Middle' => [[$renderingProvider,$payToProvider], [\&App::Billing::Claim::Person::setMiddleInitial, \&App::Billing::Claim::Person::setMiddleInitial], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+#		'Pay To Provider/Name/First' => [$payToProvider,\&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
+#		'Pay To Provider/Name/Last' => [$payToProvider, [\&App::Billing::Claim::Person::setLastName,\&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
+#		'Pay To Provider/Name/Middle' => [$payToProvider, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
+		'Pay To Provider/Specialty' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSpecialityId,\&App::Billing::Claim::Physician::setSpecialityId,], [COLUMNINDEX_VALUE_TEXTB,COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/Network ID' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setNetworkId,\&App::Billing::Claim::Physician::setNetworkId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXT]],
+		'Pay To Provider/Network ID' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setNetworkId,\&App::Billing::Claim::Physician::setNetworkId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Blue Shield ID' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setBlueShieldId,\&App::Billing::Claim::Physician::setBlueShieldId],[COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/Qualification/Degree' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setQualification, \&App::Billing::Claim::Physician::setQualification],[COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/ID Indicator' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setIdIndicator,\&App::Billing::Claim::Physician::setIdIndicator],[ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Remarks' => [$claim, \&App::Billing::Claim::setRemarks, COLUMNINDEX_VALUE_TEXT],
 		'Representator/Name/Last' => [$legalRepresentator, [\&App::Billing::Claim::Person::setLastName,\&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT,,COLUMNINDEX_VALUE_TEXTB]],
 		'Representator/Name/First' => [$legalRepresentator, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
@@ -1281,7 +1296,7 @@ sub assignInvoiceProperties
 		'Invoice/History/Item' => [[$claim, $claim, $claim], [\&App::Billing::Claim::setInvoiceHistoryDate, \&App::Billing::Claim::setInvoiceHistoryAction, \&App::Billing::Claim::setInvoiceHistoryComments], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 #		'Pay To Org/Name' => [$payToOrganization, [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
 		'Pay To Org/Phone' => [$payToOrganizationAddress, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT ],
-		'Provider/UPIN' => [ [$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setPIN,\&App::Billing::Claim::Physician::setPIN], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Provider/UPIN' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setPIN,\&App::Billing::Claim::Physician::setPIN], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Service Provider/Facility/Billing/Group Number' => [ $payToOrganization, \&App::Billing::Claim::Physician::setGRP, COLUMNINDEX_VALUE_TEXT],
 		'Submission Order' => [[$claim, $claim], [\&App::Billing::Claim::setClaimType, \&App::Billing::Claim::setBillSeq], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INT]],
 		'Assignment of Benefits' => [[$claim, $payer, $payer2, $payer3, $payer4], [\&App::Billing::Claim::setAcceptAssignment, \&App::Billing::Claim::Payer::setAcceptAssignment, \&App::Billing::Claim::Payer::setAcceptAssignment, \&App::Billing::Claim::Payer::setAcceptAssignment, \&App::Billing::Claim::Payer::setAcceptAssignment], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INT]],
@@ -1782,8 +1797,8 @@ sub populateItems
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
- 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), nvl(hcfa_service_place, $DEFAULT_PLACE_OF_SERIVCE), hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
- 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption, to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\'), data_text_b
+ 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), nvl(hcfa_service_place, " . DEFAULT_PLACE_OF_SERIVCE . "), hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
+ 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption, to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\'), data_text_b, code_type
  										from invoice_item
  										where parent_id = $invoiceId ";
 
@@ -1813,6 +1828,7 @@ sub populateItems
 		$procedureObject->setCaption($tempRow[18]);
 		$procedureObject->setPaymentDate($tempRow[19]);
 		$procedureObject->setItemStatus($tempRow[20]);
+		$procedureObject->setCodeType($tempRow[21]);
 
 		$self->populateAdjustments($procedureObject, $tempRow[12]);
 		$functionRef = $itemMap[$tempRow[16]];

@@ -41,8 +41,22 @@ sub new
 	$param{itemType} = undef;
 	$param{paymentDate} = undef;
 	$param{itemStatus} = undef;
-	
+	$param{codeType} = undef;
+
 	return bless \%param, $type;
+}
+
+
+sub setCodeType
+{
+	my ($self, $value) = @_;
+	$self->{codeType} = $value;
+}
+
+sub getCodeType
+{
+	my $self = shift;
+	return $self->{codeType};
 }
 
 
