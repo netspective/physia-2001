@@ -73,7 +73,8 @@ sub execute
 {
 	my ($self, $type, $expression) = @_;
 
-	my @bindCols = ($self->param('resource_id').'%', $self->param('caption').'%');
+	my @bindCols = ($self->session('org_internal_id'), $self->param('resource_id').'%', 
+		$self->param('caption').'%');
 
 	$self->addContent(
 	'<CENTER>',

@@ -12,7 +12,7 @@ my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
 my $ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEPERSON;
 
 use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_SEL_TEMPLATEINFO
-	$STMTFMT_SEL_EVENTS 
+	$STMTFMT_SEL_EVENTS
 );
 
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -21,36 +21,55 @@ use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_
 my $timeFormat = 'HH:MI am';
 
 $STMTFMT_SEL_TEMPLATEINFO = qq{
-	select template_id, r_ids as resources, caption, org_id,
+	select template_id,
+		r_ids as resources,
+		caption,
+		org_id,
 		to_char(start_time, 'hh:miam') as start_time,
 		to_char(end_time, 'hh:miam') as end_time,
 		to_char(effective_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
-		decode(available,0,'NO',1,'YES') as available
+		decode(available,0,'NO',1,'YES') as available,
+		patient_types,
+		visit_types,
+		days_of_month,
+		months,
+		days_of_week
 	from Org, Template
-	where facility_id = org_internal_id
+	where Template.owner_org_id = ?
+		and facility_id = org_internal_id
 		and r_ids like ?
 		and org_id like ?
 		and (available = ? or available = ?)
+		and status = ?
+		and nvl(effective_end_date, sysdate+1) > sysdate
 	order by r_ids, template_id
 };
 
 $STMTFMT_SEL_EVENTS = qq{
 	select to_char(e.start_time, 'hh24mi') as start_minute,
-		to_char(e.start_time,'yyyy,mm,dd') as start_day, e.duration,
-		e.event_id,	ep1.value_text as patient_id, ep2.value_text as resource_id,
+		to_char(e.start_time,'yyyy,mm,dd') as start_day, 
+		e.duration,
+		e.event_id,	
+		ep1.value_text as patient_id, 
+		ep2.value_text as resource_id,
 		patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
 		patient.complete_name as patient_complete_name,
-		e.subject, et.caption as event_type, aat.caption as patient_type,
-		e.remarks, e.event_status, e.facility_id,
+		e.subject, 
+		aat.caption as patient_type,
+		tt.caption as visit_type, 
+		e.remarks, 
+		e.event_status, 
+		e.facility_id,
 		to_char(e.checkin_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
 		to_char(e.checkout_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
-		stat.caption as appt_status, e.parent_id,
+		stat.caption as appt_status, 
+		e.parent_id,
 		e.scheduled_by_id,
-		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp
-	from 	Appt_Status stat, Appt_Attendee_type aat, Person patient,
-		Event_Attribute ep2, Event_Attribute ep1,
-		Event_Type et, Event e
+		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
+		at.caption as appt_type
+	from Appt_Type at, Appt_Status stat, Transaction_Type tt, Appt_Attendee_type aat,
+		Person patient, Event_Attribute ep2, Event_Attribute ep1, Event_Type et, Event e
 	where e.start_time between to_date(?, 'yyyy,mm,dd')
 			and to_date(?, 'yyyy,mm,dd')
 		and e.discard_type is null
@@ -64,7 +83,9 @@ $STMTFMT_SEL_EVENTS = qq{
 		and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
 		and ep2.value_text = ?
 		and aat.id = ep1.value_int
+		and tt.id (+) = ep1.value_intB
 		and stat.id = e.event_status
+		and at.appt_type_id (+) = e.appt_type
 	order by e.start_time, nvl(e.parent_id, 0), e.event_id
 };
 
@@ -72,23 +93,25 @@ $STMTRPTDEFN_TEMPLATEINFO =
 {
 	columnDefn =>
 		[
-			{ head => 'ID', url => q{javascript:location.href='/org/#session.org_id#/dlg-update-template/#&{?}#'}, hint => 'Edit Template #&{?}#'},
+			{ head => 'ID', url => q{javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'}, hint => 'Edit Template #&{?}#'},
 			{ head => 'Resource(s)', url => q{javascript:location.href='/search/template/1/#&{?}#'}, hint => 'View #&{?}# Templates'},
 			{ head => 'Caption'},
 			{ head => 'Facility', url => q{javascript:location.href='/search/template/1//#&{?}#'}, hint => 'View #&{?}# Templates'},
-			{ head => 'Start Time'},
-			{ head => 'End Time'},
-			{ head => 'Begin'},
-			{ head => 'End'},
-			{ head => 'Available'},
+			{ head => 'Effective', dataFmt => '#6#-<br>#7#', },
+			{ head => 'Time', dataFmt => '#4#-<br>#5#',},
+			{ head => 'Available', colIdx => 8,},
+			{ head => 'Days', colIdx => 11,},
+			{ head => 'Months', colIdx => 12,},
+			{ head => 'Weekdays', colIdx => 13,},
+			{ head => 'Patient/ Visit', dataFmt => '#9#<br>#10#',},
 		],
 };
 
 # -------------------------------------------------------------------------------------------
 $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
-	
+
 	'del_SessionPhysicians' => qq{
-		delete from Person_Attribute 
+		delete from Person_Attribute
 		where parent_id = ?
 			and value_type = App::Universal::ATTRTYPE_RESOURCEPERSON
 			and item_name = 'SessionPhysicians'
@@ -97,13 +120,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'sel_events_at_facility' =>
 	{
-		_stmtFmt => $STMTFMT_SEL_EVENTS,
+		sqlStmt => $STMTFMT_SEL_EVENTS,
 		facility_clause => 'and e.facility_id = ?',
 	},
 
 	'sel_events_any_facility' =>
 	{
-		_stmtFmt => $STMTFMT_SEL_EVENTS,
+		sqlStmt => $STMTFMT_SEL_EVENTS,
 		facility_clause => undef,
 	},
 
@@ -119,7 +142,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'selFacilityName' => qq{
-		select name_primary from Org 
+		select name_primary from Org
 		where org_internal_id = ?
 	},
 	'selApptDuration' => qq{
@@ -136,7 +159,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		_stmtFmt => qq{
 			select event_status, checkin_by_id, checkout_by_id, %simpleStamp:checkin_stamp%
 				as checkin_stamp, %simpleStamp:checkout_stamp% as checkout_stamp
-			from Event 
+			from Event
 			where event_id = ?
 		}
 	},
@@ -187,21 +210,21 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			and value_int = ?
 			and org_internal_id (+) = to_number(value_textb)
 	},
-	
+
 	'selApptSheetTimes' => qq{
 		select value_int as start_time, value_intB as end_time
 		from Person_Attribute
 		where parent_id = ?
 			and item_name = 'ApptSheet Times'
 	},
-	
+
 	'insApptSheetTimesPref' => qq{
 		insert into Person_Attribute
 		(parent_id, item_name        , value_int, value_intB)
 		values
 		(?        , 'ApptSheet Times', ?        , ?         )
 	},
-	
+
 	'updApptSheetTimesPref' => qq{
 		update Person_Attribute set
 			value_int  = ?,
@@ -233,7 +256,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select appt_type_id, resource_id, caption, duration, lead_time, lag_time, back_to_back,
 			multiple, r_ids, am_limit, pm_limit
 		from Appt_Type
-		where appt_type_id = ?
+		where appt_type_id = :1
 	},
 
 	'selPopulateAppointmentDialog' => qq{
@@ -242,17 +265,23 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			to_char(e.start_time, '$timeFormat') as appt_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
-			ep1.value_text as attendee_id, ep1.value_int as attendee_type,
+			ep1.value_text as attendee_id, 
+			ep1.value_int as patient_type,
+			ep1.value_intB as visit_type,
 			ep2.value_text as resource_id,
 			e.appt_type as appt_type_id,
 			at.caption as appt_type_caption
 		from appt_type at, event_attribute ep2, event_attribute ep1, event e
-		where event_id = ?
+		where event_id = :1
 			and ep1.parent_id = e.event_id
 			and ep1.value_type = $EVENTATTRTYPE_PATIENT
 			and ep2.parent_id = ep1.parent_id
 			and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
 			and at.appt_type_id (+) = e.appt_type
+	},
+
+	'selApptTypeById' => qq{
+		select * from Appt_Type where appt_type_id = :1
 	},
 
 	'selSchedulePreferences' => qq{
@@ -280,7 +309,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selTemplateInfo' =>
 	{
-		_stmtFmt => $STMTFMT_SEL_TEMPLATEINFO,
+		sqlStmt => $STMTFMT_SEL_TEMPLATEINFO,
 		simpleReport => $STMTRPTDEFN_TEMPLATEINFO,
 		publishDefn => $STMTRPTDEFN_TEMPLATEINFO,
 	},
@@ -288,11 +317,12 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	'selApptTypeInfo' =>
 	{
 		sqlStmt => qq{
-			select appt_type_id, resource_id, caption, duration, 
-				lead_time, lag_time, decode(back_to_back, 0, 'No', 1, 'Yes', 'No'), 
+			select appt_type_id, resource_id, caption, duration,
+				lead_time, lag_time, decode(back_to_back, 0, 'No', 1, 'Yes', 'No'),
 				decode(multiple, 0, 'No', 1, 'Yes', 'No'), am_limit, pm_limit, r_ids
 			from Appt_Type
-			where resource_id like ?
+			where owner_org_id = ?
+				and resource_id like ?
 				and caption like ?
 			order by caption, appt_type_id
 		},
@@ -301,15 +331,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		{
 			columnDefn =>
 			[
-				{ head => 'ID', 
-					#url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2# (ApptType ID #0#)', false)},
+				{ head => 'ID',
+					url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')},
 				},
 				{ head => 'Resource',
 					url => q{javascript:location.href='/search/appttype/1/#&{?}#'}, hint => 'View #&{?}# Appointment Types',
 				},
-				{ head => 'Caption',
-					url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')},
-				},
+				{ head => 'Caption'},
 				{ head => 'Duration', dAlign => 'center'},
 				{ head => 'Lead', dAlign => 'center'},
 				{ head => 'Lag', dAlign => 'center'},
@@ -430,8 +458,15 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select id, caption from Transaction_Type where id>=2040 and id<3000
 	},
 
+	'selVisitTypesDropDown' => qq{
+		select id, caption from Transaction_Type where id>=2040 and id<3000
+		UNION
+		select -1 as id, ' ' as caption from dual
+		order by caption
+	},
+
 	'selRovingResources' => qq{
-		select distinct member_name from Template_R_Ids where member_name like ?
+		select distinct member_name from Template_R_Ids where upper(member_name) like ?
 	},
 
 # -- WAITING LIST -----------------------------------------------------------------------------
@@ -505,13 +540,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		union
 		select 'None' as value_text, 0 as event_id from Dual
 	},
-	
+
 	'sel_futureAppointments' => {
 		_stmtFmt => qq{
 			select 	to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
 				eadoc.value_text as physician, e.subject
 			from 	event_attribute eaper, event_attribute eadoc, event e
-			where e.start_time > sysdate	
+			where e.start_time > sysdate
 				and eaper.parent_id = e.event_id
 				and	eaper.value_text = ?
 				and	eaper.item_name like '%Patient'

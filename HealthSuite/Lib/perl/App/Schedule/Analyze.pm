@@ -93,7 +93,7 @@ sub findAvailSlots
 
 	if ($page->param('debug')){
 		for (@available_slots) {
-			print "$_->{resource_id} -- $_->{facility_id} -- @{[minuteSet_dayTime($_->{minute_set}->run_list())]} <br>";
+			$page->addDebugStmt("$_->{resource_id} -- $_->{facility_id} -- @{[minuteSet_dayTime($_->{minute_set}->run_list())]} <br>");
 		}
 	}
 
@@ -170,6 +170,8 @@ sub buildMinuteSet
 
 	my $posMinuteSet = new Set::IntSpan;
 	my $negMinuteSet = new Set::IntSpan;
+	
+	my $daysOffset = Date_to_Days(@{$self->{search_start_date}});
 
 	my @templates = $self->getTemplates($page, $resource_id, $facility_id);
 	for my $t (@templates)
@@ -177,7 +179,7 @@ sub buildMinuteSet
 		my $template_days_set = $t->findTemplateDays($self->{search_duration}, @{$self->{search_start_date}});
 		for ($template_days_set->first; $template_days_set->current; $template_days_set->next)
 		{
-			my $day = $template_days_set->current - Date_to_Days(@{$self->{search_start_date}});
+			my $day = $template_days_set->current - $daysOffset;
 			my $dayMinutes = $day * 24 *60;
 			my $low  = hhmm2minutes($t->{start_time}) + $dayMinutes;
 			my $high = hhmm2minutes($t->{end_time}) + $dayMinutes;
@@ -198,7 +200,7 @@ sub buildMinuteSet
 		$self->findEventSlots($page, \@events, $resource_id, $facility_id);
 		for my $e (@events)
 		{
-			my $day = $e->{day} - Date_to_Days(@{$self->{search_start_date}});
+			my $day = $e->{day} - $daysOffset;
 			my $dayMinutes = $day * 24 *60;
 			my ($low, $high) = split(/\-/, $e->{minute_set}->run_list);
 			$low  += $dayMinutes;
@@ -355,6 +357,9 @@ sub getTemplates
 	my $patientTypeWhereClause = "";
 	my $visitTypeWhereClause = "";
 
+	my $patientTypeTableJoinClause = "";
+	my $visitTypeTableJoinClause = "";
+
 	my @bindParams = ($resource_id);
 
 	my $facilityWhereClause = "";
@@ -367,20 +372,16 @@ sub getTemplates
 	if ($self->{patient_type} >= 0)
 	{
 		$patientTypeTable = ', Template_patient_types';
-		$patientTypeWhereClause = qq{
-			or (Template_patient_types.member_name = ?
-				and Template_patient_types.parent_id = Template.template_id)
-		};
+		$patientTypeWhereClause = "or Template_patient_types.member_name = ?";
+		$patientTypeTableJoinClause = "and Template_Patient_Types.parent_id (+) = Template.template_id";
 		push(@bindParams, $self->{patient_type});
 	}
 
 	if ($self->{visit_type} >= 0)
 	{
 		$visitTypeTable = ', Template_visit_types';
-		$visitTypeWhereClause = qq{
-			or (Template_visit_types.member_name = ?
-				and Template_visit_types.parent_id = Template.template_id)
-		};
+		$visitTypeWhereClause = "or Template_visit_types.member_name = ?";
+		$visitTypeTableJoinClause = "and Template_Visit_Types.parent_id (+) = Template.template_id";
 		push(@bindParams, $self->{visit_type});
 	}
 
@@ -396,19 +397,22 @@ sub getTemplates
 		where Template_R_Ids.member_name = ?
 			$facilityWhereClause
 			and status = 1
+			and nvl(effective_end_date, sysdate+1) > sysdate
 			and Template.template_id = Template_R_Ids.parent_id
 			and (Template.patient_types is NULL
-				or not exists	(select ID from Appt_Attendee_Type minus
+				or not exists (select ID from Appt_Attendee_Type minus
 					(select to_number(member_name) from Template_Patient_Types where parent_id = template_id)
 				)
 				$patientTypeWhereClause
 			)
+			$patientTypeTableJoinClause
 			and (Template.visit_types is NULL
 				or not exists (select ID from Transaction_TYpe where id>=2040 and id<3000 minus
 					(select to_number(member_name) from Template_Visit_Types where parent_id = template_id)
 				)
 				$visitTypeWhereClause
 			)
+			$visitTypeTableJoinClause
 	};
 
 	my $query2 = qq{
@@ -423,6 +427,7 @@ sub getTemplates
 		where Template_R_Ids.member_name = ?
 			$facilityWhereClause
 			and status = 1
+			and nvl(effective_end_date, sysdate+1) > sysdate
 			and Template.template_id = Template_R_Ids.parent_id
 	};
 

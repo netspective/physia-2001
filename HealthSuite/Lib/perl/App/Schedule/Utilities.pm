@@ -180,7 +180,7 @@ sub minutes2Time
 sub getTimeString
 {
 	my ($hour, $minu, $flag) = @_;
-	my $apm = $hour<12 ? 'am' : 'pm';
+	my $apm = $hour<12 ? ' AM' : ' PM';
 
 	my $timeString;
 

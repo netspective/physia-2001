@@ -198,6 +198,7 @@ sub execute
 		am_limit => $page->field ('am_limit') || undef,
 		pm_limit => $page->field ('pm_limit') || undef,
 		r_ids => $page->field ('r_ids') || undef,
+		owner_org_id => $page->session('org_internal_id'),
 		_debug => 0
 	);
 

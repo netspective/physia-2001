@@ -44,7 +44,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<font size=2 face='Tahoma'>&nbsp &nbsp
-			<a href="/org/#session.org_id#/dlg-add-template">Add Template</a>
+			<a href="/schedule/dlg-add-template?_dialogreturnurl=/search/template">Add Template</a>
 			</font>
 		};
 	}
@@ -63,12 +63,17 @@ sub getForm
 			<option value="1,1" $selected1>Positive Templates</option>
 			<option value="0,0" $selected2>Negative Templates</option>
 		</select>
+		<select name="template_active" style="color: navy">
+			<option value="1">Active</option>
+			<option value="0">Inactive</option>
+		</select>
 		<script>
 			setSelectedValue(document.search_form.template_type, '@{[$self->param('template_type')]}');
+			setSelectedValue(document.search_form.template_active, '@{[$self->param('template_active')]}');
 		</script>
 
-		<input name='r_ids' size=25 maxlength=32 value="@{[$self->param('r_ids')]}"
-			title='Resource IDs'>
+		<input name='r_ids' size=17 maxlength=32 value="@{[$self->param('r_ids')]}"
+			title='Resource ID'>
 			<a href="javascript:doFindLookup(this.form, search_form.r_ids, '/lookup/person/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
@@ -90,8 +95,14 @@ sub execute
 
 	my @available = split (/,/, $self->param('template_type'));
 	@available = (0,1) unless @available;
-	my @bindCols = ($self->param('r_ids').'%', $self->param('facility_id').'%', @available);
+	my $template_active = defined $self->param('template_active') ? 
+		$self->param('template_active') : 1;
+	
+	my @bindCols = ($self->session('org_internal_id'), $self->param('r_ids').'%', 
+		$self->param('facility_id').'%', @available, $template_active);
 
+	$self->param('_dialogreturnurl', '/search/template');
+	
 	$self->addContent(
 	'<CENTER>',
 		$STMTMGR_SCHEDULING->createHtml($self, STMTMGRFLAG_NONE, 'selTemplateInfo', \@bindCols,

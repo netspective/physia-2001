@@ -32,14 +32,14 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	#return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
-	$self->param('_dialogreturnurl', '/schedule');
+	$self->param('_dialogreturnurl', '/schedule') unless $self->param('_dialogreturnurl');
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
 	{
 		$self->param('_pm_view', $pathItems->[0] || 'apptsheet');
 
-		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
+ 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
 		}
 	}
@@ -116,12 +116,15 @@ sub handleARL_appointment
 	$self->param('dialogcommand', $pathItems->[1]);
 
 	if ($pathItems->[1] =~ /add/i) {
-		my ($resource_id, $start_stamp, $duration) = split(/,/, $pathItems->[2]);
+		my ($resource_id, $start_stamp, $facilityInternalId, $patient_type, $visit_type) = 
+			split(/,/, $pathItems->[2]);
 		$start_stamp =~ s/\-/\//g;
 		$start_stamp =~ s/_/ /g;
 		$self->param('resource_id', $resource_id);
 		$self->param('start_stamp', $start_stamp);
-		$self->param('duration', $duration);
+		$self->param('facility_id', $facilityInternalId);
+		$self->param('patient_type', $patient_type);
+		$self->param('visit_type', $visit_type);
 	} else {
 		$self->param('event_id', $pathItems->[2]);
 	}
@@ -451,6 +454,8 @@ sub prepare_page_content_footer
 	my $self = shift;
 	#return 1 if $self->param('_ispopup');
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
+	return 1 if $self->param('_stdAction') eq 'dialog';
+	return 1 if $self->param('dialog');
 
 	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
 	$self->SUPER::prepare_page_content_footer(@_);
@@ -549,13 +554,14 @@ sub getApptSheetHeaderHtml
 	my $nDay = $nextDay; $nDay =~ s/\-/\//g;
 	my $pDay = $prevDay; $pDay =~ s/\-/\//g;
 
+#		<STYLE>
+#			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
+#			input  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
+#		</STYLE>
+
 	return qq{
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
 		$javascripts
-		<STYLE>
-			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-			input  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-		</STYLE>
 
 		<tr>
 			<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">

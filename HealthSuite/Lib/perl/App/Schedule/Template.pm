@@ -44,15 +44,15 @@ sub findTemplateDays {
 	@search_end_date = earlierDate (@search_end_date, @{$self->{effective_end_date}});
 	$search_duration = Delta_Days (@effective_search_begin_date, @search_end_date);
 
-	my $sortedMonths = join(',', sort split(/\s*,\s*/, $months));
+	my $sortedMonths = join(',', sort {$a <=> $b} split(/\s*,\s*/, $months));
 	my $month_spec_set = new Set::IntSpan ("$sortedMonths");
 	
-	my $sortedDays = join(',', sort split(/\s*,\s*/, $days_of_week));
+	my $sortedDays = join(',', sort {$a <=> $b} split(/\s*,\s*/, $days_of_week));
 	my $dow_spec_set   = new Set::IntSpan ("$sortedDays");
 	
-	my $sortedDaysM = join(',', sort split(/\s*,\s*/, $days_of_month));
+	my $sortedDaysM = join(',', sort {$a <=> $b} split(/\s*,\s*/, $days_of_month));
 	my $dom_spec_set   = new Set::IntSpan ("$sortedDaysM");
-
+	
 	for (my $d=0; $d<$search_duration; $d++){
 		my @date = Add_Delta_Days(@effective_search_begin_date, $d);
 

@@ -33,21 +33,6 @@ sub findPopup_as_html
 }
 
 ##############################################################################
-package App::Dialog::Field::Scheduling::Time;
-##############################################################################
-
-use strict;
-use base 'CGI::Dialog::Field';
-
-sub new
-{
-	my ($type, %params) = @_;
-	$params{size} = 10 unless $params{size};
-	$params{type} = 'time' unless $params{type};
-	return CGI::Dialog::Field::new($type, %params);
-}
-
-##############################################################################
 package App::Dialog::Field::Scheduling::Minutes;
 ##############################################################################
 
@@ -75,6 +60,42 @@ sub getHtml
 	{
 		$inputs .= qq{
 			<nobr><input type=radio onClick="setField($jsField, ':'+this.value, ':..', '12:00 AM')" name='minute' id='$_' value='$_' > <label for='$_'>$_</label>&nbsp;&nbsp;</nobr>
+		};
+	}
+	
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);	
+	return $html;
+}
+
+##############################################################################
+package App::Dialog::Field::Scheduling::Hours;
+##############################################################################
+
+use strict;
+use base 'CGI::Dialog::ContentItem';
+
+sub new
+{
+	my ($type, %params) = @_;
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	
+	my $dialogName = $dialog->formName();
+	my $fieldName = $self->{timeField};
+	my $jsField = "document.$dialogName.$fieldName";
+
+	my $selOptions = $self->{selOptions} || "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12";
+	
+	my $inputs = '';
+	for (split(/\s*,\s*/, $selOptions))
+	{
+		my $value = sprintf("%02d", $_);
+		$inputs .= qq{
+			<nobr><input type=radio onClick="setField($jsField, this.value+':', '..:', '12:00 AM')" name='minute' id='$_' value='$value' > <label for='$_'>$_</label>&nbsp;&nbsp;</nobr>
 		};
 	}
 	
@@ -123,10 +144,14 @@ package App::Dialog::Field::Scheduling::ApptType;
 
 use strict;
 use base 'CGI::Dialog::Field';
+use CGI::Dialog;
+use CGI::Validator::Field;
 
 sub new
 {
 	my ($type, %params) = @_;
+	$params{READONLY} = 'READONLY';
+		
 	return CGI::Dialog::Field::new($type, %params);
 }
 
@@ -152,6 +177,23 @@ sub findPopup_as_html
 	}
 	return '';
 }
-1;
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	my $html = '';
+
+		my $fieldName = $page->fieldPName($self->{name});
+
+		my $value = (defined $page->field($self->{name})) ? $page->field($self->{name}) : $self->{hint};
+		my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
+		my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
+
+		my $javaScript = $self->generateJavaScript($page);
+		my $onFocus = $self->{hint} ? " onFocus='clearField(this)'" : '';
+		$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<input $self->{READONLY} name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
+
+	return $html;
+}
 
 1;

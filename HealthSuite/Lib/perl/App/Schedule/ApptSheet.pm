@@ -552,8 +552,9 @@ sub getAppointments
 			my $title = "$patient_complete_name -- $time\n";
 			$title .= "Facility ID:  $slots[$i]->{attributes}->{facility_id}\n";
 			$title .= "$slots[$i]->{attributes}->{conflict}\n";
-
 			$title .= "Patient Type:  $slots[$i]->{attributes}->{patient_type}\n";
+			$title .= "Visit Type:  $slots[$i]->{attributes}->{visit_type}\n";
+			$title .= "Appointment Type:  $slots[$i]->{attributes}->{appt_type}\n";
 			$title .= "Reason for Visit:  $slots[$i]->{attributes}->{subject}\n";
 			$title .= "Symptoms:  $slots[$i]->{attributes}->{remarks}\n";
 			$title .= "$slots[$i]->{attributes}->{status}: ";

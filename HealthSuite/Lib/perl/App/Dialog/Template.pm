@@ -37,6 +37,7 @@ sub new
 
 	my $physField = new App::Dialog::Field::Person::ID(name => 'r_ids',
 		caption => 'Resource(s)',
+		types => ['Physician'],
 		hints => 'Resource(s) and/or select Roving Physician(s)',
 		size => 70,
 		maxLength => 255,
@@ -245,6 +246,7 @@ sub execute
 	months => join(',',$page->field('months')) || undef,
 	patient_types => join(',',$page->field('patient_types')) || undef,
 	visit_types => join(',',$page->field('visit_types')) || undef,
+	owner_org_id => $page->session('org_internal_id'),
 	_debug => 0
 	);
 

@@ -29,7 +29,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'appointment' => {
 		_class => 'App::Dialog::Appointment',
-		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp'],
+		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp', 'patient_type', 'visit_type'],
 		_arl_modify => ['event_id'],
 		_arl_cancel => ['event_id'],
 		_arl_noshow => ['event_id'],
@@ -49,11 +49,15 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 
-	my $findAvailSlotHint = qq{
-		<a href="javascript:doFindLookup(this.form, document.dialog._f_start_stamp,
-			'/lookup/apptslot/'+document.dialog._f_resource_id.value+	','
-			+document.dialog._f_facility_id.value+',,'+document.dialog._f_duration.value+'/1', null
-			,false, 'width=550,height=500,scrollbars,resizable');">Find Next Available Slot</a>
+	my $findAvailSlotHint = qq{&nbsp;
+		<a href="javascript:doFindLookup(this.form, document.dialog._f_appt_date,
+			'/lookup/apptslot/' + document.dialog._f_resource_id.value +	','
+			+ document.dialog._f_facility_id.value + ',,' + document.dialog._f_duration.value
+			+ ',' + document.dialog._f_patient_type.value + ',' + document.dialog._f_visit_type.value
+			+ ',' + document.dialog._f_appt_type_id.value
+			+ '/1', null, false, 'location, status, width=700,height=600,scrollbars,resizable',
+			null, document.dialog._f_appt_time);">
+			Find Next Available Slot</a>
 	};
 
 	my $waitingListHint = qq{
@@ -77,9 +81,9 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
-			name => 'attendee_id', 
+			name => 'attendee_id',
 			types => ['Patient'],
-			size => 32,
+			size => 25,
 			useShortForm => 1,
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
 			#options => FLDFLAG_REQUIRED
@@ -87,12 +91,21 @@ sub new
 		new CGI::Dialog::Field(caption => 'Patient Type',
 			type => 'enum',
 			enum => 'appt_attendee_type',
-			name => 'attendee_type',
+			name => 'patient_type',
 			options => FLDFLAG_REQUIRED
 		),
+		new CGI::Dialog::Field(caption => 'Visit Type',
+			name => 'visit_type',
+			type => 'select',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+			fKeyStmtMgr => $STMTMGR_SCHEDULING,
+			fKeyStmt => 'selVisitTypesDropDown',
+		),
+		
 		new CGI::Dialog::Field(caption => 'Reason for Visit',
 			name => 'subject',
-			size => 32,
+			size => 40,
 			options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Symptoms',
@@ -104,24 +117,36 @@ sub new
 			name => 'appt_type_caption',
 			findPopup => '/lookup/appttype',
 			secondaryFindField => '_f_appt_type_id',
+			#hints => $findAvailSlotHint,
+			size => 30,
+			hints => 'You must use the lookup to specify Appointment Type',
 		),
-		
+
 		new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
+			name => 'appt_date_time',
 			fields => [
 				new App::Dialog::Field::Scheduling::Date(
 					name => 'appt_date',
 					options => FLDFLAG_REQUIRED,
 				),
-				new App::Dialog::Field::Scheduling::Time(
+				new CGI::Dialog::Field(
 					name => 'appt_time',
+					type => 'time',
 					options => FLDFLAG_REQUIRED,
+					postHtml => $findAvailSlotHint,
 				),
 			],
 		),
+		#new App::Dialog::Field::Scheduling::Hours(
+		#	caption => 'Appt Time Hour',
+		#	name => 'appt_hour',
+		#	timeField => '_f_appt_time'
+		#),
 		new CGI::Dialog::MultiField (
+			name => 'minutes_util',
 			fields => [
 				new App::Dialog::Field::Scheduling::Minutes(
-					caption => 'Appt Time Minutes',
+					caption => 'Appt Time Minute',
 					name => 'appt_minute',
 					timeField => '_f_appt_time'
 				),
@@ -136,15 +161,8 @@ sub new
 			name => 'conflict_check',
 			type => 'bool', style => 'check', value => 1,
 		),
-		new CGI::Dialog::Field(caption => 'Duration',
-			name => 'duration',
-			fKeyStmtMgr => $STMTMGR_SCHEDULING,
-			fKeyStmt => 'selApptDuration',
-			fKeyDisplayCol => 1,
-			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED,
-			hints => $findAvailSlotHint,
-		),
+
+		new CGI::Dialog::Field(name => 'duration',	type => 'hidden',),
 
 		$physField,
 
@@ -227,8 +245,13 @@ sub makeStateChanges_cancel
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, 1);
-	$self->updateFieldFlags('attendee_type', FLDFLAG_READONLY, 1);
-	
+	$self->updateFieldFlags('patient_type', FLDFLAG_READONLY, 1);
+	$self->updateFieldFlags('visit_type', FLDFLAG_READONLY, 1);
+
+	$self->updateFieldFlags('appt_date_time', FLDFLAG_READONLY, 1);
+	$self->updateFieldFlags('minutes_util', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('appt_type_caption', FLDFLAG_READONLY, 1);
+
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('start_stamp', FLDFLAG_READONLY, 1);
@@ -262,18 +285,20 @@ sub populateData_add
 	{
 		$startStamp = $page->getTimeStamp();
 	}
-	
+
 	$startStamp =~ /(.*?) (.*)/;
 	my ($appt_date, $appt_time) = ($1, $2);
-	
+
 	$page->field('appt_date', $appt_date);
 	$page->field('appt_time', $appt_time);
-	
+
 	$page->field('attendee_id', $page->param('person_id'));
 	$page->field('resource_id', $page->param('resource_id'));
 	$page->field('facility_id', $page->param('facility_id'));
-	
-	$page->field('duration', $page->param('duration'));
+	$page->field('patient_type', $page->param('patient_type'));
+	$page->field('visit_type', $page->param('visit_type'));
+
+	#$page->field('duration', $page->param('duration'));
 	App::Dialog::Appointment::setPhysicianFields($self, $page, $command, $flags);
 }
 
@@ -311,6 +336,8 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 	
+	return unless $page->field('resource_id');
+
 	if ($page->field('attendee_id') eq '')
 	{
 		my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson',null,null,['_f_person_id'],['_f_attendee_id']);" ;
@@ -321,36 +348,9 @@ sub customValidate
 
 	if ($page->field('conflict_check'))
 	{
-		return unless $page->field('resource_id');
-		return unless $page->field('start_stamp');
-
-		my $personId = uc($page->field('attendee_id'));
-
-		$page->param('start_stamp', $page->field('start_stamp'));
-		my ($parentEventId, $patientId) = $self->findConflictEvent($page);
-
-		if ($parentEventId)
+		unless ($self->validateMultiAppts($page))
 		{
-			unless ($page->field('processConflict'))
-			{
-				my $startStampField = $self->getField('start_stamp');
-				$startStampField->invalidate($page, qq{This time slot is currently booked for $patientId.<br>
-				Please select action: <br>
-					<input name=_f_whatToDo type=radio value="wl" CHECKED
-						onClick="document.dialog._f_whatToDo[0].checked=true"> Place $personId on Waiting List <br>
-					<input name=_f_whatToDo type=radio value="db"
-						onClick="document.dialog._f_whatToDo[1].checked=true"> Over-Book $personId <br>
-					<input name=_f_whatToDo type=radio value="cancel"
-						onClick="document.dialog._f_whatToDo[2].checked=true"> Find Another Slot
-
-					<input name=_f_processConflict type=hidden value=1>
-					<input name=_f_parent_id type=hidden value="$parentEventId">
-				});
-			}
-		}
-		else
-		{
-			$page->delete('_f_parent_id');
+			$self->validateAvailTemplate($page);
 		}
 	}
 	else
@@ -359,10 +359,103 @@ sub customValidate
 	}
 }
 
-sub findConflictEvent
+sub validateAvailTemplate
 {
 	my ($self, $page) = @_;
 	
+	my @resource_ids = ();
+	push(@resource_ids, $page->field('resource_id'));
+	
+	my @internalOrgIds = ($page->field('facility_id'));
+	my @search_start_date = Decode_Date_US($page->field('appt_date'));
+	
+	my $apptType = $page->property('apptTypeInfo');
+
+	my $rIds = $apptType->{r_ids};
+	push(@resource_ids, split(/\s*,\s*/, $rIds)) if $rIds;
+	
+	my $sa = new App::Schedule::Analyze (
+		resource_ids      => \@resource_ids,
+		facility_ids      => \@internalOrgIds,
+		search_start_date => \@search_start_date,
+		search_duration   => 1,
+		patient_type      => defined $page->field('patient_type') ? $page->field('patient_type') : -1,
+		visit_type        => defined $page->field('visit_type') ? $page->field('visit_type') : -1
+	);
+	
+	my $flag = defined $rIds ? App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL
+		: App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
+
+	my @available_slots = $sa->findAvailSlots($page, $flag);
+	my $availSlot = $available_slots[0];
+	
+	my $apptBeginMinutes = hhmmAM2minutes($page->field('appt_time'));
+	my $apptEndMinutes = $apptBeginMinutes + $page->field('duration');
+	my $apptMinutesRange = "$apptBeginMinutes-$apptEndMinutes";
+
+	my $field = $self->getField('appt_date_time')->{fields}->[0];
+	my $personId = uc($page->field('attendee_id'));
+
+	if (! $availSlot->{minute_set}->superset($apptMinutesRange) 
+		&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
+	{
+		$field->invalidate($page, qq{
+			All of Part of this time slot is not available.<br>
+			Please check @{[ join(', ', @resource_ids) ]} templates, patient types and visit types. <br>
+			<u>Select action</u>: <br>
+				<input name=_f_whatToDo type=radio value="override"
+					onClick="document.dialog._f_whatToDo[0].checked=true">Override Template.  Make appointment anyway.<br>
+				<input name=_f_whatToDo type=radio value="cancel"
+					onClick="document.dialog._f_whatToDo[1].checked=true">Cancel
+		});
+	}
+}
+
+sub validateMultiAppts
+{
+	my ($self, $page) = @_;
+	
+	my $personId = uc($page->field('attendee_id'));
+
+	my ($parentEventId, $patientId) = $self->findConflictEvent($page);
+	if ($parentEventId)
+	{
+		unless ($page->field('processConflict'))
+		{
+			my $field = $self->getField('appt_date_time')->{fields}->[0];
+			$field->invalidate($page, qq{This time slot is currently booked for $patientId.<br>
+			<u>Select action</u>: <br>
+				<input name=_f_whatToDo type=radio value="wl" CHECKED
+					onClick="document.dialog._f_whatToDo[0].checked=true"> Place $personId on Waiting List <br>
+				<input name=_f_whatToDo type=radio value="db"
+					onClick="document.dialog._f_whatToDo[1].checked=true"> Over-Book $personId <br>
+				<input name=_f_whatToDo type=radio value="cancel"
+					onClick="document.dialog._f_whatToDo[2].checked=true"> Cancel
+
+				<input name=_f_processConflict type=hidden value=1>
+				<input name=_f_parent_id type=hidden value="$parentEventId">
+			});
+		}
+	}
+	else
+	{
+		$page->delete('_f_parent_id');
+	}
+	
+	return $parentEventId;
+}
+
+sub findConflictEvent
+{
+	my ($self, $page) = @_;
+
+	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selApptTypeById', $page->field('appt_type_id')) if $page->field('appt_type_id');
+	$page->property('apptTypeInfo', $apptType);
+
+	$page->field('duration', $apptType->{duration} || 10);
+	return (undef, undef) if $apptType->{multiple};
+
 	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
 	my ($startDate, $startTime, $am) = split(/ /, $start_time);
 	my $endDate   = UnixDate(DateCalc($startDate, "+1 day"), "%Y,%m,%d");
@@ -436,7 +529,7 @@ sub execute
 
 	my $eventId = $page->field('event_id');
 	my $timeStamp = $page->getTimeStamp();
-	
+
 	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
 
 	my $parentId = $page->field('parent_id');
@@ -453,7 +546,7 @@ sub execute
 				event_status => 0,
 				subject => $page->field('subject'),
 				start_time => $start_time,
-				duration => $page->field('duration') || undef,
+				duration => $page->field('duration') || 10,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				scheduled_stamp => $timeStamp,
@@ -470,7 +563,8 @@ sub execute
 					item_name => 'Appointment/Attendee/Patient',
 					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
 					value_text => $page->field('attendee_id') || undef,
-					value_int => $page->field('attendee_type') || 0,
+					value_int => $page->field('patient_type') || 0,
+					value_intB => $page->field('visit_type') || -1,
 					_debug => 0
 					);
 				$page->schemaAction(
@@ -492,7 +586,7 @@ sub execute
 				event_status => 0,
 				subject => $page->field('subject'),
 				start_time => $start_time,
-				duration => $page->field('duration') || undef,
+				duration => $page->field('duration') || 10,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				parent_id => $parentId || undef,
@@ -540,7 +634,7 @@ sub execute
 				event_status => 0,
 				subject => $page->field('subject'),
 				start_time => $start_time,
-				duration => $page->field('duration') || undef,
+				duration => $page->field('duration') || 10,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				scheduled_stamp => $timeStamp,
@@ -557,7 +651,8 @@ sub execute
 					item_name => 'Appointment/Attendee/Patient',
 					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
 					value_text => $page->field('attendee_id') || undef,
-					value_int => $page->field('attendee_type') || 0,
+					value_int => $page->field('patient_type') || 0,
+					value_intB => $page->field('visit_type') || -1,
 					_debug => 0
 					);
 				$page->schemaAction(
