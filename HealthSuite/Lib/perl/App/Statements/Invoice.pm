@@ -243,7 +243,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and client_id = ?
 		},
 	'selInvoiceAndClaimType' => q{
-		select i.invoice_id, i.invoice_status, iis.caption as invoice_status_caption,
+		select i.invoice_id, i.invoice_status, iis.caption as invoice_status_caption, i.invoice_type,
 			i.invoice_subtype, ct.caption as claim_type_caption, i.client_id,
 			i.claim_diags, i.total_items, i.total_cost, i.total_adjust, i.balance, i.client_id
 		from invoice i, claim_type ct, invoice_status iis
