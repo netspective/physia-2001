@@ -13,14 +13,21 @@ use vars qw(@EXPORT @ISA);
 use constant ROLE_GRANT => 0;
 use constant ROLE_REVOKE => 1;
 
+#RELATIONSHIP TO INSURED
+use constant INSURED_SELF => 0;
+use constant INSURED_SPOUSE => 10;
+use constant INSURED_PARENT => 11;
+use constant INSURED_CHILD => 12;
+use constant INSURED_EMPLOYER => 50;
+use constant INSURED_OTHER => 99;
+
+
 #SPECIALTY SEQUENCE
 use constant SPECIALTY_PRIMARY =>1;
 use constant SPECIALTY_SECONDARY =>2;
 use constant SPECIALTY_TERTIARY =>3;
 use constant SPECIALTY_QUARTENARY =>4;
 use constant SPECIALTY_UNKNOWN =>5;
-
-
 
 #ROLE STAUS
 use constant ROLESTATUS_ACTIVE => 0;
@@ -44,8 +51,6 @@ use constant ATTRTYPE_DATE => 150;
 use constant ATTRTYPE_DURATION => 160;
 use constant ATTRTYPE_HISTORY => 950;
 use constant ATTRTYPE_FAKE_ADDRESS => 99910;
-
-
 
 #ATTRIBUTE TYPE: ASSOCIATIONS
 use constant ATTRTYPE_FAMILY => 200;
