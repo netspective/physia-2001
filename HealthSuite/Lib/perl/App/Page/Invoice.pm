@@ -2242,11 +2242,13 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $awaitClientPayment && $invStatus != $void && $invType == $hcfaInvoiceType && ($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
-						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
+						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $awaitClientPayment && $invStatus != $void && $invType == $hcfaInvoiceType && ($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment to this Claim</option>" : '' ]}
+						@{[ $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Post Personal Payment to this Claim</option>" : '' ]}
+						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment to Self-Pay Claims</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
-						<option value="/person/$clientId/account">View All Claims for this Patient</option>
+						<option value="/person/$clientId/account">View Patient Account</option>
+						<option value="/person/$clientId/profile">View Patient Profile</option>
 
 						@{[ $invType == $hcfaInvoiceType && ($invStatus < $submitted || ($invStatus > $transferred && $invStatus < $awaitInsPayment) || $invStatus == $paymentApplied || $invStatus == $paperPrinted) ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
@@ -2271,10 +2273,6 @@ sub prepare_page_content_header
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
 						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc73Command-twcc73'>\u$twcc73Command TWCC Form 73</option>} : '' ]}
-
-						<!-- <option value="/person/$clientId/account">Adjs Exist: $noAdjsExist</option>
-						<option value="/person/$clientId/account">Adjs Count: $adjCount</option>
-						<option value="/person/$clientId/account">Adj Total: $invoiceTotalAdj</option> -->
 					</SELECT>
 					</FONT>
 				<TD>
