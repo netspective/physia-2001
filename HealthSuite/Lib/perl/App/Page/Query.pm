@@ -121,8 +121,9 @@ sub handleARL
 	{
 		$queryTitle = "\u$queryType";
 		$self->property('ACL', "page/query/$queryType");
-		my ($fileName) = map {$_->{caption}} grep {$_->{name} eq $queryType} @{$RESOURCE_MAP{query}{_views}};
+		my ($fileName) = map {$_->{name}} grep {$_->{name} eq $queryType} @{$RESOURCE_MAP{query}{_views}};
 		$fileName = File::Spec->catfile($QUERYDIR, $fileName . '.qdl');
+		#$self->addDebugStmt("fileName: $fileName");
 		if (-f $fileName)
 		{
 			$self->property('QDL', $fileName);
