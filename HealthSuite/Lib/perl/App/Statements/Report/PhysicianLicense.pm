@@ -22,6 +22,7 @@ $STMTRPTDEFN_PHYSICIAN_LICENSE =
 			{ colIdx => 5, head => 'Expiry Date', dataFmt => '#5#'},
 		],
 };
+#		and poc.category = 'Physician'
 
 $STMTMGR_REPORT_PHYSICIAN_LICENSE_MAIN = qq
 {
@@ -37,7 +38,6 @@ $STMTMGR_REPORT_PHYSICIAN_LICENSE_MAIN = qq
 		person p, person_attribute pa, person_org_category poc
 	WHERE
 		p.person_id = poc.person_id
-		and poc.category = 'Physician'
 		and poc.org_internal_id = :1
 		and p.person_id = pa.parent_id
 		and pa.value_type in (

@@ -16,7 +16,7 @@ use Date::Manip;
 
 use App::Statements::Report::PhysicianLicense;
 
-use Data::TextPublish;
+use Data::Publish;
 use App::Configuration;
 use App::Device;
 use App::Statements::Device;
@@ -30,7 +30,7 @@ use vars qw(@ISA $INSTANCE);
 
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-physician-license', heading => 'Physician License');
+	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-physician-license', heading => 'Professional License');
 
 	my $curYear = UnixDate('today', '%Y');
 	my $year;
@@ -40,16 +40,16 @@ sub new
 	}
 
 	$self->addContent(
-		new CGI::Dialog::Field(
-			caption => 'Provider',
-			name => 'provider_id',
-			fKeyStmtMgr => $STMTMGR_PERSON,
-			fKeyStmt => 'selPersonBySessionOrgAndCategory',
-			fKeyDisplayCol => 0,
-			fKeyValueCol => 0,
-			options => FLDFLAG_PREPENDBLANK
-		),
-		
+#		new CGI::Dialog::Field(
+#			caption => 'Provider',
+#			name => 'provider_id',
+#			fKeyStmtMgr => $STMTMGR_PERSON,
+#			fKeyStmt => 'selPersonBySessionOrgAndCategory',
+#			fKeyDisplayCol => 0,
+#			fKeyValueCol => 0,
+#			options => FLDFLAG_PREPENDBLANK
+#		),
+
 		new CGI::Dialog::MultiField(
 			fields => [
 				new CGI::Dialog::Field(caption => 'Expiry Month',
@@ -74,56 +74,87 @@ sub new
 	$self;
 }
 
-sub makeStateChanges
-{
-	my ($self, $page, $command, $dlgFlags) = @_;
-	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+#sub makeStateChanges
+#{
+#	my ($self, $page, $command, $dlgFlags) = @_;
+#	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $sessOrg = $page->session('org_internal_id');
-	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
-}
+#	my $sessOrg = $page->session('org_internal_id');
+#	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+#}
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $providerId = $page->field('provider_id');
+	my $providerId = ''; # $page->field('provider_id');
 	my $monthYear;
 	if ($page->field('month') ne '' && $page->field('year') ne '')
 	{
 		$monthYear = $page->field('month') . "/" . $page->field('year');
 	}
 
-	my ($data, $html);
+	my $rows;
 
 	if($providerId eq '')
 	{
 		if ($monthYear eq '')
 		{
-			$data = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_physician_license', $page->session('org_internal_id'));
-			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license', [$page->session('org_internal_id')]);
+			$rows = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_physician_license', $page->session('org_internal_id'));
+#			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license', [$page->session('org_internal_id')]);
 		}
 		else
 		{
-			$data = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_physician_license_exp', $page->session('org_internal_id'), $monthYear);
-			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_exp', [$page->session('org_internal_id'), $monthYear]);
+			$rows = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_physician_license_exp', $page->session('org_internal_id'), $monthYear);
+#			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_exp', [$page->session('org_internal_id'), $monthYear]);
 		}
 	}
 	else
 	{
 		if ($monthYear eq '')
 		{
-			$data = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov', $page->session('org_internal_id'), $providerId);
-			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov', [$page->session('org_internal_id'), $providerId]);
+			$rows = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov', $page->session('org_internal_id'), $providerId);
+#			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov', [$page->session('org_internal_id'), $providerId]);
 		}
 		else
 		{
-			$data = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov_exp', $page->session('org_internal_id'), $providerId, $monthYear);
-			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov_exp', [$page->session('org_internal_id'), $providerId, $monthYear]);
+			$rows = $STMTMGR_REPORT_PHYSICIAN_LICENSE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov_exp', $page->session('org_internal_id'), $providerId, $monthYear);
+#			$html = $STMTMGR_REPORT_PHYSICIAN_LICENSE->createHtml($page, STMTMGRFLAG_NONE, 'sel_physician_license_prov_exp', [$page->session('org_internal_id'), $providerId, $monthYear]);
 		}
 
 	}
-	
+
+	my @data = ();
+	my $physicianId;
+	foreach (@$rows)
+	{
+		if ($physicianId ne $_->{person_id})
+		{
+			$physicianId = $_->{person_id};
+#			my @rowData = (undef, undef, undef, undef,undef);
+#			push(@data, \@rowData);
+		}
+		else
+		{
+			$_->{person_id} =  '';
+			$_->{simple_name} = '';
+		}
+
+		my @rowData =
+		(
+			$_->{person_id},
+			$_->{simple_name},
+			$_->{facility_id},
+			$_->{license_name},
+			$_->{license_number},
+			$_->{expiry_date}
+		);
+		push(@data, \@rowData);
+	}
+
+	my $pub = $STMTRPTDEFN_PHYSICIAN_LICENSE;
+	my $html = createHtmlFromData($page, 0, \@data, $pub);
+
 	return $html;
 }
 
