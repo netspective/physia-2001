@@ -16,7 +16,8 @@ EXTPROC_CONNECTION_DATA.PHYSIA.COM =
 SDEDBS02.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = boron.physia.com)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = carbon.physia.com)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = nitrogen.physia.com)(PORT = 1521))
     )
     (CONNECT_DATA =
       (SID = SDEDBS02)
@@ -26,7 +27,8 @@ SDEDBS02.physia.com =
 SDEDBS03.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = boron.physia.com)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = carbon.physia.com)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = nitrogen.physia.com)(PORT = 1521))
     )
     (CONNECT_DATA =
       (SID = SDEDBS03)
@@ -36,7 +38,7 @@ SDEDBS03.physia.com =
 SDETEST.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = boron.physia.com)(PORT = 1526))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = carbon.physia.com)(PORT = 1526))
     )
     (CONNECT_DATA =
       (SID = SDETEST)
@@ -46,8 +48,8 @@ SDETEST.physia.com =
 SDEDBS04.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = nitrogen.physia.com)(PORT = 1521))
       (ADDRESS = (PROTOCOL = TCP)(HOST = carbon.physia.com)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = nitrogen.physia.com)(PORT = 1521))
     )
     (CONNECT_DATA =
       (SID = SDEDBS04)
