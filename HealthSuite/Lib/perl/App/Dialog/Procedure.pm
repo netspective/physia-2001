@@ -67,7 +67,7 @@ sub new
 		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units'),
 
-		new CGI::Dialog::Field(caption => 'Reference', name => 'reference'),
+		#new CGI::Dialog::Field(caption => 'Reference', name => 'reference'),
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo', cols => 25, rows => 4),
 	);
 	$self->{activityLog} =
@@ -1030,7 +1030,7 @@ sub execute
 			balance => defined $balance ? $balance : undef,
 			emergency => defined $emg ? $emg : undef,
 			comments => $comments || '',
-			reference => $page->field('reference') || undef,
+			#reference => $page->field('reference') || undef,
 			hcfa_service_place => $page->field('servplace') || undef,
 			hcfa_service_type => $page->field('servtype') || 'NULL',
 			service_begin_date => $page->field('service_begin_date') || undef,
