@@ -5,6 +5,8 @@ use App::Data::Obtain::InfoX::ICDinfo;
 use App::Data::Obtain::HCFA::HCPCS;
 use App::Data::Obtain::Envoy::Payers;
 use App::Data::Obtain::Perse::Epayer;
+use App::Data::Obtain::RBRVS::RVU;
+use App::Data::Obtain::RBRVS::GPCI;
 use App::Data::Transform::DBI;
 use File::Path;
 use FindBin qw($Bin);
@@ -28,7 +30,7 @@ to only load icd and cpt modules.
 sub Main
 {
 	my $connectString = shift;
-	my @modules = @_ ? @_ : ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer');
+	my @modules = @_ ? @_ : ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer','rvu');
 		
 	printUsage() unless $connectString;
 	$connectString =~ s/\@/\@dbi:Oracle:/;
@@ -47,14 +49,113 @@ sub Main
 		dataSrcEnvoyPath => File::Spec->catfile($dataSrcPath, 'envoy'),
 		dataSrcNtisPath => File::Spec->catfile($dataSrcPath, 'ntis'),
 		dataSrcPersePath => File::Spec->catfile($dataSrcPath, 'perse'),
+		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),				
+		rvuFile => grep ('rvu' , @modules),
 	};
+
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
 	importCPTInfo($properties, transformDBI => 1) if grep(/cpt/, @modules);
 	importHCPCSInfo($properties, transformDBI => 1) if grep(/hcpcs/, @modules);
 	importEnvoyPayers($properties, transformDBI => 1) if grep(/envoy/, @modules);
-	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);
+	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);		
+	importGPCIInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
+	importRVUInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 }
+
+sub importRVUInfo
+{
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::RBRVS::RVU;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	my $year=$properties->{rvuFile};
+	$year =~s/\D+//;
+	die "For rvu a two digit year must be supplied  [ example : rvu00 for rvu for 2000 ]" if ! $year;
+	my $begin_yr = "01-JAN-$year";
+	my $end_yr = "31-DEC-$year";
+	print "REF_PFS_RVU BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFile => File::Spec->catfile($properties->{dataSrcRBRVSPath}, 'pprrvu'.$year.'.xls'));			
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_PFS_RVU WHERE EFF_BEGIN_DATE = '$begin_yr' ",
+			insertStmt => "insert into REF_PFS_RVU ( EFF_BEGIN_DATE, EFF_END_DATE,CODE,MODIFIER ,
+			  DESCRIPTION, STATUS_CODE , MEDICARE_IND , WORK_RVU , NON_FAC_PE_RVU ,
+			  NA_IND, TRANS_NON_FAC_PE_RVU , FAC_PE_RVU,TRANS_FAC_PE_RVU,MAL_PRACTICE_RVU ,
+			  TLT_NON_FAC_RVU, TLT_TRANS_NON_FAC_RVU, TLT_FAC_RVU,TLT_TRANS_FAC_RVU , PC_TC_IND,
+			  GLOBAL_SURGERY, PREOP_PERCENT,INTRAOP_PERCENT,POSTOP_PERCENT,MULTI_PROCEDURE,
+			  BILAT_SURGERY,  ASST_SURGERY,CO_SURGEONS, TEAM_SURGERY, PHY_SUPERVISE,
+			   BILL_MED_CODE ,  ENDO_BASE_CODE ,CONVERSION_FACT)       
+			values ('$begin_yr','$end_yr',?,?,?,?,?,?,?,?,
+				?,?,?,?,?,?,?,?,?,?,
+				?,?,?,?,?,?,?,?,?,?,
+				?,?)",
+			#verifyCountStmt => "select count(*) from REF_PFS_RU",
+		);
+		$exporter->printErrors();
+	}
+}
+
+
+sub importGPCIInfo
+{
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::RBRVS::GPCI;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	my $year=$properties->{rvuFile};
+	$year =~s/\D+//;
+	my $begin_yr = "01-JAN-$year";
+	my $end_yr = "31-DEC-$year";
+	print "GPCI BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
+	die "For rvu a two digit year must be supplied  [ example : rvu00 for rvu for 2000 ]" if ! $year;
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFileGPCI=> File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'gpcis.xls'),
+						srcFileLocal => File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'locco.xls'),						
+						);
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete REF_GPCI WHERE EFF_BEGIN_DATE='$begin_yr' ",
+			insertStmt => "insert into REF_GPCI			
+			( EFF_BEGIN_DATE  ,EFF_END_DATE ,
+ 			  CARRIER_NUMBER  , LOCALITY_NUMBER , 			  
+ 			  LOCALITY_NAME    , STATE  , 			  
+			  COUNTY  ,     WORK ,            
+ 			  PRACTICE_EXPENSE ,MAL_PRACTICE )
+ 			 values
+ 			  ('$begin_yr','$end_yr'  ,?,?,?,?,?,?,?,?) ",
+			verifyCountStmt => "select count(*) from REF_GPCI",
+		);
+		$exporter->printErrors();
+	}
+}
+
+
 
 sub importCPTInfo
 {
