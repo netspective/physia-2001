@@ -1862,7 +1862,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.hospitalizationSurgeriesTherapies' => {
 	sqlStmt => qq{
 			select  %simpleDate:trans_begin_stamp%, related_data, trans_status_reason,
-				provider_id, caption, data_text_b, detail, data_text_c, trans_type, trans_id
+				provider_id, caption, data_num_a, detail, data_text_c, trans_type, trans_id
 			from 	transaction
 			where 	trans_type between 11000 and 11999
 			and 	trans_owner_id = ?
@@ -2462,7 +2462,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			related_data,
 			trans_status_reason,
 			provider_id, caption,
-			data_text_b,
+			data_num_a,
 			detail,
 			data_text_c,
 			data_text_a,
@@ -2488,6 +2488,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				)
 			) AND
 			trans_status = 2
+			AND (SYSDATE - trans_begin_stamp) <= data_num_a
 		},
 	sqlStmtBindParamDescr => ['Person ID for the person table, Person ID for the Person_Attribute table, Org ID for the Person_Attribute table '],
 	publishDefn => {
