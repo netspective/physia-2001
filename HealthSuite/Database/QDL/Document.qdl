@@ -21,6 +21,7 @@
 		<field id="description" caption="Document Description" join="document" column="doc_description"/>
 		<field id="created" caption="Document Created" join="document" column="doc_orig_stamp" ui-datatype="stamp"/>
 		<field id="received" caption="Document Received" join="document" column="doc_recv_stamp" ui-datatype="stamp"/>
+		<field id="owner_id" caption="Document Owner ID" join="document" column="doc_data_a"/>
 
 		<!-- Joins -->
 		<join id="document" table="document" autoinclude="1"/>

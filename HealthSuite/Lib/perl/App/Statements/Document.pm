@@ -92,6 +92,38 @@ $STMTMGR_DOCUMENT = new App::Statements::Document(
 		WHERE
 			doc_data_a = ?
 	},
+	'selDocumentById' => qq{
+		SELECT
+			doc_id,
+			doc_id_alias,
+			doc_message_digest,
+			doc_mime_type,
+			doc_header,
+			doc_spec_type,
+			doc_spec_subtype,
+			doc_source_id,
+			doc_source_type,
+			doc_source_subtype,
+			doc_source_system,
+			doc_name,
+			doc_description,
+			doc_orig_stamp,
+			doc_recv_stamp,
+			doc_data_a AS owner_id
+		FROM
+			Document
+		WHERE
+			doc_id = ?
+	},
+	'selDocumentContentById' => qq{
+		SELECT
+			doc_content_small,
+			doc_content_large
+		FROM
+			Document
+		WHERE
+			doc_id = ?
+	},
 );
 
 1;

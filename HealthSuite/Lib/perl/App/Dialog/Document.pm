@@ -8,10 +8,18 @@ use Digest::MD5 qw(md5_hex);
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
+use App::Page;
+use DBI::StatementManager;
+use App::Statements::Document;
+use App::Dialog::Field::Person;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
-	'document' => {},
+	'document' => {
+		_arl => ['doc_id'],
+		_arl_add => ['spec_subtype'],
+		_modes => ['add', 'update', 'remove', 'view'],
+	},
 );
 
 sub new
@@ -24,6 +32,16 @@ sub new
 	);
 
 	$self->addContent(
+		new CGI::Dialog::Field(
+			name => 'doc_id',
+			options => FLDFLAG_READONLY,
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+		),
+		new App::Dialog::Field::Person::ID(
+			name => 'owner_id',
+			caption => 'Owner ID',
+			options => FLDFLAG_REQUIRED,
+		),
 		new CGI::Dialog::Field(
 			name => 'doc_name',
 			caption => 'Name',
@@ -40,6 +58,7 @@ sub new
 			type => 'file',
 			options => FLDFLAG_REQUIRED,
 		),
+		new CGI::Dialog::Field(name => 'doc_mime_type', type => 'hidden'),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons());
@@ -53,6 +72,30 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
+}
+
+
+sub populateData
+{
+	my $self = shift;
+	my ($page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	$page->field('owner_id', $page->param('person_id'));
+	return if $command eq 'add';
+	$STMTMGR_DOCUMENT->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selDocumentById', $page->param('doc_id'));
+
+	if ($command eq 'view')
+	{
+		my $content = $STMTMGR_DOCUMENT->getRowAsArray($page, STMTMGRFLAG_NONE, 'selDocumentContentById', $page->param('doc_id'));
+		my $buffer = $content->[0] ? $content->[0] : $content->[1];
+		my $mime = $page->field('doc_mime_type');
+
+		# Output the file directly to the broswer
+		$page->setFlag(PAGEFLAG_CUSTOM);
+		print $page->header(-type => $mime);
+		print $buffer;
+	}
 }
 
 
@@ -79,9 +122,11 @@ sub execute
 
 	my $documentId = $page->schemaAction(
 		'Document', $command,
-		doc_mime_type => 'text/plain',
+		doc_mime_type => $fileInfo->{'Content-Type'},
 		doc_message_digest => md5_hex($fileName, (stat($fh))[9]),
+		doc_orig_stamp => $page->getTimeStamp(),
 		doc_spec_type => App::Universal::DOCSPEC_MIME,
+		doc_spec_subtype => $page->param('spec_subtype'),
 		doc_source_system => 'PHYSIA',
 		doc_source_type => App::Universal::DOCSRCTYPE_PERSON,
 		doc_source_id => $page->session('person_id'),
@@ -91,6 +136,7 @@ sub execute
 		doc_recv_stamp => undef,
 		doc_content_small => ref $smallBuffer ? $$smallBuffer : undef,
 		doc_content_large => ref $largeBuffer ? $$largeBuffer : undef,
+		doc_data_a => $page->field('owner_id') || undef,
 		_debug => 0
 	);
 }
