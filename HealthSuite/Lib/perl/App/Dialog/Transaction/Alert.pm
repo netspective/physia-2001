@@ -15,7 +15,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-%RESOURCE_MAP =( 'alert-person' => { transType => App::Universal::TRANSTYPE_ALERTORG, heading => '$Command Alert',  
+%RESOURCE_MAP =( 'alert-person' => { transType => App::Universal::TRANSTYPE_ALERTORG, heading => '$Command Alert',
 				    _arl => ['person_id'], _arl_modify => ['trans_id'] ,
 				    _idSynonym => [
 						'trans-' .App::Universal::TRANSTYPE_ALERTORG(),
@@ -25,7 +25,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 						'trans-' .App::Universal::TRANSTYPE_ALERTMEDICATION(),
 						'trans-' .App::Universal::ATTRTYPE_STUDENTPART(),
 						'trans-' .App::Universal::TRANSTYPE_ALERTACTION()
-						] 
+						]
 				    },);
 
 sub new
@@ -51,7 +51,7 @@ sub new
 
 			new App::Dialog::Field::Person::ID(caption => 'Staff Member', name => 'initiator_id', types => ['Physician', 'Staff', 'Nurse'], readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			new CGI::Dialog::Field(type => 'date', caption => 'Begin Alert', name => 'trans_begin_stamp', options => FLDFLAG_REQUIRED, futureOnly => 0),
-			new CGI::Dialog::Field(type => 'date', caption => 'End Alert', name => 'trans_end_stamp')
+			new CGI::Dialog::Field(type => 'date', caption => 'End Alert', name => 'trans_end_stamp', defaultValue => '')
 		);
 		$self->{activityLog} =
 		{
