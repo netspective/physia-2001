@@ -113,8 +113,8 @@ sub prepare
 						<b>Lookup</b>
 						<a href="/search/claim">Claims</a>,
 						<a href="/search/catalog">Fee Schedules</a>,
-						<a href="/search/insurance">Insurance Product</a>, or
-						<a href="/search/insurance">Insurance Plan</a>.
+						<a href="/search/insproduct">Insurance Product</a>, or
+						<a href="/search/insplan">Insurance Plan</a>.
 						<a href="/search/envoypayer">Envoy Payer</a>.
 
 					</TD>

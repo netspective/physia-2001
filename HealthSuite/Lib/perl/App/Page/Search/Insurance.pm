@@ -48,15 +48,19 @@ sub getForm
 		};
 	}
 
-	return ('Lookup an insurance plan', qq{
+	my $optionPlan = $self->param('_pm_view') eq 'insplan' ? '<option value="plan" selected>Plan Name</option>' : '';
+	my $type = $self->param('_pm_view') eq 'insplan' ? 'plan' : 'product';
+	return ("Lookup an insurance $type", qq{
 		<CENTER>
 		<NOBR>
 		Find:
 		<select name="search_type" style="color: darkred">
-			<option value="id">Product Name</option>
-			<option value="groupname" selected>Group Name</option>
-			<option value="groupnum">Group Number</option>
+			<option value="product">Product Name</option>
+			$optionPlan
 			<option value="insorgid">Insurance Org ID</option>
+			<option value="street">Street</option>
+			<option value="city">City</option>
+			<option value="state">State</option>
 		</select>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');
@@ -76,10 +80,15 @@ sub execute
 
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-
+	my $category = "";
+	for ($self->param('_pm_view'))
+	{
+		$_ eq 'insurance' and do {last};
+		$category = "_$_";
+	}
 	$self->addContent(
 		'<CENTER>',
-		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName",
+		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category",
 			[uc($expression)],
 			#[
 			#	['ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
@@ -95,7 +104,7 @@ sub execute
 }
 @CHANGELOG =
 (
-	
+
 	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
 		'Search/Insurance',
 		'Created simple reports instead of using createOutput function.'],
