@@ -213,7 +213,7 @@ sub execute
 	my $include_org =$page->field('include_org') ;
 	my $orgIntId;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
-	my @data=undef;
+	my @data=();
 	my $html;
 	my $textOutputFilename;
 
