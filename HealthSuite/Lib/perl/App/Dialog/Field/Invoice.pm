@@ -864,11 +864,20 @@ sub isValid
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		my $itemPayment = $page->param("_f_item_$line\_plan_paid") || $page->param("_f_item_$line\_amount_applied");
+		my $itemCharge = $page->param("_f_item_$line\_item_charge");
 		my $itemBalance = $page->param("_f_item_$line\_item_balance");
 		$totalInvoiceBalance += $itemBalance;
 		next if $itemPayment eq '';
 
 		#no validation needed for overpayments - overpayments are allowed
+		if($itemPayment > $itemCharge && $totalPayRcvd >= 0)
+		{
+			my $difference = $itemPayment - $itemCharge;
+			$paidBy eq 'insurance' ? 
+				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Charge' by \$$difference") 
+				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Charge' by \$$difference");
+		}
+
 		if($itemPayment > $totalPayRcvd && $totalPayRcvd >= 0)
 		{
 			my $amtDiff = $itemPayment - $totalPayRcvd;
@@ -966,6 +975,7 @@ sub getHtml
 		my $itemId = $item->{item_id};
 		my $itemCPT = $item->{code};
 		my $itemBalance = $item->{balance};
+		my $itemCharge = $item->{extended_cost};
 		my $itemAdjs = $item->{total_adjust} || '0';
 		$totalInvoiceBalance += $itemBalance;
 
@@ -994,6 +1004,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_charge" VALUE="$itemCharge"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_existing_adjs" VALUE="$itemAdjs"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
 			<TR VALIGN=TOP>
@@ -1003,6 +1014,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemCPT</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemCharge</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemAdjs</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -1038,6 +1051,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_charge" VALUE="$itemCharge"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_existing_adjs" VALUE="$itemAdjs"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
 			<TR VALIGN=TOP>
@@ -1047,6 +1061,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemCPT</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemCharge</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemAdjs</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -1070,6 +1086,8 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>CPT</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Charge</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Adjs</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
@@ -1092,7 +1110,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=7><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
+						<TD COLSPAN=11><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalInvoiceBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
