@@ -114,7 +114,7 @@ sub customValidate
 					#Check if open date has open invoice assoicated
 					my $checkRec = $STMTMGR_INVOICE->recordExists($page, STMTMGRFLAG_NONE, 'selInvoiceTransaction', $_->{org_internal_id},$item->{value_date},$closeDate);
 					my $msg = qq{Close date '$closeDate' is not the next date after current close date '$item->{value_date}' for $item->{org_id} };
-					$msg =    qq{There are transactions on the open dates between '$item->{value_date}' and '$closeDate'} if ($checkRec);					
+					$msg =    qq{There are transactions on the open dates between '$item->{value_date}' and '$closeDate' for $item->{org_id}} if ($checkRec);					
 					$closeField->invalidate($page,$msg); 					
 					$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE,0);									
 					$one++;
