@@ -46,14 +46,21 @@ sub execute
 
 	my $valueType = $self->{valueType};
 	my $itemName = '';
+	my $medSpecCode = $page->field('value_text');
+	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
 	if($valueType == App::Universal::ATTRTYPE_ACCREDITATION || $valueType == App::Universal::ATTRTYPE_AFFILIATION)
 	{
 		$itemName = $page->field('value_text');
+	}
+	elsif($valueType == App::Universal::ATTRTYPE_SPECIALTY)
+	{
+		$itemName = $medSpecCaption;
 	}
 	else
 	{
 		$itemName = $page->field('value_textb');
 	}
+	my $valueTextB = $medSpecCaption ne '' ? $medSpecCaption : $page->field('value_textb');
 
 	$page->schemaAction(
 		'Person_Attribute',	$command,
@@ -63,7 +70,7 @@ sub execute
 		value_type => $valueType || undef,
 		value_text => $page->field('value_text') || undef,
 		value_dateEnd => $page->field('value_dateend') ||undef,
-		value_textB => $page->field('value_textb') || undef,
+		value_textB => $valueTextB || undef,
 		_debug => 0
 	);
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
