@@ -56,7 +56,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
+		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
@@ -154,7 +155,7 @@ sub initialize
 
 
 
-		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To',
+		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To', name => 'org_fields',
 			hints => 'Service Org is the org in which services were rendered.<br>
 						Billing org is the org in which the billing should be tracked.<br>
 						Pay To org is the org which should receive payment.',
@@ -178,12 +179,12 @@ sub initialize
 
 
 
-		new CGI::Dialog::MultiField(caption =>'Similar/Current Illness Dates',
+		new CGI::Dialog::MultiField(caption =>'Similar/Current Illness Dates', name => 'illness_dates',
 			fields => [
 				new CGI::Dialog::Field(name => 'illness_begin_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'illness_end_date', type => 'date', defaultValue => '')
 			]),
-		new CGI::Dialog::MultiField(caption =>'Begin/End Disability Dates',
+		new CGI::Dialog::MultiField(caption =>'Begin/End Disability Dates', name => 'disability_dates',
 			fields => [
 				new CGI::Dialog::Field(name => 'disability_begin_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'disability_end_date', type => 'date', defaultValue => '')
@@ -286,6 +287,28 @@ sub makeStateChanges
 			}
 		}
 	}
+
+	my $invoiceId = $page->param('invoice_id');
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $invoiceFlags = $invoiceInfo->{flags};
+	if($invoiceFlags & $attrDataFlag)
+	{
+		$self->setFieldFlags('trans_type', FLDFLAG_READONLY);
+		$self->setFieldFlags('accident', FLDFLAG_READONLY);
+		$self->setFieldFlags('accident_state', FLDFLAG_READONLY);
+		$self->setFieldFlags('deduct_balance', FLDFLAG_READONLY);
+		$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
+		$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
+		$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
+		$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
+		#$self->setFieldFlags('comments', FLDFLAG_READONLY);
+	}
 }
 
 sub populateData
@@ -316,21 +339,19 @@ sub populateData
 		#$page->field('reference', $invoiceInfo->{reference});
 		$page->field('proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
+		$page->field('old_invoice_id', $invoiceId);	#this is needed if the current claim is being edited but has already been submitted. if this is the case, a new claim is being
+											#created that is an exact copy of the submitted claim.
 
 		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
 		$page->field('copay_amt', $invoiceCopayItem->{extended_cost});
 
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+		
 		$page->param('_f_proc_service_place', $procedures->[0]->{hcfa_service_place});
 		my $totalProcs = scalar(@{$procedures});
 		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-			my $itemId = $procedures->[$idx]->{item_id};
-			#$page->addDebugStmt("Item ID: $itemId");
-			
-			#$page->addDebugStmt("Index: $idx");
-			#$page->addDebugStmt("Total Procedures: $totalProcs");
 			
 			my $line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
@@ -764,7 +785,7 @@ sub handleInvoiceAttrs
 	my $currencyValueType = App::Universal::ATTRTYPE_CURRENCY;
 	my $durationValueType = App::Universal::ATTRTYPE_DURATION;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
-
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 
 	## Then, create invoice attribute indicating that this is the first (primary) claim
 	$page->schemaAction(
@@ -779,6 +800,7 @@ sub handleInvoiceAttrs
 	## Then, create invoice attribute for history of invoice status
 	my $action = $command eq 'add' ? 'Created claim' : 'Updated claim';
 
+
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
@@ -788,7 +810,7 @@ sub handleInvoiceAttrs
 			value_textB => $page->field('comments') || undef,
 			value_date => $todaysDate,
 			_debug => 0
-		);
+	);
 
 	## Then, create some invoice attributes for HCFA (the rest are found in the Procedure dialog):
 	#	 Accident Related To, Prior Auth Num, Deduct Balance, Accept Assignment, Ref Physician Name/Id,
@@ -1029,9 +1051,23 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-
+	my $invoiceFlags = $page->field('invoice_flags');
+	if($invoiceFlags & $attrDataFlag)
+	{
+		my $oldInvoiceId = $page->field('old_invoice_id');
+		$page->schemaAction(
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId || undef,
+				item_name => 'Invoice/History/Item',
+				value_type => defined $historyValueType ? $historyValueType : undef,
+				value_text => "This claim is a copy of claim $oldInvoiceId which has been submitted.",
+				value_textB => $page->field('comments') || undef,
+				value_date => $todaysDate,
+				_debug => 0
+		);
+	}
+	
 	addProcedureItems($self, $page, $command, $flags, $invoiceId);
-
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
 }
 
@@ -1312,9 +1348,13 @@ sub handleBillingInfo
 	{
 		billCopay($self, $page, 'add', $flags, $invoiceId);
 	}
-	else
+	elsif($command eq 'add')
 	{
 		$self->handlePostExecute($page, $command, $flags);
+	}
+	elsif($command eq 'update')
+	{
+		$page->redirect("/invoice/$invoiceId/summary");
 	}
 }
 
@@ -1378,7 +1418,15 @@ sub billCopay
 
 	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
 	$page->param('invoice_id', $invoiceId) if $command eq 'add';
-	$self->handlePostExecute($page, $command, $flags);
+	
+	if($command eq 'add')
+	{
+		$self->handlePostExecute($page, $command, $flags);
+	}
+	elsif($command eq 'update')
+	{
+		$page->redirect("/invoice/$invoiceId/summary");
+	}
 }
 
 sub addProcedureItems

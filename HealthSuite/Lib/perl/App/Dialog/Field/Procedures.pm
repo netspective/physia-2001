@@ -355,11 +355,23 @@ sub getHtml
 		}
 	}
 
+	my $readOnly = '';
+	my $invoiceFlags = '';
+	my $attrDataFlag = '';
+	if(my $invoiceId = $page->param('invoice_id'))
+	{
+		$invoiceFlags = $page->field('invoice_flags');
+		$attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+
+		$readOnly = $invoiceFlags & $attrDataFlag ? 'READONLY' : '';
+	}
+
+
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+		$removeChkbox = $allowRemove && ! $invoiceFlags & $attrDataFlag ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
 		my $errorMsgsHtml = '';
 		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
 		{
@@ -369,6 +381,18 @@ sub getHtml
 		else
 		{
 			$numCellRowSpan = $allowComments ? 'ROWSPAN=2' : '';
+		}
+
+		my $emg = $page->param("_f_proc_$line\_emg");
+		my $emgHtml = '';
+		if($invoiceFlags & $attrDataFlag)
+		{
+			$emgHtml = $emg eq 'on' ? "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/>Emergency</FONT>" : '';		
+		}
+		else
+		{
+			my $checked = $emg eq 'on' ? 'CHECKED' : '';
+			$emgHtml = "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' TYPE='CHECKBOX' VALUE='on' $checked><FONT $textFontAttrs/>Emergency</FONT>";
 		}
 
 		$linesHtml .= qq{
@@ -402,24 +426,23 @@ sub getHtml
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || ($line == 1 ? 'From' : '')]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
 					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || ($line == 1 ? 'To' : '') ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><NOBR><INPUT CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><NOBR><INPUT CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)"><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_cpt, '/lookup/cpt', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
-					<INPUT CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
+				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)"><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_cpt, '/lookup/cpt', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
+					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags")]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_units' TYPE='text' size=3 VALUE='@{[ $page->param("_f_proc_$line\_units") ]}'></TD>
+				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_units' TYPE='text' size=3 VALUE='@{[ $page->param("_f_proc_$line\_units") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_charges' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_charges") ]}'></TD>
-				<TD><nobr><INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' TYPE='CHECKBOX' @{[ ($page->param("_f_proc_$line\_emg") eq 'on' ? 'checked' : '' ) ]}> <FONT $textFontAttrs/>Emergency</FONT></nobr>
-				</TD>
+				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_charges' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_charges") ]}'></TD>
+				<TD><nobr>$emgHtml</nobr></TD>
 			</TR>
 		};
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=4 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
-				<TD COLSPAN=8><INPUT CLASS='procinput' NAME='_f_proc_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_proc_$line\_comments") ]}'></TD>
+				<TD COLSPAN=8><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_proc_$line\_comments") ]}'></TD>
 			</TR>
 		} if $allowComments;
 
@@ -467,7 +490,7 @@ sub getHtml
 			</TD>
 	} if $allowQuickRef;
 
-	my $removeHd = $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
+	my $removeHd = $allowRemove && ! $invoiceFlags & $attrDataFlag ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
@@ -484,9 +507,9 @@ sub getHtml
 					<TR VALIGN=TOP>
 						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'></TD>
+						<TD><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'></TD>
 					</TR>
 					$nonLinesHtml
 				</TABLE>
