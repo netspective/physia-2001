@@ -46,19 +46,6 @@ sub new
 			fKeyValueCol => 0,
 			size => 5,
 		),
-
-		#new CGI::Dialog::Field(
-		#	caption => 'Physician',
-		#	name => 'physician_list',
-		#	style => 'multidual',
-		#	fKeyStmtMgr => $STMTMGR_PERSON,
-		#	fKeyStmt => 'selResourceAssociations',
-		#	fKeyDisplayCol => 1,
-		#	fKeyValueCol => 0,
-		#	size => 5,
-		#	multiDualCaptionLeft => 'Available Physicians',
-		#	multiDualCaptionRight => 'Selected Physicians',
-		#),		
 	);
 
 	$self->{activityLog} =
@@ -86,7 +73,7 @@ sub populateData
 
 	my $orgInternalId = $page->session('org_internal_id');
 	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
-		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'), 'WorkList', $orgInternalId);
+		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->param('person_id'), 'WorkList', $orgInternalId);
 
 	my @physicians = ();
 	for (@$physicansList)
