@@ -195,13 +195,15 @@ sub importPreventivecare
 	my $parentId = $person->{id};
 	if(my $list = $preventivecare->{measure})
 	{
-	 	my $cptCode = $item->{cpt};
-		my $cptData = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
-		my $cptCodeName = $cptName->{'name'} ne '' ? $cptName->{'name'} : '';
+
 		# in case there is only one, force it to be "multiple" to simplify coding
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $cptCode = $item->{cpt};
+			my $cptData = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+			my $cptCodeName = $cptData->{'name'} ne '' ? $cptData->{'name'} : '';
+
 			$self->schemaAction($flags, "Person_Attribute", 'add',
 				parent_id => $parentId,
 				item_name => "$item->{_text}",
