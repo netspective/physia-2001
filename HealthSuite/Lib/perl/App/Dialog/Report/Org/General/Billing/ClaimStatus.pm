@@ -14,6 +14,10 @@ use DBI::StatementManager;
 use App::Statements::Org;
 use App::Statements::Report::ClaimStatus;
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -79,6 +83,22 @@ sub new
 		new App::Dialog::Field::Organization::ID(caption => 'Facility ID',
 			name => 'facility_id',
 			types => ['Facility'],
+		),
+		new CGI::Dialog::Field(
+			name => 'printReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Print report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
 		),
 	);
 
@@ -241,10 +261,20 @@ sub execute
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
+	my $hardCopy = $page->field('printReport');
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+	
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $orgId = $page->session('org_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
 
 	my $publishDefn = {
+		reportTitle => $self->heading (),
 		columnDefn =>
 		[
 			{	head => 'Claims', 
@@ -256,6 +286,8 @@ sub execute
 	};
 	
 	my $sqlStmt = $self->buildSqlStmt($page, $flags | FLAG_GETCOUNTS);
+	my $data = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsArray($page, STMTMGRFLAG_DYNAMICSQL, $sqlStmt, $orgIntId, $startDate, $endDate);
+	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $publishDefn);
 	
 	my $html = qq{
 	<table cellpadding=10>
@@ -269,7 +301,19 @@ sub execute
 	</table>
 	};
 
-	return $html;
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 }
 
 sub getDrillDownHandlers
