@@ -437,7 +437,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			to_char(data_date_a, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_a,
 			to_char(data_date_b, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_b,
 			trans_status_reason, related_data, caption, trans_substatus_reason,
-			modifier,unit_cost,quantity
+			modifier,unit_cost,quantity,trans_expire_reason
 
 			FROM 	transaction t
 			WHERE	t.parent_trans_id = :1
