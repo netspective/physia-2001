@@ -1397,6 +1397,7 @@ sub prepare_page_content_header
 						@{[ $invStatus != $onHold && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 						@{[ $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Delete Claim</option>" : '' ]}
 						@{[ $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
+						@{[ $invStatus >= $submitted ? "<option value='/patientbill/$invoiceId'>Print Patient Bill</option>" : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
 					</SELECT>
 					</FONT>

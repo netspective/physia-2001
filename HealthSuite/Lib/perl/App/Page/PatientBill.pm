@@ -7,7 +7,9 @@ use strict;
 use App::Page::Invoice;
 use Devel::ChangeLog;
 use DBI::StatementManager;
-use App::Statements::Org;
+use App::Statements::Catalog;
+use App::Statements::Invoice;
+use App::Statements::Scheduling;
 use Data::Publish;
 
 use App::Billing::Claims;
@@ -30,16 +32,23 @@ sub prepare
 	my $patientHtml = $self->getPatientHtml($claim->{careReceiver});
 	my $orgHtml = $self->getOrgHtml($claim);
 
-	my $previousBalance = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE,
+	my $previousBalance = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_CACHE,
 		'sel_previousBalance', $invoiceId, $invoiceId);
 
 	my @data = ();
 	for my $i (0..(@{$claim->{procedures}} -1))
 	{
 		my $procedure = $claim->{procedures}->[$i];
+		my $description = $procedure->{caption};
+		unless ($description)
+		{
+			my $cptData = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE,
+				'selGenericCPTCode', $procedure->{cpt});
+			$description = $cptData->{name};
+		}
 		my @rowData = (
 			formatDate($procedure->{dateOfServiceFrom}),
-			$procedure->{cptName},
+			$description,
 			$procedure->{extendedCost} || 0,
 			$procedure->{totalAdjustments},
 		);
@@ -52,7 +61,7 @@ sub prepare
 		my $procedure = $claim->{otherItems}->[$i];
 		my @rowData = (
 			formatDate($procedure->{dateOfServiceFrom}),
-			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
 		);
@@ -66,7 +75,7 @@ sub prepare
 		my $procedure = $claim->{copayItems}->[$i];
 		my @rowData = (
 			formatDate($procedure->{dateOfServiceFrom}),
-			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			$procedure->{caption} || decodeType($procedure->{itemType}),
 			#$procedure->{extendedCost},
 			undef,
 			$procedure->{totalAdjustments} || 0,
@@ -82,7 +91,7 @@ sub prepare
 		my $procedure = $claim->{adjItems}->[$i];
 		my @rowData = (
 			formatDate($procedure->{dateOfServiceFrom}),
-			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
 		);
@@ -92,27 +101,23 @@ sub prepare
 	
 	my $totalDue = $previousBalance->{balance} + $claim->{balance};
 	
-	my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Org::PUBLISH_DEFN);
+	my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Invoice::PATIENT_BILL_PUBLISH_DEFN);
 	my $sysdate = UnixDate('today', '%m/%d/%Y');
 	
-	my $futureAppts = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
+	my $futureAppts = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
 		'sel_futureAppointments', $claim->{careReceiver}->{id});
 		
 	my $apptHtml = qq{
-		<TR>
-			<TD>
-				<b><u>Next Appointment</u>:</b>
-			</TD>
-		</TR>
+		<b><u>Next Appointments</u>:</b><br>
 	};
 	
 	for (@{$futureAppts})
 	{
 		$apptHtml .= qq{
-			<TR>
-				<TD> $_->{appt_time} </TD>
-				<TD> $_->{subject} </TD>
-			</TR>
+			$_->{appt_time} --
+			$_->{physician} --
+			$_->{subject}
+			<br>
 		};
 	}
 	
@@ -121,11 +126,11 @@ sub prepare
 			<CENTER>
 				$orgHtml<br><br><br>
 	
-				<TABLE width=70%>
+				<TABLE width=80%>
 					<TR>
 						<TD align=left>$patientHtml</TD>
-						<TD align=center valign=top> <b>$claim->{id}</b></TD>
-						<TD align=right valign=top>$sysdate</TD>
+						<TD align=center valign=top>&nbsp;</TD>
+						<TD align=right valign=top><b>Invoice: $claim->{id}</b> <br> $sysdate </TD>
 					</TR>
 				
 					<TR>
@@ -170,8 +175,10 @@ sub prepare
 					
 					<TR>
 						<TD colspan=3>
-							<TABLE>
-								$apptHtml
+							<TABLE cellspacing=5>
+								<TR>
+									<TD>$apptHtml</TD>
+								</TR>
 							</TABLE>
 						</TD>
 					</TR>
@@ -311,6 +318,9 @@ sub initialize
 		$input->populateClaims($claimList, dbiHdl => $self->getSchema()->{dbh},
 					invoiceIds => [$invoiceId], valMgr => $valMgr);
 		my $st = $claimList->getStatistics;
+		
+		#push(@{$self->{page_content}}, "YO");
+		
 		if($valMgr->haveErrors())
 		{
 			my $errors = $valMgr->getErrors();

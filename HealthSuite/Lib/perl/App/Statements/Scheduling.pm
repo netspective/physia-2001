@@ -466,7 +466,21 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		union
 		select 'None' as value_text, 0 as event_id from Dual
 	},
-
+	
+	'sel_futureAppointments' => {
+		_stmtFmt => qq{
+			select 	to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
+				eadoc.value_text as physician, e.subject
+			from 	event_attribute eaper, event_attribute eadoc, event e
+			where e.start_time > sysdate	
+				and eaper.parent_id = e.event_id
+				and	eaper.value_text = ?
+				and	eaper.item_name like '%Patient'
+				and	eadoc.parent_id = e.event_id
+				and	eadoc.item_name like '%Physician'
+			order by e.start_time
+		},
+	},
 );
 
 1;

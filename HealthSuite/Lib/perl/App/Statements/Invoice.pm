@@ -7,7 +7,8 @@ use Exporter;
 use DBI::StatementManager;
 use App::Universal;
 
-use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_DEFAULT_ORG $STMTRPTDEFN_DEFAULT_PERSON);
+use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_DEFAULT_ORG 
+	$STMTRPTDEFN_DEFAULT_PERSON $PATIENT_BILL_PUBLISH_DEFN);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_INVOICE);
 
@@ -350,6 +351,31 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			from invoice_item
 			where item_id = ?
 		},
+
+	'sel_previousBalance' => qq{
+		select upper(client_id) as client_id, sum(balance) as balance
+		from Invoice
+		where upper(client_id) = (select client_id from Invoice where invoice_id = ?)
+			and invoice_id != ?
+			and balance > 0
+		group by upper(client_id)
+	},
+
+			
 );
+
+
+$PATIENT_BILL_PUBLISH_DEFN =
+{
+	columnDefn =>
+	[
+		{head => 'Date', colIdx => 0},
+		{head => 'Description', colIdx => 1},
+		{head => 'Amount', colIdx => 2, summarize => 'sum', dAlign => 'right', dformat => 'currency',},
+		{head => 'Paid', colIdx => 3, summarize => 'sum', dAlign => 'right', dformat => 'currency',},
+	],
+};
+
+
 
 1;

@@ -224,11 +224,17 @@ sub getComponentHtml
 				: undef,
 			
 			$_->{invoice_id} ? $copay->{balance} : undef,
-			
+
 			$deadBeatBalance,
 			$_->{invoice_id},
 			$_->{patient_id},
 			$copay->{item_id},
+			
+			$_->{invoice_id} ? qq{
+				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today>Print</a>
+			}
+				: undef,
+
 		);
 
 		push(@data, \@rowData);

@@ -24,7 +24,7 @@ use vars qw(@ISA @CHANGELOG);
 sub prepare_view_date
 {
 	my ($self) = @_;
-
+	
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -100,9 +100,14 @@ sub prepare_view_recentActivity
 	$self->addContent(qq{<br>
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
-				<TD colspan=5>
-					#component.stp-person.mySessionActivity# <br>
+				<TD>
 					#component.stp-person.mySessionViewCount#
+				</TD>
+				<TD>
+					&nbsp;
+				</TD>
+				<TD colspan=3>
+					#component.stp-person.mySessionActivity# <br>
 				</TD>
 			</TR>
 			<TR>

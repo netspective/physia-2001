@@ -87,7 +87,7 @@ $STMTRPTDEFN_DEFAULT =
 		{
 			head => 'Details',
 			dataFmt => q{
-				<a href='javascript:doActionPopup("/person-p/#12#/profile")' title='#12# Profile'
+				<a href='/person/#12#/profile' title='#12# Profile'
 					style='text-decoration:none'>#0#</a>
 				(<I>#3#</I>)<BR>
 				#6# with #2# at #7#<BR>

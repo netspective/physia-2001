@@ -35,6 +35,7 @@ $STMTRPTDEFN_WORKLIST =
 			hint => "Copay due for this visit.\nClick to apply payment.", 
 			dAlign => 'right', dformat => 'currency', summarize => 'sum'},
 		{colIdx => 8, hint => 'View Account Balance', head => 'Balance', url => '/person/#10#/account', dAlign => 'right', dformat => 'currency', summarize => 'sum'},
+		{colIdx => 12, head => 'Action'},
 	],
 };
 
