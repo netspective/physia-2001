@@ -282,10 +282,10 @@ sub populateData_update
 	{
 		$self->addPostHtml(qq{<script language="JavaScript1.2">setIdDisplay("panel_id_name",'none');setIdDisplay("panel",'none');</script>});						
 		$page->field('org_id',$page->param('org_id'));	
-		if($data->{modifier} eq 'Single Test')
+		if($data->{data_text} eq 'Single Test')
 		{
-			$page->field('test_id',$data->{name});
-		 	$page->field('test_caption',$data->{description});
+			$page->field('test_id',$data->{modifier});
+		 	$page->field('test_caption',$data->{name});
 		 	$page->field('code',$data->{code});		 	
 			$page->field('doc_price',$data->{unit_cost});	
 			$page->field('pat_price',$data->{data_num});			
@@ -301,7 +301,7 @@ sub populateData_update
 			$page->field('entry_id',$id);	
 			$page->field('internal_catalog_id',$data->{catalog_id});	
 			$page->field('panel_name',$data->{name});
-			$page->field('panel_id',$data->{description});		
+			$page->field('panel_id',$data->{modifier});		
 			$page->field('entry_id',$id);
 			$page->field('lab_type',$data->{entry_type});				
 			#Get Children record of this parent
@@ -310,8 +310,8 @@ sub populateData_update
 			$self->addPostHtml(qq{<script language="JavaScript1.2">setSingle('none');setPanel('block'); </script>});		
 			foreach (@$dataChild)
 			{
-				$page->field("test_id_$loop",$_->{name});
-				$page->field("test_caption_$loop",$_->{description});	
+				$page->field("test_id_$loop",$_->{modifier});
+				$page->field("test_caption_$loop",$_->{name});	
 				$page->field("doc_price_$loop",$_->{unit_cost});	
 				$page->field("pat_price_$loop",$_->{unit_cost});				
 				$page->field("entry_id_$loop",$_->{entry_id});
@@ -420,11 +420,12 @@ sub saveSingleTest
 	$page->schemaAction(
 		'Offering_Catalog_Entry',$command,
 		entry_id=>$page->field('entry_id')||undef,
-		modifier=>'Single Test',
-		#name=>$panelName,
-		#code=>$panelId,
-		name=>$lab_id,
-		description=>$caption,
+		#modifier=>'Single Test',
+		modifier=>$lab_id,		
+		#name=>$lab_id,
+		name=>$caption,		
+		#description=>$,
+		data_text =>'Single Test',
 		code=>$code,
 		unit_cost =>$doc_price,
 		data_num =>$pat_price,		
@@ -448,11 +449,12 @@ sub savePanelTest
 	my $parentId=$page->schemaAction(
 		'Offering_Catalog_Entry',$command,
 		entry_id=>$page->field('entry_id')||undef,
-		modifier=>'Panel Test',	
-		#name=>$panelName,
-		#code=>$panelId,
-		name=>$panelId,
-		description=>$panelName,
+		#modifier=>'Panel Test',	
+		data_text =>'Panel Test',
+		modifier=>$panelId,	
+		#name=>$panelId,
+		name=>$panelName,		
+		#description=>$panelName,
 		code=>$code,
 		entry_type =>App::Universal::CATALOGENTRYTYPE_SERVICE,
 		catalog_id=>$page->field('internal_catalog_id'),
@@ -462,6 +464,7 @@ sub savePanelTest
 	#Save Test Panel
 	$parentId = $page->field('entry_id') || $parentId;
 	my $loop;
+	my $list;
 	for ($loop=1;$loop<=MAXROWS;$loop++)
 	{
 
@@ -473,7 +476,7 @@ sub savePanelTest
 		my $entry_id = $page->field("entry_id_$loop");
 		my $code = $page->field("code_$loop");
 		next unless ($test_id || $page->field("entry_id_$loop"));
-		
+		$list .= $list ? ", $cap " : $cap;
 		#Even if the dialog is an update the user can add new test  to a panel so determine
 		#if current test  has an entry_id
 		$command =  $page->field("entry_id_$loop") ?  'update' : 'add' if $command eq 'update';		
@@ -482,14 +485,15 @@ sub savePanelTest
 
 			$page->schemaAction(
 			'Offering_Catalog_Entry',$command,
-			modifier=>'Panel Test Item',	
+			#modifier=>'Panel Test Item',	
+			data_text =>'Panel Test Item',
+			modifier=>$test_id,	
 			entry_id=>$page->field("entry_id_$loop") ||undef,
 			unit_cost=>$price,	
 			data_num=>$price2,
-			#name=>$cap,
-			#code=>$test_id,
-			name=>$test_id,
-			description=>$cap,
+			#name=>$test_id,
+			name=>$cap,
+			#description=>$cap,
 			code=>$code,
 			parent_entry_id =>$parentId,
 			entry_type =>App::Universal::CATALOGENTRYTYPE_SERVICE,
@@ -513,6 +517,7 @@ sub savePanelTest
 		entry_id=>$parentId,
 		unit_cost=>$doc_total,
 		data_num=>$pat_total,
+		description=>$list
 	);	
 	
 };

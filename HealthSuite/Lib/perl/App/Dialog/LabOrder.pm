@@ -116,11 +116,17 @@ sub makeStateChanges
 		$orgData = $STMTMGR_LAB_TEST->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLabOrderByID', $page->param('lab_order_id')||undef);		
 	};
 	
+		$self->addContent(
+			new CGI::Dialog::Field( caption => 'Other', name => 'other', type=>'text',size=>'30',
+				findPopup => "/lookup/other_service/$orgData->{org_internal_id}",
+				findPopupAppendValue=>','),	,			
+		);
 	
 	#Get All Catalogs
 	my $catalogData =$STMTMGR_CATALOG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCatalogByOrgIdType',$orgData->{org_internal_id},5);
 	foreach (@$catalogData)
 	{
+		next if $_->{catalog_id} eq 'OTHER';
 		$self->addContent(
 			new CGI::Dialog::Field(
 				name =>  $_->{internal_catalog_id},
@@ -215,10 +221,9 @@ sub populateData_update
 	#Get Org ID Value 
 	#Get Lab Data	
 	#Get Lab Catalogs
-	my $catalogData =$STMTMGR_LAB_TEST->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selSelectTestByParentId',$page->field('lab_order_id'));
+	my $catalogData =$STMTMGR_LAB_TEST->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selSelectTestByParentId',$page->field('lab_order_id')||undef);
 	foreach my $catalog (@$catalogData)
 	{		
-		
  		if(my $array = $value{$catalog->{catalog_id}})
  		{
 			push(@$array, $catalog->{test_entry_id}); 			
@@ -234,6 +239,15 @@ sub populateData_update
 		my $line = $value{$key};
 		$page->field($key,@$line); 
 	};
+	
+	#Get "Other" Test Data
+	my $otherData = $STMTMGR_LAB_TEST->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selOtherEntryLabCode',$page->field('lab_order_id')||undef); 
+	my $list;
+	foreach my $other (@$otherData)
+	{
+		$list .= $list ? ",$other->{lab_code}":$other->{lab_code};		
+	};
+	$page->field('other',$list);
 }
 sub populateData_remove
 {
@@ -303,15 +317,82 @@ sub execute
 	foreach my $catalog (@$catalogData)
 	{
 		my @data = $page->field($catalog->{internal_catalog_id});
+		#get selected field from a catalog
 		foreach (@data)
 		{
-			$page->schemaAction(
+
+			#get parent entry info
+			my $entryData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$_);			
+			my $id = $page->schemaAction(
 			'Lab_Order_Entry','add',
 			parent_id =>$labOrderId,
+			lab_code=>$entryData->{modifier},
+			charge_code=>$entryData->{code},
+			physician_cost=>$entryData->{unit_cost},
+			patient_cost=>$entryData->{data_num},
+			caption=>$entryData->{name},
+			panel_test_name => $entryData->{description},
+			modifier=>$entryData->{data_text},
 			test_entry_id=>$_,);				
-		
+			#save children entry if any
+			my $entryChild = $STMTMGR_CATALOG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCatalogItemsByParentItem',$_);	
+			if ($entryChild)
+			{
+				my $list='';
+				foreach my $row (@$entryChild)
+				{
+					$list .= $list ? ", $row->{name} " : $row->{name};
+					my $child = $page->schemaAction(
+						'Lab_Order_Entry','add',
+						parent_id =>$labOrderId,
+						lab_code=>$row->{modifier},
+						charge_code=>$row->{code},
+						physician_cost=>$row->{unit_cost},
+						patient_cost=>$row->{data_num},
+						caption=>$row->{name},
+						parent_entry_id=>$id,
+						modifier=>$row->{data_text},						
+						);									
+				}
+				$page->schemaAction(
+					'Lab_Order_Entry','update',				
+					entry_id => $id,
+					panel_test_name=>$list,
+				);
+			}					
 		}		
 	}
+	
+	#Get Any Other selections
+	my $other=$page->field('other');
+	my @values = split (',',$other);
+	#Get other catalog ID
+	my $entryData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogByTypeOrgId',5,$page->field('org_internal_id')||undef,
+	'OTHER');	
+	if($entryData)
+	{		
+		my $catalog_id = $entryData->{internal_catalog_id};
+		$page->addError($catalog_id);
+		foreach (@values)		
+		{
+			my $row = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selEntryByIdName' , 
+			$catalog_id,$_);
+			$page->addError($row->{modifier});
+			next unless $row;
+			my $id = $page->schemaAction(
+				'Lab_Order_Entry','add',
+				parent_id =>$labOrderId,
+				lab_code=>$row->{modifier},
+				charge_code=>$row->{code},
+				physician_cost=>$row->{unit_cost},
+				patient_cost=>$row->{data_num},
+				caption=>$row->{name},
+				panel_test_name => $row->{description},
+				modifier=>"OTHER",
+				test_entry_id=>$row->{entry_id},);				
+			
+		}	
+	};
 	$self->handlePostExecute($page, $command, $flags, undef);
 	return '';
 }

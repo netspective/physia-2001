@@ -31,7 +31,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Lab Test');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Ancillary Catalog');
 
 	my $schema = $self->{schema};
 
@@ -53,7 +53,7 @@ sub new
 			name=>'catalog_id',
 			type => 'text',
 			maxLength=>30,
-			options=>FLDFLAG_REQUIRED,
+			options=>FLDFLAG_REQUIRED | FLDFLAG_UPPERCASE,
 		),				
 		
 		new CGI::Dialog::Field(
