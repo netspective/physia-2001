@@ -20,7 +20,7 @@ use Data::Publish;
 use Text::CSV;
 
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.7 2000-10-13 02:07:54 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.8 2000-10-16 15:10:45 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 
@@ -186,7 +186,7 @@ sub new
 			type => 'select',
 			defaultValue => 'Browser',
 #			options => FLDFLAG_REQUIRED,
-			onChangeJS => q{onChangeDestination();},
+			onChangeJS => q{onChangeDestination();resetStartRow();},
 		),
 		new CGI::Dialog::Field(
 			name => 'out_printer',
@@ -525,7 +525,6 @@ sub new
 					setIdStyle('_id_out_rows', 'display', 'none');
 				}
 			}
-			resetStartRow();
 		}
 
 		// Call it at startup to initially hide fields
