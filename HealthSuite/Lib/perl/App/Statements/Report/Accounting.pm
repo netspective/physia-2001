@@ -25,7 +25,7 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 		sum(balance_151),
 		sum(decode(item_type,3,total_pending,0)),
 		sum(total_pending),
-		p.complete_name person_name
+		p.simple_name person_name
 	FROM	agedpayments a, person p, transaction t, invoice i
 	WHERE	(a.person_id = :1 or :1 is NULL)
 	AND 	(a.invoice_item_id is NULL  or a.item_type in (3) )
@@ -41,7 +41,7 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 	and i.invoice_id = a.invoice_id
 	and t.trans_id = i.main_transaction
 	%whereClause%
-	GROUP BY a.person_id, p.complete_name
+	GROUP BY a.person_id, p.simple_name
 	having sum(total_pending)> 0
 };
 
@@ -343,7 +343,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Insurance Receivables',
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -367,7 +368,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -390,7 +392,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -413,7 +416,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
@@ -464,7 +468,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
@@ -488,7 +493,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
@@ -512,7 +518,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
@@ -536,7 +543,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+#				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Patient', dataFmt => '#0#',  url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')} },
 				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },

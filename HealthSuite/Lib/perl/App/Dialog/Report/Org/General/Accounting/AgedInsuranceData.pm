@@ -15,6 +15,7 @@ use App::Statements::Person;
 
 use App::Statements::Component::Invoice;
 use App::Statements::Report::Accounting;
+use App::Statements::Report::Aging;
 
 use Data::TextPublish;
 use App::Configuration;
@@ -84,6 +85,42 @@ sub makeStateChanges
 
 	my $sessOrg = $page->session('org_internal_id');
 	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+}
+
+sub getDrillDownHandlers
+{
+	return ('prepare_detail_$detail$');
+}
+
+sub prepare_detail_insurance
+{
+	my ($self, $page) = @_;
+#	my $org_id = $page->param('_f_ins_org_id');
+	my $org_ins_id = $page->param('ins_org_id');
+	my $ins_org_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $org_ins_id);
+	my $provider_id = $page->param('_f_provider_id');
+	my $org_id = $page->param('_f_org_id');
+
+	if ($provider_id ne '' && $org_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_prov_org',
+			[$ins_org_id, $provider_id, $org_id]));
+	}
+	elsif ($provider_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_prov',
+			[$ins_org_id, $provider_id]));
+	}
+	elsif ($org_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins_org',
+			[$ins_org_id, $org_id]));
+	}
+	else
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_ins',
+			[$ins_org_id]));
+	}
 }
 
 sub execute

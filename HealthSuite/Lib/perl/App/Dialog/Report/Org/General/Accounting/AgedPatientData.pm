@@ -12,6 +12,7 @@ use CGI::Validator::Field;
 use DBI::StatementManager;
 
 use App::Statements::Report::Accounting;
+use App::Statements::Report::Aging;
 use App::Statements::Person;
 
 use Data::TextPublish;
@@ -84,7 +85,41 @@ sub makeStateChanges
 	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 }
 
+sub getDrillDownHandlers
+{
+	return ('prepare_detail_$detail$');
+}
 
+sub prepare_detail_aged_patient
+{
+	my ($self, $page) = @_;
+#	my $person_id = $page->param('_f_person_id');
+	my $person_id = $page->param('patient_id');
+	my $owner_id = $page->session('org_internal_id');
+	my $provider_id = $page->param('_f_provider_id');
+	my $org_id = $page->param('_f_org_id');
+
+	if ($provider_id ne '' && $org_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_patient_prov_org',
+			[$person_id, $owner_id, $provider_id, $org_id]));
+	}
+	elsif ($provider_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_patient_prov',
+			[$person_id, $owner_id, $provider_id]));
+	}
+	elsif ($org_id ne '')
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_patient_org',
+			[$person_id, $owner_id, $org_id]));
+	}
+	else
+	{
+		$page->addContent($STMTMGR_REPORT_AGING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_aged_patient',
+			[$person_id, $owner_id]));
+	}
+}
 
 sub execute
 {
