@@ -96,12 +96,6 @@ sub execute
 
 	}
 	
-	my $orgIntId = undef;
-	if ($page->field('service_facility_id'))
-	{
-		$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->field('service_facility_id'));
-	}
-
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
 	if ($page->schemaAction(
 			'Event', 'update',
@@ -113,7 +107,7 @@ sub execute
 			event_type => $page->field('appt_type') || 100,
 			subject => $page->field('subject') || undef,
 			duration => $page->field('duration') || 10,
-			facility_id => $orgIntId,
+			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)
 		{
