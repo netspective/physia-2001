@@ -735,6 +735,20 @@
 				<col name="caption">ACS Service Code</col>
 			</row>
 
+			<row>
+				<col name="id">300</col>
+				<col name="caption">Labs</col>
+			</row>
+			<row>
+				<col name="id">310</col>
+				<col name="caption">Radiology</col>
+			</row>
+			<row>
+				<col name="id">999</col>
+				<col name="caption">Other</col>
+			</row>
+			
+			
 
 
 		</data>

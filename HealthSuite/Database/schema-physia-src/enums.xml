@@ -301,6 +301,7 @@
 		<enum>Misc Procedure</enum>
 		<enum>Contract Schedule</enum>
 		<enum>Superbill</enum>
+		<enum>Lab Test</enum>
 	</table>
 
 	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
