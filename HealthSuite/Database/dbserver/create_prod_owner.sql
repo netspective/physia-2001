@@ -5,8 +5,30 @@
 */
 
 
-drop user &&1 cascade;
+set feedback off
+set verify off
+set echo off 
+set heading off
+set termout off
 
+spool kill_owner_sessions.sql
+
+select 'alter system kill session '''||rtrim(to_char(sid))||','||rtrim(to_char(serial#))||''';'
+from v$session where username=upper('&&1');
+
+spool off
+
+set feedback on
+set verify on
+set echo on 
+set heading on
+set termout on
+
+start kill_owner_sessions
+
+host rm kill_owner_sessions.sql
+
+drop user &&1 cascade;
 
 create user &&1 identified by &&2 default tablespace TS_DATA temporary tablespace TEMP;
 
