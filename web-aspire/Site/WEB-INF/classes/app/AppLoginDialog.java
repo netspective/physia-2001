@@ -1,24 +1,28 @@
 package app;
 
-import java.io.*;
-import java.util.*;
-import java.sql.*;
-import javax.servlet.http.*;
-import javax.naming.NamingException;
-
-import com.xaf.db.*;
-import com.xaf.form.*;
-import com.xaf.form.field.TextField;
-import com.xaf.form.field.SelectField;
+import com.xaf.db.DatabaseContext;
+import com.xaf.db.DatabaseContextFactory;
+import com.xaf.form.DialogContext;
+import com.xaf.form.DialogDirector;
+import com.xaf.form.DialogField;
+import com.xaf.form.DialogSkin;
 import com.xaf.form.field.BooleanField;
-import com.xaf.form.field.SeparatorField;
-import com.xaf.security.*;
-import com.xaf.skin.*;
-import com.xaf.sql.*;
-import com.xaf.value.*;
-import com.xaf.config.ConfigurationManager;
-import com.xaf.config.ConfigurationManagerFactory;
-import com.xaf.config.Configuration;
+import com.xaf.form.field.SelectField;
+import com.xaf.form.field.TextField;
+import com.xaf.security.AuthenticatedUser;
+import com.xaf.security.BasicAuthenticatedUser;
+import com.xaf.security.LoginDialog;
+import com.xaf.skin.StandardDialogSkin;
+import com.xaf.sql.StatementManager;
+import com.xaf.sql.StatementNotFoundException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.naming.NamingException;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
+import java.sql.SQLException;
 
 public class AppLoginDialog extends LoginDialog
 {
@@ -31,7 +35,7 @@ public class AppLoginDialog extends LoginDialog
 
 	public TextField createUserIdField()
 	{
-		TextField result = new TextField("person_id", "User ID");
+		TextField result = new TextField("user_id", "User ID");
 		result.setFlag(DialogField.FLDFLAG_REQUIRED);
 		result.setFlag(DialogField.FLDFLAG_INITIAL_FOCUS);
 		return result;
@@ -82,40 +86,51 @@ public class AppLoginDialog extends LoginDialog
 		writer.write("</head>");
 		writer.write("<body background='white'>");
 		writer.write("	<center><br>");
-		writer.write("		<img src='"+ resourcesUrl +"/images/welcome.gif' border='0'>");
+		writer.write("		<img src='" + resourcesUrl + "/images/welcome.gif' border='0'>");
 		writer.write("		<p>");
-		writer.write(       getHtml(dc, true));
+		writer.write(getHtml(dc, true));
 		writer.write("	</center>");
 		writer.write("</body>");
 	}
 
 	public boolean isValid(DialogContext dc)
-    {
-		if(! super.isValid(dc))
+	{
+		if (!super.isValid(dc))
 			return false;
 
-		if (! isValidUser(dc))
+		if (!isValidUser(dc))
 			return false;
 
-		if (! isValidPassword(dc))
+		if (!isValidPassword(dc))
 			return false;
 
 		String personId = dc.getValue(aspireUserIdField);
 		dc.getRequest().setAttribute("person_id", personId);
 
 		return true;
-    }
+	}
 
-	public boolean isValidUser(DialogContext dc) {
+	public boolean isValidUser(DialogContext dc)
+	{
 		boolean status = false;
-		DatabaseContext dbc = dc.getDatabaseContext();
+		DatabaseContext dbc = DatabaseContextFactory.getContext(dc);
 		StatementManager stmtMgr = dc.getStatementManager();
 		String dataSrcId = dc.getServletContext().getInitParameter("default-data-source");
-		String userId = dc.getValue(aspireUserIdField);
+		String userId = dc.getValue(aspireUserIdField).toUpperCase();
+
+		if (null == dbc)
+		{
+			aspireUserIdField.invalidate(dc, "DatabaseContext is null!");
+			return status;
+		}
 
 		try
 		{
-			status = stmtMgr.stmtRecordExists(dbc, dc, dataSrcId, "person.selPersonCategoryExists", new Object[] { userId });
+			status = stmtMgr.stmtRecordExists(dbc, dc, dataSrcId, "person.selPersonCategoryExists", new Object[]{ userId });
+			if (!status)
+			{
+				aspireUserIdField.invalidate(dc, "The user id you have entered is not valid");
+			}
 		}
 		catch (Exception e)
 		{
@@ -125,19 +140,26 @@ public class AppLoginDialog extends LoginDialog
 		return status;
 	}
 
-	public boolean isValidPassword(DialogContext dc) {
+	public boolean isValidPassword(DialogContext dc)
+	{
 		boolean status = false;
 
-		DatabaseContext dbc = dc.getDatabaseContext();
+		DatabaseContext dbc = DatabaseContextFactory.getContext(dc);
 		StatementManager stmtMgr = dc.getStatementManager();
 		String dataSrcId = dc.getServletContext().getInitParameter("default-data-source");
-		String userId = dc.getValue(aspireUserIdField);
+		String userId = dc.getValue(aspireUserIdField).toUpperCase();
 		String password = dc.getValue(aspirePasswordField);
+
+		if (null == dbc)
+		{
+			aspirePasswordField.invalidate(dc, "DatabaseContext is null!");
+			return status;
+		}
 
 		Map loginInfo = null;
 		try
 		{
-			loginInfo = stmtMgr.executeStmtGetValuesMap(dbc, dc, dataSrcId, "person.selLoginAnyOrg", new Object[] { userId });
+			loginInfo = stmtMgr.executeStmtGetValuesMap(dbc, dc, dataSrcId, "person.selLoginAnyOrg", new Object[]{ userId });
 		}
 		catch (Exception e)
 		{
@@ -145,21 +167,36 @@ public class AppLoginDialog extends LoginDialog
 		}
 
 		// Invalidate login if no record of this user/pass exists in database
-        if (loginInfo.isEmpty()) {
+		if (loginInfo.isEmpty())
+		{
 			aspirePasswordField.invalidate(dc, userId + " is not allowed to login (no password specified in system for given Organization ID");
 			return status;
 		}
 
 		// Invalidate if password mismatch
-		if (!password.equals(loginInfo.get("password"))) {
-			aspirePasswordField.invalidate(dc, "Invalid password specified for " + userId + "@" + (String) loginInfo.get("org_internal_id"));
+		if (!password.equals(loginInfo.get("password")))
+		{
+			int orgInternalId = 0;
+			Object orgString = null;
+			try
+			{
+				orgString = loginInfo.get("org_internal_id");
+			}
+			catch (Exception e)
+			{
+				orgString = e.toString() + " generated when converting org_internal_id to an Integer";
+			}
+
+//			orgInternalId = Integer.parseInt(orgString);
+			aspirePasswordField.invalidate(dc, "Invalid password specified for " + userId + "@" + orgString);
 			return status;
 		}
 
 		// Invalidate if too many sessions
-		int activeSessions = Integer.parseInt((String) loginInfo.get("quantity"));
+/*
+		Object quantity = loginInfo.get("quantity");
         if (dc.getValue(sessionLogout).equalsIgnoreCase("no")) {
-			if (dc.getValue("org_id").equals("")) {
+			if (dc.getValue("org_id").equals("no")) {
 				try {
 					stmtMgr.execute(dbc, dc, dataSrcId, "person.updSessionsTimeout");
 				} catch (Exception e) {
@@ -173,12 +210,36 @@ public class AppLoginDialog extends LoginDialog
 				}
 			}
 		}
-
+*/
+		status = true;
 		return status;
 	}
-/*
+
 	public AuthenticatedUser createUserData(DialogContext dc)
 	{
+		String personId = dc.getValue(aspireUserIdField);
+
+		DatabaseContext dbc = DatabaseContextFactory.getContext(dc);
+		StatementManager stmtMgr = dc.getStatementManager();
+		String dataSrcId = dc.getServletContext().getInitParameter("default-data-source");
+
+		Map personData = null;
+
+		try
+		{
+			personData = stmtMgr.executeStmtGetValuesMap(dbc, dc, dataSrcId, "person.selPersonData", new Object[] { personId });
+		}
+		catch (Exception e)
+		{
+			aspireUserIdField.invalidate(dc, e.toString() + " thrown when executing person.selPersonData for " + personId);
+		}
+
+		String personFullName = "No Record Found";
+
+        if (personData != null) {
+			personFullName = (String) personData.get("full_name");
+		}
+/*
 		// This is where we set the session variables etc...
 		String personId = (String) dc.getRequest().getAttribute("user-person-id");
 		Map personRegistration = null;
@@ -214,8 +275,15 @@ public class AppLoginDialog extends LoginDialog
 		user.setAttribute("person-id", personId);
 		user.setAttribute("registration", personRegistration);
 		user.setAttribute("member-orgs", memberOrgs);
+*/
+		AuthenticatedUser user = new BasicAuthenticatedUser(personId, "Authenticated User Name");
+		user.setAttribute("person_id", personId);
+		user.setAttribute("full_name", personFullName);
+
+		HttpSession session = dc.getSession();
+		session.setAttribute("user_id", personId);
+		session.setAttribute("temporaryVariable", "Pinky and the Brain");
 
 		return user;
 	}
-*/
 }
