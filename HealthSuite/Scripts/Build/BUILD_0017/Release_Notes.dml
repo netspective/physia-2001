@@ -39,6 +39,11 @@
 		<deliverable id="963">
 			UI: Made the license fields in the nurse dialog to be just text fields.
 		</deliverable>
+		<deliverable id="1125">
+			UI: Added a new multiField called 'Board Certification/Date' in the Physician dialog and updated the 
+			    dropdown lists for ProviderNumbers and the LicenseId numbers. Added a new dialog called 'Board Certification'
+			    under the Certification component of the 'Assocoate' tab
+		</deliverable>
 		<deliverable id="1153">
 			UI: Added the field called 'Language Spoken' in the 'Add Person' dialog.
 		</deliverable>		
@@ -172,6 +177,9 @@
 			NOTE : This change could impact the way the product plan and personal coverage dialog work when used in normal edit . add mode.  Also should test claim creation to make sure correct personal coverage record appears.			
 
 		</deliverable>
+		<deliverable id="1595">
+			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
+		</deliverable>		
 	</deliverables>
 </release-notes>
 
