@@ -279,6 +279,7 @@
 		<enum>Returned Personal Check</enum>
 		<enum>NSF Fee</enum>
 		<enum>Contractual Agreement</enum>
+		<enum>Transfer from Legacy System</enum>
 	</table>
 
 	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">

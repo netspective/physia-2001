@@ -1038,12 +1038,10 @@ sub getHtml
 
 		#create drop-down list of writeoff_types
 		my $writeoffTypes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selWriteoffTypes');
-		my $writeoffTypesHtml = '';
+		my $writeoffTypesHtml = "<OPTION></OPTION>";
 		foreach my $woType (@{$writeoffTypes})
 		{
-			my $selected = $writeoffCode == $woType->{id} ? 'SELECTED' : '';
-			$selected = $writeoffCode eq '' && $woType->{id} == App::Universal::ADJUSTWRITEOFF_FAKE_NONE ? 'SELECTED' : $selected;
-			$writeoffTypesHtml .= "<OPTION VALUE='$woType->{id}' $selected>$woType->{caption}</OPTION>";
+			$writeoffTypesHtml .= "<OPTION VALUE='$woType->{id}'>$woType->{caption}</OPTION>";
 		}
 
 		#display line item suppression checkboxes if paid by insurance
