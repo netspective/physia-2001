@@ -27,6 +27,7 @@ use App::Statements::Component::Person;
 use App::Statements::Component::Org;
 use App::Statements::Component::Scheduling;
 use App::Statements::Component::SDE;
+use App::Statements::Component::WorkList;
 use App::Statements::Catalog;
 use App::Statements::Insurance;
 use App::Statements::IntelliCode;
@@ -77,6 +78,7 @@ CGI::ImageManager::buildImageTags(\%IMAGE_TYPES);
 		$STMTMGR_COMPONENT_PERSON,
 		$STMTMGR_COMPONENT_SDE,
 		$STMTMGR_COMPONENT_ORG,
+		$STMTMGR_COMPONENT_WORKLIST,
 		$STMTMGR_PAGE,
 	);
 
