@@ -74,8 +74,8 @@ sub setCardExpiryDate
 
 sub getCardExpiryDate
 {
-	my $self = shift;
-	return $self->{cardExpDate};
+	my ($self, $formatIndicator) = @_;
+	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{cardExpDate}) : $self->{cardExpDate};
 }
 
 sub setWriteoffCode
