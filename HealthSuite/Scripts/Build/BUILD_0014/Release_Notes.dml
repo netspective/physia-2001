@@ -98,5 +98,8 @@ detail report.
 		<deliverable id="360">
 			Added the coverage begin and end date to show up in the 'Personal Coverage' component
 		</deliverable>		
+		<deliverable id="1259">
+			Moved Components around on the person page and added or removed various tabs.  See bug for specific changes.
+		</deliverable>		
 	</deliverables>
 </release-notes>
