@@ -27,16 +27,19 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 
 
 	sqlStmt => qq	{
-			select  trans_owner_id, detail,trans_id,trans_type,provider_id
+			select  trans_owner_id, detail,trans_id,trans_type,provider_id,
+			nvl(to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'),'No Date') as trans_begin_stamp
 			from transaction
 			where trans_owner_id = :1 and					
 			trans_status = 2 and
-			trans_type = $ACCOUNT_NOTES 			
+			trans_type = $ACCOUNT_NOTES 	
+			ORDER BY 6  asc
 		    	},
 	sqlStmtBindParamDescr => ['Person ID for transaction table'],
 	publishDefn => {
 			columnDefn => 	[
-					{ head => 'Account Notes', dataFmt => '#&{?}#<br/><I>(#4#) : #1#</I>' },
+					#{ head => 'Account Notes', dataFmt => '#&{?}#<br/><I>(#4# : #5#)  #1#</I>' },
+					{ head => 'Account Notes', dataFmt => '<B>#4#</B> : #5# <BR> #1#</I>' },					
 					],
 			bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#',
 			frame => {
@@ -65,7 +68,7 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 				actionRows =>
 				[
 				{	url => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#param.home#',
-				caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes/#param.person_id#?home=#param.home#'>Account Notes</A> },
+				caption => qq{#param.person_id# <BR> Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes/#param.person_id#?home=#param.home#'>Account Notes </A> },
 				},
 				],
 			},
