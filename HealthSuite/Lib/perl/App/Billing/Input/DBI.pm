@@ -380,7 +380,7 @@ sub assignPatientAttributes
 	};
 	my @row;
 
-	my $queryStatment = 2
+	my $queryStatment = qq
 	{
 		select value_text, value_textb, value_type || item_name, value_date
 		from person_attribute, invoice
