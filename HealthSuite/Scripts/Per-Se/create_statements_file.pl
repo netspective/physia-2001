@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I.
+#!/usr/bin/perl -w -I.
 
 ##############################################################################
 package InvoiceObject;
@@ -46,10 +46,27 @@ connectDB();
 my $connectKey = $CONFDATA_SERVER->db_ConnectKey() =~ /(.*?)\/(.*?)\@(.*)/;
 my ($userName, $password, $connectString) = ($1, $2, $3);
 
-my $outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 
+my $outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
 	'sel_outstandingClaims', $daysBack);
-		
+
+unless (@$outstandingClaims)
+{
+	warn "No outstanding claims found\n";
+	exit;
+}
+else
+{
+	warn @$outstandingClaims . " outstanding claims found\n";
+}
+
 my $statements = populateStatementsHash($outstandingClaims);
+
+unless (%{$statements})
+{
+	warn "No statements to send today\n";
+	exit;
+}
+
 writeStatementsFile($statements);
 
 exit;
@@ -61,34 +78,39 @@ exit;
 sub writeStatementsFile
 {
 	my ($statements) = @_;
-	
+
 	my $now = UnixDate('today', '%m%d%Y_%H%M');
 	my $fileName = 'phy169_' . $now . '.s01';
-	
+
 	my $headerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-16s%-50s%-10s%-7s\n";
 	my $dataFormat = "%1s%-4s%-16s%-10s%-16s%-7s%-7s%-7s%-7s%-7s%429s\n";
 	my $footerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-50s%-7s%-7s%-7s%-7s%-7s%230s\n";
-	
+
 	my $fileHandle = new IO::File;
 	open($fileHandle, ">$fileName") || die "Unable to open output file '$fileName': $! \n";
-	
+
 	my $i = 1;
 	for my $key (sort keys %{$statements})
 	{
 		my $statement = $statements->{$key};
-		
+
 		$statement->{statementId} = $i++;
-	
+
 		writeRecord($fileHandle, $headerFormat, getHeaderRecord($statement));
-		
+
 		for my $invoice (@{$statement->{invoices}})
 		{
 			writeRecord($fileHandle, $dataFormat, getDetailRecord($statement, $invoice));
 		}
-		
+
 		writeRecord($fileHandle, $footerFormat, getFooterRecord($statement));
+
+		foreach my $invoice (@{$statement->{invoices}})
+		{
+			addInvoiceHistory($invoice->{invoiceId}, "Client Billing Statement Transmitted to Per-Se")
+		}
 	}
-	
+
 	if ($ENV{DEBUGMODE})
 	{
 		my $dv = new Dumpvalue;
@@ -105,7 +127,7 @@ sub writeRecord
 sub numToStr
 {
 	my ($number) = @_;
-	
+
 	my $str = sprintf("%08.2f", $number);
 	$str =~ s/\.//g;
 	return $str;
@@ -115,12 +137,13 @@ sub getHeaderRecord
 {
 	my ($statement) = @_;
 
-	my @payToAddress = getOrgAddress($statement->{payToId});
-	
+	my @fromAddress = getOrgAddress($statement->{payToId}, 'Mailing');
+	my @payToAddress = getOrgAddress($statement->{payToId}, 'Payment');
+
 	return (
 		'H',
 		$statement->{statementId},
-		@payToAddress,
+		@fromAddress,
 		getSendToAddress($statement->{billToId}, $statement->{billPartyType}),
 		@payToAddress,
 		$statement->{clientId},
@@ -133,7 +156,7 @@ sub getHeaderRecord
 sub getDetailRecord
 {
 	my ($statement, $invoice) = @_;
-	
+
 	return (
 		'D',
 		$statement->{statementId},
@@ -152,15 +175,15 @@ sub getDetailRecord
 sub getFooterRecord
 {
 	my ($statement) = @_;
-	
+
 	my $billingPhone = getBillingPhone($statement->{payToId});
-	
+
 	return (
 		'F',
 		$statement->{statementId},
 		getPersonAddress($statement->{billingProviderId}),
 		'PAYMENT DUE UPON RECEIPT',
-		$billingPhone ? "Please call $billingPhone with any questions." 
+		$billingPhone ? "Please call $billingPhone with any questions."
 			: 'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS',
 		numToStr($statement->{agingCurrent}),
 		numToStr($statement->{aging30}),
@@ -174,27 +197,40 @@ sub getFooterRecord
 sub getBillingPhone
 {
 	my ($orgInternalId) = @_;
-	
-	my $billingPhone = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_NONE, 
+
+	my $billingPhone = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_NONE,
 		'sel_billingPhone', $orgInternalId);
-	
+
 	return $billingPhone;
 }
 
 sub getOrgAddress
 {
-	my ($orgInternalId) = @_;
-	
-	my $org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddress', $orgInternalId);
+	my ($orgInternalId, $addrName) = @_;
+	die "orgInternalId required" unless defined $orgInternalId;
+	$addrName = 'Mailing' unless defined $addrName && $addrName;
+
+	# First try to get the requested address
+	my $org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddressByName', $orgInternalId, $addrName);
+
+	# If the requested address isn't defined, fall back to 'Mailing' address (which "should" always be defined)
+	if (!$org && $addrName ne 'Mailing')
+	{
+		warn "WARNING: Org ID '$orgInternalId' doesn't have a $addrName Address defined!\n";
+		$org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddressByName', $orgInternalId, 'Mailing');
+	}
+
+	# If we got an address
 	if (defined $org)
 	{
 		my $primaryName = $org->{name_primary};
 		$primaryName =~ s/\s/ /g;
-		return ($primaryName || ' ', $org->{line1} || ' ', $org->{line2} || ' ', 
+		return ($primaryName || ' ', $org->{line1} || ' ', $org->{line2} || ' ',
 			$org->{city} || ' ', $org->{state} || ' ', $org->{zip} || ' ');
 	}
-	else
+	else # D'oh
 	{
+		warn "BIG-WARNING: Org ID '$orgInternalId' doesn't have a Mailing Address defined!\n";
 		return (' ', ' ', ' ', ' ', ' ', ' ');
 	}
 }
@@ -202,12 +238,12 @@ sub getOrgAddress
 sub getPersonAddress
 {
 	my ($personId) = @_;
-	
+
 	my $person = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_personAddress', $personId);
-	
+
 	if (defined $person)
 	{
-		return ($person->{complete_name} || ' ', $person->{line1} || ' ', $person->{line2} || ' ', 
+		return ($person->{complete_name} || ' ', $person->{line1} || ' ', $person->{line2} || ' ',
 			$person->{city} || ' ', $person->{state} || ' ', $person->{zip} || ' ');
 	}
 	else
@@ -219,51 +255,76 @@ sub getPersonAddress
 sub getSendToAddress
 {
 	my ($billToId, $billPartyType) = @_;
-	return $billPartyType < 2 ? getPersonAddress($billToId) : getOrgAddress($billToId);
+	return $billPartyType < 2 ? getPersonAddress($billToId) : getOrgAddress($billToId, 'Mailing');
 }
 
 sub populateStatementsHash
 {
 	my ($claims) = @_;
 	my %statements = ();
-	
+
+	# Get a list of billingEvents for this day of the month
+	my $mday = (localtime)[3];
+	my $billingEvents = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_daysBillingEvents', $mday);
+
+	# Nothing to do if there are no billing events for today
+	unless (@$billingEvents)
+	{
+		warn "ABORTING: No billing events found for this day of the month '$mday'\n";
+		return \%statements;
+	}
+
 	for (@{$claims})
 	{
 		my $key = $_->{billing_facility_id} . '_' . $_->{bill_to_id} . '_' . $_->{client_id};
-		
+
 		$statements{$key}->{billToId} = $_->{bill_to_id};
 		$statements{$key}->{payToId} = $_->{billing_facility_id};
 		$statements{$key}->{clientId} = $_->{client_id};
-		
+
 		$statements{$key}->{billingProviderId} = $_->{provider_id};
 		$statements{$key}->{careProviderId} = $_->{care_provider_id};
-		
+
 		$statements{$key}->{billPartyType} = $_->{bill_party_type};
 		$statements{$key}->{patientName} = $_->{patient_name};
-		
+		$statements{$key}->{patientLastName} = $_->{patient_name_last};
+
+		unless (defined $_->{invoice_id} && defined $_->{invoice_date} && $_->{care_provider_id})
+		{
+			warn "Data not valid";
+			next;
+		}
+		my $totalCost = defined $_->{total_cost} ? $_->{total_cost} : 0;
+		my $balance = defined $_->{balance} ? $_->{balance} : 0;
+		my $patientReceipts = defined $_->{patient_receipts} ? $_->{patient_receipts} : 0;
+		my $insuranceReceipts = defined $_->{insurance_receipts} ? $_->{insurance_receipts} : 0;
+		my $totalAdjust = defined $_->{total_adjust} ? $_->{total_adjust} : 0;
+
 		my $invObject = new InvoiceObject(
 			invoiceId => $_->{invoice_id},
 			invoiceDate => $_->{invoice_date},
 			careProviderId => $_->{care_provider_id},
-			totalCost => $_->{total_cost},
-			totalAdjust => $_->{total_adjust} < 0 ? $_->{total_adjust} * (-1) : $_->{total_adjust},
-			insuranceReceipts => $_->{insurance_receipts} < 0 ? $_->{insurance_receipts} * (-1) : $_->{insurance_receipts},
-			patientReceipts => $_->{patient_receipts} < 0 ? $_->{patient_receipts} * (-1) : $_->{patient_receipts},
-			balance => $_->{balance},
+			totalCost => $totalCost,
+			totalAdjust => $totalAdjust < 0 ? $totalAdjust * (-1) : $totalAdjust,
+			insuranceReceipts => $insuranceReceipts < 0 ? $insuranceReceipts * (-1) : $insuranceReceipts,
+			patientReceipts => $patientReceipts < 0 ? $patientReceipts * (-1) : $patientReceipts,
+			balance => $balance,
 		);
-		
+
 		push(@{$statements{$key}->{invoices}}, $invObject);
 	}
-	
-	for my $key (sort keys %statements)
+
+	my @keys = sort keys %statements;
+
+	for my $key (@keys)
 	{
 		my $clientId = $statements{$key}->{clientId};
 		my $billToId = $statements{$key}->{billToId};
-		
-		$statements{$key}->{agingCurrent} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE, 
+
+		$statements{$key}->{agingCurrent} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
 			'sel_aging', $clientId, 30, 0, $billToId);
-		
-		$statements{$key}->{aging30} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE, 
+
+		$statements{$key}->{aging30} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
 			'sel_aging', $clientId, 60, 30, $billToId);
 
 		$statements{$key}->{aging60} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
@@ -274,12 +335,61 @@ sub populateStatementsHash
 
 		$statements{$key}->{aging120} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
 			'sel_aging', $clientId, 10950, 120, $billToId);
-			
+
 		$statements{$key}->{amountDue} = $statements{$key}->{agingCurrent} + $statements{$key}->{aging30} +
 			$statements{$key}->{aging60} + $statements{$key}->{aging90} + $statements{$key}->{aging120};
+
+		unless (sendStatementToday($statements{$key}, $billingEvents))
+		{
+			# This statement doesn't get sent today
+			delete $statements{$key};
+			next;
+		}
 	}
-	
+
 	return \%statements;
+}
+
+sub sendStatementToday
+{
+	my ($stmt, $events) = @_;
+
+	foreach my $event (@$events)
+	{
+		# Check org_internal_id of billing org
+		next unless $stmt->{payToId} == $event->{parent_id};
+
+		# Check name
+		next if uc(substr($stmt->{patientLastName}, 0, 1)) lt $event->{name_begin};
+		next if uc(substr($stmt->{patientLastName}, 0, 1)) gt $event->{name_end};
+
+		# Check balance
+		next if $event->{balance_condition} > 0 && $stmt->{amountDue} < $event->{balance_criteria};
+		next if $event->{balance_condition} < 0 && $stmt->{amountDue} > $event->{balance_criteria};
+		next if $event->{balance_condition} == 0 && $stmt->{amountDue} != $event->{balance_criteria};
+
+		# We have a winner
+		warn "Sending statement for billing org '$stmt->{payToId}' last name '$stmt->{patientLastName}' balance '\$$stmt->{amountDue}'\n";
+		return 1;
+	}
+
+	# Bummer dude, no billing event matches this statement
+	warn "No billing event rule matched billing org '$stmt->{payToId}' last name '$stmt->{patientLastName}' balance '\$$stmt->{amountDue}'\n";
+	return 0;
+}
+
+sub addInvoiceHistory
+{
+	my ($invoice, $message) = @_;
+	my $date = UnixDate('today', '%m/%d/%Y');
+	return $page->schemaAction(0, 'Invoice_Attribute', 'add',
+		parent_id => $invoice,
+		cr_user_id => 'EDI_PERSE',
+		item_name => 'Invoice/History/Item',
+		value_type => App::Universal::ATTRTYPE_HISTORY,
+		value_text => $message,
+		value_date => $date,
+	);
 }
 
 sub connectDB
