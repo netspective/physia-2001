@@ -117,13 +117,14 @@ sub populateData_remove
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	if ($page->param('entity_type'))
 	{
-		my $activeCheck = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_ActiveOrgBillingIds',
+		my $activeCheck = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_ActiveOrgBillingIds',
 			$page->session('org_internal_id'));
-		
-		if (@{$activeCheck} >= 1 && $page->field('billing_active'))
+
+		if ($activeCheck->{item_id} && $page->field('billing_active') &&
+			$page->param('item_id') != $activeCheck->{item_id})
 		{
 			my $field = $self->getField('org_id');
 			$field->invalidate($page, qq{Only One Billing ID can be Active for Processing Live Claims per Org.});
@@ -131,10 +132,11 @@ sub customValidate
 	}
 	else
 	{
-		my $activeCheck = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'sel_ActivePersonBillingIds',
+		my $activeCheck = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_ActivePersonBillingIds',
 			$page->field('person_id'));
-		
-		if (@{$activeCheck} >= 1 && $page->field('billing_active'))
+
+		if ($activeCheck->{item_id} && $page->field('billing_active') &&
+			$page->param('item_id') != $activeCheck->{item_id})
 		{
 			my $field = $self->getField('person_id');
 			$field->invalidate($page, qq{Only One Billing ID can be Active for Processing Live Claims per Physician.});
@@ -162,7 +164,7 @@ sub execute
 			item_name => 'Organization Default Clearing House ID',
 			value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 			value_text => $page->field('billing_id') || undef,
-			value_int => $page->field('billing_id_type') || undef,
+			value_int => $page->field('billing_id_type') || 0,
 			value_intB => $billingActive || 0,
 			value_date => $page->field('billing_effective_date') || undef,
 			_debug => 0
@@ -177,7 +179,7 @@ sub execute
 			item_id => $page->param('item_id') || undef,
 			value_type => $valueType || undef,
 			value_text => $page->field('billing_id') || undef,
-			value_int => $page->field('billing_id_type') || undef,
+			value_int => $page->field('billing_id_type') || 0,
 			value_intB => $billingActive || 0,
 			value_date => $page->field('billing_effective_date') || undef,
 			_debug => 0

@@ -11,56 +11,90 @@ use vars qw(@ISA @EXPORT $STMTMGR_STATEMENTS);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_STATEMENTS);
 
-$STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
+my $SELECT_OUTSTANDING_CLAIMS = qq{
+	SELECT Invoice.invoice_id, bill_to_id, billing_facility_id, service_facility_id,
+		provider_id, care_provider_id, client_id, total_cost, total_adjust, balance,
+		to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, bill_party_type,
+		(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
+				and adjustment_type = 0
+				and payer_type != 0
+		) as insurance_receipts,
+		(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
+				and adjustment_type = 0
+				and payer_type = 0
+		) as patient_receipts,
+		Person.complete_name AS patient_name,
+		Person.name_last AS patient_name_last
+	FROM Transaction, Invoice_Billing, Invoice, Person
+	WHERE
+		Person.person_id = Invoice.client_id
+		AND Invoice.owner_id = ?
+		AND Invoice.invoice_status > 3
+		AND Invoice.invoice_status != 15
+		AND Invoice.invoice_status != 16
+		AND Invoice.balance > 0
+		AND Invoice.invoice_subtype in (0, 7)
+		AND Invoice_Billing.bill_id = Invoice.billing_id
+		AND Invoice_Billing.bill_party_type != 3
+		AND Invoice_Billing.bill_to_id IS NOT NULL
+		AND Transaction.trans_id = Invoice.main_transaction
+		%ProviderClause%
+	ORDER BY Invoice.invoice_id
+};
 
-	'sel_outstandingClaims' => qq{
-		SELECT Invoice.invoice_id, bill_to_id, billing_facility_id, service_facility_id,
-			provider_id, care_provider_id, client_id, total_cost, total_adjust, balance,
-			to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, bill_party_type,
-			(select nvl(sum(net_adjust), 0)
-				from Invoice_Item_Adjust
-				where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
-					and adjustment_type = 0
-					and payer_type != 0
-			) as insurance_receipts,
-			(select nvl(sum(net_adjust), 0)
-				from Invoice_Item_Adjust
-				where parent_id in (select item_id from Invoice_Item where parent_id = Invoice.invoice_id)
-					and adjustment_type = 0
-					and payer_type = 0
-			) as patient_receipts,
-			Person.complete_name AS patient_name,
-			Person.name_last AS patient_name_last
-		FROM Transaction, Invoice_Billing, Invoice, Person
-		WHERE
-			Invoice.client_id = Person.person_id
-			AND Invoice.invoice_status > 3
-			AND Invoice.invoice_status != 15
-			AND Invoice.invoice_status != 16
-			AND Invoice.invoice_date <= trunc(sysdate) - :1
-			AND Invoice.balance > 0
-			AND Invoice.invoice_subtype in (0, 7)
-			AND Invoice_Billing.bill_id = Invoice.billing_id
-			AND Invoice_Billing.bill_party_type != 3
-			AND Invoice_Billing.bill_to_id IS NOT NULL
-			AND Transaction.trans_id = Invoice.main_transaction
-		ORDER BY Invoice.invoice_id
+$STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
+	'sel_BillingIds' => qq{
+		select org.org_internal_id, org.org_id, org_attribute.value_text as billing_id,
+			org_attribute.value_int as nsf_type, null as provider_id
+		from org_attribute, org
+		where org.parent_org_id is null
+			and org.org_internal_id != 1
+			and org_attribute.parent_id = org.org_internal_id
+			and org_attribute.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			and org_attribute.item_name = 'Organization Default Clearing House ID'
+			and org_attribute.value_intb = 1
+		UNION
+		select person_org_category.org_internal_id, org.org_id, person_attribute.value_text
+			as billing_id, person_attribute.value_int as nsf_type, person_id as provider_id
+		from org, person_org_category, person_attribute
+		where person_attribute.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			and person_attribute.item_name = 'Physician Clearing House ID'
+			and person_attribute.value_intb = 1
+			and person_org_category.person_id = person_attribute.parent_id
+			and person_org_category.category = 'Physician'
+			and org.org_internal_id = person_org_category.org_internal_id
+	},
+
+	'sel_outstandingClaims_perOrg' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND not exists (select 'x' from person_attribute pa
+			where pa.parent_id = Transaction.provider_id
+				and pa.value_type = 960
+				and pa.value_intb = 1
+			)
+		},
+	},
+
+	'sel_outstandingClaims_perOrg_perProvider' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND Transaction.provider_id = ?},
+	},
+
+	'sel_internalStatementId' => qq{
+		select int_statement_id from statement where statement_id = :1
 	},
 
 	'sel_daysBillingEvents' => qq{
-		SELECT
-			item_id,
-			parent_id,
-			value_int AS day,
-			value_text AS name_begin,
-			value_textb AS name_end,
-			value_intb AS balance_condition,
-			value_float AS balance_criteria
-		FROM
-			org_attribute
-		WHERE
-			value_type = @{[ App::Universal::ATTRTYPE_BILLINGEVENT ]} AND
-			value_int = :1
+		SELECT item_id, parent_id, value_int AS day, value_text AS name_begin, value_textb AS name_end,
+			value_intb AS balance_condition, value_float AS balance_criteria
+		FROM org_attribute
+		WHERE parent_id = :1
+			AND value_int = :2
+			AND value_type = @{[ App::Universal::ATTRTYPE_BILLINGEVENT ]}
 	},
 
 	'sel_aging' => qq{
@@ -85,20 +119,11 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 
 	'sel_orgAddressByName' => qq{
-		SELECT
-			name_primary,
-			line1,
-			line2,
-			city,
-			state,
-			replace(zip, '-', null) as zip
-		FROM
-			org_address,
-			org
-		WHERE
-			org_address.parent_id = org.org_internal_id AND
-			org_internal_id = :1 AND
-			org_address.address_name = :2
+		SELECT name_primary, line1, line2, city, state, replace(zip, '-', null) as zip
+		FROM org_address, org
+		WHERE org_internal_id = :1
+			AND org_address.parent_id = org.org_internal_id
+			AND org_address.address_name = :2
 	},
 
 	'sel_personAddress' => qq{
@@ -110,7 +135,7 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 
 	'sel_submittedClaims_perOrg' => qq{
 		select invoice_id
-		from Invoice
+		from Transaction, Invoice
 		where invoice_status in (
 				@{[ App::Universal::INVOICESTATUS_SUBMITTED]},
 				@{[ App::Universal::INVOICESTATUS_APPEALED]}
@@ -118,6 +143,11 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			and owner_id = ?
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
 			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+			and Transaction.trans_id = Invoice.main_transaction
+			and not exists (select 'x' from person_attribute pa
+				where pa.parent_id = Transaction.provider_id
+					and pa.value_type = 960
+					and pa.value_intb = 1)
 		order by invoice_id
 	},
 
@@ -141,7 +171,32 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 		from Org_Attribute
 		where parent_id = :1
 			and value_type = @{[ App::Universal::ATTRTYPE_BILLING_PHONE ]}
-	}
+	},
+
+	'sel_outstandingInvoices' => qq{
+		select Invoice.invoice_id, Invoice.invoice_id || ' - ' || to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT')
+			|| ' - \$' || to_char(Invoice.balance, '99999.99') as caption
+		from Invoice_Billing, Invoice
+		where Invoice.owner_id = :2
+			and Invoice.balance > 0
+			and Invoice.invoice_status > 3
+			and Invoice.invoice_status != 15
+			and Invoice.invoice_status != 16
+			and Invoice.invoice_subtype in (0, 7)
+			and Invoice_Billing.bill_id = Invoice.billing_id
+			and Invoice_Billing.bill_party_type < 2
+			and Invoice_Billing.bill_to_id = :1
+		order by invoice_id desc
+	},
+
+	'sel_paymentPlan' => qq{
+		select plan_id, person_id, payment_cycle, payment_min, to_char(first_due, '$SQLSTMT_DEFAULTDATEFORMAT')
+			as first_due, balance, num_payments, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
+			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date, inv_ids
+		from Payment_Plan
+		where person_id = :1
+			and owner_org_id = :2
+	},
 
 );
 

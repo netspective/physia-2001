@@ -308,20 +308,35 @@
 		<column name="total_items" type="integer" calc="trigger" descr="The total number of items (minus 'phantom' adjustment items) in the invoice"/>
 		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice"/>
 		<column name="balance" type="currency" calc="trigger" descr="The total_cost - total_adjust (maintained automatically)"/>
-		<column name="budget_id" indexed="yes" parentref="Invoice_Budget.budget_id" desc="The payment budget payment plan this invoice is part of"/>
 		<column name="data_text_a" type="text" size="128" descr="Extra data"/>
 		<column name="data_text_b" type="text" size="128" descr="Extra data"/>
 		<column name="data_text_c" type="text" size="128" descr="Extra data"/>
 	</table>
 
-	<table name="Invoice_Budget" abbrev="InvBdgt" parent="Invoice" type="Audit,Secure">
-		<column name="budget_id" type="autoinc" primarykey="yes" desc="Unique ID for specific budget record"/>
-		<column name="payment_cycle" type="integer" desc="Number of days between each required budget payment"/>
+	<table name="Payment_Plan" abbrev="pmtpn" type="Audit,Secure">
+		<column name="plan_id" type="autoinc" primarykey="yes" desc="Unique ID for specific Budget record"/>
+		<column name="person_id" indexed="yes" lookupref="person.person_id" descr="Person opening this Payment Plan"/>
+		<column name="owner_org_id" indexed="yes" lookupref="Org.org_internal_id" descr="The Org that owns this Payment Plan"/>
+		<column name="payment_cycle" type="integer" desc="Number of days between each required payment"/>
 		<column name="payment_min" type="currency" desc="Minimum amount of each payment"/>
 		<column name="first_due" type="date" desc="Date first payment is due"/>
-		<column name="payment_balance" type="currency" desc="Balance remaining on current cycle's payment"/>
-		<column name="num_payments" type="integer" desc="Number of payments already made"/>
-		<column name="next_due" type="date" desc="Due date of next payment"/>
+		<column name="balance" type="currency" desc="Balance remaining on current cycle's payment"/>
+		<column name="next_due" indexed="yes" type="date" desc="Due date of next payment"/>
+		<column name="lastpay_amount" type="currency" desc="Last payment amount"/>
+		<column name="lastpay_date" type="date" desc="Last payment date"/>
+		<column name="laststmt_date" type="date" desc="Last statement send date"/>
+		<column name="inv_ids" type="text_set" descr="Invoice IDs included in this Payment Plan"/>
+	</table>
+
+	<table name="Payment_History" abbrev="PmtHist" parent="Payment_Plan" type="Audit,Secure">
+		<description>A history of payments made for a Payment Plan.</description>
+		<column name="item_id" type="autoinc" primarykey="yes" descr="The unique item identification"/>
+		<column name="parent_id" lookupref="Payment_Plan.plan_id" indexed="yes" required="yes" descr="The owner of the item"/>
+		<column name="value_text" type="text" size="512" indexed="yes" descr="For 'Text' usage"/>
+		<column name="value_int" type="longint" descr="For use in 'Integer' and 'Boolean' types"/>
+		<column name="value_float" type="float" descr="For use in 'Float' type"/>
+		<column name="value_date" type="date" indexed="yes" descr="For generic use"/>
+		<column name="value_stamp" type="stamp" indexed="yes" descr="For generic use"/>
 	</table>
 
 	<table name="Invoice_Item" abbrev="InvItem" type="Audit,Secure,">
@@ -711,15 +726,15 @@
 
 	<table name="Statement" abbrev="Stmt" type="Secure,Audit">
 		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
-		<column name="payto_id" lookupref="org.org_internal_id" descr="Pay To Billing Org ID"/>
-		<column name="billto_id" type="text" size="16" descr="Org ID or Person ID who's paying for this Statement"/>
+		<column name="payto_id" indexed="yes" lookupref="org.org_internal_id" descr="Pay To Billing Org ID"/>
+		<column name="billto_id" indexed="yes" type="text" size="16" descr="Org ID or Person ID who's paying for this Statement"/>
 		<column name="billto_type" lookupref="Invoice_Bill_Party_Type" descr="The party that should be billed for this item"/>
-		<column name="patient_id" lookupref="person.person_id" descr="Patient person ID"/>
+		<column name="patient_id" indexed="yes" lookupref="person.person_id" descr="Patient person ID"/>
 		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>
-		<column name="transmission_stamp" type="stamp" descr="Date Statement was sent " />
+		<column name="transmission_stamp" indexed="yes" type="stamp" descr="Date Statement was sent " />
 		<column name="transmission_status" lookupref="transmission_status.id" type="integer" descr="Transmission Status"/>
 		<column name="ack_stamp" type="stamp" descr="Date statement was acknowledge"/>
-		<column name="int_statement_id" type="autoinc" descr="Physia Internal Statement ID"/>
+		<column name="int_statement_id" indexed="yes" type="autoinc" descr="Physia Internal Statement ID"/>
 		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>
 		<column name="amount_due" type="currency" descr="The total amount due on Statement"/>
 		<column name="inv_ids" type="text_set" descr="Invoice IDs included in this Statement"/>

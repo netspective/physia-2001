@@ -27,7 +27,7 @@ sub getForm
 	my ($self, $flags) = @_;
 
 	return ('Adhoc Query', qq{
-		<textarea name=query rows=10 cols=80 style="font-family:Lucida; font-size:8pt">} .
+		<textarea name=query rows=10 cols=140 style="font-family:Verdana; font-size:8pt">} .
 		qq{@{[ $self->param('query')]}
 		</textarea>
 		<input type=submit name="execute" value="Go">
@@ -39,7 +39,7 @@ sub execute
 	my ($self) = @_;
 
 	my $query = App::Data::Manipulate::trim($self->param('query'));
-	
+
 	if ($query =~ /^alter/i || $query =~ /^select/i)
 	{
 		$self->addContent($STMTMGR_SCHEDULING->createHtml($self, STMTMGRFLAG_DYNAMICSQL, $query));

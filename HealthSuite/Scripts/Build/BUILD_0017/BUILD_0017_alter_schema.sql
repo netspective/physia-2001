@@ -1,19 +1,14 @@
 alter table Org add (time_zone_temp varchar2(20));
-update Org set time_zone_temp=time_zone;
-update Org set time_zone=null;
+update Org set time_zone_temp = time_zone where time_zone is not null;
+update Org set time_zone = null where time_zone is not null;
 alter table Org modify (time_zone varchar2(10));
 alter table Org drop (time_zone_temp);
 
 alter table Org_Aud add (time_zone_temp varchar2(20));
-update Org_Aud set time_zone_temp=time_zone;
-update Org_Aud set time_zone=null;
+update Org_Aud set time_zone_temp = time_zone where time_zone is not null;
+update Org_Aud set time_zone = null where time_zone is not null;
 alter table Org_Aud modify (time_zone varchar2(10));
 alter table Org_Aud drop (time_zone_temp);
-
-
-alter table Invoice add (BUDGET_ID NUMBER(16));
-alter table Invoice_Aud add (BUDGET_ID NUMBER(16));
-start tables-code/Invoice
 
 drop index INVOICE_BUDGET_ID;
 create index INVOICE_BUDGET_ID on Invoice (budget_id) TABLESPACE TS_INDEXES;
@@ -36,5 +31,14 @@ alter sequence STMT_INT_STATEMENT_ID_SEQ maxvalue 999999 cycle;
 start tables/Invoice_History
 start tables-code/Invoice_History
 
-start tables/Invoice_Budget
-start tables-code/Invoice_Budget
+start tables/Payment_Plan
+start tables/Payment_Plan_Inv_ids
+start tables-code/Payment_Plan
+
+start tables/Payment_History
+start tables-code/Payment_History
+
+delete from Payment_Type where id = 9;
+insert into Payment_Type (id, caption, group_name) values (9, 'Budget-payment', 'personal');
+
+insert into Session_Action_Type (id, caption) values (9, 'Setup');

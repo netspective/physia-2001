@@ -9,6 +9,7 @@ use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Statements::Catalog;
 use App::Statements::Insurance;
+use App::Statements::BillingStatement;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Dialog::Field::Person;
@@ -17,6 +18,7 @@ use App::Universal;
 use App::InvoiceUtilities;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
+use Date::Calc qw(:all);
 
 use vars qw(@ISA %RESOURCE_MAP);
 use constant NEXTACTION_PATIENTSUMMARY => "/person/%field.payer_id%/profile";
@@ -355,7 +357,6 @@ sub executePostPayment
 			_debug => 0
 		);
 
-
 		# Create adjustment for the item
 		my $comments = $page->param("_f_invoice_$line\_comments");
 		my $adjItemId = $page->schemaAction(
@@ -415,11 +416,56 @@ sub executePostPayment
 		);
 		$page->session('batch_id', $batchId);
 
+		if ($page->field('pay_type') == 9) # Budget Payment
+		{
+			my $paymentPlan = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE,
+				'sel_paymentPlan', $page->field('payer_id'), $page->session('org_internal_id'));
+
+			if (my $planId = $paymentPlan->{plan_id})
+			{
+				$page->schemaAction(
+					'Payment_Plan', 'update',
+					plan_id => $planId,
+					lastpay_amount => $totalAmtRecvd,
+					lastpay_date => $todaysDate,
+					balance => $paymentPlan->{balance} - $totalAmtRecvd,
+					next_due => nextDueDate($paymentPlan),
+				);
+				$page->schemaAction(
+					'Payment_History', 'add',
+					parent_id => $planId,
+					value_stamp => $page->getTimeStamp(),
+					value_float => $totalAmtRecvd,
+					value_text => "$comments " . "Batch ID: $batchId",
+				);
+			}
+		}
+
 		if($invoiceBalance == 0)
 		{
 			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 		}
 	}
+}
+
+sub nextDueDate
+{
+	my ($paymentPlan) = @_;
+
+	my $dateFormat = '%m/%d/%Y';
+	my $planDueDate = $paymentPlan->{next_due};
+	my $billingCycle = $paymentPlan->{payment_cycle};
+
+	my $nextDueDate = $billingCycle == 30 ? DateCalc($planDueDate, "+ 1 month") :
+		DateCalc($planDueDate, "+ $billingCycle days");
+
+	while (Delta_Days(Today(), Decode_Date_US(UnixDate($nextDueDate, $dateFormat))) < 0)
+	{
+		$nextDueDate = $billingCycle == 30 ? DateCalc($nextDueDate, "+ 1 month") :
+			DateCalc($nextDueDate, "+ $billingCycle days");
+	}
+
+	return UnixDate($nextDueDate, $dateFormat);
 }
 
 1;

@@ -1041,6 +1041,11 @@
 				<col name="caption">Copay</col>
 				<col name="group_name">personal</col>
 			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Budget-payment</col>
+				<col name="group_name">personal</col>
+			</row>
 		</data>
 	</table>
 
