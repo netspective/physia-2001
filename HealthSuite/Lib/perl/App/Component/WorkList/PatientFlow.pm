@@ -283,16 +283,16 @@ sub getComponentHtml
 			},
 
 			qq{<nobr>
-				<A HREF='/person/$_->{patient_id}/dlg-confirm-appointment/$_->{event_id}'
+				<A HREF='/person/$_->{patient_id}/dlg-confirm-appointment/$_->{event_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Confirm Appointment'>$apptVerifyIcon</A>
 
-				<A HREF='/person/$_->{patient_id}/dlg-verify-insurance-records/$_->{event_id}/$_->{patient_id}'
+				<A HREF='/person/$_->{patient_id}/dlg-verify-insurance-records/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Verify Insurance Records'>$insVerifyIcon</A>
 
-				<A HREF='/person/$_->{patient_id}/dlg-verify-medical/$_->{event_id}/$_->{patient_id}'
+				<A HREF='/person/$_->{patient_id}/dlg-verify-medical/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Verify Medical Records'>$medVerifyIcon</A>
 
-				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}'
+				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Verify Personal Records'>$perVerifyIcon</A>
 
 				<A HREF="javascript:doActionPopup('/person/$_->{patient_id}/facesheet')"
