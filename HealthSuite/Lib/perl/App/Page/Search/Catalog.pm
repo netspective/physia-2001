@@ -50,8 +50,7 @@ sub execute
 
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $bindParams = [$self->session('org_internal_id') || $self->session('org_internal_id'), uc($expression)];
-	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
+	my $bindParams = [$self->session('org_internal_id'), uc($expression)];
 	$self->addContent(
 		'<CENTER>',
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
@@ -60,12 +59,8 @@ sub execute
 				"sel_catalog_$type$appendStmtName", $bindParams),
 		'</CENTER>'
 	);
-
 	return 1;
 }
-
-
-
 
 sub execute_detail
 {
@@ -76,11 +71,10 @@ sub execute_detail
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
-				'sel_catalog_detail',	[uc($expression)],
+				'sel_catalog_detail', [uc($expression)],
 		),
 		'</CENTER>'
 	);
-
 	return 1;
 }
 
@@ -94,11 +88,10 @@ sub execute_detailname
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
-				'sel_catalog_detail_name',[$self->session('org_internal_id'),uc($expression)],
+				'sel_catalog_detail_name', [$self->session('org_internal_id'),uc($expression)],
 		),
 		'</CENTER>'
 	);
-
 	return 1;
 }
 
