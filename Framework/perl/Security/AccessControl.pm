@@ -167,11 +167,21 @@ sub definePermissions
 				push(@myParents, ($parentId ? '/' : '') . ($_->{root} || $_->{id}));
 			}
 			my $myParents = join('/', @myParents);
+			
+			# if the id is not specified, we're autogenerating an identifier
+			if(exists $activeNode->{id} && $activeNode->{id} eq '-')
+			{
+				my $generateId = $alias;
+				$generateId =~ s/\//\-/g;
+				$myParents .= '/' . $generateId;
+			}
+			
 			for (my $permId = $aliasPermissions->first; defined $permId; $permId = $aliasPermissions->next)
 			{
 				my $aliasId = $permissionList->[$permId]->[PERMISSIONINFOIDX_ID];
 				my $aliasChildPerms = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
 				$aliasId =~ s/^$alias/$myParents/;
+				print "  aliasId $aliasId\n";
 				$permissionIds->{$aliasId} = [$permId, $aliasId, new Set::IntSpan];
 				$permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
 			}
