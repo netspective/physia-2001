@@ -60,7 +60,9 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
+		
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'submission_order'),
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
@@ -68,8 +70,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'secondary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_type'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_ins_id'),
+		#new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
@@ -162,23 +164,29 @@ sub initialize
 
 
 
-		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To', name => 'org_fields',
+		#new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To', name => 'org_fields',
+		#	hints => 'Service Org is the org in which services were rendered.<br>
+		#				Billing org is the org in which the billing should be tracked.<br>
+		#				Pay To org is the org which should receive payment.',
+		new CGI::Dialog::MultiField(caption => 'Org Service/Billing', name => 'org_fields',
 			hints => 'Service Org is the org in which services were rendered.<br>
-						Billing org is the org in which the billing should be tracked.<br>
-						Pay To org is the org which should receive payment.',
+						Billing org is the org in which the billing should be tracked.',
 			fields => [
 				new App::Dialog::Field::OrgType(
 							caption => 'Service Facility',
 							name => 'service_facility_id',
+							options => FLDFLAG_REQUIRED,
 							types => "'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Billing Org',
 							name => 'billing_facility_id',
+							options => FLDFLAG_REQUIRED,
 							types => "'PRACTICE'"),
-				new App::Dialog::Field::OrgType(
-							caption => 'Pay To Org',
-							name => 'pay_to_org_id',
-							types => "'PRACTICE'"),
+				#new App::Dialog::Field::OrgType(
+				#			caption => 'Pay To Org',
+				#			name => 'pay_to_org_id',
+				#			options => FLDFLAG_REQUIRED,
+				#			types => "'PRACTICE'"),
 			]),
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
@@ -285,25 +293,31 @@ sub makeStateChanges
 	}
 
 	my $invoiceId = $page->param('invoice_id');
-	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	#my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $invoiceFlags = $invoiceInfo->{flags};
-	if($invoiceFlags & $attrDataFlag)
+	#my $invoiceFlags = $invoiceInfo->{flags};
+
+	my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
+	unless($submitOrder->{value_int} == 0 || $invoiceInfo->{invoice_status} > App::Universal::INVOICESTATUS_SUBMITTED)
 	{
-		#$self->setFieldFlags('trans_type', FLDFLAG_READONLY);
-		#$self->setFieldFlags('accident', FLDFLAG_READONLY);
-		#$self->setFieldFlags('accident_state', FLDFLAG_READONLY);
-		#$self->setFieldFlags('deduct_balance', FLDFLAG_READONLY);
-		#$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
-		#$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
-		#$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
-		#$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
-		#$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
-		#$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
-		#$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
-		#$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
-		#$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
-		#$self->setFieldFlags('comments', FLDFLAG_READONLY);
+		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
+		$self->setFieldFlags('trans_type', FLDFLAG_READONLY);
+		$self->setFieldFlags('accident', FLDFLAG_READONLY);
+		$self->setFieldFlags('accident_state', FLDFLAG_READONLY);
+		$self->setFieldFlags('deduct_balance', FLDFLAG_READONLY);
+		$self->setFieldFlags('payer', FLDFLAG_READONLY);
+		$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
+		$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
+		$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
+		$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
+		$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
+		$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
+		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
+		$self->setFieldFlags('comments', FLDFLAG_READONLY);
 	}
 }
 
@@ -402,18 +416,22 @@ sub populateData
 		$page->field('billing_contact', $billContactData->{value_text});
 		$page->field('billing_phone', $billContactData->{value_textb});
 
-		my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
-		$page->field('pay_to_org_item_id', $payToOrg->{item_id});
-		$page->field('pay_to_org_id', $payToOrg->{value_textb});
+		#my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
+		#$page->field('pay_to_org_item_id', $payToOrg->{item_id});
+		#$page->field('pay_to_org_id', $payToOrg->{value_textb});
 
-		my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
-		$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
+		#my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
+		#$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
 
-		my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
-		$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
+		#my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
+		#$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
 
 		my $claimFiling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Claim Filing/Indicator');
 		$page->field('claim_filing_item_id', $claimFiling->{item_id});
+
+		my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
+		my $subOrderValue = $submitOrder->{value_int} == 0 ? 0 : 1;
+		$page->field('submission_order', $subOrderValue);
 
 		my $assignment = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Assignment of Benefits');
 		my $value = $assignment->{value_int} ? 1 : 0;
@@ -538,7 +556,7 @@ sub setPayerFields
 				my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
 				$thirdPartyId = $org->{org_id};
 			}
-			push(@thirdParties, "$ins->{group_name}($thirdPartyId)");
+			push(@thirdParties, "$ins->{group_name}($thirdPartyId):$ins->{ins_internal_id}");
 		}		
 	}
 
@@ -594,7 +612,6 @@ sub voidInvoicePostSubmit
 	#CONSTANTS -------------------------------------------
 
 	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
-	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 	my $transType = App::Universal::TRANSTYPEACTION_VOID;
 
@@ -625,28 +642,22 @@ sub voidInvoicePostSubmit
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $oldInvoiceId);
 	my @claimDiags = split(/\s*,\s*/, $invoiceInfo->{claim_diags});
 	my $invoiceType = $invoiceInfo->{invoice_type};
-	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	my $claimType = $invoiceInfo->{invoice_subtype};
-	my $totalCost = 0 - $invoiceInfo->{total_cost};
-	my $balance = $totalCost;
 	my $invoiceId = $page->schemaAction(
 		'Invoice', 'add',
 		parent_invoice_id => $oldInvoiceId || undef,
 		invoice_type => defined $invoiceType ? $invoiceType : undef,
 		invoice_subtype => defined $claimType ? $claimType : undef,
-		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		invoice_status => App::Universal::INVOICESTATUS_VOID,
 		invoice_date => $page->getDate() || undef,
 		main_transaction => $transId || undef,
 		submitter_id => $invoiceInfo->{submitter_id} || undef,
 		claim_diags => join(', ', @claimDiags) || undef,
-		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		owner_type => $invoiceInfo->{owner_type} || undef,
 		owner_id => $invoiceInfo->{owner_id} || undef,
 		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
-		client_id => $personId || undef,
-		#total_items => $invoiceInfo->{total_items} || undef,
-		#total_adjust => $totalAdjust || undef,
-		#total_cost => $totalCost || undef,
-		#balance => $balance || undef,
+		client_id => $invoiceInfo->{client_id} || undef,
+		billing_id => $invoiceInfo->{billing_id} || undef,
 		_debug => 0
 	);
 
@@ -656,11 +667,8 @@ sub voidInvoicePostSubmit
 		my $itemType = $item->{item_type};
 
 		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
-		#next if $itemType == App::Universal::INVOICEITEMTYPE_VOID;
-		#next if $item->{data_text_b} eq 'void';
 
 		my $extCost = 0 - $item->{extended_cost};
-		my $itemBalance = $extCost;
 		my $emg = $item->{emergency};
 		$page->schemaAction(
 			'Invoice_Item', 'add',
@@ -683,7 +691,6 @@ sub voidInvoicePostSubmit
 			data_text_a => $item->{data_text_a} || undef,
 			data_num_a => $item->{data_num_a} || undef,
 			extended_cost => $extCost || undef,
-			#balance => $itemBalance || undef,
 			_debug => 0
 		);
 	}
@@ -697,6 +704,8 @@ sub voidInvoicePostSubmit
 		$page->schemaAction(
 			'Invoice_Billing', 'add',
 			invoice_id => $invoiceId || undef,
+			invoice_item_id => $billingRec->{invoice_item_id} || undef,
+			assoc_bill_id => $billingRec->{assoc_bill_id} || undef,
 			bill_sequence => defined $billSeq ? $billSeq : undef,
 			bill_party_type => defined $billPartyType ? $billPartyType : undef,
 			bill_to_id => $billingRec->{bill_to_id} || undef,
@@ -718,7 +727,7 @@ sub voidInvoicePostSubmit
 		parent_id => $invoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "This invoice is a voided copy of claim $oldInvoiceId",
+		value_text => "This invoice is a voided copy of invoice $oldInvoiceId",
 		value_date => $todaysDate,
 		_debug => 0
 	);
@@ -729,9 +738,16 @@ sub voidInvoicePostSubmit
 		parent_id => $oldInvoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Invoice $invoiceId is a voided copy of this claim",
+		value_text => "Invoice $invoiceId is a voided copy of this invoice",
 		value_date => $todaysDate,
 		_debug => 0
+	);
+
+	#void original claim
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $oldInvoiceId || undef,
+		invoice_status => App::Universal::INVOICESTATUS_VOID,
 	);
 }
 
@@ -742,6 +758,7 @@ sub handlePayers
 
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
+	my $currStatus = $page->field('current_status');
 	if($command eq 'update' && ($invoiceFlags & $attrDataFlag))
 	{
 		$command = 'add';
@@ -839,8 +856,7 @@ sub handlePayers
 			);
 		
 		$page->field('primary_payer', $fakeProdNameThirdParty);
-		$page->field('third_party_payer_id', $otherPayerId);
-		$page->field('third_party_payer_type', $otherPayerType);
+		$page->field('third_party_payer_ins_id', $insIntId);
 		$page->field('claim_type', $typeClient);
 	}
 	else
@@ -886,24 +902,21 @@ sub handlePayers
 				$page->field('claim_type', $primIns->{ins_type});
 				$page->field('primary_payer', $primIns->{product_name});
 			}
-			elsif($nonInsPayer[0] eq 'Third-Party')
-			{
-				my @thirdPartyId = split('\)', $nonInsPayer[1]);
-				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $thirdPartyId[0], $typeClient);
-				$page->field('claim_type', $typeClient);
-				$page->field('primary_payer', $fakeProdNameThirdParty);
-				$page->field('third_party_payer_id', $thirdPartyPlan->{guarantor_id});
-				$thirdPartyPlan->{guarantor_type} == App::Universal::ENTITYTYPE_PERSON ? 
-					$page->field('third_party_payer_type', 'person') : $page->field('third_party_payer_type', 'Org');
-			}
-			#elsif($nonInsPayer[0] eq 'Work Comp')
 			else
 			{
-				my @wcPlanName = split('\)', $nonInsPayer[1]);
-				#my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, $typeWorkComp);
-				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $nonInsPayer[0]);
-				$page->field('claim_type', $typeWorkComp);
-				$page->field('primary_payer', $workCompPlanInfo->{product_name});
+				my $wcOrThirdPartyPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $nonInsPayer[0]);
+				my $claimType = $wcOrThirdPartyPlanInfo->{ins_type};
+				$page->field('claim_type', $claimType);
+				
+				if($claimType == $typeClient)
+				{				
+					$page->field('primary_payer', $fakeProdNameThirdParty);
+					$page->field('third_party_payer_ins_id', $wcOrThirdPartyPlanInfo->{ins_internal_id});
+				}
+				elsif($claimType == $typeWorkComp)
+				{
+					$page->field('primary_payer', $wcOrThirdPartyPlanInfo->{product_name});
+				}
 			}
 		}
 	}
@@ -1248,45 +1261,45 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	my $payToOrgIntId = $page->field('pay_to_org_id');
-	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
-	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-	my $payToOrgId = $payToFacilityInfo->{org_id};
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('pay_to_org_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Pay To Org/Name',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $payToFacilityInfo->{name_primary} || undef,
-			value_textB => $payToOrgId || undef,
-			value_int => $payToOrgIntId || undef,
-			_debug => 0
-	);
+	#my $payToOrgIntId = $page->field('pay_to_org_id');
+	#my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
+	#my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
+	#my $payToOrgId = $payToFacilityInfo->{org_id};
+	#$page->schemaAction(
+	#		'Invoice_Attribute', $command,
+	#		item_id => $page->field('pay_to_org_item_id') || undef,
+	#		parent_id => $invoiceId,
+	#		item_name => 'Pay To Org/Name',
+	#		value_type => defined $textValueType ? $textValueType : undef,
+	#		value_text => $payToFacilityInfo->{name_primary} || undef,
+	#		value_textB => $payToOrgId || undef,
+	#		value_int => $payToOrgIntId || undef,
+	#		_debug => 0
+	#);
 
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('pay_to_org_tax_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Pay To Org/Tax ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $payToFacilityInfo->{tax_id} || undef,
-			value_textB => $payToOrgId || undef,
-			value_int => $payToOrgIntId || undef,
-			_debug => 0
-	);
+	#$page->schemaAction(
+	#		'Invoice_Attribute', $command,
+	#		item_id => $page->field('pay_to_org_tax_item_id') || undef,
+	#		parent_id => $invoiceId,
+	#		item_name => 'Pay To Org/Tax ID',
+	#		value_type => defined $textValueType ? $textValueType : undef,
+	#		value_text => $payToFacilityInfo->{tax_id} || undef,
+	#		value_textB => $payToOrgId || undef,
+	#		value_int => $payToOrgIntId || undef,
+	#		_debug => 0
+	#);
 
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('pay_to_org_phone_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Pay To Org/Phone',
-			value_type => defined $phoneValueType ? $phoneValueType : undef,
-			value_text => $payToFacilityPhone->{value_text} || undef,
-			value_textB => $payToOrgId || undef,
-			value_int => $payToOrgIntId || undef,
-			_debug => 0
-	);
+	#$page->schemaAction(
+	#		'Invoice_Attribute', $command,
+	#		item_id => $page->field('pay_to_org_phone_item_id') || undef,
+	#		parent_id => $invoiceId,
+	#		item_name => 'Pay To Org/Phone',
+	#		value_type => defined $phoneValueType ? $phoneValueType : undef,
+	#		value_text => $payToFacilityPhone->{value_text} || undef,
+	#		value_textB => $payToOrgId || undef,
+	#		value_int => $payToOrgIntId || undef,
+	#		_debug => 0
+	#);
 
 	my $feeSchedules = $page->param("_f_proc_active_catalogs");
 	$page->schemaAction(
@@ -1315,19 +1328,39 @@ sub handleInvoiceAttrs
 	{
 		my $oldInvoiceId = $page->field('old_invoice_id');
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => "This claim is a copy of claim $oldInvoiceId which has been transferred.",
-				value_textB => $page->field('comments') || undef,
-				value_date => $todaysDate,
-				_debug => 0
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => "This invoice is a new copy of invoice $oldInvoiceId which has been submitted and voided",
+			value_textB => $page->field('comments') || undef,
+			value_date => $todaysDate,
+			_debug => 0
+		);
+
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $oldInvoiceId,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => "Invoice $invoiceId is a new copy of this invoice",
+			value_date => $todaysDate,
+			_debug => 0
+		);
+
+		#update original claim - make it's parent_invoice the new invoice
+		$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $oldInvoiceId || undef,
+			parent_invoice_id => $invoiceId,
 		);
 	}
 
 	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
-	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
+	if($page->field('submission_order') == 0 || $command eq 'add')
+	{
+		handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
+	}
 }
 
 sub handleBillingInfo
@@ -1353,7 +1386,7 @@ sub handleBillingInfo
 
 	$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delInvoiceBillingParties', $invoiceId) if $command ne 'add';
 
-
+	my $billId = '';
 
 	#------PRIMARY PAYER
 
@@ -1381,11 +1414,11 @@ sub handleBillingInfo
 		}
 		elsif($primPayer == $fakeProdNameThirdParty)
 		{
-			my $thirdPartyId = $page->field('third_party_payer_id');
-			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
+			my $thirdPartyInsId = $page->field('third_party_payer_ins_id');
+			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $thirdPartyInsId);
 
-			$billParty = $page->field('third_party_payer_type') eq 'person' ? $billPartyTypePerson : $billPartyTypeOrg;
-			$billToId = $thirdPartyId;
+			$billParty = $insInfo->{guarantor_type} == App::Universal::ENTITYTYPE_PERSON ? $billPartyTypePerson : $billPartyTypeOrg;
+			$billToId = $insInfo->{guarantor_id};
 			$billInsId = $insInfo->{ins_internal_id};
 			#$billAmt = '';
 			#$billPct = '';
@@ -1409,7 +1442,7 @@ sub handleBillingInfo
 		}
 
 		my $primBillSeq = App::Universal::PAYER_PRIMARY;
-		$page->schemaAction(
+		$billId = $page->schemaAction(
 			'Invoice_Billing', 'add',
 			invoice_id => $invoiceId || undef,
 			bill_sequence => defined $primBillSeq ? $primBillSeq : undef,
@@ -1598,6 +1631,7 @@ sub handleBillingInfo
 		);
 	}
 
+	setCurrentPayer($self, $page, $invoiceId, $billId);
 
 
 	#redirect to next function according to copay due
@@ -1647,6 +1681,18 @@ sub handleBillingInfo
 	}
 }
 
+sub setCurrentPayer
+{
+	my ($self, $page, $invoiceId, $billId) = @_;
+	
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		billing_id => $billId,
+	);
+
+}
+
 sub billCopay
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
@@ -1665,7 +1711,6 @@ sub billCopay
 		parent_id => $invoiceId || undef,
 		item_type => defined $itemType ? $itemType : undef,
 		extended_cost => defined $copayAmt ? $copayAmt : undef,
-		#balance => defined $copayAmt ? $copayAmt : undef,
 		_debug => 0
 	);
 
@@ -1687,22 +1732,6 @@ sub billCopay
 		_debug => 0
 	);
 
-
-
-	#UPDATE INVOICE
-
-	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	#my $totalItems = $invoice->{total_items} + 1;
-	#my $totalCost = $invoice->{total_cost} + $copayAmt;
-	#my $invBalance = $totalCost + $invoice->{total_adjust};
-	#$page->schemaAction(
-	#	'Invoice', 'update',
-	#	invoice_id => $invoiceId || undef,
-	#	total_items => defined $totalItems ? $totalItems : undef,
-	#	total_cost => defined $totalCost ? $totalCost : undef,
-	#	balance => defined $invBalance ? $invBalance : undef,
-	#	_debug => 0
-	#);
 
 
 	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
@@ -1781,7 +1810,6 @@ sub handleProcedureItems
 
 
 		$record{extended_cost} = $record{unit_cost} * $record{quantity};
-		#$record{balance} = $record{extended_cost};
 
 
 		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
@@ -1790,38 +1818,6 @@ sub handleProcedureItems
 			parent_id => $invoiceId,
 			_debug => 0,
 		);
-
-
-
-		#UPDATE INVOICE
-
-		#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-
-		#my $totalItems = $invoice->{total_items};
-		#if($command eq 'add')
-		#{
-		#	$totalItems = $invoice->{total_items} + 1;
-		#}
-
-		#my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-		#my $totalCostForInvoice = 0;
-		#my $totalAdjustForInvoice = 0;
-		#foreach my $item (@{$allInvItems})
-		#{
-		#	$totalCostForInvoice += $item->{extended_cost};
-		#	$totalAdjustForInvoice += $item->{total_adjust};
-		#}
-
-		#my $invBalance = $totalCostForInvoice + $totalAdjustForInvoice;
-
-		#$page->schemaAction('Invoice', 'update',
-		#	invoice_id => $invoiceId,
-		#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-		#	total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-		#	total_items => defined $totalItems ? $totalItems : undef,
-		#	balance => defined $invBalance ? $invBalance : undef,
-		#	_debug => 0
-		#);
 	}
 }
 
@@ -1852,7 +1848,6 @@ sub voidProcedureItem
 			unit_cost => $invItem->{unit_cost} || undef,
 			quantity => $invItem->{quantity} || undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			#balance => defined $itemBalance ? $itemBalance : undef,
 			emergency => defined $emg ? $emg : undef,
 			#comments => $comments || undef,
 			hcfa_service_place => defined $invItem->{hcfa_service_place} ? $invItem->{hcfa_service_place} : undef,
@@ -1872,29 +1867,6 @@ sub voidProcedureItem
 		);
 
 
-	## UPDATE INVOICE TO WHICH ITEM BELONGS
-
-	#my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-	#my $totalCostForInvoice = '';
-	#foreach my $item (@{$allInvItems})
-	#{
-	#	$totalCostForInvoice += $item->{extended_cost};
-	#}
-
-	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	#my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
-	#my $totalItems = $invoice->{total_items} - 1;
-	#$page->schemaAction(
-	#		'Invoice', 'update',
-	#		invoice_id => $invoiceId || undef,
-	#		total_items => defined $totalItems ? $totalItems : undef,
-	#		total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-	#		balance => defined $invBalance ? $invBalance : undef,
-	#		_debug => 0
-	#	);
-
-
-
 	## ADD HISTORY ATTRIBUTE
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
@@ -1902,7 +1874,6 @@ sub voidProcedureItem
 			item_name => 'Invoice/History/Item',
 			value_type => App::Universal::ATTRTYPE_HISTORY,
 			value_text => "Voided $cptCode",
-			#value_textB => $comments || undef,
 			value_date => $todaysDate || undef,
 			_debug => 0
 	);
