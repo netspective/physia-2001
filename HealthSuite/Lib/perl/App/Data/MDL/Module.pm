@@ -92,6 +92,18 @@ sub schemaAction
 	return $self->{schema}->schemaAction($self, $table, $command, %params);
 }
 
+sub getSqlLog
+{
+	return $_[0]->{sqlLog};
+}
+
+sub clearSqlLog
+{
+	my $self = shift;
+	$self->{sqlLog} = [];
+	return $self->{sqlLog};
+}
+
 sub translateEnum
 {
 	my ($self, $flags, $tableName, $value) = @_;
