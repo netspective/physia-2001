@@ -36,7 +36,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'value_text', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'value_text', types => ['Physician', 'Referring-Doctor'], hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(caption => 'Is Primary Physician?', type => 'bool', name => 'value_int', style => 'check', hints => 'Please check the check-box if the Physician is Primary Physician '),
 		new CGI::Dialog::Field(caption => 'Specialty',
 								#type => 'foreignKey',
