@@ -67,6 +67,16 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where org_internal_id = ?
 		and upper(catalog_id) = (?)
 	},
+	'selPlanAllowedByProdAndCode' => qq
+	{
+		select ocp.allowed_cost
+		from Offering_Catalog_Entry oce, Offering_CatEntry_Price ocp, Contract_Catalog cc
+		where cc.internal_contract_id = ocp.internal_contract_id
+		and ocp.entry_id = oce.entry_id
+		and cc.product_ins_id = ?
+		and cc.org_internal_id = ?
+		and oce.code = ?		
+	},
 	'selInternalCatalogIdByIdType' => qq
 	{
 		select * from Offering_catalog
