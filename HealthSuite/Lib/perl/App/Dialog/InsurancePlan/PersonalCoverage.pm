@@ -26,6 +26,8 @@ use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
 
+my $INSURED_SELF = 1;
+my $INSURED_OTHER = 9;
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'coverage', heading => '$Command Personal Insurance Coverage');
@@ -76,7 +78,8 @@ sub new
 
 			new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
 							types => ['Patient'],
-							name => 'insured_id', options => FLDFLAG_REQUIRED
+							name => 'insured_id',
+							#options => FLDFLAG_REQUIRED
 							),
 
 			new CGI::Dialog::MultiField(name => 'rel_other_rel',
@@ -187,12 +190,12 @@ sub makeStateChanges
 	my $otherRel = $self->getField('rel_other_rel')->{fields}->[1];
 	my $relationToIns = $page->field('rel_to_insured');
 	my $otherRelation = $page->field('extra');
-	if ($relationToIns == App::Universal::INSURED_OTHER && $otherRelation eq '')
+	if ($relationToIns == $INSURED_OTHER && $otherRelation eq '')
 	{
 		$otherRel->invalidate($page, "When the 'Relation To Insured' is 'Other', then the 'Other Relationship Name' cannot be blank");
 	}
 
-	if ($relationToIns != App::Universal::INSURED_OTHER && $otherRelation ne '')
+	if ($relationToIns != $INSURED_OTHER && $otherRelation ne '')
 	{
 		$otherRel->invalidate($page, "When the 'Relation To Insured' is not 'Other', then the 'Other Relationship Name' should be blank");
 	}
@@ -210,16 +213,24 @@ sub customValidate
 	my $relToInsuredField = $self->getField('rel_other_rel')->{fields}->[0];
 	my $insuredId = $page->field('insured_id');
 	my $insuredIdField = $self->getField('insured_id');
-	my $billSeq = $self->getField('bill_sequence');
-
+	my $billSeq = $self->getField('bill_sequence');	
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-	if ($relToInsured != App::Universal::INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
-	{
-		$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is '$personId'");
-		$insuredIdField->invalidate($page, "Valid insured ID is needed (other than '$personId') if '$relToInsuredField->{caption}' is other than 'Self.'");
+	if ($relToInsured != $INSURED_SELF && ($insuredId eq $personId || $insuredId eq ''))
+	{	
+		if($insuredId ne '')
+		{
+			$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is '$personId'");
+			$insuredIdField->invalidate($page, "Valid insured ID is needed (other than '$personId') if '$relToInsuredField->{caption}' is other than 'Self.'");
+		}
+		else
+		{
+			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient ',null,null,['_f_person_id'],['_f_insured_id']);};	
+			my $invMsg = qq{<a href="$createPersonHref">Create Insured Patient</a> };
+			$insuredIdField->invalidate($page, $invMsg)
+		}
 	}
 
-	elsif($relToInsured == App::Universal::INSURED_SELF && ($insuredId ne $personId && $insuredId ne ''))
+	elsif($relToInsured == $INSURED_SELF && ($insuredId ne $personId && $insuredId ne ''))
 	{
 		$relToInsuredField->invalidate($page, "Must select '$relToInsuredField->{caption}' (other than 'Self') if '$insuredIdField->{caption}' is not '$personId'.");
 		$insuredIdField->invalidate($page, "'$insuredIdField->{caption}' must be '$personId' when selecting 'Self' in '$relToInsuredField->{caption}'");
