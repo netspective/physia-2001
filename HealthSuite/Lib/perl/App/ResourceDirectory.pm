@@ -101,10 +101,11 @@ sub overrideClass
 	#
 	eval
 	{
-		if(my $session = CGI::Page::getActiveSession())
-		{	
+		if(my ($personId, $orgId) = CGI::Page::getActiveUser())
+		{
+			warn "Got back $personId $orgId from getActiveUser";
 			my $tryClass = $$className;
-			my $findId = $session->{person_id};
+			my $findId = $personId;
 			$tryClass =~ s/^App::/$findId\::/;
 
 			my $file = $tryClass;
@@ -119,7 +120,7 @@ sub overrideClass
 			}
 
 			$tryClass = $$className;
-			$findId = $session->{org_id};
+			$findId = $orgId;
 			$tryClass =~ s/^App::/$findId\::/;
 
 			$file = $tryClass;
@@ -132,7 +133,7 @@ sub overrideClass
 				${$className} = "Org::$tryClass";
 				return;
 			}
-		}	
+		}
 	};
 }
 
@@ -156,8 +157,8 @@ sub handlePage
 	return 'ARL-000200' unless defined $resource->{_class};
 	my $pageClass = $resource->{_class};
 	overrideClass(\$pageClass);
-	
-	my $page = $pageClass->new();	
+
+	my $page = $pageClass->new();
 	#$page->addDebugStmt("Class is $pageClass");
 	$page->property('resourceMap', $resource);
 	foreach (keys %{$resource})
@@ -180,15 +181,15 @@ sub handlePage
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
 	$page->param('_isPopup', 1) if $flags & PAGEFLAG_ISPOPUP;
-	
+
 	$page->setFlag($flags);
-	
+
 	# CGI.pm doesn't auto parse the URL Query String if we're in POST mode
 	if ($ENV{REQUEST_METHOD} eq 'POST')
 	{
 		$page->parse_params($params);
 	}
-	
+
 	return $page->handleARL($arl, $params, $resourceId, $pathItems);
 }
 
@@ -369,7 +370,7 @@ sub addResourcesFromModule
 sub registerResource
 {
 	my ($RESOURCES, $resourceId, $resourceData, $prefix, $class) = @_;
-	
+
 	$resourceData->{_id} = $prefix . $resourceId unless exists $resourceData->{_id};
 
 	# If the resource is a sub-resource, envoke the power of recursion
