@@ -19,9 +19,8 @@ use App::Statements::Search::Catalog;
 use App::Dialog::Organization;
 
 use App::Page::Search;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
@@ -316,7 +315,7 @@ sub prepare_view_catalog
 	{
 		$self->addContent(
 			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalogs_all_org', 0, 4],
-				[$self->session('org_id')]) );
+				[$self->param('org_id')]) );
 	}
 
 	return 1;
@@ -426,24 +425,5 @@ sub handleARL
 	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
 	return 0;
 }
-
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant ORG_SUMMARY => 'Organization/Summary';
-use constant ORG_ACCOUNT => 'Organization/Account';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/27/2000', 'RK',
-		ORG_SUMMARY,
-		'Added a new pane called Health Maintenance Rule'],
-);
 
 1;
