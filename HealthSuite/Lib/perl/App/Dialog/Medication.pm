@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.25 2001-01-22 17:17:59 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.26 2001-01-24 21:28:18 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -245,22 +245,22 @@ sub new
 		new CGI::Dialog::Field(caption => 'Prescribed By (If not in system)',
 			name => 'other_prescribed_by',
 		),
-		#new CGI::Dialog::Field(caption => 'Prescription Output',
-		#	name => 'destination',
-		#	type => 'select',
-		#	selOptions => 'Fax to Pharmacy:fax;Print to Printer:printer',
-		#	options => FLDFLAG_PREPENDBLANK,
-		#	onChangeJS => 'onChangeDestination();',
-		#),
-		#new App::Dialog::Field::Organization::ID(caption => 'Pharmacy',
-		#	name => 'pharmacy_id',
-		#),
+		new CGI::Dialog::Field(caption => 'Prescription Output',
+			name => 'destination',
+			type => 'select',
+			selOptions => 'Fax to Pharmacy:fax;Print to Printer:printer',
+			options => FLDFLAG_PREPENDBLANK,
+			onChangeJS => 'onChangeDestination();',
+		),
+		new App::Dialog::Field::Organization::ID(caption => 'Pharmacy',
+			name => 'pharmacy_id',
+		),
 		new CGI::Dialog::Field(type => 'password', caption => 'PIN#',
 			name => 'physician_pin', options => FLDFLAG_REQUIRED,
 		),
-		#new CGI::Dialog::Field(caption => 'Printer',
-		#	name => 'printer',
-		#),
+		new CGI::Dialog::Field(caption => 'Printer',
+			name => 'printer',
+		),
 		new CGI::Dialog::Field(
 			name => 'status',
 			type => 'hidden',
