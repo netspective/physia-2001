@@ -1,6 +1,7 @@
 package App::Billing::Output::TWCC::TWCC73;
 
 use App::Billing::Output::PDF::Report;
+use App::Billing::Claim::TWCC73;
 use pdflib 2.01;
 
 use constant LEFT_MARGIN => 48;
@@ -63,6 +64,7 @@ use constant BOLD_FONT_NAME => FONT_NAME . '-Bold';
 use constant DATEFORMAT_USA => 1;
 use constant PHONE_FORMAT_DASHES => 1;
 use constant LOGO_PATH => 'C:/Windows/Desktop/shared/blueseal.jpg';
+use constant DATE_FORMAT_USA => 1;
 
 sub new
 {
@@ -161,6 +163,27 @@ sub fillData
 	$self->box11Data($p, $claim, $mainBoxX+ BOX1_WIDTH + BOX5_WIDTH, $mainBoxY - PART1_HEIGHT - 2 * BOX_HEIGHT, $report);
 	$self->box12Data($p, $claim, $mainBoxX+ BOX1_WIDTH + BOX5_WIDTH, $mainBoxY - PART1_HEIGHT - 3 * BOX_HEIGHT, $report);
 
+	my $boxPart2Y = $mainBoxY - PART1_HEIGHT - 4 * BOX_HEIGHT - PART_SPACING;
+	$self->box13Data($p, $claim, $mainBoxX, $boxPart2Y - PART_HEIGHT, $report);
+
+	my $boxPart3Y = $boxPart2Y - PART_HEIGHT - BOX13_HEIGHT - PART_SPACING;
+	my $box14Y = $boxPart3Y - PART_HEIGHT;
+	$self->box14Data($p, $claim, $mainBoxX, $box14Y, $report);
+	$self->box15Data($p, $claim, $mainBoxX, $box14Y - BOX14_HEIGHT, $report);
+	$self->box16Data($p, $claim, $mainBoxX, $box14Y - BOX14_HEIGHT - BOX15_HEIGHT, $report);
+	$self->box17Data($p, $claim, $mainBoxX + BOX14_WIDTH, $box14Y, $report);
+	$self->box18Data($p, $claim, $mainBoxX + BOX14_WIDTH, $box14Y - BOX17_HEIGHT, $report);
+	$self->box19Data($p, $claim, $mainBoxX + BOX14_WIDTH + BOX17_WIDTH, $box14Y, $report);
+	$self->box20Data($p, $claim, $mainBoxX + BOX14_WIDTH + BOX17_WIDTH, $box14Y - BOX19_HEIGHT, $report);
+
+	my $boxPart4Y = $boxPart3Y - PART_HEIGHT - BOX14_HEIGHT - BOX15_HEIGHT - BOX16_HEIGHT - PART_SPACING;
+	my $box21Y = $boxPart4Y - PART_HEIGHT;
+	$self->box21Data($p, $claim, $mainBoxX, $box21Y, $report);
+	$self->box22Data($p, $claim, $mainBoxX + BOX21_WIDTH, $box21Y, $report);
+
+	my $box23Y = $box21Y - BOX21_HEIGHT;
+	$self->box26Data($p, $claim, $mainBoxX + BOX23_WIDTH + BOX24_WIDTH + BOX25_WIDTH, $box23Y, $report);
+	$self->box27Data($p, $claim, $mainBoxX + BOX23_WIDTH + BOX24_WIDTH + BOX25_WIDTH + BOX26_WIDTH, $box23Y, $report);
 }
 
 sub header
@@ -649,7 +672,12 @@ sub box13
 			'y' => $y - $arrY->[$i]
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x + 1, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + 6,
+			'y' => $y - $arrY->[$i]
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 
  	$arr = [
@@ -796,8 +824,7 @@ sub box14
 			'y2' => $y - ($i * 14) - 36
 		};
 		$report->drawLine($p, $properties);
-
-		$self->print5Q($p, $claim, $x + 82, $y - ($i * 14) - 28, $report);
+		$self->print5RadioButtonUnSelect($p, $claim, $x + 85, $y - ($i * 14) - 28, $report);
 	}
 
 
@@ -841,7 +868,12 @@ sub box15
 		};
 		$report->drawText($p,$properties);
 
-		$self->printQ($p, $claim, $x + $arrX->[$i] - 13, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + $arrX->[$i] - 9,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 
 }
@@ -949,7 +981,7 @@ sub box17
 		};
 		$report->drawLine($p, $properties);
 
-		$self->print5Q($p, $claim, $x + 82, $y - ($i * 14) - 28, $report);
+		$self->print5RadioButtonUnSelect($p, $claim, $x + 85, $y - ($i * 14) - 28, $report);
 	}
 }
 
@@ -996,11 +1028,15 @@ sub box18
 			'y' => $y - $arrY->[$i],
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x + 1, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + 5,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 
 }
-
 
 sub box19
 {
@@ -1053,7 +1089,12 @@ sub box19
 			'y' => $y - $arrY->[$i],
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x + $arrX->[$i] - 13, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + $arrX->[$i] - 10,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 }
 
@@ -1100,7 +1141,12 @@ sub box20
 			'y' => $y - $arrY->[$i],
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x + 1, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + 5,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 }
 
@@ -1156,10 +1202,10 @@ sub box22
 	$report->drawBox($p, $x, $y, BOX22_WIDTH, BOX22_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $arr = 	[
-					"Evaluation by the treating doctor on ____________________________ (date) at ____  :  ____ am/pm",
-					"Referral to/Consult with _______________________on ____________ (date) at ____  :  ____ am/pm",
-					"Physical medicine __ X per week for __ weeks starting on __________ (date) at ____  :  ____ am/pm",
-					"Special studies (list): ____________________________ on __________ (date) at ____  :  ____ am/pm",
+					"Evaluation by the treating doctor on ____________________________ (date) at _____________ am/pm",
+					"Referral to/Consult with _______________________on ____________ (date) at _____________ am/pm",
+					"Physical medicine __ X per week for __ weeks starting on __________ (date) at _____________ am/pm",
+					"Special studies (list): ____________________________ on __________ (date) at _____________ am/pm",
 					"None. This is the last scheduled visit for this problem. At this time, no further medical care is anticipated."
 				];
 
@@ -1173,9 +1219,13 @@ sub box22
 			'y' => $y - ($i * 12) - 10,
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x, $y - ($i * 12) - 10, $report);
+		$properties =
+		{
+			'x' => $x + 5,
+			'y' => $y - ($i * 12) - 10,
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
-
 }
 
 sub box23
@@ -1280,9 +1330,13 @@ sub box26
 			'y' => $y - $arrY->[$i],
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x - 1, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + 3,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
-
 }
 
 sub box27
@@ -1321,9 +1375,13 @@ sub box27
 			'y' => $y - $arrY->[$i],
 		};
 		$report->drawText($p,$properties);
-		$self->printQ($p, $claim, $x + $arrX->[$i] - 11, $y - $arrY->[$i], $report);
+		$properties =
+		{
+			'x' => $x + $arrX->[$i] - 8,
+			'y' => $y - $arrY->[$i],
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
-
 }
 
 sub footer
@@ -1374,13 +1432,18 @@ sub printQ
 	$report->drawText($p, $properties);
 }
 
-sub print5Q
+sub print5RadioButtonUnSelect
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	for my $i(0..4)
 	{
-	$self->printQ($p, $claim, $x + ($i * 9), $y, $report);
+		my $properties =
+		{
+			'x' => $x + ($i * 9.5),
+			'y' => $y
+		};
+		$report->drawRadioButtonUnSelect($p,$properties);
 	}
 }
 
@@ -1448,7 +1511,25 @@ sub box3Data
 sub box4Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
+	my($data, $first, $rest, $i);
+	$data = $claim->{twcc73}->getInjuryDescription;
 
+	$rest = $data;
+
+	while ($rest ne "" and $i < 3)
+	{
+		($first, $rest) = $report->textSplit($p, $rest, 160, FONT_NAME, DATA_FONT_SIZE);
+		$properties =
+			{
+				'text' => $first,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + 5,
+				'y' => $y - DATA_TOP_PADDING - 10 * $i
+			};
+		$report->drawText($p, $properties);
+		$i++;
+	};
 }
 
 
@@ -1607,6 +1688,548 @@ sub box12Data
 		'y' => $y - DATA_TOP_PADDING
 	};
 	$report->drawText($p, $properties);
+}
+
+sub box13Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my($condition, $date1, $date2);
+	$condition = $claim->{twcc73}->getMedicalCondition;
+
+	if ($condition == 1)
+	{
+		$date1 = $claim->{twcc73}->getReturnToWorkDate(DATE_FORMAT_USA);
+		$date2 = "";
+		$x1 = $x + 185;
+		$y1 = $y - 11;
+		$x2 = $x;
+		$y2 = $y;
+	}
+	elsif ($condition == 2)
+	{
+		$date1 = $claim->{twcc73}->getReturnToWorkFromDate(DATE_FORMAT_USA);
+		$date2 = $claim->{twcc73}->getReturnToWorkToDate(DATE_FORMAT_USA);
+		$x1 = $x + 185;
+		$y1 = $y - 22;
+		$x2 = $x + 56;
+		$y2 = $y - 33;
+	}
+	elsif ($condition == 3)
+	{
+		$date1 = $claim->{twcc73}->getReturnToWorkFromDate(DATE_FORMAT_USA);
+		$date2 = $claim->{twcc73}->getReturnToWorkToDate(DATE_FORMAT_USA);
+		$x1 = $x + 275;
+		$y1 = $y - 44;
+		$x2 = $x + 30;
+		$y2 = $y - 55;
+	}
+
+	my $arrY = [11,22,44];
+
+	for my $i(0..2)
+	{
+		if ($condition == ($i+1) )
+		{
+			$properties =
+			{
+				'x' => $x + 6,
+				'y' => $y - $arrY->[$i]
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+
+	my $properties =
+	{
+		'text' => $date1,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x1,
+		'y' => $y1
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+		{
+			'text' => $date2,
+			'fontWidth' => DATA_FONT_SIZE,
+			'color' => DATA_FONT_COLOR,
+			'x' => $x2,
+			'y' => $y2
+		};
+	$report->drawText($p, $properties);
+}
+
+sub box14Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrPosture = [];
+	my $arrPostureOther = [];
+
+	$arrPosture->[0] = $claim->{twcc73}->getPostureRestrictionsStanding;
+	$arrPosture->[1] = $claim->{twcc73}->getPostureRestrictionsSitting;
+	$arrPosture->[2] = $claim->{twcc73}->getPostureRestrictionsKneeling;
+	$arrPosture->[3] = $claim->{twcc73}->getPostureRestrictionsBending;
+	$arrPosture->[4] = $claim->{twcc73}->getPostureRestrictionsPushing;
+	$arrPosture->[5] = $claim->{twcc73}->getPostureRestrictionsTwisting;
+	$arrPosture->[6] = $claim->{twcc73}->getPostureRestrictionsOther;
+
+	$arrPostureOther->[0] = $claim->{twcc73}->getPostureRestrictionsStandingOther;
+	$arrPostureOther->[1] = $claim->{twcc73}->getPostureRestrictionsSittingOther;
+	$arrPostureOther->[2] = $claim->{twcc73}->getPostureRestrictionsKneelingOther;
+	$arrPostureOther->[3] = $claim->{twcc73}->getPostureRestrictionsBendingOther;
+	$arrPostureOther->[4] = $claim->{twcc73}->getPostureRestrictionsPushingOther;
+	$arrPostureOther->[5] = $claim->{twcc73}->getPostureRestrictionsTwistingOther;
+	$arrPostureOther->[6] = $claim->{twcc73}->getPostureRestrictionsOtherOther;
+
+	for my $i(0..6)
+	{
+		$properties =
+		{
+			'text' => $arrPostureOther->[$i],
+			'fontWidth' => 7,
+			'x' => $x + 138,
+			'y' => $y - ($i * 14) - 28
+		};
+		$report->drawText($p, $properties);
+
+		for my $j(0..4)
+		{
+			if ((($j * 2) == $arrPosture->[$i]) and not $arrPostureOther->[$i] ne '')
+			{
+				$properties =
+				{
+					'x' => $x + 85 + ($j * 9.5),
+					'y' => $y - ($i * 14) - 28,
+				};
+				$report->drawRadioButtonSelect($p, $properties);
+			}
+		}
+	}
+	
+	$properties =
+	{
+		'text' => $claim->{twcc73}->getPostureRestrictionsOtherText,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 28,
+		'y' => $y - 110
+	};
+	$report->drawText($p, $properties);
+}
+
+sub box15Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrX = [15,15,15,15,15,90,90,90,90,145,145];
+	my $arrY = [20,33,46,59,72,20,33,46,59,33,46];
+	my $arrRestrict = ["LH","LA","LL","LF","O","RH","RA","RL","RF","N","B"];
+
+	for my $i(0..10)
+	{
+		if ($claim->{twcc73}->getSpecificRestrictions =~ m/$arrRestrict->[$i]/)
+		{
+			$properties =
+			{
+				'x' => $x + $arrX->[$i] - 9,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+
+	$properties =
+	{
+		'text' => $claim->{twcc73}->getSpecificRestrictionsOther,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 36,
+		'y' => $y - 70
+	};
+	$report->drawText($p, $properties);
+
+}
+
+sub box16Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my($data, $first, $rest, $i);
+	$data = $claim->{twcc73}->getOtherRestrictions;
+
+	$rest = $data;
+
+	while ($rest ne "" and $i < 2)
+	{
+		($first, $rest) = $report->textSplit($p, $rest, 345, FONT_NAME, DATA_FONT_SIZE);
+		$properties =
+			{
+				'text' => $first,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x,
+				'y' => $y - 12 - 15 * $i
+			};
+		$report->drawText($p, $properties);
+		$i++;
+	};
+}
+
+sub box17Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrMotion = [];
+	my $arrMotionOther = [];
+
+	$arrMotion->[0] = $claim->{twcc73}->getMotionRestrictionsWalking;
+	$arrMotion->[1] = $claim->{twcc73}->getMotionRestrictionsClimbing;
+	$arrMotion->[2] = $claim->{twcc73}->getMotionRestrictionsGrasping;
+	$arrMotion->[3] = $claim->{twcc73}->getMotionRestrictionsWrist;
+	$arrMotion->[4] = $claim->{twcc73}->getMotionRestrictionsReaching;
+	$arrMotion->[5] = $claim->{twcc73}->getMotionRestrictionsOverhead;
+	$arrMotion->[6] = $claim->{twcc73}->getMotionRestrictionsKeyboard;
+	$arrMotion->[7] = $claim->{twcc73}->getMotionRestrictionsOther;
+
+	$arrMotionOther->[0] = $claim->{twcc73}->getMotionRestrictionsWalkingOther;
+	$arrMotionOther->[1] = $claim->{twcc73}->getMotionRestrictionsClimbingOther;
+	$arrMotionOther->[2] = $claim->{twcc73}->getMotionRestrictionsGraspingOther;
+	$arrMotionOther->[3] = $claim->{twcc73}->getMotionRestrictionsWristOther;
+	$arrMotionOther->[4] = $claim->{twcc73}->getMotionRestrictionsReachingOther;
+	$arrMotionOther->[5] = $claim->{twcc73}->getMotionRestrictionsOverheadOther;
+	$arrMotionOther->[6] = $claim->{twcc73}->getMotionRestrictionsKeyboardOther;
+	$arrMotionOther->[7] = $claim->{twcc73}->getMotionRestrictionsOtherOther;
+
+	for my $i(0..7)
+	{
+		$properties =
+		{
+			'text' => $arrMotionOther->[$i],
+			'fontWidth' => 7,
+			'x' => $x + 138,
+			'y' => $y - ($i * 14) - 28
+		};
+		$report->drawText($p, $properties);
+
+		for my $j(0..4)
+		{
+			if (($j * 2) == $arrMotion->[$i]  and not $arrMotionOther->[$i] ne '')
+			{
+				$properties =
+				{
+					'x' => $x + 85 + ($j * 9.5),
+					'y' => $y - ($i * 14) - 28,
+				};
+				$report->drawRadioButtonSelect($p, $properties);
+			}
+		}
+	}
+	
+	$properties =
+	{
+		'text' => $claim->{twcc73}->getMotionRestrictionsOtherText,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 28,
+		'y' => $y - 125
+	};
+	$report->drawText($p, $properties);
+		
+}
+
+sub box18Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrY = [18,42,54];
+	my $arrLift = [];
+
+	$arrLift->[0] = $claim->{twcc73}->getLiftRestrictionsWeight;
+	$arrLift->[1] = $claim->{twcc73}->getLiftRestrictionsHours;
+	$arrLift->[2] = $claim->{twcc73}->getLiftRestrictionsOther;
+
+	my $arrLiftX = [125,60,38];
+	my $arrLiftY = [18,30,54];
+
+	for my $i(0..2)
+	{
+		if ($claim->{twcc73}->getLiftRestrictions == ($i+1) )
+		{
+			$properties =
+			{
+				'x' => $x + 5,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+
+	if ($claim->{twcc73}->getLiftRestrictions == 1 )
+	{	
+		for my $j(0..1)
+		{
+			$properties =
+			{
+				'text' => $arrLift->[$j],
+				'fontWidth' => 7,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + $arrLiftX->[$j],
+				'y' => $y - $arrLiftY->[$j]
+			};
+			$report->drawText($p, $properties);
+		}
+	}
+	elsif ($claim->{twcc73}->getLiftRestrictions == 3 )
+	{
+		$properties =
+		{
+			'text' => $arrLift->[2],
+			'fontWidth' => 7,
+			'color' => DATA_FONT_COLOR,
+			'x' => $x + $arrLiftX->[2],
+			'y' => $y - $arrLiftY->[2]
+		};
+		$report->drawText($p, $properties);
+	}
+}
+
+sub box19Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrX = [15,15,15,15,15,15,15,60,25,25,15,25,75,15,15,15];
+	my $arrY = [18,32,46,60,74,88,102,102,116,130,144,158,158,172,186,200];
+	my $arr19 = [];
+
+	$arr19->[0] = $claim->{twcc73}->getMiscRestrictionsMaxHours;
+	$arr19->[1] = $claim->{twcc73}->getMiscRestrictionsSitBreaks;
+	$arr19->[2] = $claim->{twcc73}->getMiscRestrictionsWearSplint;
+	$arr19->[3] = $claim->{twcc73}->getMiscRestrictionsCrutches;
+	$arr19->[4] = $claim->{twcc73}->getMiscRestrictionsNoDriving;
+	$arr19->[5] = $claim->{twcc73}->getMiscRestrictionsDriveAutoTrans;
+	$arr19->[6] = $claim->{twcc73}->getMiscRestrictionsNoWork;
+	$arr19->[7] = $claim->{twcc73}->getMiscRestrictionsHoursPerDay;
+	$arr19->[8] = $claim->{twcc73}->getMiscRestrictionsTemp;
+	$arr19->[9] = $claim->{twcc73}->getMiscRestrictionsHeight;
+	$arr19->[10] = $claim->{twcc73}->getMiscRestrictionsMustKeep;
+	$arr19->[11] = $claim->{twcc73}->getMiscRestrictionsElevated;
+	$arr19->[12] = $claim->{twcc73}->getMiscRestrictionsCleanDry;
+	$arr19->[13] = $claim->{twcc73}->getMiscRestrictionsNoSkinContact;
+	$arr19->[14] = $claim->{twcc73}->getMiscRestrictionsDressing;
+	$arr19->[15] = $claim->{twcc73}->getMiscRestrictionsNoRunning;
+	$arr19->[16] = $claim->{twcc73}->getMiscRestrictionsSitBreaksPer;
+
+	for my $i(0..15)
+	{
+		if ($arr19->[$i] ne '')
+		{
+			$properties =
+			{
+				'x' => $x + $arrX->[$i] - 10,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+
+	my $properties =
+	{
+		'text' => $arr19->[0],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 100,
+		'y' => $y - 18
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+	{
+		'text' => $arr19->[1],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 82,
+		'y' => $y - 32
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+	{
+		'text' => $arr19->[16],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 120,
+		'y' => $y - 32
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+	{
+		'text' => $arr19->[7],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 60,
+		'y' => $y - 102
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+	{
+		'text' => $arr19->[10],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 48,
+		'y' => $y - 144
+	};
+	$report->drawText($p, $properties);
+
+	$properties =
+	{
+		'text' => $arr19->[13],
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + 82,
+		'y' => $y - 172
+	};
+	$report->drawText($p, $properties);
+
+}
+
+sub box20Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrY = [18,30,42];
+	my $arr20 = [];
+	$arr20->[0] = $claim->{twcc73}->getMedicationRestrictionsMustTake;
+	$arr20->[1] = $claim->{twcc73}->getMedicationRestrictionsAdvised;
+	$arr20->[2] = $claim->{twcc73}->getMedicationRestrictionsDrowsy;
+
+	for my $i(0..2)
+	{
+		if ($arr20->[$i] ne '')
+		{
+			$properties =
+			{
+				'x' => $x + 5,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+}
+
+sub box21Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my($data, $first, $rest, $i);
+	$data = $claim->{twcc73}->getWorkInjuryDiagnosisInfo;
+
+	$rest = $data;
+
+	while ($rest ne "" and $i < 3)
+	{
+		($first, $rest) = $report->textSplit($p, $rest, 145, FONT_NAME, DATA_FONT_SIZE);
+		$properties =
+			{
+				'text' => $first,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x,
+				'y' => $y - 14 - 18 * $i
+			};
+		$report->drawText($p, $properties);
+		$i++;
+	};
+}
+
+sub box22Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrX = [128,88,130,80,2000,70,190,196,200,269,269,269,269];
+	my $arrY = [10,22,34,46,2000,34,22,34,46,10,22,34,46];
+	my $arr22 = [];
+	$arr22->[0] = $claim->{twcc73}->getFollowupServiceEvaluationDate(DATE_FORMAT_USA);
+	$arr22->[1] = $claim->{twcc73}->getFollowupServiceConsultWith;
+	$arr22->[2] = $claim->{twcc73}->getFollowupServicePhysMedWeeks;
+	$arr22->[3] = $claim->{twcc73}->getFollowupServiceSpecialStudies;
+	$arr22->[4] = $claim->{twcc73}->getFollowupServiceNone;
+	$arr22->[5] = $claim->{twcc73}->getFollowupServicePhysMedWeeksPer;
+	$arr22->[6] = $claim->{twcc73}->getFollowupServiceConsultDate(DATE_FORMAT_USA);
+	$arr22->[7] = $claim->{twcc73}->getFollowupServicePhysMedDate(DATE_FORMAT_USA);
+	$arr22->[8] = $claim->{twcc73}->getFollowupServiceSpecialStudiesDate(DATE_FORMAT_USA);
+	$arr22->[9] = $claim->{twcc73}->getFollowupServiceEvaluationTime;
+	$arr22->[10] = $claim->{twcc73}->getFollowupServiceConsultTime;
+	$arr22->[11] = $claim->{twcc73}->getFollowupServicePhysMedTime;
+	$arr22->[12] = $claim->{twcc73}->getFollowupServiceSpecialStudiesTime;
+
+	for my $i(0..4)
+	{
+		if ($arr22->[$i] ne '')
+		{
+			$properties =
+			{
+				'x' => $x + 5,
+				'y' => $y - ($i * 12) - 10
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+
+	for my $j(0..12)
+	{
+		$properties =
+		{
+			'text' => $arr22->[$j],
+			'fontWidth' => DATA_FONT_SIZE,
+			'color' => DATA_FONT_COLOR,
+			'x' => $x + $arrX->[$j],
+			'y' => $y - $arrY->[$j]
+		};
+		$report->drawText($p, $properties);
+	}
+}
+
+sub box26Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrY = [10,20];
+
+	for my $i(0..1)
+	{
+		if ($claim->{twcc73}->getVisitType == $i+1)
+		{
+			$properties =
+			{
+				'x' => $x + 3,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
+}
+
+sub box27Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+
+	my $arrX = [12,12,12,95,95,95,95];
+	my $arrY = [12,22,32,2,12,22,32];
+
+	for my $i(0..6)
+	{
+		if ($claim->{twcc73}->getDoctorRole == $i+1)
+		{
+			$properties =
+			{
+				'x' => $x + $arrX->[$i] - 8,
+				'y' => $y - $arrY->[$i],
+			};
+			$report->drawRadioButtonSelect($p,$properties);
+		}
+	}
 }
 
 1;
