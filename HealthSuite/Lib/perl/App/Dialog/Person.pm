@@ -108,9 +108,9 @@ sub initialize
 						hints => 'You may choose more than one ethnicity type.'),
 
 
-		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name'),
+		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', options => FLDFLAG_REQUIRED),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
-		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation'),
+		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation', options => FLDFLAG_REQUIRED),
 		#
 		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
 				fields => [
