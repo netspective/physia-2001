@@ -9,7 +9,6 @@ use DBI::StatementManager;
 use App::Universal;
 use Data::Publish;
 use App::Statements::Component;
-use CGI::ImageManager;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_PERSON $PUBLDEFN_CONTACTMETHOD_DEFAULT
@@ -2840,7 +2839,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{
 					colIdx => 6,
 					dataFmt => {
-						'1' => $IMAGETAGS{'icons/checkmark'},
+						'1' => '<img src="/resources/icons/checkmark.gif" width="16" height="16" border="0">',
 						'' => "",
 					},
 				},
