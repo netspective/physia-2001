@@ -515,34 +515,48 @@ sub setPayerFields
 
 	my $payers = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selPayerChoicesByOwnerPersonId', $personId, $personId, $personId);
 	my @insurPlans = ();
+	my @tempInsurPlans = ();
 	my @wkCompPlans = ();
 	my @thirdParties = ();
 	my @planIds  = ();
 	my $insurance;
 	my $ins_type;
+	my $prevSeq = 0;
+	my $insSeq;
+	my $badSeq;
 	foreach my $ins (@{$payers})
 	{
 		if($ins->{group_name} eq 'Insurance')
 		{
-			push(@insurPlans, "$ins->{bill_seq}($ins->{plan_name})");
-			#Get Insurnace Fee Schedule if insurance is primary
+			$insSeq = $ins->{bill_seq_id};
+			if($insSeq == $prevSeq + 1)
+			{
+				push(@tempInsurPlans, "$ins->{bill_seq}($ins->{plan_name})");
+				$prevSeq = $insSeq;
+			}
+			else
+			{
+				$badSeq = 1;
+			}
+			
+			#Get Insurance Fee Schedule if insurance is primary
 			#This code should match the code in Procedures.pm that also gets FFS for insurance 
 			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
 			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);					
 			$ins_type="$ins->{bill_seq}";
-			
+
 			#Added to store plan internal Ids for getFS
 			push(@planIds,$insurance->{'ins_internal_id'});
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
 			push(@wkCompPlans, "Work Comp($ins->{plan_name}):$ins->{ins_internal_id}");
-			#Get Work Comp Insurnace Fee Schedule
+			#Get Work Comp Insurance Fee Schedule
 			#This code should match the code in Procedures.pm that also gets FFS for insurance 
 			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
 			'selInsuranceByPlanNameAndPersonAndInsType', $ins->{plan_name}, $personId,
 			App::Universal::CLAIMTYPE_WORKERSCOMP);
-			$ins_type="Work Comp";
+			$ins_type = "Work Comp";
 			
 			#Added to store plan internal Ids for getFS
 			push(@planIds,$insurance->{'ins_internal_id'});			
@@ -558,6 +572,11 @@ sub setPayerFields
 			}
 			push(@thirdParties, "$ins->{group_name}($thirdPartyId):$ins->{ins_internal_id}");
 		}		
+	}
+
+	unless($badSeq)
+	{
+		push(@insurPlans, @tempInsurPlans);
 	}
 
 	#get Fee Schedules for Insurance and Work Comps Plan
