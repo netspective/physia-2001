@@ -2478,10 +2478,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				(
 					SELECT value_text
 					FROM person_attribute
-					WHERE
-						parent_id = :2 AND
-						value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]} AND
-						item_name = 'WorkList'
+					WHERE parent_id = :2 
+						AND value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
+						AND item_name = 'WorkList'
+						AND parent_org_id = :3
 				)
 			) AND
 			trans_status = 2
@@ -2529,28 +2529,28 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
-				[$page->session('GMT_DAYOFFSET'), $personId]);
+				[$page->session('GMT_DAYOFFSET'), $personId, $orgId]);
 		},
 	publishComp_stp =>
 		sub{
 			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panel');
+				[$page->session('GMT_DAYOFFSET'), $personId, $orgId], 'panel');
 		},
 	publishComp_stpe =>
 		sub {
 			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit');
+				[$page->session('GMT_DAYOFFSET'), $personId, $orgId], 'panelEdit');
 		},
 	publishComp_stpt =>
 		sub {
 			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
-				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp');
+				[$page->session('GMT_DAYOFFSET'), $personId, $orgId], 'panelTransp');
 		},
 },
 
