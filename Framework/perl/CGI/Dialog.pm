@@ -87,7 +87,7 @@ sub findPopup_as_html
 	{
 		my $controlField = 'null';
 		$controlField = "document.$dialogName.$self->{findPopupControlField}" if $self->{findPopupControlField};
-		
+
 		my $secondaryFindField = 'null';
 		$secondaryFindField = "document.$dialogName.$self->{secondaryFindField}" if $self->{secondaryFindField};
 
@@ -549,7 +549,7 @@ sub select_as_html
 
 	my $choices = exists $self->{fKeyStmt} ? $self->readChoicesStmt($page) : ($self->{fKeyTable} ? $self->readChoices($page) : $self->parseChoices($page));
 	$self->{size} = scalar(@$choices) if $self->{size} == 0;
-	
+
 	my $JS = '';
 	foreach (keys %$self)
 	{
@@ -663,7 +663,7 @@ sub getHtml
 		my $value = (defined $page->field($self->{name})) ? $page->field($self->{name}) : $self->{hint};
 		my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 		my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
-		
+
 		my $caption = '';
 		if ($self->{flags} & FLDFLAG_INLINECAPTION)
 		{
@@ -1084,7 +1084,7 @@ sub new
 	my %params = @_;
 	my $rowFields = $params{rowFields};
 	$params{fields} = [];
-	
+
 	foreach my $row (1..$params{rows})
 	{
 		foreach my $col (1..@{$rowFields})
@@ -1095,22 +1095,22 @@ sub new
 			}
 			# Get the template for the field
 			my %field = %{$rowFields->[$col-1]};
-			
+
 			# Skip the field on this row if asked
 			if (defined $field{_skipOnRows})
 			{
 				next if grep {$_ eq $row} @{$field{_skipOnRows}};
 			}
-			
+
 			# Include the row number in the field name
 			$field{name} .= '_' . $row;
 			$field{_row} = $row unless defined $field{_row};
 			$field{_col} = $col unless defined $field{_col};
-			
+
 			# Create a new field object
 			no strict 'refs';
 			my $fieldObj = &{"$field{_class}::new"}($field{_class}, %field);
-			
+
 			# Add it to the list
 			push @{$params{fields}}, $fieldObj;
 		}
@@ -1134,11 +1134,11 @@ sub getHtml
 	my $fields = $self->{fields};
 	my $requiredCols = 0;
 	my @messages = ();
-	
+
 	my $row = 0;
 	my $col = 0;
 	$fieldsHtml = qq{<table border="0" cellpadding="0" cellspacing="0"><tr id="_id_${name}_${row}">};
-	
+
 	# Make a first pass to get column headings
 	my @headings = ();
 	foreach(@$fields)
@@ -1151,14 +1151,14 @@ sub getHtml
 		}
 		$headings[$_->{_col}] = $caption;
 	}
-	
+
 	# Print the heading row
 	foreach(0..$#headings)
 	{
 		my $caption = $headings[$_];
 		$fieldsHtml .= qq{<td align="center" id="_id_${name}_${row}_${_}">$caption$spacerHtml$spacerHtml</td>};
 	}
-	
+
 	# Print the data rows
 	foreach(@$fields)
 	{
@@ -1172,18 +1172,18 @@ sub getHtml
 			$fieldsHtml .= qq{</tr><tr id="_id_${name}_${row}">};
 			$col = 0;
 		}
-		
+
 		while($col < $_->{_col})
 		{
 			$fieldsHtml .= qq{<td id="_id_${name}_${row}_${col}">} . '</td>';
 			$col++;
 		}
-			
+
 		$fieldsHtml .= qq{<td id="_id_${name}_${row}_${col}" nowrap>} . $_->getHtml($page, $dialog, $command, $dlgFlags) . $spacerHtml . '</td>';
 		$col++;
 	}
 	$fieldsHtml .= '</tr></table>';
-	
+
 	if(@messages)
 	{
 		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
@@ -1676,6 +1676,7 @@ sub new
 		{
 			_header => [],
 			_footer => [],
+			topHtml => [],
 			preHtml => [],
 			postHtml => [],
 			fieldMap => {},   # key is fieldName, value is fieldIndex in content
@@ -2310,7 +2311,7 @@ sub getHtml
 	my $formAction = "/";
 	$formAction .= $page->param('_isPopup') ? $page->param('arl_asPopup') : $page->param('arl');
 	$formAction =~ s/\?.*$//;
-	
+
 	# Don't display a window title unless a header is defined
 	my $titleBarHtml = '';
 	if ($heading)
@@ -2325,7 +2326,7 @@ sub getHtml
 
 	return qq{
 	<center>
-	<table border="0" bgcolor="$self->{headColor}" cellspacing="2" cellpadding="0" width="$self->{width}"><tr><td>
+	<table border="0" bgcolor="$self->{headColor}" cellspacing="2" cellpadding="0" width="$self->{width}"><tr><td>@{$self->{topHtml}}
 	<table border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="4" width="$self->{width}">$titleBarHtml$errorsHtml<tr><td>
 		@{$self->{preHtml}}
 	<table align="center" border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="$self->{cellPadding}"><SCRIPT>
