@@ -19,7 +19,7 @@ sub handler
 		return OK;
 	};
 
-	if ($@ && $DEBUG)
+	if ($@)
 	{
 		$r->content_type('text/html');
     	$r->send_http_header();
