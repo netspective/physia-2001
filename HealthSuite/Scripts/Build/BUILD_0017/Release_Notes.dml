@@ -184,8 +184,9 @@
 		</deliverable>
 		
 		<deliverable id="1535">
-			Report (Deposit Payment) : New report for capturing payments(deposits) 
-		</deliverable>
+			Report (Deposit Payment) : New report for capturing payments(deposits) .  
+		[FIX] Added sub-totals, batch ID and broke apart detail data from summary data so all summary data is shown followed by the detail data for checks.
+		 </deliverable>
 
 		<deliverable id="1536">
 			Added all remaining invoice statuses to claim search.
