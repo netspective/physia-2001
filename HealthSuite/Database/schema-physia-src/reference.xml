@@ -83,7 +83,6 @@
 
 	<table name="REF_EPayer" abbrev="EPayer">
 		<column name="id" type="text" size="16" indexed="yes" descr="The Electronic payer/processor ID"/>
-		<column name="id2" type="text" size="16" indexed="yes" descr="The Electronic payer/processor secondary ID"/>
 		<column name="name" type="text" size="256" indexed="yes" descr="Short Description of the Payer"/>
 		<column name="psource" lookupref="Electronic_Payer_Source.id" indexed="yes" descr="The electronic payer source"/>
 		<column name="ptype" lookupref="Electronic_Payer_Type.id" indexed="yes" descr="The electronic payer type"/>
@@ -105,5 +104,10 @@
 		<column name="code_max" type="text" size="10" descr="Maximum code in range"/>
 		<column name="entry_type" lookupref="Catalog_Entry_Type.id"  descr="Code Type (EPSDT,CPT,etc)"/>
 		<column name="service_type" type="text" size="10" descr="Service Type (Medical Care,Surgery,Diagnostic X-Ray,etc)"/>			
+	</table>
+	<table name="REF_SERVICE_CATEGORY" abbrev="REF_SERV_CAT"> 
+		<column name="serv_category" abbrev="serv_cat" type="text" primarykey="yes" desc="Service Category ID"/>
+		<column name="name" type="text" size="64" descr="Short Description of the Service Category "/>
+		<column name="description" type="text" size="1024" descr="Long description Service Category "/>
 	</table>
 </schema>
