@@ -271,6 +271,7 @@
 		<enum>Non-billable Service</enum>
 		<enum>Returned Personal Check</enum>
 		<enum>NSF Fee</enum>
+		<enum>Contractual Agreement</enum>
 	</table>
 
 	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">
