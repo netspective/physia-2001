@@ -161,7 +161,7 @@ sub execute
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => "Refunded \$$refundAmt to $refundToId",
-			value_textB => $comments || undef,
+			value_textB => "$comments " . "Batch Id: $batchId" || undef,
 			value_date => $todaysDate,
 			_debug => 0
 		);

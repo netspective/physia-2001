@@ -198,7 +198,7 @@ sub execute
 		$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId || undef,
-			invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED,
+			invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
 			_debug => 0
 		);
 
@@ -210,7 +210,7 @@ sub execute
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => "Personal payment of $totalAmtRecvd made by $payerId",
-			value_textB => $comments || undef,
+			value_textB => "$comments " . "Batch ID: $batchId" || undef,
 			value_date => $todaysDate,
 			_debug => 0
 		);

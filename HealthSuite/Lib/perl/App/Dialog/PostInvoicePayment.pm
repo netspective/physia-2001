@@ -214,7 +214,8 @@ sub execute
 
 	my $paidBy = $page->param('paidBy');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
-
+	my $batchID = $page->field('batch_id');
+	my $batchDate = $page->field('batch_date');
 	my $todaysDate = $page->getDate();
 	my $payerType = $paidBy eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
@@ -231,13 +232,16 @@ sub execute
 		my $itemId = $page->param("_f_item_$line\_item_id");
 
 		#update item if it is being suppressed
-		my $isSuppressed = $page->param("_f_item_$line\_suppress") ? 1 : 0;
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId || undef,
-			data_num_b => defined $isSuppressed ? $isSuppressed : undef,
-			_debug => 0
-		);
+		if($itemId)
+		{
+			my $isSuppressed = $page->param("_f_item_$line\_suppress") ? 1 : 0;
+			$page->schemaAction(
+				'Invoice_Item', 'update',
+				item_id => $itemId || undef,
+				data_num_b => defined $isSuppressed ? $isSuppressed : undef,
+				_debug => 0
+			);
+		}
 
 		my $planPaid = $page->param("_f_item_$line\_plan_paid");
 		my $amtApplied = $page->param("_f_item_$line\_amount_applied");
@@ -279,7 +283,7 @@ sub execute
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
-			value_textB => $comments || undef,
+			value_textB => "$comments " . "Batch ID: $batchID"|| undef,
 			value_date => $todaysDate,
 			_debug => 0
 		);
@@ -290,8 +294,8 @@ sub execute
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/Payment/Batch ID',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->field('batch_id') || undef,
-			value_date => $page->field('batch_date') || undef,
+			value_text => $batchID || undef,
+			value_date => $batchDate || undef,
 			value_int => $adjItemId || undef,
 			_debug => 0
 		);
