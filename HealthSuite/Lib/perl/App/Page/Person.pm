@@ -199,6 +199,7 @@ sub prepare_page_content_header
 	$chooseAction =
 		qq{<SELECT onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 			<OPTION selected>Choose Action</OPTION>
+			<OPTION value="/person/$personId/dlg-add-on-call?home=$homeArl">Add On-Call Notes</OPTION>
 			<OPTION value="/person/$personId/stpe-person.labOrderSummary?home=$homeArl">Add Ancillary Test</OPTION>
 			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
 			<OPTION value="/person/$personId/dlg-add-referral-ppms?home=$homeArl">Add Referral Request</OPTION>
@@ -208,17 +209,14 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
 			<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
 			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
-			<<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
+			<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
 			<OPTION value="/person/$personId/dlg-prescribe-medication?home=$homeArl">Prescribe Medication</OPTION>
 			<OPTION value="/person/$personId/stpe-person.activeMedications?home=$homeArl">Refills</OPTION>
 			<OPTION value="/person/$personId/dlg-send-phone_message?home=$homeArl">Phone Msgs</OPTION>
-			<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
 			<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
 			<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
 			<OPTION value="/person/$personId/dlg-remove-category?home=$homeArl">Remove Login</OPTION>
-			<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
-
 		</SELECT>} if $self->param('_pm_view');
 
 	push(@{$self->{page_content_header}},

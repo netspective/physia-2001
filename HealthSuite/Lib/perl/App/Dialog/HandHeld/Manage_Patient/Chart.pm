@@ -25,6 +25,8 @@ sub getHtml
 {
 	my ($self, $page) = @_;
 	
+	return "No patient selected.  Please select a patient." unless $page->session('active_person_id');
+	
 	my $html;
 	
 	my $activeMeds = $STMTMGR_HANDHELD->getRowsAsHashList($page, 0, 'sel_patientActiveMeds', 

@@ -37,7 +37,9 @@ sub initialize
 		if($patientId ne $self->session('active_person_id'))
 		{
 			$self->session('active_person_id', $patientId);
-			$self->session('active_person_name', $STMTMGR_HANDHELD->getSingleValue($self, STMTMGRFLAG_DYNAMICSQL, 'select short_sortable_name from person where person_id = ?', $patientId));
+			$self->session('active_person_name', $STMTMGR_HANDHELD->getSingleValue($self, 
+				STMTMGRFLAG_DYNAMICSQL, 'select initcap(simple_name) from person where person_id = :1',
+				$patientId));
 		}
 	}
 	
@@ -69,7 +71,11 @@ sub prepare_page_content_header
 	my $inHome = 0;
 	if($insideItem || scalar(@$locLinks) > 2)
 	{
-		my $location = '<a href="/mobile" border=0><img src="/resources/images/icons/home-sm.gif"></a>';
+		my $location = qq{
+			<a href="/mobile" border=0><img src="/resources/images/icons/home-sm.gif"></a> 
+			<a href="/logout" border=0><img src="/resources/widgets/action-close.gif"></a>
+		};
+		
 		my $lastLoc = $#$locLinks;
 		for(my $loc = 2; $loc <= $lastLoc; $loc++)
 		{

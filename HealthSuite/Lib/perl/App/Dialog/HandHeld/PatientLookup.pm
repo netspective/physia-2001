@@ -3,11 +3,12 @@ package App::Dialog::HandHeld::PatientLookup;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: PatientLookup.pm,v 1.3 2000-12-29 20:04:56 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: PatientLookup.pm,v 1.4 2001-01-30 17:40:53 thai_nguyen Exp $', '$Name:  $');
 
 use base qw(CGI::Dialog);
 use CGI::Validator::Field;
 use App::Statements::Search::Person;
+use Date::Calc qw(:all);
 
 use vars qw($INSTANCE);
 
@@ -20,9 +21,9 @@ sub new
 			name => 'criteria',
 			type => 'select',
 			selOptions => qq{
-				Person ID : id;
 				Last Name : lastname;
 				First or Last Name : anyname;
+				Person ID : id;
 				Social Security : ssn;
 				Date of Birth : dob;
 				Phone Number : phone;
@@ -38,6 +39,13 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	return $self;
+}
+
+sub age
+{
+	my ($dob) = @_;
+	
+	return int((Date_to_Days(Today()) - Date_to_Days(Decode_Date_US($dob))) / 365);
 }
 
 sub execute
@@ -63,7 +71,7 @@ sub execute
 	{
 		$html .= qq{
 			<b>$_->{name}</b> <a href='Manage_Patient?pid=@{[ $_->{person_id} ]}'>$_->{person_id}</a><br>
-			DOB: $_->{dob}<br>
+			($_->{gender}) @{[age($_->{dob})]}, DOB: $_->{dob}<br>
 			SSN: $_->{ssn}<br>
 			Home Phone: $_->{home_phone}<br><br>
 		};

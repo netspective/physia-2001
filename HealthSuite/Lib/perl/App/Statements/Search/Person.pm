@@ -32,7 +32,8 @@ $STMTFMT_SEL_PERSON = qq{
 						and t.trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
 						and t.trans_type = @{[ App::Universal::TRANSTYPE_ALERTAPPOINTMENT ]}
 				)
-			) as appt_alert
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
 		FROM
 			person per,
 			person_org_category cat,

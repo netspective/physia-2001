@@ -29,6 +29,8 @@ sub getHtml
 	my $self = shift;
 	my $page = shift;
 	
+	return "No patient selected.  Please select a patient." unless $page->session('active_person_id');
+	
 	my $html = '';
 	if(my $sth = $STMTMGR_HANDHELD->execute($page, 0, $self->{sqlStmtId}, 
 		$page->session('active_person_id')))
