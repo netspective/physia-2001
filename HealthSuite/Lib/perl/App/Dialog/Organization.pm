@@ -103,9 +103,18 @@ sub initialize
 				name => 'medicare_gpci',
 				findPopup => '/lookup/gpci/state/*/1',
 			),
+			new CGI::Dialog::Field(caption => 'Medicare Facility Pricing',
+				name => 'medicare_facility_type',
+				type => 'select',
+				style => 'radio',
+				choiceDelim =>',',
+				selOptions => 'Non-Facility:0,Facility:1',
+			),
 		);
 	}
+
 	$self->addContent(
+		new CGI::Dialog::Subhead(heading => '', name => ''),
 		new CGI::Dialog::Field(caption => 'Delete record?',
 			type => 'bool',
 			name => 'delete_record',
@@ -258,6 +267,7 @@ sub populateData
 		App::Universal::ATTRTYPE_TEXT
 	);
 	$page->field('medicare_gpci', $attribute->{value_text});
+	$page->field('medicare_facility_type', $attribute->{value_int});
 }
 
 sub execute_add
@@ -456,6 +466,11 @@ sub execute_add
 			_debug => 0
 		)if $page->field('contact_phone') ne '';
 
+	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
+		value_text => $page->field('medicare_gpci'),
+		value_int  => $page->field('medicare_facility_type') || 0,
+	);
+
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
@@ -489,6 +504,7 @@ sub execute_update
 
 	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
 		value_text => $page->field('medicare_gpci'),
+		value_int  => $page->field('medicare_facility_type') || 0,
 	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
