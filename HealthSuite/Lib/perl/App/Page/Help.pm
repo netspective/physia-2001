@@ -13,7 +13,7 @@ use vars qw(@ISA);
 sub prepare_page_content_header
 {
 	my $self = shift;
-	
+
 	$self->SUPER::prepare_page_content_header(@_);
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	push(@{$self->{page_content_header}}, qq{
@@ -48,17 +48,17 @@ sub prepare
 </FONT>
 
 <TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=3 BORDER=0>
-  <TR> 
+  <TR>
     <TD>
     	<FONT FACE="Arial,Helvetica" SIZE=3 COLOR=DARKBLUE>
 					<B>Organizational Terms</B>
 		</FONT>
     </TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=10 BORDER=0>
-        <TR> 
+        <TR>
           <TD>
           Provider Organizations
 <UL TYPE=DISC>
@@ -70,7 +70,7 @@ sub prepare
 
           </TD>
         </TR>
-        <TR> 
+        <TR>
           <TD>
           Insurance Entities
 <UL TYPE=DISC>
@@ -85,17 +85,17 @@ sub prepare
       </TABLE>
     </TD>
   </TR>
-  <TR> 
+  <TR>
     <TD>
     	<FONT FACE="Arial,Helvetica" SIZE=3 COLOR=DARKBLUE>
 					<B>Browser Structure Terms</B>
 		</FONT>
     </TD>
   </TR>
-  <TR> 
-    <TD> 
+  <TR>
+    <TD>
       <TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=10 BORDER=0>
-        <TR> 
+        <TR>
           <TD>
 <UL TYPE=DISC>
 	<LI><B>Application Resource Locator (ARL)</B> - the "address" of a particular web page.
@@ -121,18 +121,18 @@ sub prepare
 </FONT>
 
 <TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=3 BORDER=0>
-  <TR> 
+  <TR>
     <TD>
     	<FONT FACE="Arial,Helvetica" SIZE=3 COLOR=DARKBLUE>
 					<B>General Guidelines</B>
 		</FONT>
     </TD>
   </TR>
-    <TD> 
+    <TD>
       <TABLE WIDTH=100% CELLSPACING=0 CELLPADDING=10 BORDER=0>
-        <TR> 
+        <TR>
           <TD>
-          	The User may use the Tab, Return, or Enter keys to navigate from 
+          	The User may use the Tab, Return, or Enter keys to navigate from
             one field to the next. After the last entry in a dialog has been made, then the keys above will submit the entered data to the database.
           </TD>
         </TR>
@@ -144,7 +144,7 @@ sub prepare
       </TABLE>
     </TD>
   </TR>
-  <TR> 
+  <TR>
     <TD>
     	<FONT FACE="Arial,Helvetica" SIZE=3 COLOR=DARKBLUE>
 					<B>Formatting by Example</B>
@@ -152,232 +152,240 @@ sub prepare
     </TD>
   </TR>
   <TR>
-    <TD> 	
+    <TD>
 <table width=100% cellspacing=0 cellpadding=10 border=0>
-  <tr> 
-    <td colspan="3"> Values can be entered in a variety of formats with a variety 
-      of separators (i.e., /, -, .) 
-      <p> <font size="2">Note: For these examples, assume today's date is April 
+  <tr>
+    <td colspan="3"> Values can be entered in a variety of formats with a variety
+      of separators (i.e., /, -, .)
+      <p> <font size="2">Note: For these examples, assume today's date is April
         1, 2000. </font></p>
     </td>
   </tr>
-  <tr valign="top"> 
-    <td width="34%" rowspan="3"> 
+  <tr valign="top">
+    <td width="34%" rowspan="3">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
+        <tr align="center" bgcolor="#CCCCCC">
           <td colspan="2"> <b><font size="4">Date</font></b> </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"> <b>Entered Value</b> </td>
           <td width="66%"> <b>Result </b> </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>0</code></td>
           <td width="66%"><code>04/01/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>5</code></td>
           <td width="66%"><code>04/05/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5</code></td>
           <td width="66%"><code>04/05/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5/1</code></td>
           <td width="66%"><code>04/05/2001</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5/01</code></td>
           <td width="66%"><code>04/05/2001</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
+		          <td width="34%"><code>040501</code></td>
+		          <td width="66%"><code>04/05/2001</code></td>
+        </tr>
+        <tr align="center">
+		          <td width="34%"><code>04052001</code></td>
+		          <td width="66%"><code>04/05/2001</code></td>
+        </tr>
+        <tr align="center">
           <td width="34%"><code>today</code></td>
           <td width="66%"><code>04/01/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>now</code></td>
           <td width="66%"><code>04/01/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>yesterday</code></td>
           <td width="66%"><code>03/31/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>tomorrow</code></td>
           <td width="66%"><code>04/02/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5/1910</code></td>
           <td width="66%"><code>04/05/1910</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5/10</code></td>
           <td width="66%"><code>04/05/2010</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>4/5/11</code></td>
           <td width="66%"><code>04/05/2011<br>
-            <font size="1"> note: If the entered 2 digit year number is less than 
-            '10', then the result year is 2000 + that number. If that entered 
-            number is greater than '10', then the result year is 1900 + that number. 
+            <font size="1"> note: If the entered 2 digit year number is less than
+            '10', then the result year is 2000 + that number. If that entered
+            number is greater than '10', then the result year is 1900 + that number.
             </font> </code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>2/1</code></td>
           <td width="66%"><code>02/01/2000</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>1/1</code></td>
           <td width="66%"><code>01/01/2001 <br>
-            <font size="1"> note: If the entered month is less than 3 months from 
-            the current month and no year is specified, then the result is the 
+            <font size="1"> note: If the entered month is less than 3 months from
+            the current month and no year is specified, then the result is the
             current year plus one. </font> </code></td>
         </tr>
       </table>
     </td>
-    <td width="33%" rowspan="2"> 
+    <td width="33%" rowspan="2">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
+        <tr align="center" bgcolor="#CCCCCC">
           <td colspan="2"><b><font size="4">Time</font></b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"> <b>Entered Value</b> </td>
           <td width="66%"> <b>Result </b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>5</code></td>
           <td width="66%"><code>05:00 PM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>9</code></td>
           <td width="66%"><code>09:00 AM<br>
-            <font size="1">note: If the entered hour is greater than or equal 
-            to '7', then the result time is in the morning (i.e., AM), else the 
+            <font size="1">note: If the entered hour is greater than or equal
+            to '7', then the result time is in the morning (i.e., AM), else the
             time is in the afternoon (i.e., PM).</font></code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>9:30</code></td>
           <td width="66%"><code>09:30 AM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>5:45</code></td>
           <td width="66%"><code>05:45 AM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>6a</code></td>
           <td width="66%"><code>06:00 AM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>9p</code></td>
           <td width="66%"><code>09:00 PM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>1100</code></td>
           <td width="66%"><code>11:00 AM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>1300</code></td>
           <td width="66%"><code>1:00 PM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>21:00</code></td>
           <td width="66%"><code>09:00 PM</code></td>
         </tr>
       </table>
     </td>
-    <td width="33%"> 
+    <td width="33%">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
+        <tr align="center" bgcolor="#CCCCCC">
           <td colspan="2"> <b><font size="4">Date/Time Stamp</font></b><br>
-            <font size="1">note: Same rules as for Date and Time, but combined 
+            <font size="1">note: Same rules as for Date and Time, but combined
             with a space separator.</font> </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"> <b>Entered Value</b> </td>
           <td width="66%"> <b>Result </b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code> 0 5</code></td>
           <td width="66%"><code>04/01/2000 05:00 AM</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>15 9</code></td>
           <td width="66%"><code>04/15/2000 09:00 AM</code></td>
         </tr>
       </table>
     </td>
   </tr>
-  <tr valign="top"> 
-    <td width="33%"> 
+  <tr valign="top">
+    <td width="33%">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
-          <td colspan="2"> <b><font size="4">Social Security Number</font></b> 
+        <tr align="center" bgcolor="#CCCCCC">
+          <td colspan="2"> <b><font size="4">Social Security Number</font></b>
           </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"> <b>Entered Value</b> </td>
           <td width="66%"> <b>Result </b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code> 123456789</code></td>
           <td width="66%"><code>123-45-6789</code></td>
         </tr>
       </table>
     </td>
   </tr>
-  <tr valign="top"> 
-    <td colspan="2"> 
+  <tr valign="top">
+    <td colspan="2">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
+        <tr align="center" bgcolor="#CCCCCC">
           <td colspan="2"> <b><font size="4">Zip Code</font></b> </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"> <b>Entered Value</b> </td>
           <td width="66%"> <b>Result </b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>12345</code></td>
           <td width="66%"><code>12345</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>123456789</code></td>
           <td width="66%"><code>12345-6789</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="34%"><code>12345-6789</code></td>
           <td width="66%"><code>12345-6789</code></td>
         </tr>
       </table>
     </td>
   </tr>
-  <tr valign="top"> 
-    <td colspan="3"> 
+  <tr valign="top">
+    <td colspan="3">
       <table width="100%" border="1" cellspacing="0" bordercolor="#CCCCCC">
-        <tr align="center" bgcolor="#CCCCCC"> 
+        <tr align="center" bgcolor="#CCCCCC">
           <td colspan="2"> <b><font size="4">Telephone</font></b> </td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"> <b>Entered Value</b> </td>
           <td width="62%"> <b>Result </b></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"><code> 1234567890</code></td>
           <td width="62%"><code>123-456-7890</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"><code> 123456789012345</code></td>
           <td width="62%"><code>123-456-7890 x12345</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"><code> 1234567890 extension 12345</code></td>
           <td width="62%"><code>123-456-7890 x12345</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"><code> 1 23456 7890 x 12345</code></td>
           <td width="62%"><code>123-456-7890 x12345</code></td>
         </tr>
-        <tr align="center"> 
+        <tr align="center">
           <td width="38%"><code> 1234567890 p12345</code></td>
           <td width="62%"><code>123-456-7890 p12345</code></td>
         </tr>
@@ -388,7 +396,7 @@ sub prepare
 		</TD>
 	</TR>
 </TABLE>
-	
+
 	});
 
 	return 1;
