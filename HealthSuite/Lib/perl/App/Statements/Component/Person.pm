@@ -38,11 +38,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.account-notes' => {
 	sqlStmt => qq{
 		SELECT * FROM (
-			select to_char(trans_begin_stamp -:2, '$SQLSTMT_DEFAULTDATEFORMAT'), 
+			select to_char(trans_begin_stamp -:2, '$SQLSTMT_DEFAULTDATEFORMAT'),
 				detail, trans_id, trans_type, provider_id
 			from transaction
-			where trans_owner_id = :1 
-				and trans_status = 2 
+			where trans_owner_id = :1
+				and trans_status = 2
 				and trans_type = $ACCOUNT_NOTES
 			order by trans_id desc
 		)
@@ -426,18 +426,24 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.miscNotes' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%
+			SELECT
+				value_type,
+				item_id,
+				parent_id,
+				item_name,
+				value_text,
+				%simpleDate:value_date%,
+				value_textB
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'
 
 		},
 		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
-
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => 'Misc Notes (#5#): #4#' },
+			{ dataFmt => 'Misc Notes by <A HREF="/person/#6#/profile">#6#</A> (#5#): #4#' },
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-misc-notes/#1#?home=#homeArl#',
 		frame => {
@@ -473,10 +479,34 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		},
 	},
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelTransp'); },
+	publishComp_st =>
+	sub
+	{
+		my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]);
+	},
+	publishComp_stp =>
+	sub
+	{
+		my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel');
+	},
+	publishComp_stpe =>
+	sub
+	{
+		my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit');
+	},
+	publishComp_stpt =>
+	sub
+	{
+		my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelTransp');
+	},
 },
 
 
@@ -1839,48 +1869,32 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.surgicalProcedures' => {
 	sqlStmt => qq{
 	    SELECT
-	    	2 AS group_sort,
+	    data_text_a,
 	    	%simpleDate:t.curr_onset_date% AS curr_onset_date,
-	    	ref.descr,
+	    	ref.name,
 	    	provider_id,
 	    	trans_type,
 	    	trans_id,
-	    	'(ICD ' || t.code || ')' AS code
+	    	'(CPT ' || t.code || ')' AS code
 		FROM
 			transaction t,
-			ref_icd ref
+			ref_cpt ref
 		WHERE
 			trans_type = 4050
-			AND trans_owner_type = 0
 			AND trans_owner_id = :1
-			AND t.code = ref.icd (+)
+			AND t.code = ref.cpt (+)
 			AND trans_status = 2
-		UNION ALL (
-			SELECT
-				2 as group_sort,
-				%simpleDate:curr_onset_date% AS curr_onset_date,
-				data_text_a,
-				provider_id,
-				trans_type,
-				trans_id,
-				'' AS code
-			FROM transaction
-			WHERE
-				trans_type = 4050
-				AND trans_owner_id = :1
-				AND trans_status = 2
-		)
+
 		ORDER BY
-			group_sort,
 			curr_onset_date DESC
 		},
 	sqlStmtBindParamDescr => ['Person ID for Diagnoses Transactions'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Surgical Procedures', dataFmt => '#2# <A HREF = "/search/icd">#6#</A><BR>performed on <A HREF = "/person/#3#/profile">#3#</A> (#1#)' },
+			{ head => 'Surgical Procedures', dataFmt => '#0#: #2# <A HREF = "/search/icd">#6#</A><BR>performed by <A HREF = "/person/#3#/profile">#3#</A> (#1#)' },
 		],
 		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#homeArl#',
-		bullets => {},
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#4#/#5#?home=#homeArl#',
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-activeproblems-surgical?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -1911,7 +1925,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			 delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
+			 updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#4#/#5#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgicalProcedures', [ $personId]); },
@@ -1919,6 +1933,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgicalProcedures', [ $personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgicalProcedures', [ $personId], 'panelTransp'); },
 },
+
 
 
 #----------------------------------------------------------------------------------------------------------------------
