@@ -39,6 +39,7 @@ use vars qw(@ISA);
 @ISA = qw(App::Billing::Input::Driver);
 
 use constant INVOICESTATUS_SUBMITTED => 4;
+use constant INVOICESTATUS_APPEALED => 14;
 use constant INVOICESTATUS_CLOSED => 15;
 use constant INVOICESTATUS_VOID => 16;
 
@@ -176,14 +177,31 @@ sub getTargetInvoices
 	my @allRecords;
 	my $statment = "";
 	my $i = 0;
-	my $queryStatment = qq
+	my $queryStatment;
+
+	if($submittedStatus eq undef)
 	{
-		select distinct invoice_id
-		from invoice
-		where invoice_status = $submittedStatus
-		and invoice_subtype <> 0
-		and invoice_subtype <> 7
-	};
+		my $claimTypeSelf = CLAIM_TYPE_SELF;
+		my $claimTypeThirdParty = CLAIM_TYPE_THIRD_PARTY;
+		my $appealedStatus = INVOICESTATUS_APPEALED;
+
+		$queryStatment = qq
+		{
+			select distinct invoice_id
+			from invoice
+			where invoice_status in ($submittedStatus, $appealedStatus)
+			and invoice_subtype not in ($claimTypeSelf, $claimTypeThirdParty)
+		};
+	}
+	else
+	{
+		$queryStatment = qq
+		{
+			select distinct invoice_id
+			from invoice
+			where invoice_status = $submittedStatus
+		};
+	}
 
 	my $sth = $self->{dbiCon}->prepare("$queryStatment");
 	$sth->execute or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
