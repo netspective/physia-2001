@@ -17,13 +17,12 @@ B981 - Allow HCFA 1500 PDF to be pre-printed (PP) or plain. Pre-printed means al
        the red background to be printed along with the claim data. Plain means just the
        claim data, but no red background
 
-[No Bug] - Added capability to make upto 2 multiple appointments at a time.  I was orginally
-shooting for 4 appts, but had troubles guarding against users *malicious* invalid inputs
-causing javascript errors.  Limiting to only 2 appts makes the codes much more manageable, 
-and the scenario is probably more realistic.
+[No Bug] - Added capability to make upto 4 multiple appointments at a time.
 
 [No Bug] - Fixed sorting problem in Person lookups
 
 B656 - Added denied option to the status field in 'Refill Request' dialog
 
 B725 - Fixed the code not tho show the Primary phone in contact methods component when it is not filled while adding an Org
+
+B216 - Added the 'Hours of Operation' to showup on the profile line
