@@ -90,9 +90,12 @@ sub findPopup_as_html
 
 		#my $comboBox = 'null';
 		#$comboBox = "document.$dialogName.$self->{findPopupComboBox}" if $self->{findPopupComboBox};
+		
+		my $imgId = "_find_img_" . $self->{name};
+		my $linkId = "_find_link_" . $self->{name};
 
 		return qq{
-			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField);"><img src='$self->{popup}->{imgsrc}' border=0></a>
+			<a id="$linkId" href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField);"><img id="$imgId" src='$self->{popup}->{imgsrc}' border=0></a>
 		};
 	}
 	return '';
@@ -1065,6 +1068,182 @@ sub getHtml
 	</td></tr>};
 }
 
+
+
+##############################################################################
+package CGI::Dialog::DataGrid;
+##############################################################################
+
+use strict;
+use CGI::Validator::Field;
+use base qw(CGI::Dialog::MultiField);
+
+sub new
+{
+	my $class = shift;
+	my %params = @_;
+	my $rowFields = $params{rowFields};
+	$params{fields} = [];
+	
+	foreach my $row (1..$params{rows})
+	{
+		foreach my $col (1..@{$rowFields})
+		{
+			unless (ref($rowFields->[$col-1]) eq 'HASH')
+			{
+				die "'rowFields' parameter of a DataGrid must be an array of hashes";
+			}
+			# Get the template for the field
+			my %field = %{$rowFields->[$col-1]};
+			
+			# Skip the field on this row if asked
+			if (defined $field{_skipOnRows})
+			{
+				next if grep {$_ eq $row} @{$field{_skipOnRows}};
+			}
+			
+			# Include the row number in the field name
+			$field{name} .= '_' . $row;
+			$field{_row} = $row unless defined $field{_row};
+			$field{_col} = $col unless defined $field{_col};
+			
+			# Create a new field object
+			no strict 'refs';
+			my $fieldObj = &{"$field{_class}::new"}($field{_class}, %field);
+			
+			# Add it to the list
+			push @{$params{fields}}, $fieldObj;
+		}
+	}
+	return CGI::Dialog::MultiField::new($class, %params);
+}
+
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
+
+	my $name = $self->{name};
+	my $completeHtml = '';
+	my $fieldsHtml = '';
+	my $errorMsgsHtml = '';
+	my $bgColorAttr = '';
+	my $spacerHtml = '&nbsp;';
+	my $fields = $self->{fields};
+	my $requiredCols = 0;
+	my @messages = ();
+	
+	my $row = 0;
+	my $col = 0;
+	$fieldsHtml = qq{<table border="0" cellpadding="0" cellspacing="0"><tr id="_id_${name}_${row}">};
+	
+	# Make a first pass to get column headings
+	my @headings = ();
+	foreach(@$fields)
+	{
+		next unless $_->{caption};
+		my $caption = "<font $dialog->{bodyFontAttrs}>$_->{caption}</font>";
+		if ($caption && $_->{flags} & FLDFLAG_REQUIRED)
+		{
+			$caption = "<b>$caption</b>";
+		}
+		$headings[$_->{_col}] = $caption;
+	}
+	
+	# Print the heading row
+	foreach(0..$#headings)
+	{
+		my $caption = $headings[$_];
+		$fieldsHtml .= qq{<td align="center" id="_id_${name}_${row}_${_}">$caption$spacerHtml$spacerHtml</td>};
+	}
+	
+	# Print the data rows
+	foreach(@$fields)
+	{
+		my @fldValMsgs = $page->validationMessages($_->{name});
+		push(@messages, @fldValMsgs) if @fldValMsgs;
+		$_->setFlag(FLDFLAG_CUSTOMDRAW);
+		$requiredCols += $_->flagIsSet(FLDFLAG_REQUIRED);
+		if ($_->{_row} != $row)
+		{
+			$row = $_->{_row};
+			$fieldsHtml .= qq{</tr><tr id="_id_${name}_${row}">};
+			$col = 0;
+		}
+		
+		while($col < $_->{_col})
+		{
+			$fieldsHtml .= qq{<td id="_id_${name}_${row}_${col}">} . '</td>';
+			$col++;
+		}
+			
+		$fieldsHtml .= qq{<td id="_id_${name}_${row}_${col}" nowrap>} . $_->getHtml($page, $dialog, $command, $dlgFlags) . $spacerHtml . '</td>';
+		$col++;
+	}
+	$fieldsHtml .= '</tr></table>';
+	
+	if(@messages)
+	{
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
+		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
+
+		my $msgsHtml = '';
+		foreach (@messages)
+		{
+			next if m/^\s*$/;  # skip blanks
+			$msgsHtml .= '<br>' . $_;
+		}
+		$errorMsgsHtml = "<font $dialog->{bodyFontErrorAttrs}>$msgsHtml</font>";
+	}
+
+	# Multifield caption overrides sub field captions
+	my $caption = "";
+	if ($self->{flags} & FLDFLAG_DEFAULTCAPTION)
+	{
+		foreach(@$fields)
+		{
+			if (defined $_->{caption})
+			{
+				$caption .= " / " if ($caption);
+				$caption .= $_->{flags} & FLDFLAG_REQUIRED ? "<b>$_->{caption}</b>" : $_->{caption};
+			}
+		}
+	}
+	else
+	{
+		$caption = $self->{caption};
+		$caption = "<b>$caption</b>" if $requiredCols > 0;
+	}
+
+
+	# do some basic variable replacements
+	my $Command = "\u$command";
+	$caption =~ s/(\$\w+)/$1/eego;
+
+	my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
+	my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
+	my $id = "_id_" . $self->{name};
+	return qq{<tr valign="top" id="$id" $bgColorAttr><td width="$self->{_spacerWidth}">
+		$spacerHtml
+	</td><td align="$dialog->{captionAlign}">
+		<font $dialog->{bodyFontAttrs}>
+			$caption
+		</font>
+	</td><td>
+		<font $dialog->{bodyFontAttrs}>
+			$self->{preHtml}
+			$fieldsHtml $popupHtml $self->{postHtml}
+			$errorMsgsHtml
+			$hints
+		</font>
+	</td><td width="$self->{_spacerWidth}">
+		&nbsp;
+	</td></tr>};
+}
+
+
 ##############################################################################
 package CGI::Dialog::Field::Duration;
 ##############################################################################
@@ -1370,6 +1549,7 @@ use constant FIELDNAME_EXECMODE => 'dlg_execmode';
 use constant FIELDNAME_REFERER  => 'dlg_referer';
 
 use constant PAGEPROPNAME_EXECMODE => '_dlg_execmode';
+use constant PAGEPROPNAME_INEXEC   => '_dlg_inexec';
 use constant PAGEPROPNAME_FLAGS    => '_dlg_flags';
 use constant PAGEPROPNAME_VALID    => '_dlg_valid';
 use constant PAGEPROPNAME_COMMAND  => '_dlg_command';
@@ -1500,7 +1680,7 @@ sub new
 			postHtml => [],
 			fieldMap => {},   # key is fieldName, value is fieldIndex in content
 			priKeys => [],
-			heading => "No heading provided.",
+			heading => '',
 			#headColor => "#a7afa7",
 			#bgColor => "#d7dfe7",
 			headColor => "LIGHTSTEELBLUE",
@@ -1777,6 +1957,10 @@ sub nextExecMode
 		$isValid = $self->isValid($page);
 		$execMode = $isValid ? 'E' : 'V';
 	}
+	elsif($execMode eq 'E')
+	{
+		$execMode = 'I';
+	}
 	$execMode;
 }
 
@@ -1890,12 +2074,14 @@ sub getStateData
 	my ($self, $page, $command) = @_;
 
 	my $id = $self->id();
+	my $inExec = $page->property(PAGEPROPNAME_INEXEC . '_' . $id);
+
 	$page->property(PAGEPROPNAME_COMMAND . '_' . $id, $command);
 
 	my $flags = $self->getFlags($command, 'UNKNOWN');
 	$self->makeStateChanges($page, $command, $flags);
 
-	my $activeExecMode = $self->activeExecMode($page);
+	my $activeExecMode = $inExec ? 'I' : $self->activeExecMode($page);
 	$flags = $self->getFlags($command, $activeExecMode);
 
 	$page->property(PAGEPROPNAME_FLAGS . '_' . $id, $flags);
@@ -2124,18 +2310,25 @@ sub getHtml
 	my $formAction = "/";
 	$formAction .= $page->param('_isPopup') ? $page->param('arl_asPopup') : $page->param('arl');
 	$formAction =~ s/\?.*$//;
+	
+	# Don't display a window title unless a header is defined
+	my $titleBarHtml = '';
+	if ($heading)
+	{
+		$titleBarHtml = qq{<tr align="center" bgcolor="$self->{headColor}"><td background="/resources/design/verttab.gif">
+			<font $self->{headFontAttrs}>
+				&nbsp;<b>$heading</b><!--$activeExecMode : $newExecMode : $isValid)-->&nbsp;
+			</font>
+			$titleRule
+			</td></tr>};
+	}
 
 	return qq{
 	<center>
-	<table border="0" bgcolor="$self->{headColor}" cellspacing="2" cellpadding="0"><tr><td>
-	<table border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="4"><tr align="center" bgcolor="$self->{headColor}"><td background="/resources/design/verttab.gif">
-		<font $self->{headFontAttrs}>
-			&nbsp;<b>$heading</b><!--$activeExecMode : $newExecMode : $isValid)-->&nbsp;
-		</font>
-		$titleRule
-	</td></tr>$errorsHtml<tr><td>
+	<table border="0" bgcolor="$self->{headColor}" cellspacing="2" cellpadding="0" width="$self->{width}"><tr><td>
+	<table border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="4" width="$self->{width}">$titleBarHtml$errorsHtml<tr><td>
 		@{$self->{preHtml}}
-	<table border=0 bgcolor=$self->{bgColor} cellspacing=0 cellpadding=$self->{cellPadding} width=100%><SCRIPT>
+	<table align="center" border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="$self->{cellPadding}"><SCRIPT>
 		$fieldsInfoJS
 	</SCRIPT><form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">@dlgHouskeepingHiddens $html </form></table>
 	</td></tr></table>
