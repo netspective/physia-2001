@@ -5,9 +5,8 @@ package App::Statements::Search::Claim;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @EXPORT @CHANGELOG $STMTMGR_CLAIM_SEARCH $INVOICE_COLUMNS $UPINITEMNAME_PATH);
+use vars qw(@ISA @EXPORT $STMTMGR_CLAIM_SEARCH $INVOICE_COLUMNS $UPINITEMNAME_PATH);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CLAIM_SEARCH);
 
@@ -16,22 +15,24 @@ $UPINITEMNAME_PATH = 'UPIN';
 
 $INVOICE_COLUMNS = "invoice_id, total_items, client_id, to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, get_Invoice_Status_cap(invoice_status) as invoice_status, bill_to_id, reference, total_cost, total_adjust, balance, bill_to_type";
 
-
+#to_char(iit.service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 use vars qw($STMTFMT_SEL_CLAIM $STMTRPTDEFN_DEFAULT);
 $STMTFMT_SEL_CLAIM = qq{
 		select distinct i.invoice_id, i.total_items, i.client_id,
-			to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
-			iis.caption as invoice_status, ib.bill_to_id, i.total_cost, i.total_adjust,
-			i.balance, i.reference, ib.bill_party_type
-		from 	invoice_status iis, invoice i, invoice_billing ib %tables%
+			to_char(iit.service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			iis.caption as invoice_status, ib.bill_to_id, i.total_cost, 
+			i.total_adjust, i.balance, ib.bill_party_type,
+			to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
+		from 	invoice_status iis, invoice i, invoice_billing ib, invoice_item iit %tables%
 		where
 			%whereCond%
+			and iit.item_id = (select min(item_id) from invoice_item where parent_id = i.invoice_id and iit.item_type in (1,2))
 			and ib.invoice_id = i.invoice_id
 			and ib.invoice_item_id is NULL
 			and ib.bill_sequence = 1
 			and (owner_type = 1 and owner_id = ?)
 			and iis.id = i.invoice_status
-		order by invoice_date DESC
+		order by i.invoice_id
 };
 
 $STMTRPTDEFN_DEFAULT =
@@ -51,12 +52,13 @@ $STMTRPTDEFN_DEFAULT =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#")', hint => 'Reference: #9#' },
+		{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#")', hint => 'Created on: #10#' },
 		{ head => 'IC' },
 		{ head => 'Patient', url => '/person/#&{?}#/account' },
-		{ head => 'Date' },
+		#{ head => 'Inv Date' },
+		{ head => 'Svc Date' },
 		{ head => 'Status' },
-		{ head => 'Payer', colIdx => 10,
+		{ head => 'Payer', colIdx => 9,
 			dataFmt =>
 			{
 				0 => '<A HREF=\'/person/#5#/account\' STYLE="text-decoration:none">#5#</A>',
@@ -122,7 +124,19 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_date_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'invoice_date like ?',
+			whereCond => "invoice_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "service_begin_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "service_begin_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_upin' =>
@@ -213,13 +227,25 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_date_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and invoice_date = ?',
+			whereCond => "i.invoice_status = ? and invoice_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_date_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and invoice_date like ?',
+			whereCond => "i.invoice_status = ? and invoice_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate_status' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "i.invoice_status = ? and service_begin_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate_status_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "i.invoice_status = ? and service_begin_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_upin_status' =>
@@ -309,15 +335,25 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_date_incomplete' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = person_id and invoice_date = ?',
-			tables => ', person',
+			whereCond => "i.invoice_status in (0,1) and invoice_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_date_incomplete_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = person_id and invoice_date like ?',
-			tables => ', person',
+			whereCond => "i.invoice_status in (0,1) and invoice_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate_incomplete' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "i.invoice_status in (0,1) and service_begin_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_servicedate_incomplete_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CLAIM,
+			whereCond => "i.invoice_status in (0,1) and service_begin_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_upin_incomplete' =>
@@ -364,16 +400,4 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 		},
 );
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/06/2000', 'MAF',
-		'Search/Claim',
-		'Updated the Claim select statements by replacing them with _stmtFmt.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'MAF',
-		'Search/Claim',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/21/2000', 'MAF',
-		'Search/Claim',
-		'Fixed visit date and employer statements and other minor fixes.'],
-);
 1;
