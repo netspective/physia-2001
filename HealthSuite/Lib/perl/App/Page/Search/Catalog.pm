@@ -8,6 +8,7 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Catalog;
 use Data::Publish;
+use App::Statements::Catalog;
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
@@ -19,11 +20,38 @@ sub getForm
 {
 	my ($self, $flags) = @_;
 
-	my $view = $self->param('search_type') eq 'detail' || $self->param('search_type') eq 'detailname' ? 'offering_catalog_entry ' : 'offering_catalog';
+	my $view = $self->param('search_type') eq 'detail' || $self->param('search_type') eq 'detailname' ? 'offering_catalog_entry' : 'offering_catalog';
 	my $catalogId = $view eq 'offering_catalog_entry' ? $self->param('search_expression') : undef;
 
 	my $dialogARL = $catalogId eq '' ? '/org/#session.org_id#/dlg-add-catalog' : '/org/#session.org_id#/dlg-add-catalog-item' . $catalogId;
-	my $heading = $catalogId eq '' ?  'Lookup a fee schedule' : "Lookup a fee schedule item for '$catalogId'";	
+	my $heading;
+	my $value;
+	my $search_type;
+	if($catalogId)
+	{
+		my $id;
+		if ($self->param('search_type') eq 'detail')
+		{
+			my $catalog = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_NONE,'selCatalogById', $catalogId);
+			$id = $catalog->{catalog_id};
+		}
+		else
+		{
+			$id = $catalogId
+		}
+		$heading = "Fee schedule item(s) for '$id'";		
+		$value = $id;
+		$search_type = "id";
+	}
+	else
+	{
+		$heading = 'Lookup a fee schedule';
+		$value =$self->param('search_expression');
+		$search_type = $self->param('search_type') || 0
+		
+	}
+
+
 	return ($heading, qq{
 		<CENTER>
 		<NOBR>
@@ -33,13 +61,13 @@ sub getForm
 			<option value="description">Description</option>
 			<option value="nameordescr" selected>Name or Description</option>
 		</select>
-		<input name="search_expression" value="@{[$self->param('search_expression')]}">
+		<input name="search_expression" value="@{[$value]}">
 		<input type=submit name="execute" value="Go">
 		</NOBR>
 		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : " | <a href=$dialogARL>Add New Fee Schedule</a>" ]}
 		</CENTER>
 		<script>
-			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');
+			setSelectedValue(document.search_form.search_type, '@{[ $search_type ]}');
 		</script>
 	});
 }
