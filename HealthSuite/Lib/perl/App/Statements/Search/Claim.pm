@@ -156,14 +156,14 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_lastname' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = person_id and name_last = ?',
+			whereCond => 'i.client_id = person_id and upper(name_last) = ?',
 			tables => ', person',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = person_id and name_last like ?',
+			whereCond => 'i.client_id = person_id and upper(name_last) like ?',
 			tables => ', person',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
@@ -275,14 +275,14 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_lastname_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = person_id and name_last = ?',
+			whereCond => 'i.invoice_status = ? and i.client_id = person_id and upper(name_last) = ?',
 			tables => ', person',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = person_id and name_last like ?',
+			whereCond => 'i.invoice_status = ? and i.client_id = person_id and upper(name_last) like ?',
 			tables => ', person',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
