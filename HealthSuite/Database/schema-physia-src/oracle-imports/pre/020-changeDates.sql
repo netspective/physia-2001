@@ -1,5 +1,6 @@
-create or replace procedure changeDates(p_days in number) is    
-/*                                       p_continue in number) is  */
+create or replace procedure changeDates(p_days in number,
+                                        p_logfiledir in varchar2 := '.') is    
+/*                                      p_continue in number) is  */
                                         
 	v_table_name user_tab_columns.table_name%type;
 	v_column_name user_tab_columns.column_name%type;
@@ -27,8 +28,7 @@ begin
         	v_days_nmbr := -p_days;
         end if;
 
-   	output_file := UTL_FILE.FOPEN('/home/u01/app/oracle/product/8.1.5/utldir/log',
-                  'chng_date__'||TO_CHAR(SYSDATE, 'MMDDYY_HH:MI_AM')||'.log', 'w');
+   	output_file := UTL_FILE.FOPEN(p_logfiledir, 'chng_date__'||TO_CHAR(SYSDATE, 'MMDDYY_HH:MI_AM')||'.log', 'w');
                   
 /*	if p_continue > 0
 	then
@@ -101,10 +101,6 @@ begin
 	
    	UTL_FILE.FCLOSE(output_file);
    	
-	
---exception
---	when others then
---		DBMS_SQL.CLOSE_CURSOR(v_cursor);
 end;
 /
 show errors;
