@@ -53,7 +53,7 @@ sub new
 		level => 1,
 		scope =>'person_attribute',
 		key => "#param.person_id#",
-		data => "\u$self->{id} to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		data => "\u Care Provider to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 

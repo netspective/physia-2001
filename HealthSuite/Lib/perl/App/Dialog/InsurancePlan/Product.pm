@@ -46,9 +46,9 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_product_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_org_id'),
-			
+
 			#Hidden field to store medigap item_id
-			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),			
+			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),
 
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
 				name => 'ins_org_id',
@@ -95,7 +95,7 @@ sub new
 						name => 'medigap_number',
 						size =>'7',
 						maxLength =>'7'
-						),			
+						),
 			new CGI::Dialog::Subhead(heading => 'Remittance Information',
 				name => 'remittance_heading'
 			),
@@ -121,7 +121,7 @@ sub new
 		{
 			scope =>'insurance',
 			key => "#field.ins_org_id#",
-			data => "Insurance '#field.product_name#' in <a href='/org/#field.ins_org_id#/profile'>#field.ins_org_id#</a>"
+			data => "Insurance Product '#field.product_name#' in <a href='/org/#field.ins_org_id#/profile'>#field.ins_org_id#</a>"
 		};
 
 		$self->addFooter(new CGI::Dialog::Buttons(
@@ -201,8 +201,8 @@ sub populateData
 	my $feeItem = '';
 	foreach my $feeSchedule (@{$feeSched})
 	{
-		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', 
-			$feeSchedule->{'value_text'});	
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById',
+			$feeSchedule->{'value_text'});
 		push (@feeItemList, $feeSchedule->{'item_id'});
 		push(@feeList, $catalog->{'catalog_id'});
 		$fee = join(',', @feeList);
@@ -291,9 +291,9 @@ sub handleAttributes
 			_debug => 0
 		);
 
-	#If the medigap_number_id field is set then this is an update to the medigap number otherwise it is an add	
+	#If the medigap_number_id field is set then this is an update to the medigap number otherwise it is an add
 	my $command_medigap = $page->field('medigap_number_id') ? 'update' : 'add';
-	
+
 	#Store Medigap Number if field is populated or we have an item_id
 	$page->schemaAction(
 			'Insurance_Attribute', $command_medigap,
@@ -302,7 +302,7 @@ sub handleAttributes
 			item_name => 'Medigap/Number',
 			value_type => $textAttrType,
 			value_text => $page->field('medigap_number') || undef,
-		)if $page->field('medigap_number') || $page->field('medigap_number_id') ;			
+		)if $page->field('medigap_number') || $page->field('medigap_number_id') ;
 
 	my @feeSched =split(',', $page->field('fee_schedules'));
 
@@ -311,7 +311,7 @@ sub handleAttributes
 
 	foreach my $fee (@feeSched)
 	{
-		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', 
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',
 			$page->session('org_internal_id'),$fee,$FS_CATALOG_TYPE);
 		$page->schemaAction(
 			'Insurance_Attribute', 'add',

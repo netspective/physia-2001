@@ -155,7 +155,7 @@ sub new
 		{
 			scope =>'insurance',
 			key => "#field.ins_org_id#",
-			data => "Insurance '#field.product_name#' in <a href='/org/#param.ins_org_id#/profile'>#param.ins_org_id#</a>"
+			data => "Insurance Plan'#field.plan_name#' to Product '#field.plan_name#' in <a href='/org/#field.ins_org_id#/profile'>#field.ins_org_id#</a>"
 		};
 
 		$self->addFooter(new CGI::Dialog::Buttons(
@@ -250,8 +250,8 @@ sub populateData_add
 		foreach my $feeSchedule (@{$feeSched})
 		{
 			push (@feeItemList, $feeSchedule->{'item_id'});
-			my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', 
-			$feeSchedule->{'value_text'});				
+			my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById',
+			$feeSchedule->{'value_text'});
 			push(@feeList, $catalog->{'catalog_id'});
 			$fee = join(',', @feeList);
 			$feeItem = join(',', @feeItemList);
@@ -302,7 +302,7 @@ sub populateData_update
 	foreach my $feeSchedule (@{$feeSched})
 	{
 		push (@feeItemList, $feeSchedule->{'item_id'});
-		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', $feeSchedule->{'value_text'});		
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', $feeSchedule->{'value_text'});
 		push(@feeList, $catalog->{'catalog_id'});
 		$fee = join(',', @feeList);
 		$feeItem = join(',', @feeItemList);
@@ -434,8 +434,8 @@ sub handleAttributes
 
 	foreach my $fee (@feeSched)
 	{
-		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', 
-			$page->session('org_internal_id'),$fee,$FS_CATALOG_TYPE);	
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',
+			$page->session('org_internal_id'),$fee,$FS_CATALOG_TYPE);
 		$page->schemaAction(
 			'Insurance_Attribute', 'add',
 			item_id => $page->field('fee_item_id') || undef,
