@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.3 2000-12-05 15:43:51 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.4 2000-12-18 19:24:21 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -83,6 +83,12 @@ sub new
 		#	type => 'bool',
 		#	style => 'check',
 		#),
+		new CGI::Dialog::Field(
+			name => 'priority',
+			caption => 'Priority',
+			selOptions => 'Normal;Emergency;ASAP',
+			type => 'select',
+		),
 		new CGI::Dialog::Field(
 			name => 'subject',
 			caption => 'Subject',
@@ -197,6 +203,7 @@ sub populateData
 		$page->field('patient_id', $patientId);
 		$page->field('patient_name', $existingMsg->{'repatient_name'}) if defined $existingMsg->{'repatient_name'};
 		$page->field('deliver_records', $existingMsg->{'deliver_records'}) if defined $existingMsg->{'deliver_records'};
+		$page->field('priority', $existingMsg->{'priority'} || 'Normal');
 		$page->field('subject', $existingMsg->{'subject'});
 		$page->field('message', $existingMsg->{'message'}) if defined $existingMsg->{'message'};
 	}
@@ -253,6 +260,7 @@ sub execute
 	
 	unless ($command eq 'trash' || $command eq 'read')
 	{
+		$messageData->{'priority'} = $page->field('priority') unless defined $messageData->{'priority'};
 		$messageData->{'subject'} = $page->field('subject') unless defined $messageData->{'subject'};
 		$messageData->{'message'} = $page->field('message') unless defined $messageData->{'message'};
 		$messageData->{'to'} = $page->field('to') unless defined $messageData->{'to'};
@@ -295,6 +303,7 @@ sub sendMessage
 		doc_spec_subtype => $messageData{'type'} || App::Universal::MSGSUBTYPE_MESSAGE,
 		doc_source_id => $page->session('person_id'),
 		doc_source_type => App::Universal::DOCSRCTYPE_PERSON,
+		doc_data_b => $messageData{'priority'},
 		doc_name => $messageData{'subject'},
 		doc_content_small => $messageData{'message'},
 	);
@@ -414,7 +423,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.3 2000-12-05 15:43:51 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.4 2000-12-18 19:24:21 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
