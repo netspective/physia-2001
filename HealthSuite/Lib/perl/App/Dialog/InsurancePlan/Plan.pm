@@ -10,6 +10,7 @@ use App::Statements::Org;
 use App::Statements::Insurance;
 use CGI::Dialog;
 use App::Universal;
+use App::Dialog::Field::Insurance;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 use Date::Manip;
@@ -33,8 +34,8 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'ins_type'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
-				new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED),
+				new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
+				new App::Dialog::Field::Insurance::Plan::New(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED),
 				#new CGI::Dialog::Field::TableColumn(
 				#					caption => 'Insurance Type',
 				#					schema => $schema,

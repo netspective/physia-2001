@@ -9,6 +9,7 @@ use App::Dialog::InsurancePlan;
 use App::Statements::Org;
 use App::Statements::Person;
 use App::Statements::Insurance;
+use App::Dialog::Field::Insurance;
 use CGI::Dialog;
 use App::Universal;
 use Devel::ChangeLog;
@@ -36,8 +37,8 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'person_hidden'),
 			new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-			new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
-			new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan'),
+			new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insproduct'),
+			new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insplan'),
 			#new CGI::Dialog::Field::TableColumn(
 			#					caption => 'Insurance Type',
 			#					schema => $schema,
@@ -169,8 +170,8 @@ sub new
 			new CGI::Dialog::MultiField(caption =>'InsCompanyID/ProductName/PlanName', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
 							new App::Dialog::Field::Organization::ID(caption => 'Ins Company ID', name => 'ins_comp',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Product Name', name => 'product', findPopup => '/lookup/insproduct', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan', findPopup => '/lookup/insplan', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+							new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product', findPopup => '/lookup/insproduct', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan', findPopup => '/lookup/insplan', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						])
 
 			);

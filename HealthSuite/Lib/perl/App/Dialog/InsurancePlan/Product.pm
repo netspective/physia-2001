@@ -6,6 +6,7 @@ use Carp;
 use DBI::StatementManager;
 use CGI::Validator::Field;
 use App::Dialog::InsurancePlan;
+use App::Dialog::Field::Insurance;
 use App::Statements::Org;
 use App::Statements::Insurance;
 use CGI::Dialog;
@@ -33,7 +34,7 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED),
+				new App::Dialog::Field::Insurance::Product::New(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field::TableColumn(
 									caption => 'Product Type',
 									schema => $schema,
