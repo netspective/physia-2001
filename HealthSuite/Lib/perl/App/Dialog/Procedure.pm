@@ -325,6 +325,37 @@ sub copyInvoice
 		_debug => 0
 	);
 
+
+	#copy all attributes except history items
+	my $attributes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllAttributesExclHistory', $oldInvoiceId);
+	foreach my $attr (@{$attributes})
+	{
+		my $valueType = $attr->{value_type};
+		my $itemType = $attr->{item_type};
+		my $valueInt = $attr->{value_int};
+		my $valueIntB = $attr->{value_intb};
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $newInvoiceId,
+			item_type => defined $itemType ? $itemType : undef,
+			item_name => $attr->{item_name} || undef,
+			value_type => defined $valueType ? $valueType : undef,
+			value_text => $attr->{value_text} || undef,
+			value_textB => $attr->{value_textb} || undef,
+			value_int => defined $valueInt ? $valueInt : undef,
+			value_intB => defined $valueIntB ? $valueIntB : undef,
+			value_float => $attr->{value_float} || undef,
+			value_floatB => $attr->{value_floatb} || undef,
+			value_date => $attr->{value_date} || undef,
+			value_dateEnd => $attr->{value_dateend} || undef,
+			value_dateA => $attr->{value_datea} || undef,
+			value_dateB => $attr->{value_dateb} || undef,
+			value_block => $attr->{value_block} || undef,
+			_debug => 0
+		);	
+	}
+	
+
 	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $oldInvoiceId);
 	foreach my $item (@{$lineItems})
 	{
@@ -355,6 +386,7 @@ sub copyInvoice
 		);
 
 		my $adjustments = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selItemAdjustmentsByItemParent', $item->{item_id});
+		my $newAdjId = '';
 		foreach my $adjust (@{$adjustments})
 		{
 			my $adjType = $adjust->{adjustment_type};
@@ -362,7 +394,7 @@ sub copyInvoice
 			my $payMethod = $adjust->{pay_method};
 			my $payerType = $adjust->{payer_type};
 			my $writeoffCode = $adjust->{writeoff_code};
-			$page->schemaAction(
+			$newAdjId = $page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
 				adjustment_type => defined $adjType ? $adjType : undef,
 				adjustment_amount => $adjust->{adjustment_amount} || undef,
@@ -380,6 +412,20 @@ sub copyInvoice
 				comments => $adjust->{comments} || undef,
 				_debug => 0
 			);
+			
+			my $batchPayment = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $newInvoiceId, 'Invoice/Payment/Batch ID');
+			foreach my $batch (@{$batchPayment})
+			{				
+				if($batch->{value_int} == $adjust->{adjustment_id})
+				{
+					$page->schemaAction(
+						'Invoice_Attribute', 'update',
+						item_id => $batch->{item_id},
+						value_int => $newAdjId,
+						_debug => 0
+					);
+				}
+			}
 		}
 	}
 
@@ -431,7 +477,7 @@ sub copyInvoice
 
 	#update the new invoice with its new billing id and claim type
 	my $claimType = $newInsIntId ? $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsType', $newInsIntId) : 0;
-	my $invoiceStatus = $claimType == 0 ? App::Universal::INVOICESTATUS_CREATED : App::Universal::INVOICESTATUS_SUBMITTED;
+	my $invoiceStatus = $claimType == App::Universal::CLAIMTYPE_SELFPAY ? App::Universal::INVOICESTATUS_CREATED : App::Universal::INVOICESTATUS_SUBMITTED;
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $newInvoiceId || undef,
@@ -439,36 +485,6 @@ sub copyInvoice
 		invoice_subtype => defined $claimType ? $claimType : undef,
 		billing_id => $newPayerBillId,
 	);
-
-
-	#copy all attributes except history items
-	my $attributes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllAttributesExclHistory', $oldInvoiceId);
-	foreach my $attr (@{$attributes})
-	{
-		my $valueType = $attr->{value_type};
-		my $itemType = $attr->{item_type};
-		my $valueInt = $attr->{value_int};
-		my $valueIntB = $attr->{value_intb};
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $newInvoiceId,
-			item_type => defined $itemType ? $itemType : undef,
-			item_name => $attr->{item_name} || undef,
-			value_type => defined $valueType ? $valueType : undef,
-			value_text => $attr->{value_text} || undef,
-			value_textB => $attr->{value_textb} || undef,
-			value_int => defined $valueInt ? $valueInt : undef,
-			value_intB => defined $valueIntB ? $valueIntB : undef,
-			value_float => $attr->{value_float} || undef,
-			value_floatB => $attr->{value_floatb} || undef,
-			value_date => $attr->{value_date} || undef,
-			value_dateEnd => $attr->{value_dateend} || undef,
-			value_dateA => $attr->{value_datea} || undef,
-			value_dateB => $attr->{value_dateb} || undef,
-			value_block => $attr->{value_block} || undef,
-			_debug => 0
-		);	
-	}
 
 
 	#update the submission order attribute
