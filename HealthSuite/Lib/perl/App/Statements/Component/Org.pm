@@ -377,16 +377,16 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.associatedResources' => {
 	sqlStmt => qq{
-			select 	p.complete_name, pa.item_name, pa.parent_id
-			from 	person_attribute pa, person p
-			where	pa.parent_org_id = ?
-			and	p.person_id = pa.parent_id
-			and 	pa.value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
+			select 	p.complete_name, pa.category, pa.person_id
+			from 	person_org_category pa, person p
+			where	pa.org_id = ?
+			and	p.person_id = pa.person_id
+			order by pa.category, p.complete_name, pa.person_id
 		},
-	sqlStmtBindParamDescr => ['Org ID for parent_org_id in Person_Attribute Table'],
+	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Category', dataFmt => '#1#: <A HREF = "/person/#2#/profile">#0#</A>'},
+			{ head => 'Category', dataFmt => '#1#: <A HREF = "/person/#2#/profile">#0# (#2#)</A>'},
 		],
 		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=/#param.arl#',
 	},
@@ -431,13 +431,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.associatedResourcesStats' => {
 	sqlStmt => qq{
-			select 	item_name, count(item_name), parent_org_id
-			from 	person_attribute
-			where	parent_org_id = ?
-			and 	value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
-			group by item_name, parent_org_id
+			select 	category, count(category), org_id
+			from 	person_org_category
+			where	org_id = ?
+			group by category, org_id
 		},
-	sqlStmtBindParamDescr => ['Org ID for parent_org_id in Person_Attribute Table'],
+	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
 	publishDefn => {
 		columnDefn => [
 			{ head => 'Category', dataFmt => '#1# #0#(s)' },
