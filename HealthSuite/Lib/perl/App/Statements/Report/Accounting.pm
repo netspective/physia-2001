@@ -187,7 +187,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
-			AND (:7 IS NULL OR ic.payer_id = :7) 
+			AND (:7 IS NULL OR ic.payer_id = :7)
 			GROUP BY p.simple_name,pm.caption,
 				ic.payer_type,	ic.payer_id,
 				ic.pay_type
@@ -404,7 +404,7 @@ aic.batch_id,
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
-			AND (:7 IS NULL OR ic.payer_id = :7) 
+			AND (:7 IS NULL OR ic.payer_id = :7)
 			GROUP BY  pm.caption,
 				ic.payer_type,
 				ic.pay_type
@@ -647,6 +647,57 @@ aic.batch_id,
 
 	},
 
+	'sel_aged_insurance_total' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT 	count (distinct (bill_to_id)), count (distinct(invoice_id)),
+				sum(balance_0),
+				sum(balance_31),
+				sum(balance_61),
+				sum(balance_91),
+				sum(balance_121),
+				sum(balance_151),
+				sum(total_pending)
+			FROM	agedpayments a,org
+			WHERE	(a.bill_plain = :1 or :1 is NULL)
+			AND	a.bill_party_type  in (2,3)
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND 	a.invoice_status <> 15
+			AND	entire_invoice_balance <> 0
+			AND a.invoice_id in
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+					AND ii.item_type in (0,1,2)
+					AND ii.data_text_b is NULL
+				)
+			--having sum(total_pending) <> 0
+		},
+		sqlStmtBindParamDescr => ['Org Insurance ID'],
+		publishDefn =>
+			{
+			reportTitle => 'Aged Insurance Receivables Totals Report',
+			columnDefn =>
+				[
+#				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '#0# Insurances',},
+				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+
+	},
 
 	'sel_aged_insurance_detail' =>
 	{
@@ -812,6 +863,61 @@ aic.batch_id,
 			},
 	},
 
+	'sel_aged_all_total' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT
+				count(distinct a.person_id),
+				count(distinct invoice_id),
+				sum(balance_0),
+				sum(balance_31),
+				sum(balance_61),
+				sum(balance_91),
+				sum(balance_121),
+				sum(balance_151),
+				--sum(decode(item_type,3,total_pending,0)),
+				sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),
+				sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),
+				sum(total_pending)
+			FROM	agedpayments a, person p
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			AND EXISTS
+			(SELECT 1
+			 FROM person_org_category poc
+			 WHERE poc.person_id = a.person_id
+			 AND poc.org_internal_id  = :2
+			 )
+			AND	entire_invoice_balance <> 0
+			AND 	p.person_id = a.person_id
+			AND	a.invoice_status <> 15
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND EXISTS 
+			(
+				SELECT	b.person_id
+				FROM	agedpayments b
+				WHERE	(b.person_id = :1 or :1 is NULL)
+				AND 	(b.invoice_item_id is NULL  or b.item_type in (3) )
+				and b.person_id = a.person_id
+				AND EXISTS
+					(SELECT 1
+					FROM person_org_category poc
+					WHERE poc.person_id = b.person_id
+					AND poc.org_internal_id  = :2
+					)
+				AND	b.entire_invoice_balance <> 0
+				AND	b.invoice_status <> 15
+				AND (:3 IS NULL OR b.care_provider_id = :3)
+				AND	(:4 IS NULL OR b.service_facility_id = :4)
+				group by b.person_id
+				having sum(b.total_pending) > 0
+			)
+		},
+	},
+
 	'sel_aged_patient' =>
 	{
 		sqlStmt =>
@@ -854,6 +960,7 @@ aic.batch_id,
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
+
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
 			{
@@ -872,6 +979,92 @@ aic.batch_id,
 				{ colIdx => 8, head => '151+', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
 				{ colIdx => 9, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#9#', dformat => 'currency' },
 				{ colIdx => 10, head => 'Total Pending', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
+	'sel_aged_patient_total' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			SELECT
+				count(distinct a.person_id),
+				count(distinct invoice_id),
+				sum(balance_0),
+				sum(balance_31),
+				sum(balance_61),
+				sum(balance_91),
+				sum(balance_121),
+				sum(balance_151),
+				sum(decode(item_type,3,total_pending,0)),
+				sum(total_pending)
+			FROM	agedpayments a
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL  or item_type in (3) )
+			AND	( bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3 AND total_pending <>0))
+			AND	entire_invoice_balance <> 0
+			AND	a.invoice_status <> 15
+			AND	EXISTS
+			(SELECT 1
+			 FROM person_org_category poc
+			 WHERE poc.person_id = a.person_id
+			 AND poc.org_internal_id  = :2
+			 )
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND a.invoice_id in
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+					AND ii.item_type in (0,1,2)
+					AND ii.data_text_b is NULL
+				)
+			and exists
+			(
+				SELECT b.person_id
+				FROM	agedpayments b
+				WHERE	(b.person_id = :1 or :1 is NULL)
+				AND 	(b.invoice_item_id is NULL  or b.item_type in (3) )
+				AND	( b.bill_party_type in (0,1) or (b.bill_party_type=3 AND b.item_type=3 AND b.total_pending <>0))
+				AND	b.entire_invoice_balance <> 0
+				AND	b.invoice_status <> 15
+				and b.person_id = a.person_id
+				AND	EXISTS
+				(SELECT 1
+				 FROM person_org_category poc
+				 WHERE poc.person_id = b.person_id
+				 AND poc.org_internal_id  = :2
+				 )
+				AND 	(:3 IS NULL OR b.care_provider_id = :3)
+				AND	(:4 IS NULL OR b.service_facility_id = :4)
+				AND b.invoice_id in
+					(select parent_id from invoice_item ii
+						where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+						AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+						AND ii.item_type in (0,1,2)
+						AND ii.data_text_b is NULL
+					)
+				group by b.person_id
+				having sum(b.total_pending) > 0
+			)
+		},
+		sqlStmtBindParamDescr => ['Org Insurance ID'],
+		publishDefn =>
+			{
+			reportTitle => 'Aged Patient Receivables Totals Report',
+			columnDefn =>
+				[
+				{ colIdx => 0, hAlign=>'left',head => 'Total Patients', dataFmt => '#0# Patients'},
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#9#', dAlign => 'center', dformat => 'currency' },
 				],
 			},
 	},
@@ -1295,7 +1488,7 @@ aic.batch_id,
 
 	'sel_monthly_audit_newpatient_count_new' => qq{
 		SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
-		FROM invoice_charges 
+		FROM invoice_charges
 		WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND (facility = :3 OR :3 is NULL)
@@ -1307,7 +1500,7 @@ aic.batch_id,
 
 	'sel_monthly_audit_estpatient_count_new' => qq{
 		SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
-		FROM invoice_charges 
+		FROM invoice_charges
 		WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND (facility = :3 OR :3 is NULL)
@@ -1316,7 +1509,7 @@ aic.batch_id,
 			AND code in ('99211','99212','99213','99214','99215','99391','99392','99393','99394','99395','99396','99397')
 			GROUP BY to_char(invoice_date, 'MM/YYYY')
 	},
-	
+
 	'sel_monthly_audit_detail' => qq{
 	SELECT	invoice_charges.invoice_id ,
 		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
