@@ -7,8 +7,11 @@
 		<tested-date></tested-date>
 		<release-date></release-date>
 	</release-info>
-	
+
 	<deliverables>
+	<deliverable id=" 1138">
+		Added validation to display a warning message if user attempt to close a date that has prior open dates with transactions.
+        </deliverable>
 	
 	</deliverables>
 </release-notes>
