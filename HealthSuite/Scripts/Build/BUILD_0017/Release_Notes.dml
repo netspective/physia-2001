@@ -67,7 +67,12 @@
 
 		<deliverable id="963">
 			UI: Made the license fields in the nurse dialog to be just text fields.
+		</deliverable>	
+		
+		<deliverable id="1025">
+			UI: Added a Validation in the 'Certification' component and in the 'Add Physician' dialog for Specialty.
 		</deliverable>		
+		
 		<deliverable id="1095">
 			UI: Added a new home page when the user who logged in is a 'Physician'.
 		</deliverable>			
@@ -167,6 +172,7 @@
 		<deliverable id="1528">
 			UI: Now the Preventive-Care will show up in the alerts component, 90 days prior to the preventive care event 
 			    becoming due.
+			NOTE: Added the alert as an 'Patient File Alert'.
 		</deliverable>
 		
 		<deliverable id="1530">
