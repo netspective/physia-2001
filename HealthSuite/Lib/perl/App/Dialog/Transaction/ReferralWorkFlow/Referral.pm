@@ -60,6 +60,17 @@ sub initialize
 						new CGI::Dialog::Field(caption=>'Charge',type=>'currency',size=>9,name=>"charge$loop"),
 						]
 						));
+
+		push(@request,new CGI::Dialog::Field(caption =>'Referral Type ',
+					name => "referral_type$loop",
+					#options => FLDFLAG_PREPENDBLANK,
+					fKeyStmtMgr => $STMTMGR_TRANSACTION,
+					fKeyStmtFlags => STMTMGRFLAG_DYNAMICSQL,
+					fKeyStmt => $sqlStmt,
+					fKeyDisplayCol => 1,
+					fKeyValueCol => 0)
+				),
+
 		push(@request,new CGI::Dialog::Field(name=>"comment$loop", caption=>'Comments',type=>'text',size=>55,
 				postHtml=>qq{<A HREF = javascript:setRequestStyle($next,'block');>$IMAGETAGS{'icons/arrow-down-blue'}</A>
 						<BR> </BR>}
@@ -150,14 +161,6 @@ sub initialize
 					fKeyStmt => 'selReferralSourceType',
 					fKeyDisplayCol => 1,
 					fKeyValueCol => 0),
-		new CGI::Dialog::Field(caption =>'Referral Type ',
-					name => 'referral_type',
-					#options => FLDFLAG_PREPENDBLANK,
-					fKeyStmtMgr => $STMTMGR_TRANSACTION,
-					fKeyStmtFlags => STMTMGRFLAG_DYNAMICSQL,
-					fKeyStmt => $sqlStmt,
-					fKeyDisplayCol => 1,
-					fKeyValueCol => 0),
 
 		new CGI::Dialog::Field(caption =>'Date Of Request ', name => 'trans_end_stamp', type => 'date', pastOnly => 1),
 		new CGI::Dialog::MultiField(name => 'coord_status',
@@ -245,6 +248,7 @@ sub initialize
 			setIdDisplay("unit_charge"+line,styleValue);
 			setIdDisplay("comment"+line,styleValue);
 			setIdDisplay("description"+line,styleValue);
+			setIdDisplay("referral_type"+line,styleValue);
 		}
 		</script>
 	});
@@ -301,6 +305,8 @@ sub initialize
  			</TABLE>
  		});
 	}
+
+
 
 	elsif ($ServiceData ne '')
 	{
@@ -382,7 +388,7 @@ sub initialize
 		$page->field('trans_begin_stamp', $ServiceData->{'trans_begin_stamp'});
 		$page->field('intake_coordinator', $personSessionId);
 		#$page->field('status', $ServiceData->{'trans_substatus_reason'});
-		$page->field('referral_type', $ServiceData->{'trans_expire_reason'});
+		#$page->field('referral_type', $ServiceData->{'trans_expire_reason'});
 		$page->field('contact_org', $ServiceData->{'modifier'});
 		$page->field('mdfirstname', $ServiceData->{'auth_by'});
 		$page->field('mdlastname', $ServiceData->{'auth_ref'});
@@ -476,7 +482,7 @@ sub populateData_update
 	$page->field('trans_begin_stamp', $referralData->{'trans_begin_stamp'});
 	$page->field('intake_coordinator', $referralData->{'trans_subtype'});
 	$page->field('status', $referralData->{'trans_substatus_reason'});
-	$page->field('referral_type', $referralData->{'trans_expire_reason'});
+	#$page->field('referral_type', $referralData->{'trans_expire_reason'});
 	$page->field('icd_desc', $icdData->{'descr'});
 	$page->field('contact_org', $referralData->{'modifier'});
 	$page->field('comments', $referralData->{'display_summary'});
@@ -544,7 +550,10 @@ sub populateData_update
 	{
 		$page->field("code$count",$_->{code});
 		$page->field("modf$count",$_->{modifier});
-		$page->field("description$count",$_->{caption});
+		$page->field("referral_type$count",$_->{'trans_expire_reason'});
+		my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$_->{code},$page->session('org_internal_id') );
+
+		$page->field("description$count",$data->{description});
 		$page->field("comment$count",$_->{detail});
 		$page->field("charge$count",$_->{unit_cost});
 		$page->field("unit$count",$_->{quantity});
@@ -600,7 +609,7 @@ sub execute
 				trans_status 				=> $transStatus,
 				provider_id 				=> $page->field('provider_id') || undef,
 				care_provider_id 			=> $page->field('referral_id') || undef,
-				trans_expire_reason 		=> $page->field('referral_type') || undef,
+				#trans_expire_reason 		=> $page->field('referral_type') || undef,
 				#data_text_a 				=> $page->field('icd_desc') || undef,
 				#data_text_b 				=> $page->field('cpt_desc') || undef,
 				#data_text_c 				=> $page->field('hcspcs_desc') || undef,
@@ -735,6 +744,7 @@ sub execute
 		my $code = $page->field("code$loop");
 		my $modf = $page->field("modf$loop");
 		my $desc = $page->field("description$loop");
+		my $referralType = $page->field("referral_type$loop");
 		my $comment = $page->field("comment$loop");
 		my $charge = $page->field("charge$loop");
 		my $units = $page->field("unit$loop");
@@ -763,9 +773,11 @@ sub execute
 			detail=>$comment,
 			unit_cost => $charge,
 			quantity => $units,
-			caption=>$desc,
+			#caption=>$desc,
 			data_date_a =>$startDate,
 			data_date_b =>$endDate,
+			trans_expire_reason => $referralType,
+
 		);
 
 		my $transRef=undef;
