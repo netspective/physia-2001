@@ -100,7 +100,8 @@ sub new
 							fKeyStmtMgr => $STMTMGR_INSURANCE,
 							fKeyStmt => 'selInsuredRelation',
 							fKeyDisplayCol => 1,
-							fKeyValueCol => 0
+							fKeyValueCol => 0,
+							options => FLDFLAG_REQUIRED
 							),
 
 			new CGI::Dialog::MultiField(caption =>'Indiv/Family Deductible Remaining', name => 'deduct_remain',
