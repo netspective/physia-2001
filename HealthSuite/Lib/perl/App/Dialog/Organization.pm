@@ -483,14 +483,10 @@ sub execute_update
 		);
 
 	saveAttribute($page, 'Org_Attribute', $orgId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
-		value_int => 308,
-		value_intB => 777,
 		value_text => $page->field('hcfa_service_place'),
 	);
 
 	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
-		value_int => 118,
-		value_intB => 666,
 		value_text => $page->field('medicare_gpci'),
 	);
 	
