@@ -6,7 +6,8 @@ select 	t.provider_id as ProviderId,
 	decode(iia.payer_type,0,pm.caption,'PAYMENT') as Transaction_Type,
 	ins.plan_name as PolicyName,
 	sum(iia.adjustment_amount) as PersonalYearAmount, 
-	sum(iia.plan_paid) as InsuranceYearAmount
+	sum(iia.plan_paid) as InsuranceYearAmount,	
+	max ((select owner_org_id FROM org WHERE org_internal_id = poc.org_internal_id)) as owner_org_id	
 from 	Transaction t, Invoice i, invoice_billing ib, Invoice_Item ii, 
 	Invoice_Item_Adjust iia, Insurance ins, 
 	Person_Org_Category poc, person p, payment_method pm
@@ -37,7 +38,8 @@ select 	iia.pay_date as PayDate,
 	decode(iia.payer_type,0,pm.caption,'PAYMENT') as Transaction_Type,
 	ins.plan_name as PolicyName,
 	sum(iia.adjustment_amount) as PersonalMonthAmount, 
-	sum(iia.plan_paid) as InsuranceMonthAmount
+	sum(iia.plan_paid) as InsuranceMonthAmount,
+	max ((select owner_org_id FROM org WHERE org_internal_id = poc.org_internal_id)) as owner_org_id
 from 	Transaction t, Invoice i, invoice_billing ib, Invoice_Item ii, 
 	Invoice_Item_Adjust iia, Insurance ins, 
 	Person_Org_Category poc, person p, payment_method pm
