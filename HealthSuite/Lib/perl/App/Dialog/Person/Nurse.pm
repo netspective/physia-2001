@@ -117,16 +117,15 @@ sub makeStateChanges
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove';
+	$self->updateFieldFlags('blood_type', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('ethnicity', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+
 
 	my $personId = $page->param('person_id');
 
-	#$self->updateFieldFlags('ssndatemf', FLDFLAG_REQUIRED, 1);
-	#$self->getField('ssndatemf')->{fields}->[0]->{options} |= FLDFLAG_REQUIRED;
-	#$self->getField('ssndatemf')->{fields}->[1]->{options} |= FLDFLAG_REQUIRED;
-
-	#$self->updateFieldFlags('ssn', FLDFLAG_REQUIRED, 1);
-	#$self->updateFieldFlags('date_of_birth', FLDFLAG_REQUIRED, 1);
 
 	if($command eq 'remove')
 	{
@@ -137,8 +136,6 @@ sub makeStateChanges
 	my $sessOrgId = $page->session('org_id');
 
 	$self->getField('value_text')->{fKeyStmtBindPageParams} = "$sessOrgId";
-	#$page->addDebugStmt("Test: $self->getField('value_text')->{fKeyStmtBindPageParams} = $sessOrgId");
-	#$self->getField('value_text')->{fKeyWhere} = "p.person_id=pcat.person_id and pcat.org_id = '@{[ $page->session('org_id') ]}' and category='Physician'";
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
