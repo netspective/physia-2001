@@ -47,6 +47,13 @@
 		<column name="cr_org_internal_id" type="longint" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
 		<column name="version_id" type="version_id" required="dbms" unique="yes" group="audit" descr="A unique version number for this record (for audit purposes)"/>
 	</tabletype>
+	
+	<tabletype name="Creation_Track">
+		<column name="cr_stamp" type="stamp" default="sysdate" required="dbms" group="audit" descr="Date/time record was created"/>
+		<column name="cr_user_id" type="entity_id" group="audit" descr="The user that created the record"/>
+		<column name="cr_org_internal_id" type="longint" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
+	</tabletype>
+	
 
 	<tabletype name="Secure">
 		<column name="cr_session_id" usetype="Person_Session.session_id" required="no" group="secure" descr="Session that created this record"/>
