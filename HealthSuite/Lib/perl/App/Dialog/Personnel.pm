@@ -21,7 +21,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'personnel' => {
-		heading => '$Command Personnel', 
+		heading => '$Command Personnel',
 		_arl => ['person_id']
 	},
 );
@@ -35,11 +35,17 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new App::Dialog::Field::Person::ID(caption =>'Person ID', name => 'person_id', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(
+			caption =>'Person ID',
+			name => 'person_id',
+			hints => 'Please provide an existing Person ID.',
+			options => FLDFLAG_REQUIRED,
+			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(caption => 'Category',
 			type => 'select',
-			selOptions => 'Physician;Nurse;Staff;Patient;Guarantor;Administrator',
-			name => 'category'),
+			selOptions => 'Physician;Nurse;Staff;Patient;Guarantor;Administrator;Referring-Doctor',
+			name => 'category',
+			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 	);
 
@@ -53,6 +59,18 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 	return $self;
 }
+
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+
+	my $personId = $page->param('person_id');
+
+	#$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
+}
+
 
 #sub _customValidate
 #{
@@ -71,10 +89,10 @@ sub new
 
 sub execute
 {
-	my ($self, $page, $command, $flags) = @_;	
+	my ($self, $page, $command, $flags) = @_;
 	my $orgId = $page->param('org_id');
-	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
-	
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
 	$page->schemaAction(
 			'Person_Org_Category', $command,
 			person_id => $page->field('person_id') || undef,
