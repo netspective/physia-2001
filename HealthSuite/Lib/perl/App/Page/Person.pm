@@ -25,9 +25,7 @@ use App::Dialog::PostTransfer;
 
 use App::Page::Search;
 
-use Devel::ChangeLog;
-
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
@@ -102,9 +100,9 @@ sub prepare_page_content_header
 			['Chart', "$urlPrefix/chart", 'chart'],
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
-			['Add Appointment', "$urlPrefix/dlg-add-appointment", ''],
-			['Refills', "$urlPrefix/dlg-add-refill-request", ''],
-			['Voice Msgs', "$urlPrefix/dlg-add-phone-message", ''],			
+			['Add Appointment', "$urlPrefix/appointment", 'appointment'],
+			['Refills', "$urlPrefix/refill_request", 'refill_request'],
+			['Voice Msgs', "$urlPrefix/phone_message", 'phone_message'],			
 		], ' | ');
 
 
@@ -280,6 +278,39 @@ sub prepare_dialog_posttransfer
 #-----------------------------------------------------------------------------
 # VIEW-MANAGEMENT METHODS
 #-----------------------------------------------------------------------------
+
+sub prepare_view_appointment
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+	
+	my $dialogCmd = 'add';
+	my $cancelUrl = "/person/$personId/profile";
+	my $dialog = new App::Dialog::Appointment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+}
+
+sub prepare_view_refill_request
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+	
+	my $dialogCmd = 'add';
+	my $cancelUrl = "/person/$personId/profile";
+	my $dialog = new App::Dialog::Attribute::RefillRequest(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+}
+
+sub prepare_view_phone_message
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+	
+	my $dialogCmd = 'add';
+	my $cancelUrl = "/person/$personId/profile";
+	my $dialog = new App::Dialog::Attribute::PhoneMessage(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+}
 
 sub prepare_view_update
 {
@@ -645,33 +676,5 @@ sub handleARL
 	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
 	return 0;
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant PERSON_RECORD => 'Person';
-use constant PATIENT_SUMMARY => 'Patient/Summary';
-use constant PATIENT_CHART => 'Patient/Chart';
-use constant PATIENT_ACCOUNT => 'Patient/Account';
-use constant PERSON_SESSION => 'Person';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/28/1999', 'MAF, RK',
-		PERSON_RECORD,
-		'Updated prepare_view_remove sub routine to delete a person record'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/04/2000', ' RK',
-		PERSON_SESSION,
-		'Added sub routine called prepare_view_session.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/21/2000', ' MAF',
-		PERSON_SESSION,
-		'Fixed arl for scheduling appointments.'],
-
-);
 
 1;
