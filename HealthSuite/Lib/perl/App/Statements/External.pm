@@ -5,11 +5,14 @@ package App::Statements::External;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-
+use App::Universal;
 use vars qw(@EXPORT $STMTMGR_EXTERNAL);
 
 use base qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_EXTERNAL);
+
+my $HISTORY_RECORD=App::Universal::ATTRTYPE_HISTORY;
+my $WAITING_PAYMENT = App::Universal::INVOICESTATUS_AWAITINSPAYMENT;
 
 $STMTMGR_EXTERNAL = new App::Statements::External(
 	'sel_dupHistoryItems' => qq{
@@ -61,6 +64,57 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 	
 	'del_InvoiceAttribute' => qq{
 		delete from Invoice_Attribute where item_id = :1
+	},
+	
+	
+	# Statement for Loading Statement Ack records
+	#
+	'updateAckStatement'=>qq
+	{
+		UPDATE  Statement
+                SET     ack_stamp = sysdate,
+                tranmission_status  = 1,
+                ext_statement_id = :1
+                WHERE   ack_stamp is NULL
+                AND     int_statement_id = :2
+                AND   tranmission_status  = 0		
+	},
+
+	'updateAckStatus'=>qq
+	{
+		UPDATE 	Invoice
+		SET	invoice_status  = $WAITING_PAYMENT
+		WHERE	Invoice_id IN				
+		(SELECT sii.member_name 
+		 FROM Statement s, Statement_Inv_Ids sii
+		 WHERE sii.parent_id = s.statement_id
+		 AND s.ack_stamp is NULL
+		 AND s.tranmission_status  = 0
+		 AND  s.int_statement_id = :1
+		)
+	},
+	
+	'InsAckStatement'=>qq
+	{
+		INSERT INTO Invoice_History
+		(cr_stamp,
+		cr_user_id,
+		parent_id,
+		value_text,
+		value_date,
+		value_textb		
+		)
+		SELECT sysdate,
+		'EDI_PERSE',
+		sii.member_name,
+		:1, 
+		sysdate,
+		:2  			
+		 FROM Statement s, Statement_Inv_Ids sii
+		 WHERE sii.parent_id = s.statement_id
+		 AND s.ack_stamp is NULL
+		 AND s.tranmission_status  = 0
+		 AND sii.parent_id = :3
 	},
 	
 );
