@@ -3928,7 +3928,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.static',
-		flags => 0,
+#		flags => 0,
 		frame => { heading => 'Bookmarks / HyperLinks' },
 	},
 
