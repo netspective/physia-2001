@@ -344,19 +344,19 @@ sub handleRegistry
 	my $notApplicable = App::Universal::MARITALSTATUS_NOTAPPLICABLE;
 
 	my $namePrefix = '';
-	if($member eq 'physician')
+	if($member eq 'Physician')
 	{
 		$namePrefix = 'Dr.';
 	}
-	elsif($gender == $male && $member ne 'physician')
+	elsif($gender == $male && $member ne 'Physician')
 	{
 		$namePrefix = 'Mr.';
 	}
-	elsif($gender == $female && $member ne 'physician' && ($maritalStatus == $married || $maritalStatus == $separated || $maritalStatus == $widowed))
+	elsif($gender == $female && $member ne 'Physician' && ($maritalStatus == $married || $maritalStatus == $separated || $maritalStatus == $widowed))
 	{
 		$namePrefix = 'Mrs.';
 	}
-	elsif($gender == $female && $member ne 'physician' && ($maritalStatus == $single || $maritalStatus == $divorced || $maritalStatus == $maritalUnknown || $maritalStatus == $notApplicable))
+	elsif($gender == $female && $member ne 'Physician' && ($maritalStatus == $single || $maritalStatus == $divorced || $maritalStatus == $maritalUnknown || $maritalStatus == $notApplicable))
 	{
 		$namePrefix = 'Ms.';
 	}
