@@ -3,6 +3,9 @@
 alter table offering_catalog add(flags number(16));
 alter table offering_catalog_aud add(flags number(16));
 
+analyze table Offering_Catalog compute statistics for table for all indexes for all columns;
+analyze table Offering_Catalog_Aud compute statistics for table for all indexes for all columns;
+
 start tables-code/Offering_Catalog
 
 --bug 1803
@@ -10,7 +13,7 @@ start tables-code/Offering_Catalog
 start tables-code/Invoice_Item_totals
 start tables-code/Invoice_Item_Adjust_totals
 
---bug 1826
+--bug 1824
 
 start pre/pkg-set
 
