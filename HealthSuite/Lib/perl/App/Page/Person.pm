@@ -22,7 +22,7 @@ use App::Dialog::Adjustment;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
-
+use App::Statements::Worklist::WorklistCollection;
 use App::Page::Search;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -148,6 +148,7 @@ sub prepare_page_content_header
 		], ' | ');
 
 	my $profileLine = '<b>Profile: </b>';
+	$profileLine .= '<font color=red>(Account in Collection)</font>' if $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId);
 	$profileLine .=  '&nbsp;Category: #property.person_org_category# ' if $self->property('person_org_category');
 	$profileLine .= '&nbsp;SSN #property.person_ssn# ' if $self->property('person_ssn');
 	$profileLine .= '&nbsp;#property.person_gender_caption# ' if $self->property('person_gender_caption');
