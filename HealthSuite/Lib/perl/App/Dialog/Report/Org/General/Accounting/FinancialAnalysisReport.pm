@@ -152,7 +152,7 @@ sub execute
 	}	
 	my $startFiscal = sprintf("%02d/%02d/%04d", $month,$start_Date[2],$start_Date[0]);
 		
-	my $total_ar=$STMTMGR_REPORT_ACCOUNTING->getSingleValue($page,STMTMGRFLAG_NONE,'sel_a_r_before',$startFiscal,$reportBeginDate,$page->session('org_internal_id'));
+	my $total_ar=$STMTMGR_REPORT_ACCOUNTING->getSingleValue($page,STMTMGRFLAG_NONE,'sel_a_r_before',$startFiscal,$reportBeginDate,$page->session('org_internal_id'),$person_id,$orgIntId);
 	#$page->addError("Value : $total_ar");
 	my $track_ar = $total_ar;
 	foreach (@$far)	

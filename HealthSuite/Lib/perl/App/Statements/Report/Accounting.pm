@@ -504,6 +504,8 @@ aic.batch_id,
 			WHERE 	invoice_date >= to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	invoice_date < to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND	owner_org_id = :3
+			AND (:4 is NULL OR provider = :4)
+			AND (:5 is NULL OR facility = :5)
 		}
 	},
 	'sel_financial_monthly' =>
