@@ -134,8 +134,9 @@ sub prepare
 					<a href="/search/org">Departments</a>,
 					<a href="/search/org">Associated Providers</a>,
 					<a href="/search/org">Employers</a>,
-					<a href="/search/org">Insurers</a>, or
-					<a href="/search/org">IPAs</a>
+					<a href="/search/org">Insurers</a>, 
+					<a href="/search/org">IPAs</a>, or
+					<a href="/search/org">Labs</a>					
 				</font>
 			</td></tr><tr valign=top bgcolor=white><td align="right">
 				$IMAGETAGS{'icons/arrow_right_red'}
