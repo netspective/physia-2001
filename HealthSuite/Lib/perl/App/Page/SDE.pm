@@ -11,6 +11,7 @@ use App::Configuration;
 use App::ImageManager;
 use App::ResourceDirectory;
 use Data::Publish;
+use Data::Dumper;
 use Devel::Symdump;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -18,7 +19,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'sde' => {
 		_views => [
-			{caption => 'Database', name => 'tables',},
+			{caption => 'ACL', name => 'acl',},
+			{caption => 'Tables', name => 'tables',},
+			{caption => 'Statistics', name => 'stats',},
 			{caption => 'Statements', name => 'stmgrs',},
 			{caption => 'Resources', name => 'resources',},
 			{caption => 'Source', name => 'source',},
@@ -84,6 +87,7 @@ sub prepare_page_content_header
 			['ACL', "$urlPrefix/acl", 'acl'],
 			['Database', "$urlPrefix/tables", 'tables'],
 			['Statements', "$urlPrefix/stmgrs", 'stmgrs'],
+			['Statistics', "$urlPrefix/stats", 'stats'],
 			['Resources', "$urlPrefix/resources", 'resources'],
 			['Source', "$urlPrefix/source", 'source'],
 		], ' | ');
@@ -932,28 +936,69 @@ sub displayAcl
 			contentColor => 'white',
 		},
 		columnDefn => [
-			{ head => 'Variable', dataFmt => '#0#:', dAlign => 'RIGHT' },
+			{ head => 'Variable', dataFmt => '<B>#0#:</B>', dAlign => 'RIGHT' },
 			{ head => 'Value' },
 			],
+		rowSepStr => "\n<IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1>\n",
 	};
 	my $acl = $self->{acl};	
-	my $allPerms = '';
+	my $allowPerms = '';
+	my $denyPerms = '';
 	foreach my $item (sort keys %{$acl->{permissionIds}})
 	{
-		my $allowed = $self->hasPermission($item) ? '(allowed)' : '';
-		$allPerms .= ($allowed ? '<FONT COLOR=green>' : '') . "$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . " $allowed" . ($allowed ? '</FONT>' : '') . " <BR>";
+		#my $allowed = $self->hasPermission($item) ? '(allowed)' : '';
+		#$allPerms .= ($allowed ? '<FONT COLOR=green>' : '') . "$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . " $allowed" . ($allowed ? '</FONT>' : '') . " <BR>";
+		if ($self->hasPermission($item))
+		{
+			$allowPerms .= "<FONT COLOR=green>$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . "</FONT><BR>\n";
+		}
+		else
+		{
+			$denyPerms .= "<FONT COLOR=red>$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . "</FONT><BR>\n";
+		}
 	}
 
+	$denyPerms = 'NONE' unless $denyPerms;
+	$allowPerms = 'NONE' unless $allowPerms;
 	my $userRoles = $self->session('aclRoleNames');
 	my $data =
 		[
 			['User Roles', ref $userRoles eq 'ARRAY' ? join(', ', @{$userRoles}) : '(none)'],
 			['User Permissions', $self->{permissions}->run_list()],
-			['ACL File(s)', join(', ', $acl->{sourceFiles}->{primary}, @{$acl->{sourceFiles}->{includes}})],
-			['All Permissions', $allPerms],
+			['ACL File(s)', join(',<BR>', $acl->{sourceFiles}->{primary}, @{$acl->{sourceFiles}->{includes}})],
+			['Denied Permissions', $denyPerms],
+			['Allowed Permissions', $allowPerms],
 		];
 	return createHtmlFromData($self, $self->{flags}, $data, $publishDefn);
 }
+
+
+#---------------------------------------------------------------------------------
+
+sub prepare_view_stats
+{
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+	my $arl = $self->param('arl');
+	my @path = @pathItems;
+	my $view = shift @path;
+
+	$self->addLocatorLinks(['Statistics', '/sde/stats']);
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		</TABLE>
+		<BR>
+		Process ID: $$<BR>
+		<BR>
+		#component.stp-sde.dbstats#
+	});
+
+	return 1;
+}
+
 
 #---------------------------------------------------------------------------------
 
