@@ -21,8 +21,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'password' => {
-		_arl_add => ['person_id', 'org_id'],
-		_arl_modify => ['person_id', 'org_id'],
+		_arl_add => ['person_id', 'org_internal_id'],
+		_arl_modify => ['person_id', 'org_internal_id'],
 		heading => '$Command Password'
 	},
 );
@@ -84,12 +84,10 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	
 	my $personId = $page->param('person_id');
+	my $orgInternalId = $page->param('org_internal_id');
 	
-	my $orgId    = $page->param('org_id');
-	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
-
-	
-	my $existing = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId);
+	my $existing = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', 
+		$personId, $orgInternalId);
 	if ($existing->{person_id})
 	{
 		$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1);
@@ -112,12 +110,11 @@ sub populateData
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $personId = $page->param('person_id');
-	my $orgId = $page->param('org_id');
-
-	#my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgId);
+	my $orgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', 
+		$page->param('org_internal_id'));
 	
 	$page->field('person_id', $page->param('person_id')) unless $page->field('person_id');
-	$page->field('org_id', $page->param('org_id')) unless $page->field('org_id');
+	$page->field('org_id', $orgId);
 	$page->field('quantity', $page->property('quantity'));
 	
 	$page->field('have_password', $page->property('have_password') || 0);
@@ -144,17 +141,17 @@ sub execute
 	my $password = $page->field('password');
 	my $quantity = $page->field('quantity');
 	
-	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+	my $orgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
 
 	if ($page->field('have_password'))
 	{
 		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updPersonLogin', 
-			$password, $quantity, $personId, $orgId);
+			$password, $quantity, $personId, $orgInternalId);
 	}
 	else
 	{
 		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'insPersonLogin', 
-			$page->session('_session_id'), $page->session('user_id'), $page->session('org_internal_id'), $personId, $orgIntId, $password, $quantity);
+			$page->session('_session_id'), $page->session('user_id'), $page->session('org_internal_id'), $personId, $orgInternalId, $password, $quantity);
 	}
 
 	$page->param('_dialogreturnurl', "/org/@{[$page->param('org_id')]}/personnel");
