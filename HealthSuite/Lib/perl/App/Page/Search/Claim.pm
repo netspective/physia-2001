@@ -59,10 +59,11 @@ sub getForm
 			<option value="all">All</option>
 			<option value="0">Created</option>
 			<!-- <option value="2">Pending</option> -->
-			<option value="3">On Hold</option>			
+			<option value="3">On Hold</option>
+			<option value="17">Paper Claim Printed</option>
+			<option value="11">Rejected</option>
 			<option value="4">Submitted</option>
 			<option value="5">Transferred</option>
-			<option value="11">Rejected</option>
 			<option value="16">Voided</option>
 		</select>
 		<script>
