@@ -30,6 +30,11 @@
 			Changed collection worklist so transfer,close,reck date  function all work at the invoice level
 		</deliverable>
 
+		<deliverable id="219">
+			Added more columns to the Financial Transaction query (it now has about half of the specified 
+			columns). The rest should hopefully be done tomorrow.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
