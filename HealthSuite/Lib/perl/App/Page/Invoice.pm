@@ -1243,6 +1243,7 @@ sub prepare_view_summary
 	my $appealed = App::Universal::INVOICESTATUS_APPEALED;
 	my $closed = App::Universal::INVOICESTATUS_CLOSED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $paperPrinted = App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED;
 	#--------------------
 
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
@@ -1306,14 +1307,14 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $electronic && $invStatus < $closed ?
+						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $invStatus != $void && $invStatus != $closed ?
+						@{[ $invStatus != $void  ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
@@ -1338,7 +1339,7 @@ sub prepare_view_summary
 							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
 							</FONT>
 						</TD>" : '' ]}
-						@{[ $invStatus != $void && $invStatus != $closed ?
+						@{[ $invStatus != $void  ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Payment</a>
@@ -1984,6 +1985,7 @@ sub prepare_page_content_header
 	my $appealed = App::Universal::INVOICESTATUS_APPEALED;
 	my $closed = App::Universal::INVOICESTATUS_CLOSED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $paperPrinted = App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED;
 
 	#claim types
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;	
@@ -2087,7 +2089,7 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 
-						@{[ $claimType != $selfPay && $invStatus > $electronic && $invStatus < $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
@@ -2105,7 +2107,6 @@ sub prepare_page_content_header
 						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 
-						<!-- @{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]} -->
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
 
