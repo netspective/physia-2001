@@ -72,6 +72,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
+		new CGI::Dialog::Field(type=>'hidden',name => 'ins_ffs'), # Contains the insurance FFS 
+		new CGI::Dialog::Field(type=>'hidden',name => 'work_ffs'), # Contains the works comp
 
 		new CGI::Dialog::MultiField(caption => 'Batch ID/Date', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
@@ -474,15 +476,32 @@ sub setPayerFields
 	my @insurPlans = ();
 	my @wkCompPlans = ();
 	my @thirdParties = ();
+	my $insurance;
+	my $getFeeSchedsForInsur;
+	my $workFees;
+	my $insFees;
+	my @insFFS = ();
+	my $ins_type;
 	foreach my $ins (@{$payers})
 	{
 		if($ins->{group_name} eq 'Insurance')
 		{
 			push(@insurPlans, "$ins->{bill_seq}($ins->{plan_name})");
+			#Get Insurnace Fee Schedule if insurance is primary
+			#This code should match the code in Procedures.pm that also gets FFS for insurance 
+			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);					
+			$ins_type="$ins->{bill_seq}";
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
 			push(@wkCompPlans, "Work Comp($ins->{plan_name})");
+			#Get Work Comp Insurnace Fee Schedule
+			#This code should match the code in Procedures.pm that also gets FFS for insurance 
+			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+			'selInsuranceByPlanNameAndPersonAndInsType', $ins->{plan_name}, $personId,
+			App::Universal::CLAIMTYPE_WORKERSCOMP);
+			$ins_type="Work Comp";
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
@@ -494,6 +513,25 @@ sub setPayerFields
 				$thirdPartyId = $org->{org_id};
 			}
 			push(@thirdParties, "$ins->{group_name}($thirdPartyId)");
+		}
+		
+		#
+		#Determine Numeric value of fee schedule
+		$getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule') if $insurance;
+		
+		@insFFS = ();
+		foreach my $fs (@{$getFeeSchedsForInsur})
+		{
+			push(@insFFS, $fs->{value_text});
+		}
+		if ($ins_type eq 'Primary')
+		{
+			$insFees .=   join ",",@insFFS ;
+		}
+		elsif ($ins_type eq 'Work Comp')
+		{
+			$workFees .=  join ",",@insFFS ;
 		}
 	}
 
@@ -523,6 +561,8 @@ sub setPayerFields
 
 	my $payer = $page->field('payer');
 	$page->field('payer', $payer);
+	$page->field('work_ffs',$workFees);
+	$page->field('ins_ffs',$insFees);
 	
 }
 
