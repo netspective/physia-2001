@@ -640,7 +640,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.insurance' => {
 	sqlStmt => qq{
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
-					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'W. Comp', 99, 'InActive'),
+					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary', 5,'W. Comp', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
 					copay_amt
 			from insurance
@@ -2020,10 +2020,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.patientAppointments' => {
 	sqlStmt => qq{
-	    	select 	%simpleDate:e.start_time%, 
-	    		to_char(e.start_time, 'HH12:MI AM'), 
-	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), 
-	    		eadoc.value_text, 
+	    	select 	%simpleDate:e.start_time%,
+	    		to_char(e.start_time, 'HH12:MI AM'),
+	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'),
+	    		eadoc.value_text,
 	    		e.subject,
 	    		to_char(e.start_time, 'MM-DD-YYYY'),
 	    		1 as group_sort,
@@ -2037,24 +2037,24 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		and	eaper.value_text = ?
 		and	e.start_time > sysdate
 		UNION
-		select 	%simpleDate:sysdate%, 
-			to_char(sysdate, 'HH12:MI AM'), 
-			to_char(sysdate, 'HH12:MI AM'),  
-			'-', 
-			'-', 
+		select 	%simpleDate:sysdate%,
+			to_char(sysdate, 'HH12:MI AM'),
+			to_char(sysdate, 'HH12:MI AM'),
+			'-',
+			'-',
 			to_char(sysdate, 'MM-DD-YYYY'),
 			2 as group_sort,
 			trunc(sysdate) as apptdate
-			from dual		
+			from dual
 		UNION
-	    	select 	%simpleDate:e.start_time%, 
-	    		to_char(e.start_time, 'HH12:MI AM'), 
-	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), 
-	    		eadoc.value_text, 
+	    	select 	%simpleDate:e.start_time%,
+	    		to_char(e.start_time, 'HH12:MI AM'),
+	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'),
+	    		eadoc.value_text,
 	    		e.subject,
 	    		to_char(e.start_time, 'MM-DD-YYYY'),
 	    		3 as group_sort,
-	    		trunc(e.start_time) as apptdate	    		
+	    		trunc(e.start_time) as apptdate
 		from 	event_attribute eaper, event_attribute eadoc, event e
 		where 	eaper.parent_id = e.event_id
 		and	eadoc.parent_id = e.event_id
@@ -2062,7 +2062,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		and	eaper.item_name like '%Patient'
 		and	eadoc.item_name like '%Physician'
 		and	eaper.value_text = ?
-		and	e.start_time < sysdate		
+		and	e.start_time < sysdate
 		order by group_sort, apptdate
 		},
 	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
@@ -2070,7 +2070,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		columnDefn => [
 			{ head => 'Appointments', dataFmt => '<a href="javascript:location=\'/schedule/apptsheet/#5#\';">#0#</A>:' },
 			{ dataFmt => 'Scheduled with <A HREF="/person/#3#/profile">#3#</A> at #1# <BR> Subject: #4#'},
-		
+
 		],
 		#bullets => 'stpe-#my.stmtId#/dlg-remove-patientappointments?home=/#param.arl#',
 		separateDataColIdx => 3, # when the date is '-' add a row separator
