@@ -526,7 +526,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		UNION
 		SELECT	entry_id,entry_type,code,modifier,name,description, 2 as code_level,parent_entry_id
 		FROM	offering_catalog_entry oce
-		WHERE	rownum <5
+		WHERE	rownum < 7
 		AND	parent_entry_id IN
 		(SELECT	entry_id as code_level 
 		 FROM 	offering_catalog_entry oce
