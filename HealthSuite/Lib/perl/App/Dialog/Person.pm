@@ -83,14 +83,22 @@ sub initialize
 		new CGI::Dialog::MultiField(caption =>'SSN / Birthdate',name => 'ssndatemf',
 			fields => [
 				new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth', defaultValue => '', futureOnly => 0),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth',
+							defaultValue => '', options => FLDFLAG_REQUIRED, futureOnly => 0),
 				]),
 
 		new CGI::Dialog::MultiField(
 			fields => [
-					new CGI::Dialog::Field(type=> 'enum', enum => 'Gender', caption => 'Gender', name => 'gender', options => FLDFLAG_REQUIRED),
-					new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
-				]),
+				new CGI::Dialog::Field(
+						selOptions => 'Male:1;Female:2',
+						caption => 'Gender',
+						type => 'select',
+						name => 'gender',
+						options => FLDFLAG_REQUIRED|FLDFLAG_PREPENDBLANK
+						),
+
+				new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
+			]),
 
 		new CGI::Dialog::Field(type=> 'enum', enum => 'Blood_Type', caption => 'Blood Type', name => 'blood_type', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 		new CGI::Dialog::Field(name => 'ethnicity',
@@ -656,8 +664,8 @@ sub execute_remove
 	my $orgIntId = $page->session('org_internal_id');
 
 	# Disabled remove
-	$self->handlePostExecute($page, $command, $flags);
-	return '';
+	#$self->handlePostExecute($page, $command, $flags);
+	#return '';
 
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 
