@@ -167,7 +167,7 @@ sub getTargetInvoices
 	$submittedStatus = INVOICESTATUS_SUBMITTED if ($submittedStatus eq undef);
 	my $statment = "";
 	my $i;
-	my $queryStatment = " select distinct INVOICE_ID from invoice where INVOICE_STATUS = $submittedStatus";
+	my $queryStatment = " select distinct INVOICE_ID from invoice where INVOICE_STATUS = $submittedStatus and invoice_subtype <> 0 and invoice_subtype <> 7";
 	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -187,6 +187,7 @@ sub preStatusCheck
 
 	$go = 1 if (($claim->getStatus() <=  PRE_STATUS) || (($claim->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claim->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claim->getStatus() == PRE_VOID) && not($attrDataFlag & $row)));
 # 	$go = 1 if (($claim->getStatus() >  INVOICESTATUS_SUBMITTED) && ($claim->getStatus() <  INVOICESTATUS_CLOSED));
+
 	return $go
 }
 
@@ -522,9 +523,10 @@ sub assignPatientInsurance
 			$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 			@row = $sth->fetchrow_array();
 			$insured = $insureds[$billSeq->[$row[3]+0]];
+
 			if ($insured ne "")
 			{
-				if ($no ne ($row[3]+ 0))
+				if ($no ne ($row[3]+ 0) and ($row[3] ne ""))
 				# ($no ne ($row[3]+ 0)) other insureds of submit.
 				{
 					$insured->setInsurancePlanOrProgramName($row[0]);
@@ -612,27 +614,24 @@ sub assignInsuredInfo
 						$orgInternalId = $row[1];
 						$insured->setEmployerOrSchoolId($orgInternalId);
 
-					}
-					$queryStatment = "select value_text,value_type,value_int from person_attribute where parent_id = \'$insuredId\' and value_type between 220 and 225";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-						# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					if($row[2])
-					{
-#						my $orgInternalId = $row[2];
-#						$insured->setEmployerOrSchoolId($orgInternalId);
+						if ($orgInternalId ne "")
+						{
+							$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
+							$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+							# do the execute statement
+							$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+							my @row1 = $sth->fetchrow_array();
+							$insured->setEmployerOrSchoolName($row1[0]);
+							$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $orgInternalId and address_name = \'Mailing\'";
+							$self->populateAddress($insured->getEmployerAddress(), $queryStatment);
 
-#						$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
-						$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
-						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-						# do the execute statement
-						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-						my @row1 = $sth->fetchrow_array();
-						$insured->setEmployerOrSchoolName($row1[0]);
-#						$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
-#						$self->populateAddress($insured->getEmployerAddress(), $queryStatment);
-						$insured->setEmploymentStatus($row[1]);
+							$queryStatment = "select value_text,value_type,value_int from org_attribute where parent_id = $orgInternalId and value_type between 220 and 225";
+							$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+							# do the execute statement
+							$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+							@row = $sth->fetchrow_array();
+							$insured->setEmploymentStatus($row[1]);
+					    }
 					}
 				}
 			}
@@ -1199,18 +1198,27 @@ sub assignInvoiceProperties
 	my $patientAddress = new App::Billing::Claim::Address;
 	my $patientEmployerAddress = new App::Billing::Claim::Address;
 	$patient->setEmployerAddress($patientEmployerAddress);
+
 	my $insured = new App::Billing::Claim::Insured;
 	my $insuredAddress = new App::Billing::Claim::Address;
+	$insured->setEmployerAddress(new App::Billing::Claim::Address);
 	$insured->setAddress($insuredAddress);
+
 	my $insured2 = new App::Billing::Claim::Insured;
+	$insured2->setEmployerAddress(new App::Billing::Claim::Address);
 	my $insured2Address = new App::Billing::Claim::Address;
 	$insured2->setAddress($insured2Address);
+
 	my $insured3 = new App::Billing::Claim::Insured;
+	$insured3->setEmployerAddress(new App::Billing::Claim::Address);
 	my $insured3Address = new App::Billing::Claim::Address;
 	$insured3->setAddress($insured3Address);
+
 	my $insured4 = new App::Billing::Claim::Insured;
+	$insured4->setEmployerAddress(new App::Billing::Claim::Address);
 	my $insured4Address = new App::Billing::Claim::Address;
 	$insured4->setAddress($insured4Address);
+
 	my $treatment = new App::Billing::Claim::Treatment;
 	my $renderingProviderAddress = new App::Billing::Claim::Address;
 	my $referringProviderAddress = new App::Billing::Claim::Address;
