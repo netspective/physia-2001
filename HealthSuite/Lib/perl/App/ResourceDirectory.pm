@@ -584,7 +584,7 @@ $SEARCH_CLASSES = {
 	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
-	'postgeneralpayment' => 'App::Dialog::PostGeneralPayment',
+	'postpayment' => 'App::Dialog::PostGeneralPayment',
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
 	'invoice' => 'App::Dialog::Invoice',
