@@ -96,7 +96,7 @@ sub buildSqlStmt
 	my $statusClause='';
 	my $serviceClause='';
 	my $dateClause ;
-	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && $status;
+	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && defined $status;
 	$dateClause =qq{ and  trunc(i.invoice_date) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
