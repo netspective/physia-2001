@@ -637,12 +637,11 @@ sub isValid
 
 sub generateJavaScript
 {
-	my ($self, $page, $key, $level) = @_;
-
-	$level = 0 unless $level;
-	return if $level > 3;
-
-	if(defined $key && exists $self->{$key})
+	my ($self, $page) = @_;
+	
+	my @jsKeys = grep {$_ =~ /JS$/} keys %{$self};
+	my @jsAttr = ();
+	foreach my $key (@jsKeys)
 	{
 		my $javaScript = $self->{$key};
 		if(ref $javaScript eq 'SUB')
@@ -656,21 +655,14 @@ sub generateJavaScript
 
 		# each attribute ends in JS, but HTML tags don't -- for instance
 		#   onKeyPressJS needs to be ONKEYPRESS="blah"
-		my $jsAttr = uc($key);
-		$jsAttr =~ s/JS$//;
+		my $jsAttr = lc($key);
+		$jsAttr =~ s/js$//;
 
-		return "$jsAttr=\"$javaScript\"";
+		push @jsAttr, qq{$jsAttr="$javaScript"};
 	}
-	elsif(! defined $key)
-	{
-		my @all = ();
-		foreach ('onKeyPressJS', 'onBlurJS')
-		{
-			push(@all, $self->generateJavaScript($page, $_, $level+1));
-		}
-		return join(' ', @all);
-	}
+	return join ' ', @jsAttr;
 }
+
 use constant DATE_FIELD => 'Dialog/AnyDate';
 
 1;
