@@ -258,10 +258,10 @@ sub execute
 		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 
 		my $count_new_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_newpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id});
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'));
 
 		my $count_est_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_estpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id});
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'));
 
 		foreach (@$daily_audit)
 		{
