@@ -11,8 +11,8 @@ use App::Billing::Claim::Patient;
 use App::Billing::Claim::Physician;
 use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
-use App::Billing::Claim::TWCC73;
-use App::Billing::Claim::TWCC60;
+# use App::Billing::Claim::TWCC73;
+# use App::Billing::Claim::TWCC60;
 
 use App::Billing::Universal;
 use constant DATEFORMAT_USA => 1;
@@ -136,8 +136,18 @@ sub getEMCId
 	$ids[MEDICARE]= $self->{payToOrganization}->getMedicareId();
 	$ids[MEDICAID]= $self->{payToOrganization}->getMedicaidId();
 	$ids[WORKERSCOMP]= $self->{payToOrganization}->getWorkersComp();
-	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
-	$self->{providerEMCId} = ((grep{$_ eq $self->{insType}} @payerCodes) ? $ids[$self->{insType}] : $self->{payToProvider}->getPIN());
+	$ids[RAILROAD]= $self->{payToOrganization}->getRailroadId();
+	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP, RAILROAD);
+	$self->{providerEMCId} =
+		(
+			(grep{$_ eq $self->{insType}} @payerCodes) ?
+			(
+				($ids[$self->{insType}] eq '') ?
+				$self->{payToProvider}->getPIN() :
+				$ids[$self->{insType}]
+			) :
+			$self->{payToProvider}->getPIN()
+		);
 	return $self->{providerEMCId};
 }
 

@@ -54,11 +54,14 @@ sub processFile
 	$self->{medicareClaimsList} = new App::Billing::Claims;
 	$self->{medicaidClaimsList} = new App::Billing::Claims;
 	$self->{workerscompClaimsList} = new App::Billing::Claims;
+	$self->{railroadClaimsList} = new App::Billing::Claims;
 
-    $self->{payerClaimsBatch} = {	4 => $self->{medicareClaimsList},
-					5 => $self->{medicaidClaimsList},
-					6 => $self->{workerscompClaimsList}
-				 };
+	$self->{payerClaimsBatch} = {
+		4 => $self->{medicareClaimsList},
+		5 => $self->{medicaidClaimsList},
+		6 => $self->{workerscompClaimsList},
+		15 => $self->{railroadClaimsList},
+	};
 
 
 	$self->makeBatches($tempClaims);
@@ -142,7 +145,7 @@ sub makeBatches
     #
 
 	# fetch each element i.e. claim from claims array one by one
-	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
+	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP, RAILROAD);
 
 
 	for $claimValue (0..$#$claims)
@@ -227,7 +230,7 @@ sub makeSelectedClaimsList
 	# get reference of batches array
 	my $tempBatches = $self->{batches};
 	# fetch each element i.e. claim from claims array one by one
-	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
+	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP, RAILROAD);
 
 
 	# Following lines will add batches which were made on the basis of medicare, medicaid etc.
