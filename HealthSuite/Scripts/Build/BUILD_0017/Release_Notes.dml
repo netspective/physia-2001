@@ -228,8 +228,9 @@
 		</deliverable>
 
 		<deliverable id="1557">
-			UI: Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be
-			    edited any more from the 'Edit Profile'
+			UI:  Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be
+			     edited any more from the 'Edit Profile'
+		        NOTE: Deleted one of the 2 components called 'Blood type' in the Chart page.
 		</deliverable>
 
 		<deliverable id="1560">
