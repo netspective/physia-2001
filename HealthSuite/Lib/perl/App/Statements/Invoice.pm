@@ -153,8 +153,8 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select 1 from Invoice_Item
 		where invoice_id = ?
 		},
-	'selInvoice' => q{
-		select *
+	'selInvoice' => qq{
+		select invoice.*, to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as fmt_invoice_date
 		from invoice
 		where invoice_id = ?
 		},
