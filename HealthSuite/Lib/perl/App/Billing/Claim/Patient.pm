@@ -30,13 +30,35 @@ sub new
 	$self->{multipleIndicator} = undef;
 	$self->{legalRepData} = undef;
 	$self->{lastSeenDate} = undef;
-
+	$self->{employerOrSchoolName} = undef;
 	return bless $self, $type;
 }
 
+sub getEmployerAddress
+{
+	my ($self) = @_;
+	return $self->{employerAddress};
+}
 
+sub setEmployerAddress
+{
+	my ($self, $value) = @_;
+	$self->{employerAddress} = $value;
+}
 
- sub getPoNumber
+sub setEmployerOrSchoolName
+{
+	my ($self, $value) = @_;
+	$self->{employerOrSchoolName} = $value;
+}
+
+sub getEmployerOrSchoolName
+{
+	my $self = shift;
+	return $self->{employerOrSchoolName};
+}
+
+sub getPoNumber
 {
 
 	my $self = shift;

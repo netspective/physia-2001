@@ -56,7 +56,8 @@ sub new
 	$params{policy} = [];
 	$params{coInsuranceItems} = [];
 	$params{deductibleItems} = [];
-
+	$params{voidItems} = [];
+	
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
 	$params{totalCharge} = undef;
@@ -818,6 +819,19 @@ sub addAdjItems
 		push(@{$diagListRef}, $_);
 	}
 }
+sub addVoidItems
+{
+	my $self = shift;
+
+	my $diagListRef = $self->{voidItems};
+	foreach (@_)
+	{
+		die 'only App::Billing::Claim::Procedure objects are allowed here'
+			unless $_->isa('App::Billing::Claim::Procedure');
+
+		push(@{$diagListRef}, $_);
+	}
+}
 
 sub addPolicy
 {
@@ -1182,7 +1196,7 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field billSeq is added which reflect the current submission order'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','1 is added to submission order to make it in proper bill sequence 1-4'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/23/2000', 'SY', 'Billing Interface/Main Claim Object','New fields added namely, invoiceType, invoiceSubtype and totalItems'],
-
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/23/2000', 'SSI', 'Billing Interface/Main Claim Object','New field and method added namely, VoidItems and addVoidItems respectively. The field will reflect the items of void type.'],
 );
 
 sub printVal

@@ -34,8 +34,20 @@ sub new
 	$self->{terminationDate} = undef;
 	$self->{billSequence} = undef;
 	$self->{bcbsPlanCode} = undef;
-	
+	$self->{employerAddress} = undef;
 	return bless $self, $type;
+}
+
+sub getEmployerAddress
+{
+	my ($self) = @_;
+	return $self->{employerAddress};
+}
+
+sub setEmployerAddress
+{
+	my ($self, $value) = @_;
+	$self->{employerAddress} = $value;
 }
 
 sub getBillSequence

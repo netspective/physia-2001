@@ -5,6 +5,9 @@ package App::Billing::Input::DBI;
 use strict;
 use Carp;
 use DBI;
+
+# use App::Universal;
+
 use App::Billing::Input::Driver;
 use App::Billing::Claim;
 use App::Billing::Claim::Person;
@@ -27,7 +30,7 @@ use App::Billing::Validate::HCFA::Medicare;
 use App::Billing::Validate::HCFA::Other;
 use App::Billing::Validate::HCFA::FECA;
 # use App::Billing::Validate::HCFA::HCFA1500;
-# use App::Universal;
+
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Input::Driver);
 use Devel::ChangeLog;
@@ -111,6 +114,7 @@ use constant INVOICE_ITEM_COPAY => 3;
 use constant INVOICE_ITEM_COINSURANCE => 4;
 use constant INVOICE_ITEM_ADJUST => 5;
 use constant INVOICE_ITEM_DEDUCTABLE => 6;
+use constant INVOICE_ITEM_VOID => 7;
 
 # Insurance sequence caption
 use constant BILLSEQ_PRIMARY_CAPTION => 'Primary';
@@ -257,7 +261,7 @@ sub assignPatientInfo
 {
 	my ($self, $claim, $invoiceId) = @_;
 	my $patient = $claim->getCareReceiver();
-	my $queryStatment = "select name_last, name_middle, name_first, person_id, to_char(date_of_birth, \'dd-MON-yyyy\'), gender, marital_status from invoice, person where invoice_id = $invoiceId and person_id = invoice.client_id";
+	my $queryStatment = "select name_last, name_middle, name_first, person_id, to_char(date_of_birth, \'dd-MON-yyyy\'), gender, marital_status, ssn, person_id from invoice, person where invoice_id = $invoiceId and person_id = invoice.client_id";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 
 	# do the execute statement
@@ -271,6 +275,15 @@ sub assignPatientInfo
 	$patient->setDateOfBirth($row[4]);
 	$patient->setSex($row[5]);
 	$patient->setStatus($row[6]);
+	$patient->setSsn($row[7]);
+	$queryStatment = "select value_text,value_type from person_attribute where parent_id = \'$row[8]\' and value_type between 220 and 225";
+	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	# do the execute statement
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	@row = $sth->fetchrow_array();
+	$patient->setEmployerOrSchoolName($row[0]);
+	$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
+	$self->populateAddress($patient->getEmployerAddress, $queryStatment);
 }
 
 sub assignPatientAddressInfo
@@ -480,8 +493,9 @@ sub assignInsuredInfo
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
 					$insured->setEmployerOrSchoolName($row[0]);
+#					$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
+#					$self->populateAddress($insured->getEmployerAddress(), $queryStatment);
 					$insured->setEmploymentStatus($row[1]);
-		
 					$queryStatment = "select extra
 							from insurance, invoice_billing
 							where invoice_billing.invoice_id = $invoiceId
@@ -499,6 +513,8 @@ sub assignInsuredInfo
 		}
 	}
 }
+
+
 
 sub assignInsuredAddressInfo
 {
@@ -677,6 +693,24 @@ sub assignReferralPhysician
 	@row = $sth->fetchrow_array();
 	$treatment->setIDOfReferingPhysician($row[0]);
 }
+
+sub populateAddress
+{
+	my ($self, $address, $queryStatment) = @_;
+ 
+#	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
+	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+	# do the execute statement
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	my @row = $sth->fetchrow_array();
+	$address->setAddress1($row[0]);
+	$address->setAddress2($row[1]);
+	$address->setCity($row[2]);
+	$address->setState($row[3]);
+	$address->setZipCode($row[4]);
+	$address->setCountry($row[5]);
+}
+
 
 sub assignServiceFacility
 {
@@ -903,7 +937,7 @@ sub assignPolicy
 					$queryStatment = "select line1, line2, city, state, zip, country
 							from insurance_address
 							where parent_id = (select parent_ins_id
-										from invoice_billing , insurance
+										from invoice_billing, insurance
 										where invoice_id = $invoiceId
 											and ins_internal_id = bill_ins_id
 											and bill_party_type = " . BILL_PARTY_TYPE_INSURANCE .
@@ -991,6 +1025,8 @@ sub assignInvoiceProperties
 	my $claim = new App::Billing::Claim;
 	my $patient = new App::Billing::Claim::Patient;
 	my $patientAddress = new App::Billing::Claim::Address;
+	my $patientEmployerAddress = new App::Billing::Claim::Address;
+	$patient->setEmployerAddress($patientEmployerAddress);
 	my $insured = new App::Billing::Claim::Insured;
 	my $insuredAddress = new App::Billing::Claim::Address;
 	$insured->setAddress($insuredAddress);
@@ -1620,6 +1656,7 @@ sub populateItems
 	$itemMap[INVOICE_ITEM_ADJUST] = \&App::Billing::Claim::addAdjItems;
 	$itemMap[INVOICE_ITEM_COINSURANCE] = \&App::Billing::Claim::addCoInsurance;
 	$itemMap[INVOICE_ITEM_DEDUCTABLE] = \&App::Billing::Claim::addDeductible;
+	$itemMap[INVOICE_ITEM_VOID] = \&App::Billing::Claim::addVoidItems;
 
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
