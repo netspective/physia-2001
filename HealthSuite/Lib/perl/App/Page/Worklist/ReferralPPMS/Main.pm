@@ -35,7 +35,11 @@ use vars qw(
 		_iconSmall => 'images/page-icons/worklist-patient-flow',
 		_iconMedium => 'images/page-icons/worklist-patient-flow',
 		_iconLarge => 'images/page-icons/worklist-patient-flow',
-		_tabcaption => 'Referrals Work List'
+		_tabcaption => 'Referrals Work List',
+		_views => [
+				{caption => 'Work List' , name => 'wl',},
+				{caption => 'Setup', name => 'setup',},
+			],
 		},
 	);
 
@@ -240,8 +244,8 @@ sub prepare_view
 		q{
 			<STYLE>
 				.referral_ {}
-				.referral_0 {background-color: LIGHTYELLOW;}
-				.referral_1 {background-color: TAN;}
+				.referral_0 {background-color: TAN;}
+				.referral_1 {background-color: #B9AC91;}
 				.referral_2 {background-color: BEIGE;}
 			</STYLE>
 		},
@@ -250,6 +254,20 @@ sub prepare_view
 
 
 }
+
+########################################################
+# Worklist Setup View
+########################################################
+sub prepare_view_setup
+{
+	my ($self) = @_;
+
+	my $dialog = new App::Dialog::WorklistSetup::ReferralPPMS(schema => $self->{schema});
+	$self->addContent('<br>');
+	$dialog->handle_page($self, 'add');
+	return 1;
+}
+
 
 
 1;

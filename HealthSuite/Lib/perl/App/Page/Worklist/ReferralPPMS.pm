@@ -102,6 +102,19 @@ sub handleARL
 		}
 	};
 
+
+
+	my $menu = ($self->{page_menu_sibling} = []);
+	my $resourceMap = %RESOURCE_MAP->{'worklist/referralppms'};
+	my $urlPrefix = "/" . $self->param('arl_resource');
+	foreach my $view (@{$resourceMap->{_views}})
+	{
+		push @$menu, [ $view->{caption}, "$urlPrefix/$view->{name}", $view->{name} ];
+	}
+	$self->{page_menu_siblingSelectorParam} = '_pm_view';
+
+
+
 	#If the refresh option is not set then set refresh param to zero
 	unless($params=~m/refresh=1/)
 	{
