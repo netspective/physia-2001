@@ -64,7 +64,7 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
 
-sub populateData
+sub _populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
@@ -85,12 +85,11 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	my $personId = $command eq 'add' ? $page->field('person_id') : $page->param('person_id');
-	my $orgId = $command eq 'add' ? $page->field('org_id') : $page->param('org_id');
+
 	$page->schemaAction(
 			'Person_Login', $command,
-			person_id => $personId || undef,
-			org_id => $orgId || undef,
+			person_id => $page->field('person_id') || undef,
+			org_id => $page->field('org_id') || undef,
 			password => $page->field('password') || undef,
 			quantity => $page->field('quantity') || undef,
 			_debug => 0
