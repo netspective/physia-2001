@@ -57,7 +57,8 @@ use constant MDLFLAGS_DEFAULT => 0;
 	'Medicaid' => App::Universal::CLAIMTYPE_MEDICAID,
 	'Champus' => App::Universal::CLAIMTYPE_CHAMPUS,
 	'ChampVA' => App::Universal::CLAIMTYPE_CHAMPVA,
-	'WorkersComp' => App::Universal::CLAIMTYPE_WORKERSCOMP
+	'WorkersComp' => App::Universal::CLAIMTYPE_WORKERSCOMP,
+	'HMO(non)' => App::Universal::CLAIMTYPE_HMO_NON_CAP
 );
 
 
@@ -336,47 +337,52 @@ sub importInsurance
 {
 	my ($self, $flags, $insurance, $parentStruct) = @_;
 	$self->itemMissingMsg($flags, 'No insurance records found.') unless $insurance;
-	return unless $insurance;	
-	my $ownerId = $parentStruct->{id};	
-	#my $parentInsId = $planData->{'ins_internal_id'};
-	
+	return unless $insurance;
+	my $ownerId = $parentStruct->{id};
+
 	if(my $list = $insurance->{coverage})
-	{		
+	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
 
-				my $insOrgId = $item->{'insurance-org'};
-				my $productName = $item->{'ins-id'};
-				my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-				my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);    		
-    			my $insIntId = $self->schemaAction($flags, "Insurance", 'add',
-    										ins_org_id 		=> $insOrgId || undef,
-    										record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
-    										owner_person_id => $ownerId || undef,
-    										parent_ins_id 	=> $planData->{'parent_ins_id'} || undef,    				
-    										product_name  	=> $item->{'ins-id'} || undef,
-    										plan_name 		=> $item->{'policy-name'} || undef,
-    										bill_sequence 	=> $BILL_SEQUENCE_TYPE_MAP{exists $item->{'bill-sequence'} ? $item->{'bill-sequence'} :''},
-    										member_number 	=> $item->{'member-number'} || undef,
-    										policy_number   => $item->{'member-number'} || undef,
-    										group_name   => $item->{'group-name'} || undef,
-    										group_number   => $item->{'group-number'} || undef,
-    										insured_id    => $item->{insured} || undef,
-    										indiv_deductible_amt => $planData->{'indiv-deduct-amt'} || undef,
-											family_deductible_amt => $planData->{'family-deduct-amt'} || undef,
-											indiv_deduct_remain => $item->{'indiv-deduct-remain'} || undef,
-											family_deduct_remain => $item->{'family-deduct-remain'} || undef,
-    										ins_type 		=> $planData->{ins_type} || undef,
-    										coverage_begin_date => $planData->{coverage_begin_date} || undef,
-											coverage_end_date => $planData->{coverage_begin_date} || undef,
-											percentage_pay => $planData->{coverage_begin_date} || undef,
-											copay_amt => $planData->{coverage_begin_date} || undef,
-											remit_type => $planData->{'remit_type'} || undef,
-											remit_payer_id => $planData->{'remit_payer_id'} || undef,
-											remit_payer_name => $planData->{'remit_payer_name'} || undef,											
-											threshold => $planData->{threshold} || undef
-								);
+			my $insOrgId = $item->{'insurance-org'};
+			my $ownerOrg = $item->{'owner-org'};
+			my $productName = $item->{'ins-id'};
+			my $planName = $item->{'policy-name'};
+			my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
+			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
+			my $insInternalId = $planData->{'ins_internal_id'};
+			my $feeschedule =  $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
+			my $insType = $item->{'ins-type'} ne '' ? $item->{'ins-type'} : $planData->{ins_type};
+			my $insIntId = $self->schemaAction($flags, "Insurance", 'add',
+								ins_org_id 		=> $insOrgId || undef,
+								record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
+								owner_person_id => $ownerId || undef,
+								owner_org_id =>   $ownerOrg || undef,
+								parent_ins_id 	=> $planData->{'ins_internal_id'} || undef,
+								product_name  	=> $item->{'ins-id'} || undef,
+								plan_name 		=> $item->{'policy-name'} || undef,
+								bill_sequence 	=> $BILL_SEQUENCE_TYPE_MAP{exists $item->{'bill-sequence'} ? $item->{'bill-sequence'} :''},
+								member_number 	=> $item->{'member-number'} || undef,
+								policy_number   => $item->{'member-number'} || undef,
+								group_name   => $item->{'group-name'} || undef,
+								group_number   => $item->{'group-number'} || undef,
+								insured_id    => $item->{insured} || undef,
+								indiv_deductible_amt => $planData->{'indiv-deduct-amt'} || undef,
+								family_deductible_amt => $planData->{'family-deduct-amt'} || undef,
+								indiv_deduct_remain => $item->{'indiv-deduct-remain'} || undef,
+								family_deduct_remain => $item->{'family-deduct-remain'} || undef,
+								ins_type 		=> $insType || undef,
+								coverage_begin_date => $item->{begindate} || undef,
+								coverage_end_date => $item->{enddate} || undef,
+								percentage_pay => $planData->{percentage_pay} || undef,
+								copay_amt => $planData->{copay_amt} || undef,
+								remit_type => $planData->{'remit_type'} || undef,
+								remit_payer_id => $planData->{'remit_payer_id'} || undef,
+								remit_payer_name => $planData->{'remit_payer_name'} || undef,
+								threshold => $planData->{threshold} || undef
+							);
 
 				$self->schemaAction($flags,"Insurance_Attribute", 'add',
 						parent_id => $insIntId,
@@ -390,10 +396,10 @@ sub importInsurance
 						value_type => 0);
 
 				$self->schemaAction($flags,"Insurance_Attribute", 'add',
-						parent_id => $insIntId,
-						item_name => 'Fee Schedules',
+						parent_id => $insIntId || undef,
+						item_name => 'Fee Schedule',
 						value_type => 0,
-						value_text => $item->{feeschedule});
+						value_text => $feeschedule->{'value_text'});
 
 
 			#$self->_importContactMethods($flags, $item->{'contact-methods'}, $item, 'Insurance', $insIntId);
@@ -407,13 +413,13 @@ sub importInsurance
 #	FAMILY_DEDUCT_REMAIN = 3000
 #	DEDUCT_TYPE = 3
 	if(my $list = $insurance->{product})
-	{		
+	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			
+
 			my $insIntId =  $self->schemaAction($flags, "Insurance", 'add',
-							product_name => $item->{'ins-id'} || undef,							
+							product_name => $item->{'ins-id'} || undef,
 							owner_org_id => $ownerId || undef,
 							ins_type      => $INSURANCE_TYPE_MAP{exists $item->{'insurance-type'} ? $item->{'insurance-type'} :'Insurance'},
 							ins_org_id    => $item->{'insurance-org'} || undef,
@@ -425,6 +431,12 @@ sub importInsurance
 						item_name => 'HMO-PPO/Indicator',
 						value_type => 0,
 						value_text => $item->{'hmo-ppo'});
+
+			$self->schemaAction($flags,"Insurance_Attribute", 'add',
+									parent_id => $insIntId,
+									item_name => 'Fee Schedule',
+									value_type => 0,
+						value_text => $item->{feeschedule});
 
 			#if($item->{'record-type'} eq App::Universal::RECORDTYPE_INSURANCEPLAN)
 			#{
@@ -443,8 +455,8 @@ sub importInsurance
 			#print "The insurance ID: $insIntId \n";
 
 			$self->_importContactMethods($flags, $item->{'contact-methods'}, $item, 'Insurance', $insIntId);
-			
-			if (my $insPlan = $item->{plan})			
+
+			if (my $insPlan = $item->{plan})
 			{
 				my $rec = $item;
 				$self->importinsPlan($flags, $insPlan, $rec, $insurance, $item->{'ins-id'}, $item->{'contact-methods'}, $insIntId);
@@ -458,39 +470,46 @@ sub importInsurance
 sub importinsPlan
 {
 	my ($self, $flags, $insPlan, $rec, $insurance, $productName, $recordContactMethod, $parentInsId) = @_;
-	
+
 	#my $productName = $insurance;
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	#my $recordContactMethod = $insurance->{product}->{'contact-methods'};
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
-	
+	my $insInternalId = $recordData->{'ins_internal_id'};
+	my $feeschedule =  $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
 	if(my $list = $insPlan)
-	{		
+	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			
+
 			my $insIntId =  $self->schemaAction($flags, "Insurance", 'add',
-							product_name => $productName || undef,							
-							owner_org_id => $recordData->{'owner_org_id'} || undef,							
+							product_name => $productName || undef,
+							owner_org_id => $recordData->{'owner_org_id'} || undef,
 							ins_type      => $recordData->{'ins_type'} || undef,
 							ins_org_id    => $recordData->{'ins_org_id'} || undef,
 							parent_ins_id => $parentInsId || undef,
 							#ins_type      => $self->translateEnum($flags, "Claim_Type", $item->{'insurance-type'}),
 							record_type   => App::Universal::RECORDTYPE_INSURANCEPLAN || undef,
-							plan_name 	  => $item->{'policy-name'} || undef,	
+							plan_name 	  => $item->{'policy-name'} || undef,
 							coverage_begin_date => $item->{begindate} || undef,
 							coverage_end_date => $item->{enddate} ||undef,
 							percentage_pay => $item->{'percentage-pay'} || undef,
 							copay_amt => $item->{copay} || undef,
 							indiv_deductible_amt => $item->{'indiv-deduct-amt'} || undef,
-							family_deductible_amt => $item->{'family-deduct-amt'} || undef,							
+							family_deductible_amt => $item->{'family-deduct-amt'} || undef,
 							remit_type => $recordData->{'remit_type'} || undef,
 							remit_payer_id => $recordData->{'remit_payer_id'} || undef,
 							remit_payer_name => $recordData->{'remit_payer_name'} || undef,
 							threshold => $item->{threshold} || undef
 						);
-						
+
+			$self->schemaAction($flags,"Insurance_Attribute", 'add',
+									parent_id => $insIntId || undef,
+									item_name => 'Fee Schedule',
+									value_type => 0,
+									value_text => $feeschedule->{'value_text'} || undef);
+
 			if (! $item->{'contact-methods'})
 			{
 				$self->_importContactMethods($flags, $recordContactMethod, $rec, 'Insurance', $insIntId);
