@@ -110,7 +110,16 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		AND catalog_id = :3
 		AND modifier IS NULL
 	},
-
+	'selMiscProcedureBySessionOrgAndCode' => qq
+	{
+		SELECT 	oce.entry_id, oce.catalog_id, oce.code, oce.modifier, oce.name, oce.default_units,
+				oce.unit_cost, oce.description, oce.taxable
+		FROM 	offering_catalog oc , offering_catalog_entry oce
+		WHERE	oce.code = ?
+		AND	oc.org_internal_id = ?
+		AND	oce.catalog_id = oc.internal_catalog_id
+		AND	oc.catalog_type = 2
+	},
 	'selCatalogItemsByOrgIdAndCode' => q{
 		select oce.catalog_id, oce.parent_entry_id, oce.entry_type, oce.code, oce.modifier, oce.default_units,
 				oce.unit_cost, oce.taxable
