@@ -277,16 +277,20 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and item_type in (?,?)
 			and data_text_b is NULL
 		},
+	'selInvoiceItemsByType' => q{
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+		from invoice_item
+		where parent_id = ?
+			and item_type = ?
+		},
 	'selServiceDateRangeForAllItems' => qq{
 		select  to_char(least(service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 				to_char(greatest(service_end_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date
 		from invoice_item
 		where parent_id = ?
-		},
-	'selInvoiceItemsByType' => q{
-		select * from invoice_item
-		where parent_id = ?
-			and item_type = ?
 		},
 	'selInvoiceItemCount' => q{
 		select count(*) from Invoice_Item
