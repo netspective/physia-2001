@@ -28,6 +28,7 @@ use Devel::ChangeLog;
 use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure/add";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
+use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dialog/postpayment/personal,%param.invoice_id%";
 use constant NEXTACTION_CREATECLAIM => "/org/#session.org_id#/dlg-add-claim";
 use constant NEXTACTION_WORKLIST => "/worklist";
 
@@ -68,6 +69,7 @@ sub initialize
 							['Add a Procedure', NEXTACTION_ADDPROC],
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
+							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
 							['Add Another Claim', NEXTACTION_CREATECLAIM],
 							['Return to Work List', NEXTACTION_WORKLIST],
 							],
@@ -88,11 +90,6 @@ sub makeStateChanges
 	$self->updateFieldFlags('remarks', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('confirmed_info', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('payment_heading', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('method', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('check_number', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('copay_amt', FLDFLAG_INVISIBLE, 1);
-	#$self->updateFieldFlags('copay', FLDFLAG_INVISIBLE, 1);
 
 	#turn these fields off if there is no person id
 	if($command eq 'add')
