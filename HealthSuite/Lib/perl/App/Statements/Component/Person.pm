@@ -1302,7 +1302,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appointment</A>' },
+			{ head => 'CareProvider', 
+				dataFmt => q{
+					<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#) 
+					<A HREF ="/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#"> Sched Appointment</A>
+				},
+			},
 			#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
 			#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
 			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
@@ -2646,6 +2651,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		where ea.parent_id = e.event_id
 			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 			and ea.value_text = ?
+			and e.event_status != 3
 			and e.start_time > sysdate
 		UNION
 		select 	%simpleDate:sysdate%,
@@ -2670,12 +2676,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		where ea.parent_id = e.event_id
 			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 			and ea.value_text = ?
+			and e.event_status != 3
 			and e.start_time < sysdate
 			and 10 > (select count(*) from Event_Attribute ea2, Event e2
 				where ea2.parent_id = e2.event_id
 					and ea2.value_text = ea.value_text
 					and ea2.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 					and e.start_time < e2.start_time
+					and e2.event_status != 3
 					and e2.start_time < sysdate
 			)
 		ORDER by group_sort, apptdate DESC
