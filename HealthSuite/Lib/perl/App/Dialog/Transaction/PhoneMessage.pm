@@ -147,10 +147,10 @@ sub execute
 	my $printerName = $page->field('printerQueue');
 
 	my $printerMessage = "--------------------------------------------\n";
-	$printerMessage .= "Phone Message \n";
+	$printerMessage .= "MESSAGE \n";
 	$printerMessage .= "--------------------------------------------\n";
-	$printerMessage .= "To: ".$page->field('person_called')."\n";
-	$printerMessage .= "From: ".$page->field('provider')."\n";
+	$printerMessage .= "To: ".$page->field('provider')."\n";
+	$printerMessage .= "From: ".$page->field('person_called')."\n";
 	$printerMessage .= "Time: ".$page->field('time')."\n";
 	$printerMessage .= "Message:\n".$page->field('phone_message')."\n";
 	$printerMessage .= "--------------------------------------------\n\n";
