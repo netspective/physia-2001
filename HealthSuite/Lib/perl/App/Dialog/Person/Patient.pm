@@ -17,6 +17,7 @@ use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
+use App::Statements::Transaction;
 
 use App::Universal;
 use Date::Manip;
@@ -135,6 +136,24 @@ sub initialize
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE
 		),
+		new CGI::Dialog::MultiField(
+			fields => [
+				new CGI::Dialog::Field(
+					caption => 'Patient is deceased?',
+					type => 'bool',
+					name => 'inactivate_record',
+					style => 'check',
+					invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE
+					),
+				new CGI::Dialog::Field(
+					caption => 'Date',
+					type => 'date',
+					name => 'inactivate_date',
+					invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE
+					),
+			]),
 	);
 
 	$self->addFooter(
@@ -259,6 +278,7 @@ sub execute_add
 				_debug => 0
 		);
 
+
 		#third check if employer has any workers comp plans and if so attach to person
 		my $wrkCompValueType = App::Universal::ATTRTYPE_INSGRPWORKCOMP;
 		if(my $orgHasWorkCompPlans = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $relId, $wrkCompValueType))
@@ -318,6 +338,34 @@ sub execute_update
 	#Group all update transcations
 	$page->beginUnitWork("Unable to update Patient");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
+	my $entityType = $page->param('person_id') ? '0' : '1';
+
+	my $personId = $page->param('person_id');
+	my $inactivepatientData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, 'Patient Deceased');
+	$page->field('blood_item_id', $inactivepatientData->{'item_id'});
+
+	my $patientTransData =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selDataByTransTypeAndCaption', $personId);
+	my $transId = $patientTransData->{'trans_id'};
+	my $transStatus = $page->field('inactivate_record') ne '' ? App::Universal::TRANSSTATUS_ACTIVE : App::Universal::TRANSSTATUS_INACTIVE;
+	my $commandInactive = $page->field('inactive_patient_item_id') eq '' ? 'add' : 'update';
+	if ($page->field('inactivate_record') || $page->field('inactive_patient_item_id'))
+	{
+		$page->schemaAction(
+			'Transaction', $commandInactive,
+			trans_id => $transId || undef,
+			trans_owner_type => $entityType,
+			trans_owner_id => $page->param('person_id') || undef,
+			trans_type => App::Universal::TRANSTYPE_ALERTPATIENT,
+			trans_subtype => 'High',
+			caption => 'Deceased Patient',
+			detail => 'This patient is deceased',
+			trans_status => $transStatus,
+			initiator_id => $page->session('user_id'),
+			initiator_type => 0,
+			trans_begin_stamp => $page->field('inactivate_date') || undef,
+			_debug => 0
+			);
+	}
 	$page->endUnitWork();
 }
 
