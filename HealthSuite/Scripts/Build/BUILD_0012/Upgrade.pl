@@ -24,6 +24,8 @@ my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
+runSQL('BUILD_0012_add_attribute_value_types.sql');
+runSQL('BUILD_0012_create_index_upper.sql');
 runSQL('BUILD_0012_Invoice.sql');
 runSQL('BUILD_0012_Invoice_Status.sql');
 makeSymbolicLink();

@@ -104,5 +104,10 @@
 			UI: Correct Next-Actions on CheckOut dialog.
 		</deliverable>
 
+		<deliverable id="219">
+			Implemented Beta version of new AdHoc Query. There is no link within the application, 
+			however if you go to "/query" you can test it.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
