@@ -179,7 +179,7 @@ sub makeStateChanges
 #		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
 
-	$self->getField('pay_type')->{fKeyWhere} = "caption != 'Pre-payment' and (group_name is NULL or group_name = '$paidBy')";
+	$self->getField('pay_type')->{fKeyWhere} = "id != @{[ App::Universal::ADJUSTMENTPAYTYPE_COPAYPREPAY ]} and caption != 'Pre-payment' and (group_name is NULL or group_name = 'personal')";
 }
 
 sub populateData
