@@ -8,6 +8,7 @@ use App::Universal;
 use Number::Format;
 use Date::Manip;
 use App::ImageManager;
+use CGI::ImageManager;
 
 use DBI::StatementManager;
 use App::Statements::Org;
@@ -28,7 +29,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Summary', name => 'profile',},
 			{caption => 'Insurance', name => 'insurance',},
 			{caption => 'Personnel', name => 'personnel',},
-			{caption => 'Catalog', name => 'catalog',},
+			{caption => 'Catalog', name => 'catalog',},			
 			{caption => 'Account', name => 'account',},
 			],
 		},
@@ -322,26 +323,44 @@ sub prepare_view_catalog
 	#$self->addLocatorLinks(['Catalog', 'catalog']);
 
 	my @pathItems = split('/', $self->param('arl'));
-
-	if ($self->param('catalog_id', $pathItems[4]))
+	my $html;
+	my $viewMenu = [
+			[ "Fee Schedule Catalog","./catalog?catalog=fee_schedule" ],
+			[ "Contract Catalog","./catalog?catalog=contract" ],
+		];
+	my $viewMenuHtml = $self->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
+				selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#EEEEEE', unselTextColor => '#555555', highColor => 'navy',
+				leftImage => 'images/design/tab-top-left-corner-white', rightImage => 'images/design/tab-top-right-corner-white'} );
+	$html =qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Catalog Type:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>};	
+	
+	
+	#Show Fee Schedule Catalog
+	if ($self->param('catalog') eq "fee_schedule")
 	{
-		$self->param('internal_catalog_id', $pathItems[3]);
-		$self->addContent(
-			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalog_detail_org',
-				[$pathItems[3]] ),
-				#[$self->session('org_internal_id')] ),
-		);
+		$html .=qq{<CENTER>#component.stp-org.FSCatalogSummary#  </CENTER>};
 	}
-	else
+	#Show Contract Catalog
+	elsif ($self->param('catalog') eq "contract")
 	{
-		$self->addContent(
-			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalogs_all_org',
-				#[$self->param('org_id')]) );
-				[$self->session('org_internal_id')]) );
+		$html .=qq{<CENTER> #component.stp-org.ContractCatalogSummary# </CENTER>};
 	}
-
+	#Show Contract Detail Catalog
+	elsif ($self->param('catalog') eq "contract_detail")
+	{
+		$html .=qq{<CENTER> #component.stp-org.ContractCatalogDetail# </CENTER>};
+	}
+	#Show Fee Schedule Detail Catalog
+	elsif($self->param('catalog') eq "fee_schedule_detail")
+	{
+		$html .=qq{<CENTER> #component.stp-org.FSCatalogDetail# </CENTER>};
+	}
+	#TBD - Maybe a default catalog ????
+	$self->addContent($html);
 	return 1;
+
 }
+
+
 
 sub prepare_view_account
 {
