@@ -58,7 +58,7 @@ sub handleARL_apptsheet
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
 	# in the ARL, the date will come in as mm-dd-yyyy we need it like mm/dd/yyyy
-	$pathItems->[1] =~ s/(\d\d)\-(\d\d)/$1\/$2/g if defined $pathItems->[1];
+	#$pathItems->[1] =~ s/(\d\d)\-(\d\d)/$1\/$2/g if defined $pathItems->[1];
 	if(my $firstPathItem = $pathItems->[1])
 	{
 		if($firstPathItem eq 'customize') {
@@ -95,7 +95,9 @@ sub handleARL_apptsheet
 			$self->param('saveViewPref', 1);
 
 		}	else {
-			$self->param('_seldate', $pathItems->[1]);
+			my $selDate = $pathItems->[1];
+			$selDate =~ s/\-/\//g;
+			$self->param('_seldate', $selDate);
 		}
 	}
 }
@@ -119,7 +121,7 @@ sub handleARL_appointment
 	$self->param('dialogcommand', $pathItems->[1]);
 
 	if ($pathItems->[1] =~ /add/i) {
-		my ($resource_id, $start_stamp, $facilityInternalId, $patient_type, $visit_type) = 
+		my ($resource_id, $start_stamp, $facilityInternalId, $patient_type, $appt_type) = 
 			split(/,/, $pathItems->[2]);
 		$start_stamp =~ s/\-/\//g;
 		$start_stamp =~ s/_/ /g;
@@ -127,7 +129,7 @@ sub handleARL_appointment
 		$self->param('start_stamp', $start_stamp);
 		$self->param('facility_id', $facilityInternalId);
 		$self->param('patient_type', $patient_type);
-		$self->param('visit_type', $visit_type);
+		$self->param('appt_type', $appt_type);
 	} else {
 		$self->param('event_id', $pathItems->[2]);
 	}
@@ -301,8 +303,26 @@ sub prepare_view_apptsheet
 		return 1;
 	}
 
-	my $selectedDate = ParseDate($self->param('_seldate') || 'today');
+	my $selectedDate;
+	
+	if ($self->param('_seldate'))
+	{
+		my ($month, $day, $year) = split(/\//, $self->param('_seldate'));
+		$year = 1000 if $year < 1000;
+
+		eval{
+			check_date($year, $month, $day);
+		};
+		$selectedDate =  $@ ? 'today' : $self->param('_seldate');
+		$selectedDate = 'today' if $year < 1001;
+	}
+	else
+	{
+		$selectedDate = $self->session('selectedDate') || 'today';
+	}
+	
 	my $formattedDate = UnixDate ($selectedDate, '%m/%d/%Y');
+	$self->session('selectedDate', $formattedDate);
 
 	my @inputSpec = ();
 
@@ -455,7 +475,7 @@ sub prepare_dialog_encounterCheckout
 sub prepare_page_content_footer
 {
 	my $self = shift;
-	#return 1 if $self->param('_ispopup');
+
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	return 1 if $self->param('_stdAction') eq 'dialog';
 	return 1 if $self->param('dialog');
@@ -472,7 +492,6 @@ sub prepare_page_content_header
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-	#push(@{$self->{page_content_header}}, new App::Pane::Schedule::Heading()->as_html($self));
 
 	my $today = UnixDate('today', '%m-%d-%Y');
 	my $nextweek = UnixDate('nextweek', '%m-%d-%Y');
@@ -484,9 +503,6 @@ sub prepare_page_content_header
 		'_pm_view',
 		[
 			['Schedule', "$urlPrefix/apptsheet", 'apptsheet'],
-			#['CheckIn', "/search/appointment/,,2,$today,$today,0/1", 'checkin'],
-			#['CheckOut', "/search/appointment/,,3,,$today,1/1", 'checkout'],
-			#['Confirm', "/search/appointment/,,0,$today,$nextweek,0/1", 'confirm'],
 			['Assign', "$urlPrefix/assign/$today/$today", 'assign'],
 		], ' | ');
 
@@ -510,8 +526,6 @@ sub prepare_page_content_header
 		</TABLE>
 	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
 
-	#$html .= '<p>' if $page->param('dialog');
-
 	if ($self->param('_pm_view') =~ /apptsheet/ && ! $self->param('dialog')) {
 		my $apptSheetHeader = $self->getApptSheetHeaderHtml();
 		push(@{$self->{page_content_header}}, $apptSheetHeader);
@@ -524,9 +538,7 @@ sub getApptSheetHeaderHtml
 {
 	my ($self) = @_;
 
-	my $selectedDate = $self->param('_seldate') || 'today';
-	$selectedDate = 'today' unless ParseDate($selectedDate);
-	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
+	my $fmtDate = $self->session('selectedDate');
 
 	my $optionIndex = $self->getPreferIndex('Preference/Schedule/Action');
 
@@ -552,15 +564,10 @@ sub getApptSheetHeaderHtml
 		};
 	}
 
-	my $nextDay = UnixDate(DateCalc($selectedDate, "+1 day"), '%m-%d-%Y');
-	my $prevDay = UnixDate(DateCalc($selectedDate, "-1 day"), '%m-%d-%Y');
+	my $nextDay = UnixDate(DateCalc($fmtDate, "+1 day"), '%m-%d-%Y');
+	my $prevDay = UnixDate(DateCalc($fmtDate, "-1 day"), '%m-%d-%Y');
 	my $nDay = $nextDay; $nDay =~ s/\-/\//g;
 	my $pDay = $prevDay; $pDay =~ s/\-/\//g;
-
-#		<STYLE>
-#			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-#			input  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-#		</STYLE>
 
 	return qq{
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
@@ -582,14 +589,6 @@ sub getApptSheetHeaderHtml
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 			</td>
 			</FORM>
-
-			<!---
-			<TD align=center>
-				<img src='/resources/icons/arrow_right_red.gif'>
-				<a href="javascript:doActionPopup('/schedule-p/apptsheet', null, 'toolbar,scrollbars,resizable');" style='font-size:8pt; font-family: Tahoma'>
-				<b><nobr>Print</nobr></b></a>
-			</TD>
-			--->
 
 			<FORM name="actionForm" method=POST>
 			<td ALIGN=RIGHT>
@@ -625,21 +624,22 @@ sub getChooseDateOptsHtml
 
 	# Choose Date drop down list
 	my @quickChooseItems =
-		(
-			{ caption => 'Choose Day', value => '' },
-			{ caption => 'Today', value => 'today' },
-			{ caption => 'Previous Day', value => DateCalc($date, '- 1 business days') },
-			{ caption => 'Previous Week', value => DateCalc($date, '- 7 days') },
-			{ caption => 'Previous Month', value => DateCalc($date, '- 1 month') },
-			{ caption => 'Previous Year', value => DateCalc($date, '- 1 year') },
-			{ caption => 'Next Day', value => DateCalc($date, '+ 1 business days') },
-			{ caption => 'Next Week', value => DateCalc($date, '+ 7 days') },
-			{ caption => 'Next Month', value => DateCalc($date, '+ 1 month') },
-			{ caption => 'Next Year', value => DateCalc($date, '+ 1 year') },
-			{ caption => 'Tomorrow', value => DateCalc('today', '+ 1 business days') },
-			{ caption => 'Day after Tomorrow', value => DateCalc('today', '+ 2 business days') },
-			{ caption => '1 Week from Today', value => DateCalc('today', '+ 1 week') },
-		);
+	(
+		{ caption => 'Choose Day', value => '' },
+		{ caption => 'Today', value => 'today' },
+		{ caption => 'Previous Day', value => DateCalc($date, '- 1 day') },
+		{ caption => 'Previous Week', value => DateCalc($date, '- 7 days') },
+		{ caption => 'Previous Month', value => DateCalc($date, '- 1 month') },
+		{ caption => 'Previous Year', value => DateCalc($date, '- 1 year') },
+		{ caption => 'Next Day', value => DateCalc($date, '+ 1 day') },
+		{ caption => 'Next Week', value => DateCalc($date, '+ 7 days') },
+		{ caption => 'Next Month', value => DateCalc($date, '+ 1 month') },
+		{ caption => 'Next Year', value => DateCalc($date, '+ 1 year') },
+		{ caption => 'Tomorrow', value => DateCalc('today', '+ 1 days') },
+		{ caption => 'Day after Tomorrow', value => DateCalc('today', '+ 2 days') },
+		{ caption => '1 Week from Today', value => DateCalc('today', '+ 1 week') },
+	);
+	
 	for(my $week = 2; $week <= 12; $week++)	{
 		push(@quickChooseItems, { caption => "$week Weeks from Today", value => DateCalc('today', "+ $week weeks") });
 	}
@@ -700,14 +700,14 @@ sub readPreferences
 
 	my $preference;
 	my $userID = $self->session('user_id');
-	my $orgId  = $self->session('org_internal_id');
+	my $orgInternalId = $self->session('org_internal_id');
 
 	if ($multiple) {
 		$preference = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
-			'selSchedulePreferencesByOrg', $userID, $itemName, $orgId);
+			'selSchedulePreferencesByOrg', $userID, $itemName, $orgInternalId);
 	} else {
 		$preference = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
-			'selSchedulePreferencesByOrg', $userID, $itemName, $orgId);
+			'selSchedulePreferencesByOrg', $userID, $itemName, $orgInternalId);
 	}
 
 	return $preference;
@@ -758,13 +758,15 @@ sub saveViewPreference
 	my $currentView = $self->readPreferences($itemName, 0);
 	my $command = (defined $currentView) ? 'update' : 'add';
 	my $itemID = $currentView->{item_id};
+	my $orgInternalId  = $self->session('org_internal_id');
 
 	my $newItemID = $self->schemaAction(
 		'Person_Attribute', $command,
 		item_id    => $command eq 'add' ? undef : $itemID,
 		parent_id  => $userID,
 		item_name  => $itemName,
-		value_text => $view
+		value_text => $view,
+		parent_org_id  => $orgInternalId,
 	);
 
 	if ($view =~ /week/i)
@@ -780,7 +782,8 @@ sub saveViewPreference
 			parent_id   => $userID,
 			item_name   => $itemName,
 			value_text  => $resource_id,
-			value_textB => $facility_id
+			value_textB => $facility_id,
+			parent_org_id  => $orgInternalId,
 		);
 	}
 }
@@ -790,12 +793,11 @@ sub createDayViewPreferences
 	my ($self) = @_;
 	
 	my $userID = $self->session('user_id');
-	my $orgID  = $self->session('org_internal_id');
+	my $orgInternalId  = $self->session('org_internal_id');
 	my $itemName = 'Preference/Schedule/DayView/Column';
 
 	my $assocResources = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
-		'sel_worklist_resources', $self->session('user_id'), $WORKLIST_ITEMNAME,
-		$self->session('org_internal_id'));
+		'sel_worklist_resources', $self->session('user_id'), $WORKLIST_ITEMNAME, $orgInternalId);
 
 	my $col = 0;
 	for (@$assocResources)
@@ -807,8 +809,8 @@ sub createDayViewPreferences
 			item_name   => $itemName,
 			value_text  => $_->{resource_id},
 			value_int   => $col++,
-			value_textB => $_->{facility_id} || $orgID,
-			parent_org_id  => $orgID,
+			value_textB => $_->{facility_id} || $orgInternalId,
+			parent_org_id  => $orgInternalId,
 		);
 	}
 

@@ -41,6 +41,7 @@ sub defaultRowRptFormat
 		$self->{attributes}->{scheduled_by_id},
 		$self->{attributes}->{scheduled_stamp},
 		$self->{attributes}->{patient_id},
+		'TBD',
 	);
 }
 

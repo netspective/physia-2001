@@ -22,7 +22,7 @@ $STMTRPTDEFN_DEFAULT =
 	[
 		{ head => 'Time', 
 			colIdx => 1,
-			url => q{javascript: document.search_form != null ? chooseEntry('#9#') : ''},
+			url => q{javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()},
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 

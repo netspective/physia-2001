@@ -31,15 +31,15 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
 		decode(available,0,'Not Available',1,'Available') as available,
 		patient_types,
-		visit_types,
+		appt_types,
 		days_of_month,
 		months,
 		days_of_week
-	from Org, Template
-	where Template.owner_org_id = ?
+	from Org, Sch_Template
+	where Sch_Template.owner_org_id = ?
 		and facility_id = org_internal_id
-		and r_ids like ?
-		and org_id like ?
+		and upper(r_ids) like upper(?)
+		and upper(org_id) like upper(?)
 		and (available = ? or available = ?)
 		%effectiveWhereClause%
 	order by available, r_ids, template_id
@@ -56,7 +56,6 @@ $STMTFMT_SEL_EVENTS = qq{
 		patient.complete_name as patient_complete_name,
 		e.subject,
 		aat.caption as patient_type,
-		tt.caption as visit_type,
 		e.remarks,
 		e.event_status,
 		e.facility_id,
@@ -66,8 +65,9 @@ $STMTFMT_SEL_EVENTS = qq{
 		e.parent_id,
 		e.scheduled_by_id,
 		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
-		at.caption as appt_type
-	from Appt_Type at, Appt_Status stat, Transaction_Type tt, Appt_Attendee_type aat,
+		at.caption as appt_type,
+		e.appt_type as appt_type_id
+	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat,
 		Person patient, Event_Attribute ep2, Event_Attribute ep1, Event_Type et, Event e
 	where e.start_time between to_date(?, 'yyyy,mm,dd')
 			and to_date(?, 'yyyy,mm,dd')
@@ -80,12 +80,11 @@ $STMTFMT_SEL_EVENTS = qq{
 			and ep1.value_text = patient.person_id
 		and ep2.parent_id = ep1.parent_id
 		and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		and ep2.value_text = ?
+		and upper(ep2.value_text) = upper(?)
 		and aat.id = ep1.value_int
-		and tt.id (+) = ep1.value_intB
 		and stat.id = e.event_status
 		and at.appt_type_id (+) = e.appt_type
-	order by e.start_time, nvl(e.parent_id, 0), e.event_id
+		%orderByClause%
 };
 
 $STMTRPTDEFN_TEMPLATEINFO =
@@ -113,14 +112,23 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
 		facility_clause => 'and e.facility_id = ?',
+		orderByClause => 'order by e.start_time, nvl(e.parent_id, 0), e.event_id',
+	},
+
+	'sel_analyze_events' =>
+	{
+		sqlStmt => $STMTFMT_SEL_EVENTS,
+		facility_clause => 'and e.facility_id = ?',
+		orderByClause => 'order by nvl(e.parent_id, 0), e.event_id',
 	},
 
 	'sel_events_any_facility' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
 		facility_clause => undef,
+		orderByClause => 'order by e.start_time, nvl(e.parent_id, 0), e.event_id',
 	},
-
+	
 	'updSchedulingPref' => qq{
 		update Person_Attribute set value_int = value_int-1
 		where parent_id = ?
@@ -235,20 +243,20 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selPopulateTemplateDialog' => qq{
 		select template_id, caption, r_ids, facility_id, available, status, remarks,
-			preferences, days_of_month, months, days_of_week, patient_types, visit_types,
+			preferences, days_of_month, months, days_of_week, patient_types, appt_types,
 			to_char(effective_begin_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_begin_date,
 			to_char(effective_end_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_end_date,
 			to_char(start_time, '$timeFormat') as duration_begin_time,
 			to_char(end_time,'$timeFormat') as duration_end_time
-		from Template_R_Ids, Template
+		from Sch_Template_R_Ids, Sch_Template
 		where template_id = ?
 			and parent_id = template_id
 			and rownum = 1
 	},
 
 	'selPopulateApptTypeDialog' => qq{
-		select appt_type_id, resource_id, caption, duration, lead_time, lag_time, back_to_back,
-			multiple, r_ids, am_limit, pm_limit
+		select appt_type_id, r_ids, caption, duration, lead_time, lag_time, back_to_back,
+			multiple, num_sim, rr_ids, am_limit, pm_limit, day_limit
 		from Appt_Type
 		where appt_type_id = :1
 	},
@@ -261,9 +269,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
 			ep1.value_text as attendee_id,
 			ep1.value_int as patient_type,
-			ep1.value_intB as visit_type,
 			ep2.value_text as resource_id,
-			e.appt_type as appt_type_id,
+			e.appt_type,
 			at.caption as appt_type_caption
 		from appt_type at, event_attribute ep2, event_attribute ep1, event e
 		where event_id = :1
@@ -335,17 +342,20 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		},
 	},
 
-	'selApptTypeInfo' =>
+	'selApptTypeSearch' =>
 	{
 		sqlStmt => qq{
-			select appt_type_id, resource_id, caption, duration,
-				lead_time, lag_time, decode(back_to_back, 0, 'No', 1, 'Yes', 'No'),
-				decode(multiple, 0, 'No', 1, 'Yes', 'No'), am_limit, pm_limit, r_ids
-			from Appt_Type
-			where owner_org_id = ?
-				and resource_id like ?
-				and caption like ?
-			order by caption, appt_type_id
+			select distinct
+				appt_type_id, r_ids, caption, duration, lead_time, lag_time,
+				decode(back_to_back, 0, 'No', 1, 'Yes', 'No'),
+				decode(multiple, 0, 'No', 1, 'Yes', 'No'),
+				num_sim, am_limit, pm_limit, rr_ids, day_limit
+			from Appt_Type_R_Ids, Appt_Type
+			where owner_org_id = :1
+				and (upper(member_name) = upper(:2) or upper(r_ids) like upper(:3))
+				and upper(caption) like upper(:4)
+				and Appt_Type_R_Ids.parent_id = appt_type_id
+			order by caption, r_ids, appt_type_id
 		},
 
 		publishDefn =>
@@ -355,20 +365,46 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 				{ head => 'ID',
 					url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')},
 				},
-				{ head => 'Resource',
-					url => q{javascript:location.href='/search/appttype/1/#&{?}#'}, hint => 'View #&{?}# Appointment Types',
+				{ head => 'Caption/ Resource',
+					dataFmt => qq{
+						Caption: <b>#2# </b><br>
+						<a href="javascript:location.href='/search/appttype/1/#1#'"
+							title='View #1# Appointment Types' style="text-decoration:none" >#1#</a> <br>
+					},
 				},
-				{ head => 'Caption'},
-				{ head => 'Duration', dAlign => 'center'},
-				{ head => 'Lead', dAlign => 'center'},
-				{ head => 'Lag', dAlign => 'center'},
-				{ head => 'Back-to-Back', dAlign => 'center'},
-				{ head => 'Multiple', dAlign => 'center'},
-				{ head => 'AM Limit', dAlign => 'center'},
-				{ head => 'PM Limit', dAlign => 'center'},
-				{ head => 'Addl Resource(s)'},
+				{ head => 'Details',
+					dataFmt => qq{
+						<nobr>Duration: <b>#3# minutes</b></nobr><br>
+						<nobr>Lead / Lag Time: #4# / #5# minutes</nobr><br>
+						Add'l Resources: <i>#11#</i>
+					},
+				},
+				{ head => 'Addl Details',
+					dataFmt => qq{
+						<nobr>Back-to-Back: #6# </nobr><br>
+						<nobr>Multiple / Limits: #7# / #8#</nobr><br>
+						<nobr>Limits Day/AM/PM: #12# / #9# / #10# / </nobr><br>
+					},
+				},
+
 			],
 		}
+	},
+
+	'sel_AllApptTypes' => qq{
+		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
+		from Appt_Type
+		where owner_org_id = :1
+		order by caption
+	},
+	
+	'sel_ApptTypesDropDown' => qq{
+		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
+		from Appt_Type
+		where owner_org_id = :1
+		UNION
+		select 0 as appt_type_id, ' ' as caption from Dual
+		order by caption
 	},
 
 	'selResourcesAtFacility' => qq{
@@ -476,19 +512,31 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select id, caption from Appt_Attendee_Type
 	},
 
-	'selVisitTypes' => qq{
-		select id, caption from Transaction_Type where id>=2040 and id<3000
-	},
+	#'selVisitTypes' => qq{
+	#	select id, caption from Transaction_Type where id>=2040 and id<3000
+	#},
 
-	'selVisitTypesDropDown' => qq{
-		select id, caption from Transaction_Type where id>=2040 and id<3000
+	'selPatientTypesDropDown' => qq{
+		select id, caption from Appt_Attendee_Type
 		UNION
 		select -1 as id, ' ' as caption from dual
 		order by caption
 	},
 
 	'selRovingResources' => qq{
-		select distinct member_name from Template_R_Ids where upper(member_name) like ?
+		select distinct member_name from Sch_Template_R_Ids where upper(member_name) like ?
+	},
+	
+	'sel_resources_with_templates' => qq{
+		select distinct member_name as resource_id
+		from Sch_Template_R_Ids
+		where parent_id in (select template_id from Sch_Template where owner_org_id = ?)
+	},
+	
+	'sel_facilities_from_templates' => qq{
+		select distinct facility_id
+		from Sch_Template
+		where owner_org_id = ?
 	},
 
 # -- WAITING LIST -----------------------------------------------------------------------------
@@ -497,7 +545,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select to_char(start_time, 'hh24mi') as start_minute,
 			to_char(start_time,'yyyy,mm,dd') as start_day, duration,
 			event_id,	ea1.value_text as patient_id, ea2.value_text as resource_id,
-			Event.parent_id
+			Event.parent_id, Event.appt_type
 		from 	Event_Attribute ea2, Event_Attribute ea1, Event
 		where start_time between to_date(?, 'yyyy,mm,dd')
 			and to_date(?, 'yyyy,mm,dd')
@@ -560,7 +608,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			and Event_Attribute.parent_id = Event.event_id
 			and Event_Attribute.value_type = $EVENTATTRTYPE_PATIENT
 		union
-		select 'None' as value_text, 0 as event_id from Dual
+		select 'None' as value_text, 9999999999999999 as event_id from Dual
+		order by event_id
 	},
 
 	'sel_futureAppointments' => {

@@ -179,7 +179,8 @@ sub getControlBarHtml
 	my $optionIndex;
 
 	my $javascripts = $self->getJavascripts();
-	my $chooseDateOptsHtml = $self->getChooseDateOptsHtml($fmtDate);
+	#my $chooseDateOptsHtml = $self->getChooseDateOptsHtml($fmtDate);
+	my $chooseDateOptsHtml = App::Page::Schedule::getChooseDateOptsHtml($self, $fmtDate);
 
 	my $nextDay = UnixDate(DateCalc($selectedDate, "+1 day"), '%m-%d-%Y');
 	my $prevDay = UnixDate(DateCalc($selectedDate, "-1 day"), '%m-%d-%Y');
@@ -313,7 +314,7 @@ sub getControlBarHtml
 		<tr>
 			<FORM name='dateForm' method=POST>
 				<td ALIGN=LEFT>
-					<SELECT class='controlBar' onBlur="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
+					<SELECT class='controlBar' onChange="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
@@ -333,31 +334,6 @@ sub getControlBarHtml
 	</TABLE>
 	<br>
 	};
-}
-
-sub getChooseDateOptsHtml
-{
-	my ($self, $date) = @_;
-
-	# Choose Date drop down list
-	my @quickChooseItems =
-		(
-			{ caption => 'Choose Day', value => '' },
-			{ caption => 'Today', value => 'today' },
-			{ caption => 'Yesterday', value => DateCalc('today', '-1 day') },
-			{ caption => 'Tomorrow', value => DateCalc('today', '+1 day') },
-			{ caption => 'Day after Tomorrow', value => DateCalc('today', '+2 days') },
-		);
-
-	my $quickChooseDateOptsHtml = '';
-	foreach (@quickChooseItems)
-	{
-		my $formatDate = UnixDate($_->{value}, '%m/%d/%Y');
-		$quickChooseDateOptsHtml .=  qq{
-			<option value="$formatDate">$_->{caption}</option>
-		};
-	}
-	return $quickChooseDateOptsHtml;
 }
 
 sub initialize

@@ -14,17 +14,6 @@ sub new
 
 	$params{effective_begin_date} = $params{effective_begin_date} || [];
 	$params{effective_end_date} = $params{effective_end_date} || [];
-	$params{months} = $params{months};
-	$params{days_of_week} = $params{days_of_week};
-	$params{days_of_month} = $params{days_of_month};
-	$params{start_time} = $params{start_time};
-	$params{end_time} = $params{end_time};
-	$params{template_id} = $params{template_id};
-	$params{caption} = $params{caption};
-	$params{facility_id} = $params{facility_id};
-	$params{patient_types} = $params{patient_types};
-	$params{visit_types} = $params{visit_types};
-	$params{resource_id} = $params{resource_id};
 
 	return bless \%params, $type;
 }
@@ -38,21 +27,25 @@ sub findTemplateDays {
 
 	my $setofDays = new Set::IntSpan;
 
-	my @effective_search_begin_date = laterDate (@search_begin_date, @{$self->{effective_begin_date}});
-	my @search_end_date = Add_Delta_Days (@search_begin_date, $search_duration);
+	my @effective_search_begin_date = laterDate(@search_begin_date, @{$self->{effective_begin_date}});
+	my @search_end_date = Add_Delta_Days(@search_begin_date, $search_duration);
 
-	@search_end_date = earlierDate (@search_end_date, @{$self->{effective_end_date}});
-	$search_duration = Delta_Days (@effective_search_begin_date, @search_end_date);
+	@search_end_date = earlierDate(@search_end_date, @{$self->{effective_end_date}});
+	$search_duration = Delta_Days(@effective_search_begin_date, @search_end_date);
 
 	my $sortedMonths = join(',', sort {$a <=> $b} split(/\s*,\s*/, $months));
-	my $month_spec_set = new Set::IntSpan ("$sortedMonths");
-	
+	my $month_spec_set = new Set::IntSpan("$sortedMonths");
+
 	my $sortedDays = join(',', sort {$a <=> $b} split(/\s*,\s*/, $days_of_week));
-	my $dow_spec_set   = new Set::IntSpan ("$sortedDays");
-	
-	my $sortedDaysM = join(',', sort {$a <=> $b} split(/\s*,\s*/, $days_of_month));
-	my $dom_spec_set   = new Set::IntSpan ("$sortedDaysM");
-	
+	my $dow_spec_set   = new Set::IntSpan("$sortedDays");
+
+	#my $dom_spec_set   = new Set::IntSpan("$days_of_month");
+	my $dom_spec_set = new Set::IntSpan ();
+	for my $item (sort {$a <=> $b} split(/\s*,\s*/, App::Dialog::Template::cleanup($days_of_month) ))
+	{
+		$dom_spec_set = $dom_spec_set->union($item);
+	}
+
 	for (my $d=0; $d<$search_duration; $d++){
 		my @date = Add_Delta_Days(@effective_search_begin_date, $d);
 

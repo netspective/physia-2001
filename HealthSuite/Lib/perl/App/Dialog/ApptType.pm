@@ -33,15 +33,26 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 
-	my $physField = new App::Dialog::Field::Person::ID(name => 'r_ids',
-		caption => 'Associated Resource(s)',
+	my $r_ids_field = new App::Dialog::Field::Person::ID(caption => 'Resource ID(s)',
+		name => 'r_ids',
+		types => ['Physician'],
+		hints => 'Appt Type applies to these Resource(s)',
+		size => 40,
+		maxLength => 255,
+		findPopupAppendValue => ',',
+		options => FLDFLAG_REQUIRED,
+	);
+	$r_ids_field->clearFlag(FLDFLAG_IDENTIFIER);
+
+	my $rr_ids_field = new App::Dialog::Field::Person::ID(caption => 'Associated Resource(s)',
+		name => 'rr_ids',
 		hints => 'These Resources must also be available',
 		types => ['Physician'],
 		size => 40,
 		maxLength => 255,
 		findPopupAppendValue => ',',
 	);
-	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
+	$rr_ids_field->clearFlag(FLDFLAG_IDENTIFIER);
 
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'appt_type_id',
@@ -49,24 +60,20 @@ sub new
 			options => FLDFLAG_READONLY,
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 		),
-		new App::Dialog::Field::Person::ID(caption => 'Physician ID',
-			name => 'resource_id',
-			types => ['Physician'],
-			options => FLDFLAG_REQUIRED,
-			size => 20,
-		),
+		
+		$r_ids_field,
+		
 		new CGI::Dialog::Field::TableColumn(column => 'Appt_Type.caption',
 			caption => 'Caption',
 			schema => $schema,
-			options => FLDFLAG_REQUIRED
+			options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::Field(caption => 'Appointment Duration',
 			name => 'duration',
-			fKeyStmtMgr => $STMTMGR_SCHEDULING,
-			fKeyStmt => 'selApptDuration',
-			fKeyDisplayCol => 1,
-			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED
+			type => 'integer',
+			hints => 'Duration in Minutes',
+			defaultValue => 10,
+			options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::MultiField(
 			fields => [			
@@ -88,14 +95,25 @@ sub new
 			style => 'check',
 			defaultValue => 1,
 		),
-		new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appointments Allowed',
-			name => 'multiple',
-			type => 'bool',
-			style => 'check',
-			defaultValue => 0,
+		
+		new CGI::Dialog::MultiField(name => 'simultaneous',		
+			fields => [
+				new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appts Limits',
+					name => 'num_sim',
+					type => 'integer',
+					hints => 'Max # simultaneous appointments',
+				),
+				new CGI::Dialog::Field(caption => 'Allowed',
+					name => 'multiple',
+					type => 'bool',
+					style => 'check',
+					defaultValue => 0,
+				),
+			],
 		),
-		#new CGI::Dialog::MultiField(
-		#	fields => [
+
+		new CGI::Dialog::MultiField(name => 'limits',
+			fields => [
 				new CGI::Dialog::Field(caption => 'AM Limits',
 					name => 'am_limit',
 					type => 'integer',
@@ -106,13 +124,18 @@ sub new
 					type => 'integer',
 					hints => 'Max # appointments of this type during PM hours',
 				),
-		#	],
-		#),
+				new CGI::Dialog::Field(caption => 'All Day Limits',
+					name => 'day_limit',
+					type => 'integer',
+					hints => 'Max # appointments of this type for entire day',
+				),
+			],
+		),
 		
-		#new CGI::Dialog::Subhead(heading => 'Additional Resource Requirements'),
-		$physField,
 
-		new App::Dialog::Field::RovingResource(physician_field => '_f_r_ids',
+		$rr_ids_field,
+
+		new App::Dialog::Field::RovingResource(physician_field => '_f_rr_ids',
 			name => 'roving_physician',
 			caption => 'Roving Physician',
 			type => 'foreignKey',
@@ -159,8 +182,6 @@ sub populateData_add
 	{
 		$self->populateData_update($page, $command, $activeExecMode, $flags);
 	}
-
-	$page->field('r_ids', $page->param('resource_id'));
 }
 
 sub populateData_update
@@ -171,6 +192,8 @@ sub populateData_update
 	my $apptTypeId = $page->param('appt_type_id');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateApptTypeDialog', $apptTypeId);
+	
+	$page->field ('multiple', 1) if $page->field('num_sim') > 1;		
 }
 
 ###############################
@@ -184,25 +207,28 @@ sub execute
 	my $apptTypeId = $page->field('appt_type_id');
 	my $timeStamp = $page->getTimeStamp();
 
+	$page->field ('multiple', 1) if $page->field('num_sim') > 1;
+	
 	my $newApptTypeId = $page->schemaAction(
 		'Appt_Type', $command,
 		appt_type_id => $command eq 'add' ? undef : $apptTypeId,
-		
-		resource_id => $page->field ('resource_id'),
+		r_ids => $page->field ('r_ids'),
 		caption => $page->field ('caption'),
 		duration => $page->field('duration') || 10,
 		lead_time => $page->field ('lead_time') || undef,
 		lag_time => $page->field ('lag_time')  || undef,
 		back_to_back => $page->field ('back_to_back') || 0,
 		multiple => $page->field ('multiple') || 0,
+		num_sim => $page->field ('num_sim') || undef,
 		am_limit => $page->field ('am_limit') || undef,
 		pm_limit => $page->field ('pm_limit') || undef,
-		r_ids => $page->field ('r_ids') || undef,
+		day_limit => $page->field ('day_limit') || undef,
+		rr_ids => $page->field ('rr_ids') || undef,
 		owner_org_id => $page->session('org_internal_id'),
 		_debug => 0
 	);
 
-	$page->param('_dialogreturnurl', '/search/appttype/1/%field.resource_id%')
+	$page->param('_dialogreturnurl', '/search/appttype/1/%field.r_ids%')
 		if $command eq 'update' || ! $page->field('nextaction_redirecturl');
 	$self->handlePostExecute($page, $command, $flags);
 }

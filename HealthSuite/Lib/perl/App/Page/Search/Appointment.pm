@@ -121,7 +121,7 @@ sub getForm
 		<input name='search_to_date' size=10 maxlength=10 value="@{[$self->param('search_to_date')]}" title='To Date'>
 		<nobr>
 			&nbsp <input name='unAvailEventSearch' type=checkbox $unAvailEventSearchChecked>
-			Events Outside Available Templates
+			Appointments Outside Available Templates
 		</nobr>
 		<br>
 
@@ -177,7 +177,7 @@ sub execute
 			search_start_date => \@search_start_date,
 			search_duration   => $search_duration,
 			patient_type      => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
-			visit_type        => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
+			appt_type         => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
 		);
 
 		my @unAvailSlots = $sa->findUnAvailableAppointments($self);

@@ -34,8 +34,8 @@ sub handleARL
 
 	unless ($self->param('searchAgain')) {
 		if ($pathItems->[1]) {
-			my ($resource_ids, $facility_ids, $start_date, $appt_duration, $patient_type, 
-				$visit_type, $appt_type_id) =
+			my ($resource_ids, $facility_ids, $start_date, $appt_duration, $patient_type,
+				$appt_type) =
 				split(/,/, $pathItems->[1]);
 
 			$start_date =~ s/\-/\//g;
@@ -43,10 +43,8 @@ sub handleARL
 			$self->param('facility_ids', $facility_ids) if defined $facility_ids;
 			$self->param('start_date',  $start_date) if defined $start_date;
 			$self->param('appt_duration', $appt_duration || 10);
-			$self->param('patient_type', $patient_type) if defined $patient_type;
-			$self->param('visit_type', $visit_type) if defined $visit_type;
-			$self->param('appt_type_id', $appt_type_id) if defined $appt_type_id;
-			
+			$self->param('_f_patient_type', $patient_type) if defined $patient_type;
+			$self->param('_f_appt_type', $appt_type) if defined $appt_type;
 			$self->param('searchAgain', 1);
 		}
 	}
@@ -76,20 +74,43 @@ sub getForm
 
 	my $rovingPhysFieldHtml = $rovingPhysField->getHtml($self, $dialog);
 
+	my $patientTypeField = new CGI::Dialog::Field(caption => 'Patient Type',
+		name => 'patient_type',
+		type => 'select',
+		fKeyStmtMgr => $STMTMGR_SCHEDULING,
+		fKeyStmt => 'selPatientTypesDropDown',
+		fKeyDisplayCol => 1,
+		fKeyValueCol => 0,
+	);
+
+	my $apptTypeField =	new CGI::Dialog::Field(caption => 'Appointment Type',
+		name => 'appt_type',
+		type => 'select',
+		fKeyStmtMgr => $STMTMGR_SCHEDULING,
+		fKeyStmt => 'sel_ApptTypesDropDown',
+		fKeyStmtBindSession => ['org_internal_id'],
+		fKeyDisplayCol => 1,
+		fKeyValueCol => 0,
+	);
+
+	my $patientTypeFieldHtml = $patientTypeField->select_as_html($self, $dialog);
+	my $apptTypeFieldHtml = $apptTypeField->select_as_html($self, $dialog);
+
 	return ('Find next available slot', qq{
 	<CENTER>
 		<nobr>
+		<font face='arial,helvetica' size='2' color=black>
 		<label for="parallel_search">Parallel Search</label>
 		<input name='parallel_search' id="parallel_search" type=checkbox $parallelSearchChecked>
 
-		Resource(s):
+		<font face='arial,helvetica' size='2' color=black>
+		&nbsp; Resource(s)
 		<input name='resource_ids' id='resource_ids' size=30 maxlength=255 value="@{[$self->param('resource_ids')]}" title='Resource IDs'>
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_ids, '/lookup/physician/id', ',', false, null);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
-		&nbsp;
-
-		Facility(s):
+		<font face='arial,helvetica' size='2' color=black>
+		&nbsp; Facility(s)
 		<input name='facility_ids' id='facility_ids' size=20 maxlength=32 value="@{[$self->param('facility_ids')]}" title='Facility IDs'>
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id', ',', false);">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
@@ -100,19 +121,17 @@ sub getForm
 		</table>
 
 		<nobr>
-		Starting:
+		<font face='arial,helvetica' size='2' color=black>
+		Starting
 		<input name='start_date' id='start_date' size=10 maxlength=10 title='Start Date'
 			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}">
-		Duration:
-		<select name="appt_duration" style="color: darkred">
-			<option value="10">10 minutes</option>
-			<option value="15">15 minutes</option>
-			<option value="20">20 minutes</option>
-			<option value="30">30 minutes</option>
-			<option value="45">45 minutes</option>
-			<option value="60">1 hour</option>
-		</select>
-		Look Ahead:
+		
+		<font face='arial,helvetica' size='2' color=black>
+		&nbsp; Duration (minutes)
+		<input name='appt_duration' size=3 value="@{[$self->param('appt_duration') || 10]}">
+		
+		<font face='arial,helvetica' size='2' color=black>
+		&nbsp; Look Ahead
 		<select name="search_duration" style="color: navy">
 			<option value="7" >1 week</option>
 			<option value="14">2 weeks</option>
@@ -120,45 +139,34 @@ sub getForm
 			<option value="30">1 month</option>
 		</select>
 
-		<br>
-		<nobr>
-		Patient Type:
-		<select name="patient_type" style="color: navy">
-			<option value="-1" >All</option>
-			<option value="0" >New Patients</option>
-			<option value="1" >Established Patients</option>
-			<option value="2" >Temporary Patients</option>
-		</select>
-		Visit Type:
-		<select name="visit_type" style="color: navy">
-			<option value="-1" >All</option>
-			<option value="2080" >Complicated Visit</option>
-			<option value="2100" >Consultation</option>
-			<option value="2160" >Counseling Visit</option>
-			<option value="2050" >Executive Physical</option>
-			<option value="2110" >Injection Only</option>
-			<option value="2150" >Lab Visit</option>
-			<option value="2040" >Physical Exam</option>
-			<option value="2170" >Physical Therapy</option>
-			<option value="2120" >Procedure Visit</option>
-			<option value="2140" >Radiology Visit</option>
-			<option value="2070" >Regular Visit</option>
-			<option value="2180" >Special Visit</option>
-			<option value="2060" >Sports/School Physical</option>
-			<option value="2090" >Well Women Exam</option>
-			<option value="2130" >Workmans Comp Visit</option>
-		</select>
-		</nobr>
+		<table>
+			<tr>
+				<td>
+					<table cellpadding=1 cellspacing=0>
+						$patientTypeFieldHtml					
+					</table>
+				</td>
+				
+				<td>
+					<table cellpadding=1 cellspacing=0>
+						$apptTypeFieldHtml			
+					</table>
+				</td>
+				<td>
+					<input type=submit name="execute" value="Go">				
+				</td>
+			</tr>
+		</table>
 
 		<script>
-			setSelectedValue(document.search_form.appt_duration, '@{[ $self->param('appt_duration') || 10 ]}');
 			setSelectedValue(document.search_form.search_duration, '@{[ $self->param('search_duration') || 7 ]}');
-			setSelectedValue(document.search_form.patient_type, '@{[ $self->param('patient_type')]}');
-			setSelectedValue(document.search_form.visit_type, '@{[ $self->param('visit_type')]}');
+			
+			setSelectedValue(document.search_form._f_patient_type, '@{[ $self->param('_f_patient_type') ]}');
+			setSelectedValue(document.search_form._f_appt_type, '@{[ $self->param('_f_appt_type') ]}');
 		</script>
 
 		<input type=hidden name='searchAgain' value="@{[$self->param('searchAgain')]}">
-		<input type=submit name="execute" value="Go">
+
 	</CENTER>
 	});
 }
@@ -169,20 +177,27 @@ sub execute
 
 	my @resource_ids = split(/\s*,\s*/, $self->param('resource_ids'));
 	my @facility_ids = split(/\s*,\s*/, $self->param('facility_ids'));
-
+	
 	my @internalOrgIds = ();
 	for (@facility_ids)
 	{
 		my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
-			'selOrgId', $self->session('org_internal_id'), $_);
+			'selOrgId', $self->session('org_internal_id'), uc($_));
 		push(@internalOrgIds, $internalOrgId) if defined $internalOrgId;
 	}
-	
+
 	unless (scalar @internalOrgIds >= 1)
 	{
 		my @orgIds = ();
 		for (@facility_ids)
 		{
+			chomp;
+			if ($_ =~ /.*\D.*/)
+			{
+				$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
+				return;
+			}
+			
 			my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
 			if ($orgId)
 			{
@@ -192,25 +207,28 @@ sub execute
 			$self->param('facility_ids', join(',', @orgIds));
 		}
 	}
-	
+
 	my $rIds;
-	if ($self->param('appt_type_id'))
+	if ($self->field('appt_type') > 0)
 	{
 		my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
-			'selApptTypeById', $self->param('appt_type_id')) if $self->param('appt_type_id');
-		$rIds = $apptType->{r_ids};
+			'selApptTypeById', $self->field('appt_type'));
+			
+		$rIds = $apptType->{rr_ids};
 		push(@resource_ids, split(/\s*,\s*/, $rIds)) if $rIds;
-		$self->param('resource_ids', join(',', @resource_ids));
+		#$self->param('resource_ids', join(',', @resource_ids));
 		$self->param('parallel_search', 1) if defined $rIds;
 		$self->param('appt_duration', $apptType->{duration});
 	}
+	
+	$self->param('appt_duration', 10) if $self->param('appt_duration') <= 0;
 
 	my @search_start_date = Decode_Date_US($self->param('start_date')) if $self->param('start_date');
 	eval {check_date(@search_start_date);};
 	@search_start_date = Today() if $@;
 
-	my $patient_type = $self->param('patient_type') if defined $self->param('patient_type');
-	my $visit_type = $self->param('visit_type') if defined $self->param('visit_type');
+	my $patient_type = $self->field('patient_type') if defined $self->field('patient_type');
+	my $appt_type = $self->field('appt_type') if defined $self->field('appt_type');
 
 	my $sa = new App::Schedule::Analyze (
 		resource_ids      => \@resource_ids,
@@ -218,10 +236,10 @@ sub execute
 		search_start_date => \@search_start_date,
 		search_duration   => $self->param('search_duration') || 7,
 		patient_type      => defined $patient_type ? $patient_type : -1,
-		visit_type        => defined $visit_type ? $visit_type : -1
+		appt_type         => defined $appt_type ? $appt_type : -1
 	);
 
-	my $flag = defined $self->param('parallel_search') || defined $rIds ? 
+	my $flag = defined $self->param('parallel_search') || defined $rIds ?
 		App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL : App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
 
 	my @available_slots = $sa->findAvailSlots($self, $flag);
@@ -252,91 +270,82 @@ sub getSlotsHtml
 		$html .= "<tr><td>No available slot found in this search period.</td></tr>\n";
 	}
 
-	my $patient_type = $self->param('patient_type');
-	my $visit_type = $self->param('visit_type');
+	my $patient_type = $self->param('_f_patient_type');
+	$patient_type = 1 if $patient_type == -1;
+	my $appt_type = $self->param('_f_appt_type');
 	my $duration = $self->param('appt_duration');
 
 	my $found = 0;
 	my $today = Date_to_Days(Today());
 	my $dayPrinted = 0;
-	
+
 	my $startDay = Date_to_Days(@{$sa->{search_start_date}});
 
-	for (@slots)
+	if (scalar @{$sa->{resource_ids}} == 1)
 	{
-		my $resource_id = $_->{resource_id};
-		my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId',
-			$_->{facility_id});
-		my @minute_ranges = split(/,/, $_->{minute_set}->run_list);
-
-		my $facilityInternalId = $_->{facility_id};
-		
-		for (@minute_ranges)
+		for (@slots)
 		{
-			my ($low, $high) = split(/-/, $_);
+			my $resource_id = $_->{resource_id};
+			my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId',
+				$_->{facility_id});
+			my @minute_ranges = split(/,/, $_->{minute_set}->run_list);
 
-			my $dayOffset = int($low/24/60);
-			$low  -= $dayOffset*24*60;
-			$high -= $dayOffset*24*60;
+			my $facilityInternalId = $_->{facility_id};
 
-			my $day  = $dayOffset + $startDay;
+			for (@minute_ranges)
+			{
+				my ($outerLow, $outerHigh) = split(/-/, $_);
+			
+				for (my $loopIndex=$outerLow; $loopIndex<$outerHigh; $loopIndex += $duration) 
+				{
+					my $low = $loopIndex;
+					my $high = $low + $duration;
+					last if ($high > $outerHigh);
 
-			next if ($high - $low) < $self->param('appt_duration');
-			next if ($day < $today);
+					my $dayOffset = int($low/24/60);
+					$low  -= $dayOffset*24*60;
+					$high -= $dayOffset*24*60;
 
-			$found = 1;
+					my $day  = $dayOffset + $startDay;
 
-			my $timeString = minute_set_2_string("$low-$high", TIME_H12);
-			my @date = Days_to_Date($day);
+					last if ($high - $low) < $duration;
+					last if ($day < $today);
 
-			my $dateString = sprintf ("%02d-%02d-%04d", $date[1],$date[2],$date[0]);
-			my $fmtDate  = sprintf ("%02d/%02d/%04d", $date[1],$date[2],$date[0]);
-			my $dow = sprintf ("%.3s", Day_of_Week_to_Text(Day_of_Week(@date)));
-
-			my $resourceHref;
-			my $facilityHref;
-
-			if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
-				$resourceHref = $resource_id;
-				$resourceHref = join(',', @{$sa->{resource_ids}}) if $self->param('parallel_search');
-				$facilityHref = $facility_id;
-			} else {
-				$resourceHref = qq{<a style="font-weight:bold" href="javascript:chooseItem('/search/apptslot/%itemValue%/1', '$resource_id,,$dateString,$duration,$patient_type,$visit_type', false);" >$resource_id </a>};
-				$facilityHref = qq{<a href="javascript:chooseItem('/search/apptslot/%itemValue%/1', ',$facility_id,$dateString,$duration,$patient_type,$visit_type', false);" >$facility_id </a>};
-				$resourceHref = join(',', @{$sa->{resource_ids}}) if $self->param('parallel_search');
-			}
-
-			if ($dayPrinted == $day) {
-				$html .= "<tr><td>$resourceHref</td><td>$facilityHref</td><td>&nbsp</td><td>&nbsp</td>";
-			} else {
-				$html .= "<TR><TD COLSPAN=5><IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1></TD></TR>";
-				$html .= "<tr><td>$resourceHref</td><td>$facilityHref</td><td align=right>";
-
-				if (! $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
-					$html .= "<a href='/schedule/apptsheet/$dateString'>$dow</a>";
-				} else {
-					$html .= "$dow";
+					$found = 1;
+					$html .= $self->getRowHtml($sa, $day, $low, $high, $resource_id, $facility_id, $duration,
+						$patient_type, $appt_type, $facilityInternalId, \$dayPrinted);
 				}
-
-				$html .= "</td><td>$fmtDate</td>\n";
-				$dayPrinted = $day;
 			}
+		}
+	}
+	else
+	{
+		for (@slots)
+		{
+			my $resource_id = $_->{resource_id};
+			my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId',
+				$_->{facility_id});
+			my @minute_ranges = split(/,/, $_->{minute_set}->run_list);
 
-			my $startTime = $dateString . "_" . Trim(minute_set_2_string($low, TIME_H12));
-			my $startTimeHref;
+			my $facilityInternalId = $_->{facility_id};
 
-			if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
-				my $dashDateString = $dateString;
-				$dashDateString =~ s/\-/\//g;
-				my $beginTime = Trim(minute_set_2_string($low, TIME_H12));
-				$startTimeHref = qq{<a href="javascript:chooseItem('/schedule/appointment/add/%itemValue%', '$dashDateString', false, '$beginTime');" >$timeString </a>};
-			} else {
-				$startTime =~ s/ /_/g;
-				$startTimeHref = qq{<a href="javascript:chooseItem('/schedule/appointment/add/%itemValue%', '$resource_id,$startTime,$facilityInternalId,$patient_type,$visit_type', false);" >$timeString </a>};
+			for (@minute_ranges)
+			{
+				my ($low, $high) = split(/-/, $_);
+
+				my $dayOffset = int($low/24/60);
+				$low  -= $dayOffset*24*60;
+				$high -= $dayOffset*24*60;
+
+				my $day  = $dayOffset + $startDay;
+
+				next if ($high - $low) < $duration;
+				next if ($day < $today);
+
+				$found = 1;
+				$html .= $self->getRowHtml($sa, $day, $low, $high, $resource_id, $facility_id, $duration,
+					$patient_type, $appt_type, $facilityInternalId, \$dayPrinted);
 			}
-
-			$html .= "<td>$startTimeHref</td>\n";
-			$html .= "</tr>\n";
 		}
 	}
 
@@ -346,6 +355,70 @@ sub getSlotsHtml
 
 	$html .= "</table></center>";
 
+	return $html;
+}
+
+
+sub getRowHtml
+{
+	my ($self, $sa, $day, $low, $high, $resource_id, $facility_id, $duration, $patient_type, 
+		$appt_type, $facilityInternalId, $dayPrinted) = @_;
+
+	my $html;
+	
+	my $timeString = minute_set_2_string("$low-$high", TIME_H12);
+	my @date = Days_to_Date($day);
+
+	my $dateString = sprintf ("%02d-%02d-%04d", $date[1],$date[2],$date[0]);
+	my $fmtDate  = sprintf ("%02d/%02d/%04d", $date[1],$date[2],$date[0]);
+	my $dow = sprintf ("%.3s", Day_of_Week_to_Text(Day_of_Week(@date)));
+
+	my $resourceHref;
+	my $facilityHref;
+
+	if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
+		$resourceHref = $resource_id;
+		$resourceHref = join(',', @{$sa->{resource_ids}}) if $self->param('parallel_search');
+		$facilityHref = $facility_id;
+	} else {
+		$resourceHref = qq{<a style="font-weight:bold" href="javascript:chooseItem('/search/apptslot/%itemValue%/1', '$resource_id,,$dateString,$duration,$patient_type,$appt_type', false);" >$resource_id </a>};
+		$facilityHref = qq{<a href="javascript:chooseItem('/search/apptslot/%itemValue%/1', ',$facility_id,$dateString,$duration,$patient_type,$appt_type', false);" >$facility_id </a>};
+		$resourceHref = join(',', @{$sa->{resource_ids}}) if $self->param('parallel_search');
+	}
+
+	if ($$dayPrinted == $day) {
+		$html .= "<tr><td>$resourceHref</td><td>$facilityHref</td><td>&nbsp</td><td>&nbsp</td>";
+	} else {
+		$html .= "<TR><TD COLSPAN=5><IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1></TD></TR>";
+		$html .= "<tr><td>$resourceHref</td><td>$facilityHref</td><td align=right>";
+
+		if (! $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
+			$html .= "<a href='/schedule/apptsheet/$dateString'>$dow</a>";
+		} else {
+			$html .= "$dow";
+		}
+
+		$html .= "</td><td>$fmtDate</td>\n";
+		$$dayPrinted = $day;
+	}
+
+	my $startTime = $dateString . "_" . Trim(minute_set_2_string($low, TIME_H12));
+	my $startTimeHref;
+
+	if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP)) {
+		my $dashDateString = $dateString;
+		$dashDateString =~ s/\-/\//g;
+		my $beginTime = Trim(minute_set_2_string($low, TIME_H12));
+		$startTimeHref = qq{<a href="javascript:chooseItem('/schedule/appointment/add/%itemValue%', '$dashDateString', false, '$beginTime');" >$timeString </a>};
+	} else {
+		$startTime =~ s/ /_/g;
+		#$startTimeHref = qq{<a href="javascript:chooseItem('/schedule/appointment/add/%itemValue%', '$resource_id,$startTime,$facilityInternalId,$patient_type,$appt_type', false);" >$timeString </a>};
+		$startTimeHref = qq{<a href="javascript:chooseItem('/schedule/dlg-add-appointment//$resource_id/$facilityInternalId/$startTime/$patient_type/$appt_type', null, false);" >$timeString </a>};
+	}
+
+	$html .= "<td>$startTimeHref</td>\n";
+	$html .= "</tr>\n";
+	
 	return $html;
 }
 

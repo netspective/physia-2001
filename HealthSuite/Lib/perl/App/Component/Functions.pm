@@ -57,9 +57,9 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-appointment">Appointment</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-template">Schedule Template</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-appttype">Appointment Type</OPTION>
+					<OPTION VALUE="/schedule/dlg-add-appointment?_dialogreturnurl=/#param.arl#">Appointment</OPTION>
+					<OPTION VALUE="/schedule/dlg-add-template?_dialogreturnurl=/#param.arl#">Schedule Template</OPTION>
+					<OPTION VALUE="/schedule/dlg-add-appttype">Appointment Type</OPTION>
 				</SELECT>
 			</TD>
 		</TR>

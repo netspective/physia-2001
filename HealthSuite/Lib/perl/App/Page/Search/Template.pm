@@ -58,7 +58,6 @@ sub getForm
 	return ('Lookup a scheduling template', qq{
 		<CENTER>
 		<NOBR>
-		<font size=2 face='Tahoma'>	Search for </font>
 		<select name="template_type" style="color: darkred">
 			<option value="0,1" $selected0>All Templates</option>
 			<option value="1,1" $selected1>Positive Templates</option>
@@ -73,11 +72,13 @@ sub getForm
 			setSelectedValue(document.search_form.template_active, '@{[$self->param('template_active')]}');
 		</script>
 
+		Resource
 		<input name='r_ids' size=17 maxlength=32 value="@{[$self->param('r_ids')]}"
 			title='Resource ID'>
-			<a href="javascript:doFindLookup(this.form, search_form.r_ids, '/lookup/person/id');">
+			<a href="javascript:doFindLookup(this.form, search_form.r_ids, '/lookup/physician/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
+		Facility
 		<input name='facility_id' size=17 maxlength=32 value="@{[$self->param('facility_id')]}" title='Facility ID'>
 			<a href="javascript:doFindLookup(this.form, search_form.facility_id, '/lookup/org/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
@@ -134,13 +135,6 @@ sub execute
 		$PATIENT_TYPE{$_->{id}} =~ s/\spatient//gi;
 	}
 
-	my $visitTypes = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selVisitTypes');
-	my %VISIT_TYPE;
-	for (@$visitTypes)
-	{
-		$VISIT_TYPE{$_->{id}} = $_->{caption};
-	}
-
 	my %WEEKDAYS = (1=>'Sun', 2=>'Mon', 3=>'Tue', 4=>'Wed', 5=>'Thu', 6=>'Fri', 7=>'Sat');
 	# --------------------------------
 
@@ -149,7 +143,7 @@ sub execute
 
 	my @data = ();
 	my $patientTypesString;
-	my $visitTypesString;
+	my $apptTypesString;
 
 	foreach (@{$templates})
 	{
@@ -167,18 +161,20 @@ sub execute
 			$patientTypesString = 'All';
 		}
 
-		if ($_->{visit_types})
+		if ($_->{appt_types})
 		{
-			my @decodeVTypes = ();
-			for (split(/\s*,\s*/, $_->{visit_types}))
+			my @decodeATypes = ();
+			for (split(/\s*,\s*/, $_->{appt_types}))
 			{
-				push(@decodeVTypes, $VISIT_TYPE{$_});
+				my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE, 
+					'selApptTypeById', $_);
+				push(@decodeATypes, $apptType->{caption});
 			}
-			$visitTypesString = join(', ', @decodeVTypes);
+			$apptTypesString = join(' / ', @decodeATypes);
 		}
 		else
 		{
-			$visitTypesString = 'All';
+			$apptTypesString = 'All';
 		}
 
 		my $daysOfWeek = 'All';
@@ -202,7 +198,7 @@ sub execute
 			$_->{caption},
 			$_->{org_id},
 			$patientTypesString,
-			$visitTypesString,
+			$apptTypesString,
 			$_->{start_time},
 			$_->{end_time},
 			$_->{begin_date},
@@ -221,20 +217,27 @@ sub execute
 		columnDefn =>
 			[
 				{ head => 'ID', url => q{javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'}, hint => 'Edit Template #&{?}#'},
-				{ head => 'Resource(s)', url => q{javascript:location.href='/search/template/1/#&{?}#'}, hint => 'View #&{?}# Templates'},
-				{ head => 'Caption'},
-				{ head => 'Facility', url => q{javascript:location.href='/search/template/1//#&{?}#'}, hint => 'View #&{?}# Templates'},
-				{ head => 'Details', dataFmt => qq{
-					<b>#13#</b>
-					<nobr>Time: <b>#6# - #7# </b></nobr><br>
-					<nobr>Patient Types: #4#</nobr><br>
-					Visit Types: <i>#5#</i><br>
-					<nobr>Months: #10#</nobr><br>
-					<nobr>Days of Month: #11#</nobr><br>
-					<nobr>Weekdays: #12# </nobr><br>
+				
+				{ head => 'Resource/Caption/Facility', 
+					dataFmt => qq{
+						<a href="javascript:location.href='/search/template/1/#1#'" 
+							title='View #1# Templates' style="text-decoration:none" >#1#</a> <br>
+						Caption: <b>#2# </b><br>
+						<a href="javascript:location.href='/search/template/1//#3#'" 
+							title='View #3# Templates' style="text-decoration:none" >#3#</a> <br>
 					},
 				},
-				#{ head => 'Available', colIdx => 13,},
+				{ head => 'Details', 
+					dataFmt => qq{
+						<b>#13#</b>
+						<nobr>Time: <b>#6# - #7# </b></nobr><br>
+						<nobr>Patient Types: #4#</nobr><br>
+						Appt Types: <i>#5#</i><br>
+						<nobr>Months: #10#</nobr><br>
+						<nobr>Days of Month: #11#</nobr><br>
+						<nobr>Weekdays: #12# </nobr><br>
+					},
+				},
 				{ head => 'Effective', dataFmt => '#8#-<br>#9#', },
 			],
 	};

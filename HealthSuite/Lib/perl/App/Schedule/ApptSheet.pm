@@ -65,12 +65,12 @@ sub init
 		$PATIENT_TYPES[$id] = $_->{caption};
 	}
 
-	my $visitTypes = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selVisitTypes');
-	for (@$visitTypes)
-	{
-		my $id = $_->{id};
-		$VISIT_TYPES[$id] = $_->{caption};
-	}
+	#my $visitTypes = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selVisitTypes');
+	#for (@$visitTypes)
+	#{
+	#	my $id = $_->{id};
+	#	$VISIT_TYPES[$id] = $_->{caption};
+	#}
 
 	@DAYS_OF_WEEK = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 	@MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
@@ -258,13 +258,17 @@ sub getTemplateData
 				@patientTypes = "All";
 			}
 
-			my @visitTypes;
-			if (defined $t->{visit_types}) {
-				for (split(/,/, $t->{visit_types})) {
-					push(@visitTypes, $VISIT_TYPES[$_]);
+			my @apptTypes;
+			if (defined $t->{appt_types}) {
+
+				for (split(/,/, $t->{appt_types})) {
+					my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 
+						'selApptTypeById', $_);
+
+					push(@apptTypes, $apptType->{caption});
 				}
 			} else {
-				@visitTypes = "All";
+				@apptTypes = "All";
 			}
 
 			my @daysOfWeek;
@@ -294,7 +298,7 @@ sub getTemplateData
 			$templateTitle .= "Days of Month:  @{[ $t->{days_of_month} || 'All' ]} \n";
 			$templateTitle .= "Months:  @{[ join(', ', @months) ]} \n";
 			$templateTitle .= "Patient Types:  @{[ join(', ', @patientTypes) ]} \n";
-			$templateTitle .= "Visit Types:  @{[ join(', ', @visitTypes) ]} \n";
+			$templateTitle .= "Appt Types:  @{[ join(' / ', @apptTypes) ]}";
 
 			my $updateHref = qq{javascript:location.href = '/schedule/dlg-update-template/$templateID'};
 
@@ -549,12 +553,13 @@ sub getAppointments
 			my $event_id = $slots[$i]->{attributes}->{event_id};
 			my $parent_id = $slots[$i]->{attributes}->{parent_id};
 
-			my $title = "$patient_complete_name -- $time\n";
+			my $title = "($patient_id) $patient_complete_name -- $time\n";
 			$title .= "Facility ID:  $slots[$i]->{attributes}->{facility_id}\n";
 			$title .= "$slots[$i]->{attributes}->{conflict}\n";
 			$title .= "Patient Type:  $slots[$i]->{attributes}->{patient_type}\n";
-			$title .= "Visit Type:  $slots[$i]->{attributes}->{visit_type}\n";
-			$title .= "Appointment Type:  $slots[$i]->{attributes}->{appt_type}\n";
+			$title .= "Appointment Type:  $slots[$i]->{attributes}->{appt_type}";
+			$title .= $slots[$i]->{attributes}->{appt_type_id} ? 
+				" ($slots[$i]->{attributes}->{appt_type_id})\n" : "None\n";
 			$title .= "Reason for Visit:  $slots[$i]->{attributes}->{subject}\n";
 			$title .= "Symptoms:  $slots[$i]->{attributes}->{remarks}\n";
 			$title .= "$slots[$i]->{attributes}->{status}: ";
@@ -624,7 +629,7 @@ sub findSlots
 			search_start_date => \@date,
 			search_duration   => 1,
 			patient_type      => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
-			visit_type        => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES
+			appt_type         => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES
 		);
 
 		my $posDaysset = new Set::IntSpan;
