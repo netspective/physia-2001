@@ -13,6 +13,7 @@ use Devel::ChangeLog;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Scheduling;
+use App::Statements::Component::Scheduling;
 
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(CGI::Dialog);
@@ -103,7 +104,7 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $parentId =  $page->param('person_id');	
-	my $physicians = join(',', $page->field('value_text'));	
+	my $physiciansString = join(',', $page->field('value_text'));	
 	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selSessionPhysicians', $parentId);
 	my $itemId = $physicansList->{'item_id'};
 	
@@ -119,10 +120,31 @@ sub execute
 		parent_org_id => $page->session('org_id') || undef,
 		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 		item_name => 'SessionPhysicians',
-		value_text => $physicians,
+		value_text => $physiciansString,
 		value_int =>  1,
 		_debug => 0
 	);
+	
+	my $userId = $page->session('user_id');
+	
+	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
+		'del_worklist_resources', $userId, 'Physician');
+
+	my @physicians = $page->field('value_text');
+	for (@physicians)
+	{
+		$page->schemaAction(
+			'Person_Attribute',	'add',
+			item_id => undef,
+			parent_id => $userId,
+			parent_org_id => $page->session('org_id') || undef,
+			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
+			item_name => 'Physician',
+			value_text => $_,
+			value_int =>  1,
+			_debug => 0
+		);
+	}
 	
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
