@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!-- do not use "/" or "." inside of id attributes -->
+
+<mdl>
+	<clinical-documentation>
+	<templates id="physia">
+		<template id="visit" caption="Adult PHE">
+		<field-defn idref="vital_signs"/>
+		<field-defn idref="hpi"/>
+		<field-defn idref="ros"/>
+		<field-defn idref="habits"/>
+		<field-defn idref="current_medications"/>
+		<field-defn idref="family_planning"/>
+		<field-defn idref="physical_exam"/>
+		<field-defn idref="laboratory_results"/>
+		<field-defn idref="assessment"/>
+		<field-defn idref="procedures"/>
+		<field-defn idref="plan"/>
+		</template>
+	</templates>
+        </clinical-documentation>
+</mdl>
