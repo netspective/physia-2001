@@ -101,6 +101,7 @@ sub new
 				'';
 		$params{fKeyWhere} = "exists (select 1 from PERSON inner, PERSON_CATEGORY pc where outer.PERSON_ID = inner.PERSON_ID and inner.PERSON_ID = pc.PARENT_ID and $typeCond)" if $typeCond;
 	}
+
 	else
 	{
 		$params{type} = 'text';

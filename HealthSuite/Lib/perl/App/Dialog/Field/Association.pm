@@ -20,16 +20,16 @@ sub new
 	$params{fields} =
 	[
 		#new CGI::Dialog::Field(caption => 'Relationship',
-		#						type => 'foreignKey',
-		#						name => 'rel_type',
-		#						fKeyTable => 'Relationship',
-		#						fKeySelCols => "caption",
-		#						fKeyDisplayCol => 0,
-		#						fKeyValueCol => 0),
-		new CGI::Dialog::Field(caption => 'Relationship',								
+		#					type => 'foreignKey',
+		#					name => 'rel_type',
+		#					fKeyTable => 'Relationship',
+		#					fKeySelCols => "caption",
+		#					fKeyDisplayCol => 0,
+		#					fKeyValueCol => 0),
+		new CGI::Dialog::Field(caption => 'Relationship',
 								name => 'rel_type',
 								fKeyStmtMgr => $STMTMGR_PERSON,
-								fKeyStmt => 'selRelationship',								
+								fKeyStmt => 'selRelationship',
 								fKeyDisplayCol => 0,
 								fKeyValueCol => 0),
 
@@ -59,7 +59,7 @@ sub validateOther
 use constant FAMILY_DIALOG => 'Dialog/Family';
 
 @CHANGELOG =(
-	
+
 	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/16/2000', 'RK',
 		FAMILY_DIALOG,
 		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
