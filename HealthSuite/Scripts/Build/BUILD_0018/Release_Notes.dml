@@ -224,12 +224,24 @@
 			Fixed the multiple-Cancel-buttons error.
 		</deliverable>
 
+		<deliverable id="1849">
+			Application error regarding 3rd party payer and blank payer option in claim dialog fixed.
+		</deliverable>
+
 		<deliverable id="1854">
 			Worklist: Fixed problem with the Collection Worklist showing data across orgs
 		</deliverable>
 
 		<deliverable id="1856">
 			Report (Financial Analy Report) : Fixed problem with Total A/R
+		</deliverable>
+
+		<deliverable id="1869">
+			Validation for when adding a person category that already exists has been added.
+		</deliverable>
+
+		<deliverable id="1873">
+			Perl error from link after updating a plan has been fixed.
 		</deliverable>
 
 	</deliverables>
