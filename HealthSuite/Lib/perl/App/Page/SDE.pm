@@ -193,18 +193,20 @@ sub queryToHtmlTable
 
 sub prepare_TableStruct
 {
-	my $self = shift;
+	my ($self, $showHead) = @_;
+	$showHead = 1 unless defined $showHead;
+
 	if(my $table = $self->{schema}->{tables}->{byName}->{$self->param('table')})
 	{
 		my $updTableUrl = $self->selfRef(_reloadtable=>1);
 		my $updTableDataUrl = $self->selfRef(_reloadtabledata=>1);
 		my $allTables = $self->getTableListAsSelect();
-		my $html = qq{
+		my $html = $showHead ? qq{
 			<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
 			<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>$table->{name}</B> Table ($table->{abbrev})</font></TD><TD ALIGN=RIGHT>$allTables</TD></TR>
 			</TABLE>
 			<P>$table->{descr}</P>
-		};
+		} : '';
 
 		my $defaultsCount = 0;
 		my $tableForeignRefsCount = 0;
@@ -232,7 +234,7 @@ sub prepare_TableStruct
 		foreach my $col (@{$table->{colsInOrder}})
 		{
 			my $colName = $col->{name};
-			my $colDetailHref = "window.open('$self->{selfref}?frame=columndetail&table=$table->{name}&column=$col->{name}', 'col_$table->{name}_$col->{name}', 'width=550,height=400,scrollbars,resizable');";
+			my $colDetailHref = "$table->{name}?column=$col->{name}";
 			my $foreignRefsCount = exists $col->{foreignRefs} ? scalar(@{$col->{foreignRefs}}) : 0;
 			my $cacheRefsCount = exists $col->{cacheRefs} ? scalar(@{$col->{cacheRefs}}) : 0;
 			my $useTypeRefsCount = exists $col->{useTypeRefs} ? scalar(@{$col->{useTypeRefs}}) : 0;
@@ -295,11 +297,11 @@ sub prepare_TableStruct
 			my $domain = $col->{type} eq 'ref' ? "<font color=red>foreign key</font>" : "<font color=green>$col->{type}</font>";
 			my $default = $defaultsCount > 0 ? "<td>$col->{default}</td>" : '';
 
-			my $foreignRefs = $tableForeignRefsCount > 0 ? ("<td align=right><a href='#' onclick=\"javascript:$colDetailHref\">" . ($externalRefsCount > 0 ? $externalRefsCount : '') . "</a></td>") : '';
+			my $foreignRefs = $tableForeignRefsCount > 0 ? ("<td align=right><a HREF='$colDetailHref'>" . ($externalRefsCount > 0 ? $externalRefsCount : '') . "</a></td>") : '';
 			my $row = qq{
-				<tr bgcolor="$bgColor" valign=top ondblclick="$colDetailHref">
+				<tr bgcolor="$bgColor" valign=top>
 					<td align=center valign=center>$flags</td>
-					<td>$name<div class="coldescr">$col->{descr}</div></td>
+					<td><a href='$colDetailHref' style='text-decoration:none'>$name</a><div class="coldescr">$col->{descr}</div></td>
 					<td>$domain</td>
 					<td>$col->{sqldefn}</td>
 					$default
@@ -328,7 +330,7 @@ sub prepare_TableStruct
 	}
 }
 
-sub handle_columndetail
+sub prepare_ColumnDetail
 {
 	my $self = shift;
 
@@ -336,11 +338,18 @@ sub handle_columndetail
 	{
 		if(my $col = $table->{colsByName}->{$self->param('column')})
 		{
-			my $html = qq{
-				<h1>$table->{name}.$col->{name}</h1>
-				$col->{descr}<p>
-			};
+			$self->addContent(qq{
+				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
+				<TR>
+					<TD><font size=4 color=darkred face="arial,helvetica">Column <B>$table->{name}.$col->{name}</B></font></TD>
+					<TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD>
+				</TR>
+				</TABLE>
+				<P>
+				$col->{descr}
+			});
 
+			my $html = '';
 			my @foreignRefs = ();
 			if(exists $col->{foreignRefs})
 			{
@@ -450,6 +459,15 @@ sub prepare_view_tables
 		$self->addLocatorLinks(["$pathItems[1] Query", '/sde/table/' . $pathItems[1]]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_TableQuery();
+	}
+	elsif($self->param('column'))
+	{
+		$self->addLocatorLinks([$pathItems[1], '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["Column " . $self->param('column'), '/sde/table/' . $pathItems[1] . '?' . 'column=' . $self->param('column')]);
+		$self->param('table', $pathItems[1]);
+		$self->prepare_ColumnDetail();
+		$self->addContent('<P>');
+		$self->prepare_TableStruct(0);
 	}
 	elsif(scalar(@pathItems) > 1)
 	{
