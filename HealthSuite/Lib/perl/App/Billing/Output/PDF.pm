@@ -7,9 +7,7 @@ use App::Billing::Claims;
 use pdflib 2.01;
 
 use vars qw(@ISA);
-use Devel::ChangeLog;
 use App::Billing::Output::PDF::Worker;
-use vars qw(@CHANGELOG);
 
 use constant CLAIM_TYPE_WORKCOMP => 6;
 
@@ -210,7 +208,7 @@ sub drawForm
 	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
 
 	my $cordinates = $self->drawFormOutline($p, $drawBackgroundForm);
-	
+
 	if($drawBackgroundForm)
 	{
 		pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
@@ -495,7 +493,7 @@ sub drawFormOutline
 	$y = $y - LINE_SPACING - 1;
 	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING ) if $drawBackgroundForm;   # line dividing 24-6  and 25
 	$cordinates->{box25} = [START_X , $y - LINE_SPACING ];
-	
+
 	if($drawBackgroundForm)
 	{
 		$self->drawLine($p, START_X + STARTX_BOX24ADATE_SPACE, $y - LINE_SPACING, START_X  + STARTX_BOX24ADATE_SPACE , $startProcY );   # line dividing 24-FROM and 24-TO
@@ -1871,7 +1869,8 @@ sub box6ClaimData
 			'99' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 		};
 
-	pdflib::PDF_show_xy($p ,'X' , $temp->{uc($claim->{careReceiver}->getRelationshipToInsured)} , $box6Y - 21 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{careReceiver}->getRelationshipToInsured)});
+	my $claimType = $claim->getClaimType();
+	pdflib::PDF_show_xy($p ,'X' , $temp->{uc($claim->{insured}->[$claimType]->getRelationshipToPatient)} , $box6Y - 21 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{insured}->[$claimType]->getRelationshipToPatient)});
 	pdflib::PDF_stroke($p);
 }
 
@@ -2631,7 +2630,7 @@ sub box25ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , $claim->{payToOrganization}->getFederalTaxId eq "" ?  $claim->{payToOrganization}->getTaxId : $claim->{payToOrganization}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
 	my $temp = {
 			'S' => $box25X + CELL_PADDING_X + 112.5 + CHECKED_BOX_X,
@@ -2943,36 +2942,6 @@ sub reversePrimaryProcedure
 		$claim->{procedures}->[0] = $procedure;
 	}
 }
-
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'ProcessClaim is now changed to ProcessClaims. '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Patient sex has domain form  ( 1 or 2 )i.e 1 => Male, 2 => Female .'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Patient relationship hash changed as 0 => self, 1 => spouse, 3 => child, 4 => other.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Patient employment hash changed as status is changed.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI', 'Billing Interface/PDF Claim', 'Patient Student Status has domain from values ( STUDENT (FULL-TIME) ,STUDENT (PART-TIME),0,1). '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI', 'Billing Interface/PDF Claim', 'Accept assigment is changed as 0 => no, 1 => yes.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI', 'Billing Interface/PDF Claim', 'Condition related to has domain from  ( EMPLOYMENT, AUTO ACCIDENT, OTHER ACCIDENT). please check auto accident.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI', 'Billing Interface/PDF Claim', 'Patient employment Status will be checked off if is not equal Retired or "".'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'SSI', 'Billing Interface/PDF Claim','Patient relationship to insured has domain form 0 => 01,1 => 02,3 => 03,4 => 99,SELF => 01,SPOUSE => 02,CHILD => 03,04,05,06,OTHER => 99,07,08,09,10,11,12,13,14,15,16,17,18,19.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/PDF Claim','getConditionRelatedToEmployment sets Y if employment else N.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/PDF Claim','getConditionRelatedToAutoAccident sets Y if Auto Accident else N.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/PDF Claim','getConditionRelatedToOtherAccident sets Y if Other Accident else N.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/22/1999', 'SSI', 'Billing Interface/PDF Claim','getAcceptAssign sets Y if Auto Accident else N.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/24/1999', 'SSI', 'Billing Interface/PDF Claim','Box 11a caption is corrected form "Other insured date of birth" to "insured date of birth". '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/28/1999', 'SSI', 'Billing Interface/PDF Claim','Pin number of physician is implemented. '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/07/2000', 'SSI', 'Billing Interface/PDF Claim','The new pdf module is uploaded in which adjustment are made to make it as a image of orignal PDF 1500.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/14/2000', 'SSI', 'Billing Interface/PDF Claim','GRP number of physician is implemented. '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'SSI', 'PDF Claim', 'Patient Relationship to insured has domain from (0,1,3,4) or (self,child,spouse,other)'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/01/2000', 'SSI', 'Billing Interface/PDF Claim','More than 6 procedure and more than 4 diagnosis implemented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim',' Patient signature on file is set to default'],
-
-);
 
 1;
 
