@@ -95,6 +95,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from offering_catalog
 		where internal_catalog_id = ?
 	},
+	'selCatalogByOrgIdType' => qq{
+		select *
+		from offering_catalog
+		where org_internal_id = :1
+		and	catalog_type = :2
+	},	
 	'sel_internalCatId_orgId' => qq{
 		SELECT *
 		FROM Offering_Catalog
@@ -114,6 +120,14 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where catalog_id = ?
 			and org_internal_id = ?
 	},
+	'selCatalogByOrgIntType'=>qq
+	{
+		SELECT * 
+		FROM	Offering_Catalog
+		WHERE	org_internal_id = :1
+		AND	catalog_type = :2
+		AND 	catalog_subtype = :3
+	},
 	'selParentCatalogByOrgId' => q{
 		select *
 		from offering_catalog
@@ -130,6 +144,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from offering_catalog_entry
 		where catalog_id = ?
 			and entry_type in (?,?)
+	},
+	'selCatalogItemsByCatID'=>q
+	{
+		SELECT	*
+		FROM	offering_catlaog_entry
+		WHERE	catalog_id = :1
 	},
 	'selCatalogItemsByParentItem' => q{
 		select *
