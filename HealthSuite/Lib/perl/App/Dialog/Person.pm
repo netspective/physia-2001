@@ -217,7 +217,8 @@ sub populateData
 
 	my $guarantor = 'Guarantor';
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
-	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $guarantorName->{'value_text'});
+	$guarantorName->{'value_text'} eq $personId ? $page->field('party_name', '') : $page->field('party_name', $guarantorName->{'value_text'});
+	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', $personId) : $page->field('resp_self', '');
 	$page->field('resp_item_id', $guarantorName->{'item_id'});
 	my $relation = $guarantorName->{'value_textb'};
 	my @itemNamefragments = split('/', $relation);
@@ -483,8 +484,9 @@ sub handleAttrs
 	my $otherRelType = $page->field('other_rel_type');
 	$otherRelType = "\u$otherRelType";
 	my $relationship = $relType eq 'Other' ? "Other/$otherRelType" : $relType;
+	my $respSelf = $page->field('party_name') ne '' ? '' : $personId;
+	my $partyName =  $page->field('party_name') ne '' ? $page->field('party_name') : $page->field('resp_self');
 
-	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
 	my $commandResponsible = $command eq 'update' &&  $page->field('resp_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
 			'Person_Attribute', $commandResponsible,
@@ -494,7 +496,6 @@ sub handleAttrs
 			value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
 			value_text => $partyName || undef,
 			value_textB => $relationship || undef,
-			value_int => 1,
 			_debug => 0
 			)if $partyName ne '';
 
