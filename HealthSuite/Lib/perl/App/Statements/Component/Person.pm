@@ -33,8 +33,59 @@ $PUBLDEFN_CONTACTMETHOD_DEFAULT = {
 	],
 };
 
+
+
 $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
+'person.messageRegardingPatient' => {
+	sqlStmt => qq{
+		SELECT * FROM (
+			select d.doc_name, to_char(d.doc_orig_stamp - :2, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				as doc_orig_stamp, d.doc_source_id, d.doc_dest_ids, d.doc_spec_subtype,
+				d.doc_id
+			from document d, document_attribute da
+			where da.item_name = 'Regarding Patient'
+				and da.value_text = :1
+				and d.doc_id = da.parent_id
+			order by d.doc_orig_stamp DESC
+		)
+		WHERE ROWNUM < 11
+	},
+	publishDefn =>
+	{
+		columnDefn =>
+		[
+			{
+				dataFmt => '<a href="/person/#session.user_id#/dlg-read-message_#4#/#5#/#4#?home=#homeArl#" >#1#</a> &nbsp; From: #2# - To: #3# <br>&nbsp; #0#'
+			},
+		],
+	},
+	publishDefn_panel =>
+	{
+		style => 'panel.static',
+		inherit => 'panel',
+		frame =>
+		{
+			heading => 'Messages Regarding Patient',
+			-editUrl => '',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		style => 'panel.transparent',
+		inherit => 'panel',
+		frame =>
+		{
+			-editUrl => '',
+		},
+
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageRegardingPatient', [$personId, $page->session('GMT_DAYOFFSET')]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageRegardingPatient', [$personId, $page->session('GMT_DAYOFFSET')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageRegardingPatient', [$personId, $page->session('GMT_DAYOFFSET')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageRegardingPatient', [$personId, $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
+},
+
 'person.account-notes' => {
 	sqlStmt => qq{
 		SELECT * FROM (
@@ -94,7 +145,6 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
 },
-
 
 'person.group-account-notes' => {
 
