@@ -52,6 +52,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_phone_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_addr_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
@@ -386,6 +387,10 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrAssignment',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
+
+		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
+		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
+		$page->param("_f_proc_default_catalog", $feeSchedules->{value_text});
 
 		my $cntrlData = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Patient/Control Number');
 		$page->field('cntrl_num_item_id', $cntrlData->{item_id});
@@ -1220,6 +1225,17 @@ sub handleInvoiceAttrs
 			value_type => defined $phoneValueType ? $phoneValueType : undef,
 			value_text => $payToFacilityPhone->{value_text} || undef,
 			value_textB => $payToOrgId || undef,
+			_debug => 0
+	);
+
+	my @feeSchedules = $page->param("_f_proc_active_catalogs");
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('fee_schedules_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Fee Schedules',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => join(',', @feeSchedules) || undef,
 			_debug => 0
 	);
 
