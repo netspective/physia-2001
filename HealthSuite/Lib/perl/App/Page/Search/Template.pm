@@ -96,17 +96,17 @@ sub execute
 
 	my @available = split (/,/, $self->param('template_type'));
 	@available = (0,1) unless @available;
-	
+
 	my $template_active;
 	my $statement;
-	
+
 	if (defined $self->param('template_active'))
 	{
 		if ($self->param('template_active') == 1)
-		{ 
+		{
 			$template_active = $self->param('template_active');
 			$statement = 'selEffectiveTemplate';
-		} 
+		}
 		else
 		{
 			$template_active = 0;
@@ -118,8 +118,8 @@ sub execute
 		$template_active = 1;
 		$statement = 'selEffectiveTemplate';
 	}
-	
-	my @bindCols = ($self->session('org_internal_id'), $self->param('r_ids').'%', 
+
+	my @bindCols = ($self->session('org_internal_id'), $self->param('r_ids').'%',
 		$self->param('facility_id').'%', @available, $template_active);
 
 	$self->param('_dialogreturnurl', '/search/template');
@@ -140,24 +140,23 @@ sub execute
 	{
 		$VISIT_TYPE{$_->{id}} = $_->{caption};
 	}
-	
+
 	my %WEEKDAYS = (1=>'Sun', 2=>'Mon', 3=>'Tue', 4=>'Wed', 5=>'Thu', 6=>'Fri', 7=>'Sat');
 	# --------------------------------
-	
+
 	my $templates = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
 		$statement, @bindCols);
-		
+
 	my @data = ();
 	my $patientTypesString;
 	my $visitTypesString;
-	
+
 	foreach (@{$templates})
 	{
 		if ($_->{patient_types})
 		{
-			my @pTypes = split(/\s*,\s*/, $_->{patient_types});
 			my @decodePTypes = ();
-			for (@pTypes)
+			for (split(/\s*,\s*/, $_->{patient_types}))
 			{
 				push(@decodePTypes, $PATIENT_TYPE{$_});
 			}
@@ -170,9 +169,8 @@ sub execute
 
 		if ($_->{visit_types})
 		{
-			my @vTypes = split(/\s*,\s*/, $_->{visit_types});
 			my @decodeVTypes = ();
-			for (@vTypes)
+			for (split(/\s*,\s*/, $_->{visit_types}))
 			{
 				push(@decodeVTypes, $VISIT_TYPE{$_});
 			}
@@ -182,7 +180,7 @@ sub execute
 		{
 			$visitTypesString = 'All';
 		}
-		
+
 		my $daysOfWeek = 'All';
 		if ($_->{days_of_week})
 		{
@@ -194,10 +192,10 @@ sub execute
 			}
 			$daysOfWeek = join(', ', @decodedDOW);
 		}
-		
+
 		$_->{months} ||= 'All';
 		$_->{days_of_month} ||= 'All';
-		
+
 		my @rowData = (
 			$_->{template_id},
 			$_->{resources},
@@ -214,10 +212,10 @@ sub execute
 			$daysOfWeek,
 			$_->{available},
 		);
-			
+
 		push(@data, \@rowData);
 	}
-	
+
 	my $STMTRPTDEFN_TEMPLATEINFO =
 	{
 		columnDefn =>
@@ -227,23 +225,23 @@ sub execute
 				{ head => 'Caption'},
 				{ head => 'Facility', url => q{javascript:location.href='/search/template/1//#&{?}#'}, hint => 'View #&{?}# Templates'},
 				{ head => 'Details', dataFmt => qq{
+					<b>#13#</b>
 					<nobr>Time: <b>#6# - #7# </b></nobr><br>
 					<nobr>Patient Types: #4#</nobr><br>
 					Visit Types: <i>#5#</i><br>
 					<nobr>Months: #10#</nobr><br>
 					<nobr>Days of Month: #11#</nobr><br>
 					<nobr>Weekdays: #12# </nobr><br>
-					<nobr><b>#14#</b></nobr>
 					},
 				},
-				{ head => 'Available', colIdx => 13,},
-				{ head => 'Effective', dataFmt => '#8#-<br>#9#', },	
+				#{ head => 'Available', colIdx => 13,},
+				{ head => 'Effective', dataFmt => '#8#-<br>#9#', },
 			],
 	};
 
-	
+
 	my $html = createHtmlFromData($self, 0, \@data, $STMTRPTDEFN_TEMPLATEINFO);
-	
+
 	$self->addContent(
 	'<CENTER>',
 		$html,

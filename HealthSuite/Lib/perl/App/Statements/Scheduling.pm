@@ -29,7 +29,7 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 		to_char(end_time, '$timeFormat') as end_time,
 		to_char(effective_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
-		decode(available,0,'NO',1,'YES') as available,
+		decode(available,0,'Not Available',1,'Available') as available,
 		patient_types,
 		visit_types,
 		days_of_month,
@@ -47,22 +47,22 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 
 $STMTFMT_SEL_EVENTS = qq{
 	select to_char(e.start_time, 'hh24mi') as start_minute,
-		to_char(e.start_time,'yyyy,mm,dd') as start_day, 
+		to_char(e.start_time,'yyyy,mm,dd') as start_day,
 		e.duration,
-		e.event_id,	
-		ep1.value_text as patient_id, 
+		e.event_id,
+		ep1.value_text as patient_id,
 		ep2.value_text as resource_id,
 		patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
 		patient.complete_name as patient_complete_name,
-		e.subject, 
+		e.subject,
 		aat.caption as patient_type,
-		tt.caption as visit_type, 
-		e.remarks, 
-		e.event_status, 
+		tt.caption as visit_type,
+		e.remarks,
+		e.event_status,
 		e.facility_id,
 		to_char(e.checkin_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
 		to_char(e.checkout_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
-		stat.caption as appt_status, 
+		stat.caption as appt_status,
 		e.parent_id,
 		e.scheduled_by_id,
 		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
@@ -259,7 +259,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			to_char(e.start_time, '$timeFormat') as appt_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
-			ep1.value_text as attendee_id, 
+			ep1.value_text as attendee_id,
 			ep1.value_int as patient_type,
 			ep1.value_intB as visit_type,
 			ep2.value_text as resource_id,
@@ -328,7 +328,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		publishDefn => $STMTRPTDEFN_TEMPLATEINFO,
 		effectiveWhereClause => qq{
 			and (status = ? or
-				(	effective_end_date is NOT NULL 
+				(	effective_end_date is NOT NULL
 					and trunc(effective_end_date) < trunc(sysdate)
 				)
 			)
