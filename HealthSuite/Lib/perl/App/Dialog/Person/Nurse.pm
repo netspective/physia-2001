@@ -21,9 +21,9 @@ use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'nurse' => {
-		heading => '$Command Nurse', 
-		_arl => ['person_id'], 
-		_arl_modify => ['person_id'], 
+		heading => '$Command Nurse',
+		_arl => ['person_id'],
+		_arl_modify => ['person_id'],
 		_idSynonym => 'Nurse',
 		},
 	);
@@ -46,37 +46,62 @@ sub initialize
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_license_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
 
 		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse'),
 
 		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', name=> 'nurse_license', hints => "'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'.",
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(caption => 'RN #', name => 'rn_number'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rn_number_exp_date', defaultValue => ''),
 				new CGI::Dialog::Field(type => 'bool', name => 'check_license', caption => 'License Required',	style => 'check'),
 				]),
-		new CGI::Dialog::MultiField(caption =>'Specialty Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+
+		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date1',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Specialty1', name => 'specialty1'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'specialty1_exp_date', defaultValue => ''),
+				new CGI::Dialog::Field(
+					type => 'select',
+					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
+					caption => 'License',
+					name => 'license1',
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num1'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license1_exp_date', defaultValue => ''),
 				]),
-		new CGI::Dialog::MultiField(caption =>'Specialty Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+
+		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date2',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Specialty2', name => 'specialty2'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'specialty2_exp_date', defaultValue => ''),
+				new CGI::Dialog::Field(
+					type => 'select',
+					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
+					caption => 'License',
+					name => 'license2',
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num2'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license2_exp_date', defaultValue => ''),
 				]),
-		new CGI::Dialog::MultiField(caption =>'Specialty Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+
+		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date3',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Specialty3', name => 'specialty3'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'specialty3_exp_date', defaultValue => ''),
+				new CGI::Dialog::Field(
+					type => 'select',
+					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
+					caption => 'License',
+					name => 'license3',
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num3'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license3_exp_date', defaultValue => ''),
 				]),
+
 		new CGI::Dialog::MultiField(caption =>'Employee ID/Exp Date',
 			fields => [
 				new CGI::Dialog::Field(caption => 'Employee ID', name => 'emp_id'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'emp_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
+
 		new CGI::Dialog::Field(caption => 'Associated Physician Name',
 												#type => 'foreignKey',
 												name => 'value_text',
@@ -84,6 +109,7 @@ sub initialize
 												#fKeySelCols => "distinct p.person_id, p.complete_name",
 												#fKeyDisplayCol => 1,
 												#fKeyValueCol => 0,
+												options => FLDFLAG_PREPENDBLANK,
 												fKeyStmtMgr => $STMTMGR_PERSON,
 												fKeyStmt => 'selAssocNurse',
 												fKeyDisplayCol => 1,
@@ -154,19 +180,52 @@ sub customValidate
 	my $licenseDate = $self->getField('nurse_license')->{fields}->[1];
 	my $licenseCheck = $self->getField('nurse_license')->{fields}->[2];
 
+	my $licenseValid1 = $self->getField('licens_num_date1')->{fields}->[0];
+	my $licenseValid2 = $self->getField('licens_num_date2')->{fields}->[0];
+	my $licenseValid3 = $self->getField('licens_num_date3')->{fields}->[0];
+
+	my $licenseName2 = $page->field('license2');
+	my $licenseName3 = $page->field('license3');
+	my $licenseName1 = $page->field('license1');
 	if($page->field('rn_number') ne '' && ($page->field('check_license') eq '' || $page->field('rn_number_exp_date') eq ''))
 	{
 		$licenseNum->invalidate($page, "'Exp Date' and 'License Required' should be entered when 'Nursing License' is entered");
 	}
+
 	elsif($page->field('check_license') ne '' && ($page->field('rn_number') eq '' || $page->field('rn_number_exp_date') eq ''))
 	{
 		$licenseNum->invalidate($page, "'Nursing License' and 'Exp Date' should be entered when 'Exp Date' is entered");
 	}
+
 	elsif($page->field('rn_number_exp_date') ne '' && ($page->field('rn_number') eq '' || $page->field('check_license') eq ''))
 	{
 		$licenseNum->invalidate($page, "'Nursing License' and 'License Required' should be entered when 'Exp Date' is entered");
 	}
 
+	if ($licenseName2 eq $licenseName1 && $licenseName2 ne '')
+	{
+		$licenseValid2->invalidate($page, "The license '$licenseName2' cannot be added more than once");
+	}
+
+	if (($licenseName3 eq $licenseName1 || $licenseName3 eq $licenseName2) && $licenseName3 ne '')
+	{
+		$licenseValid3->invalidate($page, "The license '$licenseName3' cannot be added more than once");
+	}
+
+	if ($licenseName1 ne '' && $page->field('license_num1') eq '')
+	{
+		$licenseValid1->invalidate($page, "The 'License Number' should be entered when a 'License Certification' is selected");
+	}
+
+	if ($licenseName2 ne '' && $page->field('license_num2') eq '')
+	{
+		$licenseValid2->invalidate($page, "The 'License Number' should be entered when a 'License Certification' is selected");
+	}
+
+	if ($licenseName3 ne '' && $page->field('license_num3') eq '')
+	{
+		$licenseValid3->invalidate($page, "The 'License Number' should be entered when a 'License Certification' is selected");
+	}
 
 }
 
@@ -182,44 +241,37 @@ sub execute_add
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	$page->schemaAction(
-			'Person_Attribute',	$command,
+			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
-			item_name => 'Physician',
-			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
-			value_text => $page->field('value_text') || undef,
-			#parent_org_id => $page->session('org_id') || undef,
+			item_name => $page->field('license1') || undef,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
+			value_text => $page->field('license_num1')  || undef,
+			value_textB => $page->field('license1')  || undef,
+			value_dateEnd => $page->field('license1_exp_date') || undef,
 			_debug => 0
-	);
+	) if $page->field('license1') ne '';
 
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
-			item_name => 'Specialty',
+			item_name => $page->field('license2') || undef,
 			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('specialty1')  || undef,
-			value_dateA => $page->field('specialty1_exp_date') || undef,
+			value_text => $page->field('license_num2')  || undef,
+			value_textB => $page->field('license3')  || undef,
+			value_dateEnd => $page->field('license2_exp_date') || undef,
 			_debug => 0
-	) if $page->field('specialty1') ne '';
+	) if $page->field('license2') ne '';
 
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
-			item_name => 'Specialty',
+			item_name => $page->field('license3') || undef,
 			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('specialty2')  || undef,
-			value_dateA => $page->field('specialty2_exp_date') || undef,
+			value_text => $page->field('license_num3')  || undef,
+			value_textB => $page->field('license3')  || undef,
+			value_dateEnd => $page->field('license3_exp_date') || undef,
 			_debug => 0
-	) if $page->field('specialty2') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $page->field('person_id'),
-			item_name => 'Specialty',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('specialty3')  || undef,
-			value_dateA => $page->field('specialty3_exp_date') || undef,
-			_debug => 0
-	) if $page->field('specialty3') ne '';
+	) if $page->field('license3') ne '';
 
 	$page->schemaAction(
 		'Person_Attribute',	$command,
@@ -230,6 +282,18 @@ sub execute_add
 		parent_org_id => $page->session('org_id') || undef,
 		_debug => 0
 	);
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $page->field('person_id'),
+			item_name => 'Nursing/License',
+			value_type => App::Universal::ATTRTYPE_LICENSE,
+			value_text => $page->field('rn_number')  || undef,
+			value_textB => 'Nursing/License',
+			value_dateEnd => $page->field('rn_number_exp_date') || undef,
+			value_int => $page->field('check_license')  || undef,
+			_debug => 0
+		) if $page->field('rn_number') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'nurse');
 
