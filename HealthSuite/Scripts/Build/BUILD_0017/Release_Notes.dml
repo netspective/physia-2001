@@ -89,6 +89,9 @@
 		<deliverable id="1532">
 			Report (Receipt Analysis) :  Added new option to create receipt analysis  as totals only
 		</deliverable>
+		<deliverable id="1535">
+			Report (Deposit Payment) : New report for capturing payments(deposits) 
+		</deliverable>
 
 		<deliverable id="1536">
 			Added all remaining invoice statuses to claim search.
@@ -96,6 +99,10 @@
 
 		<deliverable id="1537">
 			Changed Envoy NSF tab to THINNet NSF in claim summary screen.
+		</deliverable>
+		<deliverable id="1542">
+			UI : Added new Query called "IPA Financial Transaction". This allows an org to obtain financial information other main orgs that it is assoicated with.
+			[Database] : Requires the addition of three new tables to track assoication.
 		</deliverable>
 
 		<deliverable id="1544">
@@ -133,6 +140,7 @@
 		<deliverable id="1561">
 			UI: Collection Worklist now looks like Document and claim worklist.  Also should have improved performance when using worklist.     
 			Side Effects : Since the method for storing colletion information has changed any part of the application that pulled collection information could be impacted .  The collection worklist and the collection reports have been changed already.
+			[Database] : Requires new table Invoice_Worklist 
 		</deliverable>
 		<deliverable id="1571">
 			UI: Added a new component called 'Person Categories' in the person's Summary page to add a new category to an existing person.
