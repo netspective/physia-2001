@@ -12,13 +12,15 @@ use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_
 
 $STMTFMT_SEL_INVOICETYPE = qq{
 			select i.invoice_id, i.total_items, to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
-					ist.caption as invoice_status, ib.bill_to_id, i.reference, i.total_cost,
+					ist.caption as invoice_status, ib.bill_to_id, i.total_cost,
 					i.total_adjust, i.balance, i.client_id, ib.bill_to_id
 			from invoice i, invoice_status ist, invoice_billing ib
 			where
 				%whereCond%
 				and i.invoice_status = ist.id
 				and ib.invoice_id = i.invoice_id
+				and ib.invoice_item_id is NULL
+				and ib.bill_sequence = 1
 				order by i.invoice_date, i.cr_stamp desc
 };
 
@@ -27,12 +29,11 @@ $STMTRPTDEFN_DEFAULT_ORG =
 	columnDefn =>
 			[
 				{ head => 'ID', url => '/invoice/#&{?}#', hint => 'Claim Identifier',dAlign => 'RIGHT'},
-				{ head => 'Name' , hint => 'Claim Identifier',dAlign => 'CENTER'},
+				{ head => 'IC' , hint => 'Claim Identifier', dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
 				{ head => 'Client'},
-				{ head => 'Reference'},
-				{ head => 'Total', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
 
@@ -44,12 +45,11 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 	columnDefn =>
 			[
 				{ head => 'ID', url => '/invoice/#&{?}#', hint => "Claim Identifier",dAlign => 'RIGHT'},
-				{ head => 'Name', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
+				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
 				{ head => 'Payer'},
-				{ head => 'Reference'},
-				{ head => 'Total', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
 				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
 
@@ -84,7 +84,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_id = ?
 		},
 	'selInvoiceByStatusAndDateAndType' => qq{
-		select 	invoice_id, invoice_status, client_id, reference,
+		select 	invoice_id, invoice_status, client_id,
 			to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
 			balance, total_adjust
 		from invoice
@@ -104,7 +104,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_type = ?
 		},
 	'selInvoiceAndClaimType' => q{
-		select 	i.reference, i.invoice_status, iis.caption as invoice_status_caption,
+		select 	i.invoice_status, iis.caption as invoice_status_caption,
 			i.invoice_subtype, ct.caption as claim_type_caption, i.client_id,
 			i.claim_diags, i.total_items, i.total_cost, i.total_adjust, i.balance, i.client_id
 		from invoice i, claim_type ct, invoice_status iis
