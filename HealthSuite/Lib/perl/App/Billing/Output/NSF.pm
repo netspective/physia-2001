@@ -18,9 +18,11 @@ use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Output::Driver);
 
-use App::Billing::Output::NSFConstant;
+# use App::Billing::Output::NSFConstant;
 
 
+use constant NSFDEST_ARRAY => 0;
+use constant NSFDEST_FILE => 1;
 
 
 
@@ -38,7 +40,7 @@ sub processClaims
 	
 	my $t0 = new Benchmark;
 	
-	if ($params{destination} == App::Billing::Output::NSFConstant::NSFDEST_FILE)
+	if ($params{destination} == NSFDEST_FILE)
 	{
 		$self->{outFile} = $params{outFile};
 		die 'outFile parameter required' unless $params{outFile};
