@@ -84,7 +84,7 @@ sub populateData
         if($refillInfo->{data_num_a} eq '')
         {
 
-		$page->field('filler', $refillInfo->{data_text_b});
+		$page->field('filler', $refillInfo->{processor_id});
 		$page->field('refilldate', $refillInfo->{trans_begin_stamp});
 		$page->field('provider', $refillInfo->{provider_id});
 		$page->field('refill', $refillInfo->{data_text_a});
