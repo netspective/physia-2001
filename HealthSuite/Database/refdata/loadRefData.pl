@@ -401,8 +401,11 @@ sub importTXGULFfs
 				doBefore => qq{delete from Offering_Catalog where catalog_id in ('REGULAR', 'MC_99',
 					'BCBS', 'MEDICAID', 'WC', 'ML_IPA', 'USFHP', 'CIGNA_CAP', 'NYLC_UTMB', 'CL_IPA',
 					'UMC', 'PRUD', 'KIM_CAP', 'RVU', 'MMG', 'MC2000', 'KELSEY', 'TRICARE', 'NINETEEN',
-					'TWENTY') //
-					delete from Offering_Catalog where catalog_id in (...) },
+					'TWENTY') and org_id = '$ENV{ORG_ID}'//
+					delete from Offering_Catalog where catalog_id in ('REGULAR', 'MC_99',
+					'BCBS', 'MEDICAID', 'WC', 'ML_IPA', 'USFHP', 'CIGNA_CAP', 'NYLC_UTMB', 'CL_IPA',
+					'UMC', 'PRUD', 'KIM_CAP', 'RVU', 'MMG', 'MC2000', 'KELSEY', 'TRICARE', 'NINETEEN',
+					'TWENTY') and org_id = '$ENV{ORG_ID}'},
 				insertStmt => qq{insert into Offering_Catalog
 					(cr_stamp, cr_org_id, catalog_id, caption, org_id, catalog_type, description)
 					values (sysdate, 'PHYSIA', ?, ?, '$ENV{ORG_ID}', 0, 'Imported Fee Schedule')
