@@ -14,6 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Universal;
+use App::InvoiceUtilities;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -134,7 +135,6 @@ sub handleTransferFromInvoice
 
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
 	my $transferAmt = 0 - $page->field('trans_from_amt');
@@ -177,17 +177,12 @@ sub handleTransferFromInvoice
 	$page->session('batch_id', $batchId);
 
 
-	#Create history attribute for this adjustment
+	#Create history item for this adjustment
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $fromInvoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Credit of \$$transferAmt transferred to invoice $toInvoiceId",
-		value_textB => $comments || undef,
+	addHistoryItem($page, $fromInvoiceId,
+		value_text => "Payment transfer of  \$$transferAmt to invoice <A HREF='/invoice/$toInvoiceId/summary'>$toInvoiceId</A>",
+		value_textB => "$comments " . "Batch ID: $batchId",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 }
 
@@ -198,7 +193,6 @@ sub handleTransferToInvoice
 
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
 	my $transferAmt = $page->field('trans_from_amt');
@@ -243,17 +237,12 @@ sub handleTransferToInvoice
 	$page->session('batch_id', $batchId);
 
 
-	#Create history attribute for this adjustment
+	#Create history item for this adjustment
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $toInvoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Amount \$$transferAmt was transferred from invoice $fromInvoiceId",
-		value_textB => $comments || undef,
+	addHistoryItem($page, $toInvoiceId,
+		value_text => "Credit of \$$transferAmt transferred from invoice <A HREF='/invoice/$fromInvoiceId/summary'>$fromInvoiceId</A>",
+		value_textB => "$comments " . "Batch ID: $batchId",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 }
 
