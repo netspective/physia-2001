@@ -239,4 +239,95 @@ sub new
 }
 
 
+
+##############################################################################
+package App::Dialog::Field::MultiOrg::ID;
+##############################################################################
+
+use strict;
+use App::Statements::Org;
+use CGI::Validator::Field;
+use DBI::StatementManager;
+use CGI::Dialog;
+use base qw(CGI::Dialog::Field);
+
+
+sub new
+{
+	my ($type, %params) = @_;
+	
+	$params{caption} = 'Organization ID' unless $params{caption};
+	$params{name} = 'org_id' unless $params{name};
+	$params{options} = 0 unless exists $params{options};
+	$params{options} |=FLDFLAG_UPPERCASE;
+	$params{size} = 40 unless exists $params{size};
+	$params{maxLength} = 255 unless exists $params{maxLength};
+	$params{findPopup} = '/lookup/org/id' unless defined $params{findPopup};
+	$params{type} = 'text' unless exists $params{type};
+	$params{findPopupAppendValue} = ',' unless $params{findPopupAppendValue};
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $flags = $self->{flags};
+	if ($flags & FLDFLAG_READONLY)
+	{
+		$self->{postHtml} = '' if $self->{postHtml};
+	}
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);
+	return $html;
+}
+
+sub isValid
+{
+	my ($self, $page, $validator) = @_;
+	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
+	my $value = $page->field($self->{name});
+	
+	if ($self->SUPER::isValid($page, $validator))
+	{
+		my @orgList = split(/\s*,\s*/,$value);
+		foreach my $id (@orgList)
+		{			
+			$id = uc($id);
+			$self->isValidOrgId($page,$id);
+		}
+	}
+	# return TRUE if there were no errors, FALSE (0) if there were errors
+	return $page->haveValidationErrors() ? 0 : 1;
+}
+
+
+sub isValidOrgId
+{
+	my ($self, $page, $value) = @_;
+	
+	return 1 unless $value;
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $value);
+	unless ($orgIntId)
+	{
+		my $pre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
+		my $post = "/$value');";
+		$self->invalidate($page, qq{
+			$self->{caption} '$value' does not exist.<br>
+			<img src="/resources/icons/arrow_right_red.gif">
+			Add '$value' Organization now as a:
+			<a href="${pre}main${post}">Main</a>,
+			<a href="${pre}dept${post}">Dept</a>,
+			<a href="${pre}provider${post}">Provider</a>,
+			<a href="${pre}insurance${post}">Insurance</a>,
+			<a href="${pre}employer${post}">Employer</a>, or
+			<a href="${pre}ipa${post}">IPA</a>
+		});
+		return 0;
+	}
+	return 1;
+}
+
+
+
 1;
+

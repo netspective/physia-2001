@@ -310,6 +310,151 @@ sub isValid
 	return $page->haveValidationErrors() ? 0 : 1;
 }
 
+
+
+
+##############################################################################
+package App::Dialog::Field::MultiPerson::ID;
+##############################################################################
+
+use strict;
+use DBI::StatementManager;
+use App::Statements::Person;
+use App::Statements::Scheduling;
+use App::Statements::Org;
+use Carp;
+use CGI::Validator::Field;
+use CGI::Dialog;
+use Schema::Utilities;
+
+use vars qw(@ISA @PERSON_TYPES);
+@ISA = qw(CGI::Dialog::Field);
+
+@PERSON_TYPES = ('Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient');
+
+use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	#
+	# you can pass in a "types => ['x', 'y']" and "notTypes => ['a']"
+	# to restrict/expand the selection
+	#
+
+	$params{idEntryStyle} = IDENTRYSTYLE_TEXT unless exists $params{idEntryStyle};
+	$params{name} = 'person_id' unless $params{name};
+
+	$params{options} = 0 unless exists $params{options};
+	$params{type} = 'text';
+	$params{size} = 40 unless exists $params{size};
+	$params{maxLength} = 255 unless exists $params{maxLength};
+	$params{options} |=FLDFLAG_UPPERCASE;
+	if($params{idEntryStyle} == IDENTRYSTYLE_SELECT)
+	{
+		$params{type} = 'foreignKey';
+		$params{fKeyTable} = 'PERSON outer';
+		$params{fKeySelCols} = 'PERSON_ID, SIMPLE_NAME';
+		$params{fKeyValueCol} = 0;
+		$params{fKeyDisplayCol} = 1;
+		$params{fKeyOrderBy} = 'name_last, name_first';
+
+		my $typeCond =
+			$params{types} || $params{notTypes} ?
+				Schema::Utilities::createInclusionExclusionConds('pc.MEMBER_NAME', $params{types}, $params{notTypes}, 1) :
+				'';
+		$params{fKeyWhere} = "exists (select 1 from PERSON inner, PERSON_CATEGORY pc where outer.PERSON_ID = inner.PERSON_ID and inner.PERSON_ID = pc.PARENT_ID and $typeCond)" if $typeCond;
+	}
+
+	else
+	{
+		my $lookupType = 'person';
+		if(! $params{findPopup})
+		{
+			if(my $types = $params{types})
+			{
+				if (scalar(@$types) > 1)
+				{
+					if (! grep { $_ eq 'Patient'} @$types)
+					{
+						$lookupType = 'associate';
+					}
+					else
+					{
+						$lookupType = 'person';
+					}
+				}
+				elsif (scalar(@$types))
+				{
+					$lookupType = (grep {$_ eq $$types[0]} @PERSON_TYPES)[0] || 'person';
+				}
+			}
+		}
+		$params{findPopup} = "/lookup/\l$lookupType/id" unless $params{findPopup};
+	}
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub isValid
+{
+	my ($self, $page, $validator) = @_;
+	return 0 unless $self->SUPER::isValid($page, $validator);
+
+	# If they entered a value
+	if (my $value = $page->field($self->{name}))
+	{
+
+		# Require one of ther person types specified or any valid person type
+		my $types = defined $self->{types} ? $self->{types} : \@PERSON_TYPES;
+
+
+		# If the person record doesn't exist (in any org)...
+		my @perList = split(/\s*,\s*/,$value);
+		foreach my $id (@perList)		
+		{
+			next if $id eq '';
+			$id = uc($id);
+			# Build an appropriate Invalidation Message for use if the requested ID doesn't exist
+			my $doesntExistMsg = qq{$self->{caption} '$id' does not exist. &nbsp; Add '$id' as a };
+			foreach $types (@$types)
+			{
+				my $createPersonHref;
+				$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$id');";
+				$doesntExistMsg .= qq{<a href="$createPersonHref">$types</a>, };
+			}
+			$doesntExistMsg =~ s/, $//;
+			$doesntExistMsg =~ s/, ([^,]+)$/, or a $1/;
+			unless($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $id))
+			{
+				$self->invalidate($page, $doesntExistMsg);
+			}
+			# Else (the person exists) unless the person isn't in their org...
+			elsif(! $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $id, $page->session('org_internal_id')))
+			{
+				$self->invalidate($page, "$id does not belong to your organization.");
+			}
+			# Else (the person exists in our org)
+			else
+			{
+				my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $id, $page->session('org_internal_id'));
+				
+				# Unless one of the person types requested matches one of the categories that this person is...
+				unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
+				{
+					my $typesStr = join(', ', @$types);
+					$self->invalidate($page, qq{'$id' is not a $typesStr in this Org.});
+				}
+			}
+		}
+	}	
+	# return TRUE if there were no errors, FALSE (0) if there were errors
+	return $page->haveValidationErrors() ? 0 : 1;
+}
+
+
+
+
 ##############################################################################
 package App::Dialog::Field::Person::Name;
 ##############################################################################
