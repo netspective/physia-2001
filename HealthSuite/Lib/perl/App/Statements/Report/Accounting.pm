@@ -385,14 +385,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	{
 		sqlStmt => qq
 		{
-			sELECT DISTINCT
+			select DISTINCT
 			TO_CHAR(thePatientAppt.start_time, 'MM/DD/YY') AS startDate,
 			TO_CHAR(thePatientAppt.start_time, 'HH24:MI') AS startTime,
 			thePatient.short_name AS patientname,
 			thePatientAppt.subject AS reason,
 			theDoctor.person_id AS doctorID,
 			theDoctor.short_name AS doctorName,
-			theDoctorAddr.line1 AS location,
+			theApptOrg.name_primary as location,
 			TO_CHAR(thePatient.date_of_birth, 'MM/DD/YY') AS dob,
 			thePatient.person_id AS patientNo,
 			thePatient.person_id AS respParty,
@@ -404,6 +404,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			FROM
 			Event thePatientAppt,
 			Event_Attribute theAppointmentAttr,
+			Org theApptOrg,
 			Person thePatient,
 			Person theDoctor,
 			Person_Address thePatientAddr,
@@ -414,6 +415,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND theAppointmentAttr.value_type = '333'
 			AND theAppointmentAttr.value_text = thePatient.person_id
 			AND theAppointmentAttr.value_textB = theDoctor.person_id
+			AND thePatientAppt.owner_id = theApptOrg.org_internal_id
 			AND thePatient.person_id = thePatientAddr.parent_id
 			AND theDoctor.person_id = theDoctorAddr.parent_id
 		},
