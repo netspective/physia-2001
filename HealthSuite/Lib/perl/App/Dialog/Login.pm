@@ -9,7 +9,7 @@ use CGI::Validator::Field;
 use CGI::ImageManager;
 use App::Universal;
 use Date::Manip;
-use SDE::CVS ('$Id: Login.pm,v 1.19 2000-11-01 19:53:33 radha_kotagiri Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Login.pm,v 1.20 2000-11-06 14:56:50 thai_nguyen Exp $', '$Name:  $');
 use App::Configuration;
 
 use DBI::StatementManager;
@@ -166,16 +166,19 @@ sub execute
 	$ENV{TZ} = $timezone;
 	`date` =~ /.*\d\d:\d\d:\d\d\s(.*?)\s.*/;
 	my $TZ = $1;
-	my $hackTZ = $TZ;
-	$hackTZ =~ s/(.).(.)/$1D$2/;
+	my $daylightTZ = $TZ;
+	
+	if ($TZ =~ /^(.)ST$/) {
+		$daylightTZ = $1 . 'DT';
+	}
 
 	my $now = ParseDate('today');
-	my $gmtTime = Date_ConvTZ($now, 'GMT', $hackTZ);
+	my $gmtTime = Date_ConvTZ($now, 'GMT', $daylightTZ);
 	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
 
 	$page->createSession($personId, $defaultOrgIntId, {
 		org_id => $defaultOrg, categories => $categories, personFlags => $personFlags,
-		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset,
+		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset, DAYLIGHT_TZ => $daylightTZ,
 		validOrgs => join(',',@$validOrgs), defaultOrg => $defaultOrg,
 	});
 
