@@ -157,8 +157,8 @@ use App::Dialog::Training;
 use App::Dialog::ResponsibleParty;
 use App::Dialog::Attribute::MiscNotes;
 use App::Dialog::Password;
-#use App::Dialog::FeeScheduleMatrix;
-#use App::Dialog::FeeScheduleDataEntry;
+use App::Dialog::FeeScheduleMatrix;
+use App::Dialog::FeeScheduleDataEntry;
 
 
 ##############################################################################
@@ -563,8 +563,8 @@ $SEARCH_CLASSES = {
 	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
 
 	'procedure' => 'App::Dialog::Procedure',
-	#'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
-        #'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
+	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
+        'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
 	'postgeneralpayment' => 'App::Dialog::PostGeneralPayment',
 	'postrefund' => 'App::Dialog::PostRefund',
