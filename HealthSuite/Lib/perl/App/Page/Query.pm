@@ -161,7 +161,8 @@ foreach (sort @queries)
 {
 	my $sqlGen = new SQL::GenerateQuery(file => "$QUERYDIR/$_");
 	my $id = $sqlGen->id();
-	my $caption = defined $sqlGen->{params}->{caption} ? $sqlGen->{params}->{caption} : $id;
+	next unless defined $sqlGen->{params}->{caption};
+	my $caption = $sqlGen->{params}->{caption};
 	my $icon = defined $sqlGen->{params}->{icon} ? $sqlGen->{params}->{icon} : 'images/page-icons/default';
 	push @{$RESOURCE_MAP{query}->{_views}}, {caption => $caption, name => $id, icon => $icon, };
 }

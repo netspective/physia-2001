@@ -131,6 +131,8 @@ sub prepare_page_content_header
 	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR|REFERRING-DOCTOR';
 
 	my $showHome=0;
+	
+	my $showMailBox = $personId eq $sessionUserID ? 1 : 0;
 
 	#Get Categories
 	my $categories = $self->property('person_categories');
@@ -159,7 +161,7 @@ sub prepare_page_content_header
 			$showActivity ? ['Activity', "$urlPrefix/activity", 'activity'] : undef,
 			$showAssociate ? ['Associate', "$urlPrefix/associate",'associate'] : undef,
 			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
-			['Mail Box', "$urlPrefix/mailbox", 'mailbox'],
+			$showMailBox ? ['Mail Box', "$urlPrefix/mailbox", 'mailbox'] : undef,
 			['Documents', "$urlPrefix/documents", 'documents'],
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		];
