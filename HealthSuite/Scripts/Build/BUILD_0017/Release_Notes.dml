@@ -152,8 +152,10 @@
 		</deliverable>
 
 		<deliverable id="1363">
-			Create Superbill.  An organization's Catalog tab now shows a Superbill tab which can be used to list all the superbills
-			currently stored for that org.  New superbills can be created, existing ones can be edited and previewed as PDF files.
+			UI: Created functionality to allow creation of a superbill.  If you go to an Organization's summary page and choose the
+			Catalog tab from there, you'll see a new catalog type which is called Superbill Catalog.  This contains all existing
+			superbill templates and allows the user to create new superbill templates.  Samples of these superbill templates can be
+			printed out as PDF files.  The user can also go ahead and edit and/or delete superbill templates.
 		</deliverable>
 
 		<deliverable id="1452">
