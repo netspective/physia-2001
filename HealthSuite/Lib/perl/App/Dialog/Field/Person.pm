@@ -168,7 +168,7 @@ use Schema::Utilities;
 use vars qw(@ISA @PERSON_TYPES);
 @ISA = qw(CGI::Dialog::Field);
 
-@PERSON_TYPES = ('Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient');
+@PERSON_TYPES = ('Superuser', 'Administrator', 'Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient');
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
 
@@ -267,6 +267,8 @@ sub isValid
 	{
 		# Require one of ther person types specified or any valid person type
 		my $types = defined $self->{types} ? $self->{types} : \@PERSON_TYPES;
+		unshift @{$types}, 'Administrator' unless grep {$_ eq 'Administrator'} @{$types};
+		unshift @{$types}, 'SuperUser' unless grep {$_ eq 'Administrator'} @{$types};
 
 		my @idList = split(/\s*,\s*/, $value);
 
