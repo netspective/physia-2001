@@ -39,11 +39,11 @@ sub connectDb
 
 }
 
-
 sub populateSuperBill
 {
 	my ($self, $superBill, $superBillID, $orgInternalID, %params) = @_;
 
+	$self->makeStatements;
 
 	my $handle = $params{dbiHdl};
 
@@ -56,29 +56,7 @@ sub populateSuperBill
 		$self->connectDb(%params);
 	}
 
-	my $org_internal_id = $orgInternalID;
-
-	my $queryStatement;
-	my $sth;
-	my @row;
-
-	$queryStatement = qq
-	{
-		select name_primary, tax_id
-		from org
-		where org_internal_id = $org_internal_id
-	};
-
-	$sth = $self->{dbiCon}->prepare("$queryStatement");
-	$sth->execute;
-
-	@row = $sth->fetchrow_array();
-	$sth = undef;
-
-	$superBill->setOrgName($row[0]);
-	$superBill->setTaxId($row[1]);
-
-	$self->populateSuperBillComponent($superBill, $superBillID);
+	$self->populateSuperBillAndPatient($superBill, $superBillID, $orgInternalID);
 
 	unless($handle)
 	{
@@ -88,71 +66,47 @@ sub populateSuperBill
 	return 1;
 }
 
+sub populateSuperBillAndPatient
+{
+
+	my ($self, $superBill, $superBillID, $orgInternalID) = @_;
+
+	my $sth;
+	my @row;
+
+	$sth = $self->prepareStatement('orgInternalID');
+	$sth->execute($orgInternalID);
+
+	@row = $sth->fetchrow_array();
+
+	$superBill->setOrgName($row[0]);
+	$superBill->setTaxId($row[1]);
+
+	$self->populateSuperBillComponent($superBill, $superBillID);
+}
+
 sub populateSuperBillComponent
 {
 	my ($self, $superBill, $superBillID) = @_;
 
-	my $queryStatement;
-	my $sth;
-	my @row;
+	my $sth = $self->prepareStatement('catalogEntryHeader');
+	my $sthCount = $self->prepareStatement('catalogEntryCount');
+	my $sthComp = $self->prepareStatement('catalogEntries');
 
-	my $internalCatalogID = $superBillID;
 
-	$queryStatement = qq
-	{
-		select entry_id, name
-		from offering_catalog_entry
-		where catalog_id = ?
-		and parent_entry_id is null
-		and entry_type = 0
-		and status = 1
-		and not name = 'main'
-		order by entry_id
-	};
-
-	$sth = $self->{dbiCon}->prepare($queryStatement);
 	$sth->execute($superBillID);
-
-	while(@row = $sth->fetchrow_array())
+	while(my @row = $sth->fetchrow_array())
 	{
 		my $superBillComponent = new App::Billing::SuperBill::SuperBillComponent;
 
 		$superBillComponent->setHeader($row[1]);
 
-		my $queryStatement;
-		my $sthComp;
-		my @rowComp;
+		$sthCount->execute($superBillID, $row[0]);
+		my @rowCount = $sthCount->fetchrow_array();
+		$superBillComponent->setCount($rowCount[0]);
 
-		$queryStatement = qq
-		{
-			select count(*)
-			from offering_catalog_entry
-			where catalog_id = $internalCatalogID
-			and parent_entry_id = $row[0]
-			and entry_type = 100
-			and status = 1
-		};
-
-		$sthComp = $self->{dbiCon}->prepare($queryStatement);
-		$sthComp->execute;
-		@rowComp = $sthComp->fetchrow_array();
-		$superBillComponent->setCount($rowComp[0]);
-
-		$queryStatement = qq
-		{
-			select entry_id, code, name
-			from offering_catalog_entry
-			where catalog_id = $internalCatalogID
-			and parent_entry_id = $row[0]
-			and entry_type = 100
-			and status = 1
-			order by entry_id
-		};
-
-		$sthComp = $self->{dbiCon}->prepare($queryStatement);
-		$sthComp->execute;
-
-		while(@rowComp = $sthComp->fetchrow_array())
+		$sthComp->execute($superBillID, $row[0]);
+		while(my @rowComp = $sthComp->fetchrow_array())
 		{
 			$superBillComponent->addCpt($rowComp[1]);
 			$superBillComponent->addDescription($rowComp[2]);
@@ -168,5 +122,71 @@ sub dbDisconnect
 	my $self = shift;
 	$self->{dbiCon}->disconnect;
 }
+
+sub makeStatements
+{
+	my $self = shift;
+
+	$self->{statements} =
+	{
+		'orgInternalID' => qq
+		{
+			select name_primary, tax_id
+			from org
+			where org_internal_id = ?
+		},
+
+		'catalogEntryHeader' => qq
+		{
+			select entry_id, name
+			from offering_catalog_entry
+			where catalog_id = ?
+			and parent_entry_id is null
+			and entry_type = 0
+			and status = 1
+			and not name = 'main'
+			order by entry_id
+		},
+
+		'catalogEntryCount' => qq
+		{
+			select count(*)
+			from offering_catalog_entry
+			where catalog_id = ?
+			and parent_entry_id = ?
+			and entry_type = 100
+			and status = 1
+		},
+
+		'catalogEntries' => qq
+		{
+			select entry_id, code, name
+			from offering_catalog_entry
+			where catalog_id = ?
+			and parent_entry_id = ?
+			and entry_type = 100
+			and status = 1
+			order by entry_id
+		},
+	};
+}
+
+sub getStatement
+{
+	my ($self, $statementID) = @_;
+
+	my $statements = $self->{statements};
+	return $statements->{$statementID};
+}
+
+sub prepareStatement
+{
+	my ($self, $statementID) = @_;
+
+
+	my $statements = $self->{statements};
+	return $self->{dbiCon}->prepare($statements->{$statementID});
+}
+
 
 1;
