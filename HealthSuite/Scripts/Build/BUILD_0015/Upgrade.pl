@@ -24,7 +24,7 @@ chomp $BUILDIR;
 
 system(qq{
 	cd @{[ $CONFDATA_SERVER->path_Database ]}
-	GenerateSchema.pl
+	./GenerateSchema.pl
 });
 
 runSQL('BUILD_0015_scheduling.sql');
