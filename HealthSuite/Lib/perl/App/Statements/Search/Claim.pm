@@ -46,8 +46,7 @@ $STMTFMT_SEL_CLAIM = qq{
 			AND ib.bill_id (+) = i.billing_id
 			AND (owner_type = 1 AND owner_id = ?)
 			AND iis.id = i.invoice_status
-			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
-			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
 		GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -105,7 +104,7 @@ $STMTRPTDEFN_DEFAULT =
 								'12' => '#4#',
 								'13' => '#4#',
 								'14' => '#4#',
-								'15' => '#4#',
+								'15' => 'Closed #13#',
 								'16' => 'Void #13#',
 								'17' => '#4#',
 							},
