@@ -2453,7 +2453,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					(select (decode(a.value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary'))
 					from person_attribute a where  a.value_type in (@{[ App::Universal::ATTRTYPE_SPECIALTY ]}) and a.item_id = b.item_id)value_int,
 					name_sort,
-					decode(nvl(value_intb, '1'), '1','Active', 'Inactive')
+					decode(sign(value_dateend - sysdate), -1, 'Inactive', 'Active')
 			from 	person_attribute b
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}, @{[App::Universal::ATTRTYPE_BOARD_CERTIFICATION]})
@@ -3887,9 +3887,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		WHERE document_attribute.value_text = :1
 			AND document.doc_spec_type = @{[ App::Universal::DOCSPEC_INTERNAL ]}
 			AND document.doc_id = document_attribute.parent_id
-			AND document_attribute.item_name IN ('To', 'CC')			
+			AND document_attribute.item_name IN ('To', 'CC')
 			AND document_attribute.value_int = 0
-			GROUP BY document.doc_spec_subtype			
+			GROUP BY document.doc_spec_subtype
 		union
 		SELECT '-1' as doc_spec_subtype,count (*)
 		FROM	observation
