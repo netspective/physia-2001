@@ -416,6 +416,11 @@
 			For postsubmit, address for third party orgs and person now showing correctly.
 		</deliverable>
 
+		<deliverable id="1741">
+			In the Revenue/Collection report interchanged the headings 'Collection Information (Printable version)' 
+			and 'Production Information (Printable version)'.
+		</deliverable>
+		
 	</deliverables>
 </release-notes>
 
