@@ -315,7 +315,11 @@
 		<deliverable id="1886">
 			Fixed code to not to show up duplicate entries.
 		</deliverable>
-
+		
+		<deliverable id="1891">
+			Updated the url for 'Voice Message' under 'Choose Action' in Patient Summary page to showup the new dialog.
+		</deliverable>
+		
 		<deliverable id="1896">
 			Updated the field from 'Person ID' to 'Person Name'.
 		</deliverable>
