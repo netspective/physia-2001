@@ -22,9 +22,8 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(App::Dialog::Person);
 
@@ -73,7 +72,7 @@ sub initialize
 									defaultValue => '226',
 									invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
-		new CGI::Dialog::Field(caption => 'Occupation', name => 'rel_type', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::Field(caption => 'Occupation', name => 'occupation', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => '', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -198,7 +197,7 @@ sub execute_add
 	my $relId = $page->field('rel_id');
 	if($relId ne '')
 	{
-		my $occupation = $page->field('rel_type') eq '' ? 'Unknown' : $page->field('rel_type');
+		my $occupation = $page->field('occupation') eq '' ? 'Unknown' : $page->field('occupation');
 		$occupation = "\u$occupation";
 
 		$page->schemaAction(
@@ -290,26 +289,5 @@ sub execute_remove
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
 
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-
-use constant PATIENT_DIALOG => 'Dialog/Patient';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/23/1999', 'RK',
-		PATIENT_DIALOG,
-		'Made a validation for the field ssn not to add an existing ssn while creating a new patient record. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/16/2000', 'RK',
-		PATIENT_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;
