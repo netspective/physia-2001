@@ -2779,8 +2779,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			SELECT
 				trans_id,
 				trans_owner_id,
-				a.value_text,
-				a.value_date,
+				a.ssn,
+				a.date_of_birth,
 				t.data_text_a as referral_type,
 				aa.value_int as claim_number,
 				trans_substatus_reason,
@@ -2795,21 +2795,20 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				 detail,
 				 related_data,
 				 initiator_id
-				 from transaction t, trans_attribute a, trans_attribute aa
+				 from transaction t, person a, trans_attribute aa
 				 where trans_type = 6000
 				 and trans_id = ?
-				 and a.parent_id = t.trans_id
+				 and a.person_id = t.consult_id
 				 and aa.parent_id = t.trans_id
 				 and aa.item_name = 'Referral Insurance'
-				 and a.item_name = 'Referral SSN/DOB'
 		},
 		publishDefn => 	{
 			columnDefn =>
 			[
 				{colIdx => 0, head => 'Trans ID', dataFmt => "<a href=\"javascript:doActionPopup('/org/#17#/dlg-update-trans-6000/#0#');\">#0#</a>"},
 				{colIdx => 1, head => 'Claim Number', dataFmt => '#5#'},
-				{colIdx => 2, head => 'ICD Codes', dataFmt =>'<span title="Description">#8#</span>'},
-				{colIdx => 3, head => 'CPT Codes', dataFmt =>'<span title="Description">#9#</span>'},
+				{colIdx => 2, head => 'ICD Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/icd');\">#8#</a>"},
+				{colIdx => 3, head => 'CPT Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/cpt');\">#9#</a>"},
 				{colIdx => 4, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#11#'},
 				{colIdx => 5, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#12#'},
 				{colIdx => 6, head => 'Referral Type', dataFmt =>'#13#'},
@@ -2887,6 +2886,86 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId], 'panelTransp'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.referralAndIntake' => {
+	sqlStmt => qq{
+			SELECT 	trans_id,
+			        DECODE(parent_trans_id,'','Referral','Intake') as parent_trans_id,
+			        parent_trans_id,
+			        %simpleDate:trans_end_stamp%,
+			        %simpleDate:data_date_b%,
+			        (
+					SELECT caption
+					FROM intake_service i
+					WHERE i.id = t.caption
+				) AS caption,
+			        trans_status_reason,
+			(
+				SELECT org_id
+				FROM org
+				WHERE org_internal_id = t.service_facility_id) AS org_id,
+				trans_type
+			FROM  transaction t
+			WHERE  	consult_id = ?
+			AND trans_type in (6000, 6010)
+		},
+		sqlStmtBindParamDescr => ['Trans ID'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+				{
+					colIdx => 1,
+					dataFmt => {
+						'Referral' => 'Referral : #0#, Date Of Request : #3#',
+						'Intake' => "Intake (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
+					},
+				},
+
+
+
+		],
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#homeArl#',
+		frame => {
+		addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
+		editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Referrals And Intakes' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Referral And Intakes' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#param.home#'>Referral</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelTransp'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelInDlg'); },
+},
 
 );
 
