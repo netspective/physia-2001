@@ -6,7 +6,7 @@ use strict;
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use App::Component::WorkList;
+use App::Component::WorkList::PatientFlow;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
