@@ -48,7 +48,7 @@
 		<join id="org_category" table="org_category" condition="org_category.parent_id (+) = org.org_internal_id"/>
 		<join id="org_addr_mail" table="org_address" condition="org_addr_mail.parent_id (+) = org.org_internal_id AND org_addr_mail.address_name (+) = 'Mailing'"/>
 		<join id="org_addr_street" table="org_address" condition="org_addr_street.parent_id (+) = org.org_internal_id AND org_addr_street.address_name (+) = 'Street'"/>
-		<join id="org_addr_payment" table="org_address" condition="org_addr_shipping.parent_id (+) = org.org_internal_id AND org_addr_shipping.address_name (+) = 'Payment'"/>
+		<join id="org_addr_payment" table="org_address" condition="org_addr_payment.parent_id (+) = org.org_internal_id AND org_addr_payment.address_name (+) = 'Payment'"/>
 		<join id="org_addr_any" table="org_address" condition="org_addr_any.parent_id (+) = org.org_internal_id"/>
 		<join id="org_attr_pphone" table="org_attribute" condition="org_attr_pphone.parent_id (+) = org.org_internal_id AND org_attr_pphone.value_type (+) = #constant.ATTRTYPE_PHONE# AND org_attr_pphone.item_name (+) = 'Primary'"/>
 		<join id="org_attr_billing" table="org_attribute" condition="org_attr_billing.parent_id (+) = org.org_internal_id AND org_attr_billing.value_type (+) = #constant.ATTRTYPE_BILLING_PHONE# AND org_attr_billing.item_name (+) = 'Contact Information'"/>

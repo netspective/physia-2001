@@ -21,7 +21,7 @@
 		<field id="item_name" join="catalog_item" column="name" caption="Item Name"/>
 		<field id="item_description" join="catalog_item" column="description" caption="Item Description"/>
 		<field id="item_modifier" join="catalog_item" column="modifier" caption="Item Modifier"/>
-		<field id="item_cost" join="catalog_item" column="unit_cost" caption="Item Cost"/>
+		<field id="item_cost" join="catalog_item" column="unit_cost" caption="Item Cost" ui-datatype="currency"/>
 		<field id="item_type" join="catalog_item" column="entry_type"/>
 		<field id="item_type_name" join="catalog_entry_type" column="caption"/>
 		

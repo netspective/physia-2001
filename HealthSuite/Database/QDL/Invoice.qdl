@@ -21,7 +21,7 @@
 		<field id="patient_lastname" caption="Patient Last Name" join="patient" column="name_last"/>
 		<field id="service_begin_date" caption="Service Begin Date" join="item_servdate" column="service_begin_date" columndefn="TO_CHAR(MIN(item_servdate.service_begin_date), 'IYYYMMDD')" groupbyexp="yes" ui-datatype="date"/>
 		<field id="service_end_date" caption="Service End Date" join="item_servdate" column="service_begin_date" columndefn="TO_CHAR(MAX(item_servdate.service_begin_date), 'IYYYMMDD')" groupbyexp="yes" ui-datatype="date"/>
-		<field id="provider_id" caption="Physician ID" join="person_provider" column="person_id"/>
+		<field id="provider_id" caption="Rendering Provider ID" join="rend_provider" column="person_id"/>
 		<field id="provider_upin" caption="Physician UPIN" join="inv_attr_upin" column="value_text"/>
 		<field id="employer" caption="Employer" join="bill_payer_ins_emp" column="org_id"/>
 		<field id="bill_party_type" join="bill_payer" column="bill_party_type"/>
@@ -42,7 +42,8 @@
 		<join id="bill_party_type" table="invoice_bill_party_type" requires="bill_payer" condition="bill_party_type.id = bill_payer.bill_party_type"/>
 		<join id="bill_payer_person" table="person" requires="bill_payer" condition="bill_payer_person.person_id (+) = bill_payer.bill_to_id"/>
 		<join id="bill_payer_org" table="org" requires="bill_payer" condition="TO_CHAR(bill_payer_org.org_internal_id (+)) = bill_payer.bill_to_id"/>
-		<join id="person_provider" table="person" condition=""/>
+		<join id="main_trans" table="transaction" condition="invoice.main_transaction = main_trans.trans_id"/>
+		<join id="rend_provider" table="person" requires="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
 		
 		<!-- Views -->
 		<view id="all" caption="None" distinct="yes" href="/invoice/{invoice_id}/summary">
