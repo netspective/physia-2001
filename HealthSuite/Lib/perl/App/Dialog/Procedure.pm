@@ -910,9 +910,10 @@ sub storeInsuranceInfo
 		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS)
 		{
 			my $personInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $insIntId);
-			#next if $personInsur->{bill_sequence} == App::Universal::INSURANCE_WORKERSCOMP;
 			my $insOrgId = $personInsur->{ins_org_id};
 			my $parentInsId = $personInsur->{parent_ins_id};
+			my $personInsurPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $parentInsId);
+			my $personInsurProduct = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $personInsurPlan->{parent_ins_id} || $parentInsId);
 
 			#Basic Insurance Information --------------------
 			my $insOrgInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $insOrgId);
@@ -991,7 +992,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsur->{remit_payer_id} || undef,
+					value_text => $personInsurPlan->{remit_payer_id} || $personInsurProduct->{remit_payer_id},
 					value_intB => 1,
 					_debug => 0
 				);
@@ -1091,14 +1092,8 @@ sub storeInsuranceInfo
 				);
 
 			#Relationship to Insured --------------------
-			my $relToCaption = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuredRelationship', $personInsur->{rel_to_insured});
-			my $relToCode = '';
-			$relToCode = '01' if $relToCaption eq 'Self';
-			$relToCode = '02' if $relToCaption eq 'Spouse';
-			$relToCode = '18' if $relToCaption eq 'Parent';
-			$relToCode = '03' if $relToCaption eq 'Child';
-			$relToCode = '99' if $relToCaption eq 'Other';
-			#patient's relationship to the insured
+			my $relToCode = $personInsur->{rel_to_insured};
+			my $relToCaption = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuredRelationship', $relToCode);
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
