@@ -724,13 +724,18 @@ sub setupACL
 	my $self = shift;
 	my ($dbh, $session) = ($self->{db}, $self->{session});
 	
+    # TODO: Update this select once the PERSON_ORG_CATEGORY table is removed.
     my $getRolesSth = $dbh->prepare(qq{
                 select role_name 
                 from role_name, person_org_role 
-                where person_id = ? and org_internal_id = ? and 
+                where person_id = :1 and org_internal_id = :2 and 
                 role_name.role_name_id = person_org_role.role_name_id 
+                UNION
+				select category as role_name from person_org_category 
+				where person_id = :1 and org_internal_id = :2 
                 });
 	my $roles = ($session->{aclRoleNames} = []);
+	#$getRolesSth->execute($session->{user_id}, $session->{org_internal_id}, $session->{user_id}, $session->{org_internal_id});
 	$getRolesSth->execute($session->{user_id}, $session->{org_internal_id});
 	while(my $row = $getRolesSth->fetch())
 	{
