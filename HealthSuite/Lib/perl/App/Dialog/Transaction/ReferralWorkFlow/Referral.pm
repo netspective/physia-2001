@@ -442,9 +442,12 @@ sub initialize
 		my $count=0;
 		foreach (@$serviceProcedures)
 		{
+			my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$_->{code},$page->session('org_internal_id') );
+
+			$page->field("description$count",$data->{description});
 			$page->field("code$count",$_->{code});
 			$page->field("modf$count",$_->{modifier});
-			$page->field("description$count",$_->{caption});
+			#$page->field("description$count",$_->{caption});
 			$page->field("comment$count",$_->{detail});
 			$page->field("charge$count",$_->{unit_cost});
 			$page->field("unit$count",$_->{quantity});
