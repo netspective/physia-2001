@@ -73,8 +73,7 @@ $STMTRPTDEFN_MISC_PROCEDURE =
 	columnDefn =>
 	[
 		{ head => 'Code', 		
-		url => 'javascript:chooseItem("/search/miscprocedure/detail/#4#", "#0#", false)'
-		#url => 'javascript:chooseItem("#&{?}#")'
+		url => q{javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)},		
 		},	
 		{ head => 'Name' },
 		{ head => 'Description' },
