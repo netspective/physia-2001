@@ -183,8 +183,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
 					) as description,
-					p.simple_name
-					
+					p.simple_name,
+					NULL as link_invoice
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
 				AND	upper(:2)
@@ -249,7 +249,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
 					) as description,
-					p.simple_name					
+					p.simple_name	,
+					to_char(t.data_num_b) as link_invoice
 				FROM 	transaction t ,invoice i, person p
 				WHERE 	t.trans_type = 9520
 				AND 	t.trans_status = 2
@@ -280,7 +281,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
 					) as description,
-					p.simple_name
+					p.simple_name,
+					NULL as link_invoice
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
 				AND	upper(:2)
@@ -370,7 +372,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
 					) as description,
-					p.simple_name
+					p.simple_name,
+					to_char(t.data_num_b) as link_invoice
 				FROM 	transaction t ,invoice i, person p
 				WHERE 	t.trans_type = 9520
 				AND 	t.trans_status = 2
