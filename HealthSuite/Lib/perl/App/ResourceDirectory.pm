@@ -156,6 +156,7 @@ use App::Dialog::Transaction::TestsMeasurements;
 use App::Dialog::Transaction::Immunization;
 use App::Dialog::Transaction::PhoneMessage;
 use App::Dialog::Transaction::RefillRequest;
+use App::Dialog::Personnel;
 
 #use App::Dialog::UserProblems;
 use App::Dialog::WorkersComp;
@@ -601,6 +602,7 @@ $SEARCH_CLASSES = {
 				_arl_add => ['person_id', 'org_id'],
 				_arl_modify => ['person_id', 'org_id'],
 				heading => '$Command Password'},
+	'personnel' => {_class => 'App::Dialog::Personnel', heading => '$Command Personnel', _arl => ['person_id']},
 
 );
 
