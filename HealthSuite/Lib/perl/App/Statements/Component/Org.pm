@@ -1038,6 +1038,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 					WHERE owner_org_id = :2 AND
 					org_id = :1
 				)
+			ORDER BY org_id
 
 		},
 		sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
@@ -1079,13 +1080,25 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			SELECT
 				o.org_id,
 				a.value_date,
-				DECODE (o.org_id, :1, 'Parent Org', 'Child Org') as parent_child
-			FROM  	org o, org_attribute a, org p
+				DECODE (o.org_id, :1, 'Parent Org', 'Child Org') as parent_child,
+				oc.member_name
+			FROM  	org o, org_attribute a, org_category oc
 			WHERE  	a.parent_id = o.org_internal_id
-			AND	p.org_internal_id (+) = o.parent_org_id
+
 			AND     a.item_name = 'Retire Batch Date'
-			AND 	( o.org_id = :1 OR p.org_id = :1)
-			ORDER BY parent_child DESC
+
+			AND	EXISTS
+			(
+			SELECT o1.org_id
+			FROM org o1
+			WHERE o1.org_id = :1
+			AND   ( o1.org_internal_id = o.parent_org_id OR o1.org_internal_id = o.owner_org_id OR o1.org_internal_id = o.org_internal_id )
+			)
+			AND o.org_internal_id = oc.parent_id
+			AND     UPPER(LTRIM(RTRIM(oc.member_name))) IN
+			('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'THERAPEUTIC SERVICES')
+
+			ORDER BY parent_child DESC, o.org_id
 		},
 		sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
 
@@ -1095,8 +1108,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				{
 					colIdx => 2,
 					dataFmt => {
-						'Parent Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Parent Org): #1#)",
-						'Child Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Child Org): #1#)",
+						'Parent Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Parent Org, #3#): #1#",
+						'Child Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Child Org, #3#): #1#",
 					},
 				},
 
