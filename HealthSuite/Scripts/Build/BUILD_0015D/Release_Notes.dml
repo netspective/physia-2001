@@ -27,7 +27,12 @@
 		<deliverable>
 			Added Net Adjustment, Plan Paid, and Plan Allows to Financial Transaction query
 		</deliverable>
-
+		<deliverable id="1283">
+			Report : Created reporting table to improve performance of financial reports.   This change will impact report under the Reports - Accounting.   Should see improvement in performance but the reports will need to be tested to make sure the calulation are still correct.
+		</deliverable>		
+		<deliverable id="1206">
+			Added notes component on Patient Account and Claim Summary
+		</deliverable>		
 	</deliverables>
 </release-notes>
 
