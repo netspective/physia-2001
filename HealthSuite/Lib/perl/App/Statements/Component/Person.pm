@@ -3130,7 +3130,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.recentlyVisitedPatients' => {
 	sqlStmt => qq{
 
-			select p.complete_name, pvc.view_key  from PerSess_View_Count pvc,
+			select p.simple_name, pvc.view_key  from PerSess_View_Count pvc,
 						person p , Person_Org_Category  pog
 						where p.person_id = pvc.view_key AND pvc.person_id = :2 and
 						pog.person_id = p.person_id AND pog.category = 'Patient'
