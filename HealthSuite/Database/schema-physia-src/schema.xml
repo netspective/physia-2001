@@ -469,6 +469,10 @@
 	<table name="Org_Attribute" abbrev="OrgAttr" type="Attribute">
 		<param name="parentref">Org.org_internal_id</param>
 	</table>
+	<table name="Statement_Attribute" abbrev="StmtAttr" type="Attribute">
+		<param name="parentref">Statement.statement_id</param>
+	</table>
+	
 	<table name="Insurance_Attribute" abbrev="InsAttr" type="Attribute">
 		<param name="parentref">Insurance.ins_internal_id</param>
 	</table>
@@ -799,6 +803,7 @@
 
 	<include file="reference.xml"/>
 	<include file="documents.xml"/>
+	<include file="organization.xml"/>
 	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
 
 </schema>
