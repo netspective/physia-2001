@@ -145,6 +145,9 @@ sub getComponentHtml
 				$_->{patient}
 			},
 			qq{
+					$_->{requested_service}
+			},
+			qq{
 				$_->{trans_end_stamp}
 			},
 			qq{
