@@ -54,6 +54,7 @@ sub prepare_page_content_header
 			['Add...'],
 			['Patient', "/org/#session.org_id#/dlg-add-patient", 'patient'],
 			['Claim', "/org/#session.org_id#/dlg-add-claim", 'claim'],
+			['Hospital Claim', "/org/#session.org_id#/dlg-add-claim?isHosp=1", 'claim'],
 			['Appointment', "/schedule/dlg-add-appointment?_dialogreturnurl=/menu", 'appointment'],
 			['Appointment Type', "/org/#session.org_id#/dlg-add-appttype", 'appttype'],
 			['Insurance Org', "/org/#session.org_id#/dlg-add-org-insurance", 'insurance'],
@@ -198,6 +199,7 @@ sub prepare
 				<font face="arial,helvetica" size=2>
 					<b>Add</b> a new
 					<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
+					<a href="/org/#session.org_id#/dlg-add-claim?isHosp=1">Hospital Claim</a>,
 					<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
 					<a href="/org/#session.org_id#/dlg-add-postcappayment">Monthly Cap Payment</a>,
 					<a href="/org/#session.org_id#/dlg-add-close-date">Close Date</a>,
