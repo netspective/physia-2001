@@ -3,7 +3,6 @@ package CGI::Page;
 ##############################################################################
 
 use strict;
-use Carp;
 use CGI;
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Session::DBI;
@@ -693,20 +692,20 @@ sub sessionStatus
 
 sub createSession
 {
-	my ($self, $userId, $orgId, $sessionVars) = @_;
+	my ($self, $userId, $orgIntId, $sessionVars) = @_;
 	my %session;
 	tie %session, 'CGI::Session::DBI', undef,
 		{
 			dbh => $self->{db},
 			status => 0,
 			person_id => $userId,
-			org_id => $orgId,
+			org_internal_id => $orgIntId,
 			remote_host => $self->remote_host(),
 			remote_addr => $self->remote_addr(),
 		};
 	$self->{session} = \%session;
 	$session{user_id} = $userId;
-	$session{org_id} = $orgId;
+	$session{org_internal_id} = $orgIntId;
 
 	if(ref $sessionVars eq 'HASH')
 	{
@@ -728,11 +727,11 @@ sub setupACL
     my $getRolesSth = $dbh->prepare(qq{
                 select role_name 
                 from role_name, person_org_role 
-                where person_id = ? and org_id = ? and 
+                where person_id = ? and org_internal_id = ? and 
                 role_name.role_name_id = person_org_role.role_name_id 
                 });
 	my $roles = ($session->{aclRoleNames} = []);
-	$getRolesSth->execute($session->{user_id}, $session->{org_id});
+	$getRolesSth->execute($session->{user_id}, $session->{org_internal_id});
 	while(my $row = $getRolesSth->fetch())
 	{
 		push(@$roles, $row->[0]);
@@ -744,10 +743,10 @@ sub setupACL
     my $getPermsSth = $dbh->prepare(qq{
                 select rp.role_activity_id, rp.permission_name 
 				from person_org_role por, role_permission rp
-				where por.person_id = ? and por.org_id = ? and 
+				where por.person_id = ? and por.org_internal_id = ? and 
                 por.role_name_id = rp.role_name_id
                 });                
-	$getPermsSth->execute($session->{user_id}, $session->{org_id});
+	$getPermsSth->execute($session->{user_id}, $session->{org_internal_id});
 	while(my $row = $getPermsSth->fetch())
 	{
 		if(my $permInfo = $permIds->{$row->[1]})

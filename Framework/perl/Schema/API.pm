@@ -538,7 +538,7 @@ sub Table::dbCommand
 	if($page->can('session')) # remember, this API can be called from non-web source too
 	{
 		$colDataRef->{cr_user_id} = $page->session('user_id');
-		$colDataRef->{cr_org_id} = $page->session('org_id') || undef;
+		$colDataRef->{cr_org_internal_id} = $page->session('org_internal_id') || undef;
 		$colDataRef->{cr_session_id} = $page->session('_session_id');
 	}
 

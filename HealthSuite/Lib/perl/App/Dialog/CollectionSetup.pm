@@ -9,6 +9,7 @@ use CGI::Validator::Field;
 
 use DBI::StatementManager;
 use App::Statements::Worklist::WorklistCollection;
+use App::Statements::Org;
 
 use Date::Manip;
 
@@ -86,7 +87,7 @@ sub new
 		size => '5',
 		fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
 		fKeyStmt => 'sel_worklist_available_physicians',
-		fKeyStmtBindSession => ['org_id'],
+		fKeyStmtBindSession => ['org_internal_id'],
 		hints => ''
 	);
 
@@ -283,7 +284,7 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	my $userId =  $page->session('user_id');
-	my $sessOrgId = $page->session('org_id');
+	my $sessOrgId = $page->session('org_internal_id');
 
 	# Populate the selected physicians
 	my $physicianList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
@@ -362,9 +363,19 @@ sub execute
 
 	my $userId =  $page->session('user_id');
 	my $orgId =  $page->session('org_id') || undef;
+	my $orgIntId = undef;
+	if ($orgId)
+	{
+		$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+	}
+	else 
+	{
+		$orgIntId = undef;	
+	}
+
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_associated_physicians', $userId, $orgId);
+		'del_worklist_associated_physicians', $userId, $orgIntId);
 	my @physicians = $page->field('physician_list');
 	for (@physicians)
 	{
@@ -372,7 +383,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $orgId,
+			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 			item_name => 'WorkList-Collection-Setup-Physician',
 			value_text => $_,
@@ -381,7 +392,7 @@ sub execute
 	}
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_orgvalue', $userId, $orgId);
+		'del_worklist_orgvalue', $userId, $orgIntId);
 	my @facilities = $page->field('facility_list');
 	for (@facilities)
 	{
@@ -389,7 +400,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $orgId,
+			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 			item_name => 'WorkList-Collection-Setup-Org',
 			value_text => $_,
@@ -398,7 +409,7 @@ sub execute
 	}
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_associated_products', $userId, $orgId);
+		'del_worklist_associated_products', $userId, $orgIntId);
 	my @products = $page->field('products');
 	for (@products)
 	{
@@ -406,7 +417,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $orgId,
+			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_INTEGER || undef,
 			item_name => 'WorkList-Collection-Setup-Product',
 			value_int => $_,
@@ -432,7 +443,7 @@ sub execute
 			parent_id   => $userId,
 			item_name   => $itemName,
 			value_text   => $page->field($name),
-			parent_org_id => $orgId,
+			parent_org_id => $orgIntId,
 		);
 
 		$page->session($name, $page->field($name));
@@ -440,7 +451,7 @@ sub execute
 
 	# Add the Last-name range preference
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_lastname_range', $userId, $orgId);
+		'del_worklist_lastname_range', $userId, $orgIntId);
 	my $strLastNameFrom = $page->field('LastNameFrom');
 	my $strLastNameTo = $page->field('LastNameTo');
 	$strLastNameFrom =~ s/\s+//g;
@@ -454,7 +465,7 @@ sub execute
 		'Person_Attribute',	'add',
 		item_id => undef,
 		parent_id => $userId,
-		parent_org_id => $orgId,
+		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_TEXT,,
 		item_name => 'WorkListCollectionLNameRange',
 		value_text => $strLastNameFrom,
@@ -464,7 +475,7 @@ sub execute
 
 	# Update balance age
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_balance_age_range', $userId, $orgId);
+		'del_worklist_balance_age_range', $userId, $orgIntId);
 	my $intMinAge = $page->field('BalanceAgeMin');
 	my $intMaxAge = $page->field('BalanceAgeMax');
 	if (length $intMinAge == 0)
@@ -479,7 +490,7 @@ sub execute
 		'Person_Attribute',	'add',
 		item_id => undef,
 		parent_id => $userId,
-		parent_org_id => $orgId,
+		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_INTEGER,,
 		item_name => 'WorkList-Collection-Setup-BalanceAge-Range',
 		value_int => $intMinAge,
@@ -489,7 +500,7 @@ sub execute
 
 	# Update balance amount range
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_balance_amount_range', $userId, $orgId);
+		'del_worklist_balance_amount_range', $userId, $orgIntId);
 	my $intMinAmount = $page->field('BalanceAmountMin');
 	my $intMaxAmount = $page->field('BalanceAmountMax');
 	if (length $intMinAmount == 0)
@@ -504,7 +515,7 @@ sub execute
 		'Person_Attribute',	'add',
 		item_id => undef,
 		parent_id => $userId,
-		parent_org_id => $orgId,
+		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_FLOAT,,
 		item_name => 'WorkList-Collection-Setup-BalanceAmount-Range',
 		value_float => $intMinAmount,

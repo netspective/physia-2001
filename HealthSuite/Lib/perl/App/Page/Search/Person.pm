@@ -60,9 +60,9 @@ sub getForm
 			</select>
 		};
 	}
-
+	my $searchType = $flags & SEARCHFLAG_SEARCHBAR ? 'Person' : $self->param('_pm_view');
 	return ('Lookup a' . ((grep {$_ eq substr($self->param('_pm_view'),0,1)} ('a','e','i','o','u')) ? 'n ' : ' ') .
-		$self->param('_pm_view'),
+		$searchType,
 		qq{
 		<CENTER>
 		<NOBR>
@@ -92,7 +92,7 @@ sub execute
 	my ($self, $type, $expression) = @_;
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $bindParams = $type eq 'anyname' ? [$self->session('org_id'), uc($expression) , uc($expression)] : [$self->session('org_id'), uc($expression)];
+	my $bindParams = $type eq 'anyname' ? [$self->session('org_internal_id'), uc($expression) , uc($expression)] : [$self->session('org_internal_id'), uc($expression)];
 	my $category = "";
 	for ($self->param('_pm_view'))
 	{

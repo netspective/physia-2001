@@ -19,12 +19,11 @@ sub getForm
 {
 	my ($self, $flags) = @_;
 
-	my $view = $self->param('search_type') eq 'detail' ? 'offering_catalog_entry ' : 'offering_catalog';
+	my $view = $self->param('search_type') eq 'detail' || $self->param('search_type') eq 'detailname' ? 'offering_catalog_entry ' : 'offering_catalog';
 	my $catalogId = $view eq 'offering_catalog_entry' ? $self->param('search_expression') : undef;
 
 	my $dialogARL = $catalogId eq '' ? '/org/#session.org_id#/dlg-add-catalog' : '/org/#session.org_id#/dlg-add-catalog-item' . $catalogId;
-	my $heading = $catalogId eq '' ?  'Lookup a fee schedule' : "Lookup a fee schedule item for '$catalogId'";
-
+	my $heading = $catalogId eq '' ?  'Lookup a fee schedule' : "Lookup a fee schedule item for '$catalogId'";	
 	return ($heading, qq{
 		<CENTER>
 		<NOBR>
@@ -51,9 +50,8 @@ sub execute
 
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $bindParams = [$self->param('org_id') || $self->session('org_id'), uc($expression)];
+	my $bindParams = [$self->session('org_internal_id') || $self->session('org_internal_id'), uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
-
 	$self->addContent(
 		'<CENTER>',
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
@@ -65,6 +63,9 @@ sub execute
 
 	return 1;
 }
+
+
+
 
 sub execute_detail
 {
@@ -82,5 +83,24 @@ sub execute_detail
 
 	return 1;
 }
+
+#This one will bring back the name instead of the numeric for fee schedules
+sub execute_detailname
+{
+	my ($self, $expression) = @_;
+
+	$self->addContent(
+		'<CENTER>',
+			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
+			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
+				'sel_catalog_detail_name',[$self->session('org_internal_id'),uc($expression)],
+		),
+		'</CENTER>'
+	);
+
+	return 1;
+}
+
 
 1;

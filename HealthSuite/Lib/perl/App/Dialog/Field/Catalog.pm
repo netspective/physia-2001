@@ -66,13 +66,15 @@ sub isValid
 	return 0 unless $self->SUPER::isValid($page, $validator);
 	
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
-	my $value = $page->field($self->{name});
+	my $fs_name = $page->field($self->{name});
+	my $value = $STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'selInternalCatalogIdById',$page->session('org_internal_id'),
+	$fs_name);		
 
 	return unless $value;
 	
 	$self->invalidate($page, qq{$self->{caption} '$value' does not exist for this Org.}) 
 		unless $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 
-			'sel_internalCatId_orgId', $value, $page->session('org_id'));
+			'sel_internalCatId_orgId', $value, $page->session('org_internal_id'));
 
 	return $page->haveValidationErrors() ? 0 : 1;
 }

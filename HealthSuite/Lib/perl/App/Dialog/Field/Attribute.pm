@@ -33,7 +33,15 @@ sub isValid
 
 	return () if $command ne 'add';
 
-	my $entityId = $page->param('person_id') || $page->param('org_id');
+	my $entityId;
+	if ($page->param('person_id'))
+	{
+		$entityId = $page->param('person_id')
+	}
+	else
+	{
+		$entityId = $self->{fKeyStmtMgr}->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
+	}
 	if($self->SUPER::isValid($page, $validator))
 	{
 		my $itemName = $page->replaceVars($self->{attrNameFmt});

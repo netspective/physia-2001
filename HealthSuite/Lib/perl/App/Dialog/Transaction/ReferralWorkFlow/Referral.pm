@@ -8,7 +8,6 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 
-
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
@@ -166,9 +165,11 @@ sub makeStateChanges
 
 	my $personId = $page->param('person_id');
 	my $orgId = $page->session('org_id');
-	my $personCategories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_CACHE, 'selCategory', $personId, $orgId);
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+
+	my $personCategories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_CACHE, 'selCategory', $personId, $orgIntId);
 	my $category = $personCategories->[0];
-	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1)if $category eq 'Patient';
+	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if $category eq 'Patient';
 }
 
 sub populateData_add
@@ -208,7 +209,7 @@ sub execute
 	my @icd = ();
 
 	push(@icd, $icd1) if $icd1 ne '';
-	 push(@icd, $icd2) if $icd2 ne '';
+	push(@icd, $icd2) if $icd2 ne '';
 	my $dataTextB = join (', ', @icd);
 	push(@cpt, $cpt1) if $cpt1 ne '';
 	push(@cpt, $cpt2) if $cpt2 ne '';;
@@ -216,8 +217,6 @@ sub execute
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL;
-
-
 
 	$page->schemaAction(
 			'Transaction',
@@ -239,6 +238,8 @@ sub execute
 			#consult_id => $page->field('referral_id') || undef,
 			detail => $page->field('details') || undef,
 			caption => $page->field('int_ext_flag') || undef,
+			#billing_facility_id => undef,
+			#service_facility_id => undef,
 			_debug => 0
 	);
 
@@ -247,9 +248,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
-
-
-
-
 
 1;

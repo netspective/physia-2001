@@ -34,7 +34,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				sum(ending_a_r) as ENDING_A_R
 			from 	daily_audit_recap
 			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
-			and	org_id = ?
+			and	org_internal_id = ?
 			group by DAY_OF_MONTH, ORG_ID
 		},
 	sqlStmtBindParamDescr => ['Report Start Date, Report End Date,Org ID for Attribute Table'],
@@ -90,7 +90,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				sum(change_a_r) as CHANGE_A_R
 			   from  daily_audit_recap
 			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
-			and org_id = ?
+			and org_internal_id = ?
 			group by to_char(to_date(DAY_OF_MONTH,'mm/dd/yyyy'), 'YYYY-MON'), ORG_ID
 			order by Month
 		},
@@ -670,7 +670,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
 			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
-			and 	e.facility_id = o.org_id
+			and 	e.facility_id = o.org_internal_id
 			and	t.trans_type = tt.id
 			and	p.person_id = t.provider_id
 			and	p1.person_id = e.scheduled_by_id
@@ -690,12 +690,12 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
 			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
-			and 	e.facility_id = o.org_id
+			and 	e.facility_id = o.org_internal_id
 			and	t.trans_type = tt.id
 			and	p.person_id = t.provider_id
 			and	p1.person_id = e.scheduled_by_id
 			and	t.trans_id = i.main_transaction
-			and	i.bill_to_id = o1.org_id
+			and	i.bill_to_id = o1.org_internal_id
 			and     i.bill_to_type = 1
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],

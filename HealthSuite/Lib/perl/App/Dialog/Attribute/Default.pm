@@ -255,10 +255,10 @@ sub customValidate
 	my ($self, $page) = @_;
 	my $command = $self->getActiveCommand($page);
 	my $billing = $self->getField('attr_name');
-	my $parentId = $page->param('org_id');
+	my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
 	my $valueType = $self->{valueType};
 	my $billType = App::Universal::ATTRTYPE_BILLING_PHONE;
-	my $billingExists = $STMTMGR_ORG->recordExists($page,STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
+	my $billingExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
 	if($command eq 'add' && $billingExists eq 1 && $valueType eq $billType)
 	{
 
@@ -283,60 +283,47 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-
 	my $itemId = $page->param('item_id');
-
-	if($page->param('person_id'))
-	{
-		my $data = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-		$page->field('value_text', $data->{value_text});
-		$page->field('attr_name', $data->{value_textb});
-		$page->field('preferred_flag', 1) if $data->{value_int};
-	}
-	else
-	{
-		my $data = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-		$page->field('value_text', $data->{value_text});
-		$page->field('attr_name', $data->{value_textb});
-		$page->field('preferred_flag', 1) if $data->{value_int};
-	}
+	my $stmtMgr = $page->param('person_id') ? $STMTMGR_PERSON : $STMTMGR_ORG;
+	my $data = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	$page->field('attr_name', $data->{item_name});
+	$page->field('value_text', $data->{value_text});
+	$page->field('preferred_flag', 1) if $data->{value_int};
 }
 
 
 sub execute_add
 {
 	my ($self, $page, $command,$flags) = @_;
-
-	my $personId = $page->param('person_id');
-
 	my $valueType = $self->{valueType} || '0';
 	my $prefFlag = $page->field('preferred_flag') eq '' ? 0 : 1;
-	my $itemName = '';
-	#get table name
+	
+	# Set table name and parent id
 	my $tableName = '';
-
-	if($personId)
+	my $parentId;
+	if($page->param('person_id'))
 	{
 		$tableName = 'Person_Attribute';
+		$parentId = $page->param('person_id');
 	}
-
 	else
 	{
 		$tableName = 'Org_Attribute';
+		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));
 	}
 
+	# Set the item name
+	my $itemName = '';
 	if($valueType == App::Universal::ATTRTYPE_BILLING_PHONE)
 	{
 		$itemName = 'Contact Information';
 	}
-
 	else
 	{
 		$itemName = $page->field('attr_name');
 	}
 
-	my $parentId = $personId || $page->param('org_id');
-
+	# Save the data
 	$page->schemaAction(
 		$tableName, 'add',
 		parent_id => $parentId,
@@ -344,7 +331,6 @@ sub execute_add
 		item_name => $itemName || undef,
 		value_type => defined $valueType ? $valueType : undef,
 		value_text => $page->field('value_text') || undef,
-		value_textB => $page->field('attr_name') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
 		_debug => 0
 	);

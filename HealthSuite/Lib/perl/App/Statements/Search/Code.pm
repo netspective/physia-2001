@@ -5,6 +5,9 @@ package App::Statements::Search::Code;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
+
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 use vars qw(@ISA @EXPORT
 	$STMTMGR_CATALOG_CODE_SEARCH
@@ -42,56 +45,68 @@ use vars qw(
 
 
 $STMTFMT_SEL_MISC_PROCEDURE = qq{
-		select code,caption,detail FROM Transaction
-		where 
-			%whereCond%
-			and trans_subtype = 'Misc Procedure Code'
+	SELECT code,caption,detail
+	FROM Transaction
+	WHERE 
+		%whereCond%
+		AND trans_subtype = 'Misc Procedure Code'
+		AND rownum < $LIMIT
 };
 
 
 $STMTFMT_SEL_EPSDT_CODE = qq{
-		select epsdt,name,description FROM REF_EPSDT
-		where
-			%whereCond%
+	SELECT epsdt,name,description 
+	FROM ref_epsdt
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
 
 $STMTFMT_SEL_CATALOG_CODE = qq{
-			select icd, name, descr, decode(sex, 'M','MALE', 'F','FEMALE') as sex,
-				decode(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') as age,
-				non_specific_code, major_diag_category, comorbidity_complication,
-				medicare_secondary_payer, manifestation_code, questionable_admission,
-				unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
-				non_specific_procedure, non_covered_procedure, cpts_allowed
-			from REF_ICD
-			where
-				%whereCond%
+	SELECT icd, name, descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+		DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+		non_specific_code, major_diag_category, comorbidity_complication,
+		medicare_secondary_payer, manifestation_code, questionable_admission,
+		unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+		non_specific_procedure, non_covered_procedure, cpts_allowed
+	FROM ref_icd
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
+
 $STMTFMT_SEL_CPT_CODE = qq{
-			select cpt, name, description, comprehensive_compound_cpts, mutual_exclusive_cpts,
-			decode(sex, 'M','MALE', 'F','FEMALE') as sex, unlisted, questionable, asc_, non_rep,
-			non_cov
-			from REF_CPT
-			where
-				%whereCond%
+	SELECT cpt, name, description, comprehensive_compound_cpts, mutual_exclusive_cpts,
+		DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable, asc_, non_rep,
+		non_cov
+	FROM ref_cpt
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
+
 $STMTFMT_SEL_HCPCS_CODE = qq{
-			select hcpcs, name, description from REF_HCPCS
-			where
-				%whereCond%
+	SELECT hcpcs, name, description 
+	FROM REF_HCPCS
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
 
 $STMTFMT_SEL_SERVICEPLACE_CODE = qq{
-			select abbrev, caption
-			from hcfa1500_service_place_code
-			where
-				%whereCond%
+	SELECT abbrev, caption
+	FROM hcfa1500_service_place_code
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
 
 $STMTFMT_SEL_SERVICETYPE_CODE = qq{
-			select abbrev, caption
-			from hcfa1500_service_type_code
-			where
-				%whereCond%
+	SELECT abbrev, caption
+	FROM hcfa1500_service_type_code
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
 };
 
 $STMTRPTDEFN_ICD =
@@ -407,7 +422,7 @@ $STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
 
 
 
-$STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
+$STMTMGR_MISC_PROCEDURE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_misc_procedure_code' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,

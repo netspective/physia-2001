@@ -84,7 +84,7 @@ sub execute
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_SESSION_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_status_person$appendStmtName",
-			[$statStart, $statEnd, uc($expression), $self->session('org_id')],
+			[$statStart, $statEnd, uc($expression), $self->session('org_internal_id')],
 			#[
 			#	['User ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
 			#	['Name'],

@@ -7,14 +7,14 @@ use Exporter;
 use DBI::StatementManager;
 use App::Universal;
 use Data::Publish;
-
-my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
-my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
-
 use vars qw(@ISA @EXPORT $STMTMGR_APPOINTMENT_SEARCH $STMTFMT_SEL_APPOINTMENT
 	$STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_APPOINTMENT_SEARCH);
+
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
+my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
 
 $STMTRPTDEFN_DEFAULT =
 {
@@ -73,61 +73,72 @@ $STMTRPTDEFN_DEFAULT =
 	],
 };
 
-my $APPOINTMENT_COLUMNS = qq
-{ patient.simple_name,
-	to_char(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
-	ep2.value_text as resource_id,
-	aat.caption as patient_type,
-	event.subject,
-	et.caption as event_type,
-	stat.caption,
-	event.facility_id,
-	event.remarks,
-	event.event_id,
-	scheduled_by_id,
-	to_char(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
-	patient.person_id as patient_id
-};
+my $APPOINTMENT_COLUMNS = 
+qq{		patient.simple_name,
+		TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
+		ep2.value_text AS resource_id,
+		aat.caption AS patient_type,
+		event.subject,
+		et.caption AS event_type,
+		stat.caption,
+		event.facility_id,
+		event.remarks,
+		event.event_id,
+		scheduled_by_id,
+		TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
+		patient.person_id AS patient_id};
+
+my $APPOINTMENT_TABLES = 
+qq{		person patient,
+		appt_attendee_type aat,
+		event_attribute ep2,
+		event_attribute ep1,
+		event_type et,
+		event,
+		appt_status stat};		
 
 my $STMTFMT_SEL_APPOINTMENT = qq{
-	select
-		$APPOINTMENT_COLUMNS
-	from person patient, appt_attendee_type aat,
-		event_attribute ep2, event_attribute ep1,
-		event_type et, event, appt_status stat
-	where event.facility_id like ?
-		and event.start_time between to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			and to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-		and ep1.parent_id = event.event_id
-		and ep2.parent_id = event.event_id
-		and ep1.value_type = $EVENTATTRTYPE_PATIENT
-		and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		and patient.person_id = ep1.value_text
-		and ep2.value_text like ?
-		and event.event_status = stat.id
-		and stat.id between ? and ?
-		and aat.id = ep1.value_int
-		and et.id = event.event_type
-		and event.owner_id = ?
+	SELECT
+$APPOINTMENT_COLUMNS
+	FROM
+$APPOINTMENT_TABLES
+	WHERE
+		event.facility_id LIKE ?
+		AND event.start_time BETWEEN
+			TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+		AND ep1.parent_id = event.event_id
+		AND ep2.parent_id = event.event_id
+		AND ep1.value_type = $EVENTATTRTYPE_PATIENT
+		AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
+		AND patient.person_id = ep1.value_text
+		AND ep2.value_text LIKE ?
+		AND event.event_status = stat.id
+		AND stat.id BETWEEN ? and ?
+		AND aat.id = ep1.value_int
+		AND et.id = event.event_type
+		AND event.owner_id = ?
+		AND rownum <= $LIMIT
 	%orderBy%
 };
 
 my $STMTFMT_SEL_APPOINTMENT_CONFLICT = qq{
-	select
-		$APPOINTMENT_COLUMNS
-	from person patient, appt_attendee_type aat,
-		event_attribute ep2, event_attribute ep1,
-		event_type et, event, appt_status stat
-	where (event.parent_id = ?)
-		and ep1.parent_id = event.event_id
-		and ep2.parent_id = event.event_id
-		and ep1.value_type = $EVENTATTRTYPE_PATIENT
-		and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		and patient.person_id = ep1.value_text
-		and stat.id = event.event_status
-		and aat.id = ep1.value_int
-		and et.id = event.event_type
-		and event.owner_id = ?
+	SELECT
+$APPOINTMENT_COLUMNS
+	FROM
+$APPOINTMENT_TABLES
+	WHERE
+		(event.parent_id = ?)
+		AND ep1.parent_id = event.event_id
+		AND ep2.parent_id = event.event_id
+		AND ep1.value_type = $EVENTATTRTYPE_PATIENT
+		AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
+		AND patient.person_id = ep1.value_text
+		AND stat.id = event.event_status
+		AND aat.id = ep1.value_int
+		AND et.id = event.event_type
+		AND event.owner_id = ?
+		AND rownum <= $LIMIT
 	%orderBy%
 };
 
@@ -136,21 +147,21 @@ $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(
 	{
 		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
-		orderBy => 'order by event.start_time, event.event_id',
+		orderBy => 'ORDER BY event.start_time, event.event_id',
 	},
 
 	'sel_conflict_appointments' =>
 	{
 		sqlStmt => $STMTFMT_SEL_APPOINTMENT_CONFLICT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
-		orderBy => 'order by event.start_time, event.event_id',
+		orderBy => 'ORDER BY event.start_time, event.event_id',
 	},
 
 	'sel_appointment_orderbyName' =>
 	{
 		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
-		orderBy => 'order by patient.name_last, patient.name_first, patient.name_middle',
+		orderBy => 'ORDER BY patient.name_last, patient.name_first, patient.name_middle',
 	},
 
 );

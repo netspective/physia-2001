@@ -133,7 +133,14 @@ sub recordActivity
 	#my ($self, $activityType, $actionType, $scope, $key, $level, $msg) = @_;
 
 	$STMTMGR_PERSON->execute($self, STMTMGRFLAG_REPLACEVARS, 'insSessionActivity',
-				$self->session('_session_id'), @_);
+		$self->session('_session_id'), @_);
+}
+
+sub getInternalOrgId
+{
+	#my ($self,$orgId,$org_internal_id) = @_;
+	#$org_internal_id = $self->session('org_internal_id') if defined $org_internal_id;	
+	#return $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $org_internal_id, $orgId);
 }
 
 sub incrementViewCount
@@ -409,10 +416,12 @@ sub getTextBoxHtml
 	my %params = @_;
 	$params{hcolor} ||= 'NAVY';
 	$params{color} ||= 'BEIGE';
+	$params{altColor} ||= $params{color} eq 'BEIGE' ? 'LIGHTYELLOW' : $params{color};
 	$params{width} ||= '100%';
 	$params{halign} ||= 'CENTER';
 	$params{shalign} ||= 'CENTER';
 	$params{align} ||= 'LEFT';
+	$params{valign} ||= 'TOP';
 	$params{falign} ||= 'CENTER';
 
 	my $headingRow = $params{heading} ? qq{
@@ -438,17 +447,20 @@ sub getTextBoxHtml
 		my $count = 0;
 		foreach my $msg (@{$params{messages}})
 		{
+			my $color = $params{color};
+			$params{color} = $params{altColor};
+			$params{altColor} = $color;
 			$count++;
-			$message .= "<tr><td>$count</td><td>$msg</td></tr>";
+			$message .= "<tr BGCOLOR=$color VALIGN=TOP><td><b>$count</b></td><td ALIGN=$params{align} VALIGN=$params{valign}>$msg</td></tr>";
 		}
-		$message = "<table>$message</table>";
+		$message = "<table cellpadding=10 cellspacing=0 width=100%>$message</table>";
 	}
 
 	return qq{
-		<table cellspacing=0 cellpadding=2 border=0 bgcolor="$params{hcolor}" width=$params{width}>
+		<table cellspacing=2 cellpadding=0 border=0 bgcolor="$params{hcolor}" width=$params{width}>
 			$headingRow
 			<tr><td>
-			<table cellpadding=10 border=0 bgcolor=$params{color} width=100%>
+			<table cellpadding=0 cellspacing=0 border=0 width=100%>
 				$subHeadRow
 				<tr>
 					<td ALIGN=$params{align}>

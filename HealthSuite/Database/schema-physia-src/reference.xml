@@ -49,7 +49,7 @@
 	<table name="REF_ICDStem_Usage" abbrev="ICDSUsg" parent="REF_ICD">
 		<column name="icd_stem" type="text" size="6" indexed="yes" uniquegrp="key" descr="Actual ICD-9-CM stem code (everything before the 'point')"/>
 		<column name="person_id" lookupref="Person.person_id" indexed="yes" uniquegrp="key" descr="Specific person for which usage is being tracked"/>
-		<column name="org_id" lookupref="Org.org_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
 		<column name="read_count" type="integer" descr="The number of times the parent_id has been read by person_id"/>
 	</table>
 

@@ -39,13 +39,12 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		select *
 		from insurance_attribute
 		where parent_id = ?
-			and item_name = ?
-			and cr_org_id = ?
+		and item_name = ?
 		},
 	'selInsOrgData' => qq{
 		select *
 			from org
-			where org_id = ?
+			where org_internal_id = ?
 		},
 	'selInsurancePlansForOrg' => qq{
 		select INS_INTERNAL_ID, product_name, INS_ORG_ID, INS_TYPE, plan_name, GROUP_NUMBER, o.GROUP_NAME, POLICY_NUMBER,
@@ -165,17 +164,17 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			from org_attribute oa, person_attribute pa, insurance ins
 			where
 				(pa.value_type in (220, 221)) and
-				(pa.value_text = oa.parent_id) and
+				(pa.value_int = oa.parent_id) and
 				(pa.parent_id = ?) and
 				(oa.value_type = 361)
 		union
 			select ins.product_name, group_name
 			from org, insurance ins, person_attribute pa
 			where
-				org.org_id = ins.ins_org_id and
+				org.org_internal_id = ins.ins_org_id and
 				ins.ins_type = 6 and
 				(((pa.value_type in (220, 221)) and
-				(pa.value_text = org.org_id) and
+				(pa.value_int = org.org_internal_id) and
 				(pa.parent_id=?)))
 		},
 	'selPatientHasPlan' => qq{
@@ -203,8 +202,8 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			where ins_internal_id = ?
 		},
 	'selInsuranceForInvoiceSubmit' => qq{
-		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.plan_name, ins.product_name, ins.owner_person_id, ins.group_name, ins.group_number, 
-				ins.insured_id, ins.member_number,	to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') , 
+		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.plan_name, ins.product_name, ins.owner_person_id, ins.group_name, ins.group_number,
+				ins.insured_id, ins.member_number,	to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') ,
 				to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') , ins.rel_to_insured, ins.record_type, ins.extra, ct.caption as claim_type
 			from insurance ins, claim_type ct
 			where ins.ins_internal_id = ?
@@ -400,7 +399,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				from person_attribute patt, insurance ins
 				where patt.parent_id = ?
 				and patt.value_type between 220 and 226
-				and patt.value_text = ins.ins_org_id
+				and patt.value_int = ins.ins_org_id
 				and ins.record_type = 6
 		},
 	'selInsuredRelation' => qq{
@@ -417,12 +416,13 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			where group_name = 'UI'
 		},
 	'selInsPlan' => qq{
-		select  *
-			from insurance
-			where product_name = ?
-			and plan_name = ?
-			and ins_org_id = ?
-			and record_type = 2
+		SELECT *
+		FROM insurance
+		WHERE
+			product_name = ?
+			AND plan_name = ?
+			AND ins_org_id = ?
+			AND record_type = 2
 		},
 	'selInsSequence' => qq{
 			select bill_sequence
@@ -454,7 +454,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		from insurance_attribute
 		where parent_id = ?
 			and item_name = 'Fee Schedule'
-			and cr_org_id = ?
+			and cr_org_internal_id = ?
 	},
 	'selUpdatePlanAndCoverage' => qq{
 		 update insurance
@@ -470,7 +470,8 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		 set ins_org_id = ?,
 		 product_name = ?,
 		 plan_name = ?
-		 where parent_ins_id = ?
+		 parent_ins_id = ?
+		 where ins_internal_id = ?
 	},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {

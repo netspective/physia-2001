@@ -7,6 +7,7 @@ use Carp;
 
 use DBI::StatementManager;
 use App::Statements::Invoice;
+use App::Statements::Org;
 use App::Statements::Catalog;
 use App::Statements::Insurance;
 use CGI::Dialog;
@@ -33,6 +34,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
 
 		#fields for insurance payment
 
@@ -58,7 +60,17 @@ sub new
 		#fields for personal payment
 
 		new CGI::Dialog::Field(caption => 'Total Amount', name => 'total_amount', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field::TableColumn(caption => 'Payment Type', schema => $schema, column => 'Invoice_Item_Adjust.pay_type', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),						
+				
+		new CGI::Dialog::Field(
+				name => 'pay_type',
+				caption => 'Payment Type', 
+				lookup => 'Payment_Type'),
+
+		#new CGI::Dialog::Field::TableColumn(
+		#		caption => 'Payment Type', 
+		#		schema => $schema, 
+		#		column => 'Invoice_Item_Adjust.pay_type'),
+
 		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code', name => 'pay_method_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
@@ -102,10 +114,12 @@ sub makeStateChanges
 	$page->param('batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$isPayer Payment");
 
 	$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, $isInsurance);
-	$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
+	#$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
 	$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
-
 	$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
+
+	#my $payTypeField = $self->getField('pay_type');
+	$self->getField('pay_type')->{fKeyWhere} = "group_name is NULL or group_name = '$isPayer'";
 }
 
 sub populateData
@@ -118,7 +132,9 @@ sub populateData
 	if($isPayer eq 'insurance')
 	{
 		my $primaryPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
-		$page->field('payer_id', $primaryPayer->{bill_to_id});
+		my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $primaryPayer->{bill_to_id});
+		$page->field('payer_id', $orgId->{org_id});
+		$page->field('orgpayer_internal_id', $primaryPayer->{bill_to_id});
 	}
 	elsif($isPayer eq 'personal')
 	{	
@@ -137,7 +153,7 @@ sub execute
 	my $payerType = $isPayer eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 	my $payMethod = $isPayer eq 'insurance' ? App::Universal::ADJUSTMENTPAYMETHOD_CHECK : $page->field('pay_method');
-	my $payerId = $page->field('payer_id');
+	my $payerId = $isPayer eq 'insurance' ? $page->field('orgpayer_internal_id') : $page->field('payer_id');
 	my $payRef = $page->field('pay_ref');
 	my $payType = $page->field('pay_type');
 
@@ -197,7 +213,8 @@ sub execute
 		#Create history attribute for this adjustment
 		my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 		my $itemCPT = $page->param("_f_item_$line\_item_adjustments");
-		my $description = "\u$isPayer payment made by '$payerId'";
+		my $payerIdDisplay = $page->field('payer_id');
+		my $description = "\u$isPayer payment made by '$payerIdDisplay'";
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,

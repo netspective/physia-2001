@@ -49,7 +49,7 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $sessUser = $page->session('user_id');
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $personId = $page->field('attendee_id');
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $personId);
@@ -227,17 +227,16 @@ sub isValid
 		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
 		my @cptCodes = ($procedure);
 
-		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
-		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
-		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
-		
+		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrgIntId);
+		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrgIntId);
+		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrgIntId);
 		
 		#READ - If @allFeeSchedules line for charge is changed also change the @listFeeSchedule line		
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 		my $svc_type=App::IntelliCode::getSvcType($page, $procedure, $modifier || undef,\@listFeeSchedules);
 		my $count_type = scalar(@$svc_type);
 		my $count=0;
-		$page->addDebugStmt("uf= $use_fee");
+		#$page->addDebugStmt("uf= $use_fee");
 		if ($servicetype eq '' ||$charges eq '')
 		{			
 			if ($count_type==1 || $use_fee ne '')
@@ -374,12 +373,14 @@ sub getHtml
 	my $serviceTypeHtml = '';
 
 	#get service place code from service facility org
-	my $svcFacility = $page->field('service_facility_id') || $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
+	my $sessUser = $page->session('person_id');
+	my $svcFacility = $page->field('service_facility_id') || $sessOrgIntId;
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
-	my $cptOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByORG', $page->session('org_id'));
-	my $icdOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByORG', $page->session('org_id'));
-	my $cptPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByPerson', $page->session('person_id'));
-	my $icdPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByPerson', $page->session('person_id'));
+	my $cptOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByORG', $sessOrgIntId);
+	my $icdOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByORG', $sessOrgIntId);
+	my $cptPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByPerson', $sessUser);
+	my $icdPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByPerson', $sessUser);
 	my $servicePlaceIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServicePlaceId');
 	my $serviceTypeIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServiceTypeId');
 
@@ -486,6 +487,8 @@ sub getHtml
 							<!----	document.$dialogName._f_proc_$line\_service_type.value = '01'; --->
 							if(document.$dialogName._f_proc_$line\_units.value == '')
 								document.$dialogName._f_proc_$line\_units.value = 1;
+							if(document.$dialogName._f_proc_$line\_diags.value == '')
+								document.$dialogName._f_proc_$line\_diags.value = 1;
 						}
 					}
 					function onChange_procedure_$line(event, flags)
@@ -498,14 +501,14 @@ sub getHtml
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || ($line == 1 ? 'From' : '')]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
-					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || ($line == 1 ? 'To' : '') ]}' ONBLUR="validateChange_Date(event)"></TD>
+				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || 'From' ]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
+					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
 					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags")]}'></TD>
+				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_units' TYPE='text' size=3 VALUE='@{[ $page->param("_f_proc_$line\_units") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>

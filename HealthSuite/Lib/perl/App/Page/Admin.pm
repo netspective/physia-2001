@@ -9,6 +9,7 @@ use Exporter;
 use DBI::StatementManager;
 
 use App::Statements::Admin;
+use App::Statements::Org;
 use App::Dialog::Admin::RolePermission;
 
 use App::Configuration;
@@ -129,22 +130,21 @@ sub prepare_view_permissions
 		
 	#$self->param('org_id', $self->session('org_id'));
 	my $orgID = $self->param('org_id') || $self->session('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $self->session('org_internal_id'), $orgID);
 
 	my @pathItems = split('/', $self->param('arl'));
 
 	$self->addLocatorLinks(['Permissions', "/admin/$orgID/permissions"]);
-	
+
 	if ($self->param('role_id', $pathItems[4]))
 	{
 		$self->param('internal_role_id', $pathItems[3]);
-		$self->addContent($STMTMGR_ADMIN->createHtml($self, STMTMGRFLAG_NONE, 'selAllRolePermission', [$pathItems[3]] ),
-		);
+		$self->addContent($STMTMGR_ADMIN->createHtml($self, STMTMGRFLAG_NONE, 'selAllRolePermission', [$orgIntId]));
 	}
 	else
 	{
 		$self->addContent(qq{<BR>});
-		$self->addContent(
-			$STMTMGR_ADMIN->createHtml($self, STMTMGRFLAG_NONE, 'selAllRolePermission', [$orgID]) );
+		$self->addContent($STMTMGR_ADMIN->createHtml($self, STMTMGRFLAG_NONE, 'selAllRolePermission', [$orgIntId]));
 	}
 	return 1;
 }

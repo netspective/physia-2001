@@ -54,27 +54,26 @@ sub validateUser
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
 
-	return $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value) ?
+	return $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selPersonExists', $value) ?
 		() : ("$dialogItem->{caption} '$value' not found.");
 }
 
 sub validateOrg
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
-
 	return () unless $value;
-	return $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value) ?
-		() : ("$dialogItem->{caption} '$value' not found.");
+	$dialog->{org_internal_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,'selOwnerOrgId', $value);
+	return defined $dialog->{org_internal_id} ? () : ("$dialogItem->{caption} '$value' not found.");
 }
 
 sub validatePassword
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
-
 	my $personId = uc($page->field('person_id'));
 	my $orgId = uc($page->field('org_id'));
-	my $info = $orgId ?
-		$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgId) :
+	my $orgIntId = uc($dialog->{org_internal_id});
+	my $info = $orgIntId ?
+		$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId) :
 		$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLogin', $personId);
 
 	if($info)
@@ -86,12 +85,12 @@ sub validatePassword
 			if($page->field('clear_sessions'))
 			{
 				$orgId ?
-					$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updSessionsTimeoutOrg', $personId, $orgId) :
+					$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updSessionsTimeoutOrg', $personId, $orgIntId) :
 					$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updSessionsTimeout', $personId);
 			}
 
-			my $sessions = $orgId ?
-				$STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSessionsOrg', $personId, $orgId) :
+			my $sessions = $orgIntId ?
+				$STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSessionsOrg', $personId, $orgIntId) :
 				$STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSessions', $personId);
 
 			if(scalar(@$sessions) >= $loginCount)
@@ -144,7 +143,7 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
-	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
+	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $self->{org_internal_id});
 	my $personFlags = App::Universal::PERSONFLAG_ISPATIENT;
 	foreach (@$categories)
 	{
@@ -156,7 +155,7 @@ sub execute
 		$personFlags |= App::Universal::PERSONFLAG_ISSTAFF if $_ =~ /^(Physician|Nurse|Staff|Administrator)$/i;
 	}
 
-	$page->createSession($personId, $orgId, { categories => $categories, personFlags => $personFlags });
+	$page->createSession($personId, $self->{org_internal_id}, { org_id => $orgId, categories => $categories, personFlags => $personFlags });
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 

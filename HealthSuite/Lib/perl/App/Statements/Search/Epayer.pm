@@ -5,19 +5,22 @@ package App::Statements::Search::Epayer;
 use strict;
 use Data::Publish;
 use DBI::StatementManager;
-
-use base 'Exporter';
-use base 'DBI::StatementManager';
-
+use App::Universal;
+use base qw(Exporter DBI::StatementManager);
 use vars qw(@EXPORT $STMTMGR_EPAYER_SEARCH);
 @EXPORT = qw($STMTMGR_EPAYER_SEARCH);
 
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 my $BASE_SQL = qq{
-	select * from Ref_Epayer
-	where
-	%whereCond%
-	order by name
+	SELECT *
+	FROM ref_epayer
+	WHERE
+		%whereCond%
+		AND rownum <= $LIMIT
+	ORDER BY name
 };
+
 
 my $PUBLISH_DEFN = {
 	columnDefn =>
@@ -33,20 +36,20 @@ $STMTMGR_EPAYER_SEARCH = new App::Statements::Search::Epayer(
 	'sel_name' => 
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => qq{upper(name) like upper(?)},
+		whereCond => qq{UPPER(name) LIKE UPPER(?)},
 		publishDefn => $PUBLISH_DEFN,
 		
 	},
 	'sel_id' => 
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => qq{upper(id) like upper(?)},
+		whereCond => qq{UPPER(id) LIKE UPPER(?)},
 		publishDefn => $PUBLISH_DEFN,		
 	},
 	'sel_id2' => 
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => qq{upper(id2) like upper(?)},
+		whereCond => qq{UPPER(id2) LIKE UPPER(?)},
 		publishDefn => $PUBLISH_DEFN,		
 	},
 	

@@ -263,10 +263,10 @@ sub getHtml
 
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $isBatch = $page->param('batch_id');
-	my $outstandInvoices = $isBatch ? $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllOutstandingInvoicesByClient', $personId, $sessOrg)
-								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId, $sessOrg);
+	my $outstandInvoices = $isBatch ? $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllOutstandingInvoicesByClient', $personId, $sessOrgIntId)
+								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId, $sessOrgIntId);
 	my $totalInvoices = scalar(@{$outstandInvoices});
 	my $totalBalance = 0;
 	for(my $line = 1; $line <= $totalInvoices; $line++)
@@ -417,11 +417,11 @@ sub getHtml
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
 
-
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId);
-	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId);
+	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId, $sessOrgIntId);
+	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId, $sessOrgIntId);
 	my $totalPossibleRefund = $totalPatientBalance * (-1);
 	my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? "(Amount refunded cannot exceed \$$totalPossibleRefund)" : "(There is no credit on this patient's balance)";
 
@@ -535,9 +535,10 @@ sub needsValidation
 sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId);
+	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId, $sessOrgIntId);
 	if($creditInvoices->[0]->{invoice_id} eq '')
 	{
 		$self->invalidate($page, "Cannot perform a transfer. There are no invoices with a credit for this patient.");	
@@ -563,11 +564,11 @@ sub getHtml
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
 
-
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonZeroBalanceInvoicesByClient', $personId);
-	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId);
+	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonZeroBalanceInvoicesByClient', $personId, $sessOrgIntId);
+	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId, $sessOrgIntId);
 
 	my $totalInvoices = scalar(@{$transferInvoices});
 	for(my $line = 1; $line <= $totalInvoices; $line++)
@@ -674,7 +675,6 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $sessUser = $page->session('user_id');
-	my $sessOrg = $page->session('org_id');
 	my $personId = $page->field('client_id');
 
 	if($page->param('_f_item_1_description') eq '')

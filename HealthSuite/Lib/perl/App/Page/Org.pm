@@ -35,14 +35,14 @@ use vars qw(@ISA %RESOURCE_MAP);
 	);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
-
+my $intOrgId;
 sub initialize
 {
 	my $self = shift;
-	$self->SUPER::initialize(@_);
-
-	my $orgId = $self->param('org_id');
-	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $orgId);
+	$self->SUPER::initialize(@_);	
+	my $orgId = $self->param('org_id');	
+	$intOrgId = $STMTMGR_ORG->getSingleValue($self,STMTMGRFLAG_CACHE,'selOrgId',$self->session('org_internal_id'),$orgId);
+	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
 	$self->property('org_type', split(/,/, $self->property('org_category')));
 	#$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
 
@@ -102,9 +102,10 @@ sub prepare_page_content_header
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
 	my $orgName = undef;
+	
 	if(my $orgId = $self->param('org_id'))
-	{
-		$orgName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgSimpleNameById', $orgId);
+	{		
+		$orgName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgSimpleNameById', $intOrgId);
 	}
 	else
 	{
@@ -234,6 +235,7 @@ sub prepare_view_profile
 	my ($self) = @_;
 
 	$self->addLocatorLinks(['Profile', 'profile']);
+	
 
 	$self->addContent(qq{
 		<TABLE>
@@ -337,13 +339,15 @@ sub prepare_view_catalog
 		$self->addContent(
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalog_detail_org',
 				[$pathItems[3]] ),
+				#[$self->session('org_internal_id')] ),
 		);
 	}
 	else
 	{
 		$self->addContent(
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalogs_all_org',
-				[$self->param('org_id')]) );
+				#[$self->param('org_id')]) );
+				[$self->session('org_internal_id')]) );
 	}
 
 	return 1;

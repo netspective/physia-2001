@@ -168,7 +168,7 @@ sub setPhysicianFields
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $personId = $page->param('attendee_id') || $page->field('attendee_id');
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->session('org_internal_id');
 	my $physicianData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPrimaryPhysician', $orgId, $personId);
 	my $physicianId = $physicianData->{phy};
 	$page->field('resource_id', $physicianId) unless $page->field('resource_id');
@@ -402,7 +402,7 @@ sub execute
 		{
 			my $apptID = $page->schemaAction(
 				'Event', 'add',
-				owner_id => $page->session('org_id') || undef,
+				owner_id => $page->session('org_internal_id') || undef,
 				event_type => $page->field('event_type') || undef,
 				event_status => 0,
 				subject => $page->field('subject'),
@@ -487,7 +487,7 @@ sub execute
 			);
 			my $apptID = $page->schemaAction(
 				'Event', 'add',
-				owner_id => $page->session('org_id') || undef,
+				owner_id => $page->session('org_internal_id') || undef,
 				event_type => $page->field('event_type') || undef,
 				event_status => 0,
 				subject => $page->field('subject'),

@@ -30,7 +30,7 @@ $STMTRPTDEFN_DEFAULT_ORG =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => '/invoice/#&{?}#', hint => 'Claim Identifier',dAlign => 'RIGHT'},
+				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => 'Claim Identifier',dAlign => 'RIGHT'},
 				{ head => 'IC' , hint => 'Claim Identifier', dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
@@ -46,7 +46,7 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => '/invoice/#&{?}#', hint => "Claim Identifier",dAlign => 'RIGHT'},
+				{ head => 'ID', url => '/invoice/#&{?}#/summary', hint => "Claim Identifier",dAlign => 'RIGHT'},
 				{ head => 'IC', hint => 'Number Of Items In Claim',dAlign => 'CENTER'},
 				{ head => 'Date'},
 				{ head => 'Status'},
@@ -122,16 +122,19 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	'selAllNonZeroBalanceInvoicesByClient' => q{
 		select * from invoice
 		where client_id = ?
+			and owner_id = ?
 			and NOT balance = 0
 		},
 	'selTotalPatientBalance' => qq{
 		select sum(balance)
 		from invoice
 		where client_id = ?
+			and owner_id = ?
 		},
 	'selCreditInvoicesByClient' => q{
 		select * from invoice
 		where client_id = ?
+			and owner_id = ?
 			and balance < 0
 		},
 	'selInvoicesByType' => q{

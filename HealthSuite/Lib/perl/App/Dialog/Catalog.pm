@@ -63,7 +63,7 @@ sub new
 			name => 'internal_catalog_id',
 			options => FLDFLAG_READONLY,
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
-			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDATE,
+			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE,
 		),
 
 		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule Name',
@@ -172,7 +172,7 @@ sub checkDupName
 	my ($self, $page) = @_;
 	
 	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
-		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_id'));
+		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_internal_id'));
 
 	my $field = $self->getField('catalog_id');
 	my $fieldValue = $page->field('catalog_id');
@@ -191,16 +191,17 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $id = $self->{'id'};
-	my $orgId = $page->param('org_id');
+	my $orgInternalId = $page->session('org_internal_id');
+	my $orgId = $page->session('org_id');
 	my $catalogType = $page->field('catalog_type');
 	my $status = $page->field('status');
 	my $internalCatalogId = $page->field('internal_catalog_id');
 		
-	$page->schemaAction(
+	my $newId = $page->schemaAction(
 		'Offering_Catalog', $command,
 		internal_catalog_id => $command eq 'add' ? undef : $internalCatalogId,
 		catalog_id => $page->field('catalog_id') || undef,
-		org_id => $orgId || undef,
+		org_internal_id => $orgInternalId || undef,
 		catalog_type => defined $catalogType ? $catalogType : 0,
 		caption => $page->field('caption') || undef,
 		description => $page->field('description') || undef,
@@ -209,7 +210,7 @@ sub execute
 		_debug => 0
 	);
 
-	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId, 'Capitated Contract', 
+	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId || $newId , 'Capitated Contract', 
 		App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 'sel_Catalog_Attribute',
 		value_int => defined $page->field('capitated_contract') ? 1 : 0,
 	);
@@ -306,7 +307,7 @@ sub checkDupName
 	my ($self, $page) = @_;
 	
 	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
-		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_id'));
+		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_internal_id'));
 
 	my $field = $self->getField('catalog_id');
 	$field->invalidate($page, qq{Fee Schedule Name already exists for this Org.}) 
@@ -323,7 +324,7 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	
-	my $orgId = $page->param('org_id');
+	my $orgId = $page->session('org_internal_id');
 	
 	my $existingCatalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selCatalogById', $page->field('internal_catalog_id'));
@@ -331,8 +332,7 @@ sub execute
 	my $newInternalCatalogId = $page->schemaAction(
 		'Offering_Catalog', 'add',
 		internal_catalog_id => undef,
-		catalog_id => $page->field('catalog_id') || undef,
-		org_id => $orgId || undef,
+		catalog_id => $page->field('catalog_id') || undef,		
 		catalog_type => 0,
 		caption => $page->field('caption') || $existingCatalog->{caption} || undef,
 		description => $page->field('description') || $existingCatalog->{description} || undef,
@@ -356,17 +356,16 @@ sub execute
 	my $internalCatalogId = $page->field('internal_catalog_id');
 	
 	my $insertStmt = qq{
-		insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_id,
+		insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
 			catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
 			cost_type, unit_cost, description, units_avail)
 		(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
 			entry_type, flags, status, code, modifier, name, default_units, cost_type, unit_cost,
 			description, units_avail 
 		from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
-	};
+	};	
 	
 	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
-	
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog");
 	$self->handlePostExecute($page, $command, $flags);
 }

@@ -10,7 +10,8 @@
 
 	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
 		<description>A person, such as a doctor, a nurse, a receptionist, or a patient</description>
-		<column name="person_id" type="entity_id" primarykey="yes" descr="Unique ID for a person (in our system)"/>
+		<!-- column name="person_internal_id" type="autoinc" primarykey="yes" descr="Unique person record identification (in entire system) for internal use"/ -->
+		<column name="person_id" primarykey="yes" type="entity_id" descr="Unique ID for a person within an organization."/>
 		<column name="person_ref" type="text" size="32" descr="A reference account number/id (in the user's system)"/>
 		<column name="ssn" type="socsec" descr="Social Security number"/>
 		<column name="name_prefix" type="text" size="16"/>
@@ -33,7 +34,7 @@
 		<column name="login_type" lookupref="Login_Type" descr="The login information for this person">
 			<table name="$parenttbl_name$_Login" abbrev="$parenttbl_abbrev$Lgi" type="Audit,Secure">
 				<column name="person_id" parentref="$parenttbl_name$.$parenttbl_prikey$" uniquegrp="orgperson" indexed="yes" descr="The person for whom login information is specified"/>
-				<column name="org_id" lookupref="Org.org_id" indexed="yes" uniquegrp="orgperson" descr="The organization for which login information is supplied"/>
+				<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="orgperson" descr="The organization for which login information is supplied"/>
 				<column name="password" type="text" size="16" descr="The login password"/>
 				<column name="quantity" type="integer" default="1" descr="The number of times login is allowed from different sessions"/>
 			</table>
@@ -45,7 +46,7 @@
 		<column name="session_id" type="session_id" primarykey="yes" descr="An application-generated unique session ID"/>
 		<column name="status" lookupref="Session_Status.id" required="yes" default="0" descr="The current status of the session (0:active, 1:inactive, etc)"/>
 		<column name="person_id" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
-		<column name="org_id" lookupref="Org.org_id" descr="The organization (if any) from where session is being used"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="The organization (if any) from where session is being used"/>
 		<column name="remote_host" type="text" size="128" descr="Remote host information that should be stored for security purposes"/>
 		<column name="remote_addr" type="text" size="32" required="yes" descr="Remote address information that should be kept for security purposes"/>
 		<column name="first_access" type="stamp" required="yes" default="sysdate" descr="The first known time the session was access/used"/>
@@ -82,9 +83,10 @@
 
 	<table name="Org" type="Audit,Secure,Restrict_Rows">
 		<description>An organization, such as a physician's private practice, a hospital, or an insurance company</description>
-		<column name="org_id" type="entity_id" primarykey="yes" descr="Unique ID for company or organization"/>
-		<column name="parent_org_id" selfref="org.org_id" descr="ID for parent organization"/>
-		<column name="owner_org_id" selfref="org.org_id" descr="ID for owner(creator) of organization"/>
+		<column name="org_internal_id" type="autoinc" primarykey="yes" descr="Unique organization record identification (in entire system) for internal use"/>
+		<column name="owner_org_id" selfref="org.org_internal_id" uniquegrp="orgid" descr="ID for owner(creator) of organization"/>
+		<column name="org_id" required="yes" type="entity_id" uniquegrp="orgid" descr="Unique org identification within owner organization."/>
+		<column name="parent_org_id" selfref="org.org_internal_id" indexed="yes" descr="ID for parent organization"/>
 		<column name="category" type="text_set" descr="Type(s) of organization [comma-separated if more than one]"/>
 		<column name="tax_id" type="text" descr="Tax ID"/>
 		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
@@ -95,7 +97,7 @@
 	<table name="Person_Org_Category" abbrev="PerOCatg" type="Audit,Secure">
 		<description>The category to which a person belongs for a particular organization</description>
 		<column name="person_id" parentref="Person.person_id" primarykey="yes" descr="Unique ID for person"/>
-		<column name="org_id" parentref="Org.org_id" primarykey="yes" descr="Unique ID for company or organization"/>
+		<column name="org_internal_id" parentref="Org.org_internal_id" primarykey="yes" descr="Unique ID for company or organization"/>
 		<column name="category" type="text" size="32" primarykey="yes" descr="The category to which person belongs"/>
 	</table>
 
@@ -106,9 +108,9 @@
 		<column name="record_type" lookupref="Insurance_Record_Type" descr="The type of information held in this record"/>
 		<column name="parent_ins_id" lookupref="Insurance.ins_internal_id" descr="If this record was 'inherited' from an existing record, then this is the original record id (otherwise NULL)"/>
 		<column name="owner_person_id" lookupref="Person.person_id" descr="The person for whom the insurance coverage information is being defined (NULL if not a coverage record)"/>
-		<column name="owner_org_id" lookupref="Org.org_Id" descr="The provider org for whom the insurance product/plan/coverage information is being defined"/>
-		<column name="ins_org_id" lookupref="Org.org_Id" descr="Organization policy is under (insurance firm) -- NULL if not constrained"/>
-		<column name="employer_org_id" lookupref="Org.org_Id" descr="The employer's org id, if any"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" descr="The provider org for whom the insurance product/plan/coverage information is being defined"/>
+		<column name="ins_org_id" lookupref="Org.org_internal_id" descr="Organization policy is under (insurance firm) -- NULL if not constrained"/>
+		<column name="employer_org_id" lookupref="Org.org_internal_id" descr="The employer's org id, if any"/>
 		<column name="ins_type" lookupref="Claim_Type" required="yes" descr="Insurance group/policy type"/>
 		<column name="plan_name" type="text" size="64" descr="Name of the plan"/>
 		<column name="policy_number" type="text" size="32" descr="Policy number (if applicable)"/>
@@ -140,11 +142,11 @@
 		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
 		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
 		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
-		<column name="owner_id" parentref="Org.org_id" required="yes" descr="The owning organization with which event was made"/>
+		<column name="owner_id" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
 		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
 		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
 		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
-		<column name="facility_id" lookupref="Org.org_id" descr="The location where the event will take place"/>
+		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
 		<column name="start_time" type="stamp" required="yes" descr="The starting time of the event"/>
 		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
 		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
@@ -165,12 +167,12 @@
 		<description>A specific physical resource such as the blue room or the new EKG, which may be linked to another resource item</description>
 		<column name="resource_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific resource"/>
 		<column name="parent_id" selfref="resource_item.resource_id" descr="Parent Resource, if any"/>
-		<column name="owner_id" parentref="Org.org_id" required="yes" descr="The organization which owns the resource"/>
+		<column name="owner_id" parentref="Org.org_internal_id" required="yes" descr="The organization which owns the resource"/>
 		<column name="resource_type" lookupref="Resource_Type" required="yes" descr="The type of resource (based on a lookup)"/>
 		<column name="status" type="boolean" required="yes" descr="The status of the resource, as in Active or Inactive"/>
 		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the resource"/>
 		<column name="provider_id" lookupref="Person.person_id" descr="The provider primarily associated with the resource"/>
-		<column name="facility_id" lookupref="Org.org_id" descr="The location where the resource is housed"/>
+		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the resource is housed"/>
 		<column name="duration" type="integer" required="yes" descr="The normal duration of a single use of the resource"/>
 		<column name="portable" type="boolean" required="yes" descr="Can the resource be move from room to room within the facility"/>
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the resource"/>
@@ -188,7 +190,7 @@
 		<column name="start_time" type="time" descr="The start time"/>
 		<column name="end_time" type="time" descr="The end time"/>
 		<column name="available" type="boolean" required="yes" descr="Is this time block Available or Unavailable for scheduling events?"/>
-		<column name="facility_id" lookupref="Org.org_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
 		<column name="patient_types" type="text_set" size="16" abbrev="ptypes" descr="Limit this template to particular type of patient(s) -- should be one or more comma-separated items enums in Appt_Attendee_Type table"/>
 		<column name="visit_types" type="text_set" size="64" abbrev="vtypes" descr="Limit this template to particular type of visit(s) -- should be one or more comma-separated Visit-Type items enums in Transaction_Type table"/>
 		<column name="days_of_month" type="text" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
@@ -205,7 +207,7 @@
 		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the Appt Type"/>
 		<column name="effective_begin_date" type="date" descr="The effective start date this Appt Type"/>
 		<column name="effective_end_date" type="date" descr="The effective end date for this Appt TYpe"/>
-		<column name="facility_id" lookupref="Org.org_id" descr="The location to which the Appt Type applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location to which the Appt Type applies, e.g. Office, Clinic, or Hospital"/>
 		<column name="duration" type="integer" required="yes" descr="The duration of the appointment in minutes"/>
 	</table>
 
@@ -225,8 +227,8 @@
 		<column name="detail" type="text" size="512" descr="Freeform text explanation of transaction (detail)"/>
 		<column name="code" type="text" size="32" descr="If transaction is a diagnosis, this is an ICD-9, if procedure then it is a CPT"/>
 		<column name="modifier" type="text" size="32" descr="Any modifier code (needed for CPTs if transaction is a procedure)"/>
-		<column name="billing_facility_id" lookupref="org.org_id" descr="Facility where billing should be tracked"/>
-		<column name="service_facility_id" lookupref="org.org_id" descr="Facility where transaction took place"/>
+		<column name="billing_facility_id" lookupref="org.org_internal_id" descr="Facility where billing should be tracked"/>
+		<column name="service_facility_id" lookupref="org.org_internal_id" descr="Facility where transaction took place"/>
 		<column name="provider_id" lookupref="person.person_id" descr="Person performing transaction for billing and care purposes"/>
 		<column name="care_provider_id" lookupref="person.person_id" descr="Person performing transaction (as a care giver if billing provider is different)"/>
 		<column name="consult_id" lookupref="person.person_id" descr="Person performing transaction (as a consultant)"/>
@@ -270,7 +272,7 @@
 		</description>
 		<column name="internal_catalog_id" type="autoinc" primarykey="yes" descr="Unique identification for the catalog"/>
 		<column name="catalog_id" type="text" size="32" uniquegrp="catorg" indexed="yes" descr="Unique name for the catalog (user-defined)"/>
-		<column name="org_id" lookupref="Org.org_id" uniquegrp="catorg" indexed="yes" descr="The entity that owns the catalog"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" uniquegrp="catorg" indexed="yes" descr="The entity that owns the catalog"/>
 		<column name="caption" type="text" size="64" required="yes" descr="Quick overview of the catalog"/>
 		<column name="catalog_type" lookupref="Offering_Catalog_Type" descr="The type of information held in this record"/>
 		<column name="parent_catalog_id" selfref="Offering_Catalog.internal_catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
@@ -442,7 +444,7 @@
 		<param name="parentref">person.person_id</param>
 	</table>
 	<table name="Org_Address" abbrev="OrgAddr" type="Address">
-		<param name="parentref">org.org_id</param>
+		<param name="parentref">org.org_internal_id</param>
 	</table>
 	<table name="Invoice_Address" abbrev="InvAddr" type="Address">
 		<param name="parentref">invoice.invoice_id</param>
@@ -453,13 +455,13 @@
 
 	<table name="Person_Attribute" abbrev="PerAttr" type="Attribute">
 		<param name="parentref">Person.person_id</param>
-		<column name="parent_org_id" lookupref="Org.org_id" indexed="yes" descr="When an attribute applies only to a person in a particular organization, this is that organization's id (NULL if the attribute belongs to a person in any organization)"/>
+		<column name="parent_org_id" lookupref="Org.org_internal_id" indexed="yes" descr="When an attribute applies only to a person in a particular organization, this is that organization's id (NULL if the attribute belongs to a person in any organization)"/>
 	</table>
 	<table name="Person_Data_Block" abbrev="PerDtaBlk" type="Data_Block">
 		<param name="parentref">person.person_id</param>
 	</table>
 	<table name="Org_Attribute" abbrev="OrgAttr" type="Attribute">
-		<param name="parentref">Org.org_id</param>
+		<param name="parentref">Org.org_internal_id</param>
 	</table>
 	<table name="Insurance_Attribute" abbrev="InsAttr" type="Attribute">
 		<param name="parentref">Insurance.ins_internal_id</param>
@@ -534,7 +536,7 @@
 	<table name="Hlth_Maint_Rule" abbrev="HlthRl" parent="Reference_Item" type="Audit,Secure">
 		<description>Rules specified by user to specify preventive care measures for different patients (based on age, sex, etc)</description>
 		<column name="rule_id" type="text" size="16" primarykey="yes" descr="Identifier for measure"/>
-		<column name="org_id" lookupref="Org.Org_Id" descr="Org ID to which this measure belongs"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="Org ID to which this measure belongs"/>
 		<column name="gender" lookupref="Gender.id" descr="For gender-specific measure"/>
 		<column name="start_age" type="integer" descr="Min age measure can be performed"/>
 		<column name="end_age" type="integer" descr="Max age measure can be performed"/>
@@ -550,53 +552,53 @@
 	</table>
 
 	<table name="REF_PFS_RVU" >
-			<description>Contains information on services covered by the Medicare Physician Fee Schedule</description>
-			<column name="pfs_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
-			<column name="eff" type="duration" indexed="yes" descr="Date the RVU data is effective "/>
-			<column name="code" type="text" size="6" indexed="yes" descr="Actual CPT/HCPCS Code"/>
-			<column name="modifier" type="text" size="2"  descr="Code modifier"/>
-			<column name="description" type="text" size="64" descr="Description of code"/>
-			<column name="status_code" type="text" size="2" descr="Indicates whether the code is in the fee schedule"/>
-			<column name="medicare_ind"  type="text" size="2" descr="Indicates if the RVU is used for medicare payments"/>
-			<column name="work_rvu" type="percentage" descr="RVU for physician work"/>
-			<column name="non_fac_pe_rvu" type="percentage" descr="RVU for fully-implemented resource based practice exp"/>
-			<column name="na_ind" type="text" size="2" descr="Indicates if the procedure is rarely or never performed in non-facility setting"/>
-			<column name="trans_non_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp"/>
-			<column name="fac_pe_rvu" type="percentage" descr="RVU for fully implemented resource based practice exp"/>
-			<column name="trans_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp for non-facility"/>
-			<column name="mal_practice_rvu" type="percentage" descr="RVU for malpractice exp"/>
-			<column name="tlt_non_fac_rvu" type="percentage" descr="Sum of work fully implemented non-facility practice expense"/>
-			<column name="tlt_trans_non_fac_rvu" type="percentage" descr="Sum of work transitioned non-facility practice expense"/>
-			<column name="tlt_fac_rvu" type="percentage" descr="Sum of work fully implemented based facility practice expense"/>
-			<column name="tlt_trans_fac_rvu" type="percentage" descr="Sum of work transitioned facility practice expense"/>
-			<column name="pc_tc_ind" type="text" size="2" descr="PC/TC indicator"/>
-			<column name="global_surgery" type="text" size="3" descr="Time frame for surgical procedure"/>
-			<column name="preop_percent" type="percentage" descr="Percentage for preoperative of global package"/>
-			<column name="intraop_percent" type="percentage" descr="Percentage for intraoperative portion of global package"/>
-			<column name="postop_percent" type="percentage" descr="Percentage for postoperative portion of global package"/>
-			<column name="multi_procedure" type="percentage" descr="Payment adjustment rule"/>
-			<column name="bilat_surgery" type="text" size="2" descr="Service subject to payment adjustment"/>
-			<column name="asst_surgery" type="text" size="2" descr="Indicates if assistant at surgery is paid"/>
-			<column name="co_surgeons" type="text" size="2" descr="Indicates if a co-surgeon is paid"/>
-			<column name="team_surgery" type="text" size="2" descr="Indicates services for which team surgeons may be paid"/>
-			<column name="phy_supervise" type="text" size="2" descr="Diagnostic post payment review"/>
-			<column name="bill_med_code" type="text" size="5" descr="Code for billable medical supples"/>
-			<column name="endo_base_code" type="text" size="5" descr="Identifies an endoscopic base code"/>
-			<column name="conversion_fact" type="float" descr="Multiplier that transforms RVU into payment"/>
+		<description>Contains information on services covered by the Medicare Physician Fee Schedule</description>
+		<column name="pfs_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
+		<column name="eff" type="duration" indexed="yes" descr="Date the RVU data is effective "/>
+		<column name="code" type="text" size="6" indexed="yes" descr="Actual CPT/HCPCS Code"/>
+		<column name="modifier" type="text" size="2"  descr="Code modifier"/>
+		<column name="description" type="text" size="64" descr="Description of code"/>
+		<column name="status_code" type="text" size="2" descr="Indicates whether the code is in the fee schedule"/>
+		<column name="medicare_ind"  type="text" size="2" descr="Indicates if the RVU is used for medicare payments"/>
+		<column name="work_rvu" type="percentage" descr="RVU for physician work"/>
+		<column name="non_fac_pe_rvu" type="percentage" descr="RVU for fully-implemented resource based practice exp"/>
+		<column name="na_ind" type="text" size="2" descr="Indicates if the procedure is rarely or never performed in non-facility setting"/>
+		<column name="trans_non_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp"/>
+		<column name="fac_pe_rvu" type="percentage" descr="RVU for fully implemented resource based practice exp"/>
+		<column name="trans_fac_pe_rvu" type="percentage" descr="RVU for transitioned practice exp for non-facility"/>
+		<column name="mal_practice_rvu" type="percentage" descr="RVU for malpractice exp"/>
+		<column name="tlt_non_fac_rvu" type="percentage" descr="Sum of work fully implemented non-facility practice expense"/>
+		<column name="tlt_trans_non_fac_rvu" type="percentage" descr="Sum of work transitioned non-facility practice expense"/>
+		<column name="tlt_fac_rvu" type="percentage" descr="Sum of work fully implemented based facility practice expense"/>
+		<column name="tlt_trans_fac_rvu" type="percentage" descr="Sum of work transitioned facility practice expense"/>
+		<column name="pc_tc_ind" type="text" size="2" descr="PC/TC indicator"/>
+		<column name="global_surgery" type="text" size="3" descr="Time frame for surgical procedure"/>
+		<column name="preop_percent" type="percentage" descr="Percentage for preoperative of global package"/>
+		<column name="intraop_percent" type="percentage" descr="Percentage for intraoperative portion of global package"/>
+		<column name="postop_percent" type="percentage" descr="Percentage for postoperative portion of global package"/>
+		<column name="multi_procedure" type="percentage" descr="Payment adjustment rule"/>
+		<column name="bilat_surgery" type="text" size="2" descr="Service subject to payment adjustment"/>
+		<column name="asst_surgery" type="text" size="2" descr="Indicates if assistant at surgery is paid"/>
+		<column name="co_surgeons" type="text" size="2" descr="Indicates if a co-surgeon is paid"/>
+		<column name="team_surgery" type="text" size="2" descr="Indicates services for which team surgeons may be paid"/>
+		<column name="phy_supervise" type="text" size="2" descr="Diagnostic post payment review"/>
+		<column name="bill_med_code" type="text" size="5" descr="Code for billable medical supples"/>
+		<column name="endo_base_code" type="text" size="5" descr="Identifies an endoscopic base code"/>
+		<column name="conversion_fact" type="float" descr="Multiplier that transforms RVU into payment"/>
 	</table>
 
 	<table name="REF_GPCI" >
-			<description>Contains the geographic practice cost index (GPCI) for every medicare locality</description>
-			<column name="gpci_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
-			<column name="eff" type="duration" indexed="yes" descr="Date the RVU data is effective "/>
-			<column name="carrier_number" indexed="yes" type="text" size="10" descr="Carrier Number"/>
-			<column name="locality_number" indexed="yes" type="text" size="10" descr="Locality Number" />
-			<column name="locality_name" type="text" size="50" descr="Locality Name"/>
-			<column name="state" type="text" size="50" descr="State"/>
-			<column name="county" type="text" size="256" descr="County"/>
-			<column name="work" type="float" descr="GPCI Work"/>
-			<column name="practice_expense" type="float" descr="GPCI practice expense"/>
-			<column name="mal_practice" type="float" descr="GPCI Malpractice expense"/>
+		<description>Contains the geographic practice cost index (GPCI) for every medicare locality</description>
+		<column name="gpci_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
+		<column name="eff" type="duration" indexed="yes" descr="Date the RVU data is effective "/>
+		<column name="carrier_number" indexed="yes" type="text" size="10" descr="Carrier Number"/>
+		<column name="locality_number" indexed="yes" type="text" size="10" descr="Locality Number" />
+		<column name="locality_name" type="text" size="50" descr="Locality Name"/>
+		<column name="state" type="text" size="50" descr="State"/>
+		<column name="county" type="text" size="256" descr="County"/>
+		<column name="work" type="float" descr="GPCI Work"/>
+		<column name="practice_expense" type="float" descr="GPCI practice expense"/>
+		<column name="mal_practice" type="float" descr="GPCI Malpractice expense"/>
 	</table>
 
 	<table name="Eligibility_Source" abbrev="ElSrc">
@@ -612,7 +614,7 @@
 	<table name="Org_Eligibility_Input" abbrev="OElInp">
 		<column name="input_id" type="autoinc" primarykey="yes" descr="The primary key"/>
 		<column name="source_id" lookupref="Eligibility_Source.id" descr="The unique ID of the eligibility source"/>
-		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the eligibility source"/>
+		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the eligibility source"/>
 		<column name="product_id" usetype="Insurance.product_name" descr="The unique ID of the eligibility source"/>
 		<column name="field_order" type="integer" descr="The field order"/>
 		<column name="field_caption" type="text" size="32" descr="The field caption"/>
@@ -631,7 +633,7 @@
 
 	<table name="Person_Org_Role" abbrev="PerOrgRole" type="Audit,Secure">
 		<column name="person_id" parentref="Person.person_id" descr="The unique ID of the person."/>
-		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the organization."/>
+		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
 		<column name="role_name_id" parentref="Role_Name.role_name_id" descr="The unique ID of the role."/>
 		<column name="role_status_id" lookupref="Org_Role_Status" default="0" descr="The status of the role."/>
 		<column name="priority" type="smallint" default="1" descr="Role priority."/>
@@ -639,7 +641,7 @@
 
 	<table name="Role_Permission" abbrev="RolePrm" type="Audit,Secure">
 		<column name="role_name_id" parentref="Role_Name.role_name_id" descr="The unique ID of the role."/>
-		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the organization."/>
+		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
 		<column name="permission_name" type="text" size="120" descr="Permission name."/>
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>

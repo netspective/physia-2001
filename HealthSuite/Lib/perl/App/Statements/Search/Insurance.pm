@@ -6,23 +6,32 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use Devel::ChangeLog;
-
-use vars qw(@ISA @CHANGELOG);
 use vars qw(@ISA @EXPORT $STMTMGR_INSURANCE_SEARCH $STMTFMT_SEL_INSURANCE
 	$STMTRPTDEFN_DEFAULT $STMTRPTDEFN_INSPRODUCT $STMTRPTDEFN_INSPLAN);
-
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_INSURANCE_SEARCH);
 
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 $STMTFMT_SEL_INSURANCE = qq{
-			SELECT ins.ins_org_id, ins.product_name, ins.plan_name, addr.line1, addr.city, addr.state, ins.ins_internal_id
-			FROM insurance ins, insurance_address addr
-			WHERE
-				ins.ins_internal_id = addr.parent_id and
-				%whereCond% and owner_org_id = ?
-				%catCond%
-			order by 1
+	SELECT
+		ins.ins_org_id,
+		ins.product_name,
+		ins.plan_name,
+		addr.line1,
+		addr.city,
+		addr.state,
+		ins.ins_internal_id
+	FROM
+		insurance ins,
+		insurance_address addr
+	WHERE
+		ins.ins_internal_id = addr.parent_id 
+		AND	%whereCond% 
+		AND owner_org_id = ?
+		%catCond%
+		AND rownum <= $LIMIT
+	ORDER BY 1
 };
 
 $STMTRPTDEFN_DEFAULT =
@@ -177,16 +186,6 @@ $STMTMGR_INSURANCE_SEARCH = new App::Statements::Search::Insurance(
 	%insTemplates,
 	%{$categorySqls[0]},
 	%{$categorySqls[1]},
-);
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/06/2000', 'RK',
-		'Search/Insurance',
-		'Updated the select statements by replacing them with _stmtFmt.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Insurance',
-		'Created simple reports instead of using createOutput function.'],
 );
 
 1;

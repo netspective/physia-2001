@@ -75,10 +75,12 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $orgIntId = $page->session('org_internal_id');
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 	$page->schemaAction(
 		'Org_Attribute', $command,
-		parent_id => $page->param('org_id') || undef,
+		parent_id => $orgIntId  || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name => $page->field('value_textb') || undef,
 		value_type => App::Universal::ATTRTYPE_CREDENTIALS || undef,

@@ -10,6 +10,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
+use App::Statements::Org;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 
@@ -26,7 +27,10 @@ use vars qw(@ISA %RESOURCE_MAP);
 						'trans-' .App::Universal::ATTRTYPE_STUDENTPART(),
 						'trans-' .App::Universal::TRANSTYPE_ALERTACTION()
 						]
-				    },);
+				    },
+	        'alert-org' => { transType => App::Universal::TRANSTYPE_ALERTORG, heading => '
+	        		 $Command Alert',  _arl => ['org_id'], _arl_modify => ['trans_id']} ,                                 			   				    
+				    );
 
 sub new
 {
@@ -85,7 +89,14 @@ sub execute
 
 	my $entityId = $page->param('person_id') ? $page->param('person_id') : $page->param('org_id');
 	my $entityType = $page->param('person_id') ? '0' : '1';
-
+	
+	if($entityType eq '1')
+	{
+		my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+		my $orgIntId = $page->session('org_internal_id');
+		$entityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
+	}
+	
 	$page->schemaAction(
 		'Transaction', $command,
 		trans_owner_type => $entityType,

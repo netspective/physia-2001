@@ -97,7 +97,7 @@ sub execute
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category",
-			[uc($expression), $self->session('org_id')], 
+			[uc($expression), $self->session('org_internal_id')], 
 			#[
 			#	['ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
 			#	['Group Name'],

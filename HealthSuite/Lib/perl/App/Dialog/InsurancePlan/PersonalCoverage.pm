@@ -308,12 +308,15 @@ sub customValidate
 	my $planId = $self->getField('plan_name');
 	my $prePdtId = $self->getField('insplan')->{fields}->[0];
 	my $productId = $self->getField('product_name');
-	my $orgId = $page->field('ins_org_id');
-	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$pdtName, $orgId) if $pdtName ne '';
+	my $insOrgId = $page->field('ins_org_id');
+	my $ownerOrgId = $page->session('org_internal_id');
+	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
+
+	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$pdtName, $insOrgInternalId) if $pdtName ne '';
 	my $doesPreFilledProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$preFilledProduct, $preFilledOrg) if $preFilledProduct ne '';
 
-	my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$pdtName');";
-	$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
+	my $createInsProductHref = "javascript:doActionPopup('/org-p/$insOrgId/dlg-add-ins-product?_f_ins_org_id=$insOrgId&_f_product_name=$pdtName');";
+	$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$insOrgId'.<br><img src="/resources/icons/arrow_right_red.gif">
 			<a href="$createInsProductHref">Add Product '$pdtName' now</a>
 		}) if $doesProductExist eq '' && $pdtName ne '';
 
@@ -322,10 +325,9 @@ sub customValidate
 			<a href="$createInsProductPreHref">Add Product '$preFilledProduct' now</a>
 		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
 
-	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$pdtName, $planName, $orgId);
+	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$pdtName, $planName, $insOrgInternalId);
 	my $preFilledplanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$preFilledProduct, $preFilledPlan, $preFilledOrg);
-
-	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-plan?_f_ins_org_id=$orgId&_f_product_name=$pdtName&_f_plan_name=$planName');";
+	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$insOrgId/dlg-add-ins-plan?_f_ins_org_id=$insOrgId&_f_product_name=$pdtName&_f_plan_name=$planName');";
 		$planId->invalidate($page, qq{ Plan Name '$planName' does not exist for the Product Name '$pdtName'.<br><img src="/resources/icons/arrow_right_red.gif">
 			<a href="$createInsPlanPreHref">Add Plan '$planName' now</a>
 		}) if $planForOrgExists eq '' && $planName ne '';
@@ -343,7 +345,7 @@ sub customValidate
 	my $dataProductName = $personalCoverageData->{'product_name'};
 	my $dataPlanName = $personalCoverageData->{'plan_name'};
 
-	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$pdtName, $planName, $recordType, $personId, $orgId) if !($pdtName eq $dataProductName && $dataPlanName eq $planName && $orgId eq $dataOrgId);
+	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$pdtName, $planName, $recordType, $personId, $insOrgInternalId) if !($pdtName eq $dataProductName && $dataPlanName eq $planName && $insOrgInternalId eq $dataOrgId);
 	my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
 
 	$planId->invalidate($page, "This Personal Coverage already exists for '$personId'.") if $personPlanExists ne '' ;
@@ -355,34 +357,41 @@ sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-		return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
+	return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 
-		my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
-		my $seq = 0;
-		my $hiddenBillSeq = $page->field('bill_sequence');
-		if($hiddenBillSeq ne  '')
+	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
+	my $seq = 0;
+	my $hiddenBillSeq = $page->field('bill_sequence');
+	if($hiddenBillSeq ne  '')
+	{
+		$page->field('bill_sequence', $hiddenBillSeq);
+	}
+	else
+	{
+		while ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, ++$seq)) {};
+
+		if ($seq > 4)
 		{
-			$page->field('bill_sequence', $hiddenBillSeq);
+			$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
 		}
+
 		else
 		{
-			while ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, ++$seq)) {};
-
-			if ($seq > 4)
-			{
-				$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
-			}
-
-			else
-			{
-				$page->field('bill_sequence', $seq);
-			}
+			$page->field('bill_sequence', $seq);
 		}
-		my $productName = $page->field('product_name');
-		my $planName = $page->field('plan_name');
-		my $insOrgId = $page->field('ins_org_id');
-		my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-		my $planData = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
+	}
+	my $productName = $page->field('product_name');
+	my $planName = $page->field('plan_name');
+	my $insOrgId = $page->field('ins_org_id');
+	my $ownerOrgId = $page->session('org_internal_id');
+	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
+	my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
+	$STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId) if $page->field('ins_org_id') ne '';
+	my $planData = 	$STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId)if $page->field('ins_org_id') ne '';
+	my $getInsOrgInternalId = $planData->{'ins_org_id'};
+	my $getInsOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $getInsOrgInternalId);
+	$page->field('ins_org_id', $getInsOrgId->{org_id});
+
 }
 
 sub populateData_update
@@ -397,6 +406,12 @@ sub populateData_update
 	{
 		$page->addError("Ins Internal ID '$insIntId' not found.");
 	}
+
+	my $selInsOrgData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
+	my $insOrgInternalId = $selInsOrgData->{'ins_org_id'};
+	my $insOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $insOrgInternalId);
+	$page->field('ins_org_id', $insOrgId->{org_id});
+
 	my $prevBillSeq = $page->field('bill_sequence');
 	$page->field('bill_seq_hidden', $prevBillSeq);
 }
@@ -413,9 +428,12 @@ sub execute
 	my $productName = $page->field('product_name');
 	my $planName = $page->field('plan_name');
 	my $insOrgId = $page->field('ins_org_id');
+	my $ownerOrgId = $page->session('org_internal_id');
+	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
+
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
+	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgInternalId);
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
 	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
 
@@ -431,8 +449,8 @@ sub execute
 				plan_name => $page->field('plan_name') || undef,
 				record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 				owner_person_id => $personId || undef,
-				ins_org_id => $page->field('ins_org_id') || undef,
-				owner_org_id => $page->session('org_id'),
+				ins_org_id => $insOrgInternalId || undef,
+				owner_org_id => $ownerOrgId,
 				bill_sequence => $page->field('bill_sequence') || undef,
 				ins_type => $insType || undef,
 				#fee_schedule => $page->field('fee_schedule') || undef,
@@ -455,56 +473,6 @@ sub execute
 				threshold => $page->field('threshold') || undef,
 				_debug => 0
 			);
-
-	#$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
-
-	#$self->handleAttributes($page, $command, $flags, $insIntId);
-	$self->handlePostExecute($page, $command, $flags);
-	return '';
-}
-
-
-
-sub _handleAttributes
-{
-	my ($self, $page, $command, $flags, $insIntId) = @_;
-
-	$page->schemaAction(
-			'Insurance_Address', $command,
-			item_id => $page->field('item_id') || undef,
-			parent_id => $insIntId || undef,
-			address_name => 'Billing' || undef,
-			line1 => $page->field('addr_line1') || undef,
-			line2 => $page->field('addr_line2') || undef,
-			city => $page->field('addr_city') || undef,
-			state => $page->field('addr_state') || undef,
-			zip => $page->field('addr_zip') || undef,
-			_debug => 0
-		);
-
-	my $textAttrType = App::Universal::ATTRTYPE_TEXT;
-	my $phoneAttrType = App::Universal::ATTRTYPE_PHONE;
-	my $faxAttrType = App::Universal::ATTRTYPE_FAX;
-
-	$page->schemaAction(
-			'Insurance_Attribute', $command,
-			item_id => $page->field('phone_item_id') || undef,
-			parent_id => $insIntId || undef,
-			item_name => 'Contact Method/Telephone/Primary',
-			value_type => defined $phoneAttrType ? $phoneAttrType : undef,
-			value_text => $page->field('phone') || undef,
-			_debug => 0
-		);
-
-	$page->schemaAction(
-			'Insurance_Attribute', $command,
-			item_id => $page->field('fax_item_id') || undef,
-			parent_id => $insIntId || undef,
-			item_name => 'Contact Method/Fax/Primary',
-			value_type => defined $faxAttrType ? $faxAttrType : undef,
-			value_text => $page->field('fax') || undef,
-			_debug => 0
-		);
 
 	$self->handlePostExecute($page, $command, $flags);
 	return '';

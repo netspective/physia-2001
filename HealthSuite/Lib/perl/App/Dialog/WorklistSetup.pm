@@ -143,7 +143,7 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	
-	my $sessOrgId = $page->session('org_id');
+	my $sessOrgId = $page->session('org_internal_id');
 	$self->getField('physician_list')->{fKeyStmtBindPageParams} = $sessOrgId;
 
 	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
@@ -211,7 +211,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $page->session('org_id') || undef,
+			parent_org_id => $page->session('org_internal_id') || undef,
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 			item_name => 'WorkList',
 			value_text => $_,
@@ -230,7 +230,7 @@ sub execute
 			'Person_Attribute',	'add',
 			item_id => undef,
 			parent_id => $userId,
-			parent_org_id => $page->session('org_id') || undef,
+			parent_org_id => $page->session('org_internal_id') || undef,
 			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 			item_name => 'WorkList',
 			value_text => $_,

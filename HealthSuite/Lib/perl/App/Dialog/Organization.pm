@@ -62,23 +62,38 @@ sub initialize
 {
 	my $self = shift;
 	my $schema = $self->{schema};
-
+	warn ("In initialize\n");
 	croak 'schema parameter required' unless $schema;
 
 	my $orgIdCaption = $self->{orgtype} eq 'dept' ? 'Department ID' : 'Organization ID';
 
 	if ($self->{orgtype} ne 'main')
 	{
-		$self->addContent(new App::Dialog::Field::Organization::ID(caption => 'Parent Organization ID', name => 'parent_org_id'));
+		$self->addContent(
+			new App::Dialog::Field::Organization::ID(
+				caption => 'Parent Organization ID',
+				name => 'parent_org_id'),
+			new App::Dialog::Field::Organization::ID::New(
+				caption => $orgIdCaption,
+				name => 'org_id',
+				options => FLDFLAG_REQUIRED,
+				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
+			);
+	}
+	else
+	{
+		$self->addContent(
+			new App::Dialog::Field::Organization::ID::Main::New(
+				caption => $orgIdCaption,
+				name => 'org_id',
+				options => FLDFLAG_REQUIRED,
+				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
+			);
 	}
 
 	$self->addContent(
-		new App::Dialog::Field::Organization::ID::New(caption => $orgIdCaption,
-			name => 'org_id',
-			options => FLDFLAG_REQUIRED,
-			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			postHtml => "&nbsp; &nbsp; <a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>"),
-
 		new CGI::Dialog::Field::TableColumn(caption => 'Organization Name', name => 'name_primary',
 			schema => $schema, 
 			column => 'Org.name_primary'),
@@ -92,70 +107,128 @@ sub initialize
 	$self->addContentOrgType($self->{orgtype});
 
 	$self->addContent(
-		new CGI::Dialog::MultiField(caption =>'Hours of Operation/Time Zone', name => 'hours_and_tzone',
+		new CGI::Dialog::MultiField(
+			name => 'hours_and_tzone',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Hours of Operation', name => 'business_hours'),
-				new CGI::Dialog::Field::TableColumn(type => 'select', selOptions => 'EST;CST;MST;PST',
-					schema => $schema, column => 'Org.time_zone', caption => 'Time Zone', name => 'time_zone'),
+				new CGI::Dialog::Field(
+					caption => 'Hours of Operation',
+					name => 'business_hours'),
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Time Zone',
+					type => 'select',
+					selOptions => 'EST;CST;MST;PST',
+					schema => $schema,
+					column => 'Org.time_zone',
+					name => 'time_zone'),
 			]),
-
-		new CGI::Dialog::MultiField(caption =>'Phone/Fax', name => 'phone_fax', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+		new CGI::Dialog::MultiField(
+			name => 'phone_fax',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
 			fields => [
-				new CGI::Dialog::Field(type=>'phone', caption => 'Phone', name => 'phone', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-				new CGI::Dialog::Field(invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE, type=>'phone', caption => 'Fax', name => 'fax'),
+				new CGI::Dialog::Field(
+					caption => 'Phone',
+					type=>'phone',
+					name => 'phone',
+					options => FLDFLAG_REQUIRED,
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+				new CGI::Dialog::Field(
+					caption => 'Fax',
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+					type=>'phone',
+					name => 'fax'),
 			]),
-
-		new App::Dialog::Field::Address(caption=>'Mailing Address', name => 'address',  options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-
-		new CGI::Dialog::Field(type=>'email', caption => 'Email', name => 'email', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-		new CGI::Dialog::Field(type=>'url', caption => 'Website', name => 'internet', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-		new CGI::Dialog::MultiField(caption =>'Billing Contact/Phone', name => 'org_contact', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+		new App::Dialog::Field::Address(
+			caption=>'Mailing Address',
+			name => 'address',
+			options => FLDFLAG_REQUIRED,
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+		new CGI::Dialog::Field(
+			caption => 'Email',
+			type=>'email',
+			name => 'email',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+		new CGI::Dialog::Field(
+			caption => 'Website',
+			type=>'url',
+			name => 'internet',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
+		new CGI::Dialog::MultiField(
+			name => 'org_contact',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
 			fields => [
-				new CGI::Dialog::Field(invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE, caption => 'Contact', name => 'contact_name'),
-				new CGI::Dialog::Field(type=>'phone', caption => 'Phone', name => 'contact_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-
+				new CGI::Dialog::Field(
+					caption => 'Billing Contact',
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+					name => 'contact_name'),
+				new CGI::Dialog::Field(
+					caption => 'Phone',
+					type=>'phone',
+					name => 'contact_phone',
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 			]),
 	);
 
 	if ($self->{orgtype} ne 'dept')
 	{
 		$self->addContent(
-			new CGI::Dialog::Subhead(heading => 'ID Numbers', name => 'ids_heading'),
-				new CGI::Dialog::Field::TableColumn(caption => 'Tax ID', name => 'tax_id',
-					schema => $schema, column => 'Org.tax_id'),
-				new CGI::Dialog::Field(caption => 'Employer ID', name => 'emp_id'),
-				new CGI::Dialog::Field(caption => 'State ID', name => 'state_id'),
-				new CGI::Dialog::Field(caption => 'Medicaid ID', name => 'medicaid_id'),
-				new CGI::Dialog::Field(caption => "Worker's Comp ID", name => 'wc_id'),
-				new CGI::Dialog::Field(caption => 'Blue Cross-Blue Shield ID', name => 'bcbs_id'),
-				new CGI::Dialog::Field(caption => 'Medicare ID', name => 'medicare_id'),
-				new CGI::Dialog::Field(caption => 'CLIA ID', name => 'clia_id'),
+			new CGI::Dialog::Subhead(
+				heading => 'ID Numbers',
+				name => 'ids_heading'),
+			new CGI::Dialog::Field::TableColumn(
+				caption => 'Tax ID',
+				name => 'tax_id',
+				schema => $schema,
+				column => 'Org.tax_id'),
+			new CGI::Dialog::Field(
+				caption => 'Employer ID',
+				name => 'emp_id'),
+			new CGI::Dialog::Field(
+				caption => 'State ID',
+				name => 'state_id'),
+			new CGI::Dialog::Field(
+				caption => 'Medicaid ID',
+				name => 'medicaid_id'),
+			new CGI::Dialog::Field(
+				caption => "Worker's Comp ID",
+				name => 'wc_id'),
+			new CGI::Dialog::Field(
+				caption => 'Blue Cross-Blue Shield ID',
+				name => 'bcbs_id'),
+			new CGI::Dialog::Field(
+				caption => 'Medicare ID',
+				name => 'medicare_id'),
+			new CGI::Dialog::Field(
+				caption => 'CLIA ID',
+				name => 'clia_id'),
 		);
 	}
 	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept')
 	{
 		$self->addContent(
-			new CGI::Dialog::Field(caption => 'HCFA Service Place',
+			new CGI::Dialog::Field(
+				caption => 'HCFA Service Place',
 				name => 'hcfa_service_place',
-				lookup => 'HCFA1500_Service_Place_Code'
-			),
-			new CGI::Dialog::Field(caption => 'Medicare GPCI Location',
+				lookup => 'HCFA1500_Service_Place_Code'),
+			new CGI::Dialog::Field(
+				caption => 'Medicare GPCI Location',
 				name => 'medicare_gpci',
-				findPopup => '/lookup/gpci/state/*/1',
-			),
-			new CGI::Dialog::Field(caption => 'Medicare Facility Pricing',
+				findPopup => '/lookup/gpci/state/*/1',),
+			new CGI::Dialog::Field(
+				caption => 'Medicare Facility Pricing',
 				name => 'medicare_facility_type',
 				type => 'select',
 				style => 'radio',
 				choiceDelim =>',',
-				selOptions => 'Non-Facility:0,Facility:1',
-			),
+				selOptions => 'Non-Facility:0,Facility:1',),
 		);
 	}
 
 	$self->addContent(
-		new CGI::Dialog::Subhead(heading => '', name => ''),
-		new CGI::Dialog::Field(caption => 'Delete record?',
+		new CGI::Dialog::Subhead(
+			heading => '',
+			name => ''),
+		new CGI::Dialog::Field(
+			caption => 'Delete record?',
 			type => 'bool',
 			name => 'delete_record',
 			style => 'check',
@@ -163,8 +236,7 @@ sub initialize
 			readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE),
 	);
 
-	$self->{activityLog} =
-	{
+	$self->{activityLog} = {
 		scope =>'org',
 		key => "#field.org_id#",
 		data => "Organization '#field.org_id#' <a href='/org/#field.org_id#/profile'>#field.name_primary#</a>"
@@ -188,7 +260,7 @@ sub addContentOrgType
 {
 	my ($self, $type) = @_;
 	my $excludeGroups = "''";
-
+	warn ("In addContentOrgType\n");
 	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
@@ -228,9 +300,8 @@ sub addContentOrgType
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-
+	warn ("In makeStateChanges in $command mode\n");
 	my $orgId = $page->param('org_id');
 
 	if($command eq 'update' || $command eq 'remove')
@@ -254,8 +325,8 @@ sub makeStateChanges
 
 	if($orgId && $command eq 'add' && $orgId ne $page->session('org_id'))
 	{
-		$page->field('org_id', $orgId);
-		#$self->setFieldFlags('org_id', FLDFLAG_READONLY);
+			#$page->field('org_id', $orgId);
+			#$self->setFieldFlags('org_id', FLDFLAG_READONLY);		
 	}
 
 	if($command eq 'remove')
@@ -263,11 +334,13 @@ sub makeStateChanges
 		my $deleteRecord = $self->getField('delete_record');
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Organization '$orgId'?");
 	}
+	warn ("Leaving makeStateChanges\n");
 }
 
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	warn ("In popluate data in $command mode\n");
 
 	if($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL)
 	{
@@ -278,17 +351,25 @@ sub populateData
 				/employer/	and do { $page->field('member_name','Employer'); last };
 				/ipa/		and do { $page->field('member_name','IPA'); last };
 			}
-		$page->field('parent_org_id', $page->{session}{org_id});
+		$page->field('parent_org_id', $page->param('org_id'));
 	}
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+ 
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $ownerOrg = $page->session('org_internal_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
 
-	my $orgId = $page->param('org_id');
+	my $orgData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $orgIntId);
+	foreach (keys %$orgData)
+	{
+		$page->field(lc($_), $orgData->{$_});
+	}
+	
+	my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $orgData->{parent_org_id});
+	$page->field('parent_org_id', $parentId);
 
-	$STMTMGR_ORG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
-	my $orgData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
-
-	my $categories = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selCategory', $orgId);
+	my $categories = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selCategory', $orgIntId);
 	my @categories = split(/\s,\s/, $categories);
 	$page->field('member_name', @categories);
 
@@ -298,13 +379,13 @@ sub populateData
 	}
 
 	my $attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'HCFA Service Place',
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'HCFA Service Place',
 		App::Universal::ATTRTYPE_INTEGER
 	);
 	$page->field('hcfa_service_place', $attribute->{value_text});
 
 	$attribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgId, 'Medicare GPCI Location',
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Medicare GPCI Location',
 		App::Universal::ATTRTYPE_TEXT
 	);
 	$page->field('medicare_gpci', $attribute->{value_text});
@@ -314,35 +395,53 @@ sub populateData
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
-
+	warn ("In execute_add about to $command Org record\n");
 	my @members = $page->field('member_name');
-	my $taxId;
-	if ($page->field('tax_id') eq '' && $page->field('parent_org_id') ne '')
-	{
-		my $parentId = $page->field('parent_org_id');
-		my $parentData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $parentId);
-		$taxId = $parentData->{'tax_id'} || undef;
-	}
-
+	my $ownerOrg = $page->session('org_internal_id');
 	my $orgId = $page->field('org_id');
+	my $parentId = $page->field('parent_org_id');
+	if ($parentId)
+	{
+		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $parentId);
+	}
+	my $taxId = $page->field('tax_id');
+	if ($parentId && !$taxId)
+	{
+		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
+	}
+	
 	## First create new Org record
-	$page->schemaAction(
+	my $orgIntId = $page->schemaAction(
 			'Org', $command,
-			org_id => $orgId || undef,
-			parent_org_id => $page->field('parent_org_id') || undef,
-			owner_org_id => $page->session('org_id'),
-			tax_id => $page->field('tax_id') || $taxId,
+			org_id => $orgId,
+			parent_org_id => $parentId,
+			owner_org_id => $ownerOrg,
+			tax_id => $taxId,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
 			category => join(',', @members) || undef,
 			_debug => 0
 		);
+		
+	# Retrieve the new Org's internal ID
+	#my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
+	
+	# Special handling of "Main" orgs
+	if ($self->{orgtype} eq 'main')
+	{
+		$page->schemaAction(
+			'Org', 'update',
+			org_internal_id => $orgIntId,
+			owner_org_id => $orgIntId,
+			_debug => 0
+		);
+	}
 
 	##Then add mailing address
 	$page->schemaAction(
 			'Org_Address', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			address_name => 'Mailing',
 			line1 => $page->field('addr_line1'),
 			line2 => $page->field('addr_line2') || undef,
@@ -360,7 +459,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'HCFA Service Place',
 			value_type => App::Universal::ATTRTYPE_INTEGER || undef,
 			value_text => $page->field('hcfa_service_place') || undef,
@@ -369,7 +468,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_PHONE || undef,
 			value_text => $page->field('phone') || undef,
@@ -378,7 +477,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_FAX || undef,
 			value_text => $page->field('fax') || undef,
@@ -387,7 +486,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_EMAIL || undef,
 			value_text => $page->field('email') || undef,
@@ -396,7 +495,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_URL || undef,
 			value_text => $page->field('internet') || undef,
@@ -406,37 +505,36 @@ sub execute_add
 	##Then add property record for Business Hours
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Business Hours',
 			value_type => defined $generalValueType ? $generalValueType : undef,
 			value_text => $page->field('business_hours') || undef,
 			_debug => 0
 		) if $page->field('business_hours') ne '';
 
-		my $parentId = $page->field('parent_org_id');
-		my $itemNameEmp = '';
-		my $itemName = '';
-		my $empId = '';
-		my $stateId = '';
+	my $itemNameEmp = '';
+	my $itemName = '';
+	my $empId = '';
+	my $stateId = '';
 
-		if ($page->field('emp_id') eq '')
-		{
-			 $itemNameEmp = 'Employer#';
-			 my $parentData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $itemNameEmp);
-			 $empId = $parentData->{'value_text'};
-		}
+	if ($page->field('emp_id') eq '')
+	{
+		 $itemNameEmp = 'Employer#';
+		 my $parentData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $itemNameEmp);
+		 $empId = $parentData->{'value_text'};
+	}
 
-		if ($page->field('state_id') eq  '')
-		{
-			$itemName = 'State#';
-			my $parentData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $itemName);
-			$stateId = $parentData->{'value_text'};
-		}
+	if ($page->field('state_id') eq  '')
+	{
+		$itemName = 'State#';
+		my $parentData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $itemName);
+		$stateId = $parentData->{'value_text'};
+	}
 
 	# Finally, add records for all ID Numbers
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Employer#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('emp_id') ne '' ? $page->field('emp_id') : $empId,
@@ -445,7 +543,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'State#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('state_id') ne '' ? $page->field('state_id') : $stateId,
@@ -454,7 +552,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Medicaid#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('medicaid_id') || undef,
@@ -463,7 +561,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => "Workers Comp#",
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('wc_id') || undef,
@@ -472,7 +570,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'BCBS#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('bcbs_id') || undef,
@@ -481,7 +579,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Medicare#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('medicare_id') || undef,
@@ -490,7 +588,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'CLIA#',
 			value_type => defined $credentialsValueType ? $credentialsValueType : undef,
 			value_text => $page->field('clia_id') || undef,
@@ -499,7 +597,7 @@ sub execute_add
 
 	$page->schemaAction(
 			'Org_Attribute', $command,
-			parent_id => $orgId,
+			parent_id => $orgIntId,
 			item_name => 'Contact Information',
 			value_type => App::Universal::ATTRTYPE_BILLING_PHONE || undef,
 			value_text => $page->field('contact_phone') || undef,
@@ -507,7 +605,7 @@ sub execute_add
 			_debug => 0
 		)if $page->field('contact_phone') ne '';
 
-	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
+	saveAttribute($page, 'Org_Attribute', $orgIntId, 'Medicare GPCI Location', 0,
 		value_text => $page->field('medicare_gpci'),
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
@@ -521,18 +619,28 @@ sub execute_add
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
-
-	my $orgId = $page->field('org_id');
-
+	warn ("In execute_update in $command mode\n");
 	my @members = $page->field('member_name');
-
+	my $orgId = $page->field('org_id');
+	my $ownerOrg = $page->session('org_internal_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
+	my $parentId = $page->field('parent_org_id');
+	if ($parentId)
+	{
+		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $parentId);
+	}
+	my $taxId = $page->field('tax_id');
+	if ($parentId && !$taxId)
+	{
+		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
+	}
+	
 	## First update new Org record
 	$page->schemaAction(
 			'Org', $command,
-			org_id => $orgId,
-			parent_org_id => $page->field('parent_org_id') || undef,
-			owner_org_id => $page->session('org_id'),
-			tax_id => $page->field('tax_id') || undef,
+			org_internal_id => $orgIntId,
+			parent_org_id => $parentId || undef,
+			tax_id => $taxId || undef,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
@@ -540,11 +648,11 @@ sub execute_update
 			_debug => 0
 		);
 
-	saveAttribute($page, 'Org_Attribute', $orgId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
+	saveAttribute($page, 'Org_Attribute', $orgIntId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
 		value_text => $page->field('hcfa_service_place'),
 	);
 
-	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
+	saveAttribute($page, 'Org_Attribute', $orgIntId, 'Medicare GPCI Location', 0,
 		value_text => $page->field('medicare_gpci') || undef,
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
@@ -557,12 +665,14 @@ sub execute_update
 sub execute_remove
 {
 	my ($self, $page, $command, $flags) = @_;
-
+	warn ("In execute_remove in $command mode\n");
 	my $orgId = $page->field('org_id');
+	my $ownerOrg = $page->session('org_internal_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
 
 	$page->schemaAction(
 			'Org', $command,
-			org_id => $orgId,
+			org_internal_id => $orgIntId,
 			_debug => 0
 		);
 
@@ -572,6 +682,7 @@ sub execute_remove
 
 sub saveAttribute
 {
+	warn ("In saveAttribute\n");
 	my ($page, $table, $parentId, $itemName, $valueType, %data) = @_;
 
 	my $recExist = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,

@@ -37,104 +37,172 @@ sub initialize
 
 	$self->heading('$Command Nursing Staff');
 	$self->addContent(
-			new App::Dialog::Field::Person::ID::New(caption => 'Nurse ID',
-							name => 'person_id',
-							options => FLDFLAG_REQUIRED,
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-						postHtml => $postHtml),
-			);
+		new App::Dialog::Field::Person::ID::New(
+			caption => 'Nurse ID',
+			name => 'person_id',
+			options => FLDFLAG_REQUIRED,
+			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			postHtml => $postHtml,
+		),
+	);
+	
+	# Add in the default person fields
 	$self->SUPER::initialize();
+	
 	$self->addContent(
-		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
-
-		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse'),
-
-		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', name=> 'nurse_license', hints => "'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'.",
-					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'RN #', name => 'rn_number'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rn_number_exp_date', defaultValue => ''),
-				new CGI::Dialog::Field(type => 'bool', name => 'check_license', caption => 'License Required',	style => 'check'),
-				]),
-
-		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date1',
+		new CGI::Dialog::Field(
+			type => 'hidden',
+			name => 'nurse_title_item_id',
+		),
+		new CGI::Dialog::Subhead(
+			heading => 'Certification',
+			name => 'cert_for_nurse',
+		),
+		new CGI::Dialog::MultiField(
+			name=> 'nurse_license',
+			hints => "'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'.",
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
+					caption => 'Nursing License',
+					name => 'rn_number',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Exp Date',
+					type=> 'date',
+					name => 'rn_number_exp_date',
+					defaultValue => '',
+				),
+				new CGI::Dialog::Field(
+					caption => 'License Required',
+					type => 'bool',
+					name => 'check_license',
+					style => 'check',
+				),
+			],
+		),
+		new CGI::Dialog::MultiField(
+			name => 'licens_num_date1',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(
+					caption => 'License Certification',
 					type => 'select',
 					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
-					caption => 'License',
 					name => 'license1',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-					),
-				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num1'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license1_exp_date', defaultValue => ''),
-				]),
-
-		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date2',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Number',
+					name => 'license_num1',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Exp Date',
+					type=> 'date',
+					name => 'license1_exp_date',
+					defaultValue => '',
+				),
+			],
+		),
+		new CGI::Dialog::MultiField(
+			name => 'licens_num_date2',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
+					caption => 'License Certification',
 					type => 'select',
 					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
-					caption => 'License',
 					name => 'license2',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-					),
-				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num2'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license2_exp_date', defaultValue => ''),
-				]),
-
-		new CGI::Dialog::MultiField(caption =>'License Certification/Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'licens_num_date3',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Number',
+					name => 'license_num2',
+				),
+				new CGI::Dialog::Field(
+					type=> 'date',
+					caption => 'Exp Date',
+					name => 'license2_exp_date',
+					defaultValue => '',
+				),
+			],
+		),
+		new CGI::Dialog::MultiField(
+			name => 'licens_num_date3',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
+					caption => 'License Certification',
 					type => 'select',
 					selOptions => ';DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification',
-					caption => 'License',
 					name => 'license3',
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-					),
-				new CGI::Dialog::Field(caption => 'Licence Number', name => 'license_num3'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'license3_exp_date', defaultValue => ''),
-				]),
-
-		new CGI::Dialog::MultiField(caption =>'Employee ID/Exp Date',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Number',
+					name => 'license_num3',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Exp Date',
+					type=> 'date',
+					name => 'license3_exp_date',
+					defaultValue => '',
+				),
+			],
+		),
+		new CGI::Dialog::MultiField(
+			name => 'empid_date',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Employee ID', name => 'emp_id'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'emp_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-
-		new CGI::Dialog::Field(caption => 'Associated Physician Name',
-					name => 'value_text',
-					options => FLDFLAG_PREPENDBLANK,
-					fKeyStmtMgr => $STMTMGR_PERSON,
-					fKeyStmt => 'selAssocNurse',
-					fKeyDisplayCol => 1,
-					fKeyValueCol => 0,
-					defaultValue => ''
-					),
-
+				new CGI::Dialog::Field(
+					caption => 'Employee ID',
+					name => 'emp_id',
+				),
+				new CGI::Dialog::Field(
+					caption => 'Exp Date',
+					type=> 'date',
+					name => 'emp_exp_date',
+					futureOnly => 1,
+					defaultValue => '',
+				),
+			],
+		),
 		new CGI::Dialog::Field(
-						type => 'bool',
-						name => 'delete_record',
-						caption => 'Delete record?',
-						style => 'check',
-						invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
-						readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE)
+			caption => 'Associated Physician Name',
+			name => 'value_text',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_PERSON,
+			fKeyStmt => 'selAssocNurse',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+			defaultValue => '',
+		),
+		new CGI::Dialog::Field(
+			caption => 'Delete record?',
+			name => 'delete_record',
+			type => 'bool',
+			style => 'check',
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+			readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE,
+		),
 	);
 
-	$self->addFooter(new CGI::Dialog::Buttons(
-						nextActions_add => [
-							['View Nurse Summary', "/person/%field.person_id%/profile", 1],
-							['Add Another Nurse', '/org/#session.org_id#/dlg-add-nurse'],
-							['Go to Search', "/search/person/id/%field.person_id%"],
-							['Return to Home', "/person/#session.user_id#/home"],
-							['Go to Work List', "person/worklist"],
-							],
-						cancelUrl => $self->{cancelUrl} || undef)
+	$self->addFooter(
+		new CGI::Dialog::Buttons(
+			nextActions_add => [
+				['View Nurse Summary', "/person/%field.person_id%/profile", 1],
+				['Add Another Nurse', '/org/#session.org_id#/dlg-add-nurse'],
+				['Go to Search', "/search/person/id/%field.person_id%"],
+				['Return to Home', "/person/#session.user_id#/home"],
+				['Go to Work List', "person/worklist"],
+			],
+			cancelUrl => $self->{cancelUrl} || undef,
+		),
 
 	);
 
 	return $self;
 }
+
 
 sub makeStateChanges
 {
@@ -149,9 +217,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
 
-
 	my $personId = $page->param('person_id');
-
 
 	if($command eq 'remove')
 	{
@@ -159,12 +225,11 @@ sub makeStateChanges
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Nurse '$personId'?");
 	}
 
-	my $sessOrgId = $page->session('org_id');
-
-	$self->getField('value_text')->{fKeyStmtBindPageParams} = "$sessOrgId";
+	$self->getField('value_text')->{fKeyStmtBindPageParams} = $page->session('org_internal_id');
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
+
 
 sub customValidate
 {
@@ -224,7 +289,6 @@ sub customValidate
 }
 
 
-
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -273,7 +337,7 @@ sub execute_add
 		item_name => 'Physician',
 		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 		value_text => $page->field('value_text') || undef,
-		parent_org_id => $page->session('org_id') || undef,
+		parent_org_id => $page->session('org_internal_id') || undef,
 		_debug => 0
 	);
 

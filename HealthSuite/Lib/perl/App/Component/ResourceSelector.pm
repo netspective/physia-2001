@@ -56,8 +56,8 @@ sub getComponentHtml
 
 	$dialog->addContent($field);
 
-	my $sessOrgId = $page->session('org_id');
-	$dialog->getField('physList')->{fKeyStmtBindPageParams} = $sessOrgId;
+	my $sessOrgInternalId = $page->session('org_internal_id');
+	$dialog->getField('physList')->{fKeyStmtBindPageParams} = $sessOrgInternalId;
 
 	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'));

@@ -84,9 +84,12 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	
 	my $personId = $page->param('person_id');
-	my $orgId    = $page->param('org_id');
 	
-	my $existing = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgId);
+	my $orgId    = $page->param('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+
+	
+	my $existing = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId);
 	if ($existing->{person_id})
 	{
 		$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1);
@@ -141,6 +144,8 @@ sub execute
 	my $password = $page->field('password');
 	my $quantity = $page->field('quantity');
 	
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
 	if ($page->field('have_password'))
 	{
 		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updPersonLogin', 
@@ -149,7 +154,7 @@ sub execute
 	else
 	{
 		$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'insPersonLogin', 
-			$page->session('_session_id'), $page->session('user_id'), $page->session('org_id'), $personId, $orgId, $password, $quantity);
+			$page->session('_session_id'), $page->session('user_id'), $page->session('org_internal_id'), $personId, $orgIntId, $password, $quantity);
 	}
 
 	$page->param('_dialogreturnurl', "/org/@{[$page->param('org_id')]}/personnel");

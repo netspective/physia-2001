@@ -281,7 +281,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		select distinct p.person_id, p.complete_name
 		from person p, person_org_category pcat
 		where p.person_id=pcat.person_id
-			and pcat.org_id= ?
+			and pcat.org_internal_id= ?
 			and category='Physician'
 	},
 	'sel_worklist_associated_physicians' => qq{

@@ -70,8 +70,8 @@ sub execute
 			_debug => 0
 	);
 
-	#$page->redirect("/invoice/$invoiceId/summary");
-	$self->handlePostExecute($page, $command, $flags);
+	$page->redirect("/invoice/$invoiceId/summary");
+	#$self->handlePostExecute($page, $command, $flags);
 
 }
 

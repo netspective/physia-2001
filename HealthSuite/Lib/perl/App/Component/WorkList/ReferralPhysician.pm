@@ -77,7 +77,7 @@ sub initialize
 	my $layoutDefn = $self->{layoutDefn};
 	my $arlPrefix = '/worklist/patientflow';
 
-	my $facility_id = $page->session('org_id');
+	my $facility_id = $page->session('org_internal_id');
 	my $user_id = $page->session('user_id');
 
 	$layoutDefn->{frame}->{heading} = " ";

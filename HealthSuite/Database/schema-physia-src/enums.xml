@@ -33,6 +33,9 @@
 		<enum>Add</enum>
 		<enum>Update</enum>
 		<enum>Remove</enum>
+		<enum>Cancel</enum>
+		<enum>NoShow</enum>
+		<enum>Reschedule</enum>
 	</table>
 
 	<table name="Login_Type" abbrev="LgiType" type="Enumeration">
@@ -247,16 +250,16 @@
 		<enum>Pending</enum>
 		<enum>On Hold</enum>
 		<enum>Submitted</enum>
+		<enum>Transferred</enum>
 		<enum>Approved Internal</enum>
 		<enum>Rejected Internal</enum>
-		<enum>Transferred</enum>
-		<enum>Rejected External</enum>
-		<enum>Approved External</enum>
 		<enum>Electronically Transmitted to Carrier</enum>
 		<enum>Transmitted to Carrier via Paper</enum>
+		<enum>Approved External</enum>
+		<enum>Rejected External</enum>
 		<enum>Awaiting Payment</enum>
-		<enum>Appealed</enum>
 		<enum>Payments Applied</enum>
+		<enum>Appealed</enum>
 		<enum>Closed</enum>
 		<enum>Void</enum>
 	</table>
@@ -265,14 +268,6 @@
 		<enum>Payment</enum>
 		<enum>Refund</enum>
 		<enum>Transfer</enum>
-	</table>
-
-	<table name="Payment_Type" abbrev="PayTyp" type="Enumeration">
-		<enum>Pre-payment</enum>
-		<enum>Deductible</enum>
-		<enum>Post-payment</enum>
-		<enum>Denied</enum>
-		<enum>COB</enum>
 	</table>
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">

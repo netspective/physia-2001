@@ -5,21 +5,30 @@ package App::Statements::Search::Gpci;
 use strict;
 use Data::Publish;
 use DBI::StatementManager;
-
+use App::Universal;
 use base 'Exporter';
 use base 'DBI::StatementManager';
-
 use vars qw(@EXPORT $STMTMGR_GPCI_SEARCH);
 @EXPORT = qw($STMTMGR_GPCI_SEARCH);
 
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 my $BASE_SQL = qq{
-	select gpci_id, to_char(eff_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
-	to_char(eff_end_date, '$SQLSTMT_DEFAULTDATEFORMAT'), locality_name, state, county
-	from Ref_Gpci
-	%whereCond%
-		and eff_begin_date <= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-		and eff_end_date >= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-	order by state, locality_name
+	SELECT
+		gpci_id,
+		TO_CHAR(eff_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
+		TO_CHAR(eff_end_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
+		locality_name,
+		state,
+		county
+	FROM ref_gpci
+	WHERE
+		%whereCond%
+		AND eff_begin_date <= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+		AND eff_end_date >= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+	ORDER BY
+		state,
+		locality_name
 };
 
 my $PUBLISH_DEFN = {
@@ -39,45 +48,49 @@ $STMTMGR_GPCI_SEARCH = new App::Statements::Search::Gpci(
 	'sel_GPCI_state' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'where ltrim(rtrim(upper(state))) like upper(?)',
+		whereCond => 'LTRIM(RTRIM(UPPER(state))) LIKE UPPER(?)',
 		publishDefn => $PUBLISH_DEFN,
 	},
 	
 	'sel_GPCI_locality' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'where upper(locality_name) like upper(?)',
+		whereCond => 'UPPER(locality_name) LIKE UPPER(?)',
 		publishDefn => $PUBLISH_DEFN,
 	},
 
 	'sel_GPCI_carrierNo' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'where upper(carrier_number) like upper(?)',
+		whereCond => 'UPPER(carrier_number) LIKE UPPER(?)',
 		publishDefn => $PUBLISH_DEFN,
 	},
 
 	'sel_GPCI_county' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'where upper(county) like upper(?)',
+		whereCond => 'UPPER(county) LIKE UPPER(?)',
 		publishDefn => $PUBLISH_DEFN,
 	},
 	
 	'sel_GPCI_id' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'where gpci_id = ?',
+		whereCond => 'gpci_id = ?',
 		publishDefn => $PUBLISH_DEFN,
 	},
 	
 	'sel_stateForOrg' => qq{
-		select caption from States, Org_Address
-		where parent_id = ?
-			and address_name in ('Street', 'Shipping', 'Mailing')
-			and ltrim(rtrim(States.abbrev)) = ltrim(rtrim(Org_Address.state))
+		SELECT caption
+		FROM
+			states,
+			org_address
+		WHERE
+			parent_id = ?
+			AND address_name IN ('Street', 'Shipping', 'Mailing')
+			AND LTRIM(RTRIM(states.abbrev)) = LTRIM(RTRIM(org_address.state))
+			AND rownum <= $LIMIT
 	},
-	
 );
 
 1;

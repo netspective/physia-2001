@@ -70,7 +70,7 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $sessOrg = $page->session('org_id');
+	my $sessOrg = $page->session('org_internal_id');
 	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 
 	#Set attendee_id field and make it read only if person_id exists
@@ -266,7 +266,7 @@ sub addTransactionAndInvoice
 
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $timeStamp = $page->getTimeStamp();
-	my $sessOrg = $page->session('org_id');
+	my $sessOrg = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 
 	# Constants -----------------------------------------------------------------
@@ -522,7 +522,7 @@ sub customValidate
 
 	if($payerType eq 'person')
 	{
-		my $createHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$payer');";
+		my $createHref = "javascript:doActionPopup('/org-p/#session.org_internal_id#/dlg-add-guarantor/$payer');";
 		$payerField->invalidate($page, qq{
 			Person Id '$payer' does not exist.<br>
 			<img src="/resources/icons/arrow_right_red.gif">
@@ -532,7 +532,7 @@ sub customValidate
 	}
 	elsif($payerType eq 'org')
 	{
-		my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
+		my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_internal_id#/dlg-add-org-";
 		my $createOrgHrefPost = "/$payer');";
 
 		$payerField->invalidate($page, qq{

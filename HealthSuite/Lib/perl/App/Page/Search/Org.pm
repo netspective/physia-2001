@@ -85,7 +85,7 @@ sub execute
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_ORG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName",
-			[uc($expression), $self->session('org_id')]
+			[uc($expression), $self->session('org_internal_id')]
 			),
 		'</CENTER>'
 		);

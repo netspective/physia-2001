@@ -6,27 +6,35 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use vars qw(@ISA);
-
 use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $ITEMNAME_PATH $STMTFMT_SEL_PERSON $STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_PERSON_SEARCH);
 
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 $ITEMNAME_PATH = 'Home';
 $STMTFMT_SEL_PERSON = qq{
-			select	per.person_id, per.simple_name as name, per.ssn,
-					to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
-					att.value_text as value_text,
-					cat.category
-			from 	person per, person_org_category cat, person_attribute att
-			where	per.person_id = cat.person_id(+)
-					and per.person_id = att.parent_id(+)
-					and att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
-					and att.item_name(+) = '$ITEMNAME_PATH'
-					and cat.org_id = ?
-					and %whereCond%
-					%catCond%
-			%orderBy%
+	SELECT
+		per.person_id,
+		per.simple_name AS name,
+		per.ssn,
+		TO_CHAR(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
+		att.value_text AS value_text,
+		cat.category
+	FROM
+		person per,
+		person_org_category cat,
+		person_attribute att
+	WHERE
+		per.person_id = cat.person_id(+)
+		AND per.person_id = att.parent_id(+)
+		AND att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
+		AND att.item_name(+) = '$ITEMNAME_PATH'
+		AND cat.org_internal_id = ?
+		AND %whereCond%
+		%catCond%
+		AND rownum <= $LIMIT
+	%orderBy%
 };
 
 $STMTRPTDEFN_DEFAULT =

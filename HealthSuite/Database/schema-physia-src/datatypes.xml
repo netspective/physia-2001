@@ -44,7 +44,7 @@
 	<tabletype name="Audit">
 		<column name="cr_stamp" type="stamp" default="sysdate" required="dbms" group="audit" descr="Date/time record was created"/>
 		<column name="cr_user_id" type="entity_id" group="audit" descr="The user that created the record"/>
-		<column name="cr_org_id" type="entity_id" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
+		<column name="cr_org_internal_id" type="longint" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
 		<column name="version_id" type="version_id" required="dbms" unique="yes" group="audit" descr="A unique version number for this record (for audit purposes)"/>
 	</tabletype>
 
@@ -111,7 +111,7 @@
 		<description>Usage table for tracking number of reads/writes of a particular record in the parent table.</description>
 		<column name="parent_id" parentref="$parentref$" indexed="yes" uniquegrp="key" descr="The owner of the usage information"/>
 		<column name="person_id" lookupref="Person.person_id" indexed="yes" uniquegrp="key" descr="Specific person for which usage is being tracked"/>
-		<column name="org_id" lookupref="Org.org_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
 		<column name="read_count" type="integer" descr="The number of times the parent_id has been read by person_id"/>
 		<column name="write_count" type="integer" descr="The number of times the parent_id has been written by person_id"/>
 	</tabletype>
@@ -128,7 +128,7 @@
 		<table name="$parenttbl_name$_$parentcol_Name$" abbrev="$parenttbl_abbrev$$parentcol_abbrev$">
 			<parent>$parenttbl_name$</parent>
 			<column name="parent_id" usetype="$parenttbl_name$.$parenttbl_prikey$" indexed="yes" uniquegrp="member" descr="The owner of the set member (this SHOULD be a foreign key, but causes a mutating trigger problem)"/>
-			<column name="org_id" lookupref="Org.org_id" indexed="yes" uniquegrp="member" descr="Specific organization to which member belongs"/>
+			<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="member" descr="Specific organization to which member belongs"/>
 			<column name="member_name" indexed="yes" uniquegrp="member" type="text" size="32" cache="extract:$parenttbl_name$.$parentcol_name$" descr="The set member name"/>
 		</table>
 		<assert check="parentTblHasSinglePrimaryKey"/>

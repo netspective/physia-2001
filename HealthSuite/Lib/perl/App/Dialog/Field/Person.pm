@@ -61,6 +61,7 @@ use strict;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
@@ -184,13 +185,26 @@ sub isValid
 					$invMsg .= qq{<a href="$createPersonHref">$types</a> }
 				}
 			}
-			$self->invalidate($page, $invMsg)unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value));
+			
+			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
+			{
+				if ((my $category = $self->{types}->[0]) ne 'Patient')
+				{
+					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
+						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
+						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
+				}
+			}
+			else
+			{
+				$self->invalidate($page, $invMsg);
+			}
 		}
 		else
-		{
-			my $orgId = ($page->param('org_id') ne '') ? $page->param('org_id') : $page->session('org_id');
+		{			
+			my $orgIntId = $page->session('org_internal_id');
 			$self->invalidate($page, "You do not have permission to select people outside of your organization.")
-				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgId);
+			unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgIntId) ;
 		}
 	}
 

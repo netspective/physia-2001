@@ -108,7 +108,7 @@ sub execute
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $personId = $page->field('resp_party_id');
-	my $orgId = $page->session('org_id');
+	my $intOrgId = $page->session('org_internal_id');
 
 	$page->schemaAction(
 			'Person', $command,
@@ -154,7 +154,7 @@ sub execute
 			'Person_Org_Category', $command,
 			person_id => $personId || undef,
 			category => 'Guarantor' || undef,
-			org_id => $orgId || undef,
+			org_internal_id => $intOrgId || undef,
 			_debug => 0
 		);
 

@@ -957,6 +957,53 @@
 		</data>
 	</table>
 
+	<table name="Payment_Type" abbrev="PayTyp" type="Type_Definition">
+		<description>
+			List of all payment types (those items specific to Insurance payments are in the group 'insurance').
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Pre-payment</col>
+				<col name="group_name">personal</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Deductible</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Post-payment</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Denied</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">COB</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Copay Pre-paid</col>
+				<col name="group_name">personal</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Coverage Terminated</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Past File Deadline</col>
+				<col name="group_name">insurance</col>
+			</row>
+		</data>
+	</table>
+
 	<table name="Claim_Type" abbrev="ClmTyp" type="Type_Definition">
 		<description>
 			List of all claim and insurance types (those items specific to Insurance types are in the group 'insurance').

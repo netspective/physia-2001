@@ -37,7 +37,7 @@ sub new
 	$self->addContent(
 		#new CGI::Dialog::MultiField(caption => 'Workers Comp Plan ID/Employee Workers Comp Plan ID', name => 'ins_plan',
 		#			fields => [
-		#						new App::Dialog::Field::Insurance::WorkersComp::ID(caption => 'Workers Compensation Plan ID', name => 'ins_id'),
+		#						#new App::Dialog::Field::Insurance::WorkersComp::ID(caption => 'Workers Compensation Plan ID', name => 'ins_id'),
 								#new CGI::Dialog::Field(caption => 'Employee Work Comp Plans',
 								#		type => 'foreignKey',
 								#		name => 'emp_plan',
@@ -45,7 +45,7 @@ sub new
 								#		fKeySelCols => "distinct ins.ins_id",
 								#		fKeyDisplayCol => 0,
 								#		fKeyValueCol => 0
-										#fKeyWhere => "patt.item_name like 'Association/Employment/%' and patt.value_text=ins.ins_org_id and ins.record_type = '6'"
+										#fKeyWhere => "patt.item_name like 'Association/Employment/%' and patt.value_int=ins.ins_org_id and ins.record_type = '6'"
 								#		)
 		#				]));
 

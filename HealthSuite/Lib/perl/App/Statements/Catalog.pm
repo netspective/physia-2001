@@ -19,6 +19,12 @@ my $SEL_CATALOG_ENTRY = qq{
 };
 
 $STMTMGR_CATALOG = new App::Statements::Catalog(
+	'selInternalCatalogIdById' => qq
+	{
+		select * from Offering_catalog
+		where org_internal_id = ? 
+		and catalog_id = ?
+	},
 	'selCatalogById' => qq{
 		select *
 		from offering_catalog
@@ -27,17 +33,17 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'sel_internalCatId_orgId' => qq{
 		select * from Offering_Catalog
 		where internal_catalog_id = ?
-			and org_id = ?
+			and org_internal_id = ?
 	},
 	'sel_catalog_by_id_orgId' => qq{
 		select * from Offering_catalog
 		where catalog_id = ?
-			and org_id = ?
+			and org_internal_id = ?
 	},
 	'selParentCatalogByOrgId' => q{
 		select *
 		from offering_catalog
-		where org_id = ?
+		where org_internal_id = ?
 			and parent_catalog_id is NULL
 	},
 	'selChildrenCatalogs' => q{
@@ -67,7 +73,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		select oce.catalog_id, oce.parent_entry_id, oce.entry_type, oce.code, oce.modifier, oce.default_units,
 				oce.unit_cost, oce.taxable
 		from offering_catalog oc, offering_catalog_entry oce
-		where oc.org_id = ?
+		where oc.org_internal_id = ?
 			and oc.catalog_id = oce.catalog_id
 			and oce.cost_type != 0
 			and oce.entry_type in (0,100)
@@ -84,6 +90,14 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		select *
 		from offering_catalog_entry
 		where entry_id = ?
+	},
+	'selCatalogItemNameById' => q{
+			select oce.flags,oce.units_avail,oce.entry_type, oce.name, oce.description,
+						oce.unit_cost, oce.data_text,
+						oc.catalog_id as catalog_id,oce.code,oce.modifier
+						from offering_catalog oc, offering_catalog_entry oce
+						where oce.entry_id = ?						
+			and oc.internal_catalog_id = oce.catalog_id
 	},
 	'selGenericCPT_LikeCode' => q{
 		select cpt, name, description
@@ -140,6 +154,16 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from HCFA1500_Service_Place_Code
 		where id = ?
 	},
+	'selGenericServicePlaceById' => q{
+		select abbrev
+		from HCFA1500_Service_Place_Code
+		where id = ?
+	},
+	'selGenericServicePlaceByAbbr' => q{
+		select id
+		from HCFA1500_Service_Place_Code
+		where abbrev = ?
+	},
 	'selGenericServicePlace' => q{
 		select caption
 		from HCFA1500_Service_Place_Code
@@ -150,10 +174,15 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from HCFA1500_Service_Type_Code
 		where id = ?
 	},
+	'selGenericServiceTypeById' => q{
+		select abbrev
+		from HCFA1500_Service_Type_Code
+		where id = ?
+	},
 	'selGenericServiceTypeByAbbr' => q{
-			select id
-			from HCFA1500_Service_Type_Code
-			where abbrev = ?
+		select id
+		from HCFA1500_Service_Type_Code
+		where abbrev = ?
 	},
 	'selGenericServiceType' => q{
 		select caption
@@ -191,7 +220,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selTop15CPTsByORG' => q{
 		select distinct(parent_id), read_count
 		from REF_CPT_Usage
-		where org_id = ?
+		where org_internal_id = ?
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
@@ -199,7 +228,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selTop15ICDsByORG' => q{
 		select distinct(parent_id), read_count
 		from REF_ICD_Usage
-		where org_id = ?
+		where org_internal_id = ?
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc

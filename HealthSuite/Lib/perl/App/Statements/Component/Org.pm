@@ -55,16 +55,16 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#4#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
 
 'org.contactMethodsAndAddresses' => {
-	sqlStmt => $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES,
+	sqlStmt => $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG,
 		sqlvar_entityName => 'Org',
 		sqlStmtBindParamDescr => ['Org ID for Attribute Table', 'Org ID for Address Table'],
 		publishDefn => $PUBLDEFN_CONTACTMETHOD_DEFAULT,
@@ -105,10 +105,15 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#5#/#3#?home=#param.home#',
 			},
 		},
-		publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses', [$orgId,$orgId]); },
-		publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses', [$orgId,$orgId], 'panel'); },
-		publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses', [$orgId,$orgId], 'panelTransp'); },
-		publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses', [$orgId,$orgId], 'panelEdit'); },
+		publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses',
+		[$page->param('org_id'),$page->session('org_internal_id')]); },
+		publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses',
+		[$page->param('org_id'),$page->session('org_internal_id')],'panel'); },
+		publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses',
+		[$page->param('org_id'),$page->session('org_internal_id')],'panelTransp'); },
+		publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses',
+		[$page->param('org_id'),$page->session('org_internal_id')] ,
+		 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +123,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		select 	trans_id, trans_type, caption, detail
 		from 	transaction
 		where	trans_owner_type = 1
-		and 	trans_owner_id = ?
+		and 	trans_owner_id =
+		(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+		)
 		and	trans_type between 8000 and 8999
 		and	trans_status = 2
 		order by trans_begin_stamp desc
@@ -160,19 +170,21 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#1#/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
 
 'org.generalInformation' => {
 	sqlStmt => qq{
-		select 	name_primary, name_trade, category, tax_id, org_id
+		select 	name_primary, name_trade, category, tax_id, org_id, org_internal_id
 		from 	org
-		where 	org_id = ?
+		where owner_org_id = :2 AND
+		org_id = :1
+		)
 		},
 	sqlStmtBindParamDescr => ['Org ID for Org Table'],
 	publishDefn => {
@@ -211,10 +223,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-org/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-org/#4#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -223,7 +235,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmt => qq{
 		select  value_type, item_id, item_name, value_text
 		from 	org_attribute
-		where	parent_id = ?
+		where	parent_id =
+		(select org_internal_id
+						from org
+						where owner_org_id = :2 AND
+						org_id = :1
+		)
 		and 	value_type = @{[ App::Universal::ATTRTYPE_CREDENTIALS ]}
 		},
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
@@ -262,10 +279,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 
@@ -273,11 +290,16 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.departments' => {
 	sqlStmt => qq{
-		select 	ocat.parent_id, org.name_primary, org.parent_org_id, org.org_id
+		select 	ocat.parent_id, org.name_primary, org.parent_org_id, org.org_id, org.org_internal_id
 		from 	org org, org_category ocat
-		where 	org.parent_org_id = ?
+		where 	org.parent_org_id =
+		(select org_internal_id
+				from org
+				where owner_org_id = :2 AND
+				org_id = :1
+		)
 		and 	ocat.member_name = 'Department'
-		and 	ocat.parent_id = org.org_id
+		and 	ocat.parent_id = org.org_internal_id
 		},
 	sqlStmtBindParamDescr => ['Org ID for Org Table'],
 	publishDefn => {
@@ -316,10 +338,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-org-dept/#3#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -328,7 +350,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmt => qq{
 			select 	item_id, value_type, item_name, value_text
 			from 	org_attribute
-			where	parent_id = ?
+			where	parent_id =
+			(select org_internal_id
+				from org
+				where owner_org_id = :2 AND
+				org_id = :1
+			)
 			and 	value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
 		},
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
@@ -367,19 +394,24 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
 
 'org.personnel' => {
 	sqlStmt => qq{
-			select 	p.complete_name, pa.category, pa.person_id, pa.org_id
+			select 	p.complete_name, pa.category, pa.person_id, pa.org_internal_id, pa.org_internal_id
 			from 	person_org_category pa, person p
-			where	pa.org_id = ?
+			where	pa.org_internal_id =
+				(select org_internal_id
+							from org
+							where owner_org_id = :2 AND
+							org_id = :1
+				)
 				and pa.category <> 'Patient'
 				and pa.category <> 'Guarantor'
 				and	p.person_id = pa.person_id
@@ -426,10 +458,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#3#/personnel', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=/org/#3#/personnel',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId] ); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$page->param('org_id'),$page->session('org_internal_id')] ); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 
@@ -437,10 +469,15 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.associatedResourcesStats' => {
 	sqlStmt => qq{
-			select 	category, count(category), org_id
+			select 	category, count(category), org_internal_id
 			from 	person_org_category
-			where	org_id = ?
-			group by category, org_id
+			where	org_internal_id =
+			(select org_internal_id
+						from org
+						where owner_org_id = :2 AND
+						org_id = :1
+			)
+			group by category, org_internal_id
 		},
 	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
 	publishDefn => {
@@ -479,10 +516,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		#	updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#param.home#',
 		#},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$orgId] ); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats',[$page->param('org_id'),$page->session('org_internal_id')] ); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 
@@ -493,7 +530,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			select 	oc.catalog_id, oc.caption, count(oce.entry_id)
 			from	offering_catalog oc, offering_catalog_entry oce
 			where	oc.catalog_id = oce.catalog_id (+)
-			and	oc.org_id = ?
+			and	oc.org_internal_id =
+			(select org_internal_id
+				from org
+				where owner_org_id = :2 AND
+				org_id = :1
+			)
 			group by oc.catalog_id, oc.caption, oc.description, oc.parent_catalog_id
 			order by oc.caption
 		},
@@ -534,10 +576,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-catalog/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -547,7 +589,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			select 	oce.entry_id, oce.catalog_id, oce.code, oce.unit_cost
 			from 	offering_catalog_entry oce, offering_catalog oc
 			where	oc.catalog_id = oce.catalog_id
-			and	oc.org_id = ?
+			and	oc.org_internal_id =
+			(select org_internal_id
+				from org
+				where owner_org_id = :2 AND
+				org_id = :1
+			)
 			order by oce.entry_type, oce.status, oce.name, oce.code
 		},
 	sqlStmtBindParamDescr => ['Org ID for offering catalog Table'],
@@ -587,10 +634,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-catalog-item/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 
@@ -599,12 +646,21 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.insurancePlans' => {
 	sqlStmt => qq{
 			select o.ins_internal_id, o.parent_ins_id, o.product_name,  decode(o.record_type, 1, 'product', 2, 'plan', 3, 'coverage') as record_type,
-					o.plan_name, o.owner_org_id, o.owner_org_id, cm.caption, o.ins_type,
-					o.indiv_deductible_amt, o.family_deductible_amt, o.percentage_pay, o.copay_amt
-			from insurance o, claim_type cm
+					o.plan_name, o.ins_internal_id, o.owner_org_id, cm.caption, o.ins_type,
+					o.indiv_deductible_amt, o.family_deductible_amt, o.percentage_pay, o.copay_amt, b.org_id
+			from insurance o, claim_type cm, org b
 			where o.record_type in (1, 2)
 			and ins_type = cm.id
-			and o.ins_org_id = ?
+			and b.org_id = (select org_id
+						from org
+						where org_internal_id = o.ins_org_id
+					)
+			and o.ins_org_id =
+			(select org_internal_id
+							from org
+							where owner_org_id = :2 AND
+							org_id = :1
+			)
 		},
 	#sqlStmt => qq{
 	#		select 	o.plan_name, o.group_number,
@@ -612,14 +668,14 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	#			decode(o.record_type, 0, 'ins-', 1, 'ins-', 2, 'ins-', 3, 'ins-', 4, 'ins-', 5, 'ins-')||o.record_type as test
 	#		from 	insurance o, claim_type ct
 	#		where	ct.id = o.ins_type
-	#		and	o.ins_org_id = ?
+	#		and	o.ins_org_internal_id = ?
 	#		and	o.record_type in (0,1,2,3,4,5)
 	#		and	o.ins_type != 6
 	#		UNION ALL
-	#		select 	o.plan_name, o.product_name, o.ins_org_id, o.ins_internal_id, decode(o.record_type, 5, 'ins-')||o.record_type as test
+	#		select 	o.plan_name, o.product_name, o.ins_org_id, o.ins_org_internal_id, o.ins_internal_id, decode(o.record_type, 5, 'ins-')||o.record_type as test
 	#		from 	insurance o, claim_type ct
 	#		where	ct.id = o.ins_type
-	#		and	o.ins_org_id = ?
+	#		and	o.ins_org_internal_id = ?
 	#		and	o.record_type = 5
 	#		and	o.ins_type = 6
 	#		UNION ALL
@@ -636,7 +692,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table','Org ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #6#, (#7#)' },
+			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #13# (#7#)' },
 			#{ head => 'Plan', dataFmt => '#2# (#1#)' },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=/#param.arl#',
@@ -693,10 +749,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-ins-#3#/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHierHtml($page, $flags, ['org.insurancePlans', 0, 1], [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHierHtml($page, $flags, ['org.insurancePlans', 0, 1],  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -705,7 +761,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmt => qq{
 			select  rule_id, start_age, end_age, diagnoses, measure, directions, src_begin_date, src_end_date
 			from 	Hlth_Maint_Rule
-			where 	org_id = ?
+			where 	org_internal_id =
+			(select org_internal_id
+				from org
+				where owner_org_id = :2 AND
+				org_id = :1
+			)
 		},
 	sqlStmtBindParamDescr => ['Org ID for HealthMaintenanceRule'],
 	publishDefn => {
@@ -742,10 +803,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-health-rule/#0#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule', [$orgId]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule', [$orgId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule', [$orgId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule', [$orgId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
 },
 
 

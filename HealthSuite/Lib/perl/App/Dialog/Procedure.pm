@@ -343,15 +343,16 @@ sub storeFacilityInfo
 	##billing facility information
 	my $billFacilityId = $mainTransData->{billing_facility_id};
 	my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
-	my $billingFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $billFacilityId);
+	my $billingFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billFacilityId);
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
 			item_name => 'Service Provider/Facility/Billing',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $billingFacilityName || undef,
-			value_textB => $billFacilityId || undef,
+			value_text => $billingFacilityInfo->{name_primary} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
 			_debug => 0
 		);
 
@@ -369,16 +370,17 @@ sub storeFacilityInfo
 
 	##SERVICE FACILITY INFORMATION
 	my $servFacilityId = $mainTransData->{service_facility_id};
-	my $serviceFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
-	my $serviceFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $servFacilityId);
+	my $serviceFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
+	my $serviceFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $servFacilityId);
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
 			item_name => 'Service Provider/Facility/Service',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $serviceFacilityName || undef,
-			value_textB => $servFacilityId || undef,
+			value_text => $serviceFacilityInfo->{name_primary} || undef,
+			value_textB => $serviceFacilityInfo->{org_id} || undef,
+			value_int => $servFacilityId || undef,
 			_debug => 0
 		);
 
@@ -386,11 +388,11 @@ sub storeFacilityInfo
 			'Invoice_Address', $command,
 			parent_id => $invoiceId,
 			address_name => 'Service',
-			line1 => $serviceFacility->{line1} || undef,
-			line2 => $serviceFacility->{line2} || undef,
-			city => $serviceFacility->{city} || undef,
-			state => $serviceFacility->{state} || undef,
-			zip => $serviceFacility->{zip} || undef,
+			line1 => $serviceFacilityAddr->{line1} || undef,
+			line2 => $serviceFacilityAddr->{line2} || undef,
+			city => $serviceFacilityAddr->{city} || undef,
+			state => $serviceFacilityAddr->{state} || undef,
+			zip => $serviceFacilityAddr->{zip} || undef,
 			_debug => 0
 		);
 }
@@ -774,7 +776,7 @@ sub storeInsuranceInfo
 			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
 			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
 			
-			my $thirdPartyName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $thirdPartyId);
+			my $thirdPartyInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
 			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $insIntId);
 			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $insIntId);
 
@@ -783,8 +785,9 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => 'Third-Party/Org/Name',
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $thirdPartyName || undef,
-					value_textB => $thirdPartyId || undef,
+					value_text => $thirdPartyInfo->{name_primary} || undef,
+					value_textB => $thirdPartyInfo->{org_id} || undef,
+					value_int => $thirdPartyId || undef,
 					_debug => 0
 				);
 		
@@ -859,14 +862,15 @@ sub storeInsuranceInfo
 			my $parentInsId = $personInsur->{parent_ins_id};
 
 			#Basic Insurance Information --------------------
-			my $insOrgName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $insOrgId);
+			my $insOrgInfo = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selRegistry', $insOrgId);
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insOrgName || undef,
-					value_textB => $insOrgId || undef,
+					value_text => $insOrgInfo->{name_primary} || undef,
+					value_textB => $insOrgInfo->{org_id} || undef,
+					value_int => $insOrgId || undef,
 					_debug => 0
 				);
 
@@ -1385,7 +1389,7 @@ sub execute_addOrUpdate
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $invoiceId = $page->param('invoice_id');
@@ -1415,8 +1419,8 @@ sub execute_addOrUpdate
 	## run increment usage in intellicode
 	if($command ne 'remove')
 	{
-		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
-		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
+		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrgIntId);
+		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrgIntId);
 	}
 
 	## figure out diag code pointers
@@ -1437,6 +1441,11 @@ sub execute_addOrUpdate
 	my $cptCode = $page->field('procedure');
 	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
+	my $servPlace = $page->field('servplace');
+	my $servType = $page->field('servtype');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace);
+	my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
+
 	$page->schemaAction(
 			'Invoice_Item', $command,
 			item_id => $itemId || undef,
@@ -1453,8 +1462,8 @@ sub execute_addOrUpdate
 			emergency => defined $emg ? $emg : undef,
 			comments => $comments || undef,
 			#reference => $page->field('reference') || undef,
-			hcfa_service_place => $page->field('servplace') || undef,
-			hcfa_service_type => $page->field('servtype') || 'NULL',
+			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,
+			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,
 			service_begin_date => $page->field('service_begin_date') || undef,
 			service_end_date => $page->field('service_end_date') || undef,
 			data_text_a => join(', ', @diagCodePointers) || undef,
@@ -1526,6 +1535,9 @@ sub voidProcedure
 	my $itemBalance = $extCost + $invItem->{total_adjust};
 	my $emg = $invItem->{emergency};
 	my $cptCode = $invItem->{code};
+	my $servPlace = $invItem->{hcfa_service_place};
+	my $servType = $invItem->{hcfa_service_type};
+
 	my $voidItemId = $page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_item_id => $itemId || undef,
@@ -1542,8 +1554,8 @@ sub voidProcedure
 			balance => defined $itemBalance ? $itemBalance : undef,
 			emergency => defined $emg ? $emg : undef,
 			#comments => $comments || undef,
-			hcfa_service_place => $invItem->{hcfa_service_place} || undef,
-			hcfa_service_type => $invItem->{hcfa_service_type} || 'NULL',
+			hcfa_service_place => defined $servPlace ? $servPlace : undef,
+			hcfa_service_type => defined $servType ? $servType : undef,
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,

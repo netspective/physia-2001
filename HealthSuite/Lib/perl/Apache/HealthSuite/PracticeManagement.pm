@@ -7,6 +7,7 @@ use Apache;
 use Apache::Constants qw(:common);
 use CGI qw(:standard);
 use App::ResourceDirectory;
+use CGI::Carp qw(fatalsToBrowser);
 
 sub handler
 {
@@ -17,16 +18,17 @@ sub handler
 	eval {
 		my $arl;
 		$arl = $1 if $ENV{REQUEST_URI} =~ /^\/?(.*)$/;
-		$arl = "search" unless $arl;
+		#$arl = "search" unless $arl;
 		App::ResourceDirectory::handleARL($arl);
 		return OK;
 	};
 
 	if ($@ && $DEBUG)
 	{
+		my $msg = "<h1>Perl Runtime Errors:</h1><font color=red>$@</font>";
 		$r->content_type('text/html');
-    		$r->send_http_header();
-    		$r->print("<h1>Perl Runtime Errors:</h1><font color=red>$@</font>");
+   		$r->send_http_header();
+   		$r->print($msg);
 	}
 }
 
@@ -42,6 +44,7 @@ use CGI::Page;
 sub handler
 {
 	# Pre-fetch iSyndicate news articles
+	warn ("$$ BEGIN Fetching news articles\n");
 	my $news;
 	$news = new App::Component::News(
 		id => 'news-top',
@@ -55,9 +58,12 @@ sub handler
 		source => 'healthnews',
 	);
 	$news->getNews();
+	warn ("$$ DONE Fetching news articles\n");
 
 	# Pre-connect to the database
+	warn ("$$ BEGIN Pre-Connecting to the database\n");
 	my $page = new CGI::Page;
+	warn ("$$ END Pre-Connecting to the database\n");
 }
 
 

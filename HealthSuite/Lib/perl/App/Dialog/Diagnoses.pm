@@ -51,7 +51,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $invoiceId = $page->param('invoice_id');
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntID = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
@@ -59,7 +59,7 @@ sub execute
 
 	my @claimDiags = split(/\s*,\s*/, $page->field('diagcodes'));
 
-	App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrg);
+	#App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrgIntID);
 
 	$page->schemaAction(
 			'Invoice', 'update',

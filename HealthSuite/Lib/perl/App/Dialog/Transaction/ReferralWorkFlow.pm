@@ -17,7 +17,6 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = ( 'referralworkflow' => {});
-					
 
 sub initialize
 {

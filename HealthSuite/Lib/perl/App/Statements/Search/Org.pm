@@ -5,28 +5,43 @@ package App::Statements::Search::Org;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use vars qw(@ISA);
-
-use vars qw(@ISA @EXPORT $STMTMGR_ORG_SEARCH $STMTRPTDEFN_DEFAULT);
+use App::Universal;
+use vars qw(@ISA @EXPORT $STMTMGR_ORG_SEARCH $STMTRPTDEFN_DEFAULT
+	$STMTFMT_SEL_ORG $STMTFMT_SEL_ORG_CAT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_ORG_SEARCH);
-use vars qw($STMTFMT_SEL_ORG $STMTFMT_SEL_ORG_CAT);
+
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 $STMTFMT_SEL_ORG = qq{
-			select distinct o.org_id, o.name_primary, o.category, decode(t.group_name, 'other', 'main', t.group_name)
-			from org o, org_category cat, org_type t
-			where
-				cat.parent_id = o.org_id and
-				cat.member_name = t.caption and
-				cat.member_name = (
-					select caption from org_type
-					where id = (
-						select min(id)
-						from org_type, org_category
-						where parent_id = o.org_id and caption = member_name
-					)
-				) and
-				%whereCond% and owner_org_id = ?
+	SELECT
+		DISTINCT o.org_id,
+		o.name_primary,
+		o.category,
+		DECODE(t.group_name, 'other', 'main', t.group_name)
+	FROM
+		org o,
+		org_category cat,
+		org_type t
+	WHERE
+		cat.parent_id = o.org_internal_id
+		AND	cat.member_name = t.caption
+		AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+				SELECT MIN(id)
+				FROM
+					org_type,
+					org_category
+				WHERE
+					parent_id = o.org_internal_id
+					AND caption = member_name
+			)
+		) 
+		AND	%whereCond%
+		AND owner_org_id = ?
+		AND rownum <= $LIMIT
 };
 
 $STMTRPTDEFN_DEFAULT =
@@ -43,37 +58,37 @@ $STMTMGR_ORG_SEARCH = new App::Statements::Search::Org(
 	'sel_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(o.org_id) = ?',
+			whereCond => 'UPPER(o.org_id) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_id_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(o.org_id) like ?',
+			whereCond => 'UPPER(o.org_id) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_primname' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(o.name_primary) = ?',
+			whereCond => 'UPPER(o.name_primary) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_primname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(o.name_primary) like ?',
+			whereCond => 'UPPER(o.name_primary) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_category' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(cat.member_name) = ?',
+			whereCond => 'UPPER(cat.member_name) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_category_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG,
-			whereCond => 'upper(cat.member_name) like ?',
+			whereCond => 'UPPER(cat.member_name) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 );

@@ -187,6 +187,7 @@ sub execute_add
 	#second create employment attribute
 	my $personId = $page->field('person_id');
 	my $relId = $page->field('rel_id');
+	$relId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relId);
 	if($relId ne '')
 	{
 		my $occupation = $page->field('occupation') eq '' ? 'Unknown' : $page->field('occupation');
@@ -197,8 +198,8 @@ sub execute_add
 				parent_id => $personId || undef,
 				item_name => $occupation || undef,
 				value_type => $page->field('value_type') || undef,
-				value_text => $relId || undef,
-				value_textB => $page->field('phone_number') || undef,
+				value_int => $relId || undef,
+				value_text => $page->field('phone_number') || undef,
 				#value_date => $page->field('begin_date') || undef,
 				_debug => 0
 		);
@@ -225,7 +226,7 @@ sub execute_add
 					ins_id => $insId || undef,
 					parent_ins_id => $workCompPlan->{value_int} || undef,
 					owner_id => $personId || undef,
-					owner_org_id => $page->session('org_id'),
+					owner_org_id => $page->session('org_internal_id'),
 					ins_org_id => $workCompPlanInfo->{ins_org_id} || undef,
 					ins_type => defined $insType ? $insType : undef,
 					remit_type => defined $remitType ? $remitType : undef,
@@ -242,7 +243,7 @@ sub execute_add
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
 		item_id => $page->field('acct_item_id') || undef,
-		parent_org_id => $page->session('org_id') ||undef,
+		parent_org_id => $page->session('org_internal_id') ||undef,
 		item_name => 'Patient/Account Number',
 		value_type => 0,
 		value_text => $page->field('acct_number') || undef,
@@ -253,7 +254,7 @@ sub execute_add
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
 		item_id => $page->field('chart_item_id') || undef,
-		parent_org_id => $page->session('org_id') ||undef,
+		parent_org_id => $page->session('org_internal_id') ||undef,
 		item_name => 'Patient/Chart Number',
 		value_type => 0,
 		value_text => $page->field('chart_number') || undef,

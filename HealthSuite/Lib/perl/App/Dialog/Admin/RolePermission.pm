@@ -9,6 +9,7 @@ use CGI::Validator::Field;
 
 use DBI::StatementManager;
 use App::Statements::Admin;
+use App::Statements::Org;
 
 use Date::Manip;
 
@@ -123,37 +124,38 @@ sub execute
 
 	my $userId =  $page->session('user_id');
 	my $orgId = $page->param('org_id') || $page->session('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+
 	my $roleID = $page->field('roleID');
 	my $roleIDOrg = $page->field('roleIDOrg');
 	my $permissionName = $page->field('permissionName');
 	my $permissionNameOrg = $page->field('permissionNameOrg');
 	my $roleActivityID = $page->field('permissionAccess');
-	
+
 	if ($command eq 'add')
 	{
-		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgId, $roleID, $permissionName);	# can have the same org id, role id, and permission name, but different permission, so must delete to prevent duplicates
+		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleID, $permissionName);	# can have the same org id, role id, and permission name, but different permission, so must delete to prevent duplicates
 		$page->schemaAction('Role_Permission', 'add',
 			permission_name => $permissionName,
 			role_name_id => $roleID,
 			role_activity_id => $roleActivityID,
-			org_id => $orgId
+			org_internal_id => $orgIntId
 		);
 	}
 	elsif ($command eq 'update')
 	{
-		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgId, $roleIDOrg, $permissionNameOrg);
+		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleIDOrg, $permissionNameOrg);
 		$page->schemaAction('Role_Permission', 'add',
 			permission_name => $permissionName,
 			role_name_id => $roleID,
 			role_activity_id => $roleActivityID,
-			org_id => $orgId
+			org_internal_id => $orgIntId
 		);
 	}
 	elsif ($command eq 'remove')
 	{
-		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgId, $roleID, $permissionName);
+		$STMTMGR_ADMIN->execute($page, STMTMGRFLAG_NONE, 'delRolePermission', $orgIntId, $roleID, $permissionName);
 	}
-
 
 	$self->handlePostExecute($page, $command, $flags, "/admin/$orgId/permissions");
 }

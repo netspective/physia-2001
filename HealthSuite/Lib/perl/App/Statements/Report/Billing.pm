@@ -17,7 +17,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		_stmtFmt => qq{
 			select Claim_Type.caption as payer, count(Claim_Type.id) as count
 			from Transaction, Claim_Type, Invoice
-			where Invoice.cr_org_id = ?
+			where Invoice.cr_org_internal_id = ?
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
@@ -38,7 +38,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id, bill_to_id,
 				provider_id, Transaction_Status.caption as status, total_cost, total_adjust
 			from Claim_Type, Transaction_Status, Transaction, Invoice
-			where Invoice.cr_org_id = ?
+			where Invoice.cr_org_internal_id = ?
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction

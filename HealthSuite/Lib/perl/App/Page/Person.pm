@@ -46,14 +46,12 @@ sub initialize
 	my $self = shift;
 
 	my $personId = $self->param('person_id');
-	my $userId = $self->session('user_id');
-
+	my $userId = $self->session('user_id');	
 	$self->SUPER::initialize(@_);
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
 	$self->property('person_simple_name', "Unknown ID: $personId") unless $self->property('person_simple_name');
-
-	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_internal_id')));
 	my $personCategory = defined $categories ? join(', ', @$categories) : '';
 	$self->property('person_org_category', $personCategory);
 
@@ -342,7 +340,7 @@ sub prepare_view_remove
 	my ($self) = @_;
 
 	my $personId = $self->param('person_id');
-	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id'));
+	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_internal_id'));
 
 	unless($personId)
 	{
@@ -461,7 +459,7 @@ sub prepare_view_profile
 
 	$self->addLocatorLinks(['Summary', 'profile']);
 	my $personId = $self->param('person_id');
-	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id'));
+	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_internal_id'));
 	my $category = $personCategories->[0];
 	$self->addContent(qq{
 		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
@@ -587,7 +585,7 @@ sub prepare_view_account
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, 'selInvoiceTypeForClient',
-			[$personId, $self->session('org_id')],
+			[$personId, $self->session('org_internal_id')],
 			#[
 			#	['<SPAN TITLE="Claim Identifier">ID</SPAN>', '<A HREF=\'/invoice/%0\'>%0</A>', undef, 'RIGHT'],
 			#	['<SPAN TITLE="Number of Items in Claim">IC</SPAN>', undef, undef, 'CENTER'],

@@ -9,13 +9,13 @@ use Data::Publish;
 use App::Universal;
 
 use vars qw(
-	@ISA @EXPORT $STMTMGR_COMPONENT $PUBLDEFN_CONTACTMETHOD_DEFAULT
+	@ISA @EXPORT $STMTMGR_COMPONENT $PUBLDEFN_CONTACTMETHOD_DEFAULT $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG
 	$SQLSTMT_CONTACTMETHODS $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES $SQLSTMT_ADDRESSES
 	);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw(
 	$PUBLDEFN_CONTACTMETHOD_DEFAULT
-	$SQLSTMT_CONTACTMETHODS $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES $SQLSTMT_ADDRESSES
+	$SQLSTMT_CONTACTMETHODS $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES $SQLSTMT_ADDRESSES $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG
 	);
 
 $SQLSTMT_CONTACTMETHODS = qq{
@@ -55,6 +55,43 @@ $SQLSTMT_CONTACTMETHODS_AND_ADDRESSES = qq{
 	where parent_id = ?
 	order by value_type
 };
+
+$SQLSTMT_CONTACTMETHODS_AND_ADDRESSES_INTERNAL_ORG = qq{
+
+select value_int as preferred, value_type, value_text || ' (' || item_name || ')', item_id, avt.caption as caption, 'attr-%sqlvar_entityName%-' || value_type as dialogid_suffix
+	from %sqlvar_entityName%_attribute, Attribute_Value_Type avt
+	where	parent_id = 
+	(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+		org_id = :1
+	)
+	and
+	value_type in (
+			@{[ App::Universal::ATTRTYPE_PHONE ]},
+			@{[ App::Universal::ATTRTYPE_FAX ]},
+			@{[ App::Universal::ATTRTYPE_PAGER ]},
+			@{[ App::Universal::ATTRTYPE_EMAIL ]},
+			@{[ App::Universal::ATTRTYPE_URL ]},
+			@{[ App::Universal::ATTRTYPE_BILLING_PHONE ]}
+		) and
+			avt.id = value_type
+	UNION ALL
+	select 0 as preferred, 99998 as value_type, '-' as value_text, -1, '-', '-'
+	from dual
+	UNION ALL
+	select 0 as preferred, @{[ App::Universal::ATTRTYPE_FAKE_ADDRESS() ]} as value_type, complete_addr_html as value_text, item_id, address_name as caption, DECODE('%sqlvar_entityName%', 'Person', 'attr-person-', 'Org', 'attr-org-' ) || @{[ App::Universal::ATTRTYPE_FAKE_ADDRESS() ]} as dialogid_suffix
+	from %sqlvar_entityName%_address
+	where parent_id = 
+	(
+		select org_internal_id
+		from org
+		where owner_org_id = :2 AND
+		org_id = :1
+	)
+	order by value_type
+};
+
 
 $SQLSTMT_ADDRESSES = qq{
 	select address_name, complete_addr_html, item_id

@@ -26,6 +26,11 @@ $PUBLDEFN_CONTACTMETHOD_DEFAULT = {
 };
 
 $STMTMGR_PERSON = new App::Statements::Person(
+	'selPersonExists' => qq{
+		select person_id
+		from person
+		where person_id = ?
+		},
 	'selPersonSimpleNameById' => qq{
 			select complete_name from person where person_id = ?
 		},
@@ -67,25 +72,31 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selFirstLastName' => qq{
 			select p.name_first, p.name_last, p.ssn as ssn, p.person_id as person_id
 			from person p, person_org_category pcat
-			where p.person_id = pcat.person_id and pcat.org_id = ?
+			where p.person_id = pcat.person_id and pcat.org_internal_id = ?
 		},
 
 	'selssn' => qq{
 		select p.ssn,p.person_id
-		from person p,person_org_category pcat where p.person_id = pcat.person_id and pcat.org_id = ?
+		from person p,person_org_category pcat where p.person_id = pcat.person_id and pcat.org_internal_id = ?
 		},
 
 	'selCategory' => qq{
 		select category
 		from person_org_category
-		where person_id = ? and org_id = ?
+		where person_id = ? and org_internal_id = ?
 		order by category
 		},
-
+		
+	'selVerifyCategory' => qq{
+		select category
+		from person_org_category
+		where person_id = ? and org_internal_id = ? and category = ?
+		},
+		
 	'selPersonBySessionOrgAndCategory' => q{
 			select distinct person_id
 			  	from person_org_category
-			  	where org_id = ?
+			  	where org_internal_id = ?
 			  	 and category = ?
 		},
 	'selAttribute' => qq{
@@ -141,7 +152,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selResourceAssociations' => qq{
 		select distinct p.person_id, p.complete_name from person p, person_org_category pcat
 		 where p.person_id=pcat.person_id
-		 and pcat.org_id= ?
+		 and pcat.org_internal_id= ?
 		 and category='Physician'
 		},
 	'selSessionPhysicians' => qq{
@@ -195,7 +206,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selOrgEmployee' => qq{
 		select distinct p.person_id, p.complete_name
 		from person p, person_org_category pcat,person_attribute patt
-		where p.person_id=pcat.person_id and p.person_id=patt.parent_id and pcat.org_id= ? and patt.value_type in (220, 221)  and patt.value_text= ?
+		where p.person_id=pcat.person_id and p.person_id=patt.parent_id and pcat.org_internal_id= ? and patt.value_type in (220, 221)  and patt.value_text= ?
 		},
 	'selContactMethods' => qq{
 		select * from person_attribute
@@ -358,24 +369,26 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where person_id = ?
 		},
 	'selLogin' => qq{
-		select person_id,org_id,password,quantity from person_login
+		select person_id, org_internal_id, password, quantity
+		from person_login
 		where person_id = ?
-		and org_id is null
+		and org_internal_id is null
 		},
 	'selLoginOrg' => qq{
-		select person_id,org_id,password,quantity from person_login
-		where person_id = ? and org_id = ?
+		select person_id, org_internal_id, password, quantity
+		from person_login
+		where person_id = ? and org_internal_id = ?
 		},
 	'updPersonLogin' => qq{
 		update Person_Login
 		set password = ?,
 			quantity = ?
 		where person_id = ?
-			and org_id = ?
+			and org_internal_id = ?
 	},
 	'insPersonLogin' => qq{
 		insert into Person_Login
-		(cr_session_id, cr_stamp, cr_user_id, cr_org_id, person_id, org_id, password, quantity)
+		(cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id, person_id, org_internal_id, password, quantity)
 		values
 		(?            , sysdate , ?         , ?        , ?        , ?     , ?       , ?)
 	},
@@ -385,28 +398,28 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 	'updSessionsTimeoutOrg' => qq{
 		update person_session set status = 2
-		where status = 0 and person_id = ? and org_id = ?
+		where status = 0 and person_id = ? and org_intneral_id = ?
 		},
 	'selSessions' => qq{
-		select person_id, org_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session
+		select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session
 		where status = 0 and person_id = ?
 		},
 	'selSessionsOrg' => qq{
-		select person_id, org_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session
-		where status = 0 and person_id = ? and org_id = ?
+		select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session
+		where status = 0 and person_id = ? and org_internal_id = ?
 		},
 	'selPhysStateLicense' => q{
 		select * from person_attribute
 		where parent_id = ? and value_type = 510 and value_int = ?
 		},
 	'selPrimaryPhysician' => q{
-			select p.person_id, p.complete_name, pcat.person_id,pcat.org_id, patt.value_text as phy, patt.parent_id
+			select p.person_id, p.complete_name, pcat.person_id,pcat.org_internal_id, patt.value_text as phy, patt.parent_id
 			from person p, person_org_category pcat, person_attribute patt
 			where p.person_id=pcat.person_id
 			and p.person_id=patt.value_text
 			and patt.item_name like 'Primary%'
 			and pcat.category = 'Physician'
-			and pcat.org_id = ?
+			and pcat.org_internal_id = ?
 			and patt.parent_id = ?
 		},
 	'selAuthSignatureCaption' => q{
@@ -432,7 +445,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selAssocNurse' => q{
 			select distinct p.person_id, p.complete_name
 			  	from person p, person_org_category pcat
-				where p.person_id=pcat.person_id and pcat.org_id = ? and category='Physician'
+				where p.person_id=pcat.person_id and pcat.org_internal_id = ? and category='Physician'
 		},
 	'selEmpStatus' => q{
 			select id, caption
@@ -624,7 +637,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 
 	'sel_Person_EmploymentAssociations' => {
 		sqlStmt => qq{
-				select	pa.item_name, pa.value_text, avt.caption
+				select	pa.item_name, pa.value_text, pa.value_int, avt.caption
 				from 	person_attribute pa, attribute_value_type avt
 				where	pa.parent_id = ?
 				and	pa.value_type = avt.id

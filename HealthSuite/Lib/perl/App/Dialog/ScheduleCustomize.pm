@@ -15,6 +15,7 @@ use App::Schedule::ApptSheet;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 
 use vars qw(@ISA %RESOURCE_MAP);
 use Date::Manip;
@@ -68,7 +69,7 @@ sub new
 
 		new App::Dialog::Field::Organization::ID(name => 'facility_id',
 			caption => 'Facility',
-			types => ['Facility'],
+			#types => ['Facility'],
 		),
 
 		new CGI::Dialog::Field(name => 'date_offset',
@@ -191,7 +192,8 @@ sub populateData_update
 	my $userID = $page->session('user_id');
 	my $column = $page->param('column');
 
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selColumnPreference', $userID, $column);
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+		'selColumnPreference', $userID, $column);
 
 	$page->field('column', $column+1);
 	$self->populateHourFields($page);
@@ -232,18 +234,21 @@ sub execute
 		my $newItemID = $page->schemaAction(
 			'Person_Attribute', 'remove',
 			item_id => $page->field('item_id'),
-			_debug => 1
+			_debug => 0
 		);
 
 		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_NONE, 'updSchedulingPref', $userID, $column);
 	}
 	else
 	{
+		my $facility_internal_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+			'selOrgId', $page->session('org_internal_id'), $page->field('facility_id'));
+		
 		my $newItemID = $page->schemaAction(
 		'Person_Attribute', $command,
 			item_id => $command eq 'add' ? undef : $page->field('item_id'),
 			value_text  => $page->field('resource_id'),
-			value_textB => $page->field('facility_id') || undef,
+			value_textB => $facility_internal_id || undef,
 			value_int   => $colNumber,
 			value_intB  => $page->field('date_offset'),
 			parent_id   => $userID,

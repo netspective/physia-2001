@@ -40,8 +40,6 @@ sub prepare_view_date
 {
 	my ($self) = @_;
 	
-	$self->param('person_id', $self->session('person_id')) unless $self->param('person_id');
-	
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -430,6 +428,8 @@ sub handleARL
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	#return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
+
+	$self->param('person_id', $self->session('person_id')) unless $self->param('person_id');
 	
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))

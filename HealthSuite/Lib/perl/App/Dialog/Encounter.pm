@@ -168,10 +168,12 @@ sub initialize
 							types => "'CLINIC','HOSPITAL','FACILITY/SITE'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Billing Org',
-							name => 'billing_facility_id'),
+							name => 'billing_facility_id',
+							types => "'PRACTICE'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Pay To Org',
-							name => 'pay_to_org_id'),
+							name => 'pay_to_org_id',
+							types => "'PRACTICE'"),
 			]),
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
@@ -250,9 +252,9 @@ sub makeStateChanges
 
 
 	#Populate provider id field and org fields with session org's providers
-	my $sessOrg = $page->session('org_id');
-	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
-	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+	my $sessOrgIntId = $page->session('org_internal_id');
+	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
+	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
 
 
 
@@ -282,11 +284,11 @@ sub makeStateChanges
 
 			if($page->field('billing_contact') eq '')
 			{
-				$billContactField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billContactField->{caption}' on file. Please provide one.");
+				$billContactField->invalidate($page, "This Billing Facility does not have '$billContactField->{caption}' on file. Please provide one.");
 			}
 			if($page->field('billing_phone') eq '')
 			{
-				$billPhoneField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billPhoneField->{caption}' on file. Please provide one.");
+				$billPhoneField->invalidate($page, "This Billing Facility does not have '$billPhoneField->{caption}' on file. Please provide one.");
 			}
 		}
 	}
@@ -354,17 +356,21 @@ sub populateData
 
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 		
-		$page->param('_f_proc_service_place', $procedures->[0]->{hcfa_service_place});
+		my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
+		$page->param('_f_proc_service_place', $servPlaceCode);
+		
 		my $totalProcs = scalar(@{$procedures});
 		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
+			
+			my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
 
 			my $line = $idx + 1;			
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
-			$page->param("_f_proc_$line\_service_type", $procedures->[$idx]->{hcfa_service_type});
+			$page->param("_f_proc_$line\_service_type", $servTypeCode);
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
@@ -468,7 +474,9 @@ sub setPayerFields
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
-			push(@thirdParties, "$ins->{group_name}($ins->{plan_name})");
+			#here the plan_name is actually the guarantor_id (the query says "select guarantor_id as plan_name, ...")
+			my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $ins->{plan_name});
+			push(@thirdParties, "$ins->{group_name}($orgId->{org_id})");
 		}
 	}
 
@@ -510,7 +518,7 @@ sub voidInvoicePostSubmit
 	#History attributes are created for both claims at the end.
 
 
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('attendee_id');
 	my $parentTransId = $page->field('trans_id');
@@ -562,10 +570,10 @@ sub voidInvoicePostSubmit
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
 		invoice_date => $page->getDate() || undef,
 		main_transaction => $transId || undef,
-		submitter_id => $sessUser || undef,
+		submitter_id => $invoiceInfo->{submitter_id} || undef,
 		claim_diags => join(', ', @claimDiags) || undef,
 		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
-		owner_id => $sessOrg || undef,
+		owner_id => $invoiceInfo->{owner_id} || undef,
 		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		client_id => $personId || undef,
 		total_items => $invoiceInfo->{total_items} || undef,
@@ -593,8 +601,8 @@ sub voidInvoicePostSubmit
 			flags => $item->{flags} || undef,
 			service_begin_date => $item->{service_begin_date} || undef,
 			service_end_date => $item->{service_end_date} || undef,
-			hcfa_service_place => $item->{hcfa_service_place} || undef,
-			hcfa_service_type => $item->{hcfa_service_type} || undef,
+			hcfa_service_place => defined $item->{hcfa_service_place} ? $item->{hcfa_service_place} : undef,
+			hcfa_service_type => defined $item->{hcfa_service_type} ? $item->{hcfa_service_type} : undef,
 			modifier => $item->{modifier} || undef,
 			quantity => $item->{quantity} || undef,
 			emergency => defined $emg ? $emg : undef,
@@ -662,6 +670,7 @@ sub voidInvoicePostSubmit
 sub handlePayers
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
@@ -720,9 +729,11 @@ sub handlePayers
 		}
 		else
 		{
+			my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $sessOrgIntId, $otherPayerId);
 			$guarantorType = App::Universal::ENTITYTYPE_ORG;
-			$addr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $otherPayerId, 'Mailing');
-			$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $otherPayerId, 'Primary', $phoneAttrType);
+			$addr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $orgIntId, 'Mailing');
+			$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Primary', $phoneAttrType);
+			$otherPayerId = $orgIntId; #convert value of otherPayerId to orgIntId because this is an org
 		}
 		
 		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
@@ -835,7 +846,7 @@ sub addTransactionAndInvoice
 	my ($self, $page, $command, $flags) = @_;
 	$command ||= 'add';
 
-	my $sessOrg = $page->session('org_id');
+	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('attendee_id');
 	my $claimType = $page->field('claim_type');
@@ -880,7 +891,7 @@ sub addTransactionAndInvoice
 		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		initiator_id => $personId || undef,
 		receiver_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
-		receiver_id => $page->session('org_id') || undef,
+		receiver_id => $sessOrgIntId || undef,
 		init_onset_date => $page->field('illness_begin_date') || undef,
 		curr_onset_date => $page->field('illness_end_date') || undef,
 		bill_type => defined $claimType ? $claimType : undef,
@@ -896,7 +907,7 @@ sub addTransactionAndInvoice
 
 
 	my @claimDiags = split(/\s*,\s*/, $page->param('_f_proc_diags'));
-	App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrg);
+	#App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrgIntId);
 
 	my $invoiceStatus = $command eq 'add' ? $invoiceStatusCreate : $page->field('current_status');
 	my $invoiceId = $page->schemaAction(
@@ -910,7 +921,7 @@ sub addTransactionAndInvoice
 		submitter_id => $page->session('user_id') || undef,
 		claim_diags => join(', ', @claimDiags) || undef,
 		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
-		owner_id => $page->session('org_id') || undef,
+		owner_id => $sessOrgIntId || undef,
 		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		client_id => $personId || undef,
 		_debug => 0
@@ -1165,11 +1176,11 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	my $payToOrgId = $page->field('pay_to_org_id');
-	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgId);
-	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgId, 'Mailing');
-
+	my $payToOrgIntId = $page->field('pay_to_org_id');
+	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
+	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
+	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgIntId, 'Mailing');
+	my $payToOrgId = $payToFacilityInfo->{org_id};
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			item_id => $page->field('pay_to_org_item_id') || undef,
@@ -1178,6 +1189,7 @@ sub handleInvoiceAttrs
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $payToFacilityInfo->{name_primary} || undef,
 			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
 			_debug => 0
 	);
 
@@ -1189,6 +1201,7 @@ sub handleInvoiceAttrs
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $payToFacilityInfo->{tax_id} || undef,
 			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
 			_debug => 0
 	);
 
@@ -1200,6 +1213,7 @@ sub handleInvoiceAttrs
 			value_type => defined $phoneValueType ? $phoneValueType : undef,
 			value_text => $payToFacilityPhone->{value_text} || undef,
 			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
 			_debug => 0
 	);
 
@@ -1625,9 +1639,14 @@ sub handleProcedureItems
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
 
 	my @feeSchedules = $page->param('_f_proc_default_catalog');
-
+	
+	#convert place to it's foreign key id
+	my $servPlace = $page->param('_f_proc_service_place');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace);
+	#$page->addDebugStmt("code=$servPlace");
+	#$page->addDebugStmt("id=$servPlaceId");
 	my $lineCount = $page->param('_f_line_count');
-
+	#$page->addError('stop');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
@@ -1648,17 +1667,21 @@ sub handleProcedureItems
 		my $cptCode = $page->param("_f_proc_$line\_procedure");
 		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
+		#convert type to it's foreign key id
+		my $servType = $page->param("_f_proc_$line\_service_type");
+		my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
+
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
 			item_id => $itemId || undef,
-			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,			#default for service start date is today
+			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,		#default for service start date is today
 			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,			#default for service end date is today
-			hcfa_service_place => $page->param('_f_proc_service_place') || undef,		#default for place is 11
-			hcfa_service_type => $page->param("_f_proc_$line\_service_type") || undef,		#default for service type is 2 for consultation
+			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#default for place is 11
+			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,				#default for service type is 2 for consultation
 			modifier => $page->param("_f_proc_$line\_modifier") || undef,				#default for modifier is "mandated services"
-			quantity => $page->param("_f_proc_$line\_units") || undef,				#default for units is 1
+			quantity => $page->param("_f_proc_$line\_units") || undef,					#default for units is 1
 			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
-			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,				#default for item type is service
+			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
 			code => $cptCode || undef,
 			caption => $cptShortName->{name} || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
@@ -1749,8 +1772,8 @@ sub voidProcedureItem
 			balance => defined $itemBalance ? $itemBalance : undef,
 			emergency => defined $emg ? $emg : undef,
 			#comments => $comments || undef,
-			hcfa_service_place => $invItem->{hcfa_service_place} || undef,
-			hcfa_service_type => $invItem->{hcfa_service_type} || 'NULL',
+			hcfa_service_place => defined $invItem->{hcfa_service_place} ? $invItem->{hcfa_service_place} : undef,
+			hcfa_service_type => defined $invItem->{hcfa_service_type} ? $invItem->{hcfa_service_type} : undef,
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
@@ -1860,7 +1883,6 @@ sub customValidate
 		{
 			my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
 			my $createOrgHrefPost = "/$otherPayer');";
-
 			$otherPayerField->invalidate($page, qq{
 				Org Id '$otherPayer' does not exist.<br>
 				<img src="/resources/icons/arrow_right_red.gif">
@@ -1868,7 +1890,7 @@ sub customValidate
 				<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
 				<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
 				})
-				unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
+				unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selOrgId', $page->session('org_internal_id'), $otherPayer);
 		}
 	}
 }

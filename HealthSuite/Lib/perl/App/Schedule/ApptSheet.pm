@@ -763,7 +763,8 @@ sub getResource_Facility
 
 	my $resource = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 'selCompleteName', $resource_id);
 	$resource = $resource_id unless $resource;
-	my $facility = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 'selFacilityName', $facility_id);
+	my $facility = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 
+		'selFacilityName', $facility_id);
 
 	$facility = ($facility_id ? "**Invalid**" : "All Facilities") unless $facility;
 

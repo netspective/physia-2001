@@ -488,13 +488,13 @@ sub detailLink
 
 sub incrementUsage
 {
-	my ($page, $type, $codesRef, $person_id, $org_id) = @_;
+	my ($page, $type, $codesRef, $person_id, $org_internal_id) = @_;
 	return;
 }
 
 sub __incrementUsage
 {
-	my ($page, $type, $codesRef, $person_id, $org_id) = @_;
+	my ($page, $type, $codesRef, $person_id, $org_internal_id) = @_;
 
 	my $selName1 = "sel" . ucfirst(lc($type)) . "Usage1";
 	my $selName2 = "sel" . ucfirst(lc($type)) . "Usage2";
@@ -515,22 +515,22 @@ sub __incrementUsage
 			next unless $CPT_CACHE{$code}->{cpt};
 		}
 
-		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName1, $code, $person_id, $org_id))
+		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName1, $code, $person_id, $org_internal_id))
 		{
-			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName1, $code, $person_id, $org_id);
+			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName1, $code, $person_id, $org_internal_id);
 		}
 		else
 		{
-			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $insName, $code, $person_id, $org_id);
+			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $insName, $code, $person_id, $org_internal_id);
 		}
 
-		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName2, $code, $org_id))
+		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName2, $code, $org_internal_id))
 		{
-			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName2, $code, $org_id);
+			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName2, $code, $org_internal_id);
 		}
 		else
 		{
-			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $insName, $code, undef, $org_id);
+			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $insName, $code, undef, $org_internal_id);
 		}
 	}
 }
@@ -573,6 +573,7 @@ sub getSvcType
 			my $fs = $fsRef->[$i];
 			getType($page, $cpt, $modifier, \@buffer, $fs);
 	}
+	useFFSvcType($page, $cpt, $modifier, \@buffer) unless scalar(@buffer);
 	return \@buffer;
 }
 
@@ -599,7 +600,7 @@ sub getItemPrice
 {
 	my ($page, $cpt, $modifier, $bufferRef, $fs, $ffsFlag) = @_;
 	
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->session('org_internal_id');
 
 	my $entry;
 	if ($modifier)
@@ -618,11 +619,23 @@ sub getItemPrice
 		$ffsFlag || $entry->{flags} ]) if exists $entry->{unit_cost};
 }
 
+sub useFFSvcType
+{
+	my ($page, $cpt, $modifier, $bufferRef) = @_;
+	my $orgId = $page->session('org_internal_id');
+	my $ffs = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_catalog_by_id_orgId', 'FFS', $orgId);
+	if (my $fs = $ffs->{internal_catalog_id})
+	{
+		getType($page, $cpt, $modifier, $bufferRef, $fs, 1);
+	}
+}
+
 sub defaultToFFS
 {
 	my ($page, $cpt, $modifier, $bufferRef) = @_;
 	
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->session('org_internal_id');
 	my $ffs = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_catalog_by_id_orgId', 'FFS', $orgId);
 		
@@ -636,7 +649,7 @@ sub calcRVRBS
 {
 	my ($page, $cpt, $modifier, $fsRef, $bufferRef, $flags) = @_;
 	
-	my $orgId = $page->param('org_id') || $page->session('org_id');
+	my $orgId = $page->param('org_internal_id') || $page->session('org_internal_id');
 	my $today = UnixDate('today', '%m/%d/%Y');
 	my $gpciItemName = 'Medicare GPCI Location';
 	

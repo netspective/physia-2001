@@ -5,37 +5,57 @@ package App::Statements::Search::Claim;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-
-use vars qw(@ISA @EXPORT $STMTMGR_CLAIM_SEARCH $INVOICE_COLUMNS $UPINITEMNAME_PATH);
-@ISA    = qw(Exporter DBI::StatementManager);
+use App::Universal;
+use vars qw(@ISA @EXPORT $STMTMGR_CLAIM_SEARCH $UPINITEMNAME_PATH
+	$STMTFMT_SEL_CLAIM $STMTRPTDEFN_DEFAULT);
+@ISA = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CLAIM_SEARCH);
 
-$UPINITEMNAME_PATH = 'UPIN';
-#and iit.item_id = (select min(item_id) from invoice_item where parent_id (+) = i.invoice_id and iit.item_type in (1,2))
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
-$INVOICE_COLUMNS = "invoice_id, total_items, client_id, to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, get_Invoice_Status_cap(invoice_status) as invoice_status, bill_to_id, reference, total_cost, total_adjust, balance, bill_to_type";
-#(select min(item_id) from invoice_item where parent_id = i.invoice_id and iit.item_type in (1,2))
-use vars qw($STMTFMT_SEL_CLAIM $STMTRPTDEFN_DEFAULT);
+$UPINITEMNAME_PATH = 'UPIN';
+
 $STMTFMT_SEL_CLAIM = qq{
-		select distinct i.invoice_id, i.total_items, i.client_id,
-			to_char(min(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
-			iis.caption as invoice_status, ib.bill_to_id, i.total_cost, 
-			i.total_adjust, i.balance, ib.bill_party_type,
-			to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
-		from 	invoice_status iis, invoice i, invoice_billing ib, invoice_item iit %tables%
-		where
-			%whereCond%
-			and iit.parent_id (+) = i.invoice_id			
-			and ib.invoice_id = i.invoice_id
-			and ib.invoice_item_id is NULL
-			and ib.bill_sequence = 1
-			and (owner_type = 1 and owner_id = ?)
-			and iis.id = i.invoice_status
-		group by i.invoice_id, i.total_items, i.client_id,
-			iis.caption, ib.bill_to_id, i.total_cost, 
-			i.total_adjust, i.balance, ib.bill_party_type,
-			i.invoice_date
-		order by i.invoice_id desc
+	SELECT
+		DISTINCT i.invoice_id,
+		i.total_items,
+		i.client_id,
+		TO_CHAR(MIN(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') AS service_begin_date,
+		iis.caption AS invoice_status,
+		ib.bill_to_id,
+		i.total_cost, 
+		i.total_adjust,
+		i.balance,
+		ib.bill_party_type,
+		TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date
+	FROM
+		invoice_status iis,
+		invoice i,
+		invoice_billing ib,
+		invoice_item iit
+		%tables%
+	WHERE
+		%whereCond%
+		AND iit.parent_id (+) = i.invoice_id			
+		AND ib.invoice_id = i.invoice_id
+		AND ib.invoice_item_id IS NULL
+		AND ib.bill_sequence = 1
+		AND (owner_type = 1 AND owner_id = ?)
+		AND iis.id = i.invoice_status
+		AND rownum <= $LIMIT
+	GROUP BY
+		i.invoice_id,
+		i.total_items,
+		i.client_id,
+		iis.caption,
+		ib.bill_to_id,
+		i.total_cost, 
+		i.total_adjust,
+		i.balance,
+		ib.bill_party_type,
+		i.invoice_date
+	ORDER BY
+		i.invoice_id desc
 };
 
 $STMTRPTDEFN_DEFAULT =
@@ -159,35 +179,31 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_insurance' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) = ?',
+			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) like ?',
+			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) = ?',
+			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) like ?',
+			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
-
-
-
-
 
 	'sel_id_status' =>
 		{
@@ -268,28 +284,28 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_insurance_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) = ?',
+			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) like ?',
+			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) = ?',
+			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) like ?',
+			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
@@ -376,28 +392,28 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_insurance_incomplete' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) = ?',
+			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_incomplete_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_id and upper(name_primary) like ?',
+			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_incomplete' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) = ?',
+			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_incomplete_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_text = o.org_id and upper(o.name_primary) like ?',
+			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
 			tables => ', org o, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},

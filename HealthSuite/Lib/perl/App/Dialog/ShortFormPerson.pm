@@ -148,7 +148,7 @@ sub execute
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $personId = $page->field('person_id');
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->session('org_internal_id');
 
 	$page->schemaAction(
 		'Person', $command,
@@ -200,7 +200,7 @@ sub execute
 		'Person_Org_Category', $command,
 		person_id => $personId || undef,
 		category => 'Patient' || undef,
-		org_id => $orgId || undef,
+		org_internal_id => $orgId || undef,
 		_debug => 0
 	) if $command eq 'add';
 

@@ -32,7 +32,7 @@ sub connection
     $self->{dbh} = $dbh;
     $self->{disconnectdbh} = 0;
     $dbh->{LongReadLen} = 8192;
-    $dbh->trace(1);
+    $dbh->trace(2);
 
     return $dbh;
 }
@@ -50,7 +50,7 @@ sub insert
                 INSERT INTO person_session (session_id, status, person_id, remote_host, remote_addr, first_access, last_access, session_data_size, session_data) VALUES (?,?,?,?,?,sysdate,sysdate,?,?)});
         $self->{updateorg_sth} =
             $dbh->prepare(qq{
-                update person_session set org_id = ? where session_id = ?});
+                update person_session set org_internal_id = ? where session_id = ?});
     }
     my $insertSth = $self->{insert_sth};
     my $updateOrgSth = $self->{updateorg_sth};
@@ -72,9 +72,9 @@ sub insert
     $insertSth->execute;
     $insertSth->finish;
 
-    if($sessData->{org_id} = $args->{org_id})
+    if($sessData->{org_internal_id} = $args->{org_internal_id})
 	{
-		$updateOrgSth->bind_param(1, $args->{org_id});
+		$updateOrgSth->bind_param(1, $args->{org_internal_id});
 		$updateOrgSth->bind_param(2, $sessionId);
 	    $updateOrgSth->execute;
 	    $updateOrgSth->finish;	    

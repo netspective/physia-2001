@@ -89,10 +89,12 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	
+	my $orgId = $page->param('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
+
 	$page->schemaAction(
 		'Hlth_Maint_Rule',	$command,
-		org_id => $page->param('org_id'),
+		org_internal_id => $orgIntId,
 		rule_id => $page->field('rule_id') || undef,
 		gender => $page->field('gender') || undef,
 		start_age => $page->field('start_age') || undef,

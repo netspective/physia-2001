@@ -14,6 +14,8 @@ use vars qw(@ISA @EXPORT %RESOURCE_MAP);
 @ISA = qw(Exporter App::Page);
 @EXPORT = qw(SEARCHFLAG_LOOKUPWINDOW SEARCHFLAG_SEARCHBAR);
 
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 %RESOURCE_MAP = (
 	'search' => {
 		_idSynonym => ['lookup'],
@@ -93,7 +95,7 @@ sub prepare_page_content_header
 	my $formHtml = $searchForm ? qq{
 		<TABLE BGCOLOR='#EEEEEE' BORDER=0 CELLSPACING=1 CELLPADDING=5 WIDTH=100%>
 			<TR>
-			<FORM NAME="search_form" METHOD=POST>
+			<FORM NAME="search_form" METHOD="post">
 			<TD ><FONT FACE='Arial,Helvetica' SIZE=2>
 			<INPUT TYPE="HIDDEN" NAME="arl" VALUE="@{[$self->param('arl')]}">
 			$searchForm
@@ -132,6 +134,20 @@ sub prepare_page_content_header
 		});
 
 	return 1;
+}
+
+sub prepare_page_content_footer
+{
+	my $self = shift;
+	
+	if (ref($self) ne 'App::Page::Search::Home')
+	{	
+		push(@{$self->{page_content_footer}}, qq{
+			<br>
+			<center><font color="GRAY">(Search results are limited to $LIMIT records)</font></center>
+		});
+	}
+	$self->SUPER::prepare_page_content_footer(@_);
 }
 
 sub getForm

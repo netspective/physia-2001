@@ -71,12 +71,14 @@ sub new
 
 sub execute
 {
-	my ($self, $page, $command, $flags) = @_;
+	my ($self, $page, $command, $flags) = @_;	
 	my $orgId = $page->param('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+	
 	$page->schemaAction(
 			'Person_Org_Category', $command,
 			person_id => $page->field('person_id') || undef,
-			org_id => $orgId || undef,
+			org_internal_id => $orgIntId || undef,
 			category => $page->field('category') || undef,
 			_debug => 0
 			);

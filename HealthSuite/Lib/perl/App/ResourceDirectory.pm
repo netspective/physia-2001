@@ -93,8 +93,7 @@ sub handlePage
 
 	return 'ARL-000200' unless defined $resource->{_class};
 	my $pageClass = $resource->{_class};
-	warn "page class '$pageClass'\n";
-	my $page = new $pageClass;
+	my $page = $pageClass->new();
 
 	#
 	# some pages will need their own ARLs for calling themselves as popups, so set it up now
@@ -107,6 +106,13 @@ sub handlePage
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
 	$page->setFlag($flags);
+	
+	# CGI.pm doesn't auto parse the URL Query String if we're in POST mode
+	if ($ENV{REQUEST_METHOD} eq 'POST')
+	{
+		$page->parse_params($params);
+	}
+	
 	return $page->handleARL($arl, $params, $resourceId, $pathItems);
 }
 

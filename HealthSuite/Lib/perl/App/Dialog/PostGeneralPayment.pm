@@ -42,11 +42,11 @@ sub new
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 					options => FLDFLAG_REQUIRED),
 
-		new CGI::Dialog::Field::TableColumn(
+		new CGI::Dialog::Field(
+					name => 'pay_type',
 					caption => 'Payment Type', 
-					schema => $schema, 
-					column => 'Invoice_Item_Adjust.pay_type', 
-					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					lookup => 'Payment_Type', 
+					fKeyWhere => "group_name is NULL or group_name = 'personal'"),
 
 		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number', name => 'pay_method_fields',
 			fields => [

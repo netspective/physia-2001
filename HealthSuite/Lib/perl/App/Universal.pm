@@ -9,6 +9,8 @@ use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 
+use constant SEARCH_RESULTS_LIMIT => 250;
+
 #ROLE ACTIVITY
 use constant ROLE_GRANT => 0;
 use constant ROLE_REVOKE => 1;
@@ -445,7 +447,10 @@ use enum qw(BITMASK:CONTACTFLAG_ PREFERREDMETHOD);
 use enum qw(BITMASK:PERSONFLAG_ ISPATIENT ISPHYSICIAN ISNURSE ISCAREPROVIDER ISSTAFF ISADMINISTRATOR);
 
 use vars qw(%DIALOG_COMMAND_ACTIVITY_MAP);
-%DIALOG_COMMAND_ACTIVITY_MAP = ('view' => 0, 'add' => 1, 'update' => 2, 'remove' => 3 );
+%DIALOG_COMMAND_ACTIVITY_MAP = (
+	'view' => 0, 'add' => 1, 'update' => 2, 'remove' => 3,
+	'cancel' => 4, 'noshow' => 5, 'reschedule' => 6,
+);
 use constant ACTIVITY_TYPE_RECORD => 0;
 use constant ACTIVITY_TYPE_PAGE => 1;
 use constant ACTIVITY_LEVEL_HIGH => 0;

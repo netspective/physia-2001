@@ -780,7 +780,7 @@ sub createDayViewPreferences
 	my ($self) = @_;
 
 	my $userID = $self->session('user_id');
-	my $orgID  = $self->session('org_id');
+	my $orgID  = $self->session('org_internal_id');
 	my $itemName = 'Preference/Schedule/DayView/Column';
 
 	my $assocResources = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,

@@ -5,53 +5,146 @@ package App::Statements::Search::Catalog;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-
 use Data::Publish;
-
+use App::Universal;
 use vars qw(@ISA @EXPORT $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGITEM_COLUMNS
-	$STMTRPTDEFN_DEFAULT $STMTRPTDEFN_DEFAULT_ITEM);
+	$STMTRPTDEFN_DEFAULT $STMTRPTDEFN_NAME_DEFAULT $STMTRPTDEFN_DEFAULT_ITEM );
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CATALOG_SEARCH);
 
-use vars qw($STMTFMT_SEL_CATALOG $STMTFMT_SEL_CATALOGENTRY);
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
+use vars qw($STMTFMT_SEL_CATALOG $STMTFMT_SEL_CATALOGENTRY $STMTFMT_SEL_CATENTRYBYID );
 
 $STMTFMT_SEL_CATALOG = qq{
-		select oc.catalog_id,
-			count(oce.entry_id) entries_count,
-			oc.caption,
-			oc.description,
-			oc.parent_catalog_id,
-			oc.internal_catalog_id,
-			'Add',
-			decode(oc_a.value_int, 1, '(Capitated)', null) as capitated
-		from Ofcatalog_Attribute oc_a, offering_catalog oc, offering_catalog_entry oce
-		where
-			oce.catalog_id (+) = oc.internal_catalog_id and
-			oc_a.parent_id (+) = oc.internal_catalog_id and
-			(oc.org_id is null or oc.org_id = ?)
-			%whereCond%
-		group by oc.catalog_id, oc.internal_catalog_id, oc.caption, oc.description,
-			oc.parent_catalog_id %extraCols%, oc_a.value_int
-		order by oc.catalog_id
+	SELECT
+		oc.catalog_id,
+		count(oce.entry_id) entries_count,
+		oc.caption,
+		oc.description,
+		oc.parent_catalog_id,
+		oc.internal_catalog_id,
+		'Add',
+		DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+	FROM
+		ofcatalog_Attribute oc_a,
+		offering_catalog oc,
+		offering_catalog_entry oce
+	WHERE
+		oce.catalog_id (+) = oc.internal_catalog_id
+		AND oc_a.parent_id (+) = oc.internal_catalog_id 
+		AND (oc.org_internal_id is null or oc.org_internal_id = ?)
+		%whereCond%
+		AND rownum <= $LIMIT
+	GROUP BY
+		oc.catalog_id,
+		oc.internal_catalog_id,
+		oc.caption,
+		oc.description,
+		oc.parent_catalog_id %extraCols%,
+		oc_a.value_int
+	ORDER BY
+		oc.catalog_id
 };
 
 $STMTFMT_SEL_CATALOGENTRY = qq{
-		select entry_id as ID,
-			catalog_entry_type.caption as Type,
-			code as Code,
-			modifier as Modifier,
-			description as Description,
-			unit_cost as Price,
-			default_units as UOH,
-			'Add',
-			parent_entry_id,
-			name,
-			decode(flags, 0, null, 1, '(FFS)')
-		from catalog_entry_type, offering_catalog_entry
-		where 	catalog_id = ?
-			and	offering_catalog_entry.entry_type = catalog_entry_type.id
-		order by entry_type, code, modifier
+	SELECT
+		entry_id AS ID,
+		catalog_entry_type.caption AS Type,
+		code AS code,
+		modifier AS modifier,
+		description AS description,
+		unit_cost AS price,
+		default_units AS uoh,
+		'Add',
+		parent_entry_id,
+		name,
+		DECODE(flags, 0, null, 1, '(FFS)')
+	FROM
+		catalog_entry_type,
+		offering_catalog_entry
+	WHERE
+		catalog_id = ?
+		AND	offering_catalog_entry.entry_type = catalog_entry_type.id
+		AND rownum <= $LIMIT
+	ORDER BY
+		entry_type,
+		code,
+		modifier
 };
+
+
+
+$STMTFMT_SEL_CATENTRYBYID = qq{
+	SELECT
+		oce.entry_id AS id,
+		catalog_entry_type.caption AS type,
+		oce.code AS code,
+		oce.modifier AS modifier,
+		oce.description AS description,
+		oce.unit_cost AS price,
+		oce.default_units AS uoh,
+		'Add',
+		oce.parent_entry_id,
+		oce.name,
+		decode(flags, 0, null, 1, '(FFS)')
+	FROM
+		catalog_entry_type,
+		offering_catalog_entry oce,
+		offering_catalog oc
+	WHERE 	
+		oc.org_internal_id =  ?
+		AND oc.catalog_id = ?
+		AND oce.catalog_id = oc.internal_catalog_id
+		AND	oce.entry_type = catalog_entry_type.id
+		AND rownum <= $LIMIT
+	ORDER BY entry_type, code, modifier
+},
+
+
+
+$STMTRPTDEFN_NAME_DEFAULT =
+{
+	banner =>
+	{
+		actionRows =>
+		[
+			{
+				caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
+				url => '/org/#session.org_id#/dlg-add-catalog'
+			},
+		],
+	},
+
+	stdIcons =>
+	{
+		#addUrlFmt => '/org/#session.org_id#/dlg-add-catalog',
+		updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#',
+		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
+	},
+	columnDefn =>
+	[
+		{ head => 'ID', hint => 'Fee Schedule ID #5#', 			
+			url => 'javascript:chooseItem("/search/catalog/name/#0#", "#0#", false)',
+			#dataFmt => '&{level_indent:0}#0#', 
+			tDataFmt => '&{count:0} Schedules', 
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
+		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
+		{	head => 'Contract', dataFmt => '#7#'},
+		{ head => 'Entries', 
+			colIdx => 1, 
+			dAlign => 'CENTER', 
+			tAlign=>'CENTER',
+			summarize => 'sum'
+		},
+	],
+	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
+};
+
+
+
+
 
 $STMTRPTDEFN_DEFAULT =
 {
@@ -76,6 +169,7 @@ $STMTRPTDEFN_DEFAULT =
 	[
 		{ head => 'ID', hint => 'Fee Schedule ID #5#', 
 			url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)',
+			#url => 'javascript:chooseItem("/search/catalog/detailname/#0#", "#0#", false)',
 			#dataFmt => '&{level_indent:0}#0#', 
 			tDataFmt => '&{count:0} Schedules', 
 			options => PUBLCOLFLAG_DONTWRAP,
@@ -91,6 +185,14 @@ $STMTRPTDEFN_DEFAULT =
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
+
+
+
+
+
+
+
+
 
 my $STMTRPTDEFN_ORG =
 {
@@ -218,6 +320,14 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			#whereCond => '(oc.org_id is null or oc.org_id = ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	'sel__name_catalogs_all' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			#whereCond => '(oc.org_id is null or oc.org_id = ?)',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
+	
+	
 
 	'sel_catalogs_all_org' =>
 		{
@@ -226,17 +336,33 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			publishDefn => $STMTRPTDEFN_ORG,
 		},
 
+
 	'sel_catalog_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and oc.catalog_id = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+		
+		
+	'sel_name_catalog_id' =>		
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and oc.catalog_id = ?',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
+		
 	'sel_catalog_id_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and oc.catalog_id like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_name_catalog_id_like' =>
+		{
+				_stmtFmt => $STMTFMT_SEL_CATALOG,
+				whereCond => 'and oc.catalog_id like ?',
+				publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
 		},
 	'sel_catalog_name' =>
 		{
@@ -244,17 +370,39 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			whereCond => 'and oc.caption = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	'sel_name_catalog_name' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and oc.caption = ?',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
+		
 	'sel_catalog_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and oc.caption like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+		
+	'sel_name_catalog_name_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and oc.caption like ?',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
+
 	'sel_catalog_description' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and oc.description = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+
+	'sel_name_catalog_description' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and oc.description = ?',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
 		},
 	'sel_catalog_description_like' =>
 		{
@@ -262,17 +410,36 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			whereCond => 'and oc.description like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	'sel_name_catalog_description_like' =>
+	{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and oc.description like ?',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
 	'sel_catalog_nameordescr' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and (oc.caption = ? or oc.description = ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	'sel_name_catalog_nameordescr' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and (oc.caption = ? or oc.description = ?)',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
+		},
+		
 	'sel_catalog_nameordescr_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'and (oc.caption like ? or oc.description like ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_name_catalog_nameordescr_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATALOG,
+			whereCond => 'and (oc.caption like ? or oc.description like ?)',
+			publishDefn => $STMTRPTDEFN_NAME_DEFAULT,
 		},
 
 	'sel_catalog_items_all' =>
@@ -286,8 +453,15 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			publishDefn => $STMTRPTDEFN_DEFAULT_ITEM,
 		},
 	'sel_catalog_detail' =>
+	
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOGENTRY,
+			publishDefn => $STMTRPTDEFN_DEFAULT_ITEM,
+		},
+		
+	'sel_catalog_detailname' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_CATENTRYBYID,
 			publishDefn => $STMTRPTDEFN_DEFAULT_ITEM,
 		},
 

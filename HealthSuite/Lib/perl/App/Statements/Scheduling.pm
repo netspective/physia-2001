@@ -118,7 +118,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'selFacilityName' => qq{
-		select name_primary from Org where org_id = ?
+		select name_primary from Org 
+		where org_internal_id = ?
 	},
 	'selApptDuration' => qq{
 		select id, caption
@@ -177,12 +178,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'selColumnPreference' => qq{
-		select item_id, value_text as resource_id, value_textb as facility_id,
+		select item_id, value_text as resource_id, org_id as facility_id,
 			nvl(value_intb, 0) as date_offset
-		from Person_Attribute
+		from Org, Person_Attribute
 		where parent_id = ?
 			and item_name = 'Preference/Schedule/DayView/Column'
 			and value_int = ?
+			and org_internal_id (+) = to_number(value_textb)
 	},
 	
 	'selApptSheetTimes' => qq{

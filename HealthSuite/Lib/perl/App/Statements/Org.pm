@@ -4,6 +4,7 @@ package App::Statements::Org;
 
 use strict;
 use Exporter;
+use App::Universal;
 use DBI::StatementManager;
 
 use vars qw(@ISA @EXPORT $STMTMGR_ORG $PUBLISH_DEFN);
@@ -14,26 +15,68 @@ my $ATTRTYPE_PHONE = App::Universal::ATTRTYPE_PHONE;
 
 $STMTMGR_ORG = new App::Statements::Org(
 	'selOrgSimpleNameById' => qq{
-			select name_primary from org where org_id = ?
+		select name_primary
+		from org
+		where org_internal_id = ?
+		},
+	'selOwnerOrg' => qq{
+		select *
+		from org
+		where parent_org_id IS NULL AND
+		org_id = ?
+		},
+	'selOwnerOrgId' => qq{
+		select org_internal_id
+		from org
+		where parent_org_id IS NULL AND
+		org_id = ?
+		},
+	'selOrg' => qq{
+		select *
+		from org
+		where owner_org_id = ? AND
+		org_id = ?
+		},
+	'selOrgId' => qq{
+		select org_internal_id
+		from org
+		where owner_org_id = ? AND
+		org_id = ?
+		},
+	'selId' => qq{
+		select org_id
+		from org
+		where org_internal_id = ?
 		},
 	'selRegistry' => qq{
 		select *
 		from org
-		where org_id = ?
+		where org_internal_id = ?
 		},
 	'selCategory' => qq{
 		select category
 		from org
-		where org_id = ?
+		where org_internal_id = ?
+		},
+	'selTaxId' => qq{
+		select tax_id
+		from org
+		where org_internal_id = ?
+		},
+	'selUpdateOwnerOrgId' => qq{
+		update org
+		set owner_org_id = ?
+		where org_internal_id = ?
 		},
 	'selPersonCategory' => qq{
-		select org_id from Org where 
-		(owner_org_id in (select org_id from Person_Org_Category
-		where person_id = ?)
-		or 
-		parent_org_id in (select org_id from Person_Org_Category
-		where person_id = ?))
-		and org_id = ?
+		select org_internal_id
+		from Org
+			where
+			(
+				owner_org_id in (select org_internal_id from Person_Org_Category where person_id = ?) or
+				parent_org_id in (select org_internal_id from Person_Org_Category where person_id = ?)
+			)
+			and org_internal_id = ?
 		},
 	'selAttribute' => qq{
 		select * from org_attribute
@@ -95,15 +138,8 @@ $STMTMGR_ORG = new App::Statements::Org(
 		select *
 					from org org, org_category ocat
 					where org.parent_org_id = ?
-				and ocat.member_name = 'Department' and ocat.parent_id = org.org_id
+				and ocat.member_name = 'Department' and ocat.parent_id = org.org_internal_id
 	  	 },
-	 'selInsOrgName' => qq{
-	   	select name_primary, ins_org_id
-	   		from org, insurance
-	   		where product_name = ?
-			and org_id = 'ins_org_id'
-		},
-
 	'selMemberNames' => qq{
 		select member_name
 			from org_category
@@ -127,22 +163,22 @@ $STMTMGR_ORG = new App::Statements::Org(
 			select distinct o.*, decode(t.group_name, 'other', 'main', t.group_name) as group_name
 			from org o, org_category cat, org_type t
 			where
-				cat.parent_id = o.org_id and
+				cat.parent_id = o.org_internal_id and
 				cat.member_name = t.caption and
 				cat.member_name = (
 					select caption from org_type
 					where id = (
 						select min(id)
 						from org_type, org_category
-						where parent_id = o.org_id and caption = member_name
+						where parent_id = o.org_internal_id and caption = member_name
 					)
 				) and
-			org_id = ?
+			org_internal_id = ?
 		},
 	'selOrgEligibilityInput' => qq{
 			select *
 			from org_eligibility_input
-			where org_id = ?
+			where org_internal_id = ?
 			order by field_order
 		},
 );

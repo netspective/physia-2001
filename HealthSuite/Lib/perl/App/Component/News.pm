@@ -4,7 +4,7 @@ package App::Component::News;
 
 use strict;
 use CGI::Component;
-use LWP::Simple;
+use LWP::UserAgent;
 use HTML::TokeParser;
 use Data::Publish;
 
@@ -51,14 +51,25 @@ sub getNews
 	unless( defined $NEWS{$source} )
 	{
 		my $newsData = [];
-		my $origHtml = get("http://headlines.isyndicate.com/pages/physia/$source.html") or warn "Can't fetch news from isyndicate.com!\n";
-		my $p = HTML::TokeParser->new(\$origHtml);
-		while (my $token = $p->get_tag("a"))
+		my $ua = new LWP::UserAgent;
+		$ua->timeout(5);
+		my $request = HTTP::Request->new('GET', "http://headlines.isyndicate.com/pages/physia/$source.html");
+		my $response = $ua->request($request);
+		if ($response->is_success)
 		{
-			my $url = $token->[1]{href} || "-";
-			my $text = $p->get_trimmed_text("/a");
-			next if $text =~ m/iSyndicate/i;
-			push(@$newsData, [$url, $text]);
+			my $origHtml = $response->content();
+			my $p = HTML::TokeParser->new(\$origHtml);
+			while (my $token = $p->get_tag("a"))
+			{
+				my $url = $token->[1]{href} || "-";
+				my $text = $p->get_trimmed_text("/a");
+				next if $text =~ m/iSyndicate/i;
+				push(@$newsData, [$url, $text]);
+			}
+		}
+		else
+		{
+			 warn "$$ Can't fetch news from isyndicate.com!\n"
 		}
 		$NEWS{$source} = $newsData;
 	}

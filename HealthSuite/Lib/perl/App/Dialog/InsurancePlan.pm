@@ -304,13 +304,16 @@ sub execute
 	my $billSeq = $page->field('bill_sequence');
 	my $insuredId = $page->field('insured_id') eq '' ? $personId : $page->field('insured_id') ;
 
+	my $orgId = $page->field('ins_org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+
 	my $insIntId = $page->schemaAction(
 			'Insurance', $command,
 			ins_internal_id => $editInsIntId || undef,
 			parent_ins_id => $page->field('parent_ins_id') || undef,
 			ins_id => $page->field('ins_id') || undef,
 			owner_id => $personId || undef,
-			ins_org_id => $page->field('ins_org_id') || undef,
+			ins_org_id => $orgIntId || undef,
 			record_type => defined $recordType ? $recordType : undef,
 			ins_type => defined $insType ? $insType : undef,
 			bill_sequence => defined $billSeq ? $billSeq : undef,
@@ -515,13 +518,17 @@ sub updateChildrenPlans
 
 	my $remitType = $insData->{remit_type};
 	my $insType = $insData->{ins_type};
+	
+	my $orgId = $insData->{ins_org_id};
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+	
 	foreach (@{$childPlans})
 	{
 		$page->schemaAction(
 				'Insurance', 'update',
 				ins_internal_id => $_->{ins_internal_id} || undef,
 				ins_id => $insData->{ins_id} || undef,
-				ins_org_id => $insData->{ins_org_id} || undef,
+				ins_org_id => $orgIntId || undef,
 				ins_type => defined $insType ? $insType : undef,
 				plan_name => $insData->{plan_name} || undef,
 				group_name => $insData->{group_name} || undef,

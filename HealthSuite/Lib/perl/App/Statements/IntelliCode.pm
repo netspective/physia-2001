@@ -21,71 +21,71 @@ $STMTMGR_INTELLICODE = new App::Statements::IntelliCode(
 	},
 
 	'selIcdUsage1' => qq{
-		select parent_id from REF_ICD_USAGE where parent_id = ? and person_id = ? and org_id = ?
+		select parent_id from REF_ICD_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'selIcdUsage2' => qq{
-		select parent_id from REF_ICD_USAGE where parent_id = ? and person_id is NULL and org_id = ?
+		select parent_id from REF_ICD_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'updIcdUsage1' => qq{
 		update REF_ICD_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id = ? and org_id = ?
+		where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'updIcdUsage2' => qq{
 		update REF_ICD_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id is NULL and org_id = ?
+		where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'selCptUsage1' => qq{
-		select parent_id from REF_CPT_USAGE where parent_id = ? and person_id = ? and org_id = ?
+		select parent_id from REF_CPT_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'selCptUsage2' => qq{
-		select parent_id from REF_CPT_USAGE where parent_id = ? and person_id is NULL and org_id = ?
+		select parent_id from REF_CPT_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'updCptUsage1' => qq{
 		update REF_CPT_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id = ? and org_id = ?
+		where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'updCptUsage2' => qq{
 		update REF_CPT_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id is NULL and org_id = ?
+		where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'selHcpcsUsage1' => qq{
-		select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id = ? and org_id = ?
+		select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'selHcpcsUsage2' => qq{
-		select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id is NULL and org_id = ?
+		select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'updHcpcsUsage1' => qq{
 		update REF_HCPCS_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id = ? and org_id = ?
+		where parent_id = ? and person_id = ? and org_internal_id = ?
 	},
 
 	'updHcpcsUsage2' => qq{
 		update REF_HCPCS_USAGE set read_count = read_count +1
-		where parent_id = ? and person_id is NULL and org_id = ?
+		where parent_id = ? and person_id is NULL and org_internal_id = ?
 	},
 
 	'insIcdUsage' => qq{
-		insert into REF_ICD_USAGE (parent_id, person_id, org_id, read_count)
+		insert into REF_ICD_USAGE (parent_id, person_id, org_internal_id, read_count)
 		values (?, ?, ?, 1)
 	},
 
 	'insCptUsage' => qq{
-		insert into REF_CPT_USAGE (parent_id, person_id, org_id, read_count)
+		insert into REF_CPT_USAGE (parent_id, person_id, org_internal_id, read_count)
 		values (?, ?, ?, 1)
 	},
 
 	'insHcpcsUsage' => qq{
-		insert into REF_HCPCS_USAGE (parent_id, person_id, org_id, read_count)
+		insert into REF_HCPCS_USAGE (parent_id, person_id, org_internal_id, read_count)
 		values (?, ?, ?, 1)
 	},
 	

@@ -140,7 +140,9 @@ sub makeStateChanges
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $orgIntId = $page->session('org_internal_id');
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 
 	if($page->param('_lcm_ispopup'))
 	{
@@ -157,7 +159,7 @@ sub makeStateChanges
 	my $lastName = $self->getField('person_id')->{fields}->[0];
 	my $createRecField = $self->getField('create_record');
 
-	my $names = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName', $orgId);
+	my $names = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName', $orgIntId);
 	foreach my $nameFirstLast (@{$names})
 	{
 		my $checkfirst = $nameFirstLast->{'name_first'};
@@ -435,14 +437,17 @@ sub handleRegistry
 			_debug => 0
 		);
 
-	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $orgIntId = $page->session('org_internal_id');
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
+
 
 	if($command eq 'add')
 	{
 		$page->schemaAction(
 				'Person_Org_Category', $command,
 				person_id => $personId || undef,
-				org_id => $orgId || undef,
+				org_internal_id => $orgIntId || undef,
 				category => $member || undef,
 				_debug => 0
 			);
@@ -452,8 +457,8 @@ sub handleRegistry
 				parent_id => $personId,
 				item_name => $member,
 				value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
-				value_text => $page->param('org_id') || $page->session('org_id'),
-				parent_org_id => $page->param('org_id') || $page->session('org_id'),
+				value_int => $orgIntId,
+				parent_org_id => $orgIntId,
 				_debug => 0
 			) if $member ne 'patient';
 	}
@@ -465,8 +470,6 @@ sub handleRegistry
 	{
 		$page->redirect("/person/$personId/dlg-remove-$member/$personId");
 	}
-
-
 	elsif ($command eq 'update')
 	{
 		$page->redirect("/person/$personId/profile");
@@ -474,7 +477,6 @@ sub handleRegistry
 	else
 	{
 		$self->handlePostExecute($page, $command, $flags);
-
 	}
 
 
@@ -484,11 +486,14 @@ sub handleRegistry
 sub handleAttrs
 {
 	my ($self, $page, $command, $flags, $member, $personId) = @_;
-	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $orgIntId = $page->session('org_internal_id');
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
-			parent_org_id => $orgId ||undef,
+			parent_org_id => $orgIntId ||undef,
 			item_name => 'Misc Notes' ,
 			value_text => $page->field('misc_notes') || undef,
 			_debug => 0
@@ -498,7 +503,7 @@ sub handleAttrs
 	$page->schemaAction(
 			'Person_Attribute', $commandJobCode,
 			parent_id => $personId || undef,
-			parent_org_id => $orgId ||undef,
+			parent_org_id => $orgIntId ||undef,
 			item_id => $page->field('job_item_id') || undef,
 			item_name => 'Job Code' ,
 			value_text => $page->field('job_title') || undef,
@@ -534,15 +539,13 @@ sub handleAttrs
 			_debug => 0
 		);
 
-
-
 	my $commandTitle = $command eq 'update' &&  $page->field('nurse_title_item_id') eq '' ? 'add' : $command;
 	my @titles = $page->field('nurse_title');
 	$page->schemaAction(
 			'Person_Attribute', $commandTitle,
 			parent_id => $personId || undef,
 			item_id => $page->field('nurse_title_item_id') || undef,
-			parent_org_id => $orgId ||undef,
+			parent_org_id => $orgIntId ||undef,
 			item_name => 'Nurse/Title',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => join(',', @titles) || undef,
@@ -555,7 +558,7 @@ sub handleAttrs
 			'Person_Attribute', $commandPhyType,
 			parent_id => $personId || undef,
 			item_id => $page->field('phy_type_item_id') || undef,
-			parent_org_id => $orgId ||undef,
+			parent_org_id => $orgIntId ||undef,
 			item_name => 'Physician/Type',
 			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => join(',', @physicianType) || undef,
@@ -608,14 +611,17 @@ sub customValidate
 	}
 	else
 	{
-		my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+		my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+		my $orgIntId = $page->session('org_internal_id');
+		$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
+
 
 		my $ssNum = $self->getField('ssndatemf')->{fields}->[0];
 		my $firstName = $self->getField('person_id')->{fields}->[0];
 		my $lastName = $self->getField('person_id')->{fields}->[2];
 		my $personId = $page->field('person_id');
 
-		my $personssn = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selssn', $orgId);
+		my $personssn = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selssn', $orgIntId);
 		#my $name = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName',$orgId );
 		foreach my $perssn (@{$personssn})
 		{
@@ -635,8 +641,9 @@ sub execute_remove
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $personId = $page->field('person_id');
-	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
-
+	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
+	my $orgIntId = $page->session('org_internal_id');
+	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 
 	$page->schemaAction(
 			'Person', $command,
@@ -648,7 +655,7 @@ sub execute_remove
 			'Person_Org_Category', $command,
 			person_id => $personId || undef,
 			category => $member || undef,
-			org_id => $orgId || undef,
+			org_internal_id => $orgIntId || undef,
 			_debug => 0
 		);
 

@@ -825,7 +825,8 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	// of the popup window to check the value of activeFindWinControl and
 	// either automatically populate the control or do something else
 	//
-	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? "width=600,height=600,scrollbars,resizable" : features);
+	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? 
+		"location, width=600,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
 
@@ -1117,7 +1118,7 @@ function doActionPopup(arl, autoRefresh, features)
 	}
 	else
 	{
-		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "width=620,height=600,scrollbars,resizable");
+		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "location, width=620,height=600,scrollbars,resizable");
 	}
 	popUpWindow.focus();
 }

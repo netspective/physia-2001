@@ -13,16 +13,25 @@ use Number::Format;
 use CGI::Layout;
 use Data::Publish;
 
-use enum qw(BITMASK:STMTMGRFLAG_ NULLIFNAMENOTFOUND DYNAMICSQL DEBUG CACHE REPLACEVARS FLATTREE);
+use enum qw(BITMASK:STMTMGRFLAG_ NULLIFNAMENOTFOUND DYNAMICSQL DEBUG
+	CACHE REPLACEVARS FLATTREE);
 
-use vars qw(@ISA @EXPORT $ALL_STMT_MANAGERS $SQLSTMT_DEFAULTDATEFORMAT $SQLSTMT_DEFAULTCURRENCYFORMAT $SQLSTMT_DEFAULTSTAMPFORMAT %REPORT_STYLE);
+use vars qw(@ISA @EXPORT $ALL_STMT_MANAGERS $SQLSTMT_DEFAULTDATEFORMAT
+	$SQLSTMT_DEFAULTCURRENCYFORMAT $SQLSTMT_DEFAULTSTAMPFORMAT %REPORT_STYLE);
+
 use constant STMTMGRFLAGS_NONE => 0;
 
 @ISA    = qw(Exporter);
 @EXPORT = qw(
-	$SQLSTMT_DEFAULTDATEFORMAT $SQLSTMT_DEFAULTSTAMPFORMAT $SQLSTMT_DEFAULTCURRENCYFORMAT
+	$SQLSTMT_DEFAULTDATEFORMAT
+	$SQLSTMT_DEFAULTSTAMPFORMAT
+	$SQLSTMT_DEFAULTCURRENCYFORMAT
 	$ALL_STMT_MANAGERS
-	STMTMGRFLAG_DEBUG STMTMGRFLAG_NONE STMTMGRFLAG_CACHE STMTMGRFLAG_DYNAMICSQL STMTMGRFLAG_REPLACEVARS
+	STMTMGRFLAG_DEBUG
+	STMTMGRFLAG_NONE
+	STMTMGRFLAG_CACHE
+	STMTMGRFLAG_DYNAMICSQL
+	STMTMGRFLAG_REPLACEVARS
 	STMTMGRFLAG_RPT_DEFINITIONPROVIDED
 	STMTMGRFLAG_RPT_DATAPROVIDED
 	STMTMGRFLAG_RPT_HIDEROWSEP
@@ -134,7 +143,8 @@ sub getStatementHdl
 	my ($self, $dbpage, $flags, $name) = @_;
 	if($flags & STMTMGRFLAG_DYNAMICSQL)
 	{
-		return $dbpage->{db}->prepare($name);
+		my $stmtHdl = $dbpage->{db}->prepare($name) or die $dbpage->{db}->errstr();
+		return $stmtHdl;
 	}
 
 	my $sthName = '_sth_' . $name;
@@ -148,9 +158,8 @@ sub getStatementHdl
 		if(my $statement = $self->{$name})
 		{
 			my $stmtHdl = undef;
-			eval
-			{
-				$stmtHdl = $dbpage->{db}->prepare($statement);
+			eval {
+				$stmtHdl = $dbpage->{db}->prepare($statement) or die $dbpage->{db}->errstr();
 			};
 			if($@ || ! $stmtHdl)
 			{
@@ -183,30 +192,50 @@ sub execute
 	my ($self, $dbpage, $flags, $name) = (shift, shift, shift, shift);
 
 	my $execRV = undef;
-	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
-	{
-		$dbpage->addDebugStmt("<u>Query</u>: <b>$name</b>");
-		unless($flags & STMTMGRFLAG_DYNAMICSQL)
-		{
-			$dbpage->addDebugStmt('<pre>', $self->{$name}, '</pre');
-			my @params = @_;
-			foreach (@params)
-			{
-				$_ = "'$_'";
-			}
-			$dbpage->addDebugStmt("$name params: " . join(',', @params));
-		}
-	}
 
+	# Prepare a debug message for logging and fatal error handling
+	my $debugMsg = '';
+	my $stack = '';
+	if (1) # FIX ME!!! Need to skip this block if we're in production for performance.
+	{
+		my $stmtMgrName = ref($self);
+		my $stmtName = $flags & STMTMGRFLAG_DYNAMICSQL ? '<i>Dynamic SQL</i>' : $name;
+		my $stmt = $flags & STMTMGRFLAG_DYNAMICSQL ? $name : $self->{$name};
+		for my $i (0..50)
+		{
+			my ($pack, $file, $line) = caller($i);
+			last unless $pack;
+			$stack .= '&nbsp;&nbsp;' . "$i - $pack line $line<br>";
+		}
+		$stack = "<b>Stack Trace:</b><br>$stack<br>";
+		$debugMsg = "<b>Statement Manager:</b> <a href='/sde/stmgr/$stmtMgrName'>$stmtMgrName</a><br>";
+		$debugMsg .= "<b>Statement Name:</b> ";
+		$debugMsg .= $flags & STMTMGRFLAG_DYNAMICSQL ? "$stmtName<br>" : "<a href='/sde/stmgr/$stmtMgrName/$stmtName'>$stmtName</a><br>";
+		$debugMsg .= "<b>Query:</b><pre>$stmt</pre>";
+		$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
+		for my $i ( 0..$#_)
+		{
+			my $value = defined $_[$i] ? "'$_[$i]'" : '<i>undef</i>';
+			$debugMsg .= '&nbsp;&nbsp;:' . ($i+1) . " = $value<br>";
+		}
+		$debugMsg .= "<br>";
+	}
+	
 	my $stmtHdl = $self->getStatementHdl($dbpage, $flags, $name);
+	
+	# Temporarily turn off DBI exceptions so we can handle the errors locally
+	# (DBI exceptions will automagically turn back on after we leave this block)
+	local $stmtHdl->{RaiseError} = 0 if $stmtHdl->{RaiseError};
+	
+	# Check for #something# replacements
+	my @params = @_;
 	if($flags & STMTMGRFLAG_REPLACEVARS)
 	{
 		#
 		# the substitution here (regexp) should be the same as the one in CGI::Page
 		# basically, it replaces session.xxx with $page->session('xxx'), param.yyy with
 		# $page->param('yyy'), and field.abc with $page->field('abc')
-		#
-		my @params = @_;
+		#	
 		grep
 		{
 			s/\#(\w+)\.?([\w\-\.]*)\#/
@@ -220,12 +249,19 @@ sub execute
 				}
 				/ge;
 		} @params;
-		$execRV = $stmtHdl->execute(@params);
 	}
-	else
+	
+	# Execute the SQL & handle errors
+	$execRV = $stmtHdl->execute(@params) or die "$debugMsg$stack" . $stmtHdl->errstr();
+	
+	# Add the debug message if we're in debug mode
+	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
 	{
-		$execRV = $stmtHdl->execute(@_);
+		$debugMsg .= "<b>Execute Result Code:</b> $execRV<br>";
+		$debugMsg .= $stack if $dbpage->param('_debug_stack');
+		$dbpage->addDebugStmt($debugMsg);
 	}
+	
 	wantarray ? ($stmtHdl, $execRV) : $stmtHdl;
 }
 
@@ -646,7 +682,7 @@ sub createPropertiesFromSingleRow
 sub createHtml
 {
 	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams, $pubD) = @_;
-
+	
 	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
 	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
 	my $publDefn = $self->{"_dpd_$defnName"} || {};
