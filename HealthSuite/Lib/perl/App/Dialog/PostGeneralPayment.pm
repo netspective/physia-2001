@@ -22,7 +22,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'adjustment', heading => 'Post Payment');
+	my $self = CGI::Dialog::new(@_, id => 'adjustment', heading => 'Post Personal Payment');
 
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
@@ -35,7 +35,8 @@ sub new
 		new CGI::Dialog::Field(type => 'currency',
 					caption => 'Total Payment Received',
 					name => 'total_amount',
-					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number',
 			fields => [
@@ -43,11 +44,7 @@ sub new
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.pay_method',
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-				new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.pay_ref',
-							type => 'text',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+				new CGI::Dialog::Field(caption => 'Check Number', name => 'pay_ref', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				]),
 
 		new CGI::Dialog::Field(caption => 'Authorization/Reference Number', name => 'auth_ref'),
@@ -87,19 +84,6 @@ sub makeStateChanges
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $payType = $page->param('payment');
-
-	my $isPersonal = $payType eq 'personal';
-	my $isInsurance = $payType eq 'insurance';
-
-	$self->heading("Make \u$payType Payment");
-
-	$self->updateFieldFlags('adjust_info', FLDFLAG_INVISIBLE, $isInsurance);
-	$self->updateFieldFlags('plan_info', FLDFLAG_INVISIBLE, $isPersonal);
-	$self->updateFieldFlags('adjust_codes', FLDFLAG_INVISIBLE, $isPersonal);
-	$self->updateFieldFlags('adjustment_type', FLDFLAG_INVISIBLE, $isPersonal);
-
-
 	#if param invoice id is NULL, don't want to show invoice-specific fields
 	unless($page->param('invoice_id'))
 	{
@@ -118,12 +102,10 @@ sub populateData
 	if(my $invoiceId = $page->param('invoice_id'))
 	{
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-		$page->param('payment') eq 'insurance' ? $page->field('payer_id', $invoiceInfo->{bill_to_id}) : $page->field('payer_id', $invoiceInfo->{client_id});
 		$page->field('invoice_id', $invoiceId);
 		my $balanceDisplay = $invoiceInfo->{balance} ? "\$$invoiceInfo->{balance}" : "\$0";
 		$page->field('balance', $balanceDisplay);
 		$page->field('payer_id', $invoiceInfo->{client_id});
-
 
 		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
 		my $endDateDisplay = '';
@@ -134,10 +116,13 @@ sub populateData
 		my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
 		$page->field('service_dates', $dateDisplay);
 
-
 		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
 		my $copayDisplay = $invoiceCopayItem->{balance} ? "\$$invoiceCopayItem->{balance}" : "\$0";
 		$page->field('copay_due', $copayDisplay);
+	}
+	elsif(my $personId = $page->param('person_id'))
+	{
+		$page->field('payer_id', $personId);	
 	}
 }
 
@@ -150,107 +135,201 @@ sub execute
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
-	my $lineCount = $page->param('_f_line_count');
-
-	for(my $line = 1; $line <= $lineCount; $line++)
+	if($page->field('total_amount') > 0)
 	{
-		my $payAmt = $page->param("_f_invoice_$line\_payment");
-		next if $payAmt eq '';
+		#APPLY PAYMENT TO "THIS VISIT" INVOICE
+		my $payment = $page->field('adjustment_amount');
+		if($payment > 0)
+		{
+			my $totalAdjustForItemAndItemAdjust = 0 - $payment;
 
-		my $totalAdjustForItemAndItemAdjust = 0 - $payAmt;
+			my $invoiceId = $page->param('invoice_id');
+			my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
+			my $itemSeq = $totalDummyItems + 1;
 
-		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
-		my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
-		my $itemSeq = $totalDummyItems + 1;
-
-		my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
-															# payment, there is no charge and the balance should be negative.
-		my $itemId = $page->schemaAction(
-				'Invoice_Item', 'add',
-				parent_id => $invoiceId,
-				item_type => defined $itemType ? $itemType : undef,
-				total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				balance => defined $itemBalance ? $itemBalance : undef,
-				data_num_c => $itemSeq,
-				_debug => 0
-			);
-
-
-
-
-		# Create adjustment for the item
-
-		my $payerIs = $page->param('payment');
-		my $payerType = '';
-		   $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
-		   $payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
-
-		my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-		my $payMethod = $page->field('pay_method');
-		my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
-		#my $payType = $page->field('pay_type');		# leave this out for now or until it is asked to be put in the dialog
-
-		$page->schemaAction(
-				'Invoice_Item_Adjust', 'add',
-				adjustment_type => defined $adjType ? $adjType : undef,
-				adjustment_amount => $page->field('adjustment_amount') || undef,
-				parent_id => $itemId || undef,
-				pay_date => $todaysDate || undef,
-				pay_method => defined $payMethod ? $payMethod : undef,
-				pay_ref => $page->field('pay_ref') || undef,
-				payer_type => defined $payerType ? $payerType : undef,
-				payer_id => $payerId || undef,
-				net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				data_text_a => $page->field('auth_ref') || undef,
-				#plan_allow => $page->field('plan_allow') || undef,
-				#plan_paid => $page->field('plan_paid') || undef,
-				#pay_type => defined $payType ? $payType : undef,
-				#writeoff_code => $page->field('writeoff_code') || undef,
-				#writeoff_amount => $page->field('writeoff_amount') || undef,
-				#adjust_codes => $page->field('adjust_codes') || undef,
-				#comments => $page->field('comments') || undef,
-				_debug => 0
-			);
+			my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
+																# payment, there is no charge and the balance should be negative.
+			my $itemId = $page->schemaAction(
+					'Invoice_Item', 'add',
+					parent_id => $invoiceId,
+					item_type => defined $itemType ? $itemType : undef,
+					total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+					balance => defined $itemBalance ? $itemBalance : undef,
+					data_num_c => $itemSeq,
+					_debug => 0
+				);
 
 
+			# Create adjustment for the item
 
-		#Update the invoice
+			my $payerIs = $page->param('payment');
+			my $payerType = '';
+			   $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
+			   $payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
 
-		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
+			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
+			my $payMethod = $page->field('pay_method');
+			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
+			#my $payType = $page->field('pay_type');		# leave this out for now or until it is asked to be put in the dialog
 
-		my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjustForItemAndItemAdjust;
-		my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+			$page->schemaAction(
+					'Invoice_Item_Adjust', 'add',
+					adjustment_type => defined $adjType ? $adjType : undef,
+					adjustment_amount => $payment || undef,
+					parent_id => $itemId || undef,
+					pay_date => $todaysDate || undef,
+					pay_method => defined $payMethod ? $payMethod : undef,
+					pay_ref => $page->field('pay_ref') || undef,
+					payer_type => defined $payerType ? $payerType : undef,
+					payer_id => $payerId || undef,
+					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+					data_text_a => $page->field('auth_ref') || undef,
+					#plan_allow => undef,
+					#plan_paid => undef,
+					#pay_type => undef,
+					#writeoff_code => undef,
+					#writeoff_amount => undef,
+					#adjust_codes => undef,
+					#comments => undef,
+					_debug => 0
+				);
 
-		$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId || undef,
-				total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-				balance => defined $invoiceBalance ? $invoiceBalance : undef,
-				_debug => 0
-			);
+
+			#Update the invoice
+
+			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
+
+			my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjustForItemAndItemAdjust;
+			my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+
+			$page->schemaAction(
+					'Invoice', 'update',
+					invoice_id => $invoiceId || undef,
+					total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+					balance => defined $invoiceBalance ? $invoiceBalance : undef,
+					_debug => 0
+				);
+
+
+			#Create history attribute for this adjustment
+
+			$payerIs = "\u$payerIs";
+			my $description = "$payerIs payment/adjustment made";
+
+			$page->schemaAction(
+					'Invoice_Attribute', 'add',
+					parent_id => $invoiceId || undef,
+					item_name => 'Invoice/History/Item',
+					value_type => defined $historyValueType ? $historyValueType : undef,
+					value_text => $description,
+					value_textB => $page->field('comments') || undef,
+					value_date => $todaysDate,
+					_debug => 0
+				);
+		}
+
+
+		#APPLY PAYMENTS TO LIST OF OUTSTANDING INVOICES
+
+		my $lineCount = $page->param('_f_line_count');
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			my $payAmt = $page->param("_f_invoice_$line\_payment");
+			next if $payAmt eq '';
+
+			my $totalAdjustForItemAndItemAdjust = 0 - $payAmt;
+
+			my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
+			my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
+			my $itemSeq = $totalDummyItems + 1;
+
+			my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
+																# payment, there is no charge and the balance should be negative.
+			my $itemId = $page->schemaAction(
+					'Invoice_Item', 'add',
+					parent_id => $invoiceId,
+					item_type => defined $itemType ? $itemType : undef,
+					total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+					balance => defined $itemBalance ? $itemBalance : undef,
+					data_num_c => $itemSeq,
+					_debug => 0
+				);
+
+
+
+
+			# Create adjustment for the item
+
+			my $payerIs = $page->param('payment');
+			my $payerType = '';
+			   $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
+			   $payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
+
+			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
+			my $payMethod = $page->field('pay_method');
+			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
+			#my $payType = $page->field('pay_type');		# leave this out for now or until it is asked to be put in the dialog
+
+			$page->schemaAction(
+					'Invoice_Item_Adjust', 'add',
+					adjustment_type => defined $adjType ? $adjType : undef,
+					adjustment_amount => $page->field('adjustment_amount') || undef,
+					parent_id => $itemId || undef,
+					pay_date => $todaysDate || undef,
+					pay_method => defined $payMethod ? $payMethod : undef,
+					pay_ref => $page->field('pay_ref') || undef,
+					payer_type => defined $payerType ? $payerType : undef,
+					payer_id => $payerId || undef,
+					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+					data_text_a => $page->field('auth_ref') || undef,
+					#plan_allow => undef,
+					#plan_paid => undef,
+					#pay_type => undef,
+					#writeoff_code => undef,
+					#writeoff_amount => undef,
+					#adjust_codes => undef,
+					#comments => undef,
+					_debug => 0
+				);
+
+
+
+			#Update the invoice
+
+			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
+
+			my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjustForItemAndItemAdjust;
+			my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+
+			$page->schemaAction(
+					'Invoice', 'update',
+					invoice_id => $invoiceId || undef,
+					total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+					balance => defined $invoiceBalance ? $invoiceBalance : undef,
+					_debug => 0
+				);
 
 
 
 
 
-		#Create history attribute for this adjustment
+			#Create history attribute for this adjustment
 
-		$payerIs = "\u$payerIs";
-		my $description = "$payerIs payment/adjustment made";
+			$payerIs = "\u$payerIs";
+			my $description = "$payerIs payment/adjustment made";
 
-		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => $description,
-				value_textB => $page->field('comments') || undef,
-				value_date => $todaysDate,
-				_debug => 0
-			);
+			$page->schemaAction(
+					'Invoice_Attribute', 'add',
+					parent_id => $invoiceId || undef,
+					item_name => 'Invoice/History/Item',
+					value_type => defined $historyValueType ? $historyValueType : undef,
+					value_text => $description,
+					value_textB => $page->field('comments') || undef,
+					value_date => $todaysDate,
+					_debug => 0
+				);
+		}
 	}
-
-
 
 	$self->handlePostExecute($page, $command, $flags);
 }

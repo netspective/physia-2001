@@ -304,21 +304,22 @@ sub getProceduresHtml
 	foreach my $itemIdx (0..$copayItems-1)
 	{
 		my $copayItem = $claim->{copayItems}->[$itemIdx];
-
+		my $itemId = $copayItem->{itemId};
 		my $itemNum = $itemIdx + 1;
 
 		my $itemExtCost = $copayItem->{extendedCost};
 		$itemExtCost = $formatter->format_price($itemExtCost);
 		my $itemAdjustmentTotal = $copayItem->{totalAdjustments};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-
-
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 		push(@rows, qq{
 			<TR>
 				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Copay - $copayItem->{comments}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
+				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD> -->
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
@@ -348,25 +349,52 @@ sub getProceduresHtml
 		});
 	}
 
-	my $totalAdjItems = scalar(@{$claim->{adjItems}});
+	my $adjItems = $STMTMGR_INVOICE->getRowsAsHashList($self, STMTMGRFLAG_CACHE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_ADJUST);
+	my $totalAdjItems = scalar(@{$adjItems});
 	foreach my $itemIdx (0..$totalAdjItems-1)
 	{
-		my $adjItem = $claim->{adjItems}->[$itemIdx];
+		my $itemId = $adjItems->[$itemIdx]->{item_id};
+		my $itemType = $adjItems->[$itemIdx]->{item_type};
 
 		my $itemNum = $itemIdx + 1;
 
-		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
+		my $itemAdjustmentTotal = $adjItems->[$itemIdx]->{balance};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
+		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
 		push(@rows, qq{
 			<TR>
-				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Adjustment</TD>
+				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Adjustment</B></TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
+
+
+	#UNCOMMENT THIS AFTER PROSYS GETS THIS WORKING AGAIN AND DELETE ABOVE LOOP
+	
+	#my $totalAdjItems = scalar(@{$claim->{adjItems}});
+	#foreach my $itemIdx (0..$totalAdjItems-1)
+	#{
+	#	my $adjItem = $claim->{adjItems}->[$itemIdx];
+
+	#	my $itemNum = $itemIdx + 1;
+
+	#	my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
+	#	$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
+
+	#	push(@rows, qq{
+	#		<TR>
+	#			<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">Adjustment</TD>
+	#			<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
+	#			<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD>
+	#		</TR>
+	#		<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+	#	});
+	#}
 
 
 	#SIM/CURR ILLNESS DATES:
@@ -413,6 +441,10 @@ sub getProceduresHtml
 	elsif($invStatus < $submitted)
 	{
 		$diagLink = "<A HREF='/invoice/$invoiceId/dialog/diagnoses/add'><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT></A>";
+	}
+	elsif($invStatus >= $submitted)
+	{
+		$diagLink = "<FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT>";
 	}
 
 	return qq{
@@ -600,9 +632,12 @@ sub prepare_dialog_procedure
 sub prepare_dialog_adjustment
 {
 	my $self = shift;
+	
+	my $adjItemType = App::Universal::INVOICEITEMTYPE_ADJUST;
+	
 	my $invoiceId = $self->param('invoice_id');
 	my $dialogCmd = $self->param('_pm_dialog_cmd');
-	my ($payType, $itemId, $idx) = split(/,/, $dialogCmd);
+	my ($payType, $itemId, $idx, $itemType) = split(/,/, $dialogCmd);
 	$self->param('item_id', $itemId);
 	$self->param('payment', $payType);
 
@@ -629,7 +664,7 @@ sub prepare_dialog_adjustment
 			<TABLE WIDTH=100% BGCOLOR=BEIGE CELLSPACING=0 CELLPADDING=3 BORDER=0>
 				<TD>
 					<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-						<B>Adjustments for Claim $invoiceId, Procedure $procNum</B>
+						<B>Adjustments for Claim $invoiceId @{[ $itemType != $adjItemType ? ", Procedure $procNum" : '' ]}</B>
 					</FONT>
 				</TD>
 				<TD><a href='javascript:window.close()'><img src='/resources/icons/done.gif' border=0></a></TD>
@@ -654,6 +689,8 @@ sub prepare_dialog_adjustment
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Adj Type</TD>
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Type</TD>
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Method</TD>
+						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Ref</TD>
+						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Auth Ref</TD>
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payment</TD>
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff</TD>
 						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Net Adjust</TD>
@@ -670,6 +707,8 @@ sub prepare_dialog_adjustment
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{adjustment_type}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_type}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_method}</TD>
+						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_ref}</TD>
+						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{data_text_a}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$totalAdj</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{writeoff_amount}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{net_adjust}</TD>
@@ -677,11 +716,14 @@ sub prepare_dialog_adjustment
 			});
 		}
 
-		push(@{$self->{page_content}}, qq{
-			</TABLE>
-			<BR><BR>
-			@{[ $self->getProcedureHtml($claim, $idx) ]}
-		});
+		if($itemType != $adjItemType)
+		{
+			push(@{$self->{page_content}}, qq{
+				</TABLE>
+				<BR><BR>
+				@{[ $self->getProcedureHtml($claim, $idx) ]}
+			});
+		}
 	}
 
 	return 1;
@@ -1010,12 +1052,15 @@ sub prepare_view_review
 			value_date => $todaysDate,
 			_debug => 0
 	);
-	return $self->prepare_view_summary();
+	
+	$self->redirect("/invoice/$invoiceId/summary");
+	#return $self->prepare_view_summary();
 }
 
 sub prepare_view_submit
 {
 	my $self = shift;
+	my $invoiceId = $self->param('invoice_id');
 
 	my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
 	eval
@@ -1024,7 +1069,8 @@ sub prepare_view_submit
 	};
 	$self->addError($@) if $@;
 
-	return $self->prepare_view_summary();
+	$self->redirect("/invoice/$invoiceId/summary");
+	#return $self->prepare_view_summary();
 }
 
 sub prepare_view_history
