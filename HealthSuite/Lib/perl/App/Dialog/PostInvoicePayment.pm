@@ -38,7 +38,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'client_id'),
-		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED, findPopup => '/lookup/claim'),
 
 
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',invoiceIdFieldName=>'sel_invoice_id'),		
@@ -218,28 +218,13 @@ sub execute
 		my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
 		next if $planPaid eq '' && $writeoffAmt eq '' && $amtApplied eq '';
 
-
-		# Update item
-		my $totalAdjsMade = $planPaid + $amtApplied + $writeoffAmt;
-		my $totalItemAdjust = $page->param("_f_item_$line\_item_existing_adjs") - $totalAdjsMade;
-		my $itemBalance = $page->param("_f_item_$line\_item_balance") - $totalAdjsMade;
 		my $itemId = $page->param("_f_item_$line\_item_id");
-		#$page->schemaAction(
-		#	'Invoice_Item', 'update',
-		#	item_id => $itemId,
-			#total_adjust => defined $totalItemAdjust ? $totalItemAdjust : undef,
-			#balance => defined $itemBalance ? $itemBalance : undef,
-		#	_debug => 0
-		#);
-
-
-		
+	
 		# Create adjustment for the item
 		my $planAllow = $page->param("_f_item_$line\_plan_allow");
 		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
 		$writeoffCode = $writeoffAmt eq '' || $writeoffCode == App::Universal::ADJUSTWRITEOFF_FAKE_NONE ? undef : $writeoffCode;
 
-		#my $netAdjust = 0 - $totalAdjsMade;
 		my $comments = $page->param("_f_item_$line\_comments");
 		my $adjItemId = $page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
@@ -256,7 +241,6 @@ sub execute
 			payer_id => $payerId || undef,
 			writeoff_code => defined $writeoffCode ? $writeoffCode : 'NULL',
 			writeoff_amount => $writeoffAmt || undef,
-			#net_adjust => defined $netAdjust ? $netAdjust : undef,
 			comments => $comments || undef,
 			_debug => 0
 		);
@@ -315,8 +299,6 @@ sub execute
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		invoice_status => $newStatus,
-	#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-	#	balance => defined $invoiceBalance ? $invoiceBalance : undef,
 		_debug => 0
 	);
 
