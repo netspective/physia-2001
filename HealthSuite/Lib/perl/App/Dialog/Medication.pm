@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.1 2000-12-05 15:43:51 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.2 2000-12-06 17:52:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -12,6 +12,7 @@ use Date::Manip;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Document;
+use App::Dialog::Message::Prescription;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
