@@ -176,7 +176,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		 where p.person_id=pcat.person_id
 		 	and pcat.org_internal_id= ?
 		 	and category='Physician'
-		 order by name_last, name_first, name_middle
+		 order by upper(name_last), upper(name_first), upper(name_middle)
 		},
 	'selSessionPhysicians' => qq{
 		select *
