@@ -316,8 +316,16 @@
 			Perl error from link after updating a plan has been fixed.
 		</deliverable>
 
+		<deliverable id="1883">
+			Accounting alert field no longer showing when updating other types of alerts.
+		</deliverable>
+
 		<deliverable id="1886">
 			Fixed code to not to show up duplicate entries.
+		</deliverable>
+
+		<deliverable id="1887">
+			Payer for today now prepopulated when updating claim or checking out a patient.
 		</deliverable>
 		
 		<deliverable id="1891">
@@ -333,6 +341,10 @@
 			Reopened: If fee schedule id not provided, the lookup for the parent entry returns a user friendly error.
 		</deliverable>
 
+		<deliverable id="1898">
+			Misc notes now adding properly from add patient dialog.
+		</deliverable>
+
 		<deliverable id="1901">
 			Report (DAR MAR)   Fixed the Net Chrgs column in the DAR and MAR
 		</deliverable>
@@ -341,9 +353,21 @@
 			Report (FAR)  Modified query so pre-payment invoices were included	
 			Note  Also test that service date filter is working as expected.
 		</deliverable>
-		
+
+		<deliverable id="1914">
+			Fixed Claim Status report so all claims are returned when selecting 'all'.
+		</deliverable>
+
 		<deliverable id="1916">
 			Populating service provider with billing provider in invoice dialog.
+		</deliverable>
+
+		<deliverable id="1919">
+			Removal of hospitalization entries now prefilling properly.
+		</deliverable>
+
+		<deliverable id="1923">
+			Checkboxes for suppressing items stay checked when validation occurs in post insurance payment dialog.
 		</deliverable>
 
 	</deliverables>
