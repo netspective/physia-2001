@@ -62,25 +62,15 @@ sub prepare_view
 				<TD>
 					#component.stp-person.scheduleAppts#</BR>
 					#component.stp-person.inPatient#<BR>
-					
+					#component.stp-person.bookmarks#<BR>
+					#component.news-health#<BR>
 				</TD>
-
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					#component.stp-person.messageCounts#<BR>
 					#component.lookup-records#<BR>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-			<TD>
-					#component.stp-person.linkMedicalSite#<BR>
-					#component.news-health#<BR>
-					#component.stp-person.bookmarks#<BR>
-			</TD>
-			<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-			<TD>
-					#component.stp-person.linkNonMedicalSite#<BR>
 					#component.news-top#<BR>
+				</TD>
 			</TR>
 			</TABLE>
 		};
