@@ -215,6 +215,7 @@ sub execute
 	my $html;
 	my $orgResult;
 	my $textOutputFilename;
+	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
 	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
@@ -243,9 +244,9 @@ sub execute
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },
 			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
-			{ colIdx => 11, head =>'Collection %' ,tAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}',sDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'},
-			{ colIdx => 12, head =>'New Patient', dataFmt => '#15#', dAlign => 'CENTER'},
-			{ colIdx => 13, head =>'Established Patient', dataFmt => '#16#', dAlign => 'CENTER'},
+			{ colIdx => 11, head =>'Collection %' ,tAlign=>'RIGHT',sAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}',sDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'},
+			{ colIdx => 15, head =>'New Patient', tAlign=>'center',sAlign=>'center',summarize => 'sum',dataFmt => '#15#', dAlign => 'CENTER'},
+			{ colIdx => 16, head =>'Established Patient',tAlign=>'center',sAlign=>'center', summarize => 'sum',dataFmt => '#16#', dAlign => 'CENTER'},
 		],
 	};
 	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildernOrgs',
@@ -258,10 +259,10 @@ sub execute
 		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 
 		my $count_new_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_newpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'));
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'),$gmtDayOffset);
 
 		my $count_est_patient = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_monthly_audit_estpatient_count',
-					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'));
+					$reportBeginDate,$reportEndDate, $orgValue->{org_internal_id}, $page->session('org_internal_id'),$gmtDayOffset);
 
 		foreach (@$daily_audit)
 		{
@@ -306,8 +307,8 @@ sub execute
 				$_->{tlt_chrgs},
 				$orgValue->{org_id},
 				$orgValue->{org_internal_id},
-				$newPatCount,
-				$estPatCount
+				$newPatCount||'0',
+				$estPatCount||'0'
 				);
 			push(@data, \@rowData);
 		}
