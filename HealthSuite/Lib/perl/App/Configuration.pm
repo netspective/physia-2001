@@ -35,6 +35,8 @@ struct(ServerConfigData => {
 	path_PDFOutputHREF => '$',
 	path_PDFSuperBillOutput => '$',
 	path_PDFSuperBillOutputHREF => '$',
+	path_PDFPrescriptionOutput => '$',
+	path_PDFPrescriptionOutputHREF => '$',
 	path_EDIData => '$',
 	path_PerSeEDIData => '$',
 	path_PerSeEDIDataIncoming => '$',
@@ -62,12 +64,12 @@ sub ServerConfigData::db_ConnectKey
 {
 	my $self = shift;
 	my $altConnectKey;
-	
+
 	if (@_)
 	{
 		$self->{'db_ConnectKey'} = shift;
 	}
-	
+
 	my ($name, $port) = split(':', lc($ENV{'HTTP_HOST'}));
 	$port = '' unless defined $port;
 	$name = 'default' unless defined $name;
@@ -75,7 +77,7 @@ sub ServerConfigData::db_ConnectKey
 	{
 		return $altConnectKey;
 	}
-	
+
 	return $self->{'db_ConnectKey'};
 }
 
@@ -97,7 +99,8 @@ use constant PATH_DIRECTORY	 => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Dire
 use constant PATH_HANDHELD   => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'HandHeld');
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
 use constant PATH_TEMP       => File::Spec->catfile('temp');
-use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
+use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'prescriptions');
+use constant PATH_OUTPUTPRESCRIPTIONPDF  => File::Spec->catfile(PATH_TEMP, 'superbills');
 use constant PATH_OUTPUTSUPERBILLPDF  => File::Spec->catfile(PATH_TEMP, 'superbills');
 use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
 use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
@@ -171,7 +174,7 @@ sub getDefaultConfig
 
 	$config->name_Config($name);
 	$config->name_Group($group);
-	
+
 	if (ref($dbConnectKey) eq 'HASH')
 	{
 		foreach my $key (%$dbConnectKey)
@@ -185,7 +188,7 @@ sub getDefaultConfig
 		$config->db_ConnectKey($dbConnectKey);
 	}
 	$config->db_BlobLongReadLength(1000000);
-	
+
 	$config->path_root(PATH_APPROOT);
 	$config->path_WebSite(PATH_WEBSITE);
 	$config->path_temp(File::Spec->catfile(PATH_WEBSITE, PATH_TEMP));
@@ -200,6 +203,8 @@ sub getDefaultConfig
 	$config->path_AppConf(PATH_APPCONF);
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
 	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
+	$config->path_PDFPrescriptionOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPRESCRIPTIONPDF));
+	$config->path_PDFPrescriptionOutputHREF(File::Spec->catfile('', PATH_OUTPUTPRESCRIPTIONPDF));
 	$config->path_PDFSuperBillOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTSUPERBILLPDF));
 	$config->path_PDFSuperBillOutputHREF(File::Spec->catfile('', PATH_OUTPUTSUPERBILLPDF));
 	$config->path_EDIData(PATH_EDIDATA);
@@ -334,6 +339,7 @@ createPath(
 	$CONFDATA_SERVER->path_SchemaSQL,
 	$CONFDATA_SERVER->path_temp,
 	$CONFDATA_SERVER->path_PDFOutput,
+	$CONFDATA_SERVER->path_PDFPrescriptionOutput,
 	$CONFDATA_SERVER->path_PDFSuperBillOutput,
 	$CONFDATA_SERVER->path_XMLData,
 );
