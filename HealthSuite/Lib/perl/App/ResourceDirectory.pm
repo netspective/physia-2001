@@ -155,6 +155,7 @@ use App::Dialog::ApptType;
 use App::Dialog::Training;
 use App::Dialog::ResponsibleParty;
 use App::Dialog::Attribute::MiscNotes;
+use App::Dialog::Password;
 
 ##############################################################################
 # Global variables that map (using a system-wide ID) unique text to specific
@@ -566,6 +567,10 @@ $SEARCH_CLASSES = {
 	'appttype' => {_class=>'App::Dialog::ApptType', _arl=>['appt_type_id'],},
 	'assign' => {_class=>'App::Dialog::Assign'},
 	'training' => 'App::Dialog::Training',
+	'password' => {_class=> 'App::Dialog::Password',
+				_arl_add => ['person_id', 'org_id'],
+				_arl_modify => ['person_id', 'org_id'],
+				heading => '$Command Password'},
 
 );
 
