@@ -135,8 +135,9 @@ sub customValidate
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $confirmYes = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $patientId = $page->field('attendee_id');
+	my $claimType = $page->field('claim_type');
 	
-	if ($confirmYes)
+	if ($confirmYes && $claimType != App::Universal::CLAIMTYPE_SELFPAY && $claimType != App::Universal::CLAIMTYPE_CLIENT)
 	{
 		my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 			'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
