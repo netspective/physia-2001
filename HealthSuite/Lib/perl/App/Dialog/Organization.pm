@@ -38,11 +38,11 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl => ['org_id'],
 		_idSynonym => 'Clinic'
 	},
-	'org-assoc-provider' => {
-		heading => '$Command Associated Provider Organization',
-		orgtype => 'assoc-provider',
+	'org-dir-entry' => {
+		heading => '$Command Provider Directory Entry',
+		orgtype => 'dir-entry',
 		_arl => ['org_id'],
-		_idSynonym => 'Assoc-provider'
+		_idSynonym => 'Dir-entry'
 	},
 	'org-employer' => {
 		heading => '$Command Employer Organization',
@@ -77,6 +77,8 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'clear_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'business_hrs_id'),
+				new CGI::Dialog::Field(type => 'hidden', name => 'area_served_id'),
+
 		new CGI::Dialog::Subhead(
 			heading => 'Profile Information',
 			name => 'gen_info_heading'
@@ -350,6 +352,19 @@ sub initialize
 		);
 	}
 
+	if ($self->{orgtype} eq 'assoc-provider')
+	{
+		$self->addContent(
+			new CGI::Dialog::Field(
+				caption => 'Area Served',
+				name => 'area_served',
+				type => 'select',
+				choiceDelim =>',',
+				selOptions => ' ,National,State,Regional'
+				),
+		);
+	}
+
 	$self->addContent(
 		new CGI::Dialog::Subhead(
 			heading => '',
@@ -363,19 +378,6 @@ sub initialize
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE),
 	);
-
-	if ($self->{orgtype} eq 'assoc-provider')
-	{
-		$self->addContent(
-			new CGI::Dialog::Field(
-				caption => 'Area Served',
-				name => 'area_served',
-				type => 'select',
-				choiceDelim =>',',
-				selOptions => ' ,National,State,Regional'
-				),
-		);
-	}
 
 	$self->{activityLog} = {
 		scope =>'org',
@@ -518,6 +520,14 @@ sub populateData
 	);
 	$page->field('clear_house', $clearHouseData->{value_text});
 	$page->field('clear_item_id', $clearHouseData->{item_id});
+
+	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Area Served',
+		App::Universal::ATTRTYPE_TEXT
+	);
+	$page->field('area_served', $areaServedData->{value_text});
+	$page->field('area_served_id', $areaServedData->{item_id});
+
 }
 
 
@@ -762,17 +772,6 @@ sub execute_add
 			_debug => 0
 		)if $page->field('clear_house') ne '';
 
-# ATTRIBUTES FOR	ACS ASSOCIATED PROVIDER
-
-	$page->schemaAction(
-				'Org_Attribute', $command,
-				parent_id => $orgIntId,
-				item_name =>  'Area Served',
-				value_type => App::Universal::ATTRTYPE_TEXT,
-				value_text => $page->field('area_served') || undef,
-				_debug => 0
-		)if $page->field('area_served') ne '';
-
 	$page->schemaAction(
 			'Org_Address', $command,
 			parent_id => $orgIntId || undef,
@@ -823,6 +822,15 @@ sub execute_add
 				value_int => $catSecIntenalId || undef,
 				_debug => 0
 		) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+
+	$page->schemaAction(
+					'Org_Attribute', $command,
+					parent_id => $orgIntId,
+					item_name =>  'Area Served',
+					value_type => App::Universal::ATTRTYPE_TEXT,
+					value_text => $page->field('area_served') || undef,
+					_debug => 0
+		)if $page->field('area_served') ne '';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
@@ -882,6 +890,18 @@ sub execute_update
 			value_text => $page->field('clear_house') || undef,
 			_debug => 0
 		);
+
+		my $areaCommand = $page->field('area_served_id') eq '' ? 'add' : $command;
+		$page->schemaAction(
+					'Org_Attribute', $areaCommand,
+					parent_id => $orgIntId,
+					item_name =>  'Area Served',
+					item_id  => $page->field('area_served_id') || undef,
+					value_type => App::Universal::ATTRTYPE_TEXT,
+					value_text => $page->field('area_served') || undef,
+					_debug => 0
+		)if $page->field('area_served') ne '';
+
 
 	saveAttribute($page, 'Org_Attribute', $orgIntId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
 		value_text => $page->field('hcfa_service_place'),
