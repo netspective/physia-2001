@@ -206,14 +206,6 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		WHERE	i.invoice_id = :1
 		AND	i.main_transaction = t.trans_id
 		},
-	'selInvoiceAttributeById' => qq{
-		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textb, name_sort, value_int, value_intb, value_float, value_floatb,
-			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateend,
-			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_datea, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateb,
-			value_block
-		from invoice_attribute
-		where item_id = ?
-		},
 	'selInvoiceAddr' => q{
 		select *
 		from invoice_address
@@ -386,6 +378,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 			and NOT item_name = 'Invoice/History/Item'
 		},
+	'selInvoiceAttributeById' => qq{
+		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textb, name_sort, value_int, value_intb, value_float, value_floatb,
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateend,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_datea, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateb,
+			value_block
+		from invoice_attribute
+		where item_id = ?
+		},
 	'selPostSubmitAttributes' => qq{
 		select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
 			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT'),
@@ -513,12 +513,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		order by value_date desc, cr_stamp desc
 		},
 	'selClaimPrintHistoryItemByUser' => qq{
-		select to_char(cr_stamp, 'YYYYMMDDHH24MISS') as cr_stamp, to_char(sysdate, 'YYYYMMDDHH24MISS') as timenow, cr_user_id, value_text as action, value_textB as comments, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date
-		from invoice_attribute
+		select to_char(max(cr_stamp), 'YYYYMMDDHH24MISS') as cr_stamp, to_char(sysdate, 'YYYYMMDDHH24MISS') as timenow, cr_user_id, 
+			value_text, value_textb, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date
+		from invoice_history
 		where parent_id = ?
 			and cr_user_id = ?
-			and item_name = 'Invoice/History/Item'
 			and value_text = 'Claim printed'
+		group by
+			cr_user_id, value_text, value_textb, value_date
 		},
 	'selAdjTypeCaption' => q{
 		select caption
