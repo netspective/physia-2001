@@ -322,6 +322,9 @@
 			Fixed permissions to allow view Physician's schedule from the Patient
 			Flow Worklist.
 		</deliverable>
+		<deliverable id="1645">
+			[UI] Corrected look of Add Account notes and reck date dialog from the collection worklist.  Also corrected query so collection items with a reck date do no appear until request reck date arrives
+		</deliverable>
 	</deliverables>
 </release-notes>
 
