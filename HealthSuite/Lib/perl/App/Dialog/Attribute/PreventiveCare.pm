@@ -50,7 +50,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Measure', name => 'value_text', options => FLDFLAG_REQUIRED, findPopup => "/lookup/cpt/detail?_f_search_expression=%field.attr_name%"),
 		new CGI::Dialog::MultiField(caption =>'Measure Frequency/Number Of Times',
 					fields => [
-						new CGI::Dialog::Field(caption => 'Frequency', name => 'frequency', type => 'select', selOptions => ' : 0;Weekly:1;Monthly:2;Annualy:3',value => ''),
+						new CGI::Dialog::Field(caption => 'Frequency', name => 'frequency', type => 'select', selOptions => ' : 0;Weekly:1;Monthly:2;Annually:3',value => ''),
 						new CGI::Dialog::Field(caption => 'Measure', name => 'measure', size => '3')
 				]),
 
