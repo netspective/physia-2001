@@ -70,7 +70,13 @@ sub openPrintHandle {
 sub openRawPrintHandle {
 	my ($deviceName) = @_;
 	
-	my $printHandle = IO::File->new ("| lpr -P $deviceName -o raw");
+	my $printHandle;
+	
+	if (lc ($deviceName) eq 'mercury' or lc ($deviceName) eq 'houstonlaser') {
+		$printHandle = IO::File->new ("| lpr -P $deviceName -o cpi=17");
+	} else {
+		$printHandle = IO::File->new ("| lpr -P $deviceName -o raw");
+	}
 	
 	return $printHandle;
 }
