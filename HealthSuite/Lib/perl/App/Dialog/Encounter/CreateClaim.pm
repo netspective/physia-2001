@@ -135,23 +135,78 @@ sub execute_remove
 	my $sessUser = $page->session('user_id');
 	my $invoiceId = $page->param('invoice_id');
 
+	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+	foreach my $item (@{$lineItems})
+	{
+		my $itemType = $item->{item_type};
+		my $itemId = $item->{item_id};
+		my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
+
+		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
+		next if $itemType == $voidItemType;
+		next if $item->{data_text_b} eq 'void';
+
+		my $extCost = 0 - $item->{extended_cost};
+		my $itemBalance = $extCost;
+		my $emg = $item->{emergency};
+		$page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_item_id => $itemId || undef,
+			parent_id => $invoiceId || undef,
+			item_type => defined $voidItemType ? $voidItemType : undef,
+			service_begin_date => $item->{service_begin_date} || undef,
+			service_end_date => $item->{service_end_date} || undef,
+			hcfa_service_place => $item->{hcfa_service_place} || undef,
+			hcfa_service_type => $item->{hcfa_service_type} || undef,
+			modifier => $item->{modifier} || undef,
+			quantity => $item->{quantity} || undef,
+			emergency => defined $emg ? $emg : undef,
+			code => $item->{code} || undef,
+			caption => $item->{caption} || undef,
+			#comments =>  $item->{} || undef,
+			unit_cost => $item->{unit_cost} || undef,
+			rel_diags => $item->{rel_diags} || undef,
+			data_text_a => $item->{data_text_a} || undef,
+			extended_cost => defined $extCost ? $extCost : undef,
+			balance => defined $itemBalance ? $itemBalance : undef,
+			_debug => 0
+		);
+
+		$page->schemaAction(
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			data_text_b => 'void',
+			_debug => 0
+		);
+	}
+
 	#VOID CLAIM
 	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
+	my $totalCost = 0;
+	my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+	foreach my $item (@{$updatedLineItems})
+	{
+		$totalCost += $item->{extended_cost};
+	}
+
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $balance = $totalCost + $invoiceInfo->{total_adjust};
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		total_cost => defined $totalCost ? $totalCost : undef,
+		balance => defined $balance ? $balance : undef,
 		_debug => 0
 	);
-
 	
+
 	#CREATE NEW VOID TRANSACTION FOR VOIDED CLAIM
-	my $parentTransId = $page->field('trans_id');
 	my $transType = App::Universal::TRANSTYPEACTION_VOID;
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 	$page->schemaAction(
 		'Transaction', 'add',
-		parent_trans_id => $parentTransId || undef,
+		parent_trans_id => $page->field('trans_id') || undef,
 		parent_event_id => $page->field('event_id') || undef,
 		trans_type => defined $transType ? $transType : undef,
 		trans_status => defined $transStatus ? $transStatus : undef,	
@@ -168,12 +223,13 @@ sub execute_remove
 		parent_id => $invoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Voided by $sessUser",
+		value_text => 'Voided claim',
 		value_date => $todaysDate,
 		_debug => 0
 	);
 
-	$page->redirect('/search/claim');
+	#$page->redirect('/search/claim');
+	$page->redirect("/invoice/$invoiceId/summary");
 }
 
 1;
