@@ -12,13 +12,22 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
-use App::Statements::Component::Person;
+use App::Statements::Component::WorkList;
 use App::Dialog::CollectionSetup;
 use App::Component::WorkList::Collection;
 use vars qw(@ISA %RESOURCE_MAP);
-@ISA = qw(App::Page);
+@ISA = qw(App::Page::WorkList);
 %RESOURCE_MAP = (
-	'worklist/collection' => {},
+	'worklist/collection' => {
+			_title =>'Collection Work List',
+			_iconSmall =>'icons/worklist',
+			_iconMedium =>'icons/money',
+			_views => [
+				{caption => '#param._seldate#', name => 'date',},
+				{caption => 'Account Notes', name => 'accountnotes',},
+				{caption => 'Setup', name => 'setup',},
+				],
+		},
 	);
 
 sub prepare_view_date
@@ -63,8 +72,8 @@ my ($self) = @_;
 	<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 				<TR VALIGN=TOP>
 					<BR>
-					<TD>						
-						#component.stp-person.group-account-notes# <BR>			
+					<TD>										      
+						#component.stp-worklist.group-account-notes# <BR>			
 					</TD>					
 				</TR>
 				<TR>
@@ -91,45 +100,7 @@ my ($self) = @_;
 	return 1;
 };
 
-sub prepare_view_recentActivity
-{
-	my ($self) = @_;
 
-	$self->addContent(qq{<br>
-		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.stp-person.mySessionViewCount#<BR>
-					#component.stp-person.recentlyVisitedPatients#<BR>
-				</TD>
-				<TD>
-					&nbsp;
-				</TD>
-				<TD colspan=3>
-					#component.stp-person.mySessionActivity# <br>
-				</TD>
-			</TR>
-			<TR>
-				<TD colspan=5>&nbsp;</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.lookup-records#<BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.navigate-reports-root#
-				</TD>
-			</TR>
-		</TABLE>
-	});
-
-	return 1;
-}
 
 sub prepare_view_setup
 {
@@ -178,47 +149,11 @@ sub prepare_page_content_header
 {
 	my $self = shift;
 
-	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
-	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
+	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);	
 
 	$self->SUPER::prepare_page_content_header(@_);
 
-	my $heading = "Collection Work List";
-	my $dateTitle = decodeDate($self->param('_seldate'));
-	
-	my $urlPrefix = "/worklist";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
-			[$dateTitle, "/worklist/collection/date", 'date'],
-			['Account Notes', "/worklist/collection/accountnotes", 'accountnotes'],
-			['Setup', "/worklist/collection/setup", 'setup', ],
-	
-			
-		], ' | ');
-
-	push(@{$self->{page_content_header}},
-	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
-
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
-		unless ($self->param('noControlBar'));
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) unless ($self->param('noControlBar'));
 
 	return 1;
 }
@@ -349,21 +284,8 @@ sub getControlBarHtml
 		}
 		
 
-		#$timeFieldsHtml = qq{
-		#	&nbsp; &nbsp;
-		#	Time:
-		#	<INPUT name=showTimeSelect value="Range from/to" READONLY>
-#
-		#	&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-		#	&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
-#
-		#	<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-		#	<input type=submit value="Go">
-		#};
 		
 	}
-
-	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
 
 	return qq{
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
@@ -428,8 +350,7 @@ sub initialize
 	my $self = shift;
 	$self->SUPER::initialize(@_);
 
-	$self->addLocatorLinks(
-			['WorkList', '/worklist'],
+	$self->addLocatorLinks(			
 			['Collection', '/worklist/collection'],
 	);
 	
@@ -458,7 +379,8 @@ sub handleARL
 
 	$self->param('_pm_view', $pathItems->[1] || 'date');
 	$self->param('noControlBar', 1);
-
+	$self->param('_seldate', 'Today') unless $self->param('_seldate');
+	
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
@@ -480,14 +402,6 @@ sub handleARL_date
 	$self->param('noControlBar', 0);
 }
 
-#sub handleARL_setup
-#{
-#	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-#	if ($pathItems->[1] =~ /^resource$/i)
-#	{
-#		$self->param('resources', $pathItems->[2]);
-#	}
-#}
 
 sub getContentHandlers
 {
