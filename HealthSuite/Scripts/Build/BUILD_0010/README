@@ -90,7 +90,10 @@ B515 - Changed the 'Associated Physician' field in Nurse dialog to a checkbox in
 
 B470 - Print Patients Face Sheet from the Patient Flow Work List  
 
+B162 - Added black icons and implement partial Insurance and Appointment verifications on Patient Flow Work List.
+
 [No Bug] - Updated the web server configuration to reduce memory usage and help performance
+
 
 
 
