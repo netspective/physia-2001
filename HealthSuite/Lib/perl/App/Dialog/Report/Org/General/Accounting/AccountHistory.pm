@@ -237,12 +237,22 @@ sub execute
 					$paymentMethod = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$sql);
 				}
 
-				$desc = "$paymentMethod Payment";
-				if($paymentMethod eq 'Check')
+				if($adjustmentType eq 'Payment')
 				{
-					$desc .= ", # $rowAdj->[0]->{pay_ref}";
+					$desc = "$paymentMethod Payment";
+					if($paymentType ne '')
+					{
+						$desc .= " ($paymentType)";
+					}
+					if($paymentMethod eq 'Check')
+					{
+						$desc .= ", # $rowAdj->[0]->{pay_ref}";
+					}
 				}
-
+				else
+				{
+					$desc = $adjustmentType;
+				}
 			}
 
 			my @rowData = (
