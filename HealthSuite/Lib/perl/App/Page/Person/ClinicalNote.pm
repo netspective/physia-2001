@@ -112,7 +112,7 @@ sub findResources {
 			</form>
 		};
 	} else {
-		$html .= '<b>Couldnt open directory /export/home/sjaveed/projects/HealthSuite/WebSite/resources/data<br>';
+		$html .= '<b>Couldnt open directory /resources/data<br>';
 	}
 	
 	return $html;
