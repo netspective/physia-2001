@@ -22,6 +22,7 @@ use App::Dialog::Field::BatchDateID;
 use App::Dialog::Field::Procedures;
 use App::Universal;
 use App::Schedule::Utilities;
+use App::IntelliCode;
 
 use Date::Manip;
 use Date::Calc qw(:all);
@@ -55,7 +56,7 @@ sub initialize
 		#new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_phone_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
+		#new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'parent_event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
@@ -327,7 +328,7 @@ sub populateData
 	$page->field('dupCheckin_returnUrl', $self->getReferer($page))
 		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	#Set session batch id to batch id field
+	#Set batch id field to session batch id
 	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
 
 	my $invoiceId = $page->param('invoice_id');
@@ -382,7 +383,7 @@ sub populateData
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
-			$page->param("_f_proc_$line\_service_type", $servTypeCode);
+			#$page->param("_f_proc_$line\_service_type", $servTypeCode);
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
@@ -403,10 +404,10 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
 
-		my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
-		$page->field('batch_item_id', $batchInfo->{item_id});
-		$page->field('batch_id', $batchInfo->{value_text});
-		$page->field('batch_date', $batchInfo->{value_date});
+		#my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+		#$page->field('batch_item_id', $batchInfo->{item_id});
+		#$page->field('batch_id', $batchInfo->{value_text});
+		#$page->field('batch_date', $batchInfo->{value_date});
 
 		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
@@ -1083,28 +1084,41 @@ sub handleInvoiceAttrs
 			_debug => 0
 		) if $command ne 'update';
 
-	## Then, create invoice attribute for history of invoice status
-	my $action = $command eq 'add' ? 'Created' : 'Updated';
 
-	my $comments = $page->field('comments');
-	$page->schemaAction(
+	## Check if creation batch id already exists. If not, create it and add history item.
+	my $batchId = $page->field('batch_id');
+	my $creationBatchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+	if($creationBatchInfo->{item_id} eq '' && $batchId)
+	{
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/Creation/Batch ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $batchId || undef,
+			value_date => $page->field('batch_date') || undef,
+			_debug => 0
+		);
+
+		$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $action,
+			value_text => 'Created',
 			value_textB => "Creation Batch ID: $batchId",
 			value_date => $todaysDate,
 			_debug => 0
-	);
+		);
+	}
 
 	#reset session batch id with batch id in field
 	$page->session('batch_id', $batchId);
 
+
 	## Then, create some invoice attributes for HCFA (the rest are found in the Procedure dialog):
 	#	 Accident Related To, Prior Auth Num, Deduct Balance, Accept Assignment, Ref Physician Name/Id,
 	#	 Illness/Disability/Hospitalization Dates
-
 
 
 	my $condRelToId = $page->field('accident');
@@ -1256,8 +1270,8 @@ sub handleInvoiceAttrs
 
 
 	my $billingContact = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttribute', $billingFacility, 'Contact Information');
-	my $contactName = $page->field('billing_contact') eq '' ? $billingContact->{value_text} : $page->field('billing_contact');
-	my $contactPhone = $page->field('billing_phone') eq '' ? $billingContact->{value_textb} : $page->field('billing_phone');
+	my $contactName = $billingContact->{value_text} || $page->field('billing_contact');
+	my $contactPhone = $billingContact->{value_textb} || $page->field('billing_phone');
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -1271,15 +1285,15 @@ sub handleInvoiceAttrs
 		);
 
 
-	if($page->field('billing_contact') && $page->field('billing_phone'))
+	unless($billingContact->{item_id})
 	{
 		$page->schemaAction(
-				'Org_Attribute', $command,
+				'Org_Attribute', 'add',
 				parent_id => $billingFacility,
 				item_name => 'Contact Information',
 				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $page->field('billing_contact') || undef,
-				value_textB => $page->field('billing_phone') || undef,
+				value_text => $contactName || undef,
+				value_textB => $contactPhone || undef,
 				_debug => 0
 			);
 	}
@@ -1342,26 +1356,16 @@ sub handleInvoiceAttrs
 	#);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('fee_schedules_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Fee Schedules',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->param('_f_proc_active_catalogs') || undef,
-			value_textB => $page->param('_f_proc_default_catalog') || undef,
-			_debug => 0
+		'Invoice_Attribute', $command,
+		item_id => $page->field('fee_schedules_item_id') || undef,
+		parent_id => $invoiceId,
+		item_name => 'Fee Schedules',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $page->param('_f_proc_active_catalogs') || undef,
+		value_textB => $page->param('_f_proc_default_catalog') || undef,
+		_debug => 0
 	);
 
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('batch_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Creation/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->field('batch_id') || undef,
-			value_date => $page->field('batch_date') || undef,
-			_debug => 0
-	);
 
 	my $invoiceFlags = $page->field('invoice_flags');
 	if($invoiceFlags & $attrDataFlag)
@@ -1373,7 +1377,7 @@ sub handleInvoiceAttrs
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => "This invoice is a new copy of invoice $oldInvoiceId which has been submitted and voided",
-			value_textB => $page->field('comments') || undef,
+			#value_textB => $page->field('comments') || undef,
 			value_date => $todaysDate,
 			_debug => 0
 		);
@@ -1890,36 +1894,48 @@ sub createExplosionItems
 	my $childCount = scalar(@{$miscProcChildren});
 	foreach my $child (@{$miscProcChildren})
 	{
-		my $servType = $page->param("_f_proc_$line\_service_type");
-		my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
-
+		my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
 		my $cptCode = $child->{code};
+		my $modifier = $child->{modifier};
 		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
-		
 		my $quantity = $page->param("_f_proc_$line\_units");
-		my $unitCost = $page->param("_f_proc_$line\_charges");
-		my $extCost = $unitCost * $quantity;
-		$page->schemaAction('Invoice_Item', $command,
-			item_id => $page->param("_f_proc_$line\_item_id") || undef,
-			parent_id => $invoiceId,
-			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,	#default for service start date is today
-			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,		#default for service end date is today
-			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
-			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,			#default for service type is 2 for consultation
-			modifier => $child->{modifier} || undef,
-			quantity => $quantity || undef,
-			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
-			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
-			code => $cptCode || undef,
-			code_type => $page->param("_f_proc_$line\_code_type") || undef,
-			caption => $cptShortName->{name} || undef,
-			#comments =>  # || undef,
-			unit_cost => $unitCost || undef,
-			extended_cost => $extCost || undef,
-			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
-			data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
-			data_num_a => $page->param("_f_proc_$line\_ffs_flag") || undef,			#flag indicating if item is ffs
-		);
+		my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
+
+		my $fs_entry = App::IntelliCode::getFSEntry($page, $cptCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+		#my $use_fee;
+		#my $count = 0;
+		my $count_type = scalar(@$fs_entry);
+		foreach(@$fs_entry)
+		{
+			my $servType = $_->[$INTELLICODE_FS_SERV_TYPE];
+			my $codeType = $_->[$INTELLICODE_FS_CODE_TYPE];
+			my $unitCost = $_->[$INTELLICODE_FS_COST];
+			my $ffsFlag = $_->[$INTELLICODE_FS_FFS_CAP];
+			my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
+
+			my $extCost = $unitCost * $quantity;
+			$page->schemaAction('Invoice_Item', $command,
+				item_id => $page->param("_f_proc_$line\_item_id") || undef,
+				parent_id => $invoiceId,
+				service_begin_date => $servBeginDate || undef,							#default for service start date is today
+				service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,		#default for service end date is today
+				hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
+				hcfa_service_type => defined $servTypeId ? $servTypeId : undef,			#default for service type is 2 for consultation
+				modifier => $modifier || undef,
+				quantity => $quantity || undef,
+				emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
+				item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
+				code => $cptCode || undef,
+				code_type => $codeType || undef,
+				caption => $cptShortName->{name} || undef,
+				comments => $page->param("_f_proc_$line\_comments") || undef,
+				unit_cost => $unitCost || undef,
+				extended_cost => $extCost || undef,
+				rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
+				data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
+				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
+			);
+		}
 	}
 }
 
@@ -1985,6 +2001,8 @@ sub voidProcedureItem
 sub customValidate
 {
 	my ($self, $page) = @_;
+
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	#VALIDATION FOR 'ACCIDENT?' FIELD
 	my $condRelToAuto = App::Universal::CONDRELTO_AUTO;
@@ -2058,6 +2076,43 @@ sub customValidate
 		my $payerField = $self->getField('payer');
 		$payerField->invalidate($page, 'Please choose payer for new Patient ID.');
 		$page->field('old_person_id', $personId);
+	}
+
+
+	#VALIDATION OF FEE SCHED RESULTS FOR CHILDREN OF EXPLOSION CODES
+	my $lineCount = $page->param('_f_line_count');
+	my $getProcListField = $self->getField('procedures_list');
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
+		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
+
+		my $cptCode = $page->param("_f_proc_$line\_procedure");
+		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
+		if($miscProcChildren->[0]->{code})
+		{
+			my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
+			my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
+			foreach my $child (@{$miscProcChildren})
+			{
+				my $childCode = $child->{code};
+				my $modifier = $child->{modifier};
+				my $fs_entry = App::IntelliCode::getFSEntry($page, $childCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+				my $count_type = scalar(@$fs_entry);
+				if ($count_type == 0)
+				{
+					$getProcListField->invalidate($page,"[<B>P$line</B>]Unable to find Code '$childCode' in fee schedule(s) " . join ",",@listFeeSchedules);
+				}
+				elsif ($count_type > 1)
+				{
+					$getProcListField->invalidate($page,"[<B>P$line</B>]Procedure found in multiple fee schedules.");
+				}
+				elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
+				{ 	
+					$getProcListField->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
+				}
+			}
+		}
 	}
 }
 
