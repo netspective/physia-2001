@@ -116,7 +116,7 @@ use constant ONBLUR_AUTOCAP        => 'validateChange_AutoCap(event)';
 				},
 			'currency' =>
 				{
-					regExp => '^\-?\d+(\.\d\d)?$',
+					regExp => '^\-?\d+(\.\d+)?$',
 					message => "has an invalid number (format is [-]999.99).",
 					maxLength => 10,
 					onValidate => \&validateMinMax,
