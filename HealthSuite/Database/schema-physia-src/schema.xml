@@ -598,6 +598,27 @@
 			<column name="mal_practice" type="float" descr="GPCI Malpractice expense"/>		
 	</table>
 
+	<table name="Eligibility_Source" abbrev="ElSrc">
+		<column name="id" type="text" size="16" primarykey="yes" descr="The unique ID of the eligibility source"/>
+		<column name="caption" type="text" size="64" descr="User-visible caption"/>
+		<column name="protocol" type="text" size="32" descr="User-visible caption"/>
+
+		<enum id="PHYSIA">Physia</enum>
+		<enum id="ENVOY">Envoy</enum>
+		<enum id="PROXYMED">ProxyMed</enum>
+	</table>
+
+	<table name="Org_Eligibility_Input" abbrev="OElInp">
+		<column name="input_id" type="autoinc" primarykey="yes" descr="The primary key"/>
+		<column name="source_id" lookupref="Eligibility_Source.id" descr="The unique ID of the eligibility source"/>
+		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the eligibility source"/>
+		<column name="product_id" usetype="Insurance.product_name" descr="The unique ID of the eligibility source"/>
+		<column name="field_order" type="integer" descr="The field order"/>
+		<column name="field_caption" type="integer" descr="The field caption"/>
+		<column name="field_name" type="text" size="32" descr="The name of the variable to store the value"/>
+		<column name="field_type" type="text" size="32" descr="The type of value to store"/>
+		<column name="field_attrs" type="text" size="32" descr="Field attributes to pass to Dialog manager"/>
+	</table>
 
 	<include file="reference.xml"/>
 	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
