@@ -564,58 +564,6 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
-	'selSuperBills' => {
-		sqlStmt => qq
-		{
-			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
-				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
-			from event e, event_attribute ea
-			where e.event_id = ea.parent_id
-			and owner_id = :4
-			and e.superbill_id is not null
-			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
-			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
-			union
-			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
-				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
-			from event e, event_attribute ea, appt_type apt
-			where e.event_id = ea.parent_id
-			and owner_id = :4
-			and e.superbill_id is null
-			and e.appt_type = apt.appt_type_id
-			and apt.superbill_id is not null
-			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
-			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
-		}
-	},
-
-	'selSuperBillsPhysician' => {
-		sqlStmt => qq
-		{
-			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
-				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
-			from event e, event_attribute ea
-			where e.event_id = ea.parent_id
-			and owner_id = :4
-			and e.superbill_id is not null
-			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
-			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
-			and ea.value_textb = :5
-			union
-			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id,
-				to_char(e.start_time - :3, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time
-			from event e, event_attribute ea, appt_type apt
-			where e.event_id = ea.parent_id
-			and owner_id = :4
-			and e.superbill_id is null
-			and e.appt_type = apt.appt_type_id
-			and apt.superbill_id is not null
-			and e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :3
-			and e.start_time < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :3
-			and ea.value_textb = :5
-		}
-	},
-
 );
 
 1;
