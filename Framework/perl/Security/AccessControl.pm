@@ -207,6 +207,24 @@ sub definePermissions
 		{
 			$self->definePermissions($childNode, @parentNodes, $activeNode);
 		}
+		elsif($childNode->isa('ControlXML::alias'))
+		{
+			my @parentPerms = ();
+			$parentId = '';
+			foreach (@parentNodes)
+			{
+				$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
+				push(@parentPerms, $permissionIds->{$parentId});
+			}
+			my $activeId = ($parentId ? "$parentId/" : '') . ($activeNode->{root} || $activeNode->{id});
+			my $aliasChildPerms = $permissionIds->{$childNode->{id}}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
+			my $activeChildPerms = $permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
+			$permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $activeChildPerms->union($aliasChildPerms);
+			foreach (@parentPerms)
+			{
+				$_->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $_->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
+			}
+		}
 	}
 }
 
