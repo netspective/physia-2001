@@ -143,6 +143,7 @@ use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Staff;
 use App::Dialog::PostGeneralPayment;
+#use App::Dialog::PostInsurancePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Dialog::Procedure;
@@ -585,6 +586,7 @@ $SEARCH_CLASSES = {
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
 	'postpayment' => 'App::Dialog::PostGeneralPayment',
+	#'postinspayment' => 'App::Dialog::PostInsurancePayment',
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
 	'invoice' => 'App::Dialog::Invoice',
