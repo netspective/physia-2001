@@ -13,6 +13,7 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
 use Date::Manip;
+use App::Schedule::Utilities;
 
 use constant NEXTACTION_COPYASNEW => "/schedule/template/add/,%field.template_id%";
 use vars qw(@ISA %RESOURCE_MAP);
@@ -117,7 +118,8 @@ sub new
 		new CGI::Dialog::Field::Duration(name => 'duration',
 			caption => 'Start / End Time',
 			type => 'time',
-			hints => '(Default to all day if time is not specified)',
+			options => FLDFLAG_REQUIRED,
+			#hints => '(Default to all day if time is not specified)',
 		),
 
 		new CGI::Dialog::Field(name => 'days_of_week',
@@ -186,6 +188,8 @@ sub makeStateChanges
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	if ($page->param('template_id'))
 	{
@@ -197,14 +201,16 @@ sub populateData_add
 		$page->field('effective_begin_date', $startDate);
 		$page->field('r_ids', $page->param('resource_id'));
 		$page->field('facility_id', $page->param('facility_id'));
-		$page->field('duration_begin_time', '08:00 am');
-		$page->field('duration_end_time', '08:00 pm');
+		$page->field('duration_begin_time', '08:00 AM');
+		$page->field('duration_end_time', '08:00 PM');
 	}
 }
 
 sub populateData_update
 {	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	my $timeFormat = 'HH:MI AM';
+
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	
 	my $templateID = $page->param('template_id');
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,'selPopulateTemplateDialog', $templateID);
 
@@ -212,6 +218,19 @@ sub populateData_update
   $page->field('months', split(',', $page->field('months')));
   $page->field('patient_types', split(',', $page->field('patient_types')));
   $page->field('visit_types', split(',', $page->field('visit_types')));
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	my $beginTime = App::Schedule::Utilities::hhmmAM2minutes($page->field('duration_begin_time'));
+	my $endTime   = App::Schedule::Utilities::hhmmAM2minutes($page->field('duration_end_time'));
+	
+	my $field = $self->getField('duration')->{fields}->[0];
+	$field->invalidate($page, qq{Start Time must be earlier than End Time.})
+		if $beginTime >= $endTime;
+	
 }
 
 ###############################
