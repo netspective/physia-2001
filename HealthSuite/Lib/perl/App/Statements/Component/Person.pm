@@ -983,7 +983,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				dataFmt => {
 					'0' => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party)',
 					'1' => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party)',
-					''  => '<A HREF = "/org/#7#/profile">#16#</A>(#5# #13#): #4#, #2#',
+					''  => '<A HREF = "/org/#16#/profile">#16#</A>(#5# #13#): #4#, #2#',
 				},
 			},
 		],
@@ -1059,17 +1059,31 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.extendedHealthCoverage' => {
 	sqlStmt => qq{
-			select 	decode(bill_sequence, 1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
+			SELECT 	decode(bill_sequence, 1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 				decode(ins_type,0,'Self-Pay',1,'Insurance',2,'HMO',3,'PPO',4,'Medicare',5,'Medicaid',6,'W.Comp',7,'Client Billing',8,'Champus',9,'ChampVA',10,
-					'FECA Blk Lung',11,'BCBS'), member_number, ins_internal_id, record_type, plan_name, policy_number, copay_amt, coverage_end_date, ins_org_id, product_name
-			from 	insurance
-			where 	owner_person_id = ?
-			order by bill_sequence
+					'FECA Blk Lung',11,'BCBS'),
+				member_number,
+				ins_internal_id,
+				record_type,
+				plan_name,
+				policy_number,
+				copay_amt,
+				coverage_end_date,
+				ins_org_id,
+				product_name,
+				(
+					SELECT 	b.org_id
+					FROM org b
+					WHERE b.org_internal_id = i.ins_org_id
+				) AS org_id
+			FROM 	insurance i
+			WHERE 	owner_person_id = ?
+			ORDER BY bill_sequence
 			},
 	sqlStmtBindParamDescr => ['Person ID for Insurance Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx =>0, head => 'BillSeq', dataFmt => '<b>#0#</b> (#1#, <b>#9#</b>, #10#, End Date: #8#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#'},
+			{ colIdx =>0, head => 'BillSeq', dataFmt => '<b>#0#</b> (#1#, <b>#11#</b>, #10#, End Date: #8#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#'},
 
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-ins-#4#/#3#?home=#homeArl#',
@@ -2391,20 +2405,44 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.accountPanel' => {
 	sqlStmt => qq{
-			select 	i.invoice_id, i.client_id, i.owner_id, i.submitter_id, i.invoice_date, i.total_cost, i.balance, ib.bill_to_id
-			from invoice i, invoice_billing ib
-			where i.client_id = ?
-			and ib.invoice_id = i.invoice_id
-			and ib.invoice_item_id is NULL
-			and i.balance > 0
-			order by i.invoice_date
+			SELECT
+				i.invoice_id,
+				i.client_id,
+				i.owner_id,
+				i.submitter_id,
+				i.invoice_date,
+				i.total_cost,
+				i.balance,
+				ib.bill_to_id,
+				(
+					SELECT 	b.org_id
+					FROM org b
+					WHERE b.org_internal_id = ib.bill_to_id
+					AND ib.bill_party_type not in(@{[ App::Universal::INVOICEBILLTYPE_CLIENT]},@{[ App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON]})
+				) AS org_id,
+				ib.bill_party_type
+			FROM invoice i, invoice_billing ib
+			WHERE i.client_id = ?
+			AND ib.invoice_id = i.invoice_id
+			AND ib.invoice_item_id is NULL
+			AND i.balance > 0
+			ORDER BY i.invoice_date
 			},
 	sqlStmtBindParamDescr => ['Person ID for Invoice Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx =>0, head => 'Invoice', dataFmt => '<b>Invoice: </b>#0#, Bill To: #7#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#'},
+				{
+					colIdx => 9, head => 'Invoice',
+					dataFmt => {
+						'0'  => '<b>Invoice: </b>#0#, Bill To: #7#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#',
+						'1'  => '<b>Invoice: </b>#0#, Bill To: #7#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#',
+						'2' => '<b>Invoice: </b>#0#, Bill To: #8#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#',
+						'3' => '<b>Invoice: </b>#0#, Bill To: #8#<BR><b>Total Amount:</b> $#5#, <b>Balance Remaining:</b> $#6#',
 
+					},
+				},
 		],
+
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-invoice/#0#?home=#homeArl#',
 	},
 	publishDefn_panel =>
