@@ -190,7 +190,8 @@ sub getTargetInvoices
 			select distinct invoice_id
 			from invoice
 			where invoice_status in ($submittedStatus, $appealedStatus)
-			and invoice_subtype not in ($claimTypeSelf, $claimTypeThirdParty)
+			and invoice_subtype  <> $claimTypeSelf
+			and invoice_subtype <> $claimTypeThirdParty
 		};
 	}
 	else
