@@ -49,6 +49,17 @@
 		<enum id="3" group_name="staff">Staff</enum>
 	</table>
 
+	<table name="Payment_Type" type="Lookup">
+		<enum id="0" group_name="personal">Pre-payment</enum>
+		<enum id="1" group_name="insurance">Deductible</enum>
+		<enum id="2">Post-payment</enum>
+		<enum id="3" group_name="insurance">Denied</enum>
+		<enum id="4" group_name="insurance">COB</enum>
+		<enum id="5" group_name="personal">Copay Pre-paid</enum>
+		<enum id="6" group_name="insurance">Coverage Terminated</enum>
+		<enum id="7" group_name="insurance">Past File Deadline</enum>
+	</table>
+
 	<table name="Alert_Priority" type="Lookup">
 		<enum id="0">Low</enum>
 		<enum id="1">Medium</enum>
