@@ -1036,7 +1036,7 @@
                             </tr>
                             <tr class="cell">
                               <td class="cell">&nbsp</td>
-                              <td class="cell"><strong>{$transProviderName} <strong></td>
+                              <td class="cell"><strong>{$transProviderName}<br>{$providerLicense}<strong></td>
                               <td class="cell">&nbsp &nbsp <strong>{$providerSignatureDate}<strong></td>
                             </tr>
                             <tr class="cell">
@@ -1313,7 +1313,7 @@
                       </tr>
                       <tr class="cell">
                         <td class="cell">&nbsp</td>
-                        <td colspan="2"><strong>{$physicianName}<br>{$physicianAddress}<br>{$physicianCityStateZipCode}
+                        <td colspan="2"><strong>{$physicianName}<br>{$physicianAddress}<br>{$physicianCityStateZipCode}<br>{$physicianTelephone}
                         </td>
                       </tr>
                       <tr class="cell">

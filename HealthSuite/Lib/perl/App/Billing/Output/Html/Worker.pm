@@ -98,8 +98,10 @@ sub populatePhysician
 	$data->{physicianName} = $billingFacility->getName;
 	$data->{physicianTaxTypeIdEin} = $billingFacility->getTaxId ne "" ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
+	$data->{physicianTelephone} = $billingFacilityAddress->getTelephoneNo(1);
 	$data->{physicianPin} = $physician->getPIN;
 	$data->{physicianGrp} = $billingFacility->getGRP;
+	$data->{providerLicense} = $physician->getProfessionalLicenseNo;
 }
 
 sub populateTreatment
