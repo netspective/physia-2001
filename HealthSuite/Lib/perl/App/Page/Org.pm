@@ -978,23 +978,23 @@ sub prepare_view_superbills
 			</script>
 		});
 	} elsif ($self->param ('action') eq 'printSample') {
-		my $superBill = new App::Billing::SuperBill::SuperBill;
+		my $superBills = new App::Billing::SuperBill::SuperBills;
 		my $input = new App::Billing::Input::SuperBillDBI;
 		my $output = new App::Billing::Output::SuperBillPDF;
 
 		my $superBillID = $self->param ('superbillid');
 
 		$input->populateSuperBill(
-			$superBill,
-			$superBillID,
+			$superBills,
 			$self->session ('org_internal_id'),
+			superBillID => $superBillID,
 			dbiHdl => $self->getSchema()->{dbh}
 		);
 
 		my $theFilename .= $self->session ('org_id') . $self->session ('user_id') . time() . ".superbillSample.pdf";
 		
 		$output->printReport(
-			$superBill,
+			$superBills,
 			file => File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutput, $theFilename),
 			columns => 4,
 			rows => 51
