@@ -36,6 +36,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		},
 );
 
+
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'Employment');
@@ -45,16 +46,44 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new App::Dialog::Field::Organization::ID(caption =>'Employer ID', name => 'rel_id'),
-		new CGI::Dialog::Field(caption => 'Employment Status',
-									name => 'value_type',
-									fKeyStmtMgr => $STMTMGR_PERSON,
-									fKeyStmt => 'selEmpStatus',
-									fKeyDisplayCol => 1,
-									fKeyValueCol => 0),
-		new CGI::Dialog::Field(caption => 'Occupation', name => 'rel_type'),
-		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number'),
-		new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
+		new App::Dialog::Field::Organization::ID(
+			caption =>'Employer ID',
+			name => 'rel_id'
+		),
+		new CGI::Dialog::Field(
+			caption => 'Employment Status',
+			name => 'value_type',
+			fKeyStmtMgr => $STMTMGR_PERSON,
+			fKeyStmt => 'selEmpStatus',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0
+		),
+		new CGI::Dialog::Field(
+			caption => 'Occupation',
+			name => 'rel_type'
+		),
+		new CGI::Dialog::Field(
+			type => 'phone',
+			caption => 'Phone Number',
+			name => 'phone_number'
+		),
+		new CGI::Dialog::MultiField(
+			name => 'dates',
+			fields => [
+				new CGI::Dialog::Field(
+					type => 'date',
+					caption => 'Begin',
+					name => 'begin_date',
+					defaultValue => ''
+				),
+				new CGI::Dialog::Field(
+					type => 'date',
+					caption => 'End Date',
+					name => 'end_date',
+					defaultValue => ''
+				),
+			],
+		),
 	);
 
 	$self->{activityLog} =
@@ -64,10 +93,15 @@ sub new
 		key => "#param.person_id#",
 		data => "\u$self->{id} to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
-	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+	$self->addFooter(
+		new CGI::Dialog::Buttons(
+			cancelUrl => $self->{cancelUrl} || undef
+		),
+	);
 
 	return $self;
 }
+
 
 sub populateData
 {
@@ -81,8 +115,9 @@ sub populateData
 	$page->field('phone_number', $employment->{'value_textb'});
 	$page->field('rel_id', $employment->{'value_text'});
 	$page->field('begin_date', $employment->{'value_date'});
-
+	$page->field('end_date', $employment->{'value_dateend'});
 }
+
 
 sub execute
 {
@@ -93,52 +128,55 @@ sub execute
 	$occupation = "\u$occupation";
 
 	my $relId = $page->field('rel_id');
+	my $relIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relId);
 
 	$page->schemaAction(
-			'Person_Attribute',	$command,
-			item_id => $page->param('item_id') || undef,
-			parent_id => $personId || undef,
-			item_name => $occupation || undef,
-			value_type => $page->field('value_type') || undef,
-			value_text => $relId || undef,
-			value_textB => $page->field('phone_number') || undef,
-			value_date => $page->field('begin_date') || undef,
-			_debug => 0
+		'Person_Attribute',	$command,
+		item_id => $page->param('item_id') || undef,
+		parent_id => $personId || undef,
+		item_name => $occupation || undef,
+		value_type => $page->field('value_type') || undef,
+		value_int => $relIntId || undef,
+		value_text => $relId || undef,
+		value_textB => $page->field('phone_number') || undef,
+		value_date => $page->field('begin_date') || undef,
+		value_dateEnd => $page->field('end_date') || undef,
+		_debug => 0,
 	);
 
-	if($command eq 'add' && $relId ne '')
-	{
-		my $wrkCompValueType = App::Universal::ATTRTYPE_INSGRPWORKCOMP;
-		if(my $orgHasWorkCompPlans = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $relId, $wrkCompValueType))
-		{
-			foreach my $workCompPlan (@{$orgHasWorkCompPlans})
-			{
-				my $insType = App::Universal::CLAIMTYPE_WORKERSCOMP;
-				my $insId = $workCompPlan->{value_text};
-				my $insIntId = $workCompPlan->{value_int};
-				my $patientHasPlan = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selPatientHasPlan', $insId, $personId, $insType);
-				next if $patientHasPlan ne '';
-
-				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
-
-				my $remitType = $workCompPlanInfo->{remit_type};
-				$page->schemaAction(
-						'Insurance', 'add',
-						ins_id => $insId || undef,
-						parent_ins_id => $workCompPlan->{value_int} || undef,
-						owner_id => $personId || undef,
-						owner_org_id => $page->session('org_id'),
-						ins_org_id => $workCompPlanInfo->{ins_org_id} || undef,
-						ins_type => defined $insType ? $insType : undef,
-						remit_type => defined $remitType ? $remitType : undef,
-						remit_payer_id => $workCompPlanInfo->{remit_payer_id} || undef,
-						remit_payer_name => $workCompPlanInfo->{remit_payer_name} || undef,
-						record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
-						_debug => 0
-				);
-			}
-		}
-	}
+#	if($command eq 'add' && $relId ne '')
+#	{
+#		my $wrkCompValueType = App::Universal::ATTRTYPE_INSGRPWORKCOMP;
+#		if(my $orgHasWorkCompPlans = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $relIntId, $wrkCompValueType))
+#		{
+#			foreach my $workCompPlan (@{$orgHasWorkCompPlans})
+#			{
+#				my $insType = App::Universal::CLAIMTYPE_WORKERSCOMP;
+#				my $insId = $workCompPlan->{value_text};
+#				my $insIntId = $workCompPlan->{value_int};
+#				my $patientHasPlan = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selPatientHasPlan', $insId, $personId, $insType);
+#				next if $patientHasPlan ne '';
+#
+#				my $workCompPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
+#
+#				my $remitType = $workCompPlanInfo->{remit_type};
+#				$page->schemaAction(
+#						'Insurance', 'add',
+#						ins_id => $insId || undef,
+#						parent_ins_id => $workCompPlan->{value_int} || undef,
+#						owner_id => $personId || undef,
+#						owner_org_id => $page->session('org_internal_id'),
+#						ins_org_id => $workCompPlanInfo->{ins_org_id} || undef,
+#						ins_type => defined $insType ? $insType : undef,
+#						remit_type => defined $remitType ? $remitType : undef,
+#						remit_payer_id => $workCompPlanInfo->{remit_payer_id} || undef,
+#						remit_payer_name => $workCompPlanInfo->{remit_payer_name} || undef,
+#						record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
+#						_debug => 0
+#				);
+#			}
+#		}
+#	}
 
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
