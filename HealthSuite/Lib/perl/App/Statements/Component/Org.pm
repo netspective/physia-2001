@@ -94,14 +94,15 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgphone?home=#param.home#'>Telephone</A>,
 						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgfax?home=#param.home#'>Fax</A>,
 						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgemail?home=#param.home#'>E-mail</A>,
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#param.home#'>Internet</A> }
+						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#param.home#'>Internet</A>,
+						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgbilling?home=#param.home#'>Billing Contact</A> }
 					  },
 					{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-address-org?home=#param.home#'>Physical Address</A> }, url => 'x', },
 
 				],
 			},
 			stdIcons =>	{
-				updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#6#/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#6#/#4#?home=#param.home#',
+				updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#5#/#3#?home=#param.home#',
 			},
 		},
 		publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses', [$orgId,$orgId]); },
