@@ -27,8 +27,8 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'value_text', caption => 'Refill', type => 'memo', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(caption =>'Approved By', name => 'value_textb', hints => 'Physician approving the refill.'),	
-	);
+		new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'value_textb', types => ['Physician'], hints => 'Physician approving the refill.'),
+		);
 	
 	$self->{activityLog} =
 	{
@@ -70,7 +70,7 @@ sub execute
 		value_textB => $page->field('value_textb') || undef,		
 		_debug => 0
 	);
-	return "\u$command completed.";
+	$self->handlePostExecute($page, $command, $flags);
 }
 
 use constant PANEDIALOG_ATTENDANCE => 'Dialog/Pane/Refill Request';
