@@ -170,11 +170,11 @@ sub handle_page
 
 	# first "run" the dialog and get the flags to see what happened
 	my $dlgHtml = $self->getHtml($page, $command);
-	my $dlgFlags = $page->property(CGI::Dialog::PAGEPROPNAME_FLAGS . '_' . $self->id());
+	my $dlgFlags = $page->property(&CGI::Dialog::PAGEPROPNAME_FLAGS . '_' . $self->id());
 
 	# if we executed the dialog (performed some action), then we
 	# want to leave because execute should have setup the redirect already
-	if($dlgFlags & CGI::Dialog::DLGFLAG_EXECUTE)
+	if($dlgFlags & &CGI::Dialog::DLGFLAG_EXECUTE)
 	{
 		$page->addContent($dlgHtml);
 	}
