@@ -121,6 +121,7 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['Add Another Fee Schedule', '/org/#session.org_id#/dlg-add-catalog', 1],
+			['Add RVRBS Fee Schedule Entries', '/org/#session.org_id#/dlg-add-feescheduledataentry/%field.catalog_id%'],
 			['Show Current Fee Schedule', '/org/#session.org_id#/catalog/%field.internal_catalog_id%/%field.catalog_id%'],
 			['Show List of Fee Schedules', '/org/#session.org_id#/catalog']
 			],
