@@ -415,11 +415,15 @@ sub handleRegistry
 	}
 
 
-	else
+	elsif ($command eq 'update')
 	{
 		$page->redirect("/person/$personId/profile");
 	}
+	else
+	{
+		$self->handlePostExecute($page, $command, $flags);
 
+	}
 
 
 
