@@ -63,6 +63,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -205,8 +206,7 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$command ||= 'add';
-
-
+	
 	#Set attendee_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id') || $page->param('attendee_id') || $page->field('attendee_id'))
 	{
@@ -262,6 +262,8 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	$page->field('dupCheckin_returnUrl', $page->referer()) if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id');
