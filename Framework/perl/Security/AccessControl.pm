@@ -207,7 +207,7 @@ sub definePermissions
 		{
 			$self->definePermissions($childNode, @parentNodes, $activeNode);
 		}
-		elsif($childNode->isa('ControlXML::alias'))
+		elsif($childNode->isa('ControlXML::allow') || $childNode->isa('ControlXML::deny'))
 		{
 			my @parentPerms = ();
 			$parentId = '';
@@ -217,12 +217,24 @@ sub definePermissions
 				push(@parentPerms, $permissionIds->{$parentId});
 			}
 			my $activeId = ($parentId ? "$parentId/" : '') . ($activeNode->{root} || $activeNode->{id});
-			my $aliasChildPerms = $permissionIds->{$childNode->{id}}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
+			my $aliasChildPerms = $permissionIds->{$childNode->{permission}}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
 			my $activeChildPerms = $permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
-			$permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $activeChildPerms->union($aliasChildPerms);
-			foreach (@parentPerms)
+			
+			if($childNode->isa('ControlXML::allow'))
 			{
-				$_->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $_->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
+				$permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $activeChildPerms->union($aliasChildPerms);
+				foreach (@parentPerms)
+				{
+					$_->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $_->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
+				}
+			}
+			else
+			{
+				$permissionIds->{$activeId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $activeChildPerms->diff($aliasChildPerms);
+				foreach (@parentPerms)
+				{
+					$_->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $_->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->diff($aliasChildPerms);
+				}
 			}
 		}
 	}
