@@ -119,13 +119,15 @@ sub obsResultsQuery
 
 	my $cond1 = $sqlGen->WHERE('org_internal_id', 'is', $self->session('org_internal_id'));
 	my $cond2 = $sqlGen->WHERE('lab_order_id', 'is', $self->param('dn.obs.lab_order_id'));
-	my $cond3 = $sqlGen->AND($cond1, $cond2);
+	my $cond4 = $sqlGen->WHERE('lab_parent_id', 'isnotdefined');
+	my $cond3 = $sqlGen->AND($cond1, $cond2,$cond4);
 	$cond3->outColumns('lab_test_id',
 			   'lab_test_name',
 			   'test_entry_id',
 			   'test_type',
 			   'selection',		
 			   'lab_test_entry_id',
+			   #'lab_panel_name',
 
 	);
 	return $cond3;
@@ -166,13 +168,13 @@ sub obsResultsHistQuery
 	my $self = shift;
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
-	my $cond1 = $sqlGen->WHERE('org_internal_id', 'is', $self->session('org_internal_id'));
-	my $cond3 = $sqlGen->WHERE('lab_test_entry_id', 'is', $self->param('dn.obs_results.lab_test_entry_id'));
-	my $cond4 = $sqlGen->AND($cond1, $cond3);
+	#my $cond1 = $sqlGen->WHERE('org_internal_id', 'is', $self->session('org_internal_id'));
+	my $cond3 = $sqlGen->WHERE('lab_panel_parent_id', 'is', $self->param('dn.obs_results.lab_test_entry_id'));
+	my $cond4 = $sqlGen->AND($cond3);
 	$cond4->outColumns(
 		'lab_panel_id',
 		'lab_panel_name',
-		'test_entry_id',
+		#'test_entry_id',
 		'lab_panel_price'
 	);
 	return $cond4;
