@@ -167,90 +167,92 @@ sub execute
 	my $fs = $page->param('internal_catalog_id');
 	my $fsField = $self->getField('catalog_id');
 	my $cptField = $self->getField('listofcpts');
-        $cpts =~ s/\s//g;         
-        my @cptCodes = split(/\s*,\s*/, $cpts);        
-        my $sessionId = $page->session('_session_id');
+	$cpts =~ s/\s//g;         
+	my @cptCodes = split(/\s*,\s*/, $cpts);        
+	my $sessionId = $page->session('_session_id');
 	my $userId = $page->session('user_id');
 	my $orgId = $page->session('org_internal_id');
 	my @sortCpt = sort {_sortCptValues($page,$a,$b)} @cptCodes; 	
 	
-        foreach my $check (@sortCpt)
-        {        	
+	foreach my $check (@sortCpt)
+	{
 		my @cptRange = split(/-/, $check);   			
 		$cptRange[1] = length($cptRange[1]) ? $cptRange[1] : $cptRange[0];		
+
 		#SQL COMMAND TO CREATE RANGE FEE SCHEDULE ENTRIES
 		my $insertStmt = qq{
 			INSERT INTO Offering_Catalog_Entry  (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
-			catalog_id,  entry_type, flags, status, code,  name, cost_type, unit_cost, description ,data_text) 			
+				catalog_id,  entry_type, flags, status, code,  name, cost_type, unit_cost, description ,data_text)
 			(SELECT '$sessionId', sysdate, '$userId', '$orgId', $fs,  $CPT_CODE, ora.value_int, 1 ,
-				rvu.code,
-				ref_cpt.name, 
-				1, 	
-				( 
+			rvu.code,
+			ref_cpt.name, 
+			1, 	
+			( 
 				(rvu.work_rvu * gpci.work) + 
 				(decode(ora.value_int,0,trans_non_fac_pe_rvu,trans_fac_pe_rvu) * gpci.practice_expense) + 
 				(rvu.mal_practice_rvu * gpci.mal_practice) 
-				) * rvu.conversion_fact * oc.rvrbs_multiplier
-				as unit_cost,
-				ref_cpt.description,
-				nvl((	SELECT	service_type 
-					FROM REF_Code_Service_Type
-				 	WHERE rvu.code BETWEEN code_min 
-				 	AND	code_max
-				),'01') as service_type
+			) * rvu.conversion_fact * oc.rvrbs_multiplier
+			as unit_cost,
+			ref_cpt.description,
+			nvl((	SELECT	service_type 
+				FROM REF_Code_Service_Type
+				WHERE rvu.code BETWEEN code_min 
+				AND	code_max
+			),'01') as service_type
 			FROM 	Offering_Catalog oc,  ofcatalog_attribute oa, org_attribute ora,
 				REF_PFS_RVU  rvu, REF_GPCI gpci, ref_cpt
-				
 			WHERE	oc.internal_catalog_id = $fs
-			AND	oa.parent_id (+) = oc.internal_catalog_id
-			AND	oa.item_name (+)= 'Capitated Contract'
-			AND 	ora.item_name  = 'Medicare GPCI Location'
-			AND 	ora.parent_id (+) = $orgId
-			AND	ora.value_text = gpci.gpci_id
-			AND	UPPER(rvu.code) BETWEEN UPPER('$cptRange[0]')
-			AND	UPPER('$cptRange[1]')
-			AND	rvu.modifier is NULL
-			AND	sysdate BETWEEN rvu.eff_begin_date
-			AND	rvu.eff_end_date		
-			AND	ref_cpt.cpt = rvu.code
+				AND	oa.parent_id (+) = oc.internal_catalog_id
+				AND	oa.item_name (+)= 'Capitated Contract'
+				AND 	ora.item_name  = 'Medicare GPCI Location'
+				AND 	ora.parent_id (+) = $orgId
+				AND	ora.value_text = gpci.gpci_id
+				AND	UPPER(rvu.code) BETWEEN UPPER('$cptRange[0]')
+				AND	UPPER('$cptRange[1]')
+				AND	rvu.modifier is NULL
+				AND	sysdate BETWEEN rvu.eff_begin_date
+				AND	rvu.eff_end_date		
+				AND	ref_cpt.cpt = rvu.code
 			)
 			UNION
 			(SELECT '$sessionId', sysdate, '$userId', '$orgId', $fs,  $CPT_HCPCS, ora.value_int, 1 ,
-				rvu.code,
-				ref_hcpcs.name, 
-				1, 	
-				( 
+			rvu.code,
+			ref_hcpcs.name, 
+			1, 	
+			( 
 				(rvu.work_rvu * gpci.work) + 
 				(decode(ora.value_int,0,trans_non_fac_pe_rvu,trans_fac_pe_rvu) * gpci.practice_expense) + 
 				(rvu.mal_practice_rvu * gpci.mal_practice) 
-				) * rvu.conversion_fact * oc.rvrbs_multiplier
-				as unit_cost,
-				ref_hcpcs.description,
-				nvl((	SELECT	service_type 
-					FROM REF_Code_Service_Type
-				 	WHERE rvu.code BETWEEN code_min 
-				 	AND	code_max
-				),'01') as service_type
+			) * rvu.conversion_fact * oc.rvrbs_multiplier
+			as unit_cost,
+			ref_hcpcs.description,
+			nvl((	SELECT	service_type 
+				FROM REF_Code_Service_Type
+				WHERE rvu.code BETWEEN code_min 
+				AND	code_max
+			),'01') as service_type
 			FROM 	Offering_Catalog oc,  ofcatalog_attribute oa, org_attribute ora,
 				REF_PFS_RVU  rvu, REF_GPCI gpci, 
 				ref_hcpcs
 			WHERE	oc.internal_catalog_id = $fs
-			AND	oa.parent_id (+) = oc.internal_catalog_id
-			AND	oa.item_name (+)= 'Capitated Contract'
-			AND 	ora.item_name  = 'Medicare GPCI Location'
-			AND 	ora.parent_id (+) = $orgId
-			AND	ora.value_text = gpci.gpci_id
-			AND	UPPER(rvu.code) BETWEEN UPPER('$cptRange[0]')
-			AND	UPPER('$cptRange[1]')
-			AND	rvu.modifier is NULL
-			AND	sysdate BETWEEN rvu.eff_begin_date
-			AND	rvu.eff_end_date		
-			AND	ref_hcpcs.hcpcs  = rvu.code
-			)			
+				AND	oa.parent_id (+) = oc.internal_catalog_id
+				AND	oa.item_name (+)= 'Capitated Contract'
+				AND 	ora.item_name  = 'Medicare GPCI Location'
+				AND 	ora.parent_id (+) = $orgId
+				AND	ora.value_text = gpci.gpci_id
+				AND	UPPER(rvu.code) BETWEEN UPPER('$cptRange[0]')
+				AND	UPPER('$cptRange[1]')
+				AND	rvu.modifier is NULL
+				AND	sysdate BETWEEN rvu.eff_begin_date
+				AND	rvu.eff_end_date		
+				AND	ref_hcpcs.hcpcs  = rvu.code
+			)
 		};
-	  	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
-        };       	       	
-        $page->param('_dialogreturnurl', "/org/@{[$page->param('org_id')]}/catalog");
+
+		$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
+	};       	       	
+
+	$page->param('_dialogreturnurl', "/org/@{[$page->param('org_id')]}/catalog");
 	$self->handlePostExecute($page, $command, $flags);
 }
 
