@@ -939,21 +939,34 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.insurance' => {
 	sqlStmt => qq{
-			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
-					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
-					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
-					copay_amt, guarantor_name, decode(ins_type, 7, 'thirdparty', 'coverage') as ins_type,
-					guarantor_id,guarantor_type, b.org_id
-			from insurance, org b
-			where record_type = 3
-			and b.org_id = (select org_id
-					from org
-					where org_internal_id = ins_org_id
-					)
-			and owner_person_id = ?
-			order by bill_sequence
+		SELECT
+			ins_internal_id,
+			parent_ins_id,
+			product_name,
+			DECODE(record_type, 3, 'coverage') AS record_type,
+			plan_name,
+			DECODE(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
+			owner_person_id,
+			ins_org_id,
+			indiv_deductible_amt,
+			family_deductible_amt,
+			percentage_pay,
+			copay_amt,
+			guarantor_name,
+			decode(ins_type, 7, 'thirdparty', 'coverage') AS ins_type,
+			guarantor_id,
+			guarantor_type,
+			(
+				SELECT 	b.org_id
+				FROM org b
+				WHERE b.org_internal_id = i.ins_org_id
+			) AS org_id
+		FROM insurance i
+		WHERE record_type = 3
+		AND owner_person_id = ?
+		ORDER BY bill_sequence
+	},
 
-			},
 	sqlStmtBindParamDescr => ['Person ID for Insurance Table'],
 	publishDefn => {
 
