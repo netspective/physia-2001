@@ -313,7 +313,7 @@ sub hidden_as_html
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $fieldName = $page->fieldPName($self->{name});
-	return qq{<input type="hidden" name="$fieldName" value="$page->field($self->{name})">};
+	return qq{<input type="hidden" name="$fieldName" value="@{[ $page->field($self->{name}) ]}">};
 }
 
 sub separator_as_html
