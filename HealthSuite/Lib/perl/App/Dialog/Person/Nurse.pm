@@ -207,7 +207,6 @@ sub makeStateChanges
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('blood_type', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('ethnicity', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
