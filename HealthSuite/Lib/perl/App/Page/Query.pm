@@ -16,7 +16,7 @@ $QUERYDIR = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL');
 %RESOURCE_MAP = (
 	'query' => {
 		_idSynonym => ['find'],
-		_title => '#param._query_title# Query',
+		_title => '#param._page_title#',
 		_iconSmall => 'icons/search',
 		_iconMedium => 'icons/search',
 		_iconLarge => 'icons/search',
@@ -29,8 +29,15 @@ sub prepare
 {
 	my $self = shift;
 	
+	
 	if ($self->property('QDL'))
 	{
+		unless ($self->param('_query_view'))
+		{
+			my $queryType = $self->param('_query_type');
+			$self->redirect("/query/$queryType/all");
+			return;
+		}
 		my $heading = $self->{flags} & PAGEFLAG_ISPOPUP ? $self->param('_query_title') . " Query" : '';
 		my $dialog = new App::Dialog::Query(page => $self, schema => $self->{schema}, heading => $heading);
 		$self->{queryDialog} = $dialog;
@@ -46,7 +53,7 @@ sub prepare
 		$html .= '<br><br><b>Available Queries:</b><br><ul>';
 		foreach (@{$RESOURCE_MAP{query}->{_views}})
 		{
-			$html .= qq{<li><a href="/query/$_->{name}">$_->{caption}</a></li>};
+			$html .= qq{<li><a href="/query/$_->{name}/all">$_->{caption}</a></li>};
 		}
 		$html .= '</ul>';
 		$self->addContent($html);
@@ -84,29 +91,35 @@ sub handleARL
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 	$handleExec = 1 unless defined $handleExec;
 
-	if (my $queryType = $pathItems->[0])
+	my $queryType = '';
+	my $queryTitle = '';
+	my $view = '';
+	if ($queryType = $pathItems->[0])
 	{
-		$self->param('_query_type', $queryType);
-		
-		my $queryTitle = "\u$queryType";
-		$queryTitle =~ s/_/ /g;
-		$self->param('_query_title', $queryTitle);
-		
-		$self->property('ACL', "page/query/$pathItems->[0]");
-	
+		$queryTitle = "\u$queryType";
+		$self->property('ACL', "page/query/$queryType");
 		my ($fileName) = map {$_->{caption}} grep {$_->{name} eq $queryType} @{$RESOURCE_MAP{query}{_views}};
 		$fileName = File::Spec->catfile($QUERYDIR, $fileName . '.qdl');
 		if (-f $fileName)
 		{
 			$self->property('QDL', $fileName);
 		}
-		my $style = $pathItems->[1] || 'default';
-		$self->param('_style', $style);
+		$view = $pathItems->[1] || '';	
 	}
 	else
 	{
 		$self->property('ACL', 'page/query');
 	}
+	
+	my $pageTitle = "Query";
+	$pageTitle = $queryTitle . ' ' . $pageTitle if $queryTitle;
+	$pageTitle .= " (\u$view)" if $view;
+	$pageTitle =~ s/_/ /g;
+	
+	$self->param('_page_title', $pageTitle);
+	$self->param('_query_type', $queryType);
+	$self->param('_query_title', $queryTitle);
+	$self->param('_query_view', $view);
 	
 	$self->printContents();
 	return 0;
