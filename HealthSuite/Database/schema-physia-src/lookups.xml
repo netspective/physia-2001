@@ -460,6 +460,7 @@
 		<enum>African-American</enum>
 		<enum>Asian/Pacific Islander</enum>
 		<enum>Hispanic</enum>
+		<enum>Other</enum>
 	</table>
 
 	<table name="Family_Relationship" abbrev="FMRel" type="Lookup">
