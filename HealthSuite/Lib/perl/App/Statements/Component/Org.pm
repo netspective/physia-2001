@@ -149,9 +149,9 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	FROM    org_attribute oa,
 		offering_catalog oc
 	WHERE   oa.parent_id = :1
-	AND	oa.item_name = 'Fee Schedules'
+	AND	oa.item_name = 'Fee Schedule'
 	AND	oa.item_type = 0
-	AND	oa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
+	AND	oa.value_type = @{[ App::Universal::ATTRTYPE_INTEGER ]}
 	AND	oa.value_int = oc.internal_catalog_id 
 	ORDER BY oc.catalog_id
 	},
