@@ -118,11 +118,11 @@ sub processClaim
 	my $recordCreationCondition = {NSF_ENVOY . "" => {'DA0' => sub { return 1;},
 												'DA1' => sub { return 1;},
 												'DA2' => sub {
-		 														if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
-																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
-																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() eq $tempClaim->{payToProvider}->{address}->getCity())	&&
-																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() eq $tempClaim->{payToProvider}->{address}->getState()) &&
-																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() eq $tempClaim->{payToProvider}->{address}->getZipCode()))
+		 														if (($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() ne $tempClaim->{careReceiver}->{address}->getAddress1()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() ne $tempClaim->{careReceiver}->{address}->getAddress2()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() ne $tempClaim->{careReceiver}->{address}->getCity())	&&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() ne $tempClaim->{careReceiver}->{address}->getState()) &&
+																	($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() ne $tempClaim->{careReceiver}->{address}->getZipCode()))
 																	{
 																		return 1;
 																	}
@@ -164,11 +164,11 @@ sub processClaim
 					 		 NSF_HALLEY . "" => {'DA0' => sub { return 1;},
 											'DA1' => sub { return 1;},
 											'DA2' => sub {
-		 													if (not($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() eq $tempClaim->{payToProvider}->{address}->getAddress1()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() eq $tempClaim->{payToProvider}->{address}->getAddress2()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() eq $tempClaim->{payToProvider}->{address}->getCity())	&&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() eq $tempClaim->{payToProvider}->{address}->getState()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() eq $tempClaim->{payToProvider}->{address}->getZipCode()))
+		 													if (($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() ne $tempClaim->{careReceiver}->{address}->getAddress1()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() ne $tempClaim->{careReceiver}->{address}->getAddress2()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() ne $tempClaim->{careReceiver}->{address}->getCity())	&&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() ne $tempClaim->{careReceiver}->{address}->getState()) &&
+																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() ne $tempClaim->{careReceiver}->{address}->getZipCode()))
 																{
 																	return 1;
 																}
