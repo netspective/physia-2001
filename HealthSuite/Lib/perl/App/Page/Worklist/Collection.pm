@@ -439,11 +439,11 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
-	$self->param('_pm_view', $pathItems->[0] || 'date');
+	$self->param('_pm_view', $pathItems->[1] || 'date');
 	$self->param('noControlBar', 1);
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
+	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
@@ -458,8 +458,8 @@ sub handleARL_date
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$pathItems->[1] =~ s/\-/\//g if defined $pathItems->[1];
-	$self->param('_seldate', $pathItems->[1]);
+	$pathItems->[2] =~ s/\-/\//g if defined $pathItems->[1];
+	$self->param('_seldate', $pathItems->[2]);
 	$self->param('noControlBar', 0);
 }
 
