@@ -145,7 +145,7 @@ sub prepare_page_content_header
 			['Chart', "$urlPrefix/chart", 'chart'],
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
-			['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
+			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		], ' | ');
 
