@@ -579,12 +579,6 @@
 				<col name="remarks">Response to an Alert</col>
 			</row>
 			<row>
-				<col name="id">8500</col>
-				<col name="caption">Account Notes</col>
-				<col name="group_name">Account Collection</col>
-				<col name="remarks">Collector's notes associated with an account</col>
-			</row>
-			<row>
 				<col name="id">9000</col>
 				<col name="caption">Plan</col>
 				<col name="group_name">Action</col>
@@ -603,6 +597,24 @@
 				<col name="caption">Void</col>
 				<col name="group_name">Action</col>
 				<col name="remarks">This type is created when voiding an invoice or claim</col>
+			</row>
+			<row>
+				<col name="id">9500</col>
+				<col name="caption">Account Notes</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Collector's notes associated with an account</col>
+			</row>
+			<row>
+				<col name="id">9510</col>
+				<col name="caption">Reck Date</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Reck date for the acccount</col>
+			</row>
+			<row>
+				<col name="id">9520</col>
+				<col name="caption">Account Owner</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Collector for this account</col>											
 			</row>
 			<row>
 				<col name="id">10000</col>
