@@ -156,6 +156,23 @@
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the resource"/>
 	</table>
 
+	<table name="Offering_Catalog" abbrev="OffCat" type="Audit,Secure,Restrict_Rows">
+		<description>
+			Product, service, and other offerings including pricing.
+			Contains fee schedules, products list, service codes, and other items that can go onto an invoice.
+		</description>
+		<column name="internal_catalog_id" type="autoinc" primarykey="yes" descr="Unique identification for the catalog"/>
+		<column name="catalog_id" type="text" size="32" uniquegrp="catorg" indexed="yes" descr="Unique name for the catalog (user-defined)"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" uniquegrp="catorg" indexed="yes" descr="The main org that owns the catalog"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" indexed="yes" descr="The entity that owns the catalog"/>
+		<column name="caption" type="text" size="64" required="yes" descr="Quick overview of the catalog"/>
+		<column name="catalog_type" lookupref="Offering_Catalog_Type" descr="The type of information held in this record"/>
+		<column name="parent_catalog_id" selfref="Offering_Catalog.internal_catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
+		<column name="description" type="text" size="1024" descr="Detailed description of the catalog"/>
+		<column name="effective" type="duration" descr="The effective date(s) of the catalog"/>
+		<column name="rvrbs_multiplier" type="float" descr="RVRBS multiplier"/>
+	</table>
+
 	<include file="scheduling.xml"/>
 
 	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">
@@ -213,24 +230,6 @@
 		<column name="data_date_c" type="date" descr="Extra data, dependent upon transaction type"/>
 		<column name="display_summary" type="text" size="1024" descr="Text to display for this transaction in a summary view (derived)"/>
 	</table>
-
-	<table name="Offering_Catalog" abbrev="OffCat" type="Audit,Secure,Restrict_Rows">
-		<description>
-			Product, service, and other offerings including pricing.
-			Contains fee schedules, products list, service codes, and other items that can go onto an invoice.
-		</description>
-		<column name="internal_catalog_id" type="autoinc" primarykey="yes" descr="Unique identification for the catalog"/>
-		<column name="catalog_id" type="text" size="32" uniquegrp="catorg" indexed="yes" descr="Unique name for the catalog (user-defined)"/>
-		<column name="org_internal_id" lookupref="Org.org_internal_id" uniquegrp="catorg" indexed="yes" descr="The main org that owns the catalog"/>
-		<column name="owner_org_id" lookupref="Org.org_internal_id" indexed="yes" descr="The entity that owns the catalog"/>
-		<column name="caption" type="text" size="64" required="yes" descr="Quick overview of the catalog"/>
-		<column name="catalog_type" lookupref="Offering_Catalog_Type" descr="The type of information held in this record"/>
-		<column name="parent_catalog_id" selfref="Offering_Catalog.internal_catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
-		<column name="description" type="text" size="1024" descr="Detailed description of the catalog"/>
-		<column name="effective" type="duration" descr="The effective date(s) of the catalog"/>
-		<column name="rvrbs_multiplier" type="float" descr="RVRBS multiplier"/>
-	</table>
-
 
 	<table name="Contract_Catalog" abbrev="CnCat" type="Audit,Secure,Restrict_Rows">
 		<description>

@@ -21,8 +21,9 @@
 		<column name="rr_ids" type="text" size="255" descr="Additional Resource(s) required for this appointment type"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
 		<column name="appt_width" type="integer" descr="The Appointment Width for parallel appointments"/>
+		<column name="superbill_id" lookupref="Offering_Catalog.internal_catalog_id" indexed="yes" descr="The SuperBill type for this Appt Type"/>
 	</table>
-	
+
 	<table name="Sch_Template" abbrev="ScTmpl" type="Audit,Secure,Restrict_Rows">
 		<description>A predefined block of time during which a resource is available or unavailable for scheduling events</description>
 		<column name="template_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific template"/>
@@ -80,8 +81,9 @@
 		<column name="discard_remarks" type="text" size="512" descr="Any remarks for cancellation/noshow, etc"/>
 		<column name="appt_type" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
 		<column name="chain_entry_id" lookupref="Appt_Chain_Entry.entry_id" descr="Appt Chain Entry ID number tying this appointment to the appointment chain"/>
+		<column name="superbill_id" lookupref="Offering_Catalog.internal_catalog_id" indexed="yes" descr="The SuperBill type for this Appointment"/>
 	</table>
-	
+
 	<table name="Sch_Verify" abbrev="InsVer" type="Audit,Secure">
 		<description> Insurance Verification Data (per Appointment).</description>
 		<column name="event_id" lookupref="Event.event_id" primarykey="yes" descr="The event_id of the Appointment"/>
@@ -125,5 +127,5 @@
 		<column name="verify_action" type="text" size="64" descr="Action taken to verify appointment"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
 	</table>
-	
+
 </schema>

@@ -44,3 +44,33 @@ insert into Payment_Type (id, caption, group_name) values (9, 'Budget-payment', 
 insert into Session_Action_Type (id, caption) values (9, 'Setup');
 
 commit;
+
+-- Alter table Event
+-- -----------------
+alter table Event add (SUPERBILL_ID NUMBER(16));
+alter table Event_AUD add (SUPERBILL_ID NUMBER(16));
+
+alter table Event add constraint EVENT_SUPERBILL_ID_FK FOREIGN KEY(superbill_id) references 
+	Offering_Catalog(internal_catalog_id) on delete cascade;
+	
+create index EVENT_SUPERBILL_ID on Event (superbill_id) TABLESPACE TS_INDEXES;
+
+-- Re-create Event Triggers
+-- ------------------------
+@tables-code/Event.sql
+
+-- Alter table Appt_Type
+-- ---------------------
+alter table Appt_Type add (SUPERBILL_ID NUMBER(16));
+alter table Appt_Type_Aud add (SUPERBILL_ID NUMBER(16));
+
+alter table Appt_Type add constraint APTYPE_SUPERBILL_ID_FK FOREIGN KEY(superbill_id) 
+	references Offering_Catalog(internal_catalog_id) on delete cascade;
+	
+create index APTYPE_SUPERBILL_ID on Appt_Type (superbill_id) TABLESPACE TS_INDEXES;
+
+-- Re-create Appt_Type Triggers
+-- ----------------------------
+@tables-code/Appt_Type.sql
+
+commit;
