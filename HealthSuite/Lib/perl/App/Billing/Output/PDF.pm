@@ -1693,7 +1693,7 @@ sub box1aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = $claim->{insured}->[$claimType]->getSsn();
+	my $data = $claim->{insured}->[$claimType]->getMemberNumber();
 	pdflib::PDF_show_xy($p , $data , $box1aX + CELL_PADDING_X + DATA_PADDING_X, $box1Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
@@ -2706,7 +2706,7 @@ sub box30ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my @amount  = split (/\./ , abs($claim->getTotalCharge - $claim->getTotalChargePaid));
+	my @amount  = split (/\./ , abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid)));
 	pdflib::PDF_show_xy($p , $amount[0] + 0, $box30X + 40 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box30Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box30X + 50, $box30Y - 3 * FORM_FONT_SIZE);
 
