@@ -266,7 +266,7 @@ sub importActiveProblems
 	my ($self, $flags, $activeproblems, $person) = @_;
 
 	my $parentId = $person->{id};
-	my $todaysDate = UnixDate('today', $self->defaultUnixStampFormat());
+	my $todaysDate = UnixDate('today', '%m/%d/%Y %I:%M %p');
 	if(my $list = $activeproblems->{'problem-notes'})
 	{
 		# in case there is only one, force it to be "multiple" to simplify coding
