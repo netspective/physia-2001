@@ -18,6 +18,7 @@ use Date::Manip;
 use Date::Calc qw(:all);
 use Devel::ChangeLog;
 use App::Dialog::Field::RovingResource;
+use App::Dialog::Field::Organization;
 use App::Schedule::Utilities;
 
 use vars qw(@ISA @CHANGELOG);
@@ -108,13 +109,17 @@ sub new
 			fKeyStmt => 'selRovingPhysicianTypes',
 		),
 
-		new CGI::Dialog::Field(caption => 'Facility',
-			name => 'facility_id',
-			fKeyStmtMgr => $STMTMGR_SCHEDULING,
-			fKeyStmt => 'selFacilityList',
-			fKeyDisplayCol => 1,
-			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::OrgType(
+			caption => 'Facility',
+			name => 'facility_id'),
+
+		#new CGI::Dialog::Field(caption => 'Facility',
+		#	name => 'facility_id',
+		#	fKeyStmtMgr => $STMTMGR_SCHEDULING,
+		#	fKeyStmt => 'selFacilityList',
+		#	fKeyDisplayCol => 1,
+		#	fKeyValueCol => 0,
+		#	options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::Field(caption => '$Command Remarks',
 		 	type => 'memo', name => 'discard_remarks'),
@@ -209,7 +214,7 @@ sub populateData_add
 
 	my $personId = $page->param('person_id');
 	my $startStamp = $page->getTimeStamp($page->param('start_stamp'));
-	
+
 	$page->field('attendee_id', $personId);
 	$page->field('start_stamp', $startStamp);
 	$page->field('resource_id', $page->param('resource_id'));
@@ -220,7 +225,7 @@ sub populateData_add
 sub populateData_update
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
+
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $eventId = $page->param('event_id');
