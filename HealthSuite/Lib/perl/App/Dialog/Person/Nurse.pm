@@ -40,7 +40,6 @@ sub initialize
 		new App::Dialog::Field::Person::ID::New(
 			caption => 'Nurse ID',
 			name => 'person_id',
-			options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			postHtml => $postHtml,
 		),
