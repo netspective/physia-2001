@@ -99,11 +99,11 @@ sub initialize
 						caption => 'Ethnicity',
 						hints => 'You may choose more than one ethnicity type.'),
 
-		
+
 		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor'],),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
-		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation'),							
-		#		
+		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation'),
+		#
 		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
 				fields => [
 						new CGI::Dialog::Field(caption => 'License Number', name => 'license_number'),
@@ -182,7 +182,10 @@ sub makeStateChanges
 				If you still want to add the record, enter the check-box 'Add Record'.");
 			}
 
+			last;
+
 		}
+
 		else
 		{
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
