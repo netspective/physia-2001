@@ -36,12 +36,8 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		#new CGI::Dialog::Subhead(heading => 'Attach to Existing Record', name => 'exists_heading'),
 		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'value_text', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(caption => 'Is Primary Physician?', type => 'bool', name => 'primary_physician', style => 'check', hints => 'Please check the check-box if the Physician is Primary Physician '),
-		#new CGI::Dialog::Subhead(heading => 'Define New Record', name => 'notexists_heading'),
-		#new CGI::Dialog::Field(caption =>'Full Name', name => 'rel_name', hints => 'Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact.'),
-		#new CGI::Dialog::Subhead(heading => 'Contact Information', name => 'contact_heading'),
+		new CGI::Dialog::Field(caption => 'Is Primary Physician?', type => 'bool', name => 'value_int', style => 'check', hints => 'Please check the check-box if the Physician is Primary Physician '),
 		new CGI::Dialog::Field(caption => 'Specialty',
 								#type => 'foreignKey',
 								name => 'value_textb',
@@ -50,9 +46,6 @@ sub new
 								fKeyDisplayCol => 0,
 								fKeyValueCol => 1),
 
-
-		#new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
-		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
 
 	$self->{activityLog} =
@@ -94,7 +87,7 @@ sub populateData
 
 	my $itemId = $page->param('item_id');
 
-	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 }
 
 sub execute
@@ -106,7 +99,7 @@ sub execute
 	my $parentId = $page->param('person_id');
 	my $valueType = App::Universal::ATTRTYPE_PROVIDER;
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
-	my $primaryPhy = $page->field('primary_physician');
+	my $primaryPhy = $page->field('value_int');
 	if ($primaryPhy ne '')
 	{
 		my $checkPrimary = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $parentId, $valueType);
