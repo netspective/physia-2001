@@ -74,6 +74,10 @@
 		<deliverable id="1414">
 			Validation for invalid date formats in claim lookup fixed.
 		</deliverable>
+		<deliverable id="1450">
+			If invoice balance hits zero and a invoice does not have a reck date auto remove it from the collection worklist
+		</deliverable>
+	
 	</deliverables>
 </release-notes>
 
