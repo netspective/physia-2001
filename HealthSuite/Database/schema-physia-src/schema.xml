@@ -9,7 +9,6 @@
 	<include file="typedef-attribute.xml"/>
 	<include file="devices.xml"/>
 
-
 	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
 		<description>A person, such as a doctor, a nurse, a receptionist, or a patient</description>
 		<!-- column name="person_internal_id" type="autoinc" primarykey="yes" descr="Unique person record identification (in entire system) for internal use"/ -->
@@ -164,6 +163,7 @@
 		<column name="trans_id" type="autoinc" primarykey="yes" descr="Uniqe ID for a specific transaction"/>
 		<column name="trans_owner" indexed="yes" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
 		<column name="parent_event_id" indexed="yes" lookupref="Event.event_id" descr="Any parent event (like an appointment) that this transaction may belong to (as a child)"/>
+		<column name="parent_doc_id" indexed="yes" lookupref="Document.doc_id" descr="Any parent document that this transaction may belong to (as a child)"/>
 		<column name="parent_trans_id" indexed="yes" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
 		<column name="trans_type" indexed="yes" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
 		<column name="trans_subtype" type="text" descr="Any other type information specific to Trans_Type"/>
@@ -658,13 +658,13 @@
 		<column name="billing_id" type="integer" descr="The current payer (invoice billing record) for this invoice"/>
 	</table>
 
-
 	<table name="Role_Permission" abbrev="RolePrm" type="Audit,Secure">
 		<column name="role_name_id" parentref="Role_Name.role_name_id" descr="The unique ID of the role."/>
 		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
 		<column name="permission_name" type="text" size="120" descr="Permission name."/>
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>
+
 	<table name="Collector_Invoice" abbrev="CollInv" type="Audit,Secure">
 		<column name="collector_id" lookupref="person.person_id" descr="Person performing the collection process )"/>
 		<column name="patient_id" lookupref="person.person_id" descr="Patient ID  )"/>
@@ -753,6 +753,7 @@
 	</table>
 
 	<include file="reference.xml"/>
+	<include file="documents.xml"/>
 	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
 
 </schema>
