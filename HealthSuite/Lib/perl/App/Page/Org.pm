@@ -39,7 +39,7 @@ sub initialize
 	#unless($orgId eq $self->session('org_id'))
 	#{
 		$self->addLocatorLinks(
-				['Organization Summary', '/search/org'],
+				['Organization Look-up', '/search/org'],
 				[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
 			);
 	#}
