@@ -297,7 +297,10 @@ sub customValidate
 	if ($relToInsured == App::Universal::INSURED_OTHER)
 	{
 		my $otherField = $self->getField('extra');
-		$otherField->invalidate($page, "$otherField->{caption} is required when Relationship is 'Other'.");
+		unless ($page->field('extra'))
+		{
+			$otherField->invalidate($page, "$otherField->{caption} is required when Relationship is 'Other'.");
+		}
 	}
 
 	# Validate that Insurance Product exists (if entered)
