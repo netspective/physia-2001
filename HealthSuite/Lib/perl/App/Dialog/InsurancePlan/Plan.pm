@@ -330,6 +330,7 @@ sub execute
 	my $ownerOrgId = $page->session('org_internal_id');
 	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
 	my $planName = $page->field('plan_name');
+	my $ownerOrgId = $page->session('org_internal_id');
 
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
@@ -338,7 +339,7 @@ sub execute
 				product_name => $productName || undef,
 				plan_name => $planName || undef,
 				record_type => App::Universal::RECORDTYPE_INSURANCEPLAN || undef,
-				owner_org_id => $page->session('org_internal_id'),
+				owner_org_id => $ownerOrgId,
 				ins_org_id => $insOrgInternalId || undef,
 				ins_type => $insType || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,
@@ -357,8 +358,9 @@ sub execute
 	if ($command eq 'update')
 	{
 		my $insIntId = $page->param('ins_internal_id');
+
 		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selUpdateCoverage', $insOrgInternalId, $productName, $planName, $parentInsId, $insIntId);
+			'selUpdateCoverage', $insOrgInternalId, $productName, $planName, $ownerOrgId, $insIntId);
 	}
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
@@ -441,7 +443,6 @@ sub handleAttributes
 		);
 	}
 
-	$page->param('_dialogreturnurl', '/search/insplan');
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
