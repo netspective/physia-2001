@@ -25,6 +25,7 @@
 		<field id="repatient_name" caption="Regarding Patient Name" join="per_repatient" column="simple_name"/>
 		<field id="deliver_record" caption="Deliver with record" join="attr_repatient" column="value_int"/>
 		<field id="permed_id" caption="Person Medication ID" join="message_doc" column="doc_data_a"/>
+		<field id="priority" caption="Priority" join="message_doc" column="doc_data_b"/>
 		
 		<join id="message_doc" table="document"/>
 		<join id="attr_to" table="document_attribute" requires="message_doc" condition="message_doc.doc_id = attr_to.parent_id AND attr_to.value_type = #constant.ATTRTYPE_PERSON_ID# AND attr_to.item_name = 'To'"/>
