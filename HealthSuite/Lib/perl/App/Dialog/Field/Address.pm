@@ -28,11 +28,11 @@ sub new
 	my $prefix = $params{namePrefix};
 	$params{fields} =
 	[
-		new CGI::Dialog::Field(caption => 'Address (Line 1)', name => "${prefix}line1", size => 36, maxLength => 128, postHtml => '<br>'),
-		new CGI::Dialog::Field(caption => 'Address (Line 2)', name => "${prefix}line2", size => 36, maxLength => 128, postHtml => '<br>'),
-		new CGI::Dialog::Field(caption => 'City', name => "${prefix}city", size => 16, maxLength => 64),
-		new CGI::Dialog::Field(caption => 'State', name => "${prefix}state", size => 2, maxLength => 2),
-		new CGI::Dialog::Field(type => 'zipcode', caption => 'Zip Code', name => "${prefix}zip"),
+		new CGI::Dialog::Field(caption => 'Address (Line 1)', name => "${prefix}line1", size => 36, maxLength => 128, postHtml => '<br>', ),
+		new CGI::Dialog::Field(caption => 'Address (Line 2)', name => "${prefix}line2", size => 36, maxLength => 128, postHtml => '<br>', ),
+		new CGI::Dialog::Field(caption => 'City', name => "${prefix}city", size => 16, maxLength => 64, flags => FLDFLAG_INLINECAPTION, ),
+		new CGI::Dialog::Field(caption => 'State', name => "${prefix}state", size => 2, maxLength => 2, flags => FLDFLAG_INLINECAPTION, ),
+		new CGI::Dialog::Field(type => 'zipcode', caption => 'Zip', name => "${prefix}zip", flags => FLDFLAG_INLINECAPTION, ),
 	];
 
 	return CGI::Dialog::Field::new($type, %params);
