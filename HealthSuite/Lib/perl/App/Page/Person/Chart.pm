@@ -27,6 +27,7 @@ sub prepare_view
 					<font size=1 face=arial>
 					#component.stp-person.alerts#<br>
 					#component.stp-person.activeMedications#<br>
+					#component.stp-person.inactiveMedications#<br>
 					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.appointmentCount#</BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
