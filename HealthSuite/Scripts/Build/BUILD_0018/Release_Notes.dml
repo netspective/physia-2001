@@ -48,6 +48,16 @@
 			of the Physician dialog and the 'Certification' component.
 		</deliverable>
 
+		<deliverable id="1384">
+			Contract Compliance Report has been created under Report - Accounting.
+		</deliverable>
+		
+		<deliverable id="1438">
+			Added validation to the query page to avoid error when user enters incorrect number of criteria
+			for the current operator.  For example the user must enter exactly two criteria if the operator
+			is "is between".
+		</deliverable>
+
 		<deliverable id="1445">
 			In the main menu under Utilities / Functions, added links to Accounting, Billing, Scheduling .
 		</deliverable>
@@ -137,13 +147,37 @@
 			Added activity log for claims notes and claim submissions.
 		</deliverable>
 		
+		<deliverable id="1752">
+			A component is created for Presonal Hyperlinks and Bookmarks and it is shown under Person Summary Page.
+		</deliverable>
+
+		<deliverable id="1753">
+			The database snapshot is successfully imported at ProSys.
+		</deliverable>
+
+		<deliverable id="1755">
+			A bold label of Active and Inactive is displayed in Certification component under Person Associate Page.
+		</deliverable>		
+		
 		<deliverable id="1766">
 			Report (Deposit Payment) : Added blank line after sub-total on the deposit summary
 		</deliverable>		
 
+		<deliverable id="1770">
+			The approve medication dialog now allows you to approve or deny the prescription/refill
+		</deliverable>
+		
+		<deliverable id="1771">
+			Added priority field to all messages (Normal, Emergency, ASAP).
+		</deliverable>
+
 		<deliverable id="1772">
 			Display all present and past medications when entering Edit mode of this component.
 		</deliverable>		
+
+		<deliverable id="1776">
+			The medication dialog now show the allergy component (and others) while adding a new med
+		</deliverable>
 
 		<deliverable id="1790">
 			Procedure Analysis, Financial Analysis, Claim Status, and Aging Report now have
