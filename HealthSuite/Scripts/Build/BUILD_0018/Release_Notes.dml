@@ -224,5 +224,13 @@
 			Fixed the multiple-Cancel-buttons error.
 		</deliverable>
 
+		<deliverable id="1854">
+			Worklist: Fixed problem with the Collection Worklist showing data across orgs
+		</deliverable>
+
+		<deliverable id="1856">
+			Report (Financial Analy Report) : Fixed problem with Total A/R
+		</deliverable>
+
 	</deliverables>
 </release-notes>
