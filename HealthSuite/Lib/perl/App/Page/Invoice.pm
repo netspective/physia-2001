@@ -1372,7 +1372,7 @@ sub prepare_page_content_header
 						<option value="/person/$clientId/dialog/postrefund/refund">Post Refund</option>
 						<option value="/person/$clientId/dialog/posttransfer/transfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
-						@{[ $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+						@{[ "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" ]}
 						@{[ $invStatus < $submitted && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 						@{[ $invStatus != $pending && $invStatus < $submitted && $totalItems > 0 ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]}
 						@{[ $invStatus != $onHold && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}

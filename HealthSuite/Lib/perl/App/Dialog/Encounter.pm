@@ -56,6 +56,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
@@ -314,6 +315,7 @@ sub populateData
 		$page->field('attendee_id', $invoiceInfo->{client_id});
 		#$page->field('reference', $invoiceInfo->{reference});
 		$page->field('proc_diags', $invoiceInfo->{claim_diags});
+		$page->field('invoice_flags', $invoiceInfo->{flags});
 
 		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
 		$page->field('copay_amt', $invoiceCopayItem->{extended_cost});
@@ -321,10 +323,15 @@ sub populateData
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 		$page->param('_f_proc_service_place', $procedures->[0]->{hcfa_service_place});
 		my $totalProcs = scalar(@{$procedures});
-		foreach my $idx (0..$totalProcs)
+		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-
+			my $itemId = $procedures->[$idx]->{item_id};
+			#$page->addDebugStmt("Item ID: $itemId");
+			
+			#$page->addDebugStmt("Index: $idx");
+			#$page->addDebugStmt("Total Procedures: $totalProcs");
+			
 			my $line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
@@ -470,6 +477,11 @@ sub setPayerFields
 sub handlePayers
 {
 	my ($self, $page, $command, $flags) = @_;
+
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	my $invoiceFlags = $page->field('invoice_flags');
+	$command = $command eq 'update' && ($invoiceFlags & $attrDataFlag) ? 'add' : $command;
+
 
 	my $personId = $page->field('attendee_id');
 
