@@ -57,8 +57,8 @@ sub getForm
 		Find:
 		<select name="search_status" style="color: darkred">
 			<option value="all" selected>All</option>
-			<!-- <option value="incomplete">Incomplete</option>
-			<option value="2">Pending</option> -->
+			<option value="0">Created</option>
+			<!-- <option value="2">Pending</option> -->
 			<option value="3">On Hold</option>			
 			<option value="4">Submitted</option>
 			<option value="5">Transferred</option>
