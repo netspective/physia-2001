@@ -36,9 +36,6 @@
 			+ Daily Audit - Physician ID 
 			+ Invoices - Earning column Payer
 		</deliverable>
-		<deliverable id="943">
-			UI: Simple names now showing next to all person id fields where possible.
-		</deliverable>
 
 		<deliverable id="963">
 			UI: Made the license fields in the nurse dialog to be just text fields.
