@@ -31,5 +31,8 @@
 			queries are also demo'd but don't currently function (appropriate "not yet functional"
 			messages are including).
 		</deliverable>
+		<deliverable id="1289">
+			Secure Close of Day
+		</deliverable>
 	</deliverables>
 </release-notes>
