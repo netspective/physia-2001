@@ -76,10 +76,10 @@ sub new
 				),
 		#new App::Dialog::Field::ServicePlaceType(caption => 'Service Place'),
 		new CGI::Dialog::Field(
-					caption => 'Service Place',
-					name => "servplace",
-					size => 6, options => FLDFLAG_REQUIRED,
-					defaultValue => 11,				
+				caption => 'Service Place',
+				name => "servplace",
+				size => 6, options => FLDFLAG_REQUIRED,
+				defaultValue => 11,				
 				findPopup => '/lookup/serviceplace'),
 		new CGI::Dialog::Field(type=>'hidden', name => "servtype"),
 					
@@ -210,18 +210,25 @@ sub populateData
 
 sub execAction_submit
 {
-	my ($page, $command, $invoiceId) = @_;
-	
+	my ($page, $command, $invoiceId, $resubmitFlag) = @_;
+
+	#if resubmitFlag == 1, submitting to same carrier
+	#if resubmitFlag == 2, submitting to next payer in invoice_billing
+	if($resubmitFlag == 2)
+	{
+		$invoiceId = copyInvoice($page, $command, $invoiceId);
+	}
+
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $invoice->{main_transaction});
-	
+
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $invoice->{flags};
 	my $claimType = $invoice->{invoice_subtype};
 	my $invoiceType = $invoice->{invoice_type};
-	unless($invoiceFlags & $attrDataFlag)
-	{
+	#unless($invoiceFlags & $attrDataFlag)
+	#{
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAddresses', $invoiceId);
 
@@ -246,32 +253,285 @@ sub execAction_submit
 
 		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-		## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-		if($invoiceType != App::Universal::INVOICETYPE_SERVICE && $claimType != App::Universal::CLAIMTYPE_SELFPAY)
+		if($invoice->{balance} == 0)
 		{
 			$page->schemaAction(
-					'Invoice', 'update',
-					invoice_id => $invoiceId,
-					invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
-					submitter_id => $page->session('user_id') || undef,
-					submit_date => $todaysDate || undef,
-					flags => $invoiceFlags | $attrDataFlag,
-					_debug => 0
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId || undef,
+				item_name => 'Invoice/History/Item',
+				value_type => App::Universal::ATTRTYPE_HISTORY,
+				value_text => 'Closed',
+				value_date => $todaysDate,
+				_debug => 0
+			);
+		}
+		else
+		{
+			$page->schemaAction(
+				'Invoice', 'update',
+				invoice_id => $invoiceId,
+				invoice_status => $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED,
+				submitter_id => $page->session('user_id') || undef,
+				submit_date => $todaysDate || undef,
+				flags => $invoiceFlags | $attrDataFlag,
+				_debug => 0
 			);
 
-
-			## create invoice attribute for history of invoice status
+			# create invoice attribute for history of invoice status
 			$page->schemaAction(
-					'Invoice_Attribute', 'add',
-					parent_id => $invoiceId,
-					item_name => 'Invoice/History/Item',
-					value_type => App::Universal::ATTRTYPE_HISTORY,
-					value_text => 'Submitted',
-					value_date => $todaysDate || undef,
-					_debug => 0
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId,
+				item_name => 'Invoice/History/Item',
+				value_type => App::Universal::ATTRTYPE_HISTORY,
+				value_text => $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted',
+				value_date => $todaysDate || undef,
+				_debug => 0
+			);
+		}
+	#}
+
+	return $invoiceId;
+}
+
+sub copyInvoice
+{
+	my ($page, $command, $oldInvoiceId) = @_;
+	my $oldInvoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $oldInvoiceId);
+
+	my $sessOrgIntId = $page->session('org_internal_id');
+	my $sessUser = $page->session('user_id');
+	my $timeStamp = $page->getTimeStamp();
+	my $todaysDate = $page->getDate();
+	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
+	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+
+	my @claimDiags = split(/\s*,\s*/, $oldInvoiceInfo->{claim_diags});
+	my $invoiceType = $oldInvoiceInfo->{invoice_type};
+	my $newInvoiceId = $page->schemaAction(
+		'Invoice', 'add',		
+		invoice_type => defined $invoiceType ? $invoiceType : undef,
+		#invoice_subtype => defined $claimType ? $claimType : undef,
+		#invoice_status => defined $submitted ? $submitted : undef,
+		invoice_date => $todaysDate || undef,
+		main_transaction => $oldInvoiceInfo->{main_transaction} || undef,
+		submitter_id => $oldInvoiceInfo->{submitter_id} || undef,
+		claim_diags => join(', ', @claimDiags) || undef,
+		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		owner_id => $oldInvoiceInfo->{owner_id} || undef,
+		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		client_id => $oldInvoiceInfo->{client_id} || undef,
+		#billing_id => $oldInvoiceInfo->{billing_id} || undef,
+		_debug => 0
+	);
+
+	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $oldInvoiceId);
+	foreach my $item (@{$lineItems})
+	{
+		my $itemType = $item->{item_type};
+		my $emg = $item->{emergency};
+		my $newItemId = $page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_id => $newInvoiceId || undef,
+			flags => $item->{flags} || undef,
+			service_begin_date => $item->{service_begin_date} || undef,
+			service_end_date => $item->{service_end_date} || undef,
+			hcfa_service_place => defined $item->{hcfa_service_place} ? $item->{hcfa_service_place} : undef,
+			hcfa_service_type => defined $item->{hcfa_service_type} ? $item->{hcfa_service_type} : undef,
+			modifier => $item->{modifier} || undef,
+			quantity => $item->{quantity} || undef,
+			emergency => defined $emg ? $emg : undef,
+			item_type => defined $itemType ? $itemType : undef,
+			code => $item->{code} || undef,
+			code_type => $item->{code_type} || undef,
+			caption => $item->{caption} || undef,
+			comments =>  $item->{comments} || undef,
+			unit_cost => $item->{unit_cost} || undef,
+			rel_diags => $item->{rel_diags} || undef,
+			data_text_a => $item->{data_text_a} || undef,
+			data_num_a => $item->{data_num_a} || undef,
+			extended_cost => $item->{extended_cost} || undef,
+			_debug => 0
+		);
+
+		my $adjustments = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selItemAdjustmentsByItemParent', $item->{item_id});
+		foreach my $adjust (@{$adjustments})
+		{
+			my $adjType = $adjust->{adjustment_type};
+			my $payType = $adjust->{pay_type};
+			my $payMethod = $adjust->{pay_method};
+			my $payerType = $adjust->{payer_type};
+			my $writeoffCode = $adjust->{writeoff_code};
+			$page->schemaAction(
+				'Invoice_Item_Adjust', 'add',
+				adjustment_type => defined $adjType ? $adjType : undef,
+				adjustment_amount => $adjust->{adjustment_amount} || undef,
+				parent_id => $newItemId || undef,
+				plan_allow => $adjust->{plan_allow} || undef,
+				plan_paid => $adjust->{plan_paid} || undef,
+				pay_date => $todaysDate,
+				pay_type => defined $payType ? $payType : undef,
+				pay_method => defined $payMethod ? $payMethod : undef,
+				pay_ref => $adjust->{pay_ref} || undef,
+				payer_type => defined $payerType ? $payerType : undef,
+				payer_id => $adjust->{payer_id} || undef,
+				writeoff_code => defined $writeoffCode ? $writeoffCode : 'NULL',
+				writeoff_amount => $adjust->{writeoff_amount} || undef,
+				comments => $adjust->{comments} || undef,
+				_debug => 0
 			);
 		}
 	}
+
+
+	#copy old invoice's billing records
+	my $billingInfo = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceBillingRecs', $oldInvoiceId);
+	my $billId = '';
+	my $newPayerBillId = '';
+	my $newInsIntId = '';
+	my $billSeq = '';
+	my $billPartyType = '';
+	my $billStatus = '';
+	my $oldPayerSeq = '';
+	foreach my $billingRec (@{$billingInfo})
+	{
+		$billSeq = $billingRec->{bill_sequence};
+		$billPartyType = $billingRec->{bill_party_type};
+		$billStatus = $billingRec->{bill_status};
+		if($billingRec->{bill_id} == $oldInvoiceInfo->{billing_id})
+		{
+			$oldPayerSeq = $billSeq;
+			$billStatus = 'inactive';
+		}
+
+		$billId = $page->schemaAction(
+			'Invoice_Billing', 'add',
+			invoice_id => $newInvoiceId || undef,
+			invoice_item_id => $billingRec->{invoice_item_id} || undef,
+			assoc_bill_id => $billingRec->{assoc_bill_id} || undef,
+			bill_sequence => defined $billSeq ? $billSeq : undef,
+			bill_party_type => defined $billPartyType ? $billPartyType : undef,
+			bill_to_id => $billingRec->{bill_to_id} || undef,
+			bill_ins_id => $billingRec->{bill_ins_id} || undef,
+			bill_amount => $billingRec->{bill_amount} || undef,
+			bill_pct => $billingRec->{bill_pct} || undef,
+			bill_date => $billingRec->{bill_date} || undef,
+			bill_status => $billStatus || undef,
+			bill_result => $billingRec->{bill_result} || undef,
+			_debug => 0
+		);
+		
+		if($billSeq == $oldPayerSeq + 1)
+		{
+			$newPayerBillId = $billId;
+			$newInsIntId = $billingRec->{bill_ins_id};
+		}
+	}
+
+
+	#update the new invoice with its new billing id and claim type
+	my $claimType = $newInsIntId ? $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsType', $newInsIntId) : 0;
+	my $invoiceStatus = $claimType == 0 ? App::Universal::INVOICESTATUS_CREATED : App::Universal::INVOICESTATUS_SUBMITTED;
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $newInvoiceId || undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		invoice_subtype => defined $claimType ? $claimType : undef,
+		billing_id => $newPayerBillId,
+	);
+
+
+	#copy all attributes except history items
+	my $attributes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllAttributesExclHistory', $oldInvoiceId);
+	foreach my $attr (@{$attributes})
+	{
+		my $valueType = $attr->{value_type};
+		my $itemType = $attr->{item_type};
+		my $valueInt = $attr->{value_int};
+		my $valueIntB = $attr->{value_intb};
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $newInvoiceId,
+			item_type => defined $itemType ? $itemType : undef,
+			item_name => $attr->{item_name} || undef,
+			value_type => defined $valueType ? $valueType : undef,
+			value_text => $attr->{value_text} || undef,
+			value_textB => $attr->{value_textb} || undef,
+			value_int => defined $valueInt ? $valueInt : undef,
+			value_intB => defined $valueIntB ? $valueIntB : undef,
+			value_float => $attr->{value_float} || undef,
+			value_floatB => $attr->{value_floatb} || undef,
+			value_date => $attr->{value_date} || undef,
+			value_dateEnd => $attr->{value_dateend} || undef,
+			value_dateA => $attr->{value_datea} || undef,
+			value_dateB => $attr->{value_dateb} || undef,
+			value_block => $attr->{value_block} || undef,
+			_debug => 0
+		);	
+	}
+
+
+	#update the submission order attribute
+	my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $newInvoiceId, 'Submission Order');
+	$page->schemaAction(
+		'Invoice_Attribute', 'update',
+		item_id => $submitOrder->{item_id},
+		value_int => $submitOrder->{value_int} + 1,
+		_debug => 0
+	);
+
+
+	#add new history attributes
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $newInvoiceId || undef,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => 'Created claim',
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $newInvoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "This invoice is a resubmitted copy of invoice $oldInvoiceId",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+
+	#update old invoice - status, parent invoice
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $oldInvoiceId || undef,
+		parent_invoice_id => $newInvoiceId || undef,
+		invoice_status => App::Universal::INVOICESTATUS_CLOSED,
+	);
+
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $oldInvoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "The remaining balance has been carried over to claim $newInvoiceId",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $oldInvoiceId || undef,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => 'Closed',
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	return $newInvoiceId;
 }
 
 sub hmoCapWriteoff
@@ -291,7 +551,6 @@ sub hmoCapWriteoff
 		next if $proc->{data_text_b} eq 'void';	#data_text_b indicates that this item has been voided
 		
 		my $writeoffAmt = $proc->{balance};
-		#my $netAdjust = 0 - $writeoffAmt;
 		my $itemId = $proc->{item_id};
 		$page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
@@ -300,35 +559,10 @@ sub hmoCapWriteoff
 			pay_date => $todaysDate,
 			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
 			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
-			#net_adjust => defined $netAdjust ? $netAdjust : undef,
 			comments => 'Writeoff auto-generated by system',
 			_debug => 0
 		);	
-
-		#my $totalAdjustForItem = $proc->{total_adjust} + $netAdjust;
-		#my $itemBalance = $proc->{extended_cost} + $totalAdjustForItem;
-		#$page->schemaAction(
-		#	'Invoice_Item', 'update',
-		#	item_id => $itemId || undef,
-		#	total_adjust => defined $totalAdjustForItem ? $totalAdjustForItem : undef,
-		#	balance => defined $itemBalance ? $itemBalance : undef,
-		#	_debug => 0
-		#);
-
-		#$totalAdjForItems += $netAdjust;
 	}
-
-	## update the invoice
-	#my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjForItems;
-	#my $invBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-	#$page->schemaAction(
-	#	'Invoice', 'update',
-	#	invoice_id => $invoiceId || undef,
-	#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-	#	balance => defined $invBalance ? $invBalance : undef,
-	#	_debug => 0
-	#);
-
 
 
 	## create invoice attribute for history of these adjustments
@@ -353,6 +587,7 @@ sub storeFacilityInfo
 	##billing facility information
 	my $billFacilityId = $mainTransData->{billing_facility_id};
 	my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
+	#my $billingFacilityPayAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Payment');
 	my $billingFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billFacilityId);
 
 	my $employerNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Employer#', $credentialsValueType);
@@ -483,6 +718,19 @@ sub storeFacilityInfo
 			_debug => 0
 		);
 
+	#$page->schemaAction(
+	#		'Invoice_Address', $command,
+	#		parent_id => $invoiceId,
+	#		address_name => 'Pay To Org',
+	#		line1 => $billingFacilityPayAddr->{line1},
+	#		line2 => $billingFacilityPayAddr->{line2} || undef,
+	#		city => $billingFacilityPayAddr->{city},
+	#		state => $billingFacilityPayAddr->{state},
+	#		zip => $billingFacilityPayAddr->{zip},
+	#		_debug => 0
+	#);
+
+
 	##SERVICE FACILITY INFORMATION
 	my $servFacilityId = $mainTransData->{service_facility_id};
 	my $serviceFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
@@ -513,20 +761,20 @@ sub storeFacilityInfo
 		);
 
 	#store pay to org address
-	my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
-	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrg->{value_int}, 'Mailing');
+	#my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
+	#my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrg->{value_int}, 'Mailing');
 
-	$page->schemaAction(
-			'Invoice_Address', $command,
-			parent_id => $invoiceId,
-			address_name => 'Pay To Org',
-			line1 => $payToFacilityAddr->{line1},
-			line2 => $payToFacilityAddr->{line2} || undef,
-			city => $payToFacilityAddr->{city},
-			state => $payToFacilityAddr->{state},
-			zip => $payToFacilityAddr->{zip},
-			_debug => 0
-	);
+	#$page->schemaAction(
+	#		'Invoice_Address', $command,
+	#		parent_id => $invoiceId,
+	#		address_name => 'Pay To Org',
+	#		line1 => $payToFacilityAddr->{line1},
+	#		line2 => $payToFacilityAddr->{line2} || undef,
+	#		city => $payToFacilityAddr->{city},
+	#		state => $payToFacilityAddr->{state},
+	#		zip => $payToFacilityAddr->{zip},
+	#		_debug => 0
+	#);
 }
 
 sub storeAuthorizations
@@ -915,19 +1163,34 @@ sub storeInsuranceInfo
 	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
 
 	my $clientId = $invoice->{client_id};
-
-	my $invoicePayers = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceBillingRecs', $invoiceId);
+	my $billingId = $invoice->{billing_id};
+	my $payerBillSeq = '';
+	my $order = '';
+	my $partyType = '';
+	my $insIntId = '';
+	my $billId = '';
+	my $primaryPayerBillSeq = '';
+	my $invoicePayers = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceBillingRecs', $invoiceId); #this query is ordered by bill_sequence
 	foreach my $payer (@{$invoicePayers})
 	{
-		my $partyType = $payer->{bill_party_type};
-		my $insIntId = $payer->{bill_ins_id};
+		$partyType = $payer->{bill_party_type};
+		$insIntId = $payer->{bill_ins_id};
+		$billId = $payer->{bill_id};
+		$payerBillSeq = $payer->{bill_sequence};
 
 		next if $partyType == App::Universal::INVOICEBILLTYPE_CLIENT;	#don't want to continue because this type is a self-pay
+		next if $payer->{bill_status} eq 'inactive';						#don't want to include payers that have been used already
 	
-		my $payerBillSeq = 'Primary' if $payer->{bill_sequence} == App::Universal::PAYER_PRIMARY;
-		$payerBillSeq = 'Secondary' if $payer->{bill_sequence} == App::Universal::PAYER_SECONDARY;
-		$payerBillSeq = 'Tertiary' if $payer->{bill_sequence} == App::Universal::PAYER_TERTIARY;
-		$payerBillSeq = 'Quaternary' if $payer->{bill_sequence} == App::Universal::PAYER_QUATERNARY;
+		if($billId == $billingId)
+		{
+			$order = 'Primary';
+			$primaryPayerBillSeq = $payerBillSeq;
+		}
+
+		$order = 'Secondary' if $payerBillSeq == $primaryPayerBillSeq + 1;
+		$order = 'Tertiary' if $payerBillSeq == $primaryPayerBillSeq + 2;
+		$order = 'Quaternary' if $payerBillSeq == $primaryPayerBillSeq + 3;
+
 
 		if($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
 		{
@@ -1029,7 +1292,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Name",
+					item_name => "Insurance/$order/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insOrgInfo->{name_primary} || undef,
 					value_textB => $insOrgInfo->{org_id} || undef,
@@ -1041,7 +1304,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Effective Dates",
+					item_name => "Insurance/$order/Effective Dates",
 					value_type => defined $durationValueType ? $durationValueType : undef,
 					value_date => $personInsur->{coverage_begin_date} || undef,
 					value_dateEnd => $personInsur->{coverage_end_date} || undef,
@@ -1052,7 +1315,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Type",
+					item_name => "Insurance/$order/Type",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{claim_type} || undef,
 					value_textB => $personInsur->{extra} || undef,
@@ -1063,7 +1326,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Group Number",
+					item_name => "Insurance/$order/Group Number",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{plan_name} || $personInsur->{product_name} || $personInsur->{group_name} || undef,
 					value_textB => $personInsur->{group_number} || $personInsur->{policy_number} || undef,
@@ -1077,7 +1340,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/HMO-PPO ID",
+					item_name => "Insurance/$order/HMO-PPO ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $ppoHmo->{value_text} || undef,
 					value_intB => 1,
@@ -1087,7 +1350,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/BCBS Plan Code",
+					item_name => "Insurance/$order/BCBS Plan Code",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $bcbsCode->{value_text} || undef,
 					value_intB => 1,
@@ -1099,7 +1362,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/E-Remitter ID",
+					item_name => "Insurance/$order/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsurPlan->{remit_payer_id} || $personInsurProduct->{remit_payer_id},
 					value_intB => 1,
@@ -1132,7 +1395,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Payment Source",
+					item_name => "Insurance/$order/Payment Source",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $paySource || undef,
 					value_intB => 1,
@@ -1147,7 +1410,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Champus Branch",
+					item_name => "Insurance/$order/Champus Branch",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusBranch->{value_text} || undef,
 					value_intB => 1,
@@ -1157,7 +1420,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Champus Status",
+					item_name => "Insurance/$order/Champus Status",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusStatus->{value_text} || undef,
 					value_intB => 1,
@@ -1167,7 +1430,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Champus Grade",
+					item_name => "Insurance/$order/Champus Grade",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusGrade->{value_text} || undef,
 					value_intB => 1,
@@ -1181,7 +1444,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Phone",
+					item_name => "Insurance/$order/Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $insOrgPhone->{phone} || undef,
 					value_intB => 1,
@@ -1191,7 +1454,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
-					address_name => "$payerBillSeq Insurance",
+					address_name => "$order Insurance",
 					line1 => $insOrgAddr->{line1} || undef,
 					line2 => $insOrgAddr->{line2} || undef,
 					city => $insOrgAddr->{city} || undef,
@@ -1206,7 +1469,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Patient-Insured/Relationship",
+					item_name => "Insurance/$order/Patient-Insured/Relationship",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $relToCaption || undef,
 					value_int => $relToCode || undef,
@@ -1220,7 +1483,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Name",
+					item_name => "Insurance/$order/Insured/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{complete_name} || undef,
 					value_textB => $insuredId || undef,
@@ -1231,7 +1494,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Name/Last",
+					item_name => "Insurance/$order/Insured/Name/Last",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_last} || undef,
 					value_textB => $insuredId || undef,
@@ -1242,7 +1505,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Name/First",
+					item_name => "Insurance/$order/Insured/Name/First",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_first} || undef,
 					value_textB => $insuredId || undef,
@@ -1253,7 +1516,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Name/Middle",
+					item_name => "Insurance/$order/Insured/Name/Middle",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_middle} || undef,
 					value_textB => $insuredId || undef,
@@ -1264,7 +1527,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Personal/Marital Status",
+					item_name => "Insurance/$order/Insured/Personal/Marital Status",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{marstat_caption} || undef,
 					value_intB => 1,
@@ -1274,7 +1537,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Personal/Gender",
+					item_name => "Insurance/$order/Insured/Personal/Gender",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{gender_caption} || undef,
 					value_intB => 1,
@@ -1284,7 +1547,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Personal/DOB",
+					item_name => "Insurance/$order/Insured/Personal/DOB",
 					value_type => defined $dateValueType ? $dateValueType : undef,
 					value_date => $insuredData->{date_of_birth} || undef,
 					value_intB => 1,
@@ -1294,7 +1557,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Personal/SSN",
+					item_name => "Insurance/$order/Insured/Personal/SSN",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{ssn} || undef,
 					value_intB => 1,
@@ -1304,7 +1567,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Member Number",
+					item_name => "Insurance/$order/Insured/Member Number",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{member_number} || undef,
 					value_intB => 1,
@@ -1318,7 +1581,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/Insured/Contact/Home Phone",
+					item_name => "Insurance/$order/Insured/Contact/Home Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $insuredPhone || undef,
 					value_intB => 1,
@@ -1328,7 +1591,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
-					address_name => "$payerBillSeq Insured",
+					address_name => "$order Insured",
 					line1 => $insuredAddr->{line1} || undef,
 					line2 => $insuredAddr->{line2} || undef,
 					city => $insuredAddr->{city} || undef,
@@ -1356,7 +1619,7 @@ sub storeInsuranceInfo
 				$page->schemaAction(
 						'Invoice_Attribute', $command,
 						parent_id => $invoiceId,
-						item_name => "Insurance/$payerBillSeq/Insured/$occupType/Name",
+						item_name => "Insurance/$order/Insured/$occupType/Name",
 						value_type => defined $valueType ? $valueType : undef,
 						value_text => $employerName || undef,
 						value_textB => $empStatus || undef,
