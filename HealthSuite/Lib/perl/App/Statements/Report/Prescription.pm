@@ -62,6 +62,17 @@ $STMTMGR_REPORT_PRESCRIPTION = new App::Statements::Report::Prescription (
 		}
 	},
 
+	'physicianDEA' => {
+		sqlStmt => qq
+		{
+			select value_text dea
+			from person_attribute
+			where parent_id = :1
+			and item_name = 'DEA'
+			and value_type = 500
+		}
+	},
+
 	'orgInfo' => {
 		sqlStmt => qq
 		{
@@ -84,7 +95,7 @@ $STMTMGR_REPORT_PRESCRIPTION = new App::Statements::Report::Prescription (
 	'orgContactInfo' => {
 		sqlStmt => qq
 		{
-			select value_text
+			select value_text phone
 			from org_attribute
 			where parent_id = :1
 			and item_name = 'Primary'
