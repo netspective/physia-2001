@@ -176,7 +176,7 @@ sub initialize
 							caption => 'Service Facility',
 							name => 'service_facility_id',
 							options => FLDFLAG_REQUIRED,
-							types => "'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'"),
+							types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Billing Org',
 							name => 'billing_facility_id',
