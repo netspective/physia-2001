@@ -34,7 +34,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 		actionRows => [
 			{caption => 'Send Message', url => '/person/#session.person_id#/dlg-send-message',},
 			{caption => 'Send Phone Message', url => '/person/#session.person_id#/dlg-send-phone_message',},
-			{caption => 'Send Refill Request', url => '/person/#session.person_id#/dlg-send-refill_request',},
+			#{caption => 'Send Refill Request', url => '/person/#session.person_id#/dlg-send-refill_request',},
 		],
 	},
 	bodyRowAttr => {
