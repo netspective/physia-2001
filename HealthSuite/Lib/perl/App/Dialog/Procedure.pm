@@ -38,12 +38,12 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'item_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_diags'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'data_num_a'),	#used to indicate if item is FFS (null if it isn't)
-		
+
 		new CGI::Dialog::Field(type => 'hidden', name => 'code_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'use_fee'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),	#for storing and updating fee schedules as attribute
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_catalog_ids'),	#for storing the internal catalog ids of the fee schedules entered in
-	
+
 
 		new CGI::Dialog::Field::Duration(
 				name => 'illness',
@@ -81,10 +81,10 @@ sub new
 		#		caption => 'Service Place',
 		#		name => "servplace",
 		#		size => 6, options => FLDFLAG_REQUIRED,
-		#		#defaultValue => 11,				
+		#		#defaultValue => 11,
 		#		findPopup => '/lookup/serviceplace'),
 		new CGI::Dialog::Field(type=>'hidden', name => "servtype"),
-					
+
 		new App::Dialog::Field::ProcedureLine(name=>'cptModfField', caption => 'CPT / Modf'),
 		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED, name => 'procdiags'),
 
@@ -106,7 +106,7 @@ sub new
 			]),
 
 		new CGI::Dialog::Field(caption => 'Unit Cost',
-			name => 'alt_cost', 
+			name => 'alt_cost',
 			#type => 'select',
 			#options => FLDFLAG_REQUIRED,
 		),
@@ -127,6 +127,7 @@ sub new
 								['Put Claim On Hold', "/invoice/%param.invoice_id%/dialog/hold"],
 								#['Submit Claim for Review', "/invoice/%param.invoice_id%/review"],
 								['Submit Claim for Transfer', "/invoice/%param.invoice_id%/submit"],
+								['Go to Work List', "/worklist"],
 								],
 						cancelUrl => $self->{cancelUrl} || undef));
 
@@ -164,7 +165,7 @@ sub makeStateChanges
 				$page->field('service_end_date', $serviceInfo->[$idx]->{service_end_date});
 			}
 		}
-	}	
+	}
 }
 
 sub populateData
@@ -173,14 +174,14 @@ sub populateData
 	my $invoiceId = $page->param('invoice_id');
 
 	$page->field('claim_diags', $STMTMGR_INVOICE->getSingleValue($page, 0, 'selClaimDiags', $invoiceId));
-	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;	
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	$page->field('proccharge', $page->field('alt_cost'));
-	$page->field('', $page->getDate());	
+	$page->field('', $page->getDate());
 	my $sqlStampFmt = $page->defaultSqlStampFormat();
 	my $itemId = $page->param('item_id');
 
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selProcedure', $itemId);
-	$page->field('servtype','');	
+	$page->field('servtype','');
 	if($page->field('item_type') == App::Universal::INVOICEITEMTYPE_LAB)
 	{
 		$page->field('lab_indicator', 1)
@@ -193,7 +194,7 @@ sub populateData
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrDisability',$invoiceId);
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
-	
+
 	my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 	$page->field('fee_schedules', $feeSchedules->{value_textb});
 	$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
@@ -241,7 +242,7 @@ sub execAction_submit
 			hmoCapWriteoff($page, $command, $invoiceId, $invoice, $mainTransData);
 		}
 
-		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);		
+		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);
 
 
 		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
@@ -306,7 +307,7 @@ sub copyInvoice
 	my @claimDiags = split(/\s*,\s*/, $oldInvoiceInfo->{claim_diags});
 	my $invoiceType = $oldInvoiceInfo->{invoice_type};
 	my $newInvoiceId = $page->schemaAction(
-		'Invoice', 'add',		
+		'Invoice', 'add',
 		invoice_type => defined $invoiceType ? $invoiceType : undef,
 		#invoice_subtype => defined $claimType ? $claimType : undef,
 		#invoice_status => defined $submitted ? $submitted : undef,
@@ -349,9 +350,9 @@ sub copyInvoice
 			value_dateB => $attr->{value_dateb} || undef,
 			value_block => $attr->{value_block} || undef,
 			_debug => 0
-		);	
+		);
 	}
-	
+
 
 	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $oldInvoiceId);
 	foreach my $item (@{$lineItems})
@@ -412,10 +413,10 @@ sub copyInvoice
 				comments => $adjust->{comments} || undef,
 				_debug => 0
 			);
-			
+
 			my $batchPayment = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $newInvoiceId, 'Invoice/Payment/Batch ID');
 			foreach my $batch (@{$batchPayment})
-			{				
+			{
 				if($batch->{value_int} == $adjust->{adjustment_id})
 				{
 					$page->schemaAction(
@@ -466,7 +467,7 @@ sub copyInvoice
 			bill_result => $billingRec->{bill_result} || undef,
 			_debug => 0
 		);
-		
+
 		if($billSeq == $oldPayerSeq + 1)
 		{
 			$newPayerBillId = $billId;
@@ -573,7 +574,7 @@ sub hmoCapWriteoff
 	my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	foreach my $proc (@{$procItems})
 	{
-		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY 
+		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY
 			|| $proc->{item_type} == App::Universal::INVOICEITEMTYPE_DEDUCTIBLE || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_VOID;
 		next if $proc->{data_num_a};			#data_num_a indicates that this item is FFS (null if it isn't)
 		next if $proc->{data_text_b} eq 'void';	#data_text_b indicates that this item has been voided
@@ -590,7 +591,7 @@ sub hmoCapWriteoff
 			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
 			comments => 'Writeoff auto-generated by system',
 			_debug => 0
-		);	
+		);
 
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
@@ -709,7 +710,7 @@ sub storeFacilityInfo
 			value_intB => 1,
 			_debug => 0
 		);
-		
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
@@ -721,7 +722,7 @@ sub storeFacilityInfo
 			value_intB => 1,
 			_debug => 0
 		);
-		
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
@@ -745,7 +746,7 @@ sub storeFacilityInfo
 			value_intB => 1,
 			_debug => 0
 		);
-		
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
@@ -917,7 +918,7 @@ sub storeAuthorizations
 sub storePatientInfo
 {
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
-	
+
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
 	my $dateValueType = App::Universal::ATTRTYPE_DATE;
@@ -1053,7 +1054,7 @@ sub storePatientEmployment
 	foreach my $employStat (@{$personEmployStat})
 	{
 		my $valueType = $employStat->{value_type};
-	
+
 		my $status = '';
 		$status = $employStat->{caption};
 		$status = 'Retired' if $valueType == $retiredAttr;
@@ -1089,7 +1090,7 @@ sub storePatientEmployment
 sub storeServiceProviderInfo
 {
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
-	
+
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
 	my $sessOrgId = $page->session('org_id');
@@ -1125,7 +1126,7 @@ sub storeServiceProviderInfo
 		$providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'UPIN', $sessOrgId);
 		$upin = $providerUpin->{value_text};
 	}
-	
+
 	my $providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'BCBS', $servFacilityId);
 	my $bcbs = $providerBcbs->{value_text};
 	if($bcbs eq '')
@@ -1343,7 +1344,7 @@ sub storeServiceProviderInfo
 sub storeProviderInfo
 {
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
-	
+
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
 	my $sessOrgId = $page->session('org_id');
@@ -1369,7 +1370,7 @@ sub storeProviderInfo
 		$providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'UPIN', $sessOrgId);
 		$upin = $providerUpin->{value_text};
 	}
-	
+
 	my $providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, 'BCBS', $servFacilityId);
 	my $bcbs = $providerBcbs->{value_text};
 	if($bcbs eq '')
@@ -1610,7 +1611,7 @@ sub storeInsuranceInfo
 
 		next if $partyType == App::Universal::INVOICEBILLTYPE_CLIENT;	#don't want to continue because this type is a self-pay
 		next if $payer->{bill_status} eq 'inactive';						#don't want to include payers that have been used already
-	
+
 		if($billId == $billingId)
 		{
 			$order = 'Primary';
@@ -1626,7 +1627,7 @@ sub storeInsuranceInfo
 		{
 			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
 			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
-			
+
 			my $thirdPartyInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
 			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $insIntId);
 			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $insIntId);
@@ -1642,7 +1643,7 @@ sub storeInsuranceInfo
 					value_intB => 1,
 					_debug => 0
 				);
-		
+
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
@@ -1664,7 +1665,7 @@ sub storeInsuranceInfo
 					zip => $thirdPartyAddr->{zip} || undef,
 					_debug => 0
 				);
-		
+
 		}
 		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON)
 		{
@@ -1685,7 +1686,7 @@ sub storeInsuranceInfo
 					value_intB => 1,
 					_debug => 0
 				);
-		
+
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
@@ -1707,7 +1708,7 @@ sub storeInsuranceInfo
 					zip => $thirdPartyAddr->{zip} || undef,
 					_debug => 0
 				);
-		
+
 		}
 		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS)
 		{
@@ -2106,7 +2107,7 @@ sub storeInsuranceInfo
 sub createActiveProbTrans
 {
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
-	
+
 	my $personValueType = App::Universal::ENTITYTYPE_PERSON;
 	my $transStatActive = App::Universal::TRANSSTATUS_ACTIVE;
 	my $todaysStamp = $page->getTimeStamp();
@@ -2149,17 +2150,17 @@ sub customValidate
 	{
 		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInternalCatalogIdByIdType',
 					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);
-		
+
 		push(@fsIntIds, $catalog->{internal_catalog_id});
 		#$page->addError("FS Names: $_");
 		#$page->addError("FS Ids: $catalog->{internal_catalog_id}");
 	}
 
 	$page->field('fee_schedules_catalog_ids', join(',', @fsIntIds));
-	
+
 	my $svc_type = App::IntelliCode::getSvcType($page, $cptCode, $modCode, \@fsIntIds);
 	my $count_type = scalar(@$svc_type);
-	my $count=0;	
+	my $count=0;
 	unless ($servicetype)
 	{
 		if ($count_type==1||$use_fee ne '')
@@ -2169,7 +2170,7 @@ sub customValidate
 				#Store code_type and service type in hidden fields
 				if($count_type==1||$use_fee eq $count)
 				{
-					$page->field("servtype",$_->[1]); 	
+					$page->field("servtype",$_->[1]);
 					$page->field('code_type',$_->[3]);
 				}
 			 	$count++
@@ -2192,7 +2193,7 @@ sub customValidate
 	$count=0;
 	if (! $page->field('proccharge') && ! $page->field('alt_cost'))
 	{
-		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];				
+		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];
 		my $fsResults = App::IntelliCode::getItemCost($page, $cptCode, $modCode, \@fsIntIds);
 		my $resultCount = scalar(@$fsResults);
 		if($resultCount == 0)
@@ -2207,13 +2208,13 @@ sub customValidate
 				{
 					my $unitCost = $_->[1];
 					$page->field('proccharge', $unitCost);
-				
+
 					my $isFfs = $_->[2];
 					$page->field('data_num_a', $isFfs);
 				}
 				$count++;
 			}
-			
+
 		}
 		else
 		{
@@ -2229,14 +2230,14 @@ sub customValidate
 
 			#my $costList = join(';', @costs);
 			#$self->getField('alt_cost')->{selOptions} = "$costList";
-			
+
 			my $field = $self->getField('alt_cost');
-			
+
 			#my $html = $self->getMultiPricesHtml($page, $fsResults);
 			#$field->invalidate($page, $html);
 		}
 	}
-	
+
 	explosionCodeValidate($self, $page);
 }
 
@@ -2272,7 +2273,7 @@ sub explosionCodeValidate
 				$cptModfField->invalidate($page,"Procedure found in multiple fee schedules.");
 			}
 			elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
-			{ 	
+			{
 				$cptModfField->invalidate($page,"Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
 			}
 		}
@@ -2292,9 +2293,9 @@ sub getMultiSvcTypesHtml
 		#Use the above line if you want to see the fee schedule name instead of the fee schedule number
 		my $svc_name=$_->[0];
 		$html .= qq{
-			<input onClick="document.dialog._f_use_fee.value=this.value" 
+			<input onClick="document.dialog._f_use_fee.value=this.value"
 				type=radio name='_f_multi_svc_type' value=$count>$svc_name
-		};	
+		};
 		$count++;
 	}
 
@@ -2306,12 +2307,12 @@ sub getMultiPricesHtml
 	my ($self, $page, $fsResults) = @_;
 
 	my $html = qq{Multiple prices found.  Please select a price for this item.};
-	
+
 	foreach (@$fsResults)
 	{
 		my $cost = sprintf("%.2f", $_->[1]);
 		$html .= qq{
-			<input onClick="document.dialog._f_alt_cost.value=this.value" 
+			<input onClick="document.dialog._f_alt_cost.value=this.value"
 				type=radio name='_f_multi_price' value=$cost>\$$cost
 		};
 	}
