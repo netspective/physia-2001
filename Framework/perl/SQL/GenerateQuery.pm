@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.8 2000-10-13 02:12:59 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.9 2000-10-20 01:13:07 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
@@ -768,7 +768,10 @@ sub addTableToFROM
 		}
 		else
 		{
-			$self->addTableToFROM($requires, $FROM, $WHERE, $bindParams);
+			foreach my $reqJoin (split ',', $requires)
+			{
+				$self->addTableToFROM($reqJoin, $FROM, $WHERE, $bindParams);
+			}
 		}
 
 	}
