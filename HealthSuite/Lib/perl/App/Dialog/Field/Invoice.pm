@@ -677,8 +677,52 @@ sub isValid
 
 	my $sessUser = $page->session('user_id');
 	my $sessOrg = $page->session('org_id');
+	my $personId = $page->field('client_id');
 
-	my $personId = $page->field('attendee_id');
+	if($page->param('_f_item_1_description') eq '')
+	{
+		$self->invalidate($page, "[<B>P1</B>] Item description cannot be blank.");
+	}
+	if($page->param('_f_item_1_unit_cost') eq '')
+	{
+		$self->invalidate($page, "[<B>P1</B>] Item unit cost cannot be blank.");
+	}
+	if($page->param('_f_item_1_quantity') < 1)
+	{
+		my $quantity1 = $page->param('_f_item_1_quantity');
+		$self->invalidate($page, "[<B>P1</B>] Item quantity must be 1 or more. ($quantity1)");
+	}
+
+	my $lineCount = $page->param('_f_line_count');
+	for(my $line = 2; $line <= $lineCount; $line++)
+	{
+		my $quantity = $page->param("_f_item_$line\_quantity");
+		my $description = $page->param("_f_item_$line\_description");
+		my $unitCost = $page->param("_f_item_$line\_unit_cost");
+
+		if($description ne '')
+		{
+			if($quantity < 1)
+			{
+				$self->invalidate($page, "[<B>P$line</B>] Quantity must be 1 or more");
+			}
+			if($unitCost eq '')
+			{
+				$self->invalidate($page, "[<B>P$line</B>] Unit cost cannot be blank");
+			}
+		}
+		elsif($unitCost ne '')
+		{
+			if($quantity < 1)
+			{
+				$self->invalidate($page, "[<B>P$line</B>] Quantity must be 1 or more");
+			}
+			if($description eq '')
+			{
+				$self->invalidate($page, "[<B>P$line</B>] Item description cannot be blank");
+			}
+		}	
+	}
 
 	return $page->haveValidationErrors() ? 0 : 1;
 }
@@ -702,7 +746,7 @@ sub getHtml
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
-				<TD><INPUT  NAME='_f_proc_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
+				<TD><INPUT  NAME='_f_item_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>

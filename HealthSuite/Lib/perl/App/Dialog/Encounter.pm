@@ -868,7 +868,7 @@ sub handleInvoiceAttrs
 			parent_id => $invoiceId || undef,
 			item_name => 'Patient/Deductible/Balance',
 			value_type => defined $currencyValueType ? $currencyValueType : undef,
-			value_text => $page->field('deduct_balance'),
+			value_text => $page->field('deduct_balance') || undef,
 			_debug => 0
 		);
 
@@ -1006,7 +1006,7 @@ sub handleInvoiceAttrs
 			parent_id => $invoiceId,
 			address_name => 'Pay To Org',
 			line1 => $payToFacility->{line1},
-			line2 => $payToFacility->{line2},
+			line2 => $payToFacility->{line2} || undef,
 			city => $payToFacility->{city},
 			state => $payToFacility->{state},
 			zip => $payToFacility->{zip},

@@ -146,7 +146,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-claim">Create Claim</OPTION>
-						<!-- <OPTION value="/person/$personId/dlg-add-invoice">Create Invoice</OPTION> -->
+						<OPTION value="/person/$personId/dlg-add-invoice">Create Invoice</OPTION>
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
