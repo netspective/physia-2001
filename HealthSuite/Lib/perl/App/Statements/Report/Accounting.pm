@@ -461,10 +461,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx =>  1, col =>  1, row => 49, width => 10, align => 'LEFT' },
 				# Patient
 				{ colIdx =>  2, col => 12, row => 48, width => 18, align => 'LEFT' },
-				{ colIdx =>  2, col => 12, row => 49, width => 18, align => 'LEFT' },
+#				{ colIdx =>  2, col => 12, row => 49, width => 18, align => 'LEFT' },
 				# Reason
 				{ colIdx =>  3, col => 31, row => 48, width => 11, align => 'LEFT' },
-				{ colIdx =>  3, col => 31, row => 49, width => 11, align => 'LEFT' },
+#				{ colIdx =>  3, col => 31, row => 49, width => 11, align => 'LEFT' },
 				# Ticket
 				# Dr. #
 				{ colIdx =>  4, col =>  7, row => 51, width =>  4, align => 'LEFT' },
@@ -509,14 +509,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx => 19, col => 27, row => 57, width =>  5, align => 'LEFT' },
 				# Insurance Company
 				{ colIdx => 20, col =>  1, row => 59, width =>  12, align => 'LEFT' },
-				{ colIdx => 20, col =>  1, row => 60, width =>  12, align => 'LEFT' },
-				{ colIdx => 20, col =>  1, row => 61, width =>  12, align => 'LEFT' },
-				{ colIdx => 20, col =>  1, row => 62, width =>  12, align => 'LEFT' },
+#				{ colIdx => 20, col =>  1, row => 60, width =>  12, align => 'LEFT' },
+#				{ colIdx => 20, col =>  1, row => 61, width =>  12, align => 'LEFT' },
+#				{ colIdx => 20, col =>  1, row => 62, width =>  12, align => 'LEFT' },
 				# Policy ID
 				{ colIdx => 21, col => 18, row => 59, width =>  16, align => 'LEFT' },
-				{ colIdx => 21, col => 18, row => 60, width =>  16, align => 'LEFT' },
-				{ colIdx => 21, col => 18, row => 61, width =>  16, align => 'LEFT' },
-				{ colIdx => 21, col => 18, row => 62, width =>  16, align => 'LEFT' },
+#				{ colIdx => 21, col => 18, row => 60, width =>  16, align => 'LEFT' },
+#				{ colIdx => 21, col => 18, row => 61, width =>  16, align => 'LEFT' },
+#				{ colIdx => 21, col => 18, row => 62, width =>  16, align => 'LEFT' },
 				# Relationship to Insured
 				{ colIdx => 22, col => 35, row => 61, width =>   8, align => 'LEFT',
 				  type => 'conditional',
