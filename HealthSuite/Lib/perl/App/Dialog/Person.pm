@@ -33,7 +33,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'acct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'chart_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
+		#new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'job_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_emp_item_id'),
@@ -104,13 +104,19 @@ sub initialize
 				new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
 			]),
 
-		new CGI::Dialog::Field(type=> 'enum', enum => 'Blood_Type', caption => 'Blood Type', name => 'blood_type', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
+		new CGI::Dialog::Field(type=> 'enum', enum => 'Blood_Type', caption => 'Blood Type', name => 'blood_type', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(name => 'ethnicity',
 						lookup => 'ethnicity',
 						style => 'multicheck',
 						caption => 'Ethnicity',
 						hints => 'You may choose more than one ethnicity type.'),
-
+		new CGI::Dialog::Field(
+						selOptions => "English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese",
+						caption => 'Language Spoken',
+						style => 'multicheck',
+						type => 'select',
+						name => 'language',
+						),
 
 		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name'),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
@@ -252,6 +258,8 @@ sub populateData
 	my $itemName11 = 'Patient/Preferred/Day';
 	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
+	my @languages = split(', ', $personInfo->{language});
+	$page->field('language', @languages);
 	my $preferredDay = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName11);
 	$page->field('prefer_day', $preferredDay->{value_text});
 	my @ethnicity = split(', ', $personInfo->{ethnicity});
@@ -297,10 +305,10 @@ sub populateData
 			$page->field('rel_type', $itemNamefragments[0]);
 		}
 
-	my $bloodType = 'BloodType';
-	my $bloodTypecap =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $bloodType);
-	$page->field('blood_item_id', $bloodTypecap->{'item_id'});
-	$page->field('blood_type', $bloodTypecap->{'value_text'});
+	#my $bloodType = 'BloodType';
+	#my $bloodTypecap =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $bloodType);
+	#$page->field('blood_item_id', $bloodTypecap->{'item_id'});
+	#$page->field('blood_type', $bloodTypecap->{'value_text'});
 
 	my $nurseTitle = 'Nurse/Title';
 	my $nurseTitleData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseTitle);
@@ -480,6 +488,8 @@ sub handleRegistry
 	}
 
 	my @ethnicity = $page->field('ethnicity');
+	my @languages = $page->field('language');
+
 	$page->schemaAction(
 			'Person', $command,
 			person_id => $personId || undef,
@@ -493,6 +503,7 @@ sub handleRegistry
 			gender => defined $gender ? $gender : undef,
 			marital_status => defined $maritalStatus ? $maritalStatus : undef,
 			ethnicity => join(', ', @ethnicity) || undef,
+			language => join(', ', @languages) || undef,
 			_debug => 0
 		);
 
@@ -520,6 +531,15 @@ sub handleRegistry
 				parent_org_id => $orgIntId,
 				_debug => 0
 			) if $member ne 'Patient';
+
+	$page->schemaAction(
+					'Person_Attribute', $command,
+					parent_id => $personId || undef,
+					item_name => 'BloodType' || undef,
+					value_type => App::Universal::ATTRTYPE_TEXT,
+					value_text => $page->field('blood_type') || undef,
+					_debug => 0
+		);
 	}
 
 	handleAttrs($self, $page, $command, $flags, $member, $personId);
@@ -537,9 +557,6 @@ sub handleRegistry
 	{
 		$self->handlePostExecute($page, $command, $flags);
 	}
-
-
-
 }
 
 sub handleAttrs
@@ -587,17 +604,6 @@ sub handleAttrs
 			value_textB => $relationship || undef,
 			_debug => 0
 			);
-
-	my $commandBloodType = $command eq 'update' &&  $page->field('blood_item_id') eq '' ? 'add' : $command;
-	$page->schemaAction(
-			'Person_Attribute', $commandBloodType,
-			parent_id => $personId || undef,
-			item_id => $page->field('blood_item_id') || undef,
-			item_name => 'BloodType' || undef,
-			value_type => App::Universal::ATTRTYPE_TEXT,
-			value_text => $page->field('blood_type') || undef,
-			_debug => 0
-		);
 
 	my $commandTitle = $command eq 'update' &&  $page->field('nurse_title_item_id') eq '' ? 'add' : $command;
 	my @titles = $page->field('nurse_title');
