@@ -201,6 +201,7 @@ sub prepare_page_content_header
 			<OPTION selected>Choose Action</OPTION>
 			<OPTION value="/person/$personId/stpe-person.labOrderSummary?home=$homeArl">Add Ancillary Test</OPTION>
 			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
+			<OPTION value="/person/$personId/dlg-add-referral-ppms?home=$homeArl">Add Referral Request</OPTION>
 			<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId/profile">Schedule Appointment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
 			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl&isHosp=1">Add Hospital Claim</OPTION>
