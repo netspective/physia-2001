@@ -41,7 +41,7 @@ sub getForm
 		$createFns = qq{
 			|
 			<font size=2 face='Tahoma'>&nbsp &nbsp
-			<a href="/org/#session.org_id#/dlg-add-template">Create Template</a>
+			<a href="/org/#session.org_id#/dlg-add-template">Add Template</a>
 			</font>
 		};
 	}

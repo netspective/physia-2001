@@ -664,19 +664,19 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			actionRows =>
 			[
 				{
-					caption => qq{ Create <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-product?home=#param.home#'>Insurance Product</A> },
+					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-product?home=#param.home#'>Insurance Product</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				{
-					caption => qq{ Create <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-plan?home=#param.home#'>Insurance Plan</A> },
+					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-plan?home=#param.home#'>Insurance Plan</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				#{
-				#	caption => qq{ Create <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-newplan?home=#param.home#'>Insurance Plan</A> },
+				#	caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-newplan?home=#param.home#'>Insurance Plan</A> },
 				#	hints => "Insurance Plan offered to org's customers"
 				#},
 				#{
-				#	caption => qq{ Create <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-workerscomp?home=#param.home#'>Workers Compensation Plan</A> },
+				#	caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-workerscomp?home=#param.home#'>Workers Compensation Plan</A> },
 				#	hints => "Worker's Compensation Plan offered to org's customers"
 				#},
 				#{

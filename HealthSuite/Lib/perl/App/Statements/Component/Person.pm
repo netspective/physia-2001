@@ -833,7 +833,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				#	hints => ''
 				#},
 				#{
-				#	caption => qq{ Create Unique <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-unique?home=#param.home#'>Insurance Plan</A> },
+				#	caption => qq{ Add Unique <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-unique?home=#param.home#'>Insurance Plan</A> },
 				#	hints => ''
 				#},
 				#{
@@ -911,7 +911,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					hints => ''
 				},
 				{
-					caption => qq{ Create Unique <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-unique?home=#param.home#'>Insurance Plan</A> },
+					caption => qq{ Add Unique <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-unique?home=#param.home#'>Insurance Plan</A> },
 					hints => ''
 				},
 				{
