@@ -268,14 +268,17 @@ sub customValidate
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
 	my $seq =1;
 	#$page->addDebugStmt("INS : $seq");
-	for($seq =1; $seq < $sequence; $seq++)
+	if ($sequence < 4)
 	{
-		#$page->addDebugStmt("INS : $previousInsExists, $seq");
-		my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
-		#$page->addDebugStmt("INS : $previousInsExists, $seq");
-		my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
-		$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if $previousInsExists != 1;
+		for($seq =1; $seq < $sequence; $seq++)
+		{
+			#$page->addDebugStmt("INS : $previousInsExists, $seq");
+			my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
+			#$page->addDebugStmt("INS : $previousInsExists, $seq");
+			my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
+			$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if $previousInsExists != 1;
 
+		}
 	}
 
 
