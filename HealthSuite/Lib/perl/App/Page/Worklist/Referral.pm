@@ -11,6 +11,8 @@ use App::ImageManager;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Person;
+
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
 
@@ -35,17 +37,19 @@ sub prepare_view_date
 
 	my $worklistComponent;
 
-	if ($self->param('user') eq 'physician')
+	if ($self->param('user') ne '')
 	{
-		$worklistComponent = '#component.worklist-referral-authorization#';
+		if ($self->param('user') eq 'physician')
+		{
+			$worklistComponent = '#component.worklist-referral-authorization#';
+		}
+
+
+		elsif ($STMTMGR_PERSON->recordExists($self, STMTMGRFLAG_NONE,'selPersonExists', $self->param('user')))
+		{
+			$worklistComponent = '#component.worklist-referral-authorization-user#';
+		}
 	}
-
-
-	elsif ($self->param('user') eq $self->session('person_id'))
-	{
-		$worklistComponent = '#component.worklist-referral-authorization-user#';
-	}
-
 	else
 	{
 		$worklistComponent = '#component.worklist-referral#';
@@ -159,13 +163,22 @@ sub prepare_page_content_header
 
 	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self,
 		STMTMGRFLAG_NONE, 'sel_personinfo', $self->session('user_id'));
-	my $userName = $userNameHash->{complete_name};
+	my $userName = $userNameHash->{'complete_name'};
 
 	my $heading;
-	if ($self->param('user') eq 'physician' || $self->param('user'))
+	if ($self->param('user') ne '')
 	{
+		if ($self->param('user') eq 'physician')
+		{
 		#$heading = $userName . ' Referral Authorization Requests Worklist';
-		$heading = 'Followup Worklist';
+			$heading = 'Followup Worklist';
+		}
+		elsif ($STMTMGR_PERSON->recordExists($self, STMTMGRFLAG_NONE,'selPersonExists', $self->param('user')))
+		{
+			my $userLogInName = $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE,	'selRegistry', $self->param('user'));
+			my $userSimpleName = $userLogInName->{'simple_name'};
+			$heading = "Followup Worklist Of '$userSimpleName'";
+		}
 	}
 	else
 	{
