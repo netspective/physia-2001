@@ -166,14 +166,16 @@ sub initialize
 			],
 		),
 		new CGI::Dialog::Field(
-			caption => 'Associated Physician Name',
-			name => 'value_text',
-			options => FLDFLAG_PREPENDBLANK,
+			caption => 'Associated Physicians',
+			name => 'physician_list',
+			style => 'multicheck',
 			fKeyStmtMgr => $STMTMGR_PERSON,
-			fKeyStmt => 'selAssocNurse',
+			fKeyStmt => 'selResourceAssociations',
+			fKeyStmtBindSession => ['org_internal_id'],
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fKeyDisplayCol => 1,
 			fKeyValueCol => 0,
-			defaultValue => '',
+			size => 5
 		),
 		new CGI::Dialog::Field(
 			caption => 'Delete record?',
@@ -224,7 +226,7 @@ sub makeStateChanges
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Nurse '$personId'?");
 	}
 
-	$self->getField('value_text')->{fKeyStmtBindPageParams} = $page->session('org_internal_id');
+	#$self->getField('value_text')->{fKeyStmtBindPageParams} = $page->session('org_internal_id');
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
@@ -352,6 +354,23 @@ sub execute_add
 			value_int => $page->field('check_license')  || undef,
 			_debug => 0
 		) if $page->field('rn_number') ne '';
+
+	my @physicians = $page->field('physician_list');
+	my $orgInternalId = $page->session('org_internal_id');
+
+	for (@physicians)
+	{
+		$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $page->field('person_id'),
+			parent_org_id => $page->session('org_internal_id') || undef,
+			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
+			item_name => 'WorkList',
+			value_text => $_,
+			parent_org_id => $orgInternalId,
+			_debug => 0
+		);
+	}
 
 	$self->handleContactInfo($page, $command, $flags, 'nurse');
 	$page->endUnitWork();
