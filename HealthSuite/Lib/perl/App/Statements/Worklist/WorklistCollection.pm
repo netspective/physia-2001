@@ -320,12 +320,12 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	
 	'selInColl' =>qq
 	{
-		SELECT	distinct trans_owner_id
-		FROM	transaction
-		WHERE	trans_owner_id = :1
-		AND	trans_status = $ACTIVE
-		AND	trans_subtype= 'Owner'
-		AND	trans_type = $ACCOUNT_OWNER		
+        	SELECT  distinct person_id
+                FROM    Invoice_Worklist
+                WHERE   person_id = :1
+                AND     org_internal_id = :2
+                AND     worklist_status = 'Account In Collection'
+                AND     worklist_type = 'Collection'
 	},
 
 	'selPersonAttribute' =>qq
