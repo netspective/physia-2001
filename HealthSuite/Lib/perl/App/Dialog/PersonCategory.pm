@@ -40,8 +40,8 @@ sub new
 			name => 'person_id',
 			types => ['Patient','Guarantor','Insured-Person'],
 			hints => 'Please provide an existing Person ID.',
-			options => FLDFLAG_REQUIRED,
-			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			options => FLDFLAG_REQUIRED
+			),
 		new CGI::Dialog::Field(caption => 'Category',
 			type => 'select',
 			selOptions => 'Patient;Guarantor;Insured-Person',
@@ -66,9 +66,9 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	#my $personId = $page->param('person_id');
-	#$page->field('person_id', $personId);
-	#$self->setFieldFlags('person_id', FLDFLAG_READONLY);
+	my $personId = $page->param('person_id');
+	$page->field('person_id', $personId);
+	$self->setFieldFlags('person_id', FLDFLAG_READONLY);
 }
 
 sub populateData
