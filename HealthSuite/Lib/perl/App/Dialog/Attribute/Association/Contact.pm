@@ -52,7 +52,7 @@ sub new
 		new CGI::Dialog::Subhead(heading => 'Or Provide A Contact Name', name => 'notexists_heading'),
 		new CGI::Dialog::Field(caption =>'Full Name', name => 'rel_name', hints => 'Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact.'),
 		new CGI::Dialog::Subhead(heading => 'Contact Information', name => 'contact_heading'),
-		new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Association(options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number'),
 		new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
@@ -104,7 +104,7 @@ sub customValidate
 
 	if (($page->field('rel_name')  && $page->field('phone_number') eq ''))
 	{
-		$phone->invalidate($page, "'Phone Number' is required when the 'Person' record doesn't exist.");
+		$phone->invalidate($page, "'Phone Number' is required when an existing Person ID isn't supplied.");
 	}
 
 }
