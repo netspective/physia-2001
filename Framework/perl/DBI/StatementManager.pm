@@ -645,11 +645,13 @@ sub createPropertiesFromSingleRow
 
 sub createHtml
 {
-	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams) = @_;
+	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams, $pubD) = @_;
 
 	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
 	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
 	my $publDefn = $self->{"_dpd_$defnName"} || {};
+	$publDefn = $pubD if $pubD;
+	
 	$publParams = {} unless $publParams;
 	$publParams->{stmtId} = $name unless exists $publParams->{stmtId};
 
