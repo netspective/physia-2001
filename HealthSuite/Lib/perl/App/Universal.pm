@@ -21,6 +21,7 @@ use constant ATTRTYPE_URL => 50;
 use constant ATTRTYPE_CONTACT => 70;
 use constant ATTRTYPE_BOOLEAN => 100;
 use constant ATTRTYPE_INTEGER => 110;
+use constant ATTRTYPE_FLOAT => 115;
 use constant ATTRTYPE_CURRENCY => 140;
 use constant ATTRTYPE_DATE => 150;
 use constant ATTRTYPE_DURATION => 160;
