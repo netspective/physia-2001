@@ -902,6 +902,21 @@ function isLookupWindow()
 	return flag;
 }
 
+
+//This function only works for person_id to simple_name
+//Set span value to show simple name
+function setSimpleName(itemValue)
+{
+	if(isLookupWindow())
+	{
+		var spanObj = eval("parent.opener."+parent.opener.activeFindWinControl.name +"_simple_name_s");
+		if(eval(spanObj)) 
+		{
+			spanObj.innerHTML = itemValue + " ";
+		}
+	}
+};
+
 function populateControl(what, closeWindow, secondItem)
 {
 	if(closeWindow == null)
