@@ -319,6 +319,7 @@ sub getMenu_Simple
 	my $selectorValue = $self->param($selectorParamName);
 	foreach my $item (@$items)
 	{
+		next unless $item;
 		my ($caption, $href, $itemFlags) = ($item->[MENUITEM_CAPTION], $item->[MENUITEM_HREF], $item->[MENUITEM_FLAGS]);
 		my $htmlFmt = ($itemFlags & MENUITEMFLAG_FORCESELECTED) || (defined $selectorValue && $selectorValue eq $item->[MENUITEM_SELECTORVALUE]) ? $selHtmlFmt : $unselHtmlFmt;
 		$htmlFmt =~ s/\%(\d+)/$item->[$1]/g;
@@ -392,6 +393,7 @@ sub getMenu_ComboBox
 	my $selectorValue = $self->param($selectorParamName);
 	foreach my $item (@$items)
 	{
+		next unless $item;
 		my ($caption, $href, $itemFlags) = ($item->[MENUITEM_CAPTION], $item->[MENUITEM_HREF], $item->[MENUITEM_FLAGS]);
 		my $htmlFmt = ($itemFlags & MENUITEMFLAG_FORCESELECTED) || (defined $selectorValue && $selectorValue eq $item->[MENUITEM_SELECTORVALUE]) ? $selHtmlFmt : $unselHtmlFmt;
 		$htmlFmt =~ s/\%(\d+)/$item->[$1]/g;
@@ -1054,6 +1056,16 @@ sub homeArl
 	$homeArl = '/' . $homeArl unless $homeArl =~ /^\//;
 	return $homeArl;
 }
+
+
+sub constant
+{
+	my ($self, $name) = @_;
+	
+	no strict 'refs';
+	return &{"App::Universal::$name"} || "Constant '$name' not found!";
+}
+
 
 sub handleARL
 {
