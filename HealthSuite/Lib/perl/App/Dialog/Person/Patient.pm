@@ -52,12 +52,11 @@ sub initialize
 
 				#new CGI::Dialog::Field(caption => 'Preferred Day For Appointment', name => 'prefer_day', type => 'memo', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 
-		#new CGI::Dialog::MultiField(caption =>'Responsible Party Name/Phone/Relationship', name => 'responsible', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			#	fields => [
+		new CGI::Dialog::MultiField(caption =>'Responsible Party/Self', name => 'responsible', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
 							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							#new CGI::Dialog::Field(caption => 'Phone', type => 'phone', name => 'resp_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							#new CGI::Dialog::Field(caption => 'Relationship', name => 'relation', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
-			#			]),
+							new CGI::Dialog::Field(caption => 'Self', type => 'bool', style => 'check', name => 'resp_self', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+						]),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -150,6 +149,8 @@ sub customValidate
 	my $insOrg = $self->getField('insplan')->{fields}->[0];
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
+	my $relationship = $self->getField('responsible')->{fields}->[0];
+	my $relationSelf = $self->getField('responsible')->{fields}->[1];
 
 	#my $addIns = $page->field('add_insurance');
 	#if($addIns ==1 &&
@@ -157,6 +158,18 @@ sub customValidate
 	#{
 	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	#}
+
+	if($page->field('party_name') && $page->field('resp_self'))
+	{
+		$relationship->invalidate($page, "Cannot provide both '$relationship->{caption}' and '$relationSelf->{caption}'");
+	}
+	else
+	{
+		unless($page->field('party_name') || $page->field('party_name'))
+		{
+			$relationship->invalidate($page, "Please provide either '$relationship->{caption}' or '$relationSelf->{caption}'");
+		}
+	}
 }
 
 sub execute_add
@@ -220,7 +233,7 @@ sub execute_add
 		}
 	}
 
-	my $partyName =  $page->field('party_name');
+	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
 	if ($partyName ne '')
 	{
 
@@ -230,7 +243,6 @@ sub execute_add
 				item_name => 'Guarantor' || undef,
 				value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
 				value_text => $partyName || undef,
-				value_textB => $page->field('resp_phone') || undef,
 				_debug => 0
 		);
 	}
