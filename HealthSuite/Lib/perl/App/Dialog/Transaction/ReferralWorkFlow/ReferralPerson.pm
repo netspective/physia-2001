@@ -19,8 +19,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = ('referral-person' => {heading => '$Command Service Request',
 				_arl => ['org_id'],
-				_arl_modify => ['trans_id'],
-				_idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL()},
+				_arl_modify => ['trans_id']},
 		);
 
 sub initialize
