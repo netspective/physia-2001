@@ -325,10 +325,13 @@ function _updateGroups () {
 	var currGrpListAsString;
 	
 	for (var i = 0; i < df.superbillGroups.length; i ++) {
+		var grpName = df.superbillGroups.options [i].text;
+		grpName = grpName.replace (/ /, '_');
+		
 		if (currGrpListAsString) {
-			currGrpListAsString = currGrpListAsString + ' ' + i + '_' + df.superbillGroups.options [i].text;
+			currGrpListAsString = currGrpListAsString + ' ' + i + '_' + grpName;
 		} else {
-			currGrpListAsString = i + '_' + df.superbillGroups.options [i].text;
+			currGrpListAsString = i + '_' + grpName;
 		}
 	}
 	
@@ -563,7 +566,9 @@ function _moveGroupUp () {
 		df.superbillGroups.options [newIdx].text = df.superbillGroups.options [currIdx].text;
 		df.superbillGroups.options [currIdx].text = tempGrpName;
 		
+		alert ('groups = ' + document.superbillData.groups.value);
 		_updateGroups ();
+		alert ('groups = ' + document.superbillData.groups.value);
 		_updateGroupCPTList (currIdx, tempGrpCPTList);
 		_updateGroupCPTList (newIdx, currGrpCPTList);
 		df.superbillGroups.selectedIndex = newIdx;
@@ -584,7 +589,9 @@ function _moveGroupDown () {
 		df.superbillGroups.options [newIdx].text = df.superbillGroups.options [currIdx].text;
 		df.superbillGroups.options [currIdx].text = tempGrpName;
 		
+		alert ('groups = ' + document.superbillData.groups.value);
 		_updateGroups ();
+		alert ('groups = ' + document.superbillData.groups.value);
 		_updateGroupCPTList (currIdx, tempGrpCPTList);
 		_updateGroupCPTList (newIdx, currGrpCPTList);
 		df.superbillGroups.selectedIndex = newIdx;
