@@ -283,15 +283,14 @@ sub assignPatientInfo
 	$patient->setSex($row[5]);
 	$patient->setStatus($row[6]);
 	$patient->setSsn($row[7]);
-
 	$queryStatment = "select value_text,value_type,value_int from person_attribute where parent_id = \'$row[8]\' and value_type between 220 and 225";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
-	#$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
 	if($row[2])
 	{
-		my $orgInternalId = $self->getOrgId($row[2]);
+		my $orgInternalId = $row[2];
 		$patient->setEmployerOrSchoolId($orgInternalId);
 
 		$queryStatment = "select org.org_id, org.name_primary, org.org_internal_id  from org where org_internal_id = $orgInternalId" ;
@@ -304,19 +303,6 @@ sub assignPatientInfo
 		$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row[2] and address_name = \'Mailing\'";
 		$self->populateAddress($patient->getEmployerAddress, $queryStatment);
 	}
-}
-
-sub getOrgId
-{
-	my ($self, $orgInternalId) = @_;
-
-	my $queryStatment = "select org_id from org where org_internal_id = $orgInternalId";
-	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	my @row = $sth->fetchrow_array();
-
-	return $row[0];
-	
 }
 
 sub assignPatientAddressInfo
@@ -584,7 +570,7 @@ sub assignInsuredInfo
 
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
-				#		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 						@row = $sth->fetchrow_array();
 						$insured->setHMOIndicator($row[0]);
 
@@ -597,7 +583,7 @@ sub assignInsuredInfo
 								" and invoice_billing.bill_ins_id = insurance.ins_internal_id";
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
-				#		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 						@row = $sth->fetchrow_array();
 						$insured->setTypeCode($row[0]);
 					}
@@ -608,7 +594,7 @@ sub assignInsuredInfo
 					@row = $sth->fetchrow_array();
 					if($row[2])
 					{
-						my $orgInternalId = $self->getOrgId($row[2]);
+						my $orgInternalId = $row[2];
 						$insured->setEmployerOrSchoolId($orgInternalId);
 
 						$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
@@ -984,9 +970,7 @@ sub assignPolicy
 				$payer->setBillSequence($row1[1]);
 				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE )
 				{
-					$insOrgId = $self->getOrgId($row1[0]);
 					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_Internal_id = $row1[0]";
-#					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), org_id as payer_id from org where org_id = \'$insOrgId\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1052,8 +1036,8 @@ sub assignPolicy
 							  	}
 						 	}
 						}
-					}
-					$queryStatment = "select line1, line2, city, state, zip, sountry
+					
+						$queryStatment = "select line1, line2, city, state, zip, country
 							from insurance_address
 							where parent_id = (select parent_ins_id
 										from invoice_billing, insurance
@@ -1062,17 +1046,18 @@ sub assignPolicy
 											and bill_party_type = " . BILL_PARTY_TYPE_INSURANCE .
 											" and invoice_item_id is NULL
 											and invoice_billing.bill_sequence = " . $payer->getBillSequence() . ")";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-			#		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$payerAddress->setAddress1($row[0]);
-					$payerAddress->setAddress2($row[1]);
-					$payerAddress->setCity($row[2]);
-					$payerAddress->setState($row[3]);
-					$payerAddress->setZipCode($row[4]);
-					$payerAddress->setCountry($row[5]);
-					$payer->setAddress($payerAddress);
+						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+						# do the execute statement
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						@row = $sth->fetchrow_array();
+						$payerAddress->setAddress1($row[0]);
+						$payerAddress->setAddress2($row[1]);
+						$payerAddress->setCity($row[2]);
+						$payerAddress->setState($row[3]);
+						$payerAddress->setZipCode($row[4]);
+						$payerAddress->setCountry($row[5]);
+						$payer->setAddress($payerAddress);
+					}
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_PERSON)
 				{
@@ -1106,7 +1091,6 @@ sub assignPolicy
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
-					my $oid = $self->getOrgId($row1[0]);
 					if ($row1[0])
 					{
 						$queryStatment = "select name_primary , org_id  from org where org_internal_id = $row1[0]";
