@@ -5,72 +5,66 @@ package App::Statements::Report::Accounting;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-
+use App::Universal;
 use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSIS $STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_REPORT_ACCOUNTING );
 
-$STMTFMT_SEL_RECEIPT_ANALYSIS = qq{ 
-			select 	y.NAME,
-				y.CATEGORY_NAME,
-				y.TRANSACTION_TYPE,
-				y.POLICYNAME,
-				sum(DECODE(trunc(m.PAYDATE,'MM'), trunc(to_date(?,'MM/DD/YYYY'),'MM'), NVL(m.PERSONALMONTHAMOUNT, 0) + NVL(m.INSURANCEMONTHAMOUNT, 0),0))  as MONTHAMOUNT,
-				sum(NVL(y.PERSONALYEARAMOUNT, 0) + NVL(y.INSURANCEYEARAMOUNT, 0)) as YEARAMOUNT
-			from 	monthToDateReceiptAnalysis m, yearToDateReceiptAnalysis y
-			where	m.PROVIDERID(+) = y.PROVIDERID
-			and	m.CATEGORY_NAME(+) = y.CATEGORY_NAME
-			and	m.TRANSACTION_TYPE(+) = y.TRANSACTION_TYPE
-			and 	m.PAYDATE (+) = y.PAYDATE
-			and 	m.POLICYNAME (+) = y.POLICYNAME
-			and	m.NAME (+) = y.NAME
-			and     trunc(y.PAYDATE,'YYYY') =trunc(to_date(?,'MM/DD/YYYY'),'YYYY')
-			and 	m.owner_org_id (+) = y.owner_org_id
-			and	y.owner_org_id = ?
-			and	%whereCond%
-			group by y.NAME, y.CATEGORY_NAME, y.TRANSACTION_TYPE, y.POLICYNAME
-			order by y.NAME, y.CATEGORY_NAME desc
-};
-
-$STMTRPTDEFN_DEFAULT =
-{
-	columnDefn =>
-		[
-			{ colIdx => 0, head => 'Name', groupBy => '#0#', dataFmt => '#0#' },
-			{ colIdx => 1, head => 'Category Name', groupBy => '#1#', dataFmt => '#1#' },
-			{ colIdx => 2, head => 'Transaction Type', groupBy => 'Total', dataFmt => '#2#' },
-			{ colIdx => 3, head => 'Policy Name', dataFmt => '#3#'},
-			{ colIdx => 4, head => 'Month To Date Cost', summarize => 'sum', dataFmt => '#4#',dformat => 'currency' },
-			{ colIdx => 5, head => 'Year To Date Cost', summarize => 'sum', dataFmt => '#5#',dformat => 'currency' },
-		],
-};
+my $FILLED =App::Universal::TRANSSTATUS_FILLED;        
+my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT; 
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	'sel_providerreceipt' =>
 	{
-		_stmtFmt => $STMTFMT_SEL_RECEIPT_ANALYSIS,
-		whereCond => " UPPER(y.PROVIDERID) = ? AND UPPER(y.TRANSACTION_TYPE) = ?",
-		publishDefn => $STMTRPTDEFN_DEFAULT,
+		sqlStmt=>
+		qq
+		{
+			SELECT	(SELECT simple_name FROM person where person_id = ic.provider) as provider,
+				ic.invoice_id,
+				decode(payer_type,0,'Personal Receipts', 'Insurance Receipts') as category,
+				decode(payer_type,
+					0,payer_id,
+					1,(SELECT org_id FROM org WHERE payer_id = org_internal_id)) as payer_name,
+				pay_type,
+				invoice_date ,
+				(nvl(insurance_pay,0)+nvl(person_pay,0)) as rcpt,
+				trunc(invoice_date,'MM') as month_date,
+				trunc(invoice_date,'YYYY') as year_date				
+			FROM 	invoice_charges ic		
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	payer_type is not null
+			AND	owner_org_id = :6
+			UNION
+			SELECT (SELECT simple_name FROM person WHERE person_id = t.provider_id) as provider,
+				to_number(NULL) as invoice_id,
+				'Cap Insurance Receipts' as category,
+				nvl(nvl(data_text_b,data_text_a),'UNK') as payer_name,				
+				'Check' as pay_type,
+				value_date,
+				unit_cost as rcpt,
+				trunc(value_date,'MM') as month_date,
+				trunc(value_date,'YYYY') as year_date
+			FROM	transaction t,trans_attribute  ta
+			WHERE 	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = $PAYMENT
+			AND	trans_status =$FILLED 
+			AND	(:1 IS NULL OR  provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	EXISTS
+				(SELECT 1 FROM org where org_internal_id = t.receiver_id AND owner_org_id = :6) 
+			AND	provider_id is not null
+			ORDER BY 1,3,5,6
+		}
 	},
-	'sel_providerreceipt_like' =>
-	{
-		_stmtFmt => $STMTFMT_SEL_RECEIPT_ANALYSIS,
-		whereCond => " UPPER(y.PROVIDERID) LIKE ? AND UPPER(y.TRANSACTION_TYPE) LIKE ?",
-		publishDefn => $STMTRPTDEFN_DEFAULT,
-	},
-	'sel_provider_like' =>
-	{
-		_stmtFmt => $STMTFMT_SEL_RECEIPT_ANALYSIS,
-		whereCond => " UPPER(y.PROVIDERID) LIKE ? AND UPPER(y.TRANSACTION_TYPE) = ?",
-		publishDefn => $STMTRPTDEFN_DEFAULT,
-	},
-	'sel_receipt_like' =>
-	{
-		_stmtFmt => $STMTFMT_SEL_RECEIPT_ANALYSIS,
-		whereCond => " UPPER(y.PROVIDERID) = ? AND UPPER(y.TRANSACTION_TYPE) LIKE ?",
-		publishDefn => $STMTRPTDEFN_DEFAULT,
-	},
-
+	
 	'sel_financial_monthly' =>
 	{
 		sqlStmt =>
