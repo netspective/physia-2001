@@ -25,6 +25,11 @@ my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
 ######## BEGIN UPGRADE SCRIPT #########
 
 runSQL('BUILD_0014_add_indexes.sql');
+runSQL('BUILD_0014_add_ref_epayer.sql');
+runSQL('BUILD_0014_create_new_ACS_tables.sql');
+runSQL('BUILD_0014_populate_insurance_columns.sql');
+runSQL('BUILD_0014_update_timestamps.sql');
+runSQL('BUILD_0014_compile_invalid_and_disabled.sql');
 
 ######## END UPGRADE SCRIPT #########
 
