@@ -9,9 +9,9 @@
 <release-notes>
 	<release-info>
 		<build-id>17</build-id>
-		<build-manager>Robert Jenks</build-manager>
-		<tested-date></tested-date>
-		<release-date></release-date>
+		<build-manager>Lloyd Brodsky/build-manager>
+		<tested-date>11/24/2000</tested-date>
+		<release-date>11/30/2000</release-date>
 	</release-info>
 
 	<deliverables>
