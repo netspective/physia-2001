@@ -392,4 +392,152 @@ use constant CATALOG_DIALOG => 'Dialog/FeeSchedule';
 
 );
 
+
+##############################################################################
+package App::Dialog::Catalog::Copy;
+##############################################################################
+
+use strict;
+use DBI::StatementManager;
+use App::Statements::Catalog;
+use App::Statements::Person;
+use Carp;
+use CGI::Dialog;
+use CGI::Validator::Field;
+use App::Dialog::Field::Catalog;
+
+use Devel::ChangeLog;
+use vars qw(@ISA @CHANGELOG %PROCENTRYABBREV);
+use Date::Manip;
+use Text::Abbrev;
+
+@ISA = qw(CGI::Dialog);
+
+
+
+sub new
+{
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => 'Copy Fee Schedule');
+
+	my $schema = $self->{schema};
+
+	delete $self->{schema};  # make sure we don't store this!
+
+	croak 'schema parameter required' unless $schema;
+	$self->addContent(
+			new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID (From)',
+						name => 'from_catalog_id', size => 14,
+						options => FLDFLAG_REQUIRED,
+						postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
+			new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
+						name => 'catalog_type', schema => $schema, value => 0),			
+			new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID (To)',
+						name => 'to_catalog_id', size => 14,
+						options => FLDFLAG_REQUIRED,),			
+			);
+	$self->{activityLog} =
+	{
+		scope =>'offering_catalog',
+		key => "#field.catalog_id#",
+		data => "FeeSchedule '#field.caption#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
+	};
+	$self->addFooter(new CGI::Dialog::Buttons());
+
+	return $self;
+}
+
+
+sub populateData_add
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+
+	$page->field('from_catalog_id', $page->param('parent_catalog_id'));
+}
+
+sub getFeeScheduleGrandChildren
+{
+	my ($self, $page, $catalogId) = @_;
+
+	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $catalogId);
+
+
+}
+
+sub execute
+{
+	my ($self, $page, $command, $flags) = @_;
+	my $id = $self->{'id'};
+	my $orgId = $page->param('org_id');
+	my $catalogType = $page->field('catalog_type');
+	my $fromCatalogId = $page->field('from_catalog_id');
+	my $toCatalogId = $page->field('to_catalog_id');
+	my $endFlag = 0;
+	
+	my $fromFeeSchedule = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogById', $fromCatalogId);
+
+	$page->schemaAction(
+			'Offering_Catalog', 'add',
+			catalog_id => $page->field('to_catalog_id') || undef,
+			org_id => $fromFeeSchedule->{org_id} || undef,
+			catalog_type => $fromFeeSchedule->{catalog_type} || undef,
+			caption => $fromFeeSchedule->{caption} || undef,
+			description => $fromFeeSchedule->{description} || undef,
+			parent_catalog_id => $fromFeeSchedule->{parent_catalog_id} || undef,
+			_debug => 0
+			);
+	
+	
+	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $fromCatalogId);
+	if (defined $fromFeeScheduleChild)
+	{
+	
+	$page->addDebugStmt("fromFeeScheduleChild exists");
+	
+		$page->schemaAction(
+				'Offering_Catalog', 'add',
+				catalog_id => $fromFeeScheduleChild->{'catalog_id'} || undef,
+				org_id => $fromFeeScheduleChild->{org_id} || undef,
+				catalog_type => $fromFeeScheduleChild->{catalog_type} || undef,
+				caption => $fromFeeScheduleChild->{caption} || undef,
+				description => $fromFeeScheduleChild->{description} || undef,
+				parent_catalog_id => $page->field('to_catalog_id'),
+				_debug => 0
+				);
+		my $tempChild = $fromFeeScheduleChild->{'catalog_id'};
+		#getFeeScheduleGrandChildren($self, $page, $tempChild);
+		
+	}
+#
+	#	do
+	#	{
+	#		my $fromFeeScheduleGrandChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $tempChild );
+	#		if (defined $fromFeeScheduleGrandChild)
+	#		{
+	#			$page->schemaAction(
+	#					'Offering_Catalog', 'add',
+	#					catalog_id => $fromFeeScheduleGrandChild->{'catalog_id'} || undef,
+	#					org_id => $fromFeeScheduleGrandChild->{org_id} || undef,
+	#					catalog_type => $fromFeeScheduleGrandChild->{catalog_type} || undef,
+	#					caption => $fromFeeScheduleGrandChild->{caption} || undef,
+	#					description => $fromFeeScheduleGrandChild->{description} || undef,
+	#					parent_catalog_id => $fromFeeScheduleGrandChild->{'parent_catalog_id'},
+	#					_debug => 0
+	#					);
+	#			$tempChild = $fromFeeScheduleGrandChild->{'catalog_id'}
+	#		}
+	#		else
+	#		{
+	#			my $endFlag = 1;
+	#		}
+	#	}until ($endFlag == 1);
+	#}
+
+	$self->handlePostExecute($page, $command, $flags);
+}
+
+
+
+
 1;
