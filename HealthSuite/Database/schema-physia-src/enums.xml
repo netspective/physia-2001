@@ -246,7 +246,7 @@
 
 	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
 		<enum>Payment</enum>
-		<enum>Manual</enum>
+		<enum>Refund</enum>
 		<enum>Transfer</enum>
 	</table>
 
