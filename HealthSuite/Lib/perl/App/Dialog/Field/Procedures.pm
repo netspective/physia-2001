@@ -171,7 +171,7 @@ sub isValid
 		 	}
 		}
 
-		my @actualDiagCode = ();
+		my @actualDiagCodes = ();
 		if($diags ne '')
 		{
 			my @diagNumbers = split(/\s*,\s*/, $diags);
@@ -179,15 +179,18 @@ sub isValid
 			{
 				if($diagNumber !~ /^(\d+)$/)
 				{
-				$self->invalidate($page, "[<B>P$line</B>] The diagnosis $diagNumber should be integer. Please verify");
+					$self->invalidate($page, "[<B>P$line</B>] The diagnosis $diagNumber should be integer. Please verify");
 				}
 				elsif(($diagNumber > $totalCodesEntered) || ($diagNumber == 0))
 				{
-				$self->invalidate($page, "[<B>P$line</B>] The diagnosis $diagNumber is not valid. Please verify");
+					$self->invalidate($page, "[<B>P$line</B>] The diagnosis $diagNumber is not valid. Please verify");
 				}
 
-				push(@actualDiagCode, $diagCodes[$diagNumber-1]);
+				push(@actualDiagCodes, $diagCodes[$diagNumber-1]);
 			}
+
+			@actualDiagCodes = join(', ', @actualDiagCodes);
+			$page->param("_f_proc_$line\_actual_diags", @actualDiagCodes);
 		}
 		elsif($diags eq '')
 		{
@@ -204,7 +207,7 @@ sub isValid
 		}
 
 		#for intellicode
-		push(@procs, [$procedure, $modifier || undef, @actualDiagCode]);
+		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
 		my @cptCodes = ($procedure);
 		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
@@ -254,6 +257,7 @@ sub getHtml
 		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_actual_diags" VALUE='@{[ $page->param("_f_proc_$line\_actual_diags")]}'/>
 			<TR VALIGN=TOP>
 				<SCRIPT>
 					function onChange_dosBegin_$line(event, flags)
