@@ -44,13 +44,14 @@ $STMTRPTDEFN_AUTH_WORKLIST =
 	columnDefn =>
 	[
 		{colIdx => 0, head => 'Service Request ID ', dAlign => 'left'},
-		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#8#"},
+		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#9#"},
 		{colIdx => 2, head => 'Follow Up Date ', dAlign => 'left'},
 		{colIdx => 3, head => 'SSN', dAlign => 'left'},
 		{colIdx => 4, head => 'Last Name', dAlign => 'left'},
 		{colIdx => 5, head => 'First Name', dAlign => 'left'},
-		{colIdx => 6, head => 'Service', hAlign => 'left'},
-		{colIdx => 7, head => 'Follow Up', hAlign => 'left'},
+		{colIdx => 6, head => 'Intake Coordinator', dAlign => 'center'},
+		{colIdx => 7, head => 'Service', hAlign => 'left'},
+		{colIdx => 8, head => 'Follow Up', hAlign => 'left'},
 	],
 };
 
@@ -196,6 +197,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 						p.ssn as ssn,
 						p.name_last as last_name,
 						p.name_first as first_name,
+						t.care_provider_id AS intake_coordinator,
 						(
 							SELECT caption
 							FROM   referral_service_descr rs
@@ -207,7 +209,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			AND      po.person_id = p.person_id
 			AND      po.org_internal_id = ?
 			AND 		(t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or t.trans_status_reason IS NULL)
-			ORDER BY trans_id DESC
+			ORDER BY t.care_provider_id, data_date_b DESC, trans_id DESC
 		)
 		WHERE rownum <= $LIMIT
 		},
@@ -228,6 +230,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 						  p.ssn as ssn,
 						  p.name_last as last_name,
 						  p.name_first as first_name,
+						  t.care_provider_id AS intake_coordinator,
 						  (
 								SELECT caption
 								FROM   referral_service_descr rs
@@ -240,10 +243,11 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 				AND 	po.person_id = p.person_id
 				AND     po.org_internal_id = ?
 				AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
-				ORDER BY trans_id DESC
+				ORDER BY t.care_provider_id, data_date_b DESC, trans_id DESC
 				)
 				WHERE rownum <= $LIMIT
 			},
+
 );
 
 1;
