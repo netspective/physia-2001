@@ -1417,7 +1417,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 1, head => 'Superbill ID', },
 			{ colIdx => 2, head => 'Caption' },
 			{ colIdx => 3, head => 'Description' },
-			{ dataFmt => 'Print', url => '/org/#param.org_id#/superbills?action=printSample&superbillid=#0#' }
+			{ dataFmt => 'Print', url => '/org/#param.org_id#/superbills?action=printSample&superbillid=#0#' },
 		],
 
 #		separateDataColIdx => 2,
@@ -1442,6 +1442,9 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		frame => { 
 			heading => 'Superbill Catalog',
 			addUrl => '/org/#param.org_id#/superbills?action=new',
+		},
+		stdIcons =>	{
+			delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
 		},
 	},
 	publishDefn_panelTransp =>
