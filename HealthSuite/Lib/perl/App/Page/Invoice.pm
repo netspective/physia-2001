@@ -23,8 +23,6 @@ use App::Billing::Validators;
 
 use App::Dialog::Procedure;
 use App::Dialog::OnHold;
-use App::Dialog::Diagnoses;
-use App::Dialog::ClaimProblem;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
@@ -681,21 +679,6 @@ sub getProceduresHtml
 	$invoiceBalance = $formatter->format_price($invoiceBalance);
 	my $balColor = $invoiceBalance >= 0 ? 'Green' : 'Darkred';
 
-
-	my $diagLink = '';
-	if(@allDiags && $invStatus < $submitted)
-	{
-		$diagLink = "<A HREF='/invoice/$invoiceId/dialog/diagnoses/update'><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT></A>";
-	}
-	elsif($invStatus < $submitted)
-	{
-		$diagLink = "<A HREF='/invoice/$invoiceId/dialog/diagnoses/add'><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT></A>";
-	}
-	elsif($invStatus >= $submitted)
-	{
-		$diagLink = "<FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT>";
-	}
-
 	return qq{
 		<TABLE>
 			<TR VALIGN=TOP>
@@ -714,7 +697,7 @@ sub getProceduresHtml
 							<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>$simDate</TD>
 						</TR>
 						<TR VALIGN=TOP>
-							<TD BGCOLOR=EEDDEE ALIGN=CENTER>$diagLink</TD>
+							<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><NOBR>Diagnoses</NOBR></TD>
 						</TR>
 						<TR>
 							<TD BGCOLOR=WHITE ALIGN=CENTER TITLE='$icdCaption'><FONT FACE="Arial,Helvetica" SIZE=2>@allDiags</TD>
@@ -1142,21 +1125,6 @@ sub prepare_dialog_procedure
 	return $self->prepare_view_summary();
 }
 
-sub prepare_dialog_diagnoses
-{
-	my $self = shift;
-	my $invoiceId = $self->param('invoice_id');
-	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
-	my ($action) = split(/,/, $dialogCmd);
-
-	my $cancelUrl = "/invoice/$invoiceId/summary";
-	my $dialog = new App::Dialog::Diagnoses(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $action);
-
-	$self->addContent('<p>');
-	return $self->prepare_view_summary();
-}
-
 sub prepare_dialog_hold
 {
 	my $self = shift;
@@ -1164,19 +1132,6 @@ sub prepare_dialog_hold
 
 	my $cancelUrl = "/invoice/$invoiceId/summary";
 	my $dialog = new App::Dialog::OnHold(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, 'add');
-
-	$self->addContent('<p>');
-	return $self->prepare_view_summary();
-}
-
-sub prepare_dialog_problem
-{
-	my $self = shift;
-	my $invoiceId = $self->param('invoice_id');
-
-	my $cancelUrl = "/invoice/$invoiceId/summary";
-	my $dialog = new App::Dialog::ClaimProblem(schema => $self->getSchema(), cancelUrl => $cancelUrl);
 	$dialog->handle_page($self, 'add');
 
 	$self->addContent('<p>');
@@ -1303,13 +1258,6 @@ sub prepare_view_summary
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure </a>
-							</FONT>
-						</TD>" : '' ]}
-
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $submissionOrder->{value_int} == 0 ?
-						"<TD>
-							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnosis Codes</a>
 							</FONT>
 						</TD>" : '' ]}
 
@@ -2239,8 +2187,6 @@ sub prepare_page_content_header
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 
 						@{[ $claimType != $selfPay && $invStatus > $submitted && $invStatus != $awaitClientPayment && $invStatus != $void && $invType == $hcfaInvoiceType && ($beenTransferred || $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR) ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment to this Claim</option>" : '' ]}
 						@{[ $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Post Personal Payment to this Claim</option>" : '' ]}
