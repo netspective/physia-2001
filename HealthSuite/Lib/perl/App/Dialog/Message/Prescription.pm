@@ -72,9 +72,12 @@ sub populateData
 	my $personId = $page->field('patient_id');
 	$page->field('permed_id', $permedId);
 	my $preField = $self->getField('prescription');
-	#$preField->{preHtml} = qq{<a href="/person-p/$personId/dlg-approve-medication/$permedId" target="approve_med">Edit & Approve Prescription</a>};
+
+	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
+	$command = $isPhysician ? 'approve' : 'view';
+
 	$preField->{preHtml} = qq{
-		<a href="javascript:doActionPopup('/person-p/$personId/dlg-approve-medication/$permedId', null,'location, status, width=620,height=550,scrollbars,resizable')">
+		<a href="javascript:doActionPopup('/person-p/$personId/dlg-@{[$command]}-medication/$permedId', null,'location, status, width=620,height=550,scrollbars,resizable')">
 		<b style='font-family:Tahoma'>View/Edit/Approve Prescription</b></a>
 	};
 }
