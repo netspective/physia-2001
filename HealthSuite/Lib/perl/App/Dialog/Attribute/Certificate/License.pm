@@ -12,8 +12,7 @@ use App::Dialog::Field::Attribute;
 use App::Dialog::Attribute::Certificate;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Dialog::Attribute::Certificate);
 
 sub initialize
@@ -36,21 +35,11 @@ sub initialize
 			selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 
 		new CGI::Dialog::Field(caption => 'Number', name => 'value_text', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', futureOnly => 1, defaultValue => ''),
 
 	);
 
 	$self->SUPER::initialize();
 }
-
-
-use constant PANEDIALOG_CERTIFICATE => 'Dialog/Certificate/License';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_CERTIFICATE,
-		'Created new dialog for License.'],
-);
 
 1;
