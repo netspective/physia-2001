@@ -748,7 +748,7 @@ sub getPayerHtml
 	my $addr = $payer->{address};
 
 	return qq{
-		$planOrProductName ($payer->{id})<br>
+		@{[ $planOrProductName ? $planOrProductName : $payer->{name} ]} ($payer->{id})<br>
 		$addr->{address1}<br>
 		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
 		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
