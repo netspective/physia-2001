@@ -23,7 +23,7 @@ create or replace package body Pkg_Entity as
 			where person_id = p_id;
 		elsif p_type = 1 then
 			select NAME_PRIMARY into v_display from org
-			where org_id = p_id;
+			where org_internal_id = p_id;
 		end if;
 		if v_display is null then
 			if p_onNotFound is not null then
