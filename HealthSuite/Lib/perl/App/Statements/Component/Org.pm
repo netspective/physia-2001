@@ -2020,7 +2020,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		style => 'panel.transparent.static',
 		contentColor=>'#EEEEEE',
 		frame => {
-			heading => 'Lab Tests',
+			#heading => 'Lab Tests',
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 			},
 	},
