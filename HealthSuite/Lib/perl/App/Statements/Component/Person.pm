@@ -21,21 +21,21 @@ my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.account-notes' => {
-	
-				
+
+
 				sqlStmt => qq{
 					select  trans_owner_id, detail,trans_id,trans_type
 					from transaction
 					where trans_owner_id = :1 and
 					provider_id = :2 and
 					trans_status = 2 and
-					trans_type = $ACCOUNT_NOTES				
+					trans_type = $ACCOUNT_NOTES
 				},
 				sqlStmtBindParamDescr => ['Person ID for transaction table'],
 				publishDefn => {
 						columnDefn => [
-							
-													
+
+
 							{ head => 'Account Notes', dataFmt => '#&{?}#<br/><I>#1#</I>' },
 						],
 						bullets => 'stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=/#param.arl#',
@@ -70,28 +70,28 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 							updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-trans-#3#/#param.person_id#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#/#0#?home=#param.home#'
 						},
 		},
-		
+
 				publishComp_st => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId] ); },
 				publishComp_stp => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id');  $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panel'); },
 				publishComp_stpe => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelEdit'); },
 				publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelTransp'); },
 		},
-		
+
 
 'person.group-account-notes' => {
-			
+
 			sqlStmt => qq{
 				select complete_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
 				trans_owner_id
 				from transaction, person
 				where provider_id = ? and
-				trans_owner_id = person_id and 
+				trans_owner_id = person_id and
 				trans_status = 2 and
 				trans_type = $ACCOUNT_NOTES
 				group by complete_name,trans_owner_id
 			},
 			sqlStmtBindParamDescr => ['Person ID for transaction table'],
-			
+
 			publishDefn => {
 				columnDefn => [
 					{ head=> 'Patient Name', url => "../../person/#4#/profile" },
@@ -100,7 +100,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					#{ head=> 'Notes#', dAlign => 'right' ,url => './stpe-person.alerts/dlg-add-alert-person/#4#/?home=/#param.arl#' },
 					{ head=> 'First  Note Date' },
 					{ head=> 'Last Note Date' },
-				],				
+				],
 			},
 			publishDefn_panel =>
 			{
@@ -114,15 +114,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.transparent.static',
 				inherit => 'panel',
-			},			
-	
-	
+			},
+
+
 			publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId] ); },
 			publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panel'); },
 			publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panelEdit'); },
 			publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panelTransp'); },
 	},
-	
+
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -888,7 +888,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
 					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
-					copay_amt, guarantor_name, decode(ins_type, 7, 'thirdparty', 'coverage') as ins_type
+					copay_amt, guarantor_name, decode(ins_type, 7, 'thirdparty', 'coverage') as ins_type,
+					guarantor_id,guarantor_type
 			from insurance
 			where record_type = 3
 			and owner_person_id = ?
@@ -903,8 +904,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#},
 	sqlStmtBindParamDescr => ['Person ID for Insurance Table'],
 	publishDefn => {
+
 		columnDefn => [
-			{ colIdx => 2, head => 'ID', dataFmt => '<A HREF = "/org/#7#/profile">#7#</A>#12# (#5# #13#): #4#, #2#' },
+			{
+				colIdx => 15,
+				dataFmt => {
+					'0' =>  '<A HREF = "/person/#14#/profile">#12#</A> (Third Party)',
+					'1'  => '<A HREF = "/org/#14#/profile">#12#</A> (Third Party)',
+					 '' => '<A HREF = "/org/#7#/profile">#7#</A>(#5# #13#): #4#, #2#'},
+			},
 			#{ dataFmt => '&{fmt_stripLeadingPath:0} #5#'}
 			#{ colIdx => 0, head => 'Type', dataFmt => '&{fmt_stripLeadingPath:0}:' },
 			#{ colIdx => 1, head => 'Employer', dataFmt => '#1#' },
