@@ -36,7 +36,7 @@ use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure
 #use constant NEXTACTION_ONHOLD => "/invoice/%param.invoice_id%/dialog/hold";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
-use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
+use constant NEXTACTION_POSTPAYMENT => "/invoice/%param.invoice_id%/dialog/postinvoicepayment?paidBy=personal";
 use constant NEXTACTION_POSTTRANSFER => "/person/%field.attendee_id%/dlg-add-posttransfer";
 use constant NEXTACTION_CREATECLAIM => "/org/#session.org_id#/dlg-add-claim";
 use constant NEXTACTION_CREATEHOSPCLAIM => "/org/#session.org_id#/dlg-add-claim?isHosp=1";
@@ -80,7 +80,7 @@ sub initialize
 							#['Place this claim on hold', NEXTACTION_ONHOLD],
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
-							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
+							['Post Personal Payment to this Claim', NEXTACTION_POSTPAYMENT],
 							['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
 							['Add Claim', NEXTACTION_CREATECLAIM],
 							['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
