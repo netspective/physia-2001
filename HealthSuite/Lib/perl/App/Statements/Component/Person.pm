@@ -631,33 +631,22 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending',8,'Denied'), caption,
-					provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
-				from  Transaction
-			where  	trans_owner_id = ?
-			and caption = 'Refill Request'
-                        and data_num_a is null
-                        union
-                        select  	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
-                        		provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
-                                from  Transaction
-                        where   trans_owner_id = ?
-                        and caption = 'Refill Request'
-                        and data_num_a is not null
-                        and trans_status = 6
-		},
-		sqlStmtBindParamDescr => ['Person ID for Transaction Table', 'Person ID for Transaction Table'],
+		SELECT count(*)
+		FROM document, document_attribute
+		WHERE document_attribute.value_text = :1
+			AND document.doc_spec_type = @{[ App::Universal::DOCSPEC_INTERNAL ]}
+			AND document.doc_id = document_attribute.parent_id
+			AND document_attribute.item_name IN ('To', 'CC')
+			AND document_attribute.value_int = 0
+			AND doc_spec_subtype = 2
+	},
 
-	publishDefn =>
-	{
+	publishDefn => {
 		columnDefn => [
-			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): <A HREF='/person/#11#/profile'>#11#</A> #7# (#3#)" },
+			{
+				dataFmt => qq{<a href='/person/#param.person_id#/mailbox/prescriptionRequests'>Prescription Approval Request</a> #0#},
+			},
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#',
-		frame => {
-			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-refill-request?home=#homeArl#',
-			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-		},
 	},
 	publishDefn_panel =>
 	{
@@ -687,10 +676,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		},
 	},
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelTransp'); },
 },
 
 
