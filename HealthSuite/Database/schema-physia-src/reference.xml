@@ -92,5 +92,11 @@
 		<column name="flags" type="longint" descr="Various bit-masked flags (like group policy number required, claim office number required, etc.)"/>
 		<column name="remarks" type="text" size="512" descr="Any additional remarks"/>
 	</table>
+	
+	<table name="REF_EPSDT">
+			<column name="epsdt" type="text" size="5" primarykey="yes" descr="Actual EPSDT Code"/>
+			<column name="name" type="text" size="64" descr="Short Description of the EPSDT code"/>
+			<column name="description" type="text" size="1024" descr="Long description of the EPSDT code"/>
+	</table>
 
 </schema>
