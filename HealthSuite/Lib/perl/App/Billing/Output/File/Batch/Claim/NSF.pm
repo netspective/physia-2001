@@ -161,17 +161,18 @@ sub processClaim
  											},
 					 		 NSF_HALLEY . "" => {'DA0' => sub { return 1;},
 											'DA1' => sub { return 1;},
-											'DA2' => sub {
-		 													if (($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() ne $tempClaim->{careReceiver}->{address}->getAddress1()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() ne $tempClaim->{careReceiver}->{address}->getAddress2()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() ne $tempClaim->{careReceiver}->{address}->getCity())	&&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() ne $tempClaim->{careReceiver}->{address}->getState()) &&
-																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() ne $tempClaim->{careReceiver}->{address}->getZipCode()))
-																{
-																	return 1;
-																}
-																else {return 0;}
-															},
+											'DA2' => sub { return 1;},
+#											'DA2' => sub {
+#		 													if (($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress1() ne $tempClaim->{careReceiver}->{address}->getAddress1()) &&
+#																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getAddress2() ne $tempClaim->{careReceiver}->{address}->getAddress2()) &&
+#																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getCity() ne $tempClaim->{careReceiver}->{address}->getCity())	&&
+#																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getState() ne $tempClaim->{careReceiver}->{address}->getState()) &&
+#																($tempClaim->{insured}->[$tempClaim->getClaimType()]->{address}->getZipCode() ne $tempClaim->{careReceiver}->{address}->getZipCode()))
+#																{
+#																	return 1;
+#																}
+#																else {return 0;}
+#															},
 											'DAat' => sub {return 0;},
  											'EA0' => sub { return 1;},
 						 					'EA1' => sub {
