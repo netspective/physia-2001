@@ -23,7 +23,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'diagnoses', heading => 'Create Invoice');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'invoice', heading => '$Command Invoice');
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
 
@@ -67,6 +67,13 @@ sub makeStateChanges
 
 	my $sessOrg = $page->session('org_id');
 	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+
+	#Set attendee_id field and make it read only if person_id exists
+	if(my $personId = $page->param('person_id'))
+	{
+		$page->field('client_id', $personId);
+		$self->setFieldFlags('client_id', FLDFLAG_READONLY);
+	}
 }
 
 sub populateData
@@ -80,8 +87,13 @@ sub populateData
 	$page->field('client_id', $invoiceInfo->{client_id});
 	$page->field('claim_type', $invoiceInfo->{invoice_subtype});
 	$page->field('owner_id', $invoiceInfo->{owner_id});
-
 	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
+
+	my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
+	$page->field('bill_to_id', $invoiceBilling->{bill_to_id});
+	my $billToType = $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG || $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS ? 'org' : 'person';
+	$page->field('bill_to_type', $billToType);
+
 
 	my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	my $totalItems = scalar(@{$items});
@@ -111,17 +123,21 @@ sub handlePayer
 	# ------------------------------------------------------------
 
 
-	my $payer = $page->field('bill_to_id');
-	if($payer eq $personId || $payer eq '')
+	my $payerId = $page->field('bill_to_id');
+	if($payerId eq $personId || $payerId eq '')
 	{
 		$page->field('claim_type', $typeSelfPay);
 	}
-	elsif($payer ne '')
+	else
 	{
-		$page->field('claim_type', $typeClient);
-
-		if(! $STMTMGR_INSURANCE->recordExists($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payer, $typeClient))
+		if(my $insurancePayer = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $payerId))
 		{
+			$page->field('claim_type', $insurancePayer->{ins_type});
+		}
+		elsif(! $STMTMGR_INSURANCE->recordExists($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, $typeClient))
+		{
+			$page->field('claim_type', $typeClient);
+
 			my $payerType = $page->field('bill_to_type');
 			my $addr = undef;
 			my $insPhone = undef;
@@ -130,14 +146,14 @@ sub handlePayer
 			if($payerType eq 'person')
 			{
 				$guarantorType = App::Universal::ENTITYTYPE_PERSON;
-				$addr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $payer);
-				$insPhone = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payer, 'Home', $phoneAttrType);
+				$addr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $payerId);
+				$insPhone = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payerId, 'Home', $phoneAttrType);
 			}
 			else
 			{
 				$guarantorType = App::Universal::ENTITYTYPE_ORG;
-				$addr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $payer, 'Mailing');
-				$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payer, 'Primary', $phoneAttrType);
+				$addr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $payerId, 'Mailing');
+				$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payerId, 'Primary', $phoneAttrType);
 			}
 
 			my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
@@ -146,7 +162,7 @@ sub handlePayer
 				owner_person_id => $personId || undef,
 				record_type => defined $recordType ? $recordType : undef,
 				ins_type => defined $typeClient ? $typeClient : undef,
-				guarantor_id => $payer,
+				guarantor_id => $payerId,
 				guarantor_type => defined $guarantorType ? $guarantorType : undef,
 				_debug => 0
 			);
@@ -177,7 +193,66 @@ sub handlePayer
 	}
 }
 
-sub execute
+sub execute_add
+{
+	my ($self, $page, $command, $flags) = @_;
+	addTransactionAndInvoice($self, $page, $command, $flags);
+}
+
+sub execute_update
+{
+	my ($self, $page, $command, $flags) = @_;
+	addTransactionAndInvoice($self, $page, $command, $flags);
+}
+
+sub execute_remove
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $sessUser = $page->session('user_id');
+	my $invoiceId = $page->param('invoice_id');
+
+	#VOID INVOICE
+	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		_debug => 0
+	);
+
+
+	#CREATE NEW VOID TRANSACTION FOR VOIDED INVOICE
+	my $parentTransId = $page->field('trans_id');
+	my $transType = App::Universal::TRANSTYPEACTION_VOID;
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+	$page->schemaAction(
+		'Transaction', 'add',
+		parent_trans_id => $parentTransId || undef,
+		trans_type => defined $transType ? $transType : undef,
+		trans_status => defined $transStatus ? $transStatus : undef,
+		trans_status_reason => "Invoice $invoiceId has been voided by $sessUser",
+		_debug => 0
+	);
+
+
+	#ADD HISTORY ATTRIBUTE
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "Voided by $sessUser",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	$page->redirect('/search/claim');
+}
+
+sub addTransactionAndInvoice
 {
 	my ($self, $page, $command, $flags) = @_;
 
@@ -256,10 +331,21 @@ sub execute
 		next if $unitCost eq '';
 
 		my $extCost = $quantity * $unitCost;
-
 		my $itemId = $page->param("_f_item_$line\_item_id");
+
+		my $removeProc = $page->param("_f_item_$line\_remove");
+		my $itemCommand = $command;
+		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
+		{
+			$itemCommand = 'add';
+		}
+		elsif($removeProc)
+		{
+			$itemCommand = 'remove';
+		}
+
 		$page->schemaAction(
-			'Invoice_Item', $command,
+			'Invoice_Item', $itemCommand,
 			item_id => $itemId || undef,
 			parent_id => $invoiceId || undef,
 			item_type => defined $itemType ? $itemType : undef,
@@ -302,7 +388,6 @@ sub execute
 	);
 
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
-
 }
 
 sub handleBillingInfo
@@ -317,6 +402,7 @@ sub handleBillingInfo
 	my $billPartyTypeClient = App::Universal::INVOICEBILLTYPE_CLIENT;
 	my $billPartyTypePerson = App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON;
 	my $billPartyTypeOrg = App::Universal::INVOICEBILLTYPE_THIRDPARTYORG;
+	my $billPartyTypeInsurance = App::Universal::INVOICEBILLTYPE_THIRDPARTYINS;
 
 	#-----------------------------------------------------------------------------
 
@@ -335,7 +421,7 @@ sub handleBillingInfo
 
 
 	#primary payer
-	if($payerId eq $personId)
+	if($payerId eq $personId || $payerId eq '')
 	{
 		$billParty = $billPartyTypeClient;
 		$billToId = $personId;
@@ -345,11 +431,20 @@ sub handleBillingInfo
 		#$billStatus = '';
 		#$billResult = '';
 	}
-	else
+	elsif(my $thirdPartyInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, App::Universal::CLAIMTYPE_CLIENT))
 	{
-		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, App::Universal::CLAIMTYPE_CLIENT);
-
 		$billParty = $payerType eq 'person' ? $billPartyTypePerson : $billPartyTypeOrg;
+		$billToId = $payerId;
+		$billInsId = $thirdPartyInfo->{ins_internal_id};
+		#$billAmt = '';
+		#$billPct = '';
+		#$billDate = '';
+		#$billStatus = '';
+		#$billResult = '';
+	}
+	elsif(my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonAndInsOrg', $personId, $payerId))
+	{
+		$billParty = $billPartyTypeInsurance;
 		$billToId = $payerId;
 		$billInsId = $insInfo->{ins_internal_id};
 		#$billAmt = '';
@@ -358,6 +453,7 @@ sub handleBillingInfo
 		#$billStatus = '';
 		#$billResult = '';
 	}
+	
 
 	my $primBillSeq = App::Universal::PAYER_PRIMARY;
 	$page->schemaAction(
@@ -377,7 +473,7 @@ sub handleBillingInfo
 
 
 	#secondary payer (this will only be added (as a self-pay) if the patient and payer are not the same)
-	if($payerId ne $personId)
+	if($payerId ne $personId && $payerId ne '')
 	{
 		my $billAmt = '';
 		my $billPct = '';
