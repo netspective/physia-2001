@@ -5,6 +5,7 @@ package App::Dialog::Attribute::PreventiveCare;
 use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Statements::Person;
+use App::Statements::Catalog;
 use strict;
 use Carp;
 use CGI::Dialog;
@@ -25,9 +26,10 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'cpt_name'),
 		new App::Dialog::Field::Attribute::Name(
 							name => 'attr_name',
-							caption => 'Measure',
+							caption => 'Problem',
 							options => FLDFLAG_REQUIRED,
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 							attrNameFmt => "#field.attr_name#",
@@ -35,7 +37,7 @@ sub new
 							valueType => $self->{valueType},
 							selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 
-
+		new CGI::Dialog::Field(caption => 'Measure', name => 'value_text', options => FLDFLAG_REQUIRED, findPopup => "/lookup/cpt/detail?_f_search_expression=%field.attr_name%"),
 		new CGI::Dialog::Field(type => 'date', name => 'value_date', caption => 'Last Performed', options => FLDFLAG_REQUIRED, futureOnly => 0),
 		new CGI::Dialog::Field(type => 'date', caption => 'Due', name => 'value_dateend', options => FLDFLAG_REQUIRED, futureOnly => 0)
 	);
@@ -61,16 +63,23 @@ sub populateData
 	my $itemId = $page->param('item_id');
 
 	my $preventiveCare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-
 	$page->field('attr_name' , $preventiveCare->{'item_name'});
 	$page->field('value_date' , $preventiveCare->{'value_date'});
 	$page->field('value_dateend' , $preventiveCare->{'value_dateend'});
+	$page->field('value_text', $preventiveCare->{'value_text'});
+	$page->field('cpt_name', $preventiveCare->{'value_textb'});
 
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $cptCode = $page->field('value_text');
+	my $cptName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+	my $cptCodeName = $cptName->{'name'} ne '' ? $cptName->{'name'} : '';
+	$page->addDebugStmt("NAME : $cptCodeName");
+	$page->field('cpt_name',$cptCodeName);
+	#my $cptCodeName = $page->field('cpt_name');
 
 	$page->schemaAction(
 		'Person_Attribute', $command,
@@ -78,10 +87,12 @@ sub execute
 		item_id => $page->param('item_id') || undef,
 		item_name => $page->field('attr_name') || undef,
 		value_type => $self->{valueType} || undef,
-		value_date => $page->field('value_date'),
-		value_dateEnd => $page->field('value_dateend'),
+		value_date => $page->field('value_date') || undef,
+		value_text => $page->field('value_text') || undef,
+		value_textB => $page->field('cpt_name') || undef,
+		value_dateEnd => $page->field('value_dateend') || undef
 	);
-	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
 
