@@ -1,0 +1,101 @@
+prompt -----------------------------------------------------------------------;
+prompt Creation of triggers for Invoice_Item
+prompt -----------------------------------------------------------------------;
+
+create or replace trigger biud_inv_item
+before insert or update or delete on invoice_item   
+   
+  begin 
+  
+     pkg_inv_trig.v_ind_inv_item := 0;
+     pkg_inv_trig.v_ind_inv_item_sort := 0;
+     pkg_inv_trig.v_inv_item_parent_id.delete;
+     pkg_inv_trig.v_inv_item_parent_id_dist.delete;
+  
+  end biud_inv_item;
+   
+/
+show errors;
+
+
+create or replace trigger biu_inv_item_row
+before insert or update on invoice_item
+for each row
+
+  declare
+  
+  begin 
+  
+    if :new.extended_cost is null and :new.total_adjust is null then
+      :new.balance := null;
+    else
+      :new.balance := nvl(:new.extended_cost, 0) + nvl(:new.total_adjust, 0);
+    end if;
+  
+  end biu_inv_item_row;
+/
+show errors;
+
+   
+create or replace trigger aiud_inv_item_row
+after insert or update or delete on invoice_item
+for each row
+
+  declare
+  
+  begin 
+
+    pkg_inv_trig.v_ind_inv_item := pkg_inv_trig.v_ind_inv_item + 1;
+    
+    if deleting then
+      pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :old.parent_id;
+     elsif inserting or updating then
+       pkg_inv_trig.v_inv_item_parent_id(pkg_inv_trig.v_ind_inv_item) := :new.parent_id; 
+     end if;
+ 
+   end aiud_inv_item_row;
+/
+show errors;
+   
+   
+create or replace trigger aiud_inv_item
+after insert or update or delete on invoice_item   
+   
+  declare
+    v_parent_id invoice_item.parent_id%type;
+    v_total_items invoice.total_items%type;
+    v_total_cost invoice.total_cost%type;
+    v_total_adjust invoice.total_adjust%type;
+    v_balance invoice.balance%type;
+    
+  begin 
+  
+     pkg_inv_trig.sort_inv_item; 
+  
+     for i in 1..pkg_inv_trig.v_ind_inv_item_sort loop
+     
+       v_parent_id := pkg_inv_trig.v_inv_item_parent_id_dist(i);
+       
+       select count(item_id) into v_total_items from invoice_item
+         where parent_id=v_parent_id and item_type<>5 and item_type<>7;
+         
+       select sum(total_adjust), sum(extended_cost) into v_total_adjust, v_total_cost from invoice_item
+         where parent_id=v_parent_id;
+         
+       if v_total_cost is null and v_total_adjust is null then
+         v_balance := null;
+       else
+         v_balance := nvl(v_total_cost, 0) + nvl(v_total_adjust, 0);
+       end if;
+       
+       update invoice set total_adjust = v_total_adjust,
+                          total_cost = v_total_cost,
+                          total_items = v_total_items,
+                          balance = v_balance
+          where invoice_id = v_parent_id;
+          
+     end loop; 
+ 
+   end aiud_inv_item;   
+/
+show errors;
