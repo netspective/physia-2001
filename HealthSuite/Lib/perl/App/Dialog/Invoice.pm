@@ -33,12 +33,11 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'client_id', options => FLDFLAG_REQUIRED),
-		#new App::Dialog::Field::Person::ID(caption => 'Bill to ID', name => 'bill_to_id', hints => "If left blank, invoice will be billed to the 'Patient ID'"),
+		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'client_id', options => FLDFLAG_REQUIRED, types => ['Patient']),
 		new CGI::Dialog::MultiField(caption => 'Payer ID/Type', name => 'other_payer_fields', hints => "If left blank, invoice will be billed to the 'Patient ID'",
 			fields => [
-				new CGI::Dialog::Field(caption => 'Payer ID', name => 'bill_to_id'),
-				new CGI::Dialog::Field(type => 'select', selOptions => 'Person;Organization', caption => 'Payer Type', name => 'bill_to_type'),
+				new CGI::Dialog::Field(caption => 'Payer ID', name => 'bill_to_id', findPopup => '/lookup/itemValue', findPopupControlField => '_f_bill_to_type'),
+				new CGI::Dialog::Field(type => 'select', selOptions => 'Person:person;Organization:org', caption => 'Payer Type', name => 'bill_to_type'),
 			]),
 
 
@@ -128,7 +127,7 @@ sub handlePayer
 			my $insPhone = undef;
 			my $guarantorType = undef;
 
-			if($payerType eq 'Person')
+			if($payerType eq 'person')
 			{
 				$guarantorType = App::Universal::ENTITYTYPE_PERSON;
 				$addr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $payer);
@@ -350,7 +349,7 @@ sub handleBillingInfo
 	{
 		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $payerId, App::Universal::CLAIMTYPE_CLIENT);
 
-		$billParty = $payerType eq 'Person' ? $billPartyTypePerson : $billPartyTypeOrg;
+		$billParty = $payerType eq 'person' ? $billPartyTypePerson : $billPartyTypeOrg;
 		$billToId = $payerId;
 		$billInsId = $insInfo->{ins_internal_id};
 		#$billAmt = '';
@@ -419,7 +418,7 @@ sub customValidate
 	$page->field('bill_to_id', $payer);
 	my $payerField = $self->getField('other_payer_fields')->{fields}->[0];
 
-	if($payerType eq 'Person')
+	if($payerType eq 'person')
 	{
 		my $createHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$payer');";
 		$payerField->invalidate($page, qq{
@@ -429,7 +428,7 @@ sub customValidate
 			})
 			unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $payer);
 	}
-	elsif($payerType eq 'Organization')
+	elsif($payerType eq 'org')
 	{
 		my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
 		my $createOrgHrefPost = "/$payer');";
