@@ -39,6 +39,12 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl => ['org_id'],
 		_idSynonym => 'Clinic'
 	},
+	'org-pharmacy' => {
+		heading => '$Command Pharmacy',
+		orgtype => 'pharmacy',
+		_arl => ['org_id'],
+		_idSynonym => 'Pharmacy'
+	},
 	'org-dir-entry' => {
 		heading => '$Command Provider Directory Entry',
 		orgtype => 'dir-entry',
@@ -134,7 +140,7 @@ sub initialize
 		),
 	);
 	my $type=$self->{orgtype};
-	if ($type eq 'provider' || $type eq 'dept' ||$type eq 'main')
+	if ($type eq 'provider' || $type eq 'dept' ||$type eq 'main' || $type eq 'pharmacy')
 	{
 		$self->addContent(
 		new CGI::Dialog::Field(caption => 'Fiscal Year Starts',
@@ -313,7 +319,7 @@ sub initialize
 		);
 	}
 
-	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dir-entry')
+	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dir-entry' || $type eq 'pharmacy')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -363,7 +369,7 @@ sub initialize
 			),
 		);
 	}
-	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'dir-entry')
+	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept' || $self->{orgtype} eq 'dir-entry' || $type eq 'pharmacy')
 	{
 		$self->addContent(
 			new CGI::Dialog::Subhead(
@@ -440,7 +446,7 @@ sub addContentOrgType
 {
 	my ($self, $type) = @_;
 	my $excludeGroups = "''";
-	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa'|| $type eq 'ancillary')
+	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa'|| $type eq 'ancillary' || $type eq 'pharmacy')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
 		return 1;
@@ -536,6 +542,7 @@ sub populateData
 				/insurance/	and do { $page->field('member_name','Insurance'); last };
 				/employer/	and do { $page->field('member_name','Employer'); last };
 				/ipa/		and do { $page->field('member_name','IPA'); last };
+				/pharmacy/		and do { $page->field('member_name','Pharmacy'); last };
 				/ancillary/	and do { $page->field('member_name','Ancillary Service');last };
 			}
 		$page->field('parent_org_id', $page->param('org_id'));

@@ -133,13 +133,13 @@ sub prepare_page_content_header
 		/insurance/ and do {$category = 'insurance'; last};
 		/ipa/ and do {$category = 'ipa'; last};
 		/department/ and do {$category = 'dept'; last};
-		/lab/ and do {$category = 'lab'; last};		
+		/lab/ and do {$category = 'lab'; last};
+		/pharmacy/ and do {$category = 'pharmacy'; last};
 		/location_dir_entry/ and do {$category = 'provider'; last};
 		/main_dir_entry/ and do {$category = 'provider'; last};
 		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
 
 	}
-
 	my $profileLine = '<b>Profile: </b>';
 	$profileLine .=  '&nbsp;Primary Name: #property.org_name_primary# ' if $self->property('org_name_primary');
 	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
@@ -336,13 +336,13 @@ sub prepare_view_catalog
 	{
 		/insurance/ and do {$category = 'insurance'; last};
 	}
-	
+
 	my $showLabTest=0;
-	my $labTestList = uc('Ancillary Service');	
-	
-	
-	#Probably show do this for all sub tabs on page		
-	$showLabTest=1 if uc($category)=~m/$labTestList/; 
+	my $labTestList = uc('Ancillary Service');
+
+
+	#Probably show do this for all sub tabs on page
+	$showLabTest=1 if uc($category)=~m/$labTestList/;
 
 	my @pathItems = split('/', $self->param('arl'));
 	my $html;
@@ -395,7 +395,7 @@ sub prepare_view_catalog
 	{
 		$html .=qq{<CENTER> #component.stp-org.LabTestDetail# </CENTER>};
 	}
-	
+
 	#TBD - Maybe a default catalog ????
 	$self->addContent($html);
 	return 1;
@@ -440,7 +440,7 @@ sub prepare_view_clearinghouse
 {
 	my ($self) = @_;
 	my $orgId = $self->param('org_id');
-	
+
 	if ($STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $orgId)) {
 		$self->addContent(qq{
 			<TABLE>
@@ -471,9 +471,9 @@ sub prepare_view_superbills
 		my $catalogIDExists = $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selSuperbillsByCatalogId', $self->param('catalog_id'), $self->session ('org_internal_id'));
 		my $internalCatalogID = $self->param('int_cat_id');
 		my $superbillCaption = $self->param ('caption');
-		
+
 		my $validationError = 0;
-		
+
 		$validationError = 1 unless ($superbillCaption);
 		$validationError = 1 if ($catalogIDExists or $self->param('catalog_id') eq '');
 
@@ -483,10 +483,10 @@ sub prepare_view_superbills
 			my $superbillDescription = $self->param ('description');
 			my $groupsField = $self->param ('groups');
 			my $cptField = $self->param ('cpts');
-			
+
 			my $superbillIDWarning = qq{<br><font color="red">Another superbill already exists with this ID.  Please change this and re-submit.  Thank you.</font>};
 			my $superbillCaptionWarning = qq{<br><font color="red">Please enter a name for this superbill.</font>};
-			
+
 			if ($self->param('catalog_id')) {
 				$superbillIDWarning = $catalogIDExists ? $superbillIDWarning : '';
 			} else {
@@ -499,7 +499,7 @@ sub prepare_view_superbills
 				<script src="/lib/superbill.js" language="JavaScript1.2">
 				</script>
 				<form name="superbillItemList">
-	
+
 				<table>
 					<tr>
 						<td align="right" valign="top">Superbill ID:</td>
@@ -523,14 +523,14 @@ sub prepare_view_superbills
 								<td valign="top" align="left">
 									<input name="groupHeading" type="text" size="26">&nbsp;
 								</td>
-	                        
+
 								<td valign="top" align="center">
 									<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
 									<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
 									<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
 									<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
 	                                        		</td>
-								
+
 								<td valign="top" align="right">
 									<select name="superbillGroups" onChange="javascript:_populateGroupCPT(document.superbillItemList.superbillGroups)">
 										<option value="0"> </option>
@@ -547,14 +547,14 @@ sub prepare_view_superbills
 								<td valign="top" align="left">
 									<textarea name="cpts" rows="10" cols="20"></textarea>
 								</td>
-	                        
+
 								<td valign="top" align="center">
 									<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
 									<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
 									<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
 									<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
 	                                        		</td>
-								
+
 								<td valign="top" align="right">
 									<select name="superbillData" size="12" multiple></select>
 								</td>
@@ -565,13 +565,13 @@ sub prepare_view_superbills
 							</tr>
 						</table>
         				</tr>
-					<tr>		
+					<tr>
 						<td valign="top" align="center" colspan="0">
 							<input name="submitButton" type="button" value="Submit" title="Create this Superbill" onClick="javascript:_createSuperbill()">
 						</td>
 					</tr>
 				</table>
-	        
+
 				</form>
 				<form name="superbillData" action="/org/#param.org_id#/superbills" method="post">
 					<input name="action" type="hidden" value="add">
@@ -596,31 +596,31 @@ sub prepare_view_superbills
 			my @groups = split ' ', $groups;
 			my $cpts = $self->param ('cpts');
 			my @cpts = split ' ', $cpts;
-			
+
 			my @groupArray;
 			my %cptHash;
 			my @cptArray;
-			
+
 			foreach my $grp (@groups) {
 				my ($order, $name) = split '_', $grp, 2;
 				$name =~ s/_/ /g;
-				
+
 				push @groupArray, $name;
 			}
-			
+
 			foreach my $cpt (@cpts) {
 				my ($group, $order, $name) = split '_', $cpt, 3;
 				$name =~ s/_/ /g;
-				
+
 				if (exists $cptHash {$group}) {
 					push @{$cptHash {$group}}, $name;
 				} else {
 					$cptHash {$group} = [ $name ];
 				}
 			}
-			
+
 			my $displayHierarchy = "<b>Org:</b><i>".$self->param('org_id')."</i><br>groups = $groups<br>cpts = $cpts<br>";
-			
+
 			# Display all the groups with corresponding members...
 			my $i = 0;
 			foreach my $grp (@groupArray) {
@@ -649,7 +649,7 @@ sub prepare_view_superbills
 #					description => $self->param ('description'),
 #					_debug => 0
 #				);
-				
+
 				# First delete the old superbill items...
 				# Make sure not to delete the old superbill itself!
 				for my $superbillItem (@{$superbillList}) {
@@ -670,11 +670,11 @@ sub prepare_view_superbills
 #					description => $self->param ('description'),
 #					_debug => 0
 #				);
-				
+
 				$i = 0;
 				foreach my $grp (@groupArray) {
 					my $cptList = $cptHash {$i};
-                
+
 					my $groupEntryID = $self->schemaAction (
 						'Offering_Catalog_Entry', 'add',
 						catalog_id => $internalCatalogID,
@@ -685,7 +685,7 @@ sub prepare_view_superbills
 						name => $grp,
 						sequence => $i,
 					);
-					
+
 					my $j = 0;
 					foreach my $cpt (@{$cptList}) {
 						my ($code, $name) = split /:/, $cpt, 2;
@@ -715,11 +715,11 @@ sub prepare_view_superbills
 					flags => 1,
 					_debug => 0
 				);
-				
+
 				$i = 0;
 				foreach my $grp (@groupArray) {
 					my $cptList = $cptHash {$i};
-                
+
 					my $groupEntryID = $self->schemaAction (
 						'Offering_Catalog_Entry', 'add',
 						catalog_id => $catIntId,
@@ -730,7 +730,7 @@ sub prepare_view_superbills
 						name => $grp,
 						sequence => $i,
 					);
-					
+
 					my $j = 0;
 					foreach my $cpt (@{$cptList}) {
 						my ($code, $name) = split /:/, $cpt, 2;
@@ -750,7 +750,7 @@ sub prepare_view_superbills
 					$i ++;
 				}
 			}
-			
+
 			$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 		}
 	} elsif ($self->param ('action') eq 'new') {
@@ -758,7 +758,7 @@ sub prepare_view_superbills
 			<script src="/lib/superbill.js" language="JavaScript1.2"></script>
 
 			<form name="superbillItemList">
-	
+
 			<table>
 				<tr>
 					<td align="right" valign="top">Superbill ID:</td>
@@ -780,14 +780,14 @@ sub prepare_view_superbills
 							<td valign="top" align="left">
 								<input name="groupHeading" type="text" size="26">&nbsp;
 							</td>
-                        
+
 							<td valign="top" align="center">
 								<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
 								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
 								<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
 								<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
                                         		</td>
-							
+
 							<td valign="top" align="right">
 								<select name="superbillGroups" onChange="javascript:_populateGroupCPT(document.superbillItemList.superbillGroups)">
 									<option value="0"> </option>
@@ -804,14 +804,14 @@ sub prepare_view_superbills
 							<td valign="top" align="left">
 								<textarea name="cpts" rows="10" cols="20"></textarea>
 							</td>
-                        
+
 							<td valign="top" align="center">
 								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
 								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
 								<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
 								<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
                                         		</td>
-							
+
 							<td valign="top" align="right">
 								<select name="superbillData" size="12" multiple></select>
 							</td>
@@ -822,13 +822,13 @@ sub prepare_view_superbills
 						</tr>
 					</table>
 				</tr>
-				<tr>		
+				<tr>
 					<td valign="top" align="center" colspan="0">
 						<input name="submitButton" type="button" value="Submit" title="Create this Superbill" onClick="javascript:_createSuperbill()">
 					</td>
 				</tr>
 			</table>
-        
+
 			</form>
 			<form name="superbillData" action="/org/#param.org_id#/superbills" method="post">
 				<input name="action" type="hidden" value="add">
@@ -845,22 +845,22 @@ sub prepare_view_superbills
 	} elsif ($self->param ('action') eq 'edit') {
 		my $superbillInfo = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selComponentSuperbillsByCatalogId', $self->param ('superbillid'), $self->session ('org_internal_id'));
 		my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $self->param ('superbillid')) if $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selComponentSuperbillsByCatalogId', $self->param ('superbillid'), $self->session ('org_internal_id'));
-		
+
 		my $superbillID = $self->param ('superbillid');
 		my $superbillCatalogID = $superbillInfo->[1];
 		my $superbillCaption = $superbillInfo->[2];
 		my $superbillDescription = $superbillInfo->[3];
-		
+
 		my @groups;
 		my %groupHash;
 		my %cptHash;
 		my $groupsField;
 		my $cptField;
-		
+
 		my $debugCPTCode;
 		my $debugCPTName;
 		my $debugCombo;
-		
+
 		foreach my $superbillItem (@{$superbillList}) {
 			if ($superbillItem->{parent_entry_id}) {
 				# Not a group header...
@@ -883,7 +883,7 @@ sub prepare_view_superbills
 				$groupHash {$superbillItem->{entry_id}} = $theHeader;
 			}
 		}
-		
+
 		# Replace some placeholders with proper values and concatenate...
 		my $i = 0;
 		foreach my $groupEntryID (@groups) {
@@ -921,7 +921,7 @@ sub prepare_view_superbills
 			debugCombo: $debugCombo<br>
 //-->
 			<form name="superbillItemList">
-	
+
 			<table>
 				<tr>
 					<td align="right" valign="top">Superbill ID:</td>
@@ -943,14 +943,14 @@ sub prepare_view_superbills
 							<td valign="top" align="left">
 								<input name="groupHeading" type="text" size="26">&nbsp;
 							</td>
-                        
+
 							<td valign="top" align="center">
 								<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
 								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
 								<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
 								<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
                                         		</td>
-							
+
 							<td valign="top" align="right">
 								<select name="superbillGroups" onChange="javascript:_populateGroupCPT(document.superbillItemList.superbillGroups)">
 									<option value="0"> </option>
@@ -967,14 +967,14 @@ sub prepare_view_superbills
 							<td valign="top" align="left">
 								<textarea name="cpts" rows="10" cols="20"></textarea>
 							</td>
-                        
+
 							<td valign="top" align="center">
 								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
 								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
 								<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
 								<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
                                         		</td>
-							
+
 							<td valign="top" align="right">
 								<select name="superbillData" size="12" multiple></select>
 							</td>
@@ -985,13 +985,13 @@ sub prepare_view_superbills
 						</tr>
 					</table>
 				</tr>
-				<tr>		
+				<tr>
 					<td valign="top" align="center" colspan="0">
 						<input name="submitButton" type="button" value="Submit" title="Create this Superbill" onClick="javascript:_createSuperbill()">
 					</td>
 				</tr>
 			</table>
-        
+
 			</form>
 			<form name="superbillData" action="/org/#param.org_id#/superbills" method="post">
 				<input name="action" type="hidden" value="add">
@@ -1025,14 +1025,14 @@ sub prepare_view_superbills
 		);
 
 		my $theFilename .= $self->session ('org_id') . $self->session ('user_id') . time() . ".superbillSample.pdf";
-		
+
 		$output->printReport(
 			$superBills,
 			file => File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutput, $theFilename),
 			columns => 4,
 			rows => 51
 		);
-		
+
 		my $sampleLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutputHREF, $theFilename);
 		$self->addContent (qq {<b>SuperBill Generated: </b><a href="$sampleLink">Click here to view</a>});
 	} elsif ($self->param ('action') eq 'delete') {
@@ -1048,7 +1048,7 @@ sub prepare_view_superbills
 				flags => 0,
 #				_debug => 0
 			);
-			
+
 #			for my $superbillItem (@{$superbillList}) {
 #				$self->schemaAction(
 #					'Offering_Catalog_Entry', 'remove',
@@ -1057,7 +1057,7 @@ sub prepare_view_superbills
 #				);
 #			}
 		}
-		
+
 		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 	} else {
 		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
