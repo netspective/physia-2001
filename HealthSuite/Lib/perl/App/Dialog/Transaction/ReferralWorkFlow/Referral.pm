@@ -278,8 +278,11 @@ sub initialize
 
 		$page->field('plan', $insAndClaimData->{'name_sort'});
 		$page->field('employer', $insAndClaimData->{'value_text'});
-		$page->field('case_mgr_name', $insAndClaimData->{'value_textB'});
-		$page->field('claim_number', $insAndClaimData->{'value_int'});
+		$page->field('claim_number', $insAndClaimData->{'value_textb'});
+
+		my $caseManagerData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $parentTransId, 'Case Manager Info');
+		$page->field('case_mgr_name', $caseManagerData->{'value_text'});
+		$page->field('case_mgr_phone', $caseManagerData->{'value_textb'});
 
 		my $orgContactData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $parentTransId, 'Work');
 		$page->field('org_phone', $orgContactData->{'value_text'});
