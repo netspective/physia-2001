@@ -124,26 +124,26 @@ sub execute
 	my $data;
 	my $html;
 
-	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
-	$providerId, $facilityId);
+	#$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
+	#$providerId, $facilityId);
 	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_all',  [$personId, $page->session('org_internal_id'), 
 	$providerId, $facilityId]);
 	
-	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
+	#my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 
-	if ($hardCopy == 1 and $printerAvailable) {
-		my $reportOpened = 1;
-		my $tempDir = $CONFDATA_SERVER->path_temp();
-		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
-		if ($reportOpened) {
-			while (my $reportLine = <ASCIIREPORT>) {
-				print $printHandle $reportLine;
-			}
-		}
-		close ASCIIREPORT;
-	}
+	#if ($hardCopy == 1 and $printerAvailable) {
+	#	my $reportOpened = 1;
+	#	my $tempDir = $CONFDATA_SERVER->path_temp();
+	#	open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+	#	if ($reportOpened) {
+	#		while (my $reportLine = <ASCIIREPORT>) {
+	#			print $printHandle $reportLine;
+	#		}
+	#	}
+	#	close ASCIIREPORT;
+	#}
 
-	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+	return  $html;
 }
 
 
