@@ -45,7 +45,8 @@ sub prepare_view
 					#component.stpt-person.advancedDirectives#<BR>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
 					#component.stpt-person.insurance#<BR>
-					#component.stpt-person.diagnosisSummary#
+					#component.stpt-person.diagnosisSummary#<BR>
+					#component.stpt-person.labOrderSummary#
 					</font>
 				</TD>
 			</TR>

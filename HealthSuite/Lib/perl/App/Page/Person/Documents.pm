@@ -18,7 +18,7 @@ sub setupTabs
 	my $RESOURCES = \%App::ResourceDirectory::RESOURCES;
 
 	my $children = $self->getChildResources($RESOURCES->{'page-person'}->{'documents'});
-	my $personId = $self->session('person_id');
+	my $personId = $self->param('person_id') || $self->session('person_id');
 
 	my @tabs = ();
 	foreach my $child (keys %$children)

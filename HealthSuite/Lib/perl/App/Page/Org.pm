@@ -391,6 +391,11 @@ sub prepare_view_catalog
 	{
 		$html .=qq{<CENTER> #component.stp-org.LabTestSummary# </CENTER>};
 	}
+	elsif($self->param('catalog') eq "labtest_detail")
+	{
+		$html .=qq{<CENTER> #component.stp-org.LabTestDetail# </CENTER>};
+	}
+	
 	#TBD - Maybe a default catalog ????
 	$self->addContent($html);
 	return 1;
