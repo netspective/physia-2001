@@ -298,7 +298,7 @@ sub populateData
 		my @products = ();
 		for (@$productsList)
 		{
-			push(@products, $_->{product_id});
+	#		push(@products, $_->{product_id});
 		}
 		$page->field('products', @products);		
 	}
