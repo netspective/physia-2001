@@ -188,24 +188,24 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			and address_name = 'Billing'
 		},
 	'selPayerChoicesByOwnerPersonId' => qq{
-		select i.plan_name, 'Insurance' as group_name, bs.caption as bill_seq, '1' as myorder
+		select i.plan_name, 'Insurance' as group_name, bs.caption as bill_seq, i.bill_sequence as bill_seq_id
 		   	from insurance i, claim_type ct, bill_sequence bs
 			where i.owner_person_id = ?
 				and ct.id = i.ins_type
 				and bs.id = i.bill_sequence
 				and i.bill_sequence in (1,2,3,4)
 				and ct.group_name = 'insurance'
-			order by bill_sequence
 		UNION
-		select wk.plan_name, 'Workers Compensation' as group_name, '' as bill_seq, '2' as myorder
+		(select wk.plan_name, 'Workers Compensation' as group_name, '' as bill_seq, wk.bill_sequence as bill_seq_id
 			from insurance wk
 			where wk.owner_person_id = ?
-				and wk.ins_type = 6
+				and wk.ins_type = 6)
 		UNION
-		select owner_org_id as plan_name, 'Third-Party' as group_name, '' as bill_seq, '5' as myorder
+		(select owner_org_id as plan_name, 'Third-Party' as group_name, '' as bill_seq, bill_sequence as bill_seq_id
 			from insurance
 			where owner_person_id = ?
-				and ins_type = 7
+				and ins_type = 7)
+		order by bill_seq_id
 		},
 
 		#UNION
