@@ -675,6 +675,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 					from invoice_attribute
 					where parent_id = :1 and
 					value_type = $INVOICE_NOTES
+					order by value_date desc
 				},
 
 				sqlStmtBindParamDescr => ['Invoice ID for invoice_attribute table'],
