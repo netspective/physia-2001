@@ -501,7 +501,7 @@ sub prepare_view_superbills
 			my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
 
 			$self->schemaAction(
-				'Offering_Catalog', 'delete',
+				'Offering_Catalog', 'remove',
 				internal_catalog_id => $internalCatalogID,
 				catalog_id => $self->param('catalog_id'),
 				org_internal_id => $orgIntId,
@@ -513,7 +513,7 @@ sub prepare_view_superbills
 			
 			for my $superbillItem (@{$superbillList}) {
 				$self->schemaAction(
-					'Offering_Catalog_Entry', 'delete',
+					'Offering_Catalog_Entry', 'remove',
 					entry_id => $superbillItem->{entry_id},
 				);
 			}
@@ -643,7 +643,7 @@ sub prepare_view_superbills
 					</table>
 				</tr>
 				<tr>
-					<td align="right" valign="top">CPTs:</td>
+					<td align="right" valign="top">Codes:</td>
 					<td align="left" valign="top">
 					<table>
 						<tr>
@@ -652,8 +652,8 @@ sub prepare_view_superbills
 							</td>
                         
 							<td valign="top" align="center">
-								<input name="addSelected" type="button" value="+" title="Add CPTs" onClick="javascript:_addCPT()">
-								<input name="delSelected" type="button" value="-" title="Delete CPTs" onClick="javascript:_delCPT()">
+								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
+								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()">
                                         		</td>
 							
 							<td valign="top" align="right">
@@ -802,7 +802,7 @@ sub prepare_view_superbills
 					</table>
 				</tr>
 				<tr>
-					<td align="right" valign="top">CPTs:</td>
+					<td align="right" valign="top">Codes:</td>
 					<td align="left" valign="top">
 					<table>
 						<tr>
@@ -811,8 +811,8 @@ sub prepare_view_superbills
 							</td>
                         
 							<td valign="top" align="center">
-								<input name="addSelected" type="button" value="+" title="Add CPTs" onClick="javascript:_addCPT()">
-								<input name="delSelected" type="button" value="-" title="Delete CPTs" onClick="javascript:_delCPT()">
+								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
+								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()">
                                         		</td>
 							
 							<td valign="top" align="right">
