@@ -1917,28 +1917,29 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
+
 			#Payment Source --------------------
-			my $claimType = $personInsur->{claim_type};
-			my $paySource = '';
-			$paySource = 'A' if $claimType eq 'Self-Pay';
-			$paySource = 'B' if $claimType eq 'Workers Compensation';
-			$paySource = 'C' if $claimType eq 'Medicare';
-			$paySource = 'D' if $claimType eq 'Medicaid';
-			#$paySource = 'E' if $claimType eq 'Other Federal Program';
-			$paySource = 'F' if $claimType eq 'Insurance';
-			#$paySource = 'G' if $claimType eq 'Blue Cross/Blue Shield';
-			$paySource = 'H' if $claimType eq 'CHAMPUS';
-			$paySource = 'I' if $claimType eq 'HMO';
-			#$paySource = 'J' if $claimType eq 'Federal Employee’s Program (FEP)';
-			#$paySource = 'K' if $claimType eq 'Central Certification';
-			#$paySource = 'L' if $claimType eq 'Self Administered';
-			#$paySource = 'M' if $claimType eq 'Family or Friends';
-			#$paySource = 'N' if $claimType eq 'Managed Care - Non-HMO';
-			$paySource = 'P' if $claimType eq 'BCBS';
-			#$paySource = 'T' if $claimType eq 'Title V';
-			#$paySource = 'V' if $claimType eq 'Veteran’s Administration Plan';
-			$paySource = 'X' if $claimType eq 'PPO';
-			$paySource = 'Z' if $claimType eq 'Client Billing' || $claimType eq 'ChampVA' || $claimType eq 'FECA Blk Lung';
+			my $claimType = $personInsur->{ins_type};
+			my $paySource;
+			$paySource = 'A' if $claimType == App::Universal::CLAIMTYPE_SELFPAY;
+			$paySource = 'B' if $claimType == App::Universal::CLAIMTYPE_WORKERSCOMP;
+			$paySource = 'C' if $claimType == App::Universal::CLAIMTYPE_MEDICARE;
+			$paySource = 'D' if $claimType == App::Universal::CLAIMTYPE_MEDICAID;
+			#$paySource = 'E' if $claimType == 'Other Federal Program';
+			$paySource = 'F' if $claimType == App::Universal::CLAIMTYPE_INSURANCE || $claimType == App::Universal::CLAIMTYPE_RRMEDICARE;
+			#$paySource = 'G' if $claimType == 'Blue Cross/Blue Shield';
+			$paySource = 'H' if $claimType == App::Universal::CLAIMTYPE_CHAMPUS;
+			$paySource = 'I' if $claimType == App::Universal::CLAIMTYPE_HMO || $claimType == App::Universal::CLAIMTYPE_HMO_NONCAP;
+			#$paySource = 'J' if $claimType == 'Federal Employee’s Program (FEP)';
+			#$paySource = 'K' if $claimType == 'Central Certification';
+			#$paySource = 'L' if $claimType == 'Self Administered';
+			#$paySource = 'M' if $claimType == 'Family or Friends';
+			$paySource = 'N' if $claimType == App::Universal::CLAIMTYPE_POS || $claimType == App::Universal::CLAIMTYPE_MNGCARE;
+			$paySource = 'P' if $claimType == App::Universal::CLAIMTYPE_BCBS;
+			#$paySource = 'T' if $claimType == 'Title V';
+			#$paySource = 'V' if $claimType == 'Veteran’s Administration Plan';
+			$paySource = 'X' if $claimType == App::Universal::CLAIMTYPE_PPO;
+			$paySource = 'Z' if $claimType == App::Universal::CLAIMTYPE_CLIENT || $claimType == App::Universal::CLAIMTYPE_CHAMPVA || $claimType == App::Universal::CLAIMTYPE_FECABLKLUNG;
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
