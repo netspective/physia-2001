@@ -44,6 +44,7 @@ sub initialize
 	$self->addContent(
 
 		#item ids for updating the attributes
+		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'condition_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'prior_auth_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'resub_number_item_id'),
@@ -65,7 +66,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'hospFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
+		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),		#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),		#if user changes patient id while adding a claim, need to refresh payer list for the new patient id
 
@@ -331,8 +332,8 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
 	$page->field('dupCheckin_returnUrl', $self->getReferer($page)) if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
 
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
@@ -464,8 +465,10 @@ sub populateData
 
 
 		my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+		$page->field('batch_item_id', $batchInfo->{item_id});
 		$page->field('batch_id', $batchInfo->{value_text});
 		$page->field('batch_date', $batchInfo->{value_date});
+		$self->updateFieldFlags('batch_fields', FLDFLAG_READONLY, 0) unless $page->field('batch_id');
 
 		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
@@ -903,7 +906,6 @@ sub handleInvoiceAttrs
 	my $personId = $page->field('attendee_id');
 	my $billingFacility = $page->field('billing_facility_id');
 	my $serviceFacility = $page->field('service_facility_id') || $page->field('hospital_id');
-	my $batchId = $page->field('batch_id');
 
 	#CONSTANTS
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -915,29 +917,13 @@ sub handleInvoiceAttrs
 
 	## Then, create invoice attribute indicating that this is the first (primary) claim
 	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Submission Order',
-			value_type => defined $intValueType ? $intValueType : undef,
-			value_int => 0,
-			_debug => 0
-		) if $command ne 'update';
-
-
-	## Check if creation batch id already exists. If not, create it.
-	my $creationBatchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
-	if($creationBatchInfo->{item_id} eq '' && $batchId)
-	{
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Creation/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $batchId || undef,
-			value_date => $page->field('batch_date') || undef,
-			_debug => 0
-		);
-	}
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId || undef,
+		item_name => 'Submission Order',
+		value_type => defined $intValueType ? $intValueType : undef,
+		value_int => 0,
+		_debug => 0
+	) if $command ne 'update';
 
 
 	## Then, create some invoice attributes for HCFA (the rest are found in the Procedure dialog):
@@ -954,14 +940,14 @@ sub handleInvoiceAttrs
 	}
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('condition_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Condition/Related To',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $condition || undef,
-			value_textB => $state || undef,
-			_debug => 0
+		'Invoice_Attribute', $command,
+		item_id => $page->field('condition_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Condition/Related To',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $condition || undef,
+		value_textB => $state || undef,
+		_debug => 0
 	);
 
 
@@ -982,57 +968,69 @@ sub handleInvoiceAttrs
 		my $refPhysState = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPhysStateLicense', $refPhysId, 1);
 
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Ref Provider/Name/First',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $refPhysInfo->{name_first} || undef,
-				value_textB => $refPhysId || undef,
-				_debug => 0
-			);
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Ref Provider/Name/First',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $refPhysInfo->{name_first} || undef,
+			value_textB => $refPhysId || undef,
+			_debug => 0
+		);
 
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Ref Provider/Name/Middle',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $refPhysInfo->{name_middle} || undef,
-				value_textB => $refPhysId || undef,
-				_debug => 0
-			) if $refPhysInfo->{name_middle} ne '';
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Ref Provider/Name/Middle',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $refPhysInfo->{name_middle} || undef,
+			value_textB => $refPhysId || undef,
+			_debug => 0
+		) if $refPhysInfo->{name_middle} ne '';
 
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Ref Provider/Name/Last',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $refPhysInfo->{name_last} || undef,
-				value_textB => $refPhysId || undef,
-				_debug => 0
-			);
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Ref Provider/Name/Last',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $refPhysInfo->{name_last} || undef,
+			value_textB => $refPhysId || undef,
+			_debug => 0
+		);
 
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Ref Provider/Identification',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $refPhysUpin->{value_text} || undef,
-				value_textB => $refPhysState->{value_textb} || undef,
-				_debug => 0
-			);
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Ref Provider/Identification',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $refPhysUpin->{value_text} || undef,
+			value_textB => $refPhysState->{value_textb} || undef,
+			_debug => 0
+		);
 		#end referring phys attrs
 	}
 
+	my $existsBatchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+	my $batchCommand = $existsBatchInfo->{item_id} ? 'update' : 'add';
+	$page->schemaAction(
+		'Invoice_Attribute', $batchCommand,
+		item_id => $page->field('batch_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/Creation/Batch ID',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $page->field('batch_id') || undef,
+		value_date => $page->field('batch_date') || undef,
+		_debug => 0
+	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('prior_auth_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Prior Authorization Number',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->field('prior_auth') || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('prior_auth_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Prior Authorization Number',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $page->field('prior_auth') || undef,
+		_debug => 0
+	);
 
 	if($claimType == App::Universal::CLAIMTYPE_MEDICAID)
 	{
@@ -1042,81 +1040,81 @@ sub handleInvoiceAttrs
 			$resubCommand = 'update';
 		}
 		$page->schemaAction(
-				'Invoice_Attribute', $resubCommand,
-				item_id => $page->field('resub_number_item_id') || undef,
-				parent_id => $invoiceId,
-				item_name => 'Medicaid/Resubmission',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $page->field('resub_number') || undef,
-				value_textB => $page->field('orig_ref') || undef,
-				_debug => 0
-			);
+			'Invoice_Attribute', $resubCommand,
+			item_id => $page->field('resub_number_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Medicaid/Resubmission',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $page->field('resub_number') || undef,
+			value_textB => $page->field('orig_ref') || undef,
+			_debug => 0
+		);
 	}
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('deduct_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Patient/Deductible/Balance',
-			value_type => defined $currencyValueType ? $currencyValueType : undef,
-			value_text => $page->field('deduct_balance') || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('deduct_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Patient/Deductible/Balance',
+		value_type => defined $currencyValueType ? $currencyValueType : undef,
+		value_text => $page->field('deduct_balance') || undef,
+		_debug => 0
+	);
 
 	#for now, we will always default it to 'YES' 8-3-00 MAF (Bug 498)
 	my $acceptAssign = 1; 	#$page->field('accept_assignment') eq '' ? 0 : 1;
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('assignment_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Assignment of Benefits',
-			value_type => defined $boolValueType ? $boolValueType : undef,
-			value_int => defined $acceptAssign ? $acceptAssign : undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('assignment_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Assignment of Benefits',
+		value_type => defined $boolValueType ? $boolValueType : undef,
+		value_int => defined $acceptAssign ? $acceptAssign : undef,
+		_debug => 0
+	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('illness_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Patient/Illness/Dates',
-			value_type => defined $durationValueType ? $durationValueType : undef,
-			value_date => $page->field('illness_begin_date') || undef,
-			value_dateEnd => $page->field('illness_end_date') || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('illness_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Patient/Illness/Dates',
+		value_type => defined $durationValueType ? $durationValueType : undef,
+		value_date => $page->field('illness_begin_date') || undef,
+		value_dateEnd => $page->field('illness_end_date') || undef,
+		_debug => 0
+	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('disability_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Patient/Disability/Dates',
-			value_type => defined $durationValueType ? $durationValueType : undef,
-			value_date => $page->field('disability_begin_date') || undef,
-			value_dateEnd => $page->field('disability_end_date') || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('disability_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Patient/Disability/Dates',
+		value_type => defined $durationValueType ? $durationValueType : undef,
+		value_date => $page->field('disability_begin_date') || undef,
+		value_dateEnd => $page->field('disability_end_date') || undef,
+		_debug => 0
+	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('hospital_item_id') || undef,
-			parent_id => $invoiceId || undef,
-			item_name => 'Patient/Hospitalization/Dates',
-			value_type => defined $durationValueType ? $durationValueType : undef,
-			value_date => $page->field('hospitalization_begin_date') || undef,
-			value_dateEnd => $page->field('hospitalization_end_date') || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('hospital_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Patient/Hospitalization/Dates',
+		value_type => defined $durationValueType ? $durationValueType : undef,
+		value_date => $page->field('hospitalization_begin_date') || undef,
+		value_dateEnd => $page->field('hospitalization_end_date') || undef,
+		_debug => 0
+	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('cntrl_num_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Patient/Control Number',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $invoiceId || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('cntrl_num_item_id') || undef,
+		parent_id => $invoiceId,
+		item_name => 'Patient/Control Number',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $invoiceId || undef,
+		_debug => 0
+	);
 
 
 	my $billingContact = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttribute', $billingFacility, 'Contact Information');
@@ -1124,28 +1122,28 @@ sub handleInvoiceAttrs
 	my $contactPhone = $billingContact->{value_textb} || $page->field('billing_phone');
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('bill_contact_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Billing Facility/Contact',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $contactName || undef,
-			value_textB => $contactPhone || undef,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('bill_contact_item_id') || undef,
+		parent_id => $invoiceId,
+		item_name => 'Billing Facility/Contact',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $contactName || undef,
+		value_textB => $contactPhone || undef,
+		_debug => 0
+	);
 
 
 	unless($billingContact->{item_id})
 	{
 		$page->schemaAction(
-				'Org_Attribute', 'add',
-				parent_id => $billingFacility,
-				item_name => 'Contact Information',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $contactName || undef,
-				value_textB => $contactPhone || undef,
-				_debug => 0
-			);
+			'Org_Attribute', 'add',
+			parent_id => $billingFacility,
+			item_name => 'Contact Information',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $contactName || undef,
+			value_textB => $contactPhone || undef,
+			_debug => 0
+		);
 	}
 
 
@@ -1156,14 +1154,14 @@ sub handleInvoiceAttrs
 	$claimFiling = 'M' if $personSecInsur->{ins_internal_id} ne '';
 
 	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('claim_filing_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Claim Filing/Indicator',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $claimFiling,
-			_debug => 0
-		);
+		'Invoice_Attribute', $command,
+		item_id => $page->field('claim_filing_item_id') || undef,
+		parent_id => $invoiceId,
+		item_name => 'Claim Filing/Indicator',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $claimFiling,
+		_debug => 0
+	);
 
 
 	my $activeCatalogs = uc($page->param('_f_proc_active_catalogs'));
