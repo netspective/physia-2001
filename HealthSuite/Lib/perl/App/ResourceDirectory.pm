@@ -85,6 +85,7 @@ use App::Component::Functions;
 use App::Component::News;
 use App::Component::Navigate::FileSys;
 use App::Component::WorkList::PatientFlow;
+use App::Component::WorkList::Referral;
 use App::Component::ResourceSelector;
 use App::Component::FacilitySelector;
 use App::Component::SDE;
