@@ -45,8 +45,8 @@ use App::Page::PatientBill;
 ##############################################################################
 
 use App::Page::WorkList;
-use App::Page::WorkList::Collection;
-use App::Page::WorkList::PatientFlow;
+use App::Page::Worklist::Collection;
+use App::Page::Worklist::PatientFlow;
 
 
 ##############################################################################
