@@ -242,6 +242,8 @@ sub initialize
 				name => 'confirmed_info',
 				options => FLDFLAG_REQUIRED),
 
+		new CGI::Dialog::Field(type => 'memo', caption => 'Place Claim(s) On Hold', name => 'on_hold', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
 		new CGI::Dialog::Subhead(heading => 'Procedure Entry', name => 'procedures_heading'),
 		new App::Dialog::Field::Procedures(name =>'procedures_list'),
 	);
@@ -1072,7 +1074,7 @@ sub addTransactionAndInvoice
 
 	#invoice constants
 	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
-	my $invoiceStatusCreate = App::Universal::INVOICESTATUS_CREATED;
+	my $invoiceStatus = $page->field('on_hold') ? App::Universal::INVOICESTATUS_ONHOLD : App::Universal::INVOICESTATUS_CREATED;
 
 	#entity types
 	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
@@ -1129,7 +1131,7 @@ sub addTransactionAndInvoice
 	my @claimDiags = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 	#App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrgIntId);
 
-	my $invoiceStatus = $command eq 'add' ? $invoiceStatusCreate : $page->field('current_status');
+	$invoiceStatus = $command eq 'add' ? $invoiceStatus : $page->field('current_status');
 	my $invoiceId = $page->schemaAction(
 		'Invoice', $command,
 		invoice_id => $editInvoiceId || undef,
@@ -1207,6 +1209,20 @@ sub handleInvoiceAttrs
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => 'Created',
 			value_textB => "Creation Batch ID: $batchId",
+			value_date => $todaysDate,
+			_debug => 0
+		);
+	}
+
+	if(my $onHold = $page->field('on_hold'))
+	{
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => 'On Hold',
+			value_textB => $onHold,
 			value_date => $todaysDate,
 			_debug => 0
 		);
