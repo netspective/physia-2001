@@ -125,11 +125,12 @@ sub buildSqlStmt
 	my $status = join(',',  $page->field('claim_status'));
 	my $orgId = $page->session('org_internal_id');
 	my $serviceId = $page->field('service_facility_id');
+	my $prodSelect = $page->field('product_select');
 	my $statusClause='';
 	my $serviceClause='';
 	my $dateClause;
 	my $serviceDateClause;
-	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && defined $status;
+	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && defined $status && $prodSelect != 1;
 	$dateClause =qq{ and  trunc(i.invoice_date) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
