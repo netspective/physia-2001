@@ -57,6 +57,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where person_id = ? and org_id = ?
 		order by category
 		},
+
 	'selPersonBySessionOrgAndCategory' => q{
 			select distinct person_id
 			  	from person_org_category
