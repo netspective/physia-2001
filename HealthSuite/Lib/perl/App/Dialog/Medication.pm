@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.20 2001-01-10 17:58:08 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.21 2001-01-10 22:59:28 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -28,6 +28,9 @@ use vars qw(%RESOURCE_MAP);
 );
 
 my $UNIT_SELOPTIONS = 'mg;ug;gm;kg;pills;caps;tabs;supp;cc;ml;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch;other';
+my $ROUTE_SELOPTIONS = 'PO;chew;suck;sublingual;inhaled nasally;topically;rectally;vaginally;eyes;OD;OS;ears;SQ;IM;IV';
+my $FREQ_SELOPTIONS = 'QD;BID;TID;QID;Q2H;Q4H;Q6H;Q8H;Q12H;other';
+my $PRN_SELOPTIONS = 'Pain;Severe Pain;Nausea;Vomiting;Diarrhea;Fever;Cough;SOB;Chest Pain;Angina;other';
 
 sub new
 {
@@ -49,20 +52,17 @@ sub new
 					name => 'dose',
 					size => 5,
 					type => 'float',
-					#options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Units',
 					name => 'dose_units',
 					type => 'select',
 					selOptions => $UNIT_SELOPTIONS,
-					#options => FLDFLAG_REQUIRED,
 					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_dose_units']);},
 				),
 				new CGI::Dialog::Field(caption => 'Route',
 					name => 'route',
 					type => 'select',
-					selOptions => 'PO;chew;suck;sublingual;inhaled nasally;topically;rectally;vaginally;eyes;OD;OS;ears;SQ;IM;IV',
-					#options => FLDFLAG_REQUIRED,
+					selOptions => $ROUTE_SELOPTIONS,
 				),
 			],
 		),
@@ -76,16 +76,15 @@ sub new
 				new CGI::Dialog::Field(caption => 'Frequency',
 					name => 'frequency',
 					type => 'select',
-					selOptions => 'QD;BID;TID;QID;Q2H;Q4H;Q6H;Q8H;Q12H;Other',
-					#options => FLDFLAG_REQUIRED,
-					onChangeJS => qq{showFieldsOnValues(event, ['Other'], ['other_frequency']);},
+					selOptions => $FREQ_SELOPTIONS,
+					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_frequency']);},
 				),
 				new CGI::Dialog::Field(caption => 'PRN',
 					name => 'prn',
 					type => 'select',
-					selOptions => 'Pain;Severe Pain;Nausea;Vomiting;Diarrhea;Fever;Cough;SOB;Chest Pain;Angina;Other',
+					selOptions => $PRN_SELOPTIONS,
 					options => FLDFLAG_PREPENDBLANK,
-					onChangeJS => qq{showFieldsOnValues(event, ['Other'], ['other_prn']);},
+					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_prn']);},
 				),
 			],
 		),
@@ -125,21 +124,10 @@ sub new
 				),
 			],
 		),
-				new CGI::Dialog::Field(caption => 'Ongoing',
+				new CGI::Dialog::Field(caption => 'Ongoing?',
 					name => 'ongoing',
 					type => 'bool',
 					style => 'check',
-				),
-
-				new CGI::Dialog::Field(caption => 'Print Label in',
-					name => 'label',
-					type => 'select',
-					selOptions => 'English;Spanish;Other;No Label',
-					options => FLDFLAG_REQUIRED,
-					onChangeJS => qq{showFieldsOnValues(event, ['Other'], ['other_label']);},
-				),
-				new CGI::Dialog::Field(caption => 'Other Language',
-					name => 'other_label',
 				),
 
 		new CGI::Dialog::MultiField(caption => 'Duration',
@@ -194,6 +182,24 @@ sub new
 				#new CGI::Dialog::Field(caption => 'Other Units',
 				#	name => 'other_sale_units',
 				#),
+
+				new CGI::Dialog::Field(caption => 'Label?',
+					name => 'label',
+					type => 'select',
+					style => 'radio',
+					selOptions => 'Yes:1;No:2',
+					defaultValue => 1,
+				),
+
+				new CGI::Dialog::Field(caption => 'Print Label in',
+					name => 'label_language',
+					type => 'select',
+					selOptions => 'English;Spanish;other;',
+					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_label']);},
+				),
+				new CGI::Dialog::Field(caption => 'Other Language',
+					name => 'other_label',
+				),
 
 				new CGI::Dialog::Field(caption => 'Substitution allowed?',
 					name => 'allow_substitutions',
@@ -284,14 +290,14 @@ sub new
 		}
 		if (opObj = eval('document.dialog._f_frequency'))
 		{
-			if (opObj.value != 'Other')
+			if (opObj.value != 'other')
 			{
 				setIdDisplay('other_frequency', 'none');
 			}
 		}
 		if (opObj = eval('document.dialog._f_prn'))
 		{
-			if (opObj.value != 'Other')
+			if (opObj.value != 'other')
 			{
 				setIdDisplay('other_prn', 'none');
 			}
@@ -310,9 +316,9 @@ sub new
 				setIdDisplay('other_num_refills', 'none');
 			}
 		}
-		if (opObj = eval('document.dialog._f_label'))
+		if (opObj = eval('document.dialog._f_label_language'))
 		{
-			if (opObj.value != 'Other')
+			if (opObj.value != 'other')
 			{
 				setIdDisplay('other_label', 'none');
 			}
@@ -389,6 +395,7 @@ sub makeStateChanges
 		$self->setFieldFlags('first_dose', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('first_dose_specs', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('label', FLDFLAG_INVISIBLE);
+		$self->setFieldFlags('label_language', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('other_label', FLDFLAG_INVISIBLE);
 	}
 	elsif ($command eq 'prescribe' || $command eq 'refill')
@@ -421,6 +428,7 @@ sub makeStateChanges
 		if($command eq 'refill')
 		{
 			$self->setFieldFlags('label', FLDFLAG_INVISIBLE);
+			$self->setFieldFlags('label_language', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('other_label', FLDFLAG_INVISIBLE);
 			#$self->setFieldFlags('sale_units', FLDFLAG_INVISIBLE);
 			#$self->setFieldFlags('other_sale_units', FLDFLAG_INVISIBLE);
@@ -488,63 +496,12 @@ sub makeStateChanges
 		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('label', FLDFLAG_INVISIBLE);
+		$self->setFieldFlags('label_language', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('other_label', FLDFLAG_INVISIBLE);
 		$self->setDialogViewOnly($dlgFlags);
 		$buttonsField->addActionButtons({caption => 'Close'});
 		$buttonsField->{noCancelButton} = 1;
 
-	}
-}
-
-sub customValidate
-{
-	my ($self, $page) = @_;
-
-	if ($page->field('start_date') && $page->field('end_date'))
-	{
-		my $startDate = Date_to_Days(Decode_Date_US($page->field('start_date')));
-		my $endDate   = Date_to_Days(Decode_Date_US($page->field('end_date')));
-
-		if ($endDate < $startDate)
-		{
-			my $field = $self->getField('dates_multi')->{fields}->[0];
-			$field->invalidate($page, qq{
-				End Date must be later than or equal Start Date.
-			});
-		}
-	}
-	
-	if($page->field('dose_units') eq 'other' && $page->field('other_dose_units') eq '')
-	{
-		$self->getField('other_dose_units')->invalidate($page, 'Please enter other units');
-	}
-	if($page->field('frequency') eq 'Other' && $page->field('other_frequency') eq '')
-	{
-		$self->getField('other_frequency')->invalidate($page, 'Please enter other frequency');
-	}
-	if($page->field('prn') eq 'Other' && $page->field('other_prn') eq '')
-	{
-		$self->getField('other_prn')->invalidate($page, 'Please enter other prn');
-	}
-	#if($page->field('sale_units') eq 'other' && $page->field('other_sale_units') eq '')
-	#{
-	#	$self->getField('other_sale_units')->invalidate($page, 'Please enter other units');
-	#}
-	if($page->field('num_refills') eq 'other' && $page->field('other_num_refills') eq '')
-	{
-		$self->getField('other_num_refills')->invalidate($page, 'Please enter number of refills');
-	}
-	if($page->field('label') eq 'Other' && $page->field('other_label') eq '')
-	{
-		$self->getField('other_label')->invalidate($page, 'Please enter other language for label');
-	}
-
-	#check physician password if approval is being done
-	my $pin = $page->field('physician_pin');
-	my $loginInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $page->session('user_id'), $page->session('org_internal_id'));
-	if($pin && $pin ne $loginInfo->{password})
-	{
-		$self->getField('physician_pin')->invalidate($page, 'Invalid PIN. Please try again.');
 	}
 }
 
@@ -566,31 +523,67 @@ sub populateData
 		my $allowGeneric = $medInfo->{allow_generic} == 1 ? 1 : 2;
 		$page->field('allow_generic', $allowGeneric);
 
-		my @doseUnits = split(',', $medInfo->{dose_units});
-		$page->field('dose_units', $doseUnits[0]);
-		if($doseUnits[0] eq 'other')
+		my $doseUnits = $medInfo->{dose_units};
+		my $inList;
+		my @unitOptions = split(';', $UNIT_SELOPTIONS);
+		foreach (@unitOptions)
 		{
-			$self->updateFieldFlags('other_dose_units', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_dose_units', $doseUnits[1]);
+			next if $doseUnits ne $_;
+			$inList = 1;
+		}
+		if($inList)
+		{
+			$page->field('dose_units', $doseUnits);
+		}
+		else
+		{
+			$page->field('dose_units', 'other');
+			$self->updateFieldFlags('other_dose_units', FLDFLAG_INVISIBLE, 0);			
+			$page->field('other_dose_units', $doseUnits);
+		}
+		
+
+		my $frequency = $medInfo->{frequency};
+		my $inList;
+		my @freqOptions = split(';', $FREQ_SELOPTIONS);
+		foreach (@freqOptions)
+		{
+			next if $frequency ne $_;
+			$inList = 1;
+		}
+		if($inList)
+		{
+			$page->field('frequency', $frequency);
+		}
+		else
+		{
+			$page->field('frequency', 'other');
+			$self->updateFieldFlags('other_frequency', FLDFLAG_INVISIBLE, 0);			
+			$page->field('other_frequency', $frequency);
 		}
 
-		my @frequency = split(',', $medInfo->{frequency});
-		$page->field('frequency', $frequency[0]);
-		if($frequency[0] eq 'Other')
+
+		my $prn = $medInfo->{prn};
+		my $inList;
+		my @prnOptions = split(';', $PRN_SELOPTIONS);
+		foreach (@prnOptions)
 		{
-			$self->updateFieldFlags('other_frequency', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_frequency', $frequency[1]);
+			next if $prn ne $_;
+			$inList = 1;
+		}
+		if($inList)
+		{
+			$page->field('prn', $prn);
+		}
+		else
+		{
+			$page->field('prn', 'other');
+			$self->updateFieldFlags('other_prn', FLDFLAG_INVISIBLE, 0);			
+			$page->field('other_prn', $prn);
 		}
 
-		my @prn = split(',', $medInfo->{prn});
-		$page->field('prn', $prn[0]);
-		if($prn[0] eq 'Other')
-		{
-			$self->updateFieldFlags('other_prn', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_prn', $prn[1]);
-		}
 
-		my @firstDose = split(',', $medInfo->{first_dose});
+		my @firstDose = split(': ', $medInfo->{first_dose});
 		$page->field('first_dose', $firstDose[0]);
 		unless($firstDose[0] eq 'Now')
 		{
@@ -598,21 +591,42 @@ sub populateData
 			$page->field('first_dose_specs', $firstDose[1]);
 		}
 
-		#my @saleUnits = split(',', $medInfo->{sale_units});
-		#$page->field('sale_units', $saleUnits[0]);
-		#if($saleUnits[0] eq 'other')
+
+		#my $saleUnits = $medInfo->{sale_units};
+		#my $inList;
+		#my @saleUnitOptions = split(';', $UNIT_SELOPTIONS);
+		#foreach (@saleUnitOptions)
 		#{
-		#	$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);
-		#	$page->field('other_sale_units', $saleUnits[1]);
+		#	next if $saleUnits ne $_;
+		#	$inList = 1;
+		#}
+		#if($inList)
+		#{
+		#	$page->field('sale_units', $saleUnits);
+		#}
+		#else
+		#{
+		#	$page->field('sale_units', 'other');
+		#	$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);			
+		#	$page->field('other_sale_units', $saleUnits);
 		#}
 
-		my @label = split(',', $medInfo->{label});
-		$page->field('label', $label[0]);
-		if($label[0] eq 'Other')
+
+		my $label = $medInfo->{label} == 1 ? 1 : 2;
+		$page->field('label', $label);
+
+		my $labelLanguage = $medInfo->{label_language};
+		if($labelLanguage eq 'English' || $labelLanguage eq 'Spanish')
+		{
+			$page->field('label_language', $labelLanguage);
+		}
+		else
 		{
 			$self->updateFieldFlags('other_label', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_label', $label[1]);
+			$page->field('label_language', 'other');
+			$page->field('other_label', $labelLanguage);
 		}
+
 
 		my $refills = $medInfo->{num_refills};
 		$page->field('num_refills', $refills);
@@ -671,6 +685,58 @@ sub populateData
 	}
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	if ($page->field('start_date') && $page->field('end_date'))
+	{
+		my $startDate = Date_to_Days(Decode_Date_US($page->field('start_date')));
+		my $endDate   = Date_to_Days(Decode_Date_US($page->field('end_date')));
+
+		if ($endDate < $startDate)
+		{
+			my $field = $self->getField('dates_multi')->{fields}->[0];
+			$field->invalidate($page, qq{
+				End Date must be later than or equal Start Date.
+			});
+		}
+	}
+	
+	if($page->field('dose_units') eq 'other' && $page->field('other_dose_units') eq '')
+	{
+		$self->getField('other_dose_units')->invalidate($page, 'Please enter other units');
+	}
+	if($page->field('frequency') eq 'other' && $page->field('other_frequency') eq '')
+	{
+		$self->getField('other_frequency')->invalidate($page, 'Please enter other frequency');
+	}
+	if($page->field('prn') eq 'other' && $page->field('other_prn') eq '')
+	{
+		$self->getField('other_prn')->invalidate($page, 'Please enter other prn');
+	}
+	#if($page->field('sale_units') eq 'other' && $page->field('other_sale_units') eq '')
+	#{
+	#	$self->getField('other_sale_units')->invalidate($page, 'Please enter other units');
+	#}
+	if($page->field('num_refills') eq 'other' && $page->field('other_num_refills') eq '')
+	{
+		$self->getField('other_num_refills')->invalidate($page, 'Please enter number of refills');
+	}
+	if($page->field('label_language') eq 'other' && $page->field('other_label') eq '')
+	{
+		$self->getField('other_label')->invalidate($page, 'Please enter other language for label');
+	}
+
+	#check physician password if approval is being done
+	my $pin = $page->field('physician_pin');
+	my $loginInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $page->session('user_id'), $page->session('org_internal_id'));
+	if($pin && $pin ne $loginInfo->{password})
+	{
+		$self->getField('physician_pin')->invalidate($page, 'Invalid PIN. Please try again.');
+	}
+}
+
 sub execute_add
 {
 	my $self = shift;
@@ -682,13 +748,13 @@ sub execute_add
 
 	my $dose = $page->field('dose');
 	my $route = $page->field('route');
-	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ',' . $page->field('first_dose_specs');
-	my $doseUnits = $page->field('dose_units') eq 'other' ? 'other,' . $page->field('other_dose_units') : $page->field('dose_units');
-	my $frequency = $page->field('frequency') eq 'Other' ? 'Other,' . $page->field('other_frequency') : $page->field('frequency');
-	my $prn = $page->field('prn') eq 'Other' ? 'Other,' . $page->field('other_prn') : $page->field('prn');
-	#my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
+	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ': ' . $page->field('first_dose_specs');
+	my $doseUnits = $page->field('dose_units') eq 'other' ? $page->field('other_dose_units') : $page->field('dose_units');
+	my $frequency = $page->field('frequency') eq 'other' ? $page->field('other_frequency') : $page->field('frequency');
+	my $prn = $page->field('prn') eq 'other' ? $page->field('other_prn') : $page->field('prn');
+	#my $saleUnits = $page->field('sale_units') eq 'other' ? $page->field('other_sale_units') : $page->field('sale_units');
 	my $refills = $page->field('num_refills') eq 'other' ? $page->field('other_num_refills') : $page->field('num_refills');
-	my $label = $page->field('label') eq 'Other' ? 'Other,' . $page->field('other_label') : $page->field('label');
+	my $labelLanguage = $page->field('label_language') eq 'other' ? $page->field('other_label') : $page->field('label_language');
 
 	my $sig = $prn eq '' ? "$dose, $route, $frequency" : "$dose, $route, $frequency, $prn";
 
@@ -720,7 +786,8 @@ sub execute_add
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
-		label => $label || undef,
+		label => $page->field('label') == 1 ? 1 : 0,
+		label_language => $labelLanguage || undef,
 		#signed => $page->field('') || undef,
 		_debug => 0,
 	);
@@ -757,13 +824,13 @@ sub execute_update
 
 	my $dose = $page->field('dose');
 	my $route = $page->field('route');
-	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ',' . $page->field('first_dose_specs');
-	my $doseUnits = $page->field('dose_units') eq 'other' ? 'other,' . $page->field('other_dose_units') : $page->field('dose_units');
-	my $frequency = $page->field('frequency') eq 'Other' ? 'Other,' . $page->field('other_frequency') : $page->field('frequency');
-	my $prn = $page->field('prn') eq 'Other' ? 'Other,' . $page->field('other_prn') : $page->field('prn');
-	#my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
+	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ': ' . $page->field('first_dose_specs');
+	my $doseUnits = $page->field('dose_units') eq 'other' ? $page->field('other_dose_units') : $page->field('dose_units');
+	my $frequency = $page->field('frequency') eq 'other' ? $page->field('other_frequency') : $page->field('frequency');
+	my $prn = $page->field('prn') eq 'other' ? $page->field('other_prn') : $page->field('prn');
+	#my $saleUnits = $page->field('sale_units') eq 'other' ? $page->field('other_sale_units') : $page->field('sale_units');
 	my $refills = $page->field('num_refills') eq 'other' ? $page->field('other_num_refills') : $page->field('num_refills');
-	my $label = $page->field('label') eq 'Other' ? 'Other,' . $page->field('other_label') : $page->field('label');
+	my $labelLanguage = $page->field('label_language') eq 'other' ? $page->field('other_label') : $page->field('label_language');
 
 	my $sig = $prn eq '' ? "$dose, $route, $frequency" : "$dose, $route, $frequency, $prn";
 
@@ -793,7 +860,8 @@ sub execute_update
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
-		label => $label || undef,
+		label => $page->field('label') == 1 ? 1 : 0,
+		label_language => $labelLanguage || undef,
 		#signed => $page->field('') || undef,
 		_debug => 0,
 	);
