@@ -9,6 +9,15 @@ use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 
+#SPECIALTY SEQUENCE
+use constant SPECIALTY_PRIMARY =>1;
+use constant SPECIALTY_SECONDARY =>2;
+use constant SPECIALTY_TERTIARY =>3;
+use constant SPECIALTY_QUARTENARY =>4;
+use constant SPECIALTY_UNKNOWN =>5;
+
+
+
 #ROLE STAUS
 use constant ROLESTATUS_ACTIVE => 0;
 use constant ROLESTATUS_INACTIVE => 1;
