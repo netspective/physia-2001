@@ -175,7 +175,7 @@ sub execute
 			$_->{person_pay},
 			$_->{person_write_off},			
 			$_->{refund},
-			$_->{person_pay} + $_->{insurance_pay} + $_->{refund},
+			$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
 		);
 		push(@data, \@rowData);
 	}
