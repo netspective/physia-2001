@@ -305,8 +305,8 @@ sub massageFieldDefn {
 	my $tempDir = $CONFDATA_SERVER->path_temp();
 	my $theFilename .= "/publish.debug.log";
 	
-	open (LOGFILE, ">>$tempDir$theFilename");
-	print LOGFILE "sub getReportOrganization\n";
+#	open (LOGFILE, ">>$tempDir$theFilename");
+#	print LOGFILE "sub getReportOrganization\n";
 	$logSpaces += 2;
 	my $logPrepend = (scalar localtime)." " x $logSpaces;
 
@@ -327,7 +327,7 @@ sub massageFieldDefn {
 		chop $thisHashOutput;
 		$thisHashOutput .= "}\n";
 		
-		print LOGFILE $logPrepend."thisHash => ".$thisHashOutput;
+#		print LOGFILE $logPrepend."thisHash => ".$thisHashOutput;
 
 		# Set other sane default values...
 		my $tempDataType = ($thisFieldDefn->{dformat} ? lc($thisFieldDefn->{dformat}) : 'raw' );
@@ -381,7 +381,7 @@ sub massageFieldDefn {
 		chop $massagedHashOutput;
 		$massagedHashOutput .= "}\n";
 		
-		print LOGFILE $logPrepend."$tempCol => ".$massagedHashOutput;
+#		print LOGFILE $logPrepend."$tempCol => ".$massagedHashOutput;
 		
 		$colCount ++;
 		$logSpaces -= 2;
@@ -441,8 +441,8 @@ sub getReportOrganization {
 	my $tempDir = $CONFDATA_SERVER->path_temp();
 	my $theFilename .= "/publish.debug.log";
 	
-	open (LOGFILE, ">>$tempDir$theFilename");
-	print LOGFILE "sub getReportOrganization\n";
+#	open (LOGFILE, ">>$tempDir$theFilename");
+#	print LOGFILE "sub getReportOrganization\n";
 	$logSpaces += 2;
 	my $logPrepend = (scalar localtime)." " x $logSpaces;
 
@@ -453,7 +453,7 @@ sub getReportOrganization {
 			if ($theField->{groupBy} =~ /#([0-9]+)#/) {
 				my $groupByCol = $1;
 				push @groupCols, $groupByCol;
-				print LOGFILE $logPrepend."groupBy: $groupByCol [".$theField->{groupBy}."]\n";
+#				print LOGFILE $logPrepend."groupBy: $groupByCol [".$theField->{groupBy}."]\n";
 			}
 		}
 		
@@ -464,15 +464,15 @@ sub getReportOrganization {
 					$sumCol = $1;
 				}
 				push @sumCols, $sumCol;
-				print LOGFILE $logPrepend."summarize: $sumCol [".$theField->{summarize}."]\n";
+#				print LOGFILE $logPrepend."summarize: $sumCol [".$theField->{summarize}."]\n";
 			}
 		}
 	}
 	
-	print LOGFILE $logPrepend."groupCols: (".(join '|', @groupCols).")\n";
-	print LOGFILE $logPrepend."sumCols: (".(join '|', @sumCols).")\n";
+#	print LOGFILE $logPrepend."groupCols: (".(join '|', @groupCols).")\n";
+#	print LOGFILE $logPrepend."sumCols: (".(join '|', @sumCols).")\n";
 	
-	close LOGFILE;
+#	close LOGFILE;
 	$logSpaces -= 2;
 	return (\@groupCols, \@sumCols);
 }
@@ -632,8 +632,8 @@ sub generateHeaderCallback {
 		my $tempDir = $CONFDATA_SERVER->path_temp();
 		my $theFilename .= "/publish.debug.log";
 	
-		open (LOGFILE, ">>$tempDir$theFilename");
-		print LOGFILE "sub headerCallback\n";
+#		open (LOGFILE, ">>$tempDir$theFilename");
+#		print LOGFILE "sub headerCallback\n";
 		$logSpaces += 2;
 		my $logPrepend = (scalar localtime)." " x $logSpaces;
 	
@@ -706,8 +706,8 @@ sub generateDetailCallback {
 		my $tempDir = $CONFDATA_SERVER->path_temp();
 		my $theFilename .= "/publish.debug.log";
 	
-		open (LOGFILE, ">>$tempDir$theFilename");
-		print LOGFILE "sub detailCallback\n";
+#		open (LOGFILE, ">>$tempDir$theFilename");
+#		print LOGFILE "sub detailCallback\n";
 		$logSpaces += 2;
 		my $logPrepend = (scalar localtime)." " x $logSpaces;
 
@@ -721,7 +721,7 @@ sub generateDetailCallback {
 		foreach my $field (@{$fieldOrder}) {
 			$logSpaces += 2;
 			$logPrepend = (scalar localtime)." " x $logSpaces;
-			print LOGFILE $logPrepend."field: $field\n";
+#			print LOGFILE $logPrepend."field: $field\n";
 
 			my $tempField = $newFieldDefn->{$field}->{dataFmt};
 			my $tempFieldValue;
@@ -740,13 +740,13 @@ sub generateDetailCallback {
 
 				$logSpaces += 2;
 				$logPrepend = (scalar localtime)." " x $logSpaces;
-				print LOGFILE $logPrepend."fieldNum: $field\n";
+#				print LOGFILE $logPrepend."fieldNum: $field\n";
 				$groupColumnValues [$fieldNum] = $rep_actline->[$fieldNum] if (grep $fieldNum, @_groupCols);
 
 				if (grep $fieldNum, @_sumCols) {
 					$logSpaces += 2;
 					$logPrepend = (scalar localtime)." " x $logSpaces;
-					print LOGFILE $logPrepend."Subtotal: $columnSubTotals[$fieldNum] -> ";
+#					print LOGFILE $logPrepend."Subtotal: $columnSubTotals[$fieldNum] -> ";
 			
 					# A column that needed to be subtotalled...
 					# Make sure it hasnt already been summed up earlier...
@@ -754,7 +754,7 @@ sub generateDetailCallback {
 						$columnSubTotals [$fieldNum] += $rep_actline->[$fieldNum];
 						$columnTotals [$fieldNum] += $rep_actline->[$fieldNum];
 						$summedFields [$fieldNum] = 1;
-						print LOGFILE "$columnSubTotals[$fieldNum]\n";
+#						print LOGFILE "$columnSubTotals[$fieldNum]\n";
 					}
 					$logSpaces -= 2;
 			       	}
@@ -765,7 +765,7 @@ sub generateDetailCallback {
 				chop $attribHashOutput;
 				$attribHashOutput .= "}\n";
 				
-				print LOGFILE $logPrepend."$field attribs: $attribHashOutput\n";
+#				print LOGFILE $logPrepend."$field attribs: $attribHashOutput\n";
 				if (lc ($newFieldDefn->{$fieldNum}->{dataType}) eq 'currency') {
 					$tempFieldValue = FORMATTER->format_price($rep_actline->[$fieldNum], 2);
 				}
@@ -779,8 +779,8 @@ sub generateDetailCallback {
 		
 		my $rawData = "(".(join '|', @{$rep_actline}).")";
 		my $thisRowData = "(".(join '|', @thisRowFields).")";
-		print LOGFILE $logPrepend."data: $rawData\n";
-		print LOGFILE $logPrepend."thisRowFields: $thisRowData\n";
+#		print LOGFILE $logPrepend."data: $rawData\n";
+#		print LOGFILE $logPrepend."thisRowFields: $thisRowData\n";
 
 		formline $rowFormat, @thisRowFields;
 		my $tempData = $^A;
