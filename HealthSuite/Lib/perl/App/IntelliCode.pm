@@ -14,6 +14,7 @@ use Date::Calc qw(:all);
 use Date::Manip;
 use App::Page::Search;
 use App::Data::Manipulate;
+use Exporter ();
 
 use enum qw(BITMASK:INTELLICODEFLAG_ ICDARRAY ICDARRAYINDEX SKIPWARNING 
 	NON_FACILITY_PRICING
@@ -104,7 +105,20 @@ undef %CPT_CACHE;
 	'M' => {flag => AGE_MATERNAL,  text => 'Maternal'},
 	'A' => {flag => AGE_ADULT,     text => 'Adult'},
 );
+use vars qw(@ISA @EXPORT $INTELLICODE_FS_COST $INTELLICODE_FS_SERV_TYPE $INTELLICODE_FS_CODE_TYPE $INTELLICODE_FS_ID_NUMERIC $INTELLICODE_FS_ID_TEXT
+		$INTELLICODE_FS_FFS_CAP $INTELLICODE_FS_COST $INTELLICODE_FS_SERV_CAPTION);
 
+@ISA = qw(Exporter);
+@EXPORT = qw($STMTMGR_CATALOG $INTELLICODE_FS_COST $INTELLICODE_FS_SERV_TYPE $INTELLICODE_FS_CODE_TYPE $INTELLICODE_FS_ID_NUMERIC $INTELLICODE_FS_ID_TEXT
+		$INTELLICODE_FS_FFS_CAP $INTELLICODE_FS_COST $INTELLICODE_FS_SERV_CAPTION);
+
+$INTELLICODE_FS_ID_NUMERIC = 0;
+$INTELLICODE_FS_COST = 1;
+$INTELLICODE_FS_SERV_TYPE =2;
+$INTELLICODE_FS_SERV_CAPTION = 3;
+$INTELLICODE_FS_CODE_TYPE =4;
+$INTELLICODE_FS_ID_TEXT =5;
+$INTELLICODE_FS_FFS_CAP =6;
 # validateCodes returns an array of Error Messages.  If no error, returns empty array.
 sub validateCodes
 {
@@ -553,6 +567,57 @@ sub isLabProc
 
 	return '';
 }
+
+
+#pulls information from assoicated Fee Schedules about the proceudre
+#Info includes: Price, Service Type (Lab,X-Ray,etc), Code Type (EPSDT,CPT,etc), flag (cap, ffs),Fee used
+sub getFSEntry
+{
+	my ($page, $cpt, $modifier, $fsRef, $flags) = @_;
+
+	my @buffer = ();
+	
+	#fsRef holds hierarchal list of FS, could be multiple FS on each level
+	foreach my $fsList (@$fsRef)
+	{
+		#if procedure is found in a FS then do not check for hit at lower level in the hierarchy
+		next if scalar(@buffer);
+
+		#split list in case we have multiple FS at the same level in hierarchy
+		my @fsArray = split(/\s*,\s*/,$fsList);		
+		foreach my $fs (@fsArray)							
+		{			
+			getEntry($page, $cpt, $modifier, \@buffer, $fs);		
+		}	
+	}
+	#Try FFS FS if procedure is not found
+	getFFS($page, $cpt, $modifier, \@buffer) unless scalar(@buffer);
+	return \@buffer;	
+}
+
+#Attempts to find procedure in  default FS 'FFS'
+sub getFFS
+{
+	my ($page, $cpt, $modifier, $bufferRef) = @_;
+	my $orgId = $page->session('org_internal_id');
+	my $ffs = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_catalog_by_id_orgId', 'FFS', $orgId);
+	getEntry($page, $cpt, $modifier, $bufferRef, $ffs->{internal_catalog_id} , 1) if $ffs->{internal_catalog_id};
+}
+
+#Attempts to find procedure information in Fee Schedule
+sub getEntry
+{
+	my ($page, $cpt, $modifier, $bufferRef, $fs,$ffsFlag) = @_;	
+	my $orgId = $page->session('org_internal_id');
+
+	my $entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_ProcedureInfoByCodeMod', $cpt, $modifier, $fs);	
+	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), $entry->{data_text},$entry->{caption} ,$entry->{entry_type},
+			     $entry->{catalog_id},$ffsFlag || $entry->{flags} ]) if exists $entry->{internal_catalog_id};
+}
+
+
+
 
 sub getItemCost
 {
