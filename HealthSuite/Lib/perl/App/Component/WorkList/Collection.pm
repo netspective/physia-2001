@@ -12,6 +12,7 @@ use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
 use App::Statements::Person;
 use App::Statements::Scheduling;
+use App::Statements::Invoice;
 use App::Schedule::Utilities;
 use Data::Publish;
 use Exporter;
@@ -88,7 +89,7 @@ sub getComponentHtml
 		columnDefn =>
 			[
 				{ head => 'Patient ID', hAlign=> 'left',dAlign => 'left',dataFmt=>"<A HREF = '/person/#0#/profile'>#8#</A>",},
-				{colIdx => 1, head => 'Invoice ID', hAlign=> 'left',url =>'/invoice/#1#/summary'},
+				{colIdx => 1, head => 'Invoice ID', hAlign=> 'left',url =>'/invoice/#9#/summary'},
 				{colIdx => 2, head => 'Event Description', dAlign => 'center'},							
 				{colIdx => 3, head => 'Balance' ,dAlign => 'center',dformat => 'currency', url=>'/person/#0#/account'},
 				{colIdx => 4, head => 'Age', dAlign => 'center'},
@@ -159,7 +160,33 @@ sub getComponentHtml
 				data_num_a => $_->{invoice_id} ,
 				trans_invoice_id => $_->{invoice_id} ,
 		
-                )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);			
+                )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);	
+                
+                #If this is an old invoice then we need to check to make sure the copy of the invoice has not been created for submission
+                #to secondary payer
+                if(defined $_->{trans_id})
+                {
+                	#NOT (invoice_status =15 AND parent_invoice_id is not null)
+                	my $invoice =  $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE,'selInvoice',$_->{invoice_id});
+                	if($invoice->{invoice_status} ==  16 and defined $invoice->{parent_invoice_id})
+                	{
+
+                		my $invoiceParent =  $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE,'selInvoiceDateDatabyID',$invoice->{parent_invoice_id});                	
+                		#Update trans record with new invoice_id of copied invoice
+                		$page->schemaAction(   'Transaction', 'update', 
+                		trans_id =>$_->{trans_id},
+                		data_num_a => $invoice->{parent_invoice_id},
+                		data_num_b => $invoice->{parent_invoice_id},                		
+                		trans_invoice_id => $invoice->{parent_invoice_id},
+                		);
+                		#$page->addError ("IN CHEECK $invoice->{parent_invoice_id} $invoiceParent->{invoice_date}");                		
+                		$_->{invoice_date} =$invoiceParent->{invoice_date};
+                		$_->{balance} = $invoiceParent->{balance};
+                		$_->{invoice_id} = $invoice->{parent_invoice_id};
+                		$_->{link_invoice} = $invoice->{invoice_id};
+                	};
+                }
+                
                 
 	        my @invoice_date = Decode_Date_US($_->{invoice_date});
                	my @range_Date = Decode_Date_US($fmtDate); 
@@ -168,7 +195,7 @@ sub getComponentHtml
 
 
 			
-                #Remove any accounts with a balance of zero that do have a reck date and the min range value > 0
+                #Remove any accounts with a balance of zero that do have a reck date 
                 if($_->{balance} <= 0 && !defined$_->{reck_date} )
                 {
                     	#Mark record as inactive
@@ -196,9 +223,11 @@ sub getComponentHtml
 	                }                	                
                 	next;
                 }
+                #If this is a copy of another invoice display both invoice ids
+                my $displayInvoiceID = defined $_->{link_invoice} ? "$_->{invoice_id} ($_->{link_invoice})" : "$_->{invoice_id}";
 		my @rowData = (							
 			$_->{person_id},
-			$_->{invoice_id},			
+			$displayInvoiceID,#$_->{invoice_id},			
 			$_->{description},					
 			$_->{balance},
 			$_->{age},
@@ -219,7 +248,7 @@ sub getComponentHtml
 					<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 			</nobr>}, 
 			$_->{person_id},
-
+			$_->{invoice_id}
 
 		);
 
