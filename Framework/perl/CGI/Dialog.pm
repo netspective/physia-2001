@@ -114,7 +114,7 @@ sub getHtml
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
 		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
-		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
+		$bgColorAttr = qq{bgcolor="$dialog->{errorBgColor}"};
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
 
@@ -136,21 +136,23 @@ sub getHtml
 
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
 		my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
-		$html = qq{
-		<tr valign=top $bgColorAttr>
-		<td width=$self->{_spacerWidth}>$spacerHtml</td>
-		<td align=$dialog->{captionAlign}><font $dialog->{bodyFontAttrs}>$caption</td>
-		<td>
+		my $id = "_id_" . $self->{name};
+		$html = qq{<tr valign="top" id="$id" $bgColorAttr><td width=$self->{_spacerWidth}>
+			$spacerHtml
+		</td><td align=$dialog->{captionAlign}>
 			<font $dialog->{bodyFontAttrs}>
-			$self->{preHtml}
-			$mainData $popupHtml $self->{postHtml}
-			$errorMsgsHtml
-			$hints
+				$caption
 			</font>
-		</td>
-		<td width=$self->{_spacerWidth}>&nbsp;</td>
-		</tr>
-		};
+		</td><td>
+			<font $dialog->{bodyFontAttrs}>
+				$self->{preHtml}
+				$mainData $popupHtml $self->{postHtml}
+				$errorMsgsHtml
+				$hints
+			</font>
+		</td><td width=$self->{_spacerWidth}>
+		&nbsp;
+		</td></tr>};
 	}
 
 	return $html;
@@ -543,6 +545,12 @@ sub select_as_html
 
 	my $choices = exists $self->{fKeyStmt} ? $self->readChoicesStmt($page) : ($self->{fKeyTable} ? $self->readChoices($page) : $self->parseChoices($page));
 	$self->{size} = scalar(@$choices) if $self->{size} == 0;
+	
+	my $JS = '';
+	foreach (keys %$self)
+	{
+		/^(.*?)JS$/ and do {$JS .= lc($1) . '="' . $self->{$_} . '" '};
+	}
 
 	if($readOnly)
 	{
@@ -617,13 +625,13 @@ sub select_as_html
 		{
 			my $options = '';
 			my $multiple = $self->{style} eq 'multi' ? 'multiple' : '';
-			$options .= "<option value=''></option>" if ($self->{flags} & FLDFLAG_PREPENDBLANK);
+			$options .= "<option value=''></option>\n" if ($self->{flags} & FLDFLAG_PREPENDBLANK);
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'selected' : '';
-				$options .= "<option value='$_->[2]' $selected>$_->[1]</option>";
+				$options .= qq{<option value="$_->[2]" $selected>$_->[1]</option>\n};
 			}
-			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<select name='$fieldName' size=$self->{size} $multiple>$options</select>");
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<select name="$fieldName" size="$self->{size}" $JS $multiple>\n$options</select>\n});
 		}
 	}
 
@@ -1028,21 +1036,23 @@ sub getHtml
 
 	my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
 	my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
-	return qq{
-		<tr valign=top $bgColorAttr>
-		<td width=$self->{_spacerWidth}>$spacerHtml</td>
-		<td align=$dialog->{captionAlign}><font $dialog->{bodyFontAttrs}>$caption</td>
-		<td>
-			<font $dialog->{bodyFontAttrs}>
+	my $id = "_id_" . $self->{name};
+	return qq{<tr valign="top" id="$id" $bgColorAttr><td width="$self->{_spacerWidth}">
+		$spacerHtml
+	</td><td align="$dialog->{captionAlign}">
+		<font $dialog->{bodyFontAttrs}>
+			$caption
+		</font>
+	</td><td>
+		<font $dialog->{bodyFontAttrs}>
 			$self->{preHtml}
 			$fieldsHtml $popupHtml $self->{postHtml}
 			$errorMsgsHtml
 			$hints
-			</font>
-		</td>
-		<td width=$self->{_spacerWidth}>&nbsp;</td>
-		</tr>
-	};
+		</font>
+	</td><td width="$self->{_spacerWidth}">
+		&nbsp;
+	</td></tr>};
 }
 
 ##############################################################################
@@ -1157,16 +1167,16 @@ sub getHtml
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 
 	my $shFntAttrs = $dialog->{subheadFontsAttrs};
-	my $html = "
-	<tr><td colspan=4><font size=1>&nbsp;</font></td></tr>
-	<tr valign=top>
-	<td colspan=4>
-		<font $shFntAttrs>
-		<b>$self->{heading}</b><hr size=1 color=navy noshade>
+	my $html = qq{<tr><td colspan=4>
+		<font size=1>
+			&nbsp;
 		</font>
-	</td>
-	</tr>
-	";
+	</td></tr><tr valign=top><td colspan=4>
+		<font $shFntAttrs>
+			<b>$self->{heading}</b>
+			<hr size=1 color=navy noshade>
+		</font>
+	</td></tr>};
 
 	return $html;
 }
@@ -1641,6 +1651,12 @@ sub addPreHtml
 	push(@{$self->{preHtml}}, @_);
 }
 
+sub addPostHtml
+{
+	my $self = shift;
+	push(@{$self->{postHtml}}, @_);
+}
+
 sub addHeader
 {
 	my $self = shift;
@@ -2072,19 +2088,15 @@ sub getHtml
 	my $titleRule = '';
 	if($self->{ruleBelowHeading})
 	{
-		$titleRule = "<hr size=1 color=navy width=100%>";
+		$titleRule = qq{<hr size="1" color="navy" width="100%">};
 	}
 
 	if($errorsHtml)
 	{
-		$errorsHtml = "
-		<tr>
-		<td>
-		$errorsHtml
-		<hr size=1 width=100% noshade>
-		</td>
-		</tr>
-		";
+		$errorsHtml = qq{<tr><td>
+			$errorsHtml
+			<hr size="1" width="100%" noshade>
+		</td></tr>};
 	}
 
 	# UserId @{[ $page->session('user_id') ]}
@@ -2105,34 +2117,20 @@ sub getHtml
 
 	return qq{
 	<center>
-	<table border=0 bgcolor=$self->{headColor} cellspacing=2 cellpadding=0>
-	<tr><td>
-	<table border=0 bgcolor=$self->{bgColor} cellspacing=0 cellpadding=4>
-		<tr align=center bgcolor=$self->{headColor}>
-			<td background='/resources/design/verttab.gif'>
-				<font $self->{headFontAttrs}>&nbsp;<b>$heading</b><!--$activeExecMode : $newExecMode : $isValid)-->&nbsp;</font>
-				$titleRule
-			</td>
-		</tr>
-
-		$errorsHtml
-		<tr>
-		<td>
+	<table border="0" bgcolor="$self->{headColor}" cellspacing="2" cellpadding="0"><tr><td>
+	<table border="0" bgcolor="$self->{bgColor}" cellspacing="0" cellpadding="4"><tr align="center" bgcolor="$self->{headColor}"><td background="/resources/design/verttab.gif">
+		<font $self->{headFontAttrs}>
+			&nbsp;<b>$heading</b><!--$activeExecMode : $newExecMode : $isValid)-->&nbsp;
+		</font>
+		$titleRule
+	</td></tr>$errorsHtml<tr><td>
 		@{$self->{preHtml}}
-		<table border=0 bgcolor=$self->{bgColor} cellspacing=0 cellpadding=$self->{cellPadding} width=100%>
-		<SCRIPT>
+	<table border=0 bgcolor=$self->{bgColor} cellspacing=0 cellpadding=$self->{cellPadding} width=100%><SCRIPT>
 		$fieldsInfoJS
-		</SCRIPT>
-		<form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">
-			@dlgHouskeepingHiddens
-			$html
-		</form>
-		</table>
-		</td>
-		</tr>
-	</table>
-	</tr></td>
-	</table>
+	</SCRIPT><form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">@dlgHouskeepingHiddens $html </form></table>
+	</td></tr></table>
+		@{$self->{postHtml}}
+	</td></tr></table>
 	</center>
 	};
 }
