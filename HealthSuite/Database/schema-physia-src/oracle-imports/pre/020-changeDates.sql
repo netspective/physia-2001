@@ -23,6 +23,8 @@ create or replace procedure changeDates(p_days in number,
 		
 begin
 
+        disable_triggers;
+
         if p_days < 0 then
         	v_operation := '-';
         	v_days_nmbr := -p_days;
@@ -100,6 +102,8 @@ begin
 	end loop;
 	
 	commit;
+	
+	enable_triggers;
 	
 /*   	UTL_FILE.FCLOSE(output_file);   */
    	
