@@ -267,6 +267,21 @@ $STMTMGR_ORG = new App::Statements::Org(
 			caption
 		FROM Referral_Unit_Type
 		},
+	'selPersonBillingInfo' => {
+		sqlStmt => qq{
+			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
+				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(pa.value_textb,'1','Active','Inactive')
+			from	Person_Attribute pa, Org o, Person_Org_Category poc
+			where	o.org_id = ?
+			and	pa.parent_id = poc.person_id
+			and	poc.org_internal_id = o.org_internal_id
+			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			order by pa.value_int
+		},
+		sqlStmtBindParamDescr => ['Org ID'],
+	},
+
 );
 
 1;
