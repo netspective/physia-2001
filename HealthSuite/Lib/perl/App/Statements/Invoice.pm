@@ -327,6 +327,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			from trans_related_to
 			where caption = ?
 		},
+	'selAccidentDropDown' => q{
+		select caption, id, 2 as myorder
+			from trans_related_to
+		UNION
+		(select 'None' as caption, -99999 as id, 1 as myorder
+			from dual)
+		order by myorder
+		},
 	'selProcedure' => qq{
 		select item_type, code as procedure, modifier as procmodifier, unit_cost as proccharge,
 				quantity as procunits, emergency as emg, comments,
