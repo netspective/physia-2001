@@ -479,7 +479,7 @@ sub setInsuranceFields
 			{
 				push(@schedules, $_->{value_text});
 			}
-			join(@schedules, ', ') if @schedules;
+			@schedules = join(@schedules, ', ');
 			$page->param('_f_proc_default_catalog', $schedules[0]);
 			#$page->addDebugStmt("$schedules[0]");
 		}
