@@ -14,6 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Invoice;
 use App::Universal;
+use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
