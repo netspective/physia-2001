@@ -20,12 +20,18 @@
 			Added 'Schedule Follow-up Appointment' to next actions in checkout dialog.
 		</deliverable>
 
+		<deliverable id="613">
+			Added Claims Work List.
+		</deliverable>
+
 		<deliverable id="893">
 			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
 		</deliverable>
+		
 		<deliverable id="937">
 			Updated the 'Catalog' tab in 'insurance orgs' to showup only the fee-schedules that are related to that insurance org.
 		</deliverable>
+		
 		<deliverable id="952">
 			New query function will handle lookup
 		</deliverable>
@@ -45,6 +51,10 @@
 		<deliverable id="1025">
 			Added a validation in the specialty dialog of 'Certification' component to check if the previous specialty 
 			sequence has been added to the physician or not
+		</deliverable>
+
+		<deliverable id="1107">
+			UI: Created Appointment Query.
 		</deliverable>
 
 		<deliverable id="1114">
@@ -174,15 +184,17 @@
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
 		</deliverable>
+		
 		<deliverable id="1470">
 			UI: Added a new person-type called 'Insured Person' for 'Personal Insurance Coverage' dialog and 
 			    added link called 'Insured Persons' in the lookups of Main menu.
 		</deliverable>
-		<deliverable id="none">
-			Added information about the build number, database type to the bottom of the login window 
-			to aid in troubleshooting.
-		</deliverable>
 
+		<deliverable id="1475">
+			Use Billing Provider credentials on NSF.  SIDE EFFECTS are claims and HCFA population.
+			Please test carefully.
+		</deliverable>
+		
 		<deliverable id="1495">
 			Fixed case sensitivity for fee schedules in add procedure dialog.
 		</deliverable>
@@ -193,6 +205,12 @@
 
 		<deliverable id="1497">
 			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action.
+		</deliverable>
+
+
+		<deliverable id="none">
+			Added information about the build number, database type to the bottom of the login window 
+			to aid in troubleshooting.
 		</deliverable>
 
 	</deliverables>
