@@ -187,6 +187,7 @@ begin
 */
     caption,
     invoice_type,
+    invoice_status,
     item_type,
     service_facility_id,
     billing_facility_id,
@@ -227,6 +228,7 @@ begin
 */
         ii.caption,
         i.invoice_type,
+        i.invoice_status,
         ii.item_type,
         t.service_facility_id,
         t.billing_facility_id,
