@@ -68,7 +68,6 @@
 		<enum id="10">Spouse</enum>
 		<enum id="11">Parent</enum>
 		<enum id="12">Child</enum>
-		<enum id="50">Employer</enum>
 		<enum id="99">Other</enum>
 	</table>
 
