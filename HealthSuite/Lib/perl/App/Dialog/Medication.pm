@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.11 2000-12-26 18:17:48 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.12 2000-12-28 19:25:20 radha_kotagiri Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -33,9 +33,9 @@ sub new
 	my $self = CGI::Dialog::new(@_, id => 'message', heading => '$Command Medication');
 	my $mode = $self->{command};
 	$self->addContent(
-		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
+		new CGI::Dialog::Field(caption => 'Patient Name',
 			name => 'parent_id',
-			options => FLDFLAG_REQUIRED,
+			options => FLDFLAG_REQUIRED | FLDFLAG_READONLY,
 		),
 		new CGI::Dialog::Field(caption => 'Medication',
 			name => 'med_name',
@@ -359,12 +359,12 @@ sub makeStateChanges
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	if ($page->field('start_date') && $page->field('end_date'))
 	{
 		my $startDate = Date_to_Days(Decode_Date_US($page->field('start_date')));
 		my $endDate   = Date_to_Days(Decode_Date_US($page->field('end_date')));
-		
+
 		if ($endDate < $startDate)
 		{
 			my $field = $self->getField('dates_multi')->{fields}->[0];
@@ -380,6 +380,7 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
+	$self->setFieldFlags('parent_id', FLDFLAG_READONLY);
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
 	if (my $permedId = $page->param('permed_id'))
@@ -394,14 +395,16 @@ sub populateData
 		$page->field('approved_by', $page->session('person_id')) if $isPhysician;
 	}
 
-	if ($command eq 'add' || $command eq 'prescribe')
-	{
-		if ($page->param('person_id'))
-		{
-			$page->field('parent_id', $page->param('person_id'));
-			$self->setFieldFlags('parent_id', FLDFLAG_READONLY);
-		}
-	}
+	#if ($command eq 'add' || $command eq 'prescribe')
+	#{
+	#	if ($page->param('person_id'))
+	#	{
+
+			my $personName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPersonSimpleNameById', $page->param('person_id'));
+
+			$page->field('parent_id', $personName);
+	#	}
+	#}
 
 	if ($command eq 'update' && $page->field('approved_by'))
 	{
@@ -429,7 +432,7 @@ sub execute_add
 
 	my $permedId = $page->schemaAction(
 		'Person_Medication', 'add',
-		parent_id => $page->field('parent_id') || undef,
+		parent_id => $page->param('person_id') || undef,
 		med_name => $page->field('med_name') || undef,
 		dose => $page->field('dose') || undef,
 		dose_units => $page->field('dose_units') || undef,
@@ -557,7 +560,7 @@ sub sendApprovalRequest
 	my ($page, $command, $flags) = @_;
 
 	my $med_name = $page->field('med_name');
-	my $patient = $page->field('parent_id');
+	my $patient = $page->param('person_id');
 	my $dosage = $page->field('dose') . $page->field('dose_units');
 
 	my $msgDlg = new App::Dialog::Message::Prescription();
@@ -565,7 +568,7 @@ sub sendApprovalRequest
 		subject => $command eq 'add' ? 'Add Medication' : 'Prescription Approval Request',
 		message => $page->session('person_id') . " is seeking approval for a prescription:\n\nPatient: $patient\nMedication: $med_name $dosage\n",
 		to => $page->field('get_approval_from') || $page->session('person_id'),
-		rePatient => $page->field('parent_id'),
+		rePatient => $page->param('person_id'),
 		permedId => $page->param('permed_id'),
 	);
 }
