@@ -837,7 +837,7 @@ sub execute_add
 										'Offering_Catalog', $command,
 										org_internal_id => $orgInternalId || undef,
 										catalog_id => $secCatalogId || undef,
-										catalog_type => 0,
+										catalog_type => 1,
 										caption => $secCatalogId || undef,
 										_debug => 0
 								)if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
