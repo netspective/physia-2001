@@ -42,8 +42,8 @@ sub getForm
 			<option value="is">is</option>
 		</select>
 		<input name="search_expression" value="@{[$self->param('search_expression')]}">
-		<input name='hcpcs_search' type=checkbox $hcpcsSearchChecked>
-		HCPCS Search &nbsp; &nbsp;
+		<input name='hcpcs_search' id='hcpcs_search' type=checkbox $hcpcsSearchChecked>
+		<label for="hcpcs_search">HCPCS Search</label> &nbsp; &nbsp;
 		<input type=submit name="execute" value="Go">
 		</NOBR>
 		</CENTER>
