@@ -19,6 +19,12 @@ use Devel::ChangeLog;
 
 @ISA = qw(App::Dialog::Encounter);
 
+use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
+use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
+use constant NEXTACTION_APPOINTMENTS => "/schedule";
+use constant NEXTACTION_WORKLIST => "/worklist";
+
+
 sub initialize
 {
 	my $self = shift;
@@ -27,7 +33,15 @@ sub initialize
 
 	$self->SUPER::initialize();
 
-	$self->addFooter(new CGI::Dialog::Buttons);
+	$self->addFooter(new CGI::Dialog::Buttons(
+						nextActions => [
+							['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
+							['Go to Patient Account', NEXTACTION_PATIENTACCT],
+							['Go to Appointments', NEXTACTION_APPOINTMENTS],
+							['Return to Work List', NEXTACTION_WORKLIST],
+							],
+						cancelUrl => $self->{cancelUrl} || undef));
+
 	return $self;
 }
 
@@ -54,9 +68,11 @@ sub getSupplementaryHtml
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
 	$self->updateFieldFlags('checkin_stamp', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('confirmed_info', FLDFLAG_INVISIBLE, 1);
+
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 }
 
