@@ -15,6 +15,8 @@ use App::Statements::Scheduling;
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
 
+use App::Statements::Component::Referral;
+
 use App::Dialog::CollectionSetup;
 
 use vars qw(@ISA @CHANGELOG);
@@ -24,28 +26,25 @@ sub prepare_view_date
 {
 	my ($self) = @_;
 	
+	my $worklistComponent;
+	if ($self->param('user') eq 'physician') 
+	{
+		$worklistComponent = '#component.worklist-referral-physician#';
+	}
+	else 
+	{
+		$worklistComponent = '#component.worklist-referral#';
+	}
+
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD colspan=5>
-					#component.worklist-referral#
+					$worklistComponent
 				</TD>
 			</TR>
 			<TR>
 				<TD colspan=5>&nbsp;</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.lookup-records#<BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.navigate-reports-root#
-				</TD>
 			</TR>
 		</TABLE>
 	});
@@ -108,8 +107,8 @@ sub prepare_page_content_footer
 	my $self = shift;
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
-	$self->SUPER::prepare_page_content_footer(@_);
+	#push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
+	#$self->SUPER::prepare_page_content_footer(@_);
 
 	return 1;
 }
@@ -144,10 +143,24 @@ sub prepare_page_content_header
 	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
 
 	$self->SUPER::prepare_page_content_header(@_);
-
-	my $heading = "Work List";
-	my $dateTitle = decodeDate($self->param('_seldate'));
 	
+	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self, 
+		STMTMGRFLAG_NONE, 'sel_personinfo', $self->session('user_id'));
+	my $userName = $userNameHash->{complete_name};
+
+
+	my $heading;
+	if ($self->param('user') eq 'physician') 
+	{
+		#$heading = $userName . ' Referral Authorization Requests Worklist';
+		$heading = 'Referral Authorization Requests Worklist';
+	}
+	else 
+	{
+		$heading = 'Referral Authorizations Worklist';
+	}
+	my $dateTitle = decodeDate($self->param('_seldate'));
+
 	my $urlPrefix = "/worklist";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
@@ -325,8 +338,8 @@ sub getControlBarHtml
 	}
 
 	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
-
-	return qq{
+	my $html;
+	$html = qq{
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
 		$javascripts
 		<STYLE>
@@ -357,6 +370,9 @@ sub getControlBarHtml
 	</TABLE>
 	<br>
 	};
+	
+	$html = '';
+	return $html;
 }
 
 sub getChooseDateOptsHtml
@@ -483,12 +499,5 @@ sub getJavascripts
 		</SCRIPT>
 	};
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/01/2000', 'TVN',
-		'Page/WorkList',
-		'Convert Today to Work List.'],
-);
 
 1;
