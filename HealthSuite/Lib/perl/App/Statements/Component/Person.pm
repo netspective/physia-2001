@@ -994,24 +994,51 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				detail,
 				trans_type,
 				trans_id,
-				trans_type,
-				trans_subtype
+				trans_subtype,
+				(
+					SELECT
+					%simpleDate:value_dateEnd%
+					FROM person_attribute p
+					WHERE p.item_id = t.data_text_b
+					AND t.trans_type = 8040
+				) AS value_dateEnd,
+				(
+					SELECT
+					trans_type
+					FROM person_attribute p
+					WHERE p.item_id = t.data_text_b
+					AND t.trans_type = 8040
+				) AS type
 			FROM 	transaction t, alert_priority a
 			WHERE	trans_type between 8000 and 8999
 			AND	trans_owner_type = 0
 			AND 	trans_owner_id = ?
 			AND	trans_status = 2
 			AND     a.caption = t.trans_subtype
+			AND NOT EXISTS (
+									SELECT tt.trans_end_stamp
+									FROM	transaction tt, person_attribute pa
+									WHERE tt.trans_id = t.trans_id
+									AND   (tt.trans_end_stamp-sysdate) > 90
+									AND 	tt.data_text_b = pa.item_id
+									AND   tt.trans_type = 8040
+								)
 			ORDER BY a.id desc, trans_begin_stamp desc
 		},
 	sqlStmtBindParamDescr => ['Person ID for Transaction Table'],
 	publishDefn => {
 		columnDefn => [
-			#{ colIdx => 0, dataFmt => '&{fmt_stripLeadingPath:0}:', dAlign => 'RIGHT' },
-			#{ colIdx => 1,  dataFmt => '#1#', dAlign => 'LEFT' },
-			{ head => 'Alerts', dataFmt => '<b>#5#</b>: #&{?}#<br/><I>#1#</I>' },
+				{
+					colIdx => 6 ,
+					dataFmt => {
+						'8040' => '<b>#4#</b>: #0#<br/><I>#1# (Due Date: #5#)</I>',
+						'' => "<b>#4#</b>: #0#<br/><I>#1#</I>",
+					},
+				},
+
+			#{ head => 'Alerts', dataFmt => '<b>#4#</b>: #0#<br/><I>#1# (Due Date:#5#)</I>' },
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#4#/#3#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#3#?home=#homeArl#',
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -1043,7 +1070,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#4#/#3#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#3#?home=#param.home#',
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#3#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#2#/#3#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.alerts', [$personId]); },
