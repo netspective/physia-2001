@@ -19,7 +19,7 @@ SELECT	i.invoice_id,
 	nvl(decode(ii.item_type,7,-ii.quantity ,ii.quantity),0) as units ,
 	nvl(decode(ii.item_type,7,-ii.unit_cost,ii.unit_cost),0) as unit_cost,
 	service_facility_id as facility,
-	nvl(t.care_provider_id,t.provider_id) as provider,
+	nvl(t.provider_id,t.care_provider_id) as provider,
 	ia.value_text as batch_id,
 	ii.item_type as item_type,
 	ii.service_end_date as service_begin_date,
@@ -36,7 +36,8 @@ SELECT	i.invoice_id,
 	0 as refund,
 	NULL as pay_type,
 	t.trans_id,
-	trans_type
+	trans_type,
+	i.total_items
 FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
@@ -66,7 +67,7 @@ SELECT	i.invoice_id,
 	0 as units ,
 	0 as unit_cost,
 	service_facility_id as facility,
-	nvl(t.care_provider_id,t.provider_id) as provider,
+	nvl(t.provider_id,t.care_provider_id) as provider,
 	(nvl(
 	     (
               SELECT ia.value_text FROM invoice_attribute ia WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
@@ -91,7 +92,8 @@ SELECT	i.invoice_id,
 	(select pm.caption  FROM payment_method pm WHERE
 	 pm.id = iia.pay_method) pay_type,
 	t.trans_id,
-	trans_type
+	trans_type,
+	i.total_items
 FROM 	invoice i ,  transaction t ,	
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
@@ -110,19 +112,58 @@ select  provider,
         decode(ffs_cap,0,decode(h.ABBREV,'04',0,'05',0,(total_charges)),0) as cap_ffs_prof,
         decode(ffs_cap,0,decode(h.ABBREV,'04',(total_charges),0),0) as cap_x_ray,
         decode(ffs_cap,0,decode(h.ABBREV,'05',(total_charges),0),0) as cap_lab,
-        decode(ffs_cap,0,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as cap_pmt,
+        decode(ffs_cap,0,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as cap_pmt,        
+	0 as cap_month,	        
         decode(ffs_cap,1,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as ffs_pmt,
+        decode(invoice_type,0,decode(h.ABBREV,'04',0,'05',0,(person_pay+insurance_pay)),0) as prof_pmt,
+        decode(invoice_type,0,decode(h.ABBREV,'05',(person_pay+insurance_pay),0),0) as lab_pmt,
+        decode(invoice_type,0,decode(h.ABBREV,'04',(person_pay+insurance_pay),0),0) as x_ray_pmt,
         decode(invoice_type,1,(person_pay+insurance_pay),0) as ancill_pmt,
-        invoice_subtype,
+       	total_items,
+        misc_charges,
+        invoice_subtype,        
         h.abbrev,
         hcfa_service_type,
         invoice_type,
         facility,
         SUBMITTER_ID,
         batch_id,
-        trans_type
+        trans_type,
+        refund
 FROM    invoice_charges,HCFA1500_Service_Type_Code h
-WHERE   hcfa_service_type= h.id(+);
+WHERE   hcfa_service_type= h.id(+)
+UNION ALL	
+SELECT  provider_id as provider,
+	to_number(NULL)as invoice_id,
+	(SELECT value_date FROM trans_attribute ia WHERE ia.item_name = 'Monthly Cap/Payment/Batch ID' 
+	 AND parent_id = t.trans_id) as invoice_date,
+	0 as ffs_prof,
+	0 as x_ray,
+	0 as lab,
+	0 cap_ffs_prof,
+	0 as cap_x_ray,
+	0 as cap_lab,
+	0 as cap_pmt,
+	unit_cost as cap_month,	
+	0 as ffs_pmt,
+	0 as prof_pmt,
+	0 as lab_pmt,
+	0 as x_ray_pmt,
+	0 as ancill_pmt,
+	0 as total_items,
+	0 as misc_charges,
+	to_number(null) as invoice_subtype,
+	null as addrev,
+	to_number(null) as hcfa_service_type,
+	to_number(null) as invoice_type,
+	to_number(receiver_id) as facility,
+	null as submitted_id,
+	null as batch_id,
+	to_number(null) as trans_type,
+	0 as refund
+FROM	transaction t
+WHERE	trans_type = 9030
+AND	trans_status  = 7;
 
 
 --view for total charges and charge_adjust
