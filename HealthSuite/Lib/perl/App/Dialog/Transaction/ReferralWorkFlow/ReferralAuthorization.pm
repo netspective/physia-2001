@@ -8,6 +8,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use vars qw(@ISA);
+use Mail::Sendmail;
 
 use DBI::StatementManager;
 use App::Statements::Person;
@@ -82,49 +83,65 @@ sub populateData_add
 
 
 }
+
 sub getSupplementaryHtml
 {
-	my ($self, $page, $command) = @_;
-
-	# all of the Person::* panes expect a person_id parameter
-	# -- we can use field('attendee_id') because it was created in populateData
-
-		my $transId = $page->param('parent_trans_id');
-
-		return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, qq{
-			<table cellpadding=10>
-				<tr align=right  valign=centre>
-
-				<td>
-					<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
-					@{[ $STMTMGR_COMPONENT_PERSON->createHtml($page, STMTMGRFLAG_NONE, 'sel_referral',
-						[$transId]) ]}
-				</td>
-
-				</tr>
-			</table>
-			#component.stpd-person.extendedHealthCoverage#<BR>
-			#component.stpd-person.contactMethodsAndAddresses#<BR>
-		    });
-
-	return $self->SUPER::getSupplementaryHtml($page, $command);
+	return ('special', '');
 }
 
+sub handle_page_supplType_special
+{
+	my ($self, $page, $command, $dlgHtml) = @_;
 
+	$page->addContent(qq{
+		<TABLE>
+			<TR VALIGN=TOP>
+				<TD COLSPAN=2>
+					<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
+					@{[ $STMTMGR_COMPONENT_PERSON->createHtml($page, STMTMGRFLAG_NONE, 'sel_referral',
+						[$page->param('parent_trans_id')]) ]}
+				</TD>
+			</TR>
+			<TR><TD COLSPAN=2>&nbsp;</TD></TR>
+			<TR VALIGN=TOP>
+				<TD>$dlgHtml</TD>
+				<TD>
+					#component.stpd-person.extendedHealthCoverage#<BR>
+					#component.stpd-person.contactMethodsAndAddresses#
+				</TD>
+			</TR>
+		</TABLE>
+	});
+}
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	#my $transaction = $self->{transaction};
 	my $transId = $page->param('parent_trans_id');
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 	my $transOwnerType = App::Universal::ENTITYTYPE_PERSON;
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION;
 	my $previousChildRecs = $STMTMGR_TRANSACTION->recordExists($page,STMTMGRFLAG_NONE, 'selByParentTransId', $transId);
-	$STMTMGR_TRANSACTION->execute($page,STMTMGRFLAG_DEBUG, 'selUpdateTransStatus', $transId) if ($previousChildRecs == 1);
+	$STMTMGR_TRANSACTION->execute($page,STMTMGRFLAG_NONE, 'selUpdateTransStatus', $transId) if ($previousChildRecs == 1);
 
-	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+	my $personId = $page->param('person_id');
+	my $getPerson = $STMTMGR_TRANSACTION->getRowAsHash($page,STMTMGRFLAG_NONE, 'selByTransId', $transId);
+	my $referredTo = $getPerson->{'care_provider_id'};
+	my $referredBy = $getPerson->{'provider_id'};
 
-	 $page->schemaAction(
+	my $referredToData = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPrimaryMail', $referredTo);
+	my $referredToMail = $referredToData->{'value_text'};
+
+	my $referredByData = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPrimaryMail', $referredBy);
+	my $referredByMail = $referredByData->{'value_text'};
+
+	my $patientData = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPrimaryMail', $personId);
+	my $patientMail = $patientData->{'value_text'};
+
+	#$page->addDebugStmt("PATIENT, RefferedBy, ReferredTo: $patientMail , $referredByMail, $referredToMail");
+
+	$page->schemaAction(
 			'Transaction',
 			$command,
 			parent_trans_id => $transId || undef,
@@ -152,6 +169,48 @@ sub execute
 
 	$page->param('_dialogreturnurl', "/worklist/referral");
 	$self->handlePostExecute($page, $command, $flags);
+
+	my %mail;
+
+	$patientMail = 'radha_kotagiri@physia.com';
+	$referredByMail = 'radha_kotagiri@physia.com';
+	$referredToMail = 'radha_kotagiri@physia.com';
+
+	my $strFrom = 'lloyd_brodsky@physia.com';
+
+	if ($patientMail ne '')
+	{
+		%mail =
+			(To => $patientMail,
+			From => $strFrom,
+			Subject => 'Your doctor\' referral has been just processed',
+			Message => "http://tokyo.physia.com:8515/person/$personId/dlg-add-trans-6010/$transId"
+			);
+		sendmail(%mail) or die $Mail::Sendmail::error;
+	}
+
+	if ($referredByMail ne '')
+	{
+		%mail =
+			(To => $referredByMail,
+			From => $strFrom,
+			Subject => 'Your doctor\' referral has been just processed',
+			Message => "http://tokyo.physia.com:8515/person/RHACKETT01/dlg-add-trans-6010/$transId"
+			);
+		sendmail(%mail) or die $Mail::Sendmail::error;
+	}
+
+	if ($referredToMail ne '')
+	{
+		%mail =
+			(To => $referredToMail,
+			From => $strFrom,
+			Subject => 'Your doctor\' referral has been just processed',
+			Message => "http://tokyo.physia.com:8515/person/RHACKETT01/dlg-add-trans-6010/$transId"
+			);
+		sendmail(%mail) or die $Mail::Sendmail::error;
+	}
+
 	return "\u$command completed.";
 }
 
