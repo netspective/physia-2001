@@ -10,6 +10,7 @@ use constant ATTRTYPE_TEXT => 0;
 use constant ATTRTYPE_PHONE => 10;
 use constant ATTRTYPE_FAX => 15;
 use constant ATTRTYPE_PAGER => 20;
+use constant ATTRTYPE_BILLING_PHONE => 25;
 use constant ATTRTYPE_EMAIL => 40;
 use constant ATTRTYPE_URL => 50;
 use constant ATTRTYPE_CONTACT => 70;
