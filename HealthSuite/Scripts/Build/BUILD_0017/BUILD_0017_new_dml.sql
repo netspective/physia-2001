@@ -52,5 +52,38 @@ prompt Add new attribute value type
 
 insert into Attribute_Value_Type (id, caption, dialog_params, group_name, remarks) values (560, 'Board Certification', 'type="text"', 'Certificate', 'This is the board name assigned to a provider code');
 
+insert into Offering_Catalog_Type (id, caption) values (4, 'Superbill');
+
+insert into person_medication
+(
+	CR_SESSION_ID,
+	CR_STAMP,
+	CR_USER_ID,
+	CR_ORG_INTERNAL_ID,
+	PARENT_ID,
+	START_DATE,
+	APPROVED_BY,
+	MED_NAME,
+	QUANTITY,
+	NUM_REFILLS,
+	ALLOW_GENERIC,
+	NOTES,
+
+)
+select cr_session_id,
+       cr_stamp,
+       cr_user_id,
+       cr_org_internal_id,
+       trans_owner_id,
+       trans_begin_stamp,
+       provider_id,
+       caption,
+       quantity,
+       data_num_a,
+       data_flag_b,
+       data_text_a||' '||detail||' '||data_text_b
+from transaction
+  where trans_type between 7000 and 7999;
+       
 
 commit;
