@@ -588,12 +588,12 @@ sub send_page_body
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	my $flags = $self->{flags};
 
-	print "<BODY BGCOLOR='$colors->[THEMECOLOR_BKGND_PAGE]' onLoad='return processOnInit()'>$fonts->[THEMEFONTTAG_PLAIN_OPEN]";
+	print qq{<BODY leftmargin="0" topmargin="0" marginheight="0" marginwidth="0" bgcolor="$colors->[THEMECOLOR_BKGND_PAGE]" onload="return processOnInit()">$fonts->[THEMEFONTTAG_PLAIN_OPEN]};
 	my $html = '';
 	$html = join('', @{$self->{page_content_header}}) unless $flags & PAGEFLAG_ISFRAMEBODY;
 	unless($flags & PAGEFLAG_ISFRAMEHEAD)
 	{
-		$html .= join('', @{$self->{page_content}});
+		$html .= qq{<div style="margin: 10">} . join('', @{$self->{page_content}}) . "</div>";
 		$html .= join('', @{$self->{page_content_footer}});
 	}
 
@@ -699,11 +699,11 @@ sub prepare_page_content_header
 	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	my $resourceMap = $self->property('resourceMap');
-
 	my $locLinksHtml = $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links} || [], " $IMAGETAGS{'icons/arrow-right-lblue'} ", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>");
 	my $locBGColor = $colors->[THEMECOLOR_BKGND_LOCATOR];
 	if (defined $resourceMap && $self->property('_title') && $self->property('_iconMedium'))
 	{
+		
 		my $functions = '';
 		if (defined $resourceMap->{_views}) 
 		{
@@ -716,58 +716,69 @@ sub prepare_page_content_header
 			$functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER, '_pm_view', $menu, ' | ');
 		}
 		unshift(@{$self->{page_content_header}}, qq{
-			<table width="100%" bgcolor="lightsteelblue" cellspacing="0" cellpadding="3" border="0"><tr valign="bottom"><td width="32" align="center" valign="middle">
+			<table width="100%" bgcolor="lightsteelblue" cellspacing="0" cellpadding="3" border="0"><tr valign="bottom"><td align="left" valign="middle" width="1">
 				$IMAGETAGS{$self->property('_iconMedium')}<br>
 			</td><td align="left" valign="middle">
 				<font face="Arial,Helvetica" size="4" color="darkred">
-					&nbsp;<B>@{[ $self->property('_title') ]}</B>
+					&nbsp;<nobr><b>@{[ $self->property('_title') ]}</b></nobr>
 				</font>
-			</td><td align="right" valign="middle">
+			</td><td align="right" valign="middle" width="90%">
 				<font face="Arial,Helvetica" size="2">
-					$functions
+					$functions&nbsp;
 				</font>
 			</td></tr></table>
 			});
 	}
 	unshift(@{$self->{page_content_header}}, qq{
-		<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
-			<TR VALIGN=CENTER BGCOLOR=#3366CC><TD><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><NOBR>
-						&nbsp;
-						<A HREF="/homeorg" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/people-list'} #session.org_id#</A>
-						<FONT COLOR=LIGHTYELLOW>
-						&nbsp;|&nbsp;
-						</FONT>
-						<A HREF="/home" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/home-sm'} #session.user_id#</A>
-						<FONT COLOR=LIGHTYELLOW>
-						&nbsp;|&nbsp;
-						</FONT>
-						<A HREF="/search" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/magnifying-glass-sm'} Search</A>
-						<FONT COLOR=LIGHTYELLOW>
-						&nbsp;|&nbsp;
-						</FONT>
-						<A HREF="/worklist" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/worklist'} Work Lists</A>
-						<FONT COLOR=LIGHTYELLOW>
-						&nbsp;|&nbsp;
-						</FONT>
-						<A HREF="/schedule" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/schedule'} Schedule Desk</A>
-						<FONT COLOR=LIGHTYELLOW>
-						&nbsp;|&nbsp;
-						</FONT>
-						<A HREF="/logout" STYLE="text-decoration:none; color:yellow">$IMAGETAGS{'icons/logout'} Logout</A>
-					</NOBR></FONT></TD><TD ALIGN=RIGHT><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><A HREF="/help">$IMAGETAGS{'icons/help_blue'}</A>$IMAGETAGS{'design/logo-blue-sm'}</FONT></TD></TR>
-		</TABLE>
-		<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
-			<TR HEIGHT=1><TD BGCOLOR='#3366CC' COLSPAN=2>$IMAGETAGS{'design/transparent-line'}</TD><TD BGCOLOR=BLACK>$IMAGETAGS{'design/transparent-line'}</TD></TR>
-			<TR VALIGN=CENTER HEIGHT=22><TD BGCOLOR='#3366CC'><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=WHITE STYLE="font-size:8pt">
-						<NOBR>&nbsp; $locLinksHtml</NOBR>
-					</FONT></TD>
-				<TD ALIGN=RIGHT ROWSPAN=2 BGCOLOR='#C0C0FF' WIDTH=25 HEIGHT=22>$IMAGETAGS{'design/blue-lsteelblue-merge-round-shadow'}</TD>
-				<TD ONCLICK="javascript:window.location.reload()" BGCOLOR=LIGHTSTEELBLUE ALIGN=RIGHT STYLE="border-top: 1 solid black;"><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=NAVY STYLE="font-size:8pt">
-						<NOBR>@{[ UnixDate('today', '%c') ]}&nbsp;</NOBR>
-					</FONT></TD>
-			</TR>
-			<TR HEIGHT=1><TD BGCOLOR=BLACK>$IMAGETAGS{'design/transparent-line'}</TD><TD BGCOLOR=LIGHTSTEELBLUE>$IMAGETAGS{'design/transparent-line'}</TD></TR>
-		</TABLE>
+		<table width=100% border=0 cellspacing=0 cellpadding=2><tr valign=center bgcolor=#3366cc><td>
+			<font face="tahoma,arial,helvetica" size=2 color=yellow style="font-size:8pt"><nobr>
+			&nbsp;
+			<a href="/homeorg" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/people-list'} #session.org_id#</a>
+			<font color=lightyellow>
+				&nbsp;|&nbsp;
+			</font>
+			<a href="/home" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/home-sm'} #session.user_id#</a>
+			<font color=lightyellow>
+				&nbsp;|&nbsp;
+			</font>
+			<a href="/menu" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/magnifying-glass-sm'} Main Menu</a>
+			<font color=lightyellow>
+				&nbsp;|&nbsp;
+			</font>
+			<a href="/worklist" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/worklist'} Work Lists</a>
+			<font color=lightyellow>
+				&nbsp;|&nbsp;
+			</font>
+			<a href="/schedule" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/schedule'} Schedule Desk</a>
+			<font color=lightyellow>
+				&nbsp;|&nbsp;
+			</font>
+			<a href="/logout" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/logout'} Logout</a>
+			</nobr></font>
+		</td><td align="right" valign="middle">
+			<font face="tahoma,arial,helvetica" size=2 color=yellow style="font-size:8pt"><a href="javascript:doActionPopup('/help')">$IMAGETAGS{'icons/help_blue'}</a>$IMAGETAGS{'design/physia'}</font>
+		</td></tr></table>
+		
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#3366CC"><tr height="1"><td bgcolor="#3366CC">
+			$IMAGETAGS{'design/transparent-line'}<br>
+		</td><td bgcolor="#3366CC" width="25">
+			$IMAGETAGS{'design/transparent-line'}<br>
+		</td><td bgcolor="#000000">
+			$IMAGETAGS{'design/transparent-line'}<br>
+		</td></tr><tr valign=center height=22><td bgcolor="#3366CC">
+			<nobr><font face="Tahoma,Arial,Helvetica" size=2 color=white style="font-size:8pt">&nbsp; $locLinksHtml</font></nobr><br>
+		</td><td align="left" rowspan="2" bgcolor="lightsteelblue" width="25" height="22">
+			@{[ getImageTag('design/blue-lsteelblue-merge-round-shadow', {}) ]}<br>
+		</td><td onclick="javascript:window.location.reload()" bgcolor="lightsteelblue" align="right" style="border-top: 1 solid black;">
+			<font face="tahoma,arial,helvetica" size="2" color="#000000" style="font-size:8pt">
+				<nobr>@{[ UnixDate('today', '%c') ]}&nbsp;</nobr>
+			</font>
+		</td></tr><tr height=1><td bgcolor="#000000">
+			$IMAGETAGS{'design/transparent-line'}<br>
+		</td><td bgcolor=lightsteelblue>
+			$IMAGETAGS{'design/transparent-line'}<br>
+		</td></tr></table>
+
 		});
 }
 
@@ -777,12 +788,12 @@ sub prepare_page_content_footer
 	if($self->{schemaFlags} & SCHEMAAPIFLAG_LOGSQL)
 	{
 		$self->addDebugStmt('SQL Logging is on');
-		$self->addContent('<HR SIZE=1 COLOR=DARKRED><FONT SIZE=3><CODE><OL>');
+		$self->addContent('<hr size="1" color="darkred"><font size="3"><code><ol>');
 		foreach(@{$self->{sqlLog}})
 		{
-			$self->addContent(scalar(@{$_->[1]} > 0) ? "<LI>@{[ $_->[0] ]}<BR><FONT COLOR=RED>@{[ join('<BR>', @{$_->[1]}) ]}</FONT></LI>" : "<LI>@{[ $_->[0] ]}</LI>");
+			$self->addContent(scalar(@{$_->[1]} > 0) ? qq{<li>@{[ $_->[0] ]}<br><font color="red">@{[ join('<br>', @{$_->[1]}) ]}</font></li>} : "<li>@{[ $_->[0] ]}</li>");
 		}
-		$self->addContent('</OL></CODE></FONT>');
+		$self->addContent('</ol></code></font>');
 	}
 	return 1;
 }
