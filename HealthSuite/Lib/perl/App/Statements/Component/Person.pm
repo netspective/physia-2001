@@ -181,19 +181,21 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.miscNotes' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text
+			select 	value_type, item_id, parent_id, item_name, value_text, cr_stamp
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'			
 		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+		
 	publishDefn =>
-		{
-			columnDefn => [				
-					{ head => 'Misc Notes', dataFmt => 'Misc Notes (<A HREF = "/person/#2#/profile">#2#</A>)#4#' },
-				],	
-			bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
-			frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
-		},
+	{
+		columnDefn => [				
+				{colIdx =>0, head => 'Misc Notes', dataFmt => 'Misc Notes (#5#<A HREF = "/person/#2#/profile">#2#</A>)#4#' },
+		],	
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
+	},
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
