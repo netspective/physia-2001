@@ -10,39 +10,14 @@
 	<release-info>
 		<build-id> 21 </build-id>
 		<build-manager>Lloyd Brodsky</build-manager>
-		<tested-date> TBD </tested-date>
-		<release-date>TBD </release-date>
+		<tested-date> 01/19/2001 </tested-date>
+		<release-date>01/23/2001 </release-date>
 		<overview>
-			Build 21 is targeted at five primary items.<ol>
-			<li>Clinical Tools</li>
-			<li>Physia Mobile</li>
-			<li>First Phases of Clinical Notes</li>
-			<li>Urgently Needed PPMS Functions</li>
-			<li>Production System Bugs</li>
-			</ol>
-			Build 20 is a companion build to 21 with simular targets and timing.  <br/>
-			Build 20 is being handled by Physia DC staff whild Build 21 is being handled by Prosys.
+		Duplicate of Build 20
 		</overview>
 		<br/>	
 		<description>
-			1) Clinical Tools <ul>
-				<li>Residuals from 18/19</li>
-				<li>Errors uncovered in alpha</li></ul>
-			2) Physia Mobile<ul>
-				<li>In office on-line clinical tools</li>
-				<li>Out of office on-line clinical tools</li>
-				<li>Start syncronized functions</li></ul>
-			3) First Phases of Clinical Notes<ul>
-				<li>Patient fixed information such as histories</li>
-				<li>Visit orented information</li>
-				<li>Clinical note writer</li></ul>
-			4) Urgently Needed PPMS Functions<ul>
-				<li>Specific sales opportunities</li>
-				<li>Management directed priorities</li></ul>
-			5) Production System Bugs<ul>
-				<li>Improper functions in critical areas</li>
-				<li>Program abnormal terminations</li>
-				<li>Problems with negative financial impact to customers</li></ul>
+		This is a list of Build 20 tasks assigned to Prosys
 		</description>	
 	</release-info>
 
