@@ -20,6 +20,7 @@ start tables-code/Invoice_Item_Adjust_totals
 --bug 1824
 
 start pre/pkg-set
+start post/pkg-set
 
 --bug 1827
 
