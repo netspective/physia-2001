@@ -20,6 +20,7 @@ use App::Billing::Claim::Treatment;
 use App::Billing::Claim::Address;
 use App::Billing::Claim::Payer;
 use App::Billing::Claim::Adjustment;
+use App::Billing::Claim::TWCC73;
 use App::Billing::Validator;
 use App::Billing::Input::Validate::DBI;
 
@@ -456,6 +457,8 @@ sub assignPatientInsurance
 	$sth1 = $self->{dbiCon}->prepare("$queryStatment");
 	$sth1->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 
+
+
 	while((@row1 = $sth1->fetchrow_array()) && ($no <= 3))
 	{
 		if($row1[0] eq BILL_PARTY_TYPE_INSURANCE)
@@ -468,8 +471,8 @@ sub assignPatientInsurance
 					invoice_billing.bill_sequence,
 					ins.group_number,
 					ins.insured_id,
-					to_char(coverage_begin_date, \'DD-MON-YYYY\'),
-					to_char(coverage_end_date, \'DD-MON-YYYY\'),
+					to_char(coverage_begin_date, 'DD-MON-YYYY'),
+					to_char(coverage_end_date, 'DD-MON-YYYY'),
 					group_name,
 					ins.member_number,
 					ins.extra,
@@ -477,11 +480,7 @@ sub assignPatientInsurance
 				from insurance ins, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 				and invoice_billing.invoice_item_id is null
-				and invoice_billing.bill_party_type =
-			}
-			. BILL_PARTY_TYPE_INSURANCE .
-			qq
-			{
+				and invoice_billing.bill_party_type = @{[ BILL_PARTY_TYPE_INSURANCE ]}
 				and invoice_billing.bill_ins_id = ins.ins_internal_id
 				and invoice_billing.bill_sequence = $row1[1]
 			};
@@ -529,10 +528,9 @@ sub assignPatientInsurance
 				{
 					select value_text, value_type, value_int
 					from person_attribute
-					where parent_id = \'$insuredId\'
-					and value_type in
-				}
-				. ASSOCIATION_EMPLOYMENT_ALL;
+					where parent_id = '$insuredId'
+					and value_type in @{[ ASSOCIATION_EMPLOYMENT_ALL ]}
+				};
 
 				$sth = $self->{dbiCon}->prepare("$queryStatment");
 				$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -552,13 +550,13 @@ sub assignPatientInsurance
 					name_last,
 					name_middle,
 					name_first,
-					to_char(date_of_birth, \'DD-MON-YYYY\'),
+					to_char(date_of_birth, 'DD-MON-YYYY'),
 					gender,
 					marital_status,
 					ssn,
 					complete_name
 				from person
-				where person.person_id = \'$insuredId\'
+				where person.person_id = '$insuredId'
 			};
 			$sth = $self->{dbiCon}->prepare("$queryStatment");
 			$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -578,17 +576,9 @@ sub assignPatientInsurance
 				select attr.value_text
 				from insurance, insurance_attribute attr, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
-				and invoice_billing.bill_sequence =
-			}
-			. $insured->getBillSequence() .
-			qq
-			{
+				and invoice_billing.bill_sequence = @{[ $insured->getBillSequence() ]}
 				and invoice_billing.invoice_item_id is null
-				and invoice_billing.bill_party_type =
-			}
-			. BILL_PARTY_TYPE_INSURANCE .
-			qq
-			{
+				and invoice_billing.bill_party_type = @{[ BILL_PARTY_TYPE_INSURANCE ]}
 				and invoice_billing.bill_ins_id = insurance.ins_internal_id
 				and attr.parent_id = parent_ins_id
 				and attr.item_name = 'HMO-PPO/Indicator'
@@ -598,6 +588,86 @@ sub assignPatientInsurance
 			@row = $sth->fetchrow_array();
 			$insured->setHMOIndicator($row[0]);
 
+			$no++;
+		}
+		elsif(($row1[0] eq BILL_PARTY_TYPE_PERSON) || ($row1[0] eq BILL_PARTY_TYPE_ORGANIZATION))
+		{
+			$queryStatment = qq
+			{
+				select
+					nvl(plan_name, product_name),
+					ins.rel_to_guarantor,
+					invoice_billing.bill_sequence,
+					ins.group_number,
+					ins.guarantor_id,
+					to_char(coverage_begin_date, 'DD-MON-YYYY'),
+					to_char(coverage_end_date, 'DD-MON-YYYY'),
+					group_name,
+					ins.member_number,
+					ins.extra,
+					ins.employer_org_id
+				from insurance ins, invoice_billing
+				where invoice_billing.invoice_id = $invoiceId
+				and invoice_billing.invoice_item_id is null
+				and invoice_billing.bill_ins_id = ins.ins_internal_id
+				and invoice_billing.bill_sequence = $row1[1]
+			};
+			$sth = $self->{dbiCon}->prepare("$queryStatment");
+			$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+
+			@row = $sth->fetchrow_array();
+			$insured = $insureds->[$no];
+			$insured->setInsurancePlanOrProgramName(''); #$row[0]);
+			$insured->setRelationshipToPatient($row[1]);
+			$insured->setBillSequence($row[2]);
+			$insured->setPolicyGroupOrFECANo(''); #$row[3]);
+			$insured->setId($row[4]);
+			$insured->setEffectiveDate($row[5]);
+			$insured->setTerminationDate($row[6]);
+			$insured->setPolicyGroupName($row[7]);
+			$insured->setMemberNumber($row[8]);
+			$insured->setTypeCode($row[9]);
+			$insured->setEmployerOrSchoolId($row[10]);
+
+			$insured->setLastName('');
+			$insured->setMiddleInitial('');
+			$insured->setFirstName('');
+			$insured->setDateOfBirth('');
+			$insured->setSex('');
+			$insured->setStatus('');
+			$insured->setSsn('');
+			$insured->setName('');
+
+			$self->populateAddress($insured->getAddress(), "person_address", $row[4], "NoWhere");
+			$self->populateContact($insured->getAddress(), "person_attribute", $row[4], "NoWhere", CONTACT_METHOD_TELEPHONE);
+
+			$no++;
+		}
+		else
+		{
+			$insured = $insureds->[$no];
+			$insured->setInsurancePlanOrProgramName('');
+			$insured->setRelationshipToPatient('');
+			$insured->setBillSequence('');
+			$insured->setPolicyGroupOrFECANo('');
+			$insured->setId('');
+			$insured->setEffectiveDate('');
+			$insured->setTerminationDate('');
+			$insured->setPolicyGroupName('');
+			$insured->setMemberNumber('');
+			$insured->setTypeCode('');
+			$insured->setEmployerOrSchoolId('');
+
+			$insured->setLastName('');
+			$insured->setMiddleInitial('');
+			$insured->setFirstName('');
+			$insured->setDateOfBirth('');
+			$insured->setSex('');
+			$insured->setStatus('');
+			$insured->setSsn('');
+			$insured->setName('');
+			$self->populateAddress($insured->getAddress(), "person_address", $row[4], "NoWhere");
+			$self->populateContact($insured->getAddress(), "person_attribute", $row[4], "NoWhere", CONTACT_METHOD_TELEPHONE);
 			$no++;
 		}
 	}
@@ -1207,6 +1277,9 @@ sub assignInvoiceProperties
 	$payer4->setAddress($payer4Address);
 	$claim->addPolicy($payer4);
 
+	my $twcc73 = new App::Billing::Claim::TWCC73;
+	$claim->setTWCC73($twcc73);
+
 	$payToProvider->setType("pay to");
 	$renderingProvider->setType("rendering");
 	$payToOrganization->setType("pay to");
@@ -1490,6 +1563,47 @@ sub assignInvoiceProperties
 		'Invoice/TWCC69/18' => [$treatment, \&App::Billing::Claim::Treatment::setImpairmentRating, COLUMNINDEX_VALUE_INT],
 		'Invoice/TWCC69/19' => [$treatment, [\&App::Billing::Claim::Treatment::setDoctorType, \&App::Billing::Claim::Treatment::setExaminingDoctorType], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
 		'Invoice/TWCC69/22' => [$treatment, [\&App::Billing::Claim::Treatment::setMaximumImprovementAgreement, \&App::Billing::Claim::Treatment::setImpairmentRatingAgreement], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+
+		'Invoice/TWCC73/4'   => [$twcc73,  \&App::Billing::Claim::TWCC73::setInjuryDescription, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC73/13'  => [$twcc73, [\&App::Billing::Claim::TWCC73::setMedicalCondition, \&App::Billing::Claim::TWCC73::setReturnToWorkDate, \&App::Billing::Claim::TWCC73::setReturnToWorkFromDate, \&App::Billing::Claim::TWCC73::setReturnToWorkToDate], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEA, COLUMNINDEX_VALUE_DATEB]],
+		'Invoice/TWCC73/14a' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsStanding, \&App::Billing::Claim::TWCC73::setPostureRestrictionsStandingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14b' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsSitting, \&App::Billing::Claim::TWCC73::setPostureRestrictionsSittingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14c' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsKneeling, \&App::Billing::Claim::TWCC73::setPostureRestrictionsKneelingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14d' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsBending, \&App::Billing::Claim::TWCC73::setPostureRestrictionsBendingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14e' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsPushing, \&App::Billing::Claim::TWCC73::setPostureRestrictionsPushingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14f' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsTwisting, \&App::Billing::Claim::TWCC73::setPostureRestrictionsTwistingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/14g' => [$twcc73, [\&App::Billing::Claim::TWCC73::setPostureRestrictionsOtherText, \&App::Billing::Claim::TWCC73::setPostureRestrictionsOther, \&App::Billing::Claim::TWCC73::setPostureRestrictionsOtherOther], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/15'  => [$twcc73, [\&App::Billing::Claim::TWCC73::setSpecificRestrictions, \&App::Billing::Claim::TWCC73::setSpecificRestrictionsOther], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC73/16'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setOtherRestrictions, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC73/17a' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsWalking, \&App::Billing::Claim::TWCC73::setMotionRestrictionsWalkingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17b' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsClimbing, \&App::Billing::Claim::TWCC73::setMotionRestrictionsClimbingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17c' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsGrasping, \&App::Billing::Claim::TWCC73::setMotionRestrictionsGraspingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17d' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsWrist, \&App::Billing::Claim::TWCC73::setMotionRestrictionsWristOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17e' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsReaching, \&App::Billing::Claim::TWCC73::setMotionRestrictionsReachingOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17f' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsOverhead, \&App::Billing::Claim::TWCC73::setMotionRestrictionsOverheadOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17g' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsKeyboard, \&App::Billing::Claim::TWCC73::setMotionRestrictionsKeyboardOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/17h' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMotionRestrictionsOtherText, \&App::Billing::Claim::TWCC73::setMotionRestrictionsOther, \&App::Billing::Claim::TWCC73::setMotionRestrictionsOtherOther], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/18'  => [$twcc73, [\&App::Billing::Claim::TWCC73::setLiftRestrictions, \&App::Billing::Claim::TWCC73::setLiftRestrictionsHours, \&App::Billing::Claim::TWCC73::setLiftRestrictionsWeight, \&App::Billing::Claim::TWCC73::setLiftRestrictionsOther], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Invoice/TWCC73/19a' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsMaxHours, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19b' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMiscRestrictionsSitBreaks, \&App::Billing::Claim::TWCC73::setMiscRestrictionsSitBreaksPer], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_TEXT]],
+		'Invoice/TWCC73/19c' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsWearSplint, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19d' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsCrutches, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19e' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsNoDriving, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19f' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsDriveAutoTrans, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19g' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMiscRestrictionsNoWork, \&App::Billing::Claim::TWCC73::setMiscRestrictionsHoursPerDay, \&App::Billing::Claim::TWCC73::setMiscRestrictionsTemp, \&App::Billing::Claim::TWCC73::setMiscRestrictionsHeight], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC73/19h' => [$twcc73, [\&App::Billing::Claim::TWCC73::setMiscRestrictionsMustKeep, \&App::Billing::Claim::TWCC73::setMiscRestrictionsElevated, \&App::Billing::Claim::TWCC73::setMiscRestrictionsCleanDry], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC73/19i' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsNoSkinContact, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC73/19j' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsDressing, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/19k' => [$twcc73,  \&App::Billing::Claim::TWCC73::setMiscRestrictionsNoRunning, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/20'  => [$twcc73, [\&App::Billing::Claim::TWCC73::setMedicationRestrictionsMustTake, \&App::Billing::Claim::TWCC73::setMedicationRestrictionsAdvised, \&App::Billing::Claim::TWCC73::setMedicationRestrictionsDrowsy], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_INT]],
+		'Invoice/TWCC73/21'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setWorkInjuryDiagnosisInfo, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC73/22a' => [$twcc73, [\&App::Billing::Claim::TWCC73::setFollowupServiceEvaluationDate, \&App::Billing::Claim::TWCC73::setFollowupServiceEvaluationTime], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXT]],
+		'Invoice/TWCC73/22b' => [$twcc73, [\&App::Billing::Claim::TWCC73::setFollowupServiceConsultWith, \&App::Billing::Claim::TWCC73::setFollowupServiceConsultDate, \&App::Billing::Claim::TWCC73::setFollowupServiceConsultTime], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC73/22c' => [$twcc73, [\&App::Billing::Claim::TWCC73::setFollowupServicePhysMedWeeks, \&App::Billing::Claim::TWCC73::setFollowupServicePhysMedWeeksPer, \&App::Billing::Claim::TWCC73::setFollowupServicePhysMedDate, \&App::Billing::Claim::TWCC73::setFollowupServicePhysMedTime], [COLUMNINDEX_VALUE_INTB, COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXT]],
+		'Invoice/TWCC73/22d' => [$twcc73, [\&App::Billing::Claim::TWCC73::setFollowupServiceSpecialStudies, \&App::Billing::Claim::TWCC73::setFollowupServiceSpecialStudiesDate, \&App::Billing::Claim::TWCC73::setFollowupServiceSpecialStudiesTime], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC73/22e' => [$twcc73,  \&App::Billing::Claim::TWCC73::setFollowupServiceNone, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/23'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setVisitType, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC73/24'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setDoctorRole, COLUMNINDEX_VALUE_INT],
 
 	};
 
