@@ -8,7 +8,7 @@ insert into transaction_type (id, caption, group_name, remarks) values (9040, 'O
 --BUG 2008 (FKM) Move data to new columns in offering_catalog_entry
 update offering_catalog_entry
 set data_text = modifier,
-modifier = name,
+modifier = substr(name,1,32),
 name = description
 where catalog_id IN
 (SELECT internal_catalog_id from offering_catalog where
