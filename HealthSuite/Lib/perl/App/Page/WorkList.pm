@@ -18,12 +18,16 @@ use App::Statements::Search::Appointment;
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(App::Page);
 
+
 sub prepare_view_default
 {
 	my ($self) = @_;
 
 	$self->addContent(qq{
-		<h1>hello</h1>
+		<P><FONT SIZE=+1>
+		<A HREF='/worklist/patientflow'>Patient Flow Worksheet</A><BR>
+		<A HREF='/worklist/collection'>Collection Worksheet</A><BR>
+		</FONT></P>
 	});
 
 	return 1;
@@ -64,5 +68,6 @@ sub getContentHandlers
 {
 	return ('prepare_view_$_pm_view=default$');
 }
+
 
 1;
