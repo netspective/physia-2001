@@ -1958,6 +1958,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			AND	oce.catalog_id (+)= oc.internal_catalog_id
 			AND	oce.parent_entry_id IS NULL
 			group by oc.catalog_id,oc.caption ,oc.internal_catalog_id
+			order by oc.catalog_id
 			},
 	sqlvar_entityName => 'OrgInternal ID for LAB',
 	sqlStmtBindParamDescr => ['Org Internal ID'],
@@ -2018,6 +2019,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				AND	oc.internal_catalog_id = :3
 				AND	oce.catalog_id=oc.internal_catalog_id
 				AND	parent_entry_id is null
+				order by oce.modifier,oce.code,oce.name 
 		},
 	sqlvar_entityName => 'OrgInternal ID for LAB',
 	sqlStmtBindParamDescr => ['Org Internal ID'],
