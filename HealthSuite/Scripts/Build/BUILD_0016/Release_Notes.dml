@@ -65,7 +65,7 @@
 		</deliverable>
 
 		<deliverable id="1114">
-			UI: On the collection worklist if a claim has been submitted to next payer (which causes the invoices to be copied).  On the collection worklist the new invoice number will appear with the old invoice number in parentheses.		
+			UI: On the collection worklist if a claim has been submitted to next payer (which causes the invoices to be copied).  On the collection worklist the new invoice number will appear with the old invoice number in parentheses.	NOTE : This will only work on the new items that appear on the collection worklist.  If we want to apply it to old items we will need to run a script to convert the old invoice (items)	
 		</deliverable>
 
 		<deliverable id="1163">
