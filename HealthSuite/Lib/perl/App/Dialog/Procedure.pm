@@ -9,6 +9,7 @@ use App::Statements::Insurance;
 use App::Statements::Transaction;
 use App::Statements::Org;
 use App::Statements::Catalog;
+use App::Statements::Scheduling;
 use App::IntelliCode;
 use Carp;
 use CGI::Dialog;
@@ -222,6 +223,7 @@ sub execAction_submit
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
 		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAddresses', $invoiceId);
 
+		updateParentEvent($page, $command, $invoiceId, $invoice, $mainTransData);
 		storeFacilityInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
 		storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
@@ -613,6 +615,27 @@ sub hmoCapWriteoff
 			value_date => $todaysDate || undef,
 			_debug => 0
 	);
+}
+
+sub updateParentEvent
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	my $eventId = $mainTransData->{parent_event_id};
+
+	return unless $eventId;
+
+	my $eventInfo = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 'selEventById', $eventId);
+	if($eventInfo->{event_status} == App::Universal::EVENTSTATUS_INPROGRESS)
+	{
+		$page->schemaAction(
+			'Event', 'update',
+			event_id => $eventId || undef,
+			event_status => App::Universal::EVENTSTATUS_COMPLETE,
+			checkout_stamp => $page->getTimeStamp(),
+			checkout_by_id => $page->session('user_id'),
+			_debug => 0
+		);
+	}
 }
 
 sub storeFacilityInfo
