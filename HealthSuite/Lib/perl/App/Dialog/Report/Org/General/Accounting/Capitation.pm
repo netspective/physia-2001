@@ -58,7 +58,8 @@ sub new
 		new App::Dialog::Field::Person::ID(
 			caption => 'Physician ID',
 			name => 'provider_id',
-			types => ['Physician']
+			types => ['Physician'],
+			incSimpleName=>1,
 			),
 		new App::Dialog::Field::Insurance::Product(
 			caption => 'Insurance Product',
