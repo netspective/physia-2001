@@ -97,7 +97,9 @@ sub createPath
 	{
 		unless (-d $_)
 		{
+			my $umask = umask("0000");
 			die "Can't create directory " . $_ unless (mkpath($_));
+			umask($umask);
 		}
 	}
 }
@@ -170,6 +172,7 @@ sub getDefaultConfig
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
 	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
+	'db-sde02' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
 );
 
 my $userName = '';
