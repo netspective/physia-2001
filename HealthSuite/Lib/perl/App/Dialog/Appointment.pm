@@ -114,10 +114,10 @@ sub new
 			ordinal => 0,
 		),
 		new CGI::Dialog::MultiField (
-			name => 'minutes_util',
+			name => 'minutes_util_0',
 			fields => [
 				new App::Dialog::Field::Scheduling::Minutes(
-					caption => 'Appt Time Minute',
+					caption => 'Appt 1 Time Minute',
 					name => 'appt_minute_0',
 					timeField => '_f_appt_time_0'
 				),
@@ -132,14 +132,22 @@ sub new
 			name => 'appt_date_time_1',
 			ordinal => 1,
 		),
-		#new App::Dialog::Field::Scheduling::DateTimePlus(
-		#	name => 'appt_date_time_2',
-		#	ordinal => 2,
-		#),
-		#new App::Dialog::Field::Scheduling::DateTimePlus(
-		#	name => 'appt_date_time_3',
-		#	ordinal => 3,
-		#),
+		new CGI::Dialog::MultiField (
+			name => 'minutes_util_1',
+			fields => [
+				new App::Dialog::Field::Scheduling::Minutes(
+					caption => 'Appt 2 Time Minute',
+					name => 'appt_minute_1',
+					timeField => '_f_appt_time_1'
+				),
+				new App::Dialog::Field::Scheduling::AMPM(
+					caption => 'AM PM',
+					name => 'appt_am_1',
+					timeField => '_f_appt_time_1'
+				),
+			],
+		),
+
 		new CGI::Dialog::Field(caption => 'Check for Conflicts',
 			name => 'conflict_check',
 			type => 'bool', style => 'check', value => 1,
@@ -225,6 +233,7 @@ sub new
 			if (opObj.selectedIndex == 0)
 			{
 				setIdDisplay('appt_date_time_1', 'none');
+				setIdDisplay('minutes_util_1', 'none');
 			}
 		}
 		// -->
@@ -540,7 +549,7 @@ sub validateAvailTemplate
 				<input name=_f_whatToDo_$ordinal type=radio value="cancel"
 					onClick="$radio_1.checked=true">Cancel
 		});
-		
+
 		$page->field("processConflict_$ordinal", 1);
 	}
 }
@@ -769,6 +778,21 @@ sub execute
 					_debug => 0
 				);
 
+				my $event_attribute = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+					'selEventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
+
+				$page->schemaAction(
+					'Event_Attribute', 'update',
+					item_id => $event_attribute->{item_id},
+					parent_id => $eventId,
+					item_name => 'Appointment',
+					value_type => App::Universal::EVENTATTRTYPE_APPOINTMENT,
+					value_text => $page->field('attendee_id') || undef,
+					value_textB => $page->field('resource_id') || undef,
+					value_int => $page->field('patient_type') || 0,
+					_debug => 0
+				);
+
 				$self->handleWaitingList($page, $eventId);
 			}
 			elsif ($command eq 'noshow' || $command eq 'cancel')
@@ -829,7 +853,7 @@ sub execute
 						value_textB => $page->field('resource_id') || undef,
 						value_int => $page->field('patient_type') || 0,
 						_debug => 0
-						);
+					);
 				}
 
 				$self->handleWaitingList($page, $eventId);

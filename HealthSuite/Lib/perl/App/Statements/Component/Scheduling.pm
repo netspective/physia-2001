@@ -85,7 +85,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 };
 
 my $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY = qq{
-	e.start_time, ea.value_text
+	e.start_time, e.facility_id, ea.value_text
 };
 
 my $STAMPFORMAT = 'mm/dd/yyyy hh12:miam';

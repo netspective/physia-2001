@@ -18,7 +18,7 @@ use Data::Publish;
 use Exporter;
 use CGI::ImageManager;
 
-use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL 
+use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL
 	INSURANCE_COMPLETE INSURANCE_PARTIAL MEDICAL PERSONAL);
 
 use vars qw(@ISA %RESOURCE_MAP @EXPORT
@@ -35,29 +35,31 @@ use vars qw(@ISA %RESOURCE_MAP @EXPORT
 @ISA   = qw(CGI::Component Exporter);
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
+my $arlPrefix = '/worklist/patientflow';
+
 %PATIENT_URLS = (
-	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
-	'View Chart' => {arl => '/person/itemValue/chart', title => 'View Chart'},
-	'View Account' => {arl => '/person/itemValue/account', title => 'View Account'},
-	'Make Appointment' => {arl => '/worklist/patientflow/dlg-add-appointment/itemValue', title => 'Make Appointment'},
+	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Patient Profile'},
+	'View Chart' => {arl => '/person/itemValue/chart', title => 'View Patient Chart'},
+	'View Account' => {arl => '/person/itemValue/account', title => 'View Patient Account'},
+	'Make Appointment' => {arl => "$arlPrefix/dlg-add-appointment/itemValue", title => 'Make Appointment'},
 );
 
 %PHYSICIAN_URLS = (
-	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
-	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
-	'Add Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Add Schedule Template'},
+	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Physician Profile'},
+	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Physician Schedule'},
+	'Add Template' => {arl => "$arlPrefix/dlg-add-template/itemValue", title => 'Add Schedule Template'},
 );
 
 %ORG_URLS = (
-	'View Profile' => {arl => '/org/itemValue/profile', title => 'View Profile'},
-	'View Fee Schedules' => {arl => '/org/itemValue/catalog', title => 'View Fee Schedules'},
+	'View Profile' => {arl => '/org/itemValue/profile', title => 'View Org Profile'},
+	'View Fee Schedules' => {arl => '/org/itemValue/catalog', title => 'View Org Fee Schedules'},
 );
 
 %APPT_URLS = (
-	'Reschedule' => {arl => '/worklist/patientflow/dlg-reschedule-appointment/itemValue', title => 'Reschedule Appointment'},
-	'Cancel' => {arl => '/worklist/patientflow/dlg-cancel-appointment/itemValue', title => 'Cancel Appointment'},
-	'No-Show' => {arl => '/worklist/patientflow/dlg-noshow-appointment/itemValue', title => 'No-Show Appointment'},
-	'Update' => {arl => '/worklist/patientflow/dlg-update-appointment/itemValue', title => 'Update Appointment'},
+	'Reschedule' => {arl => "$arlPrefix/dlg-reschedule-appointment/itemValue", title => 'Reschedule Appointment'},
+	'Cancel' => {arl => "$arlPrefix/dlg-cancel-appointment/itemValue", title => 'Cancel Appointment'},
+	'No-Show' => {arl => "$arlPrefix/dlg-noshow-appointment/itemValue", title => 'No-Show Appointment'},
+	'Update' => {arl => "$arlPrefix/dlg-update-appointment/itemValue", title => 'Update Appointment'},
 );
 
 $patientDefault = 'View Profile';
@@ -73,16 +75,13 @@ $apptDefault = 'Update';
 		},
 	);
 
-
 sub initialize
 {
 	my ($self, $page) = @_;
 	my $layoutDefn = $self->{layoutDefn};
-	my $arlPrefix = '/worklist/patientflow';
 
 	$layoutDefn->{frame}->{heading} = " ";
 	$layoutDefn->{style} = 'panel.transparent';
-
 
 	$layoutDefn->{banner}->{actionRows} =
 	[
@@ -187,25 +186,22 @@ sub getComponentHtml
 		</style>
 	};
 
+	my $oldEventId = 0;
 	foreach (@$appts)
 	{
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
-		
+
+		next if $oldEventId == $_->{event_id};
+
 		my $alertExists = $STMTMGR_COMPONENT_SCHEDULING->recordExists($page, STMTMGRFLAG_NONE,
 			'sel_alerts', $_->{patient_id});
-		
+
 		my $alertHtml;
 		if ($alertExists) {
-			#$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
-			#	style="text-decoration:none; color:red; font-weight:bold">Alert</a>
-			#};
-
 			$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
 				class=today title="View $_->{patient_id} Alert(s)"><b>Alert<b></a>
 			};
-			
-			
 		}
 
 		if ($_->{checkin_time} || $_->{checkout_time})
@@ -239,28 +235,31 @@ sub getComponentHtml
 		$apptHref =~ s/itemValue/$_->{event_id}/;
 
 		my $patientTitle = $PATIENT_URLS{$page->session('patientOnSelect')}->{title};
+		$patientTitle =~ s/Patient/$_->{patient_id}/;
 		my $physicianTitle = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{title};
+		$physicianTitle =~ s/Physician/$_->{physician}/;
 		my $orgTitle = $ORG_URLS{$page->session('orgOnSelect')}->{title};
+		$orgTitle =~ s/Org/$_->{facility_name}/;
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
 
 		my $flags = $_->{flags};
-		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ? 
-			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ? 
+		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ?
+			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ?
 			$IMAGETAGS{'icons/black_a'} : $IMAGETAGS{'icons/red_a'};
-		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ? 
+		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ?
 			$IMAGETAGS{'icons/green_i'} : $flags & VERIFYFLAG_INSURANCE_PARTIAL ?
 			$IMAGETAGS{'icons/black_i'} : $IMAGETAGS{'icons/red_i'};
-			
+
 		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/green_m'}
 			: $IMAGETAGS{'icons/red_m'};
 		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/green_p'}
 			: $IMAGETAGS{'icons/red_p'};
-			
+
 		my @rowData = (
 			qq{<nobr>
-				<A HREF='/worklist/patientflow/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
-				<A HREF='/worklist/patientflow/dlg-cancel-appointment/$_->{event_id}' TITLE='Cancel Appointment'>$IMAGETAGS{'icons/action-edit-remove-x'}</A>
-				<A HREF='/worklist/patientflow/dlg-noshow-appointment/$_->{event_id}' TITLE='No-Show Appointment'>$IMAGETAGS{'icons/schedule-noshow'}</A>
+				<A HREF='$arlPrefix/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
+				<A HREF='$arlPrefix/dlg-cancel-appointment/$_->{event_id}' TITLE='Cancel Appointment'>$IMAGETAGS{'icons/action-edit-remove-x'}</A>
+				<A HREF='$arlPrefix/dlg-noshow-appointment/$_->{event_id}' TITLE='No-Show Appointment'>$IMAGETAGS{'icons/schedule-noshow'}</A>
 				</nobr><br>
 				$alertHtml
 			},
@@ -295,22 +294,22 @@ sub getComponentHtml
 
 				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}'
 				TITLE='Verify Personal Records'>$perVerifyIcon</A>
-				
+
 				<A HREF="javascript:doActionPopup('/person/$_->{patient_id}/facesheet')"
 				TITLE='Print Face Sheet'>$IMAGETAGS{'icons/black_f'}</A>
 
 				</nobr>
-				
+
 			},
 
 			($_->{checkin_time} || $_->{checkout_time}) ? qq{<strong>$_->{checkin_time}</strong><br>
 				<strong title="Wait time in minutes" style="color:#999999">($waitMinutes)</strong>}:
-				qq{<a href='/worklist/patientflow/dlg-add-checkin/$_->{event_id}' TITLE='CheckIn $_->{patient_id}' class=today>CheckIn</a>},
+				qq{<a href='$arlPrefix/dlg-add-checkin/$_->{event_id}' TITLE='CheckIn $_->{patient_id}' class=today>CheckIn</a>},
 
 			$_->{checkin_time} || $_->{checkout_time} ?
 				($_->{checkout_time} ? qq{<strong>$_->{checkout_time}</strong><br>
 				<strong title="Visit time in minutes" style="color:#999999">($visitMinutes)</strong>} :
-					qq{<a href='/worklist/patientflow/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>}
+					qq{<a href='$arlPrefix/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>}
 				)
 				: undef ,
 
@@ -335,6 +334,7 @@ sub getComponentHtml
 		);
 
 		push(@data, \@rowData);
+		$oldEventId = $_->{event_id};
 	}
 
 	$html .= createHtmlFromData($page, 0, \@data,

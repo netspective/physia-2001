@@ -39,7 +39,7 @@ use base qw{CGI::Dialog::MultiField};
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	my $nextOrdinal = $params{ordinal} +1;
 
 	if ($nextOrdinal < App::Universal::MAX_APPTS)
@@ -61,11 +61,11 @@ sub new
 					choiceDelim =>',',
 					selOptions => q{:0, and:1},
 					type => 'select',
-					onChangeJS => qq{showFieldsOnValues(event, [1], ['appt_date_time_$nextOrdinal']);},
+					onChangeJS => qq{showFieldsOnValues(event, [1], ['appt_date_time_$nextOrdinal', 'minutes_util_$nextOrdinal']);},
 				),
-				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				new CGI::Dialog::Field(caption => undef, type => 'hidden',
 					name => "parent_id_$params{ordinal}"),
-				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				new CGI::Dialog::Field(caption => undef, type => 'hidden',
 					name => "processConflict_$params{ordinal}"),
 			],
 		);
@@ -84,9 +84,9 @@ sub new
 					maxLength => 8,
 					options => FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				new CGI::Dialog::Field(caption => undef, type => 'hidden',
 					name => "parent_id_$params{ordinal}"),
-				new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+				new CGI::Dialog::Field(caption => undef, type => 'hidden',
 					name => "processConflict_$params{ordinal}"),
 			],
 		);
@@ -99,17 +99,17 @@ sub findPopup_as_html
 	my $dialogName = $dialog->formName();
 	my $dateField = $self->{fields}[0]->{name};
 	my $timeField = $self->{fields}[1]->{name};
-	
+
 	return qq{
 		<a href="javascript:doFindLookup(this.form, document.dialog._f_$dateField,
 			'/lookup/apptslot/' + document.dialog._f_resource_id.value +	','
-			+ document.dialog._f_facility_id.value 
+			+ document.dialog._f_facility_id.value
 			+ ',' + substitute(document.dialog._f_$dateField.value, '/', '-')
 			+ ',' + document.dialog._f_duration.value
 			+ ',' + document.dialog._f_patient_type.value + ',' + document.dialog._f_appt_type.value
 			+ '/1', null, false, 'location, status, width=700,height=600,scrollbars,resizable',
 			null, document.dialog._f_$timeField);">
-			<img src='/resources/icons/dbdd_ts.gif' title='Find Next Available Slot' 
+			<img src='/resources/icons/dbdd_ts.gif' title='Find Next Available Slot'
 			BORDER=0></a>
 	};
 }
@@ -126,7 +126,7 @@ use base qw{CGI::Dialog::MultiField};
 sub new
 {
 	my ($type, %params) = @_;
-	
+
 	$params{ordinal} ||= 0;
 	return CGI::Dialog::MultiField::new($type, %params,
 		fields => [
@@ -140,9 +140,9 @@ sub new
 				maxLength => 8,
 				options => FLDFLAG_REQUIRED,
 			),
-			new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+			new CGI::Dialog::Field(caption => undef, type => 'hidden',
 				name => "parent_id_$params{ordinal}"),
-			new CGI::Dialog::Field(caption => undef, type => 'hidden', 
+			new CGI::Dialog::Field(caption => undef, type => 'hidden',
 				name => "processConflict_$params{ordinal}"),
 		],
 	);
@@ -171,13 +171,13 @@ sub new
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
-	
+
 	my $dialogName = $dialog->formName();
 	my $fieldName = $self->{timeField};
 	my $jsField = "document.$dialogName.$fieldName";
 
 	my $selOptions = $self->{selOptions} || "00, 15, 30, 45";
-	
+
 	my $inputs = '';
 	for (split(/\s*,\s*/, $selOptions))
 	{
@@ -185,8 +185,8 @@ sub getHtml
 			<nobr><input type=radio onClick="setField($jsField, ':'+this.value, ':..', '12:00 AM')" name='minute' id='$_' value='$_' > <label for='$_'>$_</label>&nbsp;&nbsp;</nobr>
 		};
 	}
-	
-	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);	
+
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 	return $html;
 }
 
@@ -206,13 +206,13 @@ sub new
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
-	
+
 	my $dialogName = $dialog->formName();
 	my $fieldName = $self->{timeField};
 	my $jsField = "document.$dialogName.$fieldName";
 
 	my $selOptions = $self->{selOptions} || "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12";
-	
+
 	my $inputs = '';
 	for (split(/\s*,\s*/, $selOptions))
 	{
@@ -221,8 +221,8 @@ sub getHtml
 			<nobr><input type=radio onClick="setField($jsField, this.value+':', '..:', '12:00 AM')" name='minute' id='$_' value='$value' > <label for='$_'>$_</label>&nbsp;&nbsp;</nobr>
 		};
 	}
-	
-	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);	
+
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 	return $html;
 }
 
@@ -242,13 +242,13 @@ sub new
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
-	
+
 	my $dialogName = $dialog->formName();
 	my $fieldName = $self->{timeField};
 	my $jsField = "document.$dialogName.$fieldName";
 
 	my $selOptions = $self->{selOptions} || "AM, PM";
-	
+
 	my $inputs = '';
 	for (split(/\s*,\s*/, $selOptions))
 	{
@@ -256,8 +256,8 @@ sub getHtml
 			<nobr><input type=radio onClick="setField($jsField, ' '+this.value, ' ..', '12:00 AM')" name='ampm' id='$_' value='$_' > <label for='$_'>$_</label>&nbsp;&nbsp;</nobr>
 		};
 	}
-	
-	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);	
+
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 	return $html;
 }
 
@@ -274,7 +274,7 @@ sub new
 {
 	my ($type, %params) = @_;
 	$params{READONLY} = 'READONLY';
-		
+
 	return CGI::Dialog::Field::new($type, %params);
 }
 
@@ -287,13 +287,13 @@ sub findPopup_as_html
 	if(my $arl = $self->{findPopup})
 	{
 		my $controlField = 'null';
-		$controlField = "document.$dialogName.$self->{findPopupControlField}" 
+		$controlField = "document.$dialogName.$self->{findPopupControlField}"
 			if $self->{findPopupControlField};
 
 		my $secondaryFindField = 'null';
-		$secondaryFindField = "document.$dialogName.$self->{secondaryFindField}" 
+		$secondaryFindField = "document.$dialogName.$self->{secondaryFindField}"
 			if $self->{secondaryFindField};
-		
+
 		return qq{
 			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField, $secondaryFindField);"><img src='$self->{popup}->{imgsrc}' border=0></a>
 		};
