@@ -539,7 +539,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#',
 		frame => {
-			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#homeArl#',
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-send-phone_message?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 		},
 	},
@@ -563,7 +563,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#param.home#'>Phone Message</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-send-phone_message?home=#param.home#'>Phone Message</A> } },
 			],
 		},
 		stdIcons =>	{

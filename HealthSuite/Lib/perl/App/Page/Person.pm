@@ -199,7 +199,8 @@ sub prepare_page_content_header
 	$chooseAction =
 		qq{<SELECT onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 			<OPTION selected>Choose Action</OPTION>
-			<OPTION value="/person/$personId/stpe-person.labOrderSummary?home=$homeArl">Add Ancillary Test</OPTION>			
+			<OPTION value="/person/$personId/stpe-person.labOrderSummary?home=$homeArl">Add Lab Request</OPTION>
+			<OPTION value="/person/$personId/stpe-person.labOrderSummary?home=$homeArl">Add Ancillary Test</OPTION>
 			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
 			<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId/profile">Schedule Appointment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
@@ -210,7 +211,7 @@ sub prepare_page_content_header
 			<<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
 			<OPTION value="/person/$personId/dlg-prescribe-medication?home=$homeArl">Prescribe Medication</OPTION>
 			<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
-			<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
+			<OPTION value="/person/$personId/dlg-send-phone_message?home=$homeArl">Voice Msgs</OPTION>
 			<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
 			<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
