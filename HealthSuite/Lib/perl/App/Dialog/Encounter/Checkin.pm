@@ -79,6 +79,7 @@ sub makeStateChanges
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	$page->beginUnitWork("Unable to checkin patient");
 
 	## First, update original event record to checkin status, and any changes
 	#my $timeStamp = $page->getTimeStamp();
@@ -117,6 +118,7 @@ sub execute
 
 	# Add Trans and Invoice info
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
+	$page->endUnitWork();
 }
 
 1;
