@@ -43,7 +43,9 @@ sub initialize
 
 		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
-		new CGI::Dialog::Field(caption => '1. Specialty',
+		new CGI::Dialog::MultiField(caption => '1. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty1',
+			fields => [
+					new CGI::Dialog::Field(caption => '1. Specialty',
 						#type => 'foreignKey',
 						name => 'specialty_code',
 						fKeyStmtMgr => $STMTMGR_PERSON,
@@ -51,7 +53,13 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(caption => '2. Specialty',
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+
+				]),
+
+		new CGI::Dialog::MultiField(caption => '2. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2',
+			fields => [
+					new CGI::Dialog::Field(caption => '2. Specialty',
 						#type => 'foreignKey',
 						name => 'specialty2_code',
 						fKeyStmtMgr => $STMTMGR_PERSON,
@@ -59,7 +67,12 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(caption => '3. Specialty',
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int2', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+				]),
+
+		new CGI::Dialog::MultiField(caption => '3. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty3',
+			fields => [
+					new CGI::Dialog::Field(caption => '3. Specialty',
 						#type => 'foreignKey',
 						name => 'specialty3_code',
 						fKeyStmtMgr => $STMTMGR_PERSON,
@@ -67,6 +80,9 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int3', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+				]),
+
 		new CGI::Dialog::MultiField(caption => 'Affiliation/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				#new CGI::Dialog::Field(
@@ -213,6 +229,45 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $specialty1 = $self->getField('specialty1')->{fields}->[0];
+	my $seq1 = $self->getField('specialty1')->{fields}->[1];
+	my $specialty2 = $self->getField('specialty2')->{fields}->[0];
+	my $seq2 = $self->getField('specialty2')->{fields}->[1];
+	my $specialty3 = $self->getField('specialty3')->{fields}->[0];
+	my $seq3 = $self->getField('specialty3')->{fields}->[1];
+	my $medSpecCode = $page->field('specialty_code');
+	my $medSpecCode2 = $page->field('specialty2_code');
+	my $medSpecCode3 = $page->field('specialty3_code');
+	my $specSeq1 = $page->field('value_int1');
+	my $specSeq2 = $page->field('value_int2');
+	my $specSeq3 = $page->field('value_int3');
+	my $personId = $page->field('person_id');
+
+	if ($medSpecCode2 eq $medSpecCode3 || $medSpecCode2 eq $medSpecCode)
+	{
+		$specialty2->invalidate($page, "Cannot add the same Specialty more than once for $personId");
+	}
+
+	if ($medSpecCode3 eq $medSpecCode2 || $medSpecCode3 eq $medSpecCode)
+	{
+		$specialty3->invalidate($page, "Cannot add the same Specialty more than once for $personId");
+	}
+
+	if (($specSeq2 eq $specSeq3 || $specSeq2 eq $specSeq1) && $specSeq2 ne '5')
+	{
+		$seq2->invalidate($page, "Cannot add the same 'Specialty Sequence' more than once for $personId");
+	}
+
+	if (($specSeq3 eq $specSeq2 || $specSeq3 eq $specSeq1) && $specSeq3 ne '5')
+	{
+		$seq3->invalidate($page, "Cannot add the same 'Specialty Sequence' more than once for $personId");
+	}
+}
+
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -236,6 +291,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_SPECIALTY,
 			value_text => $medSpecCode || undef,
 			value_textB => $medSpecCaption || undef,
+			value_int => $page->field('value_int1') || undef,
 			_debug => 0
 		);
 
@@ -246,6 +302,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_SPECIALTY,
 			value_text => $medSpecCode2 || undef,
 			value_textB => $medSpecCaption2 || undef,
+			value_int => $page->field('value_int2') || undef,
 			_debug => 0
 		);
 
@@ -256,6 +313,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_SPECIALTY,
 			value_text => $medSpecCode3 || undef,
 			value_textB => $medSpecCaption3 || undef,
+			value_int => $page->field('value_int3') || undef,
 			_debug => 0
 		);
 
