@@ -24,6 +24,8 @@ alter table Lab_Order_Entry add (PHYSICIAN_COST     NUMBER(12,2));
 alter table Lab_Order_Entry add (PATIENT_COST       NUMBER(12,2));
 alter table Lab_Order_Entry  add(MODIFIER           VARCHAR2(64));
 alter table Lab_Order_Entry  add(PANEL_TEST_NAME    VARCHAR2(512));
+alter table Lab_Order_Entry  add(PARENT_ENTRY_ID    NUMBER(16));
+create index LABORDENT_PARENT_ENTRY_ID on Lab_Order_Entry (parent_entry_id) TABLESPACE TS_INDEXES;
 
 alter table Lab_Order_Entry_Aud add (CAPTION            VARCHAR2(64));
 alter table Lab_Order_Entry_Aud add (LAB_CODE           VARCHAR2(64));
@@ -32,6 +34,7 @@ alter table Lab_Order_Entry_Aud add (PHYSICIAN_COST     NUMBER(12,2));
 alter table Lab_Order_Entry_Aud add (PATIENT_COST       NUMBER(12,2));
 alter table Lab_Order_Entry_Aud add (MODIFIER           VARCHAR2(64));
 alter table Lab_Order_Entry_Aud add (PANEL_TEST_NAME    VARCHAR2(512));
+alter table Lab_Order_Entry_Aud add(PARENT_ENTRY_ID    NUMBER(16));
 
 analyze table Lab_Order_Entry  compute statistics for table for all indexes for all columns; 
 
