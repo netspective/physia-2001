@@ -10,7 +10,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
-use App::Statements::WorklistCollection;
+use App::Statements::Worklist::WorklistCollection;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 

@@ -11,7 +11,7 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
-use App::Statements::WorklistCollection;
+use App::Statements::Worklist::WorklistCollection;
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
