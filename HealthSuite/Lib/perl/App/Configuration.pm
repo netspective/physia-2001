@@ -27,11 +27,13 @@ struct(ServerConfigData => [
 	path_AppConf => '$',
 	path_PDFOutput => '$',
 	path_PDFOutputHREF => '$',
+
 	file_SchemaDefn => '$',
-	file_AccessControlDefn => '$',
 	file_BuildLog => '$',
 	file_NSFHeader => '$',
 	file_NSFCounter => '$',
+	file_AccessControlDefn => '$',
+	file_AccessControlAutoPermissons => '$',
 ]);
 
 use constant CONFIGGROUP_PRO => 'production';
@@ -91,9 +93,12 @@ sub getDefaultConfig
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
 	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
-	$config->file_AccessControlDefn(File::Spec->catfile(PATH_APPLIB, 'Conf', 'AccessControl.xml'));
 	$config->file_NSFHeader(File::Spec->catfile(PATH_APPCONF, 'nsf-header-conf'));
 	$config->file_NSFCounter(File::Spec->catfile(PATH_APPCONF, 'nsf-submission-counter'));
+	$config->file_AccessControlDefn(File::Spec->catfile(PATH_APPCONF, 'acl-main.xml'));
+
+	# if you change this file location/name, please update /usr/local/bin/start_httpd
+	$config->file_AccessControlAutoPermissons(File::Spec->catfile(PATH_APPCONF, 'acl-auto-permissions.xml'));
 	return $config;
 }
 

@@ -580,7 +580,7 @@ sub send_page_body
 	}
 
 	# replace page variables if there are any
-	$html =~ s/\#(\w+)\.?(.*?)\#/
+	$html =~ s/\#(\w+)\.([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -592,7 +592,7 @@ sub send_page_body
 		/ge;
 
 	# in case any replacements ended up creating other variables, replace again
-	$html =~ s/\#(\w+)\.?(.*?)\#/
+	$html =~ s/\#(\w+)\.([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -609,6 +609,7 @@ sub send_page_body
 	$html = $self->component('sde-page-cookies') . $html if $self->param('_debug_cookies');
 	$html = $self->component('sde-page-env') . $html if $self->param('_debug_env');
 	$html = $self->component('sde-page-components') . $html if $self->param('_debug_comp');
+	$html = $self->component('sde-page-acl') . $html if $self->param('_debug_acl');
 
 	print $self->getTextBoxHtml(heading => 'Errors', messages => $self->{page_errors}) if $self->haveErrors();
 	print $self->getTextBoxHtml(heading => 'Debugging Statements', messages => $self->{page_debug}) if @{$self->{page_debug}};
@@ -703,7 +704,6 @@ sub prepare_page_content_header
 
 	my $locLinksHtml = $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links} || [], ' <IMG SRC="/resources/icons/arrow-right-lblue.gif"> ', "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>");
 	my $locBGColor = $colors->[THEMECOLOR_BKGND_LOCATOR];
-
 	unshift(@{$self->{page_content_header}}, qq{
 		<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
 			<TR VALIGN=CENTER BGCOLOR=#3366CC><TD><FONT FACE="Tahoma,Arial,Helvetica" SIZE=2 COLOR=YELLOW STYLE="font-size:8pt"><NOBR>
@@ -764,13 +764,24 @@ sub prepare_page_content_footer
 
 sub component
 {
-	my ($self, $id) = @_;
-	if(my $component = $App::ResourceDirectory::COMPONENT_CATALOG{$id})
+	my ($self, $compId) = @_;
+	my $resources = \%App::ResourceDirectory::RESOURCES;
+	my $compPrefix = &App::ResourceDirectory::COMPONENT_RESOURCE_PREFIX;
+	my $resourceName = $compPrefix . $compId;
+	if(my $component = $resources->{$resourceName}{_class})
 	{
-		push(@{$self->{components}}, $App::ResourceDirectory::COMPONENT_CATALOG_SOURCE{$id});
+		my $compType = ref $component eq 'CODE' ? App::Universal::COMPONENTTYPE_STATEMENT : App::Universal::COMPONENTTYPE_CLASS;
+		my $package = exists $resources->{$resourceName}{_stmtMgr} ? $resources->{$resourceName}{_stmtMgr} : $resources->{$resourceName}{_package};
+		my $stmtId = exists $resources->{$resourceName}{_stmtId} ? $resources->{$resourceName}{_stmtId} : '';
+		push(@{$self->{components}}, [
+			$compType,
+			$resourceName,
+			$package,
+			$stmtId,
+			]);
 		return ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0);
 	}
-	return "Component '$id' not found";
+	return "Component '$compId' not found";
 }
 
 sub getContentHandlers
@@ -823,9 +834,9 @@ sub prepare_stdAction_dialog
 	my $self = shift;
 	my ($dlgId, $dlgCmd, $startArlIndex) = scalar(@_) > 0 ? @_ :
 		($self->param('_dlgId'), $self->param('_dlgCmd'), $self->param('_dlgParamStartIndex'));
-
+	my $dlgPrefix = &App::ResourceDirectory::DIALOG_RESOURCE_PREFIX;
 	$self->addContent('<BR>');
-	if(my $dlgInfo = $App::ResourceDirectory::DIALOG_CLASSES{$dlgId})
+	if(my $dlgInfo = $App::ResourceDirectory::RESOURCES{$dlgPrefix . $dlgId})
 	{
 		my ($dlgClass, %dlgConstructParams, $dlgParams);
 		if(ref $dlgInfo eq 'HASH')
@@ -854,7 +865,7 @@ sub prepare_stdAction_dialog
 	}
 	else
 	{
-		$self->addContent("Dialog '$dlgId' not found. The ID must be one of the following: <P>", join('<BR>', sort keys %App::ResourceDirectory::DIALOG_CLASSES));
+		$self->addContent("Dialog '$dlgId' not found. The ID must be one of the following: <P>", join '<BR>', grep {$_ =~ s/^$dlgPrefix//} sort keys %App::ResourceDirectory::RESOURCES );
 	}
 
 	return 1;
@@ -881,7 +892,10 @@ sub prepare_stdAction_publish
 sub prepare_stdAction_component
 {
 	my $self = shift;
-	if(my $component = $App::ResourceDirectory::COMPONENT_CATALOG{$self->param('_compId')})
+	my $compId = $self->param('_compId');
+	my $compPrefix = &App::ResourceDirectory::COMPONENT_RESOURCE_PREFIX;
+	my $resourceName = $compPrefix . $compId;
+	if(my $component = $App::ResourceDirectory::RESOURCES{$resourceName})
 	{
 		my $m = ref $component eq 'CODE' ? $component : $component->can('getHtml');
 
@@ -901,7 +915,7 @@ sub prepare_stdAction_component
 	}
 	else
 	{
-		$self->addContent("Component not found");
+		$self->addContent("Component '$compId' not found. The ID must be one of the following: <P>", join '<BR>', grep {$_ =~ s/^$compPrefix//} sort keys %App::ResourceDirectory::RESOURCES );
 	}
 	return 1;
 }
@@ -930,7 +944,7 @@ sub arlHasStdAction
 			$self->param('_publParamStartIndex', $startArlIndex+1);
 			return 1;
 		}
-		elsif(my $component = $App::ResourceDirectory::COMPONENT_CATALOG{$action})
+		elsif(my $component = $App::ResourceDirectory::RESOURCES{&App::ResourceDirectory::COMPONENT_RESOURCE_PREFIX . $action})
 		{
 			$self->param('_stdAction', 'component');
 			$self->param('_compId', $action);
