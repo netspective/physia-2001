@@ -145,8 +145,8 @@ sub prepare
 					<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
-					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, or
-					<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>
+					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, 
+					<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>, or
 					<a href="/org/#session.org_id#/dlg-add-org-lab">Lab</a>					
 				</font>
 			</td></tr></table>
