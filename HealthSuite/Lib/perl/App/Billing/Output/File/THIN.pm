@@ -40,6 +40,7 @@ sub processFile
 
 	$self->{nsfType} = $params{nsfType};
 	$self->{payerType} = $params{payerType};
+	$self->{serialNumber} = $params{serialNumber};
 
 	# get claims from Claims collection and put it in claims array
 	my $tempClaims = $params{claimList}->getClaim();
@@ -161,9 +162,10 @@ sub getHeaderTrailerData
     my ($self, $tempClaims) = @_;
 	#my ($hash,$value,$key,$tempSerial);
 	my $params1 = {};
-
+    
+        
 	$params1->{SUBMITTER_ID} = 'S03135';
-	$params1->{SUBMISSION_SERIAL_NO} = '000001';
+	$params1->{SUBMISSION_SERIAL_NO} = $self->numToStr(6,0,$self->{serialNumber});
 	$params1->{SUBMITTER_NAME} = 'PHYSIA';
 	$params1->{ADDRESS_1} = 'PHYSIA CORPORATION';
 	$params1->{ADDRESS_2} = '260 N. SAM HOUSTON PKWY EAST, SUITE 220';

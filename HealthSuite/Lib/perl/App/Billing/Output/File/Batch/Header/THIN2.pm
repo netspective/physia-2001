@@ -68,11 +68,11 @@ sub formatData
 my %payerType = ( THIN_COMMERCIAL . "" =>		
 	  sprintf("%-3s%-15s%-3s%4d%-6s%-3s%-30s%-30s%-20s%-2s%-9s%-10s%-30s%-30s%-20s%-2s%-9s%-10s%-84s",
 	  $self->recordType(),
-	  substr($emcId,0,15), #emc provider id
+	  $spaces, #substr($emcId,0,15), #emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()), # batch no
 	  $self->numToStr(6,0,$container->getSequenceNo()), # batch id
-	  substr($claimPayToOrganization->getOrganizationType(),0,3), # prov type organization
+	  $spaces, #substr($claimPayToOrganization->getOrganizationType(),0,3), # prov type organization
 	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress1() : $spaces,0,30), # prov svc addr1
 	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress2() : $spaces,0,30), # prov svc addr2
 	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getCity() : $spaces,0,20), # prov svc city
