@@ -13,8 +13,7 @@ use App::Data::Obtain::RBRVS::GPCI;
 use App::Data::Obtain::EPSDT::EPSDT;
 use App::Data::Obtain::TXgulf::FeeSchedules;
 use App::Data::Obtain::EPSDT::CodeServType;
-
-
+use App::Data::Obtain::OneTime::PatToby;
 use File::Path;
 use FindBin qw($Bin);
 use Benchmark;
@@ -70,6 +69,7 @@ sub Main
 		dataSrcRTXgulfPath => File::Spec->catfile($dataSrcPath, 'TXgulf'),
 		dataSrcEPSDTPath => File::Spec->catfile($dataSrcPath,'EPSDT'),
 		dataSrcThinPath=>File::Spec->catfile($dataSrcPath,'ThinNet'),
+		dataSrcOneTime=>File::Spec->catfile($dataSrcPath,'OneTime'),
 	};
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
@@ -84,6 +84,7 @@ sub Main
 	importTXGULFfs($properties, transformDBI => 1) if grep(/tgcmgfs/, @modules);
 	#importServCat($properties, transformDBI => 1) if grep(/servcat/, @modules);
 	importThinPayers($properties, transformDBI => 1) if grep(/thin/, @modules);	
+	importRespPartyToby($properties, transformDBI => 1) if grep(/toby/, @modules);		
 }
 
 sub importServCat
@@ -115,6 +116,73 @@ sub importServCat
 		);
 		$exporter->printErrors();
 	}
+}
+
+sub importRespPartyToby
+{
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::OneTime::PatToby;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "Starting\n";
+	if (1)
+	{
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFilePatData => File::Spec->catfile($properties->{dataSrcOneTime}, 'patient.xls'));
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from TEMP_FKM",		
+			insertStmt => "insert into TEMP_FKM (
+			person_id,lName,fName,mName,phone,ssn,DOB,gender,plan_id,line1,
+			city,state,zip,	rpLName,rpFName,rpMName,rpPhone,rpSSN,	rpDOB,policyNumber,
+			group_num,policyHolder,	policyNumber2,group_num2,policyHolder2,medicare,medicaid,rel,responsible_id,plan_id2,
+			oLName,oFName,oMName,
+			oLName2,oFName2,oMName2,suffix,rpSuffix,osuffix,osuffix2,
+			chart,doc,ref_doc,visit)
+			values (?,?,?,?,?,?,?,?,?,?,
+				?,?,?,?,?,?,?,?,?,?,
+				?,?,?,?,?,?,?,?,?,?,
+				?,?,?,?,?,?,?,?,?,?,
+				?,?,?,?)",
+			verifyCountStmt => "select count(*) from TEMP_FKM",
+		);	
+		$exporter->printErrors();
+	}		
+	}
+	#Get Doc Data	
+	#return ;
+	my $importer2 = new App::Data::Obtain::OneTime::PatToby::RefDoc;
+	my $dataCollection2 = $params{collection} || new App::Data::Collection;
+	$importer2->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection2,
+						srcFilePatData => File::Spec->catfile($properties->{dataSrcOneTime}, 'ref_doc.xls'));
+	if($importer2->haveErrors())
+	{
+		$importer2->printErrors();
+		die "there are errors";
+	}	
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection2,
+			connect => $properties->{connectStr},
+			doBefore => "delete from TEMP_FKM_DOC",		
+			insertStmt => "insert into TEMP_FKM_DOC 
+			(person_id, lName,fName, mName,phone,upin,city,state,zip,line1,suffix,ref_doc )
+			values (?,?,?,?,?,?,?,?,?,?,?,?)",
+			verifyCountStmt => "select count(*) from TEMP_FKM_DOC",
+		);	
+		$exporter->printErrors();
+	}	
+	
 }
 
 sub importCodeServTypeInfo
