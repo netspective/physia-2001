@@ -8,6 +8,8 @@ use App::Universal;
 use Exporter;
 use DBI::StatementManager;
 use App::Configuration;
+use App::ImageManager;
+use Devel::Symdump;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter App::Page);
@@ -16,7 +18,7 @@ use constant DEFAULT_HIDE_COLUMNS => 'CR_SESSION_ID,CR_STAMP,CR_USER_ID,CR_ORG_I
 
 sub getContentHandlers
 {
-	return ('prepare_view_$view$');
+	return ('prepare_view_$_view$');
 }
 
 sub initialize
@@ -38,6 +40,43 @@ sub initialize
 		.coldescr { font-family: arial, helvetica; font-size: 8pt; color: navy }
 	</style>
 	});
+}
+
+sub prepare_page_content_header
+{
+	my ($self, $colors, $fonts, $personId, $personData) = @_;
+	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
+	$self->SUPER::prepare_page_content_header(@_);
+	my $urlPrefix = "/sde";
+	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
+		'_view',
+		[
+			['Database', "$urlPrefix/tables", 'tables'],
+			['Statements', "$urlPrefix/stmgrs", 'stmgrs'],
+			['Resources', "$urlPrefix/resources", 'resources'],
+			['Source', "$urlPrefix/source", 'source'],
+		], ' | ');
+
+	push(@{$self->{page_content_header}}, qq{
+		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
+			<TR VALIGN=BOTTOM>
+			<TD WIDTH=32>
+				$IMAGETAGS{'icon-m/sde'}
+			</TD>
+			<TD VALIGN=MIDDLE>
+				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
+					&nbsp;<B>Software Development Environment</B>
+				</FONT>
+			</TD>
+			<TD ALIGN=RIGHT VALIGN=MIDDLE>
+				<FONT FACE="Arial,Helvetica" SIZE=2>
+				$functions
+				</FONT>
+			</TD>
+			</TR>
+		</TABLE>
+		});
+	return 1;
 }
 
 sub getTableListAsOptionsAlpha
@@ -204,8 +243,10 @@ sub prepare_TableStruct
 		my $updTableDataUrl = $self->selfRef(_reloadtabledata=>1);
 		my $allTables = $self->getTableListAsSelect();
 		my $html = $showHead ? qq{
-			<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-			<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>$table->{name}</B> Table ($table->{abbrev})</font></TD><TD ALIGN=RIGHT>$allTables</TD></TR>
+			<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+			<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;<B>$table->{name}</B> Table ($table->{abbrev})</FONT></TD>
+			<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
+			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 			</TABLE>
 			<P>$table->{descr}</P>
 		} : '';
@@ -341,11 +382,10 @@ sub prepare_ColumnDetail
 		if(my $col = $table->{colsByName}->{$self->param('column')})
 		{
 			$self->addContent(qq{
-				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-				<TR>
-					<TD><font size=4 color=darkred face="arial,helvetica">Column <B>$table->{name}.$col->{name}</B></font></TD>
-					<TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD>
-				</TR>
+				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Column <B>$table->{name}.$col->{name}</FONT></TD>
+				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
+				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 				</TABLE>
 				<P>
 				$col->{descr}
@@ -429,8 +469,10 @@ sub prepare_TableQuery
 
 	queryToHtmlTable($self, $query, \$html);
 	$self->addContent(qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-		<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>SQL Query</font></TD><TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD></TR>
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;SQL Query</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 		</TABLE>
 		<P>
 		<form method="post">
@@ -453,8 +495,10 @@ sub prepare_TableList
 		<P><font color=red>Refreshed $self->{schemaFile}</font></P>
 	} : '';
 	$self->addContent(qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-		<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>All Tables</font></TD><TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD></TR>
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;All Tables</font></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 		</TABLE>
 		$msg
 		<BR><A HREF='tables/refresh'>Refresh (reload) $self->{schemaFile} now.</A>
@@ -481,13 +525,13 @@ sub prepare_view_tables
 
 	if($self->param('query'))
 	{
-		$self->addLocatorLinks(["$pathItems[1] Query", '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["\u$pathItems[1] Query", '/sde/table/' . $pathItems[1]]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_TableQuery();
 	}
 	elsif($self->param('column'))
 	{
-		$self->addLocatorLinks([$pathItems[1], '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/table/' . $pathItems[1]]);
 		$self->addLocatorLinks(["Column " . $self->param('column'), '/sde/table/' . $pathItems[1] . '?' . 'column=' . $self->param('column')]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_ColumnDetail();
@@ -502,7 +546,7 @@ sub prepare_view_tables
 	}
 	elsif(scalar(@pathItems) > 1)
 	{
-		$self->addLocatorLinks([$pathItems[1], '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/table/' . $pathItems[1]]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_TableStruct();
 	}
@@ -580,8 +624,10 @@ sub prepare_view_stmgrs
 	if(scalar @pathItems == 1)
 	{
 		$self->addContent(qq{
-				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-				<TR><TD><font size=4 color=darkred face="arial,helvetica">Statement Managers</font></TD><TD ALIGN=RIGHT>$allMgrs</TD></TR>
+				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Statement Managers</font></TD>
+				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>$allMgrs</FONT></TD></TR>
+				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 				</TABLE>
 			<P>
 			@{[ $self->getStmtMgrsList() ]}
@@ -593,8 +639,10 @@ sub prepare_view_stmgrs
 		my $stMgrObj = $ALL_STMT_MANAGERS->{$stMgrObjId};
 		$self->addLocatorLinks([$stMgrObjId, '/sde/stmgr/' . $stMgrObjId]);
 		$self->addContent(qq{
-				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-				<TR><TD><font size=4 color=darkred face="arial,helvetica">$stMgrObjId</font></TD><TD ALIGN=RIGHT>$allMgrs</TD></TR>
+				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;$stMgrObjId</font></TD>
+				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>$allMgrs</FONT></TD></TR>
+				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 				</TABLE>
 			<P>
 			@{[ $self->getStmtsList($stMgrObjId, $stMgrObj) ]}
@@ -641,8 +689,10 @@ sub prepare_view_stmgrs
 		$self->addLocatorLinks([$stMgrObjId, "/sde/stmgr/$stMgrObjId"]);
 		$self->addLocatorLinks([$stmtId, "/sde/stmgr/$stMgrObjId/$stmtId"]);
 		$self->addContent(qq{
-				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-				<TR><TD><font size=4 color=darkred face="arial,helvetica">Statement <b>$stmtId</b></font></TD><TD ALIGN=RIGHT>@{[ $self->getStmtsList($stMgrObjId, $stMgrObj, 'select') ]}</TD></TR>
+				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Statement <b>$stmtId</b></font></TD>
+				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getStmtsList($stMgrObjId, $stMgrObj, 'select') ]}</FONT></TD></TR>
+				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 				</TABLE>
 				<P>
 				<form method="post" href="/">
@@ -698,6 +748,50 @@ sub getConfigHtml
 
 #---------------------------------------------------------------------------------
 
+sub prepare_view_source
+{
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+
+	$self->addLocatorLinks(['Source', '/sde/source']);
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Source Code</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		</TABLE>
+		<P>
+		<FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">
+		<PRE>@{[ Devel::Symdump->inh_tree() ]}</PRE>
+		</FONT>
+		});
+
+	return 1;
+}
+
+#---------------------------------------------------------------------------------
+
+sub prepare_view_resources
+{
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+
+	$self->addLocatorLinks(['Resources', '/sde/resources']);
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		</TABLE>
+		<P>
+		<B><I>Not Yet Implemented... sorry</I></B>
+		});
+
+	return 1;
+}
+
+#---------------------------------------------------------------------------------
+
 sub prepare
 {
 	my ($self) = @_;
@@ -705,7 +799,7 @@ sub prepare
 
 	$self->addContent(qq{
 		<P>
-		<A HREF='/sde/tables'>Database Design</A><BR> @{[ $self->getTableListAsSelect() ]}<p>
+		<A HREF='/sde/tables'>Database Tables</A><BR> @{[ $self->getTableListAsSelect() ]}<p>
 		<A HREF='/sde/stmgrs'>Statement Managers</A><BR> @{[ $self->getStmtMgrsList('select') ]}
 		<P>
 		<A HREF='/perl-status'>View active modules</A>
@@ -719,7 +813,7 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
-	$self->param('view', $pathItems->[0]);
+	$self->param('_view', $pathItems->[0]);
 	$self->printContents();
 
 	return 0;
