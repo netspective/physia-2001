@@ -38,6 +38,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Home', name => 'home',},
 			{caption => 'Face Sheet', name => 'facesheet',},
 			],
+		_iconMedium => 'icon-m/person',
 		},
 	);
 
@@ -130,11 +131,23 @@ sub prepare_page_content_header
 	my $self = shift;
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	$self->SUPER::prepare_page_content_header(@_);
-	return 1 if $self->flagIsSet(PAGEFLAG_ISDISABLED);
-
-	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 	my $personId = $self->param('person_id');
+	my $urlPrefix = "/person/$personId";
+	
+	$self->{page_heading} = $self->property('person_simple_name');
+	$self->{page_menu_sibling} = [
+			['Summary', "$urlPrefix/profile", 'profile'],
+			['Chart', "$urlPrefix/chart", 'chart'],
+			['Account', "$urlPrefix/account", 'account'],
+			['Activity', "$urlPrefix/activity", 'activity'],
+			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
+			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
+		];
+	$self->{page_menu_siblingSelectorParam} = '_pm_view';
+	
+	$self->SUPER::prepare_page_content_header(@_);
+	
+	return 1 if $self->flagIsSet(PAGEFLAG_ISDISABLED);
 
 	my $category = lc($self->property('person_categories')->[0]) || undef;
 	# If the category isnt one of the predefined four, assume its staff.
@@ -143,18 +156,6 @@ sub prepare_page_content_header
 	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient')) {
 		$updateCategory = 'staff';
 	}
-
-	my $urlPrefix = "/person/$personId";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
-			['Summary', "$urlPrefix/profile", 'profile'],
-			['Chart', "$urlPrefix/chart", 'chart'],
-			['Account', "$urlPrefix/account", 'account'],
-			['Activity', "$urlPrefix/activity", 'activity'],
-			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
-			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
-		], ' | ');
 
 	my $profileLine = '<b>Profile: </b>';
 	$profileLine .= '<font color=red>(Account in Collection)</font>' if $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId);
@@ -197,25 +198,8 @@ sub prepare_page_content_header
 				<TD>
 	} if $self->param('_pm_view');
 
-
 	push(@{$self->{page_content_header}},
 		qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/person'}<B>#property.person_simple_name#</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE CELLSPACING=0 CELLPADDING=0 BORDER=0>
 			<TR>
 			<FORM>

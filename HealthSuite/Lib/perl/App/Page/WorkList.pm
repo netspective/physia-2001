@@ -21,9 +21,9 @@ use vars qw(@ISA @CHANGELOG %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'worklist' => {
 		_title => 'Work List Menu',
-		_iconSmall => 'icons/signpost',
-		_iconMedium => 'icons/signpost',
-		_iconLarge => 'icons/signpost',
+		_iconSmall => 'images/page-icons/worklists',
+		_iconMedium => 'images/page-icons/worklists',
+		_iconLarge => 'images/page-icons/worklists',
 		},
 	);
 

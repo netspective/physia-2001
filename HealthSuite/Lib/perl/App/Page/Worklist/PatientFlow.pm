@@ -26,9 +26,9 @@ use vars qw(%RESOURCE_MAP);
 			{caption => 'Setup', name => 'setup',},
 			],
 		_title => 'Patient Flow Work List',
-		_iconSmall => 'icons/worklist',
-		_iconMedium => 'icons/pencil',
-		_iconLarge => 'icons/pencil',
+		_iconSmall => 'images/page-icons/worklist-patient-flow',
+		_iconMedium => 'images/page-icons/worklist-patient-flow',
+		_iconLarge => 'images/page-icons/worklist-patient-flow',
 		},
 	);
 

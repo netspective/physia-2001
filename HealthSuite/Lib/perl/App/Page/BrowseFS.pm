@@ -39,10 +39,12 @@ sub setBrowseInfo
 
 sub prepare_page_content_header
 {
-	my ($self, $insideActions) = @_;
+	my ($self) = @_;
 	
 	my $browseInfo = $self->property('browseInfo');
-	$insideActions ||= "<A HREF='.'>Menu</A>";
+	my $siblings = [
+		['Menu', '.'],
+	];
 
 	if($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
@@ -57,14 +59,13 @@ sub prepare_page_content_header
 		return 1;
 	}
 
-	$self->SUPER::prepare_page_content_header(@_);
 	my $heading = $browseInfo->{rootHeading} || 'No rootHeading provided';
 	my $insideItem = 0;
 	
 	if(my $instance = $self->property('activeInstance'))
 	{
 		$heading = $instance->heading();
-		$insideActions = '<A HREF="#hrefSelfNoDlg#">Edit</A> | ' . $insideActions;
+		unshift(@$siblings, ['Edit', '#hrefSelfNoDlg#']);
 		$insideItem = 1;
 	}
 	elsif(my $caption = $self->param('ecaption'))
@@ -72,32 +73,10 @@ sub prepare_page_content_header
 		$heading = $caption;
 		$insideItem = 1;
 	}
-	
-	push(@{$self->{page_content_header}}, qq{
-		<STYLE>
-			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-			input { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-		</STYLE>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD BGCOLOR=BEIGE>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TR>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					<B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				@{[	$insideItem ? $insideActions : '' ]}
-				</FONT?
-			</TD>
-			</TR>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-		<FONT SIZE=1>&nbsp;<BR></FONT>
-		});
+
+	$self->{page_heading} = $heading;
+	$self->{page_menu_sibling} = $siblings if $insideItem;
+	$self->SUPER::prepare_page_content_header(@_);
 
 	return 1;
 }

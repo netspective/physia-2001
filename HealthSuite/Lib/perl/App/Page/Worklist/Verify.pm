@@ -27,9 +27,9 @@ use vars qw(%RESOURCE_MAP);
 			{caption => 'Setup', name => 'setup',},
 			],
 		_title => 'Verifications Work List',
-		_iconSmall => 'icons/magnify-text',
-		_iconMedium => 'icons/magnify-text',
-		_iconLarge => 'icons/magnify-text',
+		_iconSmall => 'images/page-icons/worklist-verification',
+		_iconMedium => 'images/page-icons/worklist-verification',
+		_iconLarge => 'images/page-icons/worklist-verification',
 		},
 	);
 

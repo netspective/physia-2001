@@ -494,40 +494,18 @@ sub prepare_page_content_header
 
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	$self->SUPER::prepare_page_content_header(@_);
-
 	my $today = UnixDate('today', '%m-%d-%Y');
 	my $nextweek = UnixDate('nextweek', '%m-%d-%Y');
-
-	my $heading = 'Scheduling';
-
 	my $urlPrefix = "/schedule";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
+	$self->{page_heading} = 'Scheduling';
+	$self->{page_menu_sibling} = [
 			['Appointments', "$urlPrefix/apptsheet", 'apptsheet'],
 			['Assign', "$urlPrefix/assign/$today/$today", 'assign'],
-		], ' | ');
+		];
+	$self->{page_menu_siblingSelectorParam} = '_pm_view';
 
-	push(@{$self->{page_content_header}},
-	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
+	$self->SUPER::prepare_page_content_header(@_);
+	push(@{$self->{page_content_header}}, '<p>') if $self->param('dialog');
 
 	if ($self->param('_pm_view') =~ /apptsheet/ && ! $self->param('dialog')) {
 		my $apptSheetHeader = $self->getApptSheetHeaderHtml();
@@ -730,7 +708,7 @@ sub initialize
 	}
 
 	$self->addLocatorLinks(
-			['Schedule', '', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
+			['Schedule Desk', ''],
 		);
 
 

@@ -11,34 +11,13 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 
 %RESOURCE_MAP = (
-	'help' => {},
+	'help' => {
+		_title => 'Online Help',
+		_iconSmall => 'images/page-icons/help',
+		_iconMedium => 'images/page-icons/help',
+		_iconLarge => 'images/page-icons/help',
+	},
 	);
-
-sub prepare_page_content_header
-{
-	my $self = shift;
-
-	$self->SUPER::prepare_page_content_header(@_);
-	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
-	push(@{$self->{page_content_header}}, qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD BGCOLOR=BEIGE>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TR>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					<B>Help</B>
-				</FONT>
-			</TD>
-			</TR>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-		<FONT SIZE=1>&nbsp;<BR></FONT>
-		});
-
-	return 1;
-}
 
 sub prepare
 {

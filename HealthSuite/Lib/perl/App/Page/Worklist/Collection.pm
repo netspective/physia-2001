@@ -19,9 +19,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::WorkList);
 %RESOURCE_MAP = (
 	'worklist/collection' => {
-			_title =>'Collection Work List',
-			_iconSmall =>'icons/worklist',
-			_iconMedium =>'icons/money',
+			_title =>'Collections Work List',
+			_iconSmall =>'images/page-icons/worklist-collections',
+			_iconMedium =>'images/page-icons/worklist-collections',
 			_views => [
 				{caption => '#param._seldate#', name => 'date',},
 				{caption => 'Account Notes', name => 'accountnotes',},

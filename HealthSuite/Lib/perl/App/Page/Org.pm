@@ -66,8 +66,8 @@ sub initialize
 	#$self->addDebugStmt("TEST : $x ");
 
 	$self->addLocatorLinks(
-			['Organization Look-up', '/search/org'],
-			[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
+			['Organization', '/search/org'],
+			[$orgId, 'profile'],
 		);
 
 	# Check user's permission to page
@@ -100,6 +100,20 @@ sub prepare_page_content_header
 
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
+	my $orgId = $self->param('org_id');
+	my $urlPrefix = "/org/$orgId";
+	my $orgName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgSimpleNameById', $intOrgId) || "No org_id parameter provided.";
+
+	$self->{page_heading} = $orgName;
+	$self->{page_menu_sibling} = [
+			['Summary', "$urlPrefix/profile", 'profile'],
+			['Insurance', "$urlPrefix/insurance", 'insurance'],
+			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
+			['Catalog', "$urlPrefix/catalog", 'catalog'],
+			['Account', "$urlPrefix/account", 'account'],
+		];
+	$self->{page_menu_siblingSelectorParam} = '_pm_view';
+
 	$self->SUPER::prepare_page_content_header(@_);
 	#my $category = $self->property('org_group_name');
 	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
@@ -114,42 +128,6 @@ sub prepare_page_content_header
 		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
 
 	}
-	#Retired Pane/Org/Heading.pm
-	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
-
-	my $orgName = undef;
-
-	if(my $orgId = $self->param('org_id'))
-	{
-		$orgName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgSimpleNameById', $intOrgId);
-	}
-	else
-	{
-		return 'No org_id parameter provided';
-	}
-
-	my $orgId = $self->param('org_id');
-	my $urlPrefix = "/org/$orgId";
-
-	#my $orgCategories = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCategory', $orgId);
-	#my @extras = ();
-	#foreach my $category (split(/,/, $orgCategories))
-	#{
-	#	push(@extras, ["\u$category", "$urlPrefix/\l$category", "\l$category"]);
-	#}
-
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_pm_view',
-		[
-			['Summary', "$urlPrefix/profile", 'profile'],
-			['Insurance', "$urlPrefix/insurance", 'insurance'],
-			#@extras,
-			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
-			['Catalog', "$urlPrefix/catalog", 'catalog'],
-			['Account', "$urlPrefix/account", 'account'],
-			#['WorkList', "$urlPrefix/worklist", 'worklist'],
-			#['Activity', "$urlPrefix/activity", 'activity'],
-		], ' | ');
 
 	my $profileLine = '<b>Profile: </b>';
 	$profileLine .=  '&nbsp;Primary Name: #property.org_name_primary# ' if $self->property('org_name_primary');
@@ -158,7 +136,6 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
 	$profileLine .=  '&nbsp;Hours of Operation: #property.org_hrs_oper# #property.org_time_zone#' if $self->property('org_hrs_oper');
 	$profileLine .=  '&nbsp;Clearing House ID: #property.org_clear_house# ' if $self->property('org_clear_house');
-
 
 	my $chooseAction = '';
 	$chooseAction = qq{
@@ -178,22 +155,6 @@ sub prepare_page_content_header
 
 	push(@{$self->{page_content_header}},
 		qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/org'}<B>$orgName</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE CELLSPACING=0 CELLPADDING=0 BORDER=0>
 			<TR>
 			<FORM>
@@ -259,7 +220,7 @@ sub prepare_view_profile
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Profile', 'profile']);
+	#$self->addLocatorLinks(['Profile', 'profile']);
 
 
 	$self->addContent(qq{
@@ -294,7 +255,7 @@ sub prepare_view_worklist
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['WorkList', 'worklist']);
+	#$self->addLocatorLinks(['WorkList', 'worklist']);
 
 	$self->addContent(qq{
 			<TR VALIGN=TOP>
@@ -310,7 +271,7 @@ sub prepare_view_clinic
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Clinic', 'clinic']);
+	#$self->addLocatorLinks(['Clinic', 'clinic']);
 	$self->addContent(" ", $self->param('errorcode'), "	-- NOT YET IMPLEMENTED.");
 	my $orgId = $self->param('org_id');
 
@@ -321,7 +282,7 @@ sub prepare_view_facility
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Facility', 'facility']);
+	#$self->addLocatorLinks(['Facility', 'facility']);
 	$self->addContent(" ", $self->param('errorcode'), " -- NOT YET IMPLEMENTED.");
 	my $orgId = $self->param('org_id');
 
@@ -332,7 +293,7 @@ sub prepare_view_insurance
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Insurance', 'insurance']);
+	#$self->addLocatorLinks(['Insurance', 'insurance']);
 
 	my $orgId = $self->param('org_id');
 
@@ -358,7 +319,7 @@ sub prepare_view_catalog
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Catalog', 'catalog']);
+	#$self->addLocatorLinks(['Catalog', 'catalog']);
 
 	my @pathItems = split('/', $self->param('arl'));
 
@@ -386,7 +347,7 @@ sub prepare_view_account
 {
 	my ($self) = @_;
 
-	$self->addLocatorLinks(['Account', 'account']);
+	#$self->addLocatorLinks(['Account', 'account']);
 
 	my $orgId = $self->param('org_id');
 	my $ownerOrg = $self->session('org_internal_id');
@@ -425,7 +386,7 @@ sub prepare_view_insurance
 sub prepare_view_personnel
 {
 	my ($self) = @_;
-	$self->addLocatorLinks(['Personnel', 'personnel']);
+	#$self->addLocatorLinks(['Personnel', 'personnel']);
 	$self->addContent(qq{
 		<TABLE>
 			<TR VALIGN=TOP>

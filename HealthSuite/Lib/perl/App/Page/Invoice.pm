@@ -1215,8 +1215,6 @@ sub prepare_view_summary
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
 
-	$self->addLocatorLinks(['Summary', "/invoice/$invoiceId/summary"]);
-
 	my $claim = $self->property('activeClaim');
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
 	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
@@ -1644,8 +1642,6 @@ sub prepare_view_history
 {
 	my $self = shift;
 
-	$self->addLocatorLinks(['History', 'history']);
-
 	my $claim = $self->property('activeClaim');
 
 	push(@{$self->{page_content}}, qq{
@@ -1660,8 +1656,6 @@ sub prepare_view_history
 sub prepare_view_envoy_nsf
 {
 	my $self = shift;
-
-	$self->addLocatorLinks(['NSF', 'nsf']);
 
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
@@ -1692,8 +1686,6 @@ sub prepare_view_envoy_nsf
 sub prepare_view_halley_nsf
 {
 	my $self = shift;
-
-	$self->addLocatorLinks(['NSF', 'nsf']);
 
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
@@ -1733,8 +1725,6 @@ sub prepare_view_halley_nsf
 sub prepare_view_1500
 {
 	my $self = shift;
-
-	$self->addLocatorLinks(['HCFA 1500', '1500']);
 
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
@@ -1779,8 +1769,6 @@ sub prepare_view_1500pdf
 	my $self = shift;
 	my $plain = shift;
 
-	$self->addLocatorLinks(['1500 PDF', '1500pdf']);
-
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
@@ -1811,8 +1799,6 @@ sub prepare_view_twcc61pdf
 {
 	my $self = shift;
 
-	$self->addLocatorLinks(['TWCC 61', 'twcc61pdf']);
-
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
@@ -1834,8 +1820,6 @@ sub prepare_view_twcc61pdf
 sub prepare_view_twcc64pdf
 {
 	my $self = shift;
-
-	$self->addLocatorLinks(['TWCC 64', 'twcc64pdf']);
 
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
@@ -1859,8 +1843,6 @@ sub prepare_view_twcc69pdf
 {
 	my $self = shift;
 
-	$self->addLocatorLinks(['TWCC 69', 'twcc69pdf']);
-
 	# these values are set in "initialize()" method
 	my $claimList = $self->property('claimList');
 	my $valMgr = $self->property('valMgr');
@@ -1882,8 +1864,6 @@ sub prepare_view_twcc69pdf
 sub prepare_view_errors
 {
 	my $self = shift;
-
-	$self->addLocatorLinks(['Errors', 'errors']);
 
 	my @errors =
 	(
@@ -1944,7 +1924,6 @@ sub initialize
 
 	$self->addLocatorLinks(
 			['Claims', '/search/claim'],
-			#[$invoiceId, '', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
 			[$invoiceId, "/invoice/$invoiceId"],
 		);
 
@@ -1977,7 +1956,6 @@ sub prepare_page_content_header
 {
 	my $self = shift;
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
-	$self->SUPER::prepare_page_content_header(@_);
 
 	my $invoiceId = $self->param('invoice_id');
 	my $sessOrg = $self->session('org_id');
@@ -2060,9 +2038,9 @@ sub prepare_page_content_header
 	}
 	my $clientId = uc($invoice->{client_id});
 
-	my $urlPrefix = "/invoice/$invoiceId";
-
-	my @functions = (
+	my $urlPrefix = "/invoice/$invoiceId";	
+	$self->{page_heading} = "Claim $invoiceId";
+	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/summary", 'summary'],
 			['HCFA 1500', "$urlPrefix/1500", '1500'],
 			['1500 PDF (PP)', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
@@ -2074,15 +2052,9 @@ sub prepare_page_content_header
 			['History', "$urlPrefix/history", 'history'],
 			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
 			['Halley NSF', "$urlPrefix/halley_nsf", 'halley_nsf'],
-		);
+		];
+	$self->{page_menu_siblingSelectorParam} = '_pm_view';
 	
-	
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER | App::Page::MENUFLAG_TARGETTOP,
-		'_pm_view',
-		[
-			@functions
-		], ' | ');
-
 	my $view = $self->param('_pm_view');
 	my $chooseActionMenu = '';
 	if($view eq 'envoy_nsf' || $view eq 'halley_nsf' || $view eq 'history')
@@ -2138,24 +2110,9 @@ sub prepare_page_content_header
 		};
 	}
 
+	$self->SUPER::prepare_page_content_header(@_);
 	push(@{$self->{page_content_header}},
 	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					<B>Claim $invoiceId</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE CELLSPACING=0 CELLPADDING=0 BORDER=0>
 			<TR>
 				<TD>

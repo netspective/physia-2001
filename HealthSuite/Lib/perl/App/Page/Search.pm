@@ -31,6 +31,7 @@ sub prepare_page_content_header
 	my $self = shift;
 	my $flags = 0;
 	my ($heading, $searchForm) = $self->getForm($flags);
+	$self->{page_heading} = $heading;
 	$self->property('_title', $heading) unless $self->property('_title');
 	$self->property('_iconMedium', 'icons/search') unless $self->property('_iconMedium');
 	

@@ -10,15 +10,15 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'search/_default' => {
 		_title => 'Main Menu',
-		_iconSmall => 'icons/signpost',
-		_iconMedium => 'icons/signpost',
-		_iconLarge => 'icons/signpost',
+		_iconSmall => 'images/page-icons/search',
+		_iconMedium => 'images/page-icons/search',
+		_iconLarge => 'images/page-icons/search',
 		},
 	);
 
 sub getForm
 {
-	return ('Lookup or add a record');
+	return ('Main Menu');
 }
 
 
@@ -89,7 +89,7 @@ sub prepare
 			<center>
 			<table border="0" cellspacing="0" cellpadding="5" align="center"><tr valign="top"><td>
 				<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
-					$IMAGETAGS{'icons/people'}
+					$IMAGETAGS{'images/page-icons/person'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size=5 color=navy><b>Patients</b></font>
 				</td></tr><tr><td colspan="2">
@@ -110,12 +110,12 @@ sub prepare
 				</td></tr></table>
 				<p>
 				<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
-					$IMAGETAGS{'icons/org'}
+					$IMAGETAGS{'images/page-icons/org'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size="5" color="navy"><b>Providers</b></font>
 				</td></tr><tr><td colspan=2>
 					<img src="/resources/design/bar.gif" height=1 width=100%><br>
-				</td></tr><tr valign=top bgcolor=white><td align="right">
+				</td></tr><tr valign=top bgcolor=white><td align="right"> 
 					$IMAGETAGS{'icons/arrow_right_red'}
 				</td><td>
 					<font face="arial,helvetica" size=2>
@@ -133,7 +133,7 @@ sub prepare
 				</table>
 				<p>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
-					$IMAGETAGS{'icons/accounting'}
+					$IMAGETAGS{'images/page-icons/accounting.gif'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size=5 color=navy><b>Referrals</b></font>
 				</td></tr><tr><td colspan=2>
@@ -164,7 +164,7 @@ sub prepare
 			<center>
 			<table border="0" cellspacing="0" cellpadding="5" align="center"><tr valign="top"><td>
 				<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
-					$IMAGETAGS{'icons/people'}
+					$IMAGETAGS{'images/page-icons/person'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size=5 color=navy><b>People</b></font>
 				</td></tr><tr><td colspan="2">
@@ -195,7 +195,7 @@ sub prepare
 				</td></tr></table>
 				<p>
 				<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
-					$IMAGETAGS{'icons/org'}
+					$IMAGETAGS{'images/page-icons/org'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size="5" color="navy"><b>Organizations</b></font>
 				</td></tr><tr><td colspan=2>
@@ -226,7 +226,7 @@ sub prepare
 				</td></tr></table>
 				<p>
 				<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
-					$IMAGETAGS{'icons/books04'}<br>
+					$IMAGETAGS{'images/page-icons/reference'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size="5" color="navy"><b>References / Codes</b></font>
 				</td></tr><tr><td colspan=2>
@@ -256,9 +256,9 @@ sub prepare
 					</font>
 			</td></tr></table></td><td>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
-					$IMAGETAGS{'icons/accounting'}
+					$IMAGETAGS{'images/page-icons/accounting'}
 				</td><td valign="middle">
-					<font face="arial,helvetica" size=5 color=navy><b>Billing</b></font>
+					<font face="arial,helvetica" size=5 color=navy><b>Accounting / Billing</b></font>
 				</td></tr><tr><td colspan=2>
 					<img src="/resources/design/bar.gif" height=1 width=100%></td></tr>
 				<tr valign=top bgcolor=white><td align="right">
@@ -289,7 +289,7 @@ sub prepare
 				</td></tr></table>
 				<p>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
-					$IMAGETAGS{'icons/schedule-m'}
+					$IMAGETAGS{'images/page-icons/schedule'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size="5" color="navy"><b>Appointments / Scheduling</b></font>
 				</td></tr><tr><td colspan=2>
@@ -316,7 +316,7 @@ sub prepare
 				</td></tr></table>
 				<p>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
-					$IMAGETAGS{'icons/sde'}
+					$IMAGETAGS{'images/page-icons/tools'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size="5" color="navy"><b>Utilities / Functions</b></font>
 				</td></tr><tr><td colspan=2>
