@@ -38,7 +38,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-	
+
 		new CGI::Dialog::Field(
 			name => 'show_cap',
 			type => 'hidden'
@@ -95,15 +95,15 @@ sub new
 			column => 'Offering_Catalog_Entry.description',
 			size => '50'
 		),
-		
+
 		new CGI::Dialog::Field(caption => 'Service Type',
 			name => 'data_text',
 			type => 'text',
-			size => 2,			
-			maxLength => 2,					
-			findPopup => '/lookup/servicetype',			
+			size => 2,
+			maxLength => 2,
+			findPopup => '/lookup/servicetype',
 			#options => FLDFLAG_REQUIRED,
-							
+
 		),
 		new CGI::Dialog::Field(caption => 'Status',
 			name => 'status',
@@ -144,9 +144,9 @@ sub new
 		{
 			scope =>'offering_catalog_entry',
 		key => "#field.catalog_id#",
-			data => "Fee Schedule Entry '#param.entry_id# #field.entry_id#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
+			data => "Fee Schedule Entry '#field.code#' to <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
 	};
-	
+
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%param.internal_catalog_id%", 1],
@@ -160,12 +160,12 @@ sub new
 sub makeStateChanges_special
 {
 	my ($self, $page) = @_;
-	
-	my $recExist;	
+
+	my $recExist;
 	$recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
 		$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')
 		if ($page->param('internal_catalog_id'));
-	
+
 	$self->updateFieldFlags('flags', FLDFLAG_INVISIBLE, ! $recExist->{value_int});
 	my $result = $recExist->{value_int} ? 1 :0;
 	$page->field('show_cap',$result);
@@ -183,11 +183,11 @@ sub populateData_add
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	if($page->param('parent_entry_id'))
 	{
-		my $parentEntry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('parent_entry_id')) ;	
+		my $parentEntry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('parent_entry_id')) ;
 		$page->field('parent_entry_id', $parentEntry->{name});
 	}
 
-	$page->field('entry_type', 100);	
+	$page->field('entry_type', 100);
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
 	$page->field('add_mode', 1);
@@ -204,11 +204,11 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $entryId = $page->param('entry_id');
-	if ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+	if ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selCatalogItemById', $entryId))
 	{
 		my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('catalog_id')) ;
-		$page->field('catalog_id',$parentCatalog->{catalog_id});	
+		$page->field('catalog_id',$parentCatalog->{catalog_id});
 		$self->makeStateChanges_special($page);
 	}
 	else
@@ -229,7 +229,7 @@ sub checkDupEntry
 	if ($page->field('add_mode'))
 	{
 		my $entryExists;
-		
+
 		if ($modifier)
 		{
 			$entryExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
@@ -240,7 +240,7 @@ sub checkDupEntry
 			$entryExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
 				'sel_catalogEntry_by_catalogTypeCode', $code, $entryType, $fs);
 		}
-		
+
 		my $field = $self->getField('code_modifier');
 		$field->invalidate($page, qq{Entry '$code' already exists in the system for Fee Schedule '$fs'.}) if $entryExists;
 	}
@@ -250,19 +250,19 @@ sub checkDupEntry
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	my $fs = $page->param('_f_catalog_id');
 	my $entryType = $page->param('_f_entry_type');
-	
+
 	my $code = $page->param('_f_code');
 	my $modifier = $page->param('_f_modifier');
 	my $svc_type = $page->field('data_text');
 	my $svc_field =$self->getField('data_text');
 	my $parentCatalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);
 	$page->param('internal_catalog_id',$parentCatalog->{internal_catalog_id});
-	$self->checkDupEntry($page, $parentCatalog->{internal_catalog_id}, $entryType, $code, $modifier);	
-	
-	
+	$self->checkDupEntry($page, $parentCatalog->{internal_catalog_id}, $entryType, $code, $modifier);
+
+
 	#If FS is not capitated just set flags to FFS to be safe
 	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
 			$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
@@ -273,7 +273,7 @@ sub customValidate
 	#Attempt to determine serivce type if user does not provide one
 	if ($svc_type eq '')
 	{
-		
+
 		#Service Type for EPSDT is S
 		if ($entryType == App::Universal::CATALOGENTRYTYPE_EPSDT)
 		{
@@ -285,22 +285,22 @@ sub customValidate
 			$svc_type = $STMTMGR_INTELLICODE->getSingleValue($page,STMTMGRFLAG_NONE,
 					'selServTypeByCode',$code,$entryType);
 		}
-		
+
 		#
 		#Autofill service type if we were able to determine it
 		$page->field('data_text',$svc_type);
 		my $itemNameField = $self->getField('data_text');
 		$itemNameField->invalidate($page, qq{
 		@{[ $svc_type ? "Autofilled Service Type" : "Unable to find a Service Type for code '$code'" ]}
-		});					
+		});
 	}
-	
-	
+
+
 	if($svc_type ne '' && not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericServiceTypeByAbbr', $svc_type)))
 	{
 		$svc_field->invalidate($page, "The service type code $svc_type is not valid. Please verify");
 	}
-	
+
 	if (
 		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
 		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE,App::Universal::CATALOGENTRYTYPE_EPSDT,App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
@@ -312,31 +312,31 @@ sub customValidate
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_ICD) {
 				$codeInfo = $STMTMGR_CATALOG_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
 					'sel_icd_code', $code);
-				last CASE;			
+				last CASE;
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_CPT) {
 				$codeInfo = $STMTMGR_CPT_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
 					'sel_cpt_code', $code);
-				last CASE;			
+				last CASE;
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_HCPCS) {
 				$codeInfo = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
 					'sel_hcpcs_code', $code);
-				last CASE;			
+				last CASE;
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_EPSDT) {
 				$codeInfo = $STMTMGR_EPSDT_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
 					'sel_epsdt_code',$code);
-				last CASE;			
+				last CASE;
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE) {
 				$codeInfo = $STMTMGR_MISC_PROCEDURE_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
 					'sel_misc_procedure_code',$code,$page->session('org_internal_id'));
-				last CASE;			
+				last CASE;
 			}
 
 		}
-		
+
 		unless ($page->param('_f_name'))
 		{
 			my $itemNameField = $self->getField('name');
@@ -371,7 +371,7 @@ sub execute
 	my $catalogType = $page->field('catalog_type');
 	my $status = $page->field('status');
 	my $costType = $page->field('cost_type');
-	my $entryType = $page->field('entry_type');	
+	my $entryType = $page->field('entry_type');
 	my $ffs_flag;
 #	if($page->field('show_cap'))
 #	{

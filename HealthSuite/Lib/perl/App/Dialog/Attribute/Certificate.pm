@@ -31,7 +31,7 @@ sub initialize
 		level => 1,
 		scope =>'person_attribute',
 		key => "#param.person_id#",
-		data => "Certification '#field.value_text#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		data => "Certification '#field.value_textb# #field.value_text#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 }
