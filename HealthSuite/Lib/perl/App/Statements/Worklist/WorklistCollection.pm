@@ -845,11 +845,12 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	},
 
 	'sel_worklist_available_products' => qq{
-		select i.ins_internal_id as product_id, product_name 
-		from insurance i, org 
-		where record_type = 1
-			AND	i.owner_org_id = org.org_internal_id
+		select i.ins_internal_id as product_id, product_name || ' (' || ct.caption || ')'
+		from claim_type ct, insurance i, org
+		where i.record_type = 1
+			AND	org.org_internal_id = i.owner_org_id
 			AND	org.owner_org_id = :1
+			AND ct.id = i.ins_type
 		order by product_name
 	},
 	'sel_worklist_associated_products' => qq{

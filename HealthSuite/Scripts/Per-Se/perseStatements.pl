@@ -68,6 +68,10 @@ print "What To Do = @whatToDo \n";
 createStatementsFile(@orgsToDo) if grep(/create/, @whatToDo);
 exit;
 
+############
+# end main
+############
+
 
 sub createStatementsFile
 {
@@ -89,12 +93,12 @@ sub createStatementsFile
 		if ($providerId)
 		{
 			$outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
-				'sel_outstandingClaims_perOrg_perProvider', $orgInternalId, $providerId);
+				'sel_statementClaims_perOrg_perProvider', $orgInternalId, $providerId);
 		}
 		else
 		{
 			$outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
-				'sel_outstandingClaims_perOrg', $orgInternalId);
+				'sel_statementClaims_perOrg', $orgInternalId);
 		}
 
 		print "\n";
@@ -123,10 +127,6 @@ sub createStatementsFile
 		writeStatementsFile($statements, $fileName, $orgInternalId, $stamp);
 	}
 }
-
-############
-# end main
-############
 
 sub recordStatement
 {
@@ -284,7 +284,7 @@ sub getBillingPhone
 sub getOrgAddress
 {
 	my ($orgInternalId, $addrName) = @_;
-	die "orgInternalId required" unless defined $orgInternalId;
+	#die "orgInternalId required.  addrName = $addrName" unless defined $orgInternalId;
 	$addrName = 'Mailing' unless defined $addrName && $addrName;
 
 	# First try to get the requested address
@@ -360,6 +360,11 @@ sub populateStatementsHash
 
 	for (@{$claims})
 	{
+		unless($_->{billing_facility_id})
+		{
+			print qq{Skipping Claim $_->{invoice_id}: Billing Facility ID '$_->{billing_facility_id}' is Invalid.\n};
+			next;
+		}
 		my $key = $_->{billing_facility_id} . '_' . $_->{bill_to_id} . '_' . $_->{client_id};
 
 		$statements{$key}->{billToId} = $_->{bill_to_id};
@@ -373,11 +378,6 @@ sub populateStatementsHash
 		$statements{$key}->{patientName} = $_->{patient_name};
 		$statements{$key}->{patientLastName} = $_->{patient_name_last};
 
-		unless (defined $_->{invoice_id} && defined $_->{invoice_date} && $_->{care_provider_id})
-		{
-			warn "Data not valid";
-			next;
-		}
 		my $totalCost = defined $_->{total_cost} ? $_->{total_cost} : 0;
 		my $balance = defined $_->{balance} ? $_->{balance} : 0;
 		my $patientReceipts = defined $_->{patient_receipts} ? $_->{patient_receipts} : 0;
@@ -402,6 +402,13 @@ sub populateStatementsHash
 
 	for my $key (@keys)
 	{
+		unless (sendStatementToday($statements{$key}, $billingEvents, $orgInternalId))
+		{
+			# This statement doesn't get sent today
+			delete $statements{$key};
+			next;
+		}
+
 		my $clientId = $statements{$key}->{clientId};
 		my $billToId = $statements{$key}->{billToId};
 
@@ -422,13 +429,6 @@ sub populateStatementsHash
 
 		$statements{$key}->{amountDue} = $statements{$key}->{agingCurrent} + $statements{$key}->{aging30} +
 			$statements{$key}->{aging60} + $statements{$key}->{aging90} + $statements{$key}->{aging120};
-
-		unless (sendStatementToday($statements{$key}, $billingEvents, $orgInternalId))
-		{
-			# This statement doesn't get sent today
-			delete $statements{$key};
-			next;
-		}
 	}
 
 	return \%statements;

@@ -6,14 +6,14 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 
-use vars qw(@ISA @EXPORT $STMTMGR_STATEMENTS);
+use vars qw(@EXPORT $STMTMGR_STATEMENTS);
 
-@ISA    = qw(Exporter DBI::StatementManager);
+use base qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_STATEMENTS);
 
 my $SELECT_OUTSTANDING_CLAIMS = qq{
-	SELECT Invoice.invoice_id, bill_to_id, billing_facility_id, service_facility_id,
-		provider_id, care_provider_id, client_id, total_cost, total_adjust, balance,
+	SELECT Invoice.invoice_id, bill_to_id, billing_facility_id, provider_id, care_provider_id,
+		client_id, total_cost, total_adjust, balance,
 		to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, bill_party_type,
 		(select nvl(sum(net_adjust), 0)
 			from Invoice_Item_Adjust
@@ -43,10 +43,39 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		AND Invoice_Billing.bill_to_id IS NOT NULL
 		AND Transaction.trans_id = Invoice.main_transaction
 		%ProviderClause%
+	UNION
+	SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, billing_org_id as 
+		billing_facility_id, 'Payment Plan' as provider_id, null as care_provider_id,
+		pp.person_id as client_id, 0 as total_cost, 0 as total_adjust, pp.balance,
+		to_char(first_due, 'SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, 0 as bill_party_type,
+		0 as insurance_receipts, sum(payments) as patient_receipts, p.complete_name AS 
+		patient_name, p.name_last AS patient_name_last
+	FROM Person p, Payment_Plan pp
+	WHERE pp.next_due > sysdate
+		and pp.balance > 0
+		and p.person_id = pp.person_id
+		and not exists (select 'x' from Statement where)
+	
 	ORDER BY Invoice.invoice_id
 };
 
 $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
+
+	'sel_statementClaims_perOrg' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND not exists (select 'x' from person_attribute pa
+			where pa.parent_id = Transaction.provider_id
+				and pa.value_type = 960
+				and pa.value_intb = 1
+			)
+		},
+	},
+
+	'sel_statementClaims_perOrg_perProvider' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND Transaction.provider_id = ?},
+	},
+
 	'sel_BillingIds' => qq{
 		select org.org_internal_id, org.org_id, org_attribute.value_text as billing_id,
 			org_attribute.value_int as nsf_type, null as provider_id
@@ -67,21 +96,6 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			and person_org_category.person_id = person_attribute.parent_id
 			and person_org_category.category = 'Physician'
 			and org.org_internal_id = person_org_category.org_internal_id
-	},
-
-	'sel_outstandingClaims_perOrg' => {
-		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
-		ProviderClause => qq{AND not exists (select 'x' from person_attribute pa
-			where pa.parent_id = Transaction.provider_id
-				and pa.value_type = 960
-				and pa.value_intb = 1
-			)
-		},
-	},
-
-	'sel_outstandingClaims_perOrg_perProvider' => {
-		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
-		ProviderClause => qq{AND Transaction.provider_id = ?},
 	},
 
 	'sel_internalStatementId' => qq{
@@ -191,13 +205,14 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 
 	'sel_paymentPlan' => qq{
 		select plan_id, person_id, payment_cycle, payment_min, to_char(first_due, '$SQLSTMT_DEFAULTDATEFORMAT')
-			as first_due, balance, num_payments, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
-			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date, inv_ids
+			as first_due, balance, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
+			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date, 
+			billing_org_id, inv_ids
 		from Payment_Plan
 		where person_id = :1
 			and owner_org_id = :2
 	},
-
+	
 );
 
 1;
