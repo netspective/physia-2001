@@ -21,7 +21,8 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = (
-	'lab-location' => {_arl_update => ['item_id']},
+	'lab-location' => {_arl_update => ['item_id'],
+	_arl_remove => ['item_id']},
 );
 
 
@@ -131,7 +132,7 @@ sub populateData_update
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	$page->field('add_mode', 0);
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	
+
 	#Get Address Info
 	my $address = $STMTMGR_ORG->getRowAsHash($page,STMTMGRFLAG_NONE,'selOrgAddressById',$page->param('item_id')||undef);
 	$page->field('org_internal_id',$address->{parent_id});
@@ -176,7 +177,7 @@ sub execute
 
 	#store address
 	$page->schemaAction(
-			'Org_Address', $page->field('address_item_id') ? 'update' : 'add',
+			'Org_Address', $command,
 			item_id =>$page->field('address_item_id'),
 			parent_id => $orgIntId || undef,
 			address_name => $locName,,
@@ -186,8 +187,9 @@ sub execute
 			state => $page->field('addr_state') || undef,
 			zip => $page->field('addr_zip')|| undef,);
 	#store Phone numbers
+	my $action = $command eq 'remove' ? $command : $page->field('phone_item_id') ? 'update' : 'add'	;
 	$page->schemaAction(
-			'Org_Attribute',$page->field('phone_item_id') ? 'update' : 'add',
+			'Org_Attribute',$action,
 			item_id =>$page->field('phone_item_id')	,		
 			parent_id => $orgIntId,
 			item_name => $locName,
@@ -196,8 +198,9 @@ sub execute
 		) if $page->field('phone') ne '' ;
 
 	#store Fax Number
+	$action = $command eq 'remove' ? $command :  $page->field('fax_item_id') ? 'update' : 'add';	
 	$page->schemaAction(
-			'Org_Attribute', $page->field('fax_item_id') ? 'update' : 'add',
+			'Org_Attribute', $action,
 			item_id =>$page->field('fax_item_id'),
 			parent_id => $orgIntId,
 			item_name => $locName,
