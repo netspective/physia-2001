@@ -6,8 +6,7 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $ITEMNAME_PATH $STMTFMT_SEL_PERSON $STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -48,14 +47,14 @@ my %personTemplates = (
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.person_id) = ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_id_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.person_id) like ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname' =>
@@ -90,42 +89,42 @@ my %personTemplates = (
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn = ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn like ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.date_of_birth = ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.date_of_birth like ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'att.value_text = ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'att.value_text like ?',
-			 orderBy => '',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	);
@@ -157,17 +156,6 @@ $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 	%{$categorySqls[2]},
 	%{$categorySqls[3]},
 	%{$categorySqls[4]},
-);
-
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/06/2000', 'RK',
-		'Search/Person',
-		'Updated the Person select statements by replacing them with _stmtFmt.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Person',
-		'Created simple reports instead of using createOutput function.'],
 );
 
 1;

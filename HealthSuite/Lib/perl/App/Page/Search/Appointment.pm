@@ -59,9 +59,6 @@ sub getForm
 		"/schedule/appointment/reschedule/%itemValue%",
 		"/schedule/appointment/noshow/%itemValue%",
 		"/schedule/appointment/update/%itemValue%",
-		"/person/%itemValue%/profile",
-		"/person/%itemValue%/account",
-		"/create/claim/%itemValue%",
 	);
 
 	$self->param('item_action_arl_select', $actionValues[$self->param('action')])
@@ -83,9 +80,6 @@ sub getForm
 				<option value="$actionValues[5]">Reschedule</option>
 				<option value="$actionValues[6]">No Show</option>
 				<option value="$actionValues[7]">Edit Appointment</option>
-				<option value="$actionValues[8]">*Patient Summary</option>
-				<option value="$actionValues[9]">*Patient Account</option>
-				<option value="$actionValues[10]">*Create Claim</option>
 			</SELECT>
 
 			<SELECT name="item_action_arl_dest_select">
@@ -134,7 +128,7 @@ sub getForm
 
 		Resource:
 		<input name='resource_id' size=17 maxlength=32 value="@{[$self->param('resource_id')]}" title='Resource ID'>
-			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_id, '/lookup/person/id');">
+			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_id, '/lookup/physician/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
 		Facility:
@@ -142,9 +136,18 @@ sub getForm
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_id, '/lookup/org/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		<input type=submit name="execute" value="Go">
-		</nobr>
+		
+		&nbsp; &nbsp; Order by:
+		<SELECT name='order_by'>
+			<option value="time">Appointment Time</option>
+			<option value="name">Patient Name</option>
+		</SELECT>
+		<script>
+			setSelectedValue(document.search_form.order_by, '@{[ $self->param('order_by')]}');
+		</script>
+
 		<input type=hidden name='searchAgain' value="@{[$self->param('searchAgain')]}">
-		$createFns
+		
 		$itemFns
 		</CENTER>
 	};
@@ -232,13 +235,21 @@ sub execute
 		$resourceId =~ s/\*/%/g;
 		$facilityId =~ s/\*/%/g;
 
-		$self->addContent(
-			'<CENTER>',
-			$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
+		my $html;
+		if ($self->param('order_by') eq 'name')
+		{
+			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
 				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo],
 			),
-			'</CENTER>'
-		);
+		}
+		else
+		{
+			$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
+				[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo],
+			),
+		}
+		
+		$self->addContent('<CENTER>', $html, '</CENTER>');
 	}
 
 	return 1;

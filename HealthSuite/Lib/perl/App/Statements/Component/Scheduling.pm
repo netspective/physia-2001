@@ -18,6 +18,8 @@ my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
 my $PERSON_ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEPERSON;
 my $FACILITY_ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEORG;
 
+my $WORKLIST_ITEMNAME = 'WorkList';
+
 #----------------------------------------------------------------------------------------------------------------------
 my $timeFormat = 'HH:MIam';
 $STMTRPTDEFN_WORKLIST =
@@ -69,13 +71,13 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 		select value_text from Person_Attribute
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = '$WORKLIST_ITEMNAME'
 		)
 	and e.facility_id in (
 		select value_text from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = '$WORKLIST_ITEMNAME'
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
@@ -174,7 +176,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		delete from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = '$WORKLIST_ITEMNAME'
 	},
 	
 	'sel_worklist_facilities' => qq{
@@ -182,10 +184,9 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = '$WORKLIST_ITEMNAME'
 	},
 	
-
 );
 	
 

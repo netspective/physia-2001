@@ -5,15 +5,73 @@ package App::Statements::Search::Appointment;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use Devel::ChangeLog;
 use App::Universal;
+use Data::Publish;
 
 my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
 my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
 
-use vars qw(@ISA @EXPORT @CHANGELOG $STMTMGR_APPOINTMENT_SEARCH $STMTFMT_SEL_APPOINTMENT $STMTRPTDEFN_DEFAULT);
+use vars qw(@ISA @EXPORT $STMTMGR_APPOINTMENT_SEARCH $STMTFMT_SEL_APPOINTMENT
+	$STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_APPOINTMENT_SEARCH);
+
+$STMTRPTDEFN_DEFAULT =
+{
+	columnDefn =>
+	[
+		{ head => 'Time', colIdx => 1,
+			url => 'javascript: document.search_form != null ? chooseEntry("#9#") : ""',
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
+
+		{ head => 'Type',
+			dataFmt => '#5#',
+		},
+
+		{ head => 'Patient', colIdx => 0,
+			url => qq{javascript:chooseItem("/person/#12#/profile")},
+			hint => "View #12# Profile",
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
+
+		{ head => 'Appointment',
+			dataFmt => '#6#',
+		},
+
+		{ head => 'Physician',
+			dataFmt => '#2#',
+		},
+
+		{ head => 'Facility',
+			dataFmt => '#7#',
+		},
+
+		{ head => 'Scheduled By',
+			dataFmt => '#10#',
+		},
+
+		{ head => 'Scheduled Date',
+			dataFmt => '#11#',
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
+
+		#{
+		#	head => 'Details',
+		#	dataFmt => q{
+		#		<a href='/person/#12#/profile' title='#12# Profile'
+		#			style='text-decoration:none'>#0#</a>
+		#		(<I>#3#</I>)<BR>
+		#		#6# with #2# at #7#<BR>
+		#		Appt Type: #5#<BR>
+		#		Subject: <b>#4#</b><BR>
+		#		#8# <br>
+		#		Scheduled by #10# <br>
+		#		on #11#
+		#	}
+		#},
+	],
+};
 
 my $APPOINTMENT_COLUMNS = qq
 { patient.complete_name,
@@ -50,7 +108,7 @@ my $STMTFMT_SEL_APPOINTMENT = qq{
 		and stat.id between ? and ?
 		and aat.id = ep1.value_int
 		and et.id = event.event_type
-	order by event.start_time, event.event_id
+	%orderBy%
 };
 
 my $STMTFMT_SEL_APPOINTMENT_CONFLICT = qq{
@@ -68,65 +126,31 @@ my $STMTFMT_SEL_APPOINTMENT_CONFLICT = qq{
 		and stat.id = event.event_status
 		and aat.id = ep1.value_int
 		and et.id = event.event_type
-	order by event.start_time, event.event_id
-};
-
-
-$STMTRPTDEFN_DEFAULT =
-{
-	#style => 'pane',
-	#frame =>
-	#{
-	#	heading => 'Appointments',
-	#},
-
-	columnDefn =>
-	[
-		{ head => 'Appointment', colIdx => 1,
-			url => 'javascript: document.search_form != null ? chooseEntry("#9#") : ""' },
-		{
-			head => 'Details',
-			dataFmt => q{
-				<a href='/person/#12#/profile' title='#12# Profile'
-					style='text-decoration:none'>#0#</a>
-				(<I>#3#</I>)<BR>
-				#6# with #2# at #7#<BR>
-				Appt Type: #5#<BR>
-				Subject: <b>#4#</b><BR>
-				#8# <br>
-				Scheduled by #10# <br>
-				on #11#
-			}
-		},
-	],
-	#rowSepStr => '',
+	%orderBy%
 };
 
 $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(
 	'sel_appointment' =>
 	{
-		_stmtFmt => $STMTFMT_SEL_APPOINTMENT,
+		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
+		orderBy => 'order by event.start_time, event.event_id',
 	},
 
 	'sel_conflict_appointments' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_APPOINTMENT_CONFLICT,
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-);
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'MAF',
-		'Search/Appointment',
-		'Created simple reports instead of using createOutput function.'
-	],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/19/2000', 'TVN',
-		'Search/Appointment',
-		'Revised query to use Attribute value_type instead of item_name.'
-	],
-
+	{
+		sqlStmt => $STMTFMT_SEL_APPOINTMENT_CONFLICT,
+		publishDefn => $STMTRPTDEFN_DEFAULT,
+		orderBy => 'order by event.start_time, event.event_id',
+	},
+	
+	'sel_appointment_orderbyName' =>
+	{
+		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
+		publishDefn => $STMTRPTDEFN_DEFAULT,
+		orderBy => 'order by patient.name_last, patient.name_first, patient.name_middle',
+	},
+	
 );
 
 1;

@@ -29,14 +29,16 @@ use App::Schedule::Slot;
 use App::Schedule::Utilities;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
-use Devel::ChangeLog;
+use App::Statements::Component::Scheduling;
 
 use enum qw(BITMASK:MULTIRESOURCESEARCH_ SERIAL PARALLEL);
 use constant DEFAULT_SEARCH => MULTIRESOURCESEARCH_SERIAL;
 use constant ANALYZE_ALLTEMPLATES => -99;
 
-use vars qw(@CHANGELOG $ANALYZE_INFINITY_DAYS);
+use vars qw($ANALYZE_INFINITY_DAYS);
 $ANALYZE_INFINITY_DAYS = 10000;
+
+my $WORKLIST_ITEMNAME = 'WorkList';
 
 sub new
 {
@@ -487,8 +489,8 @@ sub findResourceIds
 	}
 	else
 	{
-		my $assocResources = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selAssociatedResources', $page->session('user_id'));
+		my $assocResources = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+			'sel_worklist_resources', $page->session('user_id'), $WORKLIST_ITEMNAME);
 
 		for (@$assocResources) {
 			push(@$arrayRef, $_->{resource_id});
@@ -499,27 +501,13 @@ sub findResourceIds
 sub findFacilityIds
 {
 	my ($self, $page, $arrayRef) = @_;
-	@$arrayRef = ('CLMEDGRP', 'TMEDCTR');
+	
+	my $assocFacilities = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+		'sel_worklist_facilities', $page->session('user_id'));
+
+	for (@$assocFacilities) {
+		push(@$arrayRef, $_->{facility_id});
+	}
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/14/1999', 'TVN',
-		'Schedule/Analyze',
-		'Completed the calculation portion of Analyze2 for robust search of available slots.  Merged Analyze2 into Analyze.  Still need to tie up lose ends and develop routine to extract the available slot data out of the new data structures.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/13/2000', 'TVN',
-		'Schedule/Analyze',
-		'Completed finding available slots taking into account patient types and visit types.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/21/2000', 'TVN',
-		'Schedule/Analyze',
-		'Transfer dynamic SQL query to Statement Manager.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/02/2000', 'TVN',
-		'Schedule/Analyze',
-		'Revised queries to accommodate multiple Resources per Template.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/20/2000', 'TVN',
-		'Schedule/Analyze',
-		'Completed finding available slots for roving physicians and implemented wild-card specifications for Resource Ids.'],
-
-);
 
 1;
