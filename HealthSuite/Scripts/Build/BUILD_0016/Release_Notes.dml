@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 
+<!--
+	****************************************************************************
+	DUDES, ARRANGE YOUR BUGS IN NUMERICAL ORDER. IT'S MUCH NICER TO READ !!!!
+	****************************************************************************
+-->
+
 <release-notes>
 	<release-info>
 		<build-id>16</build-id>
@@ -10,8 +16,28 @@
 
 	<deliverables>
 
+		<deliverable id="241">
+			Added 'Schedule Follow-up Appointment' to next actions in checkout dialog.
+		</deliverable>
+
+		<deliverable id="893">
+			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
+		</deliverable>
+
+		<deliverable id="952">
+			New query function will handle lookup
+		</deliverable>
+
+		<deliverable id="1019">
+			Populating caption for epsdt and hcpcs.
+		</deliverable>
+
 		<deliverable id="1023">
 			UI: Fixed the data formatt to not to display the 'Accreditation' information twice in the same record
+		</deliverable>
+
+		<deliverable id="1024">
+			On collection worklist account notes replaced Complete Name with Simple Names
 		</deliverable>
 
 		<deliverable id="1025">
@@ -23,9 +49,61 @@
 			UI: Show how an appointment was or was not verified.
 		</deliverable>
 
+		<deliverable id="1297">
+			Report (financial analysis report) :  Changed calc for A/R column
+		</deliverable>
+
+		<deliverable id="1327">
+			Indicating submission order in claim summary (i.e. Primary, Secondary, etc.). Also added links to associated
+				claims through History items.
+		</deliverable>
+
+		<deliverable id="1340">
+			Added next actions to checkin, checkout, create claim, and post personal payment dialogs.
+		</deliverable>
+
+		<deliverable id="1345">
+			UI:  Disable Checkout when the claim is voided.
+		</deliverable>
+
+		<deliverable id="1352">
+			UI : Updated the login dialog to check if the person logged in belongs to 
+	     'Physician', 'Staff', 'Nurse', 'Adminstrator' or 'Superuser' category. 
+	     Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
+	     category from the 'Person_Org_Category' table.
+		</deliverable>				
+
+		<deliverable id="1358">
+			Added statuses to condition that shows resubmit to current payer link.
+		</deliverable>
+
+		<deliverable id="1359">
+			New dialog asking if claim is to be viewed or printed. Accessed through choose action on claim summary.
+		</deliverable>
+
+		<deliverable id="1368">
+			Created text-based reports for "Receipt analysis, Aged insurance and pt receivables,
+			revenue and collection, DAR, MAR and under Billing Section of reporting the Claims status."
+			These are currently in production.
+		</deliverable>
+
+		<deliverable id="1383">
+			UI:  Deleted the 'Find by State, City and Zip' in the Org Search page.
+		</deliverable>		
+
+		<deliverable id="1401">
+			UI:  Tie Checkin and Insurance Verification.  Verify that insurance verification is
+			complete when the user clicks 'Yes' for Insurance verification during Checkin.
+		</deliverable>		
+
 		<deliverable id="1415">
 			UI: Fixed the code to not to show up the Mr and Mrs in the 'My Associated Resources Appointments' component of the
 			User's home page
+		</deliverable>
+
+		<deliverable id="1419">
+			Created text-based reports for the details of MAR and DAR.
+			These are currently in production.
 		</deliverable>
 
 		<deliverable id="1424">
@@ -37,71 +115,17 @@
 			ACS CHANGE : Modifed service request dialog to include Case Manager Claim Number , read only followup status , space for up to 4 ICD code
 		</deliverable>
 
-		<deliverable id="952">
-			New query function will handle lookup
+		<deliverable id="1437">
+			Reversed the sender and recipient on phone messages.
 		</deliverable>
 
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
 		</deliverable>
-		<deliverable id="1340">
-			Added next actions to checkin, checkout, create claim, and post personal payment dialogs.
-		</deliverable>
-		<deliverable id="893">
-			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
-		</deliverable>
-		
-		<deliverable id="1368">
-			Created text-based reports for "Receipt analysis, Aged insurance and pt receivables,
-			revenue and collection, DAR, MAR and under Billing Section of reporting the Claims status."
-			These are currently in production.
-		</deliverable>
 
-		<deliverable id="1419">
-			Created text-based reports for the details of MAR and DAR.
-			These are currently in production.
-		</deliverable>
-
-		<deliverable id="1437">
-			Reversed the sender and recipient on phone messages.
-		</deliverable>
-		<deliverable id="1297">
-			Report (financial analysis report) :  Changed calc for A/R column
-		</deliverable>
-
-		<deliverable id="1359">
-			New dialog asking if claim is to be viewed or printed. Accessed through choose action on claim summary.
-		</deliverable>
-		<deliverable id="1019">
-			Populating caption for epsdt and hcpcs.
-		</deliverable>
-		<deliverable id="1358">
-			Added statuses to condition that shows resubmit to current payer link.
-		</deliverable>
-		<deliverable id="1024">
-			On collection worklist account notes replaced Complete Name with Simple Names
-		</deliverable>
 		<deliverable id="none">
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
-		</deliverable>
-		<deliverable id="1383">
-			UI:  Deleted the 'Find by State, City and Zip' in the Org Search page.
-		</deliverable>		
-		<deliverable id="1352">
-			UI : Updated the login dialog to check if the person logged in belongs to 
-			     'Physician', 'Staff', 'Nurse', 'Adminstrator' or 'Superuser' category. 
-			     Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
-			     category from the 'Person_Org_Category' table.
-		</deliverable>				
-
-		<deliverable id="1327">
-			Indicating submission order in claim summary (i.e. Primary, Secondary, etc.). Also added links to associated
-				claims through History items.
-		</deliverable>
-
-		<deliverable id="241">
-			Added 'Schedule Follow-up Appointment' to next actions in checkout dialog.
 		</deliverable>
 
 	</deliverables>
