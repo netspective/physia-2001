@@ -71,6 +71,9 @@
 		<deliverable id="460">
 			Report for patient account history created.
 		</deliverable>		
+		<deliverable id="1355">
+			Added security to invoice page to prevent viewing of other org's invoices
+		</deliverable>
                 <deliverable id="1142">
                         UI : Added fiscal date to the Org Dialog.
                         Report : Changed Procedure Analysis and Recipt Analysis  to use the fiscal year.  IF the same begin and end
@@ -79,6 +82,9 @@ d on fiscal year(month).  If the fiscal year for an org is Jan and the report en
  to Oct.  If a month before the fiscal month is used , example if the fiscal month is Oct/2000 and the end date for the report is Se
 pt/2000 then the year to data date from Oct-1999 to Sept-2000.
                 </deliverable>
+		<deliverable id="219">
+			Added a whole group of additional fields.  Only missing a couple columns, but the query should be done enough to start serious testing.  The main issue isn't if it works or not, but is it usable for it's intended purpose.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
