@@ -66,30 +66,39 @@ sub isValid
 	my $charges = '';
 	my $emergency = '';
 	my %diagsSeen = ();
-	my @feeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
+	my @defaultFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 
 
 	# GET FEE SCHEDULES FOR PRIMARY INSURANCE IF IT WAS SELECTED ----------------------------
 	my $payer = $page->field('payer');
 	my @singlePayer = split('\(', $payer);
+	my $insurance = undef;
 	if($singlePayer[0] eq 'Primary')
 	{
-		my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
 			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
-		my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
-			'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
-		
-		my @primaryInsFeeScheds = ();
-		foreach my $fs (@{$getFeeSchedsForInsur})
-		{
-			push(@primaryInsFeeScheds, $fs->{value_text});
-			#$page->addDebugStmt($fs->{value_text});
-		}
-		$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
+	}
+	elsif($singlePayer[0] eq 'Work Comp')
+	{
+		my @wcPlanName = split('\)', $singlePayer[1]);
+		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+			'selInsuranceByPlanNameAndPersonAndInsType', $wcPlanName[0], $personId, App::Universal::CLAIMTYPE_WORKERSCOMP);
 	}
 
-	my @insFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_insurance_catalogs'));
+	my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule');
+
+	my @primaryInsFeeScheds = ();
+	foreach my $fs (@{$getFeeSchedsForInsur})
+	{
+		#$page->addDebugStmt($fs->{value_int});
+		$page->addDebugStmt($fs->{value_text});
+		push(@primaryInsFeeScheds, $fs->{value_text});
+	}
+	$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
+
+	my @insFeeSchedules = $page->param('_f_proc_insurance_catalogs');
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	#munir's old icd validation for checking if the same icd code is entered in twice
@@ -112,7 +121,6 @@ sub isValid
 	{
 		$servicedatebegin = $page->param("_f_proc_$line\_dos_begin");
 		$servicedateend = $page->param("_f_proc_$line\_dos_end");
-		#$serviceplace = $page->param("_f_proc_$line\_service_place");
 		$servicetype = $page->param("_f_proc_$line\_service_type");
 		$procedure = $page->param("_f_proc_$line\_procedure");
 		$modifier = $page->param("_f_proc_$line\_modifier");
@@ -148,19 +156,6 @@ sub isValid
 			}
 		}
 		
-		#if($serviceplace =~ m/^(\d+)$/)
-		#{
-		#	# $1 is the check to see if it is an integer
-		#	if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericServicePlaceId', $1)))
-		#	{
-		#		$self->invalidate($page, "[<B>P$line</B>] The service place code $serviceplace is not valid. Please verify");
-		#	}
-		#}
-		#elsif($serviceplace !~ m/^(\d+)$/)
-		#{
-		#	$self->invalidate($page, "[<B>P$line</B>] The service place code $serviceplace should be an integer. Please verify");
-		#}
-
 		if($servicetype =~ m/^(\d+)$/)
 		{
 			# $1 is the check to see if it is an integer
@@ -173,19 +168,6 @@ sub isValid
 		{
 			$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype should be an integer. Please verify");
 		}
-
-		#if($procedure =~ m/^(\d+)$/)
-		#{
-			# $1 is the check to see if it is an integer
-		#	if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericCPTCode', $1)))
-		#	{
-				#$self->invalidate($page, "[<B>P$line</B>] The CPT code $procedure is not valid. Please verify");
-		#	}
-		#}
-		#elsif($procedure !~ m/^(\d+)$/)
-		#{
-		#	$self->invalidate($page, "[<B>P$line</B>] The CPT code was not found.");
-		#}
 
 		if($modifier ne '')
 		{
@@ -248,12 +230,11 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
 
-		if( $charges eq '' && ($feeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
+		if( $charges eq '' && ($defaultFeeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
 		{
-			my @allFeeSchedules = @feeSchedules ? @feeSchedules : @insFeeSchedules;
-			
-			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef,
-				\@allFeeSchedules);
+			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
+
+			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
 			if($resultCount == 0)
 			{
@@ -261,6 +242,7 @@ sub isValid
 			}
 			elsif($resultCount == 1)
 			{
+				$page->param("_f_proc_active_catalogs", @allFeeSchedules);
 				foreach (@$fsResults)
 				{
 					my $unitCost = $_->[1];
@@ -269,11 +251,12 @@ sub isValid
 			}
 			else
 			{
+				$page->param("_f_proc_active_catalogs", @allFeeSchedules);
 				my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
 				$self->invalidate($page, $html);
 			}
 		}
-		elsif($charges eq '' && ($feeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
+		elsif($charges eq '' && ($defaultFeeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
 		{
 			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
 		}
@@ -523,6 +506,7 @@ sub getHtml
 			<TD COLSPAN=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_proc_insurance_catalogs" VALUE='@{[ $page->param("_f_proc_insurance_catalogs") ]}'/>
+					<INPUT TYPE="HIDDEN" NAME="_f_proc_active_catalogs" VALUE='@{[ $page->param("_f_proc_active_catalogs") ]}'/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
