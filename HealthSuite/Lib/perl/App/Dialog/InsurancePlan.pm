@@ -219,27 +219,68 @@ sub customValidate
 sub validateExistingInsSeq
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
-	my $personId = $page->param('person_id');
-
+	my $personId = $page->field('person_id');
+	
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $dialog->id());
-
-	return () if $command ne 'add';
 
 	my $billSeqExists = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $value, $personId);
 	my $billSeqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $value);
 
-	
-	return ("\u$billSeqCap insurance for '$personId' already exists.") if $billSeqExists->{ins_internal_id} ne '';
-
-	# If it's Secondary - Quatinary
-	if ($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY)
+	if ($command eq 'add')
 	{
-		foreach my $seq (App::Universal::INSURANCE_PRIMARY .. ($value-1))
+		return ("\u$billSeqCap insurance for '$personId' already exists.") if $billSeqExists->{ins_internal_id} ne '';
+
+		# If it's Secondary - Quatinary
+		if ($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY)
 		{
-			unless($STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $seq, $personId))
+			foreach my $seq (App::Universal::INSURANCE_PRIMARY .. ($value-1))
 			{
-				my $seqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $seq);
-				return ("\u$seqCap insurance for '$personId' must exist before adding \u$billSeqCap coverage.");
+				unless($STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $seq, $personId))
+				{
+					my $seqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $seq);
+					return ("\u$seqCap insurance for '$personId' must exist before adding \u$billSeqCap coverage.");
+				}
+			}
+		}
+	}
+	else  # update or remove
+	{
+		my $prevSeq = $page->field('prev_sequence') || $page->param('prev_sequence');
+		# If they changed the coverage sequence
+		if ($value != $prevSeq)
+		{
+			# Validate that the new sequence is available
+			if ($billSeqExists->{ins_internal_id} ne '')
+			{
+				return ("\u$billSeqCap insurance for '$personId' already exists.");
+			}
+		
+			# Validate that removing the old sequence doesn't leave a hole in the sequence chain
+			if (! $page->field('do_anyway'))
+			{
+				if ($prevSeq >= App::Universal::INSURANCE_PRIMARY && $prevSeq < App::Universal::INSURANCE_QUATERNARY)
+				{
+					my $nextSeqExists = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $prevSeq+1, $personId);
+					if ($nextSeqExists || (($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY) && $value > $prevSeq))
+					{
+						my $seqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $prevSeq);
+						$dialog->updateFieldFlags('do_anyway', FLDFLAG_INVISIBLE, 0);
+						my $doAnyway = $dialog->getField('do_anyway');
+						$doAnyway->invalidate($page, "Check this box to allow the change anyway.");
+						return ("If you proceed with this change, you MUST replace the \u$seqCap insurance for '$personId' before creating a claim for this patient. Check the 'Confirm?' box to allow this change.");
+					}
+				}
+			}
+			
+			# Validate that the new sequence is valid
+			if ($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY)
+			{
+				my $priorSeqExists = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $value-1, $personId);
+				if (! $priorSeqExists)
+				{
+					my $seqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $value-1);
+					return ("\u$seqCap insurance for '$personId' must exist before adding \u$billSeqCap coverage.");
+				}
 			}
 		}
 	}
