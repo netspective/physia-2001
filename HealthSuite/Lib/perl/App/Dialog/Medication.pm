@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.18 2001-01-09 20:57:11 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.19 2001-01-10 00:39:00 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -841,6 +841,8 @@ sub sendApprovalRequest
 {
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
+	
+	return if $command eq 'add';
 
 	my $med_name = $page->field('med_name');
 	my $patient = $page->param('person_id');
@@ -848,7 +850,7 @@ sub sendApprovalRequest
 
 	my $msgDlg = new App::Dialog::Message::Prescription();
 	$msgDlg->sendMessage($page,
-		subject => $command eq 'add' ? 'Add Medication' : 'Prescription Approval Request',
+		subject => $command eq 'refill' ? 'Prescription Refill Request' : 'Prescription Approval Request',
 		message => $page->session('person_id') . " is seeking approval for a prescription:\n\nPatient: $patient\nMedication: $med_name $dosage\n",
 		to => $page->field('get_approval_from') || $page->session('person_id'),
 		rePatient => $page->param('person_id'),

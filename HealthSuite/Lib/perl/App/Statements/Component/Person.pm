@@ -3929,6 +3929,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			AND document.doc_id = document_attribute.parent_id
 			AND document_attribute.item_name IN ('To', 'CC')
 			AND document_attribute.value_int = 0
+			AND document.cr_org_internal_id = :2
 			GROUP BY document.doc_spec_subtype
 		union
 		SELECT '-1' as doc_spec_subtype,count (*)

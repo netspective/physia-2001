@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.9 2001-01-08 15:37:34 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.10 2001-01-10 00:39:07 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -505,7 +505,7 @@ sub updateRecipientFlags
 	{
 		$page->schemaAction('Document_Attribute', 'update',
 			item_id => $item_id,
-			value_int => $command eq 'read' ? 1 : 2,
+			value_int => $command eq 'trash' ? 2 : 1,
 			_debug => 0,
 		);
 	}
@@ -538,7 +538,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.9 2001-01-08 15:37:34 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.10 2001-01-10 00:39:07 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 

@@ -54,6 +54,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 
 	dnQuery => \&dnQuery,
 	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#',
+	#dnSelectRowAction => '/person/#{repatient_id}#/dlg-approve-medication/#{permed_id}#?home=#homeArl#',
 );
 
 sub iconCallback
