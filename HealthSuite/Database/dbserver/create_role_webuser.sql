@@ -9,3 +9,6 @@ grant create sequence to webuser;
 grant create synonym to webuser;
 grant create trigger to webuser;
 grant create database link to webuser;
+
+grant select on v_$mystat;
+grant select on v_$statname;
