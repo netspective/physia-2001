@@ -735,8 +735,22 @@ sub createHtmlFromStatement
 					'count' => sub { $rowNum },
 					'sum' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum > 0 ? ($sum / scalar(@{$store})) : 0; },
-					'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum > 0 ? ($sum / scalar(@{$store})) : 0; my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
+					'avg' => sub 
+					{ 
+						my $store = $colValuesStorage[$_[0]]; 
+						my $sum = 0; 
+						grep { $sum += $_ } @{$store}; 
+						$sum > 0 ? ($sum / scalar(@{$store})) : 0; 
+					},
+					'avg_currency' => sub 
+					{ 
+						my $store = $colValuesStorage[$_[0]]; 
+						my $sum = 0; 
+						grep { $sum += $_ } @{$store}; 
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+						my $fmt = FORMATTER->format_price($avg, 2); 
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+					},
 				);
 			$callbacks{'call'} = sub { my $activeCol = shift; &{$colCallbacks[$activeCol]}($rowRef, $activeCol, $colValuesStorage[$activeCol]); };
 			$callbacks{'callifvaleq'} =	sub	{
@@ -889,8 +903,21 @@ sub createHtmlFromData
 					'count' => sub { $rowNum },
 					'sum' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum > 0 ? ($sum / scalar(@{$store})) : 0; },
-					'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum > 0 ? ($sum / scalar(@{$store})) : 0; my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
+					'avg' => sub 
+					{ 
+						my $store = $colValuesStorage[$_[0]]; 
+						my $sum = 0; 
+						grep { $sum += $_ } @{$store}; 
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+					},
+					'avg_currency' => sub 
+					{
+						my $store = $colValuesStorage[$_[0]]; 
+						my $sum = 0; grep { $sum += $_ } @{$store}; 
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+						my $fmt = FORMATTER->format_price($avg, 2); 
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+					},
 					#'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum / scalar(@{$store}); },
 					#'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum / scalar(@{$store}); my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
 				);
