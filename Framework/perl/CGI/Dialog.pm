@@ -167,6 +167,87 @@ use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::ContentItem);
 
+use vars qw(%FIELD_FLAGS_ATTRMAP);
+
+%FIELD_FLAGS_ATTRMAP = (
+	'invisible' => FLDFLAG_INVISIBLE,
+	'readOnly' => FLDFLAG_READONLY,
+	'required' => FLDFLAG_REQUIRED,
+	'identifier' => FLDFLAG_IDENTIFIER,
+	'trim' => FLDFLAG_TRIM,
+	'uppercase' => FLDFLAG_UPPERCASE,
+	'ucaseinitial' => FLDFLAG_UCASEINITIAL,
+	'lowercase' => FLDFLAG_LOWERCASE,
+	'nobrcaption' => FLDFLAG_NOBRCAPTION,
+	'persist' => FLDFLAG_PERSIST,
+	'home' => FLDFLAG_HOME,
+	'sort' => FLDFLAG_SORT,
+	'prependBlank' => FLDFLAG_PREPENDBLANK,
+	);
+
+# static method
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_createField
+{
+	my ($xap, $fieldClass, $tag, $tagContent) = @_;
+	my $attrs = $tagContent->[0];
+
+	return unless $xap->allStructMembersAvail($attrs, "attribute '%s' required in '$tag' tag", 'name');
+
+	# make a copy of the attrs because we'll be changing them
+	my %fieldAttrs = %$attrs;
+	if(my $flagNames = $attrs->{flags})
+	{
+		my $flags = CGI::Validator::Field::FLDFLAGS_DEFAULT;
+		foreach (split(/,/, $flagNames))
+		{
+			if(exists $FIELD_FLAGS_ATTRMAP{$_})
+			{
+				$flags |= $FIELD_FLAGS_ATTRMAP{$_};
+			}
+			else
+			{
+				$xap->logError("unknown field flag '$_' in $xap->{_parser_activeDialogId} field $attrs->{name}");
+			}
+		}
+		$fieldAttrs{flags} = $flags;
+	}
+
+	foreach my $dlgCondAttr ('readOnlyWhen', 'invisibleWhen')
+	{
+		if(my $flagNames = $attrs->{$dlgCondAttr})
+		{
+			my $flags = 0;
+			foreach (split(/,/, $flagNames))
+			{
+				if(exists $CGI::Dialog::DLG_FLAGS_ATTRMAP{$_})
+				{
+					$flags |= $CGI::Dialog::DLG_FLAGS_ATTRMAP{$_};
+				}
+				else
+				{
+					$xap->logError("unknown dialog flag '$_' in $xap->{_parser_activeDialogId} field $attrs->{name} '$dlgCondAttr'");
+				}
+			}
+			$fieldAttrs{$dlgCondAttr} = $flags;
+		}
+	}
+
+	return $fieldClass->new(%fieldAttrs);
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, XAP_createField($xap, __PACKAGE__, $tag, $tagContent));
+}
+
 sub new
 {
 	my $type = shift;
@@ -610,6 +691,19 @@ use Schema::Utilities;
 
 @ISA = qw(CGI::Dialog::Field);
 
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field-tablecolumn', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, CGI::Dialog::Field::XAP_createField($xap, __PACKAGE__, $tag, $tagContent));
+}
+
 sub new
 {
 	my ($type, %params) = @_;
@@ -764,6 +858,25 @@ use CGI::Validator::Field;
 use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::ContentItem);
+
+# static method
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field-group', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $content) = @_;
+	my $attrs = $content->[0];
+
+	$xap->{_parser_activeFieldGrp} = new CGI::Dialog::MultiField(%$attrs);
+	$xap->{_parser_activeDialog}->addContent($xap->{_parser_activeFieldGrp});
+	CGI::Dialog::XAP_handleElementDialogContent($xap, $content);
+	$xap->{_parser_activeFieldGrp} = undef;
+}
 
 sub new
 {
@@ -942,6 +1055,19 @@ use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::MultiField);
 
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field-duration', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, CGI::Dialog::Field::XAP_createField($xap, __PACKAGE__, $tag, $tagContent));
+}
+
 sub new
 {
 	my ($class, %params) = @_;
@@ -1000,6 +1126,22 @@ use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::ContentItem);
 
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field-subhead', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	my $attrs = $tagContent->[0];
+
+	return unless $xap->allStructMembersAvail($attrs, "attribute '%s' required in '$tag' tag", 'heading');
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, __PACKAGE__->new(%$attrs));
+}
+
 sub new
 {
 	my $type = shift;
@@ -1056,6 +1198,20 @@ use vars qw(@ISA);
 
 use constant NEXTACTION_PARAMNAME => '_f_nextaction_redirecturl';
 use constant NEXTACTION_FIELDNAME => 'nextaction_redirecturl';
+
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('dialog-buttons', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	my $attrs = $tagContent->[0];
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, __PACKAGE__->new(%$attrs));
+}
 
 sub new
 {
@@ -1136,6 +1292,22 @@ use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::HeadFootItem);
 
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('field-static', \&XAP_tag_handler, 'dialog');
+}
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	my $attrs = $tagContent->[0];
+
+	return unless $xap->allStructMembersAvail($attrs, "attribute '%s' required in '$tag' tag", 'text');
+	CGI::Dialog::XAP_addDialogField($xap, $tag, $tagContent, __PACKAGE__->new(%$attrs));
+}
+
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
@@ -1189,6 +1361,103 @@ use constant CALLBACKITEM_EXTRADATA => 2;
 use enum qw(:PAGE_SUPPLEMENTARYHTML_ NONE LEFT RIGHT TOP BOTTOM);
 
 @ISA = qw(CGI::Validator);
+use vars qw(%DLG_FLAGS_ATTRMAP);
+
+%DLG_FLAGS_ATTRMAP = (
+	'initialDataEntry' => DLGFLAG_DATAENTRY_INITIAL,
+	'anyDataEntry' => DLGFLAG_DATAENTRY,
+	'execute' => DLGFLAG_EXECUTE,
+	'priKeyReadOnly' => DLGFLAG_PRIKEYREADONLY,
+	'readOnly' => DLGFLAG_READONLY,
+	'add' => DLGFLAG_ADD,
+	'update' => DLGFLAG_UPDATE,
+	'remove' => DLGFLAG_REMOVE,
+	'addInitialDataEntry' => DLGFLAG_ADD_DATAENTRY_INITIAL,
+	'updOrRemoveInitialDataEntry' => DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL,
+	'updOrRemove' => DLGFLAG_UPDORREMOVE,
+	'ignoreRedirect' => DLGFLAG_IGNOREREDIRECT,
+	);
+
+# static method
+sub XAP_initialize
+{
+	my ($xap, $tagAttrs, $typeDefns) = @_;
+
+	$xap->addTagHandler('dialog', \&XAP_tag_handler);
+}
+
+use constant TAG_SECTION		=> 'section';
+use constant TAG_FIELDGROUP		=> 'field-group';
+
+sub XAP_tag_handler
+{
+	my ($xap, $tag, $tagContent) = @_;
+	my $attrs = $tagContent->[0];
+
+	return unless $xap->allStructMembersAvail($attrs, "attribute '%s' required in '$tag' tag", 'id');
+
+	my ($pkgId, $scopeId) = $xap->getQualifiedId('dlg', $attrs->{id});
+
+	my %constructAttrs = %{$attrs};
+	$constructAttrs{id} = $pkgId;
+	my $dialog = new CGI::Dialog(qualifiedId => $scopeId, %constructAttrs);
+
+	# the following code is not re-entrant or thread-safe
+	$xap->{_parser_activeDialog} = $dialog;
+	$xap->{_parser_activeDialogId} = $scopeId;
+	$xap->{_parser_activeFieldGrp} = undef;
+	XAP_handleElementDialogContent($xap, $tagContent);
+	delete $xap->{_parser_activeFieldGrp};
+	delete $xap->{_parser_activeDialogId};
+	delete $xap->{_parser_activeDialog};
+
+	$xap->addComponent(XAP::COMPTYPE_UI_OBJECT, $attrs->{id}, $pkgId, $scopeId, $dialog);
+}
+
+sub XAP_handleElementDialogSection
+{
+	my ($xap, $tag, $content) = @_;
+	my $attrs = $content->[0];
+
+	return unless $xap->allStructMembersAvail($attrs, "attribute '%1' required in '$tag' tag", 'heading');
+
+	$xap->{_parser_activeDialog}->addContent(CGI::Dialog::Subhead->new(heading => $attrs->{heading}));
+}
+
+sub XAP_addDialogField
+{
+	my ($xap, $tag, $tagContent, $newField) = @_;
+
+	if(my $group = $xap->{_parser_activeFieldGrp})
+	{
+		push(@{$group->{fields}}, $newField);
+	}
+	else
+	{
+		$xap->{_parser_activeDialog}->addContent($newField);
+	}
+}
+
+sub XAP_handleElementDialogContent
+{
+	my ($xap, $content) = @_;
+	my ($childCount, $attrs) = (scalar(@$content), $content->[0]);
+
+	for(my $child = 1; $child < $childCount; $child += 2)
+	{
+		my ($chTag, $chContent) = ($content->[$child], $content->[$child+1]);
+		next unless $chTag; # if $tag is 0, it's just characters
+
+		if($chTag eq TAG_SECTION)
+		{
+			XAP_handleElementDialogSection($xap, $chTag, $chContent);
+		}
+		else
+		{
+			$xap->handleRegisteredTag($chTag, $chContent);
+		}
+	}
+}
 
 #
 # execmode can be (I)nput, (V)alidate, or (E)xecute [case matters!]
@@ -1548,11 +1817,11 @@ sub handlePostExecute
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
 		#unshift(@{$page->{page_head}}, qq{<script>opener.location.reload(); window.close()</script>});
-		unshift(@{$page->{page_head}}, 
+		unshift(@{$page->{page_head}},
 			qq{
 					<script>
 						if(eval("opener.inErrorMode"))
-						{						
+						{
 							opener.focus(); window.close()
 						}
 						else
