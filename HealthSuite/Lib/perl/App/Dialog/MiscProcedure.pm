@@ -41,7 +41,7 @@ sub new
 			name => 'proc_code',
 			type => 'text',
 			size =>10,			
-			options => FLDFLAG_REQUIRED,			
+			options => FLDFLAG_REQUIRED | FLDFLAG_UPPERCASE,			
 		),
 		
 		new CGI::Dialog::Field(caption => 'Procedure Name',
