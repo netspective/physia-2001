@@ -112,7 +112,7 @@ sub initialize
 								fKeyValueCol => 0),
 				]),
 		new CGI::Dialog::Field(caption => 'Code',  name => 'code', size => '7',options => FLDFLAG_READONLY,),
-		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),							
+		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Subhead(heading => 'Authorization'),
 		new CGI::Dialog::MultiField(name => 'clientid_num', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		fields => [
@@ -178,9 +178,10 @@ sub initialize
 
 	$self->addPostHtml(qq{
 			<script language="JavaScript1.2">
-				function clickMenu()
+				function clickMenu(url)
 				{
-					window.location.href='/menu';
+					var urlNext = url;
+					window.location.href= '/' + urlNext;
 				}
 			</script>
 		});
@@ -326,12 +327,12 @@ sub populateData_update
 	$page->field('provider_id', $authData->{'data_text_c'});
 	$page->field('ref_result', $authData->{'related_data'});
 	$page->field('comments', $authData->{'display_summary'});
-	
+
 	#Get Code and Description from service Request
 
-	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});	
+	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
 	$page->field('code',$serviceRequest->{code});
-	$page->field('code_description',$serviceRequest->{caption});	
+	$page->field('code_description',$serviceRequest->{caption});
 }
 
 sub populateData_remove
@@ -352,8 +353,6 @@ sub handle_page_supplType_special
 	my $test = $page->param('parent_trans_id');
 	my $personId = $page->field('person_id');
 	my $transId = $command eq 'add' ? $page->param('parent_trans_id') : $parentTransId;
-
-
 	if ($personId ne '')
 	{
 		$page->param('person_id', $personId);
@@ -364,15 +363,17 @@ sub handle_page_supplType_special
 				<TABLE>
 					<TR VALIGN=TOP>
 						<TD COLSPAN=2>
-							<a href='/org/#session.org_id#/dlg-add-patient'><input type='button' value='Add Patient'></a>
-						</TD>
-					</TR>
-					<TR VALIGN=TOP>
-						<TD COLSPAN=2>
-							<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
-							@{[ $STMTMGR_COMPONENT_PERSON->createHtml($page, STMTMGRFLAG_NONE, 'sel_referral',
-								[$transId]) ]}
-							 <b style="font-size:15pt; color=Darkred; font-family:Tahoma"><BR> Copy Of An Existing Referral</b>
+
+							<input type="button" value="Menu" onClick="javascript:clickMenu('menu');">
+							<input type='button' value='Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Lookup Patient' onClick="javascript:clickMenu('search/patient');">
+							<input type='button' value='Add Patient' onClick="javascript:clickMenu('org/#session.org_id#/dlg-add-patient');">
+							<input type='button' value='Edit Patient' onClick="javascript:clickMenu('search/patient');">
+							<input type='button' value='Edit Service Request' onClick="javascript:clickMenu('org/ACS/dlg-update-trans-6000/$transId');">
+							<input type='button' value='Add Service Request' onClick="javascript:clickMenu('org/ACS/dlg-add-referral?_f_person_id=$personId');">
+							<input type='button' value='Add Referral' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Edit Referral' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+
 						</TD>
 					</TR>
 					<TR><TD COLSPAN=2>&nbsp;</TD></TR>
@@ -398,21 +399,24 @@ sub handle_page_supplType_special
 					<TR VALIGN=TOP>
 						<TD COLSPAN=2>
 
-							<input type="button" value="Menu" onClick="javascript:clickMenu();">
-							<a href='/org/#session.org_id#/dlg-add-patient'><input type='button' value='Add Patient'></a>
-						</TD>
-					</TR>
-					<TR VALIGN=TOP>
-						<TD COLSPAN=2>
-							<b style="font-size:8pt; font-family:Tahoma">Referral Information</b>
-							@{[ $STMTMGR_COMPONENT_PERSON->createHtml($page, STMTMGRFLAG_NONE, 'sel_referral',
-								[$transId]) ]}
+							<input type="button" value="Menu" onClick="javascript:clickMenu('menu');">
+							<input type='button' value='Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Lookup Patient' onClick="javascript:clickMenu('search/patient');">
+							<input type='button' value='Add Patient' onClick="javascript:clickMenu('org/#session.org_id#/dlg-add-patient');">
+							<input type='button' value='Edit Patient' onClick="javascript:clickMenu('search/patient');">
+							<input type='button' value='Edit Service Request' onClick="javascript:clickMenu('org/ACS/dlg-update-trans-6000/$transId');">
+							<input type='button' value='Add Service Request' onClick="javascript:clickMenu('org/ACS/dlg-add-referral?_f_person_id=$personId');">
+							<input type='button' value='Add Referral' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Edit Referral' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+
 						</TD>
 					</TR>
 					<TR><TD COLSPAN=2>&nbsp;</TD></TR>
 					<TR VALIGN=TOP>
 						<TD>$dlgHtml</TD>
 						<TD>
+
+							#component.stpt-person.patientInfo#<BR>
 							#component.stpt-person.referralAndIntake#<BR>
 							#component.stpt-person.referralAndIntakeCount#<BR>
 							#component.stpd-person.contactMethodsAndAddresses#
