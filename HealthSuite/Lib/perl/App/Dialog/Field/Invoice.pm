@@ -733,7 +733,7 @@ sub getHtml
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
 	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
-
+	my $readOnly = $command eq 'remove' ? 'READONLY' : '';
 	my ($dialogName, $lineCount, $allowComments, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -745,18 +745,18 @@ sub getHtml
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
-				<TD><INPUT  NAME='_f_item_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT  NAME='_f_item_$line\_unit_cost' TYPE='text' size=8 VALUE='@{[ $page->param("_f_item_$line\_unit_cost")  ]}'></TD>
+				<TD><INPUT $readOnly  NAME='_f_item_$line\_unit_cost' TYPE='text' size=8 VALUE='@{[ $page->param("_f_item_$line\_unit_cost")  ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 			</TR>
 		};
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=2 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
-				<TD COLSPAN=5><INPUT CLASS='procinput' NAME='_f_item_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
+				<TD COLSPAN=5><INPUT $readOnly NAME='_f_item_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
 			</TR>
 		} if $allowComments;
 	}
@@ -771,7 +771,7 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Qty</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD ALIGN=CENTER><FONT $textFontAttrs>Item/Description</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Item Description</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Cost/Unit</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
