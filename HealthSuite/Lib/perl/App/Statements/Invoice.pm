@@ -120,6 +120,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select * from invoice_item
 		where parent_id = ?
 		},
+	'selServiceDateRangeForAllItems' => q{
+		select  to_char(least(service_begin_date), 'MM/DD/YYYY') as service_begin_date,
+				to_char(greatest(service_end_date), 'MM/DD/YYYY') as service_end_date
+		from invoice_item
+		where parent_id = ?
+		},
 	'selInvoiceProcedureItems' => q{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier,
 			unit_cost, quantity, rel_diags, data_num_c,	to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date,
