@@ -148,7 +148,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select * from invoice_item
 		where item_id = ?
 		},
-	'selInvoiceItems' => q{
+	'selInvoiceItems' => qq{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier,
 			unit_cost, quantity, rel_diags, data_num_c, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a, balance, total_adjust, extended_cost
@@ -196,8 +196,9 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and bill_sequence = 1
 		and invoice_item_id is NULL
 		},
-	'selInvoiceBillingRecs' => q{
-		select *
+	'selInvoiceBillingRecs' => qq{
+		select bill_id, invoice_id, invoice_item_id, assoc_bill_id, bill_sequence, bill_party_type, bill_to_id, bill_ins_id, bill_amount, 
+			bill_pct, to_char(bill_date, '$SQLSTMT_DEFAULTDATEFORMAT') as bill_date, bill_status, bill_result
 		from invoice_billing
 		where invoice_id = ?
 		order by bill_sequence
