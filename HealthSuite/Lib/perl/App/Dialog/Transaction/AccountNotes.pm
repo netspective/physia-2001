@@ -37,7 +37,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new App::Dialog::Field::Person::ID(types => ['Patient'],name => 'person_id', caption => 'Person ID', type => 'memo', options => FLDFLAG_READONLY),
+			new App::Dialog::Field::Person::ID(types => ['Patient'],name => 'person_id', caption => 'Person ID', options => FLDFLAG_READONLY),
 			new CGI::Dialog::Field(name => 'detail', caption => 'Notes', type => 'memo', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(name => 'trans_begin_stamp', caption => 'Date', type => 'date'),
 		);
