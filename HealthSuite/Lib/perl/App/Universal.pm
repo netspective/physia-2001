@@ -9,6 +9,10 @@ use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 
+#ROLE STAUS
+use constant ROLESTATUS_ACTIVE => 0;
+use constant ROLESTATUS_INACTIVE => 1;
+use constant ROLESTATUS_SUSPENDED => 2;
 
 #ATTRIBUTE TYPE: MISC
 use constant ATTRTYPE_TEXT => 0;
