@@ -97,7 +97,7 @@ sub initialize
 	}
 	if ($self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dept')
 	{
-		$self->addContent(new CGI::Dialog::Field(caption => 'HCFA Service Place', nane => 'hcfa_service_place', type => 'integer'));
+		$self->addContent(new CGI::Dialog::Field(caption => 'HCFA Service Place', nane => 'hcfa_service_place', lookup => 'HCFA1500_Service_Place_Code'));
 	}
 	$self->addContent(
 		new CGI::Dialog::Field(
