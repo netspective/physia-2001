@@ -249,15 +249,6 @@ sub prepare_view_profile
 				</TD>
 				<TD WIDTH=60%>
 					<font size=1 face=arial>
-					<!--
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
-						<TR VALIGN=TOP>
-							<TD>#component.stp-org.alerts#</TD>
-							<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-							<TD>#component.stp-org.feeSchedule#</TD>
-						</TR>
-					</TABLE><BR>
-					-->
 					#component.stp-org.alerts#<BR>
 					#component.stp-org.insurancePlans#<BR>
 					#component.stpt-org.healthMaintenanceRule#<BR>
