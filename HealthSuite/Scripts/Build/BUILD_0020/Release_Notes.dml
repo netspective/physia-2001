@@ -45,6 +45,10 @@
 			Added secondary Lookup window (lookup from a lookup window).
 		</deliverable>
 
+		<deliverable id="1907">
+			Added next actions to add medication dialog.
+		</deliverable>
+
 		<deliverable id="1954">
 			Showing all line items when editing a claim.
 		</deliverable>
