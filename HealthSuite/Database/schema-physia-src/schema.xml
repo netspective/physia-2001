@@ -87,7 +87,7 @@
 		<column name="permed_id" type="autoinc" primarykey="yes" descr="Unique record indentification"/>
 		<column name="parent_id" parentref="Person.person_id" required="yes" default="0" descr="The ID of the person that owns this medication record"/>
 		<column name="med_name" type="text" size="128" descr="The name of the medication (There should be a 'med_id' column which is a foreign key to a ref_medication table, but we don't have this table yet)"/>
-		<column name="dose" type="integer" descr="Dosage of the medication"/>
+		<column name="dose" type="float" descr="Dosage of the medication"/>
 		<column name="dose_units" type="text" size="32" descr="Units the dosage is measured in (mg, cc, etc...)"/>
 		<column name="sale_units" type="text" size="32" descr="Units the quantity is measured in (mg, cc, etc...)"/>
 		<column name="route" type="text" size="32" descr="Route or method the medication is taken through"/>
@@ -97,7 +97,7 @@
 		<column name="end_date" type="date" descr="Medication end date"/>
 		<column name="duration" type="integer" descr="How long should the medication be taken"/>
 		<column name="duration_units" type="text" size="32" descr="Units the duration is measured in (weeks, months, etc...)"/>
-		<column name="quantity" type="integer" descr="How many units of the medication per refill"/>
+		<column name="quantity" type="float" descr="How many units of the medication per refill"/>
 		<column name="num_refills" type="integer" descr="How many times can the get the medication refilled without another visit"/>
 		<column name="allow_generic" type="boolean" descr="Allow the use of generic brand medications?"/>
 		<column name="allow_substitutions" type="boolean" descr="Allow the use of substitution medications?"/>
