@@ -257,6 +257,19 @@
 		<enum>Post-payment</enum>
 	</table>
 
+	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
+		<enum>Discount</enum>
+		<enum>Professional Courtesy</enum>
+		<enum>Bad Debt</enum>
+		<enum>Collection Agency</enum>
+		<enum>Charity Discount</enum>
+		<enum>Past File Deadline</enum>
+		<enum>Posting Error</enum>
+		<enum>Non-billable Service</enum>
+		<enum>Returned Personal Check</enum>
+		<enum>NSF Fee</enum>
+	</table>
+
 	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">
 		<enum>Cash</enum>
 		<enum>Check</enum>
