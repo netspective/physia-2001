@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.16 2001-01-08 23:43:58 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.17 2001-01-09 00:23:34 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -627,7 +627,7 @@ sub populateData
 			$page->field('other_num_refills', $refills);
 		}
 
-		my @saleUnits = split(',', $medInfo->{sale_units});
+		@saleUnits = split(',', $medInfo->{sale_units});
 		$page->field('sale_units', $saleUnits[0]);
 		if($saleUnits[0] eq 'other')
 		{
@@ -688,7 +688,6 @@ sub execute_add
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
 
-	my $label = $page->field('label');
 	my $recordType = App::Universal::RECORDTYPE_EXISTING;
 	$recordType = App::Universal::RECORDTYPE_PRESCRIBE if $command eq 'prescribe';
 	$recordType = App::Universal::RECORDTYPE_REFILL if $command eq 'refill';
@@ -765,7 +764,6 @@ sub execute_update
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
 
-	my $label = $page->field('label');
 	my $recordType = App::Universal::RECORDTYPE_EXISTING;
 	$recordType = App::Universal::RECORDTYPE_PRESCRIBE if $command eq 'prescribe';
 	$recordType = App::Universal::RECORDTYPE_REFILL if $command eq 'refill';
