@@ -30,7 +30,28 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl_add => ['person_id'],
 		_arl_remove => ['trans_id'],
 		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_SURGICAL()
-	},	
+	},
+	'activeproblems-perm' => {
+		transType => App::Universal::TRANSTYPEDIAG_PERMANENT,
+		heading => '$Command Permanent Diagnosis',
+		_arl_add => ['person_id'],
+		_arl_remove => ['trans_id'],
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_PERMANENT()
+	},
+	'activeproblems-notes' => {
+		transType => App::Universal::TRANSTYPEDIAG_NOTES,
+		heading => '$Command Permanent Diagnosis',
+		_arl_add => ['person_id'],
+		_arl_remove => ['trans_id'],
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_NOTES()
+	},
+	'activeproblems-icd' => {
+		transType => App::Universal::TRANSTYPEDIAG_ICD,
+		heading => '$Command ICD Code',
+		_arl_add => ['person_id'],
+		_arl_remove => ['trans_id'],
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_ICD()
+	},
 );
 
 sub new
@@ -46,7 +67,7 @@ sub new
 	my $permanentType = App::Universal::TRANSTYPEDIAG_PERMANENT;
 	my $icdType = App::Universal::TRANSTYPEDIAG_ICD;
 	my $notesType = App::Universal::TRANSTYPEDIAG_NOTES;
-	my $surgicalType = App::Universal::TRANSTYPEDIAG_SURGICAL;	
+	my $surgicalType = App::Universal::TRANSTYPEDIAG_SURGICAL;
 
 	if($transType == $notesType)
 	{
@@ -74,7 +95,7 @@ sub new
 			new CGI::Dialog::Field(caption => 'Begin Date', name => 'curr_onset_date'),
 		);
 	}
-	
+
 	if($transType == $surgicalType)
 	{
 		$self->addContent(
@@ -84,7 +105,7 @@ sub new
 			new CGI::Dialog::Field(caption => 'Surgery Date', name => 'curr_onset_date', type => 'date'),
 		);
 	}
-	
+
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
 }
