@@ -650,7 +650,7 @@ sub prepare_view_superbills
 						status => 1,
 						cost_type => 0,
 						name => $grp,
-#						sequence => $i,
+						sequence => $i,
 					);
 					
 					my $j = 0;
@@ -665,7 +665,7 @@ sub prepare_view_superbills
 							code => $code,
 							name => $name,
 							cost_type => 0,
-#							sequence => $j,
+							sequence => $j,
 						);
 						$j ++;
 					}
@@ -694,7 +694,7 @@ sub prepare_view_superbills
 						status => 1,
 						cost_type => 0,
 						name => $grp,
-#						sequence => $i,
+						sequence => $i,
 					);
 					
 					my $j = 0;
@@ -709,7 +709,7 @@ sub prepare_view_superbills
 							code => $code,
 							name => $name,
 							cost_type => 0,
-#							sequence => $j,
+							sequence => $j,
 						);
 						$j ++;
 					}
