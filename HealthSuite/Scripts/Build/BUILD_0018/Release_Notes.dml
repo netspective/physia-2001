@@ -230,6 +230,7 @@
 
 		<deliverable id="1772">
 			Display all present and past medications when entering Edit mode of this component.
+			Reopened: New component created called Inactive Medications under pt chart.
 		</deliverable>		
 
 		<deliverable id="1776">
@@ -333,5 +334,9 @@
 			Note  Also test that service date filter is working as expected.
 		</deliverable>
 		
+		<deliverable id="1916">
+			Populating service provider with billing provider in invoice dialog.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
