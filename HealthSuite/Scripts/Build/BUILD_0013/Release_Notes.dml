@@ -39,6 +39,10 @@
 		</deliverable>	
 		<deliverable id="1128">
 			UI:  Added a new field called 'Clearing House ID' in the MainOrg dialog and it is displayed in the profile header'.
-		</deliverable>			
+		</deliverable>	
+		<deliverable id="934">
+			UI:  Added few more options in the 'Blood Type' drop-down list field and added a new component called 
+			     'Blood Type' in the 'Chart' page.
+		</deliverable>		
 	</deliverables>
 </release-notes>
