@@ -16,46 +16,49 @@ my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 $UPINITEMNAME_PATH = 'UPIN';
 
 $STMTFMT_SEL_CLAIM = qq{
-	SELECT
-		DISTINCT i.invoice_id,
-		i.total_items,
-		i.client_id,
-		TO_CHAR(MIN(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') AS service_begin_date,
-		iis.caption AS invoice_status,
-		ib.bill_to_id,
-		i.total_cost, 
-		i.total_adjust,
-		i.balance,
-		ib.bill_party_type,
-		TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date
-	FROM
-		invoice_status iis,
-		invoice i,
-		invoice_billing ib,
-		invoice_item iit
-		%tables%
-	WHERE
-		%whereCond%
-		AND iit.parent_id (+) = i.invoice_id			
-		AND ib.invoice_id = i.invoice_id
-		AND ib.invoice_item_id IS NULL
-		AND ib.bill_sequence = 1
-		AND (owner_type = 1 AND owner_id = ?)
-		AND iis.id = i.invoice_status
-		AND rownum <= $LIMIT
-	GROUP BY
-		i.invoice_id,
-		i.total_items,
-		i.client_id,
-		iis.caption,
-		ib.bill_to_id,
-		i.total_cost, 
-		i.total_adjust,
-		i.balance,
-		ib.bill_party_type,
-		i.invoice_date
-	ORDER BY
-		i.invoice_id desc
+	SELECT *
+	FROM (
+		SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date
+		FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit
+			%tables%
+		WHERE
+			%whereCond%
+			AND iit.parent_id (+) = i.invoice_id			
+			AND ib.invoice_id = i.invoice_id
+			AND ib.invoice_item_id IS NULL
+			AND ib.bill_sequence = 1
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+		GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			i.invoice_date
+		ORDER BY
+			i.invoice_id desc
+	)
+	WHERE rownum <= $LIMIT
 };
 
 $STMTRPTDEFN_DEFAULT =

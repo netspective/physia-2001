@@ -5,6 +5,7 @@ package App::Statements::Search::MiscProcedure;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT
 	$STMTMGR_MISC_PROCEDURE_CODE_SEARCH);
@@ -18,37 +19,51 @@ use vars qw(
 	$STMTRPTDEFN_MISC_PROCEDURE
 	$STMTRPTDEFN_MISC_PROCEDURE_DETAIL);
 
-
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 $STMTFMT_SEL_MISC_PROCEDURE = qq{
-		select code,caption as name ,detail as description,
-		(select count (*) from  trans_attribute ta
-			where
-			t.trans_id = ta.parent_id
-			and ta.item_name = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
-			and ta.value_type = @{[App::Universal::ATTRTYPE_CPT_CODE]}
-		)
-		 ,trans_id
-		FROM Transaction t
-		where 
+	SELECT
+		code,
+		caption AS name,
+		detail AS description,
+		(
+			SELECT count (*)
+			FROM trans_attribute ta
+			WHERE
+				t.trans_id = ta.parent_id
+				AND ta.item_name = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
+				AND ta.value_type = @{[App::Universal::ATTRTYPE_CPT_CODE]}
+		),
+		trans_id
+	FROM Transaction t
+	WHERE 
 		%whereCond%			
-		and t.trans_subtype = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'	
-		and t.trans_status = @{[App::Universal::TRANSSTATUS_ACTIVE]}
+		AND t.trans_subtype = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'	
+		AND t.trans_status = @{[App::Universal::TRANSSTATUS_ACTIVE]}
+		AND rownum <= $LIMIT
 };
-
 
 $STMTFMT_SEL_MISC_PROCEDURE_DETAIL = qq
 {
-	select ta.value_text,ta.value_textB,r.name,t.caption, t.trans_id,ta.item_id
-	FROM transaction t , trans_attribute ta, REF_CPT r
-	WHERE  %whereCond%
-		and ta.value_type = 310 
-		and ta.item_name = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
-		and ta.value_text = r.CPT		
-		and t.trans_type = 4000		
-		and t.trans_id = ta.parent_id
-		
-	
+	SELECT
+		ta.value_text,
+		ta.value_textB,
+		r.name,
+		t.caption,
+		t.trans_id,
+		ta.item_id
+	FROM
+		transaction t,
+		trans_attribute ta,
+		REF_CPT r
+	WHERE
+		%whereCond%
+		AND ta.value_type = 310 
+		AND ta.item_name = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
+		AND ta.value_text = r.CPT		
+		AND t.trans_type = 4000		
+		AND t.trans_id = ta.parent_id
+		AND rownum <= $LIMIT
 };
 
 
@@ -123,8 +138,6 @@ $STMTMGR_MISC_PROCEDURE_CODE_SEARCH = new App::Statements::Search::MiscProcedure
 		whereCond => 'code = ?',
 		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
 	},
-	
-
 	'sel_misc_procedure_description' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
@@ -162,8 +175,6 @@ $STMTMGR_MISC_PROCEDURE_CODE_SEARCH = new App::Statements::Search::MiscProcedure
 		whereCond => ' t.trans_id = ? ',
 		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE_DETAIL,
 	}
-
-
 );
 
 

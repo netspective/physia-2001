@@ -14,34 +14,41 @@ use vars qw(@ISA @EXPORT $STMTMGR_ORG_SEARCH $STMTRPTDEFN_DEFAULT
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 $STMTFMT_SEL_ORG = qq{
-	SELECT
-		DISTINCT o.org_id,
-		o.name_primary,
-		o.category,
-		DECODE(t.group_name, 'other', 'main', t.group_name)
-	FROM
-		org o,
-		org_category cat,
-		org_type t
-	WHERE
-		cat.parent_id = o.org_internal_id
-		AND	cat.member_name = t.caption
-		AND	cat.member_name = (
-			SELECT caption
-			FROM org_type
-			WHERE id = (
-				SELECT MIN(id)
-				FROM
-					org_type,
-					org_category
-				WHERE
-					parent_id = o.org_internal_id
-					AND caption = member_name
+	SELECT *
+	FROM (
+		SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+		FROM
+			org o,
+			org_category cat,
+			org_type t
+		WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+				SELECT caption
+				FROM org_type
+				WHERE id = (
+					SELECT MIN(id)
+					FROM
+						org_type,
+						org_category
+					WHERE
+						parent_id = o.org_internal_id
+						AND caption = member_name
+				)
+			) 
+			AND	%whereCond%
+			AND (
+				owner_org_id IS NULL
+				OR owner_org_id = ?
 			)
-		) 
-		AND	%whereCond%
-		AND owner_org_id = ?
-		AND rownum <= $LIMIT
+		ORDER BY o.org_id
+	)
+	WHERE rownum <= $LIMIT
 };
 
 $STMTRPTDEFN_DEFAULT =

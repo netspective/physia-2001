@@ -17,34 +17,37 @@ my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 use vars qw($STMTFMT_SEL_CATALOG $STMTFMT_SEL_CATALOGENTRY $STMTFMT_SEL_CATENTRYBYID );
 
 $STMTFMT_SEL_CATALOG = qq{
-	SELECT
-		oc.catalog_id,
-		count(oce.entry_id) entries_count,
-		oc.caption,
-		oc.description,
-		oc.parent_catalog_id,
-		oc.internal_catalog_id,
-		'Add',
-		DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
-	FROM
-		ofcatalog_Attribute oc_a,
-		offering_catalog oc,
-		offering_catalog_entry oce
-	WHERE
-		oce.catalog_id (+) = oc.internal_catalog_id
-		AND oc_a.parent_id (+) = oc.internal_catalog_id 
-		AND (oc.org_internal_id is null or oc.org_internal_id = ?)
-		%whereCond%
-		AND rownum <= $LIMIT
-	GROUP BY
-		oc.catalog_id,
-		oc.internal_catalog_id,
-		oc.caption,
-		oc.description,
-		oc.parent_catalog_id %extraCols%,
-		oc_a.value_int
-	ORDER BY
-		oc.catalog_id
+	SELECT *
+	FROM (
+		SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+		FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+		WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id 
+			AND (oc.org_internal_id is null or oc.org_internal_id = ?)
+			%whereCond%
+		GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id %extraCols%,
+			oc_a.value_int
+		ORDER BY
+			oc.catalog_id
+	)
+	WHERE rownum <= $LIMIT
 };
 
 $STMTFMT_SEL_CATALOGENTRY = qq{

@@ -14,26 +14,29 @@ use vars qw(@ISA @EXPORT $STMTMGR_INSURANCE_SEARCH $STMTFMT_SEL_INSURANCE
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 $STMTFMT_SEL_INSURANCE = qq{
-	SELECT
-		org.org_id,
-		ins.product_name,
-		ins.plan_name,
-		addr.line1,
-		addr.city,
-		addr.state,
-		ins.ins_internal_id
-	FROM
-		insurance ins,
-		insurance_address addr,
-		org
-	WHERE
-		ins.ins_internal_id = addr.parent_id
-		AND org.org_internal_id = ins.ins_org_id
-		AND	%whereCond% 
-		AND ins.owner_org_id = ?
-		%catCond%
-		AND rownum <= $LIMIT
-	ORDER BY 1
+	SELECT *
+	FROM (
+		SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+		FROM
+			insurance ins,
+			insurance_address addr,
+			org
+		WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	%whereCond% 
+			AND ins.owner_org_id = ?
+			%catCond%
+		ORDER BY 1
+	)
+	WHERE rownum <= $LIMIT
 };
 
 $STMTRPTDEFN_DEFAULT =

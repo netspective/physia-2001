@@ -14,21 +14,25 @@ use vars qw(@EXPORT $STMTMGR_GPCI_SEARCH);
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 my $BASE_SQL = qq{
-	SELECT
-		gpci_id,
-		TO_CHAR(eff_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
-		TO_CHAR(eff_end_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
-		locality_name,
-		state,
-		county
-	FROM ref_gpci
-	WHERE
-		%whereCond%
-		AND eff_begin_date <= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-		AND eff_end_date >= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-	ORDER BY
-		state,
-		locality_name
+	SELECT *
+	FROM (
+		SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			TO_CHAR(eff_end_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			locality_name,
+			state,
+			county
+		FROM ref_gpci
+		WHERE
+			%whereCond%
+			AND eff_begin_date <= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+			AND eff_end_date >= to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+		ORDER BY
+			state,
+			locality_name
+	)
+	WHERE rownum <= $LIMIT
 };
 
 my $PUBLISH_DEFN = {

@@ -87,75 +87,81 @@ $STMTRPTDEFN_DEFAULT =
 
 my $APPOINTMENT_COLUMNS = 
 qq{	patient.simple_name,
-		TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
-		ep2.value_text AS resource_id,
-		aat.caption AS patient_type,
-		event.subject,
-		et.caption AS event_type,
-		stat.caption,
-		org.org_id,
-		event.remarks,
-		event.event_id,
-		scheduled_by_id,
-		TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
-		patient.person_id AS patient_id,
-		'TBD'};
+			TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
+			ep2.value_text AS resource_id,
+			aat.caption AS patient_type,
+			event.subject,
+			et.caption AS event_type,
+			stat.caption,
+			org.org_id,
+			event.remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			'TBD'};
 
 my $APPOINTMENT_TABLES = 
 qq{	person patient,
-		appt_attendee_type aat,
-		event_attribute ep2,
-		event_attribute ep1,
-		event_type et,
-		event,
-		appt_status stat,
-		org};
+			appt_attendee_type aat,
+			event_attribute ep2,
+			event_attribute ep1,
+			event_type et,
+			event,
+			appt_status stat,
+			org};
 
 my $STMTFMT_SEL_APPOINTMENT = qq{
-	SELECT
+	SELECT *
+	FROM (
+		SELECT
 $APPOINTMENT_COLUMNS
-	FROM
+		FROM
 $APPOINTMENT_TABLES
-	WHERE
-		org.org_id like ?
-		AND event.facility_id = org.org_internal_id
-		AND event.start_time BETWEEN
-			TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-		AND ep1.parent_id = event.event_id
-		AND ep2.parent_id = event.event_id
-		AND ep1.value_type = $EVENTATTRTYPE_PATIENT
-		AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		AND patient.person_id = ep1.value_text
-		AND ep2.value_text LIKE ?
-		AND event.event_status = stat.id
-		AND stat.id BETWEEN ? and ?
-		AND aat.id = ep1.value_int
-		AND et.id = event.event_type
-		AND event.owner_id = ?
-		AND rownum <= $LIMIT
-	%orderBy%
+		WHERE
+			org.org_id like ?
+			AND event.facility_id = org.org_internal_id
+			AND event.start_time BETWEEN
+				TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			AND ep1.parent_id = event.event_id
+			AND ep2.parent_id = event.event_id
+			AND ep1.value_type = $EVENTATTRTYPE_PATIENT
+			AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
+			AND patient.person_id = ep1.value_text
+			AND ep2.value_text LIKE ?
+			AND event.event_status = stat.id
+			AND stat.id BETWEEN ? and ?
+			AND aat.id = ep1.value_int
+			AND et.id = event.event_type
+			AND event.owner_id = ?
+		%orderBy%
+	)
+	WHERE rownum <= $LIMIT
 };
 
 my $STMTFMT_SEL_APPOINTMENT_CONFLICT = qq{
-	SELECT
+	SELECT *
+	FROM (
+		SELECT
 $APPOINTMENT_COLUMNS
-	FROM
+		FROM
 $APPOINTMENT_TABLES
-	WHERE
-		event.facility_id = org.org_internal_id
-		AND (event.parent_id = ?)
-		AND ep1.parent_id = event.event_id
-		AND ep2.parent_id = event.event_id
-		AND ep1.value_type = $EVENTATTRTYPE_PATIENT
-		AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		AND patient.person_id = ep1.value_text
-		AND stat.id = event.event_status
-		AND aat.id = ep1.value_int
-		AND et.id = event.event_type
-		AND event.owner_id = ?
-		AND rownum <= $LIMIT
-	%orderBy%
+		WHERE
+			event.facility_id = org.org_internal_id
+			AND (event.parent_id = ?)
+			AND ep1.parent_id = event.event_id
+			AND ep2.parent_id = event.event_id
+			AND ep1.value_type = $EVENTATTRTYPE_PATIENT
+			AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
+			AND patient.person_id = ep1.value_text
+			AND stat.id = event.event_status
+			AND aat.id = ep1.value_int
+			AND et.id = event.event_type
+			AND event.owner_id = ?
+		%orderBy%
+	)
+	WHERE rownum <= $LIMIT
 };
 
 $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(

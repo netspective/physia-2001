@@ -25,7 +25,7 @@ my $BASE_SQL = qq{
 my $PUBLISH_DEFN = {
 	columnDefn =>
 	[
-		{ head => 'Perse Payer ID', url => q{javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)} },
+		{ head => 'PerSe Payer ID', url => q{javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)} },
 		{ head => 'Envoy Payer ID', url => q{javascript:chooseItem('/search/epayer/id2/#&{?}#', '#&{?}#', false)} },
 		{ head => 'Name', },
 	],
