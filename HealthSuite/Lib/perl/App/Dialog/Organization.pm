@@ -175,8 +175,6 @@ sub initialize
 					name => 'time_zone',
 					type => 'select',
 					selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT',
-					defaultValue => 'CST6CDT',
-					options => FLDFLAG_PERSIST,
 				),
 			],
 		),
@@ -598,6 +596,8 @@ sub populateData
 		App::Universal::ATTRTYPE_INTEGER
 	);
 	$page->field('fiscal_month',$attribute->{value_int});
+	
+	$page->field('time_zone', 'CST6CDT') unless $page->field('time_zone');
 }
 
 
@@ -1027,7 +1027,6 @@ sub execute_update
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
-
 
 sub execute_remove
 {
