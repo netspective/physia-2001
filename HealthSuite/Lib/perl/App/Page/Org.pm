@@ -309,14 +309,14 @@ sub prepare_view_catalog
 	{
 		$self->param('internal_catalog_id', $pathItems[3]);
 		$self->addContent(
-			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalog_detail_org', 0, 8],
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalog_detail_org',
 				[$pathItems[3]] ),
 		);
 	}
 	else
 	{
 		$self->addContent(
-			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalogs_all_org', 5, 4],
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalogs_all_org',
 				[$self->param('org_id')]) );
 	}
 
