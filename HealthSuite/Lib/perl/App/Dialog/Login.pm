@@ -41,7 +41,7 @@ sub new
 				),
 		new CGI::Dialog::Field(name => 'start_sep', type => 'separator'),
 		new CGI::Dialog::Field(name => 'start_arl_use', type => 'hidden'),
-		new CGI::Dialog::Field(caption => 'Start Page', name => 'start_arl', type => 'select', selOptions => 'Home:/person/$_f_person_id$/home;Search:/search;Schedule:/schedule', options => FLDFLAG_PERSIST),
+		new CGI::Dialog::Field(caption => 'Start Page', name => 'nextaction_redirecturl', type => 'select', selOptions => 'Worklist:/worklist;Home:/home;Search:/search;Schedule:/schedule', options => FLDFLAG_PERSIST),
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -153,12 +153,13 @@ sub execute
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 
-	if($page->field('start_arl_use'))
-	{
-		my $arl = $page->field('start_arl');
-		$arl =~ s/\$(\w+)\$/$page->param($1)/ge;
-		$page->redirect($arl);
-	}
+	$self->handlePostExecute($page, $command, $flags);
+	#if($page->field('start_arl_use'))
+	#{
+	#	my $arl = $page->field('start_arl');
+	#	$arl =~ s/\$(\w+)\$/$page->param($1)/ge;
+	#	$page->redirect($arl);
+	#}
 	return 'Welcome to Physia.com, ' . $page->session('user_id');
 }
 
