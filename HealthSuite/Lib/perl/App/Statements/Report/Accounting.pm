@@ -1061,7 +1061,7 @@ aic.batch_id,
 		AND 	o.owner_org_id = :7
 	},
 	'sel_revenue_collection' => qq{
-        SELECT  provider,
+        SELECT  care_provider_id as provider,
                 sum(nvl(ffs_prof,0)+nvl(misc_charges,0)) as ffs_prof,
                 sum(nvl(x_ray,0)) as x_ray,
                 sum(nvl(lab,0)) as lab,
@@ -1077,12 +1077,12 @@ aic.batch_id,
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND (facility = :3 OR :3 is NULL)
-                AND ( (provider =:4 AND provider is not null )OR :4 is NULL)
+                AND ( (care_provider_id =:4 AND care_provider_id is not null )OR :4 is NULL)
                 AND (batch_id >= :5 OR :5 is NULL)
                 AND (batch_id <= :6 OR :6 is NULL)
 		AND o.org_internal_id = rc.facility
 		AND o.owner_org_id = :7
-        GROUP by provider
+        GROUP by care_provider_id 
         },
 
 	'sel_daily_audit_detail' => qq{
