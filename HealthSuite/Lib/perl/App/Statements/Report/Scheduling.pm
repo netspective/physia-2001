@@ -16,69 +16,64 @@ $STMTRPTDEFN_DETAIL_APPT_SCHEDULE ={
 		
 		columnDefn => 
 		[
-		{ head => 'Patient',colIdx=>0, hint=>'#11#',url=>q{javascript:chooseItemForParent('/person/#0#/profile')}},			
-		{ head => 'Chart', 	colIdx => 13, },
-		{ head => 'Account',	colIdx => 14,},					
-		{ head => 'Physician',colIdx=>1,	},					
-		{ head => 'Facility',hint=>'#12#',colIdx=>2	},					
-		{ head => 'Appt Status',	colIdx=>3},
-		{ head => 'Appt Start Time',colIdx=>4	},
-		{ head => 'Reason for Visit',colIdx=>5	},
-		{ head => 'Scheduled By',	colIdx=>6},
-		{ head => 'Checkin By',	colIdx=>7},
-		{ head => 'Checkout By',colIdx=>8	},
-		],
-				
+		{ head => 'Patient',colIdx=>0, hint=>'View Patient Profile',url=>q{javascript:chooseItemForParent('/person/#11#/profile')}},			
+		{ head => 'Chart', 	colIdx => 2, },
+		{ head => 'Account',	colIdx => 1,},					
+		{ head => 'Physician',colIdx=>3,	},					
+		{ head => 'Facility',hint=>'#12#',colIdx=>4	},					
+		{ head => 'Appt Status',	colIdx=>5},
+		{ head => 'Appt Scheduled Time',colIdx=>6	},
+		{ head => 'Reason for Visit',colIdx=>7	},
+		{ head => 'Scheduled By',	colIdx=>8},
+		{ head => 'Checkin By',	colIdx=>9},
+		{ head => 'Checkout By',colIdx=>10	},
+		],				
 };
 $STMTFMT_DETAIL_APPT_SCHEDULE = qq{
-	SELECT distinct p.person_id as patient,
-	 	ea.value_textB as physician,
-		org.org_id as org_name,
-		aas.caption as status,
-		TO_CHAR(e.start_time, 'MM/DD/YYYY HH12:MI AM') AS start_time,
-		e.subject,  
-		e.scheduled_by_id as scheduled_by,
-		e.checkin_by_id as checkin_by, 
-		e.checkout_by_id as checkout_by	,				
-		aat.caption as patient_type,
-		ea.value_textB as provider,
-		p.simple_name,
-		org.name_primary,
-		(SELECT	value_text
+		SELECT 	(SELECT simple_name 
+			FROM 	person 
+			WHERE 	person_id = ea.value_text) as patient_name,
+			(SELECT	value_text
 			FROM	Person_Attribute  pa
-			WHERE	pa.parent_id = p.person_id
-				AND	pa.item_name = 'Patient/Account Number'
-		) as account_number,
-		(SELECT	value_text
+			WHERE	pa.parent_id = ea.value_text
+			AND	pa.item_name = 'Patient/Account Number'
+			) 	as account_number,
+			(SELECT	value_text
 			FROM	Person_Attribute  pa
-			WHERE	pa.parent_id = p.person_id
-				AND	pa.item_name = 'Patient/Chart Number'
-		) as chart_number	
-	FROM	
-		Event e, 
-		person p,
-		Event_Attribute ea,
-		transaction t,
-		invoice i,
-		invoice_billing ib,
-		Appt_Attendee_Type aat, 
-		Appt_Status aas,
-		org
-		%fromTable%
-	WHERE	%whereCond%
-		AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-		AND	e.facility_id = :2
-		AND	org.org_internal_id = :2
-		AND	p.person_id = ea.value_text
-		AND	trunc(e.start_time) BETWEEN TO_DATE(:3, 'MM/DD/YYYY')
-		AND	TO_DATE(:4, 'MM/DD/YYYY')
+			WHERE	pa.parent_id = ea.value_text
+			AND	pa.item_name = 'Patient/Chart Number'
+			) 	as chart_number,
+			(SELECT simple_name 
+			FROM 	person 
+			WHERE 	person_id = ea.value_textb) as physician_name,
+			(SELECT org_id 
+			FROM org 
+			WHERE org_internal_id = e.facility_id) as org_name,				
+			(SELECT caption 
+			FROM 	Appt_Status 
+			WHERE	id = e.event_status) as appt_status,
+			TO_CHAR(e.start_time, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			e.subject as reason_visit,
+			e.scheduled_by_id as scheduled_by,			
+			e.checkin_by_id as checkin_by, 
+			e.checkout_by_id as checkout_by,
+			ea.value_text as patient_id,
+			ea.value_textb as physician_id
+		FROM	Event e, Event_Attribute ea 
+			%fromTable%
+		WHERE	%whereCond%
+		AND	(:2 IS NULL OR facility_id = :2)
+		AND EXISTS
+		(
+			SELECT 	1 
+			FROM 	org
+			WHERE 	owner_org_id = :5
+			AND 	org_internal_id = e.facility_id
+		)
 		AND	e.event_id = ea.parent_id
-		AND	e.event_id = t.parent_event_id (+)
-		AND	i.main_transaction (+)= t.trans_id
-		AND	ib.invoice_id (+)= i.invoice_id
-		AND aas.id = e.event_status
-		AND aat.id = ea.value_int	
-	ORDER BY 5	
+		AND 	trunc(e.start_time) BETWEEN TO_DATE(:3, 'MM/DD/YYYY')
+		AND	TO_DATE(:4, 'MM/DD/YYYY')
+		ORDER BY 5	
 };
 
 $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
@@ -93,7 +88,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					invoice i,
 					invoice_item ii															
 				WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND	e.facility_id = :1
+				AND (:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = e.facility_id
+				)
 				AND	trunc(e.start_time) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
 				AND	TO_DATE(:3, 'MM/DD/YYYY')
 				AND	e.event_id = ea.parent_id
@@ -114,10 +116,82 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 
 	'sel_detailPatientsCPT' =>{
 				_stmtFmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
-				fromTable =>q{,invoice_item ii},
-				whereCond =>q{ii.parent_id = i.invoice_id AND ii.code=:1},			
+				fromTable =>q{,	transaction t,
+						invoice i,
+						invoice_item ii
+					     },
+				whereCond =>q{		ii.parent_id = i.invoice_id 
+						AND 	ii.code=:1 
+						AND 	i.main_transaction = t.trans_id 
+						AND	e.event_id = t.parent_event_id
+					    },			
 				publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,		
 			},
+	# -----------------------------------------------------------------------------------------				
+	'sel_missingEncounter' =>
+	{
+		sqlStmt=>qq{
+				SELECT 	to_char(e.CHECKIN_STAMP,'MM/DD/YYYY'),count (*)
+				FROM 	Event e, Event_Attribute ea
+				WHERE	(:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = e.facility_id
+				)
+				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND	trunc(e.CHECKIN_STAMP) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
+				AND	TO_DATE(:3, 'MM/DD/YYYY')
+				AND	e.event_id = ea.parent_id
+				AND	e.CHECKOUT_STAMP is NULL
+				GROUP BY to_char(e.CHECKIN_STAMP,'MM/DD/YYYY')
+			   },
+			publishDefn => 	{
+					columnDefn =>
+					[
+					{head => 'Check In Date',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=missing_encounter&encounter=#&{?}#')} , hint => 'View Details' },
+					{head => 'Count', dAlign => 'right'},
+					],
+				},				   
+	},
+	
+	'sel_detailMissingEncounter' =>
+	{
+		sqlStmt=>qq{
+				SELECT (SELECT simple_name FROM person WHERE person_id = ea.value_text) as patient_name,
+					ea.value_text,
+					to_char(e.checkin_stamp, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+					(SELECT simple_name FROM person WHERE person_id =ea.value_textB) as physician_name,
+					(SELECT org_id FROM org where org_internal_id = e.facility_id) as org_name,
+					value_text
+				FROM	Event e, Event_Attribute ea 
+				WHERE	(:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :3
+					AND 	org_internal_id = e.facility_id
+				)
+				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND	trunc(e.CHECKIN_STAMP)= TO_DATE(:2, 'MM/DD/YYYY')
+				AND	e.event_id = ea.parent_id
+				AND	e.CHECKOUT_STAMP is NULL
+			   },
+		publishDefn =>
+			   {
+				columnDefn => 
+				[
+				{ head => 'Patient Name',colIdx=>0, hint=>'View Patient Profile',url=>q{javascript:chooseItemForParent('/person/#1#/profile')}},			
+				{ head => 'Patient ID', 	colIdx => 1, },
+				{ head => 'Appt Start Time',colIdx=>2	},
+				{ head => 'Physician Name',colIdx=>3	},
+				{ head => 'Location',	colIdx=>4},
+				]
+			   }
+	},
 			
 	# -----------------------------------------------------------------------------------------			
 	'sel_patientsProduct' =>{
@@ -131,13 +205,20 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					insurance i,
 					claim_type ct
 				WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND	e.facility_id = :1
+				and (:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = e.facility_id
+				)
 				AND	trunc(e.start_time) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
 				AND	TO_DATE(:3, 'MM/DD/YYYY')
 				AND	e.event_id = ea.parent_id
 				AND	e.event_id = t.parent_event_id
 				AND	i.main_transaction = t.trans_id
-				AND	ib.invoice_id = i.invoice_id
+				AND	ib.bill_id = i.billing_id
 				AND	ib.bill_ins_id = i.ins_internal_id
 				AND	ct.id = i.ins_type
 				GROUP BY ct.caption
@@ -150,10 +231,22 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					],
 				},		
 			},
+
 	'sel_detailPatientsProduct' =>{
 				_stmtFmt => $STMTFMT_DETAIL_APPT_SCHEDULE,				
-				fromTable=>q{,claim_type ct, insurance ins},
-				whereCond=>q{ct.caption = :1 AND ib.bill_ins_id = ins.ins_internal_id  AND ct.id = ins.ins_type },
+				fromTable=>q	{,invoice i,
+						invoice_billing ib,
+						insurance i,
+						claim_type ct,
+						transaction t
+						},
+				whereCond=>q{	ct.caption = :1 
+						AND	e.event_id = t.parent_event_id
+						AND	i.main_transaction = t.trans_id						
+						AND	ib.bill_id = i.billing_id
+						AND	ib.bill_ins_id = i.ins_internal_id
+						AND	ct.id = i.ins_type
+					    },
 				publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 
 	},
@@ -166,7 +259,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			select value_textB as physician, count(value_textB) as count
 			from Event, Event_Attribute
 			where Event_Attribute.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				and facility_id = :1
+				and (:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = Event.facility_id
+				)
 				and Event.event_id = Event_Attribute.parent_id
 				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -198,7 +298,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			from Appt_Attendee_Type, Event, Event_Attribute ea
 			where ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				and Event.event_id = ea.parent_id
-				and facility_id = :1
+				and (:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = Event.facility_id
+				)
 				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and event_status in (1, 2)
@@ -216,8 +323,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	},
 
 	'sel_detailPatientsSeenByPatientType' => {
-		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,	
-		whereCond=>q{aat.id = :1 and event_status in (1,2) },
+		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
+		whereCond=>q{ea.value_int = :1 and event_status in (1,2) },
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 
 	},
@@ -229,7 +336,14 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			from Appt_Status, Event, Event_Attribute
 			where value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				and Event.event_id = Event_Attribute.parent_id
-				and facility_id = :1
+				and (:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = Event.facility_id
+				)
 				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Appt_Status.id = Event.event_status
@@ -244,10 +358,11 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					{head => 'Count', dAlign => 'right'},
 				],
 		},
-	},
+	},	
+
 	'sel_DetailAppointmentStatus'=>{
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,		
-		whereCond =>q{ aas.id = :1},			
+		whereCond =>q{e.event_status = :1},			
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,				 
 			
 	},	
