@@ -14,6 +14,16 @@ use vars qw(@ISA @EXPORT $STMTMGR_ORG $PUBLISH_DEFN);
 my $ATTRTYPE_PHONE = App::Universal::ATTRTYPE_PHONE;
 
 $STMTMGR_ORG = new App::Statements::Org(
+	'selOrgServiceFFSByInternalId' =>qq{	
+		SELECT 	distinct org_internal_id,oa.value_int
+		FROM	Org_Category oc, Org o,Org_Attribute oa
+		WHERE   o.owner_org_id = :1
+		AND	oc.parent_id = o.org_internal_id 
+		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')		
+		AND	oa.item_name ='Fee Schedules'
+		AND	oa.value_type =0
+		AND	oa.parent_id = o.org_internal_id 
+		},
 	'selOrgSimpleNameById' => qq{
 		select name_primary
 		from org
