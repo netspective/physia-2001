@@ -38,6 +38,11 @@ sub new
 							selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 
 		new CGI::Dialog::Field(caption => 'Measure', name => 'value_text', options => FLDFLAG_REQUIRED, findPopup => "/lookup/cpt/detail?_f_search_expression=%field.attr_name%"),
+		new CGI::Dialog::MultiField(caption =>'Measure Frequency/Number Of Times',
+					fields => [
+						new CGI::Dialog::Field(caption => 'Frequency', name => 'frequency', type => 'select', selOptions => ' : 0;Weekly:1;Monthly:2;Annualy:3',value => ''),
+						new CGI::Dialog::Field(caption => 'Measure', name => 'measure', size => '3'),
+				]),
 		new CGI::Dialog::Field(type => 'date', name => 'value_date', caption => 'Last Performed', options => FLDFLAG_REQUIRED, futureOnly => 0),
 		new CGI::Dialog::Field(type => 'date', caption => 'Due', name => 'value_dateend', options => FLDFLAG_REQUIRED, futureOnly => 0)
 	);
@@ -67,7 +72,8 @@ sub populateData
 	$page->field('value_date' , $preventiveCare->{'value_date'});
 	$page->field('value_dateend' , $preventiveCare->{'value_dateend'});
 	$page->field('value_text', $preventiveCare->{'value_text'});
-	$page->field('cpt_name', $preventiveCare->{'value_textb'});
+	$page->field('frequency', $preventiveCare->{'value_int'});
+	$page->field('measure', $preventiveCare->{'value_block'});
 
 }
 
@@ -89,7 +95,9 @@ sub execute
 		value_date => $page->field('value_date') || undef,
 		value_text => $page->field('value_text') || undef,
 		value_textB => $page->field('cpt_name') || undef,
-		value_dateEnd => $page->field('value_dateend') || undef
+		value_dateEnd => $page->field('value_dateend') || undef,
+		value_int => $page->field('frequency') || undef,
+		value_block => $page->field('measure') || undef,
 	);
 	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
