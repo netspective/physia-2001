@@ -16,7 +16,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Invoice;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 use Date::Calc qw(:all);
@@ -84,9 +84,9 @@ sub new
 	);
 	$self->{activityLog} =
 	{
-		scope =>'transaction',
+		scope =>'invoice',
 		key => "#param.person_id#",
-		data => "personalpayment of '#field.total_amount#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		data => "personal payment of '#field.total_amount#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -314,25 +314,9 @@ sub executePrePayment
 		_debug => 0
 	);
 
-	#Create history item for this adjustment
-	addHistoryItem($page, $invoiceId,
-		value_text => "Prepayment of $totalAmtRecvd made by $payerId",
-		value_textB => "$comments " . "Batch ID: $batchId",
-		value_date => $todaysDate,
-	);
-
-
-	#Add batch id attribute
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId || undef,
-		item_name => 'Invoice/Payment/Batch ID',
-		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $batchId || undef,
-		value_date => $batchDate || undef,
-		value_int => $adjItemId || undef,
-		_debug => 0
-	);
+	#Create history item for this adjustment and batch id attribute
+	addHistoryItem($page, $invoiceId, value_text => "Prepayment of $totalAmtRecvd made by $payerId", value_textB => "$comments " . "Batch ID: $batchId");
+	addBatchPaymentAttr($page, $invoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 
 	$page->session('batch_id', $batchId);
 }
@@ -390,46 +374,31 @@ sub executePostPayment
 			_debug => 0
 		);
 
-		#Update the invoice
-
-		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-		my $invoiceBalance = $invoice->{total_cost} + ($invoice->{total_adjust} + (0 - $payAmt));
-		my $invoiceStatus = $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED;
-		$invoiceStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_ONHOLD ? App::Universal::INVOICESTATUS_ONHOLD : $invoiceStatus;
-		$invoiceStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED ? App::Universal::INVOICESTATUS_ONHOLD : $invoiceStatus;
-		$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $invoiceId || undef,
-			invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-			_debug => 0
-		);
 
 		#Create history item for this adjustment
-		addHistoryItem($page, $invoiceId,
-			value_text => "Personal payment of $totalAmtRecvd made by $payerId",
-			value_textB => "$comments " . "Batch ID: $batchId",
-			value_date => $todaysDate,
-		);
+		addHistoryItem($page, $invoiceId, value_text => "Personal payment of $totalAmtRecvd made by $payerId", value_textB => "$comments " . "Batch ID: $batchId");
 
-		if($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED)
+
+		#Update the invoice
+		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
+		my $invoiceBalance = $invoice->{balance};
+		my $invoiceStatus = $invoice->{invoice_status};
+		my $newStatus = $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED;
+		$newStatus = $invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED ? App::Universal::INVOICESTATUS_SUBMITTED : $newStatus;
+		$newStatus = $invoiceStatus == App::Universal::INVOICESTATUS_ONHOLD ? App::Universal::INVOICESTATUS_ONHOLD : $newStatus;
+		$newStatus = $invoiceStatus == App::Universal::INVOICESTATUS_CLOSED ? App::Universal::INVOICESTATUS_ONHOLD : $newStatus;
+		changeInvoiceStatus($page, $invoiceId, $newStatus) if defined $newStatus;
+
+		if($newStatus == App::Universal::INVOICESTATUS_CLOSED)
 		{
-			addHistoryItem($page, $invoiceId,
-				value_text => 'Closed',
-				value_date => $todaysDate,
-			);
+			handleDataStorage($page, $invoiceId);
+			addHistoryItem($page, $invoiceId, value_text => 'Closed');
 		}
 
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Payment/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $batchId || undef,
-			value_date => $batchDate || undef,
-			value_int => $adjItemId || undef,
-			_debug => 0
-		);
+		#Add batch id attribute
+		addBatchPaymentAttr($page, $invoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 		$page->session('batch_id', $batchId);
+
 
 		if ($page->field('pay_type') == 9) # Budget Payment
 		{
@@ -454,11 +423,6 @@ sub executePostPayment
 					value_text => "$comments " . "Batch ID: $batchId",
 				);
 			}
-		}
-
-		if($invoiceBalance == 0)
-		{
-			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 		}
 	}
 }

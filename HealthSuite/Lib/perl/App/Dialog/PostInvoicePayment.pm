@@ -14,7 +14,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 
@@ -41,6 +41,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'alert_off'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'client_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'product_ins_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'next_payer_exists'),
 
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED, findPopup => '/lookup/claim'),
 
@@ -250,8 +251,9 @@ sub execute
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
 	my $paidBy = $page->param('paidBy');
+	my $nextPayerExists = $page->field('next_payer_exists');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
-	my $batchID = $page->field('batch_id');
+	my $batchId = $page->field('batch_id');
 	my $batchDate = $page->field('batch_date');
 	my $todaysDate = $page->getDate();
 	my $payerType = $paidBy eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
@@ -288,9 +290,7 @@ sub execute
 
 		# Create adjustment for the item
 		my $planAllow = $page->param("_f_item_$line\_plan_allow");
-		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
-		$writeoffCode = $writeoffAmt eq '' || $writeoffCode == App::Universal::ADJUSTWRITEOFF_FAKE_NONE ? undef : $writeoffCode;
-
+		my $writeoffCode = $writeoffAmt eq '' ? undef : $page->param("_f_item_$line\_writeoff_code");
 		my $comments = $page->param("_f_item_$line\_comments");
 		my $adjItemId = $page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
@@ -305,7 +305,7 @@ sub execute
 			pay_ref => $payRef || undef,
 			payer_type => defined $payerType ? $payerType : undef,
 			payer_id => $payerId || undef,
-			writeoff_code => defined $writeoffCode ? $writeoffCode : 'NULL',
+			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
 			writeoff_amount => $writeoffAmt || undef,
 			comments => $comments || undef,
 			_debug => 0
@@ -313,74 +313,57 @@ sub execute
 
 
 		#Create attribute for batchId
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Payment/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $batchID || undef,
-			value_date => $batchDate || undef,
-			value_int => $adjItemId || undef,
-			_debug => 0
-		);
+		addBatchPaymentAttr($page, $invoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 	}
 
 
 	#Reset session batch id
-	$page->session('batch_id', $batchID);
-
+	$page->session('batch_id', $batchId);
 
 	#Create history attribute for total payment
-	addHistoryItem($page, $invoiceId,
-		value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
-		value_textB => "Batch ID: $batchID",
-		value_date => $todaysDate,
-	);
-
+	addHistoryItem($page, $invoiceId, value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'", value_textB => "Batch ID: $batchId");
 
 	#Update the invoice status
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 	my $invoiceBalance = $invoice->{balance};
+	my $invoiceStatus = $invoice->{invoice_status};
+	my $claimType = $invoice->{invoice_subtype};
 	my $newStatus;
-	if($invoice->{invoice_status} == App::Universal::INVOICESTATUS_ONHOLD || $invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
+	if($invoiceStatus == App::Universal::INVOICESTATUS_ONHOLD)
 	{
 		$newStatus = App::Universal::INVOICESTATUS_ONHOLD;
-		addHistoryItem($page, $invoiceId,
-			value_text => 'On Hold',
-			value_date => $todaysDate,
-		);
+		addHistoryItem($page, $invoiceId, value_text => 'On Hold');
 	}
-	elsif($invoiceBalance == 0)
+	elsif($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED && $claimType != App::Universal::CLAIMTYPE_SELFPAY)
 	{
-		$newStatus = $invoice->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY ? App::Universal::INVOICESTATUS_PAYAPPLIED : App::Universal::INVOICESTATUS_CLOSED;
-		$newStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_PAYAPPLIED ? App::Universal::INVOICESTATUS_CLOSED : $newStatus;
-		addHistoryItem($page, $invoiceId,
-			value_text => 'Closed',
-			value_date => $todaysDate,
-		) if $newStatus == App::Universal::INVOICESTATUS_CLOSED;
+		reopenInsuranceClaim($page, $invoiceId);
+	}
+	elsif($invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED)
+	{
+		#if payments are applied to a submitted claim, don't want to change status because otherwise it will not be picked up for transfer/billing
+		$newStatus = App::Universal::INVOICESTATUS_SUBMITTED;
+	}
+	elsif($invoiceBalance == 0 && 
+			($claimType == App::Universal::CLAIMTYPE_SELFPAY || ($invoice->{flags} & App::Universal::INVOICEFLAG_DATASTOREATTR && ! $nextPayerExists)) 
+		)
+	{
+		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
+		addHistoryItem($page, $invoiceId, value_text => 'Closed');
+		handleDataStorage($page, $invoiceId);
 	}
 	else
 	{
 		$newStatus = App::Universal::INVOICESTATUS_PAYAPPLIED;
 	}
 
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		invoice_status => $newStatus,
-		_debug => 0
-	);
+	changeInvoiceStatus($page, $invoiceId, $newStatus) if defined $newStatus;
 
 
 	#Redirect
 	my $newInvoiceId;
-	if($invoiceBalance == 0 && $invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+	if($page->field('next_payer_alert') == 1)
 	{
-		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
-	}
-	elsif($page->field('next_payer_alert') == 1)
-	{
-		$newInvoiceId = App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId, App::Universal::SUBMIT_NEXTPAYER);
+		$newInvoiceId = handleDataStorage($page, $invoiceId, App::Universal::RESUBMIT_NEXTPAYER);
 	}
 
 	if(my $paramBatchId = $page->param('_p_batch_id'))
@@ -404,29 +387,22 @@ sub customValidate
 	my ($self, $page) = @_;
 
 	my $paidBy = $page->param('paidBy');
+	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+	my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
+	my $nextPayer = $nextBillingInfo->{bill_id};
+	my $invoiceStat = $invoiceInfo->{invoice_status};
+
+	#indicate that a next payer does exist in hidden field (used in sub execute to determine if claim should be closed or not)
+	$page->field('next_payer_exists', 1) if defined $nextPayer;
+
+
+	#ask if claim should be sent to next payer
 	if($paidBy eq 'insurance')	#this 'if' will never occur for self-pay invoices
 	{
-		my $totalAdjsApplied = 0;
-		my $lineCount = $page->param('_f_line_count');
-		#calculate total adjustment (plan paid and writeoff amounts)
-		for(my $line = 1; $line <= $lineCount; $line++)
-		{
-			my $planPaid = $page->param("_f_item_$line\_plan_paid");
-			my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
-			next if $planPaid eq '' && $writeoffAmt eq '';
-
-			$totalAdjsApplied += ($planPaid + $writeoffAmt);
-		}
-
-		my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
-		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-		my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
-		my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
-
-		my $newBalance = $invoiceInfo->{balance} - $totalAdjsApplied;
-		my $invoiceStat = $invoiceInfo->{invoice_status};
 		if( 
-			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && 
+			 $nextPayer && ! $page->field('next_payer_alert') && 
 			(
 				($invoiceStat >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStat <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
 				$invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||

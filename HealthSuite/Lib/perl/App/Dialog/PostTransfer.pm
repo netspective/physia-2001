@@ -14,7 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -63,6 +63,15 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
+}
+
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
 }
 
 sub customValidate
@@ -146,32 +155,22 @@ sub handleTransferFromInvoice
 			'Invoice', 'update',
 			invoice_id => $fromInvoiceId || undef,
 			invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
-			flags => 0,
 			_debug => 0
 		);
 
-		## Add history item
-		addHistoryItem($page, $fromInvoiceId,
-			value_text => 'Reopened due to transfer',
-			value_date => $todaysDate,
-		);
+		addHistoryItem($page, $fromInvoiceId, value_text => 'Reopened due to transfer');
 	}
 
 
-	my $itemId = $page->schemaAction(
-		'Invoice_Item', 'add',
-		parent_id => $fromInvoiceId,
-		item_type => defined $itemType ? $itemType : undef,
-		_debug => 0
-	);
+	#Create adjustment invoice item
+	my $itemId = $page->schemaAction('Invoice_Item', 'add', parent_id => $fromInvoiceId, item_type => App::Universal::INVOICEITEMTYPE_ADJUST, _debug => 0);
 
 
 	# Create adjustment for the item
-	my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER;
 	my $comments = $page->field('from_comments');
 	my $adjItemId = $page->schemaAction(
 		'Invoice_Item_Adjust', 'add',
-		adjustment_type => defined $adjType ? $adjType : undef,
+		adjustment_type => App::Universal::ADJUSTMENTTYPE_TRANSFER,
 		adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 		parent_id => $itemId || undef,
 		pay_date => $todaysDate || undef,
@@ -179,29 +178,18 @@ sub handleTransferFromInvoice
 		_debug => 0
 	);
 
+
 	#Add batch attribute
 	my $batchId = $page->field('batch_id');
 	my $batchDate = $page->field('batch_date');
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $fromInvoiceId || undef,
-		item_name => 'Invoice/Payment/Batch ID',
-		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $batchId || undef,
-		value_date => $batchDate || undef,
-		value_int => $adjItemId || undef,
-		_debug => 0
-	);
+	addBatchPaymentAttr($page, $fromInvoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 	$page->session('batch_id', $batchId);
 
 
 	#Create history item for this adjustment
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
-	addHistoryItem($page, $fromInvoiceId,
-		value_text => "Payment transfer of  \$$transferAmt to invoice <A HREF='/invoice/$toInvoiceId/summary'>$toInvoiceId</A>",
-		value_textB => "$comments " . "Batch ID: $batchId",
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $fromInvoiceId, value_text => "Payment transfer of  \$$transferAmt to invoice <A HREF='/invoice/$toInvoiceId/summary'>$toInvoiceId</A>",
+		value_textB => "$comments " . "Batch ID: $batchId");
 }
 
 sub handleTransferToInvoice
@@ -210,7 +198,6 @@ sub handleTransferToInvoice
 	$command = 'add';
 
 	my $todaysDate = $page->getDate();
-	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
 	my $transferAmt = $page->field('trans_from_amt');
@@ -222,33 +209,22 @@ sub handleTransferToInvoice
 			'Invoice', 'update',
 			invoice_id => $toInvoiceId || undef,
 			invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
-			flags => 0,
 			_debug => 0
 		);
 
-		## Add history item
-		addHistoryItem($page, $toInvoiceId,
-			value_text => 'Reopened due to transfer',
-			value_date => $todaysDate,
-		);
+		addHistoryItem($page, $toInvoiceId, value_text => 'Reopened due to transfer');
 	}
 
 
-	my $itemId = $page->schemaAction(
-		'Invoice_Item', 'add',
-		parent_id => $toInvoiceId,
-		item_type => defined $itemType ? $itemType : undef,
-		_debug => 0
-	);
+	#Create adjustment invoice item
+	my $itemId = $page->schemaAction('Invoice_Item', 'add', parent_id => $toInvoiceId, item_type => App::Universal::INVOICEITEMTYPE_ADJUST, _debug => 0);
 
 
 	# Create adjustment for the item
-
-	my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER;
 	my $comments = $page->field('to_comments');
 	my $adjItemId = $page->schemaAction(
 		'Invoice_Item_Adjust', 'add',
-		adjustment_type => defined $adjType ? $adjType : undef,
+		adjustment_type => App::Universal::ADJUSTMENTTYPE_TRANSFER,
 		adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 		parent_id => $itemId || undef,
 		pay_date => $todaysDate || undef,
@@ -260,26 +236,14 @@ sub handleTransferToInvoice
 	#Add batch attribute
 	my $batchId = $page->field('batch_id');
 	my $batchDate = $page->field('batch_date');
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $toInvoiceId || undef,
-		item_name => 'Invoice/Payment/Batch ID',
-		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $batchId || undef,
-		value_date => $batchDate || undef,
-		value_int => $adjItemId || undef,
-		_debug => 0
-	);
+	addBatchPaymentAttr($page, $toInvoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 	$page->session('batch_id', $batchId);
 
 
 	#Create history item for this adjustment
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
-	addHistoryItem($page, $toInvoiceId,
-		value_text => "Credit of \$$transferAmt transferred from invoice <A HREF='/invoice/$fromInvoiceId/summary'>$fromInvoiceId</A>",
-		value_textB => "$comments " . "Batch ID: $batchId",
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $toInvoiceId, value_text => "Credit of \$$transferAmt transferred from invoice <A HREF='/invoice/$fromInvoiceId/summary'>$fromInvoiceId</A>",
+		value_textB => "$comments " . "Batch ID: $batchId");
 }
 
 1;

@@ -14,7 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -96,20 +96,8 @@ sub execute
 		my $invoiceBalance = $page->param("_f_invoice_$line\_invoice_balance");
 		if($page->param("_f_invoice_$line\_invoice_status") == App::Universal::INVOICESTATUS_CLOSED)
 		{
-			$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId || undef,
-				invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
-				flags => 0,
-				_debug => 0
-			);
-
-
-			## Add history item
-			addHistoryItem($page, $invoiceId,
-				value_text => 'Reopened due to refund',
-				value_date => $todaysDate,
-			);
+			reopenInsuranceClaim($page, $invoiceId);
+			addHistoryItem($page, $invoiceId, value_text => 'Reopened due to refund');
 		}
 
 
@@ -117,12 +105,12 @@ sub execute
 		my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
 															# payment, there is no charge and the balance should be negative.
 		my $itemId = $page->schemaAction(
-				'Invoice_Item', 'add',
-				parent_id => $invoiceId,
-				item_type => defined $itemType ? $itemType : undef,
-				total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				_debug => 0
-			);
+			'Invoice_Item', 'add',
+			parent_id => $invoiceId,
+			item_type => defined $itemType ? $itemType : undef,
+			total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+			_debug => 0
+		);
 
 
 
@@ -134,39 +122,23 @@ sub execute
 		my $refundToId = $page->param("_f_invoice_$line\_refund_to_id");
 		my $refundToType = $page->param("_f_invoice_$line\_refund_to_type") eq 'person' ? App::Universal::ENTITYTYPE_PERSON : App::Universal::ENTITYTYPE_ORG;
 		my $adjItemId = $page->schemaAction(
-				'Invoice_Item_Adjust', 'add',
-				adjustment_type => defined $adjType ? $adjType : undef,
-				adjustment_amount => defined $refundAmt ? $refundAmt : undef,
-				parent_id => $itemId || undef,
-				refund_to_type => defined $refundToType ? $refundToType : undef,
-				refund_to_id => $refundToId || undef,
-				pay_date => $todaysDate || undef,
-				comments => $comments || undef,
-				_debug => 0
-			);
-
-
-
-		#Add batch attribute
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/Payment/Batch ID',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $batchId || undef,
-			value_date => $batchDate || undef,
-			value_int => $adjItemId || undef,
+			'Invoice_Item_Adjust', 'add',
+			adjustment_type => defined $adjType ? $adjType : undef,
+			adjustment_amount => defined $refundAmt ? $refundAmt : undef,
+			parent_id => $itemId || undef,
+			refund_to_type => defined $refundToType ? $refundToType : undef,
+			refund_to_id => $refundToId || undef,
+			pay_date => $todaysDate || undef,
+			comments => $comments || undef,
 			_debug => 0
 		);
+
+
+
+		#Create history item for this adjustment and add batch attribute
+		addHistoryItem($page, $invoiceId, value_text => "Refunded \$$refundAmt to $refundToId", value_textB => "$comments " . "Batch ID: $batchId");
+		addBatchPaymentAttr($page, $invoiceId, value_text => $batchId || undef, value_int => $adjItemId, value_date => $batchDate || undef);
 		$page->session('batch_id', $batchId);
-
-
-		#Create history item for this adjustment
-		addHistoryItem($page, $invoiceId,
-			value_text => "Refunded \$$refundAmt to $refundToId",
-			value_textB => "$comments " . "Batch ID: $batchId",
-			value_date => $todaysDate,
-		);
 	}
 
 
