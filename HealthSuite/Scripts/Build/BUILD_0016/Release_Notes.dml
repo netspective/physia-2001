@@ -145,6 +145,10 @@
 
 		<deliverable id="1383">
 			UI:  Deleted the 'Find by State, City and Zip' in the Org Search page.
+		</deliverable>
+
+		<deliverable id="1391">
+			Voids and edits not allowed for explosion code children. Editing of explosion code allowed.
 		</deliverable>		
 
 		<deliverable id="1400">
