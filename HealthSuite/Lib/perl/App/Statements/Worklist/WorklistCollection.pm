@@ -71,22 +71,15 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		provider_id = :2		
 	},
 	
-	'insAccountOwner' =>qq
-	{
-		INSERT INTO TRANSACTION	(trans_owner_id,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
-					 trans_subtype,trans_status,initiator_type,initiator_id) 
-		VALUES
-					 ( :1, :2, 0,sysdate,$ACCOUNT_OWNER,'Owner',2, 2,:3)
-	},
-	#The data 01/31/1800 is used to make sure the dates sort correct
+	#The data 01/31/1800 is used to make sure the dates sort correctly
 	'selPerCollByIdDate' =>qq
 	{			
 	
 		
-		SELECT	 person_id , to_date('01/31/1800','MM/DD/YYYY')
+		SELECT	p.person_id , to_date('01/31/1800','MM/DD/YYYY')
 		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
 			person_attribute pl,person_attribute pa, person_attribute pb,
-			transaction t, invoice i, invoice_billing ib
+			transaction t, invoice i, invoice_billing ib, person_org_category pog
 		WHERE	pf.parent_id = :1
 		AND	pp.parent_id = :1
 		AND	pd.parent_id = :1
@@ -99,7 +92,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	pl.item_name = 'WorkListCollectionLNameRange'
 		AND	pa.item_name = 'WorkList-Collection-Setup-BalanceAge-Range'
 		AND	pb.item_name = 'WorkList-Collection-Setup-BalanceAmount-Range'
-		
+		AND 	p.person_id = pog.person_id
+		AND	pog.org_internal_id = :3
 
 		AND NOT EXISTS
 		(
@@ -109,7 +103,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			AND 	trans_status = $ACTIVE
 			AND 	provider_id = :1
 			AND	trans_owner_id = i.client_id
-			AND	trans_owner_id = person_id			
+			AND	trans_owner_id = p.person_id			
 		)		
 		AND	i.main_transaction = t.trans_id
 		AND	i.client_id = p.person_id
@@ -192,9 +186,10 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	{
 	
 		INSERT INTO TRANSACTION	(trans_owner_id,caption,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
-					 trans_subtype,trans_status,initiator_type,initiator_id) 
+					 trans_subtype,trans_status,initiator_type,initiator_id,billing_facility_id,cr_session_id,
+					 cr_user_id,cr_org_internal_id,trans_status_reason) 
   		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
-		       	trans_subtype,trans_status,initiator_type,:2
+		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7
 		FROM 	transaction
 		WHERE	trans_owner_id = :1 
 		AND	provider_id = :2
@@ -204,7 +199,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	trans_status =$ACTIVE		
 		MINUS
 		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
-		       	trans_subtype,trans_status,initiator_type,:2
+		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7
 		FROM 	transaction
 		WHERE	trans_owner_id = :1 
 		AND	provider_id = :3
