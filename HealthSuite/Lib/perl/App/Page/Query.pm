@@ -43,7 +43,7 @@ sub prepare
 		$self->{queryDialog} = $dialog;
 
 		push @{$self->{page_content}}, $dialog->getHtml($self, 'add');
-		if ($self->field('dlg_execmode') eq 'V')
+		if ($self->field('dlg_execmode') eq 'V' && $dialog->isValid($self))
 		{
 			push @{$self->{page_content}}, $dialog->getHtml($self, 'add');
 		}
