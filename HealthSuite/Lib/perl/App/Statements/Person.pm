@@ -479,7 +479,25 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				and parent_id = ?
 				and value_int = 1
 		},
-	#
+	'selOfficeLocationData' => qq{
+			SELECT *
+			FROM person_attribute
+			WHERE parent_id = ?
+			AND item_name = 'Office Location'
+		},
+	'selupdClearDefaultOrg' => qq{
+			UPDATE person_attribute
+			SET value_int = ''
+			WHERE item_id = ?
+		},
+	'selOfficeLocationOrg' => qq{
+		SELECT *
+		FROM person_attribute
+		WHERE parent_id = ?
+		AND value_text = ?
+		AND item_name = 'Office Location'
+		},
+
 	# Registration and profile statements/definitions
 	#
 	'sel_Person_ContactMethods' => {
