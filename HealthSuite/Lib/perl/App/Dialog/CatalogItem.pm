@@ -79,7 +79,7 @@ sub new
 			schema => $schema,
 			column => 'Offering_Catalog_Entry.name',
 			size => 40,
-			hints => 'autofill for CPT, ICD and HCPCS codes',
+			hints => 'autofill for CPT, ICD, EPSDT and HCPCS codes',
 		),
 		new CGI::Dialog::Field::TableColumn(caption => 'Description',
 			name => 'description',
@@ -160,7 +160,7 @@ sub populateData_add
 	
 	$page->field('catalog_id', $page->param('catalog_id'));
 	$page->field('parent_entry_id', $page->param('parent_entry_id'));
-	$page->field('entry_type', 100);
+	$page->field('entry_type', 100);	
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
 	$page->field('add_mode', 1);
@@ -224,7 +224,7 @@ sub customValidate
 	
 	if (
 		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
-		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
+		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_EPSDT,App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
 	)
 	{
 		my $codeInfo;
@@ -244,6 +244,11 @@ sub customValidate
 				$codeInfo = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
 					'sel_hcpcs_code', $code);
 				last CASE;			
+			}
+			if ($entryType == App::Universal::CATALOGENTRYTYPE_EPSDT) {
+							$codeInfo = $STMTMGR_EPSDT_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
+								'sel_epsdt_code',$code);
+							last CASE;			
 			}
 		}
 		
