@@ -30,6 +30,7 @@ sub new
 	my $permanentType = App::Universal::TRANSTYPEDIAG_PERMANENT;
 	my $icdType = App::Universal::TRANSTYPEDIAG_ICD;
 	my $notesType = App::Universal::TRANSTYPEDIAG_NOTES;
+	my $surgicalType = App::Universal::TRANSTYPEDIAG_SURGICAL;	
 
 	if($transType == $notesType)
 	{
@@ -57,6 +58,16 @@ sub new
 			new CGI::Dialog::Field(caption => 'Begin Date', name => 'curr_onset_date'),
 		);
 	}
+	
+	if($transType == $surgicalType)
+	{
+		$self->addContent(
+			new CGI::Dialog::Field(type => 'memo', name => 'data_text_a', caption => 'Notes', options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(caption => 'ICD Code', name => 'code'),
+			new CGI::Dialog::Field(caption => 'Surgery Date', name => 'curr_onset_date', type => 'date'),
+		);
+	}
+	
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
 }
@@ -106,6 +117,7 @@ sub execute_add
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return 'Add completed.';
 }
+
 
 sub execute_remove
 {
