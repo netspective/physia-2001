@@ -18,9 +18,11 @@
 		<deliverable id="252">
 			UI: Added 'Go to Worklist' in all the dialogs which has a next-action drop-down list.
 		</deliverable>
+
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
+
 		<deliverable id="964">
 			UI:  Added Person Simple Name to :
 			+ Collection Worklist dialogs: 
@@ -37,21 +39,29 @@
 			+ Invoices - Earning column Payer
 		</deliverable>
 
+		<deliverable id="943">
+			UI: Simple names now showing next to all person id fields where possible.
+		</deliverable>
+
 		<deliverable id="963">
 			UI: Made the license fields in the nurse dialog to be just text fields.
 		</deliverable>
+
 		<deliverable id="1125">
 			UI: Added a new multiField called 'Board Certification/Date' in the Physician dialog and updated the 
 			    dropdown lists for ProviderNumbers and the LicenseId numbers. Added a new dialog called 'Board Certification'
 			    under the Certification component of the 'Assocoate' tab
 		</deliverable>
+
 		<deliverable id="1153">
 			UI: Added the field called 'Language Spoken' in the 'Add Person' dialog.
 		</deliverable>		
+
 		<deliverable id="1192">
 			Report :  New bill cycle report.  The report is at the patient statement level.  It does not drill down to invoice level data, because we are currently not storing static invoice level data per  patient statement sent ,
 			Database : Needs new Statement tables 
 		</deliverable>		
+		
 		<deliverable id="1262">
 			UI: The Electronic Billing Information component has now been moved form the Insurance tab
 			of an organization to the Clearing House tab.
@@ -60,16 +70,20 @@
 			UI: Adding/Editing a Billing Information from a Person's Associate tab changes that person's
 			clearing house information only.
 		</deliverable>
+		
 		<deliverable id="1301">
 			UI: Added the Specialty field in the 'Referring Doctor' dialog.
 		</deliverable>
+		
 		<deliverable id="1303">
 			UI: Updated the 'Personnel' component in the 'Personnel' tab to not to showup the referring doctors.
 		</deliverable>		
+		
 		<deliverable id="1308">
 			UI: Under the 'Add New Record' component in the home page and in the worklist, select-type of 
 			    'Add Main Organization' is removed.
 		</deliverable>
+		
 		<deliverable id="1315">
 			Created and added an addPopup icon wherever there is a lookup (magnifying glass).
 		</deliverable>
@@ -82,6 +96,8 @@
 		<deliverable id="1452">
 			Script to Parse Statement Status Reports From Per-Se and update database.  Scripts assumes the file provider from PerSe is fixed formatted.  Meaning the start column position for data fields is the same.
 			Database : requires new Statement tables
+		</deliverable>
+
 		<deliverable id="1511">
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			not those of the current user of the app.
@@ -90,6 +106,7 @@
 		<deliverable id="1512">
 			Deleted the validation check on the 'License Required' check-box field of the 'Nursing License' in the 'Add Nurse' dialog
 		</deliverable>
+		
 		<deliverable id="1517">
 			Report (patient activity staff) : The patient activity staff report was not converting from GMT to local timezone so work done late in a day would appear on the wrong date.
 		</deliverable>
@@ -98,10 +115,12 @@
 			New 'copay' payment type created and added to claim personal payment dialog. Also, 'Copay prepaid' works
 			like 'Prepayment' in post general payment dialog.  [DB Change Required]
 		</deliverable>
+		
 		<deliverable id="1528">
 			UI: Now the Preventive-Care will show up in the alerts component, 90 days prior to the preventive care event 
 			    becoming due.
 		</deliverable>
+		
 		<deliverable id="1530">
 			Report (Receipt and Procedure Analysis) : Made font for fiscaly year text at the top of the report  smaller for both receipt analysis and procedure analysis
 		</deliverable>
@@ -109,6 +128,7 @@
 		<deliverable id="1532">
 			Report (Receipt Analysis) :  Added new option to create receipt analysis  as totals only
 		</deliverable>
+		
 		<deliverable id="1535">
 			Report (Deposit Payment) : New report for capturing payments(deposits) 
 		</deliverable>
@@ -160,18 +180,22 @@
 			UI: Added the appointments component in the summary page and changed the default next action for
 			Patient/Person Lookup to show the 'Summary Page'.
 		</deliverable>
+
 		<deliverable id="1557">
 			UI: Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be
 			    edited any more from the 'Edit Profile'
 		</deliverable>
+
 		<deliverable id="1560">
 			Changed claim dialog next action post personal payment to send user to personal payment dialog for claims.
 		</deliverable>
+
 		<deliverable id="1561">
 			UI: Collection Worklist now looks like Document and claim worklist.  Also should have improved performance when using worklist.     
 			Side Effects : Since the method for storing colletion information has changed any part of the application that pulled collection information could be impacted .  The collection worklist and the collection reports have been changed already.
 			[Database] : Requires new table Invoice_Worklist 
 		</deliverable>
+
 		<deliverable id="1571">
 			UI: Added a new component called 'Person Categories' in the person's Summary page to add a new category to an existing person.
 			    If an existing person in the database is added as an 'Insured Person' in the PersonalCoverage dialog, then that person will be added
@@ -183,6 +207,7 @@
 			NOTE : This change could impact the way the product plan and personal coverage dialog work when used in normal edit . add mode.  Also should test claim creation to make sure correct personal coverage record appears.			
 
 		</deliverable>
+
 		<deliverable id="1595">
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
 		</deliverable>		
