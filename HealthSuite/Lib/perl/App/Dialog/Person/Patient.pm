@@ -297,28 +297,6 @@ sub execute_add
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
-		item_id => $page->field('acct_item_id') || undef,
-		parent_org_id => $page->session('org_internal_id') ||undef,
-		item_name => 'Patient/Account Number',
-		value_type => 0,
-		value_text => $page->field('acct_number') || undef,
-		_debug => 0
-		) if $page->field('acct_number') ne '';
-
-	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $personId || undef,
-		item_id => $page->field('chart_item_id') || undef,
-		parent_org_id => $page->session('org_internal_id') ||undef,
-		item_name => 'Patient/Chart Number',
-		value_type => 0,
-		value_text => $page->field('chart_number') || undef,
-		_debug => 0
-		) if $page->field('chart_number') ne '';
-
-	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $personId || undef,
 		parent_org_id => $page->session('org_internal_id') || undef,
 		item_name => 'Signature Source',
 		value_type => App::Universal::ATTRTYPE_AUTHPATIENTSIGN,
