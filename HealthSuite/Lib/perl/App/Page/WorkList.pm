@@ -14,11 +14,13 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Search::Appointment;
 
+use App::Dialog::WorklistSetup;
+
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(App::Page);
 
 
-sub _prepare_view_date
+sub prepare_view_date
 {
 	my ($self) = @_;
 
@@ -51,7 +53,7 @@ sub _prepare_view_date
 	return 1;
 }
 
-sub prepare_view_date
+sub __prepare_view_date
 {
 	my ($self) = @_;
 
@@ -123,6 +125,16 @@ sub prepare_view_recentActivity
 	return 1;
 }
 
+sub prepare_view_setup
+{
+	my ($self) = @_;
+	
+	my $dialog = new App::Dialog::WorklistSetup(schema => $self->{schema});
+	$self->addContent('<br>');
+	$dialog->handle_page($self, 'add');
+	return 1;
+}
+
 sub prepare_page_content_footer
 {
 	my $self = shift;
@@ -174,8 +186,9 @@ sub prepare_page_content_header
 		[
 			[$dateTitle, "/worklist/date", 'date'],
 			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
-			#['Setup', "/worklist/setup", 'setup'],
-			['Setup', "#SETUP", 'setup'],
+			['Setup', "/worklist/setup", 'setup', ],
+			#['Setup', "#SETUP", 'setup'],
+			
 		], ' | ');
 
 	push(@{$self->{page_content_header}},
@@ -231,21 +244,50 @@ sub getControlBarHtml
 
 	my @dateSelected = Decode_Date_US($fmtDate);
 	my $timeFieldsHtml;
+	
 	if (Delta_Days(@dateSelected, Today()) == 0)
 	{
 		$self->param('Today', 1);
 
 		my ($time1, $time2, $title1, $title2);
 
-		if ($self->session('showTimeSelect'))
+		if ($self->session('showTimeSelect') == 1)
 		{
-			$time1 = $self->session('time1') || '12:00am';
-			$time2 = $self->session('time2') || '11:59pm';
+			if (! $self->session('time1') || $self->session('time1') !~ /:/) {
+				$time1 = '12:00am';
+				$self->session('time1', $time1);
+			} else {
+				$time1 = $self->session('time1');
+			}
+
+			if (! $self->session('time2') || $self->session('time2') !~ /:/) {
+				$time2 = '11:59pm';
+				$self->session('time2', $time2);
+			} else {
+				$time2 = $self->session('time2');
+			}
+			
+			#$time1 = $self->session('time1') || '12:00am';
+			#$time2 = $self->session('time2') || '11:59pm';
 		}
 		else
 		{
-			$time1 = $self->session('time1') || 30;
-			$time2 = $self->session('time2') || 120;
+			if (! $self->session('time1') || $self->session('time1') =~ /:/) {
+				$time1 = 30;
+				$self->session('time1', $time1);
+			} else {
+				$time1 = $self->session('time1');
+			}
+
+			if (! $self->session('time2') || $self->session('time2') =~ /:/) {
+				$time2 = 120;
+				$self->session('time2', $time2);
+			} else {
+				$time2 = $self->session('time2');
+			}
+			
+			#$time1 = $self->session('time1') || 30;
+			#$time2 = $self->session('time2') || 120;
 		}
 
 		$timeFieldsHtml = qq{
@@ -281,6 +323,38 @@ sub getControlBarHtml
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input type=submit value="Go">
 		};
+	}
+	else
+	{
+		my ($time1, $time2, $title1, $title2);
+
+		if (! $self->session('time1') || $self->session('time1') !~ /:/) {
+			$time1 = '12:00am';
+			$self->session('time1', $time1);
+		} else {
+			$time1 = $self->session('time1');
+		}
+
+		if (! $self->session('time2') || $self->session('time2') !~ /:/) {
+			$time2 = '11:59pm';
+			$self->session('time2', $time2);
+		} else {
+			$time2 = $self->session('time2');
+		}
+		
+
+		$timeFieldsHtml = qq{
+			&nbsp; &nbsp;
+			Time:
+			<INPUT name=showTimeSelect value="Range from/to" READONLY>
+
+			&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
+			&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
+
+			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
+			<input type=submit value="Go">
+		};
+		
 	}
 
 	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">

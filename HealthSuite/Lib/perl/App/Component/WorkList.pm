@@ -11,11 +11,13 @@ use Date::Manip;
 use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
 use App::Statements::Person;
+use App::Statements::Scheduling;
 use App::Schedule::Utilities;
 use Data::Publish;
 
-use vars qw(@ISA);
+use vars qw(@ISA @ITEM_TYPES);
 @ISA   = qw(CGI::Component);
+@ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
 sub initialize
 {
@@ -47,6 +49,20 @@ sub initialize
 			}
 		},
 	];
+	
+	for my $itemType (@ITEM_TYPES)
+	{
+		my $name = $itemType . 'OnSelect';
+		unless ($page->session($name))
+		{
+			my $itemName = 'Worklist/' . "\u$itemType" . '/OnSelect';
+			my $preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+				'selSchedulePreferences', $page->session('user_id'), $itemName);
+			
+			$page->session($name, $preference->{column_no} || 1);
+			#$page->addDebugStmt("Read Preference for $name", $page->session($name));
+		}
+	}
 }
 
 sub getHtml
@@ -57,69 +73,9 @@ sub getHtml
 	createLayout_html($page, $self->{flags}, $self->{layoutDefn}, $self->getComponentHtml($page));
 }
 
-sub saveResourcePref
-{
-	my ($self, $page, @physicians) = @_;
-	my $userId =  $page->session('user_id');
-	
-	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_resources', $userId);
-
-	for (@physicians)
-	{
-		$page->schemaAction(
-			'Person_Attribute',	'add',
-			item_id => undef,
-			parent_id => $userId,
-			parent_org_id => $page->session('org_id') || undef,
-			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
-			item_name => 'WorkList',
-			value_text => $_,
-			value_int =>  1,
-			_debug => 0
-		);
-	}
-}
-
-sub saveFacilityPref
-{
-	my ($self, $page, @facilities) = @_;
-	my $userId = $page->session('user_id');
-
-	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_facilities', $userId);
-
-	for (@facilities)
-	{
-		$page->schemaAction(
-			'Person_Attribute',	'add',
-			item_id => undef,
-			parent_id => $userId,
-			parent_org_id => $page->session('org_id') || undef,
-			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
-			item_name => 'WorkList',
-			value_text => $_,
-			value_int =>  1,
-			_debug => 0
-		);
-	}
-}
-
 sub getComponentHtml
 {
 	my ($self, $page) = @_;
-	
-	if($page->param('_f_action_change_resources'))
-	{
-		my @resources = $page->param('_f_physList');
-		$self->saveResourcePref($page, @resources);
-	}
-
-	if($page->param('_f_action_change_facilities'))
-	{
-		my @facilities = $page->param('_f_facility_list');
-		$self->saveFacilityPref($page, @facilities);
-	}
 	
 	my $selectedDate = $page->param('_seldate') || 'today';
 	$selectedDate = 'today' unless ParseDate($selectedDate);
@@ -165,7 +121,7 @@ sub getComponentHtml
 	else
 	{
 		$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_events_worklist_not_today', $startDate, $endDate, $user_id, $user_id);
+			'sel_events_worklist_not_today', $startTime, $endTime, $user_id, $user_id);
 	}
 
 	my @data = ();
@@ -179,18 +135,18 @@ sub getComponentHtml
 	for (@$appts)
 	{
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
-		$apptMinutes = hhmmAM2minutes($_->{appointment_time});
+		$apptMinutes = stamp2minutes($_->{appointment_time});
 
 		if ($_->{checkin_time})
 		{
-			$checkinMinutes  = hhmmAM2minutes($_->{checkin_time});
+			$checkinMinutes  = stamp2minutes($_->{checkin_time});
 			$waitMinutes = $checkinMinutes - $apptMinutes;
 			$waitMinutes = 'early' if $waitMinutes < 0;
 		}
 
 		if ($_->{checkout_time})
 		{
-			$checkoutMinutes = hhmmAM2minutes($_->{checkout_time});
+			$checkoutMinutes = stamp2minutes($_->{checkout_time});
 			$visitMinutes = $checkoutMinutes - $checkinMinutes;
 			$visitMinutes = 'early' if $visitMinutes < 0;
 		}
@@ -226,7 +182,7 @@ sub getComponentHtml
 			qq{
 				<A HREF='/worklist/dlg-update-appointment/$_->{event_id}'
 				TITLE='Update Appointment' class=today>
-				<b>$_->{appointment_time}</b></A> <br>
+				@{[ formatStamp($_->{appointment_time}) ]}</A> <br>
 				<strong style="color:#999999">($_->{appt_type})</strong>
 			},
 
@@ -280,8 +236,27 @@ sub getComponentHtml
 
 	$html .= createHtmlFromData($page, 0, \@data, 
 		$App::Statements::Component::Scheduling::STMTRPTDEFN_WORKLIST);
-		
+
+	$html .= "<i style='color=red'>No appointment data found.  Please setup Resource and Facility selections.</i> <P>" 
+		if (scalar @{$appts} < 1);
+
 	return $html;
+}
+
+sub formatStamp
+{
+	my ($stamp) = @_;
+
+	if ($stamp =~ /\d\d\/\d\d\/\d\d\d\d/)
+	{
+		my ($day, $time) = split(/\s/, $stamp);
+		return qq{$day $time};
+	}
+	else
+	{
+		return "<b>$stamp</b>";
+	}
+
 }
 
 # auto-register instance

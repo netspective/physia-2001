@@ -23,10 +23,34 @@ use enum qw(BITMASK:TIME_ H24 H12 ONLY);
 	hhmmAM2minutes
 	minutes2Time
 	time2hhmm
+	stamp2minutes
 );
 
 use Date::Calc qw(:all);
+use Date::Manip;
 use App::Schedule::Slot;
+
+sub stamp2minutes
+{
+	my ($stamp) = @_;
+	my ($day, $time);
+	
+	if ($stamp =~ /\d\d\/\d\d\/\d\d\d\d/)
+	{
+		($day, $time) = split(/\s/, $stamp);
+	}
+	else
+	{
+		$day = UnixDate('today', '%m/%d/%Y');
+		$time = $stamp;
+		$time =~ s/.*(\d\d:\d\d..).*/$1/;
+	}
+	
+	my $dayMinutes = (Date_to_Days(Decode_Date_US($day))) * 24 * 60;
+	my $minutes    = hhmmAM2minutes($time);
+	
+	return $dayMinutes + $minutes;
+}
 
 sub time2hhmm
 {

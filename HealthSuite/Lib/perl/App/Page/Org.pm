@@ -99,7 +99,7 @@ sub prepare_page_content_header
 			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
 			['Catalog', "$urlPrefix/catalog", 'catalog'],
 			['Account', "$urlPrefix/account", 'account'],
-			['WorkList', "$urlPrefix/worklist", 'worklist'],
+			#['WorkList', "$urlPrefix/worklist", 'worklist'],
 			#['Activity', "$urlPrefix/activity", 'activity'],
 		], ' | ');
 

@@ -126,9 +126,14 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
 		},
 		
+		#timeSelectClause => qq{
+		#	e.start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT') 
+		#		and to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+		#},
+		
 		timeSelectClause => qq{
-			e.start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT') 
-				and to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+			e.start_time between to_date(?, '$STAMPFORMAT')
+				and to_date(?, '$STAMPFORMAT')
 		},
 		
 		publishDefn => $STMTRPTDEFN_WORKLIST,
