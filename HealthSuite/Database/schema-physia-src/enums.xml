@@ -264,6 +264,7 @@
 		<enum>Auto Insurance Writeoff</enum>
 		<enum>Transfer to Next Payer</enum>
 		<enum>Reverse Transfer to Next Payer</enum>
+		<enum>Reverse Payment</enum>
 	</table>
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
