@@ -1,5 +1,5 @@
 --
---  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.1 2000-04-24 18:38:27 alex_hillman Exp $
+--  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.2 2000-05-23 14:53:15 alex_hillman Exp $
 --  Copyright (c) Oracle Corporation 1988, 1994, 1995.  All Rights Reserved.
 --
 --  SQL*Plus Global Login startup file.
@@ -29,7 +29,7 @@ column other_plus_exp format a44
 -- Showing username and database name in SQLPLUS prompt
 
 set numwidth 9
-set linesize 1000
+set linesize 2000
 set pagesize 24
 
 set termout off
@@ -41,4 +41,6 @@ from user_users,global_name;
 
 set sqlprompt "&user_prompt>"
 set termout on
+
+SET SERVEROUTPUT ON SIZE 1000000
 
