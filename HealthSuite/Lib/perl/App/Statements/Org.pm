@@ -133,8 +133,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 	'selOrgEligibilityInput' => qq{
 			select *
 			from org_eligibility_input
-			where product_id = ?
-			and org_id = ?
+			where org_id = ?
 			order by field_order
 		},
 );
