@@ -546,7 +546,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending',8,'Denied'), caption,
 					provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
 				from  Transaction
 			where  	trans_owner_id = ?
