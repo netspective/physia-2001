@@ -15,6 +15,9 @@
 	</release-info>
 
 	<deliverables>
+		<deliverable id="252">
+			Added 'Go to Worklist' in all the dialogs which has a next-action drop-down list.
+		</deliverable>
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
