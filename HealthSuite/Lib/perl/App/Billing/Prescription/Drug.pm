@@ -18,7 +18,7 @@ sub new
 	$params{allowSubstitution} = undef;
 	$params{allowGeneric} = undef;
 	$params{label} = undef;
-	$params{labelSpanish} = undef;
+	$params{labelLanguage} = undef;
 	$params{sig} = undef;
 
 	return bless \%params, $type;
@@ -144,16 +144,16 @@ sub getLabel
 	return $self->{label};
 }
 
-sub setLabelSpanish
+sub setLabelLanguage
 {
 	my ($self, $value) = @_;
-	$self->{labelSpanish} = $value;
+	$self->{labelLanguage} = $value;
 }
 
-sub getLabelSpanish
+sub getLabelLanguage
 {
 	my ($self) = @_;
-	return $self->{labelSpanish};
+	return $self->{labelLanguage};
 }
 
 sub setSig

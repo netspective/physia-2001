@@ -141,7 +141,7 @@ sub populateDrugs
 	$drug->setAllowSubstitution($row->{allow_substitutions});
 	$drug->setAllowGeneric($row->{allow_generic});
 	$drug->setLabel($row->{label});
-	$drug->setLabelSpanish($row->{label_in_spanish});
+	$drug->setLabelLanguage($row->{label_language});
 	$drug->setSig($row->{sig});
 
 	$drugs->addDrug($drug)

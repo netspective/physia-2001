@@ -97,13 +97,13 @@ sub printSingle
 		$self->printLabel($p, $patientX, $sigY, $report, 'Sig:');
 
 		$self->printData($p, $patientX, $drugY, $report, $drug->getDrugName, 0, 15);
-		$self->printData($p, $doseX, $drugY, $report, $drug->getDose, 0, 15);
+		$self->printData($p, $doseX, $drugY, $report, $drug->getDose . " " . $drug->getDoseUnits, 0, 15);
 		$self->printData($p, $quantityX, $drugY, $report, $drug->getQuantity, 0, 15);
 		$self->printData($p, $quantityX, $drugY, $report, $drug->getDuration . " " . $drug->getDurationUnits, 60, 15);
 		$self->printData($p, $patientX, $sigY, $report, $drug->getSig, 0, 15);
 
 		$self->printLabel($p, $patientX, $labelY, $report, 'Label: No ___ Yes ___');
-		$self->printLabel($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Label in Spanish: ');
+		$self->printLabel($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Label in: ');
 		$self->printLabel($p, $refillX, $labelY, $report, 'Refill: No ___ Yes ___ # _____');
 
 		if($drug->getLabel() == 1)
@@ -125,14 +125,7 @@ sub printSingle
 			$self->printData($p, $refillX, $labelY, $report, 'X', 45, 0);
 		}
 
-		if($drug->getLabelSpanish() == 1)
-		{
-			$self->printData($p, $patientX, $labelY - LINE_HEIGHT, $report, 'Yes', 90, 0);
-		}
-		else
-		{
-			$self->printData($p, $patientX, $labelY - LINE_HEIGHT, $report, 'No', 90, 0);
-		}
+		$self->printData($p, $patientX, $labelY - LINE_HEIGHT, $report, $drug->getLabelLanguage(), 50, 0);
 
 		$self->printLabel($p, $patientX, $signatureY, $report, 'Signature');
 		$self->printLabel($p, $patientX + 50, $signatureY, $report, '_________________________');
