@@ -378,6 +378,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 					from insurance
 					where product_name = ?
 					and plan_name = ?
+					and ins_org_id = ?
 					and record_type = 2
 		},
 	'selInsSequence' => qq{
