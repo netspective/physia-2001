@@ -29,12 +29,14 @@ $STMTFMT_SEL_CLAIM = qq{
 			i.total_adjust,
 			i.balance,
 			ib.bill_party_type,
-			TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date
+			TO_CHAR(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS invoice_date,
+			o.org_id
 		FROM
 			invoice_status iis,
 			invoice i,
 			invoice_billing ib,
-			invoice_item iit
+			invoice_item iit,
+			org o
 			%tables%
 		WHERE
 			%whereCond%
@@ -44,6 +46,7 @@ $STMTFMT_SEL_CLAIM = qq{
 			AND ib.bill_sequence = 1
 			AND (owner_type = 1 AND owner_id = ?)
 			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
 		GROUP BY
 			i.invoice_id,
 			i.total_items,
@@ -54,7 +57,8 @@ $STMTFMT_SEL_CLAIM = qq{
 			i.total_adjust,
 			i.balance,
 			ib.bill_party_type,
-			i.invoice_date
+			i.invoice_date,
+			o.org_id
 		ORDER BY
 			i.invoice_id desc
 	)
@@ -89,8 +93,8 @@ $STMTRPTDEFN_DEFAULT =
 			{
 				0 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
 				1 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
-				2 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#5#</A>},
-				3 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#5#</A>},
+				2 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#11#</A>},
+				3 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#11#</A>},
 				'_DEFAULT' => '#5#',
 			},
 		},
