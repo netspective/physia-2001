@@ -341,7 +341,7 @@
 		<column name="rel_diags" type="text" size="255" descr="Related diagnosis codes (comma-separated)"/>
 		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice item (maintained automatically)"/>
 		<column name="balance" type="currency" calc="trigger" descr="The extended_cost - total_adjust (maintained automatically)"/>
-		<column name="reference" type="text" size="128" descr="Stores arbitrary reference information (like insurance information)"/>
+		<column name="parent_code" type="text" size="32" descr="Stores parent code (such as an explosion or misc procedure code)"/>
 		<column name="comments" type="text" size="512" descr="General comments from the user"/>
 
 		<column name="data_text_a" type="text" size="64" descr="Extra data, dependent upon invoice item type"/>
