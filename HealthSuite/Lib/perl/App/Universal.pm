@@ -242,7 +242,7 @@ use constant CLAIMTYPE_CHAMPUS => 8;
 use constant CLAIMTYPE_CHAMPVA => 9;
 use constant CLAIMTYPE_FECABLKLUNG => 10;
 use constant CLAIMTYPE_BCBS => 11;
-use constant CLAIMTYPE_HMO_NON_CAP => 12
+use constant CLAIMTYPE_HMO_NON_CAP => 12;
 
 #CLAIM DATE_REASON_TYPE
 use constant CLAIMDATE_VALUE => 160;
