@@ -42,6 +42,9 @@
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			    not those of the current user of the app.
                 </deliverable>
+                <deliverable id="1553">
+                	UI: Administrators can now update main org profiles
+                </deliverable>
 	</deliverables>
 </release-notes>
 
