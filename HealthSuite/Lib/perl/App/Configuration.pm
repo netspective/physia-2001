@@ -126,8 +126,8 @@ requirePath(
 	$CONFDATA_SERVER->path_BillingTemplate,
 	$CONFDATA_SERVER->path_OrgReports,
 	);
-print "path_Root = " . $CONFDATA_SERVER->path_root . "\n";
-print "name_Config = " . $CONFDATA_SERVER->name_Config . "\n";
-print "name_Group = " . $CONFDATA_SERVER->name_Group . "\n";
-print "db_ConnectKey = " . $CONFDATA_SERVER->db_ConnectKey . "\n";
+#print "path_Root = " . $CONFDATA_SERVER->path_root . "\n";
+#print "name_Config = " . $CONFDATA_SERVER->name_Config . "\n";
+#print "name_Group = " . $CONFDATA_SERVER->name_Group . "\n";
+#print "db_ConnectKey = " . $CONFDATA_SERVER->db_ConnectKey . "\n";
 1;
