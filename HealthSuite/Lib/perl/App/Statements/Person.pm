@@ -971,6 +971,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 	},
 
+	'selBookmarkById' => {
+		sqlStmt => qq{
+			SELECT value_textb Caption, value_text URL
+			FROM Person_Attribute
+			WHERE item_id = ?
+		},
+	},
+
 );
 
 1;
