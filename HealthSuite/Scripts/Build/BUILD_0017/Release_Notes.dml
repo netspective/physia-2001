@@ -25,6 +25,10 @@
                 <deliverable id="1532">
 		Report (Receipt Analysis) :  Added new option to create receipt analysis  as totals only
                 </deliverable>
+		<deliverable id="1556">
+			UI: Added the appointments component in the summary page and changed the default next action for 
+			    Patient/Person Lookup to show the 'Summary Page'.
+                </deliverable>                
 
 
 	</deliverables>
