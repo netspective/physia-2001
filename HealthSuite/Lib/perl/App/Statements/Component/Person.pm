@@ -177,7 +177,54 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.addresses', [$personId], 'panelEdit'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
 
+'person.miscNotes' => {
+	sqlStmt => qq{
+			select 	value_type, item_id, parent_id, item_name, value_text
+				from  Person_Attribute
+			where  	parent_id = ?
+			and item_name = 'Misc Notes'			
+		},
+	publishDefn =>
+		{
+			columnDefn => [				
+					{ head => 'Misc Notes', dataFmt => 'Misc Notes (<A HREF = "/person/#2#/profile">#2#</A>)#4#' },
+				],	
+			bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+			frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
+		},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Misc Notes' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Misc Notes' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-misc-notes?home=#param.home#'>Misc Notes</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
+},
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -605,6 +652,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#{ colIdx => 2, head => 'ID', dataFmt => '<A HREF = "/org/#2#/profile">#2#</A>' },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=/#param.arl#',
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-ins-coverage?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
