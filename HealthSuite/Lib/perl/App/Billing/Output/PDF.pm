@@ -2765,12 +2765,12 @@ sub box31ClaimData
 	my $box31Cordinates = $cordinates->{box31};
 	my $box31Y = $box31Cordinates->[1];
 	my $box31X = $box31Cordinates->[0];
-	my $serviceProvider = $claim->getRenderingProvider();
+	my $billingProvider = $claim->getPayToProvider();
 
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $serviceProvider->getName(), $box31X + CELL_PADDING_X + 0, START_Y + 12);
+	pdflib::PDF_show_xy($p , $billingProvider->getName(), $box31X + CELL_PADDING_X + 0, START_Y + 12);
 	pdflib::PDF_show_xy($p , $claim->getInvoiceDate(), $box31X + CELL_PADDING_X + 100, START_Y + 12);
 	pdflib::PDF_stroke($p);
 }

@@ -429,7 +429,7 @@ sub populateClaim
 	$data->{claimAmountPaid} =  "Contd";
 	$data->{claimBalance} =  "Contd";
 
-	my $physician = $claim->getRenderingProvider();
+	my $physician = $claim->getPayToProvider();
 	$data->{transProviderName} = $physician->{completeName};
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
 
@@ -543,7 +543,7 @@ sub diagnosisTable
 			$processedProc->[$i] = 1;
 		}
 	}
-		
+
 	for my $i (0..$#$procedures)
 	{
 		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
@@ -581,10 +581,10 @@ sub diagnosisTable
 
 sub populateFinalCharges
 {
-	
+
 	my ($self, $claim) = @_;
 	my $data = $self->{data};
-	
+
 	$data->{claimTotalCharge} = $claim->getTotalCharge;
 	$data->{claimAmountPaid} = abs($claim->getTotalChargePaid);
 	$data->{claimBalance} = abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid));

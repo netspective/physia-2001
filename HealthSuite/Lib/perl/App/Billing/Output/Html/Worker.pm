@@ -88,7 +88,7 @@ sub populatePhysician
 {
 	my ($self, $claim) = @_;
 	my $physician = $claim->getPayToProvider();
-	my $servicePhysician = $claim->getRenderingProvider();
+#	my $servicePhysician = $claim->getRenderingProvider();
 	my $billingFacility = $claim->getPayToOrganization();
 	my $billingFacilityAddress = $billingFacility->getAddress();
 	my $data = $self->{data};
@@ -102,7 +102,7 @@ sub populatePhysician
 	$data->{physicianTelephone} = $billingFacilityAddress->getTelephoneNo(1);
 	$data->{physicianPin} = $physician->getPIN;
 	$data->{physicianGrp} = $billingFacility->getGRP;
-	$data->{providerLicense} = $servicePhysician->getProfessionalLicenseNo;
+	$data->{providerLicense} = $physician->getProfessionalLicenseNo;
 }
 
 sub populateTreatment
@@ -121,7 +121,7 @@ sub populateTreatment
 sub populateClaim
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getRenderingProvider();
+	my $physician = $claim->getPayToProvider();
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 	$data->{claimAcceptAssignmentN} = uc($claim->getAcceptAssignment) eq 'N' ? "Checked" : "";
