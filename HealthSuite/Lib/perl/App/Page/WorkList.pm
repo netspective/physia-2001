@@ -101,7 +101,8 @@ sub prepare_view_recentActivity
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD>
-					#component.stp-person.mySessionViewCount#
+					#component.stp-person.mySessionViewCount#<BR>
+					#component.stp-person.recentlyVisitedPatients#<BR>
 				</TD>
 				<TD>
 					&nbsp;
