@@ -155,40 +155,31 @@ sub definePermissions
 
 	my $permissionList = $self->{permissionList};
 	my $permissionIds = $self->{permissionIds};
-
-	my $newIndex = scalar(@$permissionList);
-	my $aliasInfo = undef;
-	if(my $alias = $activeNode->{alias})
-	{
-		$newIndex = $aliasInfo->[PERMISSIONINFOIDX_LISTINDEX] if $aliasInfo;
-	}
-	
 	my $parentId = '';
 	if(my $alias = $activeNode->{alias})
 	{
-		if($aliasInfo = $permissionIds->{$alias})
+		if(my $aliasInfo = $permissionIds->{$alias})
 		{
 			my $aliasPermissions = $aliasInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
-			if($activeNode->{type} eq 'exclude')
+			my @myParents = ();
+			foreach (@parentNodes)
 			{
-				foreach (@parentNodes)
-				{
-					$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
-					$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->diff($aliasPermissions);
-				}
+				push(@myParents, ($parentId ? '/' : '') . ($_->{root} || $_->{id}));
 			}
-			else
+			my $myParents = join('/', @myParents);
+			for (my $permId = $aliasPermissions->first; defined $permId; $permId = $aliasPermissions->next)
 			{
-				foreach (@parentNodes)
-				{
-					$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
-					$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasPermissions);
-				}
+				my $aliasId = $permissionList->[$permId]->[PERMISSIONINFOIDX_ID];
+				my $aliasChildPerms = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
+				$aliasId =~ s/^$alias/$myParents/;
+				$permissionIds->{$aliasId} = [$permId, $aliasId, new Set::IntSpan];
+				$permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
 			}
 		}
 	}
 	else
 	{	
+		my $newIndex = scalar(@$permissionList);
 		foreach (@parentNodes)
 		{
 			$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});

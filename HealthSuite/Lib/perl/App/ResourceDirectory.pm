@@ -295,6 +295,8 @@ sub addResourcesFromModule
 sub registerResource
 {
 	my ($RESOURCES, $resourceId, $resourceData, $prefix, $class) = @_;
+	
+	$resourceData->{_id} = $prefix . $resourceId unless exists $resourceData->{_id};
 
 	# If the resource is a sub-resource, envoke the power of recursion
 	if ($resourceId =~ /^([^\/]+)\/(.+?)$/)
@@ -336,7 +338,6 @@ sub registerResource
 	}
 	return 1;
 }
-
 
 
 # Adds a prefix string to a string or each string in an array
@@ -413,6 +414,7 @@ sub addSynonyms
 	}
 }
 
+
 sub buildAccessControl
 {
 	my $gen = XML::Generator->new('pretty' => 4, 'escape' => 'always', 'conformance' => 'strict', 'namespace' => '');
@@ -431,52 +433,62 @@ sub buildAccessControl
 		{
 			if ( $key =~ /^$type\-(.*)/ )
 			{
-				$data{sub} = [];
-				foreach my $subKey (sort keys %{$RESOURCES{$key}})
+				my $id = $1;
+				if ($key eq $RESOURCES{$key}{_id}) # Not a Synonym
 				{
-					next if $subKey eq '_default';
-					if ( ref $RESOURCES{$key}{$subKey} eq 'HASH' && exists $RESOURCES{$key}{$subKey}{_class} )
+					$data{sub} = [];
+					foreach my $subKey (sort keys %{$RESOURCES{$key}})
 					{
-						push @{$data{sub}}, $gen->permission({id => $subKey});
-					}
-				}
-				$data{views} = [];
-				if ( exists $RESOURCES{$key}{_views} )
-				{
-					foreach my $view (sort @{$RESOURCES{$key}{_views}})
-					{
-						push @{$data{views}}, $gen->permission({id => $view->{name}});
-					}
-				}
-				if ($type eq 'dlg')
-				{
-					if (exists $RESOURCES{$key}{_modes})
-					{
-						my @modes = ();
-						foreach my $mode (@{$RESOURCES{$key}{_modes}})
+						next if $subKey eq '_default';
+						if ( ref $RESOURCES{$key}{$subKey} eq 'HASH' && exists $RESOURCES{$key}{$subKey}{_class} )
 						{
-							push @modes, $gen->permission({id => $mode});
+							push @{$data{sub}}, $gen->permission({id => $subKey});
 						}
-						push @{$data{$type}}, $gen->permission({id => $1}, @modes);
+					}
+					$data{views} = [];
+					if ( exists $RESOURCES{$key}{_views} )
+					{
+						foreach my $view (sort @{$RESOURCES{$key}{_views}})
+						{
+							push @{$data{views}}, $gen->permission({id => $view->{name}});
+						}
+					}
+					if ($type eq 'dlg')
+					{
+						if (exists $RESOURCES{$key}{_modes})
+						{
+							my @modes = ();
+							foreach my $mode (@{$RESOURCES{$key}{_modes}})
+							{
+								push @modes, $gen->permission({id => $mode});
+							}
+							push @{$data{$type}}, $gen->permission({id => $id}, @modes);
+						}
+						else
+						{
+							push @{$data{$type}}, $gen->permission({id => $id}, @{$data{modes}});
+						}
 					}
 					else
 					{
-						push @{$data{$type}}, $gen->permission({id => $1}, @{$data{modes}});
+						push @{$data{$type}}, $gen->permission({id => $id}, @{$data{sub}}, @{$data{views}});
 					}
 				}
-				else
+				else # It's a Synonym
 				{
-					push @{$data{$type}}, $gen->permission({id => $1}, @{$data{sub}}, @{$data{views}});
+					my $alias;
+					$alias = "$type/$1" if $RESOURCES{$key}{_id} =~ /^$type\-(.*)/;
+					push @{$data{"alias_$type"}}, $gen->permission({id => $id}, @{[$gen->permission({alias => $alias})]});
 				}
 			}
 		}
 		if ($type eq 'dlg')
 		{
-			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}}, @{$data{modes}});
+			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}}, @{$data{"alias_$type"}}, @{$data{modes}});
 		}
 		else
 		{
-			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}});
+			push @{$data{root}}, $gen->permissions({root=>"$type"}, @{$data{$type}}, @{$data{"alias_$type"}});
 		}
 	}
 	my $data = '<?xml version="1.0"?>';
@@ -486,7 +498,7 @@ sub buildAccessControl
 	open FH, ">$filename" or die "Can't open new file '$filename'";
 	print FH join ">\n<", split '><', $data;
 	close FH;
-	return $data;
+	return \$data;
 }
 
 1;
