@@ -625,6 +625,7 @@
 		<column name="pay_date" type="date" descr="The date the payment was made "/>
 		<column name="batch_id" type="text" size="32" descr="The batch id the invoice creation or payment"/>
 		<column name="charges" type="currency" descr="Dollar amount of all charges regraudless of invoice type" />\
+		<column name="invoice_status" indexed="yes" lookupref="Invoice_Status" descr="The current status of the invoice"/>
 		<column name="invoice_type" lookupref="Invoice_Type" descr="The type of invoice"/>
 		<column name="invoice_subtype" type="integer" descr="The subtype of invoice (depending upon the type)"/>
 		<column name="trans_type" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
