@@ -143,15 +143,15 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select * from invoice_item
 		where parent_id = ?
 		},
-	'selServiceDateRangeForAllItems' => q{
+	'selServiceDateRangeForAllItems' => qq{
 		select  to_char(least(service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 				to_char(greatest(service_end_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date
 		from invoice_item
 		where parent_id = ?
 		},
-	'selInvoiceProcedureItems' => q{
+	'selInvoiceProcedureItems' => qq{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier,
-			unit_cost, quantity, rel_diags, data_num_c,	to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			unit_cost, quantity, rel_diags, data_num_c, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a
 		from invoice_item
 		where parent_id = ?
