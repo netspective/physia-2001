@@ -2925,8 +2925,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{
 					colIdx => 1,
 					dataFmt => {
-						'Service Request' => 'Referral : #0#, Date Of Request : #3#',
-						'Referral' => "Intake (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
+						'Service Request' => 'Service Request : #0#, Date Of Request : #3#',
+						'Referral' => "Referral (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
 					},
 				},
 
