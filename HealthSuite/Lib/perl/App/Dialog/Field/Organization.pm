@@ -184,17 +184,23 @@ sub new
 	my ($type, %params) = @_;
 
 	$params{types} = "'CLINIC', 'FACILITY/SITE'" unless $params{types};
-
-	return CGI::Dialog::Field::new(
-				$type,
-				type => 'foreignKey',
-				fKeyTable => 'org o, org_category oset',
-				fKeySelCols => "distinct o.org_id, o.name_primary",
-				fKeyDisplayCol => 1,
-				fKeyValueCol => 0,
-				fKeyWhere => "o.org_id=oset.parent_id and ltrim(rtrim(UPPER(oset.MEMBER_NAME))) in ($params{types})",
-				options => FLDFLAG_REQUIRED,
-				%params);
+	my $sqlStmt = qq{
+		select distinct org_id, name_primary
+		from Org_Category, Org
+		where Org.owner_org_id = ?
+			and Org_Category.parent_id = Org.org_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ($params{types})
+	};
+	
+	return new CGI::Dialog::Field(
+		fKeyDisplayCol => 1,
+		fKeyValueCol => 0,
+		fKeyStmtMgr => $STMTMGR_ORG,
+		fKeyStmt => $sqlStmt,
+		fKeyStmtFlags => STMTMGRFLAG_DYNAMICSQL,
+		fKeyStmtBindSession => ['org_id'],
+		%params
+	);
 }
 
 1;
