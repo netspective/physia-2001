@@ -23,10 +23,10 @@ use vars qw(%RESOURCE_MAP);
 sub new
 {
 	my $self = App::Dialog::Message::new(@_);
-	
+
 	$self->{id} = 'prescription';
 	$self->{heading} = '$Command Prescription Request';
-	
+
 	return $self;
 }
 
@@ -34,7 +34,7 @@ sub new
 sub addExtraFields
 {
 	my $self = shift;
-	
+
 	return (
 		new CGI::Dialog::Field(
 			name => 'permed_id',
@@ -62,19 +62,20 @@ sub populateData
 {
 	my $self = shift;
 	my ($page, $command, $activeExecMode, $flags) = @_;
-	
+
 	$self->SUPER::populateData(@_);
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	my $existingMsg = $self->{existing_message};
-	
+
 	my $permedId = $existingMsg->{'permed_id'};
-	my $personId = $page->session('person_id');
+	my $personId = $page->field('patient_id');
 	$page->field('permed_id', $permedId);
 	my $preField = $self->getField('prescription');
 	#$preField->{preHtml} = qq{<a href="/person-p/$personId/dlg-approve-medication/$permedId" target="approve_med">Edit & Approve Prescription</a>};
 	$preField->{preHtml} = qq{
-		<a href="javascript:doActionPopup('/person-p/$personId/dlg-approve-medication/$permedId', null,'location, status, width=620,height=550,scrollbars,resizable')">Edit & Approve Prescription</a>
+		<a href="javascript:doActionPopup('/person-p/$personId/dlg-approve-medication/$permedId', null,'location, status, width=620,height=550,scrollbars,resizable')">
+		<b style='font-family:Tahoma'>View/Edit/Approve Prescription</b></a>
 	};
 }
 
@@ -83,7 +84,7 @@ sub execute
 	my $self = shift;
 	my ($page, $command, $flags, $messageData) = @_;
 	$messageData = {} unless defined $messageData;
-	
+
 	$messageData->{'permedId'} = $page->field('permed_id');
 	return $self->SUPER::execute($page, $command, $flags, $messageData);
 }
@@ -95,7 +96,7 @@ sub saveMessage
 	my $page = shift;
 	my $messageData = shift;
 	my %schemaActionData = @_;
-	
+
 	$schemaActionData{doc_spec_subtype} = App::Universal::MSGSUBTYPE_PRESCRIPTION;
 	$schemaActionData{doc_data_a} = $messageData->{'permedId'};
 	return $self->SUPER::saveMessage($page, $messageData, %schemaActionData);
