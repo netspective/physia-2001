@@ -622,14 +622,6 @@ sub calcRVRBS
 		) * $pfs->{conversion_fact};
 	}
 	
-	$page->addDebugStmt(
-		qq{( ($pfs->{work_rvu} * $gpci->{work}) +
-			($pfs->{trans_non_fac_pe_rvu} * $gpci->{practice_expense}) +
-			($pfs->{mal_practice_rvu} * $gpci->{mal_practice})) *$pfs->{conversion_fact}
-		},
-		$rvrbsPrice,
-	);
-
 	if ($rvrbsPrice > 0)
 	{
 		for my $fs (@{$fsRef})
