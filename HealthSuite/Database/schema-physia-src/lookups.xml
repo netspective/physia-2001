@@ -741,13 +741,13 @@
 			</row>
 			<row>
 				<col name="id">4</col>
-				<col name="caption">Unrelated Eval and Mngmnt Services by Same Physician During a Postoperative Period</col>
+				<col name="caption">Unrelated Eval and Mgmt Services (Same Physician, PostOp Period)</col>
 				<col name="abbrev">24</col>
 				<col name="result">2</col>
 			</row>
 			<row>
 				<col name="id">5</col>
-				<col name="caption">Significant, Separately Identifiable Evaluation and Mgmt Services by the Same Physician/Day of the Procedure/Service</col>
+				<col name="caption">Separately Identifiable Eval/Mgmt Srvcs (Same Physician/Srv Day)</col>
 				<col name="abbrev">25</col>
 				<col name="result">2</col>
 			</row>
@@ -819,7 +819,7 @@
 			</row>
 			<row>
 				<col name="id">17</col>
-				<col name="caption">Staged or Related Procedure or Service by the Same Physician During the Postoperative Period</col>
+				<col name="caption">Staged or Related Proc/Service (Same Physician, PostOp Period)</col>
 				<col name="abbrev">58</col>
 				<col name="result">2</col>
 			</row>
@@ -855,13 +855,13 @@
 			</row>
 			<row>
 				<col name="id">23</col>
-				<col name="caption">Return to the Operating Room for a Related Procedure During the Postoperative Period</col>
+				<col name="caption">Return to Operating Room for Related Procedure (PostOp Period)</col>
 				<col name="abbrev">78</col>
 				<col name="result">2</col>
 			</row>
 			<row>
 				<col name="id">24</col>
-				<col name="caption">Unrelated Procedure or Service by the Same Physician During the Postoperative Period</col>
+				<col name="caption">Unrelated Proc/Service (Same Physician, PostOp Period)</col>
 				<col name="abbrev">79</col>
 				<col name="result">2</col>
 			</row>
