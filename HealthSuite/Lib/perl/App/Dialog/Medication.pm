@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.24 2001-01-12 19:02:10 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.25 2001-01-22 17:17:59 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -268,6 +268,15 @@ sub new
 		),
 	);
 
+	$self->addFooter(new CGI::Dialog::Buttons(
+							nextActions_add => [
+								['Add Another Medication', "/person/%param.person_id%/dlg-add-medication", 1],
+								['View Patient Chart', "/person/%param.person_id%/chart"],
+								['Return to Work List', "/worklist"],
+								['Return to Home Page', "/person/%session.user_id%/home"],
+								],
+						cancelUrl => $self->{cancelUrl} || undef));
+
 	$self->{activityLog} =
 	{
 		level => 2,
@@ -277,7 +286,7 @@ sub new
 	};
 
 	$self->{_buttons_field} = new CGI::Dialog::Buttons();
-	$self->addFooter($self->{_buttons_field});
+	#$self->addFooter($self->{_buttons_field});
 
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
