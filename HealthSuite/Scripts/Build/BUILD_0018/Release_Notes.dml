@@ -211,7 +211,11 @@
 		<deliverable id="1762">
 			Show Recipients on Sent Items Mail Box.
 		</deliverable>		
-
+		
+		<deliverable id="1763">
+			Deleted the PhoneMessage components from the Summary page and the PatientFlowWorklist.
+		</deliverable>
+		
 		<deliverable id="1764">
 			Add Unread Message Count component.
 		</deliverable>		
