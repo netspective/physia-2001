@@ -174,7 +174,7 @@ sub initialize
 				new App::Dialog::Field::OrgType(
 							caption => 'Service Facility',
 							name => 'service_facility_id',
-							types => "'CLINIC','HOSPITAL','FACILITY/SITE'"),
+							types => "'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'"),
 				new App::Dialog::Field::OrgType(
 							caption => 'Billing Org',
 							name => 'billing_facility_id',
