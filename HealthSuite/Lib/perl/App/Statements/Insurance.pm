@@ -421,7 +421,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 	'selUpdatePlanAndCoverage' => qq{
 					   update insurance
 					   set ins_type = ?,
-					   product_name = ?
+					   product_name = ?,
 					   ins_org_id = ?
 					   where product_name = ?
 					   and ins_org_id = ?
