@@ -11,7 +11,7 @@ use Date::Manip;
 use Storable qw(dclone);
 
 use vars qw(@ISA @EXPORT %BLOCK_PUBLICATION_STYLE %FORMELEM_STYLE);
-use enum qw(BITMASK:PUBLFLAG_ STDRECORDICONS HASCALLBACKS NEEDSTORAGE HASTAILROW REPLACEDEFNVARS CHECKFORDATASEP HIDEBANNER HIDEHEAD HIDETAIL HIDEROWSEP HIDESUBTOTAL HASSUBTOTAL);
+use enum qw(BITMASK:PUBLFLAG_ STDRECORDICONS HASCALLBACKS NEEDSTORAGE HASTAILROW REPLACEDEFNVARS CHECKFORDATASEP HIDEBANNER HIDEHEAD HIDETAIL HIDEROWSEP HIDESUBTOTAL HASSUBTOTAL TEXTCOLUMNIDS ADDDATAJS);
 use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL);
 
 @ISA    = qw(Exporter);
@@ -21,6 +21,8 @@ use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL
 	PUBLFLAG_HIDETAIL
 	PUBLFLAG_HIDEROWSEP
 	PUBLFLAG_HIDESUBTOTAL
+	PUBLFLAG_TEXTCOLUMNIDS
+	PUBLFLAG_ADDDATAJS
 	PUBLCOLFLAG_DONTWRAP
 	PUBLCOLFLAG_DONTWRAPHEAD
 	PUBLCOLFLAG_DONTWRAPBODY
@@ -130,6 +132,19 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 			width => '100%',
 		},
 	},
+
+	'datanav' =>
+	{
+		flags => PUBLFLAG_TEXTCOLUMNIDS | PUBLFLAG_ADDDATAJS,
+		headBgColor => '#EEEEEE',
+		headFontOpen => '<FONT FACE="Arial,Helvetica" SIZE="2" COLOR="#000000">',
+		frame => {
+			headColor => '#98ACCE',
+			borderWidth => 1,
+			borderColor => '#98ACCE',
+			contentColor => '#FFFFFF',
+		},
+	}
 );
 
 while(my ($style, $styleInfo) = each %BLOCK_PUBLICATION_STYLE)
@@ -152,7 +167,7 @@ sub fmt_stamp
 {
 	my $page = shift;
 	my $stamp = &ParseDate(shift);
-	my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
+	my $stampFormat = $page->session('FORMAT_STAMP') || '%l';
 	$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 	return &UnixDate($stamp, $stampFormat);
 }
@@ -378,7 +393,7 @@ sub prepare_HtmlBlockFmtTemplate
 				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);
 				push(@storeCols, $colIdx) unless grep { $_ == $colIdx } @storeCols;
 				#Store column just in case doing a sum_ function on other column then colIdx (example '&{sum_currency:13} when colIdx = 11)
-				$tDataFmt=~ /\:(\d+)/;				
+				$tDataFmt=~ /\:(\d+)/;
 				push(@storeCols, $1) unless grep { $_ == $1 } @storeCols;
 				$tDataFmt=~ /(\d+)\,(\d+)/;
 				if($1 && $2)
@@ -532,11 +547,21 @@ sub prepare_HtmlBlockFmtTemplate
 
 	if(my $select = $publDefn->{select})
 	{
+		my @attrsHtml = ();
 		my $location = $select->{location} || 'lead';
+
 		my $type = $select->{type} || 'checkbox';
-		my $name = $select->{name};
+		push @attrsHtml, qq{type="$type"};
+
+		my $attrs = defined $select->{attrs} && ref($select->{attrs}) eq 'HASH' ? $select->{attrs} : {};
+		push @attrsHtml, map {$_ . '="' . $attrs->{$_} . '"'} keys %$attrs;
+
+		push @attrsHtml, qq{name="$select->{name}"} if defined $select->{name};
+
 		my $valueFmt = $select->{valueFmt} || '#0#';
-		my $control = qq{<INPUT TYPE=\U$type\E NAME='$name' VALUE="$valueFmt">};
+		push @attrsHtml, qq{value="$valueFmt"};
+
+		my $control = '<input ' . join(' ', @attrsHtml) . '>';
 
 		if($location eq 'trail')
 		{
@@ -798,6 +823,9 @@ sub createHtmlFromStatement
 	my $rowNum = 0;
 	my $fmt = undef;
 	my $publFlags = 0;
+
+	my $initArrayJS = '';  # Used for PUBLFLAG_ADDDATAJS
+
 	eval
 	{
 		my $style = $publParams->{style} || undef;
@@ -812,6 +840,36 @@ sub createHtmlFromStatement
 		my ($rowSepStr, $bodyRowFmt, $levIndentStr,$subTotalRowFmt) = ($flags & PUBLFLAG_HIDEROWSEP ? '' : $fmt->{rowSepStr}, $fmt->{bodyRowFmt}, $fmt->{levelIndentStr},$fmt->{subTotalRowFmt});
 		my ($dataSepStr, $dataSepColIdx) = ($fmt->{dataSepStr}, $fmt->{dataSepCheckColIdx});
 		my $checkDataSep = $publFlags & PUBLFLAG_CHECKFORDATASEP;
+
+		# See if they want to store the row data as a javascript array of hashes
+		my $dataArrayName;
+		if ($publFlags & PUBLFLAG_ADDDATAJS)
+		{
+			# Create an array variable init string to put at the top of the results
+			$dataArrayName = defined $publDefn->{name} ? $publDefn->{name} : int(rand 99999);
+			$dataArrayName = "publish_${dataArrayName}_rows";
+			$initArrayJS = "<script>$dataArrayName = new Array();</script>";
+
+			# Create the necessary JS code to add each rows data to the array
+			my $rowDataJS = join ',', map {"'$_' : '#{$_}#'"} @{$stmtHdl->{NAME_lc}};
+			$rowDataJS = '<script>' . $dataArrayName . "[#rowNum#] = { $rowDataJS };</script>";
+
+			# Add the row JS to the body row format
+			$bodyRowFmt .= $rowDataJS;
+		}
+
+		# If they want to use column names then we need a cross reference hash
+		my %colNames = ();
+		if ($publFlags & PUBLFLAG_TEXTCOLUMNIDS)
+		{
+			my $i = 0;
+			foreach (@{$stmtHdl->{NAME_lc}})
+			{
+				$colNames{$_} = $i++;
+			}
+			$bodyRowFmt =~ s/\#\{(\w+)\}\#/\#$colNames{$1}\#/g;
+			$subTotalRowFmt =~ s/\#\{(\w+)\}\#/\#$colNames{$1}\#/g;
+		}
 
 		#
 		# we're doing multiple loops for faster performance -- so, it may seem like code copying
@@ -835,7 +893,7 @@ sub createHtmlFromStatement
 					'fmt_stamp' => sub
 					{
 						my $stamp = &ParseDate($rowRef->[$_[0]]);
-						my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
+						my $stampFormat = $page->session('FORMAT_STAMP') || '%l';
 						$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 						return &UnixDate($stamp, $stampFormat);
 					},
@@ -995,11 +1053,13 @@ sub createHtmlFromStatement
 				}
 				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data;
-				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
+				$outSubTotalRow =~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
 				push(@outputRows,$outSubTotalRow);
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					$outRow = $fmt->{tailRowFmt};
+					$outRow =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+
 					push(@outputRows, $outRow);
 				}
 			}
@@ -1030,7 +1090,8 @@ sub createHtmlFromStatement
 				}
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
-					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					$outRow = $fmt->{tailRowFmt};
+					$outRow =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
 			}
@@ -1080,7 +1141,7 @@ sub createHtmlFromStatement
 		undef $stmtHdl;
 	}
 	return $@ if $@;
-	my $html = $fmt->{wrapContentOpen} . (join('', @outputRows) || $fmt->{noDataMsg}) . $fmt->{wrapContentClose};
+	my $html = $fmt->{wrapContentOpen} . $initArrayJS . (join('', @outputRows) || $fmt->{noDataMsg}) . $fmt->{wrapContentClose};
 	$html =~ s/\#my\.(.*?)\#/$publParams->{$1}/g if $publFlags & PUBLFLAG_REPLACEDEFNVARS;
 	return $html;
 }
