@@ -2,4 +2,5 @@
 
 <accesscontrol name="default">
 	<include file="acl-auto-permissions.xml"/>
+	<include file="acl-roles.xml"/>
 </accesscontrol>
