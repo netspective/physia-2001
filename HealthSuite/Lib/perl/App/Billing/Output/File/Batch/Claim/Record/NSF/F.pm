@@ -85,7 +85,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, 															  # Mammography certification number
 	$spaces, 															  # Class Findings
 	$spaces,  															  # Podiatry service condition
-	$spaces, 															  # CLIA number
+	substr($inpClaim->{renderingOrganization}->getCLIA,0,15), # CLIA number
 	$self->numToStr(5,2,abs($inpClaim->getAmountPaid())),					  # Primary Paid amount
 	substr($modifier[3],0,2),											  # HCPCS Modifier 4
 	substr($inpClaim->{renderingProvider}->getSpecialityId(),0,3), 			  # Provider Speciality
