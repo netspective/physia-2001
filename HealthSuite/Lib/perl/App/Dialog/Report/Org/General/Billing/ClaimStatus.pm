@@ -22,12 +22,19 @@ use enum qw(BITMASK:FLAG_ GETCOUNTS);
 
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'claimStatus', heading => 'Claims Status');
-
+	my $self = App::Dialog::Report::new(@_, id => 'claimStatus');
+	$self->{heading} = 'Claims Status';
+	
 	$self->addContent(
 		new CGI::Dialog::Field::Duration(caption => 'Invoice Dates',
 			name => 'report',
 			options => FLDFLAG_REQUIRED,
+		),
+
+		new App::Dialog::Field::Insurance::Plan(caption => 'Claim Number(s)',
+			name => 'claim_numbers',
+			findPopup => '/lookup/claim',
+			findPopupAppendValue => ',',			
 		),
 
 		new CGI::Dialog::Field(caption => 'Payer Type',
@@ -94,6 +101,7 @@ sub buildSqlStmt
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
+	my $claimNumberCond;
 	my $insuranceNameCond;
 	my $insuranceProductCond;
 	my $insurancePlanCond;
@@ -104,15 +112,12 @@ sub buildSqlStmt
 	my $productName = $page->param('_f_product_name');
 	my $planName = $page->param('_f_plan_name');
 	my $providerId = $page->param('_f_provider_id');
+	my $claimNumbers = $page->param('_f_claim_numbers');
 	
-	$insuranceNameCond = qq{and Insurance.ins_org_id = '$insOrgId'} 
-		if $page->param('_f_ins_org_id');
-		
-	$insuranceProductCond = qq{and Insurance.product_name = '$productName'}
-		if $page->param('_f_product_name');
-		
-	$insurancePlanCond = qq{and Insurance.plan_name = '$planName'}
-		if $page->param('_f_plan_name');
+	$claimNumberCond = qq{and Invoice.invoice_id in ($claimNumbers)} if $claimNumbers;
+	$insuranceNameCond = qq{and Insurance.ins_org_id = '$insOrgId'} if $insOrgId;
+	$insuranceProductCond = qq{and Insurance.product_name = '$productName'}	if $productName;
+	$insurancePlanCond = qq{and Insurance.plan_name = '$planName'} if $planName;
 
 	my $transTable;
 	if ($providerId || $facilityId)
@@ -191,6 +196,7 @@ sub buildSqlStmt
 			where Invoice.cr_org_id = ?
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				$claimNumberCond
 				$invoiceStatusCond
 				and Invoice_Status.id = Invoice.invoice_status
 				and Invoice_Billing.invoice_id = Invoice.invoice_id
@@ -218,7 +224,7 @@ sub execute
 		columnDefn =>
 		[
 			{	head => 'Claims', 
-				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#", null, "width=800,height=600,scrollbars,resizable")',
+				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#&status_caption=#0#", null, "width=800,height=600,scrollbars,resizable")',
 				hint => 'View Details' 
 			},
 			{head => 'Count', dAlign => 'right'},
@@ -250,7 +256,7 @@ sub getDrillDownHandlers
 sub prepare_detail_status
 {
 	my ($self, $page) = @_;
-
+	
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
@@ -262,6 +268,11 @@ sub prepare_detail_status
 			{head => 'Claim ID', colIdx => 7, dAlign => 'right',
 				url => qq{javascript:chooseItemForParent("/invoice/#7#/summary") },
 				hint => 'View Invoice Summary',
+			},
+			{head => 'Inquiry', colIdx => 7, dAlign => 'center',
+				dataFmt => qq{<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0>},
+				url => qq{javascript:chooseItemForParent("/invoice/#7#/dlg-add-claim-inquiry") },
+				hint => 'Add Inquiry Notes for Claim #7#',
 			},
 			{head => 'Patient ID', colIdx => 8, dAlign => 'center',
 				url => qq{javascript:chooseItemForParent("/person/#8#/account")},
@@ -280,14 +291,13 @@ sub prepare_detail_status
 				dformat => 'currency', tAlign => 'RIGHT', 
 				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
 			},
-			#{head => 'Status', colIdx => 7,},
 		],
 	};
 	
 	
-	$page->addContent(@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL
-	#| STMTMGRFLAG_DEBUG,
-	,	$sqlStmt,	[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+	$page->addContent('<b style="font-family:Helvetica; font-size:12pt">('. $page->param('status_caption') . ' Claims) </b><br><br>',
+		@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, #| STMTMGRFLAG_DEBUG,
+		$sqlStmt,	[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
 	);
 }
 
