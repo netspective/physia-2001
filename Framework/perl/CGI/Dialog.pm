@@ -87,15 +87,15 @@ sub findPopup_as_html
 	{
 		my $controlField = 'null';
 		$controlField = "document.$dialogName.$self->{findPopupControlField}" if $self->{findPopupControlField};
-
-		#my $comboBox = 'null';
-		#$comboBox = "document.$dialogName.$self->{findPopupComboBox}" if $self->{findPopupComboBox};
 		
+		my $secondaryFindField = 'null';
+		$secondaryFindField = "document.$dialogName.$self->{secondaryFindField}" if $self->{secondaryFindField};
+
 		my $imgId = "_find_img_" . $self->{name};
 		my $linkId = "_find_link_" . $self->{name};
 
 		return qq{
-			<a id="$linkId" href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField);"><img id="$imgId" src='$self->{popup}->{imgsrc}' border=0></a>
+			<a id="$linkId" href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', false, null, $controlField, $secondaryFindField);"><img id="$imgId" src='$self->{popup}->{imgsrc}' border=0></a>
 		};
 	}
 	return '';
