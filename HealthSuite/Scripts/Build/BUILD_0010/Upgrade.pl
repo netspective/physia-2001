@@ -44,6 +44,7 @@ sub update_for_scheduling
 		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
 		
 		system(qq{
+			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
 			echo "---------------------------------------" >> $logFile
 			date >> $logFile
 			echo "---------------------------------------" >> $logFile
@@ -57,6 +58,7 @@ sub update_for_scheduling
 		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
 		
 		system(qq{
+			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
 			echo "---------------------------------------" >> $logFile
 			date >> $logFile
 			echo "---------------------------------------" >> $logFile
@@ -71,6 +73,7 @@ sub update_for_scheduling
 		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
 		
 		system(qq{
+			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
 			echo "---------------------------------------" >> $logFile
 			date >> $logFile
 			echo "---------------------------------------" >> $logFile
@@ -105,3 +108,5 @@ sub connectDB
 		die "DB Schema File and Connect Key are required!";
 	}
 }
+
+
