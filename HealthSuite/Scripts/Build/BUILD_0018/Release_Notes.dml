@@ -404,5 +404,9 @@
 			Checkboxes for suppressing items stay checked when validation occurs in post insurance payment dialog.
 		</deliverable>
 
+		<deliverable id="1959">
+			Fixed refill request component on pt flow worklist.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
