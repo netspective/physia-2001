@@ -914,7 +914,7 @@ sub execAction_submit
 
 		##CREATE TRANSACTIONS FOR DIAGNOSES (ICD CODES)
 
-		my @icdCodes = split(', ', $invoice->{claim_diags});
+		my @icdCodes = split(/\s*,\s*/, $invoice->{claim_diags});
 		foreach my $icdCode (@icdCodes)
 		{
 			$page->schemaAction(
@@ -924,6 +924,8 @@ sub execAction_submit
 					parent_trans_id => $mainTransId,
 					trans_type => App::Universal::TRANSTYPEDIAG_ICD,
 					trans_status => App::Universal::TRANSSTATUS_ACTIVE,
+					init_onset_date => $mainTransData->{init_onset_date} || undef,
+					curr_onset_date => $mainTransData->{curr_onset_date} || undef,
 					billing_facility_id => $mainTransData->{billing_facility_id},
 					service_facility_id => $mainTransData->{service_facility_id},
 					code => $icdCode || undef,
