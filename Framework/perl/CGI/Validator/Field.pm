@@ -282,7 +282,6 @@ sub new
 	$params{onBlurJS} = ONBLUR_UCASEINITIAL if $params{options} && ($params{options} & FLDFLAG_UCASEINITIAL) == FLDFLAG_UCASEINITIAL && ! exists $params{onBlurJS};
 	$params{onBlurJS} = ONBLUR_AUTOCAP if $params{options} && ($params{options} & FLDFLAG_AUTOCAP) == FLDFLAG_AUTOCAP && ! exists $params{onBlurJS};
 
-
 	my $type = $params{type};
 	if(my $typeInfo = $VALIDATE_TYPE_DATA{$type})
 	{
@@ -306,6 +305,7 @@ sub new
 	}
 
 
+	$params{onKeyPressJS} = ONKEYPRESSJS_IDENTIFIER if $params{options} && ($params{options} & FLDFLAG_IDENTIFIER) == FLDFLAG_IDENTIFIER && ! exists $params{onKeyPressJS};
 	$params{onKeyPressJS} = ONKEYPRESSJS_DEFAULT unless exists $params{onKeyPressJS};
 	$params{size} = 24 unless $params{size};
 
