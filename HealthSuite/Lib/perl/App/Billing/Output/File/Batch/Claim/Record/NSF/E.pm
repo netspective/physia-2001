@@ -106,8 +106,8 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,     														   # provider type
 	$spaces,     														   # payee address code
 	$spaces,     														   # payee type
-	substr($tempDiagnosis[0] eq "" ? $refClaimTreatment->getRefProviderLastName(): $spaces, 0, 20),
-	substr($tempDiagnosis[0] eq "" ? $refClaimTreatment->getRefProviderFirstName(): $spaces, 0, 10),
+	substr($tempDiagnosis[0] eq "" ? $refClaimTreatment->getRefProviderLastName(): $refClaimTreatment->getRefProviderLastName(), 0, 20),
+	substr($tempDiagnosis[0] eq "" ? $refClaimTreatment->getRefProviderFirstName(): $refClaimTreatment->getRefProviderFirstName(), 0, 10),
 	$spaces,        								         				# First Name Filler
 	substr($refClaimTreatment->getIDOfReferingPhysician() ne "" ? $refClaimTreatment->getRefProviderMiName(): $spaces, 0, 1),
 	substr($refClaimTreatment->getReferingPhysicianState(), 0, 2),  		# refering provider state
