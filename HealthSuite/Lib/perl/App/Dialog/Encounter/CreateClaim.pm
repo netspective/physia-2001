@@ -95,6 +95,7 @@ sub makeStateChanges
 	if($command eq 'add')
 	{
 		my $personId = $page->param('person_id') || $page->field('attendee_id');
+		$personId = uc($personId);
 		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
 		{
 			if($page->field('payer') eq '')

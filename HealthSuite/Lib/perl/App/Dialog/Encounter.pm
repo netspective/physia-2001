@@ -437,20 +437,29 @@ sub setInsuranceFields
 		}
 	}
 
+	my @payerList = ();
+
 	my $insurances = join(' / ', @insurPlans) if @insurPlans;
 	$insurances = "$insurances" if $insurances;
+	push(@payerList, $insurances) if $insurances;
 
 	my $workComp = join(';', @wkCompPlans) if @wkCompPlans;
 	$workComp = "$workComp" if $workComp;
+	push(@payerList, $workComp) if $workComp;
 
 	my $thirdParty = join(';', @thirdParties) if @thirdParties;
 	$thirdParty = "$thirdParty" if $thirdParty;
+	push(@payerList, $thirdParty) if $thirdParty;
 
 	my $thirdPartyOther = 'Third-Party Payer';
 	my $selfPay = 'Self-Pay';
+	push(@payerList, $selfPay);
+	
+	@payerList = join(';', @payerList);
 
 	#$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$thirdPartyOther;$selfPay";
-	$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$selfPay";
+	$self->getField('payer')->{selOptions} = "@payerList";
+	#$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$selfPay";
 
 	my $payer = $page->field('payer');
 	$page->field('payer', $payer);
