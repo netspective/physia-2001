@@ -495,15 +495,17 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	var parentNodeType = parentNode.getAttribute('type');
 	fieldControlMap[fieldName] = fieldNode;
 	
-	if (document.all[fieldNode.getAttribute ('id')]) {
+	if (document.all[fieldName]) {
 		// This name already exists... add a number to its end...
-		alert ('This fieldName already exists...modifying');
+		if (__nodebug == false) __debug = confirm ('This fieldName already exists...modifying');
 		var notDone = 1;
 		var i = 1;
 		do {
 			var newName = fieldName + '.' + i;
+			if (__nodebug == false) notDone = confirm ('Trying ' + newName + '...\nOK - Continue\nCancel - Stop');
 			i ++;
-			if (!eval('document.all.' + newName)) {
+			if (!document.all[newName]) {
+				if (__nodebug == false) __debug = confirm (newName + ' works!');
 				notDone = 0;
 			}
 		} while (notDone);
@@ -572,15 +574,17 @@ function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
 	var fieldName = '_df_.' + namePrefix + '.' + fieldNode.getAttribute('id');
 	fieldControlMap[fieldName] = fieldNode;
 	
-	if (document.all[fieldNode.getAttribute ('id')]) {
+	if (document.all[fieldName]) {
 		// This name already exists... add a number to its end...
-		alert ('This fieldName already exists...modifying');
+		if (__nodebug == false) __debug = confirm ('This fieldName already exists...modifying');
 		var notDone = 1;
 		var i = 1;
 		do {
 			var newName = fieldName + '.' + i;
+			if (__nodebug == false) notDone = confirm ('Trying ' + newName + '...\nOK - Continue\nCancel - Stop');
 			i ++;
-			if (!eval('document.all.' + newName)) {
+			if (!document.all[newName]) {
+				if (__nodebug == false) __debug = confirm (newName + ' works!');
 				notDone = 0;
 			}
 		} while (notDone);
