@@ -18,27 +18,56 @@ use vars qw(@ISA $INSTANCE);
 
 @ISA = qw(App::Dialog::Report);
 
+use enum qw(BITMASK:FLAG_ GETCOUNTS);
+
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'claimStatus', heading => 'Claim Status');
+	my $self = App::Dialog::Report::new(@_, id => 'claimStatus', heading => 'Claims Status');
 
 	$self->addContent(
-
-		new CGI::Dialog::Field::Duration(name => 'report',
-			caption => 'Report Dates',
-			options => FLDFLAG_REQUIRED
+		new CGI::Dialog::Field::Duration(caption => 'Invoice Dates',
+			name => 'report',
+			options => FLDFLAG_REQUIRED,
 		),
 
-		new App::Dialog::Field::Person::ID(name => 'resource_id',
-			caption => 'Resource ID',
+		new CGI::Dialog::Field(caption => 'Payer Type',
+			name => 'payer_type',
+			type => 'select',
+			fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,
+			fKeyStmt => 'sel_payer_type',
+			fKeyDisplayCol => 0,
+			fKeyValueCol => 1,
+		),
+
+		new CGI::Dialog::Field(caption => 'Insurance Company ID', 
+			name => 'ins_org_id',
+			type => 'select',
+			fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,
+			fKeyStmt => 'sel_distinct_ins_org_id',
+			fKeyDisplayCol => 0,
+			fKeyValueCol => 1,
+		),
+
+		new App::Dialog::Field::Insurance::Product(caption => 'Insurance Product',
+			name => 'product_name', 
+			findPopup => '/lookup/insproduct/insorgid/itemValue', 
+			findPopupControlField => '_f_ins_org_id'
+		),
+		
+		new App::Dialog::Field::Insurance::Plan(caption => 'Insurance Plan', 
+			name => 'plan_name', 
+			findPopup => '/lookup/insplan/product/itemValue', 
+			findPopupControlField => '_f_product_name'
+		),
+
+		new App::Dialog::Field::Person::ID(caption => 'Physician/Provider ID',
+			name => 'provider_id',
 			types => ['Physician'],
-			options => FLDFLAG_REQUIRED
 		),
 
-		new App::Dialog::Field::Organization::ID(name => 'facility_id',
-			caption => 'Facility ID',
+		new App::Dialog::Field::Organization::ID(caption => 'Facility ID',
+			name => 'facility_id',
 			types => ['Facility'],
-			options => FLDFLAG_REQUIRED
 		),
 	);
 
@@ -53,29 +82,149 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('report_begin_date', $startDate);
 	$page->field('report_end_date', $startDate);
-	$page->field('resource_id', $page->session('user_id'));
-	$page->field('facility_id', $page->session('org_id'));
+	$page->field('payer', -11);
+	$page->field('ins_org_id', '');
+}
+
+sub buildSqlStmt
+{
+	my ($self, $page, $flags) = @_;
+	
+	my $facilityId  = $page->field('facility_id');
+	my $startDate   = $page->field('report_begin_date');
+	my $endDate     = $page->field('report_end_date');
+
+	my $insuranceNameCond;
+	my $insuranceProductCond;
+	my $insurancePlanCond;
+	my $providerCond;
+	my $facilityCond;
+	
+	my $insOrgId = $page->param('_f_ins_org_id');
+	my $productName = $page->param('_f_product_name');
+	my $planName = $page->param('_f_plan_name');
+	my $providerId = $page->param('_f_provider_id');
+	
+	$insuranceNameCond = qq{and Insurance.ins_org_id = '$insOrgId'} 
+		if $page->param('_f_ins_org_id');
+		
+	$insuranceProductCond = qq{and Insurance.product_name = '$productName'}
+		if $page->param('_f_product_name');
+		
+	$insurancePlanCond = qq{and Insurance.plan_name = '$planName'}
+		if $page->param('_f_plan_name');
+
+	my $transTable;
+	if ($providerId || $facilityId)
+	{
+		$transTable = qq{Transaction, };
+	}
+	
+	$providerCond = qq{
+		and Transaction.trans_id = Invoice.main_transaction
+		and upper(Transaction.provider_id) = upper('')
+	} if $providerId;
+
+	if ($facilityId)
+	{
+		if ($providerId)
+		{
+			$facilityCond = qq{
+				and upper(Transaction.service_facility_id) = upper('$facilityId')
+			};
+		}
+		else
+		{
+			$facilityCond = qq{
+				and Transaction.trans_id = Invoice.main_transaction
+				and upper(Transaction.service_facility_id) = upper('$facilityId')
+			};
+		}
+	}
+	
+	my $payerTypeCond;
+	my $payerType = $page->param('_f_payer_type');
+	$payerTypeCond = qq{and Invoice_Billing.bill_party_type = $payerType} 
+		if $payerType != -1;
+	
+	my ($columns, $groupBy, $invoiceStatusCond);
+	if ($flags & FLAG_GETCOUNTS)
+	{
+		$columns = qq{Invoice_Status.caption as caption, count(Invoice_Status.caption) as cnt, 
+			Invoice.invoice_status
+		};
+			
+		$groupBy = qq{group by Invoice_Status.caption, Invoice.invoice_status};
+	}
+	else
+	{
+		$columns = qq{to_char(Invoice.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
+			to_char(nvl(submit_date, invoice_date), '$SQLSTMT_DEFAULTDATEFORMAT') as submit_date, 
+			Invoice_Billing.bill_to_id as bill_to, 
+			product_name as insurance_product,	
+			plan_name as insurance_plan, 
+			total_cost as total_charge, 
+			total_adjust, 
+			Invoice.invoice_id, 
+			Invoice.client_id
+		};
+		
+		$groupBy = qq{order by invoice_date, bill_to};
+		
+		my $invoiceStatus = $page->param('invoice_status');
+		$invoiceStatusCond = qq{and Invoice.invoice_status = $invoiceStatus};
+	}
+
+	my $html = qq{
+		select $columns
+			from $transTable Insurance, Invoice_Billing, Invoice_Status, Invoice
+			where Invoice.cr_org_id = ?
+				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				$invoiceStatusCond
+				and Invoice_Status.id = Invoice.invoice_status
+				and Invoice_Billing.invoice_id = Invoice.invoice_id
+				$payerTypeCond
+				and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
+				$insuranceNameCond
+				$insuranceProductCond
+				$insurancePlanCond
+				$providerCond
+				$facilityCond
+			$groupBy
+	};
+
+	return $html;
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $resource_id = $page->field('resource_id');
-	my $facility_id = $page->field('facility_id');
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
+	my $publishDefn = {
+		columnDefn =>
+		[
+			{	head => 'Claims', 
+				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#", null, "status location width=800,height=600,scrollbars,resizable")',
+				hint => 'View Details' 
+			},
+			{head => 'Count', dAlign => 'right'},
+		],
+	};
+	
+	my $sqlStmt = $self->buildSqlStmt($page, $flags | FLAG_GETCOUNTS);
+	
 	my $html = qq{
 	<table cellpadding=10>
 		<tr align=center valign=top>
-
 		<td>
-			<b style="font-size:8pt; font-family:Tahoma">By Payer</b>
-			@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_NONE, 'sel_payers',
-				[$facility_id, $startDate, $endDate]) ]}
+			@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, 
+				$sqlStmt,
+				[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
 		</td>
-
 		</tr>
 	</table>
 	};
@@ -88,16 +237,48 @@ sub getDrillDownHandlers
 	return ('prepare_detail_$detail$');
 }
 
-sub prepare_detail_payer
+sub prepare_detail_status
 {
 	my ($self, $page) = @_;
-	my $facility_id = $page->param('_f_facility_id');
-	my $startDate   = $page->param('_f_report_begin_date');
-	my $endDate     = $page->param('_f_report_end_date');
-	my $payer       = $page->param('payer');
 
-	$page->addContent($STMTMGR_REPORT_BILLING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detail_payers',
-		[$facility_id, $startDate, $endDate, $payer]));
+	my $startDate   = $page->field('report_begin_date');
+	my $endDate     = $page->field('report_end_date');
+
+	my $sqlStmt = $self->buildSqlStmt($page);
+
+	my $publishDefn = {
+		columnDefn =>
+		[
+			{head => 'Claim ID', colIdx => 7,
+				url => qq{javascript:chooseItemForParent("/invoice/#7#/summary") },
+				hint => 'View Invoice Summary',
+			},
+			{head => 'Patient ID', colIdx => 8,
+				url => qq{javascript:chooseItemForParent("/person/#8#/account")},
+				hint => 'View #8# Account',
+			},
+			{head => 'Invoice Date', colIdx => 0,},
+			{head => 'Submit Date', colIdx => 1,},
+			{head => 'Bill To', colIdx => 2, dAlign => 'center'},
+			{head => 'Insurance Product', colIdx => 3, dAlign => 'center'},
+			{head => 'Insurance Plan', colIdx => 4, dAlign => 'center'},
+			{head => 'Total Charge', colIdx => 5, 
+				dformat => 'currency', tAlign => 'RIGHT', 
+				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+			},
+			{head => 'Total Adjust', colIdx => 6, 
+				dformat => 'currency', tAlign => 'RIGHT', 
+				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+			},
+			#{head => 'Status', colIdx => 7,},
+		],
+	};
+	
+	
+	$page->addContent(@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL
+	#| STMTMGRFLAG_DEBUG,
+	,	$sqlStmt,	[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+	);
 }
 
 

@@ -924,6 +924,20 @@ function chooseItem2(arlFmt, itemValue, inNewWin, features)
 		window.location.href = newArl;
 }
 
+function chooseItemForParent(arlFmt)
+{
+	if(isActionPopupWindow())
+	{
+		parent.opener.location.href = arlFmt;
+	}
+	else
+	{
+		alert('No opener Window found');
+	}
+	
+	parent.close();
+}
+
 //****************************************************************************
 // Multiselect field type support function
 //****************************************************************************

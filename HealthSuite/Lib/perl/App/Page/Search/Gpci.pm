@@ -45,6 +45,19 @@ sub getForm
 	});
 }
 
+sub findDefaultState
+{
+	my ($self) = @_;
+	
+	my $orgId = $self->param('org_id') || $self->session('org_id');
+	
+	my $states = $STMTMGR_GPCI_SEARCH->getSingleValueList($self, STMTMGRFLAG_NONE,
+		'sel_stateForOrg', $orgId);
+	
+	$self->param('search_expression', $states->[0]);
+	return $states->[0];
+}
+
 sub execute
 {
 	my ($self, $type, $expression) = @_;
@@ -61,10 +74,13 @@ sub execute
 		unless ParseDate($self->param('eff_end_date'));
 
 	$expression =~ s/\*/%/g;
+	$expression = $self->findDefaultState() if $expression =~ /^\%$/ || ! $expression;
 
 	$self->addContent(
 		'<CENTER>', 
-			$STMTMGR_GPCI_SEARCH->createHtml($self, STMTMGRFLAG_NONE,	$statement, [$expression]),
+			$STMTMGR_GPCI_SEARCH->createHtml($self, STMTMGRFLAG_NONE,	$statement, 
+				[$expression, $self->param('eff_begin_date'), $self->param('eff_end_date')]
+			),
 		'</CENTER>'
 	);
 

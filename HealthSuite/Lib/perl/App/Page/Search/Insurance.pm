@@ -86,6 +86,10 @@ sub execute
 		$_ eq 'insurance' and do {last};
 		$category = "_$_";
 	}
+	
+	#$expression =~ s/%20/ /g;
+	#$self->param('search_expression', $expression);
+	
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category",
