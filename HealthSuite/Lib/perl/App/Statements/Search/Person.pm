@@ -5,6 +5,7 @@ package App::Statements::Search::Person;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
@@ -14,26 +15,17 @@ use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $ITEMNAME_PATH $STMTFMT_SEL_PERS
 
 $ITEMNAME_PATH = 'Home';
 $STMTFMT_SEL_PERSON = qq{
-			select  distinct(per.person_id), per.complete_name as name, per.ssn,
-				to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
-				att.value_text as value_text
-			from 	person per, person_attribute att
-			where	att.parent_id = per.person_id
-			and att.item_name = '$ITEMNAME_PATH'
-			and %whereCond%
-			union all
-			select  per.person_id, per.complete_name as name, per.ssn,
-				to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
-				null as value_text
-			from 	person per, person_attribute att
-			where	att.parent_id = per.person_id
-			and 	att.item_name != '$ITEMNAME_PATH'
-			and 	per.person_id not in ( select  parent_id
-							from   person_attribute
-							where  item_name = '$ITEMNAME_PATH'
-						)
-			and %whereCond%
-			group by per.person_id, per.complete_name, per.ssn, to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT')
+			select	per.person_id, per.complete_name as name, per.ssn,
+					to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
+					att.value_text as value_text,
+					cat.category
+			from 	person per, person_org_category cat, person_attribute att
+			where	per.person_id = cat.person_id(+)
+					and per.person_id = att.parent_id(+)
+					and att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
+					and att.item_name(+) = '$ITEMNAME_PATH'
+					and %whereCond%
+					%catCond%
 			%orderBy%
 };
 
@@ -46,12 +38,12 @@ $STMTRPTDEFN_DEFAULT =
 				{ head => 'SSN'},
 				{ head => 'Date of Birth'},
 				{ head => 'Home Phone'},
+				{ head => 'Type'},
 
 			],
 };
 
-$STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
-
+my %personTemplates = (
 	'sel_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
@@ -136,7 +128,37 @@ $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 			 orderBy => '',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+	);
+
+#
+# HEY! If you add anything to @categories you must add the array index below
+#
+my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate');
+my @categorySqls = ();
+foreach my $category (@categories)
+{
+	my $sqls = {};
+	push(@categorySqls, $sqls);
+
+	my @tmplKeys = keys %personTemplates;
+	foreach (@tmplKeys)
+	{
+		my %sqlData = %{$personTemplates{$_}};
+		$sqlData{catCond} = $category eq 'associate' ? "and cat.category in ('Physician', 'Nurse', 'Staff')" : "and cat.category = '\u$category'";
+		$sqls->{"$_\_$category"} = \%sqlData;
+	}
+}
+
+# If you add anything to @categories, you must also add it below as $categorySqls[x]
+$STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
+	%personTemplates,
+	%{$categorySqls[0]},
+	%{$categorySqls[1]},
+	%{$categorySqls[2]},
+	%{$categorySqls[3]},
+	%{$categorySqls[4]},
 );
+
 
 @CHANGELOG =
 (
