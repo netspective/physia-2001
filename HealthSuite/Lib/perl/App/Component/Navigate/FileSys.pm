@@ -11,8 +11,8 @@ use App::Configuration;
 use Data::Publish;
 use Exporter;
 use Date::Manip;
-use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT);
-use enum qw(BITMASK:NAVGFILEFLAG_ PERLOBJECT RAWTEXT HTML XML PASSTHROUGH TRANSLATEUNDL TRANSLATEDATES);
+use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT REVERSESORT);
+use enum qw(BITMASK:NAVGFILEFLAG_ PERLOBJECT RAWTEXT HTML XML PASSTHROUGH TRANSLATEUNDL TRANSLATEDATES ORGLOCKDOWN);
 use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %FILE_TYPE_MAP %RESOURCE_MAP);
 @ISA   = qw(Exporter CGI::Component);
 @EXPORT = qw(NAVGPATHFLAG_STAYATROOT NAVGFILEFLAG_PERLOBJECT NAVGFILEFLAG_RAWTEXT NAVGFILEFLAG_HTML NAVGFILEFLAG_XML);
@@ -36,7 +36,8 @@ use constant ICONGRAPHIC_PAGE		=> '/resources/icons/report-yellow.gif';
 	'.pm' => [NAVGFILEFLAG_PERLOBJECT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
 	'.log' => [NAVGFILEFLAG_RAWTEXT | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
 	'.txt' => [NAVGFILEFLAG_RAWTEXT | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
-	'.pdf' => [NAVGFILEFLAG_PASSTHROUGH | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	'.pdf' => [NAVGFILEFLAG_PASSTHROUGH | FILEFLAGS_DEFAULT | NAVGFILEFLAG_ORGLOCKDOWN, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	'.claims' => [FILEFLAGS_DEFAULT | NAVGFILEFLAG_ORGLOCKDOWN, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
 	
 	FILETYPEID_DIROPEN() => [NAVGFILEFLAG_TRANSLATEUNDL, '/resources/icons/folder-orange-open.gif', ICONGRAPHIC_SELARROW],
 	FILETYPEID_DIRCLOSED() => [NAVGFILEFLAG_TRANSLATEUNDL, '/resources/icons/folder-orange-closed.gif', ICONGRAPHIC_SELARROW],
@@ -174,7 +175,7 @@ sub getActivePathInfo
 
 sub getActivePathContents
 {
-	my ($flags, $rootFS, $rootURL, $activePath, $style, $highlight) = @_;
+	my ($page, $flags, $rootFS, $rootURL, $activePath, $style, $highlight) = @_;
 	
 	my ($fsPath, $urlPath) = ($rootFS, $rootURL . '/');
 	unless($flags & NAVGPATHFLAG_STAYATROOT)
@@ -184,6 +185,7 @@ sub getActivePathContents
 	}
 
 	my @items = ();
+	my $orgInternalId = $page->session('org_internal_id');
 
 	my $addPathEntry = sub
 	{
@@ -191,8 +193,11 @@ sub getActivePathContents
 		
 		my $fullNameAndPath = "$fsPath/$entryName";
 		my ($fileName, $filePath, $fileExtn) = fileparse($_, '\..*');
-		my $fileTypeInfo = $isDirectory ? $FILE_TYPE_MAP{FILETYPEID_DIRCLOSED()} : ($FILE_TYPE_MAP{$fileExtn} || $FILE_TYPE_MAP{FILEFLAGS_DEFAULT()});
+		my $fileTypeInfo = $isDirectory ? 
+			$FILE_TYPE_MAP{FILETYPEID_DIRCLOSED()} : 
+			($FILE_TYPE_MAP{$fileExtn} || $FILE_TYPE_MAP{FILEFLAGS_DEFAULT()});
 		my $fileTypeFlags = $fileTypeInfo->[FILEEXTNINFO_FLAGS];
+		my $myOrgFile;
 		
 		if($fileTypeFlags & NAVGFILEFLAG_PERLOBJECT)
 		{
@@ -223,14 +228,27 @@ sub getActivePathContents
 			my $icon = $highlight eq $entryName ? $fileTypeInfo->[FILEEXTNINFO_ICONHIGHL] : $fileTypeInfo->[FILEEXTNINFO_ICON];
 			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEDATES)
 			{
-				$fileName =~ s/^(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$2\/$3\/$1 $4:$5", '%F (%T)') || "Invalid Date"/e;
+				if ($fileTypeFlags & NAVGFILEFLAG_ORGLOCKDOWN)
+				{
+					$fileName =~ s/^(\d*?)\_(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$3\/$4\/$2 $5:$6", '%F (%T)') || "Invalid Date"/e;
+					$myOrgFile = ($1 == $orgInternalId) ? 1 : 0;
+				}
+				else
+				{
+					$fileName =~ s/^(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$2\/$3\/$1 $4:$5", '%F (%T)') || "Invalid Date"/e;
+				}
 			}
 			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEUNDL)
 			{
 				$fileName =~ s/_/ /g;
 			}
-			push(@items, [	$isDirectory ? "$urlPath$entryName" : ($fileTypeFlags & NAVGFILEFLAG_PASSTHROUGH ? "$urlPath$entryName" : "$urlPath?enter=$fullNameAndPath&ecaption=$fileName&eflags=$fileTypeFlags"), 
-							$fileName, $icon]);
+			push(@items, 
+				[	$isDirectory ? "$urlPath$entryName" : ($fileTypeFlags & NAVGFILEFLAG_PASSTHROUGH ? 
+					"$urlPath/$entryName" : "$urlPath?enter=$fullNameAndPath&ecaption=$fileName&eflags=$fileTypeFlags"), 
+					$fileName, $icon
+				]
+			) if (($fileTypeFlags & NAVGFILEFLAG_ORGLOCKDOWN) && $myOrgFile) 
+					|| !($fileTypeFlags & NAVGFILEFLAG_ORGLOCKDOWN);
 		}
 	};
 
@@ -255,10 +273,20 @@ sub getActivePathContents
 		{
 			&$addPathEntry($_, 1) unless $_ eq 'CVS';
 		}
-		
-		foreach (sort @files)
+
+		if ($flags & NAVGPATHFLAG_REVERSESORT)
 		{
-			&$addPathEntry($_, 0);
+			foreach (reverse sort @files)
+			{
+				&$addPathEntry($_, 0);
+			}
+		}
+		else
+		{
+			foreach (sort @files)
+			{
+				&$addPathEntry($_, 0);
+			}
 		}
 	}
 	else
@@ -272,7 +300,7 @@ sub getActivePathContents
 		if(scalar(@$activePath))
 		{
 			my $highlight = pop @$activePath;
-			return getActivePathContents($flags, $rootFS, $rootURL, $activePath, $style, $highlight);
+			return getActivePathContents($page, $flags, $rootFS, $rootURL, $activePath, $style, $highlight);
 		}
 		else
 		{
@@ -318,11 +346,13 @@ sub getHtml
 	my @activePath = $page->param('arl_pathItems');
 	my $rootFS = $self->{rootFS};
 	my $rootURL = $self->{rootURL} || ('/' . $page->param('arl_resource'));
-	my $fileData = getActivePathContents($self->{flags}, $rootFS, $rootURL, \@activePath);
+	my $fileData = getActivePathContents($page, $self->{flags}, $rootFS, $rootURL, \@activePath);
 
 	return createHtmlFromData($page, $self->{flags}, $fileData, $self->{publishDefn},
-				{ activePath => getActivePathInfo($self->{flags}, $rootFS, $rootURL, \@activePath, { style => 'tree', rootCaption => $self->{rootCaption} }) }
-				);
+		{ activePath => getActivePathInfo($self->{flags}, $rootFS, $rootURL, \@activePath, 
+			{ style => 'tree', rootCaption => $self->{rootCaption} }) 
+		}
+	);
 }
 
 1;

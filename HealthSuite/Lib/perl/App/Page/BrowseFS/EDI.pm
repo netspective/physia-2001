@@ -25,7 +25,8 @@ sub initialize
 		rootURL => '/edi',
 		rootURLCaption => 'EDI',
 		rootHeading => 'EDI Data',
-		);
+		flags => App::Component::Navigate::FileSys::NAVGPATHFLAG_REVERSESORT,
+	);
 }
 
 1;

@@ -30,11 +30,11 @@ sub setBrowseInfo
 		$self->property('activeInstance', ${"$module\::INSTANCE"});
 	}
 
-	my @activePathInfo = App::Component::Navigate::FileSys::getActivePathInfo(0, $rootFS, $params{rootURL}, \@activePath, 'locator');
+	my @activePathInfo = App::Component::Navigate::FileSys::getActivePathInfo(0, $rootFS, 
+		$params{rootURL}, \@activePath, 'locator');
 	$self->addLocatorLinks(
-			[$params{rootURLCaption}, $params{rootURL}],
-			@activePathInfo,
-		);
+		[$params{rootURLCaption}, $params{rootURL}], @activePathInfo,
+	);
 }
 
 sub prepare_page_content_header
@@ -136,6 +136,7 @@ sub getNavigatorHtml
 		rootURL => $navgParams->{rootURL},
 		rootCaption => $navgParams->{rootURLCaption},
 		style => $enteredFile ? '' : 'panel.transparent',
+		flags => $navgParams->{flags},
 		)->getHtml($self),
 }
 

@@ -15,6 +15,8 @@ sub handler
 	my $DEBUG = ref($r) && $r->dir_config("StatINC_Debug");
 	$DEBUG = (! $DEBUG) || (lc($DEBUG) eq 'off') ? 0 : 1;
 
+	return DECLINED if ($ENV{REQUEST_URI} =~ /\.pdf$/);
+	
 	eval {
 		my $arl;
 		$arl = $1 if $ENV{REQUEST_URI} =~ /^\/?(.*)$/;
@@ -48,7 +50,7 @@ sub handler
 			print SENDMAIL $msg;
 			close SENDMAIL;
 		}
-	return OK;
+		return OK;
 	}
 }
 

@@ -12,6 +12,11 @@ use App::Statements::Scheduling;
 
 use vars qw($page $sqlPlusKey);
 
+my $BUILDIR = `pwd`;
+chomp $BUILDIR;
+
+my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
+
 &connectDB();
 
 # You are now connected to the database and have
@@ -19,7 +24,9 @@ use vars qw($page $sqlPlusKey);
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
+runSQL('BUILD_0012_Invoice.sql');
 runSQL('BUILD_0012_Invoice_Status.sql');
+makeSymbolicLink();
 
 ######## END UPGRADE SCRIPT #########
 
@@ -27,12 +34,24 @@ exit;
 
 # Subroutines
 
+sub makeSymbolicLink
+{
+	my $paperClaimDir = App::Configuration::PATH_WEBSITE . '/paperclaims';
+	system(qq{
+		(	echo "---------------------------------------"
+			date
+			echo "---------------------------------------"
+			rm $paperClaimDir
+			ln -fs /u/vusr_edi/paper-claims $paperClaimDir
+		) >> $LOGFILE 2>&1
+	});
+}
+
+
 sub runSQL
 {
 	my $sqlFile = shift;
-	my $buildDir = `pwd`;
-	chomp $buildDir;
-	$sqlFile = File::Spec->catfile($buildDir, $sqlFile);
+	$sqlFile = File::Spec->catfile($BUILDIR, $sqlFile);
 	my $logFile = $sqlFile . ".log";
 
 	die "Missing required '$sqlFile'. Aborted.\n" unless (-f $sqlFile);
