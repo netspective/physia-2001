@@ -92,10 +92,16 @@ sub new
 	);
 
 	my $facilitiesField = new App::Dialog::Field::OrgType(
-		caption => 'Facility',
+		caption => '',
 		name => 'facility_list',
-		style => 'multicheck',
-		hints => 'Choose one or more Facilities to monitor.'
+		#style => 'multicheck',
+		style => 'multidual',
+		multiDualCaptionLeft => 'Available Facilities',
+		multiDualCaptionRight => 'Selected Facilities',		
+		type => 'select',
+		width => '150',
+		size => '5',
+		#hints => 'Choose one or more Facilities to monitor.'
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
 
@@ -127,22 +133,12 @@ sub new
 		$apptSelOptions .= "$key:$key,";
 	}
 
-	$self->addContent(
-		#new CGI::Dialog::Subhead(heading => 'Test'),
-		#new CGI::Dialog::Field(name => 'visit_types',
-		#	caption => 'Test',
-		#	fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
-		#	fKeyStmt => 'sel_worklist_available_physicians',
-		#	fKeyValueCol => 0,
-		#	fKeyDisplayCol => 1,
-		#	type => 'select',
-		#	style => 'multicheck',
-		#),
+	$self->addContent(		
 
 		new CGI::Dialog::Subhead(heading => 'Physicians'),
 		$resourcesField,
 
-		new CGI::Dialog::Subhead(heading => 'Facilities'),
+		new CGI::Dialog::Subhead(heading => 'Service Facilities'),
 		$facilitiesField,
 
 		new CGI::Dialog::Subhead(heading => 'Insurance Providers'),
@@ -454,8 +450,10 @@ sub execute
 		'del_worklist_lastname_range', $userId, $orgIntId);
 	my $strLastNameFrom = $page->field('LastNameFrom');
 	my $strLastNameTo = $page->field('LastNameTo');
+	$page->addDebugStmt($strLastNameTo);
 	$strLastNameFrom =~ s/\s+//g;
 	$strLastNameTo =~ s/\s+//g;
+	$page->addDebugStmt($strLastNameTo);
 	if (length $strLastNameFrom == 0 && length $strLastNameTo == 0)
 	{
 		$strLastNameFrom = undef;
@@ -507,7 +505,7 @@ sub execute
 	{
 		$intMinAmount = undef;
 	}
-	if (length $intMinAmount == 0)
+	if (length $intMaxAmount == 0)
 	{
 		$intMaxAmount = undef;
 	}
@@ -537,25 +535,10 @@ sub customValidate
 	$strFrom =~ s/\s+//g;
 	$strTo =~ s/\s+//g;
 
-	if ( ($strFrom eq '' && $strTo eq '') || (length $strFrom > 0 && length $strTo > 0) )
+	if ($strFrom gt $strTo  && length $strTo gt 0)
 	{
-		if ($strFrom gt $strTo)
-		{
-			$nameRangeFields->invalidate($page, 'Invalid Last-Name range. The value on the left must be equal to or less than the value on the right.');
-		}
-	}
-	elsif (length $strFrom > 0 || length $strTo > 0)
-	{
-		if (length $strFrom > 0)
-		{
-			$page->field('LastNameTo', $page->field('LastNameFrom'));
-		}
-		else
-		{
-			$page->field('LastNameFrom', $page->field('LastNameTo'));
-		}
-	}
-
+		$nameRangeFields->invalidate($page, 'Invalid Last-Name range. The value on the left must be equal to or less than the value on the right.');
+	}	
 	my ($intBalanceAgeMin, $intBalanceAgeMax) = ($page->field('BalanceAgeMin'), $page->field('BalanceAgeMax'));
 	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0)
 	{
@@ -564,19 +547,7 @@ sub customValidate
 			my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];
 			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. The value on the left must be equal to or less than the value on the right.");
 		}
-	}
-	elsif (length $intBalanceAgeMin > 0 || length $intBalanceAgeMax > 0)
-	{
-		if (length $intBalanceAgeMin > 0)
-		{
-			$page->field('BalanceAgeMax', $page->field('BalanceAgeMin'));
-		}
-		else
-		{
-			$page->field('BalanceAgeMin', $page->field('BalanceAgeMax'));
-		}
-	}
-
+	}	
 	my ($intBalanceAmountMin, $intBalanceAmountMax) = ($page->field('BalanceAmountMin'), $page->field('BalanceAmountMax'));
 	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0)
 	{
@@ -586,20 +557,6 @@ sub customValidate
 			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. The value on the left must be equal to or less than the value on the right.");
 		}
 	}
-	elsif (length $intBalanceAmountMin > 0 || length $intBalanceAmountMax > 0)
-	{
-		if (length $intBalanceAmountMin > 0)
-		{
-			$page->field('BalanceAmountMax', $page->field('BalanceAmountMin'));
-		}
-		else
-		{
-			$page->field('BalanceAmountMin', $page->field('BalanceAmountMax'));
-		}
-	}
-
-	#my ($strFrom, $strTo) = ($page->field('LastNameFrom'), $page->field('LastNameTo'));
-	#my $nameRangeFields = $self->getField('LastNameRange')->{fields}->[0];
 }
 
 1;
