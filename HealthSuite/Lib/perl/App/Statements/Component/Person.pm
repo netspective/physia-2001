@@ -745,8 +745,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 
 'person.careProviders' => {
+
 	sqlStmt => qq{
-			select	value_type, item_id, item_name, value_text, value_textb
+			select	value_type, item_id, item_name, value_text, value_textb, parent_id
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
@@ -754,7 +755,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)' },
+			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appt</A>' },
 			#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
 			#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
 			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
