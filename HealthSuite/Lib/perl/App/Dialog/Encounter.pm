@@ -1375,6 +1375,8 @@ sub addProcedureItems
 			$procCommand = 'add';
 		}
 
+		my $cptCode = $page->param("_f_proc_$line\_procedure");
+		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
@@ -1387,7 +1389,8 @@ sub addProcedureItems
 			quantity => $page->param("_f_proc_$line\_units") || undef,				#default for units is 1
 			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
 			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,				#default for item type is service
-			code => $page->param("_f_proc_$line\_procedure") || undef,
+			code => $cptCode || undef,
+			caption => $cptShortName->{name} || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
 			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,		#the actual icd (diag) codes

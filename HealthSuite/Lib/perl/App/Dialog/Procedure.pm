@@ -8,6 +8,7 @@ use App::Statements::Person;
 use App::Statements::Insurance;
 use App::Statements::Transaction;
 use App::Statements::Org;
+use App::Statements::Catalog;
 use App::IntelliCode;
 use Carp;
 use CGI::Dialog;
@@ -1119,14 +1120,14 @@ sub execute
 	#my @hcpcsCode = split(/\s*,\s*/, $page->field('hcpcs'));
 	my @cptCodes = split(/\s*,\s*/, $page->field('procedure'));		#there will always be only one value in this array
 
-	## RUN INCREMENT USAGE IN INTELLICODE
+	## run increment usage in intellicode
 	if($command ne 'remove')
 	{
 		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
 	}
 
-	## FIGURE OUT DIAG CODE POINTERS
+	## figure out diag code pointers
 	my @diagCodePointers = ();
 	my $claimDiagCount = @claimDiags;
 	foreach my $relDiag (@relDiags)
@@ -1140,13 +1141,17 @@ sub execute
 		}
 	}
 
+	## get short name for cpt code
+	my $cptCode = $page->field('procedure');
+	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
 	$page->schemaAction(
 			'Invoice_Item', $command,
 			item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			code => $page->field('procedure') || undef,
+			code => $cptCode || undef,
+			caption => $cptShortName->{name} || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
 			unit_cost => $unitCost || undef,
