@@ -157,19 +157,6 @@ sub isValid
 			}
 		}
 		
-		if($servicetype =~ m/^(\d+)$/)
-		{
-			# $1 is the check to see if it is an integer
-			if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericServiceTypeId', $1)))
-			{
-				$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype is not valid. Please verify");
-			}
-		}
-		elsif($servicetype !~ m/^(\d+)$/ && $servicetype ne '')
-		{
-			$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype should be an integer. Please verify");
-		}
-
 		if($modifier ne '')
 		{
 			if($modifier =~ m/^(\d+)$/)
