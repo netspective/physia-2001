@@ -618,43 +618,6 @@
 		<column name="field_name" type="text" size="32" descr="The name of the variable to store the value"/>
 		<column name="field_type" type="text" size="32" descr="The type of value to store"/>
 		<column name="field_attrs" type="text" size="32" descr="Field attributes to pass to Dialog manager"/>
-
-		<row>
-			<col name="input_id">1</col>
-			<col name="org_id">ASI</col>
-			<col name="product_id">ASIPRDINS</col>
-			<col name="field_order">1</col>
-			<col name="field_caption">Social Security Number</col>
-			<col name="field_name">ssn</col>
-			<col name="field_type">text</col>
-		</row>
-		<row>
-			<col name="input_id">2</col>
-			<col name="org_id">ASI</col>
-			<col name="product_id">ASIPRDPPO</col>
-			<col name="field_order">1</col>
-			<col name="field_caption">Last Name</col>
-			<col name="field_name">last_name</col>
-			<col name="field_type">text</col>
-		</row>
-		<row>
-			<col name="input_id">3</col>
-			<col name="org_id">ASI</col>
-			<col name="product_id">ASIPRDPPO</col>
-			<col name="field_order">2</col>
-			<col name="field_caption">First Name</col>
-			<col name="field_name">first_name</col>
-			<col name="field_type">text</col>
-		</row>
-		<row>
-			<col name="input_id">4</col>
-			<col name="org_id">ASI</col>
-			<col name="product_id">ASIPRDPPO</col>
-			<col name="field_order">3</col>
-			<col name="field_caption">Date of Birth</col>
-			<col name="field_name">dob</col>
-			<col name="field_type">date</col>
-		</row>
 	</table>
 
 	<include file="reference.xml"/>
