@@ -3,6 +3,7 @@
 <!--
 	****************************************************************************
 	DUDES, ARRANGE YOUR BUGS IN NUMERICAL ORDER. IT'S MUCH NICER TO READ !!!!
+	grey's numbering order or just regular increasing magnitude order?
 	****************************************************************************
 -->
 
@@ -82,6 +83,11 @@
 
 		<deliverable id="1226">
 			In the 'Care Provider' component, the 'Schedule Appt' link shows up only when the provider is a 'Physician'
+		</deliverable>
+
+		<deliverable id="1262">
+			UI: Org's now have an Electronic Billing Information component that contains an editable list of physicians who
+				have their own independent PerSe/THINet billing id
 		</deliverable>
 
 		<deliverable id="1249">
@@ -203,6 +209,11 @@
 			pending insurance balance or patient balance.
 		</deliverable>
 		
+		<deliverable id="1464">
+			UI: A patient's account tab now has three additional columns: Provider of Service ID and 
+				Billing Provider ID and Service Org ID
+		</deliverable>
+
 		<deliverable id="1470">
 			UI: Added a new person-type called 'Insured Person' for 'Personal Insurance Coverage' dialog and 
 			    added link called 'Insured Persons' in the lookups of Main menu.
