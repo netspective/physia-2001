@@ -110,12 +110,12 @@ sub queryToHtmlTable
 		return;
 	}
 
-	${$tableStrRef} .= <<"	END_HTML";
+	${$tableStrRef} .= qq{
 	<table bgcolor=silver border=0 cellspacing=0>
 	<tr>
 	<td>
 	<table bgcolor=silver cellspacing=1 cellpadding=2 border=0>
-	END_HTML
+	};
 
 	my @hideColNames = split(/\s*,\s*/, uc($self->param('hidecols')) || DEFAULT_HIDE_COLUMNS);
 	my $foundRecords = 0;
