@@ -12,6 +12,7 @@ use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
 use App::Statements::Catalog;
+use App::Statements::Insurance;
 use App::Universal;
 
 use Date::Manip;
@@ -64,9 +65,32 @@ sub isValid
 	my $charges = '';
 	my $emergency = '';
 	my %diagsSeen = ();
-
 	my @feeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	my @diagCodes = split(/\s*,\s*/, $page->field('proc_diags'));
+
+
+	# GET FEE SCHEDULES FOR PRIMARY INSURANCE IF IT WAS SELECTED ----------------------------
+	my $payer = $page->field('payer');
+	my @singlePayer = split('\(', $payer);
+	if($singlePayer[0] eq 'Primary')
+	{
+		my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
+		my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
+		my @primaryInsFeeScheds = ();
+		foreach my $fs (@{$getFeeSchedsForInsur})
+		{
+			push(@primaryInsFeeScheds, $fs->{value_text});
+			#$page->addDebugStmt($fs->{value_text});
+		}
+		$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
+	}
+	
+	my @insFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_insurance_catalogs'));
+	
+	# ------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 	#munir's old icd validation for checking if the same icd code is entered in twice
 	foreach (@diagCodes)
@@ -219,9 +243,10 @@ sub isValid
 		App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
 
-		if($charges eq '' && $feeSchedules[0] ne '')
+		if( $charges eq '' && ($feeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
 		{
-			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier, \@feeSchedules);
+			my @allFeeSchedules = @feeSchedules || @insFeeSchedules;
+			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
 			if($resultCount == 0)
 			{
@@ -238,7 +263,7 @@ sub isValid
 				}
 			}
 		}
-		elsif($charges eq '' && $feeSchedules[0] eq '')
+		elsif($charges eq '' && ($feeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
 		{
 			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");		
 		}
@@ -381,6 +406,7 @@ sub getHtml
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
 			<TD COLSPAN=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
+					<INPUT NAME="_f_proc_insurance_catalogs" VALUE='@{[ $page->param("_f_proc_insurance_catalogs") ]}'/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>

@@ -56,6 +56,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 
+		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'secondary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
@@ -137,7 +138,7 @@ sub initialize
 			]),
 
 		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To',
-			hints => 'Service Org is the org in which services were given.<br>
+			hints => 'Service Org is the org in which services were rendered.<br>
 						Billing org is the org in which the billing should be tracked.<br>
 						Pay To org is the org which should receive payment.',
 			fields => [
@@ -206,7 +207,12 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$command ||= 'add';
-	
+
+
+	$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
+
+
+
 	#Set attendee_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id') || $page->param('attendee_id') || $page->field('attendee_id'))
 	{
@@ -429,18 +435,24 @@ sub setInsuranceFields
 	}
 
 	my $insurances = join(' / ', @insurPlans) if @insurPlans;
-	$insurances = "$insurances;" if $insurances;
+	$insurances = "$insurances" if $insurances;
 
 	my $workComp = join(';', @wkCompPlans) if @wkCompPlans;
-	$workComp = "$workComp;" if $workComp;
+	$workComp = "$workComp" if $workComp;
 
 	my $thirdParty = join(';', @thirdParties) if @thirdParties;
-	$thirdParty = "$thirdParty;" if $thirdParty;
+	$thirdParty = "$thirdParty" if $thirdParty;
 
-	my $thirdPartyOther = 'Third-Party Payer;';
-	my $selfPay = 'Self-Pay;';
+	my $thirdPartyOther = 'Third-Party Payer';
+	my $selfPay = 'Self-Pay';
 
-	$self->getField('payer')->{selOptions} = "$insurances $workComp $thirdParty $thirdPartyOther $selfPay";
+	#$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$thirdPartyOther;$selfPay";
+	$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$selfPay";
+
+	my $payer = $page->field('payer');
+	$page->field('payer', $payer);
+	
+	#handlePayers($self, $page, $command, $flags);
 
 
 	#Other third party payer if one is not given
@@ -506,6 +518,14 @@ sub handlePayers
 				if($singlePayer[0] eq 'Primary')
 				{
 					my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
+					my $insFeeSchedules = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
+					my @insFeeSchedules = ();
+					foreach my $fs (@{$insFeeSchedules})
+					{
+						push(@insFeeSchedules, $fs->{value_text});
+					}
+					$page->param('_f_proc_insurance_catalogs', @insFeeSchedules);
+					#$page->param('_f_proc_insurance_catalogs', 'test');
 					$page->field('claim_type', $primIns->{ins_type});
 					$page->field('primary_payer', $primIns->{product_name});
 				}
@@ -536,6 +556,13 @@ sub handlePayers
 			{
 				my @primaryPlan = split('\)', $nonInsPayer[1]);
 				my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
+				my $insFeeSchedules = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
+				my @insFeeSchedules = ();
+				foreach my $fs (@{$insFeeSchedules})
+				{
+					push(@insFeeSchedules, $fs->{value_text});
+				}
+				$page->param('_f_proc_insurance_catalogs', @insFeeSchedules);
 				$page->field('claim_type', $primIns->{ins_type});
 				$page->field('primary_payer', $primIns->{product_name});
 			}
@@ -625,7 +652,7 @@ sub addTransactionAndInvoice
 	$transId = $command eq 'add' ? $transId : $editTransId;
 
 
-	my @claimDiags = split(/\s*,\s*/, $page->field('proc_diags'));
+	my @claimDiags = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 	App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrg);
 
 	my $invoiceId = $page->schemaAction(
