@@ -43,6 +43,13 @@ sub formatData
 	my $zeros = "0";
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
 	my $refClaimCareReceiverAddress = $refClaimCareReceiver->{address};
+	my $anotherPlan = '3';
+
+	if($inpClaim->{policy}->[1]->{name} ne '')
+	{
+		$anotherPlan = '1';
+	}
+
 
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-10s%-2s%1s%-3s%-8s%1s%1s%-18s%-12s%-30s%-15s%-5s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-13s%-2s%-6s%-4s%-4s%-2s%-1s%-1s%-8s%-2s%-1s%-1s%-1s%-2s%-2s%-8s%-3s%-1s%-8s%-1s%-1s%-1s%-1s%-1s%-1s%-2s%-4s%-1s%-25s",
@@ -65,12 +72,12 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimCareReceiverAddress->getState(), 0, 2), # patient state
 	substr($refClaimCareReceiverAddress->getZipCode(), 0, 5) . $self->numToStr(9 - length($refClaimCareReceiverAddress->getZipCode()),0,"0"), # patient zip code
 	substr($refClaimCareReceiverAddress->getTelephoneNo(), 0, 10), # patient telephone no.
-	substr($refClaimCareReceiver->getStatus(), 0, 1), # patient marital status
+	substr(($refClaimCareReceiver->getStatus() =~ /['N','P']/) ? 'U' : $refClaimCareReceiver->getStatus(), 0, 1)  , # patient marital status
 	substr($refClaimCareReceiver->getStudentStatus(), 0, 1), # patient student status
 	substr($refClaimCareReceiver->getEmploymentStatus(), 0, 1), # patient employement status
 	substr($refClaimCareReceiver->getDeathIndicator(), 0, 1),    # patient death indicator
 	substr(($refClaimCareReceiver->getDeathIndicator() eq 'D' ? $refClaimCareReceiver->getDateOfDeath():$spaces), 0, 1),    # patient date of death
-	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
+	substr($anotherPlan, 0, 1), # other insurance indicator
 	'F',  # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
 	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
