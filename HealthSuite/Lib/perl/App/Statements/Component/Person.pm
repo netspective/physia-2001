@@ -1710,11 +1710,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
+			and     item_name != 'Nurse/Title'
+			and 	item_name != 'RN'
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
 	publishDefn => {
 		columnDefn => [
-			{ dataFmt => '&{fmt_stripLeadingPath:2} (#4#): #3#' },
+			{ dataFmt => '#2# (#4#): #3#' },
 			#{ dataFmt => '#3#' },
 			#{ colIdx => 3, head => 'Value' },
 			#{ colIdx => 4, head => 'Date', options => PUBLCOLFLAG_DONTWRAP },
@@ -2278,7 +2280,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.diagnosisSummary' => {
 	sqlStmt => qq{
-			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yy') as earliest_date, 
+			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yy') as earliest_date,
 			       to_char(min(trans_begin_stamp), 'mm/dd/yy') as latest_date, count(member_name) as num_times
 			from   ref_icd, invoice_claim_diags,transaction, invoice
 			where  client_id = ?
@@ -2288,28 +2290,28 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			group  by member_name, name
 	},
 	sqlStmtBindParamDescr => ['Person ID for Diagnosis Summary'],
-	publishDefn => 
+	publishDefn =>
 	{
-		columnDefn => 
+		columnDefn =>
 		[
 			{ colIdx =>0, head => 'Code', dataFmt => '#0#'},
 			{ colIdx =>0, head => 'Diagnosis', dataFmt => '#1#'},
 			{ colIdx =>1, head => 'Earliest Date', dataFmt => '#2#'},
 			{ colIdx =>2, head => 'Latest Date', dataFmt => '#3#'},
-			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#', dAlign => 'CENTER'},								
+			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#', dAlign => 'CENTER'},
 		],
-		frame => 
-		{ 
+		frame =>
+		{
 				heading => 'Diagnosis Summary'
-		},		 	
+		},
 	},
-	publishDefn_panel => 
+	publishDefn_panel =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.static',
 		inherit => 'panel',
-		frame => 
-		{ 
+		frame =>
+		{
 				heading => ''
 		},
 	},
@@ -2324,7 +2326,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelTransp'); },
 },
-	
+
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 );
