@@ -14,15 +14,15 @@ use vars qw(@ISA @EXPORT $STMTMGR_ORG $PUBLISH_DEFN);
 my $ATTRTYPE_PHONE = App::Universal::ATTRTYPE_PHONE;
 
 $STMTMGR_ORG = new App::Statements::Org(
-	'selOrgServiceFFSByInternalId' =>qq{	
+	'selOrgServiceFFSByInternalId' =>qq{
 		SELECT 	distinct org_internal_id,oa.value_int
 		FROM	Org_Category oc, Org o,Org_Attribute oa
 		WHERE   o.owner_org_id = :1
-		AND	oc.parent_id = o.org_internal_id 
-		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')		
+		AND	oc.parent_id = o.org_internal_id
+		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
 		AND	oa.item_name ='Fee Schedules'
 		AND	oa.value_type =0
-		AND	oa.parent_id = o.org_internal_id 
+		AND	oa.parent_id = o.org_internal_id
 		},
 	'selOrgSimpleNameById' => qq{
 		select name_primary
@@ -32,7 +32,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 	'selCloseDateChildParentOrgIds' =>qq{
 		SELECT	org_internal_id
 		FROM	org
-		WHERE	owner_org_id = :1 
+		WHERE	owner_org_id = :1
 		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 )
 	},
 	'selOwnerOrg' => qq{
@@ -40,6 +40,13 @@ $STMTMGR_ORG = new App::Statements::Org(
 		from org
 		where parent_org_id IS NULL AND
 		org_id = ?
+		},
+	'selChildFacilityOrgs' => qq{
+		SELECT
+			org_id
+		FROM 	org
+		WHERE 	owner_org_id = ?
+		AND     category IN ('Practice', 'Clinic', 'Facility/Site')
 		},
 	'selOwnerOrgId' => qq{
 		select org_internal_id
@@ -95,13 +102,13 @@ $STMTMGR_ORG = new App::Statements::Org(
 			and org_internal_id = ?
 		},
 	'selAttributeByIdValueIntParent' =>qq{
-		SELECT	item_id 
+		SELECT	item_id
 		FROM	Org_Attribute
-		WHERE	parent_id = :1 
+		WHERE	parent_id = :1
 		AND	value_int = :2
-		AND	item_name = :3	
+		AND	item_name = :3
 		},
-	
+
 	'selAttribute' => qq{
 		select * from org_attribute
 		where parent_id = ? and item_name = ?
@@ -119,7 +126,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 		where parent_id = ? and item_name = ? and value_type = ?
 		},
 	'selValueDateByItemNameAndValueTypeAndParent' =>qq{
-		SELECT to_char(value_date,'$SQLSTMT_DEFAULTDATEFORMAT') as value_date 
+		SELECT to_char(value_date,'$SQLSTMT_DEFAULTDATEFORMAT') as value_date
 		FROM org_attribute
 		WHERE parent_id = :1 and item_name = :2 and value_type = :3
 		},
