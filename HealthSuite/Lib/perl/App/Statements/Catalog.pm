@@ -400,6 +400,26 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		AND	oce.data_text  = h.abbrev (+)
 		AND	oc.internal_catalog_id = oce.catalog_id
 	},
+	'selProcedureInfoByCodeModDate'=> qq
+	{
+		SELECT 	oc.internal_catalog_id,
+			oce.entry_type,
+			oc.catalog_id,
+			oce.data_text,
+			h.caption,
+			oce.unit_cost,
+			oce.flags		
+		FROM	Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
+			Offering_Catalog oc
+		WHERE	oce.code = upper(:1)
+		AND	(modifier = :2 or :2 is NULL)
+		AND	oce.catalog_id = :3
+		AND	(oc.effective_begin_date <= to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT') or oc.effective_begin_date is NULL)
+		AND 	(oc.effective_end_date >= to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT') or oc.effective_end_date is NULL)
+		AND	oce.data_text  = h.abbrev (+)
+		AND	oc.internal_catalog_id = oce.catalog_id
+	},
+	
 	
 	#- DELETE Assoicated FS FOR Orgs and Phyisicians
 	'delOrgIdLinkedFS' =>qq
