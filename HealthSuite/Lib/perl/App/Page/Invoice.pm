@@ -366,7 +366,7 @@ sub getProceduresHtml
 		$itemExtCost = $formatter->format_price($itemExtCost);
 		my $itemAdjustmentTotal = $otherItem->{totalAdjustments};
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
-		
+
 		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
 		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
@@ -657,9 +657,9 @@ sub prepare_dialog_procedure
 sub prepare_dialog_adjustment
 {
 	my $self = shift;
-	
+
 	my $adjItemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	
+
 	my $invoiceId = $self->param('invoice_id');
 	my $dialogCmd = $self->param('_pm_dialog_cmd');
 	my ($payType, $itemId, $idx, $itemType) = split(/,/, $dialogCmd);
@@ -836,26 +836,6 @@ sub prepare_view_dialog
 		$self->addError("Can't find prepare_dialog_$dialog method");
 	}
 	return 1;
-}
-
-sub prepare_view_source
-{
-	my $self = shift;
-
-	$self->addLocatorLinks(['Source', 'source']);
-
-	if(open(SRC, __FILE__))
-	{
-		my $line = 0;
-		$self->addContent('<pre>');
-		while(<SRC>)
-		{
-			$line++;
-			$self->addContent('<font color=red>', sprintf('%04d. ', $line), '</font>', $self->escapeHTML($_));
-		}
-		$self->addContent('</pre>');
-		close(SRC);
-	}
 }
 
 sub prepare_view_summary
@@ -1065,7 +1045,7 @@ sub prepare_view_review
 			value_date => $todaysDate,
 			_debug => 0
 	);
-	
+
 	$self->redirect("/invoice/$invoiceId/summary");
 	#return $self->prepare_view_summary();
 }
@@ -1330,7 +1310,6 @@ sub prepare_page_content_header
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
 			['NSF', "$urlPrefix/nsf", 'nsf'],
-			['Source', "$urlPrefix/source", 'source'],
 		], ' | ');
 
 	push(@{$self->{page_content_header}},
