@@ -151,14 +151,16 @@ sub execute
 			_debug => 0
 	);
 
+	my $maxMedImproveReview = $page->field('max_med_improve_review');
+	my $impairRating = $page->field('impairment_rating_review');
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
 			item_id => $page->field('field22_item_id') || undef,
 			item_name => 'Invoice/TWCC69/22',
-			value_type => defined $intValueType ? $intValueType : undef,			
-			value_int => $page->field('max_med_improve_review') || undef,
-			value_intB => $page->field('impairment_rating_review') || undef,
+			value_type => defined $intValueType ? $intValueType : undef,
+			value_int => defined $maxMedImproveReview ? $maxMedImproveReview : undef,
+			value_intB => defined $impairRating ? $impairRating : undef,
 			_debug => 0
 	);
 
