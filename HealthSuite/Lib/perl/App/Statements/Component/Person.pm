@@ -36,62 +36,64 @@ $PUBLDEFN_CONTACTMETHOD_DEFAULT = {
 $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.account-notes' => {
-
-
-				sqlStmt => qq{
-					select  trans_owner_id, detail,trans_id,trans_type
-					from transaction
-					where trans_owner_id = :1 and
-					provider_id = :2 and
-					trans_status = 2 and
-					trans_type = $ACCOUNT_NOTES
+	sqlStmt => qq{
+		SELECT * FROM (
+			select to_char(trans_begin_stamp -:2, '$SQLSTMT_DEFAULTDATEFORMAT'), 
+				detail, trans_id, trans_type, provider_id
+			from transaction
+			where trans_owner_id = :1 
+				and trans_status = 2 
+				and trans_type = $ACCOUNT_NOTES
+			order by trans_id desc
+		)
+		WHERE ROWNUM < 11
+	},
+	sqlStmtBindParamDescr => ['Person ID for transaction table'],
+	publishDefn => {
+			columnDefn => [
+				{ head => 'Account Notes', dataFmt => '#&{?}# - by #4#<br/> <b>#1#</b>' },
+			],
+			bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#',
+			frame => {
+				addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes?home=#homeArl#',
+				editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 				},
-				sqlStmtBindParamDescr => ['Person ID for transaction table'],
-				publishDefn => {
-						columnDefn => [
-							{ head => 'Account Notes', dataFmt => '#&{?}#<br/><I>#1#</I>' },
-						],
-						bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#',
-						frame => {
-							addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes?home=#homeArl#',
-							editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-							},
-					},
-					publishDefn_panel =>
-					{
-						# automatically inherites columnDefn and other items from publishDefn
-						style => 'panel',
-						frame => { heading => 'Account Notes' },
-					},
-					publishDefn_panelTransp =>
-					{
-						# automatically inherites columnDefn and other items from publishDefn
-						style => 'panel.transparent',
-						inherit => 'panel',
-					},
-					publishDefn_panelEdit =>
-					{
-						# automatically inherites columnDefn and other items from publishDefn
-						style => 'panel.edit',
-						frame => { heading => 'Edit Account Notes' },
-						banner => {
-							actionRows =>
-							[
-								{	url => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#param.home#',
-									caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes/#param.person_id#?home=#param.home#'>Account Notes</A> },
-								},
-							],
-						},
-						stdIcons =>	{
-							updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#param.person_id#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#/#0#?home=#param.home#'
-						},
 		},
+		publishDefn_panel =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel',
+			frame => { heading => 'Account Notes' },
+		},
+		publishDefn_panelTransp =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel.transparent',
+			inherit => 'panel',
+		},
+		publishDefn_panelEdit =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel.edit',
+			frame => { heading => 'Edit Account Notes' },
+			banner => {
+				actionRows =>
+				[
+					{	#url => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#param.home#',
+						caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-account-notes/#param.person_id#?home=#param.home#'>Account Notes</A> },
+					},
+				],
+			},
+			stdIcons =>	{
+				updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#param.person_id#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#/#0#?home=#param.home#'
+			},
+},
 
-				publishComp_st => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId] ); },
-				publishComp_stp => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id');  $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panel'); },
-				publishComp_stpe => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelEdit'); },
-				publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelTransp'); },
-		},
+	publishComp_st => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')] ); },
+	publishComp_stp => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id');  $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId, $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
+},
 
 
 'person.group-account-notes' => {
@@ -991,52 +993,46 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.alerts' => {
 	sqlStmt => qq{
-			SELECT
-				t.caption,
-				detail,
-				trans_type,
-				trans_id,
-				trans_subtype,
-				(
-					SELECT
-					%simpleDate:value_dateEnd%
-					FROM person_attribute p
-					WHERE p.item_id = t.data_text_b
-					AND t.trans_type = 8040
-				) AS value_dateEnd,
-				(
-					SELECT
-					trans_type
-					FROM person_attribute p
-					WHERE p.item_id = t.data_text_b
-					AND t.trans_type = 8040
-				) AS type
-			FROM 	transaction t, alert_priority a
-			WHERE	trans_type between 8000 and 8999
-			AND	trans_owner_type = 0
-			AND 	trans_owner_id = ?
-			AND	trans_status = 2
-			AND     a.caption = t.trans_subtype
+		SELECT
+			t.caption,
+			detail,
+			trans_type,
+			trans_id,
+			trans_subtype,
+			%simpleDate:trans_end_stamp% as value_dateend,
+			(
+				SELECT
+				trans_type
+				FROM person_attribute p
+				WHERE p.item_id = t.data_text_b
+				AND t.trans_type = 8040
+			) AS type
+		FROM alert_priority a, transaction t
+		WHERE trans_type between 8000 and 8999
+			AND trans_owner_type = 0
+			AND trans_owner_id = :1
+			AND trans_status = 2
+			AND a.caption = t.trans_subtype
 			AND NOT EXISTS (
-									SELECT tt.trans_end_stamp
-									FROM	transaction tt, person_attribute pa
-									WHERE tt.trans_id = t.trans_id
-									AND   (tt.trans_end_stamp-sysdate) > 90
-									AND 	tt.data_text_b = pa.item_id
-									AND   tt.trans_type = 8040
-								)
-			ORDER BY a.id desc, trans_begin_stamp desc
-		},
+				SELECT tt.trans_end_stamp
+				FROM transaction tt, person_attribute pa
+				WHERE tt.trans_id = t.trans_id
+					AND tt.trans_end_stamp > sysdate + 90
+					AND tt.data_text_b = pa.item_id
+					AND tt.trans_type = 8040
+			)
+		ORDER BY a.id desc, trans_begin_stamp desc
+	},
 	sqlStmtBindParamDescr => ['Person ID for Transaction Table'],
 	publishDefn => {
 		columnDefn => [
-				{
-					colIdx => 6 ,
-					dataFmt => {
-						'8040' => '<b>#4#</b>: #0#<br/><I>#1# (Due Date: #5#)</I>',
-						'' => "<b>#4#</b>: #0#<br/><I>#1#</I>",
-					},
-				},
+		{
+			colIdx => 6 ,
+			dataFmt => {
+				'8040' => '<b>#4#</b>: #0#<br/><I>#1# (Due Date: #5#)</I>',
+				'' => "<b>#4#</b>: #0#<br/><I>#1#</I>",
+			},
+		},
 
 			#{ head => 'Alerts', dataFmt => '<b>#4#</b>: #0#<br/><I>#1# (Due Date:#5#)</I>' },
 		],
