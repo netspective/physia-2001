@@ -1034,38 +1034,37 @@ sub getHistoryHtml
 	my $historyCount = $claim->{historyCount};
 
 	my @rows = ();
-	foreach my $item (@{$allStatusHistory})
-	{
-		push(@rows, qq{
-			<TR VALIGN=TOP>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_date}</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_text}</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{cr_user_id}</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_textb}</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-			</TR>
-		});
-	}
-
-
-#	foreach my $idx (0..$historyCount-1)
+#	foreach my $item (@{$allStatusHistory})
 #	{
 #		push(@rows, qq{
 #			<TR VALIGN=TOP>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][0]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_date}</TD>
 #				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][1]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_text}</TD>
 #				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][3]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{cr_user_id}</TD>
 #				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
-#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][2]</TD>
+#				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$item->{value_textb}</TD>
 #				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
 #			</TR>
 #		});
 #	}
+
+
+	foreach my $idx (0..$historyCount-1)
+	{
+		push(@rows, qq{
+			<TR VALIGN=TOP>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][0]</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][1]</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][2]</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$historyItems->[$idx][3]</TD>
+			</TR>
+		});
+	}
 
 	return qq{
 		<TABLE border=0 CELLSPACING=0>
