@@ -33,7 +33,8 @@ sub new
 	$self->{champusSponsorGrade} = undef;
 	$self->{champusSponsorStatus} = undef;
 	$self->{billSequence} = undef;
-	
+	$self->{payerId} = undef; # envoy id for payer
+
 	
 	return bless $self, $type;
 }
@@ -44,6 +45,7 @@ sub property
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
 }
+
 
 sub getBillSequence
 {
@@ -137,7 +139,6 @@ sub setFilingIndicator
 sub getFilingIndicator
 {
 	my ($self) = @_;
-	
 	return $self->{filingIndicator};
 }
 
@@ -149,7 +150,7 @@ sub getBcbsPlanCode
 
 sub setBcbsPlanCode
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{bcbsPlanCode} = $value;
 }
 
@@ -161,7 +162,7 @@ sub getAmountPaid
 
 sub setAmountPaid
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{amountPaid} = $value;
 }
 
@@ -180,19 +181,19 @@ sub getAddress
 
 sub setName
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{name} = $value;
 }
 
 sub setAddress
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{address} = $value;
 }
 
 sub setId
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{id} = $value;
 }
 
@@ -205,26 +206,32 @@ sub getId
 sub getPayerId
 {
 	my $self = shift;
-	return $self->{id};
+	return $self->{payerId};
+}
+
+sub setPayerId
+{
+	my ($self, $value) = @_;
+	$self->{payerId} = $value;
 }
 
 sub setFirstName
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	
 	$self->{firstName} = $value;
 }
 
 sub setLastName
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	
 	$self->{lastName} = $value;
 }
 
 sub setMiddleInitial
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	
 	$self->{middleInitial} = $value;
 }
@@ -250,12 +257,22 @@ sub getMiddleInitial
 	return $self->{middleInitial};
 }
 
+sub printVal
+{
+	my ($self) = @_;
+	foreach my $key (keys(%$self))
+	{
+		print " payer $key = " . $self->{$key} . " \n";
+	}
+
+}
+
 @CHANGELOG =
 ( 
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'SSI','Billing Interface/Claim Patient','A new attribute amountpaid is added which will reflect the amount paid by the payer in claim.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI','Billing Interface/Claim Patient','A new attribute billSequence is added which will reflect the billing Sequence for the payer in claim.'],
-
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/22/2000', 'SSI','Billing Interface/Claim Patient','A new attribute payerId is added which will reflect the envoy Id for the payer in claim.'],
 );
 
 

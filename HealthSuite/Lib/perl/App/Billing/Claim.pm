@@ -933,7 +933,7 @@ sub setBillSeq
 {
 	my ($self,$value) = @_;
 
-	$self->{billSeq} = $value;
+	$self->{billSeq} = $value + 1;
 }
 
 sub setClaimType
@@ -1108,6 +1108,7 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/14/2000', 'SSI', 'Billing Interface/Main Claim Object','New field policy is added which returns 0-Primary, 1-Secondary, 1-Tertiary payers'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field transProviderId is added which reflect the transaction provider ID'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field billSeq is added which reflect the current submission order'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','1 is added to submission order to make it in proper bill sequence 1-4'],
 
 );
 

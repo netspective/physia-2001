@@ -267,7 +267,8 @@ sub populateOtherInsured
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
 		
-		if (($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName ) && ($insured2->getInsurancePlanOrProgramName ne ""))
+#		if (($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName ) && ($insured2->getInsurancePlanOrProgramName ne ""))
+		if (($insured2->getInsurancePlanOrProgramName ne ""))
 		{
 			$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
 			$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
@@ -283,7 +284,7 @@ sub populateOtherInsured
 		{
 			if (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
 			{
-#				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
+				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
 #				$data->{otherInsuredName} = "none";
 			}
 		}

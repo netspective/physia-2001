@@ -188,15 +188,6 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 
 }
 
-sub printVal
-{
-	my ($self) = @_;
-	foreach my $key (keys(%$self))
-	{
-		print " patient $key = " . $self->{$key} . " \n";
-	}
-
-}
 
 @CHANGELOG =
 ( 

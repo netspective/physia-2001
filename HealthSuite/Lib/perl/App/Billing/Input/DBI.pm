@@ -357,7 +357,7 @@ sub assignPatientInsurance
 		# do the execute statement
 		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
-		$claim->setProgramName($ins[$row[8]]);
+#		$claim->setProgramName($ins[$row[8]]);
 		$patient->setRelationshipToInsured($row[1]);
 		$insured = $claim->{insured}->[$claim->getClaimType];
 		$insured->setInsurancePlanOrProgramName($row[0]);
@@ -786,7 +786,6 @@ sub assignPolicy
 					"and invoice_billing.bill_sequence in (" . BILLSEQ_PRIMARY_PAYER . "," . BILLSEQ_SECONDARY_PAYER .
 					"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER .	")";
 	}
-
 	my $sth1 = $self->{dbiCon}->prepare(qq {$queryStatment});
 	my $sth;
 	my @row1;
@@ -805,7 +804,7 @@ sub assignPolicy
 				$payerAddress = $payer->getAddress();
 				$payer->setAmountPaid($row1[2]);
 				$payer->setBillSequence($row1[1]);
-				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE)
+				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE ) 
 				{
 					$insOrgId = $row1[0];
 					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_id = \'$insOrgId\'";
@@ -823,7 +822,7 @@ sub assignPolicy
 						'Champus Status' => [$payer, \&App::Billing::Claim::Payer::setChampusSponsorStatus, $colValText],
 						'Contact Method/Telepone/Primary' => [$payerAddress, \&App::Billing::Claim::Address::setTelephoneNo, $colValText],
 					};
-					if ($payer->getBillSequence())
+					if ($payer->getBillSequence() ne "")
 					{
 						$queryStatment = "select item_name, ia.value_text
 							from insurance ins, insurance_attribute ia, invoice_billing
@@ -898,6 +897,7 @@ sub assignPolicy
 				elsif ($row1[3] == BILL_PARTY_TYPE_PERSON)
 				{
 					my $pid = $row1[0];
+					
 					$queryStatment = "select complete_name from person where person_id = \'$pid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
@@ -926,12 +926,14 @@ sub assignPolicy
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
+
 					my $oid = $row1[0];
 					$queryStatment = "select name_primary , org_id  from org where org_id = \'$oid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
+			
 					$payer->setId($row[1]);
 					$payer->setName($row[0]);
 			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
@@ -1001,7 +1003,7 @@ sub assignInvoiceProperties
 	my $inputMap =
 	{
 		'Insurance/Primary/Type' => [ [$claim, $insured], [\&App::Billing::Claim::setProgramName,\&App::Billing::Claim::Insured::setTypeCode], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
-		'Insured/Personal/SSN'  => [$insured, [\&App::Billing::Claim::Person::setSsn, \&App::Billing::Claim::Person::setId] , [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
+		'Insured/Personal/SSN'  => [$insured, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
 		'Patient/Name/Last' => [$patient, [\&App::Billing::Claim::Person::setLastName, \&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Patient/Name/First' => [$patient, \&App::Billing::Claim::Person::setFirstName,  COLUMNINDEX_VALUE_TEXT],
 		'Patient/Name/Middle' => [$patient, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
@@ -1009,7 +1011,7 @@ sub assignInvoiceProperties
 		'Patient/Personal/DOD' => [$patient, \&App::Billing::Claim::Person::setDateOfDeath, COLUMNINDEX_VALUE_DATE],
 		'Patient/Death/Indicator' => [$patient, \&App::Billing::Claim::Person::setDeathIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Patient/Personal/Gender' => [$patient, \&App::Billing::Claim::Person::setSex, COLUMNINDEX_VALUE_TEXT],
-		'Insured/Name/Last'	=> [$insured, \&App::Billing::Claim::Person::setLastName, COLUMNINDEX_VALUE_TEXT],
+		'Insured/Name/Last'	=> [$insured, [\&App::Billing::Claim::Person::setLastName, \&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Insured/Name/First' => [$insured, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
 		'Insured/Name/Middle' => [$insured, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
 		'Insured/Contact/Home Phone' => [$insuredAddress, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
@@ -1371,15 +1373,14 @@ sub setProperPayer
 				my $payerName = $currentClaim->{insured}->[$ins]->getInsurancePlanOrProgramName();
 				$queryStatment = "select  id from ref_envoy_payer where name = \'$payerName\'";
 				$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
-
 				$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 				@tempRow = $sth->fetchrow_array();
-
+				$payer->setPayerId($tempRow[0]);
 				if ($payers->[$currentClaim->getClaimType] eq  $currentClaim->{payer})
 				{
-					$currentClaim->setPayerId(($tempRow[0]));
+					$currentClaim->setPayerId($tempRow[0]);
 				}
-				$payer->setName($payerName);
+#				$payer->setName($payerName);  # incase of 
 			}
 		}
 		elsif($tempRow[0] == CLAIM_TYPE_SELF)
