@@ -45,9 +45,9 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			product_name = ?
 		},
 	'selInsType' => qq{
-		select ins_type	
-		from insurance 
-		where ins_internal_id = ?	
+		select ins_type
+		from insurance
+		where ins_internal_id = ?
 		},
 	'selInsuranceSingleColumn' => qq{
 		SELECT ?
@@ -552,14 +552,16 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		FROM insurance
 		WHERE
 			product_name = ?
-			AND record_type = 1
+		AND owner_org_id = ?
+		AND record_type = 1
 		},
 	'selNewPlanExists' => qq{
 		SELECT plan_name
 		FROM insurance
 		WHERE
 			plan_name = ?
-			AND record_type = 2
+		AND owner_org_id = ?
+		AND record_type = 2
 		},
 
 	'selDoesProductExists' => qq{
