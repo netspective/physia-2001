@@ -281,18 +281,18 @@ sub isValid
 				}
 			}
 			
-			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
+#			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
+#			{
+#				if ((my $category = $self->{types}->[0]) ne 'Patient')
+#				{
+#					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
+#						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
+#						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
+#				}
+#			}
+			unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $value,$page->session('org_internal_id')))
 			{
-				if ((my $category = $self->{types}->[0]) ne 'Patient')
-				{
-					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
-						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
-						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
-				}
-			}
-			else
-			{
-				$self->invalidate($page, $invMsg);
+				$self->invalidate($page, $invMsg);				
 			}
 		}
 		else
@@ -326,7 +326,7 @@ sub new
 {
 	my ($type, %params) = @_;
 
-	$params{caption} = 'Complete Name<br>(last/first/middle/suffix)' unless $params{caption};
+	#$params{caption} = 'Complete Name<br>(last/first/middle/suffix)' unless $params{caption};
 	$params{options} = 0 unless exists $params{options};
 	$params{name} = 'person_id' unless $params{name};
 
