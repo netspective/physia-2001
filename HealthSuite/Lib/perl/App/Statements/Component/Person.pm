@@ -3887,9 +3887,16 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		WHERE document_attribute.value_text = :1
 			AND document.doc_spec_type = @{[ App::Universal::DOCSPEC_INTERNAL ]}
 			AND document.doc_id = document_attribute.parent_id
-			AND document_attribute.item_name IN ('To', 'CC')
+			AND document_attribute.item_name IN ('To', 'CC')			
 			AND document_attribute.value_int = 0
-		GROUP BY document.doc_spec_subtype
+			GROUP BY document.doc_spec_subtype			
+		union
+		SELECT '-1' as doc_spec_subtype,count (*)
+		FROM	observation
+		WHERE	observation.observer_org_id = :2
+		AND	observation.observer_id = :1
+		group by 1
+
 	},
 
 	publishDefn => {
@@ -3900,6 +3907,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					'0' => qq{<a href='/person/#param.person_id#/mailbox/internalMessages'>Internal Message</a>},
 					'1' => qq{<a href='/person/#param.person_id#/mailbox/phoneMessages'>Phone Message</a>},
 					'2' => qq{<a href='/person/#param.person_id#/mailbox/prescriptionRequests'>Prescription Approval Request</a>},
+					'-1' =>qq{<a href='/worklist/documents/labs'>Results</a>},
 				},
 			},
 			{
@@ -3911,7 +3919,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		style => 'panel',
 		frame => {
-			heading => 'Unread Messages Count',
+			heading => 'Work Lists',
 		},
 	},
 	publishDefn_panelTransp =>
@@ -3930,12 +3938,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		inherit => 'panel',
 	},
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelTransp'); },
-	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelStatic'); },
-	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelInDlg'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')], 'panelStatic'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId,$page->session('org_internal_id')], 'panelInDlg'); },
 },
 
 
