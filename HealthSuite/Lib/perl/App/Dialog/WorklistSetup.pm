@@ -6,6 +6,7 @@ use strict;
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
+use App::Component::WorkList;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
@@ -14,11 +15,10 @@ use App::Statements::Component::Scheduling;
 
 use Date::Manip;
 use Devel::ChangeLog;
-use constant NEXTACTION_COPYASNEW => "/schedule/template/add/,%field.template_id%";
-use vars qw(@ISA @CHANGELOG @ITEM_TYPES);
+
+use vars qw(@ISA @CHANGELOG);
 
 @ISA = qw(CGI::Dialog);
-@ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
 sub new
 {
@@ -48,6 +48,34 @@ sub new
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
 
+	my $patientSelOptions;
+	for my $key (reverse sort(keys %PATIENT_URLS))
+	{
+		#$patientSelOptions .= "$key:$PATIENT_URLS{$key}->{arl},";
+		$patientSelOptions .= "$key:$key,";
+	}
+	
+	my $physSelOptions;
+	for my $key (reverse sort(keys %PHYSICIAN_URLS))
+	{
+		#$physSelOptions .= "$key:$PHYSICIAN_URLS{$key}->{arl},";
+		$physSelOptions .= "$key:$key,";
+	}
+	
+	my $orgSelOptions;
+	for my $key (reverse sort(keys %ORG_URLS))
+	{
+		#$orgSelOptions .= "$key:$ORG_URLS{$key}->{arl},";
+		$orgSelOptions .= "$key:$key,";
+	}
+	
+	my $apptSelOptions;
+	for my $key (reverse sort(keys %APPT_URLS))
+	{
+		#$apptSelOptions .= "$key:$APPT_URLS{$key}->{arl},";
+		$apptSelOptions .= "$key:$key,";
+	}
+
 	$self->addContent(
 		new CGI::Dialog::Subhead(heading => 'Physicians'),
 		$resourcesField,
@@ -59,7 +87,7 @@ sub new
 			name => 'patientOnSelect',
 			caption => 'Patient',
 			choiceDelim =>',',
-			selOptions => "View Profile:1, View Account:2, Create Prescription:3",
+			selOptions => $patientSelOptions,
 			type => 'select',
 		),
 
@@ -67,7 +95,7 @@ sub new
 			name => 'physicianOnSelect',
 			caption => 'Physician',
 			choiceDelim =>',',
-			selOptions => "View Profile:1, View Schedule:2, Create Template:3",
+			selOptions => $physSelOptions,
 			type => 'select',
 		),
 
@@ -75,7 +103,7 @@ sub new
 			name => 'orgOnSelect',
 			caption => 'Organization',
 			choiceDelim =>',',
-			selOptions => "View Profile:1, Create Fee Schedule:2",
+			selOptions => $orgSelOptions,
 			type => 'select',
 		),
 
@@ -83,7 +111,7 @@ sub new
 			name => 'apptOnSelect',
 			caption => 'Appointment',
 			choiceDelim =>',',
-			selOptions => "Reschedule:1, Cancel:2, No-Show:3, Update:4",
+			selOptions => $apptSelOptions,
 			type => 'select',
 		),
 		
@@ -141,7 +169,23 @@ sub populateData
 	for my $itemType (@ITEM_TYPES)
 	{
 		my $name = $itemType . 'OnSelect';
-		$page->field($name, $page->session($name) || 1);
+
+		if ($page->session($name))
+		{
+			$page->field($name, $page->session($name));
+		}
+		else
+		{
+			my $itemName = 'Worklist/' . "\u$itemType" . '/OnSelect';
+			my $preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+				'selSchedulePreferences', $page->session('user_id'), $itemName);
+			
+			if (my $itemUrl = $preference->{resource_id})
+			{
+				$page->session($name, $itemUrl);
+				$page->field($name, $itemUrl);
+			}
+		}
 	}
 }
 
@@ -196,8 +240,10 @@ sub execute
 	for my $itemType (@ITEM_TYPES)
 	{
 		my $itemName = 'Worklist/' . "\u$itemType" . '/OnSelect';
-		my $preference = $self->readPreferences($page, $itemName, 0);
 
+		my $preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selSchedulePreferences', $userId, $itemName);
+			
 		my $itemID = $preference->{item_id};
 		my $command = (defined $itemID) ? 'update' : 'add';
 
@@ -208,7 +254,7 @@ sub execute
 			item_id     => $command eq 'add' ? undef : $itemID,
 			parent_id   => $userId,
 			item_name   => $itemName,
-			value_int   => $page->field($name),
+			value_text   => $page->field($name),
 		);
 		
 		$page->session($name, $page->field($name));
@@ -217,31 +263,15 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 }
 
-
-sub readPreferences
-{
-	my ($self, $page, $itemName, $multiple) = @_;
-
-	my $preference;
-	my $userID = $page->session('user_id');
-
-	if ($multiple) {
-		$preference = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'selSchedulePreferences', $userID, $itemName);
-	} else {
-		$preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selSchedulePreferences', $userID, $itemName);
-	}
-
-	return $preference;
-}
-
 use constant WORKLISTSETUP_DIALOG => 'Dialog/WorklistSetup';
 @CHANGELOG =
 (
 	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '04/21/2000', 'TVN',
 		WORKLISTSETUP_DIALOG,
 		'Added dialog for Worklist Setup.'],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '05/02/2000', 'TVN',
+		WORKLISTSETUP_DIALOG,
+		'Implement On-Select Preference for Worklist Setup.'],
 );
 
 1;

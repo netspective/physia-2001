@@ -14,10 +14,54 @@ use App::Statements::Person;
 use App::Statements::Scheduling;
 use App::Schedule::Utilities;
 use Data::Publish;
+use Exporter;
 
-use vars qw(@ISA @ITEM_TYPES);
-@ISA   = qw(CGI::Component);
+use vars qw(@ISA @ITEM_TYPES @EXPORT
+	%PATIENT_URLS
+	%PHYSICIAN_URLS
+	%ORG_URLS
+	%APPT_URLS
+	$patientDefault
+	$physicianDefault
+	$orgDefault
+	$apptDefault
+);
+
+@ISA   = qw(CGI::Component Exporter);
+
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
+
+%PATIENT_URLS = (
+	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
+	'View Chart' => {arl => '/person/itemValue/chart', title => 'View Chart'},
+	'View Account' => {arl => '/person/itemValue/account', title => 'View Account'},
+	'Make Appointment' => {arl => '/worklist/dlg-add-appointment/itemValue', title => 'Make Appointment'},
+);
+
+%PHYSICIAN_URLS = (
+	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
+	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
+	'Create Template' => {arl => '/worklist/dlg-add-template/itemValue', title => 'Create Schedule Template'},
+);
+
+%ORG_URLS = (
+	'View Profile' => {arl => '/org/itemValue/profile', title => 'View Profile'},
+	'View Fee Schedules' => {arl => '/org/itemValue/catalog', title => 'View Fee Schedules'},
+);
+
+%APPT_URLS = (
+	'Reschedule' => {arl => '/worklist/dlg-reschedule-appointment/itemValue', title => 'Reschedule Appointment'},
+	'Cancel' => {arl => '/worklist/dlg-cancel-appointment/itemValue', title => 'Cancel Appointment'},
+	'No-Show' => {arl => '/worklist/dlg-noshow-appointment/itemValue', title => 'No-Show Appointment'},
+	'Update' => {arl => '/worklist/dlg-update-appointment/itemValue', title => 'Update Appointment'},
+);
+
+$patientDefault = 'View Profile';
+$physicianDefault = 'View Profile';
+$orgDefault = 'View Profile';
+$apptDefault = 'Update';
+
+@EXPORT = qw(%PATIENT_URLS %PHYSICIAN_URLS %ORG_URLS %APPT_URLS @ITEM_TYPES);
 
 sub initialize
 {
@@ -59,8 +103,9 @@ sub initialize
 			my $preference = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 				'selSchedulePreferences', $page->session('user_id'), $itemName);
 			
-			$page->session($name, $preference->{column_no} || 1);
-			#$page->addDebugStmt("Read Preference for $name", $page->session($name));
+			my $defaultVar = $itemType. 'Default';
+			$page->session($name, $preference->{resource_id} || eval "\$$defaultVar");
+			$page->addDebugStmt("Read Preference for $name", $page->session($name));
 		}
 	}
 }
@@ -132,7 +177,7 @@ sub getComponentHtml
 		</style>
 	};
 
-	for (@$appts)
+	foreach (@$appts)
 	{
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
@@ -158,6 +203,20 @@ sub getComponentHtml
 		$copay = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page,
 			STMTMGRFLAG_NONE, 'sel_copayInfo', $_->{invoice_id}) if $_->{invoice_id};
 
+		my $patientHref = $PATIENT_URLS{$page->session('patientOnSelect')}->{arl};
+		$patientHref =~ s/itemValue/$_->{patient_id}/;
+		my $physicianHref = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{arl};
+		$physicianHref =~ s/itemValue/$_->{physician}/;
+		my $orgHref = $ORG_URLS{$page->session('orgOnSelect')}->{arl};
+		$orgHref =~ s/itemValue/$_->{facility}/;
+		my $apptHref = $APPT_URLS{$page->session('apptOnSelect')}->{arl};
+		$apptHref =~ s/itemValue/$_->{event_id}/;
+		
+		my $patientTitle = $PATIENT_URLS{$page->session('patientOnSelect')}->{title};
+		my $physicianTitle = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{title};
+		my $orgTitle = $ORG_URLS{$page->session('orgOnSelect')}->{title};
+		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
+		
 		my @rowData = (
 			qq{
 				<A HREF='/worklist/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'><IMG SRC='/resources/icons/square-lgray-hat-sm.gif' BORDER=0></A>
@@ -169,19 +228,18 @@ sub getComponentHtml
 
 			qq{
 				<nobr>
-				<A HREF='/person/$_->{patient_id}' TITLE='$_->{patient_id} profile' class=today>
+				<A HREF='$patientHref' TITLE='$patientTitle' class=today>
 				<b>$_->{patient}</b> ($_->{patient_type})</A>
 				</nobr>
 				<br>
 
-				<A HREF='/person/$_->{physician}' TITLE='$_->{physician} profile' class=today>
+				<A HREF='$physicianHref' TITLE='$physicianTitle' class=today>
 				$_->{physician}</A>
-				(<A HREF='/org/$_->{facility}' TITLE='$_->{facility} profile' class=today>$_->{facility}</A>)
+				(<A HREF='$orgHref' TITLE='$orgTitle' class=today>$_->{facility}</A>)
 			},
 
 			qq{
-				<A HREF='/worklist/dlg-update-appointment/$_->{event_id}'
-				TITLE='Update Appointment' class=today>
+				<A HREF='$apptHref' TITLE='$apptTitle' class=today>
 				@{[ formatStamp($_->{appointment_time}) ]}</A> <br>
 				<strong style="color:#999999">($_->{appt_type})</strong>
 			},
@@ -207,17 +265,17 @@ sub getComponentHtml
 
 			$_->{checkin_time} ? qq{<strong>$_->{checkin_time}</strong><br>
 				<strong title="Wait time in minutes" style="color:#999999">($waitMinutes)</strong>}:
-				qq{<a href='/worklist/dlg-add-checkin/$_->{event_id}' class=today>CheckIn</a>},
+				qq{<a href='/worklist/dlg-add-checkin/$_->{event_id}' TITLE='CheckIn $_->{patient_id}' class=today>CheckIn</a>},
 
 			$_->{checkin_time} ?
 				($_->{checkout_time} ? qq{<strong>$_->{checkout_time}</strong><br>
 				<strong title="Visit time in minutes" style="color:#999999">($visitMinutes)</strong>} :
-					qq{<a href='/worklist/dlg-add-checkout/$_->{event_id}' class=today>CheckOut</a>}
+					qq{<a href='/worklist/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>}
 				)
 				: undef ,
 
 			$_->{invoice_id} ? qq{
-				<a href='/invoice/$_->{invoice_id}' class=today><b>$_->{invoice_id}</b></a> <br>
+				<a href='/invoice/$_->{invoice_id}' TITLE='View Claim $_->{invoice_id} Summary' class=today><b>$_->{invoice_id}</b></a> <br>
 				<strong style="color:#999999">($_->{invoice_status})</strong>
 			}
 				#: qq{<a href='/create/invoice_id/$_->{patient_id}' class=today>Create</a>},
