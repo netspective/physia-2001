@@ -50,6 +50,22 @@
 			tie down various loose ends like hooking up to Statements and Billing Cycles.
 		</deliverable>
 
+		<deliverable id="932">
+			UI: The attendance component was added in the 'Associates' tab and 'Not Yet Implemented' message was added to it.
+		</deliverable>
+		
+		<deliverable id="943">
+			UI: Simple names now showing next to all person id fields where possible.
+		</deliverable>
+
+		<deliverable id="945">
+			UI: Physician license expiration report.
+		</deliverable>
+
+		<deliverable id="963">
+			UI: Made the license fields in the nurse dialog to be just text fields.
+		</deliverable>	
+
 		<deliverable id="964">
 			UI:  Added Person Simple Name to :
 			+ Collection Worklist dialogs: 
@@ -65,18 +81,6 @@
 			+ Daily Audit - Physician ID 
 			+ Invoices - Earning column Payer
 		</deliverable>
-		
-		<deliverable id="932">
-			UI: The attendance component was added in the 'Associates' tab and 'Not Yet Implemented' message was added to it.
-		</deliverable>
-		
-		<deliverable id="943">
-			UI: Simple names now showing next to all person id fields where possible.
-		</deliverable>
-
-		<deliverable id="963">
-			UI: Made the license fields in the nurse dialog to be just text fields.
-		</deliverable>	
 		
 		<deliverable id="1025">
 			UI: Added a Validation in the 'Certification' component and in the 'Add Physician' dialog for Specialty.
@@ -298,6 +302,10 @@
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
 		</deliverable>	
 		
+		<deliverable id="1598">
+			Fix invoice history item in DBI.pm
+		</deliverable>	
+
 		<deliverable id="1605">
 			Report : Changed daily monthly audit report to filter by service provider and bring back service provider instead of billing provider
 		</deliverable>			
@@ -348,6 +356,19 @@
 
 		<deliverable id="1645">
 			[UI] Corrected look of Add Account notes and reck date dialog from the collection worklist.  Also corrected query so collection items with a reck date do no appear until request reck date arrives
+		</deliverable>
+
+		<deliverable id="1649">
+			Hide NSF Format for Voided Items.
+		</deliverable>
+
+		<deliverable id="1650">
+			Superbill/appointment type mapping dialog.
+		</deliverable>
+
+		<deliverable id="1651">
+			Partially complete Superbill batch printing and report.  Individual printing of superbill
+			at checkin and from Patient Flow worklist functionality are coming later.
 		</deliverable>
 
 		<deliverable id="1655">
