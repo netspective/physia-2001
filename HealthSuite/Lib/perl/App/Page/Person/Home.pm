@@ -56,6 +56,7 @@ sub prepare_view
 				   #component.stpt-person.docPhone#<BR>
 				   #component.stpt-person.docRefill#<BR>
 				   #component.stpt-person.docResults#<BR>
+				   #component.stpt-person.clinical#<BR>
 			</TD>
 			<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 			<TD>
@@ -83,6 +84,7 @@ sub prepare_view
 					#component.stp-person.myAssociatedResourceAppointments#<BR>
 					#component.stp-person.myAssociatedResourceInPatients#<BR>
 					#component.stp-person.mySessionActivity#
+			</TD>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
