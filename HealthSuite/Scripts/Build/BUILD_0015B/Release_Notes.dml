@@ -9,6 +9,13 @@
 	</release-info>
 
 	<deliverables>
+
+
+		<deliverable id="1155">
+			Report : Modified view (table) that powers financial reports report to include NSF and  returned checks as 
+				 refund instead of write offs.  This change will impact financial Analysis report , 
+ 				 Daily Audit Recap report, Monthly Audit Recap and Revenue Collection report.
+		</deliverable>	
 	</deliverables>
 </release-notes>
 
