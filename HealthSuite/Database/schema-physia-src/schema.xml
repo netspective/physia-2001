@@ -165,7 +165,7 @@
 		<column name="start_time" type="time" descr="The start time"/>
 		<column name="end_time" type="time" descr="The end time"/>
 		<column name="available" type="boolean" required="yes" descr="Is this time block Available or Unavailable for scheduling events?"/>
-		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="facility_id" indexed="yes" lookupref="Org.org_internal_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
 		<column name="patient_types" type="text_set" size="16" abbrev="ptypes" descr="Limit this template to particular type of patient(s) -- should be one or more comma-separated items enums in Appt_Attendee_Type table"/>
 		<column name="visit_types" type="text_set" size="1024" abbrev="vtypes" descr="Limit this template to particular type of visit(s) -- should be one or more comma-separated Visit-Type items enums in Transaction_Type table"/>
 		<column name="days_of_month" type="text" size="255" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
