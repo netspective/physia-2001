@@ -930,6 +930,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B> $voidHtml</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>$item->{code}</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_allow") ]}'></TD>
@@ -950,6 +952,8 @@ sub getHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>CPT</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
