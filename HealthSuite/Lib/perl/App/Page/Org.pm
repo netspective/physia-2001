@@ -321,6 +321,12 @@ sub prepare_view_catalog
 
 	#$self->addLocatorLinks(['Catalog', 'catalog']);
 
+	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
+	for ($category)
+	{
+		/insurance/ and do {$category = 'insurance'; last};
+	}
+
 	my @pathItems = split('/', $self->param('arl'));
 	my $html;
 	my $viewMenu = [
@@ -334,7 +340,12 @@ sub prepare_view_catalog
 
 
 	#Show Fee Schedule Catalog
-	if ($self->param('catalog') eq "fee_schedule")
+	my $testOrg = $self->param('org_id');
+	if($self->param('catalog') eq "fee_schedule" && $category eq 'insurance')
+	{
+		$html .=qq{<CENTER>#component.stp-org.FSCatalogInsuranceSummary#  </CENTER>};
+	}
+	elsif ($self->param('catalog') eq "fee_schedule" && $category ne 'insurance')
 	{
 		$html .=qq{<CENTER>#component.stp-org.FSCatalogSummary#  </CENTER>};
 	}
