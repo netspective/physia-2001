@@ -90,6 +90,8 @@ B515 - Changed the 'Associated Physician' field in Nurse dialog to a checkbox in
 
 B470 - Print Patients Face Sheet from the Patient Flow Work List  
 
+[No Bug] - Updated the web server configuration to reduce memory usage and help performance
+
 
 
 
