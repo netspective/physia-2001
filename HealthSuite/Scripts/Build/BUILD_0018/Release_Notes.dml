@@ -451,5 +451,9 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 			Account for Standard/Daylight time when displaying Notes time.
 		</deliverable>
 
+		<deliverable id="1981">
+			Now showing label fields in refill dialog.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
