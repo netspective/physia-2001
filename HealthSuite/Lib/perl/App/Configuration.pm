@@ -285,7 +285,7 @@ sub getDefaultConfig
 	'db-pro_munir' => getDefaultConfig("Munir's Database", CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
 	'db-acs_test' => getDefaultConfig("ACS TEST Database", CONFIGGROUP_SWDEV, 'ACS_TEST/ACS@dbi:Oracle:SDEDBS04'),
 	'db-pro_fkm' => getDefaultConfig("ACS TEST Database", CONFIGGROUP_SWDEV, 'sde03/sde@dbi:Oracle:SDEDBS05'),
-	'db-test_build' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'demo02/demo@dbi:Oracle:SDEDBS04'),
+	'db-sde_backup' => getDefaultConfig('Backup Development Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS02'),
 
 	# New SUN Databases
 	'db-sun-pro01' => getDefaultConfig('SUN Production Configuration 01', CONFIGGROUP_PRO, 'pro01/pro@dbi:Oracle:PRO-DBS-A'),
