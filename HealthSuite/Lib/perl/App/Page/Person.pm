@@ -178,7 +178,6 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-postpersonalpayment">Apply Personal Payment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
 						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>
-						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
 					</SELECT>
 					</FONT>
 				<TD>
