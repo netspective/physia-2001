@@ -73,7 +73,7 @@
 		<column name="view_latest" type="stamp" required="yes" default="sysdate" descr="The date/time this record was most recently viewed"/>
 		<column name="view_scope" type="text" size="48" descr="This can be person, org, invoice, etc"/>
 		<column name="view_key" type="text" size="48" descr="The key for the record/thing that was the focus of the activity"/>
-		<column name="count" type="integer" descr="The number of times this same view_scope and view_key was viewed in this session"/>
+		<column name="view_count" type="integer" descr="The number of times this same view_scope and view_key was viewed in this session"/>
 		<column name="view_caption" type="text" size="255" descr="The caption to show to the user for this view-type"/>
 	</table>
 
