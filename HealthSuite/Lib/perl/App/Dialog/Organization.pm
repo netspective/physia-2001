@@ -290,6 +290,12 @@ sub initialize
 			selOptions => "Perse;THINet",
 			name   => 'clear_house'
 			),
+			
+			new CGI::Dialog::Field(
+			caption => 'Clearing House Billing ID',
+			type=>'text',
+			name   => 'clear_house_billing_id'
+			),
 		);
 	}
 
@@ -557,6 +563,7 @@ sub populateData
 		App::Universal::ATTRTYPE_TEXT
 	);
 	$page->field('clear_house', $clearHouseData->{value_text});
+	$page->field('clear_house_billing_id', $clearHouseData->{value_textB});
 	$page->field('clear_item_id', $clearHouseData->{item_id});
 
 	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
@@ -830,6 +837,7 @@ $page->schemaAction(
 			item_name =>  'Clearing House ID',
 			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => $page->field('clear_house') || undef,
+			value_textB => $page->field('clear_house_billing_id') || undef,
 			_debug => 0
 		)if $page->field('clear_house') ne '';
 
@@ -961,6 +969,7 @@ sub execute_update
 			item_name => 'Clearing House ID',
 			value_type => App::Universal::ATTRTYPE_TEXT,
 			value_text => $page->field('clear_house') || undef,
+			value_textB => $page->field('clear_house_billing_id') || undef,
 			_debug => 0
 		);
 
