@@ -109,6 +109,10 @@
 			The target build for this bug is 16, but was shipped in BUILD_15. This was reopened in BUILD_16. This bug was fixed 
 			after reopening but did not ship the changes to BUILD_15.
 		</deliverable>		
+		<deliverable id="1225">
+			Fixed a problem in the Hospital Claim dialog which was causing some claims to be duplicated and others to be
+			lost.
+		</deliverable>
 	
 	</deliverables>
 </release-notes>
