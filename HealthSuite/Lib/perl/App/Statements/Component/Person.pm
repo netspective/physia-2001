@@ -3015,6 +3015,406 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId], 'panelInDlg'); },
 },
 
+
+#----------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------Doc Short Term Stuff
+
+
+'person.linkNonMedicalSite'=>{
+	sqlStmt => qq{
+			SELECT  'CNN','News And Information','http://www.cnn.com',to_number(NULL) as item_id  FROM dual	
+			UNION 
+			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute 
+			WHERE 	parent_id = ?
+			AND	item_name = 'User/Link/NonMedical'						
+			},
+	publishDefn => {
+
+			columnDefn => [
+				{ dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>',},
+				{ dataFmt => '#1#',},
+				],
+				bullets => '/person/#param.person_id#/dlg-update-link-non-url/#3#',				
+			frame => {					
+					editUrl => '/person/#param.person_id#/dlg-add-link-non-url',				
+				},
+				
+			},
+	publishDefn_panel =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel',		
+				frame => { heading=>'Non Medical Sites', },
+			},
+	publishDefn_panelTransp =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.transparent.static',
+				inherit => 'panel',
+				frame => { heading=>'Non Meidical Sites', },				
+			},
+
+
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkNonMedicalSite', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkNonMedicalSite', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkNonMedicalSite', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkNonMedicalSite', [$personId], 'panelTransp'); },
+},
+
+'person.linkMedicalSite'=>{
+	sqlStmt => qq{
+			select 'PDR NET','Meidical Reference Information','http://physician.pdr.net/physician/index.htm',to_number(NULL) as item_id  FROM dual			
+			UNION 
+			SELECT 	value_text,value_textb,name_sort,item_id FROM person_attribute 
+			WHERE 	parent_id = ?
+			AND	item_name = 'User/Link/Medical'						
+			
+			},
+	publishDefn => {
+
+			columnDefn => [
+				{ dataFmt => '<A HREF="#2#" TARGET="NEWS">#0#</A>',},
+				{ dataFmt => '#1#',},				
+				],
+				bullets => '/person/#param.person_id#/dlg-update-link-med-url/#3#',				
+			frame => {					
+					editUrl => '/person/#param.person_id#/dlg-add-link-med-url',				
+				},				
+			},
+	publishDefn_panel =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel',		
+				frame => { heading=>'Medical Sites', },
+			},
+	publishDefn_panelTransp =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.transparent.static',
+				inherit => 'panel',
+				frame => { heading=>'Meidical Sites', },				
+			},
+
+
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.linkMedicalSite', [$personId], 'panelTransp'); },
+},
+	
+'person.docSign' => {
+	sqlStmt => qq{select 'NOT IMPLEMENTED' from dual
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => "<B>#0#</B>" },
+		],
+
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Signature Request' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Signature Request' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#param.home#'>Phone Message</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-refill-#2#/#0#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#2#/#0#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docSign', []); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docSign', [], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docSign', [], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docSign', [], 'panelTransp'); },
+},
+
+
+'person.inPatient' => {
+	sqlStmt => qq{
+			select trans_owner_id , related_data,caption,complete_name,consult_id FROM transaction,person			
+			WHERE trans_type = @{[App::Universal::TRANSTYPE_ADMISSION]}
+			AND	provider_id = :1
+			AND person.person_id = trans_owner_id
+		},
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
+
+			publishDefn => {
+				columnDefn => [
+					{ head=> 'Patient ', colIdx=>3, url => "/person/#0#/profile",hint=>"#3#",dAlign=>'left' ,hAlign=>'left'},
+					{ head=> 'Hospital Room', dataFmt=>"#1# (#2#)",dAlign=>'left',hAlign=>'left'},
+					{ head=> 'Attending MD',dataFmt=>"#4#", dAlign=>'left',hAlign=>'left'},										
+				],
+			},
+			publishDefn_panel =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.static',
+				flags => 0,			
+				frame => { heading => 'Inpatient'
+			},
+			},
+			publishDefn_panelTransp =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.transparent.static',
+				inherit => 'panel',
+			},
+
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panelTransp'); },
+},
+
+
+
+
+
+
+
+
+
+'person.docResults' => {
+	sqlStmt => qq{
+			select 	'Ms Cindy Crawford',to_char(sysdate,'Mon-DD'), 'Lab','CBC' ,'CCRAWFORD','Abnormal' FROM DUAL
+			UNION
+			select 	'GEORGE SCHMIDT' ,to_char(sysdate,'Mon-DD'),'X-Ray','Chest-Xray', 'GSCHMIDT','Normal'  FROM DUAL
+		},
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => qq{<A HREF='javascript:alert("NOT IMPLEMENTED")' >#0#</A>: (#1#) #3#  <B>#5#</B>}, },
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Results' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Results' },
+
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docResults', []); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docResults', [], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docResults', [], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docResults', [], 'panelTransp'); },
+},
+
+
+
+
+
+'person.docPhone' => {
+	sqlStmt => qq{
+
+                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b,  consult_id,complete_name
+                                from  Transaction,person
+                        where   trans_owner_id = ?
+                        and caption = 'Phone Message'
+                        and data_num_a is not null
+                        and trans_status = 5
+                        and person.person_id = consult_id
+		},
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => qq{<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#' >#10#</A>: (#6#): #7# }, },
+		],
+		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#homeArl#',
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Phone Message' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Phone Message' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-phone-message?_f_person_called=#param.person_id#&home=#param.home#'>Phone Message</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-refill-#2#/#0#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#2#/#0#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docPhone', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docPhone', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docPhone', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docPhone', [$personId], 'panelTransp'); },
+},
+
+
+
+
+'person.docRefill' => {
+	sqlStmt => qq{
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
+					provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b,  processor_id, receiver_id,
+					person.complete_name
+				from  Transaction,person
+			where  	trans_owner_id = ?
+			and caption = 'Refill Request'
+                        and data_num_a is null
+                        and processor_id = person_id
+                        union
+                        select  	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
+                        		provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b,  processor_id, receiver_id,
+                        		person.complete_name
+                                from  Transaction, person
+                        where   trans_owner_id = ?
+                        and caption = 'Refill Request'
+                        and data_num_a is not null
+                        and processor_id = person_id
+                        and trans_status = 6
+		},
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table', 'Person ID for Transaction Table'],
+
+	publishDefn =>
+	{
+
+		columnDefn => [
+				{ dataFmt =>qq{<A HREF = '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#'> #11#</A> : (#6#) #7# (#3#)}, },
+				],
+		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=#homeArl#',				
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Refill Request' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Refill Request' },
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docRefill', [$personId,$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docRefill', [$personId,$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docRefill', [$personId,$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.docRefill', [$personId,$personId], 'panelTransp'); },
+},
+
+
+
+
+
+
+
+
+
+'person.scheduleAppts' =>{	
+
+			sqlStmt => qq{SELECT p.person_id,to_char(e.start_time, 'hh:miam') as start_time,a.caption,e.subject as visit,
+			org_id,p.complete_name
+			FROM	person p, event e, event_attribute ePhy, org,appt_status a
+			WHERE	e.event_id = ePhy.parent_id
+			AND	ePhy.item_name = 'Appointment'
+			AND	ePhy.value_textB = :1			
+			AND     p.person_id = ePhy.VALUE_TEXT
+			AND	org.org_internal_id (+) = facility_id
+			AND	(to_char(e.start_time,'MM/DD/YYYY') = :2 or to_char(e.start_time,'MM/DD/YYYY') != :2)
+			AND      a.id = e.event_status
+			},
+			sqlStmtBindParamDescr => ['Person ID for transaction table'],
+
+			publishDefn => {
+				columnDefn => [
+					{ head=> 'Patient', colIdx=>5,hAlign=>'left',url => "/person/#0#/profile"},
+					{ head=> 'Appointment Time', hAlign => 'left' , },
+					{ head=>'Status' ,hAlign => 'left'},
+					{ head=> 'Reason For Visit',hAlign => 'left' },
+					{ head=> 'Facility' },
+					
+				],
+			},
+			publishDefn_panel =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.static',
+				flags => 0,			
+				frame => { heading => qq{ Date : <INPUT size=10	 NAME="_f_x"  value="#param.timeDate#" >   <A HREF="javascript:showCalendar(_f_x);"><img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>Appointments } },
+			},
+			publishDefn_panelTransp =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.transparent.static',
+				inherit => 'panel',
+			},
+
+
+			publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')] ); },
+			publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panel'); },
+			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelEdit'); },
+			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelTransp'); },
+
+	},	
+
+	
+
+#----------------------------------------------------Doc Short Term Stuff	
+#----------------------------------------------------------------------------------------------------------------------
+
 );
 
 1;
