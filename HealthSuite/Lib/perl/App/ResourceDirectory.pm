@@ -450,7 +450,19 @@ sub buildAccessControl
 				}
 				if ($type eq 'dlg')
 				{
-					push @{$data{$type}}, $gen->permission({id => $1}, @{$data{sub}}, @{$data{views}}, @{$data{modes}});
+					if (exists $RESOURCES{$key}{_modes})
+					{
+						my @modes = ();
+						foreach my $mode (@{$RESOURCES{$key}{_modes}})
+						{
+							push @modes, $gen->permission({id => $mode});
+						}
+						push @{$data{$type}}, $gen->permission({id => $1}, @modes);
+					}
+					else
+					{
+						push @{$data{$type}}, $gen->permission({id => $1}, @{$data{modes}});
+					}
 				}
 				else
 				{
