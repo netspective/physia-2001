@@ -11,6 +11,7 @@ use App::Data::Obtain::RBRVS::RVU;
 use App::Data::Obtain::RBRVS::GPCI;
 use App::Data::Obtain::EPSDT::EPSDT;
 use App::Data::Obtain::TXgulf::FeeSchedules;
+use App::Data::Obtain::EPSDT::CodeServType;
 
 use File::Path;
 use FindBin qw($Bin);
@@ -75,8 +76,46 @@ sub Main
 	importGPCIInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 	importRVUInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 	importEPSDTInfo($properties, transformDBI => 1) if grep(/epsdt/, @modules);	
+	importCodeServTypeInfo($properties, transformDBI => 1) if grep(/codeserv/, @modules);	
 	importTXGULFfs($properties, transformDBI => 1) if grep(/tgcmgfs/, @modules);
 }
+
+sub importCodeServTypeInfo
+{
+
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::EPSDT::CodeServType;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "Starting\n";
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFile => File::Spec->catfile($properties->{dataSrcEPSDTPath}, 'code_mapping.xls'));
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_Code_Service_Type cascade//Delete from REF_Code_Service_Type cascade.",
+			insertStmt => "insert into REF_Code_Service_Type
+				(CODE_MIN,CODE_MAX, ENTRY_TYPE,SERVICE_TYPE)
+			values (?,?,?, ?)",
+			verifyCountStmt => "select count(*) from REF_CODE_SERVICE_TYPE",
+		);
+		$exporter->printErrors();
+	}
+
+
+}
+
 
 sub importEPSDTInfo
 {
