@@ -92,7 +92,6 @@ sub getSupplementaryHtml
 					<TD>
 						#component.stpt-person.miscNotes#<BR>
 						<font size=1 face=arial>
-						#component.stpt-person.phoneMessage#<BR>
 						#component.stpt-person.refillRequest#<BR>
 						#component.stpt-person.benefits#</BR>
 						#component.stpt-person.additionalData#<BR>

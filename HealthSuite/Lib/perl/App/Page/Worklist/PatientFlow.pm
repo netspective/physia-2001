@@ -61,7 +61,6 @@ sub prepare_view_date
 				</TD>
 				<TD>&nbsp;</TD>
 				<TD>
-					#component.stp-person.phoneMessage#<BR>
 					#component.stp-person.refillRequest#<BR>
 				</TD>
 			</TR>
