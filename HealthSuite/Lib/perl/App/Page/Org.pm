@@ -58,8 +58,10 @@ sub initialize
 
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
 	my $orgAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Business Hours');
+	my $orgClearHouseAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Clearing House ID');
 	$self->property('org_type', split(/,/, $self->property('org_category')));
 	$self->property('org_hrs_oper', $orgAttr->{'value_text'});
+	$self->property('org_clear_house', $orgClearHouseAttr->{'value_text'});
 	#my $x = $test->{'value_text'};
 	#$self->addDebugStmt("TEST : $x ");
 
@@ -155,6 +157,8 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
 	$profileLine .=  '&nbsp;Hours of Operation: #property.org_hrs_oper# #property.org_time_zone#' if $self->property('org_hrs_oper');
+	$profileLine .=  '&nbsp;Clearing House ID: #property.org_clear_house# ' if $self->property('org_clear_house');
+
 
 	my $chooseAction = '';
 	$chooseAction = qq{
@@ -270,6 +274,7 @@ sub prepare_view_profile
 					#component.stpt-org.feeschedules#<BR>
 					#component.stpt-org.miscNotes#<BR>
 					#component.stpt-org.listAssociatedOrgs#<BR>
+					#component.stpt-org.closingDateInfo#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=60%>
