@@ -606,6 +606,12 @@
 				<col name="remarks">This type is created when voiding an invoice or claim</col>
 			</row>
 			<row>
+				<col name="id">9030</col>
+				<col name="caption">Payment</col>
+				<col name="group_name">Action</col>
+				<col name="remarks">This type is created when a payment is being collected</col>
+			</row>
+			<row>
 				<col name="id">9500</col>
 				<col name="caption">Account Notes</col>
 				<col name="group_name">Account Collection</col>
