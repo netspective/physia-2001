@@ -223,15 +223,15 @@ sub isValid
 		
 		if($modifier ne '')
 		{
-			if($modifier =~ m/^(\d+)$/)
-		 	{
+			#if($modifier =~ m/^(\d+)$/)
+		 	#{
 				# $1 is the check to see if it is an integer
-				$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier is not valid. Please verify") unless $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericModifierCodeId', $1);
-			}
-		 	else
-		 	{
-				$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier should be an integer. Please verify");
-		 	}
+				$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier is not valid. Please verify.") unless $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericModifierCodeId', $modifier);
+			#}
+		 	#else
+		 	#{
+			#	$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier should be an integer. Please verify");
+		 	#}
 		}
 
 		my @actualDiagCodes = ();
