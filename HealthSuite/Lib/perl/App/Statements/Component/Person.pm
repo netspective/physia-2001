@@ -2361,6 +2361,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					where parent_id = :4
 						and item_name = 'WorkList'
 						and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
+						and parent_org_id = :5
 				)
 			)
 			and aat.id = ea.value_int
@@ -2415,7 +2416,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
-				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId]);
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId, $orgId]);
 		},
 	publishComp_stp =>
 		sub {
@@ -2425,7 +2426,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
-				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panel');
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId, $orgId], 'panel');
 		},
 	publishComp_stpe =>
 		sub {
@@ -2434,7 +2435,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
-				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panelEdit');
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId, $orgId], 'panelEdit');
 		},
 	publishComp_stpt =>
 		sub {
@@ -2443,7 +2444,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
 			my $orgId ||= $page->session('org_internal_id');
 			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
-				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panelTransp');
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId, $orgId], 'panelTransp');
 		},
 },
 
