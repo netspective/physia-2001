@@ -20,7 +20,7 @@ use App::Billing::Universal;
 sub new
 {
 	my ($type,%params) = @_;
-		
+
 	return bless \%params,$type;
 }
 
@@ -29,59 +29,59 @@ sub processFile
 	my ($self,%params) = @_;
 	my $strRef;
 	my $batchWiseClaimsCollection;
-		
+
 	# get claims from Claims collection and put it in claims array
 	my $tempClaims = $params{claimList}->getClaim();
-	
-			
+
+
 	$self->{batches} = [];
 	$self->{batchesIndex}= 0;
 	$self->{nsfBatchObjs} = [];
 	$self->{nsfBatchObjsIndex} = 0;
 	$self->{batchWiseClaims} = [];
-	$self->{batchWiseClaimsIndex} = 0;	
-	
-	$self->{fileServiceLineCount} = 0;	
-	$self->{fileRecordCount} = 0;	
-	$self->{fileClaimCount} = 0;	
-	$self->{batchCount} = 0;	
+	$self->{batchWiseClaimsIndex} = 0;
+
+	$self->{fileServiceLineCount} = 0;
+	$self->{fileRecordCount} = 0;
+	$self->{fileClaimCount} = 0;
+	$self->{batchCount} = 0;
 	$self->{fileTotalCharges} = 0;
-	$self->{batchSequenceNo} = 0;	
-	
-	$self->{nsfType} = $params{nsfType};	
+	$self->{batchSequenceNo} = 0;
+
+	$self->{nsfType} = $params{nsfType};
 	$self->{payerType} = $params{payerType};
-	
-	
+
+
 	 $self->makeBatches($tempClaims);
 	 $self->makeSelectedClaimsList($tempClaims);
-			
+
 	 my $confData = $self->readFile($tempClaims);
-	
+
 
 	# preparing the File header
 	$self->prepareFileHeader($confData, $tempClaims,$params{outArray}, $params{payerType});
 
 	# reference of claims collection array in which each collection represent a batch
 	 my $tempBatchList =   $self->{batchWiseClaims};
-	
-	
+
+
 	 $self->{nsfBatchObjs} = new App::Billing::Output::File::Batch::THIN();
 
 
-	# taking out collection of claims one by one		
-	
+	# taking out collection of claims one by one
+
 	 for $batchWiseClaimsCollection (0..$#$tempBatchList)
 	{
-	
+
 		$self->{nsfBatchObjs}->processBatch(batchSequenceNo => $self->generateBatchSequenceNo(),claimList => $tempBatchList->[$batchWiseClaimsCollection], outArray => $params{outArray}, nsfType => $params{nsfType}, payerType => $params{payerType});
-		$self->{fileServiceLineCount} +=	$self->{nsfBatchObjs}->{batchServiceLineCount}; 
+		$self->{fileServiceLineCount} +=	$self->{nsfBatchObjs}->{batchServiceLineCount};
 		$self->{fileRecordCount} += $self->{nsfBatchObjs}->{batchRecorCount};
 		$self->{fileClaimCount} += $self->{nsfBatchObjs}->{batchClaimCount};
 		$self->{batchCount}++;
 		$self->{fileTotalCharges} += $self->{nsfBatchObjs}->{batchTotalCharges};
 	} # end of for loop
 
-	
+
 	# preparing File Trailer
 	$self->prepareFileTrailer($confData, $tempClaims,$params{outArray}, $params{payerType});
 
@@ -99,7 +99,7 @@ sub generateBatchSequenceNo
 sub prepareFileHeader
 {
 	my ($self, $confData, $tempClaims, $outArray, $payerType) = @_;
-	
+
 	$self->{fileHeaderObj} = new App::Billing::Output::File::Header::THIN;
 	push(@$outArray,$self->{fileHeaderObj}->formatData($confData,$self,'0',$tempClaims, $payerType));
 }
@@ -107,10 +107,10 @@ sub prepareFileHeader
 # responsible to create file trailer object and getting formatted string of record
 sub prepareFileTrailer
 {
-	my ($self,$confData, $tempClaims,$outArray, $payerType) = @_;	
-		
+	my ($self,$confData, $tempClaims,$outArray, $payerType) = @_;
+
 	$self->{fileTrailerObj} =  new App::Billing::Output::File::Trailer::THIN;
-	push(@$outArray,$self->{fileTrailerObj}->formatData($confData,$self,{RECORDFLAGS_NONE => 0}, $tempClaims, $payerType)); 
+	push(@$outArray,$self->{fileTrailerObj}->formatData($confData,$self,{RECORDFLAGS_NONE => 0}, $tempClaims, $payerType));
 }
 
 # this method will search all the claims and make an array and each element contains
@@ -122,57 +122,57 @@ sub makeBatches
 	my ($self,$claims) = @_;
 	my ($providerID,$claimValue);
 
-   
+
     # Following two collections are being made for making sperate bathes for specific payers
     #
 
 	for $claimValue (0..$#$claims)
 	{
     	$providerID = $claims->[$claimValue]->{payToOrganization}->getFederalTaxId();
-			
+
 			$providerID =~ s/ //g;
 			if ($providerID eq '')
 			{
 				$providerID = 'BLANK';
 			}
-		
+
 			# add it in array without duplication
-			if ($self->checkForDuplicate($providerID) eq 0) 
+			if ($self->checkForDuplicate($providerID) eq 0)
 			{
 				$self->{batches}->[$self->{batchesIndex}++] = $providerID;
 			}
-	
+
 	} # end of claims list loop
-		
-	
+
+
 }
 
 
-# this method will create collections of selected claims according to their 
+# this method will create collections of selected claims according to their
 # respective batches
 # it will accept Claims list which is same passed to processFile
 sub makeSelectedClaimsList
 {
 	my ($self,$claims) = @_;
 	my ($batchValue,$claim,$selectedClaims,$providerID, $counter);
-	
+
 	# get reference of batches array
 	my $tempBatches = $self->{batches};
 	# fetch each element i.e. claim from claims array one by one
-	
+
 		#my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
-	
+
 	# Following lines will add batches which were made on the basis of medicare, medicaid etc.
 		#foreach my $payerKey(keys %{$self->{payerClaimsBatch}})
 		#{
 	   	#if($self->{payerClaimsBatch}->{$payerKey}->getStatistics()->{count} > 0)
 	   	#{
 	   	 	# $self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $self->{payerClaimsBatch}->{$payerKey};
-	   	#}	
-		
-		#}	
-	
-	# if due to non-existence of ProviederID batches does not exist then  
+	   	#}
+
+		#}
+
+	# if due to non-existence of ProviederID batches does not exist then
 	# put them in one collection
 	if ($#$tempBatches == -1)
 	{
@@ -183,19 +183,19 @@ sub makeSelectedClaimsList
 		foreach $claim (@$claims)
 		{
 			my $payerId = $claim->{payToOrganization}->getFederalTaxId();
-			
-			# if particular payer id does not exist then add that claim into 
-			# a seperate claims collection 
+
+			# if particular payer id does not exist then add that claim into
+			# a seperate claims collection
 			if (!(grep{$_ eq $payerId} @{$self->{batches}}))
 			{
 				$selectedClaims->addClaim($claim);
 			}
 
 		}
-			
+
 		# when list of selected claims is complete add its reference in array
 		$self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $selectedClaims;
-	}		
+	}
 	else
 	{
 		# if batches exist then
@@ -210,28 +210,28 @@ sub makeSelectedClaimsList
 			{
 					$counter++;
 					$providerID = $claim->{payToOrganization}->getFederalTaxId();
-					
+
 					$providerID =~ s/ //g;
 					if ($providerID eq "")
 					{
 						$providerID = 'BLANK';
 					}
-					
+
 					if ($providerID eq $batchValue)
 					{
 						# if it is then add that claim in selected list
 						$selectedClaims->addClaim($claim);
 					}
-										
+
 			}	# end of loop of claims
-			
+
 			# when list of selected claims is complete add its reference in array
 			$self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $selectedClaims;
-			
+
 		} # loop back to create another selected claims list and store it in array
-	
+
 	}
-	
+
 }
 
 sub numToStr
@@ -257,19 +257,19 @@ sub checkForDuplicate
 			return	1;
 		}
 	}
-	
+
 	return 0;
 }
 
 sub readFile
 {
-    
-    my ($self, $tempClaims) = @_;   
+
+    my ($self, $tempClaims) = @_;
 	#my ($hash,$value,$key,$tempSerial);
 	my $params1 = {};
-	
+
 	#$params1->{RECEIVER_ID} = '13305';
-	$params1->{SUBMITTER_ID} = '13305';
+	$params1->{SUBMITTER_ID} = 'S03135';
 	$params1->{SUBMISSION_SERIAL_NO} = '000001';
 	$params1->{SUBMITTER_NAME} = 'PHYSIA';
 	$params1->{ADDRESS_1} = 'PHYSIA CORPORATION';
@@ -295,42 +295,42 @@ sub readFile
 	#while ($abc ne '')
 	#{
 	#	$abc = (<CONF>);
-	
+
 	#	chop $abc;
 	#	($hash,$value) = split(/=/,$abc);
 	#		$params1->{$hash} = $value;
 
 	#}
 	#close(CONF);
-	
+
 	#open(CONFNEW,">conf.txt");
 
 	#foreach $key (keys %$params1)
 	#{
-			
+
 	#	if ($key ne '')
 	#	{
 	#		if($key eq 'SUBMISSION_SERIAL_NO')
 	#		{
 	#			$tempSerial = $params1->{$key} + 1;
 	#			print CONFNEW "$key=$tempSerial\n";
-				
+
 	#		}
 	#		else
 	#		{
-	#			print CONFNEW "$key=$params1->{$key}\n";	
+	#			print CONFNEW "$key=$params1->{$key}\n";
 	#		}
 	#	}
-	
+
 	 #}
 
 	# close(CONFNEW);
 
-	
+
 	#open(VALID,">>valid.txt");
 	#print VALID $self->getDate,",",$params1->{SUBMISSION_SERIAL_NO},"\n";
 	#close(VALID);
-		
+
 	return $params1;
 }
 
