@@ -13,20 +13,30 @@ use base qw(CGI::Dialog::Field);
 sub new
 {
 	my ($type, %params) = @_;
-
+	
+	$params{caption} = 'Organization ID' unless $params{caption};
 	$params{name} = 'org_id' unless $params{name};
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
 	$params{type} = 'identifier' unless exists $params{type};
 	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 16 unless exists $params{maxLength};
-	unless($params{mainOrg})
-	{
-		$params{findPopup} = '/lookup/org/id' unless $params{findPopup};
-	}
+	$params{findPopup} = '/lookup/org/id' unless defined $params{findPopup};
 	return CGI::Dialog::Field::new($type, %params);
 }
 
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $flags = $self->{flags};
+	if ($flags & FLDFLAG_READONLY)
+	{
+		$self->{postHtml} = '' if $self->{postHtml};
+	}
+	my $html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags);
+	return $html;
+}
 
 sub isValid
 {
@@ -91,6 +101,7 @@ package App::Dialog::Field::Organization::ID::New;
 use strict;
 use DBI::StatementManager;
 use App::Statements::Org;
+use CGI::Validator::Field;
 use base qw(App::Dialog::Field::Organization::ID);
 
 
@@ -98,7 +109,8 @@ sub new
 {
 	my ($type, %params) = @_;
 
-	$params{findPopup} = '/lookup/org/id' unless $params{findPopup};
+	$params{findPopup} = '' unless $params{findPopup};
+	$params{postHtml} = "&nbsp;<a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>" unless $params{findPopup};
 	return App::Dialog::Field::Organization::ID::new($type, %params);
 }
 
@@ -125,6 +137,14 @@ use App::Statements::Org;
 use base qw(App::Dialog::Field::Organization::ID);
 
 
+sub new
+{
+	my ($type, %params) = @_;
+
+	return App::Dialog::Field::Organization::ID::new($type, %params);
+}
+
+
 sub isValidOrgId
 {
 	my ($self, $page, $value) = @_;
@@ -137,13 +157,7 @@ sub isValidOrgId
 		$self->invalidate($page, qq{
 			$self->{caption} '$value' does not exist.<br>
 			<img src="/resources/icons/arrow_right_red.gif">
-			Add '$value' Organization now as a:
-			<a href="${pre}main${post}">Main</a>,
-			<a href="${pre}dept${post}">Dept</a>,
-			<a href="${pre}provider${post}">Provider</a>,
-			<a href="${pre}insurance${post}">Insurance</a>,
-			<a href="${pre}employer${post}">Employer</a>, or
-			<a href="${pre}ipa${post}">IPA</a>
+			<a href="${pre}main${post}">Add Main Organization '$value' now?</a>
 		});
 		return 0;
 	}
@@ -165,8 +179,17 @@ package App::Dialog::Field::Organization::ID::Main::New;
 use strict;
 use DBI::StatementManager;
 use App::Statements::Org;
+use CGI::Validator::Field;
 use base qw(App::Dialog::Field::Organization::ID::Main);
 
+sub new
+{
+	my ($type, %params) = @_;
+
+	$params{findPopup} = '' unless $params{findPopup};
+	$params{postHtml} = "&nbsp;<a href=\"javascript:doActionPopup('/lookup/org');\">Lookup organizations</a>" unless $params{findPopup};
+	return App::Dialog::Field::Organization::ID::Main::new($type, %params);
+}
 
 sub isValidOrgIdAdd
 {
