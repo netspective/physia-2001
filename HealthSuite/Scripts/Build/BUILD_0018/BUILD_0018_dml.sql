@@ -58,7 +58,8 @@ insert into Offering_Catalog_Type (id, caption) values (5, 'Lab Test');
 
 --bug 1843
 
-insert into Org_Type (id, caption, group_name) values (12, 'Lab', 'Lab');
+insert into Org_Type (id, caption, group_name) values (12, 'Ancillary Service', 'ancillary-service');
+
 
 
 --bug 1652
@@ -69,6 +70,10 @@ update adjust_method set caption = 'Reverse Transfer Balance to Next Payer' wher
 update adjust_method set caption = 'Reverse Payment Transfer' where id = 6;
 update invoice_item_adjust set adjustment_type = 7 where data_num_a = 1;
 
+
+--bug 1906
+
+insert into Org_Type (id, caption, group_name) values (13, 'Pharmacy', 'provider');
 
 
 commit;
