@@ -128,9 +128,9 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 										'16' => 'Void #13#'
 									},
 				},
-				{ head => 'Provider of Service', dataFmt => '#15#' },
-				{ head => 'Billing Provide', dataFmt => '#16#' },
-				{ head => 'Service Org', dataFmt => '#18#' },
+				{ head => 'Provider of Service', dAlign => 'CENTER', dataFmt => '#15#' },
+				{ head => 'Billing Provider', dAlign => 'CENTER', dataFmt => '#16#' },
+				{ head => 'Service Org', dAlign => 'CENTER', dataFmt => '#18#' },
 				{ head => 'Payer', colIdx => 11, dataFmt => {
 										'0'  => '#4#',
 										'1'  => '#4#',
