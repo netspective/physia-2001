@@ -384,6 +384,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			AND	con.org_internal_id = :2
 			AND	ocp.internal_contract_id (+)= :1
 			AND	ocp.entry_id (+) = oce.entry_id
+			order by modifier, code
 			},
 	sqlvar_entityName => 'Contract_Catalog',
 	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
@@ -1439,7 +1440,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishDefn_panel =>
 	{
 		style => 'panel.transparent.static',
-		frame => { 
+		frame => {
 			heading => 'Superbill Catalog',
 			addUrl => '/org/#param.org_id#/superbills?action=new',
 		},
@@ -1502,7 +1503,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				org.owner_org_id = :2 AND
 				insurance.record_type in (1, 2) AND
 				insurance.ins_type = claim_type.id AND
-				insurance.ins_org_id = org.org_internal_id				
+				insurance.ins_org_id = org.org_internal_id
 			ORDER BY
 				insurance.product_name,
 				insurance.plan_name
