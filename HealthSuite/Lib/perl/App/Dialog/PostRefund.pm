@@ -81,7 +81,7 @@ sub execute
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		my $refundAmt = 0 - $page->param("_f_invoice_$line\_refund");
-		next if $refundAmt eq '';
+		next if $refundAmt == 0;
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
 
 		my $invoiceBalance = $page->param("_f_invoice_$line\_invoice_balance");
