@@ -820,7 +820,7 @@ $page->schemaAction(
 		)if $page->field('contact_phone') ne '';
 
 	saveAttribute($page, 'Org_Attribute', $orgIntId, 'Medicare GPCI Location', 0,
-		value_text => $page->field('medicare_gpci'),
+		value_text => $page->field('medicare_gpci') ||undef,
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
 
