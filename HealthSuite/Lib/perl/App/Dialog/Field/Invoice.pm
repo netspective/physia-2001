@@ -420,10 +420,10 @@ sub getHtml
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonZeroBalanceInvoicesByClient', $personId, $sessOrgIntId);
+	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonVoidedInvoicesByClient', $personId, $sessOrgIntId);
 	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId, $sessOrgIntId);
 	my $totalPossibleRefund = $totalPatientBalance * (-1);
-	#Removed on 8/9/00 because we want to show all invoices with a non-zero balance, not just credit invoices - MAF
+	#Removed on 8/9/00 because we want to show all invoices (excluding voided ones) - MAF
 	#my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? "(Amount refunded cannot exceed \$$totalPossibleRefund)" : "(There is no credit on this patient's balance)";
 	my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? '' : "(There is no credit on this patient's balance)";
 
