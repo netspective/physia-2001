@@ -1131,8 +1131,9 @@ sub constant
 {
 	my ($self, $name) = @_;
 	
-	no strict 'refs';
-	return &{"App::Universal::$name"} || "Constant '$name' not found!";
+	no strict 'refs';	
+	return defined &{"App::Universal::$name"} ? &{"App::Universal::$name"} : "Constant '$name' not found!";
+
 }
 
 
