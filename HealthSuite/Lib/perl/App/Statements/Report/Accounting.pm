@@ -214,6 +214,81 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	},
 
 
+
+	'sel_providerreceiptTotal'=>
+	{	sqlStmt=>
+		qq{
+			SELECT	max('ALL') as provider,
+				ic.payer_type,
+				max('ALL') as payer_id,
+				pm.caption as pay_type,
+				sum(nvl(insurance_pay,0)+nvl(person_pay,0)) as year_rcpt,
+				sum(decode(
+					   trunc(ic.invoice_date,'MM'),
+					    trunc(to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM'),
+				     		(nvl(insurance_pay,0)+nvl(person_pay,0)),
+				     	 0)
+				     ) as month_rcpt,
+				sum(decode(
+						ic.invoice_date,
+						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
+							(nvl(insurance_pay,0)+nvl(person_pay,0)),
+					 0)
+				     ) as batch_rcpt
+			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	ic.invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	ic.payer_type is not null
+			AND	ic.owner_org_id = :6
+			AND	p.person_id (+)= ic.provider
+			AND	iia.adjustment_id  (+) = ic.adjustment_id
+			AND	pm.id (+)= iia.pay_method
+			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			GROUP BY  pm.caption,
+				ic.payer_type,	
+				ic.pay_type
+			UNION
+			SELECT	max('ALL') provider,
+				max(-1) as payer_type,
+				max('ALL') as payer_id,
+				max('Check') as pay_type,
+				sum(nvl(unit_cost,0)) as year_rcpt,
+				sum(decode(
+					   trunc(value_date,'MM'),
+					    trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+				     		(nvl(unit_cost,0)),
+				     	 0)
+				     ) as month_rcpt,
+				sum(decode(
+					   value_date,
+					    to_date(:5,'MM/DD/YYYY'),
+				     		(nvl(unit_cost,0)),
+				     	 0)
+				     ) as batch_rcpt
+			FROM 	transaction t,trans_attribute  ta,person p
+			WHERE	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = $PAYMENT
+			AND	trans_status =$FILLED
+			AND	(:1 IS NULL OR  provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	provider_id is not null
+			AND	p.person_id (+)= t.provider_id
+			GROUP BY 'ALL' 				
+			ORDER BY 1,3,4,5
+
+		},
+	},
+
+
+
+
+
 	'sel_providerreceipt2' =>
 	{
 		sqlStmt=>
