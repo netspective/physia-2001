@@ -331,4 +331,9 @@
 		<enum>Personal Coverage (optional child of insurance plan)</enum>
 	</table>
 
+	<table name="Transmission_Status" abbrev="TrnmSts" type="Enumeration">
+		<enum>Transmitted</enum>
+		<enum>Acknowledged</enum>
+	</table>
+
 </schema>
