@@ -108,7 +108,7 @@ sub addPopup_as_html
 	my $dialogName = $dialog->formName();
 	my $fieldName = $page->fieldPName($self->{name});
 
-	if(my $arl = $self->{addPopup})
+	if(my $arl = $self->{addPopup} && $self->{addPopup} !~ /none/i)
 	{
 		my $controlField = 'null';
 		$controlField = $self->{addPopupControlField} if $self->{addPopupControlField};
@@ -129,7 +129,7 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags, $mainData) = @_;
 	my $flags = $self->{flags};
-	
+
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
 	{
 		if($flags & FLDFLAG_CUSTOMDRAW)
@@ -141,11 +141,11 @@ sub getHtml
 			return qq{@{[ $flags & FLDFLAG_REQUIRED ? "<b>$self->{caption}</b>" : $self->{caption} ]}: $mainData<br>};
 		}
 	}
-	
+
 	my $readOnly = ($flags & FLDFLAG_READONLY);
 	$mainData ||= '';
 	my $html = '';
-	
+
 	my $errorMsgsHtml = '';
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
@@ -159,7 +159,7 @@ sub getHtml
 
 	delete $self->{postHtml} if ($self->{flags} & FLDFLAG_READONLY);
 	#$mainData = qq{<span style="border: 2px; border-style: inset;">$mainData</span>} if $readOnly;
-	
+
 	if($self->{flags} & FLDFLAG_CUSTOMDRAW)
 	{
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
@@ -374,7 +374,7 @@ sub memo_as_html
 	my $value = $page->field($self->{name});
 	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 	my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
-	
+
 	if ($readOnly)
 	{
 		$value =~ s/\n/<br>/g;
@@ -385,7 +385,7 @@ sub memo_as_html
 	{
 		$value = "<textarea name='$fieldName' cols=$self->{cols} rows=$self->{rows} wrap='$self->{wrap}' $required>$value</textarea>";
 	}
-	
+
 	return $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
 }
 
@@ -584,7 +584,8 @@ sub parseChoices
 		my ($choice, $value) = split(/$self->{valueDelim}/);
 		$value = $choice unless defined $value;
 
-		my $choiceStruct = [0, $choice, $value];
+		my $choiceStruct = [0, App::Data::Manipulate::trim($choice),
+			App::Data::Manipulate::trim($value)];
 		$self->checkChoiceValueSelected($page, $choiceStruct);
 		push(@{$choices}, $choiceStruct);
 	}
@@ -699,7 +700,7 @@ sub select_as_html
 				$caption = "<NOBR>$caption</NOBR> " if $self->{flags} & FLDFLAG_NOBRCAPTION;
 				#$caption = '<span style="">' . $caption . '&nbsp;</span>';
 			}
-			
+
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{$caption<select name="$fieldName" size="$self->{size}" $JS $multiple>\n$options</select>\n});
 		}
 	}
@@ -1517,7 +1518,7 @@ sub new
 sub addActionButtons
 {
 	my $self = shift;
-	
+
 	foreach my $action (@_)
 	{
 		die 'Action must be a reference to a hash' unless ref($action) eq 'HASH';
@@ -1530,7 +1531,7 @@ sub addActionButtons
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
-	
+
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISHANDHELD))
 	{
 		return qq{
@@ -1544,13 +1545,13 @@ sub getHtml
 			{caption => 'OK', onClick => 'if (validateOnSubmit()) document.forms.dialog.submit()'},
 		];
 	}
-	
+
 	my $home = $page->param('home');
 	my $cancelURL = defined $home ? "document.location = '$home'" : 'javascript:history.back()';
 	$cancelURL = "document.location = '$self->{cancelUrl}'" if defined $self->{cancelUrl};
 	$cancelURL = 'javascript:window.close()' if $page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	unless (defined $self->{noCancelButton} || $self->{noCancelButton} || 
+	unless (defined $self->{noCancelButton} || $self->{noCancelButton} ||
 		$self->{addedCancelButton})
 	{
 		push @{$self->{actions}}, {caption => 'Cancel', onClick => $cancelURL};
@@ -1559,15 +1560,15 @@ sub getHtml
 
 	my $tableCols = $dialog->{_tableCols};
 	my $rowColor = '';
-	
-	
+
+
 	my @nextActions = ();
 	if(my $actionsList = ($self->{"nextActions_$command"} || $self->{nextActions}))
 	{
 		my $activeAction = $page->param(NEXTACTION_PARAMNAME);
 		foreach(@$actionsList)
 		{
-			my $replaceData = $page->replaceVars($_->[1]);			
+			my $replaceData = $page->replaceVars($_->[1]);
 			push(@nextActions, qq{ <OPTION VALUE="$_->[1]" @{[ $activeAction ? ($activeAction eq $replaceData ? ' SELECTED' : '') : ($_->[2] ? ' SELECTED' : '') ]}>$_->[0]</OPTION> });
 		}
 	}
@@ -1583,14 +1584,14 @@ sub getHtml
 	#my $fieldName = $page->fieldPName('OK');
 	#my $okButton =qq{<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">};
 	#$okButton = qq{<a href="$cancelURL"><img src="/resources/widgets/ok_btn.gif" border=0></a>}if $dialog->{viewOnly};
-	
+
 	my @buttons = ();
 	foreach my $action (@{$self->{actions}})
 	{
 		push @buttons, $self->getButtonHtml(%$action);
 	}
-	
-	
+
+
 	return qq{
 		<tr><td colspan=$tableCols><font size=1>&nbsp;</font></td></tr>
 		<tr valign=center bgcolor=$rowColor>
@@ -1615,7 +1616,7 @@ sub getHtml
 sub getButtonHtml
 {
 	my ($self, %options) = @_;
-	
+
 	my $label = defined $options{caption} ? $options{caption} : 'No Caption';
 
 	my $onClick = '';
@@ -1884,7 +1885,7 @@ sub new
 			captionAlign => 'left',
 			errorsHeading => 'Please review',
 			id => $class,
-			viewOnly=>0,			
+			viewOnly=>0,
 		};
 
 	$properties->{formName} = 'dialog' unless $params{formName};
@@ -1972,17 +1973,17 @@ sub setDialogViewOnly
 {
 	my ($self,$flags)  = @_;
 	my $contentList = $self->{content};
-	
+
 	#Change all fields on dialog to readonly
 	foreach(@$contentList)
 	{
 		my $field = $_;
-		$field->setFlag(FLDFLAG_READONLY);		
-	}	
-	
+		$field->setFlag(FLDFLAG_READONLY);
+	}
+
 	#Set dialog to viewonly mode
-	$self->{viewOnly}=1;	
-	
+	$self->{viewOnly}=1;
+
 	#Remove Add/Update part of caption from Heading
 	$self->{heading}=~s/[Update|add|Add|update]//;
 }
@@ -2017,7 +2018,7 @@ sub clearFieldFlags
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 
 	foreach(@{$self->{content}})
 	{
@@ -2252,7 +2253,7 @@ sub handlePostExecute
 		);
 		return 1;
 	}
-	
+
 	my $url = defined $specificRedirect ? $specificRedirect : ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page) || $page->param('home'));
 	$url = $page->replaceRedirectVars($url);
 	if (defined $message)
@@ -2261,7 +2262,7 @@ sub handlePostExecute
 	}
 	else
 	{
-		
+
 		if($specificRedirect)
 		{
 			$page->redirect($specificRedirect);
@@ -2446,7 +2447,7 @@ sub getHtml
 		};
 	}
 
-	
+
 	if($isHandHeld)
 	{
 		my @dlgHouskeepingHiddens = ();
@@ -2459,7 +2460,7 @@ sub getHtml
 		my $formAction = "/";
 		$formAction .= $page->param('_isPopup') ? $page->param('arl_asPopup') : $page->param('arl');
 		$formAction =~ s/\?.*$//;
-		
+
 		foreach (@{$self->{_header}})
 		{
 			$html .= $_->getHtml($page, $self, $command, $flags);
@@ -2473,20 +2474,20 @@ sub getHtml
 		{
 			$html .= $_->getHtml($page, $self, $command, $flags);
 		}
-		
+
 		my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
 		push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$execModeFieldName" value="$newExecMode">});
-		
+
 		return qq{
 			<form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post">
-			@dlgHouskeepingHiddens 
+			@dlgHouskeepingHiddens
 			$errorsHtml
 			$html
-			</form>		
+			</form>
 		}
-	}	
-	
-	my $dialogName = $self->formName();	
+	}
+
+	my $dialogName = $self->formName();
 	my $cols = $self->{columns};
 	my @fieldsInfoJS = ("dialogFields['$dialogName'] = {};", "var dlg_$dialogName\_fields = dialogFields['$dialogName'];");
 	$self->populateFieldInfoJS($self->{content}, \@fieldsInfoJS);
