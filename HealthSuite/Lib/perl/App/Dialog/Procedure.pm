@@ -480,6 +480,14 @@ sub copyInvoice
 		_debug => 0
 	);
 
+	#update the patient control number attribute
+	my $patientControlNo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $newInvoiceId, 'Patient/Control Number');
+	$page->schemaAction(
+		'Invoice_Attribute', 'update',
+		item_id => $patientControlNo->{item_id},
+		value_text => $newInvoiceId,
+		_debug => 0
+	);
 
 	#add new history attributes
 	$page->schemaAction(
