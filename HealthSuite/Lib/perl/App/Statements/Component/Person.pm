@@ -267,6 +267,113 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 #----------------------------------------------------------------------------------------------------------------------
 
+#OLD WAY
+#	{SELECT
+#		oc.catalog_id,
+#		count(oce.entry_id) entries_count,
+#		oc.caption,
+#		oc.description,
+#		oc.parent_catalog_id,
+#		oc.internal_catalog_id,
+#		'Add',
+#		DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+#	FROM    person_attribute pa,
+#		ofcatalog_Attribute oc_a,
+#		offering_catalog oc,
+#		offering_catalog_entry oce
+#	WHERE   pa.parent_id = :1
+#	AND	pa.item_name = 'Fee Schedules'
+#	AND	pa.item_type = 0
+#	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
+#	AND	pa.value_int = oc.internal_catalog_id 
+#	AND	oce.catalog_id (+) = oc.internal_catalog_id
+#	AND 	oc_a.parent_id (+) = oc.internal_catalog_id 
+#	GROUP BY
+#		oc.catalog_id,
+#		oc.internal_catalog_id,
+#		oc.caption,
+#		oc.description,
+#		oc.parent_catalog_id ,
+#		oc_a.value_int
+#	ORDER BY
+#		oc.catalog_id
+#	
+#	},
+
+'person.feeschedules'=>
+{
+	sqlStmt =>qq
+	{SELECT	oc.catalog_id,
+		oc.caption,
+		oc.description,
+		oc.internal_catalog_id,
+		pa.item_id
+	FROM    person_attribute pa,
+		offering_catalog oc
+	WHERE   pa.parent_id = :1
+	AND	pa.item_name = 'Fee Schedules'
+	AND	pa.item_type = 0
+	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
+	AND	pa.value_int = oc.internal_catalog_id 
+	ORDER BY oc.catalog_id
+	},
+	sqlvar_entityName => 'Person',
+	sqlStmtBindParamDescr => ['Person ID for Fee Schedules'],
+	publishDefn => 
+	{
+		frame => 
+		{
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-feeschedule-person?home=#homeArl#',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},   
+		columnDefn => 
+			[								
+			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#session.org_id#/catalog/#3#/#0#>#0#</A>'  },			
+			{colIdx => 1,  dAlign => 'left'},
+			],
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-feeschedule-person/#4#?home=#homeArl#',
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => {
+			heading => 'Associated Fee Schedules',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Associated Fee Schedule' },
+		banner => 
+		{
+			actionRows =>
+			[
+			{ caption => qq{ Add <A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-feeschedule-person?home=#param.home#'>Associated Fee Schedules</A> }, url => 'x', },
+			],
+		},
+		stdIcons =>	
+		{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-feeschedule-person/#4#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-feeschedule-person/#4#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panelEdit'); },			
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
 'person.addresses' => {
 	sqlStmt => $SQLSTMT_ADDRESSES,
 	sqlvar_entityName => 'Person',
