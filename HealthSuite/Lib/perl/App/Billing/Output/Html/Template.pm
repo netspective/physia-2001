@@ -311,7 +311,7 @@ sub populatePhysician
 
 	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
-	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
+	$data->{physicianFederalTaxId} = $physician->getFederalTaxId eq "" ? $physician->getTaxId : $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
 	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne '' ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";

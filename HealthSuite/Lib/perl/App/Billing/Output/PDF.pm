@@ -2613,8 +2613,8 @@ sub box25ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-
-	pdflib::PDF_show_xy($p , $claim->{payToOrganization}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
+	
+	pdflib::PDF_show_xy($p , $claim->{payToOrganization}->getFederalTaxId eq "" ?  $claim->{payToOrganization}->getTaxId : $claim->{payToOrganization}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
 	my $temp = {
 			'S' => $box25X + CELL_PADDING_X + 112.5 + CHECKED_BOX_X,
 			'E' => $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X,

@@ -2059,6 +2059,10 @@ sub assignInvoiceAddresses
 	my $payer3Address = $objects->[13]->getAddress;
 	my $insured4Address = $objects->[15]->getAddress;
 	my $payer4Address = $objects->[14]->getAddress;
+	my $insured1EmployerAddress = $objects->[2]->getEmployerAddress;
+	my $insured2EmployerAddress = $objects->[10]->getEmployerAddress;
+	my $insured3EmployerAddress = $objects->[11]->getEmployerAddress;
+	my $insured4EmployerAddress = $objects->[15]->getEmployerAddress;
 	my $thirdPartyTypeAddress = $currentClaim->{payer}->getAddress;
 	my @methods = (\&App::Billing::Claim::Address::setAddress1,\&App::Billing::Claim::Address::setAddress2,\&App::Billing::Claim::Address::setCity,\&App::Billing::Claim::Address::setState,\&App::Billing::Claim::Address::setZipCode,\&App::Billing::Claim::Address::setCountry);
 	my @bindColumns = (COLUMNINDEX_ADDRESS1,COLUMNINDEX_ADDRESS2,COLUMNINDEX_CITY,COLUMNINDEX_STATE,COLUMNINDEX_ZIPCODE,COLUMNINDEX_COUNTRY);
@@ -2070,6 +2074,10 @@ sub assignInvoiceAddresses
 		 BILLSEQ_SECONDARY_CAPTION . ' Insured' => [$insured2Address],
 		 BILLSEQ_TERTIARY_CAPTION . ' Insured' => [$insured3Address],
 		 BILLSEQ_QUATERNARY_CAPTION . ' Insured' => [$insured4Address],
+	 	 BILLSEQ_PRIMARY_CAPTION . ' Insured Employer' => [$insured1EmployerAddress],
+		 BILLSEQ_SECONDARY_CAPTION . ' Insured Employer' => [$insured2EmployerAddress],
+		 BILLSEQ_TERTIARY_CAPTION . ' Insured Employer' => [$insured3EmployerAddress],
+		 BILLSEQ_QUATERNARY_CAPTION . ' Insured Employer' => [$insured4EmployerAddress],
 		'Patient' => [$patientAddress],
 		'Service' => [$renderingOrganizationAddress],
 		'Pay To Org' => [$payToOrganizationAddress],

@@ -59,17 +59,17 @@ sub populateInsured
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
 
-	$data->{insuredName} = $claim->{insured}->[0]->getEmployerOrSchoolName;
-	my $dataA = $claim->{insured}->[0]->getEmployerAddress;
+	$data->{insuredName} = $claim->{insured}->[$claimType]->getEmployerOrSchoolName;
+	my $dataA = $insured->getEmployerAddress;
 	$data->{insuredAddressCity} = $dataA->getCity;
 	$data->{insuredAddressState} = $dataA->getState;
 	$data->{insuredAddressTelephone} = $dataA->getTelephoneNo;
 	$data->{insuredAddressZipCode} = $dataA->getZipCode;
 	$data->{insuredAddress} = $dataA->getAddress1 . " " . $dataA->getAddress2;
 #	$data->{insuredId} = $claim->{careReceiver}->getSsn();
-	$data->{insuredId} = $claim->{insured}->[0]->getSsn();
-#	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
-	$data->{insuredPolicyGroupName} = "N/A";
+	$data->{insuredId} = $insured->getSsn();
+	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
+#	$data->{insuredPolicyGroupName} = "N/A";
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
 	$data->{insuredAnotherHealthBenefitPlanN} =  "Checked" ;
 	my $payer = $claim->{payer};
@@ -92,9 +92,9 @@ sub populatePhysician
 
 	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
-	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
+	$data->{physicianFederalTaxId} = $physician->getFederalTaxId eq "" ? $physician->getTaxId : $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
-	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne '' ? "Checked" : "";
+	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne "" ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
 #	$data->{physicianPin} = $physician->getPIN;
 #	$data->{physicianGrp} = $physician->getGRP;

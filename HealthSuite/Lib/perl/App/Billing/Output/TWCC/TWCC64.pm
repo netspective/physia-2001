@@ -972,6 +972,20 @@ sub boxTopData
 				'y' => $y - 15
 			};
 	$report->drawText($p, $properties);
+	my $claimType = $claim->getClaimType();
+	my $insured = $claim->{insured}->[$claimType];
+
+	$properties =
+			{
+				'text' => $insured->getPolicyGroupOrFECANo,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + 20,
+				'y' => $y - 6
+			};
+
+	$report->drawText($p, $properties);
+	
 }
 
 sub box1Data
@@ -1112,7 +1126,7 @@ sub box9Data
 
 	$properties =
 			{
-				'text' => $claim->{insured}->[0]->getSsn,
+				'text' => $claim->{insured}->[$claim->getClaimType]->getSsn,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1127,7 +1141,7 @@ sub box10Data
 
 	$properties =
 			{
-				'text' => $claim->{insured}->[0]->getEmployerOrSchoolName,
+				'text' => $claim->{insured}->[$claim->getClaimType]->getEmployerOrSchoolName,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1142,7 +1156,7 @@ sub box11Data
 
 	$properties =
 			{
-				'text' => $claim->{insured}->[0]->{employerAddress}->getAddress1,
+				'text' => $claim->{insured}->[$claim->getClaimType]->{employerAddress}->getAddress1,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1200,7 +1214,7 @@ sub boxEmployeeCityData
 sub boxEmployerCityData
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	my $employerAddress = $claim->{insured}->[0]->getEmployerAddress;
+	my $employerAddress = $claim->{insured}->[$claim->getClaimType]->getEmployerAddress;
 
 	$properties =
 			{

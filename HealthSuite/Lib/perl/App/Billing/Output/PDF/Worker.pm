@@ -126,8 +126,9 @@ sub box1aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-#	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getSsn() : $claim->{insured}->[$claimType]->getSsn();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[0]->getSsn() : $claim->{insured}->[$claimType]->getSsn();
+	my $insured = $claim->{insured}->[$claimType];
+#	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $insured->getSsn() : $claim->{insured}->[$claimType]->getSsn();
+	my $data = $insured->getSsn();
 	pdflib::PDF_show_xy($p , $data , $box1aX + CELL_PADDING_X + DATA_PADDING_X, $box1Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
@@ -173,7 +174,7 @@ sub box4ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[0]->getEmployerOrSchoolName : $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
+	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[$claimType]->getEmployerOrSchoolName : $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
 	pdflib::PDF_show_xy($p, $data , $box4X + CELL_PADDING_X + DATA_PADDING_X, $box4Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
@@ -244,14 +245,16 @@ sub box11ClaimData
 	my $box11Cordinates = $cordinates->{box9};
 	my $box11Y = $box11Cordinates->[1];
 	my $box11X = $box11Cordinates->[0] + STARTX_BOX1A_SPACE;
+	my $claimType = $claim->getClaimType();
+	my $insured = $claim->{insured}->[$claimType];
+
 
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-#	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p , "N/A", $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+	pdflib::PDF_show_xy($p , $insured->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+#	pdflib::PDF_show_xy($p , "N/A", $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_stroke($p);
-
 }
 
 
