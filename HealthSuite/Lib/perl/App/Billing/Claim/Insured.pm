@@ -20,7 +20,7 @@ sub new
 {
 	my ($type) = shift;
 	my $self = new App::Billing::Claim::Person(@_);
-	
+
 	$self->{relationshipToPatient} = undef;
 	$self->{policyGroupName} = undef;
 	$self->{policyGroupOrFECANo} = undef;
@@ -35,6 +35,7 @@ sub new
 	$self->{billSequence} = undef;
 	$self->{bcbsPlanCode} = undef;
 	$self->{memberNumber} = undef;
+	$self->{medigapNo} = undef;
 
 	return bless $self, $type;
 }
@@ -49,6 +50,18 @@ sub setMemberNumber
 {
 	my ($self, $value) = @_;
 	$self->{memberNumber} = $value;
+}
+
+sub getMedigapNo
+{
+	my ($self) = @_;
+	return $self->{medigapNo};
+}
+
+sub setMedigapNo
+{
+	my ($self, $value) = @_;
+	$self->{medigapNo} = $value;
 }
 
 
@@ -98,15 +111,15 @@ sub setTerminationDate
 sub getRelationshipToPatient
 {
 	my ($self) = @_;
-	
+
 	return (($self->{relationshipToPatient} eq "") ? DEFAULT_RELATION_SHIP_TO_PATIENT : $self->{relationshipToPatient});
 }
 
 sub setRelationshipToPatient
 {
 	my ($self, $value) = @_;
-	my $temp = 
-		{ 
+	my $temp =
+		{
 			'0' => '01',
 			'10' => '02',
 			'12' => '03',
@@ -120,7 +133,7 @@ sub setRelationshipToPatient
 			'PARENT' => '11',
 			'EMPLOYER' => '99',
 		};
-	
+
 	$self->{relationshipToPatient} = $temp->{uc($value)};
 }
 
@@ -249,21 +262,21 @@ sub setBcbsPlanCode
 }
 
 
-sub getBcbsPlanCode	
+sub getBcbsPlanCode
 {
 	my $self = shift;
 	return $self->{bcbsPlanCode};
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute relationshipToPatient is added to reflect the insured relation to patient.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute acceptAssignment is added to reflect the Assignment of Benefit for the insured.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/18/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute billSequence added to reflect the sequence of insured for the bill.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/01/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute BCBSPlanCode is added to reflect the BCBSP plan Code of insured.'],
-	
+
 );
 
 1;
