@@ -241,6 +241,25 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	},
 
 
+	#----EPSDT QUERIES
+
+	'selGenericEPSDT_LikeCode' => q{
+		select epsdt, name, description
+		from ref_epsdt
+		where epsdt like upper(?)
+	},
+	'selGenericEPSDT_LikeText' => q{
+		select epsdt, name, description
+		from ref_epsdt
+		where (name like ? or description like ?)
+	},
+	'selGenericEPSDTCode' => q{
+		select epsdt, name, description
+		from ref_epsdt
+		where epsdt = upper(?)
+	},
+
+
 	#----ICD QUERIES
 
 	'selGenericICD_LikeCode' => q{
