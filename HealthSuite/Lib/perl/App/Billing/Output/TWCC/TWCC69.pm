@@ -1390,7 +1390,7 @@ sub box17Data
 {	
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	my $tmp = $claim->{treatment}->getMaximumImprovement();
-	my $textX = "x"  if $tmp ne ""; 
+	my $textX = "x"; # if ($tmp == 0 or $tmp == 1); 
 	my $arrTmp = [27,54];
 	my $arrDateX = [80,310];
 	my $arrDateY = [34,53];
@@ -1485,8 +1485,7 @@ sub box22Data
 	
 	my $arrtmp = [280,15];
 	my $t1 = $claim->{treatment}->getMaximumImprovementAgreement;
-	my $textX = "x" if $t1 ne "";
-	
+	my $textX = "x"; # if ($t1 == 0 or $t1 == 1);
 	my $properties =
 	{
 		'text' => $textX,
@@ -1498,7 +1497,7 @@ sub box22Data
 	$report->drawText($p, $properties);
 
 	my $t2 = $claim->{treatment}->getImpairmentRatingAgreement;
-	my $textX2 = "x" if $t1 ne "";
+	my $textX2 = "x";  # if ($t2 == 0 or $t2 == 1);
 
 	$properties =
 	{
