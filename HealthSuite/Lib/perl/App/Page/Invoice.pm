@@ -509,7 +509,7 @@ sub getProceduresHtml
 
 
 	#INVOICE TOTALS
-	my $invoiceTotal = $claim->{totalCharge};
+	my $invoiceTotal = $claim->{totalInvoiceCharges};
 	$invoiceTotal = $formatter->format_price($invoiceTotal);
 
 	my $invoiceAdjustmentTotal = $claim->{amountPaid};
@@ -690,7 +690,7 @@ sub getItemsHtml
 
 
 	#INVOICE TOTALS
-	my $invoiceTotal = $claim->{totalCharge};
+	my $invoiceTotal = $claim->{totalInvoiceCharges};
 	$invoiceTotal = $formatter->format_price($invoiceTotal);
 
 	my $invoiceAdjustmentTotal = $claim->{amountPaid};
