@@ -73,8 +73,10 @@ sub creditQuery
 	my $cond1 = $sqlGen->WHERE('balance','lessthan', 0);
 
 	my @setupConditions = ();
+	push(@setupConditions, $sqlGen->WHERE('invoice_status', 'isnot', 16));
 
 	my ($fromDate, $toDate) = $self->getInvoiceDates();
+
 	push(@setupConditions, $sqlGen->WHERE('invoice_date', 'between', $fromDate, $toDate)) if ($fromDate ne '' && $toDate ne '');
 	push(@setupConditions, $sqlGen->WHERE('invoice_date', 'geall', $fromDate))  if ($fromDate ne '' && $toDate eq '');
 	push(@setupConditions, $sqlGen->WHERE('invoice_date', 'leall', $toDate))  if ($fromDate eq '' && $toDate ne '');

@@ -7,10 +7,22 @@ use Exporter;
 use DBI::StatementManager;
 use App::Universal;
 
-use vars qw(@ISA @EXPORT $STMTMGR_WORKLIST_CREDIT);
+use vars qw(@ISA @EXPORT $STMTMGR_WORKLIST_CREDIT $STMTRPTDEFN_INVOICE_CREDIT_BALANCE);
 
 @ISA    = qw(Exporter DBI::StatementManager);
-@EXPORT = qw($STMTMGR_WORKLIST_CREDIT);
+@EXPORT = qw($STMTMGR_WORKLIST_CREDIT $STMTRPTDEFN_INVOICE_CREDIT_BALANCE);
+
+$STMTRPTDEFN_INVOICE_CREDIT_BALANCE =
+{
+	columnDefn =>
+		[
+			{ colIdx => 0, head => 'Patient ID', dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>' },
+			{ colIdx => 1, head => 'Name', dataFmt => '#1#'},
+			{ colIdx => 2, head => 'Invoice ID', tAlign=>'left', dataFmt => '<A HREF = "/invoice/#2#/summary">#2#</A>' ,dAlign =>'left' },
+			{ colIdx => 3, head => 'Credit Balace', dataFmt => '#3#', dformat => 'currency', summarize => 'sum'},
+			{ colIdx => 4, head => 'Age', dataFmt => '#4#'},
+		],
+};
 
 # -------------------------------------------------------------------------------
 $STMTMGR_WORKLIST_CREDIT = new App::Statements::Worklist::InvoiceCreditBalance (
@@ -141,6 +153,52 @@ $STMTMGR_WORKLIST_CREDIT = new App::Statements::Worklist::InvoiceCreditBalance (
 			and balance < 0
 			and person.person_id = invoice.client_id
 	},
+
+	'sel_invoice_credit_balance_patient' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			select client_id, p.simple_name, i.invoice_id, i.balance, trunc(sysdate) - trunc(i.invoice_date) age
+			from invoice i, person p , transaction t, invoice_billing ib, insurance ins
+			where i.client_id = p.person_id
+			and t.trans_id = i.main_transaction
+			and ib.bill_id = i.billing_id
+			and ins.ins_internal_id (+) = ib.bill_ins_id
+			and i.balance < 0 
+			and i.invoice_status != 16
+			and (i.invoice_date >= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
+			and (i.invoice_date <= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
+			and (t.care_provider_id = :3 OR :3 is NULL)
+			and (t.service_facility_id = :4 OR :4 is NULL)
+			and (ins.product_name = :5 OR :5 is NULL)
+			order by client_id	
+		},
+		publishDefn => $STMTRPTDEFN_INVOICE_CREDIT_BALANCE		
+	},
+	
+	'sel_invoice_credit_balance_age' =>
+	{
+		sqlStmt =>
+		qq
+		{
+			select client_id, p.simple_name, i.invoice_id, i.balance, trunc(sysdate) - trunc(i.invoice_date) age
+			from invoice i, person p , transaction t, invoice_billing ib, insurance ins
+			where i.client_id = p.person_id
+			and t.trans_id = i.main_transaction
+			and ib.bill_id = i.billing_id
+			and ins.ins_internal_id (+) = ib.bill_ins_id
+			and i.balance < 0 
+			and i.invoice_status != 16
+			and (i.invoice_date >= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
+			and (i.invoice_date <= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
+			and (t.care_provider_id = :3 OR :3 is NULL)
+			and (t.service_facility_id = :4 OR :4 is NULL)
+			and (ins.product_name = :5 OR :5 is NULL)
+			order by age desc
+		},
+		publishDefn => $STMTRPTDEFN_INVOICE_CREDIT_BALANCE		
+	}
 
 
 );

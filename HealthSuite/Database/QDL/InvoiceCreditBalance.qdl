@@ -6,7 +6,6 @@
 	<query-defn id="InvoiceCreditBalance" caption="Invoice Credit Balance" db="Oracle">
 
 		<!-- Fields -->
-		<field id="invoice_date" join="invoice" column="invoice_date"/>
 		<field id="person_id" join="invoice" column="client_id"/>
 		<field id="person_name" caption="Patient Name" join="person" column="simple_name"/>
 		<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
@@ -15,6 +14,7 @@
 		<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
 		<field id="age" join="invoice" columndefn="trunc(sysdate) - trunc(invoice.invoice_date)" caption="Age"/>
 		<field id="invoice_date" join="invoice" column="invoice_date"/>
+		<field id="invoice_status" join="invoice" column="invoice_status"/>
 
 		<field id="service_facility_id" join="transaction" column="service_facility_id"/>
 		<field id="physician_id" join="transaction" column="care_provider_id"/>
