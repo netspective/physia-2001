@@ -33,7 +33,7 @@
 		
 		
 		<!-- Joins -->
-		<join id="lab_order" table="lab_order" autoinclude="1"/>
+		<join id="lab_order" table="person_lab_order" autoinclude="1"/>
 		<join id="person" table="person" condition="person.person_id=lab_order.person_id"/>
 		<join id="org" table="org" condition="org.org_internal_id=lab_order.lab_internal_id"/>		
 		<join id="lab_order_entry" table="lab_order_entry" condition="lab_order_entry.parent_id=lab_order.lab_order_id"/>				
