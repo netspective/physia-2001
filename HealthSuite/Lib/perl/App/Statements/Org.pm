@@ -299,55 +299,54 @@ $STMTMGR_ORG = new App::Statements::Org(
 	'selSuperbillsByOrgIntId' => {
 		sqlStmt => qq{
 			select	*
-			from	Offering_Catalog oc, Org o
+			from	Offering_Catalog oc
 			where	oc.catalog_type = 4
-			and	oc.org_internal_id = o.org_internal_id
-			and	o.org_internal_id = ?
+			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
 	},
-	'selSuperbillsByOrgId' => {
-		sqlStmt => qq{
-			select	*
-			from	Offering_Catalog oc, Org o
-			where	oc.catalog_type = 4
-			and	oc.org_internal_id = o.org_internal_id
-			and	o.org_id = ?
-			order by internal_catalog_id
-		},
-		sqlStmtBindParamDescr => ['Org ID'],
-	},
+#	'selSuperbillsByOrgId' => {
+#		sqlStmt => qq{
+#			select	*
+#			from	Offering_Catalog oc, Org o
+#			where	oc.catalog_type = 4
+#			and	oc.org_internal_id = o.org_internal_id
+#			and	o.org_id = ?
+#			order by internal_catalog_id
+#		},
+#		sqlStmtBindParamDescr => ['Org ID'],
+#	},
 	'selComponentSuperbillsByOrgIntId' => {
 		sqlStmt => qq{
 			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
-			from	Offering_Catalog oc, Org o
+			from	Offering_Catalog oc
 			where	oc.catalog_type = 4
-			and	oc.org_internal_id = o.org_internal_id
-			and	o.org_internal_id = ?
+			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
 	},
-	'selComponentSuperbillsByOrgId' => {
-		sqlStmt => qq{
-			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
-			from	Offering_Catalog oc, Org o
-			where	oc.catalog_type = 4
-			and	oc.org_internal_id = o.org_internal_id
-			and	o.org_id = ?
-			order by internal_catalog_id
-		},
-		sqlStmtBindParamDescr => ['Org ID'],
-	},
+#	'selComponentSuperbillsByOrgId' => {
+#		sqlStmt => qq{
+#			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+#			from	Offering_Catalog oc, Org o
+#			where	oc.catalog_type = 4
+#			and	oc.org_internal_id = o.org_internal_id
+#			and	o.org_id = ?
+#			order by internal_catalog_id
+#		},
+#		sqlStmtBindParamDescr => ['Org ID'],
+#	},
 	'selComponentSuperbillsByCatalogId' => {
 		sqlStmt => qq{
 			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
 			from	Offering_Catalog oc
 			where	oc.internal_catalog_id = ?
+			and	oc.org_internal_id = ?
 			order by internal_catalog_id
 		},
-		sqlStmtBindParamDescr => ['Catalog ID'],
+		sqlStmtBindParamDescr => ['Catalog ID', 'Org Internal ID'],
 	},
 	'selSuperbillInfoByCatalogID' => {
 		sqlStmt => qq{
@@ -363,9 +362,10 @@ $STMTMGR_ORG = new App::Statements::Org(
 			select	oc.internal_catalog_id
 			from	Offering_Catalog oc
 			where	oc.catalog_id = ?
+			and	oc.org_internal_id = ?
 			order by catalog_id
 		},
-		sqlStmtBindParamDescr => ['Catalog ID'],
+		sqlStmtBindParamDescr => ['Catalog ID', 'Org_Internal_ID'],
 	},
 	'sel_ActiveOrgBillingIds' => qq{
 		select * from org_attribute
