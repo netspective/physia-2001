@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<release-notes>
+	<release-info>
+		<build-id>14A</build-id>
+		<build-manager>Robert Jenks</build-manager>
+		<tested-date></tested-date>
+		<release-date></release-date>
+	</release-info>
+
+	<deliverables>
+		<deliverable id="1166">
+			Users can now login without specifying an org.  Initially you will be 
+			logged in to the first associated org on file.  Once in you can switch
+			to other orgs through a new "System Menu" in the page heading.  On
+			subsequent logins you will automatically be logged into the last org you
+			switched to (assuming your using the same PC; this is stored in a cookie)
+		</deliverable>
+		<deliverable id="1090">
+			Query output is now somewhat formated.  Columns now have a caption instead of
+			simply using the internal ids.  Also currency fields now show up properly formatted.
+		</deliverable>
+		<deliverable id="1088">
+			Added several enhancements to Invoice queries.  Including new fields and correct
+			currency formatting.
+		</deliverable>
+		<deliverable>
+			Major enhancements to Query dialog.  It now allows user defined output columns and
+			sorting.  It also allows you to output in CSV or XML formats in addition to HTML.
+			Several other features like other output destinations (E-Mail, Printer) and saved 
+			queries are also demo'd but don't currently function (appropriate "not yet functional"
+			messages are including).
+		</deliverable>
+	</deliverables>
+</release-notes>
