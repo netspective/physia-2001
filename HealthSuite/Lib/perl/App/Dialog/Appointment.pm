@@ -76,7 +76,6 @@ sub new
 			name => 'attendee_id',
 			size => 25,
 			useShortForm => 1,
-			type => 'text',
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
 			#options => FLDFLAG_REQUIRED
 		),
