@@ -102,7 +102,7 @@ sub execute
 	foreach my $superbillPatientInfo (@{$superbillData}) {
 		my $patientID = $superbillPatientInfo->[8];
 
-		my $superbillAcctInfo = $STMTMGR_REPORT_ACCOUNTING->getRowAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $patientID, $page->session ('org_internal_id'));
+		my $superbillAcctInfo = $STMTMGR_REPORT_ACCOUNTING->getRowAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $patientID, $page->session ('org_internal_id'), "", "");
 
 		if ($#$superbillAcctInfo >= 0) {
 			push @{$superbillPatientInfo},
