@@ -3,7 +3,7 @@
 
 <schema name="physia-lookups">
 
-	<table name="Referral_Source_Type" type="Org_Lookup">
+	<table name="Referral_Source_Type" abbrev="RefSrTp" type="Org_Lookup">
 		<enum id="0">Dr.Office</enum>
 		<enum id="1">Patient</enum>
 		<enum id="2">Adjuster</enum>
@@ -13,7 +13,7 @@
 		<enum id="6">Add Provider</enum>
 	</table>
 
-	<table name="Referral_Payor" type="Org_Lookup">
+	<table name="Referral_Payor" abbrev="RefPyr"type="Org_Lookup">
 		<enum id="0">Argus</enum>
 		<enum id="1">American Airlines</enum>
 		<enum id="2">City of Dallas</enum>
@@ -21,7 +21,7 @@
 		<enum id="4">Pinnacol</enum>
 	</table>
 
-	<table name="Referral_Service_Type" type="Org_Lookup">
+	<table name="Referral_Service_Type" abbrev="RefSrTp" type="Org_Lookup">
 		<enum id="0">Bone Growth Simulators</enum>
 		<enum id="1">Chiropractic Services</enum>
 		<enum id="2">CMM Units</enum>
@@ -29,7 +29,7 @@
 		<enum id="4">Durable Medical Equipment</enum>
 	</table>
 
-	<table name="Referral_Service_Detail" type="Org_Lookup">
+	<table name="Referral_Service_Detail" abbrev="RefSrDtl" type="Org_Lookup">
 		<enum id="0">Cold Therapy Device</enum>
 		<enum id="1">Tape</enum>
 		<enum id="2">Neoprene Knee Sleeve</enum>
@@ -40,7 +40,7 @@
 		<enum id="7">Forearm Crutches</enum>
 	</table>
 
-	<table name="Referral_Result" type="Org_Lookup">
+	<table name="Referral_Result" abbrev="RefRst" type="Org_Lookup">
 		<enum id="0">Successful</enum>
 		<enum id="1">UnSuccessful</enum>
 		<enum id="2">Pending</enum>
@@ -50,7 +50,7 @@
 		<enum id="6">Closed/Provider No POS</enum>
 	</table>
 
-	<table name="Referral_Followup_Status" type="Org_Lookup">
+	<table name="Referral_Followup_Status" abbrev="RefFlSt" type="Org_Lookup">
 		<enum id="0">Waiting for Auth</enum>
 		<enum id="1">Waiting for Return call/Adjuster</enum>
 		<enum id="2">Waiting for Return call/Provider</enum>
@@ -75,7 +75,7 @@
 		<enum id="21">In Pre-Cert</enum>
 	</table>
 
-	<table name="Referral_Unit_Type" type="Org_Lookup">
+	<table name="Referral_Unit_Type" abbrev="RefUnt" type="Org_Lookup">
 		<enum id="0">EVAL</enum>
 		<enum id="1">Daily</enum>
 		<enum id="2">Weekly</enum>
@@ -89,7 +89,7 @@
 		<enum id="10">Visits</enum>
 	</table>
 
-	<table name="Intake_Service" type="Org_Lookup">
+	<table name="Intake_Service" abbrev="IntSr" type="Org_Lookup">
 		<enum id="0">Bone Growth Stimulator</enum>
 		<enum id="1">Chiropractic Service</enum>
 		<enum id="2">CMM Units</enum>
@@ -136,7 +136,7 @@
 		<enum id="43">Transportation: Land</enum>
 	</table>
 
-	<table name="Intake_Detail" type="Org_Lookup">
+	<table name="Intake_Detail" abbrev="IntDtl"type="Org_Lookup">
 		<enum id="0">Cold Therapy Device</enum>
 		<enum id="1">Tape</enum>
 		<enum id="2">Neoprene Knee Sleeve</enum>
@@ -269,7 +269,7 @@
 		<enum id="129">Hand CPM</enum>
 	</table>
 
-<table name="Intake_Client" type="Org_Lookup">
+<table name="Intake_Client" abbrev="IntClnt" type="Org_Lookup">
 		<enum id="0">Argus</enum>
 		<enum id="1">American Airlines</enum>
 		<enum id="2">City of Dallas</enum>
