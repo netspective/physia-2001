@@ -179,6 +179,48 @@ function setDialogHome()
 	return true;
 }
 
+function populateField()
+{
+	if( eval(parent.opener.activeActionSrcControl) && eval(parent.opener.activeActionDstControl) )
+	{	
+		var srcLen = parent.opener.activeActionSrcControl.length;
+		var dstLen = parent.opener.activeActionDstControl.length;		
+		if (dstLen != srcLen)
+		{
+			alert("Source and Destination Arrays not the same length");
+			return false;
+		}
+		//Loop through arrays copying data from child to parent window
+		for (var loop=0;loop<dstLen;loop++)
+		{
+			var srcElement = eval("document.forms.dialog."+parent.opener.activeActionSrcControl[loop]);
+			var dstElement = eval("opener.document.forms.dialog."+parent.opener.activeActionDstControl[loop]);
+			if (srcElement && dstElement)
+			{
+					dstElement.value = srcElement.value;
+			}
+		}
+	}		
+	return true;
+}
+
+
+//Check the URL to see if the current window is a popup window
+function isPopupURL()
+{	
+	var flag=false;
+	if(eval(parent.opener))
+	{
+		var pathItems = parent.opener.activeActionARL.split('/');
+		var resource = pathItems[1];
+		if(resource.substring(resource.length-2, resource.length) == '-p')
+		{
+			flag =true;
+		}
+	}
+	return flag;
+}
+
 function validateOnSubmit(objForm)
 {
 	var objSelect;
@@ -207,7 +249,10 @@ function validateOnSubmit(objForm)
 			}
 		}
 	}
-
+	if (isPopupURL())
+	{	
+		populateField();
+	}
 	return true;
 }
 
@@ -1081,14 +1126,18 @@ function SimpleSort(objSelect)  {
 var activeActionWindow = null;
 var activeActionARL = null;
 var activeActionAutoRefresh = null;
+var activeActionSrcControl = [];
+var activeActionDstControl = [];
 
-function doActionPopup(arl, autoRefresh, features)
+function doActionPopup(arl, autoRefresh, features, srcControlField, dstControlField)
 {
 	if(autoRefresh == null)
 		autoRefresh = true;
 
 	activeActionWindow = window;
 	activeActionAutoRefresh = autoRefresh;
+	activeActionSrcControl = srcControlField;
+	activeActionDstControl = dstControlField;
 
 	//
 	// all of the popup ARL resources end in "-p", which handleARL
@@ -1104,7 +1153,6 @@ function doActionPopup(arl, autoRefresh, features)
 		arl = pathItems.join('/');
 	}
 	activeActionARL = arl;
-
 	//
 	// do the actual opening of the find popup window; it will be the job
 	// of the popup window to check the value of activeFindWinControl and
@@ -1114,6 +1162,7 @@ function doActionPopup(arl, autoRefresh, features)
 	var popUpWindow;
 	if (isActionPopupWindow())
 	{
+
 		popUpWindow = open(arl, '', "location, width=620,height=600,scrollbars,resizable");
 	}
 	else
