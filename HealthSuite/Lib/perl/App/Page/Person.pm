@@ -159,6 +159,31 @@ sub prepare_page_content_header
 	{
 		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: <A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A> ';
 	}
+	
+	my $chooseAction = '';
+	$chooseAction = qq{
+				<TD ALIGN=RIGHT>
+					<FONT FACE="Arial,Helvetica" SIZE=2>
+					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
+						<OPTION>Choose Action</OPTION>
+						<OPTION value="/person/$personId/dlg-add-referral">Add Referral</OPTION>
+						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
+						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
+						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
+						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
+						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
+						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
+						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
+						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
+						<OPTION value="/person/$personId/dlg-add-postpersonalpayment">Apply Personal Payment</OPTION>
+						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
+						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>
+						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
+					</SELECT>
+					</FONT>
+				<TD>
+	} if $self->param('_pm_view');
+
 
 	push(@{$self->{page_content_header}},
 		qq{
@@ -192,26 +217,7 @@ sub prepare_page_content_header
 						$profileLine
 					</FONT>
 				</TD>
-				<TD ALIGN=RIGHT>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-						<OPTION>Choose Action</OPTION>
-						<OPTION value="/person/$personId/dlg-add-referral">Add Referral</OPTION>
-						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
-						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
-						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
-						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
-						<OPTION value="/person/$personId/dlg-add-refill-request">Refills</OPTION>
-						<OPTION value="/person/$personId/dlg-add-phone-message">Voice Msgs</OPTION>
-						<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
-						<OPTION value="/person/$personId/dlg-add-postpersonalpayment">Apply Personal Payment</OPTION>
-						<OPTION value="/person/$personId/dlg-add-postrefund">Post Refund</OPTION>
-						<OPTION value="/person/$personId/dlg-add-posttransfer">Post Transfer</OPTION>
-						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
-					</SELECT>
-					</FONT>
-				<TD>
+$chooseAction
 			</FORM>
 			</TR>
 			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
@@ -264,7 +270,7 @@ sub prepare_page_content_footer
 	return if $self->property('person_denied');
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'person'));
+	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'person')) if $self->param('_pm_view');
 	$self->SUPER::prepare_page_content_footer(@_);
 	return 1;
 }
@@ -551,7 +557,7 @@ sub prepare_view_chart
 					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
-					#component.stp-person.surgeryProcedures#<BR>
+					#component.stp-person.surgicalProcedures#<BR>
 					#component.stp-person.testsAndMeasurements#
 					</font>
 				</TD>

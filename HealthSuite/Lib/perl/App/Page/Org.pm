@@ -140,6 +140,21 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
 	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
+	
+	my $chooseAction = '';
+	$chooseAction = qq{
+				<TD ALIGN=RIGHT>
+					<FONT FACE="Arial,Helvetica" SIZE=2>
+					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
+						<OPTION>Choose Action</OPTION>
+						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
+						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
+						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
+						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
+					</SELECT>
+					</FONT>
+				<TD>
+	} if $self->param('_pm_view');
 
 	push(@{$self->{page_content_header}},
 		qq{
@@ -168,17 +183,7 @@ sub prepare_page_content_header
 						$profileLine
 					</FONT>
 				</TD>
-				<TD ALIGN=RIGHT>
-					<FONT FACE="Arial,Helvetica" SIZE=2>
-					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
-						<OPTION>Choose Action</OPTION>
-						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
-						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
-						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
-						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
-					</SELECT>
-					</FONT>
-				<TD>
+$chooseAction
 			</FORM>
 			</TR>
 			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
@@ -195,7 +200,7 @@ sub prepare_page_content_footer
 
 	#return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'org'));
+	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'org')) if $self->param('_pm_view');
 	$self->SUPER::prepare_page_content_footer(@_);
 	return 1;
 }
