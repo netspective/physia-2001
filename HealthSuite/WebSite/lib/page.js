@@ -33,6 +33,10 @@ var FLDFLAG_NOBRCAPTION = 8192;
 var FLDFLAG_PERSIST = 16384;
 var FLDFLAG_HOME = 32768;
 var FLDFLAG_SORT = 65536;
+var PREPENDBLANK = 131072;
+var DEFAULTCAPTION = 262144;
+var INLINECAPTION = 524288;
+var FLDFLAG_AUTOCAP = 1048576;
 
 var OPTIONFLAG_TRANSKEY_DONT_MOVE_ON_ENTER = 1;
 
@@ -154,7 +158,7 @@ function getDialogData(fieldName, dataName)
 
 function processOnInit()
 {
-	//setDialogHome()
+	setDialogHome()
 	return true;
 }
 
@@ -802,6 +806,29 @@ function validateChange_Phone(event, flags)
 
 function validateChange_URL(event, flags)
 {
+}
+
+function validateChange_AutoCap(event, flags)
+{
+	var inText = event.srcElement.value;
+	var outText = "";
+	var str = String();
+	var len = inText.length;		
+
+	for(i = 0; i < len; i++)
+	{
+		str = inText.charAt(i);
+		if ((i == 0) || ((i > 0) && (inText.charCodeAt(i - 1) == 32)))
+		{
+			str = str.toUpperCase();
+		}
+		else
+		{
+			str = str.toLowerCase();
+		}
+		outText = outText + str;
+	}
+	event.srcElement.value = outText;
 }
 
 function validateChange_LowerCase(event, flags)
