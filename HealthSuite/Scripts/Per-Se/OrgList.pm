@@ -10,9 +10,44 @@ use CommonUtils;
 
 %orgList = (
 	2 => {
+		orgId => 'WCLARKPA',
 		billingId => 'phy169',
 		nsfType => NSF_HALLEY,
 	},
+	
+	142 => {
+		orgId => 'TXGULF',
+		billingId => 'tex11c',
+		nsfType => NSF_HALLEY,
+	},
+	
+	501 => {
+		orgId => 'CHSINC',
+		billingId => 'hoe100',
+		nsfType => NSF_HALLEY,
+	},
+	501.1 => {
+		orgId => 'CHSINC',
+		billingId => 'she135',
+		nsfType => NSF_HALLEY,
+	},
+	
+	727 => {
+		orgId => 'SCOT',
+		billingId => 'sur127',
+		nsfType => NSF_HALLEY,
+	},
+	749 => {
+		orgId => 'CAPSTONE',
+		billingId => 'cap137',
+		nsfType => NSF_HALLEY,
+	},
+	751 => {
+		orgId => 'IDAH',
+		billingId => 'inf104',
+		nsfType => NSF_HALLEY,
+	},
+	
 );
 
 1;

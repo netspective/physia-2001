@@ -34,9 +34,18 @@ my $now = UnixDate('today', '%m%d%Y_%H%M');
 
 sub createNSFfiles
 {
-	my ($page) = @_;
+	my ($page, @ARGV) = @_;
+	
+	my @orgsToDo = ();
+	foreach (@ARGV)
+	{
+		push(@orgsToDo, $_) unless /create|transmit|archive/;
+	}
+	
+	@orgsToDo = sort {$a <=> $b} keys %orgList unless @orgsToDo;
+	print "Orgs To Do = @orgsToDo \n";
 
-	for my $orgInternalId (keys %orgList)
+	for my $orgInternalId (@orgsToDo)
 	{
 		my $nsfType = $orgList{$orgInternalId}->{nsfType};
 		my $claims = findSubmittedClaims($page, $orgInternalId);
@@ -151,6 +160,6 @@ print "\n-------------------------------\n";
 print `date`;
 print "-------------------------------\n";
 
-createNSFfiles($page) if grep (/create/, @whatToDo);
+createNSFfiles($page, @ARGV) if grep (/create/, @whatToDo);
 transmitNSFfiles($sqlPlusKey) if grep(/transmit/, @whatToDo);
 archiveNSFfiles() if grep(/archive/, @whatToDo);
