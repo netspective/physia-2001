@@ -96,7 +96,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = e.facility_id
 				)
-				AND	trunc(e.start_time) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
+				AND	trunc(e.start_time-:5) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
 				AND	TO_DATE(:3, 'MM/DD/YYYY')
 				AND	e.event_id = ea.parent_id
 				AND	e.event_id = t.parent_event_id
@@ -109,7 +109,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					columnDefn =>
 					[
 					{head => 'Procedure Code',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#')}, hint => 'View Details' },
-					{head => 'Count', dAlign => 'right'},
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
 					],
 				},				
 			},
@@ -142,7 +142,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					AND 	org_internal_id = e.facility_id
 				)
 				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND	trunc(e.CHECKIN_STAMP) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
+				AND	trunc(e.CHECKIN_STAMP-:5) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
 				AND	TO_DATE(:3, 'MM/DD/YYYY')
 				AND	e.event_id = ea.parent_id
 				AND	e.CHECKOUT_STAMP is NULL
@@ -152,7 +152,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					columnDefn =>
 					[
 					{head => 'Check In Date',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=missing_encounter&encounter=#&{?}#')} , hint => 'View Details' },
-					{head => 'Count', dAlign => 'right'},
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
 					],
 				},				   
 	},
@@ -194,6 +194,72 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	},
 			
 	# -----------------------------------------------------------------------------------------			
+			
+	'sel_dateEntered' =>
+	{
+		sqlStmt=>qq{
+				SELECT 	to_char(e.scheduled_stamp-:5,'MM/DD/YYYY'),count (*)
+				FROM 	Event e, Event_Attribute ea
+				WHERE	(:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = e.facility_id
+				)
+				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND	trunc(e.scheduled_stamp-:5) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
+				AND	TO_DATE(:3, 'MM/DD/YYYY')
+				AND	e.event_id = ea.parent_id				
+				GROUP BY to_char(e.scheduled_stamp-:5,'MM/DD/YYYY')
+			   },
+			publishDefn => 	{
+					columnDefn =>
+					[
+					{head => 'Date Appointment Entered',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#')} , hint => 'View Details' },
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
+					],
+				},				   
+	},
+			
+	'sel_detailDateEntered' =>
+	{
+		sqlStmt=>qq{
+				
+				SELECT  scheduled_by_id,
+					ea.value_text as patient_id,
+					(SELECT simple_name FROM person WHERE person_id = ea.value_text) as patient_name,
+					(SELECT simple_name FROM person WHERE person_id = ea.value_textB)  as physician_name,
+					TO_CHAR(e.start_time-:4, 'MM/DD/YYYY HH12:MI AM') as start_time,					
+					(SELECT org_id FROM org where org_internal_id = e.facility_id) as org_name
+				FROM	Event e, Event_Attribute ea 
+				WHERE	(:1 IS NULL OR facility_id = :1)
+				AND EXISTS
+				(
+					SELECT 	1 
+					FROM 	org
+					WHERE 	owner_org_id = :3
+					AND 	org_internal_id = e.facility_id
+				)
+				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND	trunc(e.scheduled_stamp-:4)= TO_DATE(:2, 'MM/DD/YYYY') 
+				AND	e.event_id = ea.parent_id
+				ORDER BY 1 asc ,3 asc
+				},
+		publishDefn =>
+			   {
+				columnDefn => 
+				[
+				{ head => 'Scheduled ID',colIdx=>0,},			
+				{ head => 'Patient Name', 	colIdx => 2,  hint=>'View Patient Profile',url=>q{javascript:chooseItemForParent('/person/#1#/profile')}},
+				{ head => 'Physician Name', colIdx =>3,},
+				{ head => 'Appt Scheduled',colIdx=>4	},
+				{ head => 'Location',	colIdx=>5},
+				]
+			   }
+	},			
+	# -----------------------------------------------------------------------------------------			
 	'sel_patientsProduct' =>{
 				sqlStmt => qq{
 				SELECT	ct.caption,count(distinct e.event_id) as count
@@ -213,7 +279,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = e.facility_id
 				)
-				AND	trunc(e.start_time) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
+				AND	trunc(e.start_time-:5) BETWEEN TO_DATE(:2, 'MM/DD/YYYY')
 				AND	TO_DATE(:3, 'MM/DD/YYYY')
 				AND	e.event_id = ea.parent_id
 				AND	e.event_id = t.parent_event_id
@@ -227,7 +293,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					columnDefn =>
 					[
 					{head => 'Product Name',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#')} , hint => 'View Details' },
-					{head => 'Count', dAlign => 'right'},
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
 					],
 				},		
 			},
@@ -268,7 +334,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					AND 	org_internal_id = Event.facility_id
 				)
 				and Event.event_id = Event_Attribute.parent_id
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				and Event.start_time-:5 between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and event_status in (1, 2)
 			group by value_textB
@@ -279,7 +345,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					{	head => 'Physician', 
 						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=physician&physician=#&{?}#')}, hint => 'View Details' 
 					},
-					{	head => 'Count', dAlign => 'right'},
+					{	head => 'Count', dAlign => 'right',summarize=>'sum'},
 				],
 		},
 	},
@@ -306,7 +372,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = Event.facility_id
 				)
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				and Event.start_time-:5 between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and event_status in (1, 2)
 				and Appt_Attendee_Type.id = ea.value_int
@@ -317,7 +383,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				[
 					{head => 'Patient type',
 						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#')}, hint => 'View Details' },
-					{head => 'Count', dAlign => 'right'},
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
 				],
 		},
 	},
@@ -344,7 +410,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = Event.facility_id
 				)
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				and Event.start_time-:5 between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and Appt_Status.id = Event.event_status
 			group by caption, event_status
@@ -355,7 +421,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					{head => 'Appointments', 
 						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#')}, hint => 'View Details' 
 					},
-					{head => 'Count', dAlign => 'right'},
+					{head => 'Count', dAlign => 'right',summarize=>'sum'},
 				],
 		},
 	},	
