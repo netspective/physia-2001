@@ -134,19 +134,6 @@ sub new
 						schema => $schema,
 					column => 'Insurance.copay_amt'),
 
-			new CGI::Dialog::Subhead(heading => 'Remittance Information', name => 'remittance_heading'),
-			new CGI::Dialog::Field::TableColumn(caption => 'Remittance Type',
-						name => 'remit_type',
-						schema => $schema,
-						column => 'Insurance.Remit_Type'),
-
-			new CGI::Dialog::Field(caption => 'E-Remittance Payer ID',
-						hints=> '(Only for non-Paper types)',
-						name => 'remit_payer_id',
-						findPopup => '/lookup/envoypayer/id'),
-
-			new CGI::Dialog::Field(caption => 'Remit Payer Name', name => 'remit_payer_name'),
-
 			new CGI::Dialog::Subhead(heading => 'Add Another Personal Insurance Coverage', name => 'insur_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 			new CGI::Dialog::MultiField(caption =>'InsCompanyID/ProductName/PlanName', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -379,11 +366,7 @@ sub populateData_add
 		}
 		else
 		{
-			do
-			{
-				$seq++;
-
-			}until ((!$STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq)) && $seq < 4);
+			while ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, ++$seq)) {};
 
 			if ($seq > 4)
 			{
@@ -470,9 +453,6 @@ sub execute
 				family_deductible_amt => $page->field('family_deductible_amt') || undef,
 				percentage_pay => $page->field('percentage_pay') || undef,
 				threshold => $page->field('threshold') || undef,
-				remit_type => $page->field('remit_type') || undef,
-				remit_payer_id => $page->field('remit_payer_id') || undef,
-				remit_payer_name => $page->field('remit_payer_name') || undef,
 				_debug => 0
 			);
 
