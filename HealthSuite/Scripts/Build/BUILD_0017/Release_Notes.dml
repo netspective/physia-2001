@@ -51,7 +51,10 @@
 			New 'copay' payment type created and added to claim personal payment dialog. Also, 'Copay prepaid' works
 			like 'Prepayment' in post general payment dialog.  [DB Change Required]
 		</deliverable>
-
+		<deliverable id="1528">
+			UI: Now the Preventive-Care will show up in the alerts component, 90 days prior to the preventive care event 
+			    becoming due.
+		</deliverable>
 		<deliverable id="1530">
 			Report (Receipt and Procedure Analysis) : Made font for fiscaly year text at the top of the report  smaller for both receipt analysis and procedure analysis
 		</deliverable>
