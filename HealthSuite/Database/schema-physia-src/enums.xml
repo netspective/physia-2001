@@ -39,6 +39,7 @@
 		<enum>Confirm</enum>
 		<enum>Verify</enum>
 		<enum>Setup</enum>
+		<enum>Prescribe</enum>
 	</table>
 
 	<table name="Login_Type" abbrev="LgiType" type="Enumeration">
