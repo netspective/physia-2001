@@ -203,7 +203,7 @@ sub new
 			new CGI::Dialog::Field(name => 'name_first', caption => 'First Name', options => FLDFLAG_REQUIRED, size => 12),
 			new CGI::Dialog::Field(name => 'name_middle', caption => 'Middle Name',	size => 8),
 			new CGI::Dialog::Field(name => 'name_last', caption => 'Last Name',	options => FLDFLAG_REQUIRED, size => 16),
-			new CGI::Dialog::Field(name => 'name_suffix', type => 'select', selOptions => ';Sr.;Jr;I;II;III;IV;V', caption => 'Suffix'),
+			new CGI::Dialog::Field(name => 'name_suffix', caption => 'Suffix', size => 16),
 
 		];
 	return CGI::Dialog::MultiField::new($type, %params);
