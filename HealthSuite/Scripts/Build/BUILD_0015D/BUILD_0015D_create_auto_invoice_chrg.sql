@@ -1,4 +1,16 @@
 start tables/Auto_Invoice_Chrg
+start tables-code/Auto_Invoice_Chrg
+
+start pre/pkg-inv-trig
+
+start tables-code/Invoice_denorm
+start tables-code/Transaction_denorm
+start tables-code/Invoice_Attribute_denorm
+start tables-code/Invoice_Item_totals
+start tables-code/Invoice_Item_Adjust_totals
+
+start post/views-report-month-audit-recap
+
 
 INSERT INTO Auto_Invoice_Chrg
 (invoice_id,trans_id,item_id,invoice_date,batch_date,batch_id,
@@ -63,15 +75,11 @@ WHERE   t.trans_id = i.main_transaction
 	AND ii.parent_id  = i.invoice_id
 	AND iia.parent_id = ii.item_id
 	AND NOT (invoice_status =15 AND parent_invoice_id is not null);
+	
+	
+commit;
 
 
 
 
 
-start tables-code/Invoice_denorm
-start tables-code/Transaction_denorm
-start tables-code/Invoice_Attribute_denorm
-start tables-code/Invoice_Item_totals
-start tables-code/Invoice_Item_Adjust_totals
-
-start post/views-report-month-audit-recap
