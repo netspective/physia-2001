@@ -107,6 +107,7 @@ $STMTRPTDEFN_DEFAULT =
 								'15' => 'Closed #13#',
 								'16' => 'Void #13#',
 								'17' => '#4#',
+								'18' => '#4#',
 							},
 		},
 		{ head => 'Payer', colIdx => 9,
