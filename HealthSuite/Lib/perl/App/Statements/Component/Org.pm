@@ -436,6 +436,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			FROM 	offering_catalog_entry oce,offering_catalog oc
 			WHERE 	oce.catalog_id = :1
 			AND	oc.internal_catalog_id = oce.catalog_id
+			ORDER BY 1
 	},
 	sqlvar_entityName => 'Org',
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
@@ -488,6 +489,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			FROM 	offering_catalog_entry oce,offering_catalog oc
 			WHERE 	oce.catalog_id = :1
 			AND	oc.internal_catalog_id = oce.catalog_id
+			ORDER BY 1
 	},
 	sqlvar_entityName => 'Org',
 	sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
