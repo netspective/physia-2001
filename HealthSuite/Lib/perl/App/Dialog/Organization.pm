@@ -717,7 +717,7 @@ sub execute_update
 			value_type => App::Universal::ATTRTYPE_ORGGENERAL,
 			value_text => $page->field('business_hours') || undef,
 			_debug => 0
-		) if $page->field('business_hours') ne '';
+		);
 
 	saveAttribute($page, 'Org_Attribute', $orgIntId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
 		value_text => $page->field('hcfa_service_place'),
