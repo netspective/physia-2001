@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.3 2000-09-13 23:40:36 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.4 2000-10-05 16:35:51 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views);
 use vars qw(%CACHE $COMPARISONS);
@@ -54,27 +54,27 @@ sub new
 {
 	my $class = shift;
 	my %opts = @_;
-	
+
 	# 'file' is a required parameter and it must exist
 	die "file must be specified and exist" unless $opts{file} && -f $opts{file};
-	
+
 	# If caching is enabled use cached object if available
 	if (exists $opts{cache} && $opts{cache})
 	{
 		return $CACHE{$opts{file}} if exists $CACHE{$opts{file}};
 	}
-	
+
 	# Create a new object
 	$class = ref($class) || $class;
 	no strict 'refs';
 	my SQL::GenerateQuery $self = [\%{"${class}::FIELDS"}];
 	bless $self, $class;
-	
+
 	$self->{qdlFile} = $opts{file};
-	
+
 	# Initialize it
 	$self->initialize();
-	
+
 	# Cache the object if requested
 	if (exists $opts{cache} && $opts{cache})
 	{
@@ -131,11 +131,11 @@ sub fields
 	if (defined $value)
 	{
 		die "Field data must be a hash ref" unless ref($value) eq 'HASH';
-		my %newField = %{$value};
 
 		# Add it to the Psuedo-Hash
-		push @{$self->{fields}}, \%newField or return 0;
-		$self->{fields}->[0]->{$newField{id}} = $#{$self->{fields}};
+		my $newField = SQL::GenerateQuery::Field->new($value) or return 0;
+		push @{$self->{fields}}, $newField;
+		$self->{fields}->[0]->{$newField->{id}} = $#{$self->{fields}};
 		return 1;
 	}
 	return exists $self->{fields}->{$id} ? $self->{fields}->{$id} : undef;
@@ -167,12 +167,22 @@ sub joins
 sub views
 {
 	my SQL::GenerateQuery $self = shift;
-	my $id = shift;
+	my ($id, $value) = @_;
 	unless (defined $id)
 	{
-		return keys %{$self->{views}};
+		return map {$_->{id}} @{$self->{views}}[1..$#{$self->{views}}];
 	}
-	return $self->{views}->{$id};
+	if (defined $value)
+	{
+		die "View data must be a hash ref" unless ref($value) eq 'HASH';
+
+		# Add it to the Psuedo-Hash
+		print "Adding view $id\n";
+		push @{$self->{views}}, $value;
+		$self->{views}->[0]->{$id} = $#{$self->{views}};
+		return $value;
+	}
+	return exists $self->{views}->{$id} ? $self->{views}->{$id} : undef;
 }
 
 
@@ -196,11 +206,11 @@ sub initialize
 {
 	my SQL::GenerateQuery $self = shift;
 	my $qdlFile = $self->{qdlFile};
-	
+
 	$self->{fields} = [{},];  # Psuedo-Hash to maintain field order
 	$self->{joins} = {};
-	$self->{views} = {};
-	
+	$self->{views} = [{},]; # Psuedo-Hash to maintain view order
+
 	# Import the QDL data
 	my $parser = new XML::Parser(Style => 'Tree');
 	my $qdl = $parser->parsefile($qdlFile) or die "Unable to open '$qdlFile'";
@@ -241,11 +251,11 @@ sub parseTags
 		{
 			# If the style contains no tags then ignore it
 			next unless $#{$value};
-			
+
 			# Pass control to parseStyle() to build the styles hash
 			my $condition = $self->parseView($value->[0]->{id}, [@$value[1..$#{$value}]], $value->[0]);
-			$self->{views}->{$value->[0]->{id}}->{condition} = $condition->[0];
-			
+			$self->views($value->[0]->{id})->{condition} = $condition->[0];
+
 			# Since we already handled the contents of this tag, skip to the next
 			next;
 		}
@@ -264,42 +274,47 @@ sub parseView
 	my SQL::GenerateQuery $self = shift;
 	my ($id, $tags, $attributes) = @_;
 	my @conditions = ();
-	
-	$self->{views}->{$id} = {} unless exists $self->{views}->{$id};
-	my $style = $self->{views}->{$id};
-	
+
+	my $view = $self->views($id);
+	$view = $self->views($id, {id => $id}) unless $view;
+
 	# Check for and add top level attributes
 	if (defined $attributes)
 	{
 		foreach my $key (keys %{$attributes})
 		{
-			next if $key eq 'id';
-			$style->{$key} = $attributes->{$key};
+			$view->{$key} = $attributes->{$key};
 		}
 	}
-	
+
 	while (defined (my $tag = shift @$tags) and defined(my $value = shift @$tags))
 	{
 		next unless $tag;
 		if ($tag eq 'column')
 		{
-			$style->{columns} = [] unless exists $style->{columns};
+			$view->{columns} = [] unless exists $view->{columns};
 			my %column = %{$value->[0]};
-			push @{$style->{columns}}, \%column;
+			push @{$view->{columns}}, \%column;
 		}
 		elsif ($tag eq 'order-by')
 		{
-			$style->{'order-by'} = [] unless exists $style->{'order-by'};
+			$view->{'order-by'} = [] unless exists $view->{'order-by'};
 			my %orderby = %{$value->[0]};
-			push @{$style->{'order-by'}}, \%orderby;
-			
+			push @{$view->{'order-by'}}, \%orderby;
+
+		}
+		elsif ($tag eq 'group-by')
+		{
+			$view->{'group-by'} = [] unless exists $view->{'group-by'};
+			my %groupby = %{$value->[0]};
+			push @{$view->{'group-by'}}, \%groupby;
 		}
 		elsif ($tag eq 'condition')
 		{
 			my $att = $value->[0];
 			push @conditions, $self->WHERE($att->{field}, $att->{comparison}, $att->{criteria});
 		}
-		
+
 		if ($#{$value})
 		{
 			# Passes a ref to a slice (which excludes the element 0 attributes)
@@ -318,6 +333,7 @@ sub parseView
 			}
 		}
 	}
+	#$self->views($id, $view);
 	return \@conditions;
 }
 
@@ -331,7 +347,7 @@ use strict;
 use fields qw(sqlGen compares);
 
 
-# Creates a new comparison object
+# Creates a new condition object
 sub new
 {
 	my $class = shift;
@@ -340,13 +356,13 @@ sub new
 	my $comparison = shift;
 	my @criteria = @_;
 	my $fieldDefn;
-	
+
 	$class = ref($class) || $class;
 	no strict 'refs';
 	my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
-	
+
 	$self->{sqlGen} = $sqlGen;
-	
+
 	# Validate the field & get the join name
 	unless($sqlGen->fields($field))
 	{
@@ -356,16 +372,16 @@ sub new
 		$fieldDefn = $field;
 		$field = $fields[0];
 	}
-	
+
 	# Validate the comparison
 	my $compare = $sqlGen->comparisons($comparison);
 	unless ($compare)
 	{
 		die "Comparison '$comparison' is invalid";
 	}
-	
+
 	# Add it
-	my $compareHash = 
+	my $compareHash =
 		{
 			field => $field,
 			comparison => $comparison,
@@ -376,13 +392,13 @@ sub new
 		};
 	$compareHash->{fieldDefn} = $fieldDefn if defined $fieldDefn;
 	$self->{compares} = [$compareHash];
-	
+
 	bless $self, $class;
 	return $self;
 }
 
 
-# Creates a new comparison object by combining two or more existing 
+# Creates a new comparison object by combining two or more existing
 # comparison objects
 sub joinConditions
 {
@@ -390,25 +406,25 @@ sub joinConditions
 	my SQL::GenerateQuery $sqlGen = shift;
 	my $type = shift;
 	my @conditions = @_;
-	
+
 	# Validate the join type
 	return 0 unless $type eq 'AND' || $type eq 'OR';
-	
+
 	# Validate the conditions
 	foreach (@conditions)
 	{
 		return 0 unless ref($_) && $_->isa('SQL::GenerateQuery::Condition');
 	}
-	
+
 	# Create an object
 	$class = ref($_[0]) || $_[0];
 	no strict 'refs';
 	my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
 	use strict;
-	
+
 	$self->{sqlGen} = $sqlGen;
 	$self->{compares} = [];
-	
+
 	# Copy the conditions into the new object
 	my $lastCond = $#conditions;
 	foreach my $i (0..$#conditions)
@@ -434,13 +450,13 @@ sub joinConditions
 			# we need to add parens around it
 			$newCompare->{startParen}++ if $y == 0 && $#{$curCond->{compares}};
 			$newCompare->{endParen}++ if $y == $#{$curCond->{compares}} && $#{$curCond->{compares}};
-			
+
 			# If it is the last compare and not the last condition add the join type
 			$newCompare->{join} = $type if $y == $#{$curCond->{compares}} && $i != $#conditions;
-			
+
 			# If it is the last compare of the last condition then join is blank
 			$newCompare->{join} = '' if $y == $#{$curCond->{compares}} && $i == $#conditions;
-			
+
 			# Add the new compare the the end of the new object's list
 			push @{$self->{compares}}, $newCompare;
 		}
@@ -456,16 +472,16 @@ sub genSQL
 {
 	my SQL::GenerateQuery::Condition $self = shift;
 	my %opts = @_;
-	
+
 	my @SELECT = ();
 	my @FROM = ();
 	my @WHERE = ();
 	my @ORDER_BY = ();
 	my @GROUP_BY = ();
 	my @bindParams = ();
-	
+
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
-	
+
 	# Add any autoInclude tables to the query
 	foreach my $join ($sqlGen->joins())
 	{
@@ -475,7 +491,7 @@ sub genSQL
 			$self->addTableToFROM($join, \@FROM, \@WHERE, \@bindParams) ;
 		}
 	}
-	
+
 	# Process the comparisons
 	foreach my $i (0 .. $#{$self->{compares}})
 	{
@@ -486,25 +502,25 @@ sub genSQL
 		my $join = $compare->{join};
 		my $startParen = $compare->{startParen};
 		my $endParen = $compare->{endParen};
-		
+
 		$join = " " . $join if $join;
 
 		my $fieldData = $sqlGen->fields($field);
 		my $columnDefn = defined $fieldData->{join} ? $fieldData->{join} . "." : '';
 		$columnDefn .= defined $fieldData->{'comp-column'} ? $fieldData->{'comp-column'} : $fieldData->{column};
 		my $compData = $sqlGen->comparisons($comparison);
-		
-		# Add the appropriate FROM tables and join WHERE conditions		
+
+		# Add the appropriate FROM tables and join WHERE conditions
 		$self->addTableToFROM($fieldData->{join}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{join};
 
 		# Add the bind parameter(s) and get the placeHolder
 		my $placeHolder = $self->addCriteria($criteria, $compData, \@bindParams);
-		
+
 		$startParen++ if $i == 0;
 		$endParen++ if $i == $#{$self->{compares}};
 		$startParen = '(' x $startParen;
 		$endParen = ')' x $endParen;
-		
+
 		# Check to see if we have a custom field definition and use it
 		if (exists $compare->{fieldDefn})
 		{
@@ -513,7 +529,7 @@ sub genSQL
 			$fieldDefn =~ s/\{\w+\}/$columnDefn/;
 			$columnDefn = $fieldDefn;
 		}
-		
+
 		# Add the WHERE condition
 		push @WHERE, $startParen . $columnDefn . " " . $compData->{operator} . $placeHolder . $endParen . $join;
 
@@ -521,7 +537,7 @@ sub genSQL
 		last unless $join;
 		$i++;
 	}
-	
+
 	# Process the Output Columns
 	foreach my $field (@{$opts{outColumns}})
 	{
@@ -536,14 +552,14 @@ sub genSQL
 		}
 		# Add the selected columns to the SELECT clause
 		my $fieldData = $sqlGen->fields($field);
-		
+
 		my $selectCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
 		$selectCol .= $fieldData->{column};
 		if (defined $fieldData->{columndefn})
 		{
 			$selectCol = $fieldData->{columndefn};
 		}
-		
+
 		if (defined $fieldDefn)
 		{
 			$fieldDefn =~ s/(\{\w+\})/$selectCol/;
@@ -551,15 +567,14 @@ sub genSQL
 		}
 		$selectCol .= " AS $field";
 		push @SELECT, $selectCol;
-		
+
 		# Add the appropriate FROM tables and join WHERE conditions
 		$self->addTableToFROM($fieldData->{join}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{join};
 	}
-	
+
 	# Process the Order By
 	foreach my $field (@{$opts{orderBy}})
 	{
-		my $fieldDefn;
 		unless ($sqlGen->fields($field))
 		{
 			my @fields = $field =~ /\{(\w+)\}/g;
@@ -567,23 +582,55 @@ sub genSQL
 			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
 			$field = $fields[0];
 		}
-		
+
 		push @ORDER_BY, $field;
 	}
-	
+
+	# Process the Group By
+	foreach my $field (@{$opts{groupBy}})
+	{
+		my $fieldDefn;
+		unless ($sqlGen->fields($field))
+		{
+			my @fields = $field =~ /\{(\w+)\}/g;
+			die "Only one field may be specified" if $#fields;
+			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
+			$fieldDefn = $field;
+			$field = $fields[0];
+		}
+		# Add the selected columns to the SELECT clause
+		my $fieldData = $sqlGen->fields($field);
+
+		my $groupCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
+		$groupCol .= $fieldData->{column};
+		if (defined $fieldData->{columndefn})
+		{
+			$groupCol = $fieldData->{columndefn};
+		}
+
+		if (defined $fieldDefn)
+		{
+			$fieldDefn =~ s/(\{\w+\})/$groupCol/;
+			$groupCol = $fieldDefn;
+		}
+
+		push @GROUP_BY, $groupCol;
+	}
+
+
 	my $SQL = '';
-	
+
 	# SELECT
 	$SQL .= "SELECT";
 	$SQL .= defined $opts{distinct} && $opts{distinct} ? " DISTINCT\n" : "\n";
 	$SQL .= join ",\n", map {"\t$_"} @SELECT;
 	$SQL .= "\n";
-	
+
 	# FROM
 	$SQL .= "FROM\n";
 	$SQL .= join ",\n", map {"\t$_"} @FROM;
 	$SQL .= "\n";
-	
+
 	# WHERE
 	if (@WHERE)
 	{
@@ -591,15 +638,7 @@ sub genSQL
 		$SQL .= join "\n", map {"\t$_"} @WHERE;
 		$SQL .= "\n";
 	}
-	
-	# ORDER BY
-	if (@ORDER_BY)
-	{
-		$SQL .= "ORDER BY\n";
-		$SQL .= join ",\n", map {"\t$_"} @ORDER_BY;
-		$SQL .= "\n";
-	}
-	
+
 	# GROUP BY
 	if (@GROUP_BY)
 	{
@@ -607,7 +646,15 @@ sub genSQL
 		$SQL .= join ",\n", map {"\t$_"} @GROUP_BY;
 		$SQL .= "\n";
 	}
-	
+
+	# ORDER BY
+	if (@ORDER_BY)
+	{
+		$SQL .= "ORDER BY\n";
+		$SQL .= join ",\n", map {"\t$_"} @ORDER_BY;
+		$SQL .= "\n";
+	}
+
 	return wantarray ? ($SQL, \@bindParams) : $SQL;
 }
 
@@ -618,11 +665,11 @@ sub addCriteria
 	my @criteria = @{shift()};
 	my $compData = shift;
 	my $bindParams = shift;
-	
+
 	# Get the templates
 	my $tempPlaceHolder = defined $compData->{placeholder} ? $compData->{placeholder} : '?';
 	my $tempValue = defined $compData->{value} ? $compData->{value} : '$';
-	
+
 	# If the value template is empty, then the condition has no right side
 	return '' unless $tempValue ne '';
 
@@ -678,7 +725,7 @@ sub addCriteria
 			push @$bindParams, @{$subBindParams};
 			$placeHolder .= '(' . $subSql . ')';
 		}
-		elsif (/^\[(.*?)\]([^\?\@]*)$/) # Handle 
+		elsif (/^\[(.*?)\]([^\?\@]*)$/) # Handle
 		{
 			my $optPattern = $1;
 			$remainder = defined $2 ? $2 : '';
@@ -702,15 +749,15 @@ sub addCriteria
 	die "Too many criteria parameters " . join(', ', map("'$_'",@criteria)) . ". SQL Generation Aborted!" if @criteria;
 	return ' ' . $placeHolder;
 }
-		
-		
+
+
 sub addTableToFROM
 {
 	my SQL::GenerateQuery::Condition $self = shift;
 	my ($join, $FROM, $WHERE, $bindParams) = @_;
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
 	my $joinData = $sqlGen->joins($join);
-	
+
 	# Construct a proper FROM clause member
 	my $table = $joinData->{table};
 	my $from = $table;
@@ -735,6 +782,28 @@ sub addTableToFROM
 	}
 }
 
+
+
+##############################################################################
+package SQL::GenerateQuery::Field;
+##############################################################################
+
+use strict;
+
+sub new
+{
+	my $class = shift;
+	$class = ref($class) || $class;
+
+	my $attributes = shift;
+	die "attributes is a " . ref($attributes) . " but must be a HASH" unless ref($attributes) eq 'HASH';
+	my %self = %{$attributes};
+	my $self = \%self;
+	bless $self, $class;
+}
+
+
+
 1;
 
 
@@ -747,26 +816,28 @@ SQL::GenerateQuery - Perl Object Interface for Generating SQL Statements
 =head1 SYNOPSIS
 
  use SQL::GenerateQuery;
- 
+
  my $personQuery = new SQL::GenerateQuery(file => 'person.qdl', cache => 1);
- 
+
  my $eyeCond1 = $personQuery->WHERE('eye_color', 'is', 'GREEN');
  my $eyeCond2 = $personQuery->WHERE('eye_color', 'is', 'BLUE');
  my $cond = $personQuery->OR($eyeCond1, $eyeCond2);
- 
+
  my ($SQL1, $params1) = $cond->genSQL(
 	 outFields => ['first_name', 'last_name', 'eye_color', 'hair_color'],
 	 sortFields => ['last_name', 'first_name'],
 	 distinct => 1
 	 );
- 
+
  my $ageCond = $personQuery->WHERE('age', 'greaterthan', '21');
  $cond = $personQuery->AND($cond, $ageCond);
- 
+
  my ($SQL2, $params2) = $cond->genSQL(
 	 outFields => ['first_name', 'last_name', 'age', 'height'],
 	 sortFields => ['age', 'last_name', 'first_name'],
 	 );
+
+ my $fieldCond = $personQuery->WHERE('last_name', 'is', $personQuery->fields('first_name'));
 
 =head1 DESCRIPTION
 
