@@ -121,6 +121,9 @@ sub prepare_page_content_header
 	my $showAccount=0;
 	my $accountList = 'PATIENT|GUARANTOR';
 
+	my $showBilling=0;
+	my $billingList = 'PATIENT';
+
 	my $showActivity=0;
 	my $activityList = '';
 
@@ -137,6 +140,7 @@ sub prepare_page_content_header
 	$showSummary=1 if grep {uc($_)=~m/$summaryList/} @$categories;
 	$showChart=1 if grep {uc($_)=~m/$chartList/} @$categories;
 	$showAccount=1 if grep {uc($_)=~m/$accountList/} @$categories;
+	$showBilling=1 if grep {uc($_)=~m/$billingList/} @$categories;
 	$showAssociate=1 if grep {uc($_)=~m/$assoicateList/} @$categories;
 	$showActivity=1 if grep {uc($_)=~m/$activityList/} @$categories;
 
@@ -150,7 +154,8 @@ sub prepare_page_content_header
 			$showHome ? ['Home', "$urlPrefix/home",'home'] : undef,
 			$showSummary ? ['Summary', "$urlPrefix/profile", 'summary']: undef,
 			$showChart ? ['Chart', "$urlPrefix/chart", 'chart']: undef,
-			$showAccount ? ['Account', "$urlPrefix/account", 'account'] : undef,,
+			$showAccount ? ['Account', "$urlPrefix/account", 'account'] : undef,
+			$showBilling ? ['Billing', "$urlPrefix/billing", 'billing'] : undef,
 			$showActivity ? ['Activity', "$urlPrefix/activity", 'activity'] : undef,
 			$showAssociate ? ['Associate', "$urlPrefix/associate",'associate'] : undef,
 			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
