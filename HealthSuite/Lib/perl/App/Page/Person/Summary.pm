@@ -51,6 +51,7 @@ sub prepare_view
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
+					#component.stp-person.bookmarks#<BR>
 					#component.stp-person.miscNotes#<BR>
 					#component.stp-person.alerts#<BR>
 					<!-- #component.stp-person.refillRequest#<BR> -->
