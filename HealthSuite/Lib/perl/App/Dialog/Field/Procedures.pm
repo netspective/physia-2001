@@ -64,8 +64,8 @@ sub isValid
 	my $charges = '';
 	my $emergency = '';
 	my %diagsSeen = ();
-	my @feeSchedules = $page->param('_f_proc_default_catalog');
 
+	my @feeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	my @diagCodes = split(/\s*,\s*/, $page->field('proc_diags'));
 
 	#munir's old icd validation for checking if the same icd code is entered in twice
@@ -82,7 +82,8 @@ sub isValid
 		$self->invalidate($page, 'Cannot enter the same ICD code more than once.');
 	}
 
-	my @procs = ();
+
+	my @errors = ();
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
@@ -207,28 +208,55 @@ sub isValid
 			$self->invalidate($page, "[<B>P$line</B>] The dollar amount $charges is not valid. Please verify");
 		}
 
-		#for intellicode
+
+
+		## INTELLICODE VALIDATION
+		my @procs = ();
 		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
 		my @cptCodes = ($procedure);
 
-		#App::IntelliCode::getItemCost($page, $procedure, \@feeSchedules);
-		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
-		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
+		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
+		App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
+		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
+
+		if($charges eq '' && $feeSchedules[0] ne '')
+		{
+			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier, \@feeSchedules);
+			my $resultCount = scalar(@$fsResults);
+			if($resultCount == 0)
+			{
+				$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for CPT code '$procedure' and modifier '$modifier'");
+			}
+			elsif($resultCount == 1)
+			{
+				foreach (@$fsResults)
+				{
+					my $fs = $_->[0];
+					my $entry = $_->[1];
+					my $unitCost = $entry->{unit_cost};
+					$page->param("_f_proc_$line\_charges", $unitCost);
+				}
+			}
+		}
+		elsif($charges eq '' && $feeSchedules[0] eq '')
+		{
+			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");		
+		}
+
+		#@errors = App::IntelliCode::validateCodes
+		#	(
+		#		$page, 0,
+		#		sex => $gender,
+		#		dateOfBirth => $dateOfBirth,
+		#		diags => \@diagCodes,
+		#		procs => \@procs,
+		#	);
+
+		#foreach (@errors)
+		#{
+		#	$self->invalidate($page, "[<B>P$line</B>] $_");
+		#}
 	}
-
-	my @errors = App::IntelliCode::validateCodes
-		(
-	#		$page, 0,
-	#		sex => $gender,
-	#		dateOfBirth => $dateOfBirth,
-	#		diags => \@diagCodes,
-	#		procs => \@procs,
-		);
-
-	#foreach (@errors)
-	#{
-	#	$self->invalidate($page, $_);
-	#}
 
 	return @errors || $page->haveValidationErrors() ? 0 : 1;
 }
@@ -237,7 +265,6 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 
-	my $errorMsgsHtml = '';
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
 	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
@@ -245,12 +272,20 @@ sub getHtml
 	#get service place code from service facility org
 	my $svcFacility = $page->field('service_facility_id') || $page->session('org_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
-
+	my @lineMsgs = ();
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
-		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
-		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
-		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
+		foreach (@messages)
+		{
+			if(m/\[\<B\>P(\d+)\<\/B\>\]/)
+			{
+				push(@{$lineMsgs[$1]}, $_);
+			}
+			else
+			{
+				push(@{$lineMsgs[0]}, $_);
+			}
+		}
 	}
 
 	my ($dialogName, $lineCount, $allowComments, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
@@ -258,6 +293,17 @@ sub getHtml
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+		my $errorMsgsHtml = '';
+		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
+		{
+			$errorMsgsHtml = "<font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @{$lineMsgs[$line]}) . "</font>";
+			$numCellRowSpan = $allowComments ? 'ROWSPAN=3' : 'ROWSPAN=2';
+		}
+		else
+		{
+			$numCellRowSpan = $allowComments ? 'ROWSPAN=2' : '';
+		}
+
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_actual_diags" VALUE='@{[ $page->param("_f_proc_$line\_actual_diags")]}'/>
@@ -309,7 +355,25 @@ sub getHtml
 				<TD COLSPAN=8><INPUT CLASS='procinput' NAME='_f_proc_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_proc_$line\_comments") ]}'></TD>
 			</TR>
 		} if $allowComments;
+
+		$linesHtml .= qq{
+			<TR>
+				<TD COLSPAN=12>$errorMsgsHtml</TD>
+			</TR>
+		} if $errorMsgsHtml;
 	}
+
+	my $lineZeroErrMsgs = '';
+	if(ref $lineMsgs[0] eq 'ARRAY' && @{$lineMsgs[0]})
+	{
+		$lineZeroErrMsgs = "<font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @{$lineMsgs[0]}) . "</font>";
+	}
+
+	my $nonLinesHtml = qq{
+		<TR>
+			<TD COLSPAN=5>$lineZeroErrMsgs</TD>
+		</TR>
+	} if $lineZeroErrMsgs;
 
 	my $removeHd = $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
 	return qq{
@@ -329,8 +393,9 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"></TD>
+						<TD><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'></TD>
 					</TR>
+					$nonLinesHtml
 				</TABLE>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$lineCount"/>
