@@ -71,24 +71,23 @@ $STMTMGR_REPORT_ACCOUNT_COLLECTION = new App::Statements::Report::AccountCollect
 		{
 			select distinct
 				p1.simple_name patient_name,
-				t1.trans_owner_id patient_id,
+				iw.person_id patient_id,
 				i.balance,
-				trunc(sysdate - i.invoice_date) age
-			from
-				invoice i,
-				person p1,
-				transaction t1,
-				person_org_category poc
+				trunc(sysdate - i.invoice_date) age,
+				iw.invoice_id
+			from	person p1,
+				Invoice_Worklist iw,
+				person_org_category poc,
+				invoice i
 			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
 			and i.balance > 0
 			and i.invoice_status <> 16
-			and i.invoice_id = t1.trans_invoice_id
-			and t1.trans_owner_id = p1.person_id
+			and i.invoice_id = iw.invoice_id
+			and iw.person_id = p1.person_id
 			and p1.person_id = poc.person_id
 			and poc.org_internal_id = :3
-			and t1.trans_status = $ACTIVE
-			and t1.trans_type = $OWNER
-			and t1.trans_subtype = 'Owner'
+			and iw.worklist_type='Collection'
+			AND iw.worklist_status = 'Account In Collection'
 			order by trunc(sysdate - i.invoice_date) desc
 		},
 
@@ -103,15 +102,15 @@ $STMTMGR_REPORT_ACCOUNT_COLLECTION = new App::Statements::Report::AccountCollect
 		{
 			select distinct
 				p2.simple_name provider_name,
-				t1.provider_id provider_id
+				iw.owner_id provider_id
 			from
 				person p2,
-				transaction t1
-			where t1.trans_owner_id = :1
-			and t1.provider_id = p2.person_id
-			and t1.trans_status = $ACTIVE
-			and t1.trans_type = $OWNER
-			and t1.trans_subtype = 'Owner'
+				Invoice_Worklist iw
+			where iw.person_id = :1
+			and iw.owner_id = p2.person_id
+			and iw.worklist_type='Collection'
+			AND iw.worklist_status = 'Account In Collection'
+			and iw.responsible_id = iw.owner_id
 			order by 2
 		},
 	},
