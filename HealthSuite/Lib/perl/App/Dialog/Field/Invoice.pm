@@ -89,7 +89,7 @@ sub new
 
 	my $nameSuffix = $params{nameSuffix} || '';
 	$params{fields} = [
-		new CGI::Dialog::Field(caption => 'Charge', name => "proccharge$nameSuffix", type => 'currency', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Charge', name => "proccharge$nameSuffix", type => 'currency'),
 		new CGI::Dialog::Field(caption => 'Units', name => "procunits$nameSuffix", type => 'integer', size => 6, minValue => 1, value => 1, options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(caption => 'EMG', name => "emg$nameSuffix", type => 'bool', style => 'check'),
 	];
