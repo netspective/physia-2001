@@ -150,6 +150,7 @@ use App::Dialog::Person::Nurse;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Staff;
+use App::Dialog::PostBatchPayment;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
@@ -625,8 +626,8 @@ $WORKLIST_CLASSES = {
 	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
-	'postpayment' => {_class => 'App::Dialog::PostGeneralPayment', heading => 'Add Personal Payment'},
-	'postbatchpayment' => {_class => 'App::Dialog::PostGeneralPayment', heading => 'Add Batch Payments'},
+	#'batch' => {_class => 'App::Dialog::PostBatchPayment', heading => '$Command Batch'},
+	'postpersonalpayment' => 'App::Dialog::PostGeneralPayment',
 	'postinvoicepayment' => 'App::Dialog::PostInvoicePayment',
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
