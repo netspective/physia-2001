@@ -193,10 +193,10 @@ sub initialize
 
 		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Physician']),
 
-		new CGI::Dialog::MultiField(caption =>'Similar/Current Illness Dates', name => 'illness_dates',
-			fields => [
-				new CGI::Dialog::Field(name => 'illness_begin_date', type => 'date', defaultValue => ''),
-				new CGI::Dialog::Field(name => 'illness_end_date', type => 'date', defaultValue => '')
+		new CGI::Dialog::MultiField(caption =>'Current/Similar Illness Dates', name => 'illness_dates',
+			fields => [				
+				new CGI::Dialog::Field(name => 'illness_end_date', type => 'date', defaultValue => ''),
+				new CGI::Dialog::Field(name => 'illness_begin_date', type => 'date', defaultValue => '')
 			]),
 		new CGI::Dialog::MultiField(caption =>'Begin/End Disability Dates', name => 'disability_dates',
 			fields => [
