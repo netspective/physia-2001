@@ -103,8 +103,7 @@ $STMTFMT_DETAIL_APPT_SCHEDULE = qq{
 			AND org_internal_id = e.facility_id
 		)
 		AND e.event_id = ea.parent_id
-		AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
-		AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		%startTimeConstraints%
 		%excludeDiscardedAppts%
 		AND aat.id = ea.value_int
 		ORDER BY 5, 7
@@ -128,8 +127,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE owner_org_id = :4
 					AND org_internal_id = Event.facility_id
 				)
-				and Event.start_time between to_date(:2 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-				and to_date(:3 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
+				and Event.start_time >= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				and Event.start_time <  to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				and Appt_Status.id = Event.event_status
 			group by caption, event_status
 		},
@@ -152,6 +151,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		sqlStmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
 		whereCond =>q{e.event_status = :1},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,
 	},
 
@@ -160,6 +163,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Discard_Type WHERE id = e.discard_type) as appt_status},
 		discardRemarks => qq{, discard_remarks },
 		whereCond =>q{e.event_status = :1},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},
 		publishDefn => $discardAppt_defn,
 	},
 	
@@ -228,6 +235,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			AND e.event_id = t.parent_event_id
 		},
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -235,7 +246,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_missingEncounter' =>
 	{
 		sqlStmt => qq{
-			SELECT 	to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
+			SELECT to_char(e.CHECKIN_STAMP - :5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
 			FROM 	Event e, Event_Attribute ea
 			WHERE	(:1 is NULL or facility_id = :1)
 				AND (:6 is NULL or ea.value_textb = :6)
@@ -247,11 +258,12 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					AND org_internal_id = e.facility_id
 				)
 				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND e.CHECKIN_STAMP >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-				AND e.CHECKIN_STAMP <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND e.event_id = ea.parent_id
-				AND e.CHECKOUT_STAMP is NULL
-			GROUP BY to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT')
+				AND e.checkin_stamp is NOT NULL
+				AND e.checkout_stamp is NULL
+			GROUP BY to_char(e.CHECKIN_STAMP - :5, '$SQLSTMT_DEFAULTDATEFORMAT')
 			ORDER BY 1 desc
 		},
 			publishDefn => 	{
@@ -275,6 +287,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			and e.checkin_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
 			and e.checkout_stamp is NULL
 		},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -283,7 +299,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_dateEntered' =>
 	{
 		sqlStmt => qq{
-			SELECT to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (e.scheduled_stamp)
+			SELECT to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count(*)
 			FROM 	Event e, Event_Attribute ea
 			WHERE	(:1 is NULL or facility_id = :1)
 				AND (:6 is NULL or ea.value_textb = :6)
@@ -321,6 +337,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			e.scheduled_stamp >= TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			and e.scheduled_stamp < TO_DATE(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6 
 		},
+		startTimeConstraints => qq{
+			AND e.scheduled_stamp >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.scheduled_stamp <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -336,10 +356,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				Event_Attribute ea,
 				Event e
 			WHERE e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND e.event_status < 3
 				AND (:1 is NULL or e.facility_id = :1)
-				AND	ea.parent_id = e.event_id
+				AND ea.parent_id = e.event_id
 				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
@@ -419,6 +439,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			AND	ct.id = i.ins_type
 		},
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -438,6 +462,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			AND	ct.id = 0
 		},
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 
@@ -481,6 +509,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
 		whereCond =>q{ event_status in (1,2) AND ea.value_textB = :1},
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE	,
 
 	},
@@ -525,6 +557,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		apptStatusSelect => qq{(SELECT caption FROM Appt_Status WHERE id = e.event_status) as appt_status},
 		whereCond=>q{ea.value_int = :1 and event_status in (1,2) },
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
+		startTimeConstraints => qq{
+			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
+			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
+		},		
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 );
