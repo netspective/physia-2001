@@ -36,8 +36,8 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'refill', caption => 'Refill', type => 'memo', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'refilldate', caption => 'Date', type => 'date'),
-		new App::Dialog::Field::Person::ID(name => 'provider', caption => 'Physician', types => ['Physician'], options => FLDFLAG_REQUIRED, hints => 'Physician approving the refill.'),
-		new App::Dialog::Field::Person::ID(name => 'filler', caption => 'Refill Processor', addType => 'nurse', options => FLDFLAG_REQUIRED, hints => 'Person processing the refill.'),
+		new App::Dialog::Field::Person::ID(name => 'provider', caption => 'Physician', types => ['Physician'], options => FLDFLAG_REQUIRED, hints => 'Physician approving the refill.', incSimpleName=>1),
+		new App::Dialog::Field::Person::ID(name => 'filler', caption => 'Refill Processor', addType => 'nurse', options => FLDFLAG_REQUIRED, hints => 'Person processing the refill.', incSimpleName=>1),
 		new CGI::Dialog::Field(name => 'comments', caption => 'Comments', type => 'memo'),
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',

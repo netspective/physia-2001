@@ -35,8 +35,8 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'patient_phone_message'),
-		new App::Dialog::Field::Person::ID(name => 'person_called', caption =>'Call From', addType => 'patient', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new App::Dialog::Field::Person::ID(name => 'provider', caption =>'Call For', addType => 'patient', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new App::Dialog::Field::Person::ID(name => 'person_called', caption =>'Call From', addType => 'patient', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, incSimpleName=>1),
+		new App::Dialog::Field::Person::ID(name => 'provider', caption =>'Call For', addType => 'patient', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, incSimpleName=>1),
 		#new CGI::Dialog::Field(name => 'datecalled', caption => 'Date', type => 'date'),
 		new CGI::Dialog::Field( caption => 'Date and Time of Calling', name => 'time', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'phone_message', caption => 'Phone Message', type => 'memo', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),

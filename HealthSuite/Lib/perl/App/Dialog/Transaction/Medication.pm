@@ -65,7 +65,7 @@ sub new
 			schema => $schema, column => 'Transaction.trans_begin_stamp', type => 'date', futureOnly => 0),
 		);
 	$prescribe ? $self->addContent(
-		new App::Dialog::Field::Person::ID(caption => 'Physician',
+		new App::Dialog::Field::Person::ID(caption => 'Physician', incSimpleName=>1,
 			name => 'provider_id', types => ['Physician'],options => FLDFLAG_REQUIRED)
 		) : undef;
 	$self->addContent(
