@@ -26,9 +26,8 @@ $STMTFMT_SEL_ORG = qq{
 						where parent_id = o.org_id and caption = member_name
 					)
 				) and
-				%whereCond%
+				%whereCond% and owner_org_id = ?
 };
-
 
 $STMTRPTDEFN_DEFAULT =
 {
