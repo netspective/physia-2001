@@ -67,6 +67,7 @@ $STMTFMT_SEL_ORG_SERVICE_DIR = qq{
 		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa
 		WHERE    oc.catalog_id = c.internal_catalog_id
 		AND     a.parent_id = o.org_internal_id
+		AND     a.address_name = 'Street'
 		AND     cat.parent_id = o.org_internal_id
 		AND     cat.member_name in ('main_dir_entry', 'location_dir_entry')
 		AND     c.catalog_type = 1
@@ -86,6 +87,7 @@ $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR = qq{
 		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa
 		WHERE    oc.catalog_id = c.internal_catalog_id
 		AND     a.parent_id = o.org_internal_id
+		AND     a.address_name = 'Street'
 		AND     cat.parent_id = o.org_internal_id
 		AND     cat.member_name in ('main_dir_entry', 'location_dir_entry')
 		AND     c.catalog_type = 1
