@@ -217,8 +217,7 @@ sub execute
 	my @data = ();
 	foreach (@$claimStatus)
 	{
-		my $sqlStmtNote = qq{select value_text from invoice_attribute where item_name ='Invoice/History/Item' and cr_user_id = 'EDI_PERSE' AND
-					parent_id = $_->{invoice_id} and rownum < 6 order by item_id asc};
+		my $sqlStmtNote = qq{select value_text from invoice_history where cr_user_id = 'EDI_PERSE' AND parent_id = $_->{invoice_id} and rownum < 6 order by item_id asc};
 		my $getEDINotes = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmtNote);
 		my $notes='';
 		foreach my $value (@$getEDINotes)
