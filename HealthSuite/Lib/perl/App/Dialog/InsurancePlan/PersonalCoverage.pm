@@ -365,7 +365,7 @@ sub execute
 		'Insurance', $command,
 		ins_internal_id			=> $page->param('ins_internal_id') || undef,
 		parent_ins_id			=> $parentRecord->{'ins_internal_id'} || undef,
-		product_name			=> $page->field('product_name') || undef,
+		product_name			=> $parentRecord->{'product_name'} || undef,
 		plan_name				=> $page->field('plan_name') || undef,
 		record_type				=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
 		owner_person_id			=> $page->param('person_id') || $page->field('person_id') || undef,
