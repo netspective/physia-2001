@@ -49,7 +49,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	substr($refClaimInsured->getRelationshipToPatient(),0,2),
-	substr($refClaimInsured->getSsn(), 0, 17),
+	substr($refClaimInsured->getMemberNumber(), 0, 17),
 	$spaces,  # insured id filler
 	substr($refClaimInsured->getLastName(), 0, 20),
 	substr($refClaimInsured->getFirstName(), 0, 10),

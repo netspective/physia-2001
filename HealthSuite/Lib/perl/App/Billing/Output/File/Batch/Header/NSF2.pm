@@ -52,11 +52,23 @@ sub formatData
 	my $claimPayToOrganizationAddress = $claimPayToOrganization->{address};
 	my $claimPayToProviderAddress = $claimPayToProvider->{address};
 	my $claimRenderingProvierAddress = $claimRenderingProvier->{address};
+	
+	my $emcId;
+	
+	for my $eachClaim (0..$#$inpClaim)
+	{
+		$emcId = $inpClaim->[$eachClaim]->getEMCId();
+		
+		if ($emcId ne "")
+		{
+			last;
+		}
+	}
 
 my %nsfType = ( NSF_HALLEY . "" =>		
 	  sprintf("%-3s%-15s%-3s%4d%-6s%-3s%-30s%-30s%-20s%-2s%-9s%-10s%-30s%-30s%-20s%-2s%-9s%-10s%-42s%-42s",
 	  $self->recordType(),
-	  substr($firstClaim->getEMCId(),0,15), #emc provider id
+	  substr($emcId,0,15), #emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
@@ -79,7 +91,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  NSF_ENVOY . "" => 
 	  sprintf("%-3s%-15s%-3s%4d%-6s%-3s%-30s%-30s%-20s%-2s%-9s%-10s%-30s%-30s%-20s%-2s%-9s%-10s%-42s%-42s",
 	  $self->recordType(),
-	  substr($firstClaim->getEMCId(),0,15), #emc provider id
+	  substr($emcId,0,15), #emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id

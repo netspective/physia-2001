@@ -476,6 +476,7 @@ sub formatData
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $Patient = $inpClaim->{careReceiver};
+	my $renderingProvider = $inpClaim->{renderingProvider};
 	
 my %nsfType = (NSF_HALLEY . "" =>	
 	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-3s%-36s%-1s%-1s%-1s',
@@ -492,9 +493,9 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,
 	$spaces,
 	$spaces,
-	$spaces,
-	$spaces,
-	$spaces,
+	substr($renderingProvider->getLastName(),0,20),#$spaces,
+	substr($renderingProvider->getFirstName(),0,12),#$spaces,
+	substr($renderingProvider->getMiddleInitial(),0,1), #$spaces,
 	$spaces,
 	$spaces,
 	$spaces,

@@ -49,9 +49,9 @@ sub stripDash
 	$claim->{payToProvider}->{address}->{zipCode} =~ s/-//g;
 	$claim->{renderingProvider}->{address}->{zipCode} =~ s/-//g;
 	$claim->{payToOrganization}->{address}->{zipCode} =~ s/-//g;
-	$claim->{renderingOrganization}->{address}->{zipCode} =~ s/-//g;
- 	$claim->{careReceiver}->{address}->{zipCode} =~ s/-//g;
- 	$claim->{insured}->[0]->{address}->{zipCode} =~ s/-//g;
+    $claim->{renderingOrganization}->{address}->{zipCode} =~ s/-//g;
+    $claim->{careReceiver}->{address}->{zipCode} =~ s/-//g;
+    $claim->{insured}->[0]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[1]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[2]->{address}->{zipCode} =~ s/-//g;
 	$claim->{insured}->[3]->{address}->{zipCode} =~ s/-//g;
@@ -67,7 +67,17 @@ sub stripSpace
 {
 	my ($self, $claim) = @_;
 	
-	$claim->{careReceiver}->{ssn} =~ s/\s*//g;
+	$claim->{careReceiver}->{ssn} =~ s/ //g;
+	$claim->{insured}->[0]->{ssn} =~ s/ //g;
+	$claim->{insured}->[1]->{ssn} =~ s/ //g;
+	$claim->{insured}->[2]->{ssn} =~ s/ //g;
+	$claim->{insured}->[3]->{ssn} =~ s/ //g;
+	
+	$claim->{insured}->[0]->{memberNumber} =~ s/ //g;
+	$claim->{insured}->[1]->{memberNumber} =~ s/ //g;
+	$claim->{insured}->[2]->{memberNumber} =~ s/ //g;
+	$claim->{insured}->[3]->{memberNumber} =~ s/ //g;
+
 }
 
 sub fillData

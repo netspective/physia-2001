@@ -53,8 +53,8 @@ sub processFile
 	$self->{medicareClaimsList} = new App::Billing::Claims;
 	$self->{medicaidClaimsList} = new App::Billing::Claims;
     $self->{payerClaimsBatch} = {	
-									 MEDICARE => [$self->{medicareClaimsList}],
-									 MEDICAID => [$self->{medicaidClaimsList}]
+									4 => $self->{medicareClaimsList},
+									5 => $self->{medicaidClaimsList}
 								 };	
 
 	
@@ -128,15 +128,17 @@ sub makeBatches
     #
 
 	# fetch each element i.e. claim from claims array one by one
+	my @payerCodes = (MEDICARE, MEDICAID);
+	
 	for $claimValue (0..$#$claims)
 	{
 	   if ($self->{nsfType} == NSF_HALLEY)
 	   {
 			 my $claimType = $claims->[$claimValue]->getInsType();
-			 
-			 if ($claimType =~ /[MEDICARE,MEDICAID]/)
+			 print "claimType = $claimType\n";
+			 if( grep{$_ eq $claimType} @payerCodes)
 			 {
-				 $self->{payerClaimsBatch}->{$claimType}->[0]->addClaim($claims->[$claimValue]);
+				 $self->{payerClaimsBatch}->{$claimType}->addClaim($claims->[$claimValue]);
 			 }
 			 else
 			 {
@@ -179,11 +181,11 @@ sub makeSelectedClaimsList
 	my $tempBatches = $self->{batches};
 
 	# Following lines will add batches which were made on the basis of payers	
-	foreach my $payerKey(keys %{$self->{payerClaimsList}})
+	foreach my $payerKey(keys %{$self->{payerClaimsBatch}})
 	{
-	   if($self->{payerClaimsList}->{$payerKey}->[0]->getStatistics()->{count} > 0)
+	   if($self->{payerClaimsBatch}->{$payerKey}->getStatistics()->{count} > 0)
 	   {
-	   	  $self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $self->{payerClaimsList}->{$payerKey}->[0];
+	   	  $self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $self->{payerClaimsBatch}->{$payerKey};
 	   }	
 		
 	}	

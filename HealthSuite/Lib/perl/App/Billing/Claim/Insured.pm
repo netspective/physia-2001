@@ -34,7 +34,21 @@ sub new
 	$self->{terminationDate} = undef;
 	$self->{billSequence} = undef;
 	$self->{bcbsPlanCode} = undef;
+	$self->{memberNumber} = undef;
+
 	return bless $self, $type;
+}
+
+sub getMemberNumber
+{
+	my ($self) = @_;
+	return $self->{memberNumber};
+}
+
+sub setMemberNumber
+{
+	my ($self, $value) = @_;
+	$self->{memberNumber} = $value;
 }
 
 

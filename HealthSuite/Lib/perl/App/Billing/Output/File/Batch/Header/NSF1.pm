@@ -50,12 +50,22 @@ sub formatData
 	my $firstClaim = $inpClaim->[0];
 	my $claimPayToProvider = $firstClaim->{payToProvider};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
-
+	my $emcId;
 	
+	for my $eachClaim (0..$#$inpClaim)
+	{
+		$emcId = $inpClaim->[$eachClaim]->getEMCId();
+		
+		if ($emcId ne "")
+		{
+			last;
+		}
+	}
+			
 my %nsfType = ( NSF_HALLEY . "" =>		
 	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-14s",
 	  $self->recordType(),
-	  substr($firstClaim->getEMCId(),0,15), # group provider id
+	  substr($emcId,0,15), # group provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
@@ -86,7 +96,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  NSF_ENVOY . "" =>
 	  sprintf("%-3s%-15s%-3s%4s%-6s%-9s%-6s%1s%-15s%-6s%-6s%-15s%-15s%-15s%-15s%-15s%-15s%-33s%-20s%-12s%1s%-3s%-15s%-15s%-15s%-15s%13s%-12s%1s%1s",
 	  $self->recordType(),
-	  substr($firstClaim->getEMCId(),0,15), # emc provider id
+	  substr($emcId,0,15), # emc provider id
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id

@@ -193,6 +193,10 @@ sub processClaim
 	{
 	   	$self->{FAatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FAat;
     }
+    elsif($nsfType == NSF_HALLEY)
+    {
+    	$self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
+    }
     
    	my $proceduresCount = $tempClaim->{procedures};
    	if($#$proceduresCount > -1)
@@ -205,6 +209,10 @@ sub processClaim
 			{
 			    push(@$outArray,$self->{FAatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 		    }
+		    elsif($nsfType == NSF_HALLEY)
+		    {
+		    	push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+			}
 	    
 	    
 #		    $self->{totalClaimCharges} +=  $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getCharges();
