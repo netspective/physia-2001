@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.10 2000-11-06 21:14:26 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.11 2000-11-22 20:31:21 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
@@ -509,10 +509,12 @@ sub orderBy
 			{
 				die "ColDefn '$colDefn' is not valid";
 			}
-			else
+			
+			unless (ref $colDefn eq 'HASH')
 			{
 				$colDefn = {id => $colDefn, order => 'Ascending'};
 			}
+			
 			push @{$self->{orderBy}}, $colDefn;
 		}
 	}
