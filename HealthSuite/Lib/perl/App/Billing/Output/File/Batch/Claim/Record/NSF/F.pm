@@ -60,7 +60,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, 											# line item control number
 	$currentProcedure->getDateOfServiceFrom(), 			#ccyy/mm/dd Service Date from
 	$currentProcedure->getDateOfServiceTo(),			#ccyy/mm/dd Service Date To
-	substr($currentProcedure->getPlaceOfService(),0,2), # Place of service
+	sprintf("%02d", substr($currentProcedure->getPlaceOfService(),0,2)), # Place of service
 	$currentProcedure->getTypeOfService(),				# type of service
 	$currentProcedure->getCPT(),						# HCPCS Procedure Code
 	$modifier[0] ne "" ? substr($modifier[0],0,2) : $spaces, # HCPCS Modifier 1
