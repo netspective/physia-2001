@@ -91,7 +91,7 @@ sub inheritHashValues
 			borderColor => '#FFFFFF',
 			contentColor => '#FFFFFF',
 			heading => 'No Heading Provided',
-			frameSepCellFmt => "<IMG SRC='/images/background/bar.gif' WIDTH=100% HEIGHT=1>",
+			frameSepCellFmt => "<IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1>",
 		},
 	},
 );
@@ -266,7 +266,7 @@ sub prepareHtmlFormat
 			my @rows = ();
 			foreach (@$actions)
 			{
-				my $icon = $_->{icon} || '/images/icons/edit_add.gif';
+				my $icon = $_->{icon} || '/resources/icons/edit_add.gif';
 				my $img = $_->{img} || "<IMG SRC='$icon' BORDER=0>";
 				push(@rows, '<TR VALIGN=TOP>',
 						$img ?

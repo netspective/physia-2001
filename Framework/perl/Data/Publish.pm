@@ -120,7 +120,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 			borderColor => '#FFFFFF',
 			contentColor => '#FFFFFF',
 			heading => 'No Heading Provided',
-			frameSepCellFmt => "<IMG SRC='/images/background/bar.gif' WIDTH=100% HEIGHT=1>",
+			frameSepCellFmt => "<IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1>",
 			editUrl => './stpe-#my.stmtId#?home=/#param.arl#',
 			width => '100%',
 		},
@@ -255,7 +255,7 @@ sub prepare_HtmlBlockFmtTemplate
 			exists $publDefn->{tSpacer} ? $publDefn->{tSpacer} : "<TH>$tailFontOpen&nbsp;&nbsp;$tailFontClose</TH>",
 
 		);
-	my $imgPath = exists $publDefn->{imgPath} ? $publDefn->{imgPath} : "/images";
+	my $imgPath = exists $publDefn->{imgPath} ? $publDefn->{imgPath} : "/resources";
 	my $colCount = 0;
 	my (@headCols, @bodyCols, @tailCols, @colCallbacks, @colValueCallbacks, @storeCols);
 
@@ -472,7 +472,7 @@ sub prepare_HtmlBlockFmtTemplate
 	# so if any changes are made here, be sure to make the same changes there, too.
 	#
 	my $dataSepStr = exists $publDefn->{dataSepStr} ? $publDefn->{dataSepStr} : "<TR><TD COLSPAN=$outColsCount><HR SIZE=1 COLOR=SILVER WIDTH=100%></TD></TR>";
-	my $rowSepStr = exists $publDefn->{rowSepStr} ? $publDefn->{rowSepStr} : "<TR><TD COLSPAN=$outColsCount><IMG SRC='/images/background/bar.gif' WIDTH=100% HEIGHT=1></TD></TR>";
+	my $rowSepStr = exists $publDefn->{rowSepStr} ? $publDefn->{rowSepStr} : "<TR><TD COLSPAN=$outColsCount><IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1></TD></TR>";
 	my $bannerFmt = '';
 	if(my $bannerInfo = $publDefn->{banner})
 	{

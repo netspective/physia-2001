@@ -103,7 +103,7 @@ sub getHtml
 
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
-		$spacerHtml = '<img src="/images/icons/arrow_right_red.gif" border=0>';
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
 		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
 		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
 	}
@@ -821,7 +821,7 @@ sub getHtml
 	}
 	if(@messages)
 	{
-		$spacerHtml = '<img src="/images/icons/arrow_right_red.gif" border=0>';
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
 		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
 
 		my $msgsHtml = '';
@@ -1046,8 +1046,8 @@ sub getHtml
 		<td align=center colspan=$tableCols valign=bottom>
 			$self->{preHtml}
 			$nextActions
-			<input name="$fieldName" type="image" src="/images/buttons/ok_btn.gif" border=0 title="">
-			<a href="$cancelURL"><img src="/images/buttons/cancel_btn.gif" border=0></a>
+			<input name="$fieldName" type="image" src="/resources/widgets/ok_btn.gif" border=0 title="">
+			<a href="$cancelURL"><img src="/resources/widgets/cancel_btn.gif" border=0></a>
 			$self->{postHtml}
 		</td>
 		</tr>
@@ -1087,18 +1087,18 @@ use CGI::Validator::Field;
 use CGI::Validator;
 
 use vars qw(@ISA $POSTMATCH);
-use enum qw(BITMASK:DLGFLAG_ 
-	DATAENTRY_INITIAL 
-	DATAENTRY 
-	EXECUTE 
-	PRIKEYREADONLY 
-	READONLY 
-	ADD 
-	UPDATE 
-	REMOVE 
-	ADD_DATAENTRY_INITIAL 
-	UPDORREMOVE_DATAENTRY_INITIAL 
-	UPDORREMOVE 
+use enum qw(BITMASK:DLGFLAG_
+	DATAENTRY_INITIAL
+	DATAENTRY
+	EXECUTE
+	PRIKEYREADONLY
+	READONLY
+	ADD
+	UPDATE
+	REMOVE
+	ADD_DATAENTRY_INITIAL
+	UPDORREMOVE_DATAENTRY_INITIAL
+	UPDORREMOVE
 	IGNOREREDIRECT);
 
 use constant FIELDNAME_EXECMODE => 'dlg_execmode';
@@ -1739,7 +1739,7 @@ sub getHtml
 	<tr><td>
 	<table border=0 bgcolor=$self->{bgColor} cellspacing=0 cellpadding=4>
 		<tr align=center bgcolor=$self->{headColor}>
-			<td background='/images/background/verttab.gif'>
+			<td background='/resources/design/verttab.gif'>
 				<font $self->{headFontAttrs}>&nbsp;<b>$heading</b><!--$activeExecMode : $newExecMode : $isValid)-->&nbsp;</font>
 				$titleRule
 			</td>
