@@ -172,6 +172,48 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 			and (modifier = ? or modifier is NULL)
 			and catalog_id = ?
 	},
+	'selTop15CPTsByORG' => q{
+		select distinct(parent_id), read_count
+		from REF_CPT_Usage
+		where org_id = ?
+		and parent_id is not null
+		and rownum < 16
+		order by read_count desc
+		},
+	'selTop15ICDsByORG' => q{
+		select distinct(parent_id), read_count
+		from REF_ICD_Usage
+		where org_id = ?
+		and parent_id is not null
+		and rownum < 16
+		order by read_count desc
+		},
+	'selTop15CPTsByPerson' => q{
+		select distinct(parent_id), read_count
+		from REF_CPT_Usage
+		where person_id = ?
+		and parent_id is not null
+		and rownum < 16
+		order by read_count desc
+		},
+	'selTop15ICDsByPerson' => q{
+		select distinct(parent_id), read_count
+		from REF_ICD_Usage
+		where person_id = ?
+		and parent_id is not null
+		and rownum < 16
+		order by read_count desc
+		},
+	'selAllServicePlaceId' => q{
+		select id
+		from HCFA1500_Service_Place_Code
+		},
+	'selAllServiceTypeId' => q{
+		select id
+		from HCFA1500_Service_Type_Code
+		},
+
+
 );
 
 1;
