@@ -183,6 +183,7 @@ sub getDefaultConfig
 	'LIMA' => getDefaultConfig('Lima Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'TITAN' => getDefaultConfig('Thai Home PC Configuration', CONFIGGROUP_SOLO, 'hs/hs@dbi:Oracle:HealthSuiteIvory'),
 	'PSLINUX' => getDefaultConfig('ProSys Configuration', CONFIGGROUP_SOLO, 'physia/physia@dbi:Oracle:physia'),
+	'SILICON' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 
 	# other keyed configurations go here
 	# if a particular UNIX user needs a special configuration, use 'account-username'
@@ -238,8 +239,8 @@ if(my $forceConfig = $ENV{HS_CONFIG})
 
 if($^O ne 'MSWin32')
 {
-	my $userName = getpwuid($>) || '';
-	my $groupName = getgrgid($)) || '';
+	$userName = getpwuid($>) || '';
+	$groupName = getgrgid($)) || '';
 
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"} unless $CONFDATA_SERVER;
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"group-$groupName"} unless $CONFDATA_SERVER;
