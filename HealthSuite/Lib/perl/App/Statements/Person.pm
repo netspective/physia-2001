@@ -414,7 +414,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as first_access, to_char(last_access, '$SQLSTMT_DEFAULTSTAMPFORMAT') as last_access from person_session
 		where status = 0 and person_id = ? and org_internal_id = ?
 		},
-	'selPhysStateLicense' => q{
+	'selPhysStateLicense' => qq{
 		select * from person_attribute
 		where parent_id = ? and value_type = @{[App::Universal::ATTRTYPE_STATE]} and value_int = ?
 		},
@@ -458,7 +458,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			  	from Referral_Reason
 		},
 
-	'selPrimaryMail' => q{
+	'selPrimaryMail' => qq{
 			select *
 				from person_attribute
 				where parent_id = ?
@@ -472,7 +472,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				where role_name = ?
 		},
 
-	'selPreferredPhoneExists' => q{
+	'selPreferredPhoneExists' => qq{
 			select value_text
 				from person_attribute
 				where value_type = @{[App::Universal::ATTRTYPE_PHONE]}
