@@ -34,10 +34,10 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				sum(ending_a_r) as ENDING_A_R
 			from 	daily_audit_recap
 			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
-			and	org_internal_id = ?
+			and	org_id = ?
 			group by DAY_OF_MONTH, ORG_ID
-		},
-	sqlStmtBindParamDescr => ['Report Start Date, Report End Date,Org ID for Attribute Table'],
+	},
+	sqlStmtBindParamDescr => ['Report Start Date, Report End Date,Internal Org ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
 			{ colIdx => 0, head => 'Day', dataFmt => '#0#', dAlign => 'RIGHT' },
@@ -90,7 +90,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				sum(change_a_r) as CHANGE_A_R
 			   from  daily_audit_recap
 			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
-			and org_internal_id = ?
+			and org_id = ?
 			group by to_char(to_date(DAY_OF_MONTH,'mm/dd/yyyy'), 'YYYY-MON'), ORG_ID
 			order by Month
 		},

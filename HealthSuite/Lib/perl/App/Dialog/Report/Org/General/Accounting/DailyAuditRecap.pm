@@ -12,6 +12,7 @@ use CGI::Validator::Field;
 use DBI::StatementManager;
 
 use App::Statements::Component::Invoice;
+use App::Statements::Org;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -56,9 +57,9 @@ sub execute
 	my $reportBeginDate = $page->field('daily_begin_date');
 	my $reportEndDate = $page->field('daily_end_date');
 	my $orgId = $page->field('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
 
-	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.dailyAuditRecap', [$reportBeginDate,$reportEndDate,$orgId]);
-
+	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.dailyAuditRecap', [$reportBeginDate, $reportEndDate, $orgIntId] );
 }
 
 

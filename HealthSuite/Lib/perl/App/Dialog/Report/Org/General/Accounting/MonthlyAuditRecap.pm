@@ -13,6 +13,7 @@ use CGI::Validator::Field;
 use DBI::StatementManager;
 
 use App::Statements::Component::Invoice;
+use App::Statements::Org;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -55,6 +56,7 @@ sub execute
 	my $reportBeginDate = $page->field('monthly_begin_date');
 	my $reportEndDate = $page->field('monthly_end_date');
 	my $orgId = $page->field('org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
 
 	#my @startDateItems = split(/\//, $reportBeginDate);
 	#my @endDateItems = split(/\//, $reportEndDate);
@@ -64,7 +66,7 @@ sub execute
 	#my $daysDiff = Delta_Days(@varTempArray1, @varTempArray2); 
 
 	#$page->addDebugStmt("The number of days difference is $daysDiff");
-	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.monthlyAuditRecap', [$reportBeginDate,$reportEndDate,$orgId]);
+	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.monthlyAuditRecap', [$reportBeginDate,$reportEndDate,$orgIntId]);
 
 }
 

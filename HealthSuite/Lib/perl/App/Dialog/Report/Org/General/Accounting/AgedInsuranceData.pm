@@ -10,6 +10,7 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+use App::Statements::Org;
 
 use App::Statements::Component::Invoice;
 
@@ -35,10 +36,11 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $orgId = $page->field('ins_org_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
 
 	if ( $orgId ne '')
 	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedInsuranceData', [$orgId]);
+		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedInsuranceData', [$orgIntId]);
 	}
 	else
 	{
