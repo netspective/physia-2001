@@ -7,6 +7,8 @@ use App::Page;
 use App::Universal;
 use App::Configuration;
 use App::Component::Navigate::FileSys;
+use App::Configuration;
+use File::Temp qw(tempfile);
 
 use vars qw(@EXPORT @ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
@@ -159,6 +161,18 @@ sub prepare
 			if($entryFlags & NAVGFILEFLAG_RAWTEXT)
 			{
 				$self->addContent('<PRE>', @fileData, '</PRE>');
+			}
+			elsif ($entryFlags & NAVGFILEFLAG_EXCEL)
+			{
+				my ($destRef, $fileName) = tempfile('reports-delim_XXXXXX', 
+					DIR => $App::Configuration::CONFDATA_SERVER->path_temp, 
+					SUFFIX => '.csv');
+
+				print $destRef @fileData;
+				close($destRef);
+				
+				$fileName =~ s{.*/}{};
+				$self->redirect('/temp/' . $fileName);
 			}
 			else
 			{
