@@ -573,6 +573,12 @@ sub importAssociatedNurse
 				item_name => 'Physician',
 				value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
 				value_text => $item->{id});
+			$self->schemaAction($flags, "Person_Attribute", 'add',
+				parent_id => $parentId,
+				item_name => 'WorkList',
+				value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
+				value_text => $item->{id} || undef,
+				value_int => 1);
 		}
 	}
 }
