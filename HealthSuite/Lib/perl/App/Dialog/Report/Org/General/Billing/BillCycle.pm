@@ -15,6 +15,7 @@ use DBI::StatementManager;
 use App::Statements::Component::Invoice;
 use App::Statements::Org;
 use App::Statements::Report::Accounting;
+
 use Data::Publish;
 use Data::TextPublish;
 use App::Configuration;
@@ -49,6 +50,23 @@ sub new
 		#	name => 'service_facility_id',
 		#	options => FLDFLAG_PREPENDBLANK,
 		#	types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),
+		new CGI::Dialog::Field(
+			name => 'printReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Print report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
+		),
+
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -61,6 +79,18 @@ sub execute
 
 	my $orgInternalId = $page->session('org_internal_id');
 	my $providerId = $page->field('person_id');
+
+	my $hardCopy = $page->field('printReport');
+	my $html;
+	my $textOutputFilename;
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 	#$ENV{OVERRIDE_BILLING_CYCLE} = 'YES';
 
@@ -79,6 +109,7 @@ sub execute
 
 	my $pubDefn =
 	{
+		reportTitle => "Billing Cycle",
 		columnDefn =>
 		[
 			{	head => 'Payer', colIdx => 0, summarize => 'count', dAlign => 'left',
@@ -94,11 +125,43 @@ sub execute
 		],
 	};
 
+	my $pub =
+		{
+			reportTitle => "New Billing Cycle",
+			columnDefn =>
+			[
+				{head => 'Payer', colIdx => 0, '222'},
+				{ head => 'Type', colIdx => 1,},
+				{ head => 'Provider', colIdx => 2,},
+				{ head => 'Patient', colIdx => 3, url => '/person/#6#/account', hint => 'View #6# Account'},
+				{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum',},
+				{ head => 'Claims', colIdx => 5,},
+			],
+	};
+
+
+	my $pubText =
+		{
+			reportTitle => "Billing Cycle",
+			columnDefn =>
+			[
+				{head => 'Payer', colIdx => 0, '222', dformat => '#6#' },
+				{ head => 'Type', colIdx => 1, dformat => '#0#' ,},
+				{ head => 'Provider', colIdx => 2, dformat => '#1#' ,},
+				{ head => 'Patient', colIdx => 3, dformat => '#2#' },
+				{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum', dformat => '#3#' ,},
+				{ head => 'Claims', colIdx => 5, dformat => '#4#' ,},
+			],
+	};
+
+
 	my @data = ();
+	my @dataTextBased = ();
 	for my $key (keys %{$statements})
 	{
 		my $statement = $statements->{$key};
 		my @rowData = ();
+		my @rowDataTextBased = ();
 
 		if ($statement->{billPartyType})
 		{
@@ -114,16 +177,19 @@ sub execute
 		}
 
 		my @invoiceIds = ();
+		my @invoiceIdsTextBased = ();
 		for (@{$statement->{invoices}})
 		{
 			if ($_->{invoiceId} > 0)
 			{
 				push(@invoiceIds, qq{<a href="/invoice/$_->{invoiceId}/summary" title="View Invoice $_->{invoiceId} Summary">
 					$_->{invoiceId}</a>});
+				push(@invoiceIdsTextBased, $_->{invoiceId});
 			}
 			else
 			{
 				push(@invoiceIds, qq{Payment Plan '@{[ - $_->{invoiceId} ]}' });
+				push(@invoiceIdsTextBased, qq{Payment Plan '@{[ - $_->{invoiceId} ]}' });
 			}
 		}
 
@@ -145,12 +211,45 @@ sub execute
 			$billToName,
 		);
 
+		push(@rowDataTextBased,
+			$billToName,
+			$statement->{billPartyType} ? 'Org' : 'Person',
+			$statement->{billingProviderId},
+			$person->{simple_name},
+			$statement->{amountDue},
+			join(', ', @invoiceIdsTextBased),
+			$statement->{clientId},
+			$statement->{billToId},
+			$statement->{payToId},
+		);
+
 		push(@data, \@rowData);
+		push(@dataTextBased, \@rowDataTextBased);
 	}
 
 	my @sortedData = sort{$b->[4] <=> $a->[4]} @data;
+	my @sortedDataTextBased = sort{$b->[4] <=> $a->[4]} @dataTextBased;
+	$html .= createHtmlFromData($page, 0,  \@sortedData, $pubDefn);
+	$textOutputFilename = createTextRowsFromData($page, 0,  \@sortedDataTextBased, $pubText);
 
-	return createHtmlFromData($page, 0, \@sortedData, $pubDefn);
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	my $pages = $self->getFilePageCount(File::Spec->catfile($CONFDATA_SERVER->path_temp, $textOutputFilename));
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version - $pages Page(s)</a> <br>} : "" ) . $html;
+
+	#return createHtmlFromData($page, 0, \@sortedData, $pubDefn);
+
 }
 
 sub prepare_detail_last4
