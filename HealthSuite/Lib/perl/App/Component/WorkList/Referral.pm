@@ -81,7 +81,7 @@ sub initialize
 	[
 		{
 			caption => qq{
-				<a href='/person/$user_id/dlg-add-referral'>DON'T HAVE USER ID Add Referral</a>
+				<a href='/person/$user_id/dlg-add-referral'>Add Referral</a>
 			}
 		},
 	];
@@ -134,7 +134,7 @@ sub getComponentHtml
 				$_->{requested_service}
 			},
 			qq{
-				$_->{request_date}
+				$_->{trans_end_stamp}
 			},
 			qq{
 				$_->{patient_id}
