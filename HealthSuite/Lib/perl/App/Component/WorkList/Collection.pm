@@ -28,6 +28,7 @@ use vars qw(@ISA %RESOURCE_MAP );
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
 my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
 my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+my $LIMIT = 251;
 sub initialize
 {
 	my ($self, $page) = @_;
@@ -98,14 +99,41 @@ sub getComponentHtml
 		],
 	};	
 
+	my $name = $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonAttribute',$page->session('user_id'),'WorkListCollectionLNameRange',$page->session('org_internal_id'));
+	my $minLastName = $name->{value_text}||'A';
+	my $maxLastName = $name->{value_textb}||'Z';
+	my $amount= $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonAttribute',$page->session('user_id'),'WorkList-Collection-Setup-BalanceAmount-Range',$page->session('org_internal_id'));	
+	my $minAmount = $amount->{value_float}||1;
+	my $maxAmount = $amount->{value_floatb}||99999;
+	my $range= $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonAttribute',$page->session('user_id'),'WorkList-Collection-Setup-BalanceAge-Range',$page->session('org_internal_id'));	
+	my $minRange = $range->{value_int}||30;
+	my $maxRange = $range->{value_intb}||999;
+	my $minDate=$fmtDate;
+	my $maxDate=$fmtDate;
+	if ($minRange)
+	{
+	    	my @date= Add_Delta_Days (@start_Date,"-".$minRange);
+	 	$maxDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);
+	}
+	if ($maxRange)
+	{
+	    	my @date= Add_Delta_Days (@start_Date,"-".$maxRange);
+	 	$minDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);		
+	}
 
-	my $person = $STMTMGR_WORKLIST_COLLECTION ->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selPerCollByIdDate',$page->session('user_id'),$startDate,$page->session('org_internal_id'));
-	
-	
+	#Get new records on the worklist
+	my $person = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selWorkListPop',
+			$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$page->session('org_internal_id'),
+			$page->session('user_id'),$fmtDate);
+	my $count=0;
 	foreach (@$person)
 	{
 		
-		my $trans_data;# = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCollectionById',$_->{person_id},$page->session('user_id'),$_->{invoice_id});		
+		next if $count >$LIMIT;
+		my @reck_Date = Decode_Date_US($_->{reck_date});
+		next if $_->{reck_date} && Delta_Days($reck_Date[0],$reck_Date[1],$reck_Date[2],$start_Date[0],$start_Date[1],$start_Date[2])<0;
+		$count++;
+
 		$_->{trans_id} = $page->schemaAction(   'Transaction', 'add',                        
 		                trans_owner_id =>$_->{person_id} || undef,
 		                provider_id => $page->session('user_id') ||undef,
@@ -118,18 +146,19 @@ sub getComponentHtml
 		                initiator_id =>$page->session('user_id'), 	
 		                billing_facility_id => $page->session('org_internal_id'),
 				data_num_a => $_->{invoice_id} ,
+				invoice_id => $_->{invoice_id} ,
 		
                 )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);			
                 
+	        my @invoice_date = Decode_Date_US($_->{invoice_date});
+               	my @range_Date = Decode_Date_US($fmtDate); 
+               	$_->{age} = Delta_Days($invoice_date[0],$invoice_date[1],$invoice_date[2],$range_Date[0],$range_Date[1],$range_Date[2]);
+		$_->{age} = $_->{age} >= 0 ? $_->{age}  : 'N/A';								
 
-		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
-			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);		
-		$_->{age} = $_->{age} >= 0 ? $_->{age}  : 'N/A';						
-		my $reckdate=$STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($page, 
-			STMTMGRFLAG_NONE, 'selReckInfoByOwner', $_->{person_id},$page->session('user_id'));
+
 			
                 #Remove any accounts with a balance of zero that do have a reck date and the min range value > 0
-                if($_->{balance} <= 0 && !$reckdate->{reck_date} && $_->{min_amount} > 0  )
+                if($_->{balance} <= 0 && !$_->{reck_date} && $_->{min_amount} > 0  )
                 {
                 	#Mark record as inactive
 			$page->schemaAction
@@ -162,8 +191,8 @@ sub getComponentHtml
 			$_->{description},					
 			$_->{balance},
 			$_->{age},
-			$appt,
-			$reckdate->{reck_date},			
+			$_->{appt},
+			$_->{reck_date},			
 			qq{<nobr>
 				<A HREF="/worklist/collection/dlg-add-account-notes/$_->{person_id}"
 					TITLE='Add Account Notes'>
@@ -171,7 +200,7 @@ sub getComponentHtml
 				<A HREF="/worklist/collection/dlg-add-transfer-account/$_->{person_id}/$_->{trans_id}"
 					TITLE='Transfer Patient Account'>
 					<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
-				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$reckdate->{reck_id}"
+				<A HREF="/worklist/collection/dlg-add-reck-date/$_->{person_id}/$_->{reck_id}"
 					TITLE='Add Reck Date'>
 					<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
 				<A HREF="/worklist/collection/dlg-add-close-account/$_->{person_id}/$_->{trans_id}"
