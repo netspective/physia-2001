@@ -244,6 +244,10 @@
 			Application error regarding 3rd party payer and blank payer option in claim dialog fixed.
 		</deliverable>
 
+		<deliverable id="1851">
+			UI: Added a new field called 'Units' to indicate the units for the 'Quantity' field.
+		</deliverable>
+		
 		<deliverable id="1854">
 			Worklist: Fixed problem with the Collection Worklist showing data across orgs
 		</deliverable>
