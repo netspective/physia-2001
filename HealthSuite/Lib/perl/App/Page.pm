@@ -63,6 +63,17 @@ use enum qw(:THEMEFONTTAG_
 
 use enum qw(:LOGINSTATUS_ DIALOG SUCCESS FAILURE);
 
+use constant MENU_APP_DEFAULT => [
+	["Main Menu", '/menu'],
+	["Work Lists", '/worklist'],
+	["Schedule Desk", '/schedule'],
+];
+
+use constant MENU_APP_SUPPORT => [
+	["Help", '/help'],
+	["Logout", '/logout'],
+];
+
 # A page is comprised of the following parts:
 # * http_header (the Content-type: text/html, etc -- see the HTTP RFC)
 # * page_header (the <HEAD> component)
@@ -111,6 +122,11 @@ sub new
 	$self->{page_content_header} = [];
 	$self->{page_content_footer} = [];
 
+	$self->{page_menu_app} = MENU_APP_DEFAULT;
+	$self->{page_menu_support} = MENU_APP_SUPPORT;
+	$self->{page_menu_sibling} = undef;
+	$self->{page_menu_siblingSelectorParam} = '';
+	
 	$self->{panemgr_header} = [];
 	$self->{panemgr_columns} = [];
 	$self->{panemgr_footer} = [];
@@ -318,7 +334,7 @@ sub getMenu_Simple
 	$unselHtmlFmt ||= "<A HREF='%1'$target>%0</A>";
 
 	my @html = ();
-	my $selectorValue = $self->param($selectorParamName);
+	my $selectorValue = $selectorParamName ? $self->param($selectorParamName) : undef;
 	foreach my $item (@$items)
 	{
 		next unless $item;
@@ -328,6 +344,41 @@ sub getMenu_Simple
 		push(@html, $htmlFmt);
 	}
 	return join($separator, @html);
+}
+
+sub getMenu_Tabs
+{
+	my ($self, $flags, $selectorParamName, $items) = @_;
+	return $self->getMenu_Simple($flags, $selectorParamName, $items, '', 
+		qq{
+			<td bgcolor="#126A97" width="3" valign="top"><img src="/resources/images/design/tab-top-left-corner.gif"/></td>
+			<td bgcolor="#126A97" height="16">
+			<nobr>
+			<font face="tahoma,helvetica" size="2" color="white" style="font-size: 8pt;">
+			&nbsp;
+			<a style="color: white; text-decoration: none" href='%1' onmouseover='anchorMouseOver(this, "yellow")' onmouseout='anchorMouseOut(this, "white")'>%0</a>
+			&nbsp;
+			</font>
+			</nobr>
+			</td>
+			<td bgcolor="#126A97" width="3" valign="top"><img src="/resources/images/design/tab-top-right-corner.gif"/></td>
+			<td width="2"></td>
+		},
+		qq{
+			<td bgcolor="#dddddd" width="3" valign="top"><img src="/resources/images/design/tab-top-left-corner.gif"/></td>
+			<td bgcolor="#dddddd" height="16">
+			<nobr>
+			<font face="tahoma,helvetica" size="2" color="black" style="font-size: 8pt;">
+			&nbsp;
+			<b><a style="color: navy; text-decoration: none" href='%1'>%0</a></b>
+			&nbsp;
+			</font>
+			</font>
+			</nobr>
+			</td>
+			<td bgcolor="#dddddd" width="3" valign="top"><img src="/resources/images/design/tab-top-right-corner.gif"/></td>
+			<td width="2"></td>
+		});
 }
 
 sub getMenu_TwoLevelTable
@@ -523,7 +574,7 @@ sub initialize
 {
 	my $self = shift;
 	$self->addLocatorLinks(
-			["$IMAGETAGS{'icons/home-sm'} Home", '/home'],
+			["$IMAGETAGS{'images/icons/home-sm'} Home", '/home'],
 		);
 
 	$self->incrementViewCount();
@@ -745,89 +796,87 @@ sub prepare_page_content_header
 {
 	my $self = shift;
 	return 1 if $self->flagIsSet(PAGEFLAG_ISPOPUP);
-	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
-	my $resourceMap = $self->property('resourceMap');
-	my $locLinksHtml = $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links} || [], " $IMAGETAGS{'icons/arrow-right-lblue'} ", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>", "<A HREF='%1' STYLE='text-decoration:none; color:white'>%0</A>");
-	my $locBGColor = $colors->[THEMECOLOR_BKGND_LOCATOR];
-	if (defined $resourceMap && $self->property('_title') && $self->property('_iconMedium'))
+
+	my $resourceMap = $self->property('resourceMap');	
+	unless($self->{page_menu_sibling})
 	{
-		
-		my $functions = '';
 		if (defined $resourceMap->{_views}) 
 		{
-			my $menu = [];
+			my $menu = ($self->{page_menu_sibling} = []);
 			my $urlPrefix = "/" . $self->param('arl_resource');
 			foreach my $view (@{$resourceMap->{_views}})
 			{
 				push @$menu, [ $view->{caption}, "$urlPrefix/$view->{name}", $view->{name} ];
 			}
-			$functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER, '_pm_view', $menu, ' | ');
+			$self->{page_menu_siblingSelectorParam} = '_pm_view';
 		}
-		unshift(@{$self->{page_content_header}}, qq{
-			<table width="100%" bgcolor="lightsteelblue" cellspacing="0" cellpadding="3" border="0"><tr valign="bottom"><td align="left" valign="middle" width="1">
-				$IMAGETAGS{$self->property('_iconMedium')}<br>
-			</td><td align="left" valign="middle">
-				<font face="Arial,Helvetica" size="4" color="darkred">
-					&nbsp;<nobr><b>@{[ $self->property('_title') ]}</b></nobr>
-				</font>
-			</td><td align="right" valign="middle" width="90%">
-				<font face="Arial,Helvetica" size="2">
-					$functions&nbsp;
-				</font>
-			</td></tr></table>
-			});
 	}
+	
 	unshift(@{$self->{page_content_header}}, qq{
-		<table width=100% border=0 cellspacing=0 cellpadding=2><tr valign=center bgcolor=#3366cc><td>
-			<font face="tahoma,arial,helvetica" size=2 color=yellow style="font-size:8pt"><nobr>
-			&nbsp;
-			<a href="/homeorg" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/people-list'} #session.org_id#</a>
-			<font color=lightyellow>
-				&nbsp;|&nbsp;
-			</font>
-			<a href="/home" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/home-sm'} #session.user_id#</a>
-			<font color=lightyellow>
-				&nbsp;|&nbsp;
-			</font>
-			<a href="/menu" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/magnifying-glass-sm'} Main Menu</a>
-			<font color=lightyellow>
-				&nbsp;|&nbsp;
-			</font>
-			<a href="/worklist" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/worklist'} Work Lists</a>
-			<font color=lightyellow>
-				&nbsp;|&nbsp;
-			</font>
-			<a href="/schedule" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/schedule'} Schedule Desk</a>
-			<font color=lightyellow>
-				&nbsp;|&nbsp;
-			</font>
-			<a href="/logout" style="text-decoration:none; color:yellow">$IMAGETAGS{'icons/logout'} Logout</a>
-			</nobr></font>
-		</td><td align="right" valign="middle">
-			<font face="tahoma,arial,helvetica" size=2 color=yellow style="font-size:8pt"><a href="javascript:doActionPopup('/help')">$IMAGETAGS{'icons/help_blue'}</a>$IMAGETAGS{'design/physia'}</font>
-		</td></tr></table>
-		
-		<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#3366CC"><tr height="1"><td bgcolor="#3366CC">
-			$IMAGETAGS{'design/transparent-line'}<br>
-		</td><td bgcolor="#3366CC" width="25">
-			$IMAGETAGS{'design/transparent-line'}<br>
-		</td><td bgcolor="#000000">
-			$IMAGETAGS{'design/transparent-line'}<br>
-		</td></tr><tr valign=center height=22><td bgcolor="#3366CC">
-			<nobr><font face="Tahoma,Arial,Helvetica" size=2 color=white style="font-size:8pt">&nbsp; $locLinksHtml</font></nobr><br>
-		</td><td align="left" rowspan="2" bgcolor="lightsteelblue" width="25" height="22">
-			@{[ getImageTag('design/blue-lsteelblue-merge-round-shadow', {}) ]}<br>
-		</td><td onclick="javascript:window.location.reload()" bgcolor="lightsteelblue" align="right" style="border-top: 1 solid black;">
-			<font face="tahoma,arial,helvetica" size="2" color="#000000" style="font-size:8pt">
-				<nobr>@{[ UnixDate('today', '%c') ]}&nbsp;</nobr>
-			</font>
-		</td></tr><tr height=1><td bgcolor="#000000">
-			$IMAGETAGS{'design/transparent-line'}<br>
-		</td><td bgcolor=lightsteelblue>
-			$IMAGETAGS{'design/transparent-line'}<br>
-		</td></tr></table>
+	<SCRIPT>
+		function anchorMouseOver(element, color)
+		{
+			element.style.color = color;
+			element.style.textDecoration = 'underline';
+		}
 
-		});
+		function anchorMouseOut(element, color)
+		{
+			element.style.color = color;
+			element.style.textDecoration = 'none';
+		}
+	</SCRIPT>
+	<table cellspacing="0" cellpadding="0" bgcolor="#389cce" width="100%">
+		<tr>
+		<td width="100">$IMAGETAGS{'images/design/app-corporate-logo'}</td>
+		<td>
+			<font face="tahoma,arial" size="2" style="font-size:8pt" color="white">
+			$IMAGETAGS{'images/icons/home-sm'} <a href="/home" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'><b>#session.user_id#</b></a>@<a href="/homeorg" style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, "white")' onmouseout='anchorMouseOut(this, "yellow")'>#session.org_id#</a>
+			$IMAGETAGS{'images/icons/arrow-right-lblue'}
+			@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_app}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:white' onmouseover='anchorMouseOver(this, \"yellow\")' onmouseout='anchorMouseOut(this, \"white\")'>%0</A>" ) ]}
+			</font>
+		</td>
+		<td align="right"> 
+			<font face="tahoma,arial" size="2" style="font-size:8pt" color="yellow">
+			@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_menu_support}, ' <font color=silver>|</font> ', "<A HREF='%1' style='text-decoration:none; color:yellow' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"yellow\")'>%0</A>" ) ]}
+			</font>
+		</td>
+		<td width="4"></td>
+		</tr>
+	</table>
+	<table cellspacing="0" cellpadding="0" bgcolor="#353365" width="100%">
+		<tr height="1" bgcolor="#ff9935"><td colspan="3"></td></tr>
+		<tr height="4"><td colspan="3"></td></tr>
+		<tr>
+			<td width="4"></td>
+			<td valign=top>
+				<font face="tahoma,arial" size="2" style="font-size:8pt" color="#ff9935">
+				@{[ $self->getMenu_Simple(MENUFLAGS_DEFAULT, undef, $self->{page_locator_links}, " $IMAGETAGS{'images/design/parent-separator'} ", "<A HREF='%1' style='text-decoration:none; color:#ff9935' onmouseover='anchorMouseOver(this, \"white\")' onmouseout='anchorMouseOut(this, \"#ff9935\")'>%0</A>" ) ]}
+				</font>
+			</td>
+			<td align="right" valign="bottom" rowspan=2>
+				@{[ $self->{page_menu_sibling} ? ('<table cellspacing="0" cellpadding="0"><tr>' . $self->getMenu_Tabs(MENUFLAGS_DEFAULT, $self->{page_menu_siblingSelectorParam}, $self->{page_menu_sibling}) . '</tr></table>') : '' ]}
+			</td>
+		</tr>
+		<tr height="2" bgcolor="#353365"><td colspan="2"></td></tr>
+		<tr height="2" bgcolor="#dddddd"><td colspan="3"></td></tr>
+	</table>
+	<table cellspacing="0" cellpadding="0" bgcolor="#353365" width="100%">
+		<tr bgcolor="#dddddd">
+			<td width="4"></td>
+			<td width=15>@{[ $IMAGETAGS{$resourceMap->{_iconMedium}} || $IMAGETAGS{'images/page-icons/default'} ]}</td>
+			<td valign=center>&nbsp;<b><font face="helvetica" size="4">@{[ $self->{page_heading} || $resourceMap->{_title} ]}</font></b></td>
+			<td align="right">
+				<font face="tahoma,arial,helvetica" style="font-size: 8pt" color="navy">
+				Updated @{[ UnixDate('today', '%a %b %d %i:%M %p') ]}
+				</font>
+				&nbsp;
+			</td>
+		</tr>
+		<tr height="2" bgcolor="#dddddd"><td colspan="4"></td></tr>
+		<!-- <tr height="1" bgcolor="#ff9935"><td colspan="3"></td></tr> -->
+	</table>
+	});
 }
 
 sub prepare_page_content_footer
