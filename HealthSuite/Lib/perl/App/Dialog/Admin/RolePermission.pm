@@ -97,21 +97,23 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	#my @pathItems = split('/', $page->param('arl'));
 
-	my $userId =  $page->session('user_id');
-	my $orgId = $page->param('org_id') || $page->session('org_id');
+	if ($page->param('org_id'))
+	{
+		my $userId =  $page->session('user_id');
+		my $orgIntId = $page->param('org_id');
+		#my $roleID = $pathItems[3];
+		#my $permissionName = $pathItems[4];
+		my $roleID = $page->param('roleid');
+		my $permissionName = $page->param('permnam');
 
-	#my $roleID = $pathItems[3];
-	#my $permissionName = $pathItems[4];
-	my $roleID = $page->param('roleid');
-	my $permissionName = $page->param('permnam');
-
-	my $RolePermission = $STMTMGR_ADMIN->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'selRolePermission', $orgId, $roleID, $permissionName);
-	$page->field('permissionName', $RolePermission->{permission_name});
-	$page->field('permissionNameOrg', $RolePermission->{permission_name});
-	$page->field('roleID', $RolePermission->{role_name_id});
-	$page->field('roleIDOrg', $RolePermission->{role_name_id});
-	$page->field('permissionAccess', $RolePermission->{role_activity_id});
+		my $RolePermission = $STMTMGR_ADMIN->getRowAsHash($page,
+			STMTMGRFLAG_NONE, 'selRolePermission', $orgIntId, $roleID, $permissionName);
+		$page->field('permissionName', $RolePermission->{permission_name});
+		$page->field('permissionNameOrg', $RolePermission->{permission_name});
+		$page->field('roleID', $RolePermission->{role_name_id});
+		$page->field('roleIDOrg', $RolePermission->{role_name_id});
+		$page->field('permissionAccess', $RolePermission->{role_activity_id});
+	}
 }
 
 ###############################
@@ -123,9 +125,10 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $userId =  $page->session('user_id');
-	my $orgId = $page->param('org_id') || $page->session('org_id');
-	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
-
+	#my $orgId = $page->param('org_id') || $page->session('org_id');
+	my $orgId = $page->session('org_id');
+	#my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
+	my $orgIntId = $page->param('org_id');
 	my $roleID = $page->field('roleID');
 	my $roleIDOrg = $page->field('roleIDOrg');
 	my $permissionName = $page->field('permissionName');
