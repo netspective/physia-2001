@@ -158,8 +158,8 @@ sub execute
 		name_last => $page->field('name_last') || undef,
 		name_suffix => $page->field('name_suffix') || undef,
 		ssn => $page->field('ssn') || undef,
-		gender => $page->field('gender'),
-		date_of_birth => $page->field('date_of_birth'),
+		gender => $page->field('gender') || undef,
+		date_of_birth => $page->field('date_of_birth') || undef,
 		_debug => 0
 	);
 	$page->schemaAction(
