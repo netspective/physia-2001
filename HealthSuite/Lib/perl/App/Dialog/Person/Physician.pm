@@ -35,7 +35,6 @@ sub initialize
 	$self->addContent(
 			new App::Dialog::Field::Person::ID::New(caption => 'Physician/Provider ID',
 							name => 'person_id',
-							options => FLDFLAG_REQUIRED,
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 						postHtml => $postHtml),
 			);
