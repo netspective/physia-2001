@@ -18,7 +18,6 @@ use vars qw($page $sqlPlusKey);
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
-
 update_for_scheduling();
 
 
@@ -36,12 +35,16 @@ sub update_for_scheduling
 
 	unless ($count)
 	{
-		my $sqlFile = 'BUILD_0008_scheduling.sql';
+		my $buildDir = `pwd`;
+		chomp $buildDir;
+
+		my $sqlFile = $buildDir . '/BUILD_0008_scheduling.sql';
+		my $logFile = $buildDir . '/BUILD_0008_scheduling.log';
+	
 		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
 		
-		my $logFile = 'BUILD_008_scheduling.log';
-		
 		system(qq{
+			cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
 			echo "---------------------------------------" >> $logFile
 			date >> $logFile
 			echo "---------------------------------------" >> $logFile
