@@ -4,10 +4,16 @@ package App::Page::Search::Home;
 
 use strict;
 use App::Page::Search;
+use CGI::ImageManager;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
 %RESOURCE_MAP = (
-	'search/_default' => {},
+	'search/_default' => {
+		_title => 'Main Menu',
+		_iconSmall => 'icons/signpost',
+		_iconMedium => 'icons/signpost',
+		_iconLarge => 'icons/signpost',
+		},
 	);
 
 sub getForm
@@ -15,166 +21,217 @@ sub getForm
 	return ('Lookup or add a record');
 }
 
+
+sub prepare_page_content_header
+{
+	my $self = shift;
+	my $urlPrefix = "/search";
+	my $functions = $self->getMenu_ComboBox(App::Page::MENUFLAG_SELECTEDISLARGER,
+		'lookup_record',
+		[
+			['Lookup...'],
+			['All Persons', "$urlPrefix/person", 'person'],
+			['Patients', "$urlPrefix/patient", 'patient'],
+			['Claims', "$urlPrefix/claim", 'claim'],
+			['Appointments', "$urlPrefix/appointment", 'appointment'],
+			['Appointment Types', "$urlPrefix/appttype", 'appttype'],
+			['Available Slots', "$urlPrefix/apptslot", 'apptslot'],
+			['Organizations', "$urlPrefix/org", 'org'],
+			['Insurance Products', "$urlPrefix/insproduct", 'insproduct'],
+			['Insurance Plans', "$urlPrefix/insplan", 'plan'],
+			['Fee Schedules', "$urlPrefix/catalog", 'catalog'],
+			['ICD', "$urlPrefix/icd", 'icd'],
+			['CPT', "$urlPrefix/cpt", 'cpt'],
+			['HCPCS', "$urlPrefix/cpt", 'hcpcs'],
+			['EPSDT', "$urlPrefix/epsdt", 'epsdt'],
+			['Misc Procedure Code', "$urlPrefix/miscprocedure", 'miscprocedure'],
+			['Schedule Template', "$urlPrefix/template", 'template'],
+			['User Sessions', "$urlPrefix/session", 'session'],
+		]);
+
+	my $addFunctions = $self->getMenu_ComboBox(App::Page::MENUFLAG_SELECTEDISLARGER,
+		'add_record',
+		[
+			['Add...'],
+			['Patient', "/org/#session.org_id#/dlg-add-patient", 'patient'],
+			['Claim', "/org/#session.org_id#/dlg-add-claim", 'claim'],
+			['Appointment', "/org/#session.org_id#/dlg-add-appointment", 'appointment'],
+			['Appointment Type', "/org/#session.org_id#/dlg-add-appttype", 'appttype'],
+			['Insurance Org', "/org/#session.org_id#/dlg-add-org-insurance", 'insurance'],
+			['Insurance Product', "/org/#session.org_id#/dlg-add-ins-product", 'insproduct'],
+			['Insurance Plan', "/org/#session.org_id#/dlg-add-ins-plan", 'insplan'],
+			['Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 'catalog'],
+			['Schedule Template', "/org/#session.org_id#/dlg-add-template", 'template'],
+		]);
+
+
+	push (@{$self->{page_content_header}}, qq{
+		<table width=100% bgcolor="#EEEEEE" cellspacing="0" cellpadding="0" border="0"><tr><form><td align="right">
+			$functions
+			$addFunctions
+		</td></form></tr><tr><td>
+			@{[ getImageTag('design/bar', { width => "100%", height => "1", }) ]}<br>
+		</td></tr></table>
+	});
+	
+	$self->SUPER::prepare_page_content_header(@_);
+
+}
+
 sub prepare
 {
 	my $self = shift;
 	$self->addContent(qq{
-		<CENTER>
-		<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=5>
-		<TR VALIGN=TOP>
-			<TD>
-			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>People</B></FONT></TD>
-				</TR>
-				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Lookup</b>
-						<a href="/search/person">All Persons</a>,
-						<a href="/search/patient">Patients</a>,
-						<a href="/search/physician">Physician/Providers</a>,
-						<a href="/search/nurse">Nurses</a>,
-						<a href="/search/staff">Staff Members</a>, or
-						<a href="/search/associate">Personnel</a>
-					</TD>
-				</TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD>
-						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Add</b> a new <a href="/org/#session.org_id#/dlg-add-patient">Patient</a>,
-						<a href="/org/#session.org_id#/dlg-add-physician">Physician/Provider</a>,
-						<a href="/org/#session.org_id#/dlg-add-nurse">Nurse</a>, or
-						<a href="/org/#session.org_id#/dlg-add-staff">Staff Member</a> record.
-					</TD>
-				</TR>
-			</TABLE>
-			<P>
-			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Organizations</B></FONT></TD>
-				</TR>
-				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Lookup</b>
-						<a href="/search/org">Departments</a>,
-						<a href="/search/org">Associated Providers</a>,
-						<a href="/search/org">Employers</a>,
-						<a href="/search/org">Insurers</a>, or
-						<a href="/search/org">IPAs</a>
-					</TD>
-				</TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD>
-						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Add</b> a new
-						<a href="/org/#session.org_id#/dlg-add-org-main">Main Organization</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, or
-						<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>
-						record.
-					</TD>
-				</TR>
-			</TABLE>
-			<P>
-			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>References/Codes</B></FONT></TD>
-				</TR>
-				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Lookup</b>
-						<a href="/search/icd">ICD-9</a>,
-						<a href="/search/cpt">CPT</a>,
-						<a href="/search/hcpcs">HCPCS</a>,
-						<a href="/search/epsdt">EPSDT</a>,
-						<a href="/search/miscprocedure">Misc Procedure Code</a>,
-						<a href="/search/serviceplace">Service Place</a>,
-						<a href="/search/servicetype">Service Type</a>,
-						<a href="/search/gpci">GPCI</a>, or
-						<a href="/search/epayer">E-Remit Payer</a>
-					</TD>
-				</TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Add</b> a new
-						<a href="/org/#session.org_id#/dlg-add-misc-procedure">Misc Procedure Code</a>
-					</TD>
-				</TR>												
-			</TABLE>
-			</TD>
-			<TD>
-			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Billing</B></FONT></TD>
-				</TR>
-				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Lookup</b>
-						<a href="/search/claim">Claims</a>,
-						<a href="/search/catalog">Fee Schedules</a>,
-						<a href="/search/insproduct">Insurance Product</a>, or
-						<a href="/search/insplan">Insurance Plan</a>
-					</TD>
-				</TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD>
-						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Add</b> a new
-						<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
-						<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
-						<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
-						<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
-						<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>,
-						<a href="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</a>, or
-						<a href="/org/#session.org_id#/dlg-add-ins-coverage">Personal Insurance Coverage</a>
-					</TD>
-				</TR>
-			</TABLE>
-			<P>
-			<TABLE BGCOLOR=WHITE BORDER=0 CELLSPACING=1 CELLPADDING=2>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=3 COLOR=NAVY><B>Appointments/Scheduling</B></FONT></TD>
-				</TR>
-				<TR><TD COLSPAN=2><IMG SRC="/resources/design/bar.gif" HEIGHT=1 WIDTH=100%></TD></TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Lookup</b>
-						<a href="/search/appointment">Existing Appointment</a>,
-						<a href="/search/apptslot">Next Available Appointment Slot</a>
-						<a href="/search/template">Scheduling Template</a>, or
-						<a href="/search/appttype">Appointment Type</a>
-					</TD>
-				</TR>
-				<TR VALIGN=TOP BGCOLOR=WHITE>
-					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
-					<TD>
-						<FONT FACE="Arial,Helvetica" SIZE=2>
-						<b>Add</b> a new
-						<a href="/org/#session.org_id#/dlg-add-appointment">Appointment</a>
-						<a href="/org/#session.org_id#/dlg-add-template">Schedule Template</a>, or
-						<a href="/org/#session.org_id#/dlg-add-appttype">Appointment Type</a>
-					</TD>
-				</TR>
-			</TABLE>
-			</TD>
-		</TR>
-		</TABLE>
-		</CENTER>
+		<center>
+		<table border="0" cellspacing="0" cellpadding="5" align="center"><tr valign="top"><td>
+			<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
+				$IMAGETAGS{'icons/people'}
+			</td><td valign="middle">
+				<font face="arial,helvetica" size=5 color=navy><b>People</b></font>
+			</td></tr><tr><td colspan="2">
+				@{[ getImageTag('design/bar', { height => "1", width => "100%", }) ]}<br>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Lookup</b>
+					<a href="/search/person">All Persons</a>,
+					<a href="/search/patient">Patients</a>,
+					<a href="/search/physician">Physician / Providers</a>,
+					<a href="/search/nurse">Nurses</a>,
+					<a href="/search/staff">Staff Members</a>, or
+					<a href="/search/associate">Personnel</a>
+				</font>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Add</b> a new <a href="/org/#session.org_id#/dlg-add-patient">Patient</a>,
+					<a href="/org/#session.org_id#/dlg-add-physician">Physician / Provider</a>,
+					<a href="/org/#session.org_id#/dlg-add-nurse">Nurse</a>, or
+					<a href="/org/#session.org_id#/dlg-add-staff">Staff Member</a>
+				</font>
+			</td></tr></table>
+			<p>
+			<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
+				$IMAGETAGS{'icons/org'}
+			</td><td valign="middle">
+				<font face="arial,helvetica" size="5" color="navy"><b>Organizations</b></font>
+			</td></tr><tr><td colspan=2>
+				<img src="/resources/design/bar.gif" height=1 width=100%><br>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Lookup</b>
+					<a href="/search/org">Departments</a>,
+					<a href="/search/org">Associated Providers</a>,
+					<a href="/search/org">Employers</a>,
+					<a href="/search/org">Insurers</a>, or
+					<a href="/search/org">IPAs</a>
+				</font>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Add</b> a new
+					<a href="/org/#session.org_id#/dlg-add-org-main">Main Organization</a>,
+					<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
+					<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
+					<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
+					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, or
+					<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>
+				</font>
+			</td></tr></table>
+			<p>
+			<table bgcolor="white" border="0" cellspacing="1" cellpadding="2"><tr valign="top" bgcolor="white"><td valign="middle">
+				$IMAGETAGS{'icons/books04'}<br>
+			</td><td valign="middle">
+				<font face="arial,helvetica" size="5" color="navy"><b>References / Codes</b></font>
+			</td></tr><tr><td colspan=2>
+				<img src="/resources/design/bar.gif" height=1 width=100%><br>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Lookup</b>
+					<a href="/search/icd">ICD-9</a>,
+					<a href="/search/cpt">CPT</a>,
+					<a href="/search/hcpcs">HCPCS</a>,
+					<a href="/search/epsdt">EPSDT</a>,
+					<a href="/search/miscprocedure">Misc Procedure Code</a>,
+					<a href="/search/serviceplace">Service Place</a>,
+					<a href="/search/servicetype">Service Type</a>,
+					<a href="/search/gpci">GPCI</a>, or
+					<a href="/search/epayer">E-Remit Payer</a>
+				</font>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Add</b> a new
+					<a href="/org/#session.org_id#/dlg-add-misc-procedure">Misc Procedure Code</a>
+				</font>
+		</td></tr></table></td><td>
+			<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
+				$IMAGETAGS{'icons/accounting'}
+			</td><td valign="middle">
+				<font face="arial,helvetica" size=5 color=navy><b>Billing</b></font>
+			</td></tr><tr><td colspan=2>
+				<img src="/resources/design/bar.gif" height=1 width=100%></td></tr>
+			<tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Lookup</b>
+					<a href="/search/claim">Claims</a>,
+					<a href="/search/catalog">Fee Schedules</a>,
+					<a href="/search/insproduct">Insurance Product</a>, or
+					<a href="/search/insplan">Insurance Plan</a>
+				</font>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Add</b> a new
+					<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
+					<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
+					<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
+					<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
+					<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>,
+					<a href="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</a>, or
+					<a href="/org/#session.org_id#/dlg-add-ins-coverage">Personal Insurance Coverage</a>
+				</font>
+			</td></tr></table>
+			<p>
+			<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
+				$IMAGETAGS{'icons/schedule-m'}
+			</td><td valign="middle">
+				<font face="arial,helvetica" size="5" color="navy"><b>Appointments / Scheduling</b></font>
+			</td></tr><tr><td colspan=2>
+				<img src="/resources/design/bar.gif" height=1 width=100%><br>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Lookup</b>
+					<a href="/search/appointment">Existing Appointment</a>,
+					<a href="/search/apptslot">Next Available Appointment Slot</a>
+					<a href="/search/template">Scheduling Template</a>, or
+					<a href="/search/appttype">Appointment Type</a>
+				</font>
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Add</b> a new
+					<a href="/org/#session.org_id#/dlg-add-appointment">Appointment</a>
+					<a href="/org/#session.org_id#/dlg-add-template">Schedule Template</a>, or
+					<a href="/org/#session.org_id#/dlg-add-appttype">Appointment Type</a>
+				</font>
+			</td></tr></table>
+		</td></tr></table>
+		</center>
 	});
 
 	return 1;
