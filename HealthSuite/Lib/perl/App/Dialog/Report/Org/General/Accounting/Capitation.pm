@@ -182,7 +182,7 @@ sub execute
 	{
 		my $batchIDClauseA =qq { and  ta.value_text = \'$row->{batchid}\'} if($row->{batchid} ne '');
 		my $batchDateClauseA =qq { and ta.value_date = \'$row->{batchdate}\'} if($row->{batchdate} ne '');
-		my $planClauseA =qq { and t.data_textb = \'$row->{plan}\'} if($row->{plan} ne '');
+		my $planClauseA =qq { and t.data_text_b = \'$row->{plan}\'} if($row->{plan} ne '');
 		my $productClauseA =qq { and t.data_text_a = \'$row->{product}\'} if($row->{product} ne '');
 		my $physicianClauseA =qq { and t.provider_id = \'$row->{provider}\'} if($row->{provider} ne '');
 		my $orgClauseA =qq { and t.receiver_id = $row->{org_id}} if($row->{org_id} ne '');
