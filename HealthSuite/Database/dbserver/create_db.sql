@@ -70,6 +70,9 @@ alter user system default tablespace TOOLS temporary tablespace TEMP;
 @$ORACLE_HOME/rdbms/admin/dbmspool.sql
 @$ORACLE_HOME/rdbms/admin/prvtpool.plb
 
+@$ORACLE_HOME/rdbms/admin/utltkprf.sql
+@$ORACLE_HOME/sqlplus/admin/plustrce.sql
+
 connect system/manager
 @$ORACLE_HOME/sqlplus/admin/pupbld.sql
 
