@@ -455,7 +455,7 @@ sub handleAttributes
 		);
 	}
 
-	$self->handlePostExecute($page, $command, $flags);
+	$self->handlePostExecute($page, $command, $flags, undef, "Insurance Plan $command was successful");
 	return '';
 }
 

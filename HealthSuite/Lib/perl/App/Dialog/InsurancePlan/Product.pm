@@ -334,8 +334,8 @@ sub handleAttributes
 
 	#$page->param('_dialogreturnurl', "/search/insproduct");
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
-	$self->handlePostExecute($page, $command, $flags);
-	#return '';
+	$self->handlePostExecute($page, $command, $flags, undef, "Insurance Product $command was successful");
+	return '';
 }
 
 1;
