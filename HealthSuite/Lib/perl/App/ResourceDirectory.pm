@@ -106,7 +106,8 @@ sub overrideClass
 	#
 	eval
 	{
-		if(my ($personId, $orgId) = CGI::Page::getActiveUser())
+		my ($personId, $orgId) = CGI::Page::getActiveUser();
+		if(defined $personId && defined $orgId)
 		{
 			warn "Got back $personId $orgId from getActiveUser";
 			my $tryClass = $$className;
@@ -142,36 +143,64 @@ sub overrideClass
 	};
 }
 
+
 sub handlePage
 {
-	my ($resource, $flags, $arl, $params, $resourceId, $pathItems) = @_;
-
-	# Dig until we find the deepest page resource available
-	my $i = 0;
-	while(ref($resource) eq 'HASH' && defined $pathItems->[$i] && defined $resource->{$pathItems->[$i]})
+	my ($resource, $arl, $flags, $params, $pathItems) = @_;
+	my $pathIndex = 0;
+	my %arlParams = ();
+	
+	while (defined $pathItems->[$pathIndex])
 	{
-		$resource = $resource->{$pathItems->[$i]};
-		$resourceId = $resource->{_id};
-		$i++;
-	}
+		print STDERR "pathIndex = $pathIndex\n";
+		if (defined $resource->{_arlParams})
+		{
+			my $resourceArlParams = ref($resource->{_arlParams}) eq 'ARRAY' ? $resource->{_arlParams} : [$resource->{_arlParams}];
+			foreach (@$resourceArlParams)
+			{
+				$arlParams{$_} = $pathItems->[$pathIndex];
+				$pathIndex++;
+			}
+		}
 
-	# Check to see if it has a default
-	if (ref($resource) eq 'HASH' && defined $resource->{_default})
+		if (defined $resource->{$pathItems->[$pathIndex]})
+		{
+			my $subResource = $resource->{$pathItems->[$pathIndex]};
+			if (ref $subResource eq 'HASH')
+			{
+				$resource = $subResource;
+				$pathIndex++;
+			}
+		}
+		else
+		{
+			last;
+		}
+	}
+	
+	if (defined $resource->{_default} && ref($resource->{_default}) eq 'HASH')
 	{
 		$resource = $resource->{_default};
-		$resourceId = $resource->{_id};
 	}
 
-	return 'ARL-000200' unless defined $resource->{_class};
+	unless (defined $resource->{_id} && defined $resource->{_class})
+	{
+		return 'ARL-000200';
+	}
+
+	my $resourceId = $resource->{_id};
 	my $pageClass = $resource->{_class};
 	overrideClass(\$pageClass);
+	
+	print STDERR "Resource ID = $resourceId\n";
+	print STDERR "pageClass = $pageClass\n";
 
 	my $page = $pageClass->new();
 	#$page->addDebugStmt("Class is $pageClass");
 	$page->property('resourceMap', $resource);
 	foreach (keys %{$resource})
 	{
-		$page->property($_, $resource->{$_});
+		#$page->property($_, $resource->{$_});
 	}
 
 	#
@@ -183,12 +212,20 @@ sub handlePage
 	# Remove the resource prefix from the ID
 	my $prefix = PAGE_RESOURCE_PREFIX;
 	$resourceId =~ s|^$prefix||;
+	
+	# Currently the page assumes that the first ARL item isn't included in $pathItems
+	shift @$pathItems;
 
 	$page->param('arl', $arl);
 	$page->param('arl_asPopup', $arlAsPopup);
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
 	$page->param('_isPopup', 1) if $flags & PAGEFLAG_ISPOPUP;
+	
+	foreach (keys %arlParams)
+	{
+		$page->param($_, $arlParams{$_});
+	}
 
 	$page->setFlag($flags);
 
@@ -216,30 +253,23 @@ sub handleARL
 {
 	my ($arl) = @_;
 
-	my($resPath, $params) = split(/\?/, $arl);
 	my $errorCode = 'ARL-000100'; # invalid ARL
 	my $flags = 0;
 
-	#
-	# if a resource name ends in -p it is assumed to be a popup window
-	#
 
-	my ($resourceId, $path) = ($resPath, '');
-	($resourceId, $path) = ($1, $2) if $resPath =~ m/^(.*?)\/(.*)/;
-
-	if($resourceId =~ s/\-(.+)$//)
+	# Look for (and remove) page flags in the ARL
+	if ($arl =~ s{^(\w+)\-(\w+)/}{$1/})
 	{
-		$flags |= $PAGE_FLAGS{$1};
+		$flags |= $PAGE_FLAGS{$2};
+	}
+	
+	my($resPath, $params) = split(/\?/, $arl);
+	$resPath = 'search' unless $resPath;
+	$resPath = PAGE_RESOURCE_PREFIX . $resPath;
+	my @pathItems = split(/\//, unescape($resPath));
 
-		# translate the ARL so that the resource doesn't have -p or -a or -xxx
-		$arl =~ s/^$resourceId\-$1/$resourceId/;
-	}
-	$resourceId = PAGE_RESOURCE_PREFIX . $resourceId;
-	if(my $resource = $RESOURCES{$resourceId})
-	{
-		my @pathItems = split(/\//, unescape($path));
-		$errorCode = handlePage($resource, $flags, $arl, $params, $resourceId, \@pathItems);
-	}
+	$errorCode = handlePage(\%RESOURCES, $arl, $flags, $params, \@pathItems);
+	
 	if($errorCode)
 	{
 		my $page = new App::Page::Error;
@@ -549,9 +579,18 @@ sub buildAccessControl
 					foreach my $subKey (sort keys %{$RESOURCES{$key}})
 					{
 						next if $subKey eq '_default';
-						if ( ref $RESOURCES{$key}{$subKey} eq 'HASH' && exists $RESOURCES{$key}{$subKey}{_class} )
+						if (ref $RESOURCES{$key}{$subKey} eq 'HASH' && exists $RESOURCES{$key}{$subKey}{_class})
 						{
-							push @{$data{sub}}, $gen->permission({id => $subKey});
+							$data{subSub} = [];
+							foreach my $subSubKey (sort keys %{$RESOURCES{$key}{$subKey}})
+							{
+								next if $subSubKey eq '_default';
+								if (ref $RESOURCES{$key}{$subKey}{$subSubKey} eq 'HASH' && exists $RESOURCES{$key}{$subKey}{$subSubKey}{_class})
+								{
+									push @{$data{subSub}}, $gen->permission({id => $subSubKey});
+								}
+							}
+							push @{$data{sub}}, $gen->permission({id => $subKey}, @{$data{subSub}});
 						}
 					}
 					$data{views} = [];
