@@ -184,7 +184,7 @@ sub initialize
 				['Add Another Patient', '/org/#session.org_id#/dlg-add-patient'],
 				['Go to Search', "/search/person/id/%field.person_id%"],
 				['Return to Home', "/person/#session.user_id#/home"],
-				['Go to Work List', "person/worklist"],
+				['Go to Work List', "/worklist"],
 			],
 			cancelUrl => $self->{cancelUrl} || undef,
 		),

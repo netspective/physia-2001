@@ -214,7 +214,7 @@ sub new
 				['Return to Previous Screen', '', 1],
 				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage"],
 				['Go to Person Profile', "/person/%field.person_id%/profile"],
-				['Go to Work List', "/person/worklist"],
+				['Go to Work List', "/worklist"],
 				],
 			cancelUrl => $self->{cancelUrl} || undef,
 			),
@@ -259,9 +259,9 @@ sub populateData
 
 	$page->field('injury_date', $injuryData->{'value_text'});
 	$page->field('injury_item_id', $injuryData->{'item_id'});
-	
+
 	#If this plan is not owned by this org then make dialog view only
-	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));	
+	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
 
 }
 

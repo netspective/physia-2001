@@ -88,7 +88,7 @@ sub initialize
 							['Add Another Staff Member', '/org/#session.org_id#/dlg-add-staff'],
 							['Go to Search', "/search/person/id/%field.person_id%"],
 							['Return to Add Record', '/search'],
-							['Go to Work List', "person/worklist"],
+							['Go to Work List', "/worklist"],
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
 	);
