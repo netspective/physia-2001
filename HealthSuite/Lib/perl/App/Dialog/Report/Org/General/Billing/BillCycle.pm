@@ -83,7 +83,7 @@ sub execute
 		[
 			{	head => 'Payer', colIdx => 0, summarize => 'count', dAlign => 'left',
 				url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=last4&billtoid=#7#&paytoid=#8#&patientid=#6#&billto_name=#9#',
-					null,'location,status,width=900,height=600,scrollbars,resizable')},
+					null,'location,status,width=800,height=600,scrollbars,resizable')},
 			},
 			{ head => 'Type', colIdx => 1,},
 			{ head => 'Provider', colIdx => 2,},
