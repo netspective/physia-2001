@@ -33,7 +33,7 @@ use Devel::ChangeLog;
 @ISA = qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure/add";
-use constant NEXTACTION_ONHOLD => "/invoice/%param.invoice_id%/dialog/hold";
+#use constant NEXTACTION_ONHOLD => "/invoice/%param.invoice_id%/dialog/hold";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
 use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
@@ -77,7 +77,7 @@ sub initialize
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
 							['Add a Procedure', NEXTACTION_ADDPROC],
-							['Place this claim on hold', NEXTACTION_ONHOLD],
+							#['Place this claim on hold', NEXTACTION_ONHOLD],
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
 							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
