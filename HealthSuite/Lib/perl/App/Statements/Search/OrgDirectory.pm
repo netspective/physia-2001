@@ -48,7 +48,6 @@ $STMTFMT_SEL_ORG_DIR = qq{
 						AND caption = member_name
 				)
 			)
-			AND     a.address_name = 'Street'
 			AND	%whereCond%
 			AND (
 				 owner_org_id = ?
