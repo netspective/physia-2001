@@ -73,13 +73,17 @@ sub populateData
 	my $transId = $page->param('trans_id');
 	my $refillInfo = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
 
-	if($refillInfo->{trans_status}  == 6)
+	if($refillInfo->{trans_status}  == App::Universal::TRANSSTATUS_PENDING)
 	{
 		$refillStatus = 'Pending';
 	}
-	elsif ($refillInfo->{trans_status}  == 7)
+	elsif ($refillInfo->{trans_status}  == App::Universal::TRANSSTATUS_FILLED)
 	{
 		$refillStatus = 'Filled';
+	}
+	elsif ($refillInfo->{trans_status}  == App::Universal::TRANSSTATUS_DENIED)
+	{
+		$refillStatus = 'Denied';
 	}
 
         if($refillInfo->{data_num_a} eq '')
@@ -109,8 +113,20 @@ sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 
-	my $refillStatus = $page->field('status') eq 'Pending' ? 6 : 7;
-
+	my $refillStatus = '';
+	my $status = $page->field('status');
+	if($status eq 'Pending')
+	{
+		$refillStatus = App::Universal::TRANSSTATUS_PENDING;
+	}
+	elsif($status eq 'Filled')
+	{
+		$refillStatus = App::Universal::TRANSSTATUS_FILLED;
+	}
+	elsif($status eq 'Denied')
+	{
+		$refillStatus = App::Universal::TRANSSTATUS_DENIED;
+	}
 
 	if($command eq 'add')
 	{
