@@ -250,7 +250,6 @@ sub bool_as_html
 	my $noSelected = $value == 0 ? 'selected' : '';
 	my $yesSelected = $value == 1 ? 'selected' : '';
 	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
-	my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
 
 	if($readOnly)
 	{
@@ -263,7 +262,7 @@ sub bool_as_html
 			$html = "
 			<tr valign=top>
 				<td width=$self->{_spacerWidth}>&nbsp;</td>
-				<td align=right $required>
+				<td align=right>
 					<input type='checkbox' name='$fieldName' align=right $checked value=1>
 				</td>
 				<td>$self->{preHtml}$self->{caption}$self->{postHtml}</td>
@@ -280,7 +279,7 @@ sub bool_as_html
 			else
 			{
 				$html = "
-				<tr valign=top $required>
+				<tr valign=top>
 					<td width=$self->{_spacerWidth} colspan=2>&nbsp;</td>
 					<td>$self->{preHtml}<input type='checkbox' name='$fieldName' align=right value=1 $checked> $self->{caption}$self->{postHtml}</td>
 					<td width=$self->{_spacerWidth}>&nbsp;</td>
@@ -290,7 +289,7 @@ sub bool_as_html
 		}
 		elsif($self->{style} eq 'combo')
 		{
-			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<select name='$fieldName' $required><option value=0 $noSelected>No<option value=1 $yesSelected>Yes</select>");
+			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<select name='$fieldName'><option value=0 $noSelected>No<option value=1 $yesSelected>Yes</select>");
 		}
 	}
 	return $html;
@@ -439,7 +438,6 @@ sub select_as_html
 	my $fieldName = $page->fieldPName($self->{name});
 	my $value = $page->field($self->{name});
 	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
-	my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
 	my $html = '';
 
 	my $choices = exists $self->{fKeyStmt} ? $self->readChoicesStmt($page) : ($self->{fKeyTable} ? $self->readChoices($page) : $self->parseChoices($page));
@@ -474,7 +472,7 @@ sub select_as_html
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'checked' : '';
-				$inputs .= "<nobr><input type=radio name='$fieldName' value='$_->[2]' $selected $required> $_->[1]&nbsp;&nbsp;</nobr> ";
+				$inputs .= "<nobr><input type=radio name='$fieldName' value='$_->[2]' $selected> $_->[1]&nbsp;&nbsp;</nobr> ";
 			}
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 		}
@@ -487,7 +485,7 @@ sub select_as_html
 				my $selected = $_->[0] ? 'selected' : '';
 				$options .= "<option value='$_->[2]' $selected>$_->[1]</option>";
 			}
-			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<select name='$fieldName' size=$self->{size} $multiple $required>$options</select>");
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<select name='$fieldName' size=$self->{size} $multiple>$options</select>");
 		}
 	}
 
