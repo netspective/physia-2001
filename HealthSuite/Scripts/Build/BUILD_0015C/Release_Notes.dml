@@ -9,6 +9,19 @@
 	</release-info>
 
 	<deliverables>
+
+		<deliverable id="1203">
+			UI:  Case-Insensitive sort caption of Appointment Types drop down.
+		</deliverable>	
+
+		<deliverable id="1263">
+			UI:  Added View Chart to On-Select for Patient Search.
+		</deliverable>	
+
+		<deliverable id="1382">
+			UI:  Remove Waiting List appointments from Patient Flow Worklist.
+		</deliverable>	
+		
 	</deliverables>
 </release-notes>
 
