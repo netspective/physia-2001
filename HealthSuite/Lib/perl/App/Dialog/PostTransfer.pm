@@ -139,6 +139,24 @@ sub handleTransferFromInvoice
 
 	my $transferAmt = 0 - $page->field('trans_from_amt');
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $fromInvoiceId);
+	if($invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
+	{
+		$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $fromInvoiceId || undef,
+			invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
+			flags => 0,
+			_debug => 0
+		);
+
+		## Add history item
+		addHistoryItem($page, $fromInvoiceId,
+			value_text => 'Reopened due to refund',
+			value_date => $todaysDate,
+		);
+	}
+
 
 	my $itemId = $page->schemaAction(
 		'Invoice_Item', 'add',
@@ -197,6 +215,24 @@ sub handleTransferToInvoice
 
 	my $transferAmt = $page->field('trans_from_amt');
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $toInvoiceId);
+	if($invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
+	{
+		$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $toInvoiceId || undef,
+			invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
+			flags => 0,
+			_debug => 0
+		);
+
+		## Add history item
+		addHistoryItem($page, $toInvoiceId,
+			value_text => 'Reopened due to refund',
+			value_date => $todaysDate,
+		);
+	}
+
 
 	my $itemId = $page->schemaAction(
 		'Invoice_Item', 'add',

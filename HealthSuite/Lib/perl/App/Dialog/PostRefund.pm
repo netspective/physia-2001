@@ -94,7 +94,7 @@ sub execute
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
 
 		my $invoiceBalance = $page->param("_f_invoice_$line\_invoice_balance");
-		if($invoiceBalance == 0)
+		if($page->param("_f_invoice_$line\_invoice_status") == App::Universal::INVOICESTATUS_CLOSED)
 		{
 			$page->schemaAction(
 				'Invoice', 'update',
