@@ -79,8 +79,8 @@ $STMTFMT_SEL_CATALOG_CODE = qq{
 };
 
 $STMTFMT_SEL_CPT_CODE = qq{
-	SELECT cpt, name, replace(description, '''', '`'), comprehensive_compound_cpts, 
-		mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable, 
+	SELECT cpt, name, replace(description, '''', '`'), comprehensive_compound_cpts,
+		mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
 		asc_, non_rep, non_cov
 	FROM ref_cpt
 	WHERE
@@ -357,7 +357,7 @@ $STMTMGR_MODIFIER_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_modifier_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
-			whereCond => 'caption = ?',
+			whereCond => 'upper(caption) = ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_modifier_code_like' =>
@@ -369,7 +369,7 @@ $STMTMGR_MODIFIER_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_modifier_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
-			whereCond => 'caption like ?',
+			whereCond => 'upper(caption) like ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 );
@@ -384,7 +384,7 @@ $STMTMGR_SERVICEPLACE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_place_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
-			whereCond => 'caption = ?',
+			whereCond => 'upper(caption) = ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_place_code_like' =>
@@ -396,7 +396,7 @@ $STMTMGR_SERVICEPLACE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_place_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
-			whereCond => 'caption like ?',
+			whereCond => 'upper(caption) like ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 );
@@ -411,7 +411,7 @@ $STMTMGR_SERVICETYPE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_type_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
-			whereCond => 'caption = ?',
+			whereCond => 'upper(caption) = ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_type_code_like' =>
@@ -423,7 +423,7 @@ $STMTMGR_SERVICETYPE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_type_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
-			whereCond => 'caption like ?',
+			whereCond => 'upper(caption) like ?',
 			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 );
