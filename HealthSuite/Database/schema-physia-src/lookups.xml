@@ -79,6 +79,7 @@
 	</table>
 
 	<table name="Electronic_Payer_Type" abbrev="EPayType" type="Lookup">
+		<enum id="0">Non-Commercial</enum>
 		<enum id="1">BCBS</enum>
 		<enum id="2">Medicare</enum>
 		<enum id="3">Medicaid</enum>
