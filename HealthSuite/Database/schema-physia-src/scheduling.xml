@@ -62,7 +62,7 @@
 		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
 		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
 		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
-		<column name="start_time" type="stamp" required="yes" descr="The starting time of the event"/>
+		<column name="start_time" type="stamp" indexed="yes" required="yes" descr="The starting time of the event"/>
 		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
 		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
