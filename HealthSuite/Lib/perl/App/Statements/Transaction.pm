@@ -177,7 +177,22 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			from transaction
 			where parent_event_id = ?
 		},
+	'selByTransId' => qq{
+		select *
+			from transaction
+			where trans_id = ?
+		},
 
+	'selByParentTransId' => qq{
+		select *
+			from transaction
+			where parent_trans_id = ?
+		},
+	'selUpdateTransStatus' => qq{
+		update transaction
+		set trans_status = 3
+		where parent_trans_id = ?
+		},
 	#
 	# expects bind parameters:
 	#   1: user_id
