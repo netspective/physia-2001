@@ -40,6 +40,7 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
+	my $command = $self->getActiveCommand($page);
 	my $pId = $self->getField('value_text');
 	my $sName = $self->getField('value_int');
 	my $licenseNum = $self->getField('value_dateend');
@@ -47,6 +48,9 @@ sub customValidate
 	my $sequence = $page->field('value_int');
 	my $personId = $page->param('person_id');
 	my $specialty = $page->field('value_text');
+	my $licenseName = $page->field('value_textb');
+	my $facilityId = $page->field('name_sort');
+	my $fName = $self->getField('name_sort');
 	my $specialtyValType = App::Universal::ATTRTYPE_SPECIALTY;
 	my $valueType = $self->{valueType};
 	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne "&SEQUENCE_SPECIALTY_UNKNOWN";
@@ -66,6 +70,13 @@ sub customValidate
 	if($page->field('value_textb') eq 'Nursing/License' && ($page->field('value_int') eq '' || $page->field('value_dateend') eq ''))
 	{
 		$licenseNum->invalidate($page, "'Expiration Date' and 'License Required' should be entered when the license is 'Nursing/License' ");
+	}
+
+	my $licenseData = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selAttrByItemNameParentNameSort', $personId, $licenseName, $facilityId);
+
+	if ($itemId ne $licenseData->{'item_id'} && $facilityId eq $licenseData->{'name_sort'} && $licenseName eq $licenseData->{'value_textb'})
+	{
+		$fName->invalidate($page, "This license already exists for '$personId' for the facility '$facilityId' ");
 	}
 }
 
@@ -101,7 +112,7 @@ sub execute
 		$itemName = $page->field('value_textb');
 	}
 	my $valueTextB = $medSpecCaption ne '' ? $medSpecCaption : $page->field('value_textb');
-
+	my $facilityId = $page->field('name_sort') ne '' ? $page->field('name_sort') : $page->session('org_id');
 	$page->schemaAction(
 		'Person_Attribute',	$command,
 		parent_id => $page->param('person_id'),
@@ -111,6 +122,7 @@ sub execute
 		value_text => $page->field('value_text') || undef,
 		value_dateEnd => $page->field('value_dateend') ||undef,
 		value_textB => $valueTextB || undef,
+		name_sort  => $facilityId || undef,
 		value_int   => $page->field('value_int') || undef,
 		_debug => 0
 	);
