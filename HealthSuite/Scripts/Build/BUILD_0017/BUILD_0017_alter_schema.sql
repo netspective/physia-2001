@@ -93,4 +93,11 @@ alter table Offering_Catalog_Entry_AUD add (SEQUENCE NUMBER(8));
 -- ----------------------------------------
 start tables-code/Offering_Catalog_Entry.sql
 
-commit;
+
+
+create index INVOICE_PARENT_INVOICE_ID on Invoice (parent_invoice_id) TABLESPACE TS_INDEXES;
+
+-- Create Person_Medication table
+
+start tables/Person_Medication.sql
+start tables-code/Person_Medication.sql
