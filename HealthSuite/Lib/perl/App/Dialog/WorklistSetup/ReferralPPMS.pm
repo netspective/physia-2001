@@ -21,7 +21,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = (
-	'wl-referral-setup' => {},	
+	'wl-referral-setup' => {},
 );
 
 sub new
@@ -46,7 +46,7 @@ sub new
 		multiDualCaptionRight => 'Selected Physicians',
 		fKeyStmtBindSession => ['org_internal_id'],
 	);
-	
+
 	$self->addContent(
 
 		new CGI::Dialog::Subhead(heading => 'Physicians'),
@@ -54,9 +54,9 @@ sub new
 
 		new CGI::Dialog::Subhead(heading => 'Insurance Providers'),
 		new CGI::Dialog::Field(type => 'select',
-			defaultValue=>'0', 
-			selOptions=>"Selected:0;All:1", 
-			name => 'product_select', 
+			defaultValue=>'0',
+			selOptions=>"Selected:0;All:1",
+			name => 'product_select',
 			caption => 'Products',
 			onChangeJS => qq{showFieldsOnValues(event, [0], ['products']);}),
 		new CGI::Dialog::Field(
@@ -72,7 +72,7 @@ sub new
 			fKeyStmtBindSession => ['org_internal_id'],
 			hints => ''
 		),
-		
+
 		new CGI::Dialog::Subhead(heading => 'Patients Last Name'),
 		new CGI::Dialog::MultiField(caption =>'Enter range:',
 			name => 'LastNameRange',
@@ -142,10 +142,10 @@ sub populateData
 
 	my $userId =  $page->session('user_id');
 	my $orgInternalId = $page->session('org_internal_id');
-	
+
 	my $itemNamePrefix = $page->param('itemNamePrefix');
 
-	my $physicansList = $STMTMGR_WORKLIST_CREDIT->getRowsAsHashList($page, 
+	my $physicansList = $STMTMGR_WORKLIST_CREDIT->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_credit_physician', $page->session('user_id'), $orgInternalId, $itemNamePrefix . '-Physician');
 
 	my @physicians = ();
@@ -154,7 +154,7 @@ sub populateData
 		push(@physicians, $_->{value_text});
 	}
 	$page->field('physician_list', @physicians);
-	
+
 	my $productsAll = $STMTMGR_WORKLIST_CREDIT->getRowAsHash($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_credit_all_products', $userId, $orgInternalId, $itemNamePrefix . '-Product');
 	if($productsAll->{value_int} == -1)
@@ -164,7 +164,7 @@ sub populateData
 	else
 	{
 		my $productsList = $STMTMGR_WORKLIST_CREDIT->getRowsAsHashList($page,
-			STMTMGRFLAG_NONE, 'sel_worklist_credit_products', $userId, $orgInternalId, 
+			STMTMGRFLAG_NONE, 'sel_worklist_credit_products', $userId, $orgInternalId,
 			$itemNamePrefix . '-Product');
 		my @products = ();
 		for (@$productsList)
@@ -197,7 +197,7 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $userId =  $page->session('user_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $itemNamePrefix = $page->param('itemNamePrefix');
@@ -309,11 +309,11 @@ sub execute
 			parent_org_id => $orgInternalId,
 			_debug => 0
 	);
-		
+
 	$page->field('expiryDays') ?
-	$self->handlePostExecute($page, $command, $flags, "/worklist/referralPPMS/exp") :
+	$self->handlePostExecute($page, $command, $flags, "/worklist/referralppms/expiring") :
 	$self->handlePostExecute($page, $command, $flags);
-	
+
 }
 
 sub customValidate
