@@ -47,7 +47,7 @@
 		<description>An active session of a user connected to the application</description>
 		<column name="session_id" type="session_id" primarykey="yes" descr="An application-generated unique session ID"/>
 		<column name="status" lookupref="Session_Status.id" required="yes" default="0" descr="The current status of the session (0:active, 1:inactive, etc)"/>
-		<column name="person_id" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
+		<column name="person_id" parentref="Person.person_id" required="yes" indexed="yes" descr="The ID of the person that owns the session"/>
 		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="The organization (if any) from where session is being used"/>
 		<column name="remote_host" type="text" size="128" descr="Remote host information that should be stored for security purposes"/>
 		<column name="remote_addr" type="text" size="32" required="yes" descr="Remote address information that should be kept for security purposes"/>
@@ -111,7 +111,7 @@
 		<column name="product_name" type="text" size="30" descr="The ID given to an insurance product (by an end-user)"/>
 		<column name="record_type" lookupref="Insurance_Record_Type" descr="The type of information held in this record"/>
 		<column name="parent_ins_id" lookupref="Insurance.ins_internal_id" descr="If this record was 'inherited' from an existing record, then this is the original record id (otherwise NULL)"/>
-		<column name="owner_person_id" lookupref="Person.person_id" descr="The person for whom the insurance coverage information is being defined (NULL if not a coverage record)"/>
+		<column name="owner_person_id" lookupref="Person.person_id" indexed="yes" descr="The person for whom the insurance coverage information is being defined (NULL if not a coverage record)"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" descr="The provider org for whom the insurance product/plan/coverage information is being defined"/>
 		<column name="ins_org_id" lookupref="Org.org_internal_id" descr="Organization policy is under (insurance firm) -- NULL if not constrained"/>
 		<column name="employer_org_id" lookupref="Org.org_internal_id" descr="The employer's org id, if any"/>
