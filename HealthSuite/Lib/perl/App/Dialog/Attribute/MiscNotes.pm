@@ -57,7 +57,7 @@ sub execute
 
 	$page->schemaAction(
 		'Person_Attribute', $command,
-		parent_id => $page->param('person_id'),
+		parent_id => $page->param('person_id') || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name =>'Misc Notes',
 		value_type => 0,
