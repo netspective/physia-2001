@@ -7,6 +7,7 @@ use App::Page;
 use App::Universal;
 use Exporter;
 use DBI::StatementManager;
+use App::Configuration;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter App::Page);
@@ -667,9 +668,40 @@ sub prepare_view_stmgr
 
 #---------------------------------------------------------------------------------
 
+sub getConfigHtml
+{
+	return
+	qq{
+		<TABLE>
+		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Configuration</TD></TR>
+		<TR><TD ALIGN=RIGHT>Name:</TD><TD><B>@{[ $CONFDATA_SERVER->name_Config() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Group:</TD><TD><B>@{[ $CONFDATA_SERVER->name_Group() ]}</TD></TR>
+		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Database</TD></TR>
+		<TR><TD ALIGN=RIGHT>Connect key:</TD><TD><B>@{[ $CONFDATA_SERVER->db_ConnectKey() ]}</TD></TR>
+		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Paths</TD></TR>
+		<TR><TD ALIGN=RIGHT>Root:</TD><TD><B>@{[ $CONFDATA_SERVER->path_root() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Temp:</TD><TD><B>@{[ $CONFDATA_SERVER->path_temp() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Database:</TD><TD><B>@{[ $CONFDATA_SERVER->path_Database() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Schema SQL:</TD><TD><B>@{[ $CONFDATA_SERVER->path_SchemaSQL() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Billing template:</TD><TD><B>@{[ $CONFDATA_SERVER->path_BillingTemplate() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Reports:</TD><TD><B>@{[ $CONFDATA_SERVER->path_Reports() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Org Report:</TD><TD><B>@{[ $CONFDATA_SERVER->path_OrgReports() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>PDF Output:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutput() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>PDF Output HREF:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutputHREF() ]}</TD></TR>
+		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Files</TD></TR>
+		<TR><TD ALIGN=RIGHT>Schema defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_SchemaDefn() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Access control defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_AccessControlDefn() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Build log:</TD><TD><B>@{[ $CONFDATA_SERVER->file_BuildLog() ]}</TD></TR>
+		</TABLE>
+	}
+}
+
+#---------------------------------------------------------------------------------
+
 sub prepare
 {
 	my ($self) = @_;
+
 
 	$self->addContent(qq{
 		<P>
@@ -677,6 +709,8 @@ sub prepare
 		<A HREF='/sde/stmgrs'>Statement Managers</A><BR> @{[ $self->getStmtMgrsList('select') ]}
 		<P>
 		<A HREF='/perl-status'>View active modules</A>
+		<P>
+			@{[ $self->getConfigHtml() ]}
 		});
 }
 
