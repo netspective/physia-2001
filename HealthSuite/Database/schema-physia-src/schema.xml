@@ -620,7 +620,7 @@
 		<column name="item_id" indexed="yes" lookupref="Invoice_Item.item_id" descr="The item ID, for the invoice item"/>
 		<column name="parent_invoice_id" indexed="yes" parentref="Invoice.invoice_id" descr="The parent Invoice"/>
 		<column name="adjustment_id" type="integer" indexed="yes"  descr="Invoice id" />
-		<column name="invoice_date" type="date" required="yes" descr="The date the invoice was created"/>
+		<column name="invoice_date" indexed="yes" type="date" required="yes" descr="The date the invoice was created"/>
 		<column name="batch_date" type="date"  descr="The batch date the invoice creation or payment"/>
 		<column name="pay_date" type="date" descr="The date the payment was made "/>
 		<column name="batch_id" type="text" size="32" descr="The batch id the invoice creation or payment"/>
@@ -633,7 +633,7 @@
 		<column name="unit_cost" type="currency" descr="The cost per unit of this item (either a calculated value or a specific amount)"/>
 		<column name="service_facility_id" abbrev="SrvFac" lookupref="org.org_internal_id" descr="Facility where procedure took place"/>
 		<column name="billing_facility_id" lookupref="org.org_internal_id" descr="Facility where billing should be tracked"/>
-		<column name="provider_id" lookupref="person.person_id" descr="Person performing transaction for billing and care purposes"/>
+		<column name="provider_id" indexed="yes" lookupref="person.person_id" descr="Person performing transaction for billing and care purposes"/>
 		<column name="care_provider_id" lookupref="person.person_id" descr="Person performing transaction (as a care giver if billing provider is different)"/>
 		<column name="service" type="duration" descr="For HCFA 1500, the service start/end date(s)"/>
 		<column name="code" type="text" size="32" descr="Usually a CPT code or code for the service/product"/>
@@ -653,7 +653,7 @@
 		<column name="plan_paid" type="currency" descr="Amount written for on insurance charges"/>
 		<column name="pay_method" lookupref="Payment_Method" descr="The method of payment"/>
 		<column name="pay_ref" type="text" size="128" descr="Any reference text that goes with pmt type (card #, check #)"/>
-		<column name="owner_org_id" lookupref="Org.org_internal_id" descr="The provider org for whom the invoice data is being defined"/>
+		<column name="owner_org_id" indexed="yes" lookupref="Org.org_internal_id" descr="The provider org for whom the invoice data is being defined"/>
 		<column name="billing_id" type="integer" descr="The current payer (invoice billing record) for this invoice"/>
 	</table>
 
