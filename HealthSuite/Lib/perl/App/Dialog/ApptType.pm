@@ -98,7 +98,6 @@ sub new
 			style => 'check',
 			defaultValue => 1,
 		),
-
 		new CGI::Dialog::MultiField(name => 'simultaneous',
 			fields => [
 				new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appts Limits',
@@ -114,7 +113,6 @@ sub new
 				),
 			],
 		),
-
 		new CGI::Dialog::MultiField(name => 'limits',
 			fields => [
 				new CGI::Dialog::Field(caption => 'AM Limits',
@@ -134,8 +132,6 @@ sub new
 				),
 			],
 		),
-
-
 		$rr_ids_field,
 
 		new App::Dialog::Field::RovingResource(physician_field => '_f_rr_ids',
@@ -148,7 +144,15 @@ sub new
 			fKeyStmt => 'selRovingPhysicianTypes',
 			appendMode => 1,
 		),
-
+		new CGI::Dialog::Field(caption => 'Super Bill Type',
+			name => 'superbill_id',
+			type => 'select',
+			fKeyStmtMgr => $STMTMGR_SCHEDULING,
+			fKeyStmt => 'sel_SuperBillTypesDropDown',
+			fKeyStmtBindSession => ['org_internal_id'],
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+		),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -229,6 +233,7 @@ sub execute
 		day_limit => $page->field ('day_limit') || undef,
 		rr_ids => cleanup($page->field ('rr_ids')) || undef,
 		owner_org_id => $page->session('org_internal_id'),
+		superbill_id => $page->field('superbill_id') || undef,
 		_debug => 0
 	);
 

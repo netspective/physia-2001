@@ -57,7 +57,7 @@ create index EVENT_SUPERBILL_ID on Event (superbill_id) TABLESPACE TS_INDEXES;
 
 -- Re-create Event Triggers
 -- ------------------------
-@tables-code/Event.sql
+start tables-code/Event.sql
 
 -- Alter table Appt_Type
 -- ---------------------
@@ -71,6 +71,26 @@ create index APTYPE_SUPERBILL_ID on Appt_Type (superbill_id) TABLESPACE TS_INDEX
 
 -- Re-create Appt_Type Triggers
 -- ----------------------------
-@tables-code/Appt_Type.sql
+start tables-code/Appt_Type.sql
+
+
+-- Alter table Offering_Catalog
+-- ----------------------------
+alter table Offering_Catalog add (SEQUENCE NUMBER(8));
+alter table Offering_Catalog_AUD add (SEQUENCE NUMBER(8));
+
+-- Re-create Offering_Catalog Triggers
+-- -----------------------------------
+start tables-code/Offering_Catalog.sql
+
+
+-- Alter table Offering_Catalog_Entry
+-- ----------------------------------
+alter table Offering_Catalog_Entry add (SEQUENCE NUMBER(8));
+alter table Offering_Catalog_Entry_AUD add (SEQUENCE NUMBER(8));
+
+-- Re-create Offering_Catalog_Entry Triggers
+-- ----------------------------------------
+start tables-code/Offering_Catalog_Entry.sql
 
 commit;

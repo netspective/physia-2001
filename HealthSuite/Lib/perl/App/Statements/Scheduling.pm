@@ -270,7 +270,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selPopulateApptTypeDialog' => qq{
 		select appt_type_id, r_ids, caption, duration, lead_time, lag_time, back_to_back,
-			multiple, num_sim, rr_ids, am_limit, pm_limit, day_limit
+			multiple, num_sim, rr_ids, am_limit, pm_limit, day_limit, superbill_id
 		from Appt_Type
 		where appt_type_id = :1
 	},
@@ -284,7 +284,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			ea.value_text as attendee_id,
 			ea.value_int as patient_type,
 			ea.value_textB as resource_id,
-			e.appt_type, e.parent_id
+			e.appt_type, e.parent_id, e.superbill_id
 		from Event_Attribute ea, event e
 		where event_id = :2
 			and ea.parent_id = e.event_id
@@ -415,6 +415,17 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where owner_org_id = :1
 		UNION
 		select 0 as appt_type_id, ' ' as caption, ' ' as upperCaption  from Dual
+		order by 3
+	},
+
+	'sel_SuperBillTypesDropDown' => qq{
+		select internal_catalog_id, catalog_id || ' (' || caption || ')' as caption,
+			upper(catalog_id) as upperCaption
+		from Offering_catalog
+		where org_internal_id = :1
+			and catalog_type = 4
+		UNION
+		select 0 as internal_catalog_id, ' ' as caption, ' ' as upperCaption  from Dual
 		order by 3
 	},
 

@@ -97,7 +97,6 @@ sub new
 		new CGI::Dialog::Field(caption => 'Symptoms',
 			type => 'memo', name => 'remarks'
 		),
-
 		new CGI::Dialog::Field(caption => 'Appointment Type',
 			name => 'appt_type',
 			type => 'select',
@@ -107,7 +106,15 @@ sub new
 			fKeyDisplayCol => 1,
 			fKeyValueCol => 0,
 		),
-
+		new CGI::Dialog::Field(caption => 'Super Bill Type',
+			name => 'superbill_id',
+			type => 'select',
+			fKeyStmtMgr => $STMTMGR_SCHEDULING,
+			fKeyStmt => 'sel_SuperBillTypesDropDown',
+			fKeyStmtBindSession => ['org_internal_id'],
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+		),
 		new App::Dialog::Field::Scheduling::DateTimeOnly(
 			name => 'appt_date_time',
 			ordinal => 0,
@@ -329,6 +336,7 @@ sub makeStateChanges_cancel
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->updateFieldFlags('patient_type', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('appt_type', FLDFLAG_READONLY, 1);
+	$self->updateFieldFlags('superbill_id', FLDFLAG_READONLY, 1);
 
 	$self->updateFieldFlags('appt_date_time', FLDFLAG_READONLY, 1);
 
@@ -790,6 +798,7 @@ sub execute
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,
+					superbill_id => $page->field('superbill_id') || undef,
 					_debug => 0
 				);
 
@@ -822,6 +831,7 @@ sub execute
 					remarks => $page->field('remarks') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,
+					superbill_id => $page->field('superbill_id') || undef,
 					_debug => 0
 				);
 
@@ -888,6 +898,7 @@ sub execute
 					scheduled_by_id => $page->session('user_id') || undef,
 					parent_id => $parentId || undef,
 					appt_type => $page->field('appt_type') || undef,
+					superbill_id => $page->field('superbill_id') || undef,
 					_debug => 0
 				);
 				if ($apptID gt 0)
