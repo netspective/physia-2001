@@ -560,6 +560,12 @@ sub prepare_HtmlBlockFmtTemplate
 		$bannerFmt =~ s/\#fmtdefn\.(\w+)\#/eval("\$$1")/ge;
 	}
 	
+	my $bodyRowAttr =
+		join ' ',
+			map {$_ . '="' . $publDefn->{bodyRowAttr}->{$_} . '"'}
+				keys %{$publDefn->{bodyRowAttr}}
+					if defined $publDefn->{bodyRowAttr};
+	
 	my ($headRowFmt, $bodyRowFmt, $tailRowFmt,$subTotalRowFmt) =
 	(
 		$publFlags & PUBLFLAG_HIDEHEAD ? '' : qq{
@@ -569,7 +575,7 @@ sub prepare_HtmlBlockFmtTemplate
 			$rowSepStr
 			},
 		qq{
-			<TR VALIGN=TOP>
+			<TR VALIGN=TOP $bodyRowAttr>
 				$dSpacer @{[ join('', @bodyCols) ]}
 			</TR>
 		},
@@ -894,7 +900,7 @@ sub createHtmlFromStatement
 					if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
 					{
 						push(@outputRows, $dataSepStr);
-						}
+					}
 					else
 					{
 					
@@ -926,6 +932,7 @@ sub createHtmlFromStatement
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						$outRow =~ s/\#rowNum#/$rowNum/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
@@ -960,6 +967,7 @@ sub createHtmlFromStatement
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						$outRow =~ s/\#rowNum#/$rowNum/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
@@ -986,6 +994,7 @@ sub createHtmlFromStatement
 					else
 					{
 						($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						$outRow =~ s/\#rowNum#/$rowNum/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
 					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
@@ -998,6 +1007,7 @@ sub createHtmlFromStatement
 				{
 					$rowNum++;
 					($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+					$outRow =~ s/\#rowNum#/$rowNum/g;
 					push(@outputRows, $outRow, $rowSepStr);
 					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
@@ -1208,6 +1218,7 @@ sub createHtmlFromData
 						push(@outputRows, $outRow, $rowSepStr);
 						
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 				
 				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
@@ -1245,6 +1256,7 @@ sub createHtmlFromData
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
@@ -1276,6 +1288,7 @@ sub createHtmlFromData
 						($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
 					}
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 			}
 			else
@@ -1285,6 +1298,7 @@ sub createHtmlFromData
 					$rowNum++;
 					($outRow = $bodyRowFmt) =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 					push(@outputRows, $outRow, $rowSepStr);
+					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
 			}
 		}
