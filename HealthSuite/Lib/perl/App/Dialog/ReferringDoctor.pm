@@ -370,7 +370,7 @@ sub execute
 			value_textB => $medSpecCaption || undef,
 			value_int => $page->field('value_int1') || undef,
 			_debug => 0
-		);
+		) if $command eq 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 
