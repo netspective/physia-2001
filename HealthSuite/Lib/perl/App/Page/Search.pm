@@ -73,6 +73,7 @@ sub prepare_page_content_header
 			['CPT', "$urlPrefix/cpt", 'cpt'],
 			['HCPCS', "$urlPrefix/cpt", 'hcpcs'],
 			['EPSDT', "$urlPrefix/epsdt", 'epsdt'],
+			['Misc Procedure Code', "$urlPrefix/miscprocedure", 'miscprocedure'],
 			['Schedule Template', "$urlPrefix/template", 'template'],
 			['User Sessions', "$urlPrefix/session", 'session'],
 		]);
