@@ -284,7 +284,7 @@ sub checkAlphanumeric
 
 sub checkValidValues
 {
-	my ($self,$condition, $valuesFlag, $positionFrom,$positionTo,$value,$claim, $fld, @values, ) = @_;
+	my ($self,$condition, $valuesFlag, $positionFrom,$positionTo,$value,$claim, $fld, @values ) = @_;
 	my ($tempValue, $digitList,$wordList,$i,$j,$passed);
 	my @wordValues;
 	my @digitValues;

@@ -1,4 +1,4 @@
-
+##############################################################################
 package App::Billing::Output::Validate::NSF;
 ##############################################################################
 
@@ -381,15 +381,15 @@ sub validateC
 	if ($tempClaim->{careReceiver}->getlegalIndicator() eq 'Y')
 	{
 		$self->checkValidNames(INDIVIDUAL_NAME,$legalRepresentator->getLastName(), $legalRepresentator->getFirstName(), $legalRepresentator->getMiddleInitial(), $tempClaim,'CA0:Incorect legal Representator name'); 	# legalRepresentator name
-		$self->checkValidAddress($legalRepresentatorAddress->getAddress1(),$legalRepresentatorAddress->getAddress2(), $legalRepresentatorAddress->getCity(), $legalRepresentatorAddress->getState(), $legalRepresentatorAddress->getZipCode(),$tempClaim,'CA0:Incorect Legal Representator Address'); # Legal Representator Address
-		$self->isRequired($legalRepresentator->getLastName(),$tempClaim,'CA0:Incorect legal Representator name');
-		$self->isRequired($legalRepresentator->getFirstName(),$tempClaim,'CA0:Incorect legal Representator name');
-		$self->isRequired($legalRepresentatorAddress->getAddress1(), $tempClaim,'CA0:Incorect Legal Representator Address');
+		$self->checkValidAddress($legalRepresentatorAddress->getAddress1(),$legalRepresentatorAddress->getAddress2(), $legalRepresentatorAddress->getCity(), $legalRepresentatorAddress->getState(), $legalRepresentatorAddress->getZipCode(),$tempClaim,'CB0:Incorect Legal Representator Address'); # Legal Representator Address
+		$self->isRequired($legalRepresentator->getLastName(),$tempClaim,'CB0:Incorect legal Representator name');
+		$self->isRequired($legalRepresentator->getFirstName(),$tempClaim,'CB0:Incorect legal Representator name');
+		$self->isRequired($legalRepresentatorAddress->getAddress1(), $tempClaim,'CB0:Incorect Legal Representator Address');
 	}
 
 	if ($tempClaim->{careReceiver}->getDateOfDeath() ne '')
 	{
-		$self->checkValidNames(INDIVIDUAL_NAME,$legalRepresentator->getLastName(), $legalRepresentator->getFirstName(), $legalRepresentator->getMiddleInitial(), $tempClaim,'CA0:Incorect legal Representator name');
+		$self->checkValidNames(INDIVIDUAL_NAME,$legalRepresentator->getLastName(), $legalRepresentator->getFirstName(), $legalRepresentator->getMiddleInitial(), $tempClaim,'CB0:Incorect legal Representator name');
 	}
 
 }
@@ -461,9 +461,13 @@ sub validateD
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('A'..'Z',0..9,'/',' ','-'));
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('0'));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('123456789','NONE','UNKNOWN','INDIVIDUAL','SELF'));
+			
+			print "SSN No ",$tempClaim->{insured}->[$payerLoop]->getSsn()  ,"\n";
+
 			if ($tempClaim->{insured}->[$payerLoop]->getSsn() ne '')
 			{
 				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',($tempClaim->{insured}->[$tempClaim->getClaimType()]->getSsn()));
+				print "Checking SSN Equivalent " . "\n";
 			}
 			
 			
@@ -471,6 +475,7 @@ sub validateD
 		elsif($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() eq 'C')
 		{
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('A'..'Z',0..9,'/',' ','-',));
+			print "Checking valid characters \n";
 		}	
 
 		# checks for Group Name
@@ -512,23 +517,23 @@ sub validateD
 	
 		#Patient relationship to insured
 		
-		if (substr($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured(),0,1) eq '0')
+		if (substr($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient(),0,1) eq '0')
 		{
 		
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',substr($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured(),1,1),$tempClaim,
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',substr($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient(),1,1),$tempClaim,
 							'DA0:Patient Relationship to insured',(1..19,'99'));
 							
 		}
 		else
 		{
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured(),$tempClaim,
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient(),$tempClaim,
 							'DA0:Patient Relationship to insured',(1..19,'99'));
 		}
 						
 					
-		$self->isRequired($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured(),$tempClaim,'DA0:Patient Relationship to insured');						
+		$self->isRequired($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient(),$tempClaim,'DA0:Patient Relationship to insured');						
 																																
-		if($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured() eq '99')
+		if($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient() eq '99')
 		{
 			$self->isRequired($tempClaim->getRemarks(),$tempClaim,'DA0:Remarks in XA0');	
 		}	
@@ -557,7 +562,7 @@ sub validateD
 		}
 
 		# Insured Last Name and First Name
-		if(($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured() ne '01') && ($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured() ne '1'))
+		if(($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient() ne '01') && ($tempClaim->{insured}->[$payerLoop]->getRelationshipToPatient eq '1'))
 		{
 			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getLastName(),$tempClaim,'DA0:Insured Last Name');	
 			if($tempClaim->{insured}->[$payerLoop]->getLastName() ne '')
@@ -1542,7 +1547,11 @@ sub getCallSequences
 	'All valid time codes, special program codes and speciality codes into a VALIDCODES hash to stop replication '],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
 	'Billing Interface/Validating NSF Output',
-	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value']
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/03/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'Function getRelaitonshipToInsured of Insured object has been replaced with getRelationshipToPatient of same object to reflect correct value']
+
 
 
 	

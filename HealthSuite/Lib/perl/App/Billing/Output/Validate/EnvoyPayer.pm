@@ -200,7 +200,7 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
 						
 			# checks for Patient Relation to Insured
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),$claim,'Patient Relationship to Insured',('99'));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),$claim,'Patient Relationship to Insured',('99'));
 						
 			# checks for Insured ID Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',9);
@@ -312,7 +312,7 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
 				
 			# checks for Patient Relation to Insured
- 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),('99'));
+ 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
 							
 			# checks for Insured ID Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
@@ -373,7 +373,7 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
 			
 			# Patient relation to Insured
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),('99'));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
 
 		
 		}
@@ -2645,7 +2645,7 @@ use constant CHECK_CHARACTERS => 60;
 	
 			
 			# checks for Patient Relation to Insured
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),('99'));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
 			
 			# checks for Insured ID Number
 			if (substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1) eq 'X')
@@ -2904,7 +2904,11 @@ sub getCallSequences
 	'A new parmeter has been added in checkValidValues method and its value could be either CHECK_EXACT_VALUES or CHECK_CHARACTERS'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
 	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value']
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/03/2000', 'AUF',
+	'Billing Interface/Envoy Payer Specific Editing Validation',
+	'Function getRelationshiptoInsured of Patient object has been replaced with getRelationshipToPatient of Insured object ']
+
 
 
 
