@@ -37,6 +37,8 @@ use App::Statements::Page;
 use App::Statements::Person;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
+use App::Statements::Report::Accounting;
+use App::Statements::Device;
 
 #
 # the following hash is create to keep track of "how" components
