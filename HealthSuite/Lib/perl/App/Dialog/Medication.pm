@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.17 2001-01-09 00:23:34 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.18 2001-01-09 20:57:11 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -182,31 +182,30 @@ sub new
 					size => 3,
 				),
 
-				new CGI::Dialog::Field(
-					name => 'sale_units',
-					caption => 'Sale Units',
-					type => 'select',
-					selOptions => $UNIT_SELOPTIONS,
-					options => FLDFLAG_REQUIRED,
-					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_sale_units']);},
-				),
 
-				new CGI::Dialog::Field(caption => 'Other Units',
-					name => 'other_sale_units',
-				),
+				#new CGI::Dialog::Field(caption => 'Sale Units',
+				#	name => 'sale_units',					
+				#	type => 'select',
+				#	selOptions => $UNIT_SELOPTIONS,
+				#	options => FLDFLAG_PREPENDBLANK,
+				#	onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_sale_units']);},
+				#),
+				#new CGI::Dialog::Field(caption => 'Other Units',
+				#	name => 'other_sale_units',
+				#),
 
 				new CGI::Dialog::Field(caption => 'Substitution allowed?',
 					name => 'allow_substitutions',
 					type => 'select',
 					style => 'radio',
-					selOptions => 'Yes:1;No:0',
+					selOptions => 'Yes:1;No:2',
 					defaultValue => 1,
 				),
 				new CGI::Dialog::Field(caption => 'Generic allowed?',
 					name => 'allow_generic',
 					type => 'select',
 					style => 'radio',
-					selOptions => 'Yes:1;No:0',
+					selOptions => 'Yes:1;No:2',
 					defaultValue => 1,
 				),
 
@@ -303,13 +302,6 @@ sub new
 				setIdDisplay('first_dose_specs', 'none');
 			}
 		}
-		if (opObj = eval('document.dialog._f_sale_units'))
-		{
-			if (opObj.value != 'other')
-			{
-				setIdDisplay('other_sale_units', 'none');
-			}
-		}
 		if (opObj = eval('document.dialog._f_num_refills'))
 		{
 			if (opObj.value != 'other')
@@ -383,6 +375,7 @@ sub makeStateChanges
 	$command = 'prescribe' if $page->flagIsSet(PAGEFLAG_ISHANDHELD);
 
 	$self->setFieldFlags('physician_pin', FLDFLAG_INVISIBLE);
+	$self->updateFieldFlags('other_num_refills', FLDFLAG_INVISIBLE);
 
 	if ($command eq 'add')
 	{
@@ -425,8 +418,8 @@ sub makeStateChanges
 		{
 			$self->setFieldFlags('label', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('other_label', FLDFLAG_INVISIBLE);
-			$self->setFieldFlags('sale_units', FLDFLAG_INVISIBLE);
-			$self->setFieldFlags('other_sale_units', FLDFLAG_INVISIBLE);
+			#$self->setFieldFlags('sale_units', FLDFLAG_INVISIBLE);
+			#$self->setFieldFlags('other_sale_units', FLDFLAG_INVISIBLE);
 		}
 	}
 	elsif ($command eq 'update')
@@ -529,10 +522,10 @@ sub customValidate
 	{
 		$self->getField('other_prn')->invalidate($page, 'Please enter other prn');
 	}
-	if($page->field('sale_units') eq 'other' && $page->field('other_sale_units') eq '')
-	{
-		$self->getField('other_sale_units')->invalidate($page, 'Please enter other units');
-	}
+	#if($page->field('sale_units') eq 'other' && $page->field('other_sale_units') eq '')
+	#{
+	#	$self->getField('other_sale_units')->invalidate($page, 'Please enter other units');
+	#}
 	if($page->field('num_refills') eq 'other' && $page->field('other_num_refills') eq '')
 	{
 		$self->getField('other_num_refills')->invalidate($page, 'Please enter number of refills');
@@ -545,7 +538,7 @@ sub customValidate
 	#check physician password if approval is being done
 	my $pin = $page->field('physician_pin');
 	my $loginInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selLoginOrg', $page->session('user_id'), $page->session('org_internal_id'));
-	if($pin && $loginInfo->{password})
+	if($pin && $pin ne $loginInfo->{password})
 	{
 		$self->getField('physician_pin')->invalidate($page, 'Invalid PIN. Please try again.');
 	}
@@ -563,9 +556,11 @@ sub populateData
 	{
 		$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPerMedById', $permedId);
 		my $medInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPerMedById', $permedId);
-		my $spanishLabel = $medInfo->{label_in_spanish};
-		$spanishLabel = defined $spanishLabel && $spanishLabel == 0 ? '0' : $spanishLabel;
-		$page->field('label', $spanishLabel);
+
+		my $allowSubstitutions = $medInfo->{allow_substitutions} == 1 ? 1 : 2;
+		$page->field('allow_substitutions', $allowSubstitutions);
+		my $allowGeneric = $medInfo->{allow_generic} == 1 ? 1 : 2;
+		$page->field('allow_generic', $allowGeneric);
 
 		my @doseUnits = split(',', $medInfo->{dose_units});
 		$page->field('dose_units', $doseUnits[0]);
@@ -599,13 +594,13 @@ sub populateData
 			$page->field('first_dose_specs', $firstDose[1]);
 		}
 
-		my @saleUnits = split(',', $medInfo->{sale_units});
-		$page->field('sale_units', $saleUnits[0]);
-		if($saleUnits[0] eq 'other')
-		{
-			$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_sale_units', $saleUnits[1]);
-		}
+		#my @saleUnits = split(',', $medInfo->{sale_units});
+		#$page->field('sale_units', $saleUnits[0]);
+		#if($saleUnits[0] eq 'other')
+		#{
+		#	$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);
+		#	$page->field('other_sale_units', $saleUnits[1]);
+		#}
 
 		my @label = split(',', $medInfo->{label});
 		$page->field('label', $label[0]);
@@ -616,23 +611,12 @@ sub populateData
 		}
 
 		my $refills = $medInfo->{num_refills};
-		if($refills <= 12)
-		{
-			$page->field('num_refills', $refills);
-		}
-		else
+		$page->field('num_refills', $refills);
+		if($refills > 12)
 		{
 			$self->updateFieldFlags('other_num_refills', FLDFLAG_INVISIBLE, 0);
 			$page->field('num_refills', 'other');
 			$page->field('other_num_refills', $refills);
-		}
-
-		@saleUnits = split(',', $medInfo->{sale_units});
-		$page->field('sale_units', $saleUnits[0]);
-		if($saleUnits[0] eq 'other')
-		{
-			$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);
-			$page->field('other_sale_units', $saleUnits[1]);
 		}
 
 		my $prescribedBy = $medInfo->{prescribed_by};
@@ -698,7 +682,7 @@ sub execute_add
 	my $doseUnits = $page->field('dose_units') eq 'other' ? 'other,' . $page->field('other_dose_units') : $page->field('dose_units');
 	my $frequency = $page->field('frequency') eq 'Other' ? 'Other,' . $page->field('other_frequency') : $page->field('frequency');
 	my $prn = $page->field('prn') eq 'Other' ? 'Other,' . $page->field('other_prn') : $page->field('prn');
-	my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
+	#my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
 	my $refills = $page->field('num_refills') eq 'other' ? $page->field('other_num_refills') : $page->field('num_refills');
 	my $label = $page->field('label') eq 'Other' ? 'Other,' . $page->field('other_label') : $page->field('label');
 
@@ -720,20 +704,19 @@ sub execute_add
 		duration_units => $page->field('duration_units') || undef,
 		quantity => $page->field('quantity') || undef,
 		num_refills => defined $refills ? $refills : undef,
-		allow_generic => $page->field('allow_generic') || undef,
-		allow_substitutions => $page->field('allow_substitutions') || undef,
+		allow_generic => $page->field('allow_generic') == 1 ? 1 : 0,
+		allow_substitutions => $page->field('allow_substitutions') == 1 ? 1 : 0,
 		notes => $page->field('notes') || undef,
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
 		status => $page->field('status') || undef,
-		sale_units => $saleUnits || undef,
+		#sale_units => $saleUnits || undef,
 		record_type => defined $recordType ? $recordType : undef,
 		first_dose => $firstDose || undef,
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
 		label => $label || undef,
-		#label_in_spanish => defined $label ? $label : undef,
 		#signed => $page->field('') || undef,
 		_debug => 0,
 	);
@@ -774,7 +757,7 @@ sub execute_update
 	my $doseUnits = $page->field('dose_units') eq 'other' ? 'other,' . $page->field('other_dose_units') : $page->field('dose_units');
 	my $frequency = $page->field('frequency') eq 'Other' ? 'Other,' . $page->field('other_frequency') : $page->field('frequency');
 	my $prn = $page->field('prn') eq 'Other' ? 'Other,' . $page->field('other_prn') : $page->field('prn');
-	my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
+	#my $saleUnits = $page->field('sale_units') eq 'other' ? 'other,' . $page->field('other_sale_units') : $page->field('sale_units');
 	my $refills = $page->field('num_refills') eq 'other' ? $page->field('other_num_refills') : $page->field('num_refills');
 	my $label = $page->field('label') eq 'Other' ? 'Other,' . $page->field('other_label') : $page->field('label');
 
@@ -796,18 +779,17 @@ sub execute_update
 		duration_units => $page->field('duration_units') || undef,
 		quantity => $page->field('quantity') || undef,
 		num_refills => defined $refills ? $refills : undef,
-		allow_generic => $page->field('allow_generic') || undef,
-		allow_substitutions => $page->field('allow_substitutions') || undef,
+		allow_generic => $page->field('allow_generic') == 1 ? 1 : 0,
+		allow_substitutions => $page->field('allow_substitutions') == 1 ? 1 : 0,
 		notes => $page->field('notes') || undef,
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
-		sale_units => $saleUnits || undef,
+		#sale_units => $saleUnits || undef,
 		first_dose => $firstDose || undef,
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
 		label => $label || undef,
-		#label_in_spanish => defined $label ? $label : undef,
 		#signed => $page->field('') || undef,
 		_debug => 0,
 	);
