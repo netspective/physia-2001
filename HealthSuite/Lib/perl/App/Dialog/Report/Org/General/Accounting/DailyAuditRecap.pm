@@ -112,7 +112,7 @@ sub prepare_detail_payment
 		reportTitle => "Daily Audit Recap - $batch_date",
 		columnDefn =>
 		[
-			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },
+			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#17#/summary') }, },
 			{colIdx => 1,head => 'Physican', dAlign => 'left',},
 			{colIdx => 2,,head => 'Patient',dAlign =>'left' , hAlign =>'left', dataFmt => '#16# <A HREF = "/person/#2#/account">#2#</A>'},
 			{colIdx => 3,head => 'Proc Code', dAlign => 'center'},
@@ -137,6 +137,14 @@ sub prepare_detail_payment
 	my $trackInvoice=undef;
 	foreach (@$daily_audit_detail)
 	{
+	
+		my $parentInvoiceId = $STMTMGR_REPORT_ACCOUNTING->getSingleValue($page,STMTMGRFLAG_NONE,'selParentInvoicebyId',
+		$_->{invoice_id});
+		my $capInv = $_->{invoice_id};
+		if ($parentInvoiceId)
+		{
+			$capInv.="($parentInvoiceId)";
+		}		
 
 		if ($trackInvoice ne $_->{invoice_id})
 		{
@@ -148,10 +156,13 @@ sub prepare_detail_payment
 			$_->{patient_id}='';
 			$_->{simple_name}='';
 		};
+		
+
 
 		my @rowData =
 		(
-			$_->{invoice_id},
+			$capInv,
+			#$_->{invoice_id},
 			$_->{care_provider_id},
 			$_->{patient_id},
 			$_->{code}||"UNK",
@@ -167,7 +178,8 @@ sub prepare_detail_payment
 			$_->{person_pay},
 			$_->{refund},
 			$_->{pay_type},
-			$_->{simple_name}
+			$_->{simple_name},
+			$_->{invoice_id},
 		);
 		push(@data, \@rowData);
 	}
