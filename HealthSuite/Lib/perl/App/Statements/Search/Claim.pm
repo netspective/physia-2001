@@ -93,8 +93,8 @@ $STMTRPTDEFN_DEFAULT =
 			{
 				0 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
 				1 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
-				2 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#11#</A>},
-				3 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#11#</A>},
+				2 => qq{<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>},
+				3 => qq{<A HREF="javascript:chooseItem('/org/#11#/account')" STYLE="text-decoration:none">#11#</A>},
 				'_DEFAULT' => '#5#',
 			},
 		},
@@ -187,14 +187,12 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
 			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) = ?',
-			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
 			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) like ?',
-			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer' =>
@@ -211,6 +209,8 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 			tables => ', org o2, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
+
+
 
 	'sel_id_status' =>
 		{
@@ -291,139 +291,30 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_insurance_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
-			tables => ', org',
+			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and upper(o.name_primary) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
-			tables => ', org',
+			whereCond => 'i.invoice_status = ? and ib.bill_party_type in (2,3) and upper(o.name_primary) like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_status' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
-			tables => ', org o, person_attribute attr',
+			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) = ?',
+			tables => ', org o2, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_status_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
-			tables => ', org o, person_attribute attr',
+			whereCond => 'i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) like ?',
+			tables => ', org o2, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 
-
-
-
-	'sel_id_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.invoice_id = ?',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_id_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.invoice_id like ?',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_patientid_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = ?',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_patientid_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id like ?',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_ssn_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = person_id and ssn = ?',
-			tables => ', person',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_ssn_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = person_id and ssn like ?',
-			tables => ', person',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_date_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and invoice_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_date_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and invoice_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_servicedate_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and service_begin_date = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_servicedate_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and service_begin_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_upin_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = '$UPINITEMNAME_PATH' and upper(attr.value_text) = ?",
-			tables => ', transaction, person_attribute attr',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_upin_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "i.invoice_status in (0,1) and i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = '$UPINITEMNAME_PATH' and upper(attr.value_text) like ?",
-			tables => ', transaction, person_attribute attr',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_insurance_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
-			tables => ', org',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_insurance_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
-			tables => ', org',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_employer_incomplete' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
-			tables => ', org o, person_attribute attr',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
-	'sel_employer_incomplete_like' =>
-		{
-			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.invoice_status in (0,1) and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
-			tables => ', org o, person_attribute attr',
-			publishDefn => $STMTRPTDEFN_DEFAULT,
-		},
 );
 
 1;
