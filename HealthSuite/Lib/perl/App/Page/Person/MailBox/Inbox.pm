@@ -10,6 +10,7 @@ use App::Configuration;
 use SQL::GenerateQuery;
 use CGI::Dialog::DataNavigator;
 use CGI::ImageManager;
+use Data::Publish;
 
 use vars qw(%RESOURCE_MAP $QDL %PUB_INBOX);
 %RESOURCE_MAP = (
@@ -49,6 +50,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 				<a title="Forward" href="/person/#session.person_id#/dlg-forward-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/forward'}</a>
 				<!-- <a href="/person/#session.person_id#/dlg-trash-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">Trash</a> -->
 			},
+			options => PUBLCOLFLAG_DONTWRAP,
 		},
 	],
 	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',

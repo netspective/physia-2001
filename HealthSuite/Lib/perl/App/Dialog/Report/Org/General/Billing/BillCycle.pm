@@ -92,8 +92,6 @@ sub execute
 
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
-	#$ENV{OVERRIDE_BILLING_CYCLE} = 'YES';
-
 	my $outstandingClaims;
 
 	if ($providerId) {
@@ -112,33 +110,24 @@ sub execute
 		reportTitle => "Billing Cycle",
 		columnDefn =>
 		[
-			{	head => 'Payer', colIdx => 0, summarize => 'count', dAlign => 'left',
+			{	head => 'Payer', colIdx => 0, summarize => 'count', dAlign => 'left', hAlign => 'left',
 				url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=last4&billtoid=#7#&paytoid=#8#&patientid=#6#&billto_name=#9#',
-					null,'location,status,width=800,height=600,scrollbars,resizable')},
+					null,'location,status,width=700,height=400,scrollbars,resizable')},
 				hint => 'View #7# Last 4 Statements',
 			},
-			{ head => 'Type', colIdx => 1,},
-			{ head => 'Provider', colIdx => 2,},
-			{ head => 'Patient', colIdx => 3, url => '/person/#6#/account', hint => 'View #6# Account'},
-			{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum',},
+			{ head => 'Payer Type', colIdx => 1, hAlign => 'left',},
+			{ head => 'Billing Org', colIdx => 10, hAlign => 'left',},
+			
+			{ head => 'Provider', colIdx => 2, hAlign => 'left',},
+			{ head => 'Patient', colIdx => 3, url => '/person/#6#/account',  hAlign => 'left', 
+				hint => 'View #6# Account'
+			},
+			{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum',
+				hAlign => 'right',
+			},
 			{ head => 'Claims', colIdx => 5,},
 		],
 	};
-
-	my $pub =
-		{
-			reportTitle => "New Billing Cycle",
-			columnDefn =>
-			[
-				{head => 'Payer', colIdx => 0, '222'},
-				{ head => 'Type', colIdx => 1,},
-				{ head => 'Provider', colIdx => 2,},
-				{ head => 'Patient', colIdx => 3, url => '/person/#6#/account', hint => 'View #6# Account'},
-				{ head => 'Amount Due', colIdx => 4, dformat => 'currency', summarize => 'sum',},
-				{ head => 'Claims', colIdx => 5,},
-			],
-	};
-
 
 	my $pubText =
 		{
@@ -188,8 +177,10 @@ sub execute
 			}
 			else
 			{
-				push(@invoiceIds, qq{Payment Plan '@{[ - $_->{invoiceId} ]}' });
-				push(@invoiceIdsTextBased, qq{Payment Plan '@{[ - $_->{invoiceId} ]}' });
+				my $planId = $_->{invoiceId};
+				$planId =~ s/^PP//;
+				push(@invoiceIds, qq{Payment Plan '$planId' });
+				push(@invoiceIdsTextBased, qq{Payment Plan '$planId' });
 			}
 		}
 
@@ -209,6 +200,7 @@ sub execute
 			$statement->{billToId},
 			$statement->{payToId},
 			$billToName,
+			$statement->{billingOrgId},
 		);
 
 		push(@rowDataTextBased,

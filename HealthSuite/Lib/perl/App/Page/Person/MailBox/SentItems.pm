@@ -10,6 +10,7 @@ use App::Configuration;
 use SQL::GenerateQuery;
 use CGI::Dialog::DataNavigator;
 use CGI::ImageManager;
+use Data::Publish;
 
 use vars qw(%RESOURCE_MAP $QDL %PUB_SENT);
 %RESOURCE_MAP = (
@@ -36,8 +37,9 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 		],
 	},
 	columnDefn => [
+		{head => '', colIdx => '#{priority}#', dataFmt => sub {return $IMAGETAGS{'widgets/mail/pri_' . $_[0]->[$_[1]]}},},
 		{head => '', colIdx => '#{doc_spec_subtype}#', dataFmt => \&iconCallback,},
-		{head => 'From', hAlign=> 'left', dataFmt => '#{from_id}#',},
+		{head => 'To', dataFmt => '#{to_ids}#',},
 		{head => 'Subject', hAlign=> 'left', dataFmt => '#{subject}#',},
 		{head => 'Regarding Patient', hAlign=> 'left', dataFmt => '#{repatient_name}# (#{repatient_id}#)',},
 		{head => 'Sent On', hAlign=> 'left', colIdx => '#{date_sent}#', dformat => 'stamp',},
@@ -47,6 +49,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 				<a title="Reply To All" href="/person/#session.person_id#/dlg-reply_to_all-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply_all'}</a>
 				<a title="Forward" href="/person/#session.person_id#/dlg-forward-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/forward'}</a>
 			},
+			options => PUBLCOLFLAG_DONTWRAP,
 		},
 	],
 	dnQuery => \&sentItemsQuery,
@@ -86,6 +89,7 @@ sub sentItemsQuery
 	my $cond2 = $sqlGen->WHERE('from_id', 'is', $self->session('person_id'));
 	my $cond3 = $sqlGen->AND($cond1, $cond2);
 	$cond3->outColumns(
+		'priority',
 		'message_id',
 		'doc_spec_subtype',
 		'from_id',
@@ -94,6 +98,7 @@ sub sentItemsQuery
 		'repatient_name',
 		'deliver_record',
 		"TO_CHAR({date_sent},'IYYYMMDDHH24MISS')",
+		'to_ids',
 	);
 	$cond3->orderBy({id => 'date_sent', order => 'Descending'});
 	$cond3->distinct(1);

@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.4 2000-12-18 19:24:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.5 2000-12-22 23:48:26 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -50,8 +50,7 @@ sub new
 
 
 	$self->addContent(
-		new CGI::Dialog::Subhead(
-			heading => 'Message',
+		new CGI::Dialog::Subhead(heading => 'Message',
 			name => 'message_subhead',
 			options => FLDFLAG_INVISIBLE,
 		),
@@ -59,16 +58,14 @@ sub new
 			name => 'message_id',
 			type => 'hidden',
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'From',
 			name => 'from',
-			caption => 'From',
 			options => FLDFLAG_READONLY,
 		),
 		$toField,
 		$ccField,
-		new App::Dialog::Field::Person::ID(
+		new App::Dialog::Field::Person::ID(caption => 'Regarding Patient',
 			name => 'patient_id',
-			caption => 'Regarding Patient',
 			types => ['Patient'],
 			postHtml => ' #field.patient_name#',
 		),
@@ -83,46 +80,39 @@ sub new
 		#	type => 'bool',
 		#	style => 'check',
 		#),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Priority',
 			name => 'priority',
-			caption => 'Priority',
-			selOptions => 'Normal;Emergency;ASAP',
+			selOptions => 'Normal;ASAP;Emergency',
 			type => 'select',
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Subject',
 			name => 'subject',
-			caption => 'Subject',
 			size => 50,
 			maxLength => 255,
 			options => FLDFLAG_REQUIRED,
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Message',
 			name => 'message',
-			caption => 'Message',
 			type => 'memo',
 			cols => 85,
 			rows => 10,
 		),
-		new CGI::Dialog::Subhead(
-			heading => 'Notes',
+		new CGI::Dialog::Subhead(heading => 'Notes',
 			name => 'notes_subhead',
 			options => FLDFLAG_INVISIBLE,
 		),
-		new App::Dialog::Message::Notes(
+		new App::Dialog::Message::Notes(caption => '',
 			name => 'existing_notes',
-			caption => '',
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Add Notes',
 			name => 'notes',
-			caption => 'Add Notes',
 			type => 'memo',
 			cols => 85,
 			rows => 10,
 			options => FLDFLAG_INVISIBLE,
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Keep notes private?',
 			name => 'notes_private',
-			caption => 'Keep notes private?',
 			type => 'bool',
 			style => 'check',
 			options => FLDFLAG_INVISIBLE,
@@ -267,6 +257,7 @@ sub execute
 		$messageData->{'cc'} = $page->field('cc') unless defined $messageData->{'cc'};
 		$messageData->{'rePatient'} = $page->field('patient_id') unless defined $messageData->{'rePatient'};
 		$messageData->{'deliverRecords'} = $page->field('deliver_records') ? 1 : 0 unless defined $messageData->{'deliverRecords'};
+		$messageData->{'docDestIds'} = $messageData->{'to'} . ', ' . $messageData->{'cc'};
 		$self->sendMessage($page, %$messageData);
 	}
 	else
@@ -296,6 +287,8 @@ sub sendMessage
 	my $page = shift;
 	my %messageData = @_;
 	
+	my $docDestIds = join(', ', split(/\s*,\s*/, $messageData{'docDestIds'}));
+	
 	my $messageId = $self->saveMessage($page, \%messageData,
 		doc_mime_type => 'text/plain',
 		doc_orig_stamp => $page->getTimeStamp(),
@@ -306,6 +299,7 @@ sub sendMessage
 		doc_data_b => $messageData{'priority'},
 		doc_name => $messageData{'subject'},
 		doc_content_small => $messageData{'message'},
+		doc_dest_ids => $docDestIds,
 	);
 
 	# Add the To recipients
@@ -423,7 +417,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.4 2000-12-18 19:24:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.5 2000-12-22 23:48:26 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 

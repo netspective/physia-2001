@@ -26,7 +26,9 @@
 		<field id="deliver_record" caption="Deliver with record" join="attr_repatient" column="value_int"/>
 		<field id="permed_id" caption="Person Medication ID" join="message_doc" column="doc_data_a"/>
 		<field id="priority" caption="Priority" join="message_doc" column="doc_data_b"/>
+		<field id="to_ids" caption="To" join="message_doc" column="doc_dest_ids"/>
 		
+		<!-- Joins -->
 		<join id="message_doc" table="document"/>
 		<join id="attr_to" table="document_attribute" requires="message_doc" condition="message_doc.doc_id = attr_to.parent_id AND attr_to.value_type = #constant.ATTRTYPE_PERSON_ID# AND attr_to.item_name = 'To'"/>
 		<join id="attr_cc" table="document_attribute" requires="message_doc" condition="message_doc.doc_id = attr_cc.parent_id (+) AND attr_cc.value_type (+) = #constant.ATTRTYPE_PERSON_ID# AND attr_cc.item_name (+) = 'CC'"/>
@@ -43,6 +45,7 @@
 			<column id="cc_id"/>
 			<column id="subject"/>
 			<column id="repatient_id"/>
+			<column id="to_ids"/>
 			<order-by id="date_sent" order="desc"/>
 			<and-conditions>
 				<condition field="doc_spec_type" comparison="is" criteria="#constant.DOCSPEC_INTERNAL#"/>
