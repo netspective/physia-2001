@@ -66,6 +66,15 @@ B419 - TWCC number assigned is now being populated correctly.
 
 End Prosys Bugs
 
+B171 - Prevent processing invalid Orgs on arl.
+
+B713 - Alert Staff members on patients with alerts.
+
+B954 - Display Org ID instead of internal Org ID on Available Slots Search.
+
+Special Enhancements:  Allow making multiple appointments using Robert's cool dynamic HTML.
+
+
   
 
 
