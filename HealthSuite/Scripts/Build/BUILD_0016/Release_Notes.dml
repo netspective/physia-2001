@@ -86,7 +86,10 @@
 
 		<deliverable id="1249">
 			The add url in the 'My Associated Resources In Patients' component is pointing to 'Add Appointment' dialog
-		</deliverable>		
+		</deliverable>
+		<deliverable id="1266">
+			Changeg the ethnicity types from 'Native American' to 'American Indian/Alaskan Native' and 'Asian-American' to 'Asian/Pacific Islander'
+		</deliverable>
 
 		<deliverable id="1286">
 			UI: Show how an appointment was or was not verified.
