@@ -253,12 +253,7 @@ sub customValidate
 	my $insOrg = $self->getField('insplan')->{fields}->[0];
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
-	#my $addIns = $page->field('add_insurance');
-	#if($addIns ==1 &&
-	#	($page->field('ins_comp') eq '' || $page->field('product') eq '' || $page->field('plan') eq ''))
-	#{
-	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
-	#}
+
 	my $sequence = $page->field('bill_sequence');
 	my $previousSequence = $page->field('bill_seq_hidden');
 	my $nextSequence = $previousSequence + 1;
@@ -268,14 +263,12 @@ sub customValidate
 	$billSeq->invalidate($page, "'$coverageCaption' Insurance already exists for '$personId' ") if ($coverageExists != 0 && $sequence <= 4 && $sequence ne $previousSequence);
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
 	my $seq =1;
-	#$page->addDebugStmt("INS : $seq");
+
 	if ($sequence <= 4)
 	{
 		for($seq =1; $seq < $sequence; $seq++)
 		{
-			#$page->addDebugStmt("INS : $previousInsExists, $seq");
 			my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
-			#$page->addDebugStmt("INS : $previousInsExists, $seq");
 			my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
 			$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if ($previousInsExists != 1);
 		}
@@ -316,10 +309,61 @@ sub customValidate
 			}
 		}
 	}
+
 	elsif ($command eq 'update' && $previousSequence < 4 && $sequence > 4 && $sequence != App::Universal::INSURANCE_INACTIVE)
 	{
 		return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
 	}
+
+	my $planName = $page->field('plan_name');
+	my $pdtName = $page->field('product_name');
+	my $preFilledOrg = $page->field('ins_comp');
+	my $preFilledProduct = $page->field('product');
+	my $preFilledPlan =  $page->field('plan');
+	my $prePlanId = $self->getField('insplan')->{fields}->[1];
+	my $planId = $self->getField('plan_name');
+	my $prePdtId = $self->getField('insplan')->{fields}->[0];
+	my $productId = $self->getField('product_name');
+	my $orgId = $page->field('ins_org_id');
+	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$pdtName, $orgId) if $pdtName ne '';
+	my $doesPreFilledProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$preFilledProduct, $preFilledOrg) if $preFilledProduct ne '';
+
+	my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$pdtName');";
+	$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
+			<a href="$createInsProductHref">Create Product '$pdtName' now</a>
+		}) if $doesProductExist eq '' && $pdtName ne '';
+
+	my $createInsProductPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-product?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct');";
+	$prePdtId->invalidate($page, qq{ Product Name '$preFilledProduct' does not exist in '$preFilledOrg'.<br><img src="/resources/icons/arrow_right_red.gif">
+			<a href="$createInsProductPreHref">Create Product '$preFilledProduct' now</a>
+		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
+
+	my $planForOrgExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$pdtName, $planName, $orgId);
+	my $preFilledplanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists',$preFilledProduct, $preFilledPlan, $preFilledOrg);
+
+	my $createInsPlanPreHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-plan?_f_ins_org_id=$orgId&_f_product_name=$pdtName&_f_plan_name=$planName');";
+		$planId->invalidate($page, qq{ Plan Name '$planName' does not exist for the Product Name '$pdtName'.<br><img src="/resources/icons/arrow_right_red.gif">
+			<a href="$createInsPlanPreHref">Create Plan '$planName' now</a>
+		}) if $planForOrgExists eq '' && $planName ne '';
+
+	my $createPreInsPlanPreHref = "javascript:doActionPopup('/org-p/$preFilledOrg/dlg-add-ins-plan?_f_ins_org_id=$preFilledOrg&_f_product_name=$preFilledProduct&_f_plan_name=$preFilledPlan');";
+		$prePlanId->invalidate($page, qq{ Plan Name '$preFilledPlan' does not exist for the Product Name '$preFilledProduct'.<br><img src="/resources/icons/arrow_right_red.gif">
+			<a href="$createPreInsPlanPreHref">Create Plan '$preFilledPlan' now</a>
+		}) if $preFilledplanExists eq '' && $preFilledPlan ne '';
+
+	my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+	my $insInternalId = $page->param('ins_internal_id') || undef;
+
+	my $personalCoverageData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$insInternalId);
+	my $dataOrgId = $personalCoverageData->{'ins_org_id'};
+	my $dataProductName = $personalCoverageData->{'product_name'};
+	my $dataPlanName = $personalCoverageData->{'plan_name'};
+
+	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$pdtName, $planName, $recordType, $personId, $orgId) if !($pdtName eq $dataProductName && $dataPlanName eq $planName && $orgId eq $dataOrgId);
+	my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
+
+	$planId->invalidate($page, "This Personal Coverage already exists for '$personId'.") if $personPlanExists ne '' ;
+	$prePlanId->invalidate($page, "This Personal Coverage already exists for '$personId'.") if $preFilledpersonPlanExists ne '';
 
 }
 
