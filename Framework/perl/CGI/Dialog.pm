@@ -1536,7 +1536,7 @@ sub getHtml
 	
 	my $home = $page->param('home');
 	my $cancelURL = defined $home ? "document.location = '$home'" : 'javascript:history.back()';
-	$cancelURL = $self->{cancelUrl} if defined $self->{cancelUrl};
+	$cancelURL = "document.location = '$self->{cancelUrl}'" if defined $self->{cancelUrl};
 	$cancelURL = 'javascript:window.close()' if $page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	unless (defined $self->{noCancelButton} || $self->{noCancelButton})
