@@ -1,29 +1,40 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 BEGIN {
 	use Apache ();
-	print "Entering startup.pl\n";
 }
 
+print "Entering startup.pl\n";
 use strict;
-use Apache::Constants;
 use CGI;
-use App::ResourceDirectory;
+use CGI::Page;
 use Apache::HealthSuite::PracticeManagement;
-use App::Configuration;
-use Schema::API;
+
+print "Caching iSyndacate News...";
 use App::Component::News;
-#CGI->compile(':all');
-print "Before ConnectDB\n";
-preConnectDB();
-print "After ConnectDB\n";
+eval{
+	my $news;
+	$news = new App::Component::News(
+			id => 'news-top',
+			heading => 'Top News',
+			source => 'topnews',
+		);
+	$news->getNews();
+	$news = new App::Component::News(
+			id => 'news-health',
+			heading => 'Health News',
+			source => 'healthnews',
+		);
+	$news->getNews();
+};
+print "done\n";
 
-sub preConnectDB {
-	my $schemaFile = $CONFDATA_SERVER->file_SchemaDefn;
-	my $dbConnectKey = $CONFDATA_SERVER->db_ConnectKey;
-	my $schema = new Schema::API(xmlFile => $schemaFile);
-	$schema->connectDB($dbConnectKey);
+print "Connecting to Database...";
+{
+	my $page = new CGI::Page;
+	$page = undef;
 }
-
+print "done\n";
 print "Leaving startup.pl\n";
+
 1;

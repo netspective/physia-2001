@@ -33,14 +33,17 @@ sub init
 sub getHtml
 {
 	my ($self, $page) = @_;
+	return createHtmlFromData($page, $self->{flags}, $self->getNews(), $self->{publishDefn});
+}
 
-	my $newsData = undef;
+sub getNews
+{
+	my $self = shift;
 	my $source = $self->{source};
-	unless($newsData = $NEWS{$source})
+	unless( defined $NEWS{$source} )
 	{
-		$newsData = [];
-		my $origHtml = get("http://headlines.isyndicate.com/pages/physia/$source.html");
-
+		my $newsData = [];
+		my $origHtml = get("http://headlines.isyndicate.com/pages/physia/$source.html") or warn "Can't fetch news from isyndicate.com!\n";
 		my $p = HTML::TokeParser->new(\$origHtml);
 		while (my $token = $p->get_tag("a"))
 		{
@@ -51,8 +54,7 @@ sub getHtml
 		}
 		$NEWS{$source} = $newsData;
 	}
-
-	return createHtmlFromData($page, $self->{flags}, $newsData, $self->{publishDefn});
+	return $NEWS{$source};
 }
 
 # create instances that will auto-register themselves
