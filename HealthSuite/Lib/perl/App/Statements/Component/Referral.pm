@@ -30,10 +30,9 @@ $STMTRPTDEFN_WORKLIST =
 		{colIdx => 1, head => 'ID', dAlign => 'left'},
 		{colIdx => 2, head => 'Status', dAlign => 'left'},
 		{colIdx => 3, head => 'Patient',hAlign=>'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
-		{colIdx => 4, head => 'Referral Type', hAlign => 'left'},
-		{colIdx => 5, head => 'Date of Request', dAlign => 'center'},
-		{colIdx => 6, head => 'Intake Coordinator', dAlign => 'center'},
-		{colIdx => 7, head => 'SSN', dAlign => 'center'},
+		{colIdx => 4, head => 'Date of Request', dAlign => 'center'},
+		{colIdx => 5, head => 'Intake Coordinator', dAlign => 'center'},
+		{colIdx => 6, head => 'SSN', dAlign => 'center'},
 		#{colIdx => 8, hint => 'View Account Balance', head => 'Balance', url => '/person/#10#/account', dAlign => 'right', dformat => 'currency', summarize => 'sum'},
 	],
 	bullets => '#10#',
@@ -64,7 +63,6 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			t.trans_id as referral_id,
 			t.initiator_id as org_id,
 			t.consult_id as patient,
-			rd.name as referral_type,
 			aa.value_int as claim_number,
 			t.trans_substatus_reason as requested_service,
 			--%simpleDate:trans_end_stamp%,
@@ -77,7 +75,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			t.trans_subtype as intake_coordinator,
 			t.trans_substatus_reason as ref_status,
 			p.ssn as ssn
-		from transaction t, trans_attribute aa, person p, person_org_category po, ref_service_category rd
+		from transaction t, trans_attribute aa, person p, person_org_category po
 		where
 		t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
 		and t.trans_substatus_reason in ('Assigned', 'Unassigned')
@@ -85,14 +83,13 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		and aa.item_name = 'Referral Insurance'
 		and t.consult_id = p.person_id
 		and po.person_id = p.person_id
-		and rd.serv_category = t.trans_expire_reason
 		and po.org_internal_id = ?
 		and exists
 				(
 					select tn.trans_id
 					from transaction tn, transaction tp
 					where tp.parent_trans_id = t.trans_id
-					and   tn.parent_trans_id = tp.trans_id	
+					and   tn.parent_trans_id = tp.trans_id
 					and   (tn.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or tn.trans_status_reason IS NULL)
 				)
 		order by t.trans_id DESC
