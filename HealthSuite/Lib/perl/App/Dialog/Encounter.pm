@@ -1599,17 +1599,13 @@ sub handleBillingInfo
 	{
 		billCopay($self, $page, 'add', $flags, $invoiceId);
 	}
-	elsif($command eq 'add' && ($invoiceFlags & $attrDataFlag))
+	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
 	{
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
 	elsif($command eq 'add')
 	{
 		$self->handlePostExecute($page, $command, $flags);
-	}
-	elsif($command eq 'update')
-	{
-		$page->redirect("/invoice/$invoiceId/summary");
 	}
 }
 
@@ -1772,8 +1768,8 @@ sub handleProcedureItems
 		}
 
 		my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-		my $totalCostForInvoice = '';
-		my $totalAdjustForInvoice = '';
+		my $totalCostForInvoice = 0;
+		my $totalAdjustForInvoice = 0;
 		foreach my $item (@{$allInvItems})
 		{
 			$totalCostForInvoice += $item->{extended_cost};
