@@ -2267,7 +2267,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo?home=#param.home#'>Billing Info</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.person_id#?home=#param.home#'>Billing Info</A> } },
 		],
 		},
 		stdIcons =>	{
