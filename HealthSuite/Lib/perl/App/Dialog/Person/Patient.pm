@@ -35,6 +35,7 @@ sub initialize
 	my $postHtml = "<a href=\"javascript:doActionPopup('/lookup/person');\">Lookup existing person</a>";
 	#$self->heading('$Command Patient');
 	$self->addContent(
+			new CGI::Dialog::Field(type => 'hidden', name => 'resp_self'),
 			new App::Dialog::Field::Person::ID::New(caption => 'Patient/Person ID',
 							name => 'person_id',
 							types => ['Person'],
@@ -53,12 +54,11 @@ sub initialize
 
 				#new CGI::Dialog::Field(caption => 'Preferred Day For Appointment', name => 'prefer_day', type => 'memo', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 
-		new CGI::Dialog::MultiField(caption =>'Responsible Party/Self', name => 'responsible', hints => "Please provide either an existing Person ID or Select 'Self'",
-				fields => [
-							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor']),
-							new CGI::Dialog::Field(caption => ' Self', type => 'bool', style => 'check', name => 'resp_self'),
-						]),
-		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Self', options => FLDFLAG_REQUIRED),
+		#new CGI::Dialog::MultiField(caption =>'Responsible Party', name => 'responsible', hints => "Please provide either an existing Person ID or Select 'Self'",
+		#		fields => [
+		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor'], hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
+		#				]),
+		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', options => FLDFLAG_REQUIRED),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -151,8 +151,8 @@ sub customValidate
 	my $insOrg = $self->getField('insplan')->{fields}->[0];
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
-	my $relationship = $self->getField('responsible')->{fields}->[0];
-	my $relationSelf = $self->getField('responsible')->{fields}->[1];
+	my $relationship = $self->getField('party_name');
+	#my $relationSelf = $self->getField('responsible')->{fields}->[1];
 
 	#my $addIns = $page->field('add_insurance');
 	#if($addIns ==1 &&
@@ -161,24 +161,26 @@ sub customValidate
 	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	#}
 
-	if($page->field('party_name') && $page->field('resp_self'))
+	#if($page->field('party_name') && $page->field('resp_self'))
+	#{
+	#	$relationship->invalidate($page, "Cannot provide both '$relationship->{caption}' and '$relationSelf->{caption}'");
+	#}
+	#else
+	#{
+	#	unless($page->field('party_name') || $page->field('resp_self'))
+	#	{
+	#		$relationship->invalidate($page, "Please provide either '$relationship->{caption}' or '$relationSelf->{caption}'");
+	#	}
+	#}
+
+	if ($page->field('party_name') && $page->field('rel_type') eq 'Self')
 	{
-		$relationship->invalidate($page, "Cannot provide both '$relationship->{caption}' and '$relationSelf->{caption}'");
+		$relationship->invalidate($page, "'Relationship' should be other than 'Self' when the 'Responsible Party' is not blank");
 	}
-	else
+
+	elsif($page->field('party_name') eq ''  && $page->field('rel_type') ne 'Self')
 	{
-		unless($page->field('party_name') || $page->field('resp_self'))
-		{
-			$relationship->invalidate($page, "Please provide either '$relationship->{caption}' or '$relationSelf->{caption}'");
-		}
-	}
-	if ($page->field('party_name') && $page->field('rel_type') eq'Self')
-	{
-		$relationship->invalidate($page, "Select 'Relationship' otherthan 'Self' when there is a 'Responsible Party'");
-	}
-	elsif($page->field('resp_self') && $page->field('rel_type') ne'Self')
-	{
-		$relationSelf->invalidate($page, "Should select 'Relationship' as 'Self' when 'Self' is selected as 'Responsible Party'");
+		$relationship->invalidate($page, "'Responsible Party' is required when the 'Relationship' is other than 'Self'");
 	}
 }
 
