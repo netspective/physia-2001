@@ -18,17 +18,37 @@ sub handler
 	eval {
 		my $arl;
 		$arl = $1 if $ENV{REQUEST_URI} =~ /^\/?(.*)$/;
-		#$arl = "search" unless $arl;
+		$arl = "search" unless $arl;
 		App::ResourceDirectory::handleARL($arl);
 		return OK;
 	};
 
-	if ($@ && $DEBUG)
+	if ($@)
 	{
 		my $msg = "<h1>Perl Runtime Errors:</h1><font color=red>$@</font>";
+		my $user = getpwuid($>) || '';
 		$r->content_type('text/html');
-   		$r->send_http_header();
-   		$r->print($msg);
+		$r->send_http_header();
+		if ($DEBUG)
+		{	
+			$r->print($msg);
+		}
+		else
+		{
+			$r->print('<h1>Error</h1><p>An application error has occured, please contact support if the problem persists.</p>');
+		}
+		unless ($ENV{HS_NOERROREMAIL})
+		{
+			open SENDMAIL, '|/usr/sbin/sendmail -t';
+			print SENDMAIL "to: $user\n";
+			print SENDMAIL "from: $user\n";
+			print SENDMAIL "subject: Application Error\n";
+			print SENDMAIL "content-type: text/html\n";
+			print SENDMAIL "\n";
+			print SENDMAIL $msg;
+			close SENDMAIL;
+		}
+	return OK;
 	}
 }
 
