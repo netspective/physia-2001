@@ -1299,23 +1299,19 @@ function showFieldsOnValues(event, onValues, showFields)
 
 function setIdDisplay(id, display)
 {
-	//alert("setting " + id + " to " + display);
-	var objPath = "document.all._id_" + id + ".style";
-	var objHandle;
-	if (eval(objPath))
-	{
-		objHandle = eval(objPath);
-	}
-	else
-	{
-		objHandle = eval("document.ids._id_" + id);
-	}
-	objHandle.display = display;
-	//IE Object: document.all._id_insured_id.style.display="none";
-	//NS Object: document.ids._id_insured_id.display="none";
+	setIdStyle('_id_' + id, 'display', display);
 }
 
 
+function setIdStyle(id, styleName, styleValue)
+{
+	var objPath = "document.all." + id + ".style";
+	var objHandle;
+	if (!eval(objPath))
+		objPath = "document.ids." + id; // Netscape
+	objPath += "." + styleName;
+	eval(objPath + ' = "' + styleValue + '"');
+}
 
 
 //
