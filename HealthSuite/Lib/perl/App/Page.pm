@@ -895,7 +895,7 @@ sub prepare_stdAction_component
 	my $compId = $self->param('_compId');
 	my $compPrefix = &App::ResourceDirectory::COMPONENT_RESOURCE_PREFIX;
 	my $resourceName = $compPrefix . $compId;
-	if(my $component = $App::ResourceDirectory::RESOURCES{$resourceName})
+	if(my $component = $App::ResourceDirectory::RESOURCES{$resourceName}{_class})
 	{
 		my $m = ref $component eq 'CODE' ? $component : $component->can('getHtml');
 
