@@ -106,10 +106,14 @@
 
 	<table name="Blood_Type" type="Enumeration">
 		<enum>Unknown</enum>
-		<enum>A</enum>
-		<enum>B</enum>
-		<enum>AB</enum>
-		<enum>O</enum>
+		<enum>A+</enum>
+		<enum>A-</enum>
+		<enum>B+</enum>
+		<enum>B-</enum>
+		<enum>AB+</enum>
+		<enum>AB-</enum>
+		<enum>O+</enum>
+		<enum>O-</enum>
 	</table>
 
 	<table name="Personal_Multibirth" abbrev="PrMtbth" type="Enumeration">
