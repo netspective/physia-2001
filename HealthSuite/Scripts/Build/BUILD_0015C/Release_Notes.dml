@@ -54,6 +54,9 @@
 		<deliverable id="1396">
 			Fixed the code to show up the correct dialogs in the 'Extended Health Coverage' component
 		</deliverable>		
+		<deliverable id="1393">
+			Changed Fee Schedule Copy so it copied the Service Type.
+		</deliverable>		
 	</deliverables>
 </release-notes>
 
