@@ -53,13 +53,20 @@ sub new
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth',
 							defaultValue => '', futureOnly => 0),
 				]),
+		new CGI::Dialog::Field(
+					selOptions => 'Male:1;Female:2',
+					caption => 'Gender',
+					type => 'select',
+					name => 'gender',
+					options => FLDFLAG_REQUIRED|FLDFLAG_PREPENDBLANK
+					),
 		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
 				fields => [
 						new CGI::Dialog::Field(caption => 'License Number', name => 'license_number'),
 						new CGI::Dialog::Field(caption => 'State', name => 'license_state', size => 2, maxLength => 2,)
 					]),
 		new App::Dialog::Field::Address(caption=>'Home Address', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'address'),
-		new CGI::Dialog::MultiField(caption =>'Home/Work Phone', name => 'home_work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		new CGI::Dialog::MultiField(invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(type => 'phone', caption => 'Home Phone', name => 'home_phone', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				new CGI::Dialog::Field(type => 'phone', caption => 'Work Phone', name => 'work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -126,6 +133,7 @@ sub execute
 			name_suffix => $page->field('name_suffix') || undef,
 			date_of_birth => $page->field('date_of_birth') || undef,
 			ssn => $page->field('ssn') || undef,
+			gender => $page->field('gender') || undef,
 			_debug => 0
 		);
 	$page->schemaAction(
