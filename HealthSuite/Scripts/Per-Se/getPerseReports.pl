@@ -34,48 +34,60 @@ OrgList::buildOrgList($page);
 
 sub archiveFiles
 {
-	for my $orgInternalId (keys %billId)
-	{
-		my $pgpFile = $billId{$orgInternalId} . 'ms.zip.pgp';
-		my $zipFile = $billId{$orgInternalId} . 'ms.zip';
+  for my $orgInternalId (keys %billId)
+  {
+    my $pgpFile = $billId{$orgInternalId} . 'ms.zip.pgp';
+    my $zipFile = $billId{$orgInternalId} . 'ms.zip';
 
-		system(qq{
-			cd $STAGINGDIR
-			if [ -f $pgpFile ]; then
-				mkdir -p $ARCHIVEDIR/$orgInternalId
-				mkdir -p $ARCHIVEDIR/$orgInternalId/pgp
+    system(qq{
+      cd $STAGINGDIR
+      if [ -f $pgpFile ]; then
+        mkdir -p $ARCHIVEDIR/$orgInternalId
+        mkdir -p $ARCHIVEDIR/$orgInternalId/pgp
 
-				pgp $pgpFile
-				unzip $zipFile
-				
-				mv $pgpFile $ARCHIVEDIR/$orgInternalId/pgp/$now.pgp
-				mv $zipFile $ARCHIVEDIR/$orgInternalId/$now.zip
+        pgp $pgpFile
+        unzip $zipFile
 
-			fi
-		});
+        mv $pgpFile $ARCHIVEDIR/$orgInternalId/pgp/$now.pgp
+        mv $zipFile $ARCHIVEDIR/$orgInternalId/$now.zip
 
-		for my $orgKey (keys %orgList)
-		{
-			my $orgInternalId = $orgKey;
-			$orgInternalId =~ s/\..*//g;
+      fi
+    });
 
-			my $msgFile = $orgList{$orgKey}->{billingId} . '.msg';
-			my $dlmFile = $orgList{$orgKey}->{billingId} . '.dlm';
-			
-			system(qq{
-				cd $STAGINGDIR
-				if [ -f $msgFile ]; then
-					mkdir -p $REPORTDIR/$orgInternalId
-					mv $msgFile $REPORTDIR/$orgInternalId/$now.txt
-				fi
-				if [ -f $dlmFile ]; then
-					mkdir -p $REPORTDELIMDIR/$orgInternalId
-					mv $dlmFile $REPORTDELIMDIR/$orgInternalId/$now.csv
-					$SCRIPTDIR/ParseReports.pl $REPORTDELIMDIR/$orgInternalId/$now.csv
-				fi
-			});
-		}
-	}
+    for my $orgKey (keys %orgList)
+    {
+      my $billingId = $orgList{$orgKey}->{billingId};
+      my $msgFile = $billingId . '.msg';
+      my $dlmFile = $billingId . '.dlm';
+
+      my ($textFile, $csvFile);
+
+      my $orgInternalId = $orgKey;
+      if ($orgInternalId =~ s/\..*//g)
+      {
+        $textFile = "$REPORTDIR/$orgInternalId/${now}_$billingId.txt";
+        $csvFile  = "$REPORTDELIMDIR/$orgInternalId/${now}_$billingId.csv";
+      }
+      else
+      {
+        $textFile = "$REPORTDIR/$orgInternalId/$now.txt";
+        $csvFile  = "$REPORTDELIMDIR/$orgInternalId/$now.csv";
+      }
+
+      system(qq{
+        cd $STAGINGDIR
+        if [ -f $msgFile ]; then
+          mkdir -p $REPORTDIR/$orgInternalId
+          mv $msgFile $textFile
+        fi
+        if [ -f $dlmFile ]; then
+          mkdir -p $REPORTDELIMDIR/$orgInternalId
+          mv $dlmFile $csvFile
+          $SCRIPTDIR/ParseReports.pl $csvFile
+        fi
+      });
+    }
+  }
 }
 
 sub ftpGetFiles
