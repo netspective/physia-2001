@@ -5,10 +5,9 @@ package App::Billing::Output::NSF;
 #
 # this class creates an NSF entry for a single Claim or multiple claims
 
-use constant NSFDEST_ARRAY => 0;
-use constant NSFDEST_FILE => 1;
 
 use strict;
+
 use Benchmark;
 use App::Billing::Output::Driver;
 use App::Billing::Claims;
@@ -17,10 +16,19 @@ use App::Billing::Output::Validate::EnvoyPayer;
 use App::Billing::Output::Validate::NSF;
 use vars qw(@ISA);
 
+@ISA = qw(App::Billing::Output::Driver);
+
+use App::Billing::Output::NSFConstant;
+
+
+
+
+
+
 #
 # this object is inherited from App::Billing::Output::Driver
 #
-@ISA = qw(App::Billing::Output::Driver);
+
 
 sub processClaims
 {
@@ -30,7 +38,7 @@ sub processClaims
 	
 	my $t0 = new Benchmark;
 	
-	if ($params{destination} == NSFDEST_FILE)
+	if ($params{destination} == App::Billing::Output::NSFConstant::NSFDEST_FILE)
 	{
 		$self->{outFile} = $params{outFile};
 		die 'outFile parameter required' unless $params{outFile};
@@ -53,8 +61,10 @@ sub processClaims
 	#	}	
 	# }
 	
-	$self->{nsfFileObj} = new App::Billing::Output::File::NSF();
-	$self->{nsfFileObj}->processFile(claimList => $claimsList, outArray => $params{outArray});
+ 
+	
+#	$self->{nsfFileObj} = new App::Billing::Output::File::NSF();
+#	$self->{nsfFileObj}->processFile(claimList => $claimsList, outArray => $params{outArray}, nsfType => $params{nsfType});
 	
 	if ($params{destination} == NSFDEST_FILE)
 	{
@@ -62,7 +72,7 @@ sub processClaims
 		die 'outFile parameter required' unless $params{outFile};
 	}
 	
-	# $self->createPGPEncryptFile($params{encryptKeyFile}, $params{outFile});
+	#$self->createPGPEncryptFile($params{encryptKeyFile}, $params{outFile});
 	
 	  #my $t1 = new Benchmark;
 	  #my $td = timediff($t1, $t0);
@@ -82,12 +92,12 @@ sub registerValidators
      $validators->register(new App::Billing::Output::Validate::NSF);
 }
 
-sub getPayerName
-{
-	my ($self,$claim) = @_;
+#sub getPayerName
+#{
+#	my ($self,$claim) = @_;
 	
-   return $claim->{insured}->getInsurancePlanOrProgramName();
-}
+ #  return $claim->{insured}->getInsurancePlanOrProgramName();
+#}
 
 sub createOutputFile
 {

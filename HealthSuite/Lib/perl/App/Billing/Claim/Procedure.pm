@@ -40,11 +40,23 @@ sub new
 	$param{adjustments} = [];
 	$param{itemType} = undef;
 	$param{paymentDate} = undef;
-
+	$param{itemStatus} = undef;
 	
 	return bless \%param, $type;
 }
 
+
+sub setItemStatus
+{
+	my ($self, $value) = @_;
+	$self->{itemStatus} = $value;
+}
+
+sub getItemStatus
+{
+	my $self = shift;
+	return $self->{itemStatus};
+}
 
 sub setPaymentDate
 {
