@@ -65,9 +65,8 @@ use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use Schema::Utilities;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::Field);
 
@@ -143,7 +142,7 @@ sub isValid
 			$self->invalidate($page, qq{
 				$self->{caption} '$value' does not exist.<br>
 				<img src="/resources/icons/arrow_right_red.gif">
-				Create '$value' Organization now as a:
+				Add '$value' Organization now as a:
 				<a href="${createOrgHrefPre}main${createOrgHrefPost}">Main</a>,
 				<a href="${createOrgHrefPre}dept${createOrgHrefPost}">Dept</a>,
 				<a href="${createOrgHrefPre}provider${createOrgHrefPost}">Provider</a>,
@@ -158,13 +157,6 @@ sub isValid
 	return $page->haveValidationErrors() ? 0 : 1;
 }
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/29/1999', 'MAF',
-		'Dialog/Lookups',
-		'Fixed create link for orgs.'],
-);
-
 ##############################################################################
 package App::Dialog::Field::OrgType;
 ##############################################################################
@@ -172,9 +164,8 @@ package App::Dialog::Field::OrgType;
 use strict;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::Field);
 
@@ -193,12 +184,5 @@ sub new
 				options => FLDFLAG_REQUIRED,
 				%params);
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/09/2000', 'MAF',
-		'Dialog/Field',
-		'Added new dialog field for drop-down of clinics/facilities.'],
-);
 
 1;

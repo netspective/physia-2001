@@ -67,9 +67,8 @@ use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use Schema::Utilities;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(CGI::Dialog::Field);
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
@@ -129,18 +128,11 @@ sub isValid
 	#my $createCatalogHref = "javascript:doActionPopup('/create-p/catalog/$value');";
 
 	$self->invalidate($page, qq{$self->{caption} '$value' does not exist.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createCatalogHref">Create Catalog '$value' now</a>
+			<a href="$createCatalogHref">Add Catalog '$value' now</a>
 		}) unless $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE, 'selCatalogById', $value);
 
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/20/2000', 'MAF',
-		'Dialog/Field/Catalog',
-		'Created new field type for catalog id.'],
-);
 
 1;

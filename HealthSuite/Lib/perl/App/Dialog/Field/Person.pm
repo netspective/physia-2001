@@ -64,9 +64,8 @@ use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use Schema::Utilities;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(CGI::Dialog::Field);
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
@@ -158,7 +157,7 @@ sub isValid
 				$self->invalidate($page, qq{
 					$self->{caption} '$value' does not exist.<br>
 					<img src="/resources/icons/arrow_right_red.gif">
-					<a href="$createPersonHref">Create $dlgName ID '$value' now</a>
+					<a href="$createPersonHref">Add $dlgName ID '$value' now</a>
 					})
 					unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
 			}
@@ -167,13 +166,6 @@ sub isValid
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/29/1999', 'MAF',
-		'Dialog/Lookups',
-		'Fixed lookup for person.'],
-);
 
 ##############################################################################
 package App::Dialog::Field::Person::Name;

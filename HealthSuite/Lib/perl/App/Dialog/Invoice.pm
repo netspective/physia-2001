@@ -117,7 +117,7 @@ sub handlePayer
 	my $personId = $page->field('client_id');
 
 	#CONSTANTS -------------------------------------------
-	
+
 	my $phoneAttrType = App::Universal::ATTRTYPE_PHONE;
 	my $typeSelfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $typeClient = App::Universal::CLAIMTYPE_CLIENT;
@@ -359,7 +359,7 @@ sub addTransactionAndInvoice
 			comments => $page->param("_f_item_$line\_comments") || undef,
 			_debug => 0
 		);
-		
+
 		$invoiceTotal += $extCost;
 		$itemCount += 1;
 	}
@@ -455,7 +455,7 @@ sub handleBillingInfo
 		#$billStatus = '';
 		#$billResult = '';
 	}
-	
+
 
 	my $primBillSeq = App::Universal::PAYER_PRIMARY;
 	$page->schemaAction(
@@ -522,7 +522,7 @@ sub customValidate
 		$payerField->invalidate($page, qq{
 			Person Id '$payer' does not exist.<br>
 			<img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createHref">Create Third Party Person Id '$payer' now</a>
+			<a href="$createHref">Add Third Party Person Id '$payer' now</a>
 			})
 			unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $payer);
 	}
@@ -534,7 +534,7 @@ sub customValidate
 		$payerField->invalidate($page, qq{
 			Org Id '$payer' does not exist.<br>
 			<img src="/resources/icons/arrow_right_red.gif">
-			Create '$payer' Organization now as an
+			Add '$payer' Organization now as an
 			<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
 			<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
 			})

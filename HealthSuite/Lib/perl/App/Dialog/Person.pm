@@ -75,7 +75,7 @@ sub initialize
 
 		# Person::Name is a 5-part multifield, w/fields named "name_*" where * is prefix|first|middle|last|suffix
 		new App::Dialog::Field::Person::Name(),
-		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Create record', style => 'check'),
+		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Add record', style => 'check'),
 
 		new CGI::Dialog::MultiField(caption =>'SSN / Birthdate',name => 'ssndatemf',
 			fields => [
@@ -159,7 +159,7 @@ sub makeStateChanges
 			unless ($page->field('create_record'))
 			{
 				$createRecField->invalidate($page, "A person record with the same '$lastName->{caption}' and '$firstName->{caption}' exists with SSN as '$ssnNum'.
-				If you still want to create the record, enter the check-box 'Create Record'.");
+				If you still want to add the record, enter the check-box 'Add Record'.");
 			}
 
 		}
