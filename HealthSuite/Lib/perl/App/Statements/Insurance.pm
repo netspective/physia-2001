@@ -12,7 +12,43 @@ use vars qw(@ISA @EXPORT $STMTMGR_INSURANCE);
 @EXPORT = qw($STMTMGR_INSURANCE);
 
 $STMTMGR_INSURANCE = new App::Statements::Insurance(
-
+	'selPlanRecord' => qq{
+		SELECT *
+		FROM insurance
+		WHERE
+			record_type = @{[App::Universal::RECORDTYPE_INSURANCEPLAN]} AND
+			owner_org_id = ? AND
+			plan_name = ?
+		},
+	'selPlanRecordExists' => qq{
+		SELECT ins_internal_id
+		FROM insurance
+		WHERE
+			record_type = @{[App::Universal::RECORDTYPE_INSURANCEPLAN]} AND
+			owner_org_id = ? AND
+			plan_name = ?
+		},
+	'selProductRecord' => qq{
+		SELECT *
+		FROM insurance
+		WHERE
+			record_type = @{[App::Universal::RECORDTYPE_INSURANCEPRODUCT]} AND
+			owner_org_id = ? AND
+			product_name = ?
+		},
+	'selProductRecordExists' => qq{
+		SELECT ins_internal_id
+		FROM insurance
+		WHERE
+			record_type = @{[App::Universal::RECORDTYPE_INSURANCEPRODUCT]} AND
+			owner_org_id = ? AND
+			product_name = ?
+		},
+	'selInsuranceSingleColumn' => qq{
+		SELECT ?
+		FROM insurance
+		WHERE ins_internal_id = ?
+		},
 	'selGroupInsurance' => qq{
 		SELECT
 			o.ins_internal_id,
