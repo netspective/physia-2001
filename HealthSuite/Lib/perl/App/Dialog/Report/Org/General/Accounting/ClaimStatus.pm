@@ -10,7 +10,13 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
+
 use App::Statements::Report::ClaimStatus;
 
 use vars qw(@ISA $INSTANCE);
@@ -30,14 +36,20 @@ sub new
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
+			new CGI::Dialog::Field::Duration(
+				name => 'service',
+				caption => 'Start/End Service Date',
+				begin_caption => 'Service Begin Date',
+				end_caption => 'Service End Date',
+				),
 			new CGI::Dialog::Field(type => 'select',
-							defaultValue=>'0',
-							selOptions=>"Selected:0;All:1",
-							name => 'product_select',
-							caption => 'Claim Selection',
-							hints=>"Select 'All' to search all claim statuses",
-							onChangeJS => qq{showFieldsOnValues(event, [0], ['claim_status']);},
-							),
+				defaultValue=>'0',
+				selOptions=>"Selected:0;All:1",
+				name => 'product_select',
+				caption => 'Claim Selection',
+				hints=>"Select 'All' to search all claim statuses",
+				onChangeJS => qq{showFieldsOnValues(event, [0], ['claim_status']);},
+				),
 			new CGI::Dialog::Field(name => 'claim_status',
 				caption => 'Claim Status',
 				style => 'multidual',
@@ -55,10 +67,10 @@ sub new
 				defaultValue => 0
 				),
 			new App::Dialog::Field::OrgType(
-							caption => 'Service Facility',
-							name => 'service_facility_id',
-							options => FLDFLAG_PREPENDBLANK,
-							types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),
+				caption => 'Service Facility',
+				name => 'service_facility_id',
+				options => FLDFLAG_PREPENDBLANK,
+				types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'"),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -90,18 +102,29 @@ sub buildSqlStmt
 	my ($self, $page, $flags) = @_;
 	my $reportBeginDate = $page->field('report_begin_date');
 	my $reportEndDate = $page->field('report_end_date');
+	my $serviceBeginDate = $page->field('service_begin_date');
+	my $serviceEndDate = $page->field('service_end_date');
 	my $status = join(',',  $page->field('claim_status'));
 	my $orgId = $page->session('org_internal_id');
 	my $serviceId = $page->field('service_facility_id');
 	my $statusClause='';
 	my $serviceClause='';
-	my $dateClause ;
+	my $dateClause;
+	my $serviceDateClause;
 	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) && defined $status;
 	$dateClause =qq{ and  trunc(i.invoice_date) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
 	$dateClause =qq{ and  trunc(i.invoice_date) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
 	$serviceClause =qq{ and t.service_facility_id = $serviceId} if $serviceId;
 	my $orderBy = qq{order by i.invoice_date desc , i.invoice_id asc };
+
+	if($serviceBeginDate ne '' && $serviceEndDate ne '')
+	{
+		$serviceDateClause = qq{ and i.invoice_id in (select parent_id from invoice_item ii
+							where ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
+							and ii.service_end_date <= to_date('$serviceEndDate', 'mm/dd/yyyy'))
+							};
+	}
 
 	my $whereClause = qq{where $statusClause
 						i.owner_type = 1
@@ -116,6 +139,7 @@ sub buildSqlStmt
 					and		i.client_id = p.person_id
 					$dateClause
 					$serviceClause
+					$serviceDateClause
 				   };
 	my $columns = qq{i.invoice_id,
 			i.total_items, i.client_id,
@@ -143,7 +167,6 @@ sub buildSqlStmt
 				$whereClause
 				$orderBy		};
 
-
 	return $sqlStmt;
 }
 
@@ -152,8 +175,6 @@ sub getDrillDownHandlers
 {
 	return ('prepare_detail_$detail$');
 }
-
-
 
 sub prepare_detail_payment
 {
@@ -242,15 +263,35 @@ sub execute
 		push(@data, \@rowData);
 	};
 
+	my $hardCopy = $page->field('printReport');
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $html = createHtmlFromData($page, 0, \@data,$pub);
-	return $html;
+
+	my $textOutputFilename = createTextRowsFromData($page, 0,  \@data, $pub);
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 
 }
-
-
-
-
-
 
 
 # create a new instance which will automatically add it to the directory of

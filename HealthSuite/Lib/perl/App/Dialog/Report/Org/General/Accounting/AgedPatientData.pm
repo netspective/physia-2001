@@ -53,6 +53,13 @@ sub new
 			types => "'PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES'",
 			),
 
+		new CGI::Dialog::Field::Duration(
+			name => 'service',
+			caption => 'Start/End Service Date',
+			begin_caption => 'Service Begin Date',
+			end_caption => 'Service End Date',
+		),
+
 		new CGI::Dialog::Field(
 			name => 'printReport',
 			type => 'bool',
@@ -100,7 +107,7 @@ sub prepare_detail_aged_patient
 	my $org_id = $page->param('_f_org_id');
 
 	$page->addContent($STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient_detail',
-			[$person_id, $owner_id, $provider_id, $org_id]));
+			[$person_id, $owner_id, $provider_id, $org_id, $page->field('service_begin_date'), $page->field('service_end_date')]));
 
 }
 
@@ -125,9 +132,9 @@ sub execute
 	my $html;
 
 	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient',$personId, $page->session('org_internal_id'),
-	$providerId, $facilityId);
+	$providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
 	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient',  [$personId, $page->session('org_internal_id'), 
-	$providerId, $facilityId]);
+	$providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
 	
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 

@@ -56,6 +56,13 @@ sub new
 			types => "'PRACTICE', 'CLINIC', 'FACILITY/SITE'"
 		),
 
+		new CGI::Dialog::Field::Duration(
+			name => 'service',
+			caption => 'Start/End Service Date',
+			begin_caption => 'Service Begin Date',
+			end_caption => 'Service End Date',
+		),
+
 		new CGI::Dialog::Field(
 			name => 'printReport',
 			type => 'bool',
@@ -102,7 +109,7 @@ sub prepare_detail_insurance
 	my $org_id = $page->param('_f_org_id');
 
 	$page->addContent($STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_detail',
-			[$org_ins_id, $page->session('org_internal_id'),$provider_id, $org_id]));
+			[$org_ins_id, $page->session('org_internal_id'),$provider_id, $org_id, $page->field('service_begin_date'), $page->field('service_end_date')]));
 }
 
 sub execute
@@ -126,8 +133,8 @@ sub execute
 	my $data;
 	my $html;
 
-	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId);
-	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId]);
+	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
+	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
 
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_insurance"});
 
