@@ -49,7 +49,7 @@ sub initialize
 					new CGI::Dialog::Field(caption => 'Memorial Sisters Of Charity', name => 'charity_id'),
 					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'mem_exp_date', defaultValue => '')
 					]),
-			new CGI::Dialog::MultiField(caption =>'EPSTD Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			new CGI::Dialog::MultiField(caption =>'EPSTD #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
 					new CGI::Dialog::Field(caption => 'EPSTD Number', name => 'provider_num'),
 					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'esptd_exp_date', defaultValue => '')
@@ -89,8 +89,6 @@ sub initialize
 					new CGI::Dialog::Field(caption => 'wc#', name => 'wc_num'),
 					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'wc_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
-		#new CGI::Dialog::Field(caption => 'Memorial Sisters Of Charity', name => 'charity_id'),
-		#new CGI::Dialog::Field(caption => 'EPSTD Number', name => 'provider_num'),
 
  		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -459,10 +457,10 @@ sub execute_add
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
-			item_name => 'Provider Number',
+			item_name => 'EPSTD',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('provider_num') || undef,
-			value_textB => 'Provider Number' || undef,
+			value_textB => 'EPSTD' || undef,
 			value_dateEnd => $page->field('esptd_exp_date') || undef,
 			_debug => 0
 		) if $page->field('provider_num');
