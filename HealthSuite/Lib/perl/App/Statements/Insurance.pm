@@ -266,6 +266,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			and plan_name = ?
 			and record_type = ?
 			and owner_person_id = ?
+			and ins_org_id = ?
 		},
 
 	'selInsuredRelationship' => qq{
