@@ -1924,7 +1924,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ head => 'My Session Activity', dataFmt => '#0# ' },
 			{ dataFmt => '#1# #2#'},
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
 	},
 	publishDefn_panel =>
 	{
@@ -1946,11 +1946,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-resource-nurse?home=#param.home#'>My Associated Resources Appointments</A> } },
+				#{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-resource-nurse?home=#param.home#'>My Associated Resources Appointments</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			#updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $sessionId) = @_; $sessionId ||= $page->session('_session_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$sessionId]); },
@@ -2020,7 +2020,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.patientAppointments' => {
 	sqlStmt => qq{
-	    	select 	%simpleDate:e.start_time%, to_char(e.start_time, 'HH12:MI AM'), to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), eadoc.value_text, e.subject
+	    	select 	%simpleDate:e.start_time%, 
+	    		to_char(e.start_time, 'HH12:MI AM'), 
+	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), 
+	    		eadoc.value_text, 
+	    		e.subject,
+	    		to_char(e.start_time, 'MM-DD-YYYY'),
+	    		1 as group_sort,
+	    		trunc(e.start_time) as apptdate
 		from 	event_attribute eaper, event_attribute eadoc, event e
 		where 	eaper.parent_id = e.event_id
 		and	eadoc.parent_id = e.event_id
@@ -2028,14 +2035,45 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		and	eaper.item_name like '%Patient'
 		and	eadoc.item_name like '%Physician'
 		and	eaper.value_text = ?
+		and	e.start_time > sysdate
+		UNION
+		select 	%simpleDate:sysdate%, 
+			to_char(sysdate, 'HH12:MI AM'), 
+			to_char(sysdate, 'HH12:MI AM'),  
+			'-', 
+			'-', 
+			to_char(sysdate, 'MM-DD-YYYY'),
+			2 as group_sort,
+			trunc(sysdate) as apptdate
+			from dual		
+		UNION
+	    	select 	%simpleDate:e.start_time%, 
+	    		to_char(e.start_time, 'HH12:MI AM'), 
+	    		to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), 
+	    		eadoc.value_text, 
+	    		e.subject,
+	    		to_char(e.start_time, 'MM-DD-YYYY'),
+	    		3 as group_sort,
+	    		trunc(e.start_time) as apptdate	    		
+		from 	event_attribute eaper, event_attribute eadoc, event e
+		where 	eaper.parent_id = e.event_id
+		and	eadoc.parent_id = e.event_id
+		and	eaper.parent_id = eadoc.parent_id
+		and	eaper.item_name like '%Patient'
+		and	eadoc.item_name like '%Physician'
+		and	eaper.value_text = ?
+		and	e.start_time < sysdate		
+		order by group_sort, apptdate
 		},
 	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Appointments', dataFmt => '#0# #1# - #2# #4# with #3#' },
+			{ head => 'Appointments', dataFmt => '<a href="javascript:location=\'/schedule/apptsheet/#5#\';">#0#</A>:' },
+			{ dataFmt => 'Scheduled with <A HREF="/person/#3#/profile">#3#</A> at #1# <BR> Subject: #4#'},
+		
 		],
 		#bullets => 'stpe-#my.stmtId#/dlg-remove-patientappointments?home=/#param.arl#',
-		#separateDataColIdx => 2, # when the date is '-' add a row separator
+		separateDataColIdx => 3, # when the date is '-' add a row separator
 	},
 	publishDefn_panel =>
 	{
@@ -2064,11 +2102,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			# delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panelTransp'); },
 },
+
 
 
 #----------------------------------------------------------------------------------------------------------------------
