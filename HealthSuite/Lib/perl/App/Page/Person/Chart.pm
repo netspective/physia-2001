@@ -38,7 +38,6 @@ sub prepare_view
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.surgicalProcedures#<BR>
 					#component.stp-person.testsAndMeasurements#<BR>
-					#component.stp-person.bloodGroup#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -63,7 +62,7 @@ sub prepare_view
 sub handleArl
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-	
+
 	# DEMO SPECIAL CONDITION
 	if($self->param('person_id') eq 'SZSMTIH' && $CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO)
 	{
