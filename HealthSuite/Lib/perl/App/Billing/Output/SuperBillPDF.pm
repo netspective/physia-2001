@@ -271,8 +271,13 @@ sub box4f
 		$self->boxData($p, $x, $y, $report, "X", $xpos, 12);
 	}
 
-	my $addressText = $superBill->{patient}->{address}->getAddress1 . ', ';
-	$addressText .= $superBill->{patient}->{address}->getCity . '/' . $superBill->{patient}->{address}->getState;
+	my $addressText;
+
+	if($superBill->{patient}->{address}->getAddress1 ne '')
+	{
+		$addressText = $superBill->{patient}->{address}->getAddress1 . ', ';
+		$addressText .= $superBill->{patient}->{address}->getCity . '/' . $superBill->{patient}->{address}->getState;
+	}
 
 	$self->boxData($p, $x, $y, $report, $addressText, 30, 10);
 #	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getCity, 150, 10);
