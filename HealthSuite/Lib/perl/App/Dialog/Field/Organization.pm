@@ -152,9 +152,13 @@ sub isValid
 			})
 			unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
 
-			my $personId = ($page->param('user_id') ne '') ? $page->param('user_id') : $page->session('user_id');
-			$self->invalidate($page, "You do not have permission to modify an organization outside of your parent organization.")
-				unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selPersonCategory', $personId, $personId, $value);
+			my $dlgFlags = $validator->getActiveFlags($page);
+			if($dlgFlags & CGI::Dialog::DLGFLAG_UPDORREMOVE)
+			{
+				my $personId = ($page->param('user_id') ne '') ? $page->param('user_id') : $page->session('user_id');
+				$self->invalidate($page, "You do not have permission to modify an organization outside of your parent organization.")
+					unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selPersonCategory', $personId, $personId, $value);
+			}
 		}
 	}
 	# return TRUE if there were no errors, FALSE (0) if there were errors
