@@ -444,7 +444,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			claim_type ct,
 			bill_sequence bs
 		WHERE
-			i.owner_person_id = ?
+			i.owner_person_id = :1
 			AND ct.id = i.ins_type
 			AND bs.id = i.bill_sequence
 			AND i.bill_sequence IN (1,2,3,4)
@@ -459,7 +459,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				guarantor_type
 			FROM insurance wk
 			WHERE
-				wk.owner_person_id = ?
+				wk.owner_person_id = :1
 				AND wk.ins_type = 6
 			)
 		UNION (
@@ -472,7 +472,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				guarantor_type
 			FROM insurance
 			WHERE
-				owner_person_id = ?
+				owner_person_id = :1
 				AND ins_type = 7
 			)
 		ORDER BY bill_seq_id
