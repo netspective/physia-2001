@@ -117,7 +117,7 @@ sub populateData
 	$self->getField('physician_list')->{fKeyStmtBindPageParams} = $sessOrgId;
 
 	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
-		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'));
+		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'), 'WorkList');
 
 	my @physicians = ();
 	for (@$physicansList)
@@ -156,7 +156,7 @@ sub execute
 	my $userId =  $page->session('user_id');
 	
 	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_resources', $userId);
+		'del_worklist_resources', $userId, 'WorkList');
 
 	my @physicians = $page->field('physician_list');
 	for (@physicians)
