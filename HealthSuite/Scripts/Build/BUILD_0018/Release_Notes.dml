@@ -70,6 +70,16 @@
 			 Added new Catalog type of Lab Test to Orgs of Type Lab (Added Dialog for adding Lab Test to a Org Lab Catalog)
 			 Added Link to adding Lab Orders to patient Chart page (Added Dialog for creating lab order request)
 			 Added new Lab Order tab under the documents tab on the person pages
+
+			FIX :
+			1 - Added new Ancillary Location dialog that allows a user to attach new address , phone,fax numbers to a org
+			2 - Added next action to the add Ancillary Org so the user can go the Ancillary Location dialog
+			3 - Added a new component "Ancillary Location" to the Ancillary summary page that allows the user to add/edit ancillary location
+			4 - Re-worked the Ancillary Catalog so user can create their own catalogs
+			5 - Added Code Charge field to the test dialogs
+			6 - Added - Location field to the Lab Order dialog so user can specify a location to send lab order
+
+Note : Lab Catalogs and Lab Order entered before this fix will not work correctly.
 		</deliverable>
 		
 		<deliverable id="1323">
