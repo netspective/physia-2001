@@ -694,6 +694,22 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and Insurance.remit_type = 0
 		ORDER BY 1
 	},
+	'selInvoiceTransaction' =>qq
+	{
+		SELECT  1
+		FROM 	transaction t
+		WHERE 	t.service_facility_id = :1	
+		AND	EXISTS
+		(
+			SELECT 	1
+			FROM 	invoice i ,invoice_attribute ia
+			WHERE 	i.main_transaction = t.trans_id
+			AND	ia.value_date  > to_date(:2,'MM/DD/YYYY')
+			AND	ia.value_date  < to_date(:3,'MM/DD/YYYY')
+			AND	ia.item_name IN('Invoice/Creation/Batch ID','Invoice/Payment/Batch ID')
+		)
+
+	}
 	
 );
 
