@@ -738,7 +738,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	// of the popup window to check the value of activeFindWinControl and
 	// either automatically populate the control or do something else
 	//
-	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? "width=600,height=500,scrollbars,resizable" : features);
+	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? "width=600,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
 
@@ -804,23 +804,23 @@ function chooseEntry(itemValue, actionObj, destObj)
 
 	if(actionObj == null)
 		actionObj = search_form.item_action_arl_select;
-	//if(destObj == null)
-	//	destObj = search_form.item_action_arl_dest_select;
+	
+	if(destObj == null)
+		destObj = search_form.item_action_arl_dest_select;
 
 	if(actionObj != null) {
 		var arlFmt = actionObj.options[actionObj.selectedIndex].value;
 		var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
-		if(destObj != null)
+		if(destObj == null)
+		{
+			window.location.href = newArl;
+		}
+		else
 		{
 			if(destObj.selectedIndex == 0)
 				window.location.href = newArl;
 			else
-				//window.open(newArl, '');
 				doActionPopup(newArl);
-		}
-		else
-		{
-			window.location.href = newArl;
 		}
 	}
 }
@@ -899,7 +899,7 @@ function doActionPopup(arl, autoRefresh, features)
 	// either automatically populate the control or do something else
 	//
 	//open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=350,scrollbars,resizable" : features);
-	var popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=500,scrollbars,resizable" : features);
+	var popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
 
