@@ -423,12 +423,24 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'updAssignResource' => qq{
-		update Event_Attribute set value_text = ? where upper(value_text) = upper(?)
+		update Event_Attribute set value_textB = ? 
+		where upper(value_textB) = upper(?)
 		and parent_id in
-			(select event_id from event
+			(select event_id from Event
 				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
 					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT') +1
 					and facility_id = ?
+			)
+	},
+
+	'updAssignResource_noFacility' => qq{
+		update Event_Attribute set value_textB = ? 
+		where upper(value_textB) = upper(?)
+		and parent_id in
+			(select event_id from Event
+				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+					and to_date (?, '$SQLSTMT_DEFAULTDATEFORMAT') +1
+					and owner_id = ?
 			)
 	},
 

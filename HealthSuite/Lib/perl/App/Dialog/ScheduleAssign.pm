@@ -127,13 +127,21 @@ sub execute
 	my $startDate = $page->field('effective_begin_date');
 	my $endDate = $page->field('effective_end_date');
 
-	my $facility_id = $page->field('facility_id') || $page->session('org_id');
-
-	my $facility_internal_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
+	my $facility_id = $page->field('facility_id');
 	
-	$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'updAssignResource', $toResourceID,
-		$fromResourceID, $startDate, $endDate, $facility_internal_id);
+	if ($facility_id)
+	{
+		my $facility_internal_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+			'selOrgId', $page->session('org_internal_id'), $facility_id);
+
+		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'updAssignResource', $toResourceID,
+			$fromResourceID, $startDate, $endDate, $facility_internal_id);
+	}
+	else
+	{
+		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'updAssignResource_noFacility', 
+			$toResourceID, $fromResourceID, $startDate, $endDate, $page->session('org_internal_id'));
+	}
 
 	$self->handlePostExecute($page, $command, $flags);
 }
