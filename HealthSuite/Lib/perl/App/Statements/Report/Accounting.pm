@@ -80,10 +80,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					SUM(person_pay) as person_pay,
 					SUM(insurance_pay) as insurance_pay,
 					SUM(refund) as refund,
-					SUM(person_pay+insurance_pay-refund) as net_rcpts,
+					SUM(person_pay+insurance_pay+refund) as net_rcpts,
 					SUM(total_charges+misc_charges-person_write_off-insurance_write_off +
 					    balance_transfer -
-					    (person_pay+insurance_pay-refund)
+					    (person_pay+insurance_pay+refund)
 					    ) as a_r,
 					to_char(invoice_date,'YYYY') as invoice_year
 				FROM 	invoice_charges,org o
@@ -330,11 +330,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		AND o.org_internal_id = invoice_charges.facility
 		AND o.owner_org_id = :7
 
-	group by to_char(invoice_date,'MM/YYYY') },
+	group by to_char(invoice_date,'MM/YYYY')
+	order by invoice_date asc},
 
 	'sel_monthly_audit_detail' => qq{
 	SELECT	invoice_id ,
-		invoice_date as invoice_batch_date,
+		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
 		service_begin_date,
 		service_end_date,
 		provider as care_provider_id ,
@@ -368,7 +369,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		)
 	AND 	o.org_internal_id = invoice_charges.facility
 	AND 	o.owner_org_id = :6
-	ORDER BY  invoice_id
+	ORDER BY  invoice_date asc
 	},
 
 
