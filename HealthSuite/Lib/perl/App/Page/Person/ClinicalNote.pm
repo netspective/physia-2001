@@ -56,14 +56,16 @@ sub findResources {
 	my ($url) = shift;
 	my $html = qq{Please choose from the follow xml templates:<br>};
 	
-	my $dirOpened = opendir DIRHANDLE, '/export/home/sjaveed/projects/HealthSuite/WebSite/resources/data';
+	my $dirOpened = opendir DIRHANDLE, $CONFDATA_SERVER->path_XMLData();
 	
 	if ($dirOpened) {
 		my @xmlDatafiles = grep /\.xml$/i, readdir DIRHANDLE;
 		
-		foreach my $xmlFile (@xmlDatafiles) {
-			$html .= qq{<a href="$url$xmlFile">$xmlFile</a><br>};
+		$html .= '<ul>';
+		foreach my $xmlFile (sort @xmlDatafiles) {
+			$html .= qq{<li><a href="$url$xmlFile">$xmlFile</a></li>};
 		}
+		$html .= '</ul><br>';
 	} else {
 		$html .= '<b>Couldnt open directory /export/home/sjaveed/projects/HealthSuite/WebSite/resources/data<br>';
 	}
