@@ -8,6 +8,8 @@ use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Claim::Entity);
 
+use constant TELEPHONE_FORMAT_DASH => 1;
+
 #
 #   -- This modlue contains all person's data (Patient, Physician, Nurse etc)
 #   -- which is given in HCFA 1500 Form
@@ -132,9 +134,23 @@ sub getState
 
 sub getTelephoneNo
 {
-	my ($self) = @_;
+	my ($self, $formatIndicator) = @_;
 	
-	return $self->{telephoneNo}; 
+	return (TELEPHONE_FORMAT_DASH == $formatIndicator) ? $self->convertTelFormat($self->{telephoneNo}) : $self->{telephoneNo};
+	
+}
+
+sub convertTelFormat
+{
+	my ($self, $telephoneNo) = @_;
+	if ($telephoneNo ne "")			
+	{
+		return substr($telephoneNo,0,3) . '-' . substr($telephoneNo,3,3) . '-' . substr($telephoneNo,6,4) ;
+	}
+	else 
+	{
+		return "";
+	}
 }
 
 
