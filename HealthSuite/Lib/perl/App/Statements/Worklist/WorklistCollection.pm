@@ -63,7 +63,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND	trans_type = $ACCOUNT_OWNER
 		AND	trans_subtype = 'Owner'
 		AND	trans_status =$ACTIVE	
-		AND	data_num_a = :3
+		AND	trans_invoice_id = :3
 	},
 	'delTransferColl' => qq
 	{
@@ -241,8 +241,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					WHERE	trans_type = 9520
 					AND 	trans_status = 2
 					AND 	provider_id = :8
-					AND	invoice_id = i.invoice_id	
-					AND 	invoice_id is not NULL
+					AND	trans_invoice_id = i.invoice_id	
+					AND 	trans_invoice_id is not NULL
 					AND	billing_facility_id = :7			
 				)	
 				UNION ALL
@@ -280,8 +280,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND 	t.trans_status = 2
 				AND 	t.trans_subtype = 'Owner'
 				AND	t.provider_id = :8
-				AND	t.invoice_id = i.invoice_id	
-				and     t.invoice_id is not null
+				AND	t.trans_invoice_id = i.invoice_id	
+				and     t.trans_invoice_id is not null
 				AND	t.billing_facility_id = :7
 		ORDER BY 1
 	},	
@@ -402,7 +402,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 		AND 	t.trans_owner_id = :1
 		AND 	t.trans_subtype = 'Owner'
 		AND	t.provider_id = :2
-		AND	t.data_num_a = :3
+		AND	t.trans_invoice_id = :3
 		AND 	tr.trans_owner_id (+) = t.trans_owner_id
 		AND 	tr.trans_type (+)= $ACCOUNT_RECK_DATE 
 		AND 	tr.provider_id (+)= :2	
@@ -457,9 +457,9 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	
 		INSERT INTO TRANSACTION	(trans_owner_id,caption,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
 					 trans_subtype,trans_status,initiator_type,initiator_id,billing_facility_id,cr_session_id,
-					 cr_user_id,cr_org_internal_id,trans_status_reason,data_num_a) 
+					 cr_user_id,cr_org_internal_id,trans_status_reason,data_num_a,trans_invoice_id) 
   		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
-		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7,data_num_a
+		       	trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7,data_num_a,trans_invoice_id
 		FROM 	transaction
 		WHERE	trans_owner_id = :1 
 		AND	provider_id = :2
