@@ -167,8 +167,8 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
-						<OPTION value="/person/$personId/dlg-add-referral">Add Referral</OPTION>
-						<OPTION value="/person/$personId/dlg-add-appointment">Schedule Appointment</OPTION>
+						<OPTION value="/person/$personId/dlg-add-referral">Add Service Request</OPTION>
+						<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId/home">Schedule Appointment</OPTION>
 						<OPTION value="/person/$personId/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/person/$personId/dlg-add-invoice">Add Invoice</OPTION>
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Profile</OPTION>
@@ -483,6 +483,8 @@ sub prepare_view_profile
 					#component.stpt-person.additionalData#
 					#component.stpt-person.diagnosisSummary#<BR>
 					#component.stpt-person.feeschedules#<BR>
+					#component.stpt-person.referralAndIntake#<BR>
+					#component.stpt-person.referralAndIntakeCount#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
