@@ -110,7 +110,6 @@ sub new
 			#options => FLDFLAG_REQUIRED,
 		),
 
-		#new CGI::Dialog::Field(caption => 'Reference', name => 'reference'),
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo', cols => 25, rows => 4),
 	);
 	$self->{activityLog} =
@@ -375,6 +374,7 @@ sub copyInvoice
 			comments =>  $item->{comments} || undef,
 			unit_cost => $item->{unit_cost} || undef,
 			rel_diags => $item->{rel_diags} || undef,
+			parent_code => $item->{parent_code} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			data_text_c => $item->{data_text_c} || undef,
 			data_num_a => $item->{data_num_a} || undef,
@@ -2429,11 +2429,13 @@ sub execute_addOrUpdate
 	## UPDATE FEE SCHEDULES ATTRIBUTE
 	if(my $feeSchedItemId = $page->field('fee_schedules_item_id'))
 	{
+		my $activeCatalogs = uc($page->field('fee_schedules_catalog_ids'));
+		my $defaultCatalogs = uc($page->field('fee_schedules'));
 		$page->schemaAction(
 				'Invoice_Attribute', 'update',
 				item_id => $feeSchedItemId,
-				value_text => $page->field('fee_schedules_catalog_ids') || undef,
-				value_textB => $page->field('fee_schedules') || undef,
+				value_text => $activeCatalogs || undef,
+				value_textB => $defaultCatalogs || undef,
 				_debug => 0
 		);
 	}
@@ -2518,6 +2520,7 @@ sub createExplosionItems
 				unit_cost => $unitCost || undef,
 				extended_cost => $extCost || undef,
 				rel_diags => join(', ', @relDiags) || undef,									#the actual icd (diag) codes
+				parent_code => $explCode || undef,										#store explosion code
 				data_text_a => join(', ', @diagCodePointers) || undef,						#the diag code pointers
 				data_text_c => 'explosion',												#indicates this procedure comes from an explosion (misc) code
 				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
@@ -2590,6 +2593,7 @@ sub voidProcedure
 			hcfa_service_type => defined $servType ? $servType : undef,
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
+			parent_code => $invItem->{parent_code} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
 			data_text_c => $invItem->{data_text_c} || undef,
 			data_num_a => $invItem->{data_num_a} || undef,

@@ -243,7 +243,7 @@ sub initialize
 				options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::Subhead(heading => 'Procedure Entry', name => 'procedures_heading'),
-		new App::Dialog::Field::Procedures(name =>'procedures_list', lineCount => 3),
+		new App::Dialog::Field::Procedures(name =>'procedures_list'),
 	);
 
 	return $self;
@@ -383,7 +383,6 @@ sub populateData
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 		$page->field('attendee_id', $invoiceInfo->{client_id});
 		$page->field('old_person_id', $invoiceInfo->{client_id});
-		#$page->field('reference', $invoiceInfo->{reference});
 		$page->field('current_status', $invoiceInfo->{invoice_status});
 		$page->param('_f_proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
@@ -748,6 +747,7 @@ sub voidInvoicePostSubmit
 			comments =>  $item->{comments} || undef,
 			unit_cost => $item->{unit_cost} || undef,
 			rel_diags => $item->{rel_diags} || undef,
+			parent_code => $item->{parent_code} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			data_text_c => $item->{data_text_c} || undef,
 			data_num_a => $item->{data_num_a} || undef,
@@ -1424,14 +1424,16 @@ sub handleInvoiceAttrs
 	#		_debug => 0
 	#);
 
+	my $activeCatalogs = uc($page->param('_f_proc_active_catalogs'));
+	my $defaultCatalogs = uc($page->param('_f_proc_default_catalog'));
 	$page->schemaAction(
 		'Invoice_Attribute', $command,
 		item_id => $page->field('fee_schedules_item_id') || undef,
 		parent_id => $invoiceId,
 		item_name => 'Fee Schedules',
 		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $page->param('_f_proc_active_catalogs') || undef,
-		value_textB => $page->param('_f_proc_default_catalog') || undef,
+		value_text => $activeCatalogs || undef,
+		value_textB => $defaultCatalogs || undef,
 		_debug => 0
 	);
 
@@ -1917,7 +1919,7 @@ sub handleProcedureItems
 		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
 		if($miscProcChildren->[0]->{code})
 		{
-			createExplosionItems($self, $page, $command, $line, $invoiceId, $miscProcChildren);
+			createExplosionItems($self, $page, $command, $line, $invoiceId, $cptCode, $miscProcChildren);
 			next;
 		}
 
@@ -1979,7 +1981,7 @@ sub handleProcedureItems
 
 sub createExplosionItems
 {
-	my ($self, $page, $command, $line, $invoiceId, $miscProcChildren) = @_;
+	my ($self, $page, $command, $line, $invoiceId, $explCode, $miscProcChildren) = @_;
 
 	my $svcFacility = $page->field('service_facility_id') || $page->field('hospital_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
@@ -2037,6 +2039,7 @@ sub createExplosionItems
 				unit_cost => $unitCost || undef,
 				extended_cost => $extCost || undef,
 				rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
+				parent_code => $explCode || undef,										#store explosion code
 				data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
 				data_text_c => 'explosion',												#indicates this procedure comes from an explosion (misc) code
 				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
@@ -2078,6 +2081,7 @@ sub voidProcedureItem
 			hcfa_service_type => defined $invItem->{hcfa_service_type} ? $invItem->{hcfa_service_type} : undef,
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
+			parent_code => $invItem->{parent_code} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
 			data_text_c => $invItem->{data_text_c} || undef,
 			data_num_a => $invItem->{data_num_a} || undef,
