@@ -15,20 +15,6 @@
 	</release-info>
 
 	<deliverables>
-
-                <deliverable id="1517">
-		Report (patient activity staff) : The patient activity staff report was not converting from GMT to local timezone so work done late in a day would appear on the wrong date.
-                </deliverable>
-                <deliverable id="1530">
-		Report (Receipt and Procedure Analysis) : Made font for fiscaly year text at the top of the report  smaller for both receipt analysis and procedure analysis
-                </deliverable>
-                <deliverable id="1532">
-		Report (Receipt Analysis) :  Added new option to create receipt analysis  as totals only
-                </deliverable>
-		<deliverable id="1556">
-			UI: Added the appointments component in the summary page and changed the default next action for 
-			    Patient/Person Lookup to show the 'Summary Page'.
-                </deliverable>
                 <deliverable id="1262">
 			UI: The Electronic Billing Information component has now been moved form the Insurance tab
 			    of an organization to the Clearing House tab.
@@ -37,14 +23,51 @@
 			UI: Adding/Editing a Billing Information from a Person's Associate tab changes that person's
 			    clearing house information only.
                 </deliverable>
-                
+
+                <deliverable id="1359">
+                	Removed View/Print dialog. Now auto-generating view or print claim history message when one of the HCFA 1500
+                	tabs is clicked.
+                </deliverable>
+
                 <deliverable id="1511">
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			    not those of the current user of the app.
                 </deliverable>
+
+                <deliverable id="1517">
+			Report (patient activity staff) : The patient activity staff report was not converting from GMT to local timezone so work done late in a day would appear on the wrong date.
+                </deliverable>
+
+                <deliverable id="1527">
+                	New 'copay' payment type created and added to claim personal payment dialog. Also, 'Copay prepaid' works
+                	like 'Prepayment' in post general payment dialog.
+                </deliverable>
+
+                <deliverable id="1530">
+			Report (Receipt and Procedure Analysis) : Made font for fiscaly year text at the top of the report  smaller for both receipt analysis and procedure analysis
+                </deliverable>
+
+                <deliverable id="1532">
+			Report (Receipt Analysis) :  Added new option to create receipt analysis  as totals only
+                </deliverable>
+
+                <deliverable id="1536">
+                	Added all remaining invoice statuses to claim search.
+                </deliverable>
+
                 <deliverable id="1553">
                 	UI: Administrators can now update main org profiles
                 </deliverable>
+
+		<deliverable id="1556">
+			UI: Added the appointments component in the summary page and changed the default next action for 
+			    Patient/Person Lookup to show the 'Summary Page'.
+                </deliverable>
+
+                <deliverable id="1560">
+			Changed claim dialog next action post personal payment to send user to personal payment dialog for claims.
+                </deliverable>
+
 	</deliverables>
 </release-notes>
 
