@@ -487,10 +487,8 @@ sub getHtml
 	my $attrDataFlag = '';
 	if(my $invoiceId = $page->param('invoice_id'))
 	{
-		$invoiceFlags = $page->field('invoice_flags');
-		$attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
-
-		#$readOnly = $invoiceFlags & $attrDataFlag ? 'READONLY' : '';
+		my $submitOrder = $page->field('submission_order');
+		#$readOnly = $submitOrder > 0 ? 'READONLY' : '';
 	}
 
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
@@ -513,12 +511,13 @@ sub getHtml
 		my $emgHtml = '';
 		if($invoiceFlags & $attrDataFlag)
 		{
-			$emgHtml = $emg eq 'on' ? "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>" : '';		
+			$emgHtml = $emg eq 'on' ? 
+					   "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>" : '';		
 		}
 		else
 		{
 			my $checked = $emg eq 'on' ? 'CHECKED' : '';
-			$emgHtml = "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' TYPE='CHECKBOX' VALUE='on' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
+			$emgHtml = "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
 		}
 
 		$linesHtml .= qq{
@@ -580,14 +579,14 @@ sub getHtml
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || 'From' ]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
-					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
+				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || 'From' ]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
+					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
 										<A HREF="javascript:getFFS();doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/feeprocedure/itemValue',null,false,null,document.$dialogName._f_proc_all_catalogs);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags") ]}'></TD>
+				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_units' TYPE='text' size=3 VALUE='@{[ $page->param("_f_proc_$line\_units") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -667,7 +666,7 @@ sub getHtml
 						<TD><FONT $textFontAttrs>Default Fee Schedule(s)</FONT></TD>
 					</TR>
 					<TR VALIGN=TOP>
-						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
+						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> 
