@@ -135,7 +135,7 @@ sub getBatches
 
 	for my $claimIndex (0..$#$claims)
 	{
-		$providerID = $claims->[$claimIndex]->{payToOrganization}->getTaxId();
+		$providerID = $claims->[$claimIndex]->{payToProvider}->getTaxId();
 		$providerID =~ s/ //g;
 		$providerID =~ s/\-//g;
 

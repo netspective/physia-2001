@@ -4,9 +4,6 @@ package App::Billing::Output::File::Batch::Claim::Trailer::NSF;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
-
-use Devel::ChangeLog;
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -17,7 +14,7 @@ use vars qw(@CHANGELOG);
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
 
@@ -29,22 +26,22 @@ sub recordType
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString, $nsfType) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
+
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 
 sub formatData
 {
-	
+
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
-	
-my %nsfType = (NSF_HALLEY . "" =>	
+
+my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%2s%2s%2s%2s%2s%2s%3s%-40s%7s%7s%7s%7s%7s%7s%7s%7s%7s%-16s%-50s%-84s%-30s",
 	$self->recordType(),
 	$spaces, # not used
@@ -71,7 +68,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces, # filler national
 	$spaces  # filler local
 	),
-	NSF_THIN . "" =>	
+	NSF_THIN . "" =>
 	sprintf("%-3s%-2s%-17s%2s%2s%2s%2s%2s%2s%3s%-40s%7s%7s%7s%7s%7s%7s%7s%7s%7s%-16s%-103s%-61s",
 	$self->recordType(),
 	$spaces, # reserved filler
@@ -126,28 +123,10 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$self->numToStr(15,0,'0')
 	)
   );
-  
+
   	return $nsfType{$nsfType};
 }
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/10/2000', 'AUF',
-	'Billing Interface/Validating CA0 Trailer ',
-	'The abs() function is used in all amount function of XA0 to keep from negative value'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'AUF',
-	'Billing Interface/Validating CA0 Trailer ',
-	'Total Patient Amount will contain Total Adjustment Amount which is stored in Invoice table ' . 
-	'and Total Payer Amount will be get from payer object']
-);
-	
-@CHANGELOG = 
-(
 
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of XA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
-	
-	
+
 1;

@@ -104,8 +104,8 @@ sub validateB
 	$self->isRequired($tempClaim->getEMCId(),$tempClaim,'BA0:Group Provider ID');
 		
 	#Provider Tax Id
-	$self->isRequired($tempClaim->{payToProvider}->getFederalTaxId(),$tempClaim,'BA0:Provider Tax Id');
-	$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{payToProvider}->getFederalTaxId(),$tempClaim,'BA0:Provider Tax Id',(0..9));
+	$self->isRequired($tempClaim->{payToProvider}->getTaxId(),$tempClaim,'BA0:Provider Tax Id');
+	$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{payToProvider}->getTaxId(),$tempClaim,'BA0:Provider Tax Id',(0..9));
 	
 	
 	#Provider Site Id

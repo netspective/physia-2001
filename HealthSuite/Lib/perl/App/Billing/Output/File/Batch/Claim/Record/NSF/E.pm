@@ -6,7 +6,7 @@ package App::Billing::Output::File::Batch::Claim::Record::NSF::EA0;
 use strict;
 use Carp;
 use App::Billing::Output::File::Batch::Claim::Record::NSF;
-use Devel::ChangeLog;
+
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -15,10 +15,6 @@ use App::Billing::Universal;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Output::File::Batch::Claim::Record::NSF);
-use vars qw(@CHANGELOG);
-
-
-
 
 
 sub recordType
@@ -267,28 +263,6 @@ my %nsfType = (NSF_HALLEY . "" =>
 }
 
 
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'Auto Accident Code is now being determined from the values of ConditionRelatedToAutoAccident value from database'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'All dates are interperated from DD-MON-YY to CCYYMMDD format in EA0 except where ' .
-	'the existence of date is checked'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'The use of function convertDateToCCYYMMDD has been removed from EA0, now on Claim object is supposed to provide data in required format'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/01/2000', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'Now the diagnosis codes are retrieved on the basis of getDiagnosisPosition method of Diagnosis object in EA0'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/04/2000', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'Now it can handle diagnosis codes more than 4, in this case it will only cater first four diagnosis codes which are required by Envoy in EA0']
-
-);
-
 1;
 
 
@@ -498,7 +472,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,
 	$spaces,
 	$spaces,
-	$self->numToStr(9,0,$claimRenderingProvider->getFederalTaxId()),
+	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),
 	substr($inpClaim->getQualifier,0,1),
 	substr(uc($inpClaim->getQualifier) eq 'O' ?
 		$claimRenderingOrganization->getName() : $claimRenderingProvider->getLastName(),0,17),
@@ -541,7 +515,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,
 	$spaces,
 	$spaces,
-	$self->numToStr(9,0,$claimRenderingProvider->getFederalTaxId()),
+	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),
 	substr($inpClaim->getQualifier,0,1),
 	substr(uc($inpClaim->getQualifier) eq 'O' ?
 		$claimRenderingOrganization->getName() : $claimRenderingProvider->getLastName(),0,17),

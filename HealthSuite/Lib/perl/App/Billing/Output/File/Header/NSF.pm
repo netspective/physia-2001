@@ -6,7 +6,7 @@ package App::Billing::Output::File::Header::NSF;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
+
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -182,13 +182,5 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	return $nsfType{$nsfType};
 }
 
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/30/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of AA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
 1;
 

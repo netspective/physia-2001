@@ -9,24 +9,23 @@ use Carp;
 use App::Billing::Universal;
 
 
-use vars qw(@CHANGELOG);
 
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
 
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString, $nsfType) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
+
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 
@@ -41,7 +40,7 @@ sub formatData
 	my $spaces = ' ';
 	my $claimLegalRepresentator = $inpClaim->{legalRepresentator};
 	my $claimLegalRepresentatorAddress = $claimLegalRepresentator->{address};
-	
+
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-10s%-2s%1s%-18s%-12s%-18s%-12s%-15s%-5s%-2s%-9s%-10s%-82s%-82s",
 	$self->recordType(),
@@ -79,7 +78,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,	# Responsible Party Telephone Number
 	$spaces,	# Filler National
 	),
-    NSF_ENVOY . "" =>	
+    NSF_ENVOY . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-10s%-2s%1s%-18s%-12s%-18s%-12s%-15s%-5s%-2s%-9s%-10s%-82s%-82s",
 	$self->recordType(),
 	$spaces,	# Reserved Filler
@@ -101,16 +100,10 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces		# Filler Local
 	)
   );
-  
+
   return $nsfType{$nsfType};
 }
 
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/30/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of CB0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
 
 1;

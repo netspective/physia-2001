@@ -4,7 +4,6 @@ package App::Billing::Output::File::Batch::Claim::Header::NSF2;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -14,19 +13,19 @@ use App::Billing::Universal;
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
 
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString, $nsfType) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
+
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 sub recordType
@@ -87,15 +86,9 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces
     )
   );
-  
+
   return $nsfType{$nsfType};
 }
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/30/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of CA1 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
 
 1;

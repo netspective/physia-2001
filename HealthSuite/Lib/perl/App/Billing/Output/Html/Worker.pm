@@ -93,9 +93,9 @@ sub populatePhysician
 
 	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
-	$data->{physicianFederalTaxId} = $physician->getFederalTaxId eq "" ? $physician->getTaxId : $physician->getFederalTaxId;
+	$data->{physicianFederalTaxId} = $physician->getTaxId eq "" ? $physician->getTaxId : $physician->getTaxId;
 	$data->{physicianName} = $physician->getName;
-	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne "" ? "Checked" : "";
+	$data->{physicianTaxTypeIdEin} = $physician->getTaxId ne "" ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
 	$data->{physicianPin} = $physician->getWorkersComp;
 #	$data->{physicianGrp} = $physician->getGRP;

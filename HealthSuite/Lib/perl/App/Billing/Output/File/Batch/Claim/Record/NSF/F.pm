@@ -12,10 +12,8 @@ use App::Billing::Universal;
 
 use vars qw(@ISA);
 use App::Billing::Output::File::Batch::Claim::Record::NSF;
-use Devel::ChangeLog;
 
 @ISA = qw(App::Billing::Output::File::Batch::Claim::Record::NSF);
-use vars qw(@CHANGELOG);
 
 sub recordType
 {
@@ -250,29 +248,6 @@ my %nsfType = (NSF_HALLEY . "" =>
  
 }
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'All dates are interperated from DD-MON-YY to CCYYMMDD format in FA0 by using ' .
-	'function convertDateToCCYYMMDD'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'The function convertDateToCCYYMMDD has been removed from FA0, now on Claim object will provide data in required format'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/10/2000', 'AUF',
-	'Billing Interface/Output NSF Object',
-	'The abs() function is used in getAmountPaid and getCharges() function in FA0 to keep from negative value'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-
-
-
-
-
-);
-
 
 1;
 
@@ -283,7 +258,6 @@ package App::Billing::Output::File::Batch::Claim::Record::NSF::FAat;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -323,7 +297,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, # Line item control number
-	$self->numToStr(9,0,$claimRenderingProvider->getFederalTaxId()),  # federal tax id
+	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),  # federal tax id
 	substr($inpClaim->getQualifier(),0,1),  # rendering provider name qualifier
 	substr(($inpClaim->getQualifier() eq 'O' ? $inpClaim->{renderingOrganization}->getName : $claimRenderingProvider->getLastName()),0,17), # rendering provider last name
 	substr(($inpClaim->getQualifier() eq 'O' ? $spaces : $claimRenderingProvider->getFirstName()),0,10), # rendering provider first name
@@ -343,7 +317,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($Patient->getAccountNo(),0,17),
 	$spaces, # Line item control number
-	$self->numToStr(9,0,$claimRenderingProvider->getFederalTaxId()),  # federal tax id
+	$self->numToStr(9,0,$claimRenderingProvider->getTaxId()),  # federal tax id
 	substr($inpClaim->getQualifier(),0,1),  # rendering provider name qualifier
 	substr(($inpClaim->getQualifier() eq 'O' ? $inpClaim->{renderingOrganization}->getName : $claimRenderingProvider->getLastName()),0,17), # rendering provider last name
 	substr(($inpClaim->getQualifier() eq 'O' ? $spaces : $claimRenderingProvider->getFirstName()),0,10), # rendering provider first name
@@ -363,12 +337,6 @@ my %nsfType = (NSF_HALLEY . "" =>
   
 }
 
-@CHANGELOG = 
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FA@ has been modified by introducing a hash in which NSF_ENVOY is used as key, which points a Envoy format record string']
-);
 
 1;
 
@@ -389,7 +357,6 @@ use App::Billing::Universal;
 use vars qw(@ISA);
 use App::Billing::Output::File::Batch::Claim::Record::NSF;
 @ISA = qw(App::Billing::Output::File::Batch::Claim::Record::NSF);
-use vars qw(@CHANGELOG);
 
 sub recordType
 {
@@ -535,14 +502,6 @@ my %nsfType = (NSF_HALLEY . "" =>
 		
 }
 
-@CHANGELOG = 
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FB0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-
-);
-
 
 1;
 
@@ -552,7 +511,6 @@ package App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -675,12 +633,6 @@ my %nsfType = (NSF_HALLEY . "" =>
 }
 
 
-@CHANGELOG = 
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FB1 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
 
 1;
 
@@ -691,7 +643,6 @@ package App::Billing::Output::File::Batch::Claim::Record::NSF::FB2;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -781,13 +732,6 @@ my %nsfType = (NSF_HALLEY . "" =>
 }
 
 
-@CHANGELOG = 
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FB2 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
-
 1;
 
 
@@ -798,7 +742,6 @@ package App::Billing::Output::File::Batch::Claim::Record::NSF::FE0;
 
 #use strict;
 use Carp;
-use vars qw(@CHANGELOG);
 
 # for exporting NSF Constants
 use App::Billing::Universal;
@@ -890,11 +833,5 @@ my %nsfType = (NSF_HALLEY . "" =>
   
 }
 
-@CHANGELOG = 
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/31/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of FE0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
-);
 
 1;

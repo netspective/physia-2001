@@ -4,7 +4,6 @@ package App::Billing::Output::File::Batch::Claim::NSF;
 
 use strict;
 use Carp;
-use Devel::ChangeLog;
 
 
 
@@ -22,7 +21,6 @@ use App::Billing::Output::File::Batch::Claim::Header::NSF2;
 use App::Billing::Output::File::Batch::Claim::Header::NSF3;
 use App::Billing::Output::File::Batch::Claim::Trailer::NSF;
 
-use vars qw(@CHANGELOG);
 
 sub new
 {
@@ -463,14 +461,6 @@ sub numToStr
 }
 
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/13/2000', 'AUF',
-	'Billing Interface/Validating Output NSF',
-	'Checks to see no. of Procedures have been implemented in Output/File/Batch/Claim/NSF.pm, if no procedure exist then EXX and FXX records ' .
-	'will not be created']
-
-);
 
 
 1;

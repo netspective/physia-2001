@@ -8,11 +8,8 @@ use vars qw(@ISA);
 
 # this object is inherited from App::Billing::Output::Driver
 @ISA = qw(App::Billing::Output::Driver);
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 sub processClaims
-{	
+{
 	my ($self, %params) = @_;
 
 	my $claimsList = $params{claimList};
@@ -20,33 +17,33 @@ sub processClaims
 
 	my $file = $params{out};
 	$file = (($file eq "") ?  'claim.htm' : $file);
-	
+
 	$self->createHTML($file);
-	
-		
-}	
+
+
+}
 
 
 sub createHTML
 {
 	my ($self, $file) = @_;
-	
+
 	my $htmlText =  $self->generateHTML();
 	open(CLAIMFILE,">$file");
 	print CLAIMFILE $htmlText;
 	close CLAIMFILE;
-}	
+}
 
 
 sub generateHTML
 {
 	my $self = shift;
-	
+
 	my $html = $self->htmlHeader();
 	$html = $html . $self->htmlBody();
 	$html = $html . $self->htmlFooter();
-	
-	
+
+
 	return $html;
 
 }
@@ -55,7 +52,7 @@ sub generateHTML
 sub htmlHeader
 {
 	my $self = shift;
-	
+
 	return '<html>
 			<head>
 			<title>Test</title>
@@ -76,22 +73,22 @@ sub htmlHeader
 			td.e { padding: 5px }
 			</style>
 			</head>';
-			
+
 }
 
 
 sub htmlFooter
 {
 	my $self = shift;
-	
+
 	return '</html>';
-	
+
 }
 
 sub htmlBody
 {
 	my $self = shift;
-	
+
 	return '<body bgcolor ="lightBlue">
 <table border="0" cellspacing="0" bgcolor="BLACK" width ="770">
 <table border="0" cellspacing="0" width ="770">
@@ -638,14 +635,7 @@ sub htmlBody
 </body>';
 
 }
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/12/1999', 'SHM','Output Html','Box 14 - 23. added'],
-);
 
 
 
 1;
-	

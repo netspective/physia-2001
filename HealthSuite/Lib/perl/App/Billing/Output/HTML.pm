@@ -13,9 +13,6 @@ use constant VIEW => 2;
 
 # this object is inherited from App::Billing::Output::Driver
 @ISA = qw(App::Billing::Output::Driver);
-use Devel::ChangeLog;
-
-use vars qw(@CHANGELOG);
 
 sub processClaims
 {
@@ -120,16 +117,5 @@ sub reversePrimaryProcedure
 	}
 }
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'SSI','Billing Interface/Output HTML','Box 14 - 23. added'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI','Billing Interface/Output HTML','method box1 is added to generate the html for box 1'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/21/2000', 'SSI','Billing Interface/Output HTML','New HTML code is implemented'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/21/2000', 'SSI','Billing Interface/Output HTML','Big brakets fixed, spelling mistakes fixied, All six procedures will be implemented soon.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/24/2000', 'SSI','Billing Interface/Output HTML','New HTML code is implemented'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/31/2000', 'SSI','Billing Interface/Output HTML','EDIT => 1, VIEW => 2 constant are added to specify the type of file genereted.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/31/2000', 'SSI','Billing Interface/Output HTML','TEMPLATE_PATH parama field  added to specify the path of the template file.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/01/2000', 'SSI','Billing Interface/Output HTML','More than six procedure implemented.'],
-);
 
 1;

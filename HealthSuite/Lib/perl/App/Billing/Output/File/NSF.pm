@@ -161,7 +161,7 @@ sub makeBatches
 			 else
 			 {
 				# get the providerID from claim
-				#$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
+				#$providerID = $claims->[$claimValue]->{payToProvider}->getTaxId();
 				$providerID = $claims->[$claimValue]->getEMCId();
 				
 				$providerID =~ s/ //g;
@@ -182,7 +182,7 @@ sub makeBatches
 	  {
 			#  
 		# get the providerID from claim
-		$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
+		$providerID = $claims->[$claimValue]->{payToProvider}->getTaxId();
 		# add it in array without duplication
 		if ($self->checkForDuplicate($providerID) eq 0)
 		{
@@ -276,7 +276,7 @@ sub makeSelectedClaimsList
 				# get providerId from claim
 				 if ($self->{nsfType} == NSF_HALLEY)
 			     {
-					#$providerID = $claim->{payToProvider}->getFederalTaxId();
+					#$providerID = $claim->{payToProvider}->getTaxId();
 					$providerID = $claim->getEMCId();
 					
 					$providerID =~ s/ //g;
@@ -287,7 +287,7 @@ sub makeSelectedClaimsList
 				}
 				elsif($self->{nsfType} == NSF_ENVOY)
 				{
-					$providerID = $claim->{payToProvider}->getFederalTaxId();
+					$providerID = $claim->{payToProvider}->getTaxId();
 				}
 				elsif($self->{nsfType} == NSF_THIN)
 				{

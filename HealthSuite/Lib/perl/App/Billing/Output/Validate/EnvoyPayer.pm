@@ -11,7 +11,6 @@ use Devel::ChangeLog;
 use Benchmark;
 
 
-use vars qw(@CHANGELOG);
 @ISA = qw(App::Billing::Validator);
 
 use constant PAYERINFOIDX_NAME         => 0;
@@ -32,13 +31,13 @@ use constant CHECK_CHARACTERS => 60;
 	'95285' =>
 	[
 		'Admar',
-		sub 
+		sub
 		{
-			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);		
+			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my @numbers = (0..9);
 			my @selectiveNumbers = ('000000000','999999999','123456789');
 			my @spaces = (' ');
-			
+
 			# check for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@numbers);
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@selectiveNumbers);
@@ -51,7 +50,7 @@ use constant CHECK_CHARACTERS => 60;
 		'AdminaStarInc',
 		sub
 		{
-			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);			
+			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 	   		my @numbers = (0..9);
 			my @selectiveNumbers = ('000000000','999999999','123456789');
 	     	my @spaces = (' ');
@@ -59,39 +58,39 @@ use constant CHECK_CHARACTERS => 60;
 
 			# checks for Provider Blue Shield number
 			$self->checkLength(LESS,'','',$claim->{payToProvider}->getBlueShieldId(),7,$claim,'Provider Blue Shield Number');
-			$self->checkLength(GREATER,'','',$claim->{payToProvider}->getBlueShieldId(),12,$claim,'Provider Blue Shield Number');	
+			$self->checkLength(GREATER,'','',$claim->{payToProvider}->getBlueShieldId(),12,$claim,'Provider Blue Shield Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number',('A'..'Z'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','7',$claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,,'8','12',$claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number',('A'..'Z',' '));
 			#$self->checkValidValues(CONTAINS,'13','13',$claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number',(' '));
-	
-			# checks for Source of Payment Code	
+
+			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment',('H'));
-			
+
 			# check for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@numbers);
 			$self->checkValidValues(NOT_CONTAINS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@selectiveNumbers);
-			
+
 			# checks for Rendering Provider Tax ID
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id');
-			
+
 			# checks for Performing Provider ID
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',('A'..'Z',','));				
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',('A'..'Z',','));
 			if( not( $claim->{renderingProvider}->getProviderId() =~ /[',']/))
 			{
-				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 3000 ', 'Performing Provider must contains comman (,) ',$self->{claim});	
+				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 3000 ', 'Performing Provider must contains comman (,) ',$self->{claim});
 			}
 		}
 	],
-	
+
 	'60054' =>
 	[
 		'Aetna Life & Casualty',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
-			 # checks for Insured ID			
+
+			 # checks for Insured ID
 			 $self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,"Insured Id");
 			 $self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
 		}
@@ -102,16 +101,16 @@ use constant CHECK_CHARACTERS => 60;
 		'Alliance PPO Inc.',
 		sub
 		{
-			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);	
-			
+			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),3,$claim,'Rendering Provider Network Id');
 			$self->checkLength(GREATER,'','',$claim->{renderingProvider}->getNetworkId(),11,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
-				
-				
+
+
+
 		}
 	],
 
@@ -121,17 +120,17 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider ID Number
 			$self->isRequired($claim->{payToProvider}->getId,$claim,'Provider Id');
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),13,$claim,'Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),13,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-				
+
 		}
 	],
 
@@ -142,8 +141,8 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
-			
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
+
 			# check for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
@@ -157,13 +156,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),13,$claim,'Provider Id');
-			
+
 			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
-						
+
 		}
 	],
 
@@ -173,13 +172,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),13,$claim,'Provider Id');
-			
+
 			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
-		
+
 		}
 	],
 
@@ -191,21 +190,21 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my $i;
 			my $tempProcedures;
-			
+
 			# checks for Patient Birth Date
 			$self->isRequired($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for Patient Sex
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
-						
+
 			# checks for Patient Relation to Insured
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),$claim,'Patient Relationship to Insured',('99'));
-						
+
 			# checks for Insured ID Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',9);
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',12);
-			
+
 			if (length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 10)
 			{
 				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9,'N'));
@@ -216,15 +215,15 @@ use constant CHECK_CHARACTERS => 60;
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
-			}		
+			}
 			my $val = substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1);
-			
+
 			if ((length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 12) && ($val =~ m/[0..9]/))
 			{
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','12',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
-			}		
+			}
 			if ((length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 12) && ($val =~ m/[A..Z]/))
 			{
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','3',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
@@ -235,54 +234,54 @@ use constant CHECK_CHARACTERS => 60;
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9,'R'));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}
-						
+
 			# checks for Insured Last Name
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getLastName(),$claim,'Insured Last Name');
-			
+
 			# checks for Insured First Name
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getFirstName(),$claim,'Insured First Name');
-			
+
 			# checks for Insured Address-1
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->{address}->getAddress1(),$claim,'Insured Address-1');
 
 			# checks for Insured City
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->{address}->getCity(),$claim,'Insured City');
-			
+
 			# checks Insured State
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->{address}->getState(),$claim,'Insured State');
-			
+
 			# checks for Insured Zip Code
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->{address}->getZipCode(),$claim,'Insured ZipCode');
-			
+
 			# checks for Symptom Indicator
 			$self->isRequired($claim->getSymptomIndicator(),$claim,'Symptom Indicator');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSymptomIndicator(),$claim,'Symptom Indicator',('1','2'));
-						
+
 			# checks for Accident/Sysptom Date
 			$self->isRequired($claim->{treatment}->getDateOfIllnessInjuryPregnancy(),$claim,'Accident/Symptom Date');
 			$self->checkValidDate($claim->{treatment}->getDateOfIllnessInjuryPregnancy(),$claim,'Accident/Symptom Date');
-			
+
 			# checks for Admission Date-1
 			$self->isRequired($claim->{treatment}->getHospitilizationDateFrom,$claim,'Admission Date-1');
-						
+
 			# checks for Discharge Date-1
 			$self->isRequired($claim->{treatment}->getHospitilizationDateTo,$claim,'Discharge Date-1');
-			
+
 			# checks for Diagnosis Code 1
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{diagnosis}->[0]->getDiagnosis(),$claim,'Diagnosis 1',(0..9,'N'));
-			
+
 			# checks for Diagnosis Code 2
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{diagnosis}->[1]->getDiagnosis(),$claim,'Diagnosis 2',(0..9,'N'));
-			
+
 			# checks for Diagnosis Code 3
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{diagnosis}->[2]->getDiagnosis(),$claim,'Diagnosis 3',(0..9,'N'));
-			
+
 			# checks for Diagnosis Code 4
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{diagnosis}->[3]->getDiagnosis(),$claim,'Diagnosis 4',(0..9,'N'));
-			
+
 			# checks for Sequence Number
 				# not necessay because it depends upon no. of procedures which are only four
-			
+
 			# checks for Type of Service
 			$tempProcedures = $claim->{procedures};
 			if ($#$tempProcedures > -1)
@@ -291,8 +290,8 @@ use constant CHECK_CHARACTERS => 60;
 				{
 					$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{procedures}->[$i]->getTypeOfService(),$claim,'Type of Service',('B','F','I'));
 				}
-			}		
-			
+			}
+
 		}
 	],
 
@@ -304,45 +303,45 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my ($i,$modifier1, $modifier2);
 			my $tempProcedures;
-			
+
 			# checks for Patient Sex
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
-			
+
 			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
-				
+
 			# checks for Patient Relation to Insured
  			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
-							
+
 			# checks for Insured ID Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),12,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insurd Id',(0..9,'A'..'Z'));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('XE','XL'));
-			
+
 			if (substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1) eq 'R')
 			{
-				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'2','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));	
-			}	
-			
+				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'2','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			}
+
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-						
+
 			# checks for Rendering Provider Zip Code/Service Zip Code
 			$self->isRequired($claim->{renderingProvider}->getZipCode(),$claim,'Rendering Provider Zip Code');
-				
+
 			# checks for HCPCS procedure Code
 			$tempProcedures = $claim->{procedures};
-			
+
 			if ($#$tempProcedures > -1)
 			{
 				for $i (0..$#$tempProcedures)
 				{
 					$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{procedures}->[$i]->getCPT(),$claim,'HCPCS Procedure Code',('99070'));
-				}		
-			}		
-				
-			# checks for HCPCS modifier 
+				}
+			}
+
+			# checks for HCPCS modifier
 			$tempProcedures = $claim->{procedures};
 			if($#$tempProcedures > -1)
 			{
@@ -355,10 +354,10 @@ use constant CHECK_CHARACTERS => 60;
 						$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$modifier2,$claim,'Modifier 2',('20','30'));
 					}
 				}
-			 }		
-		
-			
-			 
+			 }
+
+
+
 		}
 	],
 
@@ -368,14 +367,14 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checsk for Patient Sex
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
-			
+
 			# Patient relation to Insured
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
 
-		
+
 		}
 	],
 
@@ -385,11 +384,11 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Blue Shield Number
 			$self->isRequired($claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number');
-				
-			
+
+
 			# checks for source of payment code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
 
@@ -402,16 +401,16 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# Rendering Provider Name Qulifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-						
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
+
 		}
 	],
 
@@ -422,13 +421,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# Rendering Provider Name Qulifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-						
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
 
@@ -444,17 +443,17 @@ use constant CHECK_CHARACTERS => 60;
 
 			# Rendering Provider Name Qulifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-						
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			if ($claim->getQualifier() eq 'L')
 			{
 				$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
 			}
 
-			
+
 		}
 	],
 
@@ -464,18 +463,18 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider ID Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Id');
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),$claim,'Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
-						
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),13,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-	
-	
+
+
 		}
 	],
 
@@ -485,15 +484,15 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
 
-			
+
 			# checks for Insured Id Number
 
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
-			
+
 
 		}
 	],
@@ -504,13 +503,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
-			
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
+
 			# checks for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
-	
+
 		}
 	],
 
@@ -520,7 +519,7 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');
 
@@ -546,65 +545,65 @@ use constant CHECK_CHARACTERS => 60;
 									'022222222','033333333','044444444',
 									'055555555','066666666','077777777',
 									'088888888','099999999');
-			
-			# checks for Group No.						
+
+			# checks for Group No.
 			 $self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,1,5,$claim->{insured}->[$claim->getClaimType()]->getPolicyGroupOrFECANo,$claim,'Policy Group or FECA No',@groupValues);
-			
+
 			# checks for Insured ID Number
 			 $self->checkValidValues(CONTAINS,CHECK_CHARACTERS,1,9,$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@numbers);
 			 #$self->checkValidValues(CONTAINS,10,17,$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@spaces);
 			 $self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@characters);
-			
+
 			# check for Insured Last Name
 			 $self->isRequired($claim->{insured}->[$claim->getClaimType()]->getLastName(),$claim,'Insured Last Name');
-			
+
 			# check for Insured First Name
 			 $self->isRequired($claim->{insured}->[$claim->getClaimType()]->getFirstName(),$claim,'Insured First Name');
-					
+
 			# check for Accident State
 			 $self->isRequired($claim->getConditionRelatedToAutoAccidentPlace,$claim,'Accident Place');
-					
+
 			# checks for Rendering Provider Tax ID
-			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id');				
+			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id',(0..9));
-			
+
 			# checks for Rendering Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
 			if (uc($claim->{treatment}->getOutsideLab()) eq 'Y')
 			{
 				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getQualifier(),$claim,'Rendering Provider Name Qualifier',('O'));
 			}
-			
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-				
-				
+
+
 			# Rendering Provider/Service Address,City,State,ZipCode
-			$self->isRequired($claim->{renderingProvider}->{address}->getAddress1(),$claim,'Rendering Provider Address1');	
+			$self->isRequired($claim->{renderingProvider}->{address}->getAddress1(),$claim,'Rendering Provider Address1');
 			$self->isRequired($claim->{renderingProvider}->{address}->getCity(),$claim,'Rendering Provider City');
 			$self->isRequired($claim->{renderingProvider}->{address}->getState(),$claim,'Rendering Provider State');
 			$self->isRequired($claim->{renderingProvider}->{address}->getZipCode(),$claim,'Rendering Provider ZipCode');
-			
-			
+
+
 			# checks for Service From Date
 			if($#$procedures > -1)
 			{
 				 for $i (0..$#$procedures)
 				 {
-				 	$self->checkDate(LESS,$claim->{procedures}->[$i]->getDateOfServiceFrom(),$claim,'Service Date From'); 		
-				 }		
-			
+				 	$self->checkDate(LESS,$claim->{procedures}->[$i]->getDateOfServiceFrom(),$claim,'Service Date From');
+				 }
+
 			# checks for Service To Date
 				for $i (0..$#$procedures)
 				 {
 				 	@serviceMonth = (substr($claim->{procedures}->[$i]->getDateOfServiceFrom(),4,2));
 				 	$self->checkDate(LESS,$claim->{procedures}->[$i]->getDateOfServiceTo(),$claim,'Service Date To');
 				 	$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,5,6,$claim->{procedures}->[$i]->getDateOfServiceTo(), $claim, 'Service Date To', @serviceMonth);
-				 }	
- 			 	 
+				 }
+
 			# checks for HCPCS Procedure Code
 				for $i (0..$#$procedures)
 				{
@@ -618,9 +617,9 @@ use constant CHECK_CHARACTERS => 60;
   			}
 			# checks for Anesthesia/Oxygen Minutes
 			$self->isRequired($claim->getAnesthesiaOxygenMinutes(),$claim,'Anesthesia/Oxygen Minutes');
-						
-		}		
-			
+
+		}
+
 	],
 
 	'34172' =>
@@ -629,13 +628,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-				
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
 		}
@@ -648,11 +647,11 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 
-			# checks for Insured Id number			
+			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
-	
-			
+
+
 		}
 	],
 
@@ -662,32 +661,32 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');			
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
-			
+
 			# checks for Refering provider network id
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getNetworkId(),5,$claim,'Referring Provider Network Id');
 			$self->checkLength(GREATER,'','',$claim->{payToProvider}->getNetworkId(),7,$claim,'Referring Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getNetworkId(),$claim,'Referring Provider Network Id',(0..9,'A'..'Z'));
-									
+
 			# checks for Consult/Surgery Date
 				# not available
-			
+
 			# checks for Rendering Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-				
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
-					
+
+
 		}
 	],
-	
+
 	'04284' =>
 	[
 		'Consolidated Group Claims',
@@ -722,13 +721,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-				
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
 		}
@@ -740,34 +739,34 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
-			# checks for Provider ID 
+
+			# checks for Provider ID
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Id');
 			$self->checkLength(LESS,$claim->{payToProvider}->getId(),6,$claim,'Provider Id');
 			$self->checkLength(GREATER,$claim->{payToProvider}->getId(),7,$claim,'Provider Id');
 			if (length($claim->{payToProvider}->getId()) == 6)
 			{
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','6',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
-			}		
+			}
 			if (length($claim->{payToProvider}->getId()) == 7)
 			{
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','4',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'5','5',$claim->{payToProvider}->getId(),$claim,'Provider Id',('.'));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'6','7',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
 			}
-			
+
 			# checks for Insured ID
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number');
-			
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
-			
+
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
+
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
-	
+
 			### checking for only Social Security Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
-					
+
 		}
 	],
 
@@ -777,41 +776,41 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
+
 			# checks for Rendering Qualification Degree
 			$self->isRequired($claim->{renderingProvider}->getQualification(),$claim,'Rendering Qualification Degree');
-			
-			
+
+
 		}
 	],
-	
+
 	'39026' =>
 	[
 		'Employers Insurance of Wausau',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-				
+
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
+
 			# Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,' '));	
-			
-			
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,' '));
+
+
 		}
 	],
 
@@ -828,19 +827,19 @@ use constant CHECK_CHARACTERS => 60;
 									'022222222','033333333','044444444',
 									'055555555','066666666','077777777',
 									'088888888','099999999');
-			my @modifierValues = ('P1','P2','P3','P4','P5','P6','22','23','32','51');						
+			my @modifierValues = ('P1','P2','P3','P4','P5','P6','22','23','32','51');
 			my ($i,$modifier1, $modifier2);
-			my $procedures = $claim->{procedures};								
-			
+			my $procedures = $claim->{procedures};
+
 			# checks for Group Number
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','5',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',@groupNumbers);
-			
+
 			# checks for Insured ID Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@insuredIdNumbers);
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
-			
+
 			# checks for Insured Last Name
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getLastName(),$claim,'Insured Last Name');
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getFirstName(),$claim,'Insured First Name');
@@ -848,17 +847,17 @@ use constant CHECK_CHARACTERS => 60;
 			{
 				$self->isRequired($claim->getConditionRelatedToAutoAccident(),$claim,'Accident State');
 			}
-			
+
 			# checks for Rendering Provider Tax Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id');
 			if ($claim->{treatment}->getOutsideLab() eq 'Y')
 			{
 				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id',('O'));
-			}		
+			}
 
-				
+
 			# checks for Rendering Provider Qualifier
-			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');	
+			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
 				if (uc($claim->{treatment}->getOutsideLab()) eq 'Y')
 			{
 				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getQualifier(),$claim,'Rendering Provider Name Qualifier',('O'));
@@ -866,38 +865,38 @@ use constant CHECK_CHARACTERS => 60;
 
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
+
 			# Rendering Provider Address1
 			$self->isRequired($claim->{renderingProvider}->{address}->getAddress1(),$claim,'Rendering Provider Address 1');
-			
+
 			# Rendering Provider City
 			$self->isRequired($claim->{renderingProvider}->{address}->getCity(),$claim,'Rendering Provider City');
-			
+
 			# Rendering Provider State
 			$self->isRequired($claim->{renderingProvider}->{address}->getState(),$claim,'Rendering Provider State');
 
 			# Rendering Provider State
 			$self->isRequired($claim->{renderingProvider}->{address}->getZipCode(),$claim,'Rendering Provider ZipCode');
-			
+
 			# checks for Service From Date
 			if ($#$procedures > -1)
 			{
 				for $i (0..$#$procedures)
 				{
-					$self->checkDate(GREATER,$claim->{procedures}->[$i]->getDateOfServiceFrom(),$claim,'Service Date From'); 					
+					$self->checkDate(GREATER,$claim->{procedures}->[$i]->getDateOfServiceFrom(),$claim,'Service Date From');
 				}
 				# checks for Service To Date
 				for $i (0..$#$procedures)
 				{
-					$self->checkDate(GREATER,$claim->{procedures}->[$i]->getDateOfServiceTo(),$claim,'Service Date To'); 					
+					$self->checkDate(GREATER,$claim->{procedures}->[$i]->getDateOfServiceTo(),$claim,'Service Date To');
 				}
-			
+
 				# checks for HCPCS Procedure Code
 					# not necessary to implement
-				
+
 				# checks for HCPCS Modifiers
 				for $i (0..$#$procedures)
 				{
@@ -910,12 +909,12 @@ use constant CHECK_CHARACTERS => 60;
 							$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$modifier2,$claim,'Modifier 2',@modifierValues);
 						}
 					}
-				}	
+				}
 			}
-			
+
 			# checks for Anesthesia/Oxygen Minutes
 			$self->isRequired($claim->getAnesthesiaOxygenMinutes(),$claim,'Anesthesia/Oxygen Minutes');
-			
+
 		}
 	],
 
@@ -925,17 +924,17 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
-			
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
-			
+
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
+
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 
-			
+
 		}
 	],
 
@@ -945,11 +944,11 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-	
+
 			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
-					
+
 		}
 	],
 
@@ -959,27 +958,27 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-	
+
 			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(' '));
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
-			
+
 			# checks for Rendering Provider Qualifier
-			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');	
+			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
 
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
-			
-		
+
+
+
 		}
 	],
-	
+
 	'25169' =>
 	[
 		'Gateway Health Plan',
@@ -991,23 +990,23 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Id');
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),7,$claim,'Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
-						
+
 			# checks for Insured ID Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),6,$claim,'Insured ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
 		}
 	],
-	
+
 	'63665' =>
 	[
 		'General American Life Insurance',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for HCPCS Procedure Code
 				# no need to implement
-			
+
 		}
 	],
 
@@ -1017,28 +1016,28 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
-			# check for Group Number			
+
+			# check for Group Number
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',('PSI'));
-			
+
 		}
 	],
-	
+
 	'91051' =>
 	[
 		'Group Health Cooperative of Puget Sound (WA)',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# check for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Id');
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
-			
+
 		}
 	],
 
@@ -1048,23 +1047,23 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),7,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9));
-			
-			
+
+
 		}
 	],
-	
+
 	'64246' =>
 	[
 		'Guardian Life Insurance',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
@@ -1083,15 +1082,15 @@ use constant CHECK_CHARACTERS => 60;
 			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRquired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(GREATER,'','',$claim->{renderingProvider}->getNetworkId(),7,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9));
-				
+
 		}
 	],
-	
+
 	'04245' =>
 	[
 		'Harvard Community',
@@ -1114,19 +1113,19 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured ID Number
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('0'));
 			$self->checkAlpha(NOT_ALL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
 			$self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),7,$claim,"Insured Id");
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),14,$claim,"Insured Id");
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkAlpha(NOT_ALL,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',('0'));
-		
+
 		}
 	],
 
@@ -1136,12 +1135,12 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->checkLength(LESS,'','',$claim->{payToProvider}->getId(),6,$claim,'Provider Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Number',(0..9,'A'..'Z'));
 		}
-		
+
 	],
 
 	'31081' =>
@@ -1150,11 +1149,11 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-	
-			
+
+
 			# checks for Patient Sex
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('M','F'));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 		}
@@ -1184,7 +1183,7 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# check for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
 			$self->checkLength(LESS,'','',$claim->{payToProvider}->getId(),3,$claim,'Provider Number');
@@ -1234,18 +1233,18 @@ use constant CHECK_CHARACTERS => 60;
 			{
 				push(@codeValidValues,'X'.numToStr(4,0,$i));
 			}
-			
+
 			push(@codeValidValues,'05815');
 			push(@codeValidValues,'09947');
 			push(@codeValidValues,'90089');
 			push(@codeValidValues,'97789');
 			push(@codeValidValues,'99079');
-			
+
 			# checks for HCPCS Procedure Code
 			if ($i > -1)
 			{
 				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{procedures}->[$i]->getCPT(),$claim,'HCPCS Procedure Code',@codeValidValues);
-			}		
+			}
 		}
 	],
 
@@ -1256,17 +1255,17 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Qualifier
-			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');	
+			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
 
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-						
+
 			# Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
 
-			
+
 		}
 	],
 
@@ -1277,22 +1276,22 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my $procedures = $claim->{procedures};
-			
+
 			# checks for Provider Blue Shield Number
 			$self->isRequired($claim->{payToProvider}->getBlueShieldId(),$claim,'Provider Blue Shield Number');
-			
-			
+
+
 			# checks for Other insurance indicator
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getAnotherHealthBenefitPlan(),$claim,'Other Insurance Indicator');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),6,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9));
-			 
+
 			# checks for Sequence Number
 			 	# not necessary
-			
+
 			# checks for Service To Date
 			my $i;
 			if($#$procedures > -1)
@@ -1301,10 +1300,10 @@ use constant CHECK_CHARACTERS => 60;
 				{
 					if ($claim->{procedures}->[$i]->getDateOfServiceTo() ne '')
 					{
-						$self->isRequired($claim->{procedures}->[$i]->getDateOfServiceTo(),$claim,'Service Date From'); 					
-					}		
-				}  
-			}		
+						$self->isRequired($claim->{procedures}->[$i]->getDateOfServiceTo(),$claim,'Service Date From');
+					}
+				}
+			}
 		}
 	],
 
@@ -1314,13 +1313,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),5,$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),11,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-				
+
 		}
 	],
 
@@ -1330,13 +1329,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-			
+
 		}
 	],
 
@@ -1346,10 +1345,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
@@ -1362,13 +1361,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 
 		}
 	],
-	
+
 	'61127' =>
 	[
 		'Healthsource Kentucky',
@@ -1380,7 +1379,7 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
 	],
-	
+
 	'02039' =>
 	[
 		'Healthsource New Hampshire(Medicare)',
@@ -1389,7 +1388,7 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
@@ -1413,10 +1412,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
@@ -1430,12 +1429,12 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
 	],
-	
+
 	'31141' =>
 	[
 		'Healthsource Ohio',
@@ -1473,10 +1472,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
@@ -1488,17 +1487,17 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),13,$claim,'Provider Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Number',(0..9,'A'..'Z'));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),13,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
+
 		}
 	],
 
@@ -1508,14 +1507,14 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for HCPCS procedure code
 				# no need to check
-			
+
 			# checks for Performing Provider Id
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 
-			
+
 		}
 	],
 
@@ -1525,10 +1524,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 		}
@@ -1540,13 +1539,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Qualifier
-			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');	
+			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
 
 			# Rendering Provider Organization/Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
-			
+
 		}
 	],
 
@@ -1555,8 +1554,8 @@ use constant CHECK_CHARACTERS => 60;
 		'Jardine Group Services',
 		sub
 		{
-			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);			
-			
+			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
+
 			# checks for Patient Date of Birth
 			$self->isRequired($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date');
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date');
@@ -1569,7 +1568,7 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
@@ -1585,49 +1584,49 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my $procedures = $claim->{procedures};
-			
-			
+
+
 			# checks for Insured Id number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','7',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'8','8',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('A'..'Z'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('A'..'Z',0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
-			
+
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),6,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
+
 			# checks for Refering Provider ID Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Referring Provider Id');
 			$self->checkLength(GREATER,'','',$claim->{payToProvider}->getId(),6,$claim,'Referring Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Referring Provider Id',(0..9,'A'..'Z'));
-			
-			
+
+
 			# checks for Refering Provider ID Indicator
 			$self->isRequired($claim->{payToProvider}->getIdIndicator(),$claim,'Rendering Provider ID Indicator');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getIdIndicator(),$claim,'Rendering Provider ID Indicator',('U'));
-			
+
 			# checks for Refering Provider Last Name
 			my $i;
 			if($#$procedures > -1)
 			{
 				for $i (0..$#$procedures)
 				{
-					if (($claim->{procedures}->[$i]->getPlaceOfService() != 11) && 
-						 (($claim->{procedures}->[$i]->getTypeOfService() == 4) 
+					if (($claim->{procedures}->[$i]->getPlaceOfService() != 11) &&
+						 (($claim->{procedures}->[$i]->getTypeOfService() == 4)
 												|| ($claim->{procedures}->[$i]->getTypeOfService() == 5)))
-					{							
+					{
 						$self->isRequired($claim->{treatment}->getRefProviderLastName(),$claim,'Referring Provider ID Indicator');
 						$self->isRequired($claim->{treatment}->getRefProviderFirstName(),$claim,'Referring Provider ID Indicator');
-					}		
+					}
 				}
-			}		
-								
+			}
+
 		}
 	],
-	
+
 	'37124' =>
 	[
 		'Kepple & Company',
@@ -1639,8 +1638,8 @@ use constant CHECK_CHARACTERS => 60;
 									 '10300','10300','10301','10302','10301',
 									 '10330','10350','10600','30001','50001',
  									 '70001','80010','80021','90001');
-									 
-			
+
+
 			# checks for Group Number
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',@validGroupNumbers);
 
@@ -1653,39 +1652,39 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider ID Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Referring Provider Id');
 			$self->checkLength(EQUAL,$claim->{payToProvider}->getId(),13,$claim,'Referring Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Referring Provider Id',(0..9,'A'..'Z'));
-						
+
 			# checks for Rendering Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),13,$claim,'Rendering Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
-		
+
+
 		}
 	],
-	
+
 	'02030' =>
 	[
 		'Mathew Thornton Health Plan',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('9'));
-			
-			
+
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),2,$claim,'Rendering Network Id');
 			$self->checkLength(GREATER,'','',$claim->{renderingProvider}->getNetworkId(),7,$claim,'Rendering Network Id');
 
-					
+
 		}
 	],
 
@@ -1696,23 +1695,23 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
-			
+
 		}
 	],
-	
+
 	'87726' =>
 	[
 		'Medicare Part B: Travelers Insurance',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('C'));
-				
+
 		}
 	],
 
@@ -1722,12 +1721,12 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),5,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
-			
+
 		}
 	],
 
@@ -1737,28 +1736,28 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
-			
-			
+
+
 		}
 	],
-	
+
 	'71412' =>
 	[
 		'Mutual of Omaha',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id number
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','6',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('999999'));
-			
+
 		}
 	],
 
@@ -1768,21 +1767,21 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Group Number
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',('PSI'));
-			
+
 
 		}
 	],
-	
+
 	'66915' =>
 	[
 		'New York Life Insurance Co.',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Group Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',(0..9,'A'..'Z'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','4',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',(0..9));
@@ -1799,14 +1798,14 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Patient Sex
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('M','F'));
-			
+
 			# checks for Insured Id
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
-			
-						
+
+
 		}
 	],
 
@@ -1817,10 +1816,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
@@ -1833,15 +1832,15 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
@@ -1859,16 +1858,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66919' =>
 	[
 		'NYLCare Health Plan',
@@ -1880,16 +1879,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66920' =>
 	[
 		'NYLCare Health Plan',
@@ -1901,16 +1900,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66921' =>
 	[
 		'NYLCare Health Plan',
@@ -1922,16 +1921,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66922' =>
 	[
 		'NYLCare Health Plan',
@@ -1943,10 +1942,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
@@ -1964,16 +1963,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66924' =>
 	[
 		'NYLCare Health Plan',
@@ -1985,16 +1984,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'66925' =>
 	[
 		'NYLCare Health Plan',
@@ -2006,10 +2005,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
@@ -2027,16 +2026,16 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'91166' =>
 	[
 		'NYLCare Health Plan',
@@ -2048,56 +2047,56 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getProviderId(),9,$claim,'Performing Provider ID');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID',(0..9,' '));
-				
+
 			# checks for Rendering Provider Name Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Organization Last Name');
 
 		}
 	],
-	
+
 	'95356' =>
 	[
 		'Oaktree Health Plan of Pennsylvania, Inc.',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),9,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9));
-			
-				
-			
+
+
+
 		}
 	],
-	
+
 	'52151' =>
 	[
 		'Optimum Choice Inc. of Pennsylvania',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),3,$claim,'Rendering Provider Network Id');
 			$self->checkLength(GREATER,'','',$claim->{renderingProvider}->getNetworkId(),11,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
-		}	
+
+		}
 	],
-	
+
 	'52152' =>
 	[
 		'Optimum Choice of Carolinas Inc.',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),3,$claim,'Rendering Provider Network Id');
@@ -2105,176 +2104,176 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
 		}
 	],
-	
-	
+
+
 	'06111' =>
 	[
 		'Oxford Health Plans',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');			
-			
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
+
 			# checks for Rendering Provider Tax Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax id');
-			
+
 			# checks for Rendering Provider Last Name
 			$self->isRequired($claim->{renderingProvider}->getLastName(),$claim,'Rendering Provider Last Name');
-			
+
 			# checks for Rendering Provider First Name
 			$self->isRequired($claim->{renderingProvider}->getFirstName(),$claim,'Rendering Provider First Name');
-			
+
 		}
 	],
-	
+
 	'95959' =>
 	[
 		'Pacificare',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9));
-			
+
 		}
 	],
-	
+
 	'61129' =>
 	[
 		'Passport Health Plan',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Id Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Referring Provider Id');
 			$self->checkLength(EQUAL,$claim->{payToProvider}->getId(),13,$claim,'Referring Provider Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Referring Provider Id',(0..9,'A'..'Z'));
-						
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-			
+
 		}
 	],
-	
+
 	'65018' =>
 	[
 		'PCA Health Plans of Florida',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),10,$claim,'Insured Id Number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9,' '));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(' '));
-			
+
 			# checks for Rendering Provider Network Id
 			my @medicareProviderId = $claim->{renderingProvider}->getMedicareId();
-			
+
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',@medicareProviderId);
-			
+
 
 			# checks for Diagnosis Code Pointer 1
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$self->getDiagnosisPtr($claim->{diagnosis}->[0]->getDiagnosis()),$claim,'Diagnosis Code Pointer 1',('0','5'));
-					
+
 			# checks for Performing Provider id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-	
+
 		}
 	],
-	
+
 	'62153' =>
 	[
 		'Phoenix Healthcare of Tennessee',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Patient Status
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getState(),$claim,'Patient State',('TN','MS'));
-			
+
 			# checks for Insured State
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getState(),$claim,'Patient State',('TN','MS'));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-			
-			
+
+
 		}
 	],
-	
+
 	'67814' =>
 	[
 		'Phoenix Home Life',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Group Number
 			$self->checkLength(LESS,'','',$claim->{insured}->getPolicyGroupOrFECANo(),6,$claim,'Group Number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->getPolicyGroupOrFECANo(),9,$claim,'Group Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',(0..9));
-						
+
 			# checks for Insured ID number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 
-						
+
 		}
 	],
-	
+
 	'06108' =>
 	[
 		'Physicians Health Services',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured ID number
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',	$claim->{renderingProvider}->getNetworkId(),6,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9,'A'..'Z'));
-			
+
 		}
 	],
-	
-	
+
+
 	'16105' =>
 	[
 		'Prepaid Health Plans',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
 
-						
+
 			# checks for Insured ID Number
 			my @insuredValue = $claim->payerId();
-			
+
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','5',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@insuredValue);
-								
-			
+
+
 		}
 	],
-	
-	
+
+
 	'68241' =>
 	[
 		'Prudential (The)',
@@ -2282,34 +2281,34 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my @values = ('AARP','A.A.R.P.','A A R P');
-			
+
 			# check for Payer Name
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payer}->getName(),$claim,'Program Name', @values);
-			
+
 			# check for Group Name
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getInsurancePlanOrProgramName(),$claim,'Program Name', @values);
 		}
 	],
-	
+
 	'22300' =>
 	[
 		'Qual-Med',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
 
@@ -2319,19 +2318,19 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
 
@@ -2341,108 +2340,108 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
-	
-	
+
+
 	'22330' =>
 	[
 		'Qual-Med',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
-	
+
 	'22340' =>
 	[
 		'Qual-Med',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
-	
+
 	'22350' =>
 	[
 		'Qual-Med',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
-	
+
 	'22360' =>
 	[
 		'Qual-Med',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
 
@@ -2452,19 +2451,19 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for patient birth date
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
-			
+
 			# checks for  Insured Id number
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
-			
+
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
-			
+
 		}
 	],
 
@@ -2475,12 +2474,12 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 
-			
+
 		}
 	],
 
@@ -2490,16 +2489,16 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
 			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
-			
+
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(LESS,'','',$claim->{renderingProvider}->getNetworkId(),2,$claim,'Rendering Provider Network Id');
-			
+
 		}
 	],
 
@@ -2509,7 +2508,7 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-				
+
 			# checks for Insured Id Number
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
@@ -2518,14 +2517,14 @@ use constant CHECK_CHARACTERS => 60;
 
 		}
 	],
-	
+
 	'87726' =>
 	[
 		'Travelers Insurance Co.',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# Insured ID Number
 			if ($claim->getSourceOfPayment() eq 'F')
 			{
@@ -2538,7 +2537,7 @@ use constant CHECK_CHARACTERS => 60;
 				# no need to check
 		}
 	],
-	
+
 	'23222' =>
 	[
 		'U.S. Healthcare',
@@ -2547,16 +2546,16 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my $i;
 			my $procedures = $claim->{procedures};
-			
+
 			# checks for Accident/Symptom Date
 			$self->isRquired($claim->{treatment}->getDateOfIllnessInjuryPregnancy(),$claim,'Accident/Symptom Date');
-						
+
 			# checks for Admission Date-1
 			$self->isRequired($claim->{treatment}->getHospitilizationDateFrom,$claim,'Admission Date-1');
-			
+
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
-												
+
 			# checks for Place of Service
 			if($#$procedures > -1)
 			{
@@ -2564,28 +2563,28 @@ use constant CHECK_CHARACTERS => 60;
 				{
 					$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{procedures}->[$i]->getPlaceOfService(),$claim,'Place of Service',('26'));
 				}
-			
-			
+
+
 				# checks for Line Charges
-					
-			
+
+
 				# checks for Total Claim Charges
-			
+
 				# checks for Remarks
 				for $i(0..$#$procedures)
 				{
 					if ($claim->{procedures}->[$i]->getCPT() =~ m/[99070,99071,92393]/)
 					{
-						$self->isRequired($claim->getRemarks(),$claim,'Remarks');	
+						$self->isRequired($claim->getRemarks(),$claim,'Remarks');
 					}
 				}
-					
-			}	
-			
+
+			}
+
 			# checks for Batch Total Charges
-			
+
 			# checks for File Total Charges
-						
+
 		}
 	],
 
@@ -2595,13 +2594,13 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for insured id Number
 			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->getSsn,$claim,'Insured id',(0..9));
-			
-			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
-			
+
+			my @federalTaxId = ($claim->{payToProvider}->getTaxId());
+
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 
@@ -2609,25 +2608,25 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),7,$claim,'Rendering Provider Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',(0..9));
-			
-						 
+
+
 		}
 	],
-	
+
 	'80314' =>
 	[
 		'Unicare Major Accounts',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
-			
-			
+
+
 		}
 	],
-	
+
 	'47195' =>
 	[
 		'Unicare of Texas',
@@ -2635,18 +2634,18 @@ use constant CHECK_CHARACTERS => 60;
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			my $procedures = $claim->{procedures};
-			
-			
+
+
 			# checks for Patient Sex
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('U'));
-			
+
 			# checks for Source of Payment Code
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment Code',('G'));
-	
-			
+
+
 			# checks for Patient Relation to Insured
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->getRelationshipToPatient(),('99'));
-			
+
 			# checks for Insured ID Number
 			if (substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1) eq 'X')
 			{
@@ -2655,7 +2654,7 @@ use constant CHECK_CHARACTERS => 60;
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'4','12',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'13','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			}
-			
+
 			# checks for HCPCS procedure code
 			my $i;
 			if ($#$procedures > -1)
@@ -2663,63 +2662,63 @@ use constant CHECK_CHARACTERS => 60;
 				for $i (0..$#$procedures)
 				{
 					$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{procedures}->[$i]->getCPT(),$claim,'HCPCS Procedure Code',('99070'));
-				}		
+				}
 			}
-		
+
 		}
 	],
-	
+
 	'59129' =>
 	[
 		'United Healthcare of Florida',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),10,$claim,'Insured Id Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 
 		}
 	],
-	
+
 	'74095' =>
 	[
 		'USAA',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
-			# checks for Prior Authorization Number			
+
+			# checks for Prior Authorization Number
 			$self->isRequired($claim->{treatment}->getPriorAuthorizationNo(),$claim,'Prior Authorization Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{treatment}->getPriorAuthorizationNo(),$claim,'Prior Authorization Number',(0..9));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','10',$claim->{treatment}->getPriorAuthorizationNo(),$claim,'Prior Authorization Number',('-'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','13',$claim->{treatment}->getPriorAuthorizationNo(),$claim,'Prior Authorization Number',(0..9));
-			
+
 			# checks for Accident Indicator
 			$self->isRequired($claim->getConditionRelatedToOtherAccident(),$claim,'Accident Indicator');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getConditionRelatedToOtherAccident(),$claim,'Accident Indicator',('A'));
-			
-			
+
+
 		}
 	],
-	
+
 	'36369' =>
 	[
 		'Utilimited',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			#checks for Group Number
 			$self->isRequired($claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number');
 			$self->checkLength(EQUAL,'','',$claim->{insured}->getPolicyGroupOrFECANo(),4,$claim,'Group Number');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',('U'));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id',('S'));
-			
+
 		}
 	],
 
@@ -2729,10 +2728,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
-				
+
 		}
 	],
 
@@ -2742,10 +2741,10 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Speciality
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getSpecialityId(),$claim,'Provider Speciality',('035'));
-			
+
 		}
 	],
 
@@ -2755,7 +2754,7 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Provider Number
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Number');
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getId(),6,$claim,'Provider Number');
@@ -2763,27 +2762,27 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkLength(CONTAINS,'2','2',$claim->{payToProvider}->getId(),$claim,'Provider Number',(0..9,'A'..'Z'));
 			$self->checkLength(CONTAINS,'3','6',$claim->{payToProvider}->getId(),$claim,'Provider Number',(0..9));
 
-						
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
 			$self->checkLength(EQUAL,'','',$claim->{renderingProvider}->getNetworkId(),6,$claim,'Rendering Network Id');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id',('A'..'Z'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','2',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id',(0..9,'A'..'Z'));
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'3','6',$claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id',(0..9));
-			
+
 		}
 	],
-	
+
 	'14164' =>
 	[
 		'Wellcare',
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
-			
+
 			# checks for Insured Id Number
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',('A'..'Z'));
-			
+
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
 
@@ -2791,7 +2790,7 @@ use constant CHECK_CHARACTERS => 60;
 	]
 
 );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
 sub validate
 {
 	my ($self,$valMgr,$callSeq,$vFlags,$claim) = @_;
@@ -2800,10 +2799,10 @@ sub validate
 
 	$self->{claim} = $claim;
     $self->{valMgr} = $valMgr;
-	 
+
 #	 my $t0 = new Benchmark;
-	 
-    
+
+
     if ($claim->getPayerId() =~ m/^VN/)
     {
     	$payerId = 'VN';
@@ -2812,18 +2811,18 @@ sub validate
     {
     	$payerId = $claim->getPayerId();
     }
-    
-    
+
+
 	if(my $payerInfo = $PAYERSMAP{$payerId})
 	{
 		$result = &{$payerInfo->[PAYERINFOIDX_VALIDATEFUNC]}($self,$valMgr,$callSeq,$vFlags,$claim);
 	}
-	
+
 #	 my $t1 = new Benchmark;
 #     my $td = timediff($t1, $t0);
 #	print  "Envoy NSF took:",timestr($td),"\n";
 
-	
+
 	return	$result;
 }
 
@@ -2851,68 +2850,6 @@ sub getCallSequences
 }
 
 
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'All the dates are now interperated from DD-MON-YY to CCYYMMDD by using a function ' .
-    'changeDateToCCYYMMDD in EnvoyPayer module\'s ' .
-    ' Blue Cross/Blue Shield of New Jersey, ' .
-    ' CIGNA, ' .
-    ' Equicor, ' .
-    ' Healthcare Interchange ' . 
-    ' Jardine Group Services ' .
-    ' Qual-Med ' .
-	' U.S. Healthcare ' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'All Codes of Gender are now interprated from 0,1,2 to U,M,F in '.
-    'Blue Cross/Blue Shield of New Jersey, ' .
-	'Blue Cross of California, ' .
-	'Blue Cross of California: Encounters, ' . 
-	'Health First, ' .
-	'North American Medical Management, ' .
-	'Unicare of Texas' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'All the above changes in Codes of Gender and use of changeDateToCCYYMMDD for date formats have been removed from '.
-    'Blue Cross/Blue Shield of New Jersey, ' .
-	'Blue Cross of California, ' .
-	'Blue Cross of California: Encounters, ' . 
-	'Health First, ' .
-	'North American Medical Management, ' .
-	'Unicare of Texas and now formated data will be provided by Claim object' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/01/2000', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'Function getDiagnosisPtr is being called in payer PCA Health Plans of Florida to get diagnosis pointer'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/13/2000', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'Checks to see no. of Procedures have been implemented in payers '.
-	'Blue Cross/Blue Shield of New Jersey ' .
-	'Blue Cross of California '.
-	'CIGNA ' . 
-	'Equicor ' . 
-	'Healthcare Interchange, Inc ' .
-	'John Deere Healthcare ' .
-	'U.S. Healthcare ' . 
-	'Unicare of Texas ' .
-	', if no procedure exist then all procedures checks will be skipped'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/12/2000', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'A new parmeter has been added in checkValidValues method and its value could be either CHECK_EXACT_VALUES or CHECK_CHARACTERS'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/03/2000', 'AUF',
-	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'Function getRelationshiptoInsured of Patient object has been replaced with getRelationshipToPatient of Insured object ']
-
-
-
-
-);
 
 
 1;

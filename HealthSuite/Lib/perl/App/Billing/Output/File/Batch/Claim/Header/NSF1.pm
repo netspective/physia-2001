@@ -4,19 +4,17 @@ package App::Billing::Output::File::Batch::Claim::Header::NSF1;
 
 use strict;
 use Carp;
-use Devel::ChangeLog;
 
 # for exporting NSF Constants
 use App::Billing::Universal;
 
 
 
-use vars qw(@CHANGELOG);
 
 sub new
 {
 	my ($type,%params) = @_;
-	
+
 	return \%params,$type;
 }
 
@@ -24,12 +22,12 @@ sub new
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 	$temp1[0]=substr($temp1[0],0,$len);
 	$temp1[1]=substr($temp1[1],0,$lenDec);
-	
+
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 sub recordType
@@ -45,7 +43,7 @@ sub formatData
 	my $zeros = "0";
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
 	my $refClaimCareReceiverAddress = $refClaimCareReceiver->{address};
-		
+
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%-20s%-10s%-2s%1s%-3s%-8s%1s%1s%-18s%-12s%-30s%-15s%-5s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-13s%-2s%-6s%-4s%-4s%-2s%-1s%-1s%-8s%-2s%-1s%-1s%-1s%-2s%-2s%-8s%-3s%-1s%-8s%-1s%-1s%-1s%-1s%-1s%-1s%-2s%-4s%-1s%-25s",
 	$self->recordType(),
@@ -53,7 +51,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimCareReceiver->getAccountNo(), 0, 17), # patient control number
 	substr($refClaimCareReceiver->getLastName(), 0, 20),  # patient last name
 	substr($refClaimCareReceiver->getFirstName(), 0, 10), # patient first name
-	$spaces, 
+	$spaces,
 	substr($refClaimCareReceiver->getMiddleInitial(), 0, 1), # patient middle initial
 	$spaces, # patient generation
 	substr($refClaimCareReceiver->getDateOfBirth(), 0, 8), # patient date of birth
@@ -75,9 +73,9 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	'F',  # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	$spaces,  # Provider Number Filler 02 spaces
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
@@ -134,14 +132,14 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	$spaces,  # claim editing indicator
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces,  # filler national
 	),
-	NSF_ENVOY . "" =>	
+	NSF_ENVOY . "" =>
 	sprintf("%-3s%1s%1s%-17s%-20s%-10s%-2s%1s%-3s%-8s%1s%1s%-18s%-12s%-30s%-15s%-5s%-2s%-9s%-10s%1s%1s%1s%1s%-8s%1s%1s%-2s%1s%-9s%-17s%-13s%-2s%-6s%-20s%-43s%-14s%-10s",
 	$self->recordType(),
 	$spaces, # *** As suggested by Envoy *** # substr(($inpClaim->getSourceOfPayment() eq 'F' ? $spaces : 'B'),0,1), # TPO Participation Indicator
@@ -149,7 +147,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimCareReceiver->getAccountNo(), 0, 17), # patient control number
 	substr($refClaimCareReceiver->getLastName(), 0, 20),  # patient last name
 	substr($refClaimCareReceiver->getFirstName(), 0, 10), # patient first name
-	$spaces, 
+	$spaces,
 	substr($refClaimCareReceiver->getMiddleInitial(), 0, 1), # patient middle initial
 	$spaces, # patient generation
 	substr($refClaimCareReceiver->getDateOfBirth(), 0, 8), # patient date of birth
@@ -171,44 +169,22 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getAnotherHealthBenefitPlan(), 0, 1), # other insurance indicator
 	$spaces,  # CLAIM ADJUDICATION INDICATOR - RECEIVER TYPE
 	$spaces,  # TYPE OF CLAIM INDICATOR
-	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR	
-	$spaces,  # ORIGIN CODE	
-	$spaces,  # PAYER CLAIM CONTROL NUMBER	
+	substr($refClaimCareReceiver->getlegalIndicator(),0,1),  # LEGAL REPRESENTATIVE INDICATOR
+	$spaces,  # ORIGIN CODE
+	$spaces,  # PAYER CLAIM CONTROL NUMBER
 	$spaces,  # PROVIDER NUMBER
 	$spaces,  # Provider Number Filler 02 spaces
 	substr($inpClaim->getId(),0,6),     # CLAIM IDENTIFICATION NUMBER
 	$spaces,  # Filler - national
-	$spaces,  # Filler - local	
+	$spaces,  # Filler - local
 	$spaces,   # claim sequence number
 	substr($refClaimCareReceiver->getSsn(),0,10)   # patient id
 	)
   );
-  
+
   return $nsfType{$nsfType};
-	
+
 }
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'AUF',
-	'Billing Interface/Validating CA0 Header',
-	'All dates are now interperated from DD-MON-YY to CCYYMMDD format by '.
-	'using convertDateToCCYYMMDD in CA0'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'AUF',
-	'Billing Interface/Validating CA0 Header',
-	'All Codes of Gender are now interprated from 0,1,2 to U,M,F in CA0'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'AUF',
-	'Billing Interface/Validating CA0 Header',
-	'All the changes in Codes of Gender and use of convertDateToCCYYMMDD has been removed from CA0, the Claim object will provide formatted data'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/17/2000', 'AUF',
-	'Billing Interface/Validating CA0 Header',
-	'Spaces has been put in TPO Participation Indicator as advised by Envoy in its 16-FEB-2000 e-mail to Mr. Yousuf'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/30/2000', 'AUF',
-	'Billing Interface/Validating NSF Output',
-	'The format method of CA0 has been made capable to generate Halley as well as Envoy NSF format record string by using a hash, in which NSF_HALLEY and NSF_ENVOY are used as keys']
 
-
-
-);
-	
 1;

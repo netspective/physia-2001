@@ -126,7 +126,7 @@ sub processClaims
 	    $self->setFileSerialNumber($serialNumber);
 
 	    # To add new line character in the last line inserted in array
-	    $params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
+	    #$params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
     }
     else
     {
@@ -235,7 +235,7 @@ sub createOutputFile
 
 	open(OUTFILE,">$self->{outFile}");
 	my $outString = join("\n", @{$outDataRef});
-
+    $outString = $outString . "\n";
 	print OUTFILE uc($outString);
 	close(OUTFILE);
 

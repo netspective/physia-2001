@@ -43,7 +43,7 @@ sub formatData
 	my ($self, $container, $flags, $inpClaim, $payerType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
-	my $claimPayToProvider = $firstClaim->{payToOrganization};
+	my $claimPayToProvider = $firstClaim->{payToProvider};
 	my $emcId;
 	my $taxId;
 	my $taxIdType;
@@ -52,14 +52,14 @@ sub formatData
 	{
 		$taxId = $claimPayToProvider->getTaxId();
 		$taxId =~ s/-//g;
-		$taxIdType = 'E';
+		$taxIdType = 'S';
 	}
-	elsif($claimPayToProvider->getFederalTaxId() ne '')
-	{
-		$taxId = $claimPayToProvider->getFederalTaxId();
-		$taxId =~ s/-//g;
-		$taxIdType = 'E';
-	}
+	#elsif($claimPayToProvider->getFederalTaxId() ne '')
+	#{
+	#	$taxId = $claimPayToProvider->getFederalTaxId();
+	#	$taxId =~ s/-//g;
+	#	$taxIdType = 'E';
+	#}
 	else
 	{
 		$taxIdType = '';

@@ -8,10 +8,8 @@ package App::Billing::Locale::USCodes;
 
 use strict;
 use Carp;
-use Devel::ChangeLog;
 
-
-use vars qw(@VALID_USA_STATES %USA_STATE_ZIPCODE_MAP %USA_STATE_AREACODE_MAP @CHANGELOG);
+use vars qw(@VALID_USA_STATES %USA_STATE_ZIPCODE_MAP %USA_STATE_AREACODE_MAP);
 
 
 @VALID_USA_STATES = (
@@ -255,20 +253,6 @@ sub isValidAreaCode
 	
 		
 }	
-
-
-
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/24/1999', 'AUF',
-	'Billing Interface/USCodes.pm',
-	'New function getAreaCodes and Telephone area Codes have been added'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '01/05/2000', 'AUF',
-	'Billing Interface/USCodes.pm',
-	'new method has been removed and now global variables are being used to store zipcodes, areacodes and state names']
-);
 
 	
 1;
