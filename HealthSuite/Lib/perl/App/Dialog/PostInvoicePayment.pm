@@ -14,6 +14,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 
@@ -247,7 +248,6 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	my $sessOrg = $page->session('org_id');
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
 	my $paidBy = $page->param('paidBy');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
@@ -325,24 +325,20 @@ sub execute
 		);
 	}
 
-	#reset session batch id
+
+	#Reset session batch id
 	$page->session('batch_id', $batchID);
 
 
 	#Create history attribute for total payment
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $invoiceId,
 		value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
-		value_textB => "Batch ID: $batchID" || undef,
+		value_textB => "Batch ID: $batchID",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
-	#Update the invoice
 
+	#Update the invoice
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 	my $invoiceBalance = $invoice->{balance};
 	my $newStatus;
