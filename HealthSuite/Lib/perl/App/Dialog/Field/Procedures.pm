@@ -67,7 +67,7 @@ sub isValid
 	my $emergency = '';
 	my %diagsSeen = ();
 	my @feeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
-	my @diagCodes = split(/\s*,\s*/, $page->field('proc_diags'));
+	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 
 
 	# GET FEE SCHEDULES FOR PRIMARY INSURANCE IF IT WAS SELECTED ----------------------------
@@ -198,6 +198,7 @@ sub isValid
 		}
 
 		my @actualDiagCodes = ();
+		my @actualDiagCodesForIntellicode = ();
 		if($diags ne '')
 		{
 			my @diagNumbers = split(/\s*,\s*/, $diags);
@@ -211,11 +212,14 @@ sub isValid
 				{
 					$self->invalidate($page, "[<B>P$line</B>] The diagnosis $diagNumber is not valid. Please verify");
 				}
-
-				push(@actualDiagCodes, $diagCodes[$diagNumber-1]);
+				else
+				{
+					push(@actualDiagCodes, $diagCodes[$diagNumber-1]);
+					push(@actualDiagCodesForIntellicode, $diagCodes[$diagNumber-1]);
+				}
 			}
 
-			# @actualDiagCodes = join(', ', @actualDiagCodes);
+			@actualDiagCodes = join(', ', @actualDiagCodes);
 			$page->param("_f_proc_$line\_actual_diags", @actualDiagCodes);
 		}
 		elsif($diags eq '')
@@ -271,9 +275,8 @@ sub isValid
 		(
 			$page, App::IntelliCode::INTELLICODEFLAG_SKIPWARNING,
 			sex => $gender,
-			dateOfBirth => $dateOfBirth,
-			#diags => \@diagCodes,
-			diags => \@actualDiagCodes,
+			dateOfBirth => $dateOfBirth,			
+			diags => \@actualDiagCodesForIntellicode,
 			procs => \@procs,
 		);
 
@@ -360,7 +363,7 @@ sub getHtml
 		$invoiceFlags = $page->field('invoice_flags');
 		$attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 
-		$readOnly = $invoiceFlags & $attrDataFlag ? 'READONLY' : '';
+		#$readOnly = $invoiceFlags & $attrDataFlag ? 'READONLY' : '';
 	}
 
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
