@@ -45,6 +45,7 @@ sub new
 
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id',
 				name => 'ins_org_id',
+				addType => 'insurance',
 				options => FLDFLAG_REQUIRED
 			),
 			new App::Dialog::Field::Insurance::Product(caption => 'Product Name',

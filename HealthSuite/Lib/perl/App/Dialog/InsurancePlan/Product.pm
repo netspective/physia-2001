@@ -51,7 +51,8 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),
 
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
-				name => 'ins_org_id',
+				name => 'ins_org_id', 
+				addType => 'insurance',
 				options => FLDFLAG_REQUIRED
 			),
 			new App::Dialog::Field::Insurance::Product::New(caption => 'Product Name',
