@@ -270,6 +270,15 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where parent_id = ?
 		 and address_name = 'Home'
 		},
+	'selStatementsForClient' => qq{
+		select statement_id, payto_id as pay_to_id, billto_id as bill_to_id, patient_id, eps.caption as source, ts.caption as trans_status, ack_stamp,
+			ext_statement_id as ext_stmt_id, amount_due, inv_ids as claims
+		from statement, electronic_payer_source eps, transmission_status ts
+		where patient_id = ?
+			and cr_org_internal_id = ?
+			and statement_source = eps.id
+			and transmission_status = ts.id
+		},
 	'selPersonAddressById' => qq{
 		select *
 		from person_address
