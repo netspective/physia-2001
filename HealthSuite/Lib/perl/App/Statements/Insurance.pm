@@ -284,14 +284,14 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		select product_name
 			from insurance
 			where product_name = ?
-			and owner_org_id = ?
+			and ins_org_id = ?
 		},
 	'selNewPlanExists' => qq{
 		select plan_name
 			from insurance
 			where product_name = ?
 			and plan_name = ?
-			and owner_org_id = ?
+			and ins_org_id = ?
 			and record_type = 2
 		},
 
