@@ -61,7 +61,14 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 			and value_text = :3
 			and value_date = to_date(:4, '$SQLSTMT_DEFAULTDATEFORMAT')
 	},
-	
+
+	'sel_InvoiceHistory' => qq{
+		select * from Invoice_History
+		where parent_id = :1
+			and value_text = :2
+			and value_date = to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+	},
+
 	'del_InvoiceAttribute' => qq{
 		delete from Invoice_Attribute where item_id = :1
 	},
