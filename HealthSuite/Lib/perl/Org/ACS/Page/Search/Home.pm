@@ -80,7 +80,8 @@ sub prepare
 					<b>Lookup</b>
 					<a href="/worklist/referral">Service Request Worklist</a>,
 					<a href="/worklist/referral?user=physician">Everybody Referral Followup Worklist</a>,
-					<a href="/worklist/referral?user=$sessionUser">Personal Referral Followup Worklist</a>
+					<a href="/worklist/referral?user=$sessionUser">Personal Referral Followup Worklist</a>,
+					<a href="/org/#session.org_id#/dlg-add-referral-intake">Intake Coordinator's Referral Followup Worklist</a>
 				</font>
 			</td></tr><tr valign=top bgcolor=white><td align="right">
 				$IMAGETAGS{'icons/arrow_right_red'}
