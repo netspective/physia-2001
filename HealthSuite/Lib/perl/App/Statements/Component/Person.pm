@@ -2281,7 +2281,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.diagnosisSummary' => {
 	sqlStmt => qq{
 			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yyyy') as earliest_date,
-			       to_char(min(trans_begin_stamp), 'mm/dd/yyyy') as latest_date, count(member_name) as num_times
+			       to_char(max(trans_begin_stamp), 'mm/dd/yyyy') as latest_date, count(member_name) as num_times
 			from   ref_icd, invoice_claim_diags,transaction, invoice
 			where  client_id = ?
 			and    trans_id = main_transaction
@@ -2294,7 +2294,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		columnDefn =>
 		[
-			{ head => 'Diagnosis Summary', dataFmt => '<b>ICD: </b>#0#<br><b>ICD: </b>Diagnosis: #1#<br><b>Earliest Date: </b>#2#<br><b>Latest Date: </b>#3#<br><b>Diagnosed Times: </b>#4#<br><br>'},
+			{ head => 'Diagnosis Summary', dataFmt => '<A HREF = "/search/icd">(#0#)</A> #1#<br> #2#--#3#:#4#<br><br>'},
 		],
 	},
 	publishDefn_panel =>
@@ -2304,7 +2304,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		inherit => 'panel',
 		frame =>
 		{
-				heading => 'Diagnosis Summary'
+				heading => 'Diagnosis Summary',
+				-editUrl => '', 
 		},
 	},
 	publishDefn_panelTransp =>
