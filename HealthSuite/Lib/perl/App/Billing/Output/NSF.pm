@@ -14,6 +14,8 @@ use App::Billing::Claims;
 use App::Billing::Output::File::NSF;
 use App::Billing::Output::Validate::EnvoyPayer;
 use App::Billing::Output::Validate::NSF;
+use App::Billing::Output::Strip;
+
 use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Output::Driver);
@@ -62,8 +64,13 @@ sub processClaims
 	#	}	
 	# }
 	
- 
-	
+    if ($params{FLAG_STRIPDASH} ne '')
+    {
+    	my $strip = new App::Billing::Output::Strip;
+    	$strip->strip($claimsList);
+    }
+    
+    	
 	$self->{nsfFileObj} = new App::Billing::Output::File::NSF();
 	$self->{nsfFileObj}->processFile(claimList => $claimsList, outArray => $params{outArray}, nsfType => $params{nsfType});
 	

@@ -297,7 +297,7 @@ sub assignPatientInfo
 	@row = $sth->fetchrow_array();
 
 	$patient->setEmployerOrSchoolName($row[1]);
-	$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$orgId\' and address_name = \'Mailing\'";
+	$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row[0] and address_name = \'Mailing\'";
 	$self->populateAddress($patient->getEmployerAddress, $queryStatment);
 }
 
@@ -822,7 +822,7 @@ sub assignServiceFacility
 	my ($self, $claim, $invoiceId) = @_;
 
 	my $renderingOrganization = $claim->getRenderingOrganization();
-	my $queryStatment = "select org.org_id, org.name_primary from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_Internal_id = trans.service_facility_id ";
+	my $queryStatment = "select org.org_id, org.name_primary, org.org_Internal_id from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_internal_id = trans.service_facility_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -831,7 +831,7 @@ sub assignServiceFacility
 	$renderingOrganization->setName($row[1]);
 
 	my $renderingOrganizationAdress = $renderingOrganization->getAddress();
-	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
+	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row[2] and address_name = \'Mailing\'";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -863,7 +863,7 @@ sub assignServiceBilling
 {
 	my ($self, $claim, $invoiceId) = @_;
 	my $payToOrganization = $claim->getPayToOrganization();
-	my $queryStatment = "select org.org_id, org.name_primary  from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_internal_id = trans.billing_facility_id ";
+	my $queryStatment = "select org.org_id, org.name_primary, org.org_internal_id  from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_internal_id = trans.billing_facility_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	my $orgId;
 	# do the execute statement
@@ -873,13 +873,13 @@ sub assignServiceBilling
 	$payToOrganization->setId($row[0]);
 	$payToOrganization->setName($row[1]);
 #	$payToOrganization->setFederalTaxId($row[2]);
-	$queryStatment = "select value_text from org_attribute where parent_id = \'$row[0]\' and value_type = " . FACILITY_GROUP_NUMBER;
+	$queryStatment = "select value_text from org_attribute where parent_id = $row[2] and value_type = " . FACILITY_GROUP_NUMBER;
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
 #	$payToOrganization->setGRP($row[0]);
 	my $payToOrganizationAddress = new App::Billing::Claim::Address;
-	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$orgId\' and address_name = \'Mailing\'";
+	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row[2] and address_name = \'Mailing\'";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -972,7 +972,7 @@ sub assignPolicy
 				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE )
 				{
 					$insOrgId = $self->getOrgId($row1[0]);
-					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_Internal_id = \'$insOrgId\'";
+					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_Internal_id = $row1[0]";
 #					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), org_id as payer_id from org where org_id = \'$insOrgId\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
@@ -1040,7 +1040,7 @@ sub assignPolicy
 						 	}
 						}
 					}
-					$queryStatment = "select line1, line2, city, state, zip, country
+					$queryStatment = "select line1, line2, city, state, zip, sountry
 							from insurance_address
 							where parent_id = (select parent_ins_id
 										from invoice_billing, insurance
@@ -1084,7 +1084,7 @@ sub assignPolicy
 					$payerAddress->setState($row[3]);
 					$payerAddress->setZipCode($row[4]);
 					$payerAddress->setCountry($row[5]);
-					$queryStatment = "select value_text from person_attribute where parent_id = \'$pid\' and Item_name = \'Home\' and value_type = " . CONTACT_METHOD_TELEPHONE;
+					$queryStatment= "select value_text from person_attribute where parent_id = \'$pid\' and Item_name = \'Home\' and value_type = " . CONTACT_METHOD_TELEPHONE;
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1102,7 +1102,7 @@ sub assignPolicy
 
 					$payer->setId($row[1]);
 					$payer->setName($row[0]);
-			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
+			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row1[0] and address_name = \'Mailing\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1113,7 +1113,7 @@ sub assignPolicy
 					$payerAddress->setState($row[3]);
 					$payerAddress->setZipCode($row[4]);
 					$payerAddress->setCountry($row[5]);
-					$queryStatment = "select value_text from org_attribute where parent_id = \'$oid\' and Item_name = \'Contact Method/Telepone/Primary\'";
+					$queryStatment = "select value_text from org_attribute where parent_id = $row1[0] and Item_name = \'Contact Method/Telepone/Primary\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1576,9 +1576,9 @@ sub setClaimProperties
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@tempRow = $sth->fetchrow_array();
 	my $diagnosis;
-	$tempRow[2] =~ s/ //g;
+	$tempRow[2] =~ s/\s*//g;
 
-	my @diagnosisCodes = split (/,/, $tempRow[2]) ;
+	my @diagnosisCodes = split (/\s*,\s*/, $tempRow[2]);
 	my $diagCount;
 	my @ins;
 	$ins[CLAIM_TYPE_SELF] = "OTHER";
@@ -1641,28 +1641,28 @@ sub setClaimProperties
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{otherItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{adjItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{copayItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 }
@@ -1683,7 +1683,7 @@ sub diagnosisPtr
 			$count++;
 		}
 	}
-	my @diagCodes = split(/,/, $codes);
+	my @diagCodes = split(/\s*,\s*/, $codes);
 	for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 	{
 		$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . " " . $ptr;

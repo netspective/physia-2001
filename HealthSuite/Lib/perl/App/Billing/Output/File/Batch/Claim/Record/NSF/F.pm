@@ -45,12 +45,12 @@ sub formatData
 	my $zero = "0";
 	my $pointer = $container->getSequenceNo();
 	my @modifier = split (/ /,$currentProcedure->getModifier());
-	my @diagnosis = split (/ /,$self->diagnosisPtr($inpClaim,$currentProcedure->getDiagnosis()));
+	my @diagnosis = split (/\s*/,$self->diagnosisPtr($inpClaim,$currentProcedure->getDiagnosis()));
 	
 	# modifier are separated by to spaces '  '
 	
 my %nsfType = (NSF_HALLEY . "" =>	
-	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%1s%1s%1s%1s%4s%4s%1s%1s%1s%-15s%-15s%-2s%1s%7s%7s%1s%1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%3s%2s%3s%3s%-8s%3s%7s%7s%-2s%-8s%8s%-1s%-8s%7s%-1s%-12s%-9s%-1s%-1s%-7s%-14s%-1s%-1s%-1s%-1s',
+	sprintf('%-3s%-2s%-17s%-17s%-8s%-8s%-2s%-2s%-5s%-2s%-2s%-2s%7s%1s%1s%1s%1s%4s%4s%1s%1s%1s%-15s%-15s%-2s%1s%7s%7s%1s%1s%-10s%-9s%-3s%-15s%7s%-2s%-3s%1s%1s%1s%-8s%2s%2s%3s%3s%-8s%3s%7s%7s%-2s%-8s%8s%-1s%-8s%7s%-1s%-12s%-9s%-1s%-1s%-7s%-14s%-1s%-1s%-1s%-1s',
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($Patient->getAccountNo(),0,17),
