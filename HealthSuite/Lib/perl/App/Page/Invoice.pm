@@ -46,7 +46,6 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
 					{caption => 'Envoy NSF', name => 'envoy_nsf',},
-					{caption => 'Envoy NSF', name => 'envoy_nsf',},
 					{caption => 'Halley NSF', name => 'halley_nsf',},
 			],
 		},
@@ -1645,7 +1644,7 @@ sub prepare_page_content_header
 
 	my $view = $self->param('_pm_view');
 	my $chooseActionMenu = '';
-	if($view eq 'nsf' || $view eq 'history')
+	if($view eq 'envoy_nsf' || $view eq 'halley_nsf' || $view eq 'history')
 	{
 		$chooseActionMenu = qq{ <TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD> };
 	}
