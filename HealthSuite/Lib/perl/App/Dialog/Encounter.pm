@@ -1336,18 +1336,19 @@ sub billCopay
 	);
 
 
+
 	#UPDATE INVOICE
 
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $totalItems = $invoice->{total_items} + 1;
 	my $totalCost = $invoice->{total_cost} + $copayAmt;
 	my $invTotalAdj = $invoice->{total_adjust} - $copay;
-	my $invBalance = $totalCost - $invTotalAdj;
+	my $invBalance = $totalCost + $invTotalAdj;
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		total_items => defined $totalItems ? $totalItems : undef,
-		total_cost => defined $copayAmt ? $copayAmt : undef,
+		total_cost => defined $totalCost ? $totalCost : undef,
 		total_adjust => defined $invTotalAdj ? $invTotalAdj : undef,
 		balance => defined $invBalance ? $invBalance : undef,
 		_debug => 0
