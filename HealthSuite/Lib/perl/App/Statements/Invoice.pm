@@ -185,6 +185,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		WHERE	i.invoice_id = :1
 		AND	i.main_transaction = t.trans_id
 		},
+	'selInvoiceAttributeById' => qq{
+		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textb, name_sort, value_int, value_intb, value_float, value_floatb,
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateend,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_datea, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateb,
+			value_block
+		from invoice_attribute
+		where item_id = ?
+		},
 	'selInvoiceAddr' => q{
 		select *
 		from invoice_address
