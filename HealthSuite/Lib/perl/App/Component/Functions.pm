@@ -40,7 +40,7 @@ use constant CONTENT_HTML => qq{
 			</TD>
 		</TR>
 		<TR>
-			<TD ALIGN=RIGHT>#fmtdefn.defaultFontOpen#Accounting:#fmtdefn.defaultFontClose#</TD>
+			<TD ALIGN=RIGHT>#fmtdefn.defaultFontOpen#Billing:#fmtdefn.defaultFontClose#</TD>
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
