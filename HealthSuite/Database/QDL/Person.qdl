@@ -6,15 +6,15 @@
 	<query-defn id="Person" db="Oracle">
 
 		<!-- Fields -->
-		<field id="person_id" caption="Person ID" view="person" column="person_id"/>
-		<field id="row_num" caption="Row" column="rownum"/>
+		<field id="person_id" caption="Person ID" view="person" column="person_id" href="/person/{person-id}/profile"/>
+		<field id="row_num" column="rownum"/>
 		<field id="ssn" caption="SSN" view="person" column="SSN"/>
 		<field id="name_first" caption="First Name" view="person" column="name_first"/>
 		<field id="name_middle" caption="Middle Name" view="person" column="name_middle"/>
 		<field id="name_last" caption="Last Name" view="person" column="name_last"/>
 		<field id="name_suffix" caption="Name Suffix" view="person" column="name_suffix"/>
 		<field id="simple_name" caption="Full Name" view="person" column="simple_name"/>
-		<field id="dob" caption="Bate of Birth" view="person" column="date_of_birth"/>
+		<field id="dob" caption="Date of Birth" view="person" column="date_of_birth" ui-datatype="date"/>
 		<field id="age" caption="Age" view="person" column="age"/>
 		<field id="gender" caption="Gender" view="gender" column="caption"/>
 		<field id="marital_status" caption="Marital Status" view="mstat" column="caption"/>
@@ -97,7 +97,7 @@
 			<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
 		</output-style>
 		<output-style id="nurse" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="person_id" caption="Nurse" href="/person/{person_id}/{name_last}"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
@@ -132,6 +132,8 @@
 				<condition field="category" comparison="is" criteria="Physician"/>
 			</and-conditions>
 		</output-style>
+		<field-group>
+		</field-group>
 		<output-style id="staff" distinct="yes">
 			<column id="person_id" href="/person/{person_id}/{name_last}"/>
 			<column id="name_last"/>
