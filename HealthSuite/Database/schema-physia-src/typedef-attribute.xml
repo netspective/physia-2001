@@ -454,6 +454,12 @@
 				<col name="remarks">License for Organizations.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
 			</row>
 			<row>
+				<col name="id">650</col>
+				<col name="caption">Billing Event</col>
+				<col name="group_name">Billing</col>
+				<col name="remarks">value_int = day,value_text = name_begin, value_textb = name_end, value_float = balance_criteria, value_intb = balance_operator (1 = greater than, -1 = less than)</col>
+			</row>
+			<row>
 				<col name="id">700</col>
 				<col name="caption">Insurance</col>
 				<col name="group_name">Benefits</col>
