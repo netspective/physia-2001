@@ -13,7 +13,7 @@
 		<enum id="6">Add Provider</enum>
 	</table>
 
-	<table name="Referral_Payor" abbrev="RefPyr"type="Org_Lookup">
+	<table name="Referral_Payor" abbrev="RefPyr" type="Org_Lookup">
 		<enum id="0">Argus</enum>
 		<enum id="1">American Airlines</enum>
 		<enum id="2">City of Dallas</enum>
@@ -136,7 +136,7 @@
 		<enum id="43">Transportation: Land</enum>
 	</table>
 
-	<table name="Intake_Detail" abbrev="IntDtl"type="Org_Lookup">
+	<table name="Intake_Detail" abbrev="IntDtl" type="Org_Lookup">
 		<enum id="0">Cold Therapy Device</enum>
 		<enum id="1">Tape</enum>
 		<enum id="2">Neoprene Knee Sleeve</enum>
