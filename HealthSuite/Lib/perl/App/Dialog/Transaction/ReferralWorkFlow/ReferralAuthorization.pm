@@ -109,6 +109,7 @@ sub initialize
 				]),
 		new CGI::Dialog::Field(caption => 'Code',  name => 'code', size => '7',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),
+		new CGI::Dialog::Field(caption =>'Referral Type ', name => 'referral_type', options => FLDFLAG_READONLY),
 		new CGI::Dialog::Field(caption => 'Comment',  type => 'memo',name=>'code_comment',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Service Request Charge',  name => 'service_rate', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
 
@@ -241,6 +242,10 @@ sub populateData_add
 	$page->field('ref_id', $transId);
 	$page->field('coordinator', $transId);
 	$page->field('person_id', $parentTransData->{'consult_id'});
+	my $referralType = $parentTransData->{'trans_expire_reason'};
+
+	my $referralTypeData = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selReferralServiceType', $referralType);
+	$page->field('referral_type', $referralTypeData);
 
 	my $sourceOfServiceData = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selServiceSourceTypeByTransId', $transId);
 	$page->field('source_referral', $sourceOfServiceData);
@@ -292,6 +297,7 @@ sub populateData_update
 	# Populating the fields while updating the dialog
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
 	my $authData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByTransId', $page->param('trans_id'));
+
 	my $providerData = $authData->{'service_facility_id'};
 	#my $clientId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $clientData);
 	my $provider = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $providerData);
@@ -341,6 +347,10 @@ sub populateData_update
 
 	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
 	$page->field('code',$serviceRequest->{code});
+
+	my $referralType = $serviceRequest->{'trans_expire_reason'};
+	my $referralTypeData = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selReferralServiceType', $referralType);
+	$page->field('referral_type', $referralTypeData);
 	my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$serviceRequest->{code},$page->session('org_internal_id') );
 
 	$page->field('code_description',$data->{description});
