@@ -21,6 +21,7 @@ use Devel::ChangeLog;
 
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
+use constant NEXTACTION_PRINTRECEIPT => "/";
 use constant NEXTACTION_APPOINTMENTS => "/schedule";
 use constant NEXTACTION_WORKLIST => "/worklist";
 
@@ -37,6 +38,7 @@ sub initialize
 						nextActions => [
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
+							#['Print Patient Receipt', NEXTACTION_PRINTRECEIPT],
 							['Go to Appointments', NEXTACTION_APPOINTMENTS],
 							['Return to Work List', NEXTACTION_WORKLIST],
 							],
