@@ -1197,6 +1197,65 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeProblems', [$personId, $personId, $personId, $personId], 'panelTransp'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------
+
+'person.surgeryProcedures' => {
+	sqlStmt => qq{
+	    	select	2 as GROUP_SORT, %simpleDate:t.curr_onset_date% as curr_onset_date, ref.descr, provider_id, trans_type, trans_id, '(ICD ' || t.code || ')' as code
+			from 	transaction t, ref_icd ref
+			where 	trans_type = 4050
+			and 	trans_owner_type = 0 and trans_owner_id = ?
+			and 	t.code = ref.icd (+)
+			and 	trans_status = 2
+		UNION ALL
+		select	2 as GROUP_SORT, %simpleDate:curr_onset_date%, data_text_a, provider_id, trans_type, trans_id, '' as code
+		from 	transaction
+		where 	trans_type = 4050
+		and 	trans_owner_id = ?
+		and 	trans_status = 2
+		order by GROUP_SORT, curr_onset_date DESC
+		},
+	sqlStmtBindParamDescr => ['Person ID for Diagnoses Transactions', 'Person ID for ICD-9 Transactions'],
+	publishDefn => {
+		columnDefn => [
+			{ head => 'Surgery Procedures', dataFmt => '#2# <A HREF = "/search/icd">#6#</A><BR>performed on <A HREF = "/person/#3#/profile">#3#</A> (#1#)' },
+		],
+		bullets => 'stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=/#param.arl#',
+		separateDataColIdx => 2, # when the date is '-' add a row separator
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Surgery Procedures' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Surgery Procedures' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-activeproblems-surgical?home=#param.home#'>Surgery Procedures</A> } },
+			],
+		},
+		stdIcons =>	{
+			 delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgeryProcedures', [ $personId, $personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgeryProcedures', [ $personId, $personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgeryProcedures', [ $personId, $personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.surgeryProcedures', [ $personId, $personId], 'panelTransp'); },
+},
+
 
 #----------------------------------------------------------------------------------------------------------------------
 
@@ -1950,6 +2009,62 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.accountPanel', [$personId], 'panelStatic'); },
 	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.accountPanel', [$personId], 'panelInDlg'); },
 },
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
+'person.patientAppointments' => {
+	sqlStmt => qq{
+	    	select 	e.start_time, e.duration, eadoc.value_text, e.subject
+		from 	event_attribute eaper, event_attribute eadoc, event e
+		where 	eaper.parent_id = e.event_id
+		and	eadoc.parent_id = e.event_id
+		and	eaper.parent_id = eadoc.parent_id
+		and	eaper.item_name like '%Patient'
+		and	eadoc.item_name like '%Physician'
+		and	eaper.value_text = ?
+		},
+	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
+	publishDefn => {
+		columnDefn => [
+			{ head => 'Appointments', dataFmt => '#0# #2# #3# #1#' },
+		],
+		bullets => 'stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#?home=/#param.arl#',
+		separateDataColIdx => 2, # when the date is '-' add a row separator
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Appointments' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Appointments' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-activeproblems-surgical?home=#param.home#'>Appointments</A> } },
+			],
+		},
+		stdIcons =>	{
+			 delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId], 'panelTransp'); },
+},
+
 
 #----------------------------------------------------------------------------------------------------------------------
 
