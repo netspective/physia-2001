@@ -1,0 +1,1 @@
+update person_attribute set item_name='EPSDT' where item_name='EPSTD' and value_type=0;
