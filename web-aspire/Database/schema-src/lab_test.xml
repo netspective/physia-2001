@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="lab_test">
+	<include file="generic-datatypes.xml"/>	
+	
+	<table name="Person_Lab_Order" abbrev="PLabOrd" type="Audit,Secure">
+		<description>Contains Lab order request for a patient</description>
+		<column name="lab_order_id" type="autoinc" primarykey="yes" descr="Unique Lab Order ID"/>
+		<column name="person_id"  parentref="Person.person_id" indexed="yes" descr="Person ID of patient the Lab Order is created"/>	
+		<column name="date_order" type="stamp"  indexed="yes"  descr="Date and Time Lab order was requested"/>			
+		<column name="date_done" type="stamp" descr="Date and Time Lab order was finished"/>	
+		<column name="provider_id" lookupref="person.person_id"  indexed="yes" descr="Person ID of patient the Lab Order is created"/>	
+		<column name="result_id" lookupref="person.person_id"  indexed="yes" descr="Person ID of Person to contact with lab results"/>			
+		<column name="lab_comments" type="text" size="512" descr="Comments to the lab"/>			
+		<column name="patient_comments" type="text" size="512" descr="Comments for the patient"/>					
+		<column name="instructions" type="text" size="512" descr="Instructions for the patient"/>
+		<column name="icd" type="text_set"  descr="Diagnosis "/>		
+		<column name="communication" lookupref="Lab_Order_Transmission.id" descr="Communication method (e-mail,fax.phone,etc) "/>				
+		<column name="priority" lookupref="Lab_Order_Priority.id" descr="priority of lab request"/>						
+		<column name="lab_order_status" lookupref="Lab_Order_Status.id" descr="Lab Order Status"/>								
+		<column name="lab_internal_id" lookupref="Org.org_internal_id"  indexed="yes" descr="Internal ID of Lab that will perform this test"/>				
+		<column name="org_internal_id" lookupref="Org.org_internal_id"  indexed="yes" descr="Internal ID of Main Org"/>						
+		<column name="location_address_id" lookupref="Org_Address.item_id" descr="Address ID of Location to send Lab Order"/>						
+		
+	</table>	
+	
+	<table name="Lab_Order_Status" abbrev="LabOrdSts" type="Enumeration">
+		<description>Status of Lab Order Request</description>
+		<enum id="0">Approved</enum>		
+		<enum id="1">Pending</enum>
+		<enum id="2">Faxed to Lab</enum>		
+		<enum id="3">E-Mailed to Lab</enum>				
+		<enum id="4">Transmitted to Lab</enum>						
+	</table>	
+	
+	<table name="Lab_Order_Priority" abbrev="LabOrdPri" type="Enumeration">
+		<description>Priority of Lab Order Request</description>
+		<enum id="0">Normal</enum>		
+		<enum id="1">STAT</enum>
+		<enum id="2">ASAP</enum>		
+		<enum id="3">Today</enum>				
+	</table>		
+
+	<table name="Lab_Order_Transmission" abbrev="LabOrdTrans" type="Enumeration">
+		<description>Priority of Lab Order Request</description>
+		<enum id="0">Print</enum>		
+		<enum id="1">E-Mail</enum>
+		<enum id="2">Fax</enum>		
+	</table>		
+	
+	
+	<table name="Lab_Order_Entry" abbrev="LabOrdEnt" type="Audit,Secure">
+		<description>Contains Lab order Entry request for a patient</description>
+		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique Lab Order ID"/>
+		<column name="parent_entry_id" selfref="Lab_Order_Entry.entry_id" indexed="yes" descr="If this item is a child of another item (like a group)"/>		
+		<column name="parent_id" parentref="person_lab_order.lab_order_id" descr="Unique Lab Order ID"/>				
+		<column name="test_entry_id" lookupref="offering_catalog_entry.entry_id" descr="Unique Lab Order ID"/>						
+		<column name="options" abbrev="o" type="text_set" descr="List of options for this test"/>								
+		<column name="caption" type="text" size="64" descr="The caption of the item"/>				
+		<column name="lab_code" type="text" size="64" descr="The code of the item"/>								
+		<column name="charge_code" type="text" size="64" descr="The code of the item"/>										
+		<column name="physician_cost" type="currency" descr="The cost to physician for lab order"/>												
+		<column name="patient_cost" type="currency" descr="The cost to patient for lab order"/>														
+		<column name="modifier" type="text" size="64" descr="Information about order"/>														
+		<column name="panel_test_name" type="text" size="512" descr="Comma seperated list of panel test names"/>
+	</table>		
+</schema>
+
+
+
+

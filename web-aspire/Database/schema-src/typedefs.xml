@@ -1,0 +1,1207 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-typedefs">
+	<table name="Event_Type" abbrev="EventType" type="Type_Definition">
+		<description>A type of event, such as an Appointment, Staff Meeting, or Surgery</description>
+		<column name="duration" type="integer" descr="Default duration (in minutes) of particular event"/>
+		<data>
+			<!-- the 100-199 types are Appointments (usually single events) -->
+			<row>
+				<col name="id">100</col>
+				<col name="caption">Appointment</col>
+				<col name="duration">10</col>
+				<col name="remarks">Unspecified appointment</col>
+			</row>
+			<delimrow>105,Well Examination</delimrow>
+			<delimrow>110,Consultation</delimrow>
+			<delimrow>115,Sick</delimrow>
+			<delimrow>120,Re-Check</delimrow>
+			<delimrow>125,Allergy Injection</delimrow>
+			<delimrow>130,Immunization</delimrow>
+			<delimrow>135,Physical Exam</delimrow>
+
+			<row>
+				<col name="id">200</col>
+				<col name="caption">Seminar</col>
+				<col name="duration">60</col>
+			</row>
+			<row>
+				<col name="id">300</col>
+				<col name="caption">Group Therapy</col>
+				<col name="duration">50</col>
+			</row>
+			<row>
+				<col name="id">400</col>
+				<col name="caption">Hospital Rounds</col>
+				<col name="duration">60</col>
+			</row>
+			<row>
+				<col name="id">500</col>
+				<col name="caption">Surgery</col>
+				<col name="duration">60</col>
+			</row>
+			<row>
+				<col name="id">600</col>
+				<col name="caption">Meeting</col>
+				<col name="duration">30</col>
+			</row>
+			<row>
+				<col name="id">610</col>
+				<col name="caption">Staff Meeting</col>
+				<col name="duration">30</col>
+			</row>
+			<row>
+				<col name="id">950</col>
+				<col name="caption">Unique Event</col>
+				<col name="duration">20</col>
+				<col name="remarks">For events which do not fall into one of defined event types</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Resource_Type" abbrev="ResType" type="Type_Definition">
+		<description>A type of physical resource, such as a room or an EKG machine</description>
+		<data>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Meeting Room</col>
+				<col name="group_name">Meeting Room</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Small Patient Room</col>
+				<col name="group_name">Patient Room</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Medium Patient Room</col>
+				<col name="group_name">Patient Room</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Large Patient Room</col>
+				<col name="group_name">Patient Room</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Overhead Projector</col>
+				<col name="group_name">Photographic</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Slide Viewer</col>
+				<col name="group_name">Photographic</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Laser Camera</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Imager</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Processor</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Ventilator</col>
+				<col name="group_name">Respiratory</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Nebulizer</col>
+				<col name="group_name">Respiratory</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Spirometer</col>
+				<col name="group_name">Respiratory</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Plethysmyograph</col>
+				<col name="group_name">Respiratory</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Cardiovascular and abdominal ultrasound</col>
+				<col name="group_name">Ultrasound</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Fetal ultrasound</col>
+				<col name="group_name">Ultrasound</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">EEG</col>
+				<col name="group_name">Physicians Office</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">EKG</col>
+				<col name="group_name">Physicians Office</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Diathermy</col>
+				<col name="group_name">Physicians Office</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Transaction_Type" abbrev="TransType" type="Type_Definition">
+		<description>A type of transaction, such as Alert, Visit, Directive, Diagnosis, Procedure</description>
+		<column name="icon_img_summ" type="text" size="32" descr="The icon that should be displayed for the transaction type in a summary view"/>
+		<data>
+			<row>
+				<col name="id">1000</col>
+				<col name="caption">Telephone</col>
+				<col name="group_name">Communication</col>
+				<col name="icon_img_summ">phone.gif</col>
+				<col name="remarks">Telephone communication between patient and clinic</col>
+			</row>
+			<row>
+				<col name="id">1010</col>
+				<col name="caption">Fax</col>
+				<col name="group_name">Communication</col>
+				<col name="icon_img_summ">fax.gif</col>
+				<col name="remarks">Fax communication between patient and clinic</col>
+			</row>
+			<row>
+				<col name="id">1020</col>
+				<col name="caption">Page</col>
+				<col name="group_name">Communication</col>
+				<col name="icon_img_summ">phone.gif</col>
+				<col name="remarks">Pager communication between patient and clinic</col>
+			</row>
+			<row>
+				<col name="id">1030</col>
+				<col name="caption">EMail</col>
+				<col name="group_name">Communication</col>
+				<col name="icon_img_summ">email.gif</col>
+				<col name="remarks">Email communication between patient and clinic</col>
+			</row>
+			<row>
+				<col name="id">1040</col>
+				<col name="caption">Delivery</col>
+				<col name="group_name">Communication</col>
+				<col name="icon_img_summ">delivery.gif</col>
+				<col name="remarks">Delivery to/from patient from/to clinic</col>
+			</row>
+			<row>
+				<col name="id">1100</col>
+				<col name="caption">Telephone</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">phone.gif</col>
+				<col name="remarks">Telephone communication between physician and physician</col>
+			</row>
+			<row>
+				<col name="id">1110</col>
+				<col name="caption">Fax</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">fax.gif</col>
+				<col name="remarks">Fax communication between physician and physician</col>
+			</row>
+			<row>
+				<col name="id">1120</col>
+				<col name="caption">Page</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">phone.gif</col>
+				<col name="remarks">Pager communication between physician and physician</col>
+			</row>
+			<row>
+				<col name="id">1130</col>
+				<col name="caption">EMail</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">email.gif</col>
+				<col name="remarks">Email communication between physician and physician</col>
+			</row>
+			<row>
+				<col name="id">1140</col>
+				<col name="caption">Delivery</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">delivery.gif</col>
+				<col name="remarks">Delivery from physician to physician</col>
+			</row>
+			<row>
+				<col name="id">1150</col>
+				<col name="caption">Mail</col>
+				<col name="group_name">Physician Communication</col>
+				<col name="icon_img_summ">mail.gif</col>
+				<col name="remarks">Delivery from physician to physician</col>
+			</row>
+			<row>
+				<col name="id">1200</col>
+				<col name="caption">Physician</col>
+				<col name="group_name">Directive</col>
+				<col name="icon_img_summ">mail.gif</col>
+				<col name="remarks">Medical instructions given by the care provider to the patient</col>
+			</row>
+			<row>
+				<col name="id">1210</col>
+				<col name="caption">Patient</col>
+				<col name="group_name">Directive</col>
+				<col name="icon_img_summ">mail.gif</col>
+				<col name="remarks">Medical instructions given by the patient</col>
+			</row>
+			<row>
+				<col name="id">2000</col>
+				<col name="caption">Office</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">A patient visit to an office - the reason for visit is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2010</col>
+				<col name="caption">Clinic</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">A patient visit to a clinic - the reason for visit is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2020</col>
+				<col name="caption">Hospital</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">A patient visit to a hospital - the reason for visit is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2030</col>
+				<col name="caption">Facility</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">A patient visit to a facility - the reason for visit is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2040</col>
+				<col name="caption">Physical Exam</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2050</col>
+				<col name="caption">Executive Physical</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2060</col>
+				<col name="caption">Sports/School Physical</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2070</col>
+				<col name="caption">Regular Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2080</col>
+				<col name="caption">Complicated Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2090</col>
+				<col name="caption">Well Women Exam</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2100</col>
+				<col name="caption">Consultation</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2110</col>
+				<col name="caption">Injection Only</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2120</col>
+				<col name="caption">Procedure Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2130</col>
+				<col name="caption">Workmans Comp Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2140</col>
+				<col name="caption">Radiology Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2150</col>
+				<col name="caption">Lab Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2160</col>
+				<col name="caption">Counseling Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2170</col>
+				<col name="caption">Physical Therapy</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+			<row>
+				<col name="id">2180</col>
+				<col name="caption">Special Visit</col>
+				<col name="group_name">Visit</col>
+				<col name="icon_img_summ">visit.gif</col>
+				<col name="remarks">The Visit Type is stored in caption field</col>
+			</row>
+
+			<row>
+				<col name="id">3000</col>
+				<col name="caption">Transient</col>
+				<col name="group_name">Diagnosis</col>
+				<col name="icon_img_summ">diagnosis.gif</col>
+				<col name="remarks">Temporary diagnosis for a patient by a physician.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Date in curr_onset_date, Diagnosis in data_text_a</col>
+			</row>
+			<row>
+				<col name="id">3010</col>
+				<col name="caption">Permanent</col>
+				<col name="group_name">Diagnosis</col>
+				<col name="icon_img_summ">diagnosis.gif</col>
+				<col name="remarks">Permanent diagnosis for a patient by a physician.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Diagnosis Date in curr_onset_date, Diagnosis in data_text_a</col>
+			</row>
+			<row>
+				<col name="id">3020</col>
+				<col name="caption">ICD</col>
+				<col name="group_name">Diagnosis</col>
+				<col name="icon_img_summ">diagnosis.gif</col>
+				<col name="remarks">Diagnosis code</col>
+			</row>
+			<row>
+				<col name="id">3100</col>
+				<col name="caption">Notes</col>
+				<col name="group_name">Diagnosis</col>
+				<col name="icon_img_summ">diagnosis.gif</col>
+				<col name="remarks">Notes taken by a physician during diagnosis.The fields are stored in the table 'transaction' as follows:Physician in provider_id,Date in trans_begin_stamp, Notes in data_text_a</col>
+			</row>
+			<row>
+				<col name="id">4000</col>
+				<col name="caption">Regular</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4010</col>
+				<col name="caption">Immunization</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">vaccine.gif</col>
+			</row>
+			<row>
+				<col name="id">4020</col>
+				<col name="caption">Health Maintenenace</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4030</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4040</col>
+				<col name="caption">Inpatient</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4050</col>
+				<col name="caption">Surgical</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4060</col>
+				<col name="caption">Office Visit, New</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4070</col>
+				<col name="caption">Office Visit, Return</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">procedures.gif</col>
+			</row>
+			<row>
+				<col name="id">4080</col>
+				<col name="caption">Vaccinations</col>
+				<col name="group_name">Procedure</col>
+				<col name="icon_img_summ">vaccine.gif</col>
+			</row>
+			<row>
+				<col name="id">5000</col>
+				<col name="caption">Lab Results</col>
+				<col name="group_name">Report</col>
+				<col name="icon_img_summ">lab.gif</col>
+				<col name="remarks">Lab test results for a patient</col>
+			</row>
+			<row>
+				<col name="id">5010</col>
+				<col name="caption">Radiology</col>
+				<col name="group_name">Report</col>
+				<col name="icon_img_summ">xray.gif</col>
+				<col name="remarks">Radiology test result for a patient</col>
+			</row>
+			<row>
+				<col name="id">5020</col>
+				<col name="caption">Diagnostic Test</col>
+				<col name="group_name">Report</col>
+				<col name="icon_img_summ">survey.gif</col>
+				<col name="remarks">Diagnostic test result for a patient</col>
+			</row>
+			<row>
+				<col name="id">5030</col>
+				<col name="caption">Diagnostic Procedure</col>
+				<col name="group_name">Report</col>
+				<col name="icon_img_summ">survey.gif</col>
+				<col name="remarks">Description of diagnostic procedure</col>
+			</row>
+			<row>
+				<col name="id">6000</col>
+				<col name="caption">Specialist</col>
+				<col name="group_name">Referral</col>
+				<col name="icon_img_summ">person.gif</col>
+				<col name="remarks">Referral to a specialist</col>
+			</row>
+			<row>
+				<col name="id">6010</col>
+				<col name="caption">Imaging</col>
+				<col name="group_name">Referral</col>
+				<col name="icon_img_summ">person.gif</col>
+			</row>
+			<row>
+				<col name="id">6020</col>
+				<col name="caption">Consult</col>
+				<col name="group_name">Referral</col>
+				<col name="icon_img_summ">person.gif</col>
+				<col name="remarks">Referral to a consulting care provider</col>
+			</row>
+			<row>
+				<col name="id">6030</col>
+				<col name="caption">Service Request Procedure</col>
+				<col name="group_name">Referral</col>
+				<col name="icon_img_summ">person.gif</col>
+				<col name="remarks">Service Request Procedure</col>
+			</row>
+			<row>
+				<col name="id">7000</col>
+				<col name="caption">Prescription</col>
+				<col name="group_name">Medication</col>
+				<col name="icon_img_summ">prescription.gif</col>
+				<col name="remarks">A prescription made for a patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Physician in provider_id,Name of medication oi data_text_a,Quantity in quantity,Number of refills in data_num_a,Brand name in data_flag_b,Instructions in detail, Notes in data_text_b,Print prescription in data_flag_c.</col>
+			</row>
+			<row>
+				<col name="id">7010</col>
+				<col name="caption">OTC</col>
+				<col name="group_name">Medication</col>
+				<col name="icon_img_summ">prescription.gif</col>
+				<col name="remarks">Over the counter medication used by the patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Name of medication oi data_text_a,Instructions in detail, Notes in data_text_b.</col>
+			</row>
+			<row>
+				<col name="id">7020</col>
+				<col name="caption">Homeopathic</col>
+				<col name="group_name">Medication</col>
+				<col name="icon_img_summ">prescription.gif</col>
+				<col name="remarks">Home made medication or remedy used by the patient.The fields are stored in the table 'transaction' as follows:Medication Type in trans_type,Start Date in trans_begin_stamp,Name of medication in data_text_a,Instructions in detail, Notes in data_text_b.</col>
+			</row>
+			<row>
+				<col name="id">8000</col>
+				<col name="caption">Organization Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert for the whole organization.The fields are stored in the table 'transaction' as follows:Priority in trans_subtype,Caption in caption,Datails in detail,Staff member in initiator_id, Begin alert in trans_begin_stamp,End alert in trans_end_stamp.</col>
+			</row>
+			<row>
+				<col name="id">8010</col>
+				<col name="caption">Organization Facility Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert for a facility within an organization</col>
+			</row>
+			<row>
+				<col name="id">8020</col>
+				<col name="caption">Patient File Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert requiring action on a patient file</col>
+			</row>
+			<row>
+				<col name="id">8025</col>
+				<col name="caption">Patient Accounting Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert requiring action on a patient account</col>
+			</row>
+			<row>
+				<col name="id">8026</col>
+				<col name="caption">Patient Appointment Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert requiring action on a patient appointments</col>
+			</row>
+			<row>
+				<col name="id">8030</col>
+				<col name="caption">Insurance Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert regarding an insurance company</col>
+			</row>
+			<row>
+				<col name="id">8040</col>
+				<col name="caption">Medication Alert</col>
+				<col name="group_name">Alert</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Alert regarding information on medication/drugs</col>
+			</row>
+			<row>
+				<col name="id">8200</col>
+				<col name="caption">Action</col>
+				<col name="group_name">Alert Response</col>
+				<col name="icon_img_summ">alert_btn.gif</col>
+				<col name="remarks">Response to an Alert</col>
+			</row>
+			<row>
+				<col name="id">9000</col>
+				<col name="caption">Plan</col>
+				<col name="group_name">Action</col>
+				<col name="icon_img_summ">plan.gif</col>
+				<col name="remarks">Any medical decision or plan made by care provider</col>
+			</row>
+			<row>
+				<col name="id">9010</col>
+				<col name="caption">Notes</col>
+				<col name="group_name">Action</col>
+				<col name="icon_img_summ">notes.gif</col>
+				<col name="remarks">Any medical notes made by care provider</col>
+			</row>
+			<row>
+				<col name="id">9020</col>
+				<col name="caption">Void</col>
+				<col name="group_name">Action</col>
+				<col name="remarks">This type is created when voiding an invoice or claim</col>
+			</row>
+			<row>
+				<col name="id">9030</col>
+				<col name="caption">Payment</col>
+				<col name="group_name">Action</col>
+				<col name="remarks">This type is created when a payment is being collected</col>
+			</row>
+			<row>
+				<col name="id">9040</col>
+				<col name="caption">On Call</col>
+				<col name="group_name">Action</col>
+				<col name="remarks">This type is created when a provider is on call</col>
+			</row>
+			<row>
+				<col name="id">9500</col>
+				<col name="caption">Account Notes</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Collector's notes associated with an account</col>
+			</row>
+			<row>
+				<col name="id">9510</col>
+				<col name="caption">Reck Date</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Reck date for the acccount</col>
+			</row>
+			<row>
+				<col name="id">9520</col>
+				<col name="caption">Account Owner</col>
+				<col name="group_name">Account Collection</col>
+				<col name="remarks">Collector for this account</col>
+			</row>
+			<row>
+				<col name="id">10000</col>
+				<col name="caption">Place</col>
+				<col name="group_name">Service</col>
+				<col name="remarks">Place where service was rendered</col>
+			</row>
+			<row>
+				<col name="id">10010</col>
+				<col name="caption">Type</col>
+				<col name="group_name">Service</col>
+				<col name="remarks">Type of service rendered</col>
+			</row>
+			<row>
+				<col name="id">11000</col>
+				<col name="caption">Hospitalization</col>
+				<col name="group_name">Hospitalization</col>
+				<col name="remarks">General admission in the hospital.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
+			</row>
+			<row>
+				<col name="id">11100</col>
+				<col name="caption">Surgery</col>
+				<col name="group_name">Hospitalization</col>
+				<col name="remarks">Admitted in the hospital for a surgery.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
+			</row>
+			<row>
+				<col name="id">11200</col>
+				<col name="caption">Therapy</col>
+				<col name="group_name">Hospitalization</col>
+				<col name="remarks">Admitted in the hospital for therapy.The fields are stored in the table 'transaction' as follows:Date of admission in trans_begin_stamp,Hospital Name in related data,Room number in caption,Reason for admission in trans_status_reason,Physician in Provider_id,In/Out patient in data_text_a,Orders in detail,Procedures in data_text_c,Consulting physician inconsult_id, Findings in trans_substatus_reason,Duration of stay in data_text_b.</col>
+			</row>
+			<row>
+				<col name="id">12000</col>
+				<col name="caption">Tests</col>
+				<col name="group_name">Measurements</col>
+				<col name="remarks">Tests done on a patient and the results.The fields are stored in the table 'transaction' as follows:Test date in trans_begin_stamp,Height in data_text_b,Height value in data_text_a, Weight in data_text_b,Weight value in data_text_a,Diet in data_text_b,Diet value in data_text_a, Blood sugar in data_text_b,Blood sugar value in data_text_a,Blood pressure in data_text_b,Blood pressure value in data_text_a,Exercise in data_text_b,Exercise value in data_text_a,Stress in data_text_b,Stress value in data_text_a,Cholesterol in data_text_b,Cholesterol value in data_text_a</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Catalog_Entry_Type" abbrev="CatEntTy" type="Type_Definition">
+		<description></description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Item Group</col>
+				<col name="remarks">This item type is just a placeholder for other child items</col>
+			</row>
+			<row>
+				<col name="id">80</col>
+				<col name="caption">ICD-9</col>
+			</row>
+			<row>
+				<col name="id">100</col>
+				<col name="caption">CPT</col>
+			</row>
+			<row>
+				<col name="id">110</col>
+				<col name="caption">Procedure</col>
+			</row>
+			<row>
+				<col name="id">120</col>
+				<col name="caption">Procedure (requiring certification)</col>
+			</row>
+			<row>
+				<col name="id">150</col>
+				<col name="caption">Service</col>
+			</row>
+			<row>
+				<col name="id">160</col>
+				<col name="caption">Service (requiring certification)</col>
+			</row>
+			<row>
+				<col name="id">200</col>
+				<col name="caption">Product</col>
+			</row>
+			<row>
+				<col name="id">210</col>
+				<col name="caption">HCPCS</col>
+			</row>
+			<row>
+				<col name="id">220</col>
+				<col name="caption">EPSDT</col>
+			</row>
+			<row>
+				<col name="id">230</col>
+				<col name="caption">Misc Procedure Code</col>
+			</row>
+			<row>
+				<col name="id">250</col>
+				<col name="caption">ACS Service Code</col>
+			</row>
+
+			<row>
+				<col name="id">300</col>
+				<col name="caption">Labs</col>
+			</row>
+			<row>
+				<col name="id">310</col>
+				<col name="caption">Radiology</col>
+			</row>
+			<row>
+				<col name="id">999</col>
+				<col name="caption">Other</col>
+			</row>
+
+
+
+
+		</data>
+	</table>
+
+	<table name="Allergen_Reaction" abbrev="AllgRxn" type="Type_Definition">
+		<description></description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Anaphylaxis</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Anaphylactoid</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Immediate</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Delayed</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Rash</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Hives/Urticaria</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Itching</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Steven Johnson's Syndrome</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Fever</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Arthritis</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Erythema Nodosum</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Shortness of Breath</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Laryngospasms</col>
+				<col name="group_name">Medication Allergy</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Asthma</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Cough</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Sinusitis</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Conjunctivitis</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Itchy Eyes</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Rhinitis</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Sneezing</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Rash</col>
+				<col name="group_name">Environmental Allergy</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Renal Toxicity</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Hepatic Toxicity</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Neutropenia</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Thrombocytopenia</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Anemia</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Nausea</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Vomiting</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Dizziness</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">Problems Sleeping</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">Hallucinations</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">Abdominal Cramping/Pain</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">Dry Mouth</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">Diarrhea</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">Headaches</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Peripheral Neuropathy</col>
+				<col name="group_name">Medication Intolerance</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Org_Type" abbrev="OrgTyp" type="Type_Definition">
+		<description>
+			List of all organization types.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Practice</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Clinic</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Facility/Site</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Diagnostic Services</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Department</col>
+				<col name="group_name">dept</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Hospital</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Therapeutic Services</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Insurance</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Employer</col>
+				<col name="group_name">employer</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">IPA</col>
+				<col name="group_name">ipa</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">main_dir_entry</col>
+				<col name="group_name">provider_directory</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">location_dir_entry</col>
+				<col name="group_name">provider_directory</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Lab</col>
+				<col name="group_name">Lab</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Pharmacy</col>
+				<col name="group_name">provider</col>
+			</row>
+			<row>
+				<col name="id">99</col>
+				<col name="caption">other</col>
+				<col name="group_name">other</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Payment_Type" abbrev="PayTyp" type="Type_Definition">
+		<description>
+			List of all payment types (those items specific to Insurance payments are in the group 'insurance').
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Pre-payment</col>
+				<col name="group_name">personal</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Deductible</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Post-payment</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Denied</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">COB</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Copay Pre-paid</col>
+				<col name="group_name">personal</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Coverage Terminated</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Past File Deadline</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Copay</col>
+				<col name="group_name">personal</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Budget-payment</col>
+				<col name="group_name">personal</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Claim_Type" abbrev="ClmTyp" type="Type_Definition">
+		<description>
+			List of all claim and insurance types (those items specific to Insurance types are in the group 'insurance').
+			All items are "Claim Types" but only group_names named 'insurance' are valid Insurance types.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Self-Pay</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Insurance</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">HMO(cap)</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">PPO</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Medicare</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Medicaid</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Workers Compensation</col>
+				<col name="group_name">workers compensation</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Third-Party Payer</col>
+				<col name="group_name">third-party</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Champus</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">ChampVA</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">FECA Blk Lung</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">BCBS</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">HMO(non-cap)</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">MC(managed care choice)</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">POS(point of service)</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Railroad Medicare</col>
+				<col name="group_name">insurance</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Bill_Remittance_Type" abbrev="BlRmtTy" type="Type_Definition">
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Paper</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Electronic</col>
+			</row>
+
+			<row>
+				<col name="id">1100</col>
+				<col name="caption">Envoy Commercial - Medical</col>
+			</row>
+			<row>
+				<col name="id">1200</col>
+				<col name="caption">Envoy BCBS - Medical</col>
+			</row>
+			<row>
+				<col name="id">1300</col>
+				<col name="caption">Envoy Medicare - Medical</col>
+			</row>
+			<row>
+				<col name="id">1400</col>
+				<col name="caption">Envoy Medicaid - Medical</col>
+			</row>
+		</data>
+	</table>
+
+</schema>

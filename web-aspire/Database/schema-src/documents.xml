@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="documents">
+	<include file="generic-datatypes.xml"/>
+
+	<table name="Document_Specification" abbrev="DocSpec" type="Enumeration">
+		<description>Types of documents that the application can manage.</description>
+		<enum id="0">Folder/Container</enum>
+		<enum id="1000">MIME Document</enum>
+		<enum id="2000">Internal Message (within Physia system)</enum>
+		<enum id="2100">E-mail Message</enum>
+		<enum id="3000">HL7 Message (Originating)</enum>
+		<enum id="4000">HL7 Message (Translated to XML/MDL)</enum>
+		<enum id="5000">Fax</enum>
+	</table>
+
+	<table name="Document_Event_Type" abbrev="DocEvTy" type="Enumeration">
+		<description>Variety of events that can take place while managing documents.</description>
+		<enum>Arrived</enum>
+		<enum>Reviewed</enum>
+		<enum>Filed</enum>
+		<enum>On-hold</enum>
+		<enum>Routed</enum>
+		<enum>Signed</enum>
+	</table>
+
+	<table name="Document_Source_Type" abbrev="DocSrcTy" type="Enumeration">
+		<description>Variety of sources that can send us documents to be managed.</description>
+		<enum id="0">Physia</enum>
+		<enum id="100">Person</enum>
+		<enum id="200">Org</enum>
+	</table>
+
+	<table name="Document_Association_Type" abbrev="DocAsnTy" type="Enumeration">
+		<description>Variety of assocations that a document can have to another document.</description>
+		<enum id="0">None</enum>
+		<enum id="1">Parent</enum>
+		<enum id="2">Child</enum>
+		<enum id="3">Sibling</enum>
+		<enum id="10">Translated from</enum>
+		<enum id="1000">Owned by Person</enum>
+		<enum id="1010">Owned by Organization</enum>
+		<enum id="1020">Owned by Person in Organization</enum>
+		<enum id="2000">Requested by Person</enum>
+		<enum id="2010">Requested by Organization</enum>
+		<enum id="2020">Requested by Person in Organization</enum>
+		<enum id="3000">Requires review by Person</enum>
+		<enum id="3010">Requires review by Organization</enum>
+		<enum id="3020">Requires review by Person in Organization</enum>
+	</table>
+
+	<table name="Document_Association_Status" abbrev="DocAsnSt" type="Enumeration">
+		<description>Variety of associations that a document can have to another document.</description>
+		<enum id="0">Active</enum>
+		<enum id="1">Inactive</enum>
+	</table>
+	
+	<table name="Document" abbrev="Doc" type="Audit,Secure">
+		<description>All documents that we can manage</description>
+		<column name="doc_id" type="autoinc" primarykey="yes" descr="Unique Document ID"/>
+		<column name="doc_id_alias" type="text" size="64" descr="Document ID assigned from the source (alias, if any)"/>
+		<column name="doc_message_digest" type="text" size="32" descr="128-bit unique message digest (MD5)"/>
+		<column name="doc_mime_type" type="text" size="128" descr="The MIME type, if any for this document"/>
+		<column name="doc_header" type="text" size="4000" descr="Any header/signature that document posseses"/>
+		<column name="doc_spec_type" lookupref="Document_Specification" required="yes" indexed="yes" descr="They type/specification of the document"/>		
+		<column name="doc_spec_subtype" type="text" size="128" indexed="yes" descr="Any subtype/specification of the document (depends upon doc_spec_type -- e.g. it's the message type for a HL7 message)"/>		
+		<column name="doc_source_id" type="text" size="255" indexed="yes" descr="The id associated with the source type"/>
+		<column name="doc_source_type" lookupref="Document_Source_Type" required="yes" indexed="yes" descr="They source of the document"/>
+		<column name="doc_source_subtype" type="text" size="255" indexed="yes" descr="Any subtype/specification of the document (depends upon doc_source_type)"/>
+		<column name="doc_source_system" type="text" size="255" indexed="yes" descr="If the document is a message, this is the application that sent the message"/>
+		<column name="doc_name" type="text" size="1024" required="yes" descr="They name of the document"/>		
+		<column name="doc_description" type="text" size="4000" descr="They description of the document"/>		
+		<column name="doc_orig_stamp" type="stamp" descr="The date/time document was created/originated"/>		
+		<column name="doc_recv_stamp" type="stamp" descr="The date/time document was received"/>		
+		<column name="doc_data_a" type="text" size="1024" descr="Any document-specific alias/information"/>		
+		<column name="doc_data_b" type="text" size="1024" descr="Any document-specific alias/information"/>		
+		<column name="doc_data_c" type="text" size="1024" descr="Any document-specific alias/information"/>		
+		<column name="doc_content_uri" type="text" size="512" descr="If the document is addressable by a URI, this is the URI"/>
+		<column name="doc_content_small" type="text" size="4000" descr="They actual content of the document (depends on spec as to whether this or _large is used)"/>		
+		<column name="doc_content_large" type="datablock" descr="They actual content of the document"/>
+		<column name="doc_dest_ids" type="text" size="1024" descr="The ids of the recipients (both To and CC)"/>
+	</table>
+
+	<table name="Document_Association" abbrev="DocAssn" type="Audit,Secure">
+		<description>Associations between documents</description>
+		<column name="doc_assn_id" type="autoinc" primarykey="yes" descr="Unique Association ID"/>
+		<column name="assn_status" lookupref="Document_Association_Status" indexed="yes" descr="Whether or not association is currently active"/>
+		<column name="assn_type" lookupref="Document_Association_Type" indexed="yes" required="yes" descr="Type of association"/>
+		<column name="assn_sequence" type="integer" indexed="yes" descr="If there is more than one association, this is the sequence"/>
+		<column name="doc_id" parentref="Document.doc_id" indexed="yes" required="yes" descr="Originating Document ID"/>
+		<column name="assoc_doc_id" lookupref="Document.doc_id" indexed="yes" descr="Associated Document ID"/>
+		<column name="person_id" lookupref="Person.person_id" indexed="yes" descr="Person for whom document is associated"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" descr="Org for whom document is associated"/>
+		<column name="assn_data_a" type="text" size="1024" descr="Any association-specific information"/>		
+		<column name="assn_data_b" type="text" size="1024" descr="Any association-specific information"/>		
+		<column name="assn_data_c" type="text" size="1024" descr="Any association-specific information"/>		
+	</table>
+	
+	<table name="Document_Attribute" abbrev="DocAttr" type="Attribute">
+		<param name="parentref">Document.doc_id</param>
+		<column name="person_id" lookupref="Person.person_id" descr="Person for whom attributed is stored"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="Org for whom attributed is stored"/>
+	</table>
+	
+	<table name="Document_Keyword" abbrev="DocKeyw" type="Audit,Secure">
+		<description>Keywords that occur for documents</description>
+		<column name="doc_keyword_id" type="autoinc" primarykey="yes" descr="Unique keyword ID"/>
+		<column name="doc_id" parentref="Document.doc_id" required="yes" descr="Unique Document ID"/>
+		<column name="keyword" type="text" size="1024" indexed="yes" descr="Related Document ID"/>
+		<column name="person_id" lookupref="Person.person_id" indexed="yes" descr="Person for whom keyword is stored"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" descr="Org for whom keyword is stored"/>
+	</table>
+		
+	<table name="Observation" abbrev="Obs" type="Audit,Secure">
+		<description>Lab Test/Observation</description>
+		
+		<column name="observation_id" type="autoinc" primarykey="yes" descr="Unique observation ID"/>
+		<column name="parent_obs_id" selfref="Observation.observation_id" descr="The parent observation (if related to another observation)"/>
+		<column name="obs_status" lookupref="Document_Association_Status" indexed="yes" descr="Whether or not observation is currently active"/>
+		<column name="parent_doc_id" parentref="Document.doc_id" required="yes" indexed="yes" descr="Unique Document ID (parent)"/>
+		<column name="obs_sequence" type="integer" indexed="yes" descr="If there is more than one observation per document, this is the sequence"/>
+		<column name="observee_id" lookupref="Person.person_id" indexed="yes" descr="The person being observed  (Physia ID)"/>
+		<column name="observee_name" type="text" size="64" descr="The person being observed (what was in the HL7 message)"/>
+		<column name="observer_id" lookupref="Person.person_id" indexed="yes" descr="The care provider requesting the observation (Physia ID)"/>
+		<column name="observer_name" type="text" size="64" descr="The care provider requesting the observation (what was in the HL7 message)"/>
+		<column name="observer_org_id" lookupref="Org.org_internal_id" indexed="yes" descr="The care provider requesting the observation (organization)"/>
+		<column name="req_control_num" type="text" size="64" descr="The requester's control number of the observation"/>
+		<column name="prod_control_num" type="text" size="64" descr="The producer's control number of the observation"/>
+		<column name="battery_id" type="text" size="32" descr="The observation (test) ID"/>
+		<column name="battery_text" type="text" size="32" descr="The observation (test) Name"/>
+		<column name="battery_coding" type="text" size="32" descr="The name of the coding system"/>
+		<column name="alt_battery_id" type="text" size="32" descr="The alternate observation (test) ID"/>
+		<column name="alt_battery_text" type="text" size="32" descr="The alternate observation (test) Name"/>
+		<column name="alt_battery_coding" type="text" size="32" descr="The alternate name of the coding system"/>
+		<column name="specimen_collection_stamp" type="stamp" descr="The date/time specimen was collected"/>
+		<column name="obs_report_stamp" type="stamp" descr="The date/time observation was reported"/>
+		<column name="obs_order_status" type="text" size="16" descr="The order status (X=canceled, P=partial, or F=final)"/>
+	</table>
+
+	<table name="Observation_Result" abbrev="ObsRes" type="Audit,Secure">
+		<description>Lab Test Result/Observation Result</description>
+		
+		<column name="result_id" type="autoinc" primarykey="yes" descr="Unique observation result ID"/>
+		<column name="parent_obs_id" parentref="Observation.observation_id" required="yes" indexed="yes" descr="Unique Observation ID"/>
+		<column name="result_producer_id" type="text" size="32" descr="The person producing the result"/>
+		<column name="result_sequence" type="integer" indexed="yes" descr="If there is more than one result per observation, this is the sequence"/>
+		<column name="result_obs_id" type="text" size="64" descr="The observation result ID"/>
+		<column name="result_obs_text" type="text" size="255" descr="The observation result text"/>
+		<column name="result_obs_coding" type="text" size="255" descr="The observation result coding system"/>
+		<column name="result_value_type" type="text" size="6" descr="The observation result value type"/>
+		<column name="result_value_text" type="text" size="4000" descr="The observation result value (in text or paragraphs)"/>
+		<column name="result_value_num" type="float" descr="The observation result value as a single number"/>
+		<column name="result_units_id" type="text" size="32" descr="The observation result units of measure (ID)"/>
+		<column name="result_units_text" type="text" size="32" descr="The observation result units of measure (name)"/>
+		<column name="result_units_coding" type="text" size="32" descr="The name of the coding system"/>
+		<column name="alt_units_id" type="text" size="32" descr="The alternate observation units ID"/>
+		<column name="alt_units_text" type="text" size="32" descr="The alternate observation units Name"/>
+		<column name="alt_units_coding" type="text" size="32" descr="The alternate name of the coding system"/>
+		<column name="result_normal_range" type="text" size="32" descr="The normal range of the results"/>
+		<column name="result_abnormal_flags" type="text" size="32" descr="Any abnormality flags"/>		
+		<column name="result_abnormal_nature" type="text" size="32" descr="Nature of abnormal checking"/>		
+		<column name="result_order_status" type="text" size="16" descr="The order status (C=corrected, F=final, or P=preliminary, X=deleted)"/>
+		<column name="result_notes" type="text" size="4000" descr="Any notes for the results"/>
+	</table>
+
+	<table name="Document_Event" abbrev="DocEvent" type="Audit,Secure">
+		<description>Events that occur for documents</description>
+		<column name="doc_event_id" type="autoinc" primarykey="yes" descr="Unique Event ID"/>
+		<column name="event_type" lookupref="Document_Event_Type" indexed="yes" required="yes" descr="Type of event"/>
+		<column name="event_status" type="text" size="1024" descr="Any status message for this event"/>
+		<column name="doc_id" parentref="Document.doc_id" required="yes" descr="Unique Document ID"/>
+		<column name="obs_id" lookupref="Observation.observation_id" required="yes" descr="Unique Observation ID (if event was about an observation)"/>
+		<column name="obs_result_id" lookupref="Observation_Result.result_id" required="yes" descr="Unique Observation result ID (if event was about observation result)"/>
+		<column name="related_doc_id" lookupref="Document.doc_id" descr="Related Document ID"/>
+		<column name="person_id" lookupref="Person.person_id" indexed="yes" descr="Person for whom event occurred"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" descr="Org for whom event occurred"/>
+		<column name="event_info" type="text" size="1024" descr="What happened (the event information)"/>
+		<column name="event_info_extra" type="text" size="1024" descr="Any other extra event information"/>
+	</table>
+	
+</schema>

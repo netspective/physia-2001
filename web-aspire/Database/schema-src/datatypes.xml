@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-datatypes">
+	<include file="generic-datatypes.xml"/>
+	<include file="enums.xml"/>
+
+	<!--
+	**************************************************************************
+	The following datatypes are specific to physia, but general in nature
+	so multiple physia applications can use them
+	**************************************************************************
+	-->
+
+	<datatype name="session_id" type="text" size="16"/>
+	<datatype name="entity_id" type="text" size="16"/>
+	<datatype name="duration">
+		<composite>
+			<column name="$name$_begin_date" type="date"/>
+			<column name="$name$_end_date" type="date"/>
+		</composite>
+	</datatype>
+	<datatype name="stamp_range">
+		<composite>
+			<column name="$name$_begin_stamp" type="stamp"/>
+			<column name="$name$_end_stamp" type="stamp"/>
+		</composite>
+	</datatype>
+	<datatype name="entity">
+		<composite>
+			<column name="$name$_type" lookupref="Entity_Type"/>
+			<column name="$name$_id" type="entity_id"/>
+		</composite>
+	</datatype>
+
+	<tabletype name="Entity_Owned_Lookup" type="Lookup">
+		<column name="parent" type="entity"/>
+	</tabletype>
+
+	<tabletype name="Entity_Owned_Type_Definition" type="Type_Definition">
+		<column name="parent" type="entity"/>
+	</tabletype>
+
+	<tabletype name="Audit">
+		<column name="cr_stamp" type="stamp" default="sysdate" required="dbms" group="audit" descr="Date/time record was created"/>
+		<column name="cr_user_id" type="entity_id" group="audit" descr="The user that created the record"/>
+		<column name="cr_org_internal_id" type="longint" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
+		<column name="version_id" type="version_id" required="dbms" unique="yes" group="audit" descr="A unique version number for this record (for audit purposes)"/>
+	</tabletype>
+	
+	<tabletype name="Creation_Track">
+		<column name="cr_stamp" type="stamp" default="sysdate" required="dbms" group="audit" descr="Date/time record was created"/>
+		<column name="cr_user_id" type="entity_id" group="audit" descr="The user that created the record"/>
+		<column name="cr_org_internal_id" type="longint" group="audit" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
+	</tabletype>
+	
+
+	<tabletype name="Secure">
+		<column name="cr_session_id" usetype="Person_Session.session_id" required="no" group="secure" descr="Session that created this record"/>
+	</tabletype>
+
+	<!--
+		THE RESTRICT_ROWS AND RESTRICT_ROWS_ABBREV TableTypes ARE
+		IDENTICAL EXCEPT FOR NAME OF CHILDTABLE (one has full table name + _Permit,
+		the other has abbreviated table name + _Permit).
+	-->
+
+	<tabletype name="Restrict_Rows">
+		<column name="permissions" lookupref="Permission_Type" descr="The permissions needed to view a specific row">
+			<table name="$parenttbl_name$_Permit" abbrev="$parenttbl_abbrev$PM" type="Audit,Secure">
+				<column name="parent_id" parentref="$parenttbl_name$.$parenttbl_prikey$" primarykey="yes" descr="The owner of the permission"/>
+				<column name="member_type" primarykey="yes" lookupref="Permit_Member_Type" descr="The type of member that permission is being defined for (group, person, org, etc)"/>
+				<column name="member_id" primarykey="yes" type="text" descr="The id of the member (a group, person, etc)"/>
+				<column name="permit_flags" type="bitmaskedflags" descr="All permission booleans combined into one (for simple access)"/>
+				<column name="permit_use" type="boolean" descr="Allow use of parent_id by member_id (can it be used for reporting, aggregation, etc)"/>
+				<column name="permit_view" type="boolean" descr="Allow viewing of parent_id by member_id"/>
+				<column name="permit_modify" type="boolean" descr="Allow modification of parent_id by member_id"/>
+				<column name="permit_remove" type="boolean" descr="Allow removal of parent_id by member_id"/>
+				<column name="effective" type="stamp_range" descr="Permissions are effective from start to end date (if not-NULL)"/>
+				<column name="extra_data" type="text" size="512" descr="Any extra security information like applicable to zip code, county, etc"/>
+			</table>
+		</column>
+	</tabletype>
+
+	<tabletype name="Restrict_Rows_Abbrev">
+		<column name="permissions" lookupref="Permission_Type" descr="The permissions needed to view a specific row">
+			<table name="$parenttbl_abbrev$_Permit" abbrev="$parenttbl_abbrev$PM" type="Audit,Secure">
+				<column name="parent_id" parentref="$parenttbl_name$.$parenttbl_prikey$" primarykey="yes" descr="The owner of the permission"/>
+				<column name="member_type" primarykey="yes" lookupref="Permit_Member_Type" descr="The type of member that permission is being defined for (group, person, org, etc)"/>
+				<column name="member_id" primarykey="yes" type="text" descr="The id of the member (a group, person, etc)"/>
+				<column name="permit_flags" type="bitmaskedflags" descr="All permission booleans combined into one (for simple access)"/>
+				<column name="permit_use" type="boolean" descr="Allow use of parent_id by member_id (can it be used for reporting, aggregation, etc)"/>
+				<column name="permit_view" type="boolean" descr="Allow viewing of parent_id by member_id"/>
+				<column name="permit_modify" type="boolean" descr="Allow modification of parent_id by member_id"/>
+				<column name="permit_remove" type="boolean" descr="Allow removal of parent_id by member_id"/>
+				<column name="effective" type="stamp_range" descr="Permissions are effective from start to end date (if not-NULL)"/>
+				<column name="extra_data" type="text" size="512" descr="Any extra security information like applicable to zip code, county, etc"/>
+			</table>
+		</column>
+	</tabletype>
+
+	<tabletype name="Address" type="Audit,Secure">
+		<description>An address of a members of a certain entity, such as a person or org.</description>
+		<column name="item_id" type="autoinc" primarykey="yes" descr="Unique identifier for foreign-key and update purposes"/>
+		<column name="parent_id" parentref="$parentref$" indexed="yes" uniquegrp="addrname" descr="The owner of the address"/>
+		<column name="address_name" indexed="yes" type="text" size="128" uniquegrp="addrname" descr="The address name"/>
+		<column name="line1" type="text" size="256" descr="The first address line"/>
+		<column name="line2" type="text" size="256" descr="The second address line"/>
+		<column name="city" type="text" size="128" descr="The city of the state"/>
+		<column name="county" type="text" size="128" descr="The county of the state"/>
+		<column name="state" type="text" size="128" descr="The state of the union"/>
+		<column name="zip" type="text" size="128" descr="The postal code (+4 format)"/>
+		<column name="country" type="text" size="128" descr="The country of the address"/>
+		<column name="complete_addr_html" type="text" size="512" calc="trigger" descr="The complete address (created automatically)"/>
+	</tabletype>
+
+	<tabletype name="Usage">
+		<description>Usage table for tracking number of reads/writes of a particular record in the parent table.</description>
+		<column name="parent_id" parentref="$parentref$" indexed="yes" uniquegrp="key" descr="The owner of the usage information"/>
+		<column name="person_id" lookupref="Person.person_id" indexed="yes" uniquegrp="key" descr="Specific person for which usage is being tracked"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
+		<column name="read_count" type="integer" descr="The number of times the parent_id has been read by person_id"/>
+		<column name="write_count" type="integer" descr="The number of times the parent_id has been written by person_id"/>
+	</tabletype>
+
+	<tabletype name="Notify">
+		<description>Notify table for tracking who and how to notify in case of change to a record.</description>
+		<column name="parent_id" parentref="$parentref$" primarykey="yes" descr="The owner of the notification"/>
+		<column name="entity" required="yes" descr="The entity that will be notified"/>
+		<column name="notify_type" lookupref="Notify_Type" required="yes" descr="The type of notification being defined"/>
+		<column name="notify_data" type="text" size="512" required="yes" descr="Any comments/information"/>
+	</tabletype>
+
+	<datatype name="org_text_set" type="text" size="384">
+		<table name="$parenttbl_name$_$parentcol_Name$" abbrev="$parenttbl_abbrev$$parentcol_abbrev$">
+			<parent>$parenttbl_name$</parent>
+			<column name="parent_id" usetype="$parenttbl_name$.$parenttbl_prikey$" indexed="yes" uniquegrp="member" descr="The owner of the set member (this SHOULD be a foreign key, but causes a mutating trigger problem)"/>
+			<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="member" descr="Specific organization to which member belongs"/>
+			<column name="member_name" indexed="yes" uniquegrp="member" type="text" size="32" cache="extract:$parenttbl_name$.$parentcol_name$" descr="The set member name"/>
+		</table>
+		<assert check="parentTblHasSinglePrimaryKey"/>
+		<templateflag name="addtriggers" value="org_text_set"/>
+	</datatype>
+
+</schema>

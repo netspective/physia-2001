@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="organization">
+	<include file="generic-datatypes.xml"/>	
+	<table name="Org_Association" abbrev="OrgAn" type="Audit,Secure">
+		<description>Associations between Organization</description>
+		<column name="org_assn_id" type="autoinc" primarykey="yes" descr="Unique Association ID"/>
+		<column name="org_assn_status" lookupref="Org_Association_Status" indexed="yes" descr="Whether or not association is currently active"/>
+		<column name="org_assn_type" lookupref="Org_Association_Type" indexed="yes" required="yes" descr="Type of association"/>
+		<column name="org_assn_sequence" type="integer" indexed="yes" descr="If there is more than one association, this is the sequence"/>
+		<column name="org_internal_id" parentref="org.org_internal_id" indexed="yes" required="yes" descr="Organization ID"/>
+		<column name="assn_org_internal_id" lookupref="org.org_internal_id" indexed="yes" descr="Associated Organization ID"/>
+	</table>
+	<table name="Org_Association_Status" abbrev="OrgAsnSt" type="Enumeration">
+		<description>Variety of associations that a document can have to another document.</description>
+		<enum id="0">Active</enum>
+		<enum id="1">Inactive</enum>
+	</table>		
+	<table name="Org_Association_Type" abbrev="OrgAsnTy" type="Enumeration">
+		<description>Types of assocations between two Orgs</description>
+		<enum id="0">None</enum>
+		<enum id="1">Self</enum>		
+		<enum id="2">Parent Organization</enum>
+		<enum id="3">Child Organization</enum>
+		<enum id="100">IPA</enum>
+		<enum id="110">IPA Member</enum>
+	</table>	
+</schema>

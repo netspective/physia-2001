@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="generic-datatypes.xml">
+	<datatype name="text">
+		<sqldefn>varchar2(%size%)</sqldefn>
+		<sqlwritefmt>'$escapedTextValue$'</sqlwritefmt>
+		<size>32</size>
+	</datatype>
+
+	<datatype name="char">
+		<sqldefn>char(1)</sqldefn>
+		<sqlwritefmt>'$escapedTextValue$'</sqlwritefmt>
+	</datatype>
+
+	<datatype name="user_id" type="text">
+		<sqlwritefmt>'$escapedTextValue$'</sqlwritefmt>
+		<size>32</size>
+	</datatype>
+
+	<datatype name="float">
+		<sqldefn>number(20,6)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="integer">
+		<sqldefn>number(8)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="smallint">
+		<sqldefn>number(4)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="longint">
+		<sqldefn>number(16)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="bitmaskedflags">
+		<sqldefn>number(16)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="boolean">
+		<sqldefn>number(1)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+		<validate method="constraint" type="numset" set="0,1"/>
+	</datatype>
+
+	<datatype name="currency">
+		<sqldefn>number(12,2)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="percentage">
+		<sqldefn>number(5,2)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="lookup">
+		<sqldefn>number(8)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="date">
+		<sqldefn>date</sqldefn>
+		<sqlwritefmt>to_date('$value$', 'MM/DD/YYYY')</sqlwritefmt>
+	</datatype>
+
+	<datatype name="stamp">
+		<sqldefn>date</sqldefn>
+		<sqlwritefmt>to_date('$value$', 'MM/DD/YYYY HH:MI AM') + #session.GMT_DAYOFFSET# </sqlwritefmt>
+	</datatype>
+
+	<datatype name="time">
+		<sqldefn>date</sqldefn>
+		<sqlwritefmt>to_date('$value$', 'HH:MI AM') + #session.GMT_DAYOFFSET# </sqlwritefmt>
+	</datatype>
+
+	<datatype name="socsec" type="text" size="11"/>
+	<datatype name="password" type="text" size="16"/>
+
+	<datatype name="autoinc">
+		<sqldefn>number(16)</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+		<copytype>longint</copytype>
+	</datatype>
+
+	<datatype name="datablock">
+		<sqldefn>clob</sqldefn>
+		<sqlwritefmt>$value$</sqlwritefmt>
+	</datatype>
+
+	<datatype name="version_id" type="autoinc"/>
+
+	<datatype name="md5key" type="text" size="32"/>
+
+	<table name="Reference_Item">
+		<description>
+			This table is basically used for creating parent/child relationships
+			for Enumeration and Lookup tables. Since it has no columns, no physical
+			table will exist so it becomes a simple logical placeholder.
+		</description>
+	</table>
+
+	<tabletype name="Enumeration" parent="Reference_Item">
+		<param name="capsize">64</param>
+		<param name="abbrevsize">32</param>
+
+		<column name="id" type="integer" primarykey="yes" descr="The value associated with a single enum"/>
+		<column name="caption" type="text" size="$capsize$" required="yes" descr="The name/text an end-user would see"/>
+		<column name="abbrev" type="text" size="$abbrevsize$" unique="yes" descr="An abbreviated form of the caption"/>
+	</tabletype>
+
+	<table name="Lookup_Result_Type" abbrev="LkResTy" type="Enumeration">
+		<enum>ID</enum>
+		<enum>Caption</enum>
+		<enum>Abbreviation</enum>
+	</table>
+
+	<tabletype name="Lookup" type="Enumeration">
+		<column name="group_name" type="text" size="32" descr="The group to which the lookup item belongs"/>
+		<column name="sort_seq" type="integer" descr="The sorting sequence within the group (if sorting differently than the ID or Caption"/>
+		<column name="result" lookupref="Lookup_Result_Type" descr="The type of result after a lookup (the value that should be used for the lookup -- the id or caption or abbreviation)"/>
+	</tabletype>
+
+	<tabletype name="Org_Lookup" type="Lookup">
+		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="The organization that owns this item (NULL if owned globally)"/>
+	</tabletype>
+
+	<tabletype name="Type_Definition" type="Lookup">
+		<column name="remarks" type="text" size="2048" descr="Any special remarks, usage instructions etc."/>
+	</tabletype>
+
+	<datatype name="text_set" type="text" size="255">
+		<table name="$parenttbl_name$_$parentcol_Name$" abbrev="$parenttbl_abbrev$$parentcol_Short$SM">
+			<description>
+				This table is a cache of its parent's text_set column. The contents
+				of this table are updated automatically via a trigger.
+				DO NOT INSERT/UPDATE/DELETE MANUALLY.
+
+				The "set" type column in the main table is actually a cache of all
+				the set members in the child table. A set is limited to about 20-25
+				10-character member names. The column in the main table is a comma-
+				separated list of text items. The child table is the exact same contents
+				in a row-oriented format in a separate table (maintained by triggers).
+			</description>
+			<parent>$parenttbl_name$</parent>
+			<column name="parent_id" usetype="$parenttbl_name$.$parenttbl_prikey$" primarykey="yes" descr="The owner of the set member (this SHOULD be a foreign key, but causes a mutating trigger problem)"/>
+			<column name="member_name" primarykey="yes" type="text" size="32" cache="extract:$parenttbl_name$.$parentcol_name$" descr="The set member name"/>
+		</table>
+		<assert check="parentTblHasSinglePrimaryKey"/>
+		<templateflag name="addtriggers" value="text_set"/>
+	</datatype>
+
+	<datatype name="lookup_set" type="text" size="255">
+		<table name="$parenttbl_name$_$parentcol_Name$" abbrev="$parenttbl_abbrev$$parentcol_Short$SM">
+			<description>
+				This table is a cache of its parent's lookup_set column. The contents
+				of this table are updated automatically via a trigger.
+				DO NOT INSERT/UPDATE/DELETE MANUALLY.
+
+				The "set" type column in the main table is actually a cache of all
+				the set members in the child table. The column in the main table is a comma-
+				separated list of text items. The child table is the exact same contents
+				in a row-oriented format in a separate table (maintained by triggers).
+			</description>
+			<parent>$parenttbl_name$</parent>
+			<column name="parent_id" usetype="$parenttbl_name$.$parenttbl_prikey$" primarykey="yes" descr="The owner of the set member (this SHOULD be a foreign key, but causes a mutating trigger problem)"/>
+			<column name="member_name" primarykey="yes" lookupref="$parentcol.lookupsetref$" cache="extract:$parenttbl_name$.$parentcol_name$" descr="The set member ID"/>
+		</table>
+		<assert check="parentTblHasSinglePrimaryKey"/>
+		<templateflag name="addtriggers" value="lookup_set"/>
+	</datatype>
+
+</schema>

@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-reference">
+
+	<table name="REF_ICD">
+		<column name="icd" type="text" size="6" primarykey="yes" descr="Actual ICD-9-CM code including the 'point'"/>
+		<column name="name" type="text" size="50" descr="The short description of the ICD code"/>
+		<column name="descr" type="text" size="300" indexed="yes" descr="The long description of the ICD code"/>
+		<column name="non_specific_code" type="boolean" descr="'True' if code requires additional 4th or 5th digit for reporting"/>
+		<column name="sex" type="char" descr="M=Male; F=Female; otherwise space"/>
+		<column name="age" type="char" descr="A=adult 14 and up; M=Maternal, 12-55; N=newborn less than 1; P=pediatric 0-17; otherwise space"/>
+		<column name="major_diag_category" type="text" size="2" descr="Number of the MDC for the Prospective Payment System (PPS) 01-24, 99"/>
+		<column name="comorbidity_complication" type="boolean" descr="True= indentifies secondary diagnosis codes as a complication or comorbidity"/>
+		<column name="medicare_secondary_payer" type="boolean" descr="Trauma releated codes that may trigger investigation for liability insurance as the primary payer"/>
+		<column name="manifestation_code" type="boolean" descr="True= Manifestation code, cannot be primary diagnosis"/>
+		<column name="questionable_admission" type="boolean" descr="True or False"/>
+		<column name="unacceptable_primary_wo" type="boolean" descr="True or False"/>
+		<column name="unacceptable_principal" type="boolean" descr="True or False"/>
+		<column name="unacceptable_procedure" type="boolean" descr="True= identifies code as operating room procedure"/>
+		<column name="non_specific_procedure" type="boolean" descr="True= non-specific operating room procedure.  More specific code should be used"/>
+		<column name="non_covered_procedure" type="boolean" descr="True= Medicare does not cover"/>
+		<column name="cpts_allowed" type="text" size="4000" descr="List of CPT codes allowed"/>
+	</table>
+
+	<table name="REF_CPT">
+		<column name="cpt" type="text" size="5" primarykey="yes" descr="Actual CPT Code"/>
+		<column name="name" type="text" size="64" descr="Short Description of the CPT code"/>
+		<column name="description" type="text" size="1024" descr="Long description of the CPT code"/>
+		<column name="comprehensive_compound_cpts" type="text" size="4000" descr="List of comprehensive-compound CPT codes"/>
+		<column name="comprehensive_compound_flags" type="text" size="4000" descr="List of comprehensive-compound flags"/>
+		<column name="mutual_exclusive_cpts" type="datablock" descr="List of mutually exclusive CPT codes"/>
+		<column name="mutual_exclusive_flags" type="text" size="4000" descr="List of mutually exclusive flags (one for each cpt in mutual_exclusive_cpts column)"/>
+		<column name="sex" type="char" descr="M=Male; F=Female; otherwise space"/>
+		<column name="unlisted" type="boolean" descr="True or False"/>
+		<column name="questionable" type="boolean" descr="True or False"/>
+		<column name="asc_" type="boolean" descr="True or False"/>
+		<column name="non_rep" type="boolean" descr="True or False"/>
+		<column name="non_cov" type="boolean" descr="True or False"/>
+	</table>
+
+	<table name="REF_HCPCS">
+		<column name="hcpcs" type="text" size="6" primarykey="yes" descr="Actual HCPCS Code"/>
+		<column name="name" type="text" size="64" descr="Short Description of the HCPCS code"/>
+		<column name="description" type="text" size="1024" descr="Long description of the HCPCS code"/>
+	</table>
+
+	<!-- icdstem_usage must go before icd_usage because of trigger -->
+	<table name="REF_ICDStem_Usage" abbrev="ICDSUsg" parent="REF_ICD">
+		<column name="icd_stem" type="text" size="6" indexed="yes" uniquegrp="key" descr="Actual ICD-9-CM stem code (everything before the 'point')"/>
+		<column name="person_id" lookupref="Person.person_id" indexed="yes" uniquegrp="key" descr="Specific person for which usage is being tracked"/>
+		<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="key" descr="Specific organization for which usage is being tracked"/>
+		<column name="read_count" type="integer" descr="The number of times the parent_id has been read by person_id"/>
+	</table>
+
+	<table name="REF_ICD_Usage" abbrev="ICDUsg" type="Usage">
+		<param name="parentref">REF_ICD.icd</param>
+	</table>
+
+	<table name="REF_CPT_Usage" abbrev="CPTUsg" type="Usage">
+		<param name="parentref">REF_CPT.cpt</param>
+	</table>
+
+	<table name="REF_HCPCS_Usage" abbrev="HCPCSUsg" type="Usage">
+		<param name="parentref">REF_HCPCS.hcpcs</param>
+	</table>
+
+	<table name="Envoy_Payer_Type" abbrev="ENPT" type="Enumeration">
+		<enum id="100">Commercial - Medical</enum>
+		<enum id="200">Blue Cross/Blue Shield - Medical</enum>
+		<enum id="300">Medicare - Medical</enum>
+		<enum id="400">Medicaid - Medical</enum>
+	</table>
+
+	<table name="REF_Envoy_Payer" abbrev="ENV">
+		<column name="id" type="text" size="16" indexed="yes" descr="The Envoy payer/processor ID"/>
+		<column name="name" type="text" size="256" indexed="yes" descr="The complete name of the payer/processor"/>
+		<column name="ptype" lookupref="Envoy_Payer_Type" indexed="yes" descr="The Envoy payer/processor type"/>
+		<column name="state" type="text" size="2" indexed="yes" descr="2-letter state identifier for BCBS, Medicare, Medicaid"/>
+		<column name="flags" type="longint" descr="Various bit-masked flags (like group policy number required, claim office number required, etc.)"/>
+		<column name="remarks" type="text" size="512" descr="Any additional remarks"/>
+	</table>
+
+	<table name="REF_EPayer" abbrev="EPayer">
+		<column name="id" type="text" size="16" indexed="yes" descr="The Electronic payer/processor ID"/>
+		<column name="name" type="text" size="256" indexed="yes" descr="Short Description of the Payer"/>
+		<column name="psource" lookupref="Electronic_Payer_Source.id" indexed="yes" descr="The electronic payer source"/>
+		<column name="ptype" lookupref="Electronic_Payer_Type.id" indexed="yes" descr="The electronic payer type"/>
+		<column name="subtype" type="text" size="16" descr="Secondary information about the Payer type (perhaps describing some attributes)"/>
+		<column name="state" type="text" size="2" indexed="yes" descr="2-letter state identifier for BCBS, Medicare, Medicaid"/>
+		<column name="flags" type="longint" descr="Various bit-masked flags (like group policy number required, claim office number required, etc.)"/>
+		<column name="remarks" type="text" size="512" descr="Any additional remarks"/>
+	</table>
+	
+	<table name="REF_EPSDT">
+		<column name="epsdt" type="text" size="5" primarykey="yes" descr="Actual EPSDT Code"/>
+		<column name="name" type="text" size="64" descr="Short Description of the EPSDT code"/>
+		<column name="description" type="text" size="1024" descr="Long description of the EPSDT code"/>
+	</table>
+
+	<table name="REF_Code_Service_Type" abbrev="CodeServType">
+		<column name="id" type="autoinc" primarykey="yes" descr="Unique identification for the code service type mapping"/>
+		<column name="code_min" type="text" size="10" descr="Minimum code in range"/>
+		<column name="code_max" type="text" size="10" descr="Maximum code in range"/>
+		<column name="entry_type" lookupref="Catalog_Entry_Type.id"  descr="Code Type (EPSDT,CPT,etc)"/>
+		<column name="service_type" type="text" size="10" descr="Service Type (Medical Care,Surgery,Diagnostic X-Ray,etc)"/>			
+	</table>
+	<table name="REF_SERVICE_CATEGORY" abbrev="REF_SERV_CAT"> 
+		<column name="serv_category" abbrev="serv_cat" type="text" primarykey="yes" desc="Service Category ID"/>
+		<column name="name" type="text" size="64" descr="Short Description of the Service Category "/>
+		<column name="description" type="text" size="1024" descr="Long description Service Category "/>
+	</table>
+</schema>

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="person">
+	<include file="generic-datatypes.xml"/>
+
+	<table name="Person_Referral_Note" abbrev="RefNote" type="Audit,Secure">
+		<description>Notes associated with a referral</description>
+		<column name="referral_note_id" abbrev="refNteId" type="autoinc" primarykey="yes" descr="Unique Referral Note ID"/>		
+		<column name="referral_id" parentref="Person_Referral.referral_id"  descr="Referral ID of referral notes belongs"/>				
+		<column name="person_id"  lookupref="Person.person_id" descr="Person ID of person creating the note"/>
+		<column name="note"  type="text" size="1024" descr="Referral Note"/>		
+		<column name="note_date"  type="stamp" descr="Date Of Note was taken"/>			
+		<column name="org_internal_id"  lookupref="org.org_internal_id" abbrev="insOrgIntId" descr="Org Interal ID of Main org note belongs"/>				
+	</table>
+	
+	<table name="Person_Referral" abbrev="PerRef" type="Audit,Secure">
+		<description></description>
+		<column name="referral_id" type="autoinc" primarykey="yes" descr="Unique Referral ID"/>
+		<column name="request_date" type="stamp" descr="Date of Request"/>
+		<column name="referral_urgency" lookupref="Referral_Urgency.id" descr="Referral Urgency"/>
+		<column name="user_id"  parentref="Person.person_id" descr="Person who has created this referral or to whom this referral is transferred"/>
+		<column name="person_id"  parentref="Person.person_id" descr="Person ID of patient"/>
+		<column name="requester_id" parentref="Person.person_id" descr="Person ID of Requesting Physician"/>
+		<column name="product_internal_id" lookupref="Insurance.ins_internal_id"  abbrev="prdIntId" descr="Insurance Product Internal ID"/>
+		<column name="ins_org_internal_id" lookupref="org.org_internal_id" abbrev="insOrgIntId" descr="Insurance Company Org Internal"/>
+		<column name="code"  type="text" size="60" descr="Usually a CPT code or code for the service/product"/>
+		<column name="code_type"  lookupref="Catalog_Entry_Type" descr="Code types such as cpt, hcpcs, etc"/>
+		<column name="rel_diags"  abbrev="rd" type="text_set" descr="Related diagnosis codes (comma-separated)"/>
+		<column name="provider_id" parentref="Person.person_id" descr="Person ID of Physician Patient will be referred"/>
+		<column name="speciality"  type="text" size="512" descr="Speciality of referred Physician"/>
+		<column name="referral_type" lookupref="Referral_Type.id" type="duration" descr="Type of Referral"/>
+		<column name="allowed_visits" type="integer"  descr="Number of Visits allowed"/>
+		<column name="auth_number" type="text" size="60" descr="Authorization Number"/>
+		<column name="referral"  type="duration" descr=""/>
+		<column name="communication" lookupref="Referral_Communication.id" type="duration" descr="Method of communication"/>
+		<column name="completion_date"  type="stamp" descr="Date Of Completion"/>
+		<column name="recheck_date"  type="stamp" descr="Recheck Date"/>
+		<column name="referral_status"  lookupref="Referral_Status.id" descr="Status of Referral"/>
+		<column name="referral_status_date"  type="stamp" descr="Status of Referral"/>
+		<column name="referral_reason"  type="text" size="512" descr="Short description for annotating the reason"/>
+		<column name="comments"  type="text" size="512" descr="Referral comments"/>
+	</table>
+
+	<table name="Referral_Communication" abbrev="RefComm" type="Enumeration">
+		<description>Referral Communication method</description>
+		<enum id="0">Verbal</enum>
+		<enum id="1">Fax</enum>
+		<enum id="2">E-Mail</enum>
+		<enum id="3">Mail</enum>
+		<enum id="4">Left Message</enum>
+	</table>
+
+	<table name="Referral_Urgency" abbrev="RefUrge" type="Enumeration">
+		<description>Referral Urgency</description>
+		<enum id="0">Stat</enum>
+		<enum id="1">Regular</enum>
+		<enum id="2">Follow Up</enum>
+	</table>
+
+	<table name="Referral_Status" abbrev="RefSts" type="Enumeration">
+		<description>Referral Type</description>
+		<enum id="0">Active</enum>
+		<enum id="1">Inactive</enum>
+		<enum id="2">Transferred</enum>
+		<enum id="3">Closed</enum>
+	</table>
+
+	<table name="Referral_Type" abbrev="RefType" type="Enumeration">
+		<description>Referral Type</description>
+		<enum id="0">Test</enum>
+		<enum id="1">Consultation</enum>
+		<enum id="2">Evaluation</enum>
+		<enum id="3">Treatment</enum>
+		<enum id="4">Surgery</enum>
+		<enum id="5">Procedure</enum>
+	</table>
+
+
+</schema>

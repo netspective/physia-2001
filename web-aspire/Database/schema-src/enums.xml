@@ -1,0 +1,359 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-enums">
+	<include file="generic-datatypes.xml"/>
+
+	<table name="Session_Status" abbrev="SesStat" type="Enumeration">
+		<enum>Active</enum>
+		<enum>Inactive (User Normal Logout)</enum>
+		<enum>Inactive (User Forced Logout)</enum>
+		<enum>Inactive (System Forced Logout)</enum>
+		<enum>Inactive (Timeout)</enum>
+	</table>
+
+	<table name="Org_Role_Status" abbrev="RoleStat" type="Enumeration">
+		<enum>Active</enum>
+		<enum>Suspended</enum>
+		<enum>Inactive</enum>
+	</table>
+
+	<table name="Role_Activity" abbrev="RoleActivity" type="Enumeration">
+		<enum>Grant</enum>
+		<enum>Revoke</enum>
+	</table>
+
+	<table name="Session_Activity_Type" abbrev="SesActv" type="Enumeration">
+		<enum>Record</enum>
+		<enum>Page</enum>
+	</table>
+
+	<table name="Session_Action_Type" abbrev="SesAct" type="Enumeration">
+		<enum>View</enum>
+		<enum>Add</enum>
+		<enum>Update</enum>
+		<enum>Remove</enum>
+		<enum>Cancel</enum>
+		<enum>NoShow</enum>
+		<enum>Reschedule</enum>
+		<enum>Confirm</enum>
+		<enum>Verify</enum>
+		<enum>Setup</enum>
+		<enum>Prescribe</enum>
+		<enum>Refill</enum>
+		<enum>Approve</enum>
+		<enum>Deny</enum>
+		<enum>Submit</enum>
+		<enum>Resubmit</enum>
+	</table>
+
+	<table name="Login_Type" abbrev="LgiType" type="Enumeration">
+		<enum>None</enum>
+		<enum>Specific (specified in Login table)</enum>
+	</table>
+
+	<table name="Entity_Type" abbrev="EntType" type="Enumeration">
+		<enum>Person</enum>
+		<enum abbrev="Org">Organization</enum>
+		<enum abbrev="Trn">Transaction</enum>
+	</table>
+
+	<table name="Permit_Member_Type" abbrev="PermMem" type="Enumeration">
+		<enum>Owner</enum>
+		<enum>Person</enum>
+		<enum>Organization</enum>
+	</table>
+
+	<table name="Permission_Type" abbrev="PermTyp" type="Enumeration">
+		<enum>Allow All</enum>
+		<enum>Allow All, Deny Some</enum>
+		<enum>Deny All, Allow Some</enum>
+		<enum>Allow Owner, Deny All</enum>
+		<enum>Allow Owner, Deny All, Allow Some</enum>
+		<enum>Allow Care Provider, Allow Owner, Deny All</enum>
+		<enum>Allow Care Provider, Allow Owner, Deny All, Allow Some</enum>
+		<enum>Allow Care Provider, Deny All</enum>
+		<enum>Allow Care Provider, Deny All, Allow Some</enum>
+		<enum>Allow Physician, Deny All</enum>
+		<enum>Allow Physician, Deny All, Allow Some</enum>
+		<enum id="999">No Default</enum>
+	</table>
+
+	<table name="Gender" type="Enumeration">
+		<enum>Male</enum>
+		<enum>Female</enum>
+		<enum>Not applicable</enum>
+	</table>
+
+	<table name="Month" type="Enumeration">
+		<enum>January</enum>
+		<enum>February</enum>
+		<enum>March</enum>
+		<enum>April</enum>
+		<enum>May</enum>
+		<enum>June</enum>
+		<enum>July</enum>
+		<enum>August</enum>
+		<enum>September</enum>
+		<enum>October</enum>
+		<enum>November</enum>
+		<enum>December</enum>
+	</table>
+
+	<table name="Marital_Status" abbrev="MarStat" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>Single</enum>
+		<enum>Married</enum>
+		<enum>Partner</enum>
+		<enum>Legally Separated</enum>
+		<enum>Divorced</enum>
+		<enum>Widowed</enum>
+		<enum>Not applicable</enum>
+	</table>
+
+	<table name="Blood_Type" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>A+</enum>
+		<enum>A-</enum>
+		<enum>B+</enum>
+		<enum>B-</enum>
+		<enum>AB+</enum>
+		<enum>AB-</enum>
+		<enum>O+</enum>
+		<enum>O-</enum>
+	</table>
+
+	<table name="Personal_Multibirth" abbrev="PrMtbth" type="Enumeration">
+		<enum id="1">Singleton</enum>
+		<enum id="2">Twin</enum>
+		<enum id="3">Triplet</enum>
+		<enum id="4">Quadruplet</enum>
+		<enum id="5">Quintuplet</enum>
+		<enum id="6">Septuplet</enum>
+	</table>
+
+	<table name="Personal_Birthorder" abbrev="PrBthOr" type="Enumeration">
+		<enum id="1">First</enum>
+		<enum id="2">Second</enum>
+		<enum id="3">Third</enum>
+		<enum id="4">Fourth</enum>
+		<enum id="5">Fifth</enum>
+		<enum id="6">Sixth</enum>
+		<enum id="7">Seventh</enum>
+		<enum id="8">Eighth</enum>
+		<enum id="9">Ninth</enum>
+		<enum id="10">Tenth</enum>
+		<enum id="11">Eleventh</enum>
+		<enum id="12">Twelvth</enum>
+	</table>
+
+	<table name="Appt_Duration" type="Enumeration">
+		<enum id="10">10 minutes</enum>
+		<enum id="15">15 minutes</enum>
+		<enum id="20">20 minutes</enum>
+		<enum id="30">30 minutes</enum>
+		<enum id="45">45 minutes</enum>
+		<enum id="60">1 hour</enum>
+	</table>
+
+	<table name="Deduct_Type" type="Enumeration">
+		<enum>None</enum>
+		<enum>Individual</enum>
+		<enum>Family</enum>
+		<enum>Both</enum>
+	</table>
+
+	<table name="Tax_Id_Type" type="Enumeration">
+		<enum>Employer Identification Number</enum>
+		<enum>Social Security Number</enum>
+		<enum>Corporate Name</enum>
+	</table>
+
+	<table name="Bill_Sequence" type="Enumeration">
+		<enum id="1">Primary</enum>
+		<enum id="2">Secondary</enum>
+		<enum id="3">Tertiary</enum>
+		<enum id="4">Quaternary</enum>
+		<enum id="5">Workers Comp</enum>
+		<enum id="98">Terminated</enum>
+		<enum id="99">InActive</enum>
+	</table>
+
+	<table name="Appt_Attendee_Type" abbrev="ApPty" type="Enumeration">
+		<enum>New Patient</enum>
+		<enum>Established Patient</enum>
+		<enum>Temporary Patient</enum>
+	</table>
+
+	<table name="Appt_Status" abbrev="ApStat" type="Enumeration">
+		<enum>Scheduled</enum>
+		<enum>In Progress</enum>
+		<enum>Complete</enum>
+		<enum>Discard</enum>
+	</table>
+
+	<table name="Appt_Discard_Type" abbrev="ApDisc" type="Enumeration">
+		<enum>Cancel</enum>
+		<enum>No Show</enum>
+		<enum>Patient Reschedule</enum>
+		<enum>Org Reschedule</enum>
+	</table>
+
+	<table name="Trans_Related_To" abbrev="TrnRel" type="Enumeration">
+		<enum>Employment</enum>
+		<enum>Auto Accident</enum>
+		<enum>Other Accident</enum>
+	</table>
+
+	<table name="Medication_Type" abbrev="MedType" type="Enumeration">
+		<enum>Encounter</enum>
+		<enum>Maintenance</enum>
+		<enum>Permanent</enum>
+	</table>
+
+	<table name="Invoice_Type" type="Enumeration">
+		<enum>HCFA 1500 Claim</enum>
+		<enum>Services Rendered</enum>
+	</table>
+
+	<table name="Inv_Item_Type" type="Enumeration">
+		<enum>Invoice</enum>
+		<enum>Service</enum>
+		<enum>Lab</enum>
+		<enum>Co-pay</enum>
+		<enum>Co-insurance</enum>
+		<enum>Adjustment</enum>
+		<enum>Deductible</enum>
+		<enum>Void</enum>
+	</table>
+
+	<table name="Transaction_Status" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>Not Required</enum>
+		<enum>Active</enum>
+		<enum>Inactive</enum>
+		<enum>Read</enum>
+		<enum>Not Read</enum>
+		<enum>Pending</enum>
+		<enum>Filled</enum>
+		<enum>Denied</enum>
+	</table>
+
+	<table name="Invoice_Status" type="Enumeration">
+		<enum>Created</enum>
+		<enum>Incomplete</enum>
+		<enum>Pending</enum>
+		<enum>On Hold</enum>
+		<enum>Submitted</enum>
+		<enum>Transferred</enum>
+		<enum>Approved Internal</enum>
+		<enum>Rejected Internal</enum>
+		<enum>Electronically Transmitted to Carrier</enum>
+		<enum>Transmitted to Carrier via Paper</enum>
+		<enum>Approved External</enum>
+		<enum>Rejected External</enum>
+		<enum>Awaiting Insurance Payment</enum>
+		<enum>Payments Applied</enum>
+		<enum>Appealed</enum>
+		<enum>Closed</enum>
+		<enum>Void</enum>
+		<enum>Paper Claim Printed</enum>
+		<enum>Awaiting Client Payment</enum>
+	</table>
+
+	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
+		<enum>Payment</enum>
+		<enum>Refund</enum>
+		<enum>Transfer</enum>
+		<enum>Auto Capitated Service Adjustment</enum>
+		<enum>Transfer Balance to Next Payer</enum>
+		<enum>Reverse Transfer Balance to Next Payer</enum>
+		<enum>Reverse Payment Transfer</enum>
+		<enum>Payment Transfer</enum>
+	</table>
+
+	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
+		<enum>Discount</enum>
+		<enum>Professional Courtesy</enum>
+		<enum>Bad Debt</enum>
+		<enum>Collection Agency</enum>
+		<enum>Charity Discount</enum>
+		<enum>Past File Deadline</enum>
+		<enum>Posting Error</enum>
+		<enum>Non-billable Service</enum>
+		<enum>Returned Personal Check</enum>
+		<enum>NSF Fee</enum>
+		<enum>Contractual Agreement</enum>
+		<enum>Transfer from Legacy System</enum>
+	</table>
+
+	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">
+		<enum>Cash</enum>
+		<enum>Check</enum>
+		<enum>Money Order</enum>
+		<enum>Debit Card</enum>
+		<enum>MasterCard</enum>
+		<enum>VISA</enum>
+		<enum>AMEX</enum>
+		<enum>Discover</enum>
+		<enum>Diners Club</enum>
+		<enum>Travelers Check</enum>
+	</table>
+
+	<table name="Offering_Catalog_Type" abbrev="OfCatTy" type="Enumeration">
+		<enum>Fee Schedule</enum>
+		<enum>Service Type</enum>
+		<enum>Misc Procedure</enum>
+		<enum>Contract Schedule</enum>
+		<enum>Superbill</enum>
+		<enum>Lab Test</enum>
+	</table>
+
+	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
+		<enum>Inactive</enum>
+		<enum>Active</enum>
+	</table>
+
+	<table name="Catalog_Entry_Cost_Type" abbrev="CatItmCt" type="Enumeration">
+		<enum>No Cost</enum>
+		<enum>Specific Dollar</enum>
+		<enum>Multiple of Group</enum>
+		<enum>Multiple of Parent</enum>
+		<enum>Medicare Value</enum>
+		<enum>Multiple of RVU</enum>
+		<enum>UCR 75% Value</enum>
+	</table>
+
+	<table name="Invoice_Bill_Party_Type" abbrev="BillParTy" type="Enumeration">
+		<enum>Client</enum>
+		<enum>Third-party Person</enum>
+		<enum>Third-party Organization</enum>
+		<enum>Third-party Insurance Organization</enum>
+	</table>
+
+	<table name="Survey_Item_Type" abbrev="SurItemTy" type="Enumeration">
+		<enum>Question</enum>
+		<enum>Statement</enum>
+		<enum>Heading</enum>
+		<enum>Subhead</enum>
+	</table>
+
+	<table name="Medication_Record_Type" abbrev="MedRecTy" type="Enumeration">
+		<enum>Existing</enum>		
+		<enum>Prescribe</enum>
+		<enum>Refill</enum>
+	</table>
+
+	<table name="Insurance_Record_Type" abbrev="InsRecTy" type="Enumeration">
+		<enum>Category (arbitrary grouping of other records)</enum>
+		<enum>Insurance Product (child of an insurance org)</enum>
+		<enum>Insurance Plan (child of an insurance product)</enum>
+		<enum>Personal Coverage (optional child of insurance plan)</enum>
+	</table>
+
+	<table name="Transmission_Status" abbrev="TrnmSts" type="Enumeration">
+		<enum>Transmitted</enum>
+		<enum>Acknowledged</enum>
+	</table>
+
+</schema>

@@ -1,0 +1,3840 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-lookups">
+
+	<table name="Referral_Source_Type" abbrev="RefSouTp" type="Org_Lookup">
+		<enum id="0">Dr.Office</enum>
+		<enum id="1">Patient</enum>
+		<enum id="2">Adjuster</enum>
+		<enum id="3">Case Manager</enum>
+		<enum id="4">Non-contracted Provider</enum>
+		<enum id="5">SRS Adjuster</enum>
+		<enum id="6">Add Provider</enum>
+	</table>
+
+
+	<table name="Referral_Result" abbrev="RefRst" type="Org_Lookup">
+		<enum id="0">Successful</enum>
+		<enum id="1">UnSuccessful</enum>
+		<enum id="2">Pending</enum>
+		<enum id="3">Contracted</enum>
+		<enum id="4">Closed/Pending Closed</enum>
+		<enum id="5">Closed/Pending Contract</enum>
+		<enum id="6">Closed/Provider No POS</enum>
+	</table>
+
+	<table name="Referral_Followup_Status" abbrev="RefFlSt" type="Org_Lookup">
+		<enum id="22">Waiting for Auth</enum>
+		<enum id="1">Waiting for Return call/Adjuster</enum>
+		<enum id="2">Waiting for Return call/Provider</enum>
+		<enum id="3">Waiting for Return call/Patient</enum>
+		<enum id="4">Waiting for Return call/Case Manager</enum>
+		<enum id="5">No Claim Filed</enum>
+		<enum id="6">Claim Denied</enum>
+		<enum id="7">Case Closed</enum>
+		<enum id="8">Confirm Delivery/Patient Survey</enum>
+		<enum id="9">Waiting for Bill</enum>
+		<enum id="10">Waiting for Demographics</enum>
+		<enum id="11">Waiting for Script/LMN</enum>
+		<enum id="12">On Hold/Adjuster</enum>
+		<enum id="13">Denied/MMI</enum>
+		<enum id="14">Denied/No PreAuth</enum>
+		<enum id="15">Denied/Medical Records</enum>
+		<enum id="16">Denied/Non-Compensable</enum>
+		<enum id="17">Denied/No Medical Need</enum>
+		<enum id="18">Denied/Claim Settled</enum>
+		<enum id="19">Denied/Non-Complaint</enum>
+		<enum id="20">Pending Contract</enum>
+		<enum id="21">In Pre-Cert</enum>
+	</table>
+
+	<table name="Referral_Unit_Type" abbrev="RefUnt" type="Org_Lookup">
+		<enum id="0">EVAL</enum>
+		<enum id="1">Daily</enum>
+		<enum id="2">Weekly</enum>
+		<enum id="3">Monthly</enum>
+		<enum id="4">Purchase</enum>
+		<enum id="5">Case</enum>
+		<enum id="6">Boxes</enum>
+		<enum id="7">Pairs</enum>
+		<enum id="8">Hours</enum>
+		<enum id="9">Hourly</enum>
+		<enum id="10">Visits</enum>
+	</table>
+
+	<table name="Referral_Service_Descr" abbrev="RefSrDescr" type="Org_Lookup">
+		<enum id="0">BGS Bone Growth Stim</enum>
+		<enum id="1">CPM Elbow CPM</enum>
+		<enum id="2">CPM Hand CPM</enum>
+		<enum id="3">CPM Shoulder CPM</enum>
+		<enum id="4">DME Apnea Monitor</enum>
+		<enum id="5">DME Bath Bench</enum>
+		<enum id="6">DME Bi-Pap machine</enum>
+		<enum id="7">DME Breast Pump</enum>
+		<enum id="8">DME Burn Garments</enum>
+		<enum id="9">DME Cane</enum>
+		<enum id="10">DME Catheter Supplies</enum>
+		<enum id="11">DME Cervical Collar</enum>
+		<enum id="12">DME Cervical Collar Cover</enum>
+		<enum id="13">DME Cervical Pillow</enum>
+		<enum id="14">DME Cervical Traction Unit</enum>
+		<enum id="15">DME Clinitron Bed</enum>
+		<enum id="16">DME Cold Therapy Device</enum>
+		<enum id="17">DME Comode Chair/Bedside</enum>
+		<enum id="18">DME Crutch Arm Pads/Hand Grips</enum>
+		<enum id="19">DME Crutches</enum>
+		<enum id="20">DME Custom Shoes</enum>
+		<enum id="21">DME Depends/Attends</enum>
+		<enum id="22">DME Desk Chair</enum>
+		<enum id="23">DME Dressing Changes</enum>
+		<enum id="24">DME Forearm Crutches</enum>
+		<enum id="25">DME Front Wheeled Walker</enum>
+		<enum id="26">DME Gloves/Latex</enum>
+		<enum id="27">DME Glucometer</enum>
+		<enum id="28">DME Grab Bar</enum>
+		<enum id="29">DME Gym Ball</enum>
+		<enum id="30">DME Hand Held Shower</enum>
+		<enum id="31">DME Hospital Bed</enum>
+		<enum id="32">DME Hoyer Lift</enum>
+		<enum id="33">DME Iodine Solution</enum>
+		<enum id="34">DME Jay Cushon</enum>
+		<enum id="35">DME Jobst Stocking</enum>
+		<enum id="36">DME Latex Gloves</enum>
+		<enum id="37">DME Leg Bags</enum>
+		<enum id="38">DME Lumbar Cushion</enum>
+		<enum id="39">DME Lumbar Traction Unit</enum>
+		<enum id="40">DME Night Bags</enum>
+		<enum id="41">DME Over the Door Pulley</enum>
+		<enum id="42">DME Oxygen refill</enum>
+		<enum id="43">DME Oxygen Tanks</enum>
+		<enum id="44">DME Para Supplies</enum>
+		<enum id="45">DME Paraffin Bath</enum>
+		<enum id="46">DME Paraffin Refills</enum>
+		<enum id="47">DME Peak Flow Meter</enum>
+		<enum id="48">DME Pelvic Traction Unit</enum>
+		<enum id="49">DME Platform Crutches</enum>
+		<enum id="50">DME Pressure Garments/Gloves</enum>
+		<enum id="51">DME Raised Toilet Seat</enum>
+		<enum id="52">DME Reacher</enum>
+		<enum id="53">DME Repairs to Wheelchair</enum>
+		<enum id="54">DME Saunders Traction Unit</enum>
+		<enum id="55">DME Scooter</enum>
+		<enum id="56">DME Shower Chair</enum>
+		<enum id="57">DME SI Belt</enum>
+		<enum id="58">DME Sock Aide</enum>
+		<enum id="59">DME Suction Machine</enum>
+		<enum id="60">DME Tape</enum>
+		<enum id="61">DME Ted Hose</enum>
+		<enum id="62">DME TheraCane</enum>
+		<enum id="63">DME Tub Transfer Bench</enum>
+		<enum id="64">DME Tube Feedings/Supplies</enum>
+		<enum id="65">DME Undergarments</enum>
+		<enum id="66">DME Vinyl Gloves</enum>
+		<enum id="67">DME Walker w/ Glide</enum>
+		<enum id="68">DME Walker w/ Wheels</enum>
+		<enum id="69">DME Walker w/o wheels</enum>
+		<enum id="70">DME Wheelchair Repairs</enum>
+		<enum id="71">DME Wheelchair-Electric</enum>
+		<enum id="72">DME Wheelchair-Manual</enum>
+		<enum id="73">DME Wound Care Supplies</enum>
+		<enum id="74">DME Wound VAC</enum>
+		<enum id="75">EMG EMG</enum>
+		<enum id="76">HHA Home Health Aide</enum>
+		<enum id="77">HHI IV Infusion</enum>
+		<enum id="78">HHS IV Monitoring</enum>
+		<enum id="79">HHS Skilled Nursing Visit</enum>
+		<enum id="80">HHS SN Eval</enum>
+		<enum id="81">HHS Speech Therapy Visits</enum>
+		<enum id="82">HHS ST EVAL</enum>
+		<enum id="83">HHT External Therapy</enum>
+		<enum id="84">HHT Gauze (4x4)</enum>
+		<enum id="85">HHT OT Eval</enum>
+		<enum id="86">HHT OT Visits</enum>
+		<enum id="87">HHT PT EVAL</enum>
+		<enum id="88">HHT PT visits</enum>
+		<enum id="89">HHT Respiratory Therapy</enum>
+		<enum id="90">HHV IVP</enum>
+		<enum id="91">OAP ACL Brace</enum>
+		<enum id="92">OAP ACL Custom Brace</enum>
+		<enum id="93">OAP AFO Brace</enum>
+		<enum id="94">OAP Ankle Brace</enum>
+		<enum id="95">OAP Back Brace</enum>
+		<enum id="96">OAP CTI 2 Brace</enum>
+		<enum id="97">OAP CyberTech Brace</enum>
+		<enum id="98">OAP Dress Orthotic</enum>
+		<enum id="99">OAP DynaSplint/Shoulder</enum>
+		<enum id="100">OAP Elbow Splint</enum>
+		<enum id="101">OAP Foot Brace</enum>
+		<enum id="102">OAP Foot Insert/Molded</enum>
+		<enum id="103">OAP Foot Orthotic</enum>
+		<enum id="104">OAP Forearm Brace</enum>
+		<enum id="105">OAP Hip Abduction Splint</enum>
+		<enum id="106">OAP Jas  Splint</enum>
+		<enum id="107">OAP Knee Brace</enum>
+		<enum id="108">OAP Knee Brace/Custom made</enum>
+		<enum id="109">OAP Lumbar Brace</enum>
+		<enum id="110">OAP Neoprene Knee Sleeve</enum>
+		<enum id="111">OAP Repairs to Brace (any kind)</enum>
+		<enum id="112">OAP Soft Goods/Jas Splint</enum>
+		<enum id="113">OAP Thoracic Brace</enum>
+		<enum id="114">OAP TLSO Brace/Back Brace</enum>
+		<enum id="115">OAP Work Boots</enum>
+		<enum id="116">OAP Work Orthotic</enum>
+		<enum id="117">OAP Wrist Splint</enum>
+		<enum id="118">TEN Galvanic HV Stim</enum>
+		<enum id="119">TEN IF2 unit</enum>
+		<enum id="120">TEN Muscle Stimulator</enum>
+		<enum id="121">TEN Tens Unit</enum>
+		<enum id="122">TES Battery Charger</enum>
+		<enum id="123">TES Galvanic Supplies</enum>
+		<enum id="124">TES Inferrential Supplies</enum>
+		<enum id="125">TES Inferrential unit</enum>
+		<enum id="126">TES Muscle Stim Supplies</enum>
+		<enum id="127">TES Rechargable Batteries</enum>
+		<enum id="128">TES Sportx unit</enum>
+		<enum id="129">TES Tens Unit Supplies</enum>
+	</table>
+
+	<table name="Intake_Detail" abbrev="IntDtl" type="Org_Lookup">
+		<enum id="0">Cold Therapy Device</enum>
+		<enum id="1">Tape</enum>
+		<enum id="2">Neoprene Knee Sleeve</enum>
+		<enum id="3">Oxygen Refill</enum>
+		<enum id="4">IV Monitoring</enum>
+		<enum id="5">Forearm Crutches</enum>
+		<enum id="6">Hand Held Shower</enum>
+		<enum id="7">Hip Abduction Splint</enum>
+		<enum id="8">Gloves/Latex</enum>
+		<enum id="9">Pressure Garments/Gloves</enum>
+		<enum id="10">Wound VAC</enum>
+		<enum id="11">Work Boots</enum>
+		<enum id="12">Thoracic Brace</enum>
+		<enum id="13">Lumbar Cushion</enum>
+		<enum id="14">Wrist Splint</enum>
+		<enum id="15">Galvanic supplies</enum>
+		<enum id="16">Inferrential Supplies</enum>
+		<enum id="17">OT Visits</enum>
+		<enum id="18">Home Health Aide</enum>
+		<enum id="19">Reacher</enum>
+		<enum id="20">Tens Unit Supplies</enum>
+		<enum id="21">Platform Crutches</enum>
+		<enum id="22">Iodine Solution</enum>
+		<enum id="23">Apnea Monitor</enum>
+		<enum id="24">Foot Insert/Molded</enum>
+		<enum id="25">Sock Aide</enum>
+		<enum id="26">TLSO Brace/Back Brace</enum>
+		<enum id="27">Soft Goods/Jas Splint</enum>
+		<enum id="28">PT EVAL</enum>
+		<enum id="29">Work Orthotic</enum>
+		<enum id="30">Cane</enum>
+		<enum id="31">PT Visits</enum>
+		<enum id="32">Battery Charger</enum>
+		<enum id="33">Tens Unit</enum>
+		<enum id="34">Muscle Stimulator</enum>
+		<enum id="35">Galvanic HV Stim</enum>
+		<enum id="36">Crutches</enum>
+		<enum id="37">Front Wheeled Walker</enum>
+		<enum id="38">Walker w/o Wheels</enum>
+		<enum id="39">Wheelchair-Manul</enum>
+		<enum id="40">Wheelchair-Electric</enum>
+		<enum id="41">Cervial Traction Unit</enum>
+		<enum id="42">Jas Splint</enum>
+		<enum id="43">Bath Bench</enum>
+		<enum id="44">Raised Toilet Seat</enum>
+		<enum id="45">Shower Chair</enum>
+		<enum id="46">Hoyer Lift</enum>
+		<enum id="47">Catheter Supplies</enum>
+		<enum id="48">Cervical Pillow</enum>
+		<enum id="49">Hospital Bed</enum>
+		<enum id="50">Paraffin Bath</enum>
+		<enum id="51">Oxygen Tanks</enum>
+		<enum id="52">Bi-Pap Machine</enum>
+		<enum id="53">Ted Hose</enum>
+		<enum id="54">AFO Brace</enum>
+		<enum id="55">Wound Care Supplies</enum>
+		<enum id="56">Desk Chair</enum>
+		<enum id="57">Cyber Tech Brace</enum>
+		<enum id="58">Repairs to Brace (any kind)</enum>
+		<enum id="59">Burn Garment</enum>
+		<enum id="60">Repairs to Wheelchair</enum>
+		<enum id="61">Knee Brace</enum>
+		<enum id="62">Wheelchair Repairs</enum>
+		<enum id="63">Vinyl Gloves</enum>
+		<enum id="64">Latex Gloves</enum>
+		<enum id="65">Breast Pump</enum>
+		<enum id="66">External Therapy</enum>
+		<enum id="67">IF2 Unit</enum>
+		<enum id="68">Dressing Changes</enum>
+		<enum id="69">Leg Bags</enum>
+		<enum id="70">Speech Therapy Visits</enum>
+		<enum id="71">Muscle Stim Supplies</enum>
+		<enum id="72">Comode Chair/Bedside</enum>
+		<enum id="73">Dress Orthotic</enum>
+		<enum id="74">Depends/Attends</enum>
+		<enum id="75">Night Bags</enum>
+		<enum id="76">Inferrential Unit</enum>
+		<enum id="77">Skilled Nursing Visit</enum>
+		<enum id="78">Walker w/ Wheels</enum>
+		<enum id="79">OT Eval</enum>
+		<enum id="80">Paraffin Refills</enum>
+		<enum id="81">Grab Bar</enum>
+		<enum id="82">IVP</enum>
+		<enum id="83">Knee Brace/Custom made</enum>
+		<enum id="84">IV Infusion</enum>
+		<enum id="85">Gym Ball</enum>
+		<enum id="86">DynaSplint/Shoulder</enum>
+		<enum id="87">Walker w/ Glide</enum>
+		<enum id="88">Back Brace</enum>
+		<enum id="89">Respiratory Therapy</enum>
+		<enum id="90">EMG</enum>
+		<enum id="91">Guage (4x4)</enum>
+		<enum id="92">Rechargeble Batteries</enum>
+		<enum id="93">TheraCane</enum>
+		<enum id="94">Crutch Arm Pads/Hand Grips</enum>
+		<enum id="95">Lumbar Brace</enum>
+		<enum id="96">Scooter</enum>
+		<enum id="97">Ankle Brace</enum>
+		<enum id="98">SN Eval</enum>
+		<enum id="99">Tube Feeding/Supplies</enum>
+		<enum id="100">Clinitron Bed</enum>
+		<enum id="101">ST EVAL</enum>
+		<enum id="102">Lumbar Traction Unit</enum>
+		<enum id="103">Over the Door Pulley</enum>
+		<enum id="104">ACL Custom Brace</enum>
+		<enum id="105">Jobst Stocking</enum>
+		<enum id="106">Tub Transfer Bench</enum>
+		<enum id="107">Saunders Traction Unit</enum>
+		<enum id="108">ACL Brace</enum>
+		<enum id="109">Sportx Unit</enum>
+		<enum id="110">Undergarments</enum>
+		<enum id="111">CTI 2 Brace</enum>
+		<enum id="112">Cervical Collar</enum>
+		<enum id="113">Cervical Collar Cover</enum>
+		<enum id="114">Suction Machine</enum>
+		<enum id="115">Forearm Brace</enum>
+		<enum id="116">Bone Growth Stim</enum>
+		<enum id="117">Custom Shoes</enum>
+		<enum id="118">Glucometer</enum>
+		<enum id="119">Para Supplies</enum>
+		<enum id="120">Peak Flow Meter</enum>
+		<enum id="121">Elbow Splint</enum>
+		<enum id="122">Sl Belt</enum>
+		<enum id="123">Foot orthotic</enum>
+		<enum id="124">Shoulder CPM</enum>
+		<enum id="125">Elbow CPM</enum>
+		<enum id="126">Jay Cushion</enum>
+		<enum id="127">Pelvic Traction Unit</enum>
+		<enum id="128">Foot Brace</enum>
+		<enum id="129">Hand CPM</enum>
+	</table>
+
+<table name="Intake_Client" abbrev="IntClnt" type="Org_Lookup">
+		<enum id="0">Argus</enum>
+		<enum id="1">American Airlines</enum>
+		<enum id="2">City of Dallas</enum>
+		<enum id="3">City of Garland</enum>
+		<enum id="4">City of Houston</enum>
+		<enum id="5">Concentra</enum>
+		<enum id="6">City of San Antonio</enum>
+		<enum id="7">CRA</enum>
+		<enum id="8">Dallas County</enum>
+		<enum id="9">Dept of Labor</enum>
+		<enum id="10">Fleming Companies, Inc</enum>
+		<enum id="11">Federated</enum>
+		<enum id="12">Harris County</enum>
+		<enum id="13">Northeast Independent School District</enum>
+		<enum id="14">Orange Cove ISD</enum>
+		<enum id="15">Poly America</enum>
+		<enum id="16">San Antonio Independent School District</enum>
+		<enum id="17">Spectrum</enum>
+		<enum id="18">TWCIF</enum>
+		<enum id="19">Young Insurance</enum>
+		<enum id="20">Pinnacol</enum>
+		<enum id="21">CMI</enum>
+		<enum id="22">Carus Healthcare</enum>
+	</table>
+
+	<table name="Org_Contact_Addrs" type="Lookup">
+		<enum id="0">Mailing</enum>
+		<enum id="1">Payment</enum>
+		<enum id="2">Street</enum>
+		<enum id="3">Billing</enum>
+	</table>
+
+	<table name="Person_Contact_Class" abbrev="PerCnCl" type="Lookup">
+		<enum id="0">Telephone</enum>
+		<enum id="1">Pager</enum>
+		<enum id="2">Fax</enum>
+		<enum id="3">EMail</enum>
+		<enum id="4">Internet</enum>
+	</table>
+
+	<table name="Person_Contact_Phones" abbrev="PerCnPh" type="Lookup">
+		<enum id="0">Home</enum>
+		<enum id="1">Work</enum>
+		<enum id="2">Cellular</enum>
+		<enum id="3">Alternate</enum>
+	</table>
+
+	<table name="Person_Contact_Addrs" abbrev="PrCnAdr" type="Lookup">
+		<enum id="0">Home</enum>
+		<enum id="1">Work</enum>
+		<enum id="2">Alternate</enum>
+	</table>
+
+	<table name="Person_Contact_Order" abbrev="PrCnOrd" type="Lookup">
+		<enum id="0">Primary</enum>
+		<enum id="1">Secondary</enum>
+		<enum id="2">Alternate</enum>
+	</table>
+
+	<table name="Org_Contact_Name" type="Lookup">
+		<enum id="0">Primary</enum>
+		<enum id="1">Secondary</enum>
+		<enum id="2">Alternate</enum>
+		<enum id="4">Billing</enum>
+	</table>
+
+	<table name="Person_Type" type="Lookup">
+		<enum id="0">Patient</enum>
+		<enum id="1" group_name="staff">Physician</enum>
+		<enum id="2" group_name="staff">Nurse</enum>
+		<enum id="3" group_name="staff">Staff</enum>
+	</table>
+
+	<table name="Alert_Priority" type="Lookup">
+		<enum id="0">Low</enum>
+		<enum id="1">Medium</enum>
+		<enum id="2">High</enum>
+	</table>
+
+	<table name="Insured_Relationship" abbrev="InsRel" type="Lookup">
+		<enum id="01">Self</enum>
+		<enum id="02">Spouse</enum>
+		<enum id="03">Natural/Adopted Child (Insured has Financial Responsibility)</enum>
+		<enum id="04">Natural/Adopted Child (Insured does not have Financial Resp.)</enum>
+		<enum id="05">Step Child</enum>
+		<enum id="06">Foster Child</enum>
+		<enum id="07">Ward of the Court</enum>
+		<enum id="08">Employee</enum>
+		<enum id="09">Unknown/Other</enum>
+		<enum id="10">Handicapped Dependent</enum>
+		<enum id="11">Organ Donor</enum>
+		<enum id="12">Cadaver Donor</enum>
+		<enum id="13">Grandchild</enum>
+		<enum id="14">Niece/Nephew</enum>
+		<enum id="15">Injured Plaintiff</enum>
+		<enum id="16">Sponsored Dependent</enum>
+		<enum id="17">Minor Dependent of a Minor Dependent</enum>
+		<enum id="18">Parent</enum>
+		<enum id="19">Grandparent</enum>
+	</table>
+
+	<table name="Resp_Party_Relationship" abbrev="RPRel" type="Lookup">
+		<enum id="0">Self</enum>
+		<enum id="10">Spouse</enum>
+		<enum id="11">Parent</enum>
+		<enum id="12">Child</enum>
+		<enum id="99">Other</enum>
+	</table>
+
+	<table name="Electronic_Payer_Source" abbrev="EPaySrc" type="Lookup">
+		<enum id="0">Direct</enum>
+		<enum id="1">Envoy</enum>
+		<enum id="2">Perse</enum>
+		<enum id="3">Thin Net</enum>
+	</table>
+
+	<table name="Electronic_Payer_Type" abbrev="EPayType" type="Lookup">
+		<enum id="0">Non-Commercial</enum>
+		<enum id="100">Commercial - Medical</enum>
+		<enum id="200">Blue Cross/Blue Shield - Medical</enum>
+		<enum id="300">Medicare - Medical</enum>
+		<enum id="400">Medicaid - Medical</enum>
+	</table>
+
+	<table name="Ethnicity" type="Lookup">
+		<enum>American Indian/Alaskan Native</enum>
+		<enum>Caucasian</enum>
+		<enum>African-American</enum>
+		<enum>Asian/Pacific Islander</enum>
+		<enum>Hispanic</enum>
+		<enum>Other</enum>
+	</table>
+
+	<table name="Family_Relationship" abbrev="FMRel" type="Lookup">
+		<enum>Other</enum>
+		<enum>Mother</enum>
+		<enum>Father</enum>
+		<enum>Sister</enum>
+		<enum>Brother</enum>
+		<enum>Son</enum>
+		<enum>Daughter</enum>
+		<enum>Cousin</enum>
+		<enum>Grandparent</enum>
+	</table>
+
+	<table name="Time_Metric" type="Lookup">
+		<enum>Seconds</enum>
+		<enum>Minutes</enum>
+		<enum>Hours</enum>
+		<enum>Days</enum>
+		<enum>Weeks</enum>
+		<enum>Months</enum>
+		<enum>Years</enum>
+	</table>
+
+	<table name="Auth_Signature" abbrev="AuthSign" type="Lookup">
+		<description>
+			A code used to indicate whether the provider has a signature from the patient on file.
+			Provided by Envoy Document DA0.16. Used for processing NSF claims.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Signed HCFA-1500 claim form on file</col>
+				<col name="abbrev">C</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Authorization form for HCFA Block 12 on file</col>
+				<col name="abbrev">S</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Authorization form for HCFA Block 13 on file</col>
+				<col name="abbrev">M</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Authorization form for HCFA Blocks 12and 13 on file</col>
+				<col name="abbrev">B</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Signature generated by provider</col>
+				<col name="abbrev">P</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Auth_Assign" abbrev="AuthAssg" type="Lookup">
+		<description>
+			A code used to indicate whether the provider and the beneficiary have a	signed mutual
+			agreement authorizing the Medicare carrier to pay the provider. Provided by Envoy
+			Document EA0.34. Used for processing NSF claims.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Assigned</col>
+				<col name="abbrev">A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Not assigned</col>
+				<col name="abbrev">N</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Clinical Lab only</col>
+				<col name="abbrev">B</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Patient refuses to assign benefits</col>
+				<col name="abbrev">P</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="PPO_HMO_Indicator" abbrev="PPOHMO" type="Lookup">
+		<description>
+			An indicator that the provider is submitting this claim to or has submitted
+			this claim to the indicated payer under a Special Processing Agreement. Provided by
+			Envoy Document DA0.12. Used for	processing NSF claims.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">CHAMPUS CAM Charleston Partnership agreement</col>
+				<col name="abbrev">C</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">CHAMPUS External Partnership Agreement</col>
+				<col name="abbrev">E</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">CHAMPUS Army CAM Demonstration</col>
+				<col name="abbrev">G</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">CHAMPUS Navy CAM Demonstration</col>
+				<col name="abbrev">H</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">CHAMPUS Internal Partnership agreement</col>
+				<col name="abbrev">I</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">CHAMPUS Air Force CAM Demonstration</col>
+				<col name="abbrev">J</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">HMO or PPO claim</col>
+				<col name="abbrev">N</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">CHAMPUS MCSP PPO agreement</col>
+				<col name="abbrev">O</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">CHAMPUS MCSP Prime agreement</col>
+				<col name="abbrev">P</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">CHAMPUS TRICARE MCSP Extra agreement</col>
+				<col name="abbrev">T</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">CHAMPUS TRICARE MCSP HMO agreement</col>
+				<col name="abbrev">U</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">HMO/PPO agreement</col>
+				<col name="abbrev">Y</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">CHAMPUS Cooperative Care claim</col>
+				<col name="abbrev">X</col>
+				<col name="result">2</col>
+			</row>
+
+		</data>
+	</table>
+
+	<table name="Insurance_Type_Code" abbrev="InsTyCode" type="Lookup">
+		<description>Identifies type of insurance policy.
+			Provided by Envoy Document DA0.06. Used for processing NSF claims.
+		</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Auto Insurance Policy</col>
+				<col name="abbrev">AP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Group Policy</col>
+				<col name="abbrev">GP</col>
+				<col name="group_name">UI</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Individual Policy</col>
+				<col name="abbrev">IP</col>
+				<col name="group_name">UI</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Long Term Policy</col>
+				<col name="abbrev">LD</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Litigation</col>
+				<col name="abbrev">LT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Personal Payment</col>
+				<col name="abbrev">PP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Supplemental Policy</col>
+				<col name="abbrev">SP</col>
+				<col name="group_name">UI</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Medicare</col>
+				<col name="abbrev">MP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Other</col>
+				<col name="abbrev">OT</col>
+				<col name="group_name">UI</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+
+	<table name="HCFA1500_Modifier_Code" abbrev="HcfaMod" type="Lookup">
+		<description>List of Modifiers. Includes EPSDT and workers comp modifiers.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Microsurgery</col>
+				<col name="abbrev">20</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Prolonged Evaluation and Management Services</col>
+				<col name="abbrev">21</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Unusual Procedural Services</col>
+				<col name="abbrev">22</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Unusual Anesthesia</col>
+				<col name="abbrev">23</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Unrelated Eval and Mgmt Services (Same Physician, PostOp Period)</col>
+				<col name="abbrev">24</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Separately Identifiable Eval/Mgmt Srvcs (Same Physician/Srv Day)</col>
+				<col name="abbrev">25</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Professional Component</col>
+				<col name="abbrev">26</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Mandated Services</col>
+				<col name="abbrev">32</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Anesthesia by Surgeon</col>
+				<col name="abbrev">47</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Bilateral Procedure</col>
+				<col name="abbrev">50</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Multiple Procedures</col>
+				<col name="abbrev">51</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Reduced Services</col>
+				<col name="abbrev">52</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Discontinued Procedure</col>
+				<col name="abbrev">53</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Surgical Care Only</col>
+				<col name="abbrev">54</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Postoperative Management Only</col>
+				<col name="abbrev">55</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Preoperative Management Only</col>
+				<col name="abbrev">56</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Decision for Surgery</col>
+				<col name="abbrev">57</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Staged or Related Proc/Service (Same Physician, PostOp Period)</col>
+				<col name="abbrev">58</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Distinct Procedural Service</col>
+				<col name="abbrev">59</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Two Surgeons</col>
+				<col name="abbrev">62</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Surgical Team</col>
+				<col name="abbrev">66</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Repeat Procedure by Same Physician</col>
+				<col name="abbrev">76</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Repeat Procedure by Another Physician</col>
+				<col name="abbrev">77</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Return to Operating Room for Related Procedure (PostOp Period)</col>
+				<col name="abbrev">78</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Unrelated Proc/Service (Same Physician, PostOp Period)</col>
+				<col name="abbrev">79</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Assistant Surgeon</col>
+				<col name="abbrev">80</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Minimum Assistant Surgeon</col>
+				<col name="abbrev">81</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Assistant Surgeon When Qualified Resident Surgeon not Available</col>
+				<col name="abbrev">82</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Reference (Outside) Laboratory</col>
+				<col name="abbrev">90</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">Multiple Modifiers</col>
+				<col name="abbrev">99</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">Left Side</col>
+				<col name="abbrev">LT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">Right Side</col>
+				<col name="abbrev">RT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">Upper Left Eyelid</col>
+				<col name="abbrev">E1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">Lower Left Eyelid</col>
+				<col name="abbrev">E2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">Upper Right Eyelid</col>
+				<col name="abbrev">E3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Lower Right Eyelid</col>
+				<col name="abbrev">E4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">36</col>
+				<col name="caption">Left Hand, thumb</col>
+				<col name="abbrev">FA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">37</col>
+				<col name="caption">Left Hand, second digit</col>
+				<col name="abbrev">F1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">38</col>
+				<col name="caption">Left Hand, third digit</col>
+				<col name="abbrev">F2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">39</col>
+				<col name="caption">Left Hand, fourth digit</col>
+				<col name="abbrev">F3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">Left Hand, fifth digit</col>
+				<col name="abbrev">F4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">41</col>
+				<col name="caption">Right Hand, thumb</col>
+				<col name="abbrev">F5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">42</col>
+				<col name="caption">Right Hand, second digit</col>
+				<col name="abbrev">F6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">43</col>
+				<col name="caption">Right Hand, third digit</col>
+				<col name="abbrev">F7</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">44</col>
+				<col name="caption">Right Hand, fourth digit</col>
+				<col name="abbrev">F8</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">45</col>
+				<col name="caption">Right Hand, fifth digit</col>
+				<col name="abbrev">F9</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">46</col>
+				<col name="caption">Left Circumflex, coronary artery</col>
+				<col name="abbrev">LC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">47</col>
+				<col name="caption">Left anterior descending coronary artery</col>
+				<col name="abbrev">LD</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">48</col>
+				<col name="caption">Right coronary artery</col>
+				<col name="abbrev">RC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">49</col>
+				<col name="caption">Ambulance service provided under arrangement</col>
+				<col name="abbrev">QM</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">Ambulance service furnished directly by provider</col>
+				<col name="abbrev">QN</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">51</col>
+				<col name="caption">Repeat laboratory test performed on the same day</col>
+				<col name="abbrev">QR</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">52</col>
+				<col name="caption">Left Foot, great toe</col>
+				<col name="abbrev">TA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">53</col>
+				<col name="caption">Left Foot, second digit</col>
+				<col name="abbrev">T1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">54</col>
+				<col name="caption">Left Foot, third digit</col>
+				<col name="abbrev">T2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">55</col>
+				<col name="caption">Left Foot, fourth digit</col>
+				<col name="abbrev">T3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">56</col>
+				<col name="caption">Left Foot, fifth digit</col>
+				<col name="abbrev">T4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">57</col>
+				<col name="caption">Right Foot, great toe</col>
+				<col name="abbrev">T5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">58</col>
+				<col name="caption">Right Foot, second digit</col>
+				<col name="abbrev">T6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">59</col>
+				<col name="caption">Right Foot, third digit</col>
+				<col name="abbrev">T7</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">60</col>
+				<col name="caption">Right Foot, fourth digit</col>
+				<col name="abbrev">T8</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">61</col>
+				<col name="caption">Right Foot, fifth digit</col>
+				<col name="abbrev">T9</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">62</col>
+				<col name="caption">Private Office Physician</col>
+				<col name="abbrev">O5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">63</col>
+				<col name="caption">Private Office Physician Asst</col>
+				<col name="abbrev">O6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">64</col>
+				<col name="caption">Informal reciprocal arrangement</col>
+				<col name="abbrev">Q5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">65</col>
+				<col name="caption">Locum tenens or temporary arrangement</col>
+				<col name="abbrev">Q6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">66</col>
+				<col name="caption">Excision/destruction due to signs and symptoms</col>
+				<col name="abbrev">EX</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">67</col>
+				<col name="caption">Lesion is actinic keratosis</col>
+				<col name="abbrev">2A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">68</col>
+				<col name="caption">Injection necessary as the oral route contraindicated</col>
+				<col name="abbrev">OC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">69</col>
+				<col name="caption">Emergency Treatment</col>
+				<col name="abbrev">ET</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">70</col>
+				<col name="caption">Injection into joints, sheaths, trigger points necessary</col>
+				<col name="abbrev">JI</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">71</col>
+				<col name="caption">Injectable medication is accepted treatment of choice</col>
+				<col name="abbrev">6A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">72</col>
+				<col name="caption">Temp over 102 high level antibiotics required</col>
+				<col name="abbrev">6B</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">73</col>
+				<col name="caption">Anesthesia services by anesthesiologist</col>
+				<col name="abbrev">AA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">74</col>
+				<col name="caption">Medical direction of employees by anesthesiologist</col>
+				<col name="abbrev">AB</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">75</col>
+				<col name="caption">Medical direction of other employees</col>
+				<col name="abbrev">AC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">76</col>
+				<col name="caption">Supervision of more than 4 concurrent services</col>
+				<col name="abbrev">AD</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">77</col>
+				<col name="caption">Medically directed 2 concurrent procedures</col>
+				<col name="abbrev">QJ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">78</col>
+				<col name="caption">Medically directed 3 concurrent procedures</col>
+				<col name="abbrev">QO</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">79</col>
+				<col name="caption">Medically directed 4 concurrent procedures</col>
+				<col name="abbrev">QQ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">80</col>
+				<col name="caption">Physician</col>
+				<col name="abbrev">7D</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">81</col>
+				<col name="caption">Advanced Practice Nurse or CNM</col>
+				<col name="abbrev">AL</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">82</col>
+				<col name="caption">Physician Assistant</col>
+				<col name="abbrev">AN</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">83</col>
+				<col name="caption">Psychologist</col>
+				<col name="abbrev">7A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">84</col>
+				<col name="caption">Social Worker</col>
+				<col name="abbrev">AJ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">85</col>
+				<col name="caption">Visiting Nurse</col>
+				<col name="abbrev">7C</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">86</col>
+				<col name="caption">Antepartum care</col>
+				<col name="abbrev">D1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">87</col>
+				<col name="caption">Postpartum care</col>
+				<col name="abbrev">D2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">88</col>
+				<col name="caption">Delivery</col>
+				<col name="abbrev">D3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">89</col>
+				<col name="caption">CRNA medically directed by anesthesiologist</col>
+				<col name="abbrev">QX</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">90</col>
+				<col name="caption">CRNA not medically directed</col>
+				<col name="abbrev">QZ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">91</col>
+				<col name="caption">Technical Component</col>
+				<col name="abbrev">TC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">92</col>
+				<col name="caption">Acute Treatment</col>
+				<col name="abbrev">AT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">93</col>
+				<col name="caption">Necessary Equipment is in Physicians Office</col>
+				<col name="abbrev">PO</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">94</col>
+				<col name="caption">Physician assistant rendering services</col>
+				<col name="abbrev">PA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">95</col>
+				<col name="caption">Kidney Donor</col>
+				<col name="abbrev">Q3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">96</col>
+				<col name="caption">Service performed by resident under supervision</col>
+				<col name="abbrev">GC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">97</col>
+				<col name="caption">Physician Assistant acting as asst surgeon</col>
+				<col name="abbrev">AS</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">98</col>
+				<col name="caption">Nurse Practitioner rural team member</col>
+				<col name="abbrev">AK</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">99</col>
+				<col name="caption">Physician services in rural HPSA</col>
+				<col name="abbrev">QB</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">100</col>
+				<col name="caption">Medical direction of one CRNA</col>
+				<col name="abbrev">QY</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">101</col>
+				<col name="caption">Physician services in urban HPSA</col>
+				<col name="abbrev">QU</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">102</col>
+				<col name="caption">Waiver of Liability</col>
+				<col name="abbrev">GA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">103</col>
+				<col name="caption">MMI Office Visit Level 1</col>
+				<col name="abbrev">L1WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">104</col>
+				<col name="caption">MMI Office Visit Level 2</col>
+				<col name="abbrev">L2WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">105</col>
+				<col name="caption">MMI Office Visit Level 3</col>
+				<col name="abbrev">L3WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">106</col>
+				<col name="caption">MMI Office Visit Level 4</col>
+				<col name="abbrev">L4WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">107</col>
+				<col name="caption">MMI Office Visit Level 5</col>
+				<col name="abbrev">L5WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">108</col>
+				<col name="caption">Treating physician exams/performs</col>
+				<col name="abbrev">WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">109</col>
+				<col name="caption">Review of the report only</col>
+				<col name="abbrev">RP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">110</col>
+				<col name="caption">Greater than or equal to 2 yrs</col>
+				<col name="abbrev">L1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">111</col>
+				<col name="caption">Greater than or equal to 1 yr, less than 2</col>
+				<col name="abbrev">L2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">112</col>
+				<col name="caption">Less than 1 yr</col>
+				<col name="abbrev">L3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">113</col>
+				<col name="caption">TWCC 73 form</col>
+				<col name="abbrev">73</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">114</col>
+				<col name="caption">TWCC 73 form when requested by the carrier</col>
+				<col name="abbrev">RR</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">115</col>
+				<col name="caption">TWCC 73 form re-requested by the carrier</col>
+				<col name="abbrev">EC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">116</col>
+				<col name="caption">Item or service prov. as routine care in an apprv. clin. trial</col>
+				<col name="abbrev">QV</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">117</col>
+				<col name="caption">Waived test </col>
+				<col name="abbrev">QW</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+
+	<table name="HCFA1500_Service_Place_Code" abbrev="HcfaPos" type="Lookup">
+		<description>List of Place of Service. Provided by Envoy Exhibit 5 for processing NSF claims.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Office</col>
+				<col name="abbrev">11</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Home</col>
+				<col name="abbrev">12</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Inpatient Hospital</col>
+				<col name="abbrev">21</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Outpatient Hospital</col>
+				<col name="abbrev">22</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Emergency Room - Hospital</col>
+				<col name="abbrev">23</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Ambulatory Surgical Center</col>
+				<col name="abbrev">24</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Birthing Center</col>
+				<col name="abbrev">25</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Military Treatment Facility</col>
+				<col name="abbrev">26</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Skilled Nursing Facility</col>
+				<col name="abbrev">31</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Nursing Facility</col>
+				<col name="abbrev">32</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Custodial Care Facility</col>
+				<col name="abbrev">33</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Hospice</col>
+				<col name="abbrev">34</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Ambulance - Land</col>
+				<col name="abbrev">41</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Ambulance - Air or Water</col>
+				<col name="abbrev">42</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Inpatient Psychiatric Facility</col>
+				<col name="abbrev">51</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Psychiatric Facility Partial Hospitalization</col>
+				<col name="abbrev">52</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Community Mental Health Center</col>
+				<col name="abbrev">53</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Intermediate Care Facility/Mentally Retarded</col>
+				<col name="abbrev">54</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Residential Substance Abuse Treatement Facility</col>
+				<col name="abbrev">55</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Psychiatric Residential Treatment Center</col>
+				<col name="abbrev">56</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Comprehensive Inpatient Rehabilitation Facility</col>
+				<col name="abbrev">61</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Comprehensive Outpatient Rehabilitation Facility</col>
+				<col name="abbrev">62</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">End Stage Renal Disease Treatment Facility</col>
+				<col name="abbrev">65</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">State or Local Public Health Clinic</col>
+				<col name="abbrev">71</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Rural Health Clinic</col>
+				<col name="abbrev">72</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Independent Laboratory</col>
+				<col name="abbrev">81</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Other Unlisted Facility</col>
+				<col name="abbrev">99</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="HCFA1500_Service_Type_Code" abbrev="HcfaTos" type="Lookup">
+		<description>List of Type of Service. Provided by Envoy Exhibit 6 for processing NSF claims.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Medical Care</col>
+				<col name="abbrev">01</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Surgery</col>
+				<col name="abbrev">02</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Consultation</col>
+				<col name="abbrev">03</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Diagnostic X-Ray</col>
+				<col name="abbrev">04</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Diagnostic Laboratory</col>
+				<col name="abbrev">05</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Radiation Therapy</col>
+				<col name="abbrev">06</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Anesthesia</col>
+				<col name="abbrev">07</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Surgical Assistance</col>
+				<col name="abbrev">08</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Other Medical Service</col>
+				<col name="abbrev">09</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Blood Charges</col>
+				<col name="abbrev">10</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Used DME</col>
+				<col name="abbrev">11</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">DME Purchase</col>
+				<col name="abbrev">12</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">ASC Facility</col>
+				<col name="abbrev">13</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Renal Supplies in the Home</col>
+				<col name="abbrev">14</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Alternate Method Dialysis Payment</col>
+				<col name="abbrev">15</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">CRD Equipment</col>
+				<col name="abbrev">16</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Pre-Admission Testing</col>
+				<col name="abbrev">17</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">DME Rental</col>
+				<col name="abbrev">18</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Pneumonia Vaccine</col>
+				<col name="abbrev">19</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Second Opinion on Elective Surgery</col>
+				<col name="abbrev">20</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Third Opinion on Elective Surgery</col>
+				<col name="abbrev">21</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Other</col>
+				<col name="abbrev">99</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">EPSDT Office Visit</col>
+				<col name="abbrev">S</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Medical_Specialty" abbrev="MedSpec" type="Lookup">
+		<description>List of physician specialties. Provided by Envoy Exhibit 3 for processing NSF claims.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Addiction Medicine</col>
+				<col name="abbrev">079</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Allergy/Immunology</col>
+				<col name="abbrev">003</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Anesthesiology</col>
+				<col name="abbrev">005</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Cardiac Surgery</col>
+				<col name="abbrev">078</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Cardiology</col>
+				<col name="abbrev">006</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Chiropractic</col>
+				<col name="abbrev">035</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Critical Care (Intensivists)</col>
+				<col name="abbrev">081</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Colorectal Surgery</col>
+				<col name="abbrev">028</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Dermatology</col>
+				<col name="abbrev">007</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Diagnostic Radiology</col>
+				<col name="abbrev">030</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Emergency Medicine</col>
+				<col name="abbrev">093</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Endocrinology</col>
+				<col name="abbrev">046</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Family Practice</col>
+				<col name="abbrev">008</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Gastroenterology</col>
+				<col name="abbrev">010</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">General Practice</col>
+				<col name="abbrev">001</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">General Surgery</col>
+				<col name="abbrev">002</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Geriatric Medicine</col>
+				<col name="abbrev">038</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Gynecology (Osteopaths only)</col>
+				<col name="abbrev">009</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Hand Surgery</col>
+				<col name="abbrev">040</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Hematology</col>
+				<col name="abbrev">082</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Hematology/Oncology</col>
+				<col name="abbrev">083</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Infectious Disease</col>
+				<col name="abbrev">044</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Internal Medicine</col>
+				<col name="abbrev">011</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Interventional Radiology</col>
+				<col name="abbrev">094</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Maxillofacial Surgery</col>
+				<col name="abbrev">085</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Medical Oncology</col>
+				<col name="abbrev">090</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Multispecialty Clinic or Group Practice</col>
+				<col name="abbrev">070</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Nephrology</col>
+				<col name="abbrev">039</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Neurology</col>
+				<col name="abbrev">013</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">Neuropsychiatry</col>
+				<col name="abbrev">086</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">Neurosurgery</col>
+				<col name="abbrev">014</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">Nuclear Medicine</col>
+				<col name="abbrev">036</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">Obstetrics (Osteopaths only)</col>
+				<col name="abbrev">015</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">Obstetrics/Gynecology</col>
+				<col name="abbrev">016</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">Ophthalmology</col>
+				<col name="abbrev">018</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Ophthalmology/Otolaryngology (Osteopaths only)</col>
+				<col name="abbrev">017</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">36</col>
+				<col name="caption">Oral Surgery (Dentists only)</col>
+				<col name="abbrev">019</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">37</col>
+				<col name="caption">Orthopedic Surgery</col>
+				<col name="abbrev">020</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">38</col>
+				<col name="caption">Osteopathic Manipulative Therapy</col>
+				<col name="abbrev">012</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">39</col>
+				<col name="caption">Otolaryngology</col>
+				<col name="abbrev">004</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">Pathologic Anatomy; Clinical Pathology (Osteopaths only)</col>
+				<col name="abbrev">021</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">41</col>
+				<col name="caption">Pathology</col>
+				<col name="abbrev">022</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">42</col>
+				<col name="caption">Pediatric Medicine</col>
+				<col name="abbrev">037</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">43</col>
+				<col name="caption">Peripheral Vascular Disease</col>
+				<col name="abbrev">076</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">44</col>
+				<col name="caption">Peripheral Vascular Disease - Med or Surg (Osteopaths only)</col>
+				<col name="abbrev">023</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">45</col>
+				<col name="caption">Physical Medicine and Rehabilitation</col>
+				<col name="abbrev">025</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">46</col>
+				<col name="caption">Plastic and Reconstruction Surgery</col>
+				<col name="abbrev">024</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">47</col>
+				<col name="caption">Preventive Medicine</col>
+				<col name="abbrev">084</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">48</col>
+				<col name="caption">Psychiatry</col>
+				<col name="abbrev">026</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">49</col>
+				<col name="caption">Psychiatry/Neurology (Osteopaths only)</col>
+				<col name="abbrev">027</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">Pulmonary Diseases</col>
+				<col name="abbrev">029</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">51</col>
+				<col name="caption">Radiation Oncology</col>
+				<col name="abbrev">092</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">52</col>
+				<col name="caption">Radiation Therapy (Osteopaths only)</col>
+				<col name="abbrev">032</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">53</col>
+				<col name="caption">Rheumatology</col>
+				<col name="abbrev">066</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">54</col>
+				<col name="caption">Roentgenology/Radiology (Osteopaths only)</col>
+				<col name="abbrev">031</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">55</col>
+				<col name="caption">Surgical Oncology</col>
+				<col name="abbrev">091</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">56</col>
+				<col name="caption">Thoracic Surgery</col>
+				<col name="abbrev">033</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">57</col>
+				<col name="caption">Unknown Physician Specialty</col>
+				<col name="abbrev">099</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">58</col>
+				<col name="caption">Urology</col>
+				<col name="abbrev">034</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">59</col>
+				<col name="caption">Vascular Surgery</col>
+				<col name="abbrev">077</col>
+				<col name="group_name">Physician Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">60</col>
+				<col name="caption">Certified Clinical Nurse Specialist</col>
+				<col name="abbrev">089</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">61</col>
+				<col name="caption">Certified Nurse Midwife</col>
+				<col name="abbrev">042</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">62</col>
+				<col name="caption">Certified Registered Nurse Anesthetist</col>
+				<col name="abbrev">043</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">63</col>
+				<col name="caption">Clinical Psychologist</col>
+				<col name="abbrev">068</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">64</col>
+				<col name="caption">Independently-Billing Audiologist</col>
+				<col name="abbrev">064</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">65</col>
+				<col name="caption">Independently-Billing Psychologist</col>
+				<col name="abbrev">062</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">66</col>
+				<col name="caption">Independently-Practicing Occupational Therapist</col>
+				<col name="abbrev">067</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">67</col>
+				<col name="caption">Independently-Practicing Physical Therapist</col>
+				<col name="abbrev">065</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">68</col>
+				<col name="caption">Licensed Clinical Social Worker</col>
+				<col name="abbrev">080</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">69</col>
+				<col name="caption">Nurse Practitioner</col>
+				<col name="abbrev">050</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">70</col>
+				<col name="caption">Optometry</col>
+				<col name="abbrev">041</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">71</col>
+				<col name="caption">Physician Assistant</col>
+				<col name="abbrev">097</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">72</col>
+				<col name="caption">Podiatry</col>
+				<col name="abbrev">048</col>
+				<col name="group_name">Lmtd License Practitioner</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">73</col>
+				<col name="caption">Diagnostic Laboratory, GPPP</col>
+				<col name="abbrev">072</col>
+				<col name="group_name">Grp Practice Pre-Payment Plan</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">74</col>
+				<col name="caption">Diagnostic X-Ray, GPPP</col>
+				<col name="abbrev">071</col>
+				<col name="group_name">Grp Practice Pre-Payment Plan</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">75</col>
+				<col name="caption">Occupational Therapy, GPPP</col>
+				<col name="abbrev">074</col>
+				<col name="group_name">Grp Practice Pre-Payment Plan</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">76</col>
+				<col name="caption">Other Medical Care, GPPP</col>
+				<col name="abbrev">075</col>
+				<col name="group_name">Grp Practice Pre-Payment Plan</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">77</col>
+				<col name="caption">Physiotherapy, GPPP</col>
+				<col name="abbrev">073</col>
+				<col name="group_name">Grp Practice Pre-Payment Plan</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">78</col>
+				<col name="caption">All Other (ex. Drug and Dept Stores)</col>
+				<col name="abbrev">087</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">79</col>
+				<col name="caption">Ambulance Service Supplier</col>
+				<col name="abbrev">059</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">80</col>
+				<col name="caption">Ambulatory Surgical Center</col>
+				<col name="abbrev">049</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">81</col>
+				<col name="caption">Independent Physiological Laboratory</col>
+				<col name="abbrev">095</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">82</col>
+				<col name="caption">Independently Billing Clinical Laboratory</col>
+				<col name="abbrev">069</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">83</col>
+				<col name="caption">Individual Certified Orthotist</col>
+				<col name="abbrev">055</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">84</col>
+				<col name="caption">Individual Certified Prosthetist</col>
+				<col name="abbrev">056</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">85</col>
+				<col name="caption">Individual Certified Prosthetist-Orthotist</col>
+				<col name="abbrev">057</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">86</col>
+				<col name="caption">Individual Certified (Other)</col>
+				<col name="abbrev">058</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">87</col>
+				<col name="caption">Mammography Screening Center</col>
+				<col name="abbrev">045</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">88</col>
+				<col name="caption">Medical Supply Co. (with Orthotist Cert. by ABCPO)</col>
+				<col name="abbrev">051</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">89</col>
+				<col name="caption">Medical Supply Co. (with Prosthetist Cert. by ABCPO)</col>
+				<col name="abbrev">052</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">90</col>
+				<col name="caption">Medical Supply Co. (with Prosthetist-Orthotist Cert. by ABCPO)</col>
+				<col name="abbrev">053</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">91</col>
+				<col name="caption">Medical Supply Company (Other)</col>
+				<col name="abbrev">054</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">92</col>
+				<col name="caption">Portable X-Ray Supplier</col>
+				<col name="abbrev">063</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">93</col>
+				<col name="caption">Public Health or Welfare Agencies</col>
+				<col name="abbrev">060</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">94</col>
+				<col name="caption">Unknown Supplier/Provider</col>
+				<col name="abbrev">088</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">95</col>
+				<col name="caption">Volun. Health or Charitable Agencies</col>
+				<col name="abbrev">061</col>
+				<col name="group_name">Supplier Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">96</col>
+				<col name="caption">Acupuncturist</col>
+				<col name="abbrev">N04</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">97</col>
+				<col name="caption">Independently Billing Radiology Grp</col>
+				<col name="abbrev">N06</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">98</col>
+				<col name="caption">Licensed Massage Therapist</col>
+				<col name="abbrev">N07</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">99</col>
+				<col name="caption">Licensed Practical Nurse</col>
+				<col name="abbrev">N02</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">100</col>
+				<col name="caption">Opthamology, Cataracts</col>
+				<col name="abbrev">N03</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">101</col>
+				<col name="caption">Obstetrics/Neo Natal</col>
+				<col name="abbrev">N05</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">102</col>
+				<col name="caption">Registered Nurse</col>
+				<col name="abbrev">N01</col>
+				<col name="group_name">NEIC-Specific Medical Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">103</col>
+				<col name="caption">Dental General Practice</col>
+				<col name="abbrev">301</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">104</col>
+				<col name="caption">Denturist</col>
+				<col name="abbrev">308</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">105</col>
+				<col name="caption">Endodontics</col>
+				<col name="abbrev">303</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">106</col>
+				<col name="caption">Independent Hygienist</col>
+				<col name="abbrev">302</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">107</col>
+				<col name="caption">Orthodontics</col>
+				<col name="abbrev">307</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">108</col>
+				<col name="caption">Pedodontics</col>
+				<col name="abbrev">304</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">109</col>
+				<col name="caption">Periodontics</col>
+				<col name="abbrev">305</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">110</col>
+				<col name="caption">Prosthodontics</col>
+				<col name="abbrev">306</col>
+				<col name="group_name">NEIC-Specific Dental Specialty</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="Referral_Reason" abbrev="RefReas" type="Lookup">
+		<data>
+			<row>
+				<col name="id">0816</col>
+				<col name="caption">Allergy serum only</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">0817</col>
+				<col name="caption">Allergy shots/injection</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2041</col>
+				<col name="caption">RAST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2042</col>
+				<col name="caption">MAST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2043</col>
+				<col name="caption">RIST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2059</col>
+				<col name="caption">Other allergy</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2001</col>
+				<col name="caption">Angiograms</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2002</col>
+				<col name="caption">EKG stress testing</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2003</col>
+				<col name="caption">Cardiac rehab</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2019</col>
+				<col name="caption">Other cardiology</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2201</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2202</col>
+				<col name="caption">Worker's compensation</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2219</col>
+				<col name="caption">Other chiropractic</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2101</col>
+				<col name="caption">Lesion removal</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2102</col>
+				<col name="caption">PUVA therapy</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2103</col>
+				<col name="caption">Dermabrasion</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2104</col>
+				<col name="caption">Chemical peel</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2105</col>
+				<col name="caption">Reconstructive/Plastic</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2106</col>
+				<col name="caption">Scar revision</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2119</col>
+				<col name="caption">Other dermatology</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2061</col>
+				<col name="caption">Growth hormones</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2062</col>
+				<col name="caption">Diabetic education</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2063</col>
+				<col name="caption">Nutritional counseling</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2079</col>
+				<col name="caption">Other endocrinology</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2021</col>
+				<col name="caption">Interferon therapy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2022</col>
+				<col name="caption">Sigmoidoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2023</col>
+				<col name="caption">Endoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2024</col>
+				<col name="caption">Colonoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2039</col>
+				<col name="caption">Other gastroenterology</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2161</col>
+				<col name="caption">Aerosol pentamidine</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">2162</col>
+				<col name="caption">Interferon therapy</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">2179</col>
+				<col name="caption">Other infectious disease</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">0511</col>
+				<col name="caption">Mental Health Consultation</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0512</col>
+				<col name="caption">Chemical Dependency Consultation</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0513</col>
+				<col name="caption">Mental Health Outpatient</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0514</col>
+				<col name="caption">Chemical Dependency Outpatient</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0518</col>
+				<col name="caption">Mental Health, Residential</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0519</col>
+				<col name="caption">Dual Diagnosis, MH Primary/CD Secondary</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0520</col>
+				<col name="caption">Mental Health, Inpatient Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0521</col>
+				<col name="caption">Mental Health, Transitional Adult</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0522</col>
+				<col name="caption">Mental Health, Transitional Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0523</col>
+				<col name="caption">Chemical Dependency, Inpatient Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0524</col>
+				<col name="caption">Chemical Dependency, Transitional Adult</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0525</col>
+				<col name="caption">Chemical Dependency, Transitional Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">2081</col>
+				<col name="caption">Dialysis</col>
+				<col name="group_name">Nephrology</col>
+			</row>
+			<row>
+				<col name="id">2099</col>
+				<col name="caption">Other nephrology</col>
+				<col name="group_name">Nephrology</col>
+			</row>
+			<row>
+				<col name="id">2121</col>
+				<col name="caption">Sleep studies</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2122</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2123</col>
+				<col name="caption">Worker's Compensation</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2139</col>
+				<col name="caption">Other neurology</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2601</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2606</col>
+				<col name="caption">Prenatal care</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2619</col>
+				<col name="caption">Other OB/GYN</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2181</col>
+				<col name="caption">Radiation therapy</col>
+				<col name="group_name">Oncology</col>
+			</row>
+			<row>
+				<col name="id">2182</col>
+				<col name="caption">Chemotherapy</col>
+				<col name="group_name">Oncology</col>
+			</row>
+			<row>
+				<col name="id">2199</col>
+				<col name="caption">Other oncology</col>
+				<col name="group_name">Oncology</col>
+			</row>
+
+
+			<row>
+				<col name="id">0624</col>
+				<col name="caption">Eye exam, routine</col>
+				<col name="group_name">Ophthalmology</col>
+			</row>
+			<row>
+				<col name="id">0639</col>
+				<col name="caption">Other ophthalmology</col>
+				<col name="group_name">Ophthalmology</col>
+			</row>
+			<row>
+				<col name="id">2627</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2625</col>
+				<col name="caption">Sports injury</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2626</col>
+				<col name="caption">Work related injury</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2639</col>
+				<col name="caption">Other orthopedic</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2141</col>
+				<col name="caption">Bronchoscopies</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">2142</col>
+				<col name="caption">Sleep studies</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">2159</col>
+				<col name="caption">Other pulmonology</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">3561</col>
+				<col name="caption">Bone density study</col>
+				<col name="group_name">Rheumatology</col>
+			</row>
+			<row>
+				<col name="id">1221</col>
+				<col name="caption">Other rheumatology</col>
+				<col name="group_name">Rheumatology</col>
+			</row>
+			<row>
+				<col name="id">3071</col>
+				<col name="caption">Hospice</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3011</col>
+				<col name="caption">IV therapy</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3031</col>
+				<col name="caption">Nursing care</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3051</col>
+				<col name="caption">Uterine monitoring</col>
+				<col name="group_name">Monitoring</col>
+			</row>
+			<row>
+				<col name="id">3099</col>
+				<col name="caption">Other home care</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3181</col>
+				<col name="caption">Cardiac rehab</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3191</col>
+				<col name="caption">Cognitive/Neuropsych therapy</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3201</col>
+				<col name="caption">Pain clinics</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3299</col>
+				<col name="caption">Other outpatient rehab</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">0627</col>
+				<col name="caption">Hearing evaluation</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">0628</col>
+				<col name="caption">Hearing aid evaluation</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">3341</col>
+				<col name="caption">Dispense hearing aid</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">3121</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3123</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3122</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3161</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3162</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3163</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3101</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3102</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3103</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3141</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3142</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3143</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3142</col>
+				<col name="caption">Cochlear implants</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3321</col>
+				<col name="caption">Supplies</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3341</col>
+				<col name="caption">Hearing aids</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3361</col>
+				<col name="caption">Prosthetics</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3381</col>
+				<col name="caption">Orthotics</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3401</col>
+				<col name="caption">Oxygen</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3459</col>
+				<col name="caption">Other equipment/supplies</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">8808</col>
+				<col name="caption">DME purchase</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">8809</col>
+				<col name="caption">DME rental</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3501</col>
+				<col name="caption">MRI of joints</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3502</col>
+				<col name="caption">Other MRIs</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3521</col>
+				<col name="caption">CTs</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3541</col>
+				<col name="caption">PET scanners</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3561</col>
+				<col name="caption">Bone density study</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3599</col>
+				<col name="caption">Other diagnostic studies</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">4322</col>
+				<col name="caption">Mammogram</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">4335</col>
+				<col name="caption">Ultrasonic examination</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">0914</col>
+				<col name="caption">TMJ surgery</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">0912</col>
+				<col name="caption">Cleft palate/lip consult or surgery</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">0920</col>
+				<col name="caption">TMJ and appliances</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3601</col>
+				<col name="caption">TMJ disorder</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3621</col>
+				<col name="caption">Accidental dental services</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3699</col>
+				<col name="caption">Other services provided by a dentist</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">4302</col>
+				<col name="caption">Nonpar hospitals</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">4301</col>
+				<col name="caption">Nonpar physicians</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">4303</col>
+				<col name="caption">Other nonpar providers</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">2999</col>
+				<col name="caption">Other surgery</col>
+				<col name="group_name">Surgery</col>
+			</row>
+			<row>
+				<col name="id">0712</col>
+				<col name="caption">Cardiovascular surgery</col>
+				<col name="group_name">Cardiovascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">0713</col>
+				<col name="caption">Cardiac catherization</col>
+				<col name="group_name">Cardiovascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2501</col>
+				<col name="caption">TMJ disorder</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2502</col>
+				<col name="caption">Tympanostomy</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2503</col>
+				<col name="caption">Rhinoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2505</col>
+				<col name="caption">Septo/Rinoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2504</col>
+				<col name="caption">Septoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2506</col>
+				<col name="caption">T and A</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2507</col>
+				<col name="caption">Myringotomy</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2519</col>
+				<col name="caption">Other ENT surgery</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2605</col>
+				<col name="caption">Laparoscopy</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2661</col>
+				<col name="caption">Gastric bypass</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2662</col>
+				<col name="caption">Skin lesion</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2663</col>
+				<col name="caption">Panniculectomy</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2664</col>
+				<col name="caption">Breast reduction</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2665</col>
+				<col name="caption">Male gynecomastia</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2666</col>
+				<col name="caption">Scar removal</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2667</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2668</col>
+				<col name="caption">Reconstructive</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2679</col>
+				<col name="caption">Other general surgery</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">1225</col>
+				<col name="caption">Laminectomy</col>
+				<col name="group_name">Neurosurgery</col>
+			</row>
+			<row>
+				<col name="id">2701</col>
+				<col name="caption">Other neurosurgery</col>
+				<col name="group_name">Neurosurgery</col>
+			</row>
+			<row>
+				<col name="id">2601</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2602</col>
+				<col name="caption">Reversal of sterilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2603</col>
+				<col name="caption">Invitro fertilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2604</col>
+				<col name="caption">GIFT/ZIFT</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2605</col>
+				<col name="caption">Laparoscopy</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2606</col>
+				<col name="caption">Prenatal care</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2607</col>
+				<col name="caption">Norplant</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2608</col>
+				<col name="caption">Pregnancy termination</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2609</col>
+				<col name="caption">Sterilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2619</col>
+				<col name="caption">Other OB/GYN</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2521</col>
+				<col name="caption">Blepharoplasty</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2522</col>
+				<col name="caption">Cataract surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2523</col>
+				<col name="caption">Strabismus surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2524</col>
+				<col name="caption">Refractive surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2539</col>
+				<col name="caption">Other ophthalmologic surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2621</col>
+				<col name="caption">Bunionectomy</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2622</col>
+				<col name="caption">Fracture care</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2623</col>
+				<col name="caption">Arthroscopy</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2624</col>
+				<col name="caption">Carpal tunnel repair</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2625</col>
+				<col name="caption">Sports injury</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2626</col>
+				<col name="caption">Work related injury</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2627</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2639</col>
+				<col name="caption">Other orthopedic</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">0912</col>
+				<col name="caption">Cleft palate/lip consult or surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2541</col>
+				<col name="caption">Panniculectomy</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2542</col>
+				<col name="caption">Rhinoplasty</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2543</col>
+				<col name="caption">Reconstructive surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2544</col>
+				<col name="caption">General plastic surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2545</col>
+				<col name="caption">Scar revision</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2546</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2547</col>
+				<col name="caption">Lesion removal</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2548</col>
+				<col name="caption">MOH's procedure</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2549</col>
+				<col name="caption">Breast reduction</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2550</col>
+				<col name="caption">Male gynecomastia</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2579</col>
+				<col name="caption">Other plastic/reconstructive</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2641</col>
+				<col name="caption">Bunionectomy</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2642</col>
+				<col name="caption">Diabetic foot care</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2643</col>
+				<col name="caption">Surgery</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2659</col>
+				<col name="caption">Other podiatrist</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2681</col>
+				<col name="caption">Reversal of sterilization</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2682</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2699</col>
+				<col name="caption">Other urology</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2581</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2582</col>
+				<col name="caption">Varicose veins</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2583</col>
+				<col name="caption">Spider veins</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2599</col>
+				<col name="caption">Other vascular surgery</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">1511</col>
+				<col name="caption">Bone marrow</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1512</col>
+				<col name="caption">Heart</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1513</col>
+				<col name="caption">Liver</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1514</col>
+				<col name="caption">Kidney</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1515</col>
+				<col name="caption">Double lung</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1516</col>
+				<col name="caption">Single lung</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3701</col>
+				<col name="caption">Evaluation</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3704</col>
+				<col name="caption">Post-transplant care</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3702</col>
+				<col name="caption">Pre-transplant care</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1599</col>
+				<col name="caption">All other transplants</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3801</col>
+				<col name="caption">Ambulance</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3802</col>
+				<col name="caption">Taxi</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3803</col>
+				<col name="caption">Amulet/MediCab</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3901</col>
+				<col name="caption">Room and board</col>
+				<col name="group_name">Skilled Nursing Facility</col>
+			</row>
+			<row>
+				<col name="id">2499</col>
+				<col name="caption">Other medical referral</col>
+				<col name="group_name">Skilled Nursing Facility</col>
+			</row>
+		</data>
+	</table>
+
+	<table name="States" type="Lookup">
+		<description>List of States.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Alabama</col>
+				<col name="abbrev">AL</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Alaska</col>
+				<col name="abbrev">AK</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Arizona</col>
+				<col name="abbrev">AZ</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Arkansas</col>
+				<col name="abbrev">AR</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">California</col>
+				<col name="abbrev">CA</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Colorado</col>
+				<col name="abbrev">CO</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Connecticut</col>
+				<col name="abbrev">CT</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Delaware</col>
+				<col name="abbrev">DE</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">District of Columbia</col>
+				<col name="abbrev">DC</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Florida</col>
+				<col name="abbrev">FL</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Georgia</col>
+				<col name="abbrev">GA</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Hawaii</col>
+				<col name="abbrev">HI</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Idaho</col>
+				<col name="abbrev">ID</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Illinois</col>
+				<col name="abbrev">IL</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Indiana</col>
+				<col name="abbrev">IN</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Iowa</col>
+				<col name="abbrev">IA</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Kansas</col>
+				<col name="abbrev">KS</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Kentucky</col>
+				<col name="abbrev">KY</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Louisiana</col>
+				<col name="abbrev">LA</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Maine</col>
+				<col name="abbrev">ME</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Maryland</col>
+				<col name="abbrev">MD</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Massachusetts</col>
+				<col name="abbrev">MA</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Michigan</col>
+				<col name="abbrev">MI</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Minnesota</col>
+				<col name="abbrev">MN</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Mississippi</col>
+				<col name="abbrev">MS</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Missouri</col>
+				<col name="abbrev">MO</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Montana</col>
+				<col name="abbrev">MT</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Nebraska</col>
+				<col name="abbrev">NE</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Nevada</col>
+				<col name="abbrev">NV</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">New Hampshire</col>
+				<col name="abbrev">NH</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">New Jersey</col>
+				<col name="abbrev">NJ</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">New Mexico</col>
+				<col name="abbrev">NM</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">New York</col>
+				<col name="abbrev">NY</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">North Carolina</col>
+				<col name="abbrev">NC</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">North Dakota</col>
+				<col name="abbrev">ND</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Ohio</col>
+				<col name="abbrev">OH</col>
+			</row>
+			<row>
+				<col name="id">36</col>
+				<col name="caption">Oklahoma</col>
+				<col name="abbrev">OK</col>
+			</row>
+			<row>
+				<col name="id">37</col>
+				<col name="caption">Oregon</col>
+				<col name="abbrev">OR</col>
+			</row>
+			<row>
+				<col name="id">38</col>
+				<col name="caption">Pennsylvania</col>
+				<col name="abbrev">PA</col>
+			</row>
+			<row>
+				<col name="id">39</col>
+				<col name="caption">Rhode Island</col>
+				<col name="abbrev">RI</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">South Carolina</col>
+				<col name="abbrev">SC</col>
+			</row>
+			<row>
+				<col name="id">41</col>
+				<col name="caption">South Dakota</col>
+				<col name="abbrev">SD</col>
+			</row>
+			<row>
+				<col name="id">42</col>
+				<col name="caption">Tennessee</col>
+				<col name="abbrev">TN</col>
+			</row>
+			<row>
+				<col name="id">43</col>
+				<col name="caption">Texas</col>
+				<col name="abbrev">TX</col>
+			</row>
+			<row>
+				<col name="id">44</col>
+				<col name="caption">Utah</col>
+				<col name="abbrev">UT</col>
+			</row>
+			<row>
+				<col name="id">45</col>
+				<col name="caption">Vermont</col>
+				<col name="abbrev">VT</col>
+			</row>
+			<row>
+				<col name="id">46</col>
+				<col name="caption">Virginia</col>
+				<col name="abbrev">VA</col>
+			</row>
+			<row>
+				<col name="id">47</col>
+				<col name="caption">Washington</col>
+				<col name="abbrev">WA</col>
+			</row>
+			<row>
+				<col name="id">48</col>
+				<col name="caption">West Virginia</col>
+				<col name="abbrev">WV</col>
+			</row>
+			<row>
+				<col name="id">49</col>
+				<col name="caption">Wisconsin</col>
+				<col name="abbrev">WI</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">Wyoming</col>
+				<col name="abbrev">WY</col>
+			</row>
+			<row>
+				<col name="id">51</col>
+				<col name="caption">American Samoa</col>
+				<col name="abbrev">A_S</col>
+			</row>
+			<row>
+				<col name="id">52</col>
+				<col name="caption">Federated States of Micronesia</col>
+				<col name="abbrev">F_S_M</col>
+			</row>
+			<row>
+				<col name="id">53</col>
+				<col name="caption">Guam</col>
+				<col name="abbrev">GUAM</col>
+			</row>
+			<row>
+				<col name="id">54</col>
+				<col name="caption">Marshall Islands</col>
+				<col name="abbrev">M_I</col>
+			</row>
+			<row>
+				<col name="id">55</col>
+				<col name="caption">Northern Mariana Islands</col>
+				<col name="abbrev">N_M_I</col>
+			</row>
+			<row>
+				<col name="id">56</col>
+				<col name="caption">Palau</col>
+				<col name="abbrev">PALAU</col>
+			</row>
+			<row>
+				<col name="id">57</col>
+				<col name="caption">Puerto Rico</col>
+				<col name="abbrev">P_R</col>
+			</row>
+			<row>
+				<col name="id">58</col>
+				<col name="caption">Virgin Islands</col>
+				<col name="abbrev">V_I</col>
+			</row>
+		</data>
+	</table>
+
+</schema>

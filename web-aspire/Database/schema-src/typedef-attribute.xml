@@ -1,0 +1,557 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="typedef-properties">
+	<include file="generic-datatypes.xml"/>
+
+	<tabletype name="Attribute" type="Audit,Secure,Restrict_Rows_Abbrev">
+		<description>An attribute that further describes its parent row</description>
+		<column name="item_id" type="autoinc" primarykey="yes" descr="The unique item identification"/>
+
+		<column name="parent_id" parentref="$parentref$" indexed="yes" required="yes" descr="The owner of the item"/>
+		<column name="item_type" lookupref="Attribute_Type" required="yes" indexed="yes" default="0"/>
+		<column name="item_name" type="text" size="128" indexed="yes" descr="The complete designation (like abc/def/xxx)"/>
+		<column name="name_sort" type="text" size="64" descr="If any alternate sorting is required, provide it here"/>
+
+		<column name="value_type" lookupref="Attribute_Value_Type" required="yes" default="0"/>
+		<column name="value_text" type="text" size="512" indexed="yes" descr="For use in 'Text' 'ICD-9' 'CPT' 'Medication' and 'Certificate' types"/>
+		<column name="value_textB" type="text" size="512" indexed="yes" descr="For generic use"/>
+		<column name="value_int" type="longint" descr="For use in 'Integer' and 'Boolean' types"/>
+		<column name="value_intB" type="longint" descr="For generic use"/>
+		<column name="value_float" type="float" descr="For use in 'Float' type"/>
+		<column name="value_floatB" type="float" descr="For generic use"/>
+		<column name="value_date" type="date" descr="For use in 'Date' and 'Duration' (the starting duration) types"/>
+		<column name="value_dateEnd" type="date" descr="For use in 'Duration' type the ending duration"/>
+		<column name="value_dateA" type="date" descr="For generic use, also used in 'Certificate' type"/>
+		<column name="value_dateB" type="date" descr="For generic use, also used in 'Certificate' type"/>
+		<column name="value_block" type="datablock" descr="A generic block of data (used in 'DataBlock' type)"/>
+	</tabletype>
+
+	<tabletype name="Data_Block">
+		<description>
+			A named blob or block of data that extends another record in the system.
+			Different from an Attribute only in that it manages a complete block of data and
+			is usually not editable separately by an end-user (UI). The data items in a data block
+			usually do not need to be managed separately for searching, reporting, or other purposes.
+			Note that this table does not audit changes, restrict rows, or require session_ids.
+		</description>
+		<column name="parent_id" parentref="$parentref$" primarykey="yes" descr="The owner of the item"/>
+		<column name="name" type="text" size="128" primarykey="yes" descr="The name of the data buffer"/>
+		<column name="data" type="datablock" descr="A generic block of data"/>
+	</tabletype>
+
+	<table name="Attribute_Type" type="Enumeration">
+		<enum>Attribute Name/Value Pair</enum>
+		<enum>Attribute Group</enum>
+	</table>
+
+	<table name="Attribute_Value_Type" abbrev="AtValTy" type="Type_Definition">
+		<description>The type of that an attribute can hold, defined with a 2-level hierarchy, such as Retirement Benefits or State Certificate</description>
+		<column name="dialog_params" type="text" size="512" descr="Any specific dialog parameters that are needed"/>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Text</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Data type for Text stored in text.</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">DataBlock</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Phone</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="phone"</col>
+				<col name="remarks">Data type for phone number. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Fax</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="phone"</col>
+				<col name="remarks">Data type for fax number. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Pager</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="pager"</col>
+				<col name="remarks">Data type for pager number.Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Billing Phone</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="phone"</col>
+				<col name="remarks">Data type for phone number. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">ZIP Code</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="zipcode"</col>
+				<col name="remarks">Data type for zip code. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">EMail</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="email"</col>
+				<col name="remarks">Data type for Email address. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">URL</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="url"</col>
+				<col name="remarks">Data type for URL address. Stored in value_text in person_attribute table</col>
+			</row>
+			<row>
+				<col name="id">60</col>
+				<col name="caption">Social Security</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="ssn"</col>
+				<col name="remarks">Data type for social security number. Stored in ssn in person table</col>
+			</row>
+			<row>
+				<col name="id">70</col>
+				<col name="caption">Contact</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="contact"</col>
+				<col name="remarks">Data type for contact names. Stored in value_text in org_attribute table</col>
+			</row>
+			<row>
+				<col name="id">100</col>
+				<col name="caption">Boolean</col>
+				<col name="group_name">Numeric</col>
+				<col name="dialog_params">type="bool"</col>
+				<col name="remarks">Data is of type boolean stored in int</col>
+			</row>
+			<row>
+				<col name="id">110</col>
+				<col name="caption">Integer</col>
+				<col name="group_name">Numeric</col>
+				<col name="dialog_params">type="integer"</col>
+				<col name="remarks">Data is of type integer stored in int</col>
+			</row>
+			<row>
+				<col name="id">120</col>
+				<col name="caption">Float</col>
+				<col name="group_name">Numeric</col>
+				<col name="dialog_params">type="float"</col>
+				<col name="remarks">Data is of type float stored in int</col>
+			</row>
+			<row>
+				<col name="id">130</col>
+				<col name="caption">Percentage</col>
+				<col name="group_name">Numeric</col>
+				<col name="dialog_params">type="percentage"</col>
+				<col name="remarks">Data type for percentage stored in int</col>
+			</row>
+			<row>
+				<col name="id">140</col>
+				<col name="caption">Currency</col>
+				<col name="group_name">Numeric</col>
+				<col name="dialog_params">type="currency"</col>
+				<col name="remarks">Data type for currency stored in int</col>
+			</row>
+			<row>
+				<col name="id">150</col>
+				<col name="caption">Date</col>
+				<col name="group_name">Date</col>
+				<col name="dialog_params">type="date"</col>
+				<col name="remarks">Data type for date stored in date</col>
+			</row>
+			<row>
+				<col name="id">160</col>
+				<col name="caption">Duration</col>
+				<col name="group_name">Date</col>
+				<col name="dialog_params">type="duration"</col>
+				<col name="remarks">Data type for a set of dates stored in date</col>
+			</row>
+			<row>
+				<col name="id">200</col>
+				<col name="caption">Family</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Association between patient and the family member. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
+			</row>
+			<row>
+				<col name="id">201</col>
+				<col name="caption">Emergency</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Association between patient and emergency contact person. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
+			</row>
+			<row>
+				<col name="id">210</col>
+				<col name="caption">Provider</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The care provider or physician for a patient. The fields are stored in the table 'person_attribute' as follows:Person Id and Full Name in value_text,relationship in item_name, phone number in value_text_B and begin date in value_date</col>
+			</row>
+			<row>
+				<col name="id">220</col>
+				<col name="caption">Employed (Full-Time)</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment status is 'employed(full-time)'.Stored in value_text in 'person_attribute' table  </col>
+			</row>
+			<row>
+				<col name="id">221</col>
+				<col name="caption">Employed (Part-Time)</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment status is 'employed(part-time)'.Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">222</col>
+				<col name="caption">Self-Employed</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment status is 'self-employed'. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">223</col>
+				<col name="caption">Retired</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment status is 'retired'. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">224</col>
+				<col name="caption">Student (Full-Time)</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient is a full-time student. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">225</col>
+				<col name="caption">Student (Part-Time)</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient is a part-time student. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">226</col>
+				<col name="caption">Unknown</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment is unknown. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">227</col>
+				<col name="caption">Unemployed</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment is unemployed. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
+				<col name="id">250</col>
+				<col name="caption">Resource (Person)</col>
+				<col name="group_name">Association</col>
+				<col name="remarks">An associated person resource (used for associating physicians with nurses for looking at appointments, etc) -- value_text is the person_id.</col>
+			</row>
+			<row>
+				<col name="id">251</col>
+				<col name="caption">Resource (Other)</col>
+				<col name="group_name">Association</col>
+				<col name="remarks">An associated non-person resource (used for associating physicians with nurses for looking at appointments, etc) -- value_text is the resource_id.</col>
+			</row>
+			<row>
+				<col name="id">252</col>
+				<col name="caption">Resource (Org)</col>
+				<col name="group_name">Association</col>
+				<col name="remarks">An associated non-org resource (used for associating physicians with nurses for looking at appointments, etc) -- value_text is the org_id.</col>
+			</row>
+			<row>
+				<col name="id">300</col>
+				<col name="caption">ICD-9</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+
+			</row>
+			<row>
+				<col name="id">310</col>
+				<col name="caption">CPT</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+
+			</row>
+			<row>
+				<col name="id">320</col>
+				<col name="caption">ACL Role</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">330</col>
+				<col name="caption">Person</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">331</col>
+				<col name="caption">Patient</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">332</col>
+				<col name="caption">Physician</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">333</col>
+				<col name="caption">Appointment</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">340</col>
+				<col name="caption">Organization</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">350</col>
+				<col name="caption">Transaction</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">360</col>
+				<col name="caption">Insurance Group</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">361</col>
+				<col name="caption">Workers Compensation</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">370</col>
+				<col name="caption">Authorization (Signature)</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">371</col>
+				<col name="caption">Authorization (Provider Assign)</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">372</col>
+				<col name="caption">Authorization (Info Release)</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">400</col>
+				<col name="caption">Preventive Care Protocol</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Preventive measure given to a patient.The fields are stored in the table 'person_attribute' as follows:Measure in attr_name,last performed in value_date, due in value_date_end</col>
+			</row>
+			<row>
+				<col name="id">410</col>
+				<col name="caption">Medication Allergy</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The medication for which the patient is allergitic.The fields are stored in the table 'person_attribute' as follows:Medication allergy in attr_name,reaction in value_text, other reaction  in value_text_B</col>
+			</row>
+			<row>
+				<col name="id">411</col>
+				<col name="caption">Environmental Allergy</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The environment for which the patient is allergitic.The fields are stored in the table 'person_attribute' as follows:Environmental allergy in attr_name,reaction in value_text, other reaction  in value_text_B</col>
+			</row>
+			<row>
+				<col name="id">412</col>
+				<col name="caption">Medication Intolerance</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The medication for which the patient is intolerent.The fields are stored in the table 'person_attribute' as follows:Medication intolerance in attr_name,reaction in value_text, other reaction  in value_text_B</col>
+			</row>
+			<row>
+				<col name="id">420</col>
+				<col name="caption">Advance Directive - Patient Ordered</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Instructions given by the patient.The fields are stored in the table 'person_attribute' as follows:Directive in attr_name, date in value_date</col>
+			</row>
+			<row>
+				<col name="id">421</col>
+				<col name="caption">Advance Directive - Physician Ordered</col>
+				<col name="group_name">Clinical</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Instructions given by the physician.The fields are svored in the table 'person_attribute' as follows:Directive in attr_name, date in Value_date</col>
+			</row>
+			<row>
+				<col name="id">500</col>
+				<col name="caption">License</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Type of license for the physician.The fields are stored in the table 'person_attribute' as follows:License in attr_name,number in value_text,expiration date in value_dateend</col>
+			</row>
+			<row>
+				<col name="id">510</col>
+				<col name="caption">State</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The state license for the physician.The fields are stored in the table 'person_attribute' as follows:Type in attr_name,text in value_text</col>
+			</row>
+			<row>
+				<col name="id">520</col>
+				<col name="caption">Accreditations</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Accreditations for the physician.The fields are stored in the table 'person_attribute' as follows:Accreditation in value_text,expiration date in value_dateend </col>
+			</row>
+			<row>
+				<col name="id">530</col>
+				<col name="caption">Affiliations</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Affiliations for the physician.The fields are stored in the table 'person_attribute' as follows:Affiliation in attr_name,other affiliations in value_text, date in value_dateend</col>
+			</row>
+			<row>
+				<col name="id">540</col>
+				<col name="caption">Specialty</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Physicians specialties (primary, secondary, etc)</col>
+			</row>
+			<row>
+				<col name="id">550</col>
+				<col name="caption">Insurance Company Provider Id</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">This is the id code assigned by an insurance company to a provider code which authorizes the provider to bill the insurance company for service rendered</col>
+			</row>
+			<row>
+				<col name="id">560</col>
+				<col name="caption">Board Certification</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">This is the board name assigned to a provider code</col>
+			</row>
+			<row>
+				<col name="id">570</col>
+				<col name="caption">Tax Id</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Code assigned by a government to a person or a corporation for tax purposes</col>
+			</row>
+			<row>
+				<col name="id">600</col>
+				<col name="caption">Licensing</col>
+				<col name="group_name">Credentials</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">License for Organizations.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+			</row>
+			<row>
+				<col name="id">650</col>
+				<col name="caption">Billing Event</col>
+				<col name="group_name">Billing</col>
+				<col name="remarks">value_int = day,value_text = name_begin, value_textb = name_end, value_float = balance_criteria, value_intb = balance_operator (1 = greater than, -1 = less than)</col>
+			</row>
+			<row>
+				<col name="id">700</col>
+				<col name="caption">Insurance</col>
+				<col name="group_name">Benefits</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Insurance benifits for the physician</col>
+			</row>
+			<row>
+				<col name="id">710</col>
+				<col name="caption">Retirement</col>
+				<col name="group_name">Benefits</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Benefits for the physician after retirement.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+			</row>
+			<row>
+				<col name="id">720</col>
+				<col name="caption">Other</col>
+				<col name="group_name">Benefits</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Other benifits for physician.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+			</row>
+			<row>
+				<col name="id">800</col>
+				<col name="caption">Attendance</col>
+				<col name="group_name">General</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Leave for the physician.The fields are stored in the table 'person_attribute' as follows:Caption in attr_name, value in value_text</col>
+			</row>
+			<row>
+				<col name="id">810</col>
+				<col name="caption">Employment Record</col>
+				<col name="group_name">General</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">820</col>
+				<col name="caption">Personal</col>
+				<col name="group_name">General</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">830</col>
+				<col name="caption">Org</col>
+				<col name="group_name">General</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
+				<col name="id">900</col>
+				<col name="caption">Confirmation</col>
+				<col name="group_name">Scheduling</col>
+			</row>
+			<row>
+				<col name="id">950</col>
+				<col name="caption">History</col>
+				<col name="group_name">Status</col>
+			</row>
+			<row>
+				<col name="id">960</col>
+				<col name="caption">Billing Info</col>
+				<col name="group_name">Status</col>
+				<col name="remarks">value_text = billing id, value_textb = 0/1 (inactive/active), value_int = billing id type, parent_org_id = org_id for which this billing id is valid</col>
+			</row>
+
+			<!--
+				NOTE: be careful putting any ids beyond 999 because the properties
+				pane "Series" feature will stop working. (the properites pane expects
+				series to end at 999). If you need propery IDs beyond 999, be sure
+				to update App::Pane::Properties accordingly. Look for the variable
+				$series in that module.
+			-->
+			<row>
+				<col name="id">10100</col>
+				<col name="caption">Security/Login</col>
+				<col name="group_name">Security</col>
+				<col name="remarks">value_text is the Organization for which password applies (NULL for personal login)</col>
+			</row>
+
+			<!-- NOTE: all ids from 20000 to 20999 are used for invoice attributes -->
+			<row>
+				<col name="id">20000</col>
+				<col name="caption">Notes</col>
+				<col name="group_name">Invoice</col>
+				<col name="remarks">value_text are the notes, value_textb is the user</col>
+			</row>
+
+			<!-- NOTE: all ids at or beyond 99900 are used for "FAKE" properties at runtime so don't use them -->
+		</data>
+	</table>
+</schema>

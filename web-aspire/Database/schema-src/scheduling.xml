@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-scheduling">
+
+	<table name="Appt_Type" abbrev="ApType" type="Audit,Secure,Restrict_Rows">
+		<description>Appointment Type.  A template for appointments.</description>
+		<column name="appt_type_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Appt Type"/>
+		<column name="parent_id" selfref="Appt_Type.appt_type_id" descr="The parent appt_type ID"/>
+		<column name="r_ids" type="text_set" descr="Resources to which appointment type applies"/>
+		<column name="caption" type="text" size="128" required="yes" indexed="yes" descr="The descriptive name of the Appt Type"/>
+		<column name="duration" type="integer" required="yes" descr="The duration of the appointment in minutes"/>
+		<column name="lead_time" type="integer" descr="Lead time in minutes before the appointment"/>
+		<column name="lag_time" type="integer" descr="Lag time in minutes after the appointment"/>
+		<column name="back_to_back" type="boolean" descr="Back-to-Back appointment of this type allowed"/>
+		<column name="multiple" type="boolean" descr="Multiple simultaneous appointments of this type allowed"/>
+		<column name="num_sim" type="integer" descr="Limit the number of simultaneous appointments of this type"/>
+		<column name="am_limit" type="integer" descr="Limit the number of appointments of this type in AM hours"/>
+		<column name="pm_limit" type="integer" descr="Limit the number of appointments of this type in PM hours"/>
+		<column name="day_limit" type="integer" descr="Limit the number of appointments of this type for the day"/>
+		<column name="rr_ids" type="text" size="255" descr="Additional Resource(s) required for this appointment type"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+		<column name="appt_width" type="integer" descr="The Appointment Width for parallel appointments"/>
+		<column name="superbill_id" lookupref="Offering_Catalog.internal_catalog_id" indexed="yes" descr="The SuperBill type for this Appt Type"/>
+	</table>
+
+	<table name="Sch_Template" abbrev="ScTmpl" type="Audit,Secure,Restrict_Rows">
+		<description>A predefined block of time during which a resource is available or unavailable for scheduling events</description>
+		<column name="template_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific template"/>
+		<column name="r_ids" type="text_set" required="yes" descr="Resource/Person(s) to which template applies"/>
+		<column name="status" required="yes" type="boolean" descr="Should this template time block be considered active?"/>
+		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the template"/>
+		<column name="effective_begin_date" type="date" descr="The effective start date this template"/>
+		<column name="effective_end_date" type="date" descr="The effective end date for this template"/>
+		<column name="start_time" type="time" descr="The start time"/>
+		<column name="end_time" type="time" descr="The end time"/>
+		<column name="available" type="boolean" required="yes" descr="Is this time block Available or Unavailable for scheduling events?"/>
+		<column name="facility_id" indexed="yes" lookupref="Org.org_internal_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="patient_types" type="text_set" size="16" abbrev="ptypes" descr="Limit this template to particular type of patient(s) -- should be one or more comma-separated items enums in Appt_Attendee_Type table"/>
+		<column name="appt_types" type="text_set" abbrev="atypes" descr="Limit this template to particular appointment types"/>
+		<column name="days_of_month" type="text" size="255" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
+		<column name="months" type="text" descr="Months specification (cron style)"/>
+		<column name="days_of_week" type="text" abbrev="dow" descr="Weekday specification (cron style)"/>
+		<column name="preferences" type="text" size="1024" descr="Any preferences noted by Physician regarding scheduling during this block of time"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the template"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+		<column name="slot_width" type="integer" descr="The Slot Width for parallel appointments"/>
+	</table>
+
+	<table name="Appt_Chain_Entry" abbrev="ApChainE" type="Audit,Secure,Restrict_Rows">
+		<description> Appointment Chain Entry detailing chain appointments related to an appointment type.</description>
+		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Entry"/>
+		<column name="chain_id" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
+		<column name="appt_type_id" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
+		<column name="sequence" type="integer" descr="Index number indicating the sequence of this entry in the chain"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+	</table>
+
+	<table name="Event" abbrev="Event" type="Audit,Secure,Restrict_Rows">
+		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
+		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
+		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
+		<column name="owner_id" indexed="yes" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
+		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
+		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
+		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
+		<column name="facility_id" indexed="yes" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
+		<column name="start_time" type="stamp" indexed="yes" required="yes" descr="The starting time of the event"/>
+		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
+		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
+		<column name="scheduled_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="scheduled_stamp" indexed="yes" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
+		<column name="checkin_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="checkin_stamp" indexed="yes" type="stamp" descr="The date/time when the patient was checked in"/>
+		<column name="checkout_by_id" lookupref="Person.person_id" descr="The person who checked the patient out"/>
+		<column name="checkout_stamp" type="stamp" descr="The date/time when the patient was checked out"/>
+		<column name="discard_type" lookupref="Appt_Discard_Type" descr="The type of discard (cancel, no-show, etc)"/>
+		<column name="discard_by_id" lookupref="Person.person_id" descr="The person (employee) who cancelled, no-showed, or rescheduled"/>
+		<column name="discard_stamp" type="stamp" descr="The date/time when the event was cancelled, no-showed, or rescheduled"/>
+		<column name="discard_remarks" type="text" size="512" descr="Any remarks for cancellation/noshow, etc"/>
+		<column name="appt_type" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
+		<column name="chain_entry_id" lookupref="Appt_Chain_Entry.entry_id" descr="Appt Chain Entry ID number tying this appointment to the appointment chain"/>
+		<column name="superbill_id" lookupref="Offering_Catalog.internal_catalog_id" indexed="yes" descr="The SuperBill type for this Appointment"/>
+	</table>
+
+	<table name="Sch_Verify" abbrev="InsVer" type="Audit,Secure">
+		<description> Insurance Verification Data (per Appointment).</description>
+		<column name="event_id" lookupref="Event.event_id" primarykey="yes" descr="The event_id of the Appointment"/>
+		<column name="person_id" lookupref="Person.person_id" required="yes" indexed="yes" descr="The ID of the patient"/>
+		<column name="effective_begin_date" type="date" descr="The effective start date of the Insurance"/>
+		<column name="deductible" type="currency" descr="Deductible amount"/>
+		<column name="deductible_met" type="currency" descr="The amount of deductible met"/>
+		<column name="ovcopay" type="currency" descr="Office Visit Copay amount"/>
+		<column name="labcopay" type="currency" descr="Lab Copay amount"/>
+		<column name="xraycopay" type="currency" descr="XRay Copay amount"/>
+		<column name="referral_required" type="boolean" descr="Whether or not referral is required"/>
+		<column name="sep_copay_xray" type="boolean" descr="Whether or not separate copay for X-ray"/>
+		<column name="lab" type="text" size="128" descr="The Lab Organization "/>
+		<column name="provider_id" lookupref="Person.person_id" descr="The Primary Care Physician"/>
+		<column name="coverage_req" type="text" size="128" descr="Coverage Required"/>
+		<column name="coverage_on" type="text" size="128" descr="Coverage on"/>
+		<column name="referral_or_precert" type="boolean" descr="Referral or Pre-Cert on Out Patient"/>
+		<column name="precert_phone" type="text" size="20" descr="Pre-Cert Phone"/>
+		<column name="annual_pe_ww" type="text" size="128" descr="Annual Physical Exam / Well Woman"/>
+		<column name="gyn_exam" type="text" size="128" descr="GYN Exam"/>
+		<column name="thin_prep_pap" type="text" size="128" descr="Thin Prep Pap Test"/>
+		<column name="depo_inj" type="text" size="128" descr="Depo Injection for Contraception"/>
+		<column name="iud" type="text" size="128" descr="IUD"/>
+		<column name="tubal_lig" type="text" size="128" descr="Tubal Ligament"/>
+		<column name="surgery" type="text" size="128" descr="Surgery"/>
+		<column name="flex_sig" type="text" size="128" descr="Flex-Sigmoidoscopy"/>
+		<column name="output_xray" type="text" size="128" descr="Output XRays/Procs"/>
+		<column name="mammogram" type="text" size="128" descr="Mammograms"/>
+		<column name="amniocenteses" type="text" size="128" descr="Amniocenteses"/>
+		<column name="pelvic_ultrasound" type="text" size="128" descr="Pelvic Ultrasound"/>
+		<column name="fertility_test" type="text" size="128" descr="Fertility Testing"/>
+		<column name="circumcision" type="text" size="128" descr="Circumcisions"/>
+		<column name="ins_rep_name" type="text" size="128" descr="Insurance Rep Name"/>
+		<column name="ins_verified_by" lookupref="Person.person_id" descr="The ID of the person doing the Insurance verification"/>
+		<column name="ins_verify_date" type="date" descr="Date of Insurance verification"/>
+		<column name="app_verified_by" lookupref="Person.person_id" descr="The ID of the person doing the Appointment verification"/>
+		<column name="app_verify_date" type="date" descr="Date of Appointment verification"/>
+		<column name="med_verified_by" lookupref="Person.person_id" descr="The ID of the person doing the Medical verification"/>
+		<column name="med_verify_date" type="date" descr="Date of Medical verification"/>
+		<column name="per_verified_by" lookupref="Person.person_id" descr="The ID of the person doing the Personal verification"/>
+		<column name="per_verify_date" type="date" descr="Date of Personal verification"/>
+		<column name="verify_action" type="text" size="64" descr="Action taken to verify appointment"/>
+		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+	</table>
+
+</schema>
