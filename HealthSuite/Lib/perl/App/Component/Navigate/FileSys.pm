@@ -223,7 +223,7 @@ sub getActivePathContents
 			my $icon = $highlight eq $entryName ? $fileTypeInfo->[FILEEXTNINFO_ICONHIGHL] : $fileTypeInfo->[FILEEXTNINFO_ICON];
 			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEDATES)
 			{
-				$fileName =~ s/^(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$3\/$2\/$1 $4:$5", '%F (%T)')/e;
+				$fileName =~ s/^(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$2\/$3\/$1 $4:$5", '%F (%T)') || "Invalid Date"/e;
 			}
 			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEUNDL)
 			{
