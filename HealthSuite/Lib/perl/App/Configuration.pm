@@ -17,6 +17,7 @@ struct(ServerConfigData => [
 	name_Group => '$',
 	db_ConnectKey => '$',
 	path_root => '$',
+	path_WebSite => '$',
 	path_temp => '$',
 	path_Database => '$',
 	path_SchemaSQL => '$',
@@ -114,6 +115,7 @@ sub getDefaultConfig
 	$config->name_Group($group);
 	$config->db_ConnectKey($dbConnectKey);
 	$config->path_root(PATH_APPROOT);
+	$config->path_WebSite(PATH_WEBSITE);
 	$config->path_temp(File::Spec->catfile(PATH_WEBSITE, PATH_TEMP));
 	$config->path_Database(PATH_DATABASE);
 	$config->path_Reports(PATH_REPORTS);
@@ -164,9 +166,11 @@ sub getDefaultConfig
 	'db-sde_prime' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
 	'db-sde_prime2' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime2/sde@dbi:Oracle:SDEDBS02'),
 	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
+	'db-demo02' => getDefaultConfig('Demo02 Configuration', CONFIGGROUP_DEMO, 'demo02/demo@dbi:Oracle:SDEDBS02'),
 	'db-pro01' => getDefaultConfig('Production Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
+	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 );
 
 my $userName = '';
