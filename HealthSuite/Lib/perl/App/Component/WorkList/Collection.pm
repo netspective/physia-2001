@@ -146,7 +146,7 @@ sub getComponentHtml
 		                initiator_id =>$page->session('user_id'), 	
 		                billing_facility_id => $page->session('org_internal_id'),
 				data_num_a => $_->{invoice_id} ,
-				invoice_id => $_->{invoice_id} ,
+				trans_invoice_id => $_->{invoice_id} ,
 		
                 )if (! defined $_->{trans_id} &&  $fmtDate eq $todayDate);			
                 
