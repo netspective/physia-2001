@@ -35,8 +35,8 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new CGI::Dialog::Field(name => 'person_id', caption => 'Person ID', type => 'text', options => FLDFLAG_READONLY),
-			new App::Dialog::Field::Person::ID(name => 'transfer_id', caption =>'Transfer To', options => FLDFLAG_REQUIRED, hints => 'Collector to Transfer Account'),			
+			new App::Dialog::Field::Person::ID(incSimpleName=>1,name => 'person_id', caption => 'Person ID', type => 'text', options => FLDFLAG_READONLY),
+			new App::Dialog::Field::Person::ID(incSimpleName=>1, name => 'transfer_id', caption =>'Transfer To', options => FLDFLAG_REQUIRED, hints => 'Collector to Transfer Account'),			
 			new CGI::Dialog::Field(name => 'detail', caption => 'Reason For Transfer', type => 'memo', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(name => 'date_data_b', caption => 'Date', type => 'date'),	
 		);
