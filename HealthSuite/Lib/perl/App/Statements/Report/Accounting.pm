@@ -23,6 +23,7 @@ $STMTFMT_SEL_RECEIPT_ANALYSIS = qq{
 			and	m.TRANSACTION_TYPE(+) = y.TRANSACTION_TYPE
 			and 	m.PAYDATE (+) = y.PAYDATE
 			and     trunc(y.PAYDATE,'YYYY') =trunc(to_date(?,'MM/DD/YYYY'),'YYYY')
+			and	y.owner_org_id = ?
 			and	%whereCond%
 			group by y.NAME, y.CATEGORY_NAME, y.TRANSACTION_TYPE, y.POLICYNAME
 			order by y.NAME, y.CATEGORY_NAME desc
@@ -216,21 +217,24 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
                 sum(nvl(ffs_pmt,0)) as ffs_pmt,
                 sum(nvl(cap_pmt,0)) as cap_pmt,
                 sum(nvl(ancill_pmt,0)) as ancill_pmt,
-                count((select 1 FROM dual
-                      WHERE rc.trans_type in (2000,2010,2040,2050,2060,2070,2080,2090,2100,2120,2130,2160,2170,2180)
-                     )) as office_visit,                   
-                count((select 1 FROM dual
-                      WHERE rc.trans_type in (2020)
-                     )) as hospital_visit
-                    
-        FROM 	revenue_collection rc,org o
+                MIN ( (SELECT COUNT (e.event_id)
+                 FROM 	Event e, Event_Attribute ea
+                 WHERE 	ea.item_name = 'Appointment/Attendee/Physician'
+                 AND	e.event_status=2
+                 AND	e.event_type = 100
+                 AND	trunc(e.checkin_stamp) between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+                 AND	to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+                 AND	ea.value_text = provider
+                 AND    ea.parent_id = e.event_id
+                 ))as appt
+        FROM revenue_collection,org o
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND (facility = :3 OR :3 is NULL)
                 AND (provider =:4 OR :4 is NULL)
                 AND (batch_id >= :5 OR :5 is NULL)
                 AND (batch_id <= :6 OR :6 is NULL)
-		AND o.org_internal_id = rc.facility
+		AND o.org_internal_id = revenue_collection.facility
 		AND o.owner_org_id = :7
         GROUP by provider
         },
