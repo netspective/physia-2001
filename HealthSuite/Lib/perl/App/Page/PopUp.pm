@@ -9,6 +9,12 @@ use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
 use App::Statements::Person;
 
+use App::Billing::Prescription::Prescription;
+use App::Billing::Input::PrescriptionDBI;
+use App::Billing::Output::PrescriptionPDF;
+use App::Configuration;
+
+
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'popup' => {},
@@ -45,6 +51,39 @@ sub prepare_view_alerts
 
 	return 1;
 }
+
+sub prepare_view_prescription_pdf
+{
+	my ($self) = @_;
+	my $permed_id = $self->param('permed_id');
+
+	my $prescription = new App::Billing::Prescription::Prescription;
+	my $input = new App::Billing::Input::PrescriptionDBI;
+	my $output = new App::Billing::Output::PrescriptionPDF;
+
+	$input->populatePrescription (
+		$prescription,
+		$self,
+		$permed_id
+	);
+
+	my $theFilename = $self->session ('org_id') . $self->session ('user_id') . time() . ".perscription.pdf";
+
+	$output->printReport(
+		$prescription,
+		file => File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutput, $theFilename),
+#		columns => 4,
+#		rows => 51
+	);
+
+	my $fileLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutputHREF, $theFilename);
+
+	$self->addContent(qq {<b>Prescription Generated: </b><a href="$fileLink">Click here to view</a>});
+
+	return 1;
+
+}
+
 
 sub getContentHandlers
 {
