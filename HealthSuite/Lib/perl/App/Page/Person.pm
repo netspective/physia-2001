@@ -461,11 +461,16 @@ sub prepare_view_profile
 								<TD>#component.stp-person.certification#</TD>
 							</TR>
 						</TABLE><BR>
-						#component.stp-person.recentlyVisitedPatients#<BR>
-						#component.stp-person.affiliations#<BR>
+					#component.stp-person.recentlyVisitedPatients#<BR>
+					#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedSessionPhysicians#<BR>
-					#component.stp-person.benefits#</BR>
-					
+					#component.stp-person.benefits#</BR>				
+					</font>
+				</TD>
+				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD>
+					<font size=1 face=arial>					
+					#component.st-person.diagnosisSummary#<BR>
 					</font>
 				</TD>
 				<!--
@@ -481,6 +486,10 @@ sub prepare_view_profile
 		</TABLE>
 	});
 }
+
+
+##### #component.stp-person.diagnosisSummaryTitle# 
+
 
 sub prepare_view_chart
 {
