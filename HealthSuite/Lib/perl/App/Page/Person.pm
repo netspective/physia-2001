@@ -114,7 +114,10 @@ sub prepare_page_content_header
 	$profileLine .= '(#property.person_date_of_birth#) ' if $self->property('person_date_of_birth');
 	$profileLine .= '&nbsp;#property.person_ethnicity# ' if $self->property('person_ethnicity');
 	$profileLine .= '&nbsp;#property.person_marstat_caption# ' if $self->property('person_marstat_caption');
-	$profileLine .=  '&nbsp;Responsible Person: #property.person_responsible# ' if $self->property('person_responsible');
+	if ($self->property('person_responsible'))
+	{
+		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: <A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A> ';
+	}
 
 	push(@{$self->{page_content_header}},
 		qq{
