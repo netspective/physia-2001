@@ -119,6 +119,10 @@ sub execute
 	my $transId = $page->param('parent_trans_id');
 	my $transOwnerType = App::Universal::ENTITYTYPE_PERSON;
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION;
+	my $previousChildRecs = $STMTMGR_TRANSACTION->recordExists($page,STMTMGRFLAG_NONE, 'selByParentTransId', $transId);
+	$STMTMGR_TRANSACTION->execute($page,STMTMGRFLAG_DEBUG, 'selUpdateTransStatus', $transId) if ($previousChildRecs == 1);
+
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 
 	 $page->schemaAction(
 			'Transaction',
@@ -127,6 +131,7 @@ sub execute
 			trans_owner_type => defined $transOwnerType ? $transOwnerType : undef,
 			trans_owner_id => $page->param('person_id'),
 			trans_type => $transType || undef,
+			trans_status => $transStatus || undef,
 			provider_id => $page->field('provider_id') || undef,
 			auth_date => $page->field('auth_date') || undef,
 			data_num_a => $page->field('auth_num') || undef,
