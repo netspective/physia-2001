@@ -88,6 +88,14 @@ $STMTMGR_ORG = new App::Statements::Org(
 			)
 			and org_internal_id = ?
 		},
+	'selAttributeByIdValueIntParent' =>qq{
+		SELECT	item_id 
+		FROM	Org_Attribute
+		WHERE	parent_id = :1 
+		AND	value_int = :2
+		AND	item_name = :3	
+		},
+	
 	'selAttribute' => qq{
 		select * from org_attribute
 		where parent_id = ? and item_name = ?
@@ -103,6 +111,11 @@ $STMTMGR_ORG = new App::Statements::Org(
 	'selAttributeByItemNameAndValueTypeAndParent' => qq{
 		select * from org_attribute
 		where parent_id = ? and item_name = ? and value_type = ?
+		},
+	'selValueDateByItemNameAndValueTypeAndParent' =>qq{
+		SELECT to_char(value_date,'$SQLSTMT_DEFAULTDATEFORMAT') as value_date 
+		FROM org_attribute
+		WHERE parent_id = :1 and item_name = :2 and value_type = :3
 		},
 	'selAlerts' => qq{
 		select trans_type, trans_id, caption, detail, to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as trans_begin_stamp,

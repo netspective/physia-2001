@@ -352,6 +352,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			from person_attribute
 			where item_id = ?
 		},
+	'selAttributeByIdValueIntParent' =>qq{
+		SELECT	item_id 
+		FROM	Person_Attribute
+		WHERE	parent_id = :1 
+		AND	value_int = :2
+		AND	item_name = :3	
+		},
+			
 	'selPersonEmpIdAssociation' => qq{
 		select value_text as rel_id
 			from person_attribute
