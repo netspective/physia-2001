@@ -662,7 +662,6 @@ sub new
 	$params{type} = 'invoice_items';
 	$params{lineCount} = 4 unless exists $params{count};
 	$params{allowComments} = 1 unless exists $params{allowComments};
-	$params{allowQuickRef} = 0 unless exists $params{allowQuickRef};
 
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -692,18 +691,18 @@ sub getHtml
 	my $spacerHtml = '&nbsp;';
 	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
 
-	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
+	my ($dialogName, $lineCount, $allowComments, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_item_$line\_remove'></TD>} : '';
 
 		$linesHtml .= qq{
-			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE='@{[ $page->param("_f_item_$line\_item_id")]}'/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
-				<TD><INPUT  NAME='_f_proc_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") ]}'></TD>
+				<TD><INPUT  NAME='_f_proc_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -714,7 +713,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=2 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
-				<TD COLSPAN=5><INPUT CLASS='procinput' NAME='_f_proc_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_proc_$line\_comments") ]}'></TD>
+				<TD COLSPAN=5><INPUT CLASS='procinput' NAME='_f_item_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
 			</TR>
 		} if $allowComments;
 	}
