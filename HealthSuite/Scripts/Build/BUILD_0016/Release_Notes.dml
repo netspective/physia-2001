@@ -49,6 +49,14 @@
 			TWCC 60 Form: dialog and pdf complete.
 		</deliverable>
 
+		<deliverable id="1226">
+			In the 'Care Provider' component, the 'Schedule Appt' link shows up only when the provider is a 'Physician'
+		</deliverable>
+
+		<deliverable id="1249">
+			The add url in the 'My Associated Resources In Patients' component is pointing to 'Add Appointment' dialog
+		</deliverable>		
+
 		<deliverable id="1286">
 			UI: Show how an appointment was or was not verified.
 		</deliverable>
@@ -95,6 +103,11 @@
 			UI:  Deleted the 'Find by State, City and Zip' in the Org Search page.
 		</deliverable>		
 
+		<deliverable id="1400">
+			UI:  Patient Activity Report.  For discarded appointments, show discard types and
+			remarks.
+		</deliverable>		
+
 		<deliverable id="1401">
 			UI:  Tie Checkin and Insurance Verification.  Verify that insurance verification is
 			complete when the user clicks 'Yes' for Insurance verification during Checkin.
@@ -139,14 +152,6 @@
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
 		</deliverable>
-		
-		<deliverable id="1226">
-			In the 'Care Provider' component, the 'Schedule Appt' link shows up only when the provider is a 'Physician'
-		</deliverable>
-
-		<deliverable id="1249">
-			The add url in the 'My Associated Resources In Patients' component is pointing to 'Add Appointment' dialog
-		</deliverable>		
 
 	</deliverables>
 </release-notes>
