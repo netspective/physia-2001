@@ -45,8 +45,8 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 	},
 	
 	'sel_claim_status_used' => qq{
-		select  'All Claims' as caption,-1 as id , 2 as sort_field from Dual
-		UNION
+		--select  'All Claims' as caption,-1 as id , 2 as sort_field from Dual
+		--UNION
 		select  caption, id,1 as sort_field from Invoice_Status
 		WHERE ID NOT IN (1,2,6,10)
 		order by 3,2 asc
