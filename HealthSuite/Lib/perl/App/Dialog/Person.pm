@@ -112,6 +112,7 @@ sub initialize
 
 		new CGI::Dialog::Field(type => 'email', caption => 'Email', name => 'email', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 	);
+	
 	$self->{activityLog} =
 	{
 		scope =>'person',
@@ -208,18 +209,18 @@ sub populateData
 	$page->field('acct_number', $acctNum->{'value_text'});	
 	$page->field('acct_item_id', $acctNum->{'item_id'});
 	
-	my $itemName = 'Patient/Chart Number';
-	my $chartNum  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
+	my $itemName1 = 'Patient/Chart Number';
+	my $chartNum  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName1);
 	$page->field('chart_number', $chartNum->{'value_text'});
 	$page->field('chart_item_id', $chartNum->{'item_id'});
 	
-	#my $itemName = 'Nurse/Title';
-	#my $nurseTitle  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
+	#my $itemName2 = 'Nurse/Title';
+	#my $nurseTitle  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName2);
 	#$page->field('nurse_title', $nurseTitle->{'value_text'});
 	#$page->field('nurse_title_item_id', $nurseTitle->{'item_id'});
 	
-	#my $itemName = 'Physician/Type';
-	#my $physicianType  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
+	#my $itemName3 = 'Physician/Type';
+	#my $physicianType  = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName3);
 	#my @phyType = split(',', $physicianType->{'value_text'});
 	#$page->field('physician_type', @phyType);		
 	#$page->field('phy_type_item_id', $physicianType->{'item_id'});
