@@ -9,6 +9,7 @@ use App::ResourceDirectory;
 sub handler
 {
 	my $r = shift;
+	my $DEBUG = ref($r) && $r->dir_config("StatINCDebug") ? 1 : 0;
 
 	eval {
 		my $arl;
@@ -18,7 +19,7 @@ sub handler
 		return OK;
 	};
 
-	if ($@)
+	if ($@ && $DEBUG)
 	{
 		$r->content_type('text/html');
     	$r->send_http_header();
