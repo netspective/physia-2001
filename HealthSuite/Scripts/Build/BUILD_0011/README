@@ -45,3 +45,5 @@ B964 - Fixed the validation of the Other Relationship field on the Personal Cove
 B737 - Added medigap number to the Insurnace produca dialog.  Use medigap number when primary is meidcare and medigap number exist for secondary insurace on EDI to Per-Se and HFCA 1500 forms (HTML,PDF,etc).  
 
 B913 - Closed because B737 was finished
+
+B335 - Line item suppression implemented into UI and integrated into electronic submission process.
