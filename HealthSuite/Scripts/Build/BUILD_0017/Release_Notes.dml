@@ -30,6 +30,10 @@
 			clearing house information only.
 		</deliverable>
 
+		<deliverable id="1315">
+			Created and added an addPopup icon wherever there is a lookup (magnifying glass).
+		</deliverable>
+
 		<deliverable id="1359">
 			Removed View/Print dialog. Now auto-generating view or print claim history message when one of the HCFA 1500
 			tabs is clicked.
