@@ -93,7 +93,8 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	if($page->field('pay_type') == 0)
+	my $payType = $page->field('pay_type');
+	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY || $payType == App::Universal::ADJUSTMENTPAYTYPE_COPAYPREPAY)
 	{
 		$self->setFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_invoices_list', FLDFLAG_INVISIBLE, 1);
@@ -157,10 +158,10 @@ sub customValidate
 	}
 	$page->field('list_invoices',$list);
 
-	if($payWasApplied == 1 && $payType < 1)
+	if($payWasApplied == 1 && ($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY || $payType == App::Universal::ADJUSTMENTPAYTYPE_COPAYPREPAY) )
 	{
 		my $payTypeField = $self->getField('pay_type');
-		$payTypeField->invalidate($page, "Cannot choose 'Pre-payment' when applying payment to invoices.");
+		$payTypeField->invalidate($page, "Cannot choose 'Pre-payment' or 'Copay Pre-paid' when applying payment to invoices.");
 	}
 }
 
@@ -170,12 +171,12 @@ sub execute
 	$command = 'add';
 
 	my $payType = $page->field('pay_type');
-	if($payType < 1)
+	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY || $payType == App::Universal::ADJUSTMENTPAYTYPE_COPAYPREPAY)
 	{
 		#$page->addError("Pre: $payType < 1");
 		executePrePayment($self, $page, $command, $flags);
 	}
-	elsif($payType >= 1)
+	else
 	{
 		#$page->addError("Pre: $payType > 1");
 		executePostPayment($self, $page, $command, $flags);
