@@ -47,7 +47,7 @@
 		<join id="bill_payer_org" table="org" requires="bill_payer" condition="TO_CHAR(bill_payer_org.org_internal_id (+)) = bill_payer.bill_to_id"/>
 		<join id="main_trans" table="transaction" condition="invoice.main_transaction = main_trans.trans_id"/>
 		<join id="rend_provider" table="person" requires="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
-		<join id="orgassn" table="Org_ASSOCIATION"  requires="invoice" condition="invoice.owner_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 100 or orgassn.org_assn_type = 1)"/>	
+		<join id="orgassn" table="Org_ASSOCIATION"  requires="invoice" condition="invoice.owner_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 110 or orgassn.org_assn_type = 1)"/>	
 		<join id="parent_org" table="org" requires="orgassn" condition="orgassn.assn_org_internal_id=parent_org.org_internal_id and parent_org.parent_org_id is NULL"/>
 		
 		<!-- Views -->

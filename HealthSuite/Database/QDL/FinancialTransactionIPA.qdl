@@ -52,7 +52,7 @@
 		
 		<!-- JOINS -->
 		<join id="autoinv" table="auto_invoice_chrg" />				
-		<join id="orgassn" table="Org_ASSOCIATION" requires="autoinv" condition="autoinv.owner_org_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 100 or orgassn.org_assn_type = 1)"/>				
+		<join id="orgassn" table="Org_ASSOCIATION" requires="autoinv" condition="autoinv.owner_org_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 110 or orgassn.org_assn_type = 1)"/>				
 		<join id="bill_facility_org" table="org" requires="autoinv" condition="autoinv.billing_facility_id = bill_facility_org.org_internal_id (+)"/>
 		<join id="bill_facility_addr" table="org_address" requires="bill_facility_org" condition="bill_facility_org.org_internal_id = bill_facility_addr.parent_id (+) AND bill_facility_addr.address_name (+) = 'Payment'"/>
 		<join id="srv_facility_org" table="org" requires="autoinv" condition="autoinv.billing_facility_id = srv_facility_org.org_internal_id (+)"/>
