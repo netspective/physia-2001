@@ -98,7 +98,7 @@ sub execute
 	my $printerAvailable = 1;
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
-	my $printHandle = undef; #App::Device::openRawPrintHandle ($printerDevice);
+	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
 
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
