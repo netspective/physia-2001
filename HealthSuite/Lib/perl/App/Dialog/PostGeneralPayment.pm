@@ -34,11 +34,8 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
-			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
-			]),
+		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient/Person Id', name => 'payer_id', options => FLDFLAG_REQUIRED),
 
@@ -103,7 +100,7 @@ sub makeStateChanges
 	my $batchDate = $page->param('_p_batch_date') || $page->field('batch_date');
 	if( $batchId && $batchDate )
 	{
-		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
+#		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
 }
 
@@ -121,6 +118,22 @@ sub populateData
 	my $personId = $page->param('person_id');
 	$page->field('payer_id', $personId);
 }
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	my $lineCount = $page->param('_f_line_count');
+	my $list='';
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		my $payAmt = $page->param("_f_invoice_$line\_payment");
+		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
+		next if $payAmt eq '';		
+		$list .= $invoiceId.",";		
+	}
+	$page->field('list_invoices',$list);
+}
+
 
 sub execute
 {

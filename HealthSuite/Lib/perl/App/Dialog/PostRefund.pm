@@ -34,15 +34,11 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		#new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',orgInternalIdFieldName=>'service_facility_id'),
-		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
-			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
-			]),
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),		
 
 		new CGI::Dialog::Subhead(heading => 'Overpaid Invoices', name => 'credit_heading'),
 		new App::Dialog::Field::CreditInvoices(name =>'credit_invoices_list'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
 	);
 	$self->{activityLog} =
 	{
@@ -53,6 +49,21 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	my $lineCount = $page->param('_f_line_count');
+	my $list='';
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		my $refundAmt = 0 - $page->param("_f_invoice_$line\_refund");
+		next if $refundAmt eq '';
+		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");	
+		$list .= $invoiceId.",";		
+	}
+	$page->field('list_invoices',$list);
 }
 
 sub execute

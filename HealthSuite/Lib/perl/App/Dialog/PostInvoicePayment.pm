@@ -37,13 +37,9 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED),
 
-		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
-			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
-			]),
 
-
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',invoiceIdFieldName=>'sel_invoice_id'),		
+		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
 		#fields for insurance payment
 
 		new CGI::Dialog::Field::TableColumn(
@@ -110,6 +106,8 @@ sub new
 	return $self;
 }
 
+
+
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
@@ -139,7 +137,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_items_list', FLDFLAG_INVISIBLE, 1);
 	}
-	elsif($invoiceId)
+     	elsif($invoiceId)
 	{
 		$self->updateFieldFlags('sel_invoice_id', FLDFLAG_READONLY, 1);
 		$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, $isInsurance);
@@ -152,7 +150,7 @@ sub makeStateChanges
 	my $batchDate = $page->param('_p_batch_date') || $page->field('batch_date');
 	if( $batchId && $batchDate )
 	{
-		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
+#		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
 
 	$self->getField('pay_type')->{fKeyWhere} = "group_name is NULL or group_name = '$paidBy'";

@@ -39,13 +39,10 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
 
-		new CGI::Dialog::MultiField(caption => 'Batch ID/Date', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', options => FLDFLAG_REQUIRED,
-						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, size => 12),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED, 
-						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			]),
+
+		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
+		#Batch Date must be > then close Date to pass validation
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',orgInternalIdFieldName=>'owner_id'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'client_id', options => FLDFLAG_REQUIRED, types => ['Patient']),
 		new CGI::Dialog::MultiField(caption => 'Payer ID/Type', name => 'other_payer_fields', hints => "If left blank, invoice will be billed to the 'Patient ID'",
