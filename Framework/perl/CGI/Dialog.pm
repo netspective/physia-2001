@@ -269,9 +269,9 @@ sub bool_as_html
 			<tr valign=top>
 				<td width=$self->{_spacerWidth}>&nbsp;</td>
 				<td align=right>
-					<input type='checkbox' name='$fieldName' align=right $checked value=1>
+					<input type='checkbox' name='$fieldName' id='$fieldName' align=right $checked value=1>
 				</td>
-				<td>$self->{preHtml}$self->{caption}$self->{postHtml}</td>
+				<td>$self->{preHtml}<label for='$fieldName'>$self->{caption}</label>$self->{postHtml}</td>
 				<td width=$self->{_spacerWidth}>&nbsp;</td>
 			</tr>
 			";
@@ -280,14 +280,14 @@ sub bool_as_html
 		{
 			if($self->{flags} & FLDFLAG_CUSTOMDRAW)
 			{
-				$html = "<input type='checkbox' name='$fieldName' align=right value=1 $checked> $self->{caption}";
+				$html = "<input type='checkbox' name='$fieldName' id='$fieldName' align=right value=1 $checked> <label for='$fieldName'>$self->{caption}</label>";
 			}
 			else
 			{
 				$html = "
 				<tr valign=top>
 					<td width=$self->{_spacerWidth} colspan=2>&nbsp;</td>
-					<td>$self->{preHtml}<input type='checkbox' name='$fieldName' align=right value=1 $checked> $self->{caption}$self->{postHtml}</td>
+					<td>$self->{preHtml}<input type='checkbox' name='$fieldName' id='$fieldName' align=right value=1 $checked> <label for='$fieldName'>$self->{caption}</label>$self->{postHtml}</td>
 					<td width=$self->{_spacerWidth}>&nbsp;</td>
 				</tr>
 				";
@@ -445,6 +445,7 @@ sub select_as_html
 	my $value = $page->field($self->{name});
 	my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 	my $html = '';
+	my $i = 1;
 
 	my $choices = exists $self->{fKeyStmt} ? $self->readChoicesStmt($page) : ($self->{fKeyTable} ? $self->readChoices($page) : $self->parseChoices($page));
 	$self->{size} = scalar(@$choices) if $self->{size} == 0;
@@ -468,7 +469,8 @@ sub select_as_html
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'checked' : '';
-				$inputs .= "<nobr><input type='checkbox' name='$fieldName' value='$_->[2]' $selected> $_->[1]&nbsp;&nbsp;</nobr> ";
+				$inputs .= "<nobr><input type='checkbox' name='$fieldName' id='$fieldName$i' value='$_->[2]' $selected> <label for='$fieldName$i'>$_->[1]</label>&nbsp;&nbsp;</nobr> ";
+				$i++;
 			}
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 		}
@@ -478,7 +480,8 @@ sub select_as_html
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'checked' : '';
-				$inputs .= "<nobr><input type=radio name='$fieldName' value='$_->[2]' $selected> $_->[1]&nbsp;&nbsp;</nobr> ";
+				$inputs .= "<nobr><input type=radio name='$fieldName' id='$fieldName$i' value='$_->[2]' $selected> <label for='$fieldName$i'>$_->[1]</label>&nbsp;&nbsp;</nobr> ";
+				$i++;
 			}
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
 		}
