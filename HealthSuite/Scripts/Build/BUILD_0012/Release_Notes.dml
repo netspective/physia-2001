@@ -53,6 +53,10 @@
 			     the 'Facility ID' and 'License' field as drop-down list. If the License is entered, a new multifield will be automatically displayed below it.
 			     And a new dialog called 'Provider Numbers' is created under 'Certificate' component to add and update the 'Provider Numbers'. 
 		</deliverable>
+
+		<deliverable id="1048">
+			Removed the delete Icon from the 'Health Coverage' component.
+		</deliverable>		
 		
 	</deliverables>
 </release-notes>
