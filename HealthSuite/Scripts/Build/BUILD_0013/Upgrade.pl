@@ -24,6 +24,13 @@ my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
+runSQL('BUILD_0013_add_record_to_attribute_value_type.sql');
+runSQL('BUILD_0013_update_org_attribute_value_type.sql');
+runSQL('BUILD_0013_add_record_to_claim_type.sql');
+runSQL('BUILD_0013_create_shahbaz_tables.sql');
+runSQL('BUILD_0013_drop_and_recreate_Blood_Type.sql');
+runSQL('BUILD_0013_load_pre_post_code.sql');
+
 makeSymbolicLink();
 
 ######## END UPGRADE SCRIPT #########
