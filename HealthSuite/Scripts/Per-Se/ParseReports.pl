@@ -226,13 +226,14 @@ sub addInvoiceHistory
 	
 	$date = UnixDate($date, '%m/%d/%Y');
 	my $invHistory = $STMTMGR_EXTERNAL->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
-		'sel_InvoiceHistory', $invoice, $message, $date);
-		
+		'sel_InvoiceHistory', $invoice, $message, $date, "\%$transTrackNum\%", "\%$transContNum\%");
+
 	if (@{$invHistory})
 	{
 		for (@{$invHistory})
 		{
-			print "EXISTING: $_->{item_id} - $_->{cr_stamp}: $_->{value_text} - $_->{value_date} \n";
+			print "TransTrackNum: '$transTrackNum' -- TransContNum: '$transContNum'\n";
+			print "EXISTING: $_->{item_id} - $_->{cr_stamp}: $_->{value_text} - $_->{value_date} - $_->{value_textb}\n";
 		}
 		return 0;
 	}

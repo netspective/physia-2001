@@ -18,18 +18,16 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 	'sel_dupHistoryItems' => qq{
 		select parent_id, value_text, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date,
 			count(*) as count
-		from Invoice_Attribute
+		from Invoice_History
 		where cr_user_id = 'EDI_PERSE'
-		 and item_name like '%History%'
 		group by parent_id, value_text, value_date having count(*) > 1	
 	},
 	
 	'sel_minItemId' => qq{
 		select min(item_id)
-		from Invoice_Attribute
+		from Invoice_History
 		where parent_id = :1
 			and cr_user_id = 'EDI_PERSE'
-			and item_name like '%History%'
 			and value_text = :2
 			and value_date = to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
 	},
@@ -37,18 +35,17 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 	'sel_firstItem' => qq{
 		select item_id, value_text, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date,
 			to_char(cr_stamp, 'mm/dd/yyyy hh:mi:ss pm') as cr_stamp
-		from Invoice_Attribute
+		from Invoice_History
 		where item_id = :1
 	},
 
 	'sel_restItems' => qq{
 		select item_id, value_text, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date,
 			to_char(cr_stamp, 'mm/dd/yyyy hh:mi:ss pm') as cr_stamp
-		from Invoice_Attribute
+		from Invoice_History
 		where parent_id = :1
 			and item_id > :2
 			and cr_user_id = 'EDI_PERSE'
-			and item_name like '%History%'
 			and value_text = :3
 			and value_date = to_date(:4, '$SQLSTMT_DEFAULTDATEFORMAT')
 		order by item_id
@@ -67,10 +64,14 @@ $STMTMGR_EXTERNAL = new App::Statements::External(
 		where parent_id = :1
 			and value_text = :2
 			and value_date = to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+			and (value_textb is null
+				or (:4 != '%%' and value_textb is NOT NULL and value_textb like :4)
+				or (:5 != '%%' and value_textb is NOT NULL and value_textb like :5)
+			)
 	},
 
 	'del_InvoiceAttribute' => qq{
-		delete from Invoice_Attribute where item_id = :1
+		delete from Invoice_History where item_id = :1
 	},
 	
 	
