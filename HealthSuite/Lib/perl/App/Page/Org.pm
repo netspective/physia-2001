@@ -99,17 +99,19 @@ sub prepare_page_content_header
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-	my $category = $self->property('org_group_name');
-#	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
-#	for ($category)
-#	{
-#		/employer/ and do {$category = 'employer'; last};
-#		/insurance/ and do {$category = 'insurance'; last};
-#		/ipa/ and do {$category = 'ipa'; last};
-#		/department/ and do {$category = 'dept'; last};
-#		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
-#
-#	}
+	#my $category = $self->property('org_group_name');
+	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
+	for ($category)
+	{
+		/employer/ and do {$category = 'employer'; last};
+		/insurance/ and do {$category = 'insurance'; last};
+		/ipa/ and do {$category = 'ipa'; last};
+		/department/ and do {$category = 'dept'; last};
+		/location_dir_entry/ and do {$category = 'provider'; last};
+		/main_dir_entry/ and do {$category = 'provider'; last};
+		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
+
+	}
 	#Retired Pane/Org/Heading.pm
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
