@@ -2179,7 +2179,7 @@ sub prepare_page_content_header
 						@{[ $invStatus < $submitted && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 
 						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
-						@{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $awaitInsPayment || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
 						@{[ $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
