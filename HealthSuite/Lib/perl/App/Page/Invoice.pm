@@ -1120,17 +1120,18 @@ sub prepare_view_summary
 	{
 		if($invType == $hcfaInvoiceType)
 		{
-			my $submissionOrder = $self->property('submission')->{value_int};
+			
+			my $submissionOrder = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
 			$quickLinks = qq{
 					<TR>
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $submissionOrder == 0 ?
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $submissionOrder->{value_int} == 0 ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure </a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $submissionOrder == 0 ?
+						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $submissionOrder->{value_int} == 0 ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnosis Codes</a>
@@ -1686,9 +1687,6 @@ sub initialize
 
 	my $claim = $claimList->{claims}->[0];
 	$self->property('activeClaim', $claim);
-	#my $submitOrder = ;
-	#my $order = $submitOrder->{value_int};
-	$self->property('submission', $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order'));
 
 	$self->addLocatorLinks(
 			['Claims', '/search/claim'],
@@ -1767,7 +1765,7 @@ sub prepare_page_content_header
 	my $submissionOrder = '';
 	if($invType == $hcfaInvoiceType)
 	{
-		$submissionOrder = $self->property('submission')->{value_int};
+		$submissionOrder = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
 	}
 
 
@@ -1842,7 +1840,7 @@ sub prepare_page_content_header
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for this Patient</option>
 
-						@{[ $invType == $hcfaInvoiceType && ($submissionOrder == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+						@{[ $invType == $hcfaInvoiceType && ($submissionOrder->{value_int} == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
