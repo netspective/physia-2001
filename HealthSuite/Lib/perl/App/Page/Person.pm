@@ -101,8 +101,6 @@ sub prepare_page_content_header
 			['Account', "$urlPrefix/account", 'account'],
 			['Activity', "$urlPrefix/activity", 'activity'],
 			['Add Appointment', "$urlPrefix/appointment", 'appointment'],
-			['Refills', "$urlPrefix/refill_request", 'refill_request'],
-			['Voice Msgs', "$urlPrefix/phone_message", 'phone_message'],			
 		], ' | ');
 
 
@@ -283,7 +281,7 @@ sub prepare_view_appointment
 {
 	my $self = shift;
 	my $personId = $self->param('person_id');
-	
+
 	my $dialogCmd = 'add';
 	my $cancelUrl = "/person/$personId/profile";
 	my $dialog = new App::Dialog::Appointment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
@@ -292,19 +290,12 @@ sub prepare_view_appointment
 
 sub prepare_view_refill_request
 {
-#	my $self = shift;
-#	my $personId = $self->param('person_id');
-#	
-#	my $dialogCmd = 'add';
-#	my $cancelUrl = "/person/$personId/profile";
-#	my $dialog = new App::Dialog::Attribute::RefillRequest(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-#	$dialog->handle_page($self, $dialogCmd);
 
 
         my ($self) = @_;
         $self->addContent(qq{
                 <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
-                        <TR VALIGN=TOP> 
+                        <TR VALIGN=TOP>
                                 <TD>
                                         #component.stp-person.refillRequest#<BR>
                                 </TD>
@@ -316,13 +307,6 @@ sub prepare_view_refill_request
 
 sub prepare_view_phone_message
 {
-	#my $self = shift;
-	#my $personId = $self->param('person_id');
-	
-	#my $dialogCmd = 'add';
-	#my $cancelUrl = "/person/$personId/profile";
-	#my $dialog = new App::Dialog::Attribute::PhoneMessage(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	#$dialog->handle_page($self, $dialogCmd);
 
         my ($self) = @_;
         $self->addContent(qq{
@@ -507,7 +491,7 @@ sub prepare_view_profile
 							<TD>#component.stp-person.activeMedications#</TD>
 						</TR>
 					</TABLE><BR>
-					#component.stp-person.refillRequest#<BR>					
+					#component.stp-person.refillRequest#<BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.authorization#<BR>
@@ -520,13 +504,13 @@ sub prepare_view_profile
 						</TABLE><BR>
 					#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedSessionPhysicians#<BR>
-					#component.stp-person.benefits#</BR>				
+					#component.stp-person.benefits#</BR>
 					</font>
 				</TD>
 				<!--
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
-					<font size=1 face=arial>					
+					<font size=1 face=arial>
 					#component.st-person.diagnosisSummary#<BR>
 					</font>
 				</TD>
@@ -546,7 +530,7 @@ sub prepare_view_profile
 }
 
 
-##### #component.stp-person.diagnosisSummaryTitle# 
+##### #component.stp-person.diagnosisSummaryTitle#
 
 
 sub prepare_view_chart
