@@ -77,8 +77,11 @@ sub execute
 	my ($self, $type, $expression) = @_;
 
 	my $r_ids = $self->param('r_ids') || '%';
+	$r_ids =~ s/\*/\%/g;
 	my $r_ids_p = $self->param('r_ids') . '%';
+	$r_ids_p =~ s/\*/\%/g;
 	my $caption = '%' . $self->param('caption') . '%';
+	$caption =~ s/\*/\%/g;
 
 	my @bindCols = ($self->session('org_internal_id'), $r_ids, $r_ids_p, $caption);
 
