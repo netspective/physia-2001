@@ -151,6 +151,9 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where o.ORG_ID = oc.PARENT_ID
 			and UPPER(oc.MEMBER_NAME) in ('FACILITY','CLINIC')
 	},
+	'selEventById' => qq{
+		select * from Event where event_id = :1
+	},
 	'sel_eventInfo' => {
 		sqlStmt => qq{
 			select event_status, checkin_by_id, checkout_by_id, discard_by_id,
