@@ -23,12 +23,13 @@ sub new
 	$self->{hints} = '' unless $self->{hints};
 	$self->{findPopup} = undef unless $self->{findPopup};
 	$self->{findPopupAppendValue} = '' unless $self->{findPopupAppendValue};
+	$self->{addPopup} = undef unless $self->{addPopup};
 	$self->{popup} =
 		{
 			url => '',
 			name => 'popup',
 			imgsrc => '/resources/icons/magnifying-glass-sm.gif',
-			features=>'width=450,height=450,scrollbars,resizable',
+			features => 'width=450,height=450,scrollbars,resizable',
 			appendValue => '',
 		} unless $self->{popup};
 
@@ -101,6 +102,29 @@ sub findPopup_as_html
 	return '';
 }
 
+sub addPopup_as_html
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	my $dialogName = $dialog->formName();
+	my $fieldName = $page->fieldPName($self->{name});
+
+	if(my $arl = $self->{addPopup})
+	{
+		my $controlField = 'null';
+		$controlField = $self->{addPopupControlField} if $self->{addPopupControlField};
+
+		my $imgId = "_add_img_" . $self->{name};
+		my $linkId = "_add_link_" . $self->{name};
+
+		#the <SCRIPT> tag was put in to make sure parent dialog does not refresh
+		return qq{
+			<SCRIPT>var bypassRefresh = 1;</SCRIPT>
+			<a id="$linkId" href="javascript:doActionPopup('$arl', false, null, ['$controlField'], ['$fieldName']);"><img id="$imgId" src='/resources/icons/action-edit-add.gif' border=0></a>
+		};
+	}
+	return '';
+}
+
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags, $mainData) = @_;
@@ -137,7 +161,8 @@ sub getHtml
 		my $Command = "\u$command";
 		$caption =~ s/(\$\w+)/$1/eego;
 
-		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
+		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) . $self->addPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
+		#$popupHtml .= $self->addPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
 		my $hints = ($self->{hints} && ! $readOnly) ? "<br><font $dialog->{hintsFontAttrs}>$self->{hints}</font>" : '';
 		my $id = "_id_" . $self->{name};
 		$html = qq{<tr valign="top" id="$id" $bgColorAttr><td width=$self->{_spacerWidth}>
@@ -2034,7 +2059,7 @@ sub handlePostExecute
 		unshift(@{$page->{page_head}},
 			qq{
 					<script>
-						if(eval("opener.inErrorMode"))
+						if(eval("opener.bypassRefresh"))
 						{
 							opener.focus(); window.close()
 						}
@@ -2222,7 +2247,7 @@ sub getHtml
 		<font color=red size=+1><b>$self->{errorsHeading}</b></font>:
 		<ul>
 			<li>$errorMsgs
-			<SCRIPT>var inErrorMode = 1;</SCRIPT>
+			<SCRIPT>var bypassRefresh = 1;</SCRIPT>
 		</ul>
 		</font>
 		};
