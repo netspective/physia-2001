@@ -137,6 +137,7 @@ sub prepare_page_content_header
 		/pharmacy/ and do {$category = 'pharmacy'; last};
 		/location_dir_entry/ and do {$category = 'provider'; last};
 		/main_dir_entry/ and do {$category = 'provider'; last};
+		/ancillary service/ and do {$category ='ancillary'; last};
 		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
 
 	}
