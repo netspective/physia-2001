@@ -475,8 +475,13 @@ sub setPayerFields
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
 			#here the plan_name is actually the guarantor_id (the query says "select guarantor_id as plan_name, ...")
-			my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $ins->{plan_name});
-			push(@thirdParties, "$ins->{group_name}($orgId->{org_id})");
+			my $thirdPartyId = $ins->{plan_name};
+			if($ins->{guarantor_type} == App::Universal::ENTITYTYPE_ORG)
+			{
+				my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
+				$thirdPartyId = $org->{org_id};
+			}
+			push(@thirdParties, "$ins->{group_name}($thirdPartyId)");
 		}
 	}
 
