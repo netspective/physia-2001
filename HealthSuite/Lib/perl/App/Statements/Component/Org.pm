@@ -149,7 +149,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 #------------------------------------------------------------------------------------------------------------------------
 'org.ContractCatalogSummary' => {
 	sqlStmt => qq{
-			SELECT	con.contract_id, 
+			SELECT	con.contract_id,
 				con.caption,
 				(SELECT catalog_id from offering_catalog oc WHERE oc.internal_catalog_id = con.parent_catalog_id) as catalog_id,
 				(SELECT product_name FROM Insurance WHERE ins_internal_id = con.product_ins_id) as product_name,
@@ -163,10 +163,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
 	publishDefn => {
 				bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
-				columnDefn => 
+				columnDefn =>
 				[
 				{colIdx => 0, tDataFmt => '&{count:0} Contracts', head => 'Contract ID',url=>qq{/org/#param.org_id#/catalog?catalog=contract_detail&contract_detail=#6#}},
-				{colIdx => 1, head => 'Contract Name', },				
+				{colIdx => 1, head => 'Contract Name', },
 				{colIdx => 2, head => 'Fee Schedule ID',},
 				{colIdx => 3, head => 'Insurance Product'},
 				{colIdx => 4, head => 'Entries',summarize => 'sum' },
@@ -177,45 +177,45 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				[
 				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Contract Catalog</A> } },
 				],
-				contentColor=>'#EEEEEE',				
-			},	
+				contentColor=>'#EEEEEE',
+			},
 
-		
-			},	
+
+			},
 	publishDefn_panel =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent.static',
-		contentColor=>'#EEEEEE',			
+		contentColor=>'#EEEEEE',
 		frame => {
 			heading => 'Contract Catalogs',
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 			},
-	},			
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogSummary', [$orgId], 'panel'); },			
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogSummary', [$orgId], 'panel'); },
 },
 #------------------------------------------------------------------------------------------------------------------------
 'org.FSCatalogSummary' => {
 	sqlStmt => qq{
 	SELECT *
 	FROM (
-		SELECT	oc.catalog_id,			
+		SELECT	oc.catalog_id,
 			oc.caption,
 			--oc.description,
-			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,		
-			count(oce.entry_id) entries_count,			
+			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,
+			count(oce.entry_id) entries_count,
 			oc.parent_catalog_id,
 			oc.internal_catalog_id,
-			'Add'		
+			'Add'
 		FROM
 			ofcatalog_Attribute oc_a,
 			offering_catalog oc,
 			offering_catalog_entry oce
 		WHERE
 			oce.catalog_id (+) = oc.internal_catalog_id
-			AND oc_a.parent_id (+) = oc.internal_catalog_id 
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
-			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)			
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
 		GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
@@ -231,36 +231,36 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	},
 	sqlvar_entityName => 'Offering_Catalog',
 	sqlStmtBindParamDescr => ['Org Internal ID'],
-	publishDefn => 
+	publishDefn =>
 		{
 				bullets => '/org/#param.org_id#/dlg-update-catalog/#5#?home=#homeArl#',
-				columnDefn => 
+				columnDefn =>
 				[
 				{colIdx => 0,hAlign=>'left', head => 'Catalog ID',url=>qq{/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#},
 				tDataFmt => '&{count:0} Schedules',},
-				{colIdx => 1, head => 'Catalog Name', hAlign=>'left'},				
+				{colIdx => 1, head => 'Catalog Name', hAlign=>'left'},
 				{colIdx => 2, head => 'Contract Type',},
 				{colIdx => 3, head => 'Entries',summarize => 'sum',},
 				{colIdx =>6,url=>'/org/#session.org_id#/dlg-add-catalog/#5#' ,hint=>'Add Child Item'},
 				],
 			banner =>
 			{contentColor=>'#EEEEEE',
-			
+
 			actionRows =>
 			[
 				{
-					caption => qq{ 
+					caption => qq{
 						<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
 						<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
 						<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
 					},
 				},
-			],			},	
+			],			},
 			stdIcons =>
 			{
 				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
-			},				
-		},	
+			},
+		},
 	publishDefn_panel =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
@@ -269,8 +269,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			heading => 'Fee Schedules Catalogs',
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 			},
-	},			
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogSummary', [$orgId], 'panel'); },			
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogSummary', [$orgId], 'panel'); },
 },
 
 
@@ -291,30 +291,30 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				Offering_CatEntry_Price ocp
 			WHERE 	con.internal_contract_id = :1
 			AND	oce.catalog_id = con.parent_catalog_id
-			AND	con.org_internal_id = :2	
+			AND	con.org_internal_id = :2
 			AND	ocp.internal_contract_id (+)= :1
-			AND	ocp.entry_id (+) = oce.entry_id 
+			AND	ocp.entry_id (+) = oce.entry_id
 			},
 	sqlvar_entityName => 'Contract_Catalog',
 	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
-	publishDefn => {				
-				columnDefn => 
+	publishDefn => {
+				columnDefn =>
 				[
 				{colIdx => 0, head => 'Code',tDataFmt =>'&{count:0} Entries'},
-				{colIdx => 1, head => 'Modifier', },				
+				{colIdx => 1, head => 'Modifier', },
 				{colIdx => 2, head => 'Type',dAlign=>'left',hAlign=>'left'},
 				{colIdx => 3, head => 'Name',hAlign=>'left'},
 				{colIdx => 4, head => 'Expected Price', dformat => 'currency',summarize => 'sum'},
-				{colIdx => 5, head => 'Allowed Price', dformat => 'currency',summarize => 'sum'},	
+				{colIdx => 5, head => 'Allowed Price', dformat => 'currency',summarize => 'sum'},
 				{colIdx => 9,head=>'Actions',
 						dataFmt => {
 								'Mod' => qq{<A HREF="/org/#param.org_id#/dlg-update-contract-item/#8#"
 					TITLE='Modify Contract Price'>
-					<img src="/resources/icons/black_m.gif" BORDER=0></A> 
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>
 					<A HREF="/org/#param.org_id#/dlg-remove-contract-item/#8#"
 										TITLE='Delete Contract Price'>
-					<img src="/resources/icons/black_d.gif" BORDER=0></A> 
-									  },									
+					<img src="/resources/icons/black_d.gif" BORDER=0></A>
+									  },
 								'Add' => qq{<A HREF="/org/#param.org_id#/dlg-add-contract-item/#7#/#6#"
 					TITLE='Add Contract Price'>
 					<IMG SRC="/resources/icons/black_a.gif" BORDER=0></A>}
@@ -330,8 +330,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 #				[
 #				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Contract Catalog</A> } },
 #				],
-#			},				
-			},	
+#			},
+			},
 	publishDefn_panel =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
@@ -340,13 +340,13 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			heading => '#param.contract_id# : Contract Entries ',
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 			},
-	},			
+	},
 	publishComp_stp => sub { my ($page, $flags, $contract_id,$org_id) = @_;$org_id = $page->session('org_internal_id');
-	$contract_id = $page->param('contract_detail');	
+	$contract_id = $page->param('contract_detail');
 	#Get Contract ID
-	my $catalog = $STMTMGR_CONTRACT->getRowAsHash($page,STMTMGRFLAG_NONE,'selContractByID',$contract_id);	
+	my $catalog = $STMTMGR_CONTRACT->getRowAsHash($page,STMTMGRFLAG_NONE,'selContractByID',$contract_id);
 	$page->param('contract_id',$catalog->{contract_id});
-	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogDetail', [$contract_id,$org_id], 'panel'); },			
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.ContractCatalogDetail', [$contract_id,$org_id], 'panel'); },
 },
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -354,11 +354,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmt => qq{
 			SELECT
 				code AS code,
-				modifier AS modifier,				
+				modifier AS modifier,
 				catalog_entry_type.caption AS Type,
 				name,
 				--description AS description,
-				DECODE(flags, 0, NULL, '(FFS)'),				
+				DECODE(flags, 0, NULL, '(FFS)'),
 				unit_cost AS price,
 				--default_units AS uoh,
 				'Add',
@@ -380,37 +380,37 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		},
 	sqlvar_entityName => 'Contract_Catalog',
 	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
-	publishDefn => {				
-				columnDefn => 
+	publishDefn => {
+				columnDefn =>
 				[
 				{colIdx => 0, hAlign =>'left',head => 'Code',tDataFmt => '&{count:0} Entries'},
-				{colIdx => 1, hAlign =>'left', head => 'Modifier', },				
+				{colIdx => 1, hAlign =>'left', head => 'Modifier', },
 				{colIdx => 2, head => 'Procedure Type',dAlign=>'left',hAlign=>'left'},
 				{colIdx => 3, head => 'Name',hAlign=>'left'},
-				{colIdx => 4, head => 'Contract Type',dAlign=>'left',hAlign=>'left'},				
+				{colIdx => 4, head => 'Contract Type',dAlign=>'left',hAlign=>'left'},
 				{colIdx => 5, head => 'Price', dformat => 'currency',summarize => 'sum'},
 				{colIdx => 5, head => 'Actions', dataFmt=>
 					q{
 						<A HREF="/org/#param.org_id#/dlg-add-catalog-item/#9#/#8#"
 						TITLE='Add Child Item'>
-						<img src="/resources/icons/black_a.gif" BORDER=0></A> 					
+						<img src="/resources/icons/black_a.gif" BORDER=0></A>
 						<A HREF="/org/#param.org_id#/dlg-update-catalog-item/#8#"
 						TITLE='Modify Item'>
-						<img src="/resources/icons/black_m.gif" BORDER=0></A> 
+						<img src="/resources/icons/black_m.gif" BORDER=0></A>
 						<A HREF="/org/#param.org_id#/dlg-remove-catalog-item/#8#"
 											TITLE='Delete Item'>
-						<img src="/resources/icons/black_d.gif" BORDER=0></A> 
-									  }				
-				},				
+						<img src="/resources/icons/black_d.gif" BORDER=0></A>
+									  }
+				},
 				],
 			banner =>
-			{contentColor=>'#EEEEEE',	
+			{contentColor=>'#EEEEEE',
 				actionRows =>
 				[
 				{ caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.fee_schedule_detail#?home=#homeArl#'>Fee Schedule Item</A> } },
 				],
-			},				
-			},	
+			},
+			},
 	publishDefn_panel =>
 	{
 		# automatically inherites columnDefn and other items from publishDefn
@@ -419,12 +419,12 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			heading => '#param.catalog_id#  : Fee Schedule Entries ',
 					addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 			},
-	},			
-	publishComp_stp => sub { my ($page, $flags, $contract_id,$org_id) = @_; $org_id = $page->session('org_internal_id'); $contract_id = $page->param('fee_schedule_detail'); 
+	},
+	publishComp_stp => sub { my ($page, $flags, $contract_id,$org_id) = @_; $org_id = $page->session('org_internal_id'); $contract_id = $page->param('fee_schedule_detail');
 	#Get Fee Schedule Catalog ID
 	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$contract_id);
 	$page->param('catalog_id',$catalog->{catalog_id});
-	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogDetail', [$contract_id,$org_id], 'panel'); },			
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.FSCatalogDetail', [$contract_id,$org_id], 'panel'); },
 },
 
 
@@ -1229,23 +1229,33 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.insurancePlans' => {
 	sqlStmt => qq{
-			select o.ins_internal_id, o.parent_ins_id, o.product_name,  decode(o.record_type, 1, 'product', 2, 'plan', 3, 'coverage') as record_type,
-					o.plan_name, o.ins_internal_id, o.owner_org_id, cm.caption, o.ins_type,
-					o.indiv_deductible_amt, o.family_deductible_amt, o.percentage_pay, o.copay_amt, b.org_id
-			from insurance o, claim_type cm, org b
-			where o.record_type in (1, 2)
-			and ins_type = cm.id
-			and b.org_id = (select org_id
-						from org
-						where org_internal_id = o.ins_org_id
-					)
-			and o.ins_org_id =
-			(select org_internal_id
-							from org
-							where owner_org_id = :2 AND
-							org_id = :1
-			)
-			order by o.product_name,o.plan_name
+			SELECT
+				insurance.ins_internal_id,
+				insurance.parent_ins_id,
+				insurance.product_name,
+				decode(insurance.record_type, 1, 'product', 2, 'plan', 3, 'coverage') as record_type,
+				insurance.plan_name,
+				insurance.ins_internal_id,
+				insurance.owner_org_id,
+				claim_type.caption,
+				insurance.ins_type,
+				insurance.indiv_deductible_amt,
+				insurance.family_deductible_amt,
+				insurance.percentage_pay,
+				insurance.copay_amt,
+				org.org_id
+			FROM
+				insurance,
+				claim_type,
+				org
+			WHERE
+				insurance.ins_org_id = (SELECT org_internal_id FROM org WHERE owner_org_id = :2 AND org_id = :1) AND
+				(insurance.record_type in (1, 2) AND
+				insurance.ins_type = claim_type.id AND
+				insurance.ins_org_id = org.org_internal_id)
+			ORDER BY
+				insurance.product_name,
+				insurance.plan_name
 		},
 	#sqlStmt => qq{
 	#		select 	o.plan_name, o.group_number,
@@ -1533,6 +1543,80 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+},
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'org.billingEvents' => {
+	sqlStmt => qq{
+		SELECT
+			item_id,
+			value_int AS day,
+			value_text AS name_begin,
+			value_textb AS name_end,
+			value_intb AS balance_condition,
+			value_float AS balance_criteria
+		FROM
+			org_attribute
+		WHERE
+			parent_id = (SELECT org_internal_id FROM org WHERE owner_org_id = :2 AND org_id = :1) AND
+			value_type = @{[ App::Universal::ATTRTYPE_BILLINGEVENT ]}
+		ORDER BY
+			day
+	},
+	sqlStmtBindParamDescr => ['Org ID for Attribute Table', 'Session Org Internal Id'],
+	publishDefn =>
+	{
+		columnDefn => [
+			{colIdx => 1, dataFmt => '<b>Day #1#</b>'},
+			{
+				colIdx => 2,
+				dataFmt => "Name From '#2#' to '#3#'",
+			},
+			{
+				colIdx => 4,
+				dataFmt => {
+					'1' => 'Balance > $#5#',
+					'-1' => 'Balance < $#5#',
+				},
+			},
+		],
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-billing-event/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-billing-event?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Billing Events' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		inherit => 'panel',
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-billing-event?home=#param.home#'>Billing Event</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-billing-event/#0#?home=#homeArl#',
+			delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-org-billing-event/#0#?home=#homeArl#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billingEvents',  [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billingEvents',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billingEvents',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billingEvents',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
 },
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'org.closingDateInfo' => {
