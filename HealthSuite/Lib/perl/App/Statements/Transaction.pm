@@ -278,6 +278,133 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				and trans_status = 2
 				and person_id = trans_owner_id
 	},
+#####################################################################
+	#SQL STAEMENTS FOR REFERRAL AUTHORIZATION INFO
+#####################################################################
+
+	'selClaimNumByParentId' => qq
+		{
+			SELECT  value_int
+			FROM trans_attribute
+			WHERE  parent_id = ?
+		},
+	'selUpdateTransByParentId' => qq
+		{
+			UPDATE transaction
+			SET auth_ref = ?,
+			    consult_id = ?
+			WHERE parent_trans_id = ?
+		},
+	'selUpdateReferralStatus' => qq
+		{
+			UPDATE transaction
+			SET trans_substatus_reason = 'Assigned'
+			WHERE trans_id = ?
+			AND trans_substatus_reason = 'Unassigned'
+		},
+	'selRemoveChildReferrals' => qq
+		{
+			DELETE
+			FROM transaction
+			WHERE parent_trans_id = ?
+			AND trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
+		},
+	'selRemoveChildReferralAttr' => qq
+		{
+			DELETE
+			FROM trans_attribute
+			WHERE parent_id = ?
+		},
+	'selByParentIdItemName' => qq
+		{
+			SELECT *
+			FROM trans_attribute
+			WHERE parent_id = ?
+			AND item_name = ?
+		},
+	'selReferralSourceType' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	referral_source_type
+			ORDER BY caption
+		},
+	'selIntakeService' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	intake_service
+			ORDER BY caption
+		},
+	'selIntakeDetail' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	intake_detail
+			ORDER BY caption
+		},
+	'selReferralUnitType' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	referral_unit_type
+			ORDER BY caption
+		},
+	'selReferralFollowStatus' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	referral_followup_status
+			ORDER BY caption
+		},
+	'selReferralResult' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	referral_result
+			ORDER BY caption
+		},
+	'selIntakeClient' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM    intake_client
+			ORDER BY caption
+		},
+	'selReferralServiceDesc' => qq
+		{
+			SELECT
+				id,
+				caption
+			FROM 	referral_service_descr
+			ORDER BY caption
+		},
+	'selTransAddressByName' => qq
+		{
+			SELECT *
+			FROM trans_address
+			WHERE parent_id = ?
+			AND address_name = ?
+		},
+	'selServiceRequestData' => qq
+		{
+			SELECT *
+			FROM transaction t
+			WHERE trans_id = (
+						SELECT MAX(trans_id)
+						FROM transaction tt
+						WHERE tt.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
+						AND tt.consult_id = ?
+
+					)
+		},
 );
 
 
