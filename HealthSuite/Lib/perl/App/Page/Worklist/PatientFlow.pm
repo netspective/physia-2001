@@ -21,10 +21,12 @@ use App::Dialog::WorklistSetup;
 
 use base 'App::Page::WorkList';
 
+my $baseArl = '/worklist/patientflow';
+
 sub prepare_view_date
 {
 	my ($self) = @_;
-	
+
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -403,7 +405,8 @@ sub handleARL
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
 		}
 	}
-
+	
+	$self->param('_dialogreturnurl', $baseArl);
 	$self->printContents();
 	return 0;
 }

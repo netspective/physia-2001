@@ -43,27 +43,6 @@ sub initialize
 	);
 }
 
-sub handleARL
-{
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
-
-	$self->param('worklist_type', $pathItems->[0]) unless $self->param('worklist_type');
-	$self->param('_pm_view', $pathItems->[1]);
-
-	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
-	{
-		if (my $handleMethod = $self->can("handleARL_" . $self->param('worklist_view'))) {
-			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
-		}
-	}
-
-	$self->printContents();
-	return 0;
-}
-
-
 sub getContentHandlers
 {
 	return ('prepare_view_$_pm_view=default$');
