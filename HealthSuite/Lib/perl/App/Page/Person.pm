@@ -455,7 +455,7 @@ sub prepare_view_profile
 						</TABLE><BR>
 						#component.stp-person.recentlyVisitedPatients#<BR>
 						#component.stp-person.affiliations#<BR>
-					#component.stp-person.associatedResources#</BR>
+					#component.stp-person.associatedSessionPhysicians#<BR>
 					#component.stp-person.benefits#</BR>
 					#component.stp-person.miscNotes#</BR>
 					</font>
