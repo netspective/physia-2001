@@ -593,7 +593,7 @@ sub send_page_body
 	$html = join('', @{$self->{page_content_header}}) unless $flags & PAGEFLAG_ISFRAMEBODY;
 	unless($flags & PAGEFLAG_ISFRAMEHEAD)
 	{
-		$html .= qq{<div style="margin: 10">} . join('', @{$self->{page_content}}) . "</div>";
+		$html .= qq{<div style="width: 100%; margin: 10">} . join('', @{$self->{page_content}}) . "</div>";
 		$html .= join('', @{$self->{page_content_footer}});
 	}
 
