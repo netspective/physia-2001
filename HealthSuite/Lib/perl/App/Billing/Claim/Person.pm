@@ -311,7 +311,7 @@ sub getMiddleInitial
 sub getName
 {
 	my ($self) = @_;
-	return $self->{completeName}
+	return $self->{completeName};
 }
 
 sub getAddress

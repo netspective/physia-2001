@@ -23,7 +23,7 @@ sub new
 	my ($type) = shift;
 	my $self = new App::Billing::Claim::Person(@_);
 
-	$self->{name} = undef;
+#	$self->{name} = undef;
 
 	$self->{pin} = undef;
 	$self->{taxId} = undef;
@@ -308,11 +308,11 @@ sub setPIN
 	$self->{pin} = $value;
 }
 
-sub setName
-{
-	my ($self,$value) = @_;
-	$self->{name} = $value;
-}
+#sub setName
+#{
+#	my ($self,$value) = @_;
+#	$self->{name} = $value;
+#}
 
 sub setGRP
 {
@@ -345,11 +345,11 @@ sub getPIN
 	return $temp;
 }
 
-sub getName
-{
-	my ($self) = @_;
-	return $self->{name};
-}
+#sub getName
+#{
+#	my ($self) = @_;
+#	return $self->{name};
+#}
 
 sub getGRP
 {
