@@ -9,31 +9,27 @@ use CGI::Dialog;
 use DBI::StatementManager;
 use App::Statements::Person;
 use Schema::Utilities;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(CGI::Dialog::MultiField);
 
 sub new
 {
 	my ($type, %params) = @_;
 
+	$params{name} = 'relation' unless $params{name};
+	$params{hints} = "Select an existing relationship type or select 'Other' and fill in the 'Other' field" unless $params{hints};
 	$params{fields} =
 	[
-		#new CGI::Dialog::Field(caption => 'Relationship',
-		#					type => 'foreignKey',
-		#					name => 'rel_type',
-		#					fKeyTable => 'Relationship',
-		#					fKeySelCols => "caption",
-		#					fKeyDisplayCol => 0,
-		#					fKeyValueCol => 0),
 		new CGI::Dialog::Field(caption => 'Relationship',
-								name => 'rel_type',
-								fKeyStmtMgr => $STMTMGR_PERSON,
-								fKeyStmt => 'selRelationship',
-								fKeyDisplayCol => 0,
-								fKeyValueCol => 0),
+					name => 'rel_type',
+					fKeyStmtMgr => $STMTMGR_PERSON,
+					fKeyStmt => 'selRelationship',
+					fKeyDisplayCol => 0,
+					fKeyValueCol => 0,
+					options => $params{options}
+				),
 
-		new CGI::Dialog::Field(caption => 'Other Relationship', name => 'other_rel_type', onValidate => \&validateOther),
+		new CGI::Dialog::Field(caption => 'Other', name => 'other_rel_type', onValidate => \&validateOther),
 	];
 
 	return CGI::Dialog::Field::new($type, %params);
@@ -50,19 +46,10 @@ sub validateOther
 
 	if($page->field('rel_type') ne 'Other' && $page->field('other_rel_type'))
 	{
-		return ("When supplying a relationship name, select 'Other'.");
+		return ("If you supply a value in the 'Other' field, you must select 'Other' from the 'Relationship' pull-down");
 	}
 
 	return ();
 }
-
-use constant FAMILY_DIALOG => 'Dialog/Family';
-
-@CHANGELOG =(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/16/2000', 'RK',
-		FAMILY_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;
