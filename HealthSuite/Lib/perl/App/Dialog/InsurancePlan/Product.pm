@@ -9,6 +9,7 @@ use App::Dialog::InsurancePlan;
 use App::Dialog::Field::Insurance;
 use App::Statements::Org;
 use App::Statements::Insurance;
+use App::Statements::Catalog;
 use CGI::Dialog;
 use App::Universal;
 
@@ -24,8 +25,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 use Date::Manip;
 
-@ISA = qw(CGI::Dialog);
 
+@ISA = qw(CGI::Dialog);
+my $FS_CATALOG_TYPE = 0;
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'product', heading => '$Command Insurance Product');
@@ -66,9 +68,9 @@ sub new
 			),
 			new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 				name => 'fee_schedules',
-				type => 'integer',
+				#type => 'integer',
 				findPopup => '/lookup/catalog',
-				hints => 'Numeric Fee Schedule ID',
+				#hints => 'Numeric Fee Schedule ID',
 			),
 			new App::Dialog::Field::Address(caption=>'Billing Address',
 				name => 'billing_addr',
@@ -199,8 +201,10 @@ sub populateData
 	my $feeItem = '';
 	foreach my $feeSchedule (@{$feeSched})
 	{
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selCatalogById', 
+			$feeSchedule->{'value_text'});	
 		push (@feeItemList, $feeSchedule->{'item_id'});
-		push(@feeList, $feeSchedule->{'value_text'});
+		push(@feeList, $catalog->{'catalog_id'});
 		$fee = join(',', @feeList);
 		$feeItem = join(',', @feeItemList);
 	}
@@ -307,12 +311,14 @@ sub handleAttributes
 
 	foreach my $fee (@feeSched)
 	{
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', 
+			$page->session('org_internal_id'),$fee,$FS_CATALOG_TYPE);
 		$page->schemaAction(
 			'Insurance_Attribute', 'add',
 			item_id => $page->field('fee_item_id') || undef,
 			parent_id => $insIntId || undef,
 			item_name => 'Fee Schedule' || undef,
-			value_text => $fee || undef,
+			value_text => $catalog->{internal_catalog_id} || undef,
 			value_type => 0,
 			_debug => 0
 		);
