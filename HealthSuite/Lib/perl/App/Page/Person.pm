@@ -23,6 +23,7 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Dialog::Budget;
+use App::Dialog::BillingCycle;
 use App::Statements::Worklist::WorklistCollection;
 use App::Page::Search;
 use App::Configuration;
@@ -193,6 +194,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
 						<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
 						<OPTION value="/person/$personId/dlg-add-budget?home=$homeArl">Payment Plan</OPTION>
+						<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
 					</SELECT>
 					</FONT>
 				<TD>
