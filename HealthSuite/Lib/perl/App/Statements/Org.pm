@@ -30,10 +30,12 @@ $STMTMGR_ORG = new App::Statements::Org(
 		where org_internal_id = ?
 		},
 	'selCloseDateChildParentOrgIds' =>qq{
-		SELECT	org_internal_id
-		FROM	org
-		WHERE	owner_org_id = :1
-		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 )
+		SELECT	o.org_internal_id
+		FROM	org o,Org_Category oc
+		WHERE	o.owner_org_id = :1
+		AND	( (o.parent_org_id = :2 AND :3 = 1) OR o.org_internal_id = :2 )
+		AND	oc.parent_id = o.org_internal_id
+		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
 	},
 	'selOwnerOrg' => qq{
 		select *
@@ -125,7 +127,13 @@ $STMTMGR_ORG = new App::Statements::Org(
 		select * from org_attribute
 		where parent_id = ? and item_name = ? and value_type = ?
 		},
-	'selValueDateByItemNameAndValueTypeAndParent' =>qq{
+	'selAttributeItemDateByItemNameAndValueTypeAndParent' => qq{
+		SELECT 	item_id,to_char(value_date,'$SQLSTMT_DEFAULTDATEFORMAT') as value_date,o.org_id
+		FROM 	org_attribute oa,org o
+		WHERE	oa.parent_id = ? and oa.item_name = ? and oa.value_type = ?
+		AND	o.org_internal_id = oa.parent_id
+		},		
+	'selValueDateByItemNameAndValueTypeAndParent' =>qq{	
 		SELECT to_char(value_date,'$SQLSTMT_DEFAULTDATEFORMAT') as value_date
 		FROM org_attribute
 		WHERE parent_id = :1 and item_name = :2 and value_type = :3
