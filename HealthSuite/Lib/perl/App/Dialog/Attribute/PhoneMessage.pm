@@ -70,7 +70,8 @@ sub execute
 		value_textB => $page->field('value_textb') || undef,		
 		_debug => 0
 	);
-	return "\u$command completed.";
+	$self->handlePostExecute($page, $command, $flags);
+	
 }
 
 use constant PANEDIALOG_ATTENDANCE => 'Dialog/Pane/Phone Message';
