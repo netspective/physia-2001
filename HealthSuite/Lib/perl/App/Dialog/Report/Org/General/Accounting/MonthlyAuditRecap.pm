@@ -104,9 +104,19 @@ sub prepare_detail_payment
 	my $daily_audit_detail = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit_detail',
 		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'),$reportBeginDate,$reportEndDate);	
 	my @data = ();	
+	my $trackInvoice=undef;
 	foreach (@$daily_audit_detail)
 	{	
-	
+		if ($trackInvoice ne $_->{invoice_id})
+		{
+			$trackInvoice = $_->{invoice_id};
+		}
+		else
+		{
+			$_->{care_provider_id}='';
+			$_->{patient_id}='';
+		};
+		
 		my @rowData = 
 		(	
 			$_->{invoice_id},			
