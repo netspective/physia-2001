@@ -266,9 +266,10 @@
 		<enum>Refund</enum>
 		<enum>Transfer</enum>
 		<enum>Auto Capitated Service Adjustment</enum>
-		<enum>Transfer to Next Payer</enum>
-		<enum>Reverse Transfer to Next Payer</enum>
-		<enum>Reverse Payment</enum>
+		<enum>Transfer Balance to Next Payer</enum>
+		<enum>Reverse Transfer Balance to Next Payer</enum>
+		<enum>Reverse Payment Transfer</enum>
+		<enum>Payment Transfer</enum>
 	</table>
 
 	<table name="Writeoff_Type" abbrev="WrOffTy" type="Enumeration">
