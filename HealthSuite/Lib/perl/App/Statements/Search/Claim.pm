@@ -27,6 +27,8 @@ $STMTFMT_SEL_CLAIM = qq{
 		where
 			%whereCond%
 			and ib.invoice_id = i.invoice_id
+			and ib.invoice_item_id is NULL
+			and ib.bill_sequence = 1
 			and (owner_type = 1 and owner_id = ?)
 			and iis.id = i.invoice_status
 		order by invoice_date DESC
