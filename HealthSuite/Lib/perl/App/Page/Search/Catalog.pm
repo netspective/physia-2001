@@ -27,28 +27,34 @@ sub getForm
 	my $heading;
 	my $value;
 	my $search_type;
-	if($catalogId)
+	if($view eq 'offering_catalog_entry')
 	{
-		my $id;
-		if ($self->param('search_type') eq 'detail')
+		if($catalogId)
 		{
-			my $catalog = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_NONE,'selCatalogById', $catalogId);
-			$id = $catalog->{catalog_id};
+			my $id;
+			if ($self->param('search_type') eq 'detail')
+			{
+				my $catalog = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_NONE,'selCatalogById', $catalogId);
+				$id = $catalog->{catalog_id};
+			}
+			else
+			{
+				$id = $catalogId
+			}
+			$heading = "Fee schedule item(s) for '$id'";
+			$value = $id;
+			$search_type = "id";
 		}
 		else
 		{
-			$id = $catalogId
+			return ("Error ",qq{ No fee schedule id was provided. });
 		}
-		$heading = "Fee schedule item(s) for '$id'";
-		$value = $id;
-		$search_type = "id";
 	}
 	else
 	{
 		$heading = 'Lookup a fee schedule';
 		$value =$self->param('search_expression');
-		$search_type = $self->param('search_type') || 0
-
+		$search_type = $self->param('search_type') || 0;
 	}
 
 
