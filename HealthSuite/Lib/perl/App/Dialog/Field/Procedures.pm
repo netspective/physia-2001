@@ -41,6 +41,9 @@ sub needsValidation
 	return 1;
 }
 
+
+
+
 sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
@@ -223,7 +226,27 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
-
+		
+		
+		#READ - If @allFeeSchedules line for charge is changed also change the @listFeeSchedule line		
+		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
+		my $svc_type=App::IntelliCode::getSvcType($page, $procedure, $modifier || undef,\@listFeeSchedules);
+		my $count_type = scalar(@$svc_type);
+		unless ($servicetype)
+		{
+			if ($count_type==1)
+			{
+				foreach(@$svc_type)
+				{
+					$page->param("_f_proc_$line\_service_type",$_->[1]); 	
+				}
+			}
+			elsif ($count_type>1)
+			{
+				my $html_svc = $self->getMultiSvcTypesHtml($page, $line, $svc_type);
+				$self->invalidate($page, $html_svc);
+			}
+		}
 		unless ($charges)
 		{
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
@@ -241,7 +264,9 @@ sub isValid
 				foreach (@$fsResults)
 				{
 					my $unitCost = $_->[1];
+					my $ffsFlag = $_->[2];
 					$page->param("_f_proc_$line\_charges", $unitCost);
+					$page->param("_f_proc_$line\_ffs_flag",$ffsFlag);
 				}
 			}
 			else
@@ -283,6 +308,25 @@ sub getMultiPricesHtml
 				type=radio name='_f_multi_price' value=$cost>\$$cost
 		};
 	}
+	return $html;
+}
+
+sub getMultiSvcTypesHtml
+{
+	my ($self, $page, $line, $fsResults) = @_;
+
+	my $html = qq{[<B>P$line</B>] Multiple service types found.  Please select a service type for this line item.};
+	
+	foreach (@$fsResults)
+	{
+		my $svc_type=$_->[1];
+		my $svc_name=$_->[2];
+		$html .= qq{
+			<input onClick="document.dialog._f_proc_$line\_service_type.value=this.value" 
+				type=radio name='_f_multi_svc_type' value=$svc_type>$svc_name
+		};
+	}
+
 	return $html;
 }
 
@@ -394,6 +438,7 @@ sub getHtml
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_actual_diags" VALUE='@{[ $page->param("_f_proc_$line\_actual_diags")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_ffs_flag" VALUE='@{[ $page->param("_f_proc_$line\_ffs_flag")]}'/>			
 			<TR VALIGN=TOP>
 				<SCRIPT>
 					function onChange_dosBegin_$line(event, flags)
@@ -405,8 +450,8 @@ sub getHtml
 							document.$dialogName._f_proc_$line\_dos_end.value = event.srcElement.value;
 						if(event.srcElement.value != '')
 						{
-							if(document.$dialogName._f_proc_$line\_service_type.value == '')
-								document.$dialogName._f_proc_$line\_service_type.value = '01';
+							<!--- if(document.$dialogName._f_proc_$line\_service_type.value == '') --->
+							<!----	document.$dialogName._f_proc_$line\_service_type.value = '01'; --->
 							if(document.$dialogName._f_proc_$line\_units.value == '')
 								document.$dialogName._f_proc_$line\_units.value = 1;
 						}
@@ -415,6 +460,8 @@ sub getHtml
 					{
 						if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
 							document.$dialogName._f_proc_$line\_modifier.value = '';
+						document.$dialogName._f_proc_$line\_charges.value = '';
+						document.$dialogName._f_proc_$line\_service_type.value = '';						
 					}
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
@@ -422,9 +469,7 @@ sub getHtml
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || ($line == 1 ? 'From' : '')]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
 					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || ($line == 1 ? 'To' : '') ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2>
-					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
-				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_service_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_service_type")]}'/>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
 					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
@@ -437,6 +482,11 @@ sub getHtml
 				<TD><nobr>$emgHtml</nobr></TD>
 			</TR>
 		};
+		
+		#<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2>
+		#<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+		#<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				
 		$linesHtml .= qq{
 			<TR>
 				<TD COLSPAN=4 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
@@ -520,8 +570,6 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						$removeHd
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Dates</FONT></TD>
-						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Type</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>CPT/Modf</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
