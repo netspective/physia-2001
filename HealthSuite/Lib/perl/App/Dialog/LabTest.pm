@@ -123,7 +123,7 @@ sub new
 			name => 'lab_type',
 			fKeyStmtMgr => $STMTMGR_LAB_TEST,
 			fKeyStmt => 'selTestType',		
-			options => FLDFLAG_REQUIRED
+			options => FLDFLAG_REQUIRED ,
 		),		
 		new CGI::Dialog::Field( caption => 'Test Selection', 						
 					type => 'select',
@@ -137,21 +137,21 @@ sub new
 			options => FLDFLAG_REQUIRED,
 			fields=>[					
 				new CGI::Dialog::Field(
-					name => 'panel_name',
-					type => 'text',
-					caption => 'Panel Name',
-					size=>15,
-					maxLength=>30,
-					#options => FLDFLAG_REQUIRED			
-				),	
-				new CGI::Dialog::Field(
 					name => 'panel_id',
 					type => 'text',
 					caption => 'Panel ID',
 					size=>15,
 					maxLength=>30,
 					#options => FLDFLAG_REQUIRED
-				)
+				),
+				new CGI::Dialog::Field(
+					name => 'panel_name',
+					type => 'text',
+					caption => 'Panel Name',
+					size=>15,
+					maxLength=>30,
+					#options => FLDFLAG_REQUIRED			
+				),					
 				],
 			),		
 		@requestSingle,
@@ -184,6 +184,7 @@ sub new
        	my ($self, $page, $command, $dlgFlags) = @_;
        	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$self->setFieldFlags('panel_test',FLDFLAG_READONLY) if $command ne 'add';	
+
 
 	#Stick Down arrow on dataGrid fields	
 	my $pos=-1;
@@ -327,7 +328,11 @@ sub configureDialog
 	my ($self, $page,$command,$panel) = @_;
 
 	#Set Test Selection to read only if this is a update or delete
+	my $type = $STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'selCatalogEntryTypeCapById',$page->field('lab_type')||300);	
+	my $com =ucfirst($command) ;
+	$self->{heading}="$com $type Test";
 	$self->setFieldFlags('panel_test',FLDFLAG_READONLY) if $command ne 'add';	
+	$self->setFieldFlags('lab_type',FLDFLAG_READONLY) if $page->field('lab_type');
 	#Reset Dialog
 	$self->addPostHtml(qq{<script language="JavaScript1.2">setIdDisplay("panel_id_name",'none');setIdDisplay("panel",'none');</script>});						
 	if($panel)

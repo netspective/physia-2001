@@ -338,7 +338,7 @@ sub prepare_view_catalog
 	}
 	
 	my $showLabTest=0;
-	my $labTestList = 'LAB';	
+	my $labTestList = uc('Ancillary Service');	
 	
 	
 	#Probably show do this for all sub tabs on page		
@@ -350,7 +350,7 @@ sub prepare_view_catalog
 			[ "Fee Schedule Catalog","./catalog?catalog=fee_schedule" ],
 			[ "Contract Catalog","./catalog?catalog=contract" ],
 			[ "Superbill Catalog","./catalog?catalog=superbill" ],
-			$showLabTest ? [ "Lab Tests","./catalog?catalog=labtest"] : undef,
+			$showLabTest ? [ "Ancillary Service Order","./catalog?catalog=labtest"] : undef,
 		];
 	my $viewMenuHtml = $self->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
 				selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#EEEEEE', unselTextColor => '#555555', highColor => 'navy',

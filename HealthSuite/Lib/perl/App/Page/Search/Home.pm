@@ -136,7 +136,7 @@ sub prepare
 					<a href="/search/org">Employers</a>,
 					<a href="/search/org">Insurers</a>, 
 					<a href="/search/org">IPAs</a>, or
-					<a href="/search/org">Labs</a>					
+					<a href="/search/org">Ancillary Service</a>					
 				</font>
 			</td></tr><tr valign=top bgcolor=white><td align="right">
 				$IMAGETAGS{'icons/arrow_right_red'}
@@ -148,7 +148,7 @@ sub prepare
 					<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>, or
-					<a href="/org/#session.org_id#/dlg-add-org-lab">Lab</a>
+					<a href="/org/#session.org_id#/dlg-add-org-ancillary">Ancillary Service</a>
 				</font>
 			</td></tr></table>
 			<p>

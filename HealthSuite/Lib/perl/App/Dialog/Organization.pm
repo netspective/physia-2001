@@ -63,11 +63,11 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl => ['org_id'],
 		_idSynonym => 'Ipa'
 	},
-	'org-lab' => {
-		heading => '$Command Lab Organization',
-		orgtype => 'lab',
+	'org-ancillary' => {
+		heading => '$Command Ancillary Service Organization',
+		orgtype => 'ancillary',
 		_arl => ['org_id'],
-		_idSynonym => 'Lab'
+		_idSynonym => 'Ancillary'
 	},
 );
 
@@ -440,7 +440,7 @@ sub addContentOrgType
 {
 	my ($self, $type) = @_;
 	my $excludeGroups = "''";
-	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa'|| $type eq 'lab')
+	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa'|| $type eq 'ancillary')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
 		return 1;
@@ -536,7 +536,7 @@ sub populateData
 				/insurance/	and do { $page->field('member_name','Insurance'); last };
 				/employer/	and do { $page->field('member_name','Employer'); last };
 				/ipa/		and do { $page->field('member_name','IPA'); last };
-				/lab/		and do { $page->field('member_name','Lab');last };
+				/ancillary/	and do { $page->field('member_name','Ancillary Service');last };
 			}
 		$page->field('parent_org_id', $page->param('org_id'));
 	}
@@ -951,7 +951,7 @@ sub execute_add
 	) if $page->field('area_served') ne '';
 
 	#If Org is a Lab create a Lab,Radiology,Other Catalogs
-	$self->addLabCatalogs($page,$orgIntId) if $page->field('member_name') eq 'Lab';
+	$self->addLabCatalogs($page,$orgIntId) if $page->field('member_name') eq 'Ancillary Service';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
