@@ -218,7 +218,12 @@ sub customValidate
 
 	elsif($page->field('party_name') eq ''  && $page->field('rel_type') ne 'Self')
 	{
-		$relationship->invalidate($page, "'Responsible Party' is required when the 'Relationship' is other than 'Self'");
+		#$relationship->invalidate($page, "'Responsible Party' is required when the 'Relationship' is other than 'Self'");
+		
+		#If user left Responsible party blank the field level validation will ignore so catch error here			
+		my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor',null,null,['_f_person_id'],['_f_party_name']);};	
+		my $invMsg = qq{<a href="$createPersonHref">Create Responsible Party</a> };
+		$relationship->invalidate($page, $invMsg);
 	}
 }
 
@@ -232,8 +237,8 @@ sub execute_add
 
 	#second create employment attribute
 	my $personId = $page->field('person_id');
-	my $relId = $page->field('rel_id');
-	$relId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relId);
+	my $relTextId = $page->field('rel_id');	
+	my $relId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relTextId);
 	if($relId ne '')
 	{
 		my $occupation = $page->field('occupation') eq '' ? 'Unknown' : $page->field('occupation');
@@ -245,7 +250,8 @@ sub execute_add
 				item_name => $occupation || undef,
 				value_type => $page->field('value_type') || undef,
 				value_int => $relId || undef,
-				value_text => $page->field('phone_number') || undef,
+				value_text => $relTextId || undef,
+				value_textB => $page->field('phone_number') || undef,
 				#value_date => $page->field('begin_date') || undef,
 				_debug => 0
 		);
