@@ -67,26 +67,16 @@ sub execute
 			_debug => 0
 		);
 
-	## Add history attribute
+
+	## Add history item
 	addHistoryItem($page, $invoiceId,
 		value_text => 'Diagnosis codes modified',
 		value_textB => $page->field('comments') || undef,
 		value_date => $todaysDate,
 	);
-	#$page->schemaAction(
-	#		'Invoice_Attribute', 'add',
-	#		parent_id => $invoiceId,
-	#		item_name => 'Invoice/History/Item',
-	#		value_type => defined $historyValueType ? $historyValueType : undef,
-	#		value_text => 'Diagnosis codes modified',
-	#		value_textB => $page->field('comments') || undef,
-	#		value_date => $todaysDate,
-	#		_debug => 0
-	#);
 
-#	$page->redirect("/invoice/$invoiceId/summary");
+
 	$self->handlePostExecute($page, $command, $flags);
-
 }
 
 1;
