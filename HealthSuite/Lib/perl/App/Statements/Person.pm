@@ -86,13 +86,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where person_id = ? and org_internal_id = ?
 		order by category
 		},
-		
+
 	'selVerifyCategory' => qq{
 		select category
 		from person_org_category
 		where person_id = ? and org_internal_id = ? and category = ?
 		},
-		
+
 	'selPersonBySessionOrgAndCategory' => q{
 			select distinct person_id
 			  	from person_org_category
@@ -142,12 +142,12 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selEmergencyAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type = 201
+		and value_type = @{[App::Universal::ATTRTYPE_EMERGENCY]}
 		},
 	'selFamilyAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type = 200
+		and value_type = @{[App::Universal::ATTRTYPE_FAMILY]}
 		},
 	'selResourceAssociations' => qq{
 		select distinct p.person_id, p.complete_name from person p, person_org_category pcat
@@ -158,7 +158,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selSessionPhysicians' => qq{
 		select *
 		from person_attribute
-		where value_type = 250
+		where value_type =  @{[App::Universal::ATTRTYPE_RESOURCEPERSON]}
 		and item_name = 'SessionPhysicians'
 		and value_int = 1
 		and parent_id = ?
@@ -166,28 +166,28 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selProviderAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type = 210
+		and value_type =  @{[App::Universal::ATTRTYPE_PROVIDER]}
 		},
 	'selPrimaryPhysicianOrProvider' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type = 210
+		and value_type = @{[App::Universal::ATTRTYPE_PROVIDER]}
 		and value_int = 1
 		},
 	'selEmploymentAssociations' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type between 220 and 226
+		and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
 		},
 	'selEmpStatus' => qq{
 		select id, caption from attribute_value_type
-		where id between 220 and 226
+		where id between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
 		},
 	'selEmploymentStatusCaption' => qq{
 		select value_type, value_text, value_textB, value_int, caption
 		from person_attribute, attribute_value_type
 		where parent_id = ?
-			and value_type between 220 and 226
+			and value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
 			and value_type = id
 		},
 	'selBloodTypeCaption' => q{
@@ -211,7 +211,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selContactMethods' => qq{
 		select * from person_attribute
 		where parent_id = ?
-		and value_type in (10, 15, 20, 40, 50)
+		and value_type in (
+					@{[App::Universal::ATTRTYPE_PHONE]},
+				   	@{[App::Universal::ATTRTYPE_FAX]},
+				    	@{[App::Universal::ATTRTYPE_PAGER]},
+				    	@{[App::Universal::ATTRTYPE_EMAIL]},
+				   	@{ [App::Universal::ATTRTYPE_URL]}
+				    )
 		order by name_sort, item_name
 		},
 	'selHomePhone' => qq{
@@ -255,73 +261,73 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			)
 			and
 			(
-			trans_type between 8000 and 8999
+			trans_type between @{[App::Universal::TRANSTYPE_ALERTORG]} and @{[App::Universal::TRANSTYPE_ALERTRANGE]}
 			)
 			and
 			(
-			trans_status = 2
+			trans_status = @{[App::Universal::TRANSSTATUS_ACTIVE]}
 			)
 		order by trans_begin_stamp desc
 		},
 	'updClearPreferredPhoneFlag' => qq{
 		update person_attribute
 		set value_int = 0
-		where value_type = 10
+		where value_type = @{[App::Universal::ATTRTYPE_PHONE]}
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
 	'updClearPreferredFaxFlag' => qq{
 		update person_attribute
 		set value_int = 0
-		where value_type = 15
+		where value_type = @{[App::Universal::ATTRTYPE_FAX]}
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
 	'updClearPreferredPagerFlag' => qq{
 		update person_attribute
 		set value_int = 0
-		where value_type = 20
+		where value_type = @{[App::Universal::ATTRTYPE_PAGER]}
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
 	'updClearPreferredEmailFlag' => qq{
 		update person_attribute
 		set value_int = 0
-		where value_type = 40
+		where value_type = @{[App::Universal::ATTRTYPE_EMAIL]}
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
 	'updClearPreferredInternetFlag' => qq{
 		update person_attribute
 		set value_int = 0
-		where value_type = 50
+		where value_type = @{[App::Universal::ATTRTYPE_URL]}
 			and (value_int is not null and value_int <> 0)
 			and parent_id = ?
 		},
 	'updClearPrimaryPhysician' => qq{
 			update person_attribute
 			set value_int = ''
-			where value_type = 210
+			where value_type = @{[App::Universal::ATTRTYPE_PROVIDER]}
 				and item_id = ?
 		},
 	'selSpecialtySequence' => qq{
 					select value_int, item_id
 					from person_attribute
-					where value_type = 540
+					where value_type = @{[App::Universal::ATTRTYPE_SPECIALTY]}
 					and parent_id = ?
 					and value_int = ?
 		},
 	'selSpecialtyExists' => qq{
 				select value_text, item_id
 				from person_attribute
-				where value_type = 540
+				where value_type = @{[App::Universal::ATTRTYPE_SPECIALTY]}
 				and parent_id = ?
 				and value_text = ?
 		},
 	'selPhysicianSpecialty' => qq{
 					select value_textB, item_id
 					from person_attribute
-					where value_type = 210
+					where value_type = @{[App::Universal::ATTRTYPE_PROVIDER]}
 					and parent_id = ?
 					and value_text = ?
 					and value_textB = ?
@@ -410,7 +416,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 	'selPhysStateLicense' => q{
 		select * from person_attribute
-		where parent_id = ? and value_type = 510 and value_int = ?
+		where parent_id = ? and value_type = @{[App::Universal::ATTRTYPE_STATE]} and value_int = ?
 		},
 	'selPrimaryPhysician' => q{
 			select p.person_id, p.complete_name, pcat.person_id,pcat.org_internal_id, patt.value_text as phy, patt.parent_id
@@ -450,7 +456,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selEmpStatus' => q{
 			select id, caption
 			  	from Attribute_Value_Type
-				where id between 220 and 226
+				where id between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
 		},
 	'selReferralReason' => q{
 			select id, caption
@@ -461,7 +467,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			select *
 				from person_attribute
 				where parent_id = ?
-				and value_type = 40
+				and value_type = @{[App::Universal::ATTRTYPE_EMAIL]}
 				and item_name = 'Primary'
 		},
 
@@ -474,7 +480,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'selPreferredPhoneExists' => q{
 			select value_text
 				from person_attribute
-				where value_type = 10
+				where value_type = @{[App::Universal::ATTRTYPE_PHONE]}
 				and parent_id = ?
 				and value_int = 1
 		},
@@ -484,7 +490,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	'sel_Person_ContactMethods' => {
 			sqlStmt => qq{
 				select value_int, value_type, item_name, value_text, item_id from person_attribute
-				where parent_id = ? and value_type in (10, 15, 20, 40, 50)
+				where parent_id = ?
+				and value_type in (
+							@{[App::Universal::ATTRTYPE_PHONE]},
+							@{[App::Universal::ATTRTYPE_FAX]},
+							@{[App::Universal::ATTRTYPE_PAGER]},
+							@{[App::Universal::ATTRTYPE_EMAIL]},
+							@{[App::Universal::ATTRTYPE_URL]}
+						)
 				order by name_sort, item_name
 			},
 			sqlStmtBindParamDescr => ['Person ID'],
@@ -516,7 +529,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			sqlStmt => qq{
 				select value_int as preferred, value_type, item_name, value_text, item_id
 				from person_attribute pa
-				where parent_id = ? and value_type in (10, 15, 20, 40, 50)
+				where parent_id = ?
+				and value_type in (
+							@{[App::Universal::ATTRTYPE_PHONE]},
+							@{[App::Universal::ATTRTYPE_FAX]},
+							@{[App::Universal::ATTRTYPE_PAGER]},
+							@{[App::Universal::ATTRTYPE_EMAIL]},
+							@{[App::Universal::ATTRTYPE_URL]}
+						)
 				union all
 				select 0 as preferred, 9998 as value_type, '-' as item_name, '-' as value_text, -1
 				from dual
@@ -641,7 +661,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				from 	person_attribute pa, attribute_value_type avt
 				where	pa.parent_id = ?
 				and	pa.value_type = avt.id
-				and	pa.value_type between 220 and 226
+				and	pa.value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
 			},
 		sqlStmtBindParamDescr => ['Person ID'],
 		publishDefn => {
@@ -677,7 +697,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				select 	item_name, value_text, value_textb
 				from 	person_attribute
 				where	parent_id = ?
-				and 	value_type  = 201
+				and 	value_type  = @{[App::Universal::ATTRTYPE_EMERGENCY]}
 
 			},
 		sqlStmtBindParamDescr => ['Person ID'],
@@ -714,7 +734,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				select	item_name, value_text, value_textb
 				from 	person_attribute
 				where	parent_id = ?
-				and	value_type  = 200
+				and	value_type  = @{[App::Universal::ATTRTYPE_FAMILY]}
 			},
 		sqlStmtBindParamDescr => ['Person ID'],
 		publishDefn => {
@@ -779,10 +799,10 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		sqlStmt => qq{
 				select 	caption, detail
 				from 	transaction
-				where	trans_type between 8000 and 8999
+				where	trans_type between @{[App::Universal::TRANSTYPE_ALERTORG]} and @{[App::Universal::TRANSTYPE_ALERTRANGE]}
 				and	trans_owner_type = 0
 				and 	trans_owner_id = ?
-				and	trans_status = 2
+				and	trans_status = @{[App::Universal::TRANSSTATUS_ACTIVE]}
 				order by trans_begin_stamp desc
 			},
 		sqlStmtBindParamDescr => ['Person ID'],
