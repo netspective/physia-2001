@@ -264,7 +264,7 @@ sub customValidate
 	my $coverageExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $sequence);
 	my $coverageCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$sequence);
 
-	$billSeq->invalidate($page, "'$coverageCaption' Insurance already exists for '$personId' ") if ($coverageExists != 0 && $sequence <= 4);
+	$billSeq->invalidate($page, "'$coverageCaption' Insurance already exists for '$personId' ") if ($coverageExists != 0 && $sequence <= 4 && $sequence ne $previousSequence);
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
 	my $seq =1;
 	#$page->addDebugStmt("INS : $seq");
