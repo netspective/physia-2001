@@ -10,6 +10,7 @@ use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Universal;
 use App::Configuration;
+use App::Utilities::Invoice;
 
 use App::Billing::Claims;
 use App::Billing::Input::DBI;
@@ -126,11 +127,11 @@ sub updatePaperClaimsPrinted
 	my ($self, $claims) = @_;
 	
 	my $claimListString = join(',', @{$claims});
-	
-	$STMTMGR_INVOICE->execute($self, STMTMGRFLAG_DYNAMICSQL, qq{
-		update Invoice set invoice_status = @{[App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED]} 
-			where invoice_id in ($claimListString)
-	});
+
+	foreach (@$claims)
+	{
+		handleDataStorage($self, $_, App::Universal::SUBMIT_PAYER, 1);
+	}
 }
 
 sub prepare_view_printerSpec
