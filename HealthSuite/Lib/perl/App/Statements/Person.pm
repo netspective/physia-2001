@@ -26,6 +26,15 @@ $PUBLDEFN_CONTACTMETHOD_DEFAULT = {
 };
 
 $STMTMGR_PERSON = new App::Statements::Person(
+	'selPersonServiceFFSByInternalId' => q{
+			SELECT	distinct pa.parent_id ,pa.value_int
+			FROM	person_org_category poc, person_attribute pa
+			WHERE	poc.org_internal_id = :1
+			AND	UPPER(poc.category) = 'PHYSICIAN'
+			AND	pa.parent_id = poc.person_id			
+			AND	pa.item_name ='Fee Schedules'
+			AND	pa.item_type = 0			  	 
+		},
 	'selPersonExists' => qq{
 		select person_id
 		from person
