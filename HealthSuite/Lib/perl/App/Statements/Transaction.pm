@@ -181,7 +181,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		where id = ?
 	},
 	'selTransCreateClaim' => qq{
-		select trans_id, trans_type, caption as subject, provider_id, care_provider_id, parent_event_id,
+		select trans_id, trans_type, caption as subject, provider_id, care_provider_id, parent_event_id, to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as trans_begin_stamp,
 				service_facility_id, billing_facility_id, bill_type, data_text_a as ref_id, data_text_b as comments
 		from transaction
 		where trans_id = ?
