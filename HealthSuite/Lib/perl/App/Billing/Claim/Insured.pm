@@ -34,6 +34,7 @@ sub new
 	$self->{effectiveDate} = undef;
 	$self->{terminationDate} = undef;
 	$self->{billSequence} = undef;
+	$self->{bcbsPlanCode} = undef;
 	
 	return bless $self, $type;
 }
@@ -249,6 +250,19 @@ sub getAcceptAssignment
 	return $self->{acceptAssignment};
 }
 
+sub setBCBSPlanCode	
+{
+	my($self, $value) = @_;
+	$self->{bcbsPlanCode} = $value;
+}
+
+
+sub getBCBSPlanCode	
+{
+	my $self = shift;
+	return $self->{bcbsPlanCode};
+}
+
 @CHANGELOG =
 ( 
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
@@ -256,6 +270,8 @@ sub getAcceptAssignment
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute relationshipToInsured is added to reflect the insured relation to patient.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute acceptAssignment is added to reflect the Assignment of Benefit for the insured.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/18/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute billSequence added to reflect the sequence of insured for the bill.'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/01/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute BCBSPlanCode is added to reflect the BCBSP plan Code of insured.'],
+	
 );
 
 1;
