@@ -42,3 +42,5 @@ delete from Payment_Type where id = 9;
 insert into Payment_Type (id, caption, group_name) values (9, 'Budget-payment', 'personal');
 
 insert into Session_Action_Type (id, caption) values (9, 'Setup');
+
+commit;
