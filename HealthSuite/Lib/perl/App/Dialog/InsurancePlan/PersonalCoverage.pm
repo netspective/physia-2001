@@ -21,7 +21,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			_arl_modify => ['ins_internal_id'],
 		   	_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
 		  );
-		  
+
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
@@ -79,7 +79,9 @@ sub new
 							name => 'insured_id', options => FLDFLAG_REQUIRED
 							),
 
-			new CGI::Dialog::Field(caption => "Patient's Relationship to Insured",
+			new CGI::Dialog::MultiField(name => 'rel_other_rel',
+					fields => [
+						new CGI::Dialog::Field(caption => "Patient's Relationship to Insured",
 							name => 'rel_to_insured',
 							fKeyStmtMgr => $STMTMGR_INSURANCE,
 							fKeyStmt => 'selInsuredRelation',
@@ -87,30 +89,34 @@ sub new
 							fKeyValueCol => 0,
 							options => FLDFLAG_REQUIRED
 							),
-
-			new CGI::Dialog::MultiField(caption =>'Indiv/Family Deductible Remaining', name => 'deduct_remain',
-				fields => [
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Insurance.indiv_deduct_remain'),
-						new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Insurance.family_deduct_remain'),
-					]),
+						new CGI::Dialog::Field(caption => 'Other Relationship Name',
+							name => 'extra'
+							),
+						]),
 
 			new CGI::Dialog::Subhead(heading => 'Coverage Information', name => 'coverage_heading'),
 			new CGI::Dialog::MultiField (caption => 'Coverage Begin/End Dates',	name => 'dates',
 					fields => [
 								new CGI::Dialog::Field(caption => 'Begin Date', name => 'coverage_begin_date', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1, defaultValue => ''),
-								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', futureOnly => 1, defaultValue => ''),
+								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', defaultValue => ''),
 							]),
 
-			new CGI::Dialog::MultiField(caption =>'Deductible Amounts', hints => 'Individual/Family', name => 'deduct_amts',
+			new CGI::Dialog::MultiField(caption =>'Individual/Family Deductible Amounts', name => 'deduct_amts',
 					fields => [
 								new CGI::Dialog::Field::TableColumn(caption => 'Individual Deductible Amount',
 									schema => $schema, column => 'Insurance.indiv_deductible_amt'),
 								new CGI::Dialog::Field::TableColumn(caption => 'Family Deductible Amount',
 									schema => $schema, column => 'Insurance.family_deductible_amt'),
+					]),
+
+			new CGI::Dialog::MultiField(caption =>'Individual/Family Deductible Remaining', name => 'deduct_remain',
+					fields => [
+						new CGI::Dialog::Field::TableColumn(
+							schema => $schema,
+							column => 'Insurance.indiv_deduct_remain'),
+						new CGI::Dialog::Field::TableColumn(
+							schema => $schema,
+						column => 'Insurance.family_deduct_remain'),
 					]),
 
 			new CGI::Dialog::MultiField(caption =>'Percentage Pay/Threshold', name => 'percentage_threshold',
@@ -196,6 +202,21 @@ sub makeStateChanges
 
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 	$page->field('person_hidden', $personId);
+
+	my $otherRel = $self->getField('rel_other_rel')->{fields}->[1];
+	my $relationToIns = $page->field('rel_to_insured');
+	my $otherRelation = $page->field('extra');
+	if ($relationToIns == App::Universal::INSURED_OTHER && $otherRelation eq '')
+	{
+		$otherRel->invalidate($page, "When the 'Relation To Insured' is 'Other', then the 'Other Relationship Name' cannot be blank");
+	}
+
+	if ($relationToIns != App::Universal::INSURED_OTHER && $otherRelation ne '')
+	{
+		$otherRel->invalidate($page, "When the 'Relation To Insured' is not 'Other', then the 'Other Relationship Name' should be blank");
+	}
+
+	$page->field('insured_id', $personId) if $relationToIns == App::Universal::INSURED_SELF;
 }
 
 sub customValidate
@@ -207,7 +228,7 @@ sub customValidate
 	return () if $command eq 'remove';
 
 	my $relToInsured = $page->field('rel_to_insured');
-	my $relToInsuredField = $self->getField('rel_to_insured');
+	my $relToInsuredField = $self->getField('rel_other_rel')->{fields}->[0];
 	my $insuredId = $page->field('insured_id');
 	my $insuredIdField = $self->getField('insured_id');
 	my $billSeq = $self->getField('bill_sequence');
@@ -439,6 +460,7 @@ sub execute
 				insured_id => $page->field('insured_id') || undef,
 				guarantor_id => $page->field('guarantor_id') || undef,
 				rel_to_insured => $page->field('rel_to_insured') || undef,
+				extra          => $page->field('extra') || undef,
 				indiv_deduct_remain => $page->field('indiv_deduct_remain') || undef,
 				family_deduct_remain => $page->field('family_deduct_remain') || undef,
 				copay_amt => $page->field('copay_amt') || undef,
