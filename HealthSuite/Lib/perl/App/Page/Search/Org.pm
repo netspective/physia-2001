@@ -62,6 +62,11 @@ sub getForm
 			<option value="id">Org ID</option>
 			<option value="primname" selected>Primary Name</option>
 			<option value="category">Type of Org</option>
+			<option value="taxid">Tax ID</option>
+			<option value="state">State</option>
+			<option value="city">City</option>
+			<option value="zip">Zip Code</option>
+			<option value="vendor">Vendor Code</option>
 		</select>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $self->param('search_type') || 0 ]}');

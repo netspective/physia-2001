@@ -39,7 +39,7 @@ sub getForm
 		{
 			$id = $catalogId
 		}
-		$heading = "Fee schedule item(s) for '$id'";		
+		$heading = "Fee schedule item(s) for '$id'";
 		$value = $id;
 		$search_type = "id";
 	}
@@ -48,7 +48,7 @@ sub getForm
 		$heading = 'Lookup a fee schedule';
 		$value =$self->param('search_expression');
 		$search_type = $self->param('search_type') || 0
-		
+
 	}
 
 
@@ -64,7 +64,7 @@ sub getForm
 		<input name="search_expression" value="@{[$value]}">
 		<input type=submit name="execute" value="Go">
 		</NOBR>
-		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : " | <a href=$dialogARL>Add New Fee Schedule</a>" ]}
+		@{[ $flags & SEARCHFLAG_LOOKUPWINDOW ? '' : " | <a href=$dialogARL>Add New Fee Schedule</a>  <a href=/org/#session.org_id#/dlg-add-catalog-item>Add Fee Schedule Item</a>" ]}
 		</CENTER>
 		<script>
 			setSelectedValue(document.search_form.search_type, '@{[ $search_type ]}');
