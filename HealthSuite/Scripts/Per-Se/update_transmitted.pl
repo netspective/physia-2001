@@ -17,6 +17,7 @@ sub getClaimDetails
 			and ib.bill_id = i.billing_id
 			and p.person_id = i.client_id
 			and to_char(o.org_internal_id (+)) = ib.bill_to_id
+		order by i.invoice_id
 	};
 
 	my $sth = $dbh->prepare($sqlStmt);
@@ -102,7 +103,7 @@ my %mail =
 (	To => $sendMailTo,
 	From => $user . '@physia.com',
 	Cc => 'thai_nguyen@physia.com',
-	Subject => "Claims Submission to Per-Se - " . `date`,
+	Subject => "PerSe Claims Submission - $nsfFileName - " . `date`,
 	Message => "The following claims were submitted to Per-Se in file $nsfFileName:\n\n"
 		. "Number of Claims:  $numClaims\n"
 		. qq{Total Dollars:  \$@{[ App::Data::Manipulate::trim(sprintf("%9.2f", $total)) ]}\n\n}
