@@ -43,7 +43,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED, findPopup => '/lookup/claim'),
 
 
-		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',invoiceIdFieldName=>'sel_invoice_id'),		
+		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',invoiceIdFieldName=>'sel_invoice_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
 		#fields for insurance payment
 
@@ -56,7 +56,7 @@ sub new
 
 		new CGI::Dialog::MultiField(caption => 'Check Amount/Number', name => 'check_fields',
 			fields => [
-					new CGI::Dialog::Field(caption => 'Check Amount', 
+					new CGI::Dialog::Field(caption => 'Check Amount',
 						name => 'check_amount',
 						type => 'currency',
 						options => FLDFLAG_REQUIRED,
@@ -69,10 +69,10 @@ sub new
 						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 					]),
 
-		
+
 		#fields for personal payment
 
-		new CGI::Dialog::Field(caption => 'Total Amount', 
+		new CGI::Dialog::Field(caption => 'Total Amount',
 			name => 'total_amount',
 			type => 'currency',
 			options => FLDFLAG_REQUIRED,
@@ -100,10 +100,10 @@ sub new
 
 		new CGI::Dialog::Subhead(heading => 'Outstanding Items', name => 'outstanding_heading'),
 		new App::Dialog::Field::OutstandingItems(name =>'outstanding_items_list'),
-		
+
 		new CGI::Dialog::Field(type => 'select', style => 'radio', selOptions => 'Yes:1;No:2', name => 'next_payer_alert', caption => 'Submit to Next Payer?'),
-		
-		
+
+
 	);
 
 	#$self->addFooter(new CGI::Dialog::Buttons(
@@ -121,7 +121,7 @@ sub new
 	{
 		scope =>'invoice',
 		key => "#param.invoice_id#",
-		data => "postinspayment claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
+		data => "'#param.paidBy#' postinspayment to claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
 	};
 
 	return $self;
@@ -140,7 +140,7 @@ sub makeStateChanges
 	my $isInsurance = $paidBy eq 'insurance';
 
 	$page->param('_p_batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$paidBy Payment");
-	
+
 	$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 1);
 	$self->setFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 1);
 	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
@@ -210,7 +210,7 @@ sub populateData
 		}
 	}
 	elsif($paidBy eq 'personal')
-	{	
+	{
 		$page->field('payer_id', $clientId);
 	}
 
@@ -221,7 +221,7 @@ sub populateData
 	foreach my $idx (0..$totalProcs-1)
 	{
 		#NOTE: data_num_b indicates that the line item was suppressed
-		my $line = $idx + 1;			
+		my $line = $idx + 1;
 		$page->param("_f_item_$line\_suppress", $procedures->[$idx]->{data_num_b});
 	}
 }
@@ -343,7 +343,7 @@ sub execute
 	{
 		$newStatus = $paidBy eq 'insurance' ? App::Universal::INVOICESTATUS_PAYAPPLIED : $invoice->{invoice_status};
 	}
-	
+
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
@@ -373,12 +373,14 @@ sub execute
 	{
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
+
+	$self->handlePostExecute($page, $command, $flags);
 }
 
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	my $paidBy = $page->param('paidBy');
 	if($paidBy eq 'insurance')
 	{
