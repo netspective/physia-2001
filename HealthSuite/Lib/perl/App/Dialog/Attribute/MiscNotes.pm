@@ -76,6 +76,8 @@ sub execute
 		value_date => $page->field('value_date') || undef,
 		_debug => 0
 	);
+
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
