@@ -265,6 +265,11 @@ sub isValid
 					$page->param("_f_proc_$line\_charges", $unitCost);
 				}
 			}
+			else
+			{
+				my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
+				$self->invalidate($page, $html);
+			}
 		}
 		elsif($charges eq '' && ($feeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
 		{
@@ -287,6 +292,24 @@ sub isValid
 	}
 
 	return @errors || $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub getMultiPricesHtml
+{
+	my ($self, $page, $line, $fsResults) = @_;
+
+	my $html = qq{[<B>P$line</B>] Multiple prices found.  Please select a charge for this line item.};
+	
+	foreach (@$fsResults)
+	{
+		my $entry = $_->[1];
+		$html .= qq{
+			<input onClick="document.dialog._f_proc_$line\_charges.value=this.value" 
+				type=radio name='_f_multi_price' value=@{[$entry->{unit_cost}]}>$entry->{unit_cost}
+		};
+	}
+
+	return $html;
 }
 
 sub getHtml
