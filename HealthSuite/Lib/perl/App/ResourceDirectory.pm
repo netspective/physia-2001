@@ -25,6 +25,7 @@ use vars qw(@COMPONENT_CATALOG %PAGE_FLAGS %RESOURCES %RESOURCE_TYPES $ACCESS_CO
 use App::Statements::Component;
 use App::Statements::Component::Person;
 use App::Statements::Component::Org;
+use App::Statements::Component::Invoice;
 use App::Statements::Component::Scheduling;
 use App::Statements::Component::SDE;
 use App::Statements::Component::WorkList;
@@ -80,6 +81,7 @@ CGI::ImageManager::buildImageTags(\%IMAGE_TYPES);
 		$STMTMGR_COMPONENT_PERSON,
 		$STMTMGR_COMPONENT_SDE,
 		$STMTMGR_COMPONENT_ORG,
+		$STMTMGR_COMPONENT_INVOICE,
 		$STMTMGR_COMPONENT_WORKLIST,
 		$STMTMGR_PAGE,
 	);
