@@ -9,6 +9,7 @@ use App::Data::Obtain::Envoy::Payers;
 use App::Data::Obtain::Perse::Epayer;
 use App::Data::Obtain::RBRVS::RVU;
 use App::Data::Obtain::RBRVS::GPCI;
+use App::Data::Obtain::EPSDT::EPSDT;
 use App::Data::Obtain::TXgulf::FeeSchedules;
 
 use File::Path;
@@ -20,7 +21,7 @@ use File::Basename;
 use Date::Manip;
 
 $ENV{TZ} = 'EST' unless exists $ENV{TZ};
-my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'rvu' . UnixDate('today', '%y'));
+my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'epsdt', 'rvu' . UnixDate('today', '%y'));
 
 sub printUsage
 {
@@ -63,6 +64,7 @@ sub Main
 		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),
 		rvuFile => \@rvuFile,
 		dataSrcRTXgulfPath => File::Spec->catfile($dataSrcPath, 'TXgulf'),
+		dataSrcEPSDTPath => File::Spec->catfile($dataSrcPath,'EPSDT'),
 	};
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
@@ -72,8 +74,44 @@ sub Main
 	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);
 	importGPCIInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 	importRVUInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
-	
+	importEPSDTInfo($properties, transformDBI => 1) if grep(/epsdt/, @modules);	
 	importTXGULFfs($properties, transformDBI => 1) if grep(/tgcmgfs/, @modules);
+}
+
+sub importEPSDTInfo
+{
+
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::EPSDT::EPSDT;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "Starting\n";
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+						srcFile => File::Spec->catfile($properties->{dataSrcEPSDTPath}, 'EPSDT.xls'));
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from REF_EPSDT cascade//Delete from REF_EPSDT cascade.",
+			insertStmt => "insert into REF_EPSDT
+				(epsdt,name, description)
+			values (?,?, ?)",
+			verifyCountStmt => "select count(*) from REF_EPSDT",
+		);
+		$exporter->printErrors();
+	}
+
+
 }
 
 sub importRVUInfo
