@@ -277,8 +277,11 @@ sub getHtml
 					}
 					function onChange_procedure_$line(event, flags)
 					{
-						if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
-							document.$dialogName._f_proc_$line\_modifier.value = '';
+						if($command eq 'add')
+						{
+							if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
+								document.$dialogName._f_proc_$line\_modifier.value = '';
+						}
 					}
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
@@ -289,7 +292,7 @@ sub getHtml
 				<TD><NOBR><INPUT CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><NOBR><INPUT CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)"><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_cpt, '/lookup/cpt', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
-					<INPUT CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 ? 'Modf' : '') ]}'></TD>
+					<INPUT CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? 'Modf' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags")]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
