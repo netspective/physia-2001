@@ -150,6 +150,9 @@
 			This new view allows the sending/reading/forwarding/replying to user-to-user, and phone messages.
 			Added new message type for Refill Requests and it's associated dialog.  Also changed the Active Medications
 			component to look at the new data and give the ability to add medication, prescriptions, and refill requests.
+			Fixed a problem when the num refills is zero.
+			Made "Physician for Approval" required in Prescribe and Refill mode
+			Only allow editing start and end dates after medication has been approved
 		</deliverable>
 
 		<deliverable id="1359">
