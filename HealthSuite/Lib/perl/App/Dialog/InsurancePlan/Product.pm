@@ -247,12 +247,12 @@ sub execute
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
 
-	$self->handleAttributes($page, $command, $flags, $insIntId);
+	$self->handleAttributes($page, $command, $flags, $insIntId, $insOrgId);
 }
 
 sub handleAttributes
 {
-	my ($self, $page, $command, $flags, $insIntId) = @_;
+	my ($self, $page, $command, $flags, $insIntId, $orgId) = @_;
 
 	$page->schemaAction(
 			'Insurance_Address', $command,
@@ -314,7 +314,7 @@ sub handleAttributes
 		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',
 			$page->session('org_internal_id'),$fee,$FS_CATALOG_TYPE);
 		$page->schemaAction(
-			'Insurance_Attribute', 'add',
+		'Insurance_Attribute', 'add',
 			item_id => $page->field('fee_item_id') || undef,
 			parent_id => $insIntId || undef,
 			item_name => 'Fee Schedule' || undef,
@@ -325,8 +325,9 @@ sub handleAttributes
 	}
 
 	#$page->param('_dialogreturnurl', "/search/insproduct");
+	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 	$self->handlePostExecute($page, $command, $flags);
-	return '';
+	#return '';
 }
 
 1;
