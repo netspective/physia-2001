@@ -2,6 +2,9 @@
 
 use strict;
 use Date::Manip;
+use Dumpvalue;
+
+use CommonUtils;
 use OrgList;
 
 # Config Params
@@ -21,9 +24,13 @@ my $SCRIPTDIR = '$HOME/projects/HealthSuite/Scripts/Per-Se';
 # ----------------------------------------------------------
 
 my %billId = (
-	2   => 'phy169',
+	2 => 'phy169',
 );
+
 my $now = UnixDate('today', '%Y-%m-%d_%H-%M');
+
+my ($page, $sqlPlusKey) = CommonUtils::connectDB();
+OrgList::buildOrgList($page);
 
 sub archiveFiles
 {

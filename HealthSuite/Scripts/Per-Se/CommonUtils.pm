@@ -1,3 +1,6 @@
+##############################################################################
+package CommonUtils;
+##############################################################################
 
 use strict;
 
@@ -19,7 +22,7 @@ sub connectDB
 	my $page = new App::Data::MDL::Module();
 	$page->{schema} = undef;
 	$page->{schemaFlags} = SCHEMAAPIFLAG_LOGSQL | SCHEMAAPIFLAG_EXECSQL;
-	
+
 	if($CONFDATA_SERVER->db_ConnectKey() && $CONFDATA_SERVER->file_SchemaDefn())
 	{
 		my $schemaFile = $CONFDATA_SERVER->file_SchemaDefn();
@@ -34,7 +37,7 @@ sub connectDB
 
 		my $sqlPlusKey = $connectKey;
 		$sqlPlusKey =~ s/dbi:Oracle://;
-		
+
 		return ($page, $sqlPlusKey);
 	}
 	else
@@ -46,7 +49,7 @@ sub connectDB
 sub findSubmittedClaims
 {
 	my ($page, $orgInternalId, $providerId) = @_;
-	
+
 	if ($providerId)
 	{
 		return $STMTMGR_STATEMENTS->getSingleValueList($page, STMTMGRFLAG_NONE,

@@ -2,6 +2,7 @@
 
 use strict;
 use Date::Manip;
+use Getopt::Long;
 
 use App::Universal;
 use App::Configuration;
@@ -34,34 +35,25 @@ my $now = UnixDate('today', '%m%d%Y_%H%M');
 
 sub createNSFfiles
 {
-	my ($page, @ARGV) = @_;
-	
-	my @orgsToDo = ();
-	foreach (@ARGV)
-	{
-		push(@orgsToDo, $_) unless /create|transmit|archive/;
-	}
-	
-	@orgsToDo = sort {$a <=> $b} keys %orgList unless @orgsToDo;
-	print "Orgs To Do = @orgsToDo \n";
+	my ($page, @orgsToDo) = @_;
 
 	for my $orgKey (@orgsToDo)
 	{
 		my $providerID;
 		my $orgInternalId = $orgKey;
-		
+
 		if ($orgKey =~ /(.*?)\..*/)
 		{
 			$providerID = $orgList{$orgKey}->{providerId};
 			$orgInternalId = $1;
 		}
 		my $nsfType = $orgList{$orgKey}->{nsfType};
-		my $claims = findSubmittedClaims($page, $orgInternalId, $providerID);
-		
+		my $claims = CommonUtils::findSubmittedClaims($page, $orgInternalId, $providerID);
+
 		eval{
 			createNSFfile($page, $orgKey, $nsfType, $claims) if defined $claims;
 		};
-		
+
 		print "ERROR encountered while creating NSF for Org $orgKey:\n$@\n" if $@;
 	}
 }
@@ -83,7 +75,7 @@ sub createNSFfile
 	my @outArray = ();
 	my $output = new App::Billing::Output::NSF();
 	my $outResult = $output->processClaims(
-		destination => NSFDEST_FILE,
+		destination => CommonUtils::NSFDEST_FILE,
 		outArray => \@outArray,
 		outFile => $nsfFile,
 		claimList => $claimList,
@@ -105,7 +97,7 @@ sub transmitNSFfiles
 	};
 
 	my @nsfFiles = ();
-	
+
 	opendir(DIR, ".") || die "Can't opendir .: $!\n";
   for my $file (readdir(DIR))
   {
@@ -120,7 +112,7 @@ sub transmitNSFfiles
 		print "No '.nsf' file found to transmit -- " . `date`;
 		return;
 	}
-	
+
 	$ftpCommands .= qq{dir
 		bye
 	!!!
@@ -166,16 +158,25 @@ sub archiveNSFfiles
 # main
 ########
 
-my $forceConfig = shift || die "\nUsage: $0 <db-connect-key>\n";
-$CONFDATA_SERVER = $App::Configuration::AVAIL_CONFIGS{$forceConfig};
-my ($page, $sqlPlusKey) = connectDB();
+my ($db, $orgs, $actions);
+GetOptions ('db=s', \$db, 'orgs=s', \$orgs, 'actions=s', \$actions);
+$CONFDATA_SERVER = $App::Configuration::AVAIL_CONFIGS{$db};
+my ($page, $sqlPlusKey) = CommonUtils::connectDB();
 
-my @whatToDo = @ARGV ? @ARGV : ('create');
+OrgList::buildOrgList($page);
+
+my @orgsToDo = split(/\s*,\s*/, $orgs);
+@orgsToDo = sort keys %orgList unless @orgsToDo;
+print "Orgs To Do = @orgsToDo \n";
+
+my @whatToDo = split(/\s*,\s*/, $actions);
+@whatToDo = ('create') unless @whatToDo;
+print "What To Do = @whatToDo \n";
 
 print "\n-------------------------------\n";
 print `date`;
 print "-------------------------------\n";
 
-createNSFfiles($page, @ARGV) if grep (/create/, @whatToDo);
+createNSFfiles($page, @orgsToDo) if grep(/create/, @whatToDo);
 transmitNSFfiles($sqlPlusKey) if grep(/transmit/, @whatToDo);
 archiveNSFfiles() if grep(/archive/, @whatToDo);

@@ -205,6 +205,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
 			<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
 			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
+			<<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
 			<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
 			<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
 			<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
@@ -214,6 +215,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
 			<OPTION value="/person/$personId/dlg-remove-category?home=$homeArl">Remove Login</OPTION>
 			<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
+
 		</SELECT>} if $self->param('_pm_view');
 
 	push(@{$self->{page_content_header}},
@@ -260,7 +262,7 @@ sub handleARL
 
 	#$pathItems->[0] = uc($pathItems->[0]);
 	#$self->param('person_id', $pathItems->[0]);
-	
+
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	#if($pathItems->[0] eq 'SZSMTIH' && $pathItems->[1] eq 'chart' && $CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO )
 	#{
