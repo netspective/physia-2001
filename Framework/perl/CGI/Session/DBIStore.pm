@@ -32,6 +32,7 @@ sub connection
     $self->{dbh} = $dbh;
     $self->{disconnectdbh} = 0;
     $dbh->{LongReadLen} = 8192;
+    $dbh->trace(1);
 
     return $dbh;
 }
