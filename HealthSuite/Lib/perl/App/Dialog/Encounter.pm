@@ -895,7 +895,7 @@ sub handlePayers
 		else
 		{
 			my @nonInsPayer = split('\(', $payer);
-			if($nonInsPayer[0] eq 'Primary')
+			if($nonInsPayer[0] eq 'Primary' || $nonInsPayer[0] eq 'Secondary' || $nonInsPayer[0] eq 'Tertiary' || $nonInsPayer[0] eq 'Quaternary')
 			{
 				my @primaryPlan = split('\)', $nonInsPayer[1]);
 				my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
