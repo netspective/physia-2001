@@ -151,6 +151,18 @@ sub initialize
 			]),
 	);
 
+	$self->addPostHtml(qq{
+		<script language="JavaScript1.2">
+			if (opObj = eval('document.dialog._f_product_select'))
+			{
+				if (opObj.selectedIndex == 1)
+				{
+					setIdDisplay("products",'none');
+				}
+			}
+		</script>
+	});
+
 	return $self;
 }
 
@@ -163,25 +175,6 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
-
-	my $userId =  $page->session('user_id');
-	my $sessOrgId = $page->session('org_internal_id');
-	my $itemNamePrefix = $page->property('itemNamePrefix');
-	
-	#Check if the all products option was selected if so get all products move to list
-	#if so hide the product list box
-	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'sel_worklist_all_products', $userId, $sessOrgId, $itemNamePrefix . '-Product');
-		
-	if($productsAll->{value_int} == -1)
-	{
-		$self->addPostHtml(
-	       	qq{
-			<script language="JavaScript1.2">	
-			setIdDisplay("products",'none');
-			</script>
-		});
-	}
 }
 
 ###############################
@@ -211,17 +204,10 @@ sub populateData
 	#Check if the all products option was selected if so get all products move to list
 	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId, $itemNamePrefix . '-Product');
+
 	if($productsAll->{value_int} == -1)
 	{
 		$page->field('product_select', 1);
-		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-			STMTMGRFLAG_NONE, 'sel_worklist_available_products',  $sessOrgId);
-		my @products = ();
-		for (@$productsList)
-		{
-			#push(@products, $_->{product_id});
-		}
-		$page->field('products', @products);		
 	}
 	else
 	{
