@@ -676,7 +676,16 @@ sub select_as_html
 				my $selected = $_->[0] ? 'selected' : '';
 				$options .= qq{<option value="$_->[2]" $selected>$_->[1]</option>\n};
 			}
-			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<select name="$fieldName" size="$self->{size}" $JS $multiple>\n$options</select>\n});
+			my $caption = '';
+			if ($self->{flags} & FLDFLAG_INLINECAPTION)
+			{
+				$caption = $self->{caption};
+				$caption = "<b>$caption</b> " if $self->{flags} & FLDFLAG_REQUIRED;
+				$caption = "<NOBR>$caption</NOBR> " if $self->{flags} & FLDFLAG_NOBRCAPTION;
+				#$caption = '<span style="">' . $caption . '&nbsp;</span>';
+			}
+			
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{$caption<select name="$fieldName" size="$self->{size}" $JS $multiple>\n$options</select>\n});
 		}
 	}
 
