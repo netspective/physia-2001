@@ -68,6 +68,8 @@ sub isValid
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
 	my $value = $page->field($self->{name});
 
+	return unless $value;
+	
 	$self->invalidate($page, qq{$self->{caption} '$value' does not exist for this Org.}) 
 		unless $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 
 			'sel_internalCatId_orgId', $value, $page->session('org_id'));
