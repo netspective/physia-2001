@@ -67,7 +67,6 @@ sub new
 		options => FLDFLAG_REQUIRED,
 		size => 32,
 		maxLength => 64,
-		useShortForm => 1,
 		incSimpleName => 1,
 	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
