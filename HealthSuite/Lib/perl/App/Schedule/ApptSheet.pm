@@ -555,9 +555,8 @@ sub getAppointments
 			$title .= "$slots[$i]->{attributes}->{conflict}\n";
 
 			$title .= "Patient Type:  $slots[$i]->{attributes}->{patient_type}\n";
-			$title .= "Subject:  $slots[$i]->{attributes}->{subject}\n";
-			$title .= "Reason for Visit:  $slots[$i]->{attributes}->{event_type}\n";
-			$title .= "Remarks:  $slots[$i]->{attributes}->{remarks}\n";
+			$title .= "Reason for Visit:  $slots[$i]->{attributes}->{subject}\n";
+			$title .= "Symptoms:  $slots[$i]->{attributes}->{remarks}\n";
 			$title .= "$slots[$i]->{attributes}->{status}: ";
 			$title .= " $slots[$i]->{attributes}->{checkinout_stamp}";
 
