@@ -118,8 +118,8 @@ sub new
 			new CGI::Dialog::Subhead(heading => 'Coverage Information', name => 'coverage_heading'),
 			new CGI::Dialog::MultiField (caption => 'Coverage Begin/End Dates',	name => 'dates',
 					fields => [
-								new CGI::Dialog::Field(caption => 'Begin Date', name => 'coverage_begin_date', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1),
-								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', futureOnly => 1),
+								new CGI::Dialog::Field(caption => 'Begin Date', name => 'coverage_begin_date', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1, defaultValue => ''),
+								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', futureOnly => 1, defaultValue => ''),
 							]),
 
 			new CGI::Dialog::MultiField(caption =>'Deductible Amounts', hints => 'Individual/Family', name => 'deduct_amts',
@@ -268,7 +268,7 @@ sub customValidate
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
 	my $seq =1;
 	#$page->addDebugStmt("INS : $seq");
-	if ($sequence < 4)
+	if ($sequence <= 4)
 	{
 		for($seq =1; $seq < $sequence; $seq++)
 		{
@@ -276,9 +276,11 @@ sub customValidate
 			my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
 			#$page->addDebugStmt("INS : $previousInsExists, $seq");
 			my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
-			$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if $previousInsExists != 1;
-
+			$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if ($previousInsExists != 1);
 		}
+
+		my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
+		$billSeq->invalidate($page, "'$coverageCaptionInc Insurance' cannot be replaced with '$coverageCaption Insurance' because '$coverageCaptionInc Insurance' should exist for '$personId' inorder to add '$coverageCaption Insurance'. ") if ( $sequence > $previousSequence);
 	}
 
 
