@@ -253,17 +253,13 @@ sub customValidate
 	my $previousSequence = $page->field('bill_seq_hidden');
 
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
-	$page->addDebugStmt("HIDDEN EXISTS: $previousSequence");
 	my $sequence = $page->field('bill_sequence');
-	$page->addDebugStmt("REC EXISTS: $sequence");
+
 	if ($sequence == 99)
 	{
-
 		do
 		{
 			$previousSequence ++;
-			$page->addDebugStmt("REC EXISTS: $previousSequence");
-
 			if($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence))
 			{
 				$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
@@ -296,7 +292,6 @@ sub populateData_add
 		my $hiddenBillSeq = $page->field('bill_sequence');
 		if($hiddenBillSeq ne  '')
 		{
-			$page->addDebugStmt("HIDDEN SEQ : $hiddenBillSeq");
 			$page->field('bill_sequence', $hiddenBillSeq);
 		}
 		else
