@@ -189,13 +189,11 @@ sub new
 		new CGI::Dialog::MultiField(caption=>'Referral Status',name=>"inactive_fields",
 			fields=>[
 				new CGI::Dialog::Field(type => 'select',
-					style => 'select',
-					fKeyStmtMgr => $STMTMGR_REFERRAL_PPMS,
-					fKeyStmt => 'selReferralStatus',
-					fKeyDisplayCol => 1,
-					fKeyValueCol => 0,
-					caption => 'Referral Status',
+					style => 'radio',
+					caption => 'Make Inactive',
 					name => 'referral_status',
+					selOptions => 'Active:0;Inactive:1',
+					defaultValue => 0
 				),
 				new CGI::Dialog::Field(caption => 'Date ',
 					name => 'referral_status_date',
@@ -296,9 +294,6 @@ sub createPayerDropDown
 		push(@insurPlans, "@tempInsurPlans:@insurIntIds");
 	}
 
-	#get Fee Schedules for Insurance and Work Comps Plan
-#	getFS($self,$page,@planIds);
-
 	#create payer drop down
 	my @payerList = ();
 
@@ -333,7 +328,7 @@ sub makeStateChanges
 
 	#keep third party other invisible unless it is chosen (see customValidate)
 #	$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
-#	$self->setFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
+	$self->setFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
 
 	#Set patient_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id'))
@@ -355,7 +350,7 @@ sub customValidate
 
 	my $oldPersonId = $page->field('old_person_id');
 	my $personId = $page->field('patient_id');
-	if($personId ne $oldPersonId) # && $oldPersonId ne '')
+	if($personId ne $oldPersonId && $oldPersonId ne '')
 	{
 		my $payerField = $self->getField('payer');
 		$payerField->invalidate($page, 'Please choose payer for Patient ID.');
@@ -416,7 +411,7 @@ sub populateData_update
 #	{
 #		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
 #		{
-			createPayerDropDown($self, $page, $command, $activeExecMode, $flags,  $page->field('patient_id'));
+			createPayerDropDown($self, $page, $command, $activeExecMode, $flags,  $page->param('person_id'));
 #		}
 #		$page->field('old_person_id', $personId);
 #	}
