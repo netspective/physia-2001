@@ -710,7 +710,7 @@ sub getItemsHtml
 						@rows
 						<TR BGCOLOR=DDEEEE>
 							<TD COLSPAN=3><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
-							<!-- <TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD> -->							
+							<!-- <TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD> -->
 							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green"><B>$invoiceTotal</B></TD>
@@ -1054,7 +1054,7 @@ sub prepare_view_summary
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
 	my $provider = $self->getPersonHtml($claim->{renderingProvider});
 	my $service = $self->getOrgHtml($claim->{renderingOrganization});
-	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{policyGroupName});
+	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{insurancePlanOrProgramName});
 	my $invStatus = $claim->getStatus();
 	my $invType = $claim->getInvoiceType();
 	my $claimType = $claim->getInvoiceSubtype();
@@ -1580,7 +1580,7 @@ sub prepare_page_content_header
 	}
 	else
 	{
-		$chooseActionMenu = 
+		$chooseActionMenu =
 		qq{
 			<FORM>
 				<TD COLSPAN=1><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD>
@@ -1609,7 +1609,7 @@ sub prepare_page_content_header
 					</SELECT>
 					</FONT>
 				<TD>
-			</FORM>		
+			</FORM>
 		};
 	}
 
