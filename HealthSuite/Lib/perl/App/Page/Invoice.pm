@@ -658,7 +658,11 @@ sub getProceduresHtml
 	{
 		$icdCaption .= "$diag: ";
 		my $icdInfo = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericICDCode', $diag);
-		$icdCaption .= $icdInfo->{descr};
+		
+		my $icdDescr = $icdInfo->{descr};
+		$icdDescr =~ s/\'/&quot;/g;
+		$icdCaption .= $icdDescr;
+		#$icdCaption .= $icdInfo->{descr};
 		$icdCaption .= "\n";
 	}
 
