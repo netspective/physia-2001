@@ -75,7 +75,7 @@ sub isValid
 	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 	my $insurance = undef;
 	my $plan_id;
-	my $product_id;	
+	my $product_id=undef;	
 	my $list=undef;
 	my @insFeeSchedules = ();
 	my @usedFS=();
@@ -120,9 +120,11 @@ sub isValid
 		$product_id = $product_info->{'ins_internal_id'};		
 	}
 	
+	my $care = $page->field('care_provider_id')||undef;
+	my $fac = $page->field('service_facility_id')||undef;
 	#Get Fee Schedule for the Insurance, Physician, and Org (Location)
 	my $getFeeScheds = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
-		'selFSHierarchy', $page->field('care_provider_id'),$page->field('service_facility_id'),$plan_id,$product_id);
+		'selFSHierarchy', $care,$fac ,$plan_id,$product_id);
 
 	#Put Fee Schedules into an Insurance array
 	my $order=$getFeeScheds->[0]->{'fs_order'} if $getFeeScheds->[0]->{'fs_order'} ;
