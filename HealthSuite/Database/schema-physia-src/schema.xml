@@ -268,7 +268,7 @@
 		<column name="invoice_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice"/>
 		<column name="parent_invoice_id" selfref="Invoice.invoice_id" descr="Any parent invoice that this invoice may belong to (as a child)"/>
 		<column name="invoice_number" type="text" size="32" descr="The owner's specific invoice number (their format)"/>
-		<column name="invoice_status" lookupref="Invoice_Status" descr="The current status of the invoice"/>
+		<column name="invoice_status" indexed="yes" lookupref="Invoice_Status" descr="The current status of the invoice"/>
 		<column name="invoice_type" lookupref="Invoice_Type" descr="The type of invoice"/>
 		<column name="invoice_subtype" type="integer" descr="The subtype of invoice (depending upon the type)"/>
 		<column name="invoice_date" type="date" required="yes" descr="The date the invoice was created"/>
