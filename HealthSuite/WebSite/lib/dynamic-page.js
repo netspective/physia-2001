@@ -262,14 +262,10 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		var _parentPrefix = fieldDefnId.replace (/\/{1}/g, '.');
 		_parentPrefix = _parentPrefix.replace (/\.?[\w\-]+$/, '');
 		
-		if (__nodebug == false && __debug == true) {
-			__debug = confirm ('createFieldHtml...\n_parentPrefix = ' + _parentPrefix);
-		}
-		
 		parentPrefix = (parentPrefix && parentPrefix != '' ? parentPrefix : _parentPrefix);
 
 		if (__nodebug == false && __debug == true) {
-			__debug = confirm ('createFieldHtml...\nparentPrefix = ' + parentPrefix);
+			__debug = confirm ('createFieldHtml...\n_parentPrefix = ' + _parentPrefix + '\nparentPrefix = ' + parentPrefix);
 		}
 		
 	}
@@ -281,10 +277,9 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 
 	var html = '';
 	var sectionName = 'section' + level;
-	var sectionId = sectionName + '_' + count;
+//	var sectionId = sectionName + '_' + count;
 	var fieldNodeId = fieldNode.getAttribute('id');
-//	var _parentPrefix = getFQNameById(fieldNodeId)	
-//	alert ('Creating Field ' + fieldNodeId + ' (' + fieldNode.getAttribute('type') + ')\nparent = ' + parent + '\nparentPrefix = ' + parentPrefix);
+	var sectionId = (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId;
 	
 	if(fieldType == 'container' || fieldType == 'grid')
 	{
@@ -299,7 +294,12 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 			for (var i = 0; i < fieldCount; i++)
 			{
 				var childFieldDefn = fieldNode.childNodes[i];
-				contentsHtml += createFieldHtml(childFieldDefn, level+1, i, fieldNode, (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId);
+				var controlHtml = createFieldHtml(childFieldDefn, level+1, i, fieldNode, (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId);
+				contentsHtml += controlHtml;
+				
+				if (__nodebug == false && __debug == true) {
+					__debug = confirm ('createFieldHtml...\nsectionId = ' + sectionId + '\nsectLevel = ' + level + '\n\ncontrolHtml = [' + controlHtml.length + '] ' + controlHtml);
+				}
 			}
 			var normalsGroup = fieldGroupNormalsMap[fieldNode.getAttribute('id')];
 			if(normalsGroup != null)
@@ -315,6 +315,9 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 			contentsHtml = prepareFieldHtml_grid(fieldNode, level, count, parent, parentPrefix);
 		}
 		
+		if (__nodebug == false && __debug == true) {
+			__debug = confirm ('createFieldHtml...\nsectionId = ' + sectionId + '\nsectLevel = ' + level + '\n\ncontentsHtml = [' + contentsHtml.length + '] ' + contentsHtml);
+		}
 		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">\n';
 		html += '\t<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
 		html += '\t<div id="'+ sectionId +'_body" class="section_body" sectLevel="'+level+'" style="display:none">\n';
@@ -360,8 +363,8 @@ function prepareFieldHtml_static(fieldNode, level, count, namePrefix, style)
 
 function prepareFieldHtml_caption(fieldNode, level, count, namePrefix, style)
 {
-	var sectionName = 'section' + level;
-	var sectionId = sectionName + '_' + count;
+//	var sectionName = 'section' + level;
+//	var sectionId = sectionName + '_' + count;
 	return '<span '+ style +' id="'+ namePrefix +'_label" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="section_field_label">'+fieldNode.getAttribute('caption')+':</span>';
 }
 
@@ -372,20 +375,21 @@ function createGridFieldHtml(fieldNode)
 
 function addGridRow(theTable, level, count, parent, namePrefix) {
 	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
-	var tableName = theTable.getAttribute ('id');
+	var tableObject = document.all[theTable];
+	var tableName = theTable;
 	var matches = tableName.match (/table_(.+)/i);
 	var gridName = matches [1];
 	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
-	var gridFieldNode = getFieldById (gridName);
+	var gridXMLName = gridName.replace (/\./g, '/');
+	var gridFieldNode = getFieldById (gridXMLName);
 	var gridId = gridFieldNode.getAttribute ('id');
 
-	var theRow = theTable.insertRow ();
-	var cellData = prepareFieldHtml_gridrowArray (gridFieldNode, level, count, parent, namePrefix);
+	var theRow = tableObject.insertRow ();
+	var cellData = prepareFieldHtml_gridrowArray (gridFieldNode, level, count, parent, gridName);
 	
 	for (var i = 0; i < cellData.length; i ++) {
 		var theCell = theRow.insertCell ();
 		theCell.innerHTML = cellData [i];
-//		theRow.cells [i].class = 'section_field_grid_data';
 	}
 }
 
@@ -430,11 +434,15 @@ function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 		__debug = confirm ('id = ' + fieldNodeId + ' (' + fieldType + ')\nnamePrefix = ' + namePrefix);
 	}
 
+	var rowCount = fieldNode.getAttribute('rows');
 	var fieldCount = fieldNode.childNodes.length;
 	var headRow = '';
 	var dataRowPrototype = '';
 	var parentPrefix = (namePrefix ? namePrefix + '.' : '') + fieldNode.getAttribute('id');
 	var tableName = 'table_' + parentPrefix;
+	
+	if (!rowCount || rowCount == '')
+		rowCount = 1;
 
 	if (__nodebug == false) __debug = confirm ('prepareFieldHtml_grid...\nid = ' + fieldNodeId + ' (' + fieldType + ')\nnamePrefix = ' + namePrefix + '\nparentPrefix = ' + parentPrefix + '\ntableName = ' + tableName);
 	
@@ -444,10 +452,26 @@ function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 		headRow += '<td class="section_field_grid_head">'+childFieldDefn.getAttribute('caption')+'</td>';
 		dataRowPrototype += '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn, level + 1, count, parent, parentPrefix)+'</td>';
 	}
-	headRow += '<td class="section_field_grid_add" onClick="addGridRow(' + tableName + ')">Add...</td>';
+	headRow += '<td class="section_field_grid_add" onClick="addGridRow(\'' + tableName + '\')">Add...</td>';
 	headRow = '<tr>' + headRow + '</tr>';
 	dataRowPrototype = '<tr>' + dataRowPrototype + '</tr>';
-	return '<table id="' + tableName + '" class="section_field_grid">'+headRow+dataRowPrototype+'</table>';
+	var html = '<table id="' + tableName + '" class="section_field_grid">'+headRow+dataRowPrototype;
+
+	for (var row = 1; row < rowCount; row ++) {
+		if (__nodebug == false) __debug = confirm ('adding row #' + rowCount);
+		var theDataRow = "";
+		for (var i = 0; i < fieldCount; i++)
+		{
+			var childFieldDefn = fieldNode.childNodes[i];
+			theDataRow = '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn, level + 1, count, parent, parentPrefix)+'</td>';
+		}
+		
+		theDataRow = '<tr>' + theDataRow + '</tr>';
+		html += theDataRow;
+	}
+
+	html += '</table>';
+	return html;
 }
 
 function prepareFieldHtml_composite(fieldNode, level, count, parent, namePrefix)
@@ -484,8 +508,8 @@ function prepareFieldHtml_composite(fieldNode, level, count, parent, namePrefix)
 
 function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 {
-	var sectionName = 'section' + level;
-	var sectionId = sectionName + '_' + count;
+//	var sectionName = 'section' + level;
+//	var sectionId = sectionName + '_' + count;
 	
 	var fieldHtml = '';
 	var addLabelStyle = '';
@@ -565,8 +589,8 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 
 function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
 {
-	var sectionName = 'section' + level;
-	var sectionId = sectionName + '_' + count;
+//	var sectionName = 'section' + level;
+//	var sectionId = sectionName + '_' + count;
 	var parentNode = fieldNode.parentNode;
 	var parentNodeName = parentNode.getAttribute('id');
 	var parentNodeType = parentNode.getAttribute('type');
@@ -647,6 +671,8 @@ function chooseSection(sectId, toggle)
 	var sectionIconsElem = document.all.item(sectId + '_icons');
 	if(toggle == null || toggle == true)
 	{
+//		__debug = confirm ('sectionBodyElem = ' + sectionBodyElem + ' [' + sectionBodyElem.length + ']\nsectionBodyElem.style = ' + sectionBodyElem.style + '\nsectionBodyElem.display = ' + sectionBodyElem.display + '\nsectId = ' + sectId + '\ntoggle = ' + toggle);
+
 		if(sectionBodyElem.style.display == 'none')
 		{
 			sectionIconsElem.innerHTML = '<img src="/resources/images/icons/minus.gif"> ';
