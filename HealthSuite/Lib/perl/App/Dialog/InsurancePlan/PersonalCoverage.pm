@@ -213,26 +213,26 @@ sub makeStateChanges
 	my $sequence = $page->field('bill_sequence');
 	#if ($sequence eq 99)
 	#{
-	#	my $checkSeq = 1;
-	#	for($checkSeq = 1; $checkSeq <=3; $checkSeq ++)
-	#	{
+		my $checkSeq = 1;
+		#for($checkSeq = 1; $checkSeq <=3; $checkSeq ++)
+		#{
 
-	#		my $doesBillSeqExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $checkSeq);
+		#	my $doesBillSeqExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $checkSeq);
+		#	$page->addDebugStmt("REC EXISTS: $doesBillSeqExists");
 
+			#if($doesBillSeqExists eq '')
+			#{
+			#	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+			#	my $createInsCoverageHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousBillSequence');";
+			#	$self->invalidate($page, Do u want to Inactivate the other low level Insurance Coverages? If so check the box <br><a href="$createInsCoverageHref">Or Click Here to add another Insurance Coverage of the same bill sequence</a>);
 
-	#		if($doesBillSeqExists eq '')
-	#		{
-	#			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
-	#			my $createInsCoverageHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousBillSequence');";
-	#			$self->invalidate($page, Do u want to Inactivate the other low level Insurance Coverages? If so check the box <br><a href="$createInsCoverageHref">Or Click Here to add another Insurance Coverage of the same bill sequence</a>);
+			#	if($page->field(create_record, 1))
+			#	{
+			#		$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $checkSeq);
+			#	}
 
-	#			if($page->field(create_record, 1))
-	#			{
-	#				$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $checkSeq);
-	#			}
-#
-	#		}
-	#	}
+			#}
+		#}
 	#}
 
 }
