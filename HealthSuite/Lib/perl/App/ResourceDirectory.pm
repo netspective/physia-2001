@@ -642,6 +642,7 @@ $WORKLIST_CLASSES = {
 	'referral-auth' => {_class => 'App::Dialog::Transaction::ReferralWorkFlow::ReferralAuthorization', transId => ['parent_trans_id'], heading => 'Add Referral Authorization', _arl => ['person_id'], _arl_add => ['parent_trans_id'], _idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION()},
 
 	'eligibility' => {_class => 'App::Dialog::Eligibility', heading => '$Command Eligibility', _arl => ['org_id']},
+	'eligibilitypatient' => {_class => 'App::Dialog::EligibilityPatient', heading => '$Command Eligibility', _arl => ['org_id', 'product_name']},
 
 );
 
