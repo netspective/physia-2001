@@ -216,7 +216,11 @@ sub new
 			{
 				if (scalar(@$types) > 1)
 				{
-					if (! grep { $_ eq 'Patient'} @$types)
+					if((! grep { $_ eq 'Patient'} @$types) && (grep { $_ eq 'Physician'} @$types) && (grep { $_ eq 'Referring-Doctor'} @$types))
+					{
+						$lookupType = 'physician-ref';
+					}
+					elsif (! grep { $_ eq 'Patient'} @$types)
 					{
 						$lookupType = 'associate';
 					}
@@ -390,7 +394,11 @@ sub new
 			{
 				if (scalar(@$types) > 1)
 				{
-					if (! grep { $_ eq 'Patient'} @$types)
+					if((! grep { $_ eq 'Patient'} @$types) && (grep { $_ eq 'Physician'} @$types) && (grep { $_ eq 'Referring-Doctor'} @$types))
+					{
+						$lookupType = 'physician-ref';
+					}
+					elsif (! grep { $_ eq 'Patient'} @$types)
 					{
 						$lookupType = 'associate';
 					}
