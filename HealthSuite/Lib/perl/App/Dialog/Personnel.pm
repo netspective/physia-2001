@@ -16,9 +16,15 @@ use App::Statements::Org;
 use App::Statements::Person;
 
 use App::Universal;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'personnel' => {
+		heading => '$Command Personnel', 
+		_arl => ['person_id']
+	},
+);
 
 sub new
 {

@@ -20,10 +20,18 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'feescheduleentry' => {
+			heading => '$Command Fee Schedule Entry', 
+			_arl => ['feeschedules'], 
+			_arl_modify => ['feeschedules'], 
+			_idSynonym => 'FeeScheduleEntry'
+		},	
+);
 
 sub new
 {

@@ -20,9 +20,9 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
-
+%RESOURCE_MAP = ();
 
 sub initialize
 {

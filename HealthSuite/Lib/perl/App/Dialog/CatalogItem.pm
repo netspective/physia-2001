@@ -15,6 +15,14 @@ use App::Dialog::Field::Catalog;
 use Date::Manip;
 
 use base 'CGI::Dialog';
+use vars qw(%RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'catalog-item' => {
+		_arl_add => ['catalog_id', 'parent_entry_id'],
+		_arl_modify => ['entry_id']
+	},
+);
 
 sub new
 {

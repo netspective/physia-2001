@@ -17,9 +17,13 @@ use App::Dialog::Field::Invoice;
 use App::Dialog::Field::Organization;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'invoice' => {},
+);
 
 sub new
 {

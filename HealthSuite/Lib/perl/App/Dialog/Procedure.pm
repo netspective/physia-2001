@@ -17,9 +17,13 @@ use CGI::Validator::Field;
 use App::Universal;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'procedure' => {},
+);
 
 sub new
 {

@@ -16,9 +16,16 @@ use App::Statements::Org;
 use App::Statements::Person;
 
 use App::Universal;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'password' => {
+		_arl_add => ['person_id', 'org_id'],
+		_arl_modify => ['person_id', 'org_id'],
+		heading => '$Command Password'
+	},
+);
 
 sub initialize
 {

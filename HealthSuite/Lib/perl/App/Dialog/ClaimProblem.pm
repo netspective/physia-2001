@@ -11,9 +11,12 @@ use CGI::Validator::Field;
 use App::Universal;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+%RESOURCE_MAP = (
+	'claim-problem' => {},	
+);
 
 sub new
 {
@@ -65,14 +68,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 
 }
-
-use constant CLAIMPROBLEM_DIALOG => 'Dialog/ClaimProblem';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/10/2000', 'MAF',
-		CLAIMPROBLEM_DIALOG,
-		'Created new dialog for reporting problems with claims.'],
-);
 
 1;

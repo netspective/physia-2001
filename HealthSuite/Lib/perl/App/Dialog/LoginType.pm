@@ -7,13 +7,20 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use vars qw(@ISA);
 
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
 
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP  = (
+	'loginType' => {
+		heading => 'Change Login Type', 
+		_arl => ['person_id'],
+	},
+);
 
 sub new
 {
@@ -47,7 +54,5 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 }
-
-
 
 1;

@@ -19,6 +19,13 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'template' => {
+		_arl_modify => ['template_id'], 
+		_arl_add => ['resource_id', 'facility_id'],
+	},
+);
+
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'template', heading => '$Command Template');
@@ -242,13 +249,5 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-%RESOURCE_MAP = (
-	'template' => {
-		_class => 'App::Dialog::Template', 
-		_arl_modify => ['template_id'], 
-		_arl_add => ['resource_id', 'facility_id'],
-	},
-);
 
 1;

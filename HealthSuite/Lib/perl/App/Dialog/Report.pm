@@ -6,7 +6,8 @@ use strict;
 use Carp;
 use CGI::Dialog;
 use App::Universal;
-use vars qw(@ISA %DIRECTORY);
+use vars qw(@ISA %DIRECTORY %RESOURCE_MAP);
+%RESOURCE_MAP = ();
 
 @ISA = qw(CGI::Dialog);
 %DIRECTORY = ();

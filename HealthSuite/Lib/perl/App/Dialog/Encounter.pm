@@ -24,11 +24,10 @@ use Date::Manip;
 use Date::Calc qw(:all);
 use Text::Abbrev;
 
-use Devel::ChangeLog;
-
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+%RESOURCE_MAP = ();
 
 sub initialize
 {

@@ -14,8 +14,16 @@ use Date::Manip;
 use Text::Abbrev;
 use App::Universal;
 
-use vars qw(@ISA %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %CODE_TYPE_MAP);
+use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %CODE_TYPE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'catalog' => {
+		_arl_add => ['parent_catalog_id'],
+		_arl_modify => ['internal_catalog_id'],
+		_arl_remove => ['internal_catalog_id'],
+	},
+);
 
 %PROCENTRYABBREV = abbrev qw(feescheduleentryid name modifier units description);
 

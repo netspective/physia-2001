@@ -13,11 +13,16 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
 use constant NEXTACTION_COPYASNEW => "/org/%session.org_id%/dlg-add-appttype/%field.appt_type_id%";
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'appttype' => { 
+			_arl => ['appt_type_id'], 
+		},
+);
 
 sub new
 {
@@ -160,13 +165,5 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-use constant APPT_TYPE_DIALOG => 'Dialog/ApptType';
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/23/2000', 'TVN',
-		APPT_TYPE_DIALOG,
-		'Added ApptType Dialog.'],
-);
 
 1;

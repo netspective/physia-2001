@@ -16,10 +16,14 @@ use App::Schedule::ApptSheet;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'customize' => {},
+);
 
 sub new
 {

@@ -11,9 +11,8 @@ use DBI::StatementManager;
 use App::Statements::Worklist::WorklistCollection;
 
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @ITEM_TYPES @EXPORT
+use vars qw(@ISA %RESOURCE_MAP @ITEM_TYPES @EXPORT
 	%PATIENT_URLS
 	%PHYSICIAN_URLS
 	%ORG_URLS
@@ -25,6 +24,10 @@ use vars qw(@ISA @ITEM_TYPES @EXPORT
 );
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'wl-collection-setup' => {},
+);
 
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 

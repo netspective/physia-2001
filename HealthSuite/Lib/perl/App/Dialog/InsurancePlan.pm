@@ -18,10 +18,10 @@ use App::Dialog::Field::Person;
 use App::Dialog::Field::Address;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+%RESOURCE_MAP = ();
 
 sub initialize
 {
@@ -537,63 +537,5 @@ sub updateChildrenPlans
 	$self->handlePostExecute($page, 'update', $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "Update completed.";
 }
-
-
-use constant INSURANCE_DIALOG => 'Dialog/Insurance';
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/27/1999', 'MAF',
-		INSURANCE_DIALOG,
-		'Updated the code to display the phone number while updating an insurance plan in an org '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/29/1999', 'RK',
-		INSURANCE_DIALOG,
-		'Updated the code in execute subroutine so that the child plans will be updated if the Parent Org plan is updated. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/05/2000', 'MAF',
-		INSURANCE_DIALOG,
-		"Added a new field for 'HMO-PPO Indicator'."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/06/2000', 'MAF',
-		INSURANCE_DIALOG,
-		"Added a new field for 'Insurance Type Code'."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/06/2000', 'MAF',
-		INSURANCE_DIALOG,
-		"Added 'customValidate' to validate the 'HMO-PPO Indicator' and 'Insurance Type Code'."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/06/2000', 'MAF',
-		INSURANCE_DIALOG,
-		"Changed the name of the function 'handleContactInfo' to 'handleAttributes'."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/06/2000', 'MAF',
-		INSURANCE_DIALOG,
-		"Deleted the 'NewOrgPlan' module due to its similarities to 'NewPlan' module."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/12/2000', 'RK',
-			INSURANCE_DIALOG,
-		'Deleted session-activity in execute_add subroutine and added activityLog in the sub new subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/12/2000', 'RK',
-			INSURANCE_DIALOG,
-		'Added handlePostExecute in sub execute subroutine'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/26/2000', 'RK',
-			INSURANCE_DIALOG,
-		'Modified sub handleAttribute subroutine to display the address and phone while updating.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/21/2000', 'MAF',
-			INSURANCE_DIALOG,
-		'Fixed attr value types for insurance attributes.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/22/2000', 'RK',
-		INSURANCE_DIALOG,
-		'Changed the Date field names in the dialog and in schema actions in order to display the dates while updating and deleting'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/22/2000', 'MAF',
-		INSURANCE_DIALOG,
-		'Added field to allow attachment of multiple fee schedules.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/22/2000', 'MAF',
-		INSURANCE_DIALOG,
-		'Added more validation to insured_id and rel_to_insured fields.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/23/2000', 'MAF',
-		INSURANCE_DIALOG,
-		'Created sub updateChildrenPlans that for when updating an org plan.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		INSURANCE_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/07/2000', 'MAF',
-		INSURANCE_DIALOG,
-		'Added champus fields for Branch, Grade, Status.'],
-
-);
 
 1;

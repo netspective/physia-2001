@@ -11,10 +11,16 @@ use App::Dialog::Field::Organization;
 use DBI::StatementManager;
 use App::Statements::Org;
 use Date::Manip;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'health-rule' => {
+			heading => '$Command Health Maintenance Rule', 
+			_arl => ['rule_id']
+		},
+);
 
 sub new
 {
@@ -106,16 +112,4 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant PANEDIALOG_HEALTHMAINTENANCE => 'Dialog/HealthMaintenance';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/27/2000', 'RK',
-		PANEDIALOG_HEALTHMAINTENANCE,
-		'Added a new dialog called Health Maintenance.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		PANEDIALOG_HEALTHMAINTENANCE,
-		'Replaced fkeyxxx select in the dialogs with Sql statement from Statement Manager'],
-	
-);
 1;

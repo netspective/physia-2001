@@ -11,9 +11,12 @@ use CGI::Validator::Field;
 use App::Universal;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'diagnoses' => {},
+);
 
 sub new
 {
@@ -81,20 +84,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 
 }
-
-use constant DIAG_DIALOG => 'Dialog/Diagnosis';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/02/2000', 'MAF',
-		DIAG_DIALOG,
-		'Updated validation to disallow user from entering in the same icd code twice.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/06/2000', 'MAF',
-		DIAG_DIALOG,
-		'Updated validation to disallow user from deleting an icd code that is being used in a procedure.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/14/2000', 'MAF',
-		DIAG_DIALOG,
-		'Added increment tracking of icd codes (see ref_icd_usage table).'],
-);
 
 1;

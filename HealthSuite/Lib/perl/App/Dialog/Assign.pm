@@ -10,18 +10,18 @@ use CGI::Dialog;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::RovingResource;
-
 use App::Schedule::ApptSheet;
-
 use DBI::StatementManager;
 use App::Statements::Scheduling;
-
 use Date::Manip;
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'assign' => {},	
+);
 
 sub new
 {
@@ -140,12 +140,5 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/03/2000', 'TVN',
-		'Dialog/Assign',
-		'Completed dialog for assignment of Real Resource to Roving Resources.'],
-);
 
 1;

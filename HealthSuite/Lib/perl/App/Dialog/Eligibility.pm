@@ -17,10 +17,16 @@ use vars qw(@ISA);
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'eligibility' => {
+		heading => 'Verify Eligibility', 
+		_arl => ['org_id'],
+	},
+);
 
 sub new
 {

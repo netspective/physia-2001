@@ -14,11 +14,14 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'postinvoicepayment' => {},
+	);
 
 sub new
 {

@@ -12,13 +12,15 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Person;
 use App::Statements::Component::Scheduling;
-
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'worklist_setup' => {},	
+);
 
 sub new
 {
@@ -262,16 +264,5 @@ sub execute
 	
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-use constant WORKLISTSETUP_DIALOG => 'Dialog/WorklistSetup';
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '04/21/2000', 'TVN',
-		WORKLISTSETUP_DIALOG,
-		'Added dialog for Worklist Setup.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '05/02/2000', 'TVN',
-		WORKLISTSETUP_DIALOG,
-		'Implement On-Select Preference for Worklist Setup.'],
-);
 
 1;

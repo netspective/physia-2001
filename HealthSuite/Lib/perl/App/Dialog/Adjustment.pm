@@ -12,13 +12,15 @@ use App::Statements::Insurance;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-#use App::Dialog::Field::Adjustment;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'adjustment' => {},
+);
 
 sub new
 {

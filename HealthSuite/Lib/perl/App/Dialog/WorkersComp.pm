@@ -15,13 +15,18 @@ use App::Dialog::Field::Organization;
 use App::Dialog::Field::Insurance;
 use App::Dialog::Field::Address;
 use App::Universal;
-
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
-
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'ins-workerscomp' => {
+		heading => '$Command Workers Compensation Plan'	,
+		_arl_add => ['ins_id'],
+		_arl_modify => ['ins_internal_id'],
+		},	
+	);
 
 sub new
 {
@@ -357,31 +362,5 @@ sub removeChildrenPlans
 	$self->handlePostExecute($page, 'remove', $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return 'Remove completed.';
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant WORKCOMP_DIALOG => 'Dialog/Workers Comp';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'MAF',
-		WORKCOMP_DIALOG,
-		'Added contact information section.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/29/1999', 'RK',
-		WORKCOMP_DIALOG,
-		'Updated the code in execute subroutine so that the child plans will be updated if a Workers Comp plan is updated. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '03/07/2000', 'MAF',
-		WORKCOMP_DIALOG,
-		'Fixed attribute types.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '03/15/2000', 'MAF',
-		WORKCOMP_DIALOG,
-		'Reconstructed entire workers comp dialog. Added new functions for updating/deleting children plans and attached org attributes.'],
-);
 
 1;

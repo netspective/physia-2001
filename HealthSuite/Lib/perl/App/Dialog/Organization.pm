@@ -15,9 +15,48 @@ use App::Statements::Org;
 use App::Universal;
 
 use Date::Manip;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'org-main' => {
+		heading => '$Command Main Organization',
+		orgtype => 'main',
+		_arl => ['org_id'], 
+		_idSynonym => 'Root'
+	},
+	'org-dept' => {
+		heading => '$Command Department Organization',
+		orgtype => 'dept',
+		_arl => ['org_id'], 
+		_idSynonym => 'Department'
+	},
+	'org-provider' => {
+		heading => '$Command Associated Provider Organization',
+		orgtype => 'provider',
+		_arl => ['org_id'], 
+		_idSynonym => 'Clinic'
+	},
+	'org-employer' => {
+		heading => '$Command Employer Organization',
+		orgtype => 'employer',
+		_arl => ['org_id'], 
+		_idSynonym => 'Employer'
+	},
+	'org-insurance' => {
+		heading => '$Command Insurance Organization',
+		orgtype => 'insurance',
+		_arl => ['org_id'], 
+		_idSynonym => 'Insurance'
+	},
+	'org-ipa' => {
+		heading => '$Command IPA Organization',
+		orgtype => 'ipa',
+		_arl => ['org_id'], 
+		_idSynonym => 'Ipa'
+	},
+);
 
 sub initialize
 {

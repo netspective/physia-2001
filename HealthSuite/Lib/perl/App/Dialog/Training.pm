@@ -11,11 +11,14 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'training' => {},
+);
 
 # new - Define fields & next actions
 sub new
@@ -57,23 +60,6 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant TRAINING_DIALOG => 'Dialog/Training';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '04/01/2000', 'RCWJ',
-		TRAINING_DIALOG,
-		'Created new dialog'],
-);
 
 1;
 

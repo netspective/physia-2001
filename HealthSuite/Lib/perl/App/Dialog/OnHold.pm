@@ -11,9 +11,14 @@ use CGI::Validator::Field;
 use App::Universal;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+
+use vars qw(@ISA %RESOURCE_MAP );
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP  = (
+	'claim-hold' => {
+		_arl_add => ['invoice_id'] },
+);
 
 sub new
 {
@@ -69,14 +74,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 
 }
-
-use constant ONHOLD_DIALOG => 'Dialog/OnHold';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/10/2000', 'MAF',
-		ONHOLD_DIALOG,
-		'Created new dialog for placing claim on hold.'],
-);
 
 1;

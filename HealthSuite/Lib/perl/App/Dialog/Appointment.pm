@@ -25,6 +25,17 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'appointment' => {
+		_class => 'App::Dialog::Appointment',
+		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp'],
+		_arl_modify => ['event_id'],
+		_arl_cancel => ['event_id'],
+		_arl_noshow => ['event_id'],
+		_arl_reschedule => ['event_id'],
+	},
+);
+
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'appointment', heading => '$Command Appointment');
@@ -518,16 +529,5 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-%RESOURCE_MAP = (
-	'appointment' => {
-		_class => 'App::Dialog::Appointment',
-		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp'],
-		_arl_modify => ['event_id'],
-		_arl_cancel => ['event_id'],
-		_arl_noshow => ['event_id'],
-		_arl_reschedule => ['event_id'],
-	},
-);
 
 1;

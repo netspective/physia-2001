@@ -12,7 +12,10 @@ use vars qw(@ISA);
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
-
+use vars qw(%RESOURCE_MAP);
+%RESOURCE_MAP = (
+	'login' => {},
+);
 @ISA = qw(CGI::Dialog);
 
 sub new

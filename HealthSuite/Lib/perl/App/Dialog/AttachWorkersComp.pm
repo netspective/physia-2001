@@ -7,19 +7,23 @@ use DBI::StatementManager;
 use App::Statements::Org;
 use App::Statements::Person;
 use App::Statements::Insurance;
-
 use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use App::Dialog::Field::Insurance;
 use App::Dialog::Field::Address;
-
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'person-attachworkerscomp' => {
+		_arl_add => ['ins_id'],
+		_arl_modify => ['ins_internal_id'],
+		},
+	);
 
 sub new
 {
@@ -114,25 +118,5 @@ sub execute
 	return "\u$command completed.";
 
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant ATTACHWORKCOMP_DIALOG => 'Dialog/Attach Workers Comp';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/14/2000', 'MAF',
-		ATTACHWORKCOMP_DIALOG,
- 		'Created attach workers comp dialog (person).'],
- 	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '02/22/2000', 'RK',
-			ATTACHWORKCOMP_DIALOG,
- 		'Added a new field to show the list of existing plans for the employee.'],
-);
 
 1;
