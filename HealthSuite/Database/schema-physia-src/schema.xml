@@ -317,6 +317,7 @@
 		<column name="plan_id" type="autoinc" primarykey="yes" desc="Unique ID for specific Budget record"/>
 		<column name="person_id" indexed="yes" lookupref="person.person_id" descr="Person opening this Payment Plan"/>
 		<column name="owner_org_id" indexed="yes" lookupref="Org.org_internal_id" descr="The Org that owns this Payment Plan"/>
+		<column name="billing_org_id" indexed="yes" lookupref="Org.org_internal_id" descr="The Billing Org to send payments to"/>
 		<column name="payment_cycle" type="integer" desc="Number of days between each required payment"/>
 		<column name="payment_min" type="currency" desc="Minimum amount of each payment"/>
 		<column name="first_due" type="date" desc="Date first payment is due"/>
