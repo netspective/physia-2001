@@ -4,21 +4,37 @@ package App::Dialog::Transaction::Medication;
 
 use strict;
 use Carp;
-use CGI::Dialog;
 use App::Universal;
 use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
-use vars qw(@ISA %RESOURCE_MAP);
+use vars qw(%RESOURCE_MAP);
+use base 'CGI::Dialog';
 
-@ISA = qw(CGI::Dialog );
+%RESOURCE_MAP = (
+	'medication-prescribe' => {
+		transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, 
+		heading => '$Command Prescription',  
+		_arl => ['person_id'], _arl_modify => ['trans_id'] , 
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPE_PRESCRIBEMEDICATION()
+		},
+	'medication-current' => {
+		transType => [
+			App::Universal::TRANSTYPE_CURRENTMEDICATION_OTC,
+			App::Universal::TRANSTYPE_CURRENTMEDICATION_HOMEO
+			],
+		heading => '$Command Current Medication',
+		_arl => ['person_id'],
+		_arl_modify => ['trans_id'],
+		_idSynonym => [
+			'trans-' . App::Universal::TRANSTYPE_CURRENTMEDICATION_OTC(),
+			'trans-' . App::Universal::TRANSTYPE_CURRENTMEDICATION_HOMEO()
+			],
+		},
+	);
 
-%RESOURCE_MAP = ( 'medication-prescribe' => { transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, 
-						heading => '$Command Prescribe Medication',  
-						_arl => ['person_id'], _arl_modify => ['trans_id'] , 
-						_idSynonym => 'trans-' . App::Universal::TRANSTYPE_PRESCRIBEMEDICATION() },);
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'medication');
