@@ -20,8 +20,6 @@
 		<field id="unit_cost" join="invitem" column="unit_cost" caption="Unit Cost" ui-datatype="currency"/>
 		<field id="quantity" join="invitem" column="quantity" caption="Quantity" ui-datatype="number"/>
 		<field id="extended_cost" join="invitem" column="extended_cost" caption="Extended Cost" ui-datatype="currency"/>
-		<field id="writeoff_code" join="invitem" column="writeoff_code" caption="Writeoff Code"/>
-		<field id="writeoff_amt" join="invitem" column="writeoff_amount" caption="Writeoff Amount" ui-datatype="currency"/>
 		<field id="rel_diags" join="invitem" column="rel_diags" caption="Related Diagnosis"/>
 		<field id="comments" join="invitem" column="comments" caption="Comments"/>
 		<field id="bill_provider_id" join="main_trans" column="provider_id" caption="Billing Provider ID"/>
@@ -43,6 +41,11 @@
 		<field id="adjustment_id" join="invitem_adjust" column="adjustment_id" caption="Adjustment ID"/>
 		<field id="adjustment_type" join="invitem_adjust_type" column="caption" caption="Adjustment Type"/>
 		<field id="adjustment_amt" join="invitem_adjust" column="adjustment_amount" caption="Adjustment Amount" ui-datatype="currency"/>
+		<field id="adjustment_amt_net" join="invitem_adjust" column="net_adjust" caption="Net Adjustment" ui-datatype="currency"/>
+		<field id="ajustment_plan_allowed" join="invitem_adjust" column="plan_allow" caption="Plan Allowed" ui-datatype="currency"/>
+		<field id="ajustment_plan_paid" join="invitem_adjust" column="plan_paid" caption="Plan Paid" ui-datatype="currency"/>
+		<field id="writeoff_code" join="invitem_adjust" column="writeoff_code" caption="Writeoff Code"/>
+		<field id="writeoff_amt" join="invitem_adjust" column="writeoff_amount" caption="Writeoff Amount" ui-datatype="currency"/>
 		<field id="patient_id" join="invoice" column="client_id" caption="Patient ID"/>
 		<field id="patient_name" join="patient" column="simple_name" caption="Patient Name"/>
 		<field id="patient_dob" join="patient" column="date_of_birth" caption="Patient Date of Birth" ui-datatype="date"/>
