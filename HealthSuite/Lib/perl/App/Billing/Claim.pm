@@ -12,7 +12,7 @@ use App::Billing::Claim::Physician;
 use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
 use App::Billing::Claim::TWCC73;
-# use App::Billing::Claim::TWCC60;
+use App::Billing::Claim::TWCC60;
 
 use App::Billing::Universal;
 use constant DATEFORMAT_USA => 1;
@@ -64,7 +64,7 @@ sub new
 	$params{suppressedItems} = [];
 
 	$params{twcc73} = undef;
-#	$params{twcc60} = undef;
+	$params{twcc60} = undef;
 
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
@@ -165,17 +165,17 @@ sub getTWCC73
 	return $self->{twcc73};
 }
 
-#	sub setTWCC60
-#	{
-#		my ($self, $value) = @_;
-#		$self->{twcc60} = $value;
-#	}
-#
-#	sub getTWCC60
-#	{
-#		my $self = shift;
-#		return $self->{twcc60};
-#	}
+sub setTWCC60
+{
+	my ($self, $value) = @_;
+	$self->{twcc60} = $value;
+}
+
+sub getTWCC60
+{
+	my $self = shift;
+	return $self->{twcc60};
+}
 
 sub setTransProviderId
 {
