@@ -78,7 +78,7 @@ sub initialize
 	my $arlPrefix = '/worklist/patientflow';
 
 	my $facility_id = $page->session('org_internal_id');
-	my $user_id = $page->session('user_id');
+	my $user_id = $page->session('org_id');
 
 	$layoutDefn->{frame}->{heading} = " ";
 	$layoutDefn->{style} = 'panel.transparent';
@@ -87,7 +87,7 @@ sub initialize
 	[
 		{
 			caption => qq{
-				<a href='/person/$user_id/dlg-add-referral'>Add Referral</a>
+				<a href='/org/$user_id/dlg-add-referral-person'>Add Service Request</a>
 			}
 		},
 	];
@@ -106,7 +106,7 @@ sub getComponentHtml
 	my ($self, $page) = @_;
 
 	my $referrals;
-	$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_open');
+	$referrals = $STMTMGR_COMPONENT_REFERRAL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel_referrals_open', $page->session('org_internal_id'));
 
 	my @data = ();
 	my $html = qq{
@@ -119,19 +119,16 @@ sub getComponentHtml
 
 	foreach (@$referrals)
 	{
+
 		#$_->{checkin_time}
 
 		my $referralID;
-		if ($_->{trans_id_mod} eq $_->{referral_id})
-		{
-			$referralID = '/person/' . $_->{patient_id} . '/dlg-add-trans-6010/' . $_->{trans_id_mod};
-		}
-		else
-		{
-			$referralID = '/person/' . $_->{patient_id} . '/dlg-update-trans-6010/' . $_->{trans_id_mod};
-		}
+		my $orgId = $_->{org_id} ne '' ? $_->{org_id} : $page->session('org_id');
 
-		my $addCommentARL = '/person/' . $_->{patient_id} . '/dlg-add-trans-6020/' . $_->{trans_id_mod};
+			$referralID = '/org/' . $orgId . '/dlg-add-trans-6010/' . $_->{referral_id};
+
+		my $addCommentARL = '/org/' . $orgId . '/dlg-update-trans-6000/' . $_->{referral_id};
+		my $updateReferral = '/org/' . $orgId . '/dlg-update-trans-6000/' . $_->{referral_id};
 
 		my @rowData = (
 			qq{
@@ -139,25 +136,25 @@ sub getComponentHtml
 				<IMG VSPACE=2 HSPACE=0 ALIGN=left VALIGN=top SRC='/resources/icons/info.gif' BORDER=0 ALT='Request information'>
 			},
 			qq{
-				$_->{trans_id_mod}
+				$_->{referral_id}
 			},
 			qq{
-				$_->{trans_status_reason}
+				$_->{ref_status}
 			},
 			qq{
 				$_->{patient}
 			},
 			qq{
-				$_->{service_provider}
-			},
-			qq{
-				$_->{service_provider_type}
-			},
-			qq{
-				$_->{requested_service}
+				$_->{referral_type}
 			},
 			qq{
 				$_->{trans_end_stamp}
+			},
+			qq{
+				$_->{intake_coordinator}
+			},
+			qq{
+				$_->{ssn}
 			},
 			qq{
 				$referralID
@@ -165,6 +162,10 @@ sub getComponentHtml
 			qq{
 				$addCommentARL
 			},
+			qq{
+				$updateReferral
+			},
+
 		);
 
 		push(@data, \@rowData);
