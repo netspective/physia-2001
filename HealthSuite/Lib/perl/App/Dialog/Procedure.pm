@@ -1039,6 +1039,7 @@ sub storeProviderInfo
 	my $providerMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Medicare', $licenseValueType);
 	my $providerMedicaid = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Medicaid', $licenseValueType);
 	my $providerChampus = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Champus', $licenseValueType);
+	my $providerWorkComp = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'WC#', $licenseValueType);
 	my $providerSpecialty = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Primary', App::Universal::ATTRTYPE_SPECIALTY);
 
 	$page->schemaAction(
@@ -1142,6 +1143,16 @@ sub storeProviderInfo
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerTaxId->{value_text} || undef,
 			value_textB => $providerTaxId->{value_textb} || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Workers Comp',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerWorkComp->{value_text} || undef,
 			value_intB => 1,
 			_debug => 0
 		);
@@ -1299,8 +1310,12 @@ sub storeInsuranceInfo
 			my $personInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $insIntId);
 			my $insOrgId = $personInsur->{ins_org_id};
 			my $parentInsId = $personInsur->{parent_ins_id};
-			my $personInsurPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $parentInsId);
-			my $personInsurProduct = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $personInsurPlan->{parent_ins_id} || $parentInsId);
+			my $personInsurPlanOrProd = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $parentInsId);
+			my $personInsurProduct = undef;
+			if($personInsurPlanOrProd->{record_type} == App::Universal::RECORDTYPE_INSURANCEPLAN)
+			{
+				$personInsurProduct = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $personInsurPlanOrProd->{parent_ins_id});
+			}
 
 			#Basic Insurance Information --------------------
 			my $insOrgInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $insOrgId);
@@ -1379,7 +1394,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$order/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsurPlan->{remit_payer_id} || $personInsurProduct->{remit_payer_id},
+					value_text => $personInsurPlanOrProd->{remit_payer_id} || $personInsurProduct->{remit_payer_id},
 					value_intB => 1,
 					_debug => 0
 				);
@@ -1451,6 +1466,23 @@ sub storeInsuranceInfo
 					value_intB => 1,
 					_debug => 0
 				);
+
+
+			#Medigap Number  --------------------
+			if($invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_MEDICARE)
+			{
+				my $medigapNo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $personInsurProduct->{ins_internal_id} || $personInsurPlanOrProd->{ins_internal_id}, 'Medigap/Number');
+				$page->schemaAction(
+						'Invoice_Attribute', $command,
+						parent_id => $invoiceId,
+						item_name => "Insurance/$order/Medigap",
+						value_type => defined $textValueType ? $textValueType : undef,
+						value_text => $medigapNo->{value_text} || undef,
+						value_intB => 1,
+						_debug => 0
+					);
+			}
+
 
 			#Insurance Contact Info --------------------
 			my $insOrgPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
@@ -1618,33 +1650,18 @@ sub storeInsuranceInfo
 
 
 			#Insured's Employment Info
-			#my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
-			#foreach my $employer (@{$insuredEmployers})
-			#{
-				#my $valueType = $employer->{value_type};
-				#next if $valueType == $retiredAttr;
+			my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $personInsur->{employer_org_id});
 
-				#my $occupType = 'Employer';
-				#$occupType = 'School' if $valueType == $ftStudentAttr || $valueType == $ptStudentAttr;
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$order/Insured/Employer/Name",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $employerName || undef,
+					value_intB => 1,
+					_debug => 0
+				);
 
-				#my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $valueType);
-
-				#my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_int});
-				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $personInsur->{employer_org_id});
-
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						#item_name => "Insurance/$order/Insured/$occupType/Name",
-						item_name => "Insurance/$order/Insured/Employer/Name",
-						#value_type => defined $valueType ? $valueType : undef,
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $employerName || undef,
-						#value_textB => $empStatus || undef,
-						value_intB => 1,
-						_debug => 0
-					);
-			#}
 
 			my $insuredEmployerAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $personInsur->{employer_org_id}, 'Mailing');
 			$page->schemaAction(
@@ -1659,8 +1676,6 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
-
-			##NEED TO CREATE ATTR FOR 'Medigap/Number' (THIS IS FOUND AT THE PRODUCT LEVEL)
 
 			##MEDICAID - RESUBMISSION CODE AND ORIGINAL REFERENCE
 
