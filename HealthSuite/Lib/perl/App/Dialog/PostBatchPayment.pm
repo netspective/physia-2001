@@ -88,11 +88,13 @@ sub populateData
 
 	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
 
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+
 	my $batchType = $page->param('_p_batch_type');
 	$page->field('batch_type', $batchType);
 
-	my $batchId = $page->param('_p_batch_id');
-	$page->field('batch_id', $batchId);
+	#my $batchId = $page->param('_p_batch_id');
+	#$page->field('batch_id', $batchId);
 }
 
 sub customValidate
@@ -114,6 +116,10 @@ sub customValidate
 			{
 				$getInvoiceIdField->invalidate($page, "Claim $invoiceId is 'Self-Pay'. Cannot apply insurance payment to this claim.");
 			}		
+		}
+		else
+		{
+			$getInvoiceIdField->invalidate($page, "Claim $invoiceId does not exist.");
 		}
 	}
 	else
@@ -137,6 +143,9 @@ sub execute
 	my $invoiceId = $page->field('sel_invoice_id');
 	my $payerId = $page->field('payer_id');
 	my $sessOrg = $page->session('org_id');
+	
+	$page->session('batch_id', $batchId);
+
 	if($batchType eq 'personal')
 	{
 		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-postpersonalpayment?_p_batch_id=$batchId&_p_batch_date=$batchDate&_payer_id=$payerId");

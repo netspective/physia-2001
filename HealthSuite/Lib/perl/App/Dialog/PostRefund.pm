@@ -49,6 +49,15 @@ sub new
 	return $self;
 }
 
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+}
+
 sub customValidate
 {
 	my ($self, $page) = @_;
@@ -152,6 +161,7 @@ sub execute
 			value_int => $adjItemId || undef,
 			_debug => 0
 		);
+		$page->session('batch_id', $batchId);
 
 
 		#Create history attribute for this adjustment

@@ -185,6 +185,8 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
@@ -212,12 +214,7 @@ sub populateData
 		$page->field('payer_id', $clientId);
 	}
 
-	if(my $batchId = $page->param('_p_batch_id'))
-	{
-		my $batchDate = $page->param('_p_batch_date');
-		$page->field('batch_id', $batchId);
-		$page->field('batch_date', $batchDate);
-	}
+	$page->field('batch_date', $page->param('_p_batch_date'));
 
 	my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 	my $totalProcs = scalar(@{$procedures});
@@ -311,6 +308,10 @@ sub execute
 			_debug => 0
 		);
 	}
+
+	#reset session batch id
+	$page->session('batch_id', $batchID);
+
 
 	#Create history attribute for total payment
 	$page->schemaAction(

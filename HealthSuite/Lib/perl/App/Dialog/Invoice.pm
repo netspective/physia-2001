@@ -93,6 +93,8 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $invoiceId = $page->param('invoice_id');
@@ -449,8 +451,9 @@ sub addTransactionAndInvoice
 
 
 
-	## Add history and batch creation attribute
+	## Add history and batch creation attribute and reset session batch id with batch id in field
 	my $batchId = $page->field('batch_id');
+	$page->session('batch_id', $batchId);
 	my $description = $command eq 'add' ? "Created" : 'Modified';
 	$page->schemaAction(
 		'Invoice_Attribute', 'add',
@@ -462,6 +465,7 @@ sub addTransactionAndInvoice
 		value_date => $todaysDate,
 		_debug => 0
 	);
+
 
 	$page->schemaAction(
 		'Invoice_Attribute', $command,

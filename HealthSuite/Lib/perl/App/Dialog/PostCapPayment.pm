@@ -74,12 +74,14 @@ sub new
 	return $self;
 }
 
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#
-#	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-#}
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+}
 
 sub execute
 {
@@ -114,15 +116,17 @@ sub execute
 	);
 
 	## Add batch attribute
+	my $batchId = $page->field('batch_id');
 	$page->schemaAction(
 		'Trans_Attribute', 'add',
 		parent_id => $transId,
 		item_name => 'Monthly Cap/Payment/Batch ID',
 		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $page->field('batch_id') || undef,
+		value_text => $batchId || undef,
 		value_date => $page->field('batch_date') || undef,
 		_debug => 0
 	);
+	$page->session('batch_id', $batchId);
 
 	$self->handlePostExecute($page, $command, $flags);
 

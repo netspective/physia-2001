@@ -116,6 +116,8 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+
 	if(my $batchId = $page->param('_p_batch_id'))
 	{
 		my $batchDate = $page->param('_p_batch_date');
@@ -313,7 +315,8 @@ sub executePrePayment
 		value_int => $adjItemId || undef,
 		_debug => 0
 	);
-	
+	$page->session('batch_id', $batchId);
+
 	$page->redirect("/person/$payerId/account");
 }
 
@@ -406,6 +409,7 @@ sub executePostPayment
 			value_int => $adjItemId || undef,
 			_debug => 0
 		);
+		$page->session('batch_id', $batchId);
 
 		if($invoiceBalance == 0)
 		{

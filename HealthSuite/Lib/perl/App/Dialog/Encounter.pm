@@ -326,6 +326,9 @@ sub populateData
 	$page->field('dupCheckin_returnUrl', $self->getReferer($page))
 		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
+	#Set session batch id to batch id field
+	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
 
@@ -1085,6 +1088,9 @@ sub handleInvoiceAttrs
 			value_date => $todaysDate,
 			_debug => 0
 	);
+
+	#reset session batch id with batch id in field
+	$page->session('batch_id', $batchId);
 
 	## Then, create some invoice attributes for HCFA (the rest are found in the Procedure dialog):
 	#	 Accident Related To, Prior Auth Num, Deduct Balance, Accept Assignment, Ref Physician Name/Id,
