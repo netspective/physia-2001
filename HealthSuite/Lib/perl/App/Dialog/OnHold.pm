@@ -54,6 +54,15 @@ sub execute
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $invoice->{flags};
+	if($invoiceFlags & $attrDataFlag)
+	{
+		my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+		foreach my $item (@{$items})
+		{
+			$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delAutoWriteoffAdjustmentsForItem', $item->{item_id});
+		}
+	}
+
 	$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId,
