@@ -2886,7 +2886,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.referralAndIntake' => {
 	sqlStmt => qq{
 			SELECT 	trans_id,
-			        DECODE(parent_trans_id,'','Referral','Intake') as parent_trans_id,
+			        DECODE(parent_trans_id,'','Service Request','Referral') as parent_trans_id,
 			        parent_trans_id,
 			        %simpleDate:trans_end_stamp%,
 			        %simpleDate:data_date_b%,
@@ -2895,11 +2895,16 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					FROM intake_service i
 					WHERE i.id = t.caption
 				) AS caption,
-			        trans_status_reason,
-			(
-				SELECT org_id
-				FROM org
-				WHERE org_internal_id = t.service_facility_id) AS org_id,
+			        (
+					SELECT r.caption
+					FROM referral_followup_status r
+					WHERE r.id = t.trans_status_reason
+				) AS follow_up,
+				(
+					SELECT org_id
+					FROM org
+					WHERE org_internal_id = t.service_facility_id
+				) AS org_id,
 				trans_type
 			FROM  transaction t
 			WHERE  	consult_id = ?
@@ -2913,8 +2918,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{
 					colIdx => 1,
 					dataFmt => {
-						'Referral' => 'Referral : #0#, Date Of Request : #3#',
-						'Intake' => "Intake (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
+						'Service Request' => 'Referral : #0#, Date Of Request : #3#',
+						'Referral' => "Intake (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
 					},
 				},
 
@@ -2931,7 +2936,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Referrals And Intakes' },
+		frame => { heading => 'Service Requests And Referrals' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -2943,7 +2948,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Referral And Intakes' },
+		frame => { heading => 'Service Requests And Referrals' },
 		banner => {
 			actionRows =>
 			[
@@ -2960,6 +2965,47 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelTransp'); },
 	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntake', [$personId], 'panelInDlg'); },
+},
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.referralAndIntakeCount' => {
+	sqlStmt => qq{
+			SELECT
+				(COUNT(trans_id)-COUNT(parent_trans_id)) AS service_request,
+				COUNT(parent_trans_id) AS referral
+			FROM  transaction
+			WHERE  	consult_id = ?
+			AND trans_type in (6000, 6010)
+		},
+		sqlStmtBindParamDescr => ['Trans ID'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+
+			{ head => 'Record Count', dataFmt => 'Service Request Count : #0# <BR> Referral Count : #1#'},
+
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Service Request And Referral Count' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId], 'panelTransp'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.referralAndIntakeCount', [$personId], 'panelInDlg'); },
 },
 
 );
