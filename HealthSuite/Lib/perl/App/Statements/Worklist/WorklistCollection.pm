@@ -258,7 +258,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	t.trans_invoice_id = i.invoice_id	
 				and     t.trans_invoice_id is not null
 				AND	t.billing_facility_id = :7
-				AND	p.person = t.trans_owner_id
+				AND	p.person_id = t.trans_owner_id
 				AND	ROWNUM<$COLLECTION_LIMIT
 		ORDER BY 1		
 	}, 
