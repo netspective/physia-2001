@@ -202,7 +202,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	'selInvoiceTypeForClient' =>
 		{
 				_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
-				whereCond => 'client_id = ? and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
+				whereCond => 'upper(client_id) = ? and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
 				publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
 		},
 	'selInvoiceTypeForOrg' =>
