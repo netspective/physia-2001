@@ -2221,6 +2221,67 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 #----------------------------------------------------------------------------------------------------------------------
 
+'person.billinginfo' => {
+	sqlStmt => qq{
+			select	value_type, item_id, value_text, value_textb, value_int, %simpleDate:value_date%,
+				decode(value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(value_textb,'1','Active','Inactive')
+			from	person_attribute
+			where	parent_id = ?
+			and	value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			order by value_int
+		},
+	sqlStmtBindParamDescr => ['Person ID for Billing Information'],
+	publishDefn => {
+		columnDefn => [
+					{
+						colIdx => 0,
+						dataFmt => "#7# #6# ID: #2# (Exp: #5#)",
+					},
+		],
+
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		frame => {
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Billing Information' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Billing Information' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo?home=#param.home#'>Billing Info</A> } },
+		],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelTransp'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
 'person.associatedResources' => {
 	sqlStmt => qq{
 			select 	value_type, item_id, item_name, value_text
