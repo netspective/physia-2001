@@ -30,7 +30,7 @@ sub handleARL
 		$date =~ s/\-/\//g;
 		$self->param('_date', $date);
 	}
-	
+
 	$self->printContents();
 
 	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
@@ -77,7 +77,8 @@ sub prepare_view
 			<TR VALIGN=TOP>
 			<TD>
 					#component.stp-person.linkMedicalSite#<BR>
-					#component.news-health#<BR>					
+					#component.news-health#<BR>
+					#component.stp-person.bookmarks#<BR>
 			</TD>
 			<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 			<TD>
@@ -108,7 +109,8 @@ sub prepare_view
 				<TD>
 					#component.create-records#<BR>
 					#component.news-top#<BR>
-					#component.news-health#
+					#component.news-health#<BR>
+					#component.stp-person.bookmarks#<BR>
 				</TD>
 			</TR>
 		</TABLE>
