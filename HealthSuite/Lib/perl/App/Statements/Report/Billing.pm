@@ -130,7 +130,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_earningsFromItem_Adjust' => {
 		_stmtFmt => qq{
 			--select payer_id as payer, sum(plan_paid) as earning
-			select org_id as payer, sum(plan_paid) as earning ,2			
+			select org_id as payer, sum(plan_paid) as earning ,2, null	
 			from Invoice_Item_Adjust, Invoice_Item, Invoice, org o,Transaction t
 			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -144,8 +144,10 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and plan_paid > 0
 			group by org_id
 			UNION
-			select payer_id as payer_id, sum(adjustment_amount) as earning,1
-			from Invoice_Item_Adjust, Invoice_Item, Invoice,Transaction t,org
+			select payer_id as payer_id, sum(adjustment_amount) as earning,1,
+			p.simple_name 
+			from Invoice_Item_Adjust, Invoice_Item, Invoice,Transaction t,org,
+			person p
 			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and  t.trans_id = Invoice.main_transaction
@@ -155,12 +157,15 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				and Invoice_Item_Adjust.payer_type = 0
 				and t.service_facility_id = org.org_internal_id
 				and org.owner_org_id = ?				
-			group by payer_id
+				and p.person_id=payer_id
+			group by payer_id,p.simple_name
 		},
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Payer', url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#&{?}#&type=#2#')}, hint => 'View Details' },
+					{head => 'Payer', colIdx=> 2 , 
+					 dataFmt => {'2'=>"#0#",'1'=>"#3# (#0#)" ,}, 					
+					url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#0#&type=#2#')}, hint => 'View Details' },
 					{head => 'Earning', dAlign => 'right', dformat => 'currency'},
 				],
 		},
@@ -208,17 +213,17 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 				t.provider_id, Transaction_Status.caption as status, nvl(sum(total_cost),0), nvl(sum(Invoice_Item_Adjust.plan_paid),0)	,
 				p.simple_name
 			from Invoice_Item_Adjust, Invoice_Item, Invoice, Transaction t,Transaction_Status,org, person p
-			where Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-					and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			where Invoice.invoice_date between to_date(:1 || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+					and to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and  t.trans_id = Invoice.main_transaction
-				and t.service_facility_id = ?
+				and t.service_facility_id = :3
 				and Invoice_Item.parent_id = Invoice.invoice_id
 				and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
-				and Invoice_Item_Adjust.payer_id = ?
+				and Invoice_Item_Adjust.payer_id = :4
 				and Transaction_Status.id = t.trans_status
-				and org.org_internal_id =  Invoice_Item_Adjust.payer_id
+				and org.org_internal_id = :4
 				and p.person_id (+) = invoice.client_id
-				and org.owner_org_id = ?
+				and org.owner_org_id = :5
 			group by org.org_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
 				t.provider_id, Transaction_Status.caption ,p.simple_name
 		},		
@@ -229,8 +234,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 					{colIdx => 0, head => 'Payer ID',summarize=>'count'},
 					{colIdx => 1, head => 'Invoice'},
 					{colIdx => 2, head => 'Date'},
-					{colIdx => 3, ,hint=>"View account: #3#",head => 'Patient', dataFmt => '<A HREF = "/person/#3#/account">#8#</A>'},
-					#{colIdx => 4, head => 'Bill to'},
+					{colIdx => 3, ,hint=>"View account: #3#",head => 'Patient ID', dataFmt => '<A HREF = "/person/#3#/account">#3#</A>'},
+					{colIdx => 8, head => 'Patient Name'},
 					{colIdx => 4, head => 'Provider'},
 					{colIdx => 5, head => 'Status'},
 					{colIdx => 6, head => 'Total cost', ,summarize=>'sum',dformat => 'currency', dAlign => 'right'},
