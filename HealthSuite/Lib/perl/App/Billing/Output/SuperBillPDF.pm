@@ -36,6 +36,8 @@ use constant DATA_LEFT_PADDING => 3;
 use constant DATA_TOP_PADDING => 10;
 use constant DATA_TOP_PADDING2 => 4;
 use constant DATA_FONT_COLOR => '0,0,0';
+use constant REPORT_COLOR => '0,0,0';
+use constant REPORT_FILL_COLOR => '0.9,0.9,0.9';
 use constant DATA_FONT_SIZE => 8;
 use constant THRESHOLD => 4;
 
@@ -53,15 +55,16 @@ sub printReport
 	my $filename = $params{file} ne "" ? $params{file} : "SuperBill.pdf";
 	my $columns = $params{columns} ne "" ? $params{columns} : 4;
 	my $rows = $params{rows} ne "" ? $params{rows} : 51;
-	my $startX = $params{startX} ne "" ? $params{startX} : HX;
-	my $startY = $params{startY} ne "" ? $params{startY} : HY;
+	my $startX = $params{startX} ne "" ? HX + $params{startX} : HX;
+	my $startY = $params{startY} ne "" ? HY - $params{startY} : HY;
+	my $reportColor = $params{reportColor} ne "" ? $params{reportColor} : REPORT_COLOR;
 
 	$columns = 4 if($columns > 4);
 	$rows = 55 if($rows > 55);
 
 	my $p = pdflib::PDF_new();
 	die "Couldn't open PDF file"  if (pdflib::PDF_open_file($p, $filename) == -1);
-	my $report = new App::Billing::Output::PDF::Report();
+	my $report = new App::Billing::Output::PDF::Report(color => $reportColor);
 
 	for my $pages (1..2) # it depends on the number of patients
 	{
@@ -94,10 +97,7 @@ sub printReport
 					$self->printRow($p, $x + $columnNo * $columnWidth, $y - $rowNo * ROW_HEIGHT, $report, [$column1Width, $column2Width, $column3Width, $column4Width], ['']);
 				}
 				$columnNo++;$rowNo=0;
-				if($columnNo >= $columns)
-				{
-					last;
-				}
+				last if($columnNo >= $columns);
 			}
 
 			$rowNo++;
@@ -112,20 +112,13 @@ sub printReport
 				if ($rowNo == $rows)
 				{
 					$columnNo++;$rowNo=1;
-					if($columnNo >= $columns)
-					{
-						last;
-					}
+					last if($columnNo >= $columns);
 
 					my $contHeading = $heading . " (contd.)";
 					$self->printRowMain($p, $x + $columnNo * $columnWidth, $y - $rowNo * ROW_HEIGHT, $report, [$columnWidth], $contHeading);
 				}
 			}
-			if($columnNo >= $columns)
-			{
-				last;
-			}
-
+			last if($columnNo >= $columns);
 
 			#blank row after each component
 			$rowNo++;
@@ -133,10 +126,7 @@ sub printReport
 			if ($rowNo == $rows)
 			{
 				$columnNo++;$rowNo=0;
-				if($columnNo >= $columns)
-				{
-					last;
-				}
+				last if($columnNo >= $columns);
 			}
 
 
@@ -357,7 +347,7 @@ sub box10f
 		'width' =>  BOX7_WIDTH,
 		'height' => 15,
 		'x' => $x,
-		'y' => $y - 30
+		'y' => $y - 30,
 	};
 	$report->drawFilledRectangle($p, $properties);
 
@@ -653,11 +643,11 @@ sub printRowMain
 		'height' => ROW_HEIGHT,
 		'x' => $x,
 		'y' => $y,
-		'color' => '0.9,0.9,0.9'
+		'fillColor' => REPORT_FILL_COLOR,
 	};
 	$report->drawFilledRectangle($p, $properties);
 
-	my $properties =
+	$properties =
 			{
 			texts =>
 				[
@@ -666,7 +656,7 @@ sub printRowMain
 						'fontName' => BOLD_FONT_NAME,
 						'fontWidth' => 7,
 						'x' => $x + $columnWidths->[0]/2 - $length/2 ,
-						'y' => $y
+						'y' => $y,
 					}
 				],
 			};

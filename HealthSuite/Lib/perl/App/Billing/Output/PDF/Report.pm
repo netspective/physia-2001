@@ -25,7 +25,9 @@ use constant TWCC_INNER_RADIUS => 1;
 sub new
 {
 	my ($type, %params) = @_;
-	return bless \%params, $type;
+	my $self = {};
+	$self->{'color'} = $params{'color'} eq '' ? '0,0,0' :  $params{'color'};
+	return bless $self, $type;
 }
 
 sub drawBox
@@ -81,6 +83,9 @@ sub drawBox
 	{
 		$self->drawCheckBox($pdf, $element);
 	}
+
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawText
@@ -91,6 +96,8 @@ sub drawText
 	pdflib::PDF_setfont($pdf, $font, $properties->{'fontWidth'} eq "" ? TWCC_FORM_FONT_WIDTH : $properties->{'fontWidth'});
 	$self->setColor($pdf, $properties);
 	pdflib::PDF_show_xy($pdf, $properties->{'text'}, $properties->{'x'} + TWCC_PADDING_LEFT, $properties->{'y'} - TWCC_PADDING_TOP);
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawLine
@@ -103,6 +110,8 @@ sub drawLine
 	pdflib::PDF_moveto($pdf, $properties->{'x1'}, $properties->{'y1'});
 	pdflib::PDF_lineto($pdf, $properties->{'x2'}, $properties->{'y2'});
 	pdflib::PDF_stroke($pdf);
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawCheckBox
@@ -111,10 +120,10 @@ sub drawCheckBox
 	$self->setColor($pdf, $properties);
 	my $width = $properties->{'width'} ne "" ? $properties->{'width'} : TWCC_CHECK_BOX_WIDTH;
 	my $height = $properties->{'height'} ne "" ? $properties->{'height'} : TWCC_CHECK_BOX_HEIGHT;
-
-#	pdflib::PDF_setrgbcolor($pdf, 0.7, 0, 0);
 	pdflib::PDF_rect($pdf, $properties->{'x'}, $properties->{'y'}, $width , $height);
 	pdflib::PDF_stroke($pdf);
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawRadioButtonUnSelect
@@ -125,6 +134,8 @@ sub drawRadioButtonUnSelect
 
 	pdflib::PDF_circle($pdf, $properties->{'x'} + $radius, $properties->{'y'} - $radius, $radius);
 	pdflib::PDF_stroke($pdf);
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawRadioButtonSelect
@@ -138,6 +149,8 @@ sub drawRadioButtonSelect
 	pdflib::PDF_stroke($pdf);
 	pdflib::PDF_circle($pdf, $properties->{'x'} + $radius, $properties->{'y'} - $radius, $innerRadius);
 	pdflib::PDF_fill_stroke($pdf);
+	$self->setColor($pdf, $self);
+
 }
 
 sub drawArrow
@@ -154,24 +167,16 @@ sub drawArrow
 	}
 	pdflib::PDF_lineto($pdf, $xs->[0], $ys->[0]);
 	pdflib::PDF_closepath_fill_stroke($pdf);
+	$self->setColor($pdf, $self);
+
 }
 
 sub setColor
 {
 	my ($self, $pdf, $properties) = @_;
-
-	my @rgb = split(/,/, $properties->{'color'});
-	my $color;
-	$color->[0] = $rgb[0];
-	$color->[1] = $rgb[1];
-	$color->[2] = $rgb[2];
-	unless($properties->{'color'})
-	{
-		$color->[0] = TWCC_FORM_RED;
-		$color->[1] = TWCC_FORM_GREEN;
-		$color->[2] = TWCC_FORM_BLUE;
-	}
-	pdflib::PDF_setrgbcolor($pdf, $color->[0], $color->[1], $color->[2]);
+	my $color = $properties->{'color'} eq '' ?  $self->{'color'} : $properties->{'color'};
+	my @rgb = split(/,/, $color);
+	pdflib::PDF_setrgbcolor($pdf, $rgb[0], $rgb[1], $rgb[2]);
 }
 
 sub newPage
@@ -228,8 +233,16 @@ sub drawFilledRectangle
 	my($self, $p, $properties) = @_;
 
 	$self->setColor($p, $properties);
+	if ($properties->{'fillColor'} ne '')
+	{
+		my @rgb = split(/,/, $properties->{'fillColor'});
+		pdflib::PDF_setrgbcolor_fill($p, $rgb[0], $rgb[1], $rgb[2]);
+	}
+
 	pdflib::PDF_rect($p, $properties->{'x'}, $properties->{'y'}, $properties->{'width'}, -1 * $properties->{'height'});
 	pdflib::PDF_closepath_fill_stroke($p);
+	$self->setColor($p, $self);
+
 }
 
 1;
