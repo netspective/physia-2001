@@ -2402,7 +2402,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.myAssociatedResourceInPatients' => {
 	sqlStmt => qq{
-		select 	%simpleDate:trans_begin_stamp%, complete_name,
+		SELECT
+			%simpleDate:trans_begin_stamp%,
+			complete_name,
 			related_data,
 			trans_status_reason,
 			provider_id, caption,
@@ -2411,20 +2413,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			data_text_c,
 			data_text_a,
 			consult_id,
-			trans_id,trans_type,
+			trans_id,
+			trans_type,
 			trans_owner_id
-		from 	transaction, person
-		where 	trans_type between 11000 and 11999
-		and 	person_id = trans_owner_id
-		and	(provider_id = ? or
-			provider_id in
-			(select value_text from person_attribute
-				where parent_id = ?
-					and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
-					and item_name = 'WorkList'
-			)
-		)
-		and 	trans_status = 2
+		FROM
+			transaction,
+			person
+		WHERE
+			trans_type BETWEEN 11000 AND 11999 AND
+			person_id = trans_owner_id AND
+			(
+				provider_id = ? OR provider_id IN
+				(
+					SELECT value_text
+					FROM person_attribute
+					WHERE
+						parent_id = ? AND
+						value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]} AND
+						item_name = 'WorkList'
+				)
+			) AND
+			trans_status = 2
 		},
 	sqlStmtBindParamDescr => ['Person ID for the person table, Person ID for the Person_Attribute table, Org ID for the Person_Attribute table '],
 	publishDefn => {
@@ -2432,7 +2441,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ head => 'My Associated Resources In Patients', dataFmt => '#0#' },
 			{ dataFmt => '<A HREF="/person/#13#/chart">#1#</A> <BR> #2#, #3# <BR> (#4#) <BR> Room: #5#  <BR> Duration of Stay: #6# <BR> Orders: #7# <BR> Procedures: #8#'},
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#homeArl#',
 		frame => {
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 		},
