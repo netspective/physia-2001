@@ -33,9 +33,9 @@ $STMTMGR_ORG = new App::Statements::Org(
 		SELECT	o.org_internal_id
 		FROM	org o,Org_Category oc
 		WHERE	o.owner_org_id = :1
-		AND	( (o.parent_org_id = :2 AND :3 = 1) OR o.org_internal_id = :2 )
+		AND	( ( (o.parent_org_id = :2 OR o.owner_org_id = :2) AND :3 = 1) OR o.org_internal_id = :2 )
 		AND	oc.parent_id = o.org_internal_id
-		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
+		AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
 	},
 	'selOwnerOrg' => qq{
 		select *
