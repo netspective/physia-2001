@@ -331,12 +331,8 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	$page->field('dupCheckin_returnUrl', $self->getReferer($page))
-		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-
-	#Set batch id field to session batch id
 	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
+	$page->field('dupCheckin_returnUrl', $self->getReferer($page)) if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
@@ -465,6 +461,11 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceMedicaidResubNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
+
+
+		my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+		$page->field('batch_id', $batchInfo->{value_text});
+		$page->field('batch_date', $batchInfo->{value_date});
 
 		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
