@@ -64,7 +64,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			trans_id as referral_id,
 			initiator_id as org_id,
 			consult_id as patient,
-			t.data_text_a as referral_type,
+			rd.caption as referral_type,
 			aa.value_int as claim_number,
 			t.trans_substatus_reason as requested_service,
 			--%simpleDate:trans_end_stamp%,
@@ -77,7 +77,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			trans_subtype as intake_coordinator,
 			trans_substatus_reason as ref_status,
 			p.ssn as ssn
-		from transaction t, trans_attribute aa, person p, person_org_category po
+		from transaction t, trans_attribute aa, person p, person_org_category po, referral_service_descr rd
 		where
 		t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
 		and t.trans_substatus_reason in ('Assigned', 'Unassigned')
@@ -85,6 +85,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		and aa.item_name = 'Referral Insurance'
 		and t.consult_id = p.person_id
 		and po.person_id = p.person_id
+		and rd.id = t.trans_expire_reason
 		and po.org_internal_id = ?
 		order by trans_id DESC
 	},
