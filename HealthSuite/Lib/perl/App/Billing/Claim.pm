@@ -277,10 +277,17 @@ sub setInvoiceHistoryAction
 }
 
 
-sub setInvoiceHistoryComments
+sub setInvoiceHistoryBy
 {
 	my ($self, $value) = @_;
 	$self->{invoiceHistoryItem}->[$self->{historyCount}][2] = $value;
+	$self->{historyCount}++;
+}
+
+sub setInvoiceHistoryComments
+{
+	my ($self, $value) = @_;
+	$self->{invoiceHistoryItem}->[$self->{historyCount}][3] = $value;
 	$self->{historyCount}++;
 }
 

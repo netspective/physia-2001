@@ -270,17 +270,18 @@ sub populateClaims
 	}
 
 	my $claims = $claimList->getClaim();
+	my $queryStatment = qq
+	{
+		select flags
+		from invoice
+		where invoice_id = ?
+	};
+	my $sth = $self->{dbiCon}->prepare("$queryStatment");
+
 	for $i (0..$#$targetInvoices)
 	{
 		my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
-		my $queryStatment = qq
-		{
-			select flags
-			from invoice
-			where invoice_id = $targetInvoices->[$i]
-		};
-		my $sth = $self->{dbiCon}->prepare("$queryStatment");
-		$sth->execute or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+		$sth->execute($targetInvoices->[$i]) or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
 		$claims->[$i]->setFlags($row[0]);
 		if($self->preSubmitStatusCheck($claims->[$i], $attrDataFlag, $row[0]) == 1)
@@ -288,6 +289,8 @@ sub populateClaims
 			$self->assignInvoicePreSubmit($claims->[$i], $targetInvoices->[$i]);
 		}
 	}
+
+	$sth = undef;
 
 	if ($params{dbiHdl} eq "")
 	{
@@ -324,7 +327,7 @@ sub assignPatientInfo
 			name_middle,
 			name_first,
 			person_id,
-			to_char(date_of_birth, \'DD-MON-YYYY\'),
+			to_char(date_of_birth, 'DD-MON-YYYY'),
 			gender,
 			marital_status,
 			ssn,
@@ -353,10 +356,9 @@ sub assignPatientInfo
 	{
 		select value_text, value_type, value_int
 		from person_attribute
-		where parent_id = \'$row[3]\'
-		and value_type in
-	}
-	. ASSOCIATION_EMPLOYMENT_ALL;
+		where parent_id = '$row[3]'
+		and value_type in @{[ ASSOCIATION_EMPLOYMENT_ALL ]}
+	};
 
 	$sth = $self->{dbiCon}->prepare("$queryStatment");
 	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -369,12 +371,16 @@ sub assignPatientInfo
 		$patient->setStudentStatus($row[0] =~ /$a/ ? $row[0] : "");
 
 		my $orgId = $row[2];
+
+		# check this query
+
 		$queryStatment = qq
 		{
 			select org.org_id, org.name_primary
 			from org
 			where org.org_internal_id = $orgId
 		};
+
 		$sth = $self->{dbiCon}->prepare("$queryStatment");
 		$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
@@ -410,7 +416,7 @@ sub assignPatientAttributes
 		select value_text, value_textb, value_type || item_name, value_date
 		from person_attribute, invoice
 		where invoice_id = $invoiceId
-		and parent_id = \'$patientId\'
+		and parent_id = '$patientId'
 	};
 	my $sth = $self->{dbiCon}->prepare("$queryStatment");
 	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -484,6 +490,9 @@ sub assignPatientInsurance
 	{
 		if($row1[0] eq BILL_PARTY_TYPE_INSURANCE)
 		{
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select
@@ -529,6 +538,9 @@ sub assignPatientInsurance
 			my $orgInternalId = $row[10];
 			if ($orgInternalId ne "")
 			{
+
+				# check this query
+
 				$queryStatment = qq
 				{
 					select name_primary, org_id
@@ -544,6 +556,8 @@ sub assignPatientInsurance
 
 				$self->populateAddress($insured->getEmployerAddress(), "org_address", $orgInternalId, "Mailing");
 				$self->populateContact($insured->getEmployerAddress(), "org_attribute", $orgInternalId, "Primary", CONTACT_METHOD_TELEPHONE);
+
+				# check this query
 
 				$queryStatment = qq
 				{
@@ -564,6 +578,9 @@ sub assignPatientInsurance
 					$insured->setStudentStatus($row[0] =~ /$a/ ? $row[0] : "");
 				}
 	    }
+
+
+			# check this query
 
 			$queryStatment = qq
 			{
@@ -592,6 +609,9 @@ sub assignPatientInsurance
 			$insured->setSsn($row[6]);
 			$insured->setName($row[7]);
 
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select attr.value_text
@@ -613,6 +633,9 @@ sub assignPatientInsurance
 		}
 		elsif(($row1[0] eq BILL_PARTY_TYPE_PERSON) || ($row1[0] eq BILL_PARTY_TYPE_ORGANIZATION))
 		{
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select
@@ -864,11 +887,10 @@ sub assignReferralPhysician
 	{
 		select value_text
 		from person_attribute
-		where parent_id = \'$row[3]\'
+		where parent_id = '$row[3]'
 		and item_name = 'UPIN'
-		and value_type =
-	}
-	. CERTIFICATION_LICENSE;
+		and value_type = @{[ CERTIFICATION_LICENSE ]}
+	};
 	$sth = $self->{dbiCon}->prepare("$queryStatment");
 	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 
@@ -957,6 +979,9 @@ sub assignPaytoAndRendFacilityInfo
 			FACILITY_GROUP_NUMBER . 'Workers Comp#' => [$provider, \&App::Billing::Claim::Organization::setWorkersComp, $colValText],
 			FACILITY_GROUP_NUMBER . 'Railroad Medicare#' => [$provider, \&App::Billing::Claim::Organization::setRailroadId, $colValText],
 		};
+
+
+		# check this query
 
 		$queryStatment = qq
 		{
@@ -1052,12 +1077,8 @@ sub assignPolicy
 			where ib.invoice_id = $invoiceId
 			and ib.invoice_item_id is null
 			and ib.bill_status is null
-			and ib.bill_party_type in (
-		}
-		. BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .
-		qq
-		{
-			) order by ib.bill_sequence
+			and ib.bill_party_type in ( @{[ BILL_PARTY_TYPE_PERSON ]} , @{[ BILL_PARTY_TYPE_ORGANIZATION ]} )
+			order by ib.bill_sequence
 		};
 	}
 	else
@@ -1078,11 +1099,7 @@ sub assignPolicy
 			and ib.bill_status is null
 			and ib.bill_ins_id = i.ins_internal_id
 			and ib.invoice_item_id is NULL
-			and ib.bill_party_type =
-		}
-		. BILL_PARTY_TYPE_INSURANCE .
-		qq
-		{
+			and ib.bill_party_type = @{[ BILL_PARTY_TYPE_INSURANCE ]}
  			order by ib.bill_sequence
 		};
 	}
@@ -1098,6 +1115,9 @@ sub assignPolicy
 
 		if($row_bill[3] == BILL_PARTY_TYPE_INSURANCE )
 		{
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select name_primary, org_id
@@ -1121,16 +1141,15 @@ sub assignPolicy
 				'Champus Grade' => [$payer, \&App::Billing::Claim::Payer::setChampusSponsorGrade, $colValText],
 				'Champus Status' => [$payer, \&App::Billing::Claim::Payer::setChampusSponsorStatus, $colValText],
 			};
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select item_name, ia.value_text
 				from insurance ins, insurance_attribute ia, invoice_billing ib
 				where ib.invoice_id = $invoiceId
-				and ib.bill_party_type =
-			}
-			. BILL_PARTY_TYPE_INSURANCE .
-			qq
-			{
+				and ib.bill_party_type = @{[ BILL_PARTY_TYPE_INSURANCE ]}
 				and ib.invoice_item_id is null
 				and ib.bill_sequence = $row_bill[1]
 				and ins.ins_internal_id = ib.bill_ins_id
@@ -1176,11 +1195,14 @@ sub assignPolicy
 		}
 		elsif ($row_bill[3] == BILL_PARTY_TYPE_PERSON)
 		{
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select complete_name
 				from person
-				where person_id = \'$row_bill[0]\'
+				where person_id = '$row_bill[0]'
 			};
 			$sth = $self->{dbiCon}->prepare("$queryStatment");
 			$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -1193,6 +1215,9 @@ sub assignPolicy
 		}
 		elsif ($row_bill[3] == BILL_PARTY_TYPE_ORGANIZATION)
 		{
+
+			# check this query
+
 			$queryStatment = qq
 			{
 				select name_primary, org_id
@@ -1676,10 +1701,10 @@ sub assignInvoiceProperties
 			VALUE_INTB,
 			VALUE_FLOAT,
 			VALUE_FLOATB,
-			to_char(VALUE_DATE, \'DD-MON-YYYY\'),
-			to_char(VALUE_DATEEND, \'DD-MON-YYYY\'),
-			to_char(VALUE_DATEA, \'DD-MON-YYYY\'),
-			to_char(VALUE_DATEB, \'DD-MON-YYYY\')
+			to_char(VALUE_DATE, 'DD-MON-YYYY'),
+			to_char(VALUE_DATEEND, 'DD-MON-YYYY'),
+			to_char(VALUE_DATEA, 'DD-MON-YYYY'),
+			to_char(VALUE_DATEB, 'DD-MON-YYYY')
 		from invoice_attribute
 		where parent_id = $invoiceId
 	};
@@ -1727,7 +1752,7 @@ sub assignInvoiceProperties
 
 	$queryStatment = qq
 	{
-		select to_char(value_date, 'DD-MON-YYYY'), value_text, value_textb
+		select to_char(value_date, 'DD-MON-YYYY'), value_text, cr_user_id, value_textb
 		from invoice_history
 		where parent_id = $invoiceId
 	};
@@ -1738,7 +1763,8 @@ sub assignInvoiceProperties
 	{
 		$claim->setInvoiceHistoryDate($row[0]);
 		$claim->setInvoiceHistoryAction($row[1]);
-		$claim->setInvoiceHistoryComments($row[2]);
+		$claim->setInvoiceHistoryBy($row[2]);
+		$claim->setInvoiceHistoryComments($row[3]);
 	}
 
 	#get all invoice_billing records for a claim
@@ -1826,6 +1852,8 @@ sub assignProviderLicenses
 	my $serviceProviderAddress = $serviceProvider->getAddress();
 	my $state = uc($serviceProviderAddress->getState());
 
+	# check this query
+
 	my $queryStatment = qq
 	{
 		select value_text
@@ -1849,7 +1877,7 @@ sub assignInjuryInformation
 
 	my $queryStatment = qq
 	{
-		select to_char(to_date(value_text,'mm/dd/yyyy'),'DD-MON-YYYY')
+		select to_char(to_date(value_text, 'mm/dd/yyyy'), 'DD-MON-YYYY')
 		from insurance_attribute insa, insurance ins, invoice_billing ib, invoice i
 		where i.billing_id = ib.bill_id
 		and i.invoice_subtype = 6
@@ -1912,7 +1940,7 @@ sub payersRemainingProperties
 					select item_name, value_text, value_textB
 					from invoice_attribute
 					where parent_id = $invoiceId
-					and item_name like \'Third-Party/$billPartyType[$row[2]]/%\'
+					and item_name like 'Third-Party/$billPartyType[$row[2]]/%'
 				};
 				my $sth1 = $self->{dbiCon}->prepare("$queryStatment");
 				$sth1->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -2316,16 +2344,18 @@ sub populateItems
 		{
 			$functionRef = $itemMap[$tempRow[16]];
 		}
+
 		if (($tempRow[16] == INVOICE_ITEM_LAB) && (uc($tempRow[20]) ne "VOID") && ($tempRow[22] != 1))
 		{
 			$outsideLabCharges = $outsideLabCharges + $tempRow[13]
 		}
+
 		if((uc($tempRow[20]) ne "VOID") && ($tempRow[22] != 1))
 		{
 			$claimCharge[$tempRow[16]] = $claimCharge[$tempRow[16]] + $tempRow[13];
 			$claimChargePaid = $claimChargePaid + $tempRow[15] if (($tempRow[16] == INVOICE_ITEM_SERVICE) ||($tempRow[16] == INVOICE_ITEM_LAB));
-
 		}
+
 		if ($functionRef ne "")
 		{
 			&$functionRef($currentClaim, $procedureObject) ;
