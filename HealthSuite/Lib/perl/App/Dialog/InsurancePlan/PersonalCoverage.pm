@@ -63,9 +63,9 @@ sub new
 			options => FLDFLAG_REQUIRED,
 			),
 		new CGI::Dialog::Field(
-			caption => 'Inactivate Coverage?',
+			caption => 'Confirm?',
 			type => 'bool',
-			name => 'create_record',
+			name => 'do_anyway',
 			style => 'check',
 			options => FLDFLAG_INVISIBLE,
 			),
@@ -230,6 +230,10 @@ sub populateData
 	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId))
 	{
 		$page->addError("Insurance Internal ID '$insIntId' not found.");
+	}
+	unless ($page->field('prev_sequence'))
+	{
+		$page->param('prev_sequence', $page->field('bill_sequence'));
 	}
 	if($page->field('employer_org_id'))
 	{
