@@ -246,8 +246,8 @@ sub execAction_submit
 
 	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-	#unless($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
-	#{
+	unless($invoice->{balance} == 0 && $claimType == App::Universal::CLAIMTYPE_SELFPAY)
+	{
 		my $invStat = $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
 		$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
 		$page->schemaAction(
@@ -267,7 +267,7 @@ sub execAction_submit
 			value_text => $action,
 			value_date => $todaysDate,
 		);
-	#}
+	}
 
 	return $invoiceId;
 }

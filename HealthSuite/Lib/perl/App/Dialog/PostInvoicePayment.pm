@@ -123,7 +123,7 @@ sub new
 	{
 		scope =>'invoice',
 		key => "#param.invoice_id#",
-		data => "'#param.paidBy#' postinspayment to claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
+		data => "'#param.paidBy#' post invoice payment to claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
 	};
 
 	return $self;
@@ -374,7 +374,7 @@ sub execute
 
 	#Redirect
 	my $newInvoiceId;
-	if($invoiceBalance == 0)
+	if($invoiceBalance == 0 && $invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
 	{
 		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 	}
@@ -404,7 +404,7 @@ sub customValidate
 	my ($self, $page) = @_;
 
 	my $paidBy = $page->param('paidBy');
-	if($paidBy eq 'insurance')
+	if($paidBy eq 'insurance')	#this 'if' will never occur for self-pay invoices
 	{
 		my $totalAdjsApplied = 0;
 		my $lineCount = $page->param('_f_line_count');
@@ -426,7 +426,7 @@ sub customValidate
 		my $newBalance = $invoiceInfo->{balance} - $totalAdjsApplied;
 		my $invoiceStat = $invoiceInfo->{invoice_status};
 		if( 
-			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $newBalance > 0  && 
+			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && 
 			(
 				($invoiceStat >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStat <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
 				$invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||
