@@ -10,8 +10,7 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
-
-use App::Statements::Component::Invoice;
+use App::Statements::Search::OrgDirectory;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -22,37 +21,24 @@ sub new
 	my $self = App::Dialog::Directory::new(@_, id => 'provider-Tax ID', heading => 'Tax ID');
 
 	$self->addContent(
-			new CGI::Dialog::Field(caption => 'Tax ID',  name => 'taxID'),
+			new CGI::Dialog::Field(caption => 'Tax ID',  name => 'tax_id'),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
 }
 
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#
-#	$page->field('person_id', $page->session('person_id'));
-#}
-
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $personId = $page->field('person_id');
-
-	if ( $personId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysis', [$personId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysisAll');
-	}
-
-
+	my $taxid = $page->field('tax_id') eq '' ? '*' : $page->field('tax_id');
+	my $taxidLike = $taxid =~ s/\*/%/g ? 'taxid' : '';
+	my $like = $taxidLike  ? '_like' : 'taxid';
+	my $appendStmtName = "sel_$taxidLike$like";
+	my $sessionId = $page->session('org_internal_id');
+	return $STMTMGR_ORG_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",
+						[uc($taxid), $sessionId]);
 
 }
 

@@ -10,8 +10,8 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
-
-use App::Statements::Component::Invoice;
+use App::Statements::Search::OrgDirectory;
+use App::Statements::Transaction;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -23,43 +23,35 @@ sub new
 
 	$self->addContent(
 			new CGI::Dialog::Field(caption =>'Service',
-												name => 'Service',
-												options => FLDFLAG_REQUIRED,
-												type => 'select',
-												selOptions => 'Bone Growth Stimulators;Durable Medical Equipment;DI/R Full Service Imaging;DI/R Open MRI;DI/R MRI & CT Scan Only;DI/R MRI Only;DI/R CT Scan Only'),
+						name => 'service',
+						size => 6,
+						maxLength => 6),
+			#new CGI::Dialog::Field(caption =>'Service',
+			#			name => 'service',
+			#			options => FLDFLAG_PREPENDBLANK,
+			#			fKeyStmtMgr => $STMTMGR_TRANSACTION,
+			#			fKeyStmt => 'selIntakeService',
+			#			fKeyDisplayCol => 1,
+			#			fKeyValueCol => 0),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
 }
 
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#
-#	$page->field('person_id', $page->session('person_id'));
-#}
-
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $personId = $page->field('person_id');
+	my $service = $page->field('service') eq '' ? '*' : $page->field('service');
+	my $serviceLike = $service =~ s/\*/%/g ? 'onlyservice_like' : 'onlyservice';
+	my $appendStmtName = "sel_$serviceLike";
+	my $sessionId = $page->session('org_internal_id');
 
-	if ( $personId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysis', [$personId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysisAll');
-	}
-
-
+	return $STMTMGR_ORG_SERVICE_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",
+						[uc($service), $sessionId]);
 
 }
-
 
 # create a new instance which will automatically add it to the directory of
 # reports
