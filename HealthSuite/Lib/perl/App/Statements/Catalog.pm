@@ -529,7 +529,24 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		FROM 	offering_catalog_entry oce , offering_catalog_entry oce2
 		WHERE	oce.entry_id= :1
 		AND	oce2.entry_id = oce.parent_entry_id
-	}
+	},
+
+	'selFindDescByCode' =>qq
+	{
+		SELECT 	   NVL(NVL((
+			       NVL((SELECT description FROM Ref_HCPCS WHERE UPPER(hcpcs) = UPPER(:1)),
+			       	   (SELECT description FROM Ref_CPT WHERE UPPER(cpt) = UPPER(:1))
+			       	   )),
+		       		(SELECT 	oce.entry_id
+		       		FROM 	offering_catalog oc , offering_catalog_entry oce
+		       		WHERE	UPPER(oce.code) = UPPER(:1)
+		       		AND	oc.org_internal_id = :2
+		       		AND	oce.catalog_id = oc.internal_catalog_id
+				AND	oc.catalog_type = 2)
+				),NULL)	as  description       
+				
+		FROM DUAL
+	},
 	
 );
 
