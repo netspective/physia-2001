@@ -160,7 +160,13 @@
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
 		</deliverable>
-
+		<deliverable id="1440">
+			Added 2 more columns in the 'Monthly Audit Recap' report to showup the count of established and new patients
+		</deliverable>
+		<deliverable id="1171">
+			UI: Added a new component called 'Appointment Discard Type Count' to give the count of 'Rescheduled', 'No Show' 
+				and 'Cancel' appointments.
+		</deliverable>		
 	</deliverables>
 </release-notes>
 
