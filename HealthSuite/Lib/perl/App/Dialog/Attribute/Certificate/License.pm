@@ -36,7 +36,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(
 			type => 'select',
-			selOptions => 'DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification;Nursing/License;Memorial Sisters Charity;EPSDT',
+			selOptions => 'DEA;DPS;IRS;Board Certification;Nursing/License;Memorial Sisters Charity;EPSDT',
 			caption => 'License',
 			name => 'value_textb',
 			options => FLDFLAG_REQUIRED,
