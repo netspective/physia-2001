@@ -370,7 +370,7 @@ sub execute
 	my $planName = $page->field('plan_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_DEBUG, 'selInsPlan', $productName, $planName);
+	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
 	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
 
