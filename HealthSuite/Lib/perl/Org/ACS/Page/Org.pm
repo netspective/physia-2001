@@ -233,6 +233,7 @@ sub prepare_view_profile
 					<font size=1 face=arial>
 					#component.stpt-org.contactMethodsAndAddresses#<BR>
 					#component.stpt-org.miscNotes#<BR>
+					#component.stpt-org.listAssociatedOrgs#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=60%>
