@@ -548,7 +548,6 @@ sub getFS
 	my $fsList=undef;
 	foreach my $id (@planIds)
 	{
-		#
 		#Get Parent Id for Plan
 		my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $id);
 
@@ -605,6 +604,7 @@ sub setPayerFields
 	{
 		if($ins->{group_name} eq 'Insurance')
 		{
+			$page->addError();					
 			$insSeq = $ins->{bill_seq_id};
 			if($insSeq == $prevSeq + 1)
 			{
@@ -623,7 +623,7 @@ sub setPayerFields
 			$ins_type="$ins->{bill_seq}";
 
 			#Added to store plan internal Ids for getFS
-			push(@planIds,$insurance->{'ins_internal_id'});
+			push(@planIds,$ins->{ins_internal_id});
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
@@ -636,7 +636,7 @@ sub setPayerFields
 			$ins_type = "Work Comp";
 
 			#Added to store plan internal Ids for getFS
-			push(@planIds,$insurance->{'ins_internal_id'});
+			push(@planIds,$ins->{ins_internal_id});
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
