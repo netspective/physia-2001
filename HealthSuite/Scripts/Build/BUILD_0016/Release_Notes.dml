@@ -123,9 +123,11 @@
 
 		<deliverable id="1352">
 			UI : Updated the login dialog to check if the person logged in belongs to 
-	     'Physician', 'Staff', 'Nurse', 'Adminstrator' or 'Superuser' category. 
-	     Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
-	     category from the 'Person_Org_Category' table.
+	     		     'Physician', 'Staff', 'Nurse', 'Adminstrator' or 'Superuser' category. 
+	     		      Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
+	     		      category from the 'Person_Org_Category' table.
+	     		NOTE: Fixed the reopened bug by adding a new icon besides the update icon in the personnel component to update the password
+	     		    
 		</deliverable>				
 
 		<deliverable id="1357">
