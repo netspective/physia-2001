@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.1 2000-11-27 03:20:30 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.2 2000-11-27 18:15:09 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -177,6 +177,7 @@ sub populateData
 		$existingMsg = $STMTMGR_DOCUMENT->getRowAsHash($page, STMTMGRFLAG_NONE, 'selMessage', $messageId);
 		$existingMsg->{to} = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessageToList', $messageId);
 		$existingMsg->{cc} = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessageCCList', $messageId);
+		$existingMsg->{cc} = [] unless defined $existingMsg->{cc};
 	}
 	$self->{existing_message} = $existingMsg;
 
@@ -190,7 +191,7 @@ sub populateData
 		# We're displaying an existing message
 		$page->field('from', $existingMsg->{'from_id'});
 		$page->field('to', join(',', @{$existingMsg->{'to'}}));
-		$page->field('cc', join(',', @{$existingMsg->{'cc'}})) if defined $existingMsg->{'cc'};
+		$page->field('cc', join(',', @{$existingMsg->{'cc'}}));
 		my $patientId = defined $existingMsg->{'repatient_id'} ? $existingMsg->{'repatient_id'} : '';
 		#$patientId = $existingMsg->{'repatient_name'} . qq{ (<a target="regarding_patient" href="/person/$patientId/chart">$patientId</a>)} if $patientId;
 		$page->field('patient_id', $patientId);
@@ -387,7 +388,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.1 2000-11-27 03:20:30 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.2 2000-11-27 18:15:09 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
