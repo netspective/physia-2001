@@ -625,9 +625,19 @@ sub execute_add
 			state => $page->field('addr_state') || undef,
 			zip => $page->field('addr_zip')|| undef,
 			_debug => 0
-		) if $page->field('addr_line1') ne '';
+		) if $page->field('addr_line1') ne '' && $self->{orgtype} ne 'dir-entry';
 
-
+$page->schemaAction(
+			'Org_Address', $command,
+			parent_id => $orgIntId || undef,
+			address_name => 'Street',
+			line1 => $page->field('addr_line1') || undef,
+			line2 => $page->field('addr_line2') || undef,
+			city => $page->field('addr_city') || undef,
+			state => $page->field('addr_state') || undef,
+			zip => $page->field('addr_zip')|| undef,
+			_debug => 0
+		) if $page->field('addr_line1') ne '' && $self->{orgtype} eq 'dir-entry';
 
 	##Then add attributes
 
