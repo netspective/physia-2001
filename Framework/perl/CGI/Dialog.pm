@@ -2080,7 +2080,7 @@ sub execute
 
 sub handlePostExecute
 {
-	my ($self, $page, $command, $flags, $specificRedirect) = @_;
+	my ($self, $page, $command, $flags, $specificRedirect, $message) = @_;
 	if(my $activityLog = $self->{activityLog})
 	{
 		$page->recordActivity(
@@ -2111,20 +2111,31 @@ sub handlePostExecute
 		);
 		return 1;
 	}
-	if($specificRedirect)
+	
+	my $url = defined $specificRedirect ? $specificRedirect : ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page) || $page->param('home'));
+
+	if (defined $message)
 	{
-		$page->redirect($specificRedirect);
-		return 1;
+		$page->addContent(qq{$message<BR>Click <a href="$url">Here</a> to Continue});
 	}
 	else
 	{
-		unless($flags & DLGFLAG_IGNOREREDIRECT)
+		
+		if($specificRedirect)
 		{
-			if(my $url = ($page->param(CGI::Dialog::Buttons::NEXTACTION_PARAMNAME) || $self->getReferer($page) || $page->param('home')))
+			$page->redirect($specificRedirect);
+			return 1;
+		}
+		else
+		{
+			unless($flags & DLGFLAG_IGNOREREDIRECT)
 			{
-				#$page->addError("Redirecting to $url");
-				$page->redirect($url);
-				return 1;
+				if($url)
+				{
+					#$page->addError("Redirecting to $url");
+					$page->redirect($url);
+					return 1;
+				}
 			}
 		}
 	}
