@@ -662,7 +662,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from 	person_attribute pa, attribute_value_type avt
 			where	pa.parent_id = ?
 			and	pa.value_type = avt.id
-			and pa.value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
+			and pa.value_type between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_UNEMPLOYED]}
 		},
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
@@ -2858,6 +2858,26 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			columnDefn =>
 			[
 				{colIdx => 0, head => 'Trans ID', dataFmt => "<a href=\"javascript:doActionPopup('/org/#17#/dlg-update-trans-6000/#0#');\">#0#</a>"},
+				{colIdx => 1, head => 'Claim Number', dataFmt => '#5#'},
+				{colIdx => 2, head => 'ICD Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/icd');\">#8#</a>"},
+				{colIdx => 3, head => 'CPT Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/cpt');\">#9#</a>"},
+				{colIdx => 4, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#11#'},
+				{colIdx => 5, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#12#'},
+				{colIdx => 6, head => 'Referral Type', dataFmt =>'#13#'},
+				{colIdx => 7, head => 'SSN', dataFmt => '#2#'},
+				{colIdx => 8, head => 'Date of Birth', dataFmt => '#3#'},
+				{colIdx => 9, head => 'Comments', dataFmt =>'#16#'},
+			],
+		},
+},
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------
+'sel_referral_buttons'=> {
+
+		publishDefn => 	{
+			columnDefn =>
+			[
+				{colIdx => 0,  dataFmt => "<a href=\"javascript:doActionPopup('/org/#17#/dlg-update-trans-6000/#0#');\">#0#</a>"},
 				{colIdx => 1, head => 'Claim Number', dataFmt => '#5#'},
 				{colIdx => 2, head => 'ICD Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/icd');\">#8#</a>"},
 				{colIdx => 3, head => 'CPT Codes', dataFmt =>"<a href=\"javascript:doActionPopup('/lookup/cpt');\">#9#</a>"},
