@@ -14,7 +14,7 @@ use App::Configuration;
 use Security::AccessControl;
 use Set::IntSpan;
 
-use vars qw(@ISA $VERSION);
+use vars qw(@ISA $VERSION %ENV);
 
 @ISA = qw(CGI);
 $VERSION = '1.1';
@@ -831,9 +831,23 @@ sub establishSession
 #
 sub hasPermission
 {
-	return 1;
-
 	my $self = shift;
+
+	my $disableSecurity = 0;
+	
+	if (defined ($ENV{HS_NOSECURITY}))
+	{
+		if ( ($ENV{HS_NOSECURITY} ? 1 : 0) ) 
+		{
+			$disableSecurity = 1;
+		}
+	}
+
+	if ($disableSecurity)
+	{
+		$self->addContent('<h2><blink>Role-based permissions have been disabled.</blink></h2>');
+		return 1;
+	}
 
 	my $permIds = $self->{acl}->{permissionIds};
 	foreach (@_)
@@ -843,7 +857,7 @@ sub hasPermission
 			return 1 if $self->{permissions}->member($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_LISTINDEX]);
 		}
 	}
-	
+
 	return 0;
 }
 
