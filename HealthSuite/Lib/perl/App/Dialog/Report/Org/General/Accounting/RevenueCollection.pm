@@ -34,11 +34,11 @@ sub new
 				begin_caption => 'Report Begin Date',
 				end_caption => 'Report End Date',
 				),
-			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-						fields => [
-			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
-			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
-			]),
+			#new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			#			fields => [
+			#new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
+			#new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
+			#]),
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			new App::Dialog::Field::Person::ID(incSimpleName=>1,caption =>'Physician ID', name => 'person_id',types => ['Physician'] ),
 			new CGI::Dialog::Field(type => 'select',
@@ -93,8 +93,8 @@ sub execute
 	my $reportEndDate = $page->field('batch_end_date')||'01/01/9999';
 	my $orgId = $page->field('org_id');
 	my $person_id = $page->field('person_id')||undef;
-	my $batch_from = $page->field('batch_id_from')||undef;
-	my $batch_to = $page->field('batch_id_to')||undef;
+	my $batch_from = undef; #$page->field('batch_id_from')||undef;
+	my $batch_to = undef; #$page->field('batch_id_to')||undef;
 	my $format_report = $page->field('format');
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
@@ -245,7 +245,7 @@ sub execute
 		my $tempDir = $CONFDATA_SERVER->path_temp();
 		my $Constraints = [
 		{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
-		{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+		#{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
 		{ Name=> "Site Organization ID ", Value => $orgId },
 		{ Name=> "Physician ID ", Value => $person_id },
 		{ Name=> "Report View ", Value => "Whole" },
@@ -282,7 +282,7 @@ sub execute
 		my $tempDir = $CONFDATA_SERVER->path_temp();
 		my $Constraints = [
 		{ Name => "Batch Report Date ", Value => $reportBeginDate."  ".$reportEndDate},
-		{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
+		#{ Name => "Batch ID Range ", Value => $batch_from."  ".$batch_to},
 		{ Name=> "Site Organization ID ", Value => $orgId },
 		{ Name=> "Physician ID ", Value => $person_id },
 		{ Name=> "Report View ", Value => "Segmented" },
