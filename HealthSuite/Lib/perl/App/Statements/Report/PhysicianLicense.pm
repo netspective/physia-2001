@@ -15,11 +15,12 @@ $STMTRPTDEFN_PHYSICIAN_LICENSE =
 	columnDefn =>
 		[
 			{ colIdx => 0, head => 'Physician ID', dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>' },
-			{ colIdx => 1, head => 'Name', tAlign=>'left', ,dataFmt => '#1#',dAlign =>'left' },
-			{ colIdx => 2, head => 'Facility ID', dataFmt => '#2#'},
-			{ colIdx => 3, head => 'License Name', dataFmt => '#3#'},
-			{ colIdx => 4, head => 'License No.', dataFmt => '#4#'},
-			{ colIdx => 5, head => 'Expiry Date', dataFmt => '#5#'},
+			{ colIdx => 1, head => 'Category', dataFmt => '#1#'},
+			{ colIdx => 2, head => 'Name', tAlign=>'left', ,dataFmt => '#2#',dAlign =>'left' },
+			{ colIdx => 3, head => 'Facility ID', dataFmt => '#3#'},
+			{ colIdx => 4, head => 'License Name', dataFmt => '#4#'},
+			{ colIdx => 5, head => 'License No.', dataFmt => '#5#'},
+			{ colIdx => 6, head => 'Expiry Date', dataFmt => '#6#'},
 		],
 };
 #		and poc.category = 'Physician'
@@ -29,6 +30,7 @@ $STMTMGR_REPORT_PHYSICIAN_LICENSE_MAIN = qq
 
 	SELECT
 		p.person_id,
+		poc.category,
 		p.simple_name,
 		pa.name_sort facility_id,
 		pa.item_name license_name,
