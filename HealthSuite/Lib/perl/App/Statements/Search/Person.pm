@@ -137,14 +137,14 @@ my %personTemplates = (
 	'sel_phone' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'att.value_text = ?',
+			 whereCond => 'hphone.value_text = ?',
 			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'att.value_text like ?',
+			 whereCond => 'hphone.value_text like ?',
 			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
