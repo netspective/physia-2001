@@ -248,6 +248,55 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
 	},
 
+	'sel_verified_events' => {
+		sqlStmt => qq {
+			select
+				to_char(scheduled_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') verification_dates,
+				(
+					select product_name || ' (Primary)'
+					from insurance
+					where owner_person_id = :2
+					and owner_org_id = :1
+					and bill_sequence = 1
+					and record_type = 3
+					and not ins_type = 7
+				) as product_name,
+				ea.value_text,
+				e.event_id
+			from event e, event_attribute ea
+			where e.event_id = ea.parent_id
+			and (mod(trunc(ea.value_intb / 4), 2) = 1
+			or mod(trunc(ea.value_intb / 8), 2) = 1)
+			and e.owner_id = :1
+			and e.event_status in (0, 1, 2)
+			and e.checkin_stamp is not null
+			and e.discard_type is null
+			and ea.value_text = :2
+			order by 1, 2
+		},
+
+		publishDefn => {
+			columnDefn => [
+				{
+					colIdx => 0,
+					head => 'Verification Dates',
+					dataFmt => qq {
+						<A HREF = '/person/#2#/dlg-verify-insurance-records/#3#/#2#?_dialogreturnurl=/person/#2#/billing'>#0#</A>
+					},
+					hAlign => 'center',
+					dAlign => 'center',
+				},
+				{
+					colIdx => 1,
+					head => 'Insurance Product',
+					dataFmt => '#1#',
+					hAlign => 'center',
+					dAlign => 'left',
+				},
+			],
+		},
+	},
+
 # ---------------------------------------------------------------------------------------
 	'sel_detail_alerts' => {
 		sqlStmt => qq{
