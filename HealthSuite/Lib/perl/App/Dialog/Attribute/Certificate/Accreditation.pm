@@ -30,7 +30,6 @@ sub initialize
 						caption => 'Accreditation',
 						name => 'value_text',
 						options => FLDFLAG_REQUIRED,
-						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 						attrNameFmt => "#field.value_text#",
 						fKeyStmtMgr => $STMTMGR_PERSON,
 						valueType => $self->{valueType},
