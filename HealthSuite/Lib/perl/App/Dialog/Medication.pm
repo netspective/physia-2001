@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.13 2000-12-28 23:31:41 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.14 2000-12-29 16:50:54 radha_kotagiri Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -47,8 +47,8 @@ sub new
 			fields => [
 				new CGI::Dialog::Field(caption => 'Dose',
 					name => 'dose',
-					size => 4,
-					type => 'integer',
+					size => 5,
+					type => 'float',
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Units',
@@ -118,8 +118,8 @@ sub new
 			fields => [
 				new CGI::Dialog::Field(caption => 'Quantity',
 					name => 'quantity',
-					size => 4,
-					type => 'integer',
+					size => 5,
+					type => 'float',
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(
@@ -261,7 +261,7 @@ sub makeStateChanges
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
 	$command = 'prescribe' if $page->flagIsSet(PAGEFLAG_ISHANDHELD);
-	
+
 	if ($command eq 'add')
 	{
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
@@ -396,8 +396,9 @@ sub populateData
 	#	{
 
 			my $personName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPersonSimpleNameById', $page->param('person_id'));
-
-			$page->field('parent_id', $personName);
+			my $personId = $page->param('person_id');
+			my $nameAndId = $personName . " (" .$personId. ")";
+			$page->field('parent_id',  $nameAndId);
 	#	}
 	#}
 
