@@ -12,6 +12,12 @@
 		<build-manager>Lloyd Brodsky</build-manager>
 		<tested-date>12/15/2000 ***Tentative***</tested-date>
 		<release-date>TBD</release-date>
+		<overview>
+			Testing Overview
+		</overview>	
+		<description>
+			Testing Description
+		</description>	
 	</release-info>
 
 	<deliverables>
