@@ -236,6 +236,14 @@ sub new
 			}
 		}
 		$params{findPopup} = "/lookup/\l$lookupType/id" unless $params{findPopup};
+
+		my $addType = 'patient';
+		if(! $params{addPopup})
+		{
+			$addType = $params{addType} || $params{types}->[0];
+		}
+		$params{addPopup} = "/org/#session.org_id#/dlg-add-$addType" unless $params{addPopup};
+		$params{addPopupControlField} = '_f_person_id' unless exists $params{addPopupControlField};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -416,7 +424,16 @@ sub new
 			}
 		}
 		$params{findPopup} = "/lookup/\l$lookupType/id" unless $params{findPopup};
+
+		my $addType = 'patient';
+		if(! $params{addPopup})
+		{
+			$addType = $params{addType} || $params{types}->[0];
+		}
+		$params{addPopup} = "/org/#session.org_id#/dlg-add-$addType" unless $params{addPopup};
+		$params{addPopupControlField} = '_f_person_id' unless exists $params{addPopupControlField};
 	}
+
 	return CGI::Dialog::Field::new($type, %params);
 }
 
