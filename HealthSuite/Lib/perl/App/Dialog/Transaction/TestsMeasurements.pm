@@ -9,10 +9,17 @@ use App::Universal;
 use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
+
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP  = ('tests' => { transType => App::Universal::TRANSTYPE_TESTSMEASUREMENTS, 
+				heading => '$Command Tests/Measurements',  
+				_arl_add => ['person_id'], 
+				_idSynonym => 'trans-' . App::Universal::TRANSTYPE_TESTSMEASUREMENTS() 
+			},);
 
 sub new
 {
@@ -166,17 +173,5 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant TESTSMEASUREMENTS_DIALOG => 'Dialog/Pane/TestsMeasurements';
-
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		TESTSMEASUREMENTS_DIALOG,
-		'Moved the dialog for Tests and Measurements from transaction.pm to a seperate file in Transaction directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-		TESTSMEASUREMENTS_DIALOG,
-		'Added sub Execute subroutine.'],
-);
 
 1;

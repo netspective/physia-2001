@@ -12,9 +12,18 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Directive);
+
+%RESOURCE_MAP = (
+	'directive-patient' => {
+		valueType => App::Universal::DIRECTIVE_PATIENT,
+		_arl_add => ['person_id'],
+		_arl_remove => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::DIRECTIVE_PATIENT()
+		},
+);
 
 sub initialize
 {
@@ -59,14 +68,5 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant PANEDIALOG_DIRECTIVE => 'Dialog/Pane/Advance Directive (Patient)';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-			PANEDIALOG_DIRECTIVE,
-		'Removed Item Path from Item Name'],
-
-);
 
 1;

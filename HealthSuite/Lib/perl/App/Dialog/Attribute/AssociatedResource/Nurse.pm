@@ -10,9 +10,19 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'resource-nurse' => {
+		valueType => App::Universal::ATTRTYPE_RESOURCEPERSON,
+		heading => '$Command Associated Physician',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-assoc-nurse-' .App::Universal::ATTRTYPE_RESOURCEPERSON()
+		},
+);
 
 sub new
 {
@@ -40,7 +50,7 @@ sub new
 										options => FLDFLAG_REQUIRED,
 										readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE)
 			);
-			
+
 		$self->{activityLog} =
 		{
 				level => 1,
@@ -108,23 +118,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ASSOCRSRC => 'Dialog/Associated Resource';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/01/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Created a new dialog for Associated resource pane in Nurse Profile.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Added customValidate to do the validation for not adding the same physican multiple times. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Removed Item Path from Item Name'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/17/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;

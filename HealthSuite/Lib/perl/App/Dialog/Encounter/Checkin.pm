@@ -9,7 +9,14 @@ use CGI::Dialog;
 use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Universal;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'checkin' => {
+		_arl => ['event_id'] 
+		},
+	);
+	
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use Date::Manip;

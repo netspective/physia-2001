@@ -13,10 +13,20 @@ use App::Dialog::Field::Attribute;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 use App::Statements::Person;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Certificate);
+
+%RESOURCE_MAP = (
+	'affiliation' => {
+		valueType => App::Universal::ATTRTYPE_AFFILIATION,
+		heading => '$Command Affiliation',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_AFFILIATION()
+		},
+);
 
 sub initialize
 {
@@ -41,15 +51,5 @@ sub initialize
 
 	$self->SUPER::initialize();
 }
-
-
-use constant PANEDIALOG_CERTIFICATE => 'Dialog/Certificate/Affiliation';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_CERTIFICATE,
-		'Created new dialog for Affiliation.'],
-);
 
 1;

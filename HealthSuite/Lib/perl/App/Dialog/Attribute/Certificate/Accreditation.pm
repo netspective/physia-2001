@@ -13,10 +13,20 @@ use App::Dialog::Attribute::Certificate;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 use App::Statements::Person;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Certificate);
+
+%RESOURCE_MAP = (
+	'certificate-accreditation' => {
+		valueType => App::Universal::ATTRTYPE_ACCREDITATION,
+		heading => '$Command Accreditation',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_ACCREDITATION()
+		},
+);
 
 sub initialize
 {
@@ -40,15 +50,5 @@ sub initialize
 
 	$self->SUPER::initialize();
 }
-
-
-use constant PANEDIALOG_CERTIFICATE => 'Dialog/Certificate/Accreditation';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_CERTIFICATE,
-		'Created new dialog for Accreditation.'],
-);
 
 1;

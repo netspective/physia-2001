@@ -14,13 +14,19 @@ use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Person;
 use Date::Manip;
-use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'assoc-family' => {
+		valueType => App::Universal::ATTRTYPE_FAMILY,
+		heading => '$Command Family Contact',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_FAMILY()
+		},
+);
 
 sub new
 {
@@ -43,7 +49,7 @@ sub new
 		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
@@ -140,18 +146,4 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant PANEDIALOG_FAMILY => 'Dialog/Family';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/02/2000', 'RK',
-		PANEDIALOG_FAMILY,
-		'Added a new dialog for Family Pane.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'RK',
-		PANEDIALOG_FAMILY,
-		'Renamed the Package name from App::Dialog::Association::Family to App::Dialog::Attribute::Association::Family.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_FAMILY,
-		'Removed Item Path from Item Name'],
-);
 1;

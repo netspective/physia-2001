@@ -13,13 +13,19 @@ use App::Dialog::Field::Organization;
 use Date::Manip;
 use DBI::StatementManager;
 use App::Statements::Person;
-use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'assoc-provider' => {
+		valueType => App::Universal::ATTRTYPE_PROVIDER,
+		heading => '$Command Care Provider',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_PROVIDER()
+		},
+);
 
 sub new
 {
@@ -128,20 +134,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_CAREPROVIDER => 'Dialog/Care Provider';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/02/2000', 'RK',
-		PANEDIALOG_CAREPROVIDER,
-		'Added a new dialog for Care Provider Pane.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'RK',
-		PANEDIALOG_CAREPROVIDER,
-		'Renamed the Package name from App::Dialog::Association::CareProvider to App::Dialog::Attribute::Association::CareProvider.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_CAREPROVIDER,
-		'Removed Item Path from Item Name'],
-);
 
 1;

@@ -12,7 +12,16 @@ use App::Statements::Insurance;
 use CGI::Dialog;
 use App::Universal;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-product' => {
+			heading => '$Command Insurance Product',
+			_arl_add => ['product_name'],
+			_arl_modify => ['ins_internal_id'],
+			},
+		);
+
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
@@ -36,14 +45,14 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_product_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_org_id'),
 
-			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id', 
-				name => 'ins_org_id', 
+			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
+				name => 'ins_org_id',
 				options => FLDFLAG_REQUIRED
 			),
-			new App::Dialog::Field::Insurance::Product::New(caption => 'Product Name', 
-				name => 'product_name', 
+			new App::Dialog::Field::Insurance::Product::New(caption => 'Product Name',
+				name => 'product_name',
 				size => 24,
-				findPopup => '/lookup/insproduct/insorgid/itemValue', 
+				findPopup => '/lookup/insproduct/insorgid/itemValue',
 				findPopupControlField => '_f_ins_org_id',
 				options => FLDFLAG_REQUIRED,
 			),
@@ -52,13 +61,13 @@ sub new
 				column => 'Insurance.ins_type',
 				typeGroup => ['insurance', 'workers compensation']
 			),
-			new CGI::Dialog::Field(caption => 'Fee Schedule(s)', 
+			new CGI::Dialog::Field(caption => 'Fee Schedule(s)',
 				name => 'fee_schedules',
 				size => 24,
 				findPopupAppendValue => ',',
 				findPopup => '/lookup/catalog',
 			),
-			new App::Dialog::Field::Address(caption=>'Billing Address', 
+			new App::Dialog::Field::Address(caption=>'Billing Address',
 				name => 'billing_addr',
 				options => FLDFLAG_REQUIRED
 			),
@@ -75,7 +84,7 @@ sub new
 							invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 				]
 			),
-			new CGI::Dialog::Subhead(heading => 'Remittance Information', 
+			new CGI::Dialog::Subhead(heading => 'Remittance Information',
 				name => 'remittance_heading'
 			),
 			new CGI::Dialog::Field::TableColumn(caption => 'Remittance Type',
@@ -143,21 +152,21 @@ sub populateData
 	$page->field('pre_org_id', $preOrgId);
 
 	$STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceAddr', $insIntId);
-	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr_Org',	$insIntId, 'Contact Method/Telephone/Primary', 
+	my $insPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org',	$insIntId, 'Contact Method/Telephone/Primary',
 		$page->session('org_id')
 	);
 	$page->field('phone_item_id', $insPhone->{'item_id'});
 	$page->field('phone', $insPhone->{'value_text'});
 
-	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary', 
+	my $insFax = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selInsuranceAttr_Org', $insIntId, 'Contact Method/Fax/Primary',
 		$page->session('org_id')
 	);
 	$page->field('fax_item_id', $insFax->{'item_id'});
 	$page->field('fax', $insFax->{'value_text'});
 
-	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
+	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule', $page->session('org_id'));
 	my @feeList = ();
 	my @feeItemList = ();
@@ -253,7 +262,7 @@ sub handleAttributes
 
 	my @feeSched =split(',', $page->field('fee_schedules'));
 
-	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule', 
+	$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selDeleteFeeSchedule',
 		$insIntId, $page->session('org_id'));
 
 	foreach my $fee (@feeSched)

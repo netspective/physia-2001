@@ -8,15 +8,23 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Scheduling;
 use App::Statements::Component::Scheduling;
+use vars qw(@ISA %RESOURCE_MAP);
 
-use vars qw(@ISA @CHANGELOG);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'resource-session-physicians' => {
+		valueType => App::Universal::ATTRTYPE_RESOURCEPERSON,
+		heading => '$Command Session Set Of Physicians',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_RESOURCEPERSON()
+		},
+);
 
 sub new
 {
@@ -29,7 +37,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 
-	$self->addContent(	new CGI::Dialog::Field(type => 'hidden', name => 'attr_path')  );	
+	$self->addContent(	new CGI::Dialog::Field(type => 'hidden', name => 'attr_path')  );
 	$self->addContent(
 			new CGI::Dialog::Field(caption => 'Physician Name',
 										#type => 'foreignKey',
@@ -46,7 +54,7 @@ sub new
 										options => FLDFLAG_REQUIRED,
 										readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE)
 			);
-			
+
 		$self->{activityLog} =
 		{
 				level => 1,
@@ -72,13 +80,13 @@ sub _customValidate
 	my $parentId = $page->param('person_id');
 
 	my $physicianList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-	
-	
+
+
 		if ($physicianList->{'value_int'} eq 1)
 		{
 			$physicianName->invalidate($page, " A list of Physicians allready exists. Modify the existing record to change the list.");
 		}
-	
+
 }
 
 sub makeStateChanges
@@ -94,25 +102,25 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 	my $itemId = $page->param('item_id');
-	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);	
-	
+	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+
 	my @physicians = split(/,/, $physicansList->{value_text});
-	$page->field('value_text', @physicians);	
+	$page->field('value_text', @physicians);
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	my $parentId =  $page->param('person_id');	
-	my $physiciansString = join(',', $page->field('value_text'));	
+	my $parentId =  $page->param('person_id');
+	my $physiciansString = join(',', $page->field('value_text'));
 	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selSessionPhysicians', $parentId);
 	my $itemId = $physicansList->{'item_id'};
-	
+
 	if ($itemId ne '' && $command eq 'add')
 	{
 		$command = 'update';
 	}
-	
+
 	$page->schemaAction(
 		'Person_Attribute',	$command,
 		item_id => $command eq 'add' ? undef : $itemId,
@@ -124,9 +132,9 @@ sub execute
 		value_int =>  1,
 		_debug => 0
 	);
-	
+
 	my $userId = $page->session('user_id');
-	
+
 	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_resources', $userId, 'Physician');
 
@@ -145,27 +153,9 @@ sub execute
 			_debug => 0
 		);
 	}
-	
+
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ASSOCRSRC => 'Dialog/Associated Resource';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/01/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Created a new dialog for Associated resource pane in Nurse Profile.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Added customValidate to do the validation for not adding the same physican multiple times. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Removed Item Path from Item Name'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/17/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;

@@ -13,9 +13,14 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ( 'phone-message' => { transType => App::Universal::TRANSTYPE_PC_TELEPHONE, 
+					heading => '$Command Phone Message', 
+					_arl => ['person_id'] , 
+					_arl_modify => ['trans_id'], 
+					_idSynonym => 'trans-' .App::Universal::TRANSTYPE_PC_TELEPHONE() },);
 
 sub new
 {

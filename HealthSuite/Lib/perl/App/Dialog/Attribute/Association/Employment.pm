@@ -15,9 +15,26 @@ use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
 use Date::Manip;
-use vars qw(@ISA);
-use vars qw(@ISA );
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'assoc-employment' => {
+		heading => '$Command Employment',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => [
+			'attr-' .App::Universal::ATTRTYPE_EMPLOYEDFULL(),
+			'attr-' .App::Universal::ATTRTYPE_EMPLOYEDPART(),
+			'attr-' .App::Universal::ATTRTYPE_SELFEMPLOYED(),
+			'attr-' .App::Universal::ATTRTYPE_RETIRED(),
+			'attr-' .App::Universal::ATTRTYPE_STUDENTFULL(),
+			'attr-' .App::Universal::ATTRTYPE_STUDENTPART(),
+			'attr-' .App::Universal::ATTRTYPE_EMPLOYUNKNOWN()
+			],
+		},
+);
 
 sub new
 {

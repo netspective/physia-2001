@@ -11,12 +11,17 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ( 'hospitalization' => { transType => [App::Universal::TRANSTYPE_ADMISSION, App::Universal::TRANSTYPE_SURGERY,App::Universal::TRANSTYPE_THERAPY ], heading => '$Command Hospitalization',  _arl => ['person_id'], _arl_modify => ['trans_id'],
+					_idSynonym => [
+				'trans-' . App::Universal::TRANSTYPE_ADMISSION(),
+				'trans-' . App::Universal::TRANSTYPE_SURGERY(),
+				'trans-' . App::Universal::TRANSTYPE_THERAPY()
+				]
+		   },);
 
 sub new
 {
@@ -102,16 +107,5 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant HOSPITALIZATION_DIALOG => 'Dialog/Pane/Hospitalization';
 
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		HOSPITALIZATION_DIALOG,
-		'Moved the dialog for Hospitalization from transaction.pm to a seperate file in Transaction directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-			HOSPITALIZATION_DIALOG,
-		'Added sub execute, sub populateData_update and sub populateData_remove sub-routines. '],
-);
 1;

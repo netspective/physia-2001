@@ -10,8 +10,14 @@ use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use App::Universal;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-exists' => {
+			_arl_add => ['ins_id'],
+			_arl_modify => ['ins_internal_id'],
+			},
+		);
 
 @ISA = qw(App::Dialog::InsurancePlan);
 
@@ -213,30 +219,5 @@ sub execute
 
 use constant INSURANCEEXISTS_DIALOG => 'Dialog/Existing Insurance';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/27/1999', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		'Updated the code to add the PatientId as InsuredId by default and added the customValidate subroutine to check that if the field rel_to_insured is other than Self, a valid insured_id must be entered. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/10/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		"Added session-activity to the existing insurance plan."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/22/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		"Added a new field to show the list of employee plans for whome the patient is working."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/22/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		"Changed the Date field names in the dialog and in schema actions in order to display the dates while updating and deleting"],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/22/2000', 'MAF',
-		INSURANCEEXISTS_DIALOG,
-		'Cleaned up dialog fields and makeStateChanges.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/12/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/13/2000', 'RK',
-		INSURANCEEXISTS_DIALOG,
-		'Made the Coverage Begin Data and End Date as required fields.'],
-
-);
 
 1;

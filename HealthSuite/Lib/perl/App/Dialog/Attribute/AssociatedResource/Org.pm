@@ -10,9 +10,20 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'resource-org' => {
+		valueType => App::Universal::ATTRTYPE_RESOURCEORG,
+		heading => '$Command Associated Organization',
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_RESOURCEORG()
+		},
+);
+
 
 sub new
 {
@@ -29,7 +40,7 @@ sub new
 	$self->addContent(
 				new App::Dialog::Field::Organization::ID(caption => 'Org ID', name => 'value_text', options => FLDFLAG_REQUIRED)
 			);
-			
+
 	$self->{activityLog} =
 	{
 		level => 2,
@@ -68,17 +79,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ASSOCRSRC => 'Dialog/Associated Resource';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/01/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Added a new dialog for Associated Resource pane in Org profile.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Removed Item Path from Item Name'],
-);
 
 1;

@@ -12,9 +12,14 @@ use App::Statements::Org;
 use App::Statements::Person;
 use App::Statements::Insurance;
 use Date::Manip;
-use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-unique' => {
+			_arl_add => ['ins_id'],
+			_arl_modify => ['ins_internal_id'],
+			},
+		);
 
 @ISA = qw(App::Dialog::InsurancePlan);
 
@@ -158,31 +163,5 @@ sub initialize
 
 use constant INSURANCEUNIQUE_DIALOG => 'Dialog/Unique Insurance';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/27/1999', 'RK',
-		INSURANCEUNIQUE_DIALOG,
-		'Updated the code to add the PatientId as InsuredId by default and added the customValidate subroutine to check that if the field rel_to_insured is other than Self, a valid insured_id must be entered. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/10/2000', 'RK',
-		INSURANCEUNIQUE_DIALOG,
-		"Added session-activity to the unique insurance plan."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/26/2000', 'MAF',
-		INSURANCEUNIQUE_DIALOG,
-		'Fixed problem with handleAttribute not working properly.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/22/2000', 'RK',
-		INSURANCEUNIQUE_DIALOG,
-		"Changed the Date field names in the dialog and in schema actions in order to display the dates while updating and deleting"],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/22/2000', 'MAF',
-		INSURANCEUNIQUE_DIALOG,
-		'Cleaned up dialog fields and makeStateChanges.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/23/2000', 'MAF',
-		INSURANCEUNIQUE_DIALOG,
-		'Removed sub execute. Modularized code.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		INSURANCEUNIQUE_DIALOG,
-		'Replaced fkeyxxx select in the dialogs with Sql statement from Statement Manager'],
-
-
-);
 
 1;

@@ -11,8 +11,16 @@ use App::Statements::Insurance;
 use CGI::Dialog;
 use App::Universal;
 use App::Dialog::Field::Insurance;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-plan' => {
+			heading => '$Command Insurance Plan',
+			productName => ['product_name'],
+			_arl_add => ['plan_name'],
+			_arl_modify => ['ins_internal_id'],
+			},
+		);
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);

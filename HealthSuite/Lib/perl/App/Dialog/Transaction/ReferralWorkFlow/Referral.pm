@@ -7,13 +7,19 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use vars qw(@ISA);
+
 
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Transaction::ReferralWorkFlow);
+
+%RESOURCE_MAP = ('referral' => {heading => 'Add Referral', 
+				_arl => ['person_id'], 
+				_idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL()},
+		);
 
 sub initialize
 {

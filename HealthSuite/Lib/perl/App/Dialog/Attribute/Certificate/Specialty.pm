@@ -13,11 +13,20 @@ use App::Dialog::Field::Attribute;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 use App::Statements::Person;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Certificate);
 
+%RESOURCE_MAP = (
+	'certificate-state' => {
+		valueType => App::Universal::ATTRTYPE_STATE,
+		heading => '$Command State License',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_STATE()
+		},
+);
 
 sub initialize
 {

@@ -11,9 +11,19 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'resource-orgemp' => {
+		valueType => App::Universal::ATTRTYPE_RESOURCEOTHER,
+		heading => '$Command Associated Employee',
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_RESOURCEOTHER()
+		},
+);
 
 sub new
 {
@@ -30,7 +40,7 @@ sub new
 		new App::Dialog::Field::Person::ID(caption => 'Employee ID', name => 'emp_id'),
 
 	);
-	
+
 	$self->{activityLog} =
 	{
 			level => 1,
@@ -79,21 +89,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-
-use constant PANEDIALOG_ASSOCRSRC => 'Dialog/Associated Resource';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/02/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Added new dialog for Associated Staff pane in Org Profile.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Removed Item Path from Item Name'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/16/2000', 'RK',
-		PANEDIALOG_ASSOCRSRC,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;

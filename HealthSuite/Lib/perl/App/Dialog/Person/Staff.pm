@@ -17,10 +17,12 @@ use App::Statements::Person;
 use App::Universal;
 use Date::Manip;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Person);
 
+%RESOURCE_MAP = ( 'staff' => { heading => '$Command Staff Member', 
+			  	_arl => ['person_id'], },);
 #sub new
 #{
 	#my $self = App::Dialog::Person::new(@_, id => 'staff', heading => '$Command Staff', postHtml => "<a href=\"javascript:doActionPopup('/lookup/person');\">Lookup existing staff</a>");

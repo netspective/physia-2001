@@ -18,13 +18,18 @@ use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
 
-#use App::Pane::Item::Property;
-
 use App::Universal;
 use Date::Manip;
 
-use vars qw(@ISA);
-
+use vars qw(@ISA %RESOURCE_MAP);
+%RESOURCE_MAP = (
+	'patient' => {
+		heading => '$Command Patient/Person', 
+		_arl => ['person_id'], 
+		_arl_modify => ['person_id'], 
+		_idSynonym => 'Patient',
+		},
+	);
 @ISA = qw(App::Dialog::Person);
 
 sub initialize

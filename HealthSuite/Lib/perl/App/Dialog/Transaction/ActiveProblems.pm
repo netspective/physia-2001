@@ -12,11 +12,15 @@ use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = ('activeproblems-trans' => {_transType => App::Universal::TRANSTYPEDIAG_TRANSIENT,
+				heading => '$Command Transient Diagnosis',
+				_arl_add => ['person_id'],
+				_arl_remove => ['trans_id'],
+				_idSynonym => 'trans-' . App::Universal::TRANSTYPEDIAG_TRANSIENT() },);
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_);
@@ -142,27 +146,6 @@ sub execute_remove
 	return 'Remove completed.';
 }
 
-use constant ACTIVEPROBLEMS_DIALOG => 'Dialog/ActiveProblems';
-
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		ACTIVEPROBLEMS_DIALOG,
-		'Moved the dialog for Active Problems pane from transaction.pm to a seperate file in Transaction directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-		ACTIVEPROBLEMS_DIALOG,
-		'Added sub execute and sub populateData_remove sub-routines.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/21/2000', 'MAF',
-		ACTIVEPROBLEMS_DIALOG,
-		'Cleaned up and organized code.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/21/2000', 'MAF',
-		ACTIVEPROBLEMS_DIALOG,
-		'Created execute_remove and execute_add subroutines.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/21/2000', 'MAF',
-		ACTIVEPROBLEMS_DIALOG,
-		'Fixed field names and populateData to populate dialogs correctly.'],
-);
 
 1;
 

@@ -17,7 +17,14 @@ use App::Dialog::Field::Catalog;
 use App::Universal;
 use Text::Abbrev;
 
-use vars qw(@ISA @CHANGELOG %PROCENTRYABBREV);
+use vars qw(@ISA  %PROCENTRYABBREV %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'claim' => {
+		_arl_add => ['person_id'], 
+		_arl_modify => ['invoice_id'] 
+		},
+	);
 
 use Date::Manip;
 

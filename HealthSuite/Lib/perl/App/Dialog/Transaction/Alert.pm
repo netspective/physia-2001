@@ -11,12 +11,22 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP =( 'alert-person' => { transType => App::Universal::TRANSTYPE_ALERTORG, heading => '$Command Alert',  
+				    _arl => ['person_id'], _arl_modify => ['trans_id'] ,
+				    _idSynonym => [
+						'trans-' .App::Universal::TRANSTYPE_ALERTORG(),
+						'trans-' .App::Universal::TRANSTYPE_ALERTORGFACILITY(),
+						'trans-' .App::Universal::TRANSTYPE_ALERTPATIENT(),
+						'trans-' .App::Universal::TRANSTYPE_ALERTINSURANCE(),
+						'trans-' .App::Universal::TRANSTYPE_ALERTMEDICATION(),
+						'trans-' .App::Universal::ATTRTYPE_STUDENTPART(),
+						'trans-' .App::Universal::TRANSTYPE_ALERTACTION()
+						] 
+				    },);
 
 sub new
 {
@@ -95,16 +105,4 @@ sub execute
 }
 
 
-use constant ALERT_DIALOG => 'Dialog/Pane/Alert';
-
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		ALERT_DIALOG,
-		'Moved the dialog for Alert from transaction.pm to a seperate file in Transaction directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-			ALERT_DIALOG,
-		'Added sub execute, sub populateData_update and sub populateData_remove sub-routines. '],
-);
 1;

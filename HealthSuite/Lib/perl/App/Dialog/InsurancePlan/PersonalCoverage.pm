@@ -12,7 +12,16 @@ use App::Statements::Insurance;
 use App::Dialog::Field::Insurance;
 use CGI::Dialog;
 use App::Universal;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-coverage' => {
+			heading => '$Command Personal Insurance Coverage',
+			_arl_add => ['plan_name'],
+			_arl_modify => ['ins_internal_id'],
+		   	_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
+		  );
+		  
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);

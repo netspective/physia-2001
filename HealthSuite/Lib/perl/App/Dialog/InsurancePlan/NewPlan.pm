@@ -7,8 +7,16 @@ use CGI::Validator::Field;
 use App::Dialog::InsurancePlan;
 use CGI::Dialog;
 use App::Universal;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'ins-newplan' => {
+			heading => '$Command Insurance Plan',
+			_arl_add => ['ins_id'],
+			_arl_modify => ['ins_internal_id'],
+			_idSynonym => 'ins-' . App::Universal::RECORDTYPE_INSURANCEPLAN },
+		);
+
 use Date::Manip;
 
 @ISA = qw(App::Dialog::InsurancePlan);
@@ -97,11 +105,5 @@ sub initialize
 
 use constant INSURANCEEXISTS_DIALOG => 'Dialog/New Insurance Plan';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/22/2000', 'MAF',
-		INSURANCEEXISTS_DIALOG,
-		'Cleaned up dialog fields and removed makeStateChanges.'],
-);
 
 1;

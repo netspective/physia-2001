@@ -13,7 +13,14 @@ use CGI::Dialog;
 use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Universal;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'checkout' => {
+		_arl => ['event_id'] 
+		},
+	);
+
 use Date::Manip;
 
 @ISA = qw(App::Dialog::Encounter);

@@ -17,10 +17,16 @@ use App::Statements::Person;
 use App::Page::Search::Session;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
-
+use vars qw(@ISA %RESOURCE_MAP);
+%RESOURCE_MAP = (
+	'nurse' => {
+		heading => '$Command Nurse', 
+		_arl => ['person_id'], 
+		_arl_modify => ['person_id'], 
+		_idSynonym => 'Nurse',
+		},
+	);
 @ISA = qw(App::Dialog::Person);
 
 sub initialize
@@ -249,31 +255,5 @@ sub execute_remove
 
 }
 
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-
-use constant NURSE_DIALOG => 'Dialog/Nurse';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/14/1999', 'MAF',
-		NURSE_DIALOG,
-		'Added entry for nursing license and specialties in the Nurse dialog.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/23/2000', 'RK',
-		NURSE_DIALOG,
-		'Added a dropdown list in the Nurse dialog that has the list of physicians.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-		NURSE_DIALOG,
-		'Changed the urls from create/... to org/.... '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/16/2000', 'RK',
-		NURSE_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;

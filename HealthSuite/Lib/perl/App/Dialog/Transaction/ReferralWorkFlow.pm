@@ -7,13 +7,17 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use vars qw(@ISA);
+
 
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ( 'referralworkflow' => {});
+					
 
 sub initialize
 {

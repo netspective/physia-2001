@@ -7,7 +7,7 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use vars qw(@ISA);
+
 use Mail::Sendmail;
 
 use DBI::StatementManager;
@@ -16,8 +16,20 @@ use App::Statements::Org;
 use App::Statements::Transaction;
 use App::Statements::Component::Person;
 
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Transaction::ReferralWorkFlow);
 
+%RESOURCE_MAP = (
+	'referral-auth' => {
+		transId => ['parent_trans_id'], 
+		heading => 'Review Authorization Request', 
+		_arl => ['person_id'], 
+		_arl_add => ['parent_trans_id'], 
+		_arl_modify => ['trans_id'], 
+		_idSynonym => 'trans-' . App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION()
+		},
+	);
 sub initialize
 {
 	my $self = shift;

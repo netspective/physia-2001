@@ -13,10 +13,18 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
+%RESOURCE_MAP = (
+	'refill-request' => {
+		transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, 
+		heading => '$Command Refill Request', 
+		_arl => ['person_id'] , 
+		_arl_modify => ['trans_id'], 
+		_idSynonym => 'trans-refill-' .App::Universal::TRANSTYPE_PRESCRIBEMEDICATION() 
+		},
+	);
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'refillrequest', heading => '$Command Refill Request');

@@ -12,8 +12,19 @@ use App::Dialog::Field::Attribute;
 use App::Dialog::Attribute::Certificate;
 use App::Universal;
 use Date::Manip;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Certificate);
+
+%RESOURCE_MAP = (
+	'certificate-license' => {
+		valueType => App::Universal::ATTRTYPE_LICENSE,
+		heading => '$Command License',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_LICENSE()
+		},
+);
 
 sub initialize
 {

@@ -16,10 +16,14 @@ use App::Statements::Org;
 use App::Statements::Person;
 use App::Universal;
 use Date::Manip;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Person);
 
+%RESOURCE_MAP = ( 'physician' => { heading => '$Command Physician/Provider', 
+				  _arl => ['person_id'], 
+				  _arl_modify => ['person_id'], 
+				  _idSynonym => 'Physician' },);
 
 sub initialize
 {

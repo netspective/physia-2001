@@ -13,9 +13,20 @@ use App::Dialog::Field::Attribute;
 use App::Dialog::Attribute::Authorization;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(App::Dialog::Attribute::Authorization);
+
+
+%RESOURCE_MAP = (
+	'auth-inforelease' => {
+		 valueType => App::Universal::ATTRTYPE_AUTHINFORELEASE,
+		 heading => '$Command Information Release Indicator',
+		 _arl => ['person_id'],
+		 _arl_modify => ['item_id'],
+		 _idSynonym => 'attr-' .App::Universal::ATTRTYPE_AUTHINFORELEASE()
+		 },
+);
 
 sub initialize
 {
@@ -38,17 +49,5 @@ sub initialize
 
 	$self->SUPER::initialize();
 }
-
-use constant PANEDIALOG_AUTHORIZATION => 'Dialog/Authorization/Info Release';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/03/2000', 'MAF',
-		PANEDIALOG_AUTHORIZATION,
-		'Created new dialog for Info Release.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_AUTHORIZATION,
-		'Removed Item Path from Item Name'],
-);
 
 1;

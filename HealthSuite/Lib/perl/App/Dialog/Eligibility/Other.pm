@@ -13,11 +13,17 @@ use DBI::StatementManager;
 use App::Statements::Org;
 use App::Dialog::Field::Insurance;
 
-use vars qw(@ISA);
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
+
+%RESOURCE_MAP = (
+	'eligibility-other' => {
+		heading => '$Command Eligibility', 
+		_arl => ['org_id', 'product_name']
+		},
+	);
 
 @ISA = qw(CGI::Dialog);
 

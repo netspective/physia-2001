@@ -11,13 +11,14 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
-@ISA = qw(CGI::Dialog);
+@ISA = qw(CGI::Dialog );
 
+%RESOURCE_MAP = ( 'medication-prescribe' => { transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, 
+						heading => '$Command Prescribe Medication',  
+						_arl => ['person_id'], _arl_modify => ['trans_id'] , 
+						_idSynonym => 'trans-' . App::Universal::TRANSTYPE_PRESCRIBEMEDICATION() },);
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'medication');
@@ -132,17 +133,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-use constant MEDICATION_DIALOG => 'Dialog/Pane/Medication';
 
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		MEDICATION_DIALOG,
-		'Moved the dialog for Medication from transaction.pm to a seperate file in Transaction directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-		MEDICATION_DIALOG,
-		'Added sub execute sub-routine.'],
-
-);
 1;
