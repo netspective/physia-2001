@@ -74,6 +74,7 @@ sub execute
 		value_type => 0,
 		value_text => $page->field('value_text') || undef,
 		value_date => $page->field('value_date') || undef,
+		value_textB => $page->session('user_id') || undef,
 		_debug => 0
 	);
 
