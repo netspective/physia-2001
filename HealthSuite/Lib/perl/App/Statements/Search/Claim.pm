@@ -11,27 +11,30 @@ use vars qw(@ISA @EXPORT $STMTMGR_CLAIM_SEARCH $INVOICE_COLUMNS $UPINITEMNAME_PA
 @EXPORT = qw($STMTMGR_CLAIM_SEARCH);
 
 $UPINITEMNAME_PATH = 'UPIN';
-
+#and iit.item_id = (select min(item_id) from invoice_item where parent_id (+) = i.invoice_id and iit.item_type in (1,2))
 
 $INVOICE_COLUMNS = "invoice_id, total_items, client_id, to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, get_Invoice_Status_cap(invoice_status) as invoice_status, bill_to_id, reference, total_cost, total_adjust, balance, bill_to_type";
-
-#to_char(iit.service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+#(select min(item_id) from invoice_item where parent_id = i.invoice_id and iit.item_type in (1,2))
 use vars qw($STMTFMT_SEL_CLAIM $STMTRPTDEFN_DEFAULT);
 $STMTFMT_SEL_CLAIM = qq{
 		select distinct i.invoice_id, i.total_items, i.client_id,
-			to_char(iit.service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(min(iit.service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 			iis.caption as invoice_status, ib.bill_to_id, i.total_cost, 
 			i.total_adjust, i.balance, ib.bill_party_type,
 			to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
 		from 	invoice_status iis, invoice i, invoice_billing ib, invoice_item iit %tables%
 		where
 			%whereCond%
-			and iit.item_id = (select min(item_id) from invoice_item where parent_id = i.invoice_id and iit.item_type in (1,2))
+			and iit.parent_id (+) = i.invoice_id			
 			and ib.invoice_id = i.invoice_id
 			and ib.invoice_item_id is NULL
 			and ib.bill_sequence = 1
 			and (owner_type = 1 and owner_id = ?)
 			and iis.id = i.invoice_status
+		group by i.invoice_id, i.total_items, i.client_id,
+			iis.caption, ib.bill_to_id, i.total_cost, 
+			i.total_adjust, i.balance, ib.bill_party_type,
+			i.invoice_date
 		order by i.invoice_id
 };
 
