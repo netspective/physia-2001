@@ -17,6 +17,11 @@ my $ACCOUNT_RECK_DATE = App::Universal::TRANSTYPE_ACCOUNTRECKDATE;
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
 my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 
+my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+
+
+
 
 use vars qw(@ISA @EXPORT $STMTMGR_WORKLIST_COLLECTION);
 
@@ -28,112 +33,144 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 
 ########################
 
-
-
-
-
-#'selAccountWatchById'=>qq{
-#			
-#			select t1.trans_owner_id, p.complete_name, sum(i.balance) as balance
-#			from transaction t1, transaction t2,person p, invoice i
-#			where t1.provider_id = :1
-#			and t1.trans_owner_id = p.person_id			
-#			and t1.trans_type = 8520 			
-#			and t2.provider_id = :1
-#			and t2.trans_owner_id = p.person_id
-#			and t2.trans_type = 8510 
-#			and t2.trans_subtype = 'Owner' 
-#			and t1.trans_owner_id (+)=i.client_id
-#			and trunc(t1.trans_begin_stamp) <= to_date(:2,'MM/DD/YYYY')
-#			group by t1.trans_owner_id,p.complete_name			
-#	
-#		     },
-
-
-'selReckInfoById' =>qq
-	{	
-		select to_char(trans_begin_stamp,'MM/DD/YYYY') as trans_begin_stamp
-		from transaction
-		where trans_id = ?
-	},
-'selAccBalAgeById' =>qq
+	'selInColl' =>qq
 	{
-		select sum (i.balance) as balance , max(round(to_date(:1,'MM/DD/YYYY') - i.invoice_date)) as age
-		from  invoice i 
-		where	i.client_id = :2		
-		group by client_id
+		SELECT	distinct trans_owner_id
+		FROM	transaction
+		WHERE	trans_owner_id = :1
+		AND	trans_status = $ACTIVE
+		AND	trans_subtype= 'Owner'
+		AND	trans_type = $ACCOUNT_OWNER		
 	},
-				
-'selReckDateById' =>qq
+
+
+	'selReckInfoById' => qq
 	{
-		select trans_id,trans_begin_stamp
-		from transaction 
-		where trans_type = $ACCOUNT_RECK_DATE and
-		trans_owner_id = :1 and
-		provider_id = :2
-		
+		SELECT 	trans_begin_stamp , trans_id  
+		FROM 	transaction 
+		WHERE 	trans_id = :1
+	},
+	'closeCollectionById' => qq
+	{
+		UPDATE 	transaction
+		SET 	trans_status = 3,
+			trans_subtype = 'Account Closed',
+			trans_status_reason = :1
+		WHERE	trans_owner_id = :2
+			AND trans_status = $ACTIVE
+			AND trans_type = $ACCOUNT_OWNER
+			AND provider_id = :3
 	},
 	
-'insAccountOwner' =>qq
+	'delReckDateById' =>qq
 	{
-		insert into transaction
-		(trans_owner_id,provider_id,trans_owner_type,trans_begin_stamp,trans_type,trans_subtype,trans_status,initiator_type,
-		initiator_id) 
-		values
-		( :1, :2, 0,sysdate,$ACCOUNT_OWNER,'Owner',2, 2,:3)
+		update transaction 
+		set trans_status = $INACTIVE
+		where trans_type = $ACCOUNT_RECK_DATE and
+		trans_owner_id = :1 and
+		provider_id = :2		
 	},
-
-'selPerCollByIdDate' =>qq
+	
+	'insAccountOwner' =>qq
 	{
-		select distinct p2.person_id , 
-		(select distinct trans_subtype from transaction t where p2.person_id  = t.trans_owner_id and :1 = provider_id and
-		trans_type=$ACCOUNT_OWNER) trans_subtype ,
-		(select  trans_id from transaction t where p2.person_id  = t.trans_owner_id and :1 = provider_id and
-		trans_type=$ACCOUNT_OWNER) trans_id,
-		(select trans_begin_stamp from transaction t3 where t3.trans_type=$ACCOUNT_RECK_DATE and provider_id = :1 and 
-		trans_owner_id = p2.person_id )	as reck_date	
-		from person p , person p2, person_attribute pan , invoice i, 
-		person_attribute pad , person_attribute pat 
-		where p.person_id = :1 and		 
-		pan.parent_id = p.person_id and
-		pad.parent_id = p.person_id and
-		pat.parent_id = p.person_id and
-		p2.person_id = i.client_id  and				
-		pan.item_name = 'WorkListCollectionLNameRange'  and
-		pad.item_name = 'WorkList-Collection-Setup-BalanceAge-Range' and
-		pat.item_name = 'WorkList-Collection-Setup-BalanceAmount-Range' and
-		( i.total_cost >= pat.value_float or pat.value_float is null) and
-		( i.total_cost <= pat.value_floatb or pat.value_floatb is null) and
-		upper(SUBSTR(p2.Name_last,1,1)) >= upper(pan.Value_Text) and
-		upper(SUBSTR(p2.Name_last,1,1)) <= upper(pan.Value_TextB) and				
-		( round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) >= pad.value_int or pad.value_int is null) and
-		( round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) <= pad.value_intB or pad.value_intB is null) 		
+		INSERT INTO TRANSACTION	(trans_owner_id,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
+					 trans_subtype,trans_status,initiator_type,initiator_id) 
+		VALUES
+					 ( :1, :2, 0,sysdate,$ACCOUNT_OWNER,'Owner',2, 2,:3)
+	},
+	#The data 01/31/1800 is used to make sure the dates sort correct
+	'selPerCollByIdDate' =>qq
+	{			
+	
 		
+		SELECT	 person_id , to_date('01/31/1800','MM/DD/YYYY')
+		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
+			person_attribute pl,person_attribute pa, person_attribute pb,
+			transaction t, invoice i, invoice_billing ib
+		WHERE	pf.parent_id = :1
+		AND	pp.parent_id = :1
+		AND	pd.parent_id = :1
+		AND	pl.parent_id = :1
+		AND	pa.parent_id = :1
+		AND	pb.parent_id = :1
+		AND	pf.item_name = 'WorkList-Collection-Setup-Org'
+		AND	pp.item_name = 'WorkList-Collection-Setup-Product'
+		AND	pd.item_name = 'WorkList-Collection-Setup-Physician' 
+		AND	pl.item_name = 'WorkListCollectionLNameRange'
+		AND	pa.item_name = 'WorkList-Collection-Setup-BalanceAge-Range'
+		AND	pb.item_name = 'WorkList-Collection-Setup-BalanceAmount-Range'
+		
+
+		AND NOT EXISTS
+		(
+			SELECT	trans_owner_id 
+			FROM	transaction
+			WHERE	trans_type = $ACCOUNT_OWNER
+			AND 	trans_status = $ACTIVE
+			AND 	provider_id = :1
+			AND	trans_owner_id = i.client_id
+			AND	trans_owner_id = person_id			
+		)		
+		AND	i.main_transaction = t.trans_id
+		AND	i.client_id = p.person_id
+		AND	i.invoice_id = ib.invoice_id
+		AND	ib.bill_sequence = 1		
+		AND 	( SUBSTR(p.name_last,1,1) >= upper(pl.Value_Text)  or pl.Value_Text is NULL)
+		AND 	( SUBSTR(p.name_last,1,1) <= upper(pl.Value_TextB) or pl.Value_TextB is NULL)
+		AND 	(i.balance >= pb.value_float  OR pb.value_float is null)
+		AND 	(i.balance <= pb.value_floatb OR pb.value_floatb is null)
+		AND 	(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) >= pa.value_int OR pa.value_int is null)		
+		AND 	(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) <= pa.value_intB OR pa.value_intB is null) 	
+		AND	(t.provider_id = pd.value_text)
+		AND	(t.service_facility_id = pf.value_text)
+		AND	(
+			     ib.bill_party_type IN (0,1) 
+			 OR  pp.value_int =
+			     (SELECT product.ins_internal_id	
+			     FROM	insurance product, insurance plan
+			     WHERE	plan.ins_internal_id = ib.bill_ins_id 
+			     AND	plan.product_name = product.product_name
+			     AND	product.record_type = $INSURANCE_TYPE_PRODUCT
+			     AND	product.owner_org_id = plan.owner_org_id
+			     )
+			)			
 		UNION
+		SELECT 	t.trans_owner_id  as person_id,nvl(tr.trans_begin_stamp,to_date('01/31/1800','MM/DD/YYYY'))
+			
+		FROM 	transaction t ,transaction tr 
+		WHERE 	t.trans_type = $ACCOUNT_OWNER
+		AND 	t.trans_status = $ACTIVE
+		AND 	t.trans_owner_id = tr.trans_owner_id (+)
+		AND 	t.trans_subtype = 'Owner'
+		AND	t.provider_id = :1
+		AND 	tr.trans_owner_id (+) = t.trans_owner_id
+		AND 	tr.trans_type (+)= $ACCOUNT_RECK_DATE 
+		AND 	tr.provider_id (+)= :1	
+		AND 	tr.trans_status (+)= $ACTIVE
+		ORDER by 2 asc , 1 
+
+	},						
+	'selectBalanceAgeById' => qq
+	{
+		SELECT 	sum(i.balance) as balance,  MAX(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date)) as age
+		FROM	invoice i
+		WHERE	i.client_id = :1
+		GROUP BY client_id
 		
-		select trans_owner_id , trans_subtype,trans_id ,
-		(select trans_begin_stamp from transaction t3 where t3.trans_type=$ACCOUNT_RECK_DATE and provider_id = :1 and 
-		t3.trans_owner_id = t.trans_owner_id )	as reck_date	
-		from transaction t
-		where provider_id = :1 and
-		trans_owner_type = 0 and
-		trans_type=$ACCOUNT_OWNER and trans_subtype = 'Owner'
-		
-		MINUS 
-		
-		select trans_owner_id , 'Owner', 
-		(select  trans_id from transaction t2 where  t.trans_owner_id = t2.trans_owner_id and
-		t2.provider_id = :1 and trans_type=$ACCOUNT_OWNER) trans_id,
-		(select trans_begin_stamp from transaction t3 where t3.trans_type=$ACCOUNT_RECK_DATE and provider_id = :1 and 
-		t3.trans_owner_id = t.trans_owner_id )	as reck_date			
-		from transaction t
-		where provider_id = :1 and
-		trans_owner_type = 0 and
-		( 
-		 	(trans_type=$ACCOUNT_OWNER and trans_subtype !='Owner') or
-		 	(trans_type=$ACCOUNT_RECK_DATE and  to_date(:2,'MM/DD/YYYY') < trunc(trans_begin_stamp) )
-		)				
-		order by 4 desc
+	},
+	'selTransCollectionById'=>qq
+	{
+		SELECT 	tr.trans_begin_stamp reck_date, tr.trans_id as reck_date_id, t.trans_id as trans_id
+		FROM 	transaction t, transaction tr
+		WHERE 	t.trans_type = $ACCOUNT_OWNER
+		AND 	t.trans_status = $ACTIVE
+		AND 	t.trans_owner_id = :1
+		AND 	t.trans_subtype = 'Owner'
+		AND	t.provider_id = :2
+		AND 	tr.trans_owner_id (+) = t.trans_owner_id
+		AND 	tr.trans_type (+)= $ACCOUNT_RECK_DATE 
+		AND 	tr.provider_id (+)= :2	
+		AND 	tr.trans_status (+)= $ACTIVE
 	},
 	'selNextApptById' => qq
 	{
@@ -146,10 +183,36 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	
 	'delAccountNotesById' =>qq
 	{
-		update transaction set trans_status = 3
+		update transaction set trans_status = $INACTIVE
 		where provider_id = :1 and
 		trans_owner_id = :2 and
 		trans_type=$ACCOUNT_NOTES
+	},	
+	'TranCollectionById' =>qq
+	{
+	
+		INSERT INTO TRANSACTION	(trans_owner_id,caption,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
+					 trans_subtype,trans_status,initiator_type,initiator_id) 
+  		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
+		       	trans_subtype,trans_status,initiator_type,:2
+		FROM 	transaction
+		WHERE	trans_owner_id = :1 
+		AND	provider_id = :2
+		AND	trans_owner_type= 0
+		AND	trans_type = $ACCOUNT_OWNER
+		AND	trans_subtype = 'Owner'
+		AND	trans_status =$ACTIVE		
+		MINUS
+		SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
+		       	trans_subtype,trans_status,initiator_type,:2
+		FROM 	transaction
+		WHERE	trans_owner_id = :1 
+		AND	provider_id = :3
+		AND	trans_owner_type= 0
+		AND	trans_type = $ACCOUNT_OWNER
+		AND	trans_subtype = 'Owner'
+		AND	trans_status =$ACTIVE				
+		       
 	},
 	'TranAccountNotesById' =>qq
 	{
