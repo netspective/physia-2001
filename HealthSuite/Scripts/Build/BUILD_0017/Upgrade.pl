@@ -24,11 +24,14 @@ system(qq{
 	./GenerateSchema.pl
 });
 
+my $schemaName = uc($sqlPlusKey);
+$schemaName =~ s/\/.*//;
+
 runSQL('BUILD_0017_alter_schema.sql');
 runSQL('BUILD_0017_creating_new_frank_tables.sql');
 runSQL('BUILD_0017_new_dml.sql');
 runSQL('BUILD_0017_correct_invoice_item.sql');
-runSQL('BUILD_0017_analyze_schema.sql');
+runSQL('BUILD_0017_analyze_schema.sql', $schemaName);
 runSQL('BUILD_0017_compile_invalid_and_disabled.sql');
 
 
