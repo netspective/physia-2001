@@ -18,11 +18,38 @@
 		<deliverable id="110">
 			Medicaid resubmission code and original reference fields add to claim dialog and showing on HCFA.
 		</deliverable>
-
+	
+		<deliverable id="896">
+			In the 'SurgicalProcedures' component, the ICD code field is changed to CPT code field. It allows you to 
+			edit the records and the CPT name is displayed in the component.
+		</deliverable>
+		
+		<deliverable id="1323">
+			If we choose retired, unemployed, student full time or student part time, the occupation will not be 
+			filled with 'Unknown'.
+		</deliverable>
+		
+		<deliverable id="1335">
+			Fixed code to uppercase the states while adding them to the database through the 'State Licenses' 
+			of the Physician dialog and the 'Certification' component.
+		</deliverable>
+		
+		<deliverable id="1447">
+			Added activity logs to showup in the 'My Recent Activity (today)' component in the user's home page.
+		</deliverable>
+		
 		<deliverable id="1501">
 			Fixed claim status changes.
 		</deliverable>
 
+		<deliverable id="1552">
+			In the 'Referring Doctor' dialog, now the phone number is stored as a work phone.
+		</deliverable>
+
+		<deliverable id="1613">
+			In the 'Misc Notes' component, it will show the User Id who has entered the Misc-Notes.
+		</deliverable>
+		
 		<deliverable id="1614">
 			Fixed validation for asking for third party payer id in checkin dialog.
 		</deliverable>
@@ -31,18 +58,36 @@
 			If intellicode errors occur in checkout or claim, redirect forced to an error view on the claim summary.
 		</deliverable>
 
+		<deliverable id="1624">
+			Added some validation to check if the primary 'Email' is added before adding a secondary email. An error message will be
+			displayed if we try to add a secondary one without adding a primary one.
+		</deliverable>
+		
 		<deliverable id="1652">
 			Fixed handling of primary, secondary, tertiary claims (i.e. status changes, functions allowed based on status changes, 
 			reopening of claims and voiding of subsequent claims, etc.)
-		</deliverable>
+		</deliverable>		
 
 		<deliverable id="1697">
 			New transfer from legacy system writeoff type for personal payment dialog found on claim summary.
+		</deliverable>
+
+		<deliverable id="1723">
+			When you select 'Prescribe Medication' from the 'On Select' list in the 'Lookup a Patient' page, it will 
+			show the new 'Prescribe Medication' dialog.
 		</deliverable>
 
 		<deliverable id="1732">
 			Added practices to pay to org drop down in Add Invoice dialog.
 		</deliverable>
 
+		<deliverable id="1744">
+			In the Claims WorkList, when you click the OrgID link, it will show up the Summmary page of that Org.
+		</deliverable>
+		
+		<deliverable id="1799">
+			In the 'Personal Insurance Coverage' dialog, it will inherit the parent Plan's or parent Product's remit_type.
+		</deliverable>
+		
 	</deliverables>
 </release-notes>
