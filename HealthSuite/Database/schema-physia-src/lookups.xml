@@ -2,6 +2,299 @@
 <!DOCTYPE schema SYSTEM "schema-markup.dtd">
 
 <schema name="physia-lookups">
+
+	<table name="Referral_Source_Type" type="Org_Lookup">
+		<enum id="0">Dr.Office</enum>
+		<enum id="1">Patient</enum>
+		<enum id="2">Adjuster</enum>
+		<enum id="3">Case Manager</enum>
+		<enum id="4">Non-contracted Provider</enum>
+		<enum id="5">SRS Adjuster</enum>
+		<enum id="6">Add Provider</enum>
+	</table>
+
+	<table name="Referral_Payor" type="Org_Lookup">
+		<enum id="0">Argus</enum>
+		<enum id="1">American Airlines</enum>
+		<enum id="2">City of Dallas</enum>
+		<enum id="3">City of Garland</enum>
+		<enum id="4">Pinnacol</enum>
+	</table>
+
+	<table name="Referral_Service_Type" type="Org_Lookup">
+		<enum id="0">Bone Growth Simulators</enum>
+		<enum id="1">Chiropractic Services</enum>
+		<enum id="2">CMM Units</enum>
+		<enum id="3">Diagnostic Imaging/Radiology</enum>
+		<enum id="4">Durable Medical Equipment</enum>
+	</table>
+
+	<table name="Referral_Service_Detail" type="Org_Lookup">
+		<enum id="0">Cold Therapy Device</enum>
+		<enum id="1">Tape</enum>
+		<enum id="2">Neoprene Knee Sleeve</enum>
+		<enum id="3">Oxygen Refill</enum>
+		<enum id="4">Neoprene Knee Sleeve</enum>
+		<enum id="5">Oxygen Refill</enum>
+		<enum id="6">IV Monitoring</enum>
+		<enum id="7">Forearm Crutches</enum>
+	</table>
+
+	<table name="Referral_Result" type="Org_Lookup">
+		<enum id="0">Successful</enum>
+		<enum id="1">UnSuccessful</enum>
+		<enum id="2">Pending</enum>
+		<enum id="3">Contracted</enum>
+		<enum id="4">Closed/Pending Closed</enum>
+		<enum id="5">Closed/Pending Contract</enum>
+		<enum id="6">Closed/Provider No POS</enum>
+	</table>
+
+	<table name="Referral_Followup_Status" type="Org_Lookup">
+		<enum id="0">Waiting for Auth</enum>
+		<enum id="1">Waiting for Return call/Adjuster</enum>
+		<enum id="2">Waiting for Return call/Provider</enum>
+		<enum id="3">Waiting for Return call/Patient</enum>
+		<enum id="4">Waiting for Return call/Case Manager</enum>
+		<enum id="5">No Claim Filed</enum>
+		<enum id="6">Claim Denied</enum>
+		<enum id="7">Case Closed</enum>
+		<enum id="8">Confirm Delivery/Patient Survey</enum>
+		<enum id="9">Waiting for Bill</enum>
+		<enum id="10">Waiting for Demographics</enum>
+		<enum id="11">Waiting for Script/LMN</enum>
+		<enum id="12">On Hold/Adjuster</enum>
+		<enum id="13">Denied/MMI</enum>
+		<enum id="14">Denied/No PreAuth</enum>
+		<enum id="15">Denied/Medical Records</enum>
+		<enum id="16">Denied/Non-Compensable</enum>
+		<enum id="17">Denied/No Medical Need</enum>
+		<enum id="18">Denied/Claim Settled</enum>
+		<enum id="19">Denied/Non-Complaint</enum>
+		<enum id="20">Pending Contract</enum>
+		<enum id="21">In Pre-Cert</enum>
+	</table>
+
+	<table name="Referral_Unit_Type" type="Org_Lookup">
+		<enum id="0">EVAL</enum>
+		<enum id="1">Daily</enum>
+		<enum id="2">Weekly</enum>
+		<enum id="3">Monthly</enum>
+		<enum id="4">Purchase</enum>
+		<enum id="5">Case</enum>
+		<enum id="6">Boxes</enum>
+		<enum id="7">Pairs</enum>
+		<enum id="8">Hours</enum>
+		<enum id="9">Hourly</enum>
+		<enum id="10">Visits</enum>
+	</table>
+
+	<table name="Intake_Service" type="Org_Lookup">
+		<enum id="0">Bone Growth Stimulator</enum>
+		<enum id="1">Chiropractic Service</enum>
+		<enum id="2">CMM Units</enum>
+		<enum id="3">Diagnostic Imaging/Radiology: CT Scan Only</enum>
+		<enum id="4">Diagnostic Imaging/Radiology: Other Services</enum>
+		<enum id="5">Durable Medical Equipment</enum>
+		<enum id="6">Dialysis Services</enum>
+		<enum id="7">EMG</enum>
+		<enum id="8">Exercise Equipment</enum>
+		<enum id="9">Rehabilitation Services: Functional Capacity Evaluation</enum>
+		<enum id="10">Diagnostic Imaging/Radiology: Full Service Imaging</enum>
+		<enum id="11">Home Health Services: Aids</enum>
+		<enum id="12">Home Health Services: Infusion Therapy</enum>
+		<enum id="13">Home Health Services: Medical Social Worker</enum>
+		<enum id="14">Home Health Services: Skilled Nursing</enum>
+		<enum id="15">Home Health Services: Therapies</enum>
+		<enum id="16">Home Health Services: Vocational Nursing</enum>
+		<enum id="17">Home Health Services: Wound Care</enum>
+		<enum id="18">Hospice</enum>
+		<enum id="19">Laboratory Services</enum>
+		<enum id="20">Diagnostic Imaging/Radiology: MRI and CT Scan Only</enum>
+		<enum id="21">Home Modifications</enum>
+		<enum id="22">Diagnostic Imaging/Radiology: MRI Only</enum>
+		<enum id="23">NCV</enum>
+		<enum id="24">Orthotices and Prosthetics</enum>
+		<enum id="25">Outpatient Therapies: Occupational</enum>
+		<enum id="26">Diagnostic Imaging/Radiology: Open MRI</enum>
+		<enum id="27">Outpatient Therapies:Physical Therapy</enum>
+		<enum id="28">Outpatient Therapies: Respiratory Therapy</enum>
+		<enum id="29">Outpatient Therapies: Speech Therapy</enum>
+		<enum id="30">Perinatal Monotring</enum>
+		<enum id="31">Pharmaceuticals: Mail Order</enum>
+		<enum id="32">Podiatry Services</enum>
+		<enum id="33">Pharmaceuticals: Pick Up</enum>
+		<enum id="34">Rehabilative Services (H-Code)</enum>
+		<enum id="35">Sub-Acute and Skilled Nursing Facilities</enum>
+		<enum id="36">Skilled Nursing Services</enum>
+		<enum id="37">Specialty Equipment(spas, etc.)</enum>
+		<enum id="38">Sleep Studies: Home</enum>
+		<enum id="39">Sleep Studies: Lab</enum>
+		<enum id="40">T.N.E.S</enum>
+		<enum id="41">T.E.N.S. Supplies</enum>
+		<enum id="42">Transportaion: Air</enum>
+		<enum id="43">Transportation: Land</enum>
+	</table>
+
+	<table name="Intake_Detail" type="Org_Lookup">
+		<enum id="0">Cold Therapy Device</enum>
+		<enum id="1">Tape</enum>
+		<enum id="2">Neoprene Knee Sleeve</enum>
+		<enum id="3">Oxygen Refill</enum>
+		<enum id="4">IV Monitoring</enum>
+		<enum id="5">Forearm Crutches</enum>
+		<enum id="6">Hand Held Shower</enum>
+		<enum id="7">Hip Abduction Splint</enum>
+		<enum id="8">Gloves/Latex</enum>
+		<enum id="9">Pressure Garments/Gloves</enum>
+		<enum id="10">Wound VAC</enum>
+		<enum id="11">Work Boots</enum>
+		<enum id="12">Thoracic Brace</enum>
+		<enum id="13">Lumbar Cushion</enum>
+		<enum id="14">Wrist Splint</enum>
+		<enum id="15">Galvanic supplies</enum>
+		<enum id="16">Inferrential Supplies</enum>
+		<enum id="17">OT Visits</enum>
+		<enum id="18">Home Health Aide</enum>
+		<enum id="19">Reacher</enum>
+		<enum id="20">Tens Unit Supplies</enum>
+		<enum id="21">Platform Crutches</enum>
+		<enum id="22">Iodine Solution</enum>
+		<enum id="23">Apnea Monitor</enum>
+		<enum id="24">Foot Insert/Molded</enum>
+		<enum id="25">Sock Aide</enum>
+		<enum id="26">TLSO Brace/Back Brace</enum>
+		<enum id="27">Soft Goods/Jas Splint</enum>
+		<enum id="28">PT EVAL</enum>
+		<enum id="29">Work Orthotic</enum>
+		<enum id="30">Cane</enum>
+		<enum id="31">PT Visits</enum>
+		<enum id="32">Battery Charger</enum>
+		<enum id="33">Tens Unit</enum>
+		<enum id="34">Muscle Stimulator</enum>
+		<enum id="35">Galvanic HV Stim</enum>
+		<enum id="36">Crutches</enum>
+		<enum id="37">Front Wheeled Walker</enum>
+		<enum id="38">Walker w/o Wheels</enum>
+		<enum id="39">Wheelchair-Manul</enum>
+		<enum id="40">Wheelchair-Electric</enum>
+		<enum id="41">Cervial Traction Unit</enum>
+		<enum id="42">Jas Splint</enum>
+		<enum id="43">Bath Bench</enum>
+		<enum id="44">Raised Toilet Seat</enum>
+		<enum id="45">Shower Chair</enum>
+		<enum id="46">Hoyer Lift</enum>
+		<enum id="47">Catheter Supplies</enum>
+		<enum id="48">Cervical Pillow</enum>
+		<enum id="49">Hospital Bed</enum>
+		<enum id="50">Paraffin Bath</enum>
+		<enum id="51">Oxygen Tanks</enum>
+		<enum id="52">Bi-Pap Machine</enum>
+		<enum id="53">Ted Hose</enum>
+		<enum id="54">AFO Brace</enum>
+		<enum id="55">Wound Care Supplies</enum>
+		<enum id="56">Desk Chair</enum>
+		<enum id="57">Cyber Tech Brace</enum>
+		<enum id="58">Repairs to Brace (any kind)</enum>
+		<enum id="59">Burn Garment</enum>
+		<enum id="60">Repairs to Wheelchair</enum>
+		<enum id="61">Knee Brace</enum>
+		<enum id="62">Wheelchair Repairs</enum>
+		<enum id="63">Vinyl Gloves</enum>
+		<enum id="64">Latex Gloves</enum>
+		<enum id="65">Breast Pump</enum>
+		<enum id="66">External Therapy</enum>
+		<enum id="67">IF2 Unit</enum>
+		<enum id="68">Dressing Changes</enum>
+		<enum id="69">Leg Bags</enum>
+		<enum id="70">Speech Therapy Visits</enum>
+		<enum id="71">Muscle Stim Supplies</enum>
+		<enum id="72">Comode Chair/Bedside</enum>
+		<enum id="73">Dress Orthotic</enum>
+		<enum id="74">Depends/Attends</enum>
+		<enum id="75">Night Bags</enum>
+		<enum id="76">Inferrential Unit</enum>
+		<enum id="77">Skilled Nursing Visit</enum>
+		<enum id="78">Walker w/ Wheels</enum>
+		<enum id="79">OT Eval</enum>
+		<enum id="80">Paraffin Refills</enum>
+		<enum id="81">Grab Bar</enum>
+		<enum id="82">IVP</enum>
+		<enum id="83">Knee Brace/Custom made</enum>
+		<enum id="84">IV Infusion</enum>
+		<enum id="85">Gym Ball</enum>
+		<enum id="86">DynaSplint/Shoulder</enum>
+		<enum id="87">Walker w/ Glide</enum>
+		<enum id="88">Back Brace</enum>
+		<enum id="89">Respiratory Therapy</enum>
+		<enum id="90">EMG</enum>
+		<enum id="91">Guage (4x4)</enum>
+		<enum id="92">Rechargeble Batteries</enum>
+		<enum id="93">TheraCane</enum>
+		<enum id="94">Crutch Arm Pads/Hand Grips</enum>
+		<enum id="95">Lumbar Brace</enum>
+		<enum id="96">Scooter</enum>
+		<enum id="97">Ankle Brace</enum>
+		<enum id="98">SN Eval</enum>
+		<enum id="99">Tube Feeding/Supplies</enum>
+		<enum id="100">Clinitron Bed</enum>
+		<enum id="101">ST EVAL</enum>
+		<enum id="102">Lumbar Traction Unit</enum>
+		<enum id="103">Over the Door Pulley</enum>
+		<enum id="104">ACL Custom Brace</enum>
+		<enum id="105">Jobst Stocking</enum>
+		<enum id="106">Tub Transfer Bench</enum>
+		<enum id="107">Saunders Traction Unit</enum>
+		<enum id="108">ACL Brace</enum>
+		<enum id="109">Sportx Unit</enum>
+		<enum id="110">Undergarments</enum>
+		<enum id="111">CTI 2 Brace</enum>
+		<enum id="112">Cervical Collar</enum>
+		<enum id="113">Cervical Collar Cover</enum>
+		<enum id="114">Suction Machine</enum>
+		<enum id="115">Forearm Brace</enum>
+		<enum id="116">Bone Growth Stim</enum>
+		<enum id="117">Custom Shoes</enum>
+		<enum id="118">Glucometer</enum>
+		<enum id="119">Para Supplies</enum>
+		<enum id="120">Peak Flow Meter</enum>
+		<enum id="121">Elbow Splint</enum>
+		<enum id="122">Sl Belt</enum>
+		<enum id="123">Foot orthotic</enum>
+		<enum id="124">Shoulder CPM</enum>
+		<enum id="125">Elbow CPM</enum>
+		<enum id="126">Jay Cushion</enum>
+		<enum id="127">Pelvic Traction Unit</enum>
+		<enum id="128">Foot Brace</enum>
+		<enum id="129">Hand CPM</enum>
+	</table>
+
+<table name="Intake_Client" type="Org_Lookup">
+		<enum id="0">Argus</enum>
+		<enum id="1">American Airlines</enum>
+		<enum id="2">City of Dallas</enum>
+		<enum id="3">City of Garland</enum>
+		<enum id="4">City of Houston</enum>
+		<enum id="5">Concentra</enum>
+		<enum id="6">City of San Antonio</enum>
+		<enum id="7">CRA</enum>
+		<enum id="8">Dallas County</enum>
+		<enum id="9">Dept of Labor</enum>
+		<enum id="10">Fleming Companies, Inc</enum>
+		<enum id="11">Federated</enum>
+		<enum id="12">Harris County</enum>
+		<enum id="13">Northeast Independent School District</enum>
+		<enum id="14">Orange Cove ISD</enum>
+		<enum id="15">Poly America</enum>
+		<enum id="16">San Antonio Independent School District</enum>
+		<enum id="17">Spectrum</enum>
+		<enum id="18">TWCIF</enum>
+		<enum id="19">Young Insurance</enum>
+		<enum id="20">Pinnacol</enum>
+		<enum id="21">CMI</enum>
+		<enum id="22">Carus Healthcare</enum>
+	</table>
+
 	<table name="Org_Contact_Addrs" type="Lookup">
 		<enum id="0">Mailing</enum>
 		<enum id="1">Shipping</enum>
