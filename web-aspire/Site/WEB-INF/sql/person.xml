@@ -989,7 +989,7 @@ SELECT * FROM (
 			
 			<report>
 				<column index="9" heading="Payer"/>
-				<column heading="Patient" url="/person/#&{?}#/account"/>
+				<column heading="Patient" url="/person/#&amp;{?}#/account"/>
 				<column heading="Send Date"/>
 				<column heading="Ack Date"/>
 				<column heading="Billing Org"/>
@@ -1264,7 +1264,7 @@ SELECT * FROM (
 					}
 					2 => {
 						dAlign => 'RIGHT'
-						dataFmt => '&{fmt_stripLeadingPath:2}:'
+						dataFmt => '&amp;{fmt_stripLeadingPath:2}:'
 						head => 'Name'
 
 					}

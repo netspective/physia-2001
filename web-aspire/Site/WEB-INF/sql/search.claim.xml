@@ -61,9 +61,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -215,9 +215,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -230,7 +230,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -239,7 +239,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -370,9 +370,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -385,7 +385,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -394,7 +394,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -525,9 +525,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -540,7 +540,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -549,7 +549,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -680,9 +680,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -695,7 +695,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -704,7 +704,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -835,9 +835,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -850,7 +850,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -859,7 +859,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -991,9 +991,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1006,7 +1006,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1015,7 +1015,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1147,9 +1147,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1162,7 +1162,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1171,7 +1171,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1302,9 +1302,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1317,7 +1317,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1326,7 +1326,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1456,9 +1456,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1471,7 +1471,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1480,7 +1480,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1612,9 +1612,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1627,7 +1627,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1636,7 +1636,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1767,9 +1767,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1782,7 +1782,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1791,7 +1791,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -1921,9 +1921,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -1936,7 +1936,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1945,7 +1945,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2075,9 +2075,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2090,7 +2090,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2099,7 +2099,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2230,9 +2230,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2245,7 +2245,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2254,7 +2254,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2385,9 +2385,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2400,7 +2400,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2409,7 +2409,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2540,9 +2540,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2555,7 +2555,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2564,7 +2564,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2695,9 +2695,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2710,7 +2710,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2719,7 +2719,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -2851,9 +2851,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -2866,7 +2866,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2875,7 +2875,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3007,9 +3007,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3022,7 +3022,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3031,7 +3031,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3162,9 +3162,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3177,7 +3177,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3186,7 +3186,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3316,9 +3316,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3331,7 +3331,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3340,7 +3340,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3472,9 +3472,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3487,7 +3487,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3496,7 +3496,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3627,9 +3627,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3642,7 +3642,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3651,7 +3651,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3781,9 +3781,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3796,7 +3796,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3805,7 +3805,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -3935,9 +3935,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -3950,7 +3950,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -3959,7 +3959,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4090,9 +4090,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4105,7 +4105,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4114,7 +4114,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4245,9 +4245,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4260,7 +4260,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4269,7 +4269,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4401,9 +4401,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4416,7 +4416,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4425,7 +4425,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4556,9 +4556,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4571,7 +4571,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4580,7 +4580,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4713,9 +4713,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4728,7 +4728,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4737,7 +4737,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -4869,9 +4869,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -4884,7 +4884,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -4893,7 +4893,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -5024,9 +5024,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -5039,7 +5039,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -5048,7 +5048,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -5179,9 +5179,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -5194,7 +5194,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -5203,7 +5203,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -5335,9 +5335,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -5350,7 +5350,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -5359,7 +5359,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {
@@ -5491,9 +5491,9 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="IC"/>
-				<column heading="Patient" url="javascript:chooseItem('/person/#&{?}#/account')"/>
+				<column heading="Patient" url=""/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
 				<column index="9" heading="Payer"/>
@@ -5506,7 +5506,7 @@
 					0 => {
 						head => 'ID'
 						hint => 'Created on: #10#'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -5515,7 +5515,7 @@
 					}
 					2 => {
 						head => 'Patient'
-						url => 'javascript:chooseItem('/person/#&{?}#/account')'
+						url => ''
 
 					}
 					3 => {

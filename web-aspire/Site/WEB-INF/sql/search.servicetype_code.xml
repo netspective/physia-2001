@@ -18,14 +18,14 @@
 				<param value="request:abbrev"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -47,14 +47,14 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -76,14 +76,14 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -105,14 +105,14 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {

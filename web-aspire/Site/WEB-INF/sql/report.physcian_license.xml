@@ -135,7 +135,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						dataFmt => '&lt;A HREF = "/person/#0#/profile"&gt;#0#&lt;/A&gt;'
 						head => 'Physician ID'
 
 					}
@@ -224,7 +224,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						dataFmt => '&amp;lt;A HREF = "/person/#0#/profile"&amp;gt;#0#&amp;lt;/A&amp;gt;'
 						head => 'Physician ID'
 
 					}
@@ -313,7 +313,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						dataFmt => '&amp;amp;lt;A HREF = "/person/#0#/profile"&amp;amp;gt;#0#&amp;amp;lt;/A&amp;amp;gt;'
 						head => 'Physician ID'
 
 					}

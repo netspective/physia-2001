@@ -19,7 +19,7 @@
 				<param value="request:psource"/>
 			</params>
 			<report>
-				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Payer ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -50,7 +50,7 @@
 			ORDER BY name
 
 			<report>
-				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Payer ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -58,7 +58,7 @@
 					0 => {
 						hAlign => 'left'
 						head => 'Payer ID'
-						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -84,7 +84,7 @@
 				<param value="request:psource"/>
 			</params>
 			<report>
-				<column heading="Payer ID" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Payer ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -92,7 +92,7 @@
 					0 => {
 						hAlign => 'left'
 						head => 'Payer ID'
-						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {

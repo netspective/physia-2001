@@ -20,7 +20,7 @@
 				<param value="request:cpt"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -57,7 +57,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -66,7 +66,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -94,7 +94,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -103,7 +103,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -131,7 +131,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -140,7 +140,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -168,7 +168,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -177,7 +177,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -205,7 +205,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -214,7 +214,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -242,7 +242,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -251,7 +251,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -279,7 +279,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -288,7 +288,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -319,7 +319,7 @@
 				<param value="request:cpt"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 			</report>
@@ -328,7 +328,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {

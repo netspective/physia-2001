@@ -25,7 +25,7 @@
 				<column index="4" type="currency" heading="61 - 90"/>
 				<column index="5" type="currency" heading="91 - 120"/>
 				<column index="6" type="currency" heading="121 - 150"/>
-				<column index="7" type="currency" heading=">150"/>
+				<column index="7" type="currency" heading="&gt;150"/>
 				<column index="8" type="currency" heading="Pending Insurance Total"/>
 			</report>
 			<!--
@@ -113,7 +113,7 @@
 				<column index="4" type="currency" heading="61 - 90"/>
 				<column index="5" type="currency" heading="91 - 120"/>
 				<column index="6" type="currency" heading="121 - 150"/>
-				<column index="7" type="currency" heading=">150"/>
+				<column index="7" type="currency" heading="&gt;150"/>
 				<column index="8" type="currency" heading="Pending Insurance Total"/>
 			</report>
 			<!--
@@ -207,7 +207,7 @@
 				<column index="3" type="currency" heading="61 - 90"/>
 				<column index="4" type="currency" heading="91 - 120"/>
 				<column index="5" type="currency" heading="121 - 150"/>
-				<column index="6" type="currency" heading=">150"/>
+				<column index="6" type="currency" heading="&gt;150"/>
 				<column index="7" type="currency" heading="Co-Pay Owed"/>
 				<column index="8" type="currency" heading="Total"/>
 				<column index="9" type="currency" heading="Pending Insurance"/>
@@ -306,7 +306,7 @@
 				<column index="3" type="currency" heading="61 - 90"/>
 				<column index="4" type="currency" heading="91 - 120"/>
 				<column index="5" type="currency" heading="121 - 150"/>
-				<column index="6" type="currency" heading=">150"/>
+				<column index="6" type="currency" heading="&gt;150"/>
 				<column index="7" type="currency" heading="Co-Pay Owed"/>
 				<column index="8" type="currency" heading="Total"/>
 				<column index="9" type="currency" heading="Pending Insurance"/>

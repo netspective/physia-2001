@@ -514,7 +514,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Payer" url="javascript:doActionPopup('#hrefSelfPopup#&detail=earning&insurance=#0#&type=#2#')"/>
+				<column index="2" heading="Payer" url=""/>
 				<column type="currency" heading="Earning"/>
 			</report>
 			<!--
@@ -561,7 +561,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Payer Type" url="javascript:doActionPopup('#hrefSelfPopup#&detail=payer&payer=#&{?}#')"/>
+				<column heading="Payer Type" url=""/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -603,7 +603,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&insurance=#&{?}#')"/>
+				<column heading="Insurance" url=""/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -645,7 +645,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Procedure" url="javascript:doActionPopup('#hrefSelfPopup#&detail=cpt&code=#&{?}#')"/>
+				<column heading="Procedure" url=""/>
 				<column heading="Count"/>
 			</report>
 			<!--

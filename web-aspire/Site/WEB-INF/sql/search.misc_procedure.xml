@@ -31,7 +31,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -105,7 +105,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -126,7 +126,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -179,7 +179,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -200,7 +200,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -253,7 +253,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -274,7 +274,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -393,7 +393,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -414,7 +414,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -467,7 +467,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Entries"/>
@@ -488,7 +488,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/miscprocedure/detail/#4#', '#0#', false)'
+						url => ''
 
 					}
 					1 => {

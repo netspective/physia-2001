@@ -167,7 +167,7 @@
 			WHERE 	org_internal_id = ?
 			
 			<report>
-				<column index="0" heading="Contract ID" url="/org/#param.org_id#/catalog?catalog=contract_detail&contract_detail=#6#"/>
+				<column index="0" heading="Contract ID" url="/org/#param.org_id#/catalog?catalog=contract_detail&amp;contract_detail=#6#"/>
 				<column index="1" heading="Contract Name"/>
 				<column index="2" heading="Fee Schedule ID"/>
 				<column index="3" heading="Insurance Product"/>
@@ -378,7 +378,7 @@
 			WHERE rownum &lt;= 250
 			
 			<report>
-				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#"/>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&amp;fee_schedule_detail=#5#"/>
 				<column index="1" heading="Catalog Name"/>
 				<column index="2" heading="Contract Type"/>
 				<column index="3" heading="Entries"/>
@@ -476,7 +476,7 @@
 			WHERE rownum &lt;= 250
 			
 			<report>
-				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#5#"/>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=fee_schedule_detail&amp;fee_schedule_detail=#5#"/>
 				<column index="1" heading="Catalog Name"/>
 				<column index="2" heading="Contract Type"/>
 				<column index="3" heading="Entries"/>
@@ -650,10 +650,10 @@
 			order by oc.catalog_id
 			
 			<report>
-				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#3#"/>
+				<column index="0" heading="Catalog ID" url="/org/#param.org_id#/catalog?catalog=labtest_detail&amp;labtest_detail=#3#"/>
 				<column index="1" heading="Catalog Name"/>
 				<column index="2" heading="Entries"/>
-				<column heading="Action" url="/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&home=#homeArl#"/>
+				<column heading="Action" url="/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&amp;home=#homeArl#"/>
 			</report>
 			<!--
 				banner => {
@@ -1812,7 +1812,7 @@ SELECT	oc.catalog_id,
 				<column index="1" heading="Superbill ID"/>
 				<column index="2" heading="Caption"/>
 				<column index="3" heading="Description"/>
-				<column url="/org/#param.org_id#/superbills?action=printSample&superbillid=#0#"/>
+				<column url="/org/#param.org_id#/superbills?action=printSample&amp;superbillid=#0#"/>
 			</report>
 			<!--
 				banner => {

@@ -90,7 +90,7 @@
 			order by caption, r_ids, appt_type_id
 			
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Caption/ Resource"/>
 				<column heading="Details"/>
 				<column heading="Addl Details"/>
@@ -219,10 +219,10 @@
 				<param value="request:status"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'"/>
-				<column heading="Resource(s)" url="javascript:location.href='/search/template/1/#&{?}#'"/>
+				<column heading="ID" url=""/>
+				<column heading="Resource(s)" url=""/>
 				<column heading="Caption"/>
-				<column heading="Facility" url="javascript:location.href='/search/template/1//#&{?}#'"/>
+				<column heading="Facility" url=""/>
 				<column heading="Effective"/>
 				<column heading="Time"/>
 				<column index="8" heading="Available"/>
@@ -399,10 +399,10 @@
 				<param value="request:status"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template'"/>
-				<column heading="Resource(s)" url="javascript:location.href='/search/template/1/#&{?}#'"/>
+				<column heading="ID" url=""/>
+				<column heading="Resource(s)" url=""/>
 				<column heading="Caption"/>
-				<column heading="Facility" url="javascript:location.href='/search/template/1//#&{?}#'"/>
+				<column heading="Facility" url=""/>
 				<column heading="Effective"/>
 				<column heading="Time"/>
 				<column index="8" heading="Available"/>
@@ -415,14 +415,14 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						hint => 'Edit Template #&{?}#'
-						url => 'javascript:location.href='/schedule/dlg-update-template/#&{?}#?_dialogreturnurl=/search/template''
+						hint => 'Edit Template #&amp;{?}#'
+						url => ''
 
 					}
 					1 => {
 						head => 'Resource(s)'
-						hint => 'View #&{?}# Templates'
-						url => 'javascript:location.href='/search/template/1/#&{?}#''
+						hint => 'View #&amp;{?}# Templates'
+						url => ''
 
 					}
 					2 => {
@@ -431,17 +431,17 @@
 					}
 					3 => {
 						head => 'Facility'
-						hint => 'View #&{?}# Templates'
-						url => 'javascript:location.href='/search/template/1//#&{?}#''
+						hint => 'View #&amp;{?}# Templates'
+						url => ''
 
 					}
 					4 => {
-						dataFmt => '#6#-<br>#7#'
+						dataFmt => '#6#-&lt;br&gt;#7#'
 						head => 'Effective'
 
 					}
 					5 => {
-						dataFmt => '#4#-<br>#5#'
+						dataFmt => '#4#-&lt;br&gt;#5#'
 						head => 'Time'
 
 					}
@@ -466,7 +466,7 @@
 
 					}
 					10 => {
-						dataFmt => '#9#<br>#10#'
+						dataFmt => '#9#&lt;br&gt;#10#'
 						head => 'Patient/ Visit'
 
 					}

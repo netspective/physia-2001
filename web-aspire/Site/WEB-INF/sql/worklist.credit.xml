@@ -151,7 +151,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/person/#0#/profile">#0#</A>'
+						dataFmt => '&lt;A HREF = "/person/#0#/profile"&gt;#0#&lt;/A&gt;'
 						head => 'Patient ID'
 
 					}
@@ -164,7 +164,7 @@
 					2 => {
 						colIdx => '2'
 						dAlign => 'left'
-						dataFmt => '<A HREF = "/invoice/#2#/summary">#2#</A>'
+						dataFmt => '&lt;A HREF = "/invoice/#2#/summary"&gt;#2#&lt;/A&gt;'
 						head => 'Invoice ID'
 						tAlign => 'left'
 

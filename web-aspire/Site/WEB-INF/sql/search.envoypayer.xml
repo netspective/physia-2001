@@ -20,7 +20,7 @@
 				<param value="request:id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -54,7 +54,7 @@
 			AND rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -62,7 +62,7 @@
 					0 => {
 						dAlign => 'CENTER'
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -88,7 +88,7 @@
 			AND rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -96,7 +96,7 @@
 					0 => {
 						dAlign => 'CENTER'
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -122,7 +122,7 @@
 			AND rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -130,7 +130,7 @@
 					0 => {
 						dAlign => 'CENTER'
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {

@@ -182,7 +182,7 @@
 					0 => {
 						colIdx => '0'
 						dAlign => 'left'
-						dataFmt => '<A HREF = "/org/#8#/account">#0#</A>'
+						dataFmt => '&lt;A HREF = "/org/#8#/account"&gt;#0#&lt;/A&gt;'
 						hAlign => 'center'
 						head => 'Insurance Co.'
 

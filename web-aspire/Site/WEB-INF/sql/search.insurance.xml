@@ -45,7 +45,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -125,9 +125,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -212,8 +212,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -292,7 +292,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -303,7 +303,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -372,9 +372,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -384,7 +384,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -395,7 +395,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -459,8 +459,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -470,13 +470,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -539,7 +539,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -550,7 +550,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -619,9 +619,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -631,7 +631,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -642,7 +642,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -706,8 +706,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -717,13 +717,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -786,7 +786,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -797,7 +797,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -866,9 +866,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -878,7 +878,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -889,7 +889,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -953,8 +953,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -964,13 +964,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -1033,7 +1033,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -1044,7 +1044,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1113,9 +1113,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1125,7 +1125,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1136,7 +1136,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -1200,8 +1200,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1211,13 +1211,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -1280,7 +1280,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -1291,7 +1291,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1360,9 +1360,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1372,7 +1372,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1383,7 +1383,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -1447,8 +1447,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1458,13 +1458,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -1527,7 +1527,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -1538,7 +1538,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1607,9 +1607,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1619,7 +1619,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1630,7 +1630,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -1694,8 +1694,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1705,13 +1705,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -1774,7 +1774,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -1785,7 +1785,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1854,9 +1854,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1866,7 +1866,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -1877,7 +1877,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -1941,8 +1941,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -1952,13 +1952,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -2021,7 +2021,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -2032,7 +2032,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2101,9 +2101,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2113,7 +2113,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2124,7 +2124,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -2188,8 +2188,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2199,13 +2199,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -2268,7 +2268,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -2279,7 +2279,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2348,9 +2348,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2360,7 +2360,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2371,7 +2371,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -2435,8 +2435,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2446,13 +2446,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -2515,7 +2515,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -2526,7 +2526,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2595,9 +2595,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2607,7 +2607,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2618,7 +2618,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -2682,8 +2682,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2693,13 +2693,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {
@@ -2762,7 +2762,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Insurance Org" url=""/>
 				<column heading="Product Name"/>
 				<column heading="Plan Name"/>
 				<column heading="Street"/>
@@ -2773,7 +2773,7 @@
 				columnDefn => {
 					0 => {
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2842,9 +2842,9 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="2" heading="Plan Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')"/>
+				<column index="2" heading="Plan Name" url=""/>
 				<column index="1" heading="Product Name"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2854,7 +2854,7 @@
 					0 => {
 						colIdx => '2'
 						head => 'Plan Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -2865,7 +2865,7 @@
 					2 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					3 => {
@@ -2929,8 +2929,8 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Product Name" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')"/>
-				<column index="0" heading="Insurance Org" url="javascript:chooseEntry('#&{?}#')"/>
+				<column index="1" heading="Product Name" url=""/>
+				<column index="0" heading="Insurance Org" url=""/>
 				<column index="3" heading="Street"/>
 				<column index="4" heading="City"/>
 				<column index="5" heading="State"/>
@@ -2940,13 +2940,13 @@
 					0 => {
 						colIdx => '1'
 						head => 'Product Name'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')'
+						url => ''
 
 					}
 					1 => {
 						colIdx => '0'
 						head => 'Insurance Org'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					2 => {

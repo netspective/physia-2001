@@ -41,8 +41,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&lt;BR&gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -137,11 +137,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&lt;BR&gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -242,11 +242,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;lt;BR&amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -267,14 +267,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&lt;B&gt;#2#&lt;/B&gt;&lt;BR&gt;&lt;I&gt;#3#&lt;/I&gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&lt;BR&gt;Description'
 
 					}
 					2 => {
@@ -294,10 +294,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&gt;&lt;/a&gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -340,7 +340,7 @@
 				<param value="request:catalog_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="ID" url=""/>
 				<column heading="Type"/>
 				<column heading="Code"/>
 				<column heading="Modifier"/>
@@ -552,7 +552,7 @@
 			ORDER BY entry_type, code, modifier
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="ID" url=""/>
 				<column heading="Type"/>
 				<column heading="Code"/>
 				<column heading="Modifier"/>
@@ -568,8 +568,8 @@
 						dAlign => 'center'
 						head => 'ID'
 						options => '1'
-						tDataFmt => '&{count:0} Entries'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)'
+						tDataFmt => '&amp;{count:0} Entries'
+						url => ''
 
 					}
 					1 => {
@@ -592,7 +592,7 @@
 						dformat => 'currency'
 						head => 'Price'
 						tAlign => 'RIGHT'
-						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+						tDataFmt => '&amp;{avg_currency:&amp;{?}}&lt;BR&gt;&amp;{sum_currency:&amp;{?}}'
 
 					}
 					6 => {
@@ -660,11 +660,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;lt;BR&amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -685,14 +685,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;lt;B&amp;gt;#2#&amp;lt;/B&amp;gt;&amp;lt;BR&amp;gt;&amp;lt;I&amp;gt;#3#&amp;lt;/I&amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;lt;BR&amp;gt;Description'
 
 					}
 					2 => {
@@ -712,10 +712,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;gt;&amp;lt;/a&amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -765,11 +765,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;lt;BR&amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -790,14 +790,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;lt;B&amp;amp;gt;#2#&amp;amp;lt;/B&amp;amp;gt;&amp;amp;lt;BR&amp;amp;gt;&amp;amp;lt;I&amp;amp;gt;#3#&amp;amp;lt;/I&amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;lt;BR&amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -817,10 +817,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;gt;&amp;amp;lt;/a&amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -852,7 +852,7 @@
 				<param value="request:catalog_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)"/>
+				<column heading="ID" url=""/>
 				<column heading="Type"/>
 				<column heading="Code"/>
 				<column heading="Modifier"/>
@@ -868,8 +868,8 @@
 						dAlign => 'center'
 						head => 'ID'
 						options => '1'
-						tDataFmt => '&{count:0} Entries'
-						url => 'javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;{count:0} Entries'
+						url => ''
 
 					}
 					1 => {
@@ -892,7 +892,7 @@
 						dformat => 'currency'
 						head => 'Price'
 						tAlign => 'RIGHT'
-						tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
+						tDataFmt => '&amp;amp;{avg_currency:&amp;amp;{?}}&amp;lt;BR&amp;gt;&amp;amp;{sum_currency:&amp;amp;{?}}'
 
 					}
 					6 => {
@@ -960,11 +960,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -985,14 +985,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;lt;B&amp;amp;amp;gt;#2#&amp;amp;amp;lt;/B&amp;amp;amp;gt;&amp;amp;amp;lt;BR&amp;amp;amp;gt;&amp;amp;amp;lt;I&amp;amp;amp;gt;#3#&amp;amp;amp;lt;/I&amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;lt;BR&amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1012,10 +1012,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;gt;&amp;amp;amp;lt;/a&amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -1065,11 +1065,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -1090,14 +1090,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;lt;B&amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;I&amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1117,10 +1117,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -1170,11 +1170,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -1195,14 +1195,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1222,10 +1222,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -1275,11 +1275,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -1300,14 +1300,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1327,10 +1327,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -1379,11 +1379,11 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
-				<column heading="Action" url="javascript:doActionPopup('/search/catalog/detail/#5#')"/>
+				<column heading="Action" url=""/>
 			</report>
 			<!--
 				banner => {
@@ -1404,14 +1404,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1431,10 +1431,10 @@
 					}
 					4 => {
 						dAlign => 'CENTER'
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
 						head => 'Action'
-						url => 'javascript:doActionPopup('/search/catalog/detail/#5#')'
+						url => ''
 
 					}
 
@@ -1484,7 +1484,7 @@
 
 			<report>
 				<column heading="ID" url="/org/#session.org_id#/catalog/#5#/#0#"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="Name /&lt;BR&gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column index="6" heading="" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
@@ -1592,8 +1592,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;lt;BR&amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -1616,14 +1616,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&lt;B&gt;#2#&lt;/B&gt;&lt;BR&gt;&lt;I&gt;#3#&lt;/I&gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&lt;BR&gt;Description'
 
 					}
 					2 => {
@@ -1688,8 +1688,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;lt;BR&amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -1712,14 +1712,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;lt;B&amp;gt;#2#&amp;lt;/B&amp;gt;&amp;lt;BR&amp;gt;&amp;lt;I&amp;gt;#3#&amp;lt;/I&amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;lt;BR&amp;gt;Description'
 
 					}
 					2 => {
@@ -1784,8 +1784,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;lt;BR&amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -1808,14 +1808,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;lt;B&amp;amp;gt;#2#&amp;amp;lt;/B&amp;amp;gt;&amp;amp;lt;BR&amp;amp;gt;&amp;amp;lt;I&amp;amp;gt;#3#&amp;amp;lt;/I&amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;lt;BR&amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1880,8 +1880,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -1904,14 +1904,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;lt;B&amp;amp;amp;gt;#2#&amp;amp;amp;lt;/B&amp;amp;amp;gt;&amp;amp;amp;lt;BR&amp;amp;amp;gt;&amp;amp;amp;lt;I&amp;amp;amp;gt;#3#&amp;amp;amp;lt;/I&amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;lt;BR&amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -1976,8 +1976,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -2000,14 +2000,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;lt;B&amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;I&amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -2072,8 +2072,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -2096,14 +2096,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -2168,8 +2168,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -2192,14 +2192,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {
@@ -2264,8 +2264,8 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)"/>
-				<column heading="Name /<BR>Description"/>
+				<column heading="ID" url=""/>
+				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 			</report>
@@ -2288,14 +2288,14 @@
 						head => 'ID'
 						hint => 'Fee Schedule ID #5#'
 						options => '1'
-						tDataFmt => '&{count:0} Schedules'
-						url => 'javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)'
+						tDataFmt => '&amp;amp;amp;amp;amp;amp;amp;amp;{count:0} Schedules'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '<B>#2#</B><BR><I>#3#</I>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;amp;lt;B&amp;amp;amp;amp;amp;amp;amp;gt;#2#&amp;amp;amp;amp;amp;amp;amp;lt;/B&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;I&amp;amp;amp;amp;amp;amp;amp;gt;#3#&amp;amp;amp;amp;amp;amp;amp;lt;/I&amp;amp;amp;amp;amp;amp;amp;gt;'
 						hVAlign => 'BOTTOM'
-						head => 'Name /<BR>Description'
+						head => 'Name /&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;Description'
 
 					}
 					2 => {

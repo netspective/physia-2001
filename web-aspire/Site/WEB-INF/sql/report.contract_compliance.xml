@@ -45,8 +45,8 @@
 				<column index="2" heading="Product ID"/>
 				<column index="3" heading="Invoice ID"/>
 				<column index="4" heading="CPT Code"/>
-				<column index="5" type="currency" heading="Amount<br>Expected"/>
-				<column index="6" type="currency" heading="Amount<br>Paid"/>
+				<column index="5" type="currency" heading="Amount&lt;br&gt;Expected"/>
+				<column index="6" type="currency" heading="Amount&lt;br&gt;Paid"/>
 			</report>
 			<!--
 				columnDefn => {
@@ -153,8 +153,8 @@
 				<column index="2" heading="Product ID"/>
 				<column index="3" heading="Invoice ID"/>
 				<column index="4" heading="CPT Code"/>
-				<column index="5" type="currency" heading="Amount<br>Expected"/>
-				<column index="6" type="currency" heading="Amount<br>Paid"/>
+				<column index="5" type="currency" heading="Amount&amp;lt;br&amp;gt;Expected"/>
+				<column index="6" type="currency" heading="Amount&amp;lt;br&amp;gt;Paid"/>
 			</report>
 			<!--
 				columnDefn => {
@@ -185,7 +185,7 @@
 					3 => {
 						colIdx => '3'
 						dAlign => 'right'
-						dataFmt => '<A HREF = "/invoice/#3#/summary">#3#</A>'
+						dataFmt => '&lt;A HREF = "/invoice/#3#/summary"&gt;#3#&lt;/A&gt;'
 						hAlign => 'center'
 						head => 'Invoice ID'
 
@@ -204,7 +204,7 @@
 						dataFmt => '#5#'
 						dformat => 'currency'
 						hAlign => 'center'
-						head => 'Amount<br>Expected'
+						head => 'Amount&lt;br&gt;Expected'
 
 					}
 					6 => {
@@ -213,7 +213,7 @@
 						dataFmt => '#6#'
 						dformat => 'currency'
 						hAlign => 'center'
-						head => 'Amount<br>Paid'
+						head => 'Amount&lt;br&gt;Paid'
 
 					}
 
@@ -261,8 +261,8 @@
 				<column index="2" heading="Product ID"/>
 				<column index="3" heading="Invoice ID"/>
 				<column index="4" heading="CPT Code"/>
-				<column index="5" type="currency" heading="Amount<br>Expected"/>
-				<column index="6" type="currency" heading="Amount<br>Paid"/>
+				<column index="5" type="currency" heading="Amount&amp;amp;lt;br&amp;amp;gt;Expected"/>
+				<column index="6" type="currency" heading="Amount&amp;amp;lt;br&amp;amp;gt;Paid"/>
 			</report>
 			<!--
 				columnDefn => {
@@ -293,7 +293,7 @@
 					3 => {
 						colIdx => '3'
 						dAlign => 'right'
-						dataFmt => '<A HREF = "/invoice/#3#/summary">#3#</A>'
+						dataFmt => '&amp;lt;A HREF = "/invoice/#3#/summary"&amp;gt;#3#&amp;lt;/A&amp;gt;'
 						hAlign => 'center'
 						head => 'Invoice ID'
 
@@ -312,7 +312,7 @@
 						dataFmt => '#5#'
 						dformat => 'currency'
 						hAlign => 'center'
-						head => 'Amount<br>Expected'
+						head => 'Amount&amp;lt;br&amp;gt;Expected'
 
 					}
 					6 => {
@@ -321,7 +321,7 @@
 						dataFmt => '#6#'
 						dformat => 'currency'
 						hAlign => 'center'
-						head => 'Amount<br>Paid'
+						head => 'Amount&amp;lt;br&amp;gt;Paid'
 
 					}
 

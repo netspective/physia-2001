@@ -19,7 +19,7 @@
 			ORDER BY name
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -53,7 +53,7 @@
 			ORDER BY name
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -61,7 +61,7 @@
 					0 => {
 						hAlign => 'left'
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -87,7 +87,7 @@
 			ORDER BY name
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -95,7 +95,7 @@
 					0 => {
 						hAlign => 'left'
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -121,7 +121,7 @@
 			ORDER BY name
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 			</report>
 			<!--
@@ -129,7 +129,7 @@
 					0 => {
 						hAlign => 'left'
 						head => 'Code'
-						url => 'javascript:chooseItem('/search/epayer/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {

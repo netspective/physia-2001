@@ -1240,7 +1240,7 @@
 			<!--
 				columnDefn => {
 					0 => {
-						dataFmt => '<A HREF = "/search/icd/detail/#0#">(ICD #0#)</A> #1#<br> #2#--#3#: #4#<br><br>'
+						dataFmt => '<A HREF = "/search/icd/detail/#0#">(ICD #0#)</A> #1#<br> #2#-#3#: #4#<br><br>'
 						head => 'Diagnosis Summary'
 
 					}
@@ -1622,7 +1622,7 @@ SELECT	oc.catalog_id,
 			</params>
 			<report>
 				<column heading="Patient Name" url="/person/#4#/profile"/>
-				<column heading="Notes#" url="/person/#param.person_id#/stpe-person.account-notes?home=#homeArl#&person_id=#4#"/>
+				<column heading="Notes#" url="/person/#param.person_id#/stpe-person.account-notes?home=#homeArl#&amp;person_id=#4#"/>
 				<column heading="First  Note Date"/>
 				<column heading="Last Note Date"/>
 			</report>
@@ -2002,7 +2002,7 @@ SELECT	oc.catalog_id,
 			order by org_id
 			
 			<report>
-				<column index="1" heading="Lab Name" url="/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&org_id=#0#"/>
+				<column index="1" heading="Lab Name" url="/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&amp;org_id=#0#"/>
 				<column index="3" heading="Patient Lab Requests"/>
 			</report>
 			<!--

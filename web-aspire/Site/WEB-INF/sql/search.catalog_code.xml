@@ -23,7 +23,7 @@
 				<param value="request:icd"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Sex"/>
@@ -76,7 +76,7 @@
 				<param value="request:icd"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Sex"/>
@@ -87,7 +87,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -126,7 +126,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Sex"/>
@@ -137,7 +137,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -179,7 +179,7 @@
 				<param value="request:descr"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Sex"/>
@@ -190,7 +190,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {
@@ -229,7 +229,7 @@
 			AND rownum &lt; 250
 
 			<report>
-				<column heading="Code" url="javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column heading="Description"/>
 				<column heading="Sex"/>
@@ -240,7 +240,7 @@
 					0 => {
 						head => 'Code'
 						hint => 'Lookup Detailed Data'
-						url => 'javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')'
+						url => ''
 
 					}
 					1 => {

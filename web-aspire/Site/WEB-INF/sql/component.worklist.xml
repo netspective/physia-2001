@@ -60,7 +60,7 @@
 			
 			<report>
 				<column heading="Patient Name" url="/person/#4#/profile"/>
-				<column heading="Notes#" url="/worklist/collection/stpe-worklist.account-notes/?home=#homeArl#&person_id=#4#"/>
+				<column heading="Notes#" url="/worklist/collection/stpe-worklist.account-notes/?home=#homeArl#&amp;person_id=#4#"/>
 				<column heading="First  Note Date"/>
 				<column heading="Last Note Date"/>
 			</report>

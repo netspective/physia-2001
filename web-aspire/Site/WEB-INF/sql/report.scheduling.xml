@@ -62,7 +62,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -203,7 +203,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -300,10 +300,7 @@
 			group by caption, event_status
 			
 			<report>
-				<column heading="Appointments" url="javascript:doActionPopup(
-							'#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#',
-							null,'location,status,width=800,height=600,scrollbars,resizable')
-						"/>
+				<column heading="Appointments" url=" 							'#hrefSelfPopup#&amp;detail=appointments&amp;event_status=#2#&amp;caption=#0#', 							null,'location,status,width=800,height=600,scrollbars,resizable') 						"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -350,8 +347,7 @@
 			ORDER BY 1 desc
 			
 			<report>
-				<column heading="Date" url="javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#',
-						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Date" url=" 						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -433,7 +429,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -452,7 +448,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -577,7 +573,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -596,7 +592,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -729,7 +725,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -748,7 +744,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -880,7 +876,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -899,7 +895,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -1030,7 +1026,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -1049,7 +1045,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -1170,7 +1166,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -1189,7 +1185,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -1310,7 +1306,7 @@
 			ORDER BY 5, 7
 
 			<report>
-				<column index="0" heading="Patient" url="javascript:chooseItemForParent('/person/#11#/profile')"/>
+				<column index="0" heading="Patient" url=""/>
 				<column index="2" heading="Chart"/>
 				<column index="1" heading="Account"/>
 				<column index="3" heading="Physician"/>
@@ -1329,7 +1325,7 @@
 						head => 'Patient'
 						hint => 'View #17# #11# Profile'
 						options => '1'
-						url => 'javascript:chooseItemForParent('/person/#11#/profile')'
+						url => ''
 
 					}
 					1 => {
@@ -1418,8 +1414,7 @@
 			ORDER BY 1 desc
 			
 			<report>
-				<column heading="Check In Date" url="javascript:doActionPopup('#hrefSelfPopup#&detail=missing_encounter&encounter=#&{?}#',
-						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Check In Date" url=" 						null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -1478,8 +1473,7 @@
 			ORDER BY 1
 			
 			<report>
-				<column heading="Procedure Code" url="javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#',
-					null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Procedure Code" url=" 					null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -1568,8 +1562,7 @@
 			GROUP BY ct.caption
 			
 			<report>
-				<column heading="Product Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=product&product=#&{?}#',
-				null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Product Name" url=" 				null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -1614,8 +1607,7 @@
 			group by ea.value_textB
 			
 			<report>
-				<column heading="Physician" url="javascript:doActionPopup('#hrefSelfPopup#&detail=physician&physician=#&{?}#',
-							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Physician" url=" 							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--
@@ -1661,8 +1653,7 @@
 			group by caption, Appt_Attendee_Type.id
 			
 			<report>
-				<column heading="Patient type" url="javascript:doActionPopup('#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#',
-							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
+				<column heading="Patient type" url=" 							null,'location,status,width=800,height=600,scrollbars,resizable')"/>
 				<column heading="Count"/>
 			</report>
 			<!--

@@ -29,7 +29,7 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
 				<column index="2" heading="End"/>
 				<column index="3" heading="Locality"/>
@@ -97,7 +97,7 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
 				<column index="2" heading="End"/>
 				<column index="3" heading="Locality"/>
@@ -108,7 +108,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -165,7 +165,7 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
 				<column index="2" heading="End"/>
 				<column index="3" heading="Locality"/>
@@ -176,7 +176,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -233,7 +233,7 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
 				<column index="2" heading="End"/>
 				<column index="3" heading="Locality"/>
@@ -244,7 +244,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {
@@ -301,7 +301,7 @@
 			WHERE rownum &lt;= 250
 
 			<report>
-				<column heading="ID" url="javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)"/>
+				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
 				<column index="2" heading="End"/>
 				<column index="3" heading="Locality"/>
@@ -312,7 +312,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)'
+						url => ''
 
 					}
 					1 => {

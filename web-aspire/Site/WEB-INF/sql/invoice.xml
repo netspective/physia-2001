@@ -191,7 +191,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -1133,7 +1133,7 @@
 				<param value="request:bill_to_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -1369,7 +1369,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -1387,7 +1387,7 @@
 						dAlign => 'RIGHT'
 						head => 'ID'
 						hint => 'Created on: #14#'
-						url => '/invoice/#&{?}#/summary'
+						url => '/invoice/#&amp;{?}#/summary'
 
 					}
 					1 => {

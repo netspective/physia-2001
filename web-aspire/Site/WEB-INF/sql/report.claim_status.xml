@@ -81,7 +81,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column heading="Claims" url="javascript:doActionPopup("#hrefSelfPopup#&detail=payer&payer=#&{?}#")"/>
+				<column heading="Claims" url=""/>
 				<column heading="Count"/>
 			</report>
 			<!--

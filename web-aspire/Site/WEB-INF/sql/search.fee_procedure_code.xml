@@ -20,7 +20,7 @@
 				<param value="request:code"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -62,7 +62,7 @@
 				<param value="request:internal_catalog_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -71,7 +71,7 @@
 					0 => {
 						hAlign => 'LEFT'
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -104,7 +104,7 @@
 				<param value="request:internal_catalog_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -113,7 +113,7 @@
 					0 => {
 						hAlign => 'LEFT'
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -146,7 +146,7 @@
 				<param value="request:internal_catalog_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -155,7 +155,7 @@
 					0 => {
 						hAlign => 'LEFT'
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -188,7 +188,7 @@
 				<param value="request:internal_catalog_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -197,7 +197,7 @@
 					0 => {
 						hAlign => 'LEFT'
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {
@@ -230,7 +230,7 @@
 				<param value="request:internal_catalog_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="Code" url=""/>
 				<column heading="Name"/>
 				<column index="3" heading="Code Type"/>
 			</report>
@@ -239,7 +239,7 @@
 					0 => {
 						hAlign => 'LEFT'
 						head => 'Code'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {

@@ -276,7 +276,7 @@ SELECT invoice_id
 			having sum(total_pending)&gt; 0
 			
 			<report>
-				<column index="0" heading="Patient Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_data&patient_id=#1#')"/>
+				<column index="0" heading="Patient Name" url=""/>
 				<column index="1" heading="Patient ID"/>
 				<column index="2" heading="Total Invoices"/>
 				<column index="3" type="currency" heading="0 - 30"/>
@@ -483,7 +483,7 @@ SELECT invoice_id
 			having sum(balance)&lt;&gt; 0
 			
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Invoice Date"/>
 				<column heading="Status"/>
@@ -575,7 +575,7 @@ SELECT invoice_id
 			--having sum(total_pending) &lt;&gt; 0
 			
 			<report>
-				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="0" heading="Insurance" url=""/>
 				<column index="1" heading="Total Invoices"/>
 				<column index="2" type="currency" heading="0 - 30"/>
 				<column index="3" type="currency" heading="31 - 60"/>
@@ -813,7 +813,7 @@ SELECT invoice_id
 			GROUP BY bill_to_id
 
 			<report>
-				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="0" heading="Insurance" url=""/>
 				<column index="1" heading="Total Invoices"/>
 				<column index="2" type="currency" heading="0 - 30"/>
 				<column index="3" type="currency" heading="31 - 60"/>
@@ -925,7 +925,7 @@ SELECT invoice_id
 			GROUP BY bill_to_id
 
 			<report>
-				<column index="0" heading="Insurance" url="javascript:doActionPopup('#hrefSelfPopup#&detail=insurance&ins_org_id=#&{?}#')"/>
+				<column index="0" heading="Insurance" url=""/>
 				<column index="1" heading="Total Invoices"/>
 				<column index="2" type="currency" heading="0 - 30"/>
 				<column index="3" type="currency" heading="31 - 60"/>
@@ -1177,7 +1177,7 @@ SELECT invoice_id
 			having sum(total_pending)&gt; 0
 			
 			<report>
-				<column index="0" heading="Patient Name" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#1#')"/>
+				<column index="0" heading="Patient Name" url=""/>
 				<column index="1" heading="Patient ID"/>
 				<column index="2" heading="Total Invoices"/>
 				<column index="3" type="currency" heading="0 - 30"/>
@@ -1328,7 +1328,7 @@ SELECT invoice_id
 			having sum(balance)&lt;&gt; 0
 			
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Invoice Date"/>
 				<column heading="Status"/>
@@ -1424,7 +1424,7 @@ SELECT invoice_id
 
 			<report>
 				<column index="0" heading="Patient Name"/>
-				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="1" heading="Patient ID" url=""/>
 				<column index="2" heading="Total Invoices"/>
 				<column index="3" type="currency" heading="0 - 30"/>
 				<column index="4" type="currency" heading="31 - 60"/>
@@ -1564,7 +1564,7 @@ SELECT invoice_id
 
 			<report>
 				<column index="0" heading="Patient Name"/>
-				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="1" heading="Patient ID" url=""/>
 				<column index="2" heading="Total Invoices"/>
 				<column index="3" type="currency" heading="0 - 30"/>
 				<column index="4" type="currency" heading="31 - 60"/>
@@ -1704,7 +1704,7 @@ SELECT invoice_id
 
 			<report>
 				<column index="0" heading="Patient Name"/>
-				<column index="1" heading="Patient ID" url="javascript:doActionPopup('#hrefSelfPopup#&detail=aged_patient&patient_id=#&{?}#')"/>
+				<column index="1" heading="Patient ID" url=""/>
 				<column index="2" heading="Total Invoices"/>
 				<column index="3" type="currency" heading="0 - 30"/>
 				<column index="4" type="currency" heading="31 - 60"/>

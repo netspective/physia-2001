@@ -30,7 +30,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="User ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="User ID" url=""/>
 				<column heading="Name"/>
 				<column heading="Start"/>
 				<column heading="Last"/>
@@ -88,7 +88,7 @@
 				<param value="request:org_internal_id"/>
 			</params>
 			<report>
-				<column heading="User ID" url="javascript:chooseEntry('#&{?}#')"/>
+				<column heading="User ID" url=""/>
 				<column heading="Name"/>
 				<column heading="Start"/>
 				<column heading="Last"/>
@@ -98,7 +98,7 @@
 				columnDefn => {
 					0 => {
 						head => 'User ID'
-						url => 'javascript:chooseEntry('#&{?}#')'
+						url => ''
 
 					}
 					1 => {

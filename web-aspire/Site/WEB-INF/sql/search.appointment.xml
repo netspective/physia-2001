@@ -71,7 +71,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Appointment Date Time" url="javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()"/>
+				<column index="1" heading="Appointment Date Time" url=""/>
 				<column heading="Physician/Facility"/>
 				<column heading="Patient Name"/>
 				<column heading="Patient Type"/>
@@ -206,7 +206,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Appointment Date Time" url="javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()"/>
+				<column index="1" heading="Appointment Date Time" url=""/>
 				<column heading="Physician/Facility"/>
 				<column heading="Patient Name"/>
 				<column heading="Patient Type"/>
@@ -222,24 +222,16 @@
 						head => 'Appointment Date Time'
 						hint => 'Perform On-Select Function'
 						options => '1'
-						url => 'javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '
-				<a href="javascript:chooseItem('/search/appointment/#2#//#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #2# Appointments' style='text-decoration:none'>#2#</a> <br>
-				<a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
-			'
+						dataFmt => ' 				&lt;a href=" 					title='View #2# Appointments' style='text-decoration:none'&gt;#2#&lt;/a&gt; &lt;br&gt; 				&lt;a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')" 					title='View #7# Appointments' style='text-decoration:none'&gt;#7#&lt;/a&gt; 			'
 						head => 'Physician/Facility'
 
 					}
 					2 => {
-						dataFmt => '	<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
-				style='text-decoration:none'>#16# (#12#)</a> <br>
-				Scheduled by: #10#
-			'
+						dataFmt => '	&lt;a href=" 				style='text-decoration:none'&gt;#16# (#12#)&lt;/a&gt; &lt;br&gt; 				Scheduled by: #10# 			'
 						head => 'Patient Name'
 						options => '1'
 
@@ -341,7 +333,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Appointment Date Time" url="javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()"/>
+				<column index="1" heading="Appointment Date Time" url=""/>
 				<column heading="Physician/Facility"/>
 				<column heading="Patient Name"/>
 				<column heading="Patient Type"/>
@@ -357,24 +349,16 @@
 						head => 'Appointment Date Time'
 						hint => 'Perform On-Select Function'
 						options => '1'
-						url => 'javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '
-				<a href="javascript:chooseItem('/search/appointment/#2#//#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #2# Appointments' style='text-decoration:none'>#2#</a> <br>
-				<a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
-			'
+						dataFmt => ' 				&amp;lt;a href=" 					title='View #2# Appointments' style='text-decoration:none'&amp;gt;#2#&amp;lt;/a&amp;gt; &amp;lt;br&amp;gt; 				&amp;lt;a href="'
 						head => 'Physician/Facility'
 
 					}
 					2 => {
-						dataFmt => '	<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
-				style='text-decoration:none'>#16# (#12#)</a> <br>
-				Scheduled by: #10#
-			'
+						dataFmt => '	&amp;lt;a href=" 				style='text-decoration:none'&amp;gt;#16# (#12#)&amp;lt;/a&amp;gt; &amp;lt;br&amp;gt; 				Scheduled by: #10# 			'
 						head => 'Patient Name'
 						options => '1'
 
@@ -476,7 +460,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Appointment Date Time" url="javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()"/>
+				<column index="1" heading="Appointment Date Time" url=""/>
 				<column heading="Physician/Facility"/>
 				<column heading="Patient Name"/>
 				<column heading="Patient Type"/>
@@ -492,24 +476,16 @@
 						head => 'Appointment Date Time'
 						hint => 'Perform On-Select Function'
 						options => '1'
-						url => 'javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '
-				<a href="javascript:chooseItem('/search/appointment/#2#//#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #2# Appointments' style='text-decoration:none'>#2#</a> <br>
-				<a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
-			'
+						dataFmt => ' 				&amp;amp;lt;a href=" 					title='View #2# Appointments' style='text-decoration:none'&amp;amp;gt;#2#&amp;amp;lt;/a&amp;amp;gt; &amp;amp;lt;br&amp;amp;gt; 				&amp;amp;lt;a href="'
 						head => 'Physician/Facility'
 
 					}
 					2 => {
-						dataFmt => '	<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
-				style='text-decoration:none'>#16# (#12#)</a> <br>
-				Scheduled by: #10#
-			'
+						dataFmt => '	&amp;amp;lt;a href=" 				style='text-decoration:none'&amp;amp;gt;#16# (#12#)&amp;amp;lt;/a&amp;amp;gt; &amp;amp;lt;br&amp;amp;gt; 				Scheduled by: #10# 			'
 						head => 'Patient Name'
 						options => '1'
 
@@ -607,7 +583,7 @@
 				<param value="request:owner_id"/>
 			</params>
 			<report>
-				<column index="1" heading="Appointment Date Time" url="javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()"/>
+				<column index="1" heading="Appointment Date Time" url=""/>
 				<column heading="Physician/Facility"/>
 				<column heading="Patient Name"/>
 				<column heading="Patient Type"/>
@@ -623,24 +599,16 @@
 						head => 'Appointment Date Time'
 						hint => 'Perform On-Select Function'
 						options => '1'
-						url => 'javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()'
+						url => ''
 
 					}
 					1 => {
-						dataFmt => '
-				<a href="javascript:chooseItem('/search/appointment/#2#//#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #2# Appointments' style='text-decoration:none'>#2#</a> <br>
-				<a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
-					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
-			'
+						dataFmt => ' 				&amp;amp;amp;lt;a href=" 					title='View #2# Appointments' style='text-decoration:none'&amp;amp;amp;gt;#2#&amp;amp;amp;lt;/a&amp;amp;amp;gt; &amp;amp;amp;lt;br&amp;amp;amp;gt; 				&amp;amp;amp;lt;a href="'
 						head => 'Physician/Facility'
 
 					}
 					2 => {
-						dataFmt => '	<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
-				style='text-decoration:none'>#16# (#12#)</a> <br>
-				Scheduled by: #10#
-			'
+						dataFmt => '	&amp;amp;amp;lt;a href=" 				style='text-decoration:none'&amp;amp;amp;gt;#16# (#12#)&amp;amp;amp;lt;/a&amp;amp;amp;gt; &amp;amp;amp;lt;br&amp;amp;amp;gt; 				Scheduled by: #10# 			'
 						head => 'Patient Name'
 						options => '1'
 

@@ -28,7 +28,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="City" url="javascript:location.href='#hrefSelf#&detail=service&city=#1#'"/>
+				<column heading="City" url=""/>
 				<column heading="State"/>
 			</report>
 			<!--
@@ -72,7 +72,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="City" url="javascript:location.href='#hrefSelf#&detail=service&city=#1#'"/>
+				<column heading="City" url=""/>
 				<column heading="State"/>
 			</report>
 			<!--
@@ -80,7 +80,7 @@
 					0 => {
 						dataFmt => '#1#'
 						head => 'City'
-						url => 'javascript:location.href='#hrefSelf#&detail=service&city=#1#''
+						url => ''
 
 					}
 					1 => {
@@ -116,7 +116,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="City" url="javascript:location.href='#hrefSelf#&detail=service&city=#1#'"/>
+				<column heading="City" url=""/>
 				<column heading="State"/>
 			</report>
 			<!--
@@ -124,7 +124,7 @@
 					0 => {
 						dataFmt => '#1#'
 						head => 'City'
-						url => 'javascript:location.href='#hrefSelf#&detail=service&city=#1#''
+						url => ''
 
 					}
 					1 => {
@@ -160,7 +160,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="City" url="javascript:location.href='#hrefSelf#&detail=service&city=#1#'"/>
+				<column heading="City" url=""/>
 				<column heading="State"/>
 			</report>
 			<!--
@@ -168,7 +168,7 @@
 					0 => {
 						dataFmt => '#1#'
 						head => 'City'
-						url => 'javascript:location.href='#hrefSelf#&detail=service&city=#1#''
+						url => ''
 
 					}
 					1 => {
@@ -246,15 +246,15 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
@@ -372,21 +372,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -414,7 +414,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -423,9 +423,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&gt;&lt;/a&gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -498,21 +498,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -540,7 +540,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -549,9 +549,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;gt;&amp;lt;/a&amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -624,21 +624,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -666,7 +666,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -675,9 +675,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;gt;&amp;amp;lt;/a&amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -750,21 +750,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -792,7 +792,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -801,9 +801,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;gt;&amp;amp;amp;lt;/a&amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -876,21 +876,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -918,7 +918,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -927,9 +927,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -1002,21 +1002,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -1044,7 +1044,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -1053,9 +1053,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -1128,21 +1128,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -1170,7 +1170,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -1179,9 +1179,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -1254,21 +1254,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -1296,7 +1296,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -1305,9 +1305,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 
@@ -1380,21 +1380,21 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="Code" url="javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';"/>
+				<column heading="Code" url=""/>
 				<column heading="Provider Name"/>
 				<column heading="City"/>
 				<column heading="State"/>
 				<column heading="Street"/>
 				<column heading="Phone"/>
-				<column heading="Fee Schedule" url="javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')"/>
+				<column heading="Fee Schedule" url=""/>
 				<column heading="Type"/>
-				<column heading="Parent Provider" url="javascript:doActionPopup('/org/#9#/profile')"/>
+				<column heading="Parent Provider" url=""/>
 			</report>
 			<!--
 				columnDefn => {
 					0 => {
 						head => 'Code'
-						url => 'javascript:if(isLookupWindow())  populateControl('#0#', true, '#1#'); else window.location.href = '/org/#0#/profile';'
+						url => ''
 
 					}
 					1 => {
@@ -1422,7 +1422,7 @@
 					6 => {
 						dataFmt => '#7#'
 						head => 'Fee Schedule'
-						url => 'javascript:doActionPopup('/org/#0#/catalog/#6#/#7#')'
+						url => ''
 
 					}
 					7 => {
@@ -1431,9 +1431,9 @@
 
 					}
 					8 => {
-						dataFmt => '<img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0></a>'
+						dataFmt => '&amp;amp;amp;amp;amp;amp;amp;amp;lt;img src="/resources/images/icons/hand-pointing-to-folder-sm.gif" border=0&amp;amp;amp;amp;amp;amp;amp;amp;gt;&amp;amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;amp;gt;'
 						head => 'Parent Provider'
-						url => 'javascript:doActionPopup('/org/#9#/profile')'
+						url => ''
 
 					}
 

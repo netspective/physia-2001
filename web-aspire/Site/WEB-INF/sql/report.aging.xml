@@ -181,7 +181,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						dataFmt => '&lt;A HREF = "/invoice/#0#/summary"&gt;#0#&lt;/A&gt;'
 						head => 'ID'
 
 					}
@@ -299,7 +299,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						dataFmt => '&amp;lt;A HREF = "/invoice/#0#/summary"&amp;gt;#0#&amp;lt;/A&amp;gt;'
 						head => 'ID'
 
 					}
@@ -417,7 +417,7 @@
 				columnDefn => {
 					0 => {
 						colIdx => '0'
-						dataFmt => '<A HREF = "/invoice/#0#/summary">#0#</A>'
+						dataFmt => '&amp;amp;lt;A HREF = "/invoice/#0#/summary"&amp;amp;gt;#0#&amp;amp;lt;/A&amp;amp;gt;'
 						head => 'ID'
 
 					}
@@ -521,7 +521,7 @@
 			ORDER BY i.invoice_id desc
 
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -655,7 +655,7 @@
 			ORDER BY i.invoice_id desc
 
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -670,7 +670,7 @@
 						dAlign => 'RIGHT'
 						head => 'ID'
 						hint => 'Created on: #14#'
-						url => '/invoice/#&{?}#/summary'
+						url => '/invoice/#&amp;{?}#/summary'
 
 					}
 					1 => {
@@ -789,7 +789,7 @@
 			ORDER BY i.invoice_id desc
 
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;amp;amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -804,7 +804,7 @@
 						dAlign => 'RIGHT'
 						head => 'ID'
 						hint => 'Created on: #14#'
-						url => '/invoice/#&{?}#/summary'
+						url => '/invoice/#&amp;amp;{?}#/summary'
 
 					}
 					1 => {
@@ -923,7 +923,7 @@
 			ORDER BY i.invoice_id desc
 
 			<report>
-				<column heading="ID" url="/invoice/#&{?}#/summary"/>
+				<column heading="ID" url="/invoice/#&amp;amp;amp;amp;{?}#/summary"/>
 				<column heading="IC"/>
 				<column heading="Svc Date"/>
 				<column index="12" heading="Status"/>
@@ -938,7 +938,7 @@
 						dAlign => 'RIGHT'
 						head => 'ID'
 						hint => 'Created on: #14#'
-						url => '/invoice/#&{?}#/summary'
+						url => '/invoice/#&amp;amp;amp;{?}#/summary'
 
 					}
 					1 => {

@@ -48,7 +48,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -115,7 +115,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -123,7 +123,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+						url => ''
 
 					}
 					1 => {
@@ -182,7 +182,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -190,7 +190,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+						url => ''
 
 					}
 					1 => {
@@ -249,7 +249,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -257,7 +257,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+						url => ''
 
 					}
 					1 => {
@@ -316,7 +316,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -324,7 +324,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+						url => ''
 
 					}
 					1 => {
@@ -383,7 +383,7 @@
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
-				<column heading="ID" url="javascript:chooseEntry('#&{?}#', null, null, '#3#')"/>
+				<column heading="ID" url=""/>
 				<column heading="Primary Name"/>
 				<column heading="Category"/>
 			</report>
@@ -391,7 +391,7 @@
 				columnDefn => {
 					0 => {
 						head => 'ID'
-						url => 'javascript:chooseEntry('#&{?}#', null, null, '#3#')'
+						url => ''
 
 					}
 					1 => {
