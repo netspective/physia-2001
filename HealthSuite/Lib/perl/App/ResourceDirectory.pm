@@ -29,10 +29,8 @@ use App::Statements::Transaction;
 ##############################################################################
 
 use App::Page;
-use App::Page::ChangeLog;
-use App::Page::Construct;
 use App::Page::Error;
-use App::Page::Home;
+use App::Page::Redirect;
 use App::Page::Help;
 use App::Page::Invoice;
 use App::Page::Org;
@@ -196,14 +194,12 @@ $SEARCH_CLASSES = {
 };
 
 %PAGE_CLASSES = (
-	'logout' => 'App::Page::Home',
+	'logout' => 'App::Page::Redirect',
+	'home' => 'App::Page::Redirect',
+	'homeorg' => 'App::Page::Redirect',
+
 	'help' => 'App::Page::Help',
-	'home' => 'App::Page::Home',
-	'homeorg' => 'App::Page::Home',
 	'invoice' => 'App::Page::Invoice',
-	'create' => 'App::Page::Construct',
-	'modify' => 'App::Page::Construct',
-	'delete' => 'App::Page::Construct',
 	'error' => 'App::Page::Error',
 	'org' => 'App::Page::Org',
 	'person' => 'App::Page::Person',
@@ -211,7 +207,6 @@ $SEARCH_CLASSES = {
 	'schedule' => 'App::Page::Schedule',
 	'search' => $SEARCH_CLASSES,
 	'lookup' => $SEARCH_CLASSES,
-	'changes' => 'App::Page::ChangeLog',
 	'sde' => 'App::Page::SDE',
 	'worklist' => 'App::Page::WorkList',
 );
@@ -439,7 +434,7 @@ $SEARCH_CLASSES = {
 	'nurse' => {_class => 'App::Dialog::Person::Nurse', heading => '$Command Nurse', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Nurse' },
 	'patient' => {_class => 'App::Dialog::Person::Patient',heading => '$Command Patient/Person', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Patient'},
 	'responsibleparty' => {_class => 'App::Dialog::ResponsibleParty',heading => '$Command Responsible Party', _arl => ['party_name'], _arl_modify => ['party_name'], _idSynonym => 'ResponsibleParty'},
-	'patientappointments' => {_class => 'App::Dialog::patientAppointments',heading => 'Appointments', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'PatientAppointments'},	
+	'patientappointments' => {_class => 'App::Dialog::patientAppointments',heading => 'Appointments', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'PatientAppointments'},
 	'physician' => {_class => 'App::Dialog::Person::Physician', heading => '$Command Physician/Provider', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Physician' },
 	'staff' => {_class => 'App::Dialog::Person::Staff', heading => '$Command Staff Member', _arl => ['person_id'], },
 	'org-main' => {_class => 'App::Dialog::Organization',
