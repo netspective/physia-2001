@@ -174,6 +174,12 @@ sub new
 		new CGI::Dialog::Field(caption => '$Command Remarks',
 		 	type => 'memo', name => 'discard_remarks'
 		),
+		new CGI::Dialog::Field(
+				caption => '$Command Reason',
+		 		type => 'select',
+		 		name => 'cancel_remarks',
+		 		selOptions => ' ;Weather;Illness;Death in family;Doctor cancel;Patient cancel;Accident;Miscellaneous;Invalid appt;',
+		),
 		new CGI::Dialog::Field(caption => "Rescheduled By",
 		 	type => 'select',
 			selOptions => 'Patient;Office',
@@ -296,7 +302,9 @@ sub makeStateChanges
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	$self->updateFieldFlags('discard_remarks', FLDFLAG_INVISIBLE, $command =~ m/^(add|update|confirm)$/);
+	$self->updateFieldFlags('discard_remarks', FLDFLAG_INVISIBLE, $command =~ m/^(add|update|confirm|cancel)$/);
+	$self->updateFieldFlags('cancel_remarks', FLDFLAG_INVISIBLE, $command !~ m/^(cancel)$/);
+
 	$self->updateFieldFlags('rescheduled', FLDFLAG_INVISIBLE, $command =~ m/^(add|cancel|noshow|update|confirm)$/);
 	$self->updateFieldFlags('resource_id', FLDFLAG_READONLY, $command =~ m/^(cancel|noshow|update|confirm)$/);
 	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|confirm)$/);
@@ -322,7 +330,7 @@ sub makeStateChanges_cancel
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('minutes_util_0', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('minutes_util_1', FLDFLAG_INVISIBLE, 1);
+
 
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
@@ -802,6 +810,7 @@ sub execute
 			elsif ($command eq 'noshow' || $command eq 'cancel')
 			{
 				my $discardType = $command eq 'cancel' ? 0: 1;
+				my $discardRemarks = $command eq 'cancel' ? $page->field('cancel_remarks') : $page->field('discard_remarks');
 				$page->schemaAction(
 					'Event', 'update',
 					event_id => $eventId,
@@ -809,7 +818,7 @@ sub execute
 					discard_type => $discardType,
 					discard_by_id => $page->session('user_id') || undef,
 					discard_stamp => $timeStamp,
-					discard_remarks => $page->field('discard_remarks') || undef,
+					discard_remarks => $discardRemarks || undef,
 					_debug => 0
 				);
 
