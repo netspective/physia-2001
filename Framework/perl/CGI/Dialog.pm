@@ -31,6 +31,8 @@ sub new
 	# any HTML to put in before and after a field
 	$self->{preHtml} = '' unless $self->{preHtml};
 	$self->{postHtml} = '' unless $self->{postHtml};
+	
+	
 
 	# internal housekeeping variables
 	$self->{_spacerWidth} = 0;
@@ -363,6 +365,15 @@ sub readChoicesStmt
 			#else { push(@bindParams, $page->field($params)) }
 			else { push(@bindParams, $params) }
 		}
+		if(my $params = $self->{fKeyStmtBindSession})
+		{
+			if(ref $params eq 'ARRAY')
+			{
+				foreach(@$params) { push(@bindParams, $page->session($_)) }
+			}
+			#else { push(@bindParams, $page->field($params)) }
+			else { push(@bindParams, $params) }
+		}
 
 		my $cursor = $self->{fKeyStmtMgr}->execute($page, $stmtExecFlags, $self->{fKeyStmt}, @bindParams);
 		while(my $rowRef = $cursor->fetch())
@@ -484,6 +495,40 @@ sub select_as_html
 				$i++;
 			}
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
+		}
+		elsif($self->{style} eq 'multidual')
+		{		
+			my ($selectOptions, $selectOptionsSelected) = ('', '');
+			foreach (@{$choices})
+			{
+				my $lb = $_->[0] ? \$selectOptionsSelected : \$selectOptions;
+				$$lb .= "<option value=\"$_->[2]\">$_->[1]</option>";
+			}			
+			my $sorted = $self->flagIsSet(FLDFLAG_SORT) ? 'true' : 'false';
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{
+					<TABLE CELLSPACING=0 CELLPADDING=1 ALIGN=left BORDER=0>
+					<TR>
+					<TD ALIGN=left><FONT SIZE=2>$self->{multiDualCaptionLeft}</FONT></TD><TD></TD>
+					<TD ALIGN=left><FONT SIZE=2>$self->{multiDualCaptionRight}</FONT></TD>
+					</TR>
+					<TR>
+					<TD ALIGN=left VALIGN=top>
+						<SELECT ondblclick="MoveSelectItems('Dialog', '$self->{name}_From', '_f_$self->{name}', $sorted)" NAME=$self->{name}_From SIZE=$self->{size} MULTIPLE STYLE="width: $self->{width}pt">
+						$selectOptions
+						</SELECT>
+					</TD>
+					<TD ALIGN=center VALIGN=middle>
+						&nbsp;<INPUT TYPE=button NAME="$self->{name}_addBtn" onClick="MoveSelectItems('Dialog', '$self->{name}_From', '_f_$self->{name}', $sorted)" VALUE=" > ">&nbsp;<BR CLEAR=both>
+						&nbsp;<INPUT TYPE=button NAME="$self->{name}_removeBtn" onClick="MoveSelectItems('Dialog', '_f_$self->{name}', '$self->{name}_From', $sorted)" VALUE=" < ">&nbsp;
+					</TD>
+					<TD ALIGN=left VALIGN=top>
+						<SELECT ondblclick="MoveSelectItems('Dialog', '_f_$self->{name}', '$self->{name}_From', $sorted)" NAME=_f_$self->{name} SIZE=$self->{size} MULTIPLE STYLE="width: $self->{width}pt">
+						$selectOptionsSelected
+						</SELECT>
+					</TD>
+					</TR>
+					</TABLE>
+				});
 		}
 		else
 		{
@@ -1570,7 +1615,7 @@ sub populateFieldInfoJS
 			my $editable = $self->isEditable($_);
 			my $caption = $_->{caption};
 			$caption =~ s/\'//g;
-			push(@$jsList, "dlg_$dialogName\_fields['_f_$_->{name}'] = { 'name' : '$_->{name}', 'type' : '$_->{type}', 'prevFld' : $prevField, 'nextFld' : $nextField, 'caption' : '$caption', 'options' : '$_->{options}', 'editable' : '$editable' };");
+			push(@$jsList, "dlg_$dialogName\_fields['_f_$_->{name}'] = { 'name' : '$_->{name}', 'type' : '$_->{type}', 'prevFld' : $prevField, 'nextFld' : $nextField, 'caption' : '$caption', 'options' : '$_->{options}', 'style' : '$_->{style}', 'editable' : '$editable' };");
 			$prevField = "'_f_$_->{name}'";
 		}
 		$fieldNum++;
@@ -1761,7 +1806,7 @@ sub getHtml
 		<SCRIPT>
 		$fieldsInfoJS
 		</SCRIPT>
-		<form name="$self->{formName}" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit()">
+		<form name="$self->{formName}" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">
 			@dlgHouskeepingHiddens
 			$html
 		</form>
