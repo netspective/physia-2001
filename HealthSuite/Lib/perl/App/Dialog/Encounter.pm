@@ -535,22 +535,24 @@ sub createPayerDropDown
 	#this function called from populateData
 
 	my $insurRecs = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selPayerChoicesByOwnerPersonId', $personId);
-	my @tempInsurPlans = ();
+	my @insurPlans = ();
 	my @insurIntIds = ();
 	my @wkCompPlans = ();
 	my @thirdParties = ();
-	my @planIds  = ();
+	my @allIntIds  = ();
 	my $prevSeq = 0;
 	my $insSeq;
 	my $badSeq;
 	foreach my $ins (@{$insurRecs})
 	{
+		next unless $ins->{ins_internal_id};
+
 		if($ins->{group_name} eq 'Insurance')
 		{
 			$insSeq = $ins->{bill_seq_id};
 			if($insSeq == $prevSeq + 1)
 			{
-				push(@tempInsurPlans, "$ins->{bill_seq}($ins->{plan_name})");
+				push(@insurPlans, "$ins->{bill_seq}($ins->{plan_name})");
 				push(@insurIntIds, $ins->{ins_internal_id});
 				$prevSeq = $insSeq;
 			}
@@ -560,14 +562,14 @@ sub createPayerDropDown
 			}
 
 			#Added to store plan internal Ids for getFS if insurance is primary
-			push(@planIds,$ins->{ins_internal_id}) if $insSeq == App::Universal::INSURANCE_PRIMARY;
+			push(@allIntIds,$ins->{ins_internal_id}) if $insSeq == App::Universal::INSURANCE_PRIMARY;
 		}
 		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
 			push(@wkCompPlans, "Work Comp($ins->{plan_name}):$ins->{ins_internal_id}");
 
 			#Added to store plan internal Ids for getFS
-			push(@planIds,$ins->{ins_internal_id});
+			push(@allIntIds,$ins->{ins_internal_id});
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
@@ -582,24 +584,15 @@ sub createPayerDropDown
 		}
 	}
 
-	#if insurance sequence is out of order, do not include in payer drop down
-	my @insurPlans = ();
-	unless($badSeq)
-	{
-		@insurIntIds = join(',', @insurIntIds);
-		@tempInsurPlans = join(' / ', @tempInsurPlans);
-		push(@insurPlans, "@tempInsurPlans:@insurIntIds");
-	}
-
 	#get Fee Schedules for Insurance and Work Comps Plan
-	getFS($self,$page,@planIds);
+	getFS($self,$page,@allIntIds);
 
 	#create payer drop down
 	my @payerList = ();
 
-	my $insurances = join(' / ', @insurPlans) if @insurPlans;
-	$insurances = "$insurances" if $insurances;
-	push(@payerList, $insurances) if $insurances;
+	my $insurIntIds = join(',', @insurIntIds);
+	my $insurances = join(' / ', @insurPlans) . ":$insurIntIds" unless $badSeq;		#if insurance sequence is out of order, do not include in payer drop down
+	push(@payerList, $insurances) if $insurIntIds && $insurances;
 
 	my $workComp = join(';', @wkCompPlans) if @wkCompPlans;
 	push(@payerList, $workComp) if $workComp;
@@ -623,11 +616,11 @@ sub createPayerDropDown
 
 sub getFS
 {
-	my ($self,$page,@planIds) = @_;
+	my ($self,$page,@insIntIds) = @_;
 	my $product_id;
 	my $plan_id;
 	my $fsList=undef;
-	foreach my $id (@planIds)
+	foreach my $id (@insIntIds)
 	{
 		#Get Parent Id for Plan
 		my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $id);
