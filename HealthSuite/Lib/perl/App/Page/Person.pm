@@ -207,7 +207,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
 			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
 			<<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
-			<OPTION value="/person/$personId/dlg-add-medication-prescribe?home=$homeArl">Prescribe Medication</OPTION>
+			<OPTION value="/person/$personId/dlg-prescribe-medication?home=$homeArl">Prescribe Medication</OPTION>
 			<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
 			<OPTION value="/person/$personId/dlg-add-phone-message?home=$homeArl">Voice Msgs</OPTION>
 			<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
