@@ -297,6 +297,7 @@
 		<enum>AMEX</enum>
 		<enum>Discover</enum>
 		<enum>Diners Club</enum>
+		<enum>Travelers Check</enum>
 	</table>
 
 	<table name="Offering_Catalog_Type" abbrev="OfCatTy" type="Enumeration">
