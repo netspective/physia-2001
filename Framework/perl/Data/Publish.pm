@@ -488,7 +488,7 @@ sub prepare_HtmlBlockFmtTemplate
 		{
 			my $bulletIcons = { location => 'lead' };
 			push(@$allIcons, $bulletIcons);
-			
+
 			push(@{$bulletIcons->{data}}, {
 					imgSrc => exists $bullets->{imgSrc} ? $bullets->{imgSrc} : '/resources/icons/square-lgray-sm.gif',
 					urlFmt => exists $bullets->{urlFmt} ? $bullets->{urlFmt} : (exists $publDefn->{stdIcons} ? (exists $publDefn->{stdIcons}->{updUrlFmt} ? $publDefn->{stdIcons}->{updUrlFmt} : undef) : undef),
@@ -522,7 +522,7 @@ sub prepare_HtmlBlockFmtTemplate
 		{
 			my $bulletIcons = { location => 'lead' };
 			push(@$allIcons, $bulletIcons);
-			
+
 			if($bullets =~ m/^1$/)
 			{
 				push(@{$bulletIcons->{data}}, { imgSrc => '/resources/icons/square-lgray-sm.gif', title => 'Edit Record' });
@@ -656,29 +656,36 @@ sub prepare_HtmlBlockFmtTemplate
 
 	my ($headRowFmt, $bodyRowFmt, $tailRowFmt,$subTotalRowFmt) =
 	(
-		$publFlags & PUBLFLAG_HIDEHEAD ? '' : qq{
+		$publFlags & PUBLFLAG_HIDEHEAD ? '<TBODY>' : qq{
+			<THEAD>
 			<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{headBgColor} || 'EEEEDD' ]}>
 				$hSpacer @{[ join('', @headCols) ]}
 			</TR>
 			$rowSepStr
+			</THEAD>
+			<TBODY>
 			},
 		qq{
 			<TR VALIGN=TOP $bodyRowAttr>
 				$dSpacer @{[ join('', @bodyCols) ]}
 			</TR>
 		},
-		$publFlags & PUBLFLAG_HIDETAIL ? '' : qq{
+		$publFlags & PUBLFLAG_HIDETAIL ? '</TBODY>' : qq{
+				</TBODY>
+				<TFOOT>
 				$rowSepStr
 				<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{tailBgColor} || 'DDEEEE' ]}>
 					$tSpacer @{[ join('', @tailCols) ]}
 				</TR>
+				</TFOOT>
 		},
 		$publFlags & PUBLFLAG_HIDESUBTOTAL ? '' : qq{
 				$rowSepStr
 				<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{tailBgColor} || 'DCDCDC ' ]}>
 					$sSpacer @{[ join('', @subTotalCols) ]}
 				</TR>
-				$groupBySepStr				
+				$groupBySepStr
+
 		},
 
 	);
@@ -1100,6 +1107,11 @@ sub createHtmlFromStatement
 
 					push(@outputRows, $outRow);
 				}
+				else
+				{
+					$outRow = '</TBODY>';
+					push(@outputRows, $outRow);
+				}
 			}
 			else
 			{
@@ -1130,6 +1142,11 @@ sub createHtmlFromStatement
 				{
 					$outRow = $fmt->{tailRowFmt};
 					$outRow =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
+				}
+				else
+				{
+					$outRow = '</TBODY>';
 					push(@outputRows, $outRow);
 				}
 			}
@@ -1385,6 +1402,11 @@ sub createHtmlFromData
 					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
+				else
+				{
+					$outRow = '</TBODY>';
+					push(@outputRows, $outRow);
+				}
 			}
 			else
 			{
@@ -1416,6 +1438,11 @@ sub createHtmlFromData
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
 					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' value '$2' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
+				}
+				else
+				{
+					$outRow = '</TBODY>';
 					push(@outputRows, $outRow);
 				}
 			}
