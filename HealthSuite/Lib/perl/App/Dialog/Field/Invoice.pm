@@ -21,7 +21,9 @@ sub new
 				#type => 'integer', 
 				size => 8,
 				options => FLDFLAG_REQUIRED,
-				findPopup => '/lookup/cpt'),
+				findPopup => '/lookup/feeprocedure/itemValue', 
+				findPopupControlField => '_f_fee_schedules'),
+				#findPopup => '/lookup/cpt'),
 		new CGI::Dialog::Field(
 				caption => 'Modifier',
 				name => "procmodifier$nameSuffix",
