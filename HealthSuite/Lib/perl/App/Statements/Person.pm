@@ -35,6 +35,12 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			AND	pa.item_name ='Fee Schedules'
 			AND	pa.item_type = 0
 		},
+	'selPersonCategoryExists' => qq{
+			SELECT person_id
+			FROM person_org_category
+			WHERE person_id = ?
+			AND category IN ('Physician', 'Staff', 'Nurse','Administrator', 'Superuser')
+		},
 	'selPersonExists' => qq{
 		select person_id
 		from person
