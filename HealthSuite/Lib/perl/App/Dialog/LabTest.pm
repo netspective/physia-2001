@@ -96,12 +96,14 @@ sub new
 					type => 'hidden',
 				),					
 		new CGI::Dialog::MultiField(caption =>'Test ID/Caption', name => "test",
-			options => FLDFLAG_REQUIRED,
+			#options => FLDFLAG_REQUIRED,
 			fields=>[						
 					new CGI::Dialog::Field(caption=>"Test ID", type=>'text',
-								options => FLDFLAG_REQUIRED ,name=>"test_id",size=>15,maxLength=>30),
+								#options => FLDFLAG_REQUIRED ,
+								name=>"test_id",size=>15,maxLength=>30),
 					new CGI::Dialog::Field(caption=>"Test Caption", ,
-								options => FLDFLAG_REQUIRED ,name=>"test_caption"),
+								#options => FLDFLAG_REQUIRED ,
+								name=>"test_caption"),
 				],),					
 				new CGI::Dialog::Field(caption=>"Physician Cost", type=>'currency',name=>"doc_price"),			
 				new CGI::Dialog::Field(caption=>"Patient Cost", type=>'currency',name=>"pat_price")
@@ -118,11 +120,9 @@ sub new
 		
 		new CGI::Dialog::Field(caption => 'Test Type',
 			type => 'select',
-			#enum => 'lab_test_type',
 			name => 'lab_type',
 			fKeyStmtMgr => $STMTMGR_LAB_TEST,
-			fKeyStmt => 'selTestType',
-			#fKeyStmtBindFields => ['org_internal_id'],			
+			fKeyStmt => 'selTestType',		
 			options => FLDFLAG_REQUIRED
 		),		
 		new CGI::Dialog::Field( caption => 'Test Selection', 						
@@ -142,7 +142,7 @@ sub new
 					caption => 'Panel Name',
 					size=>15,
 					maxLength=>30,
-					options => FLDFLAG_REQUIRED			
+					#options => FLDFLAG_REQUIRED			
 				),	
 				new CGI::Dialog::Field(
 					name => 'panel_id',
@@ -150,7 +150,7 @@ sub new
 					caption => 'Panel ID',
 					size=>15,
 					maxLength=>30,
-					options => FLDFLAG_REQUIRED
+					#options => FLDFLAG_REQUIRED
 				)
 				],
 			),		
@@ -360,14 +360,29 @@ sub customValidate
 	#Based On test type some fields are not required
 	if($page->field('panel_test'))
 	{
-		$self->clearFieldFlags('test',FLDFLAG_REQUIRED);		
+		#$self->clearFieldFlags('test',FLDFLAG_REQUIRED);		
+		my $field;
+		$field = $self->getField("panel_id_name");
+		unless($page->field('panel_id') && $page->field('panel_name') )
+		{
+			$field->invalidate($page, qq{For Panel test panel name and ID are required.});
+		}
 	}
 	else		
 	{
-		$self->clearFieldFlags('panel_id_name',FLDFLAG_REQUIRED);
-		$self->clearFieldFlags('panel_name',FLDFLAG_REQUIRED);		
-		$self->clearFieldFlags('panel_id',FLDFLAG_REQUIRED);		
+		my $field;
+		$field = $self->getField("test");
+		unless($page->field('test_id') && $page->field('test_caption') )
+		{
+			$field->invalidate($page, qq{Test Name and ID are required.});
+		}
+	
+		#$self->clearFieldFlags('panel_id_name',FLDFLAG_REQUIRED);
+		#$self->clearFieldFlags('panel_name',FLDFLAG_REQUIRED);		
+		#$self->clearFieldFlags('panel_id',FLDFLAG_REQUIRED);		
 	}	
+	
+	
 }
 
 
