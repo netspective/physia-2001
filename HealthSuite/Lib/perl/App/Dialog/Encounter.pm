@@ -315,8 +315,9 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	
-	$page->field('dupCheckin_returnUrl', $page->referer()) if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-
+	$page->field('dupCheckin_returnUrl', $self->getReferer($page)) 
+		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+		
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id');
 
