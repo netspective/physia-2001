@@ -16,6 +16,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
+my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
 
 %RESOURCE_MAP = ('transfer-account' => {transType => $ACCOUNT_OWNER, heading => 'Transfer Account',  _arl => ['person_id','trans_id'], _arl_modify => ['trans_id'] ,
@@ -37,6 +38,8 @@ sub new
 	$self->addContent(
 			new CGI::Dialog::Field(name => 'person_id', caption => 'Person ID', type => 'memo', options => FLDFLAG_READONLY),
 			new App::Dialog::Field::Person::ID(name => 'transfer_id', caption =>'Transfer To', options => FLDFLAG_REQUIRED, hints => 'Collector to Transfer Account'),			
+			new CGI::Dialog::Field(name => 'detail', caption => 'Reason For Transfer', type => 'memo', options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(name => 'trans_begin_stamp', caption => 'Date', type => 'date'),	
 		);
 		$self->{activityLog} =
 		{
@@ -71,8 +74,23 @@ sub execute
 	my ($self, $page, $command,$flags) = @_;	
 	$command = 'update';
 	my $new_owner = $page->field('transfer_id');
+	my $transStatus =  App::Universal::TRANSSTATUS_ACTIVE;	
+	my $old_owner = $page->session('user_id');
+	my $trans_id = $page->schemaAction
+	(
+		'Transaction','add',                  
+		trans_id => undef,
+		trans_owner_id => $page->param('person_id') || undef,
+		provider_id => $page->session('user_id') ||undef,
+		trans_owner_type => 0,                        
+		caption =>'Account Notes',
+		trans_type => $ACCOUNT_NOTES,                        
+		trans_begin_stamp => $page->field('trans_begin_stamp')||undef,
+		detail => $page->field('detail') || undef,     
+		trans_status => $transStatus,             
+	);
 	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranCollectionById', $page->param('person_id'),$page->session('user_id'),$new_owner,
-	$page->session('_session_id'), $page->session('user_id'),$page->session('org_internal_id'),"Account Transfer From $page->session('user_id')" );
+	$page->session('_session_id'), $page->session('user_id'),$page->session('org_internal_id'),"Transfered From $old_owner" );
 	$page->schemaAction(   'Transaction', $command,                        
 		                trans_owner_id => $page->param('person_id') || undef,
 		                provider_id => $page->session('user_id') ||undef,
