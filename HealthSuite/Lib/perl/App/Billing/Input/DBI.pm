@@ -7,7 +7,6 @@ use Carp;
 use DBI;
 
 use App::Universal;
-
 use App::Billing::Input::Driver;
 use App::Billing::Claim;
 use App::Billing::Claim::Person;
@@ -36,6 +35,7 @@ use vars qw(@ISA);
 use Devel::ChangeLog;
 use vars qw(@CHANGELOG);
 use constant INVOICESTATUS_SUBMITTED => 4;
+use constant INVOICESTATUS_TRANSMITTED => 7;
 # constant related with invoice attribute
 use constant COLUMNINDEX_ATTRNAME => 1;
 use constant COLUMNINDEX_VALUE_TEXT => 2;
@@ -160,7 +160,7 @@ sub getTargetInvoices
 	$submittedStatus = INVOICESTATUS_SUBMITTED if ($submittedStatus eq undef);
 	my $statment = "";
 	my $i;
-	my $queryStatment = " select INVOICE_ID from invoice where INVOICE_STATUS = $submittedStatus ";
+	my $queryStatment = " select distinct INVOICE_ID from invoice where INVOICE_STATUS = $submittedStatus";
 	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -232,6 +232,12 @@ sub populateClaims
 		{
 			$self->assignInvoicePreSubmit($claims->[$i], $targetInvoices->[$i]);
 		}
+	}
+
+	if($params{changeStatus} eq 1) {
+		my $queryStatment = "update invoice set invoice_status = INVOICESTATUS_TRANSMITTED where INVOICE_STATUS = INVOICESTATUS_SUBMITTED";
+		my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+		$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	}
 
 	if ($params{dbiHdl} eq "")
@@ -403,7 +409,14 @@ sub assignPatientInsurance
 
 	if ($claim->getStatus() ne INVOICESTATUS_SUBMITTED)  # here populate only the current insurer for the bill
 	{
-		$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+		$queryStatment = "select bill_party_type from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE = $no";
+		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+		# do the execute statement
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		if ($row[0] eq BILL_PARTY_TYPE_INSURANCE)
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
 									ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
 									ins.ins_type, Ins.member_number
 							from org, insurance ins, invoice_billing
@@ -413,6 +426,19 @@ sub assignPatientInsurance
 								" and invoice_billing.bill_ins_id = ins.ins_internal_id
 								and ins.ins_org_id = org.org_id
 								and invoice_billing.BILL_SEQUENCE = $no";
+		}
+		else
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+									ins.guarantor_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+									ins.ins_type, Ins.member_number
+							from insurance ins, invoice_billing
+							where invoice_billing.invoice_id = $invoiceId
+								and invoice_billing.invoice_item_id is NULL
+								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+								" and invoice_billing.bill_ins_id = ins.ins_internal_id
+								and invoice_billing.BILL_SEQUENCE = $no";
+		}
 		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 		# do the execute statement
 		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -429,23 +455,46 @@ sub assignPatientInsurance
 		$insured->setBillSequence($row[2]);
 		$insured->setSsn($row[9]);
 	}
+	my @rowBilling;
+	$queryStatment = "select bill_id, bill_party_type, BILL_SEQUENCE from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE <> $no";
+	my $sth1 = $self->{dbiCon}->prepare(qq{$queryStatment});
+	# do the execute statement
+	$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	
+	while(@rowBilling = $sth1->fetchrow_array())
+	{
+		if ($rowBilling[1] eq BILL_PARTY_TYPE_INSURANCE)
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+									ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+									ins.ins_type, Ins.member_number
+							from org, insurance ins, invoice_billing
+							where invoice_billing.invoice_id = $invoiceId
+								and invoice_billing.bill_id = $rowBilling[0]
+								and invoice_billing.invoice_item_id is NULL
+								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+								" and invoice_billing.bill_ins_id = ins.ins_internal_id
+								and ins.ins_org_id = org.org_id
+								and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
+		}
+		else
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+									ins.guarantor_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+									ins.ins_type, Ins.member_number
+							from insurance ins, invoice_billing
+							where invoice_billing.invoice_id = $invoiceId
+								and invoice_billing.bill_id = $rowBilling[0]
+								and invoice_billing.invoice_item_id is NULL
+								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+								" and invoice_billing.bill_ins_id = ins.ins_internal_id
+								and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
+		}
 
-	$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.group_number, ins.rel_to_insured, Invoice_billing.bill_sequence,
-					ins.insured_id, to_char(coverage_begin_date, \'dd-MON-yyyy\'), to_char(coverage_end_date,\'dd-MON-yyyy\'), ins.member_number
-					from org, insurance ins, invoice_billing
-					where invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
-						" and invoice_billing.invoice_item_id is NULL
-						and invoice_billing.bill_ins_id = ins.ins_internal_id
-						and invoice_id = $invoiceId
-						and ins.ins_org_id = org.org_id
-						and Invoice_billing.bill_sequence in (" . BILLSEQ_PRIMARY_PAYER . "," . BILLSEQ_SECONDARY_PAYER .
-						"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER . ")
-						and Invoice_billing.bill_sequence <> $no ";
 	$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	# do the execute statement
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	while (@row = $sth->fetchrow_array())
-	{
+	
 		$insured = $insureds[$billSeq->[$row[3]+0]];
 		if ($insured ne "")
 		{
@@ -502,7 +551,9 @@ sub assignInsuredInfo
 #					$insured->setSsn($row[6]); this is now populated in patient insurance with ins.member_number
 					$insured->setId($row[7]);
 
-					$queryStatment = "select attr.value_text
+					if ($insured->getBillSequence() ne"")
+					{
+						$queryStatment = "select attr.value_text
 							from insurance, insurance_attribute attr, invoice_billing
 							where invoice_billing.invoice_id = $invoiceId
 								and invoice_billing.bill_sequence = " . $insured->getBillSequence() .
@@ -512,12 +563,25 @@ sub assignInsuredInfo
 								and attr.parent_id = parent_ins_id
 								and attr.item_name = \'HMO-PPO/Indicator\'";
 
+						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+						# do the execute statement
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						@row = $sth->fetchrow_array();
+						$insured->setHMOIndicator($row[0]);
+
+						$queryStatment = "select extra
+							from insurance, invoice_billing
+							where invoice_billing.invoice_id = $invoiceId
+								and invoice_billing.bill_sequence = " . $insured->getBillSequence().
+								" and invoice_billing.invoice_item_id is NULL
+								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
+								" and invoice_billing.bill_ins_id = insurance.ins_internal_id";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
-					$insured->setHMOIndicator($row[0]);
-
+					$insured->setTypeCode($row[0]);
+					}
 					$queryStatment = "select value_text,value_type from person_attribute where parent_id = \'$insuredId\' and value_type between 220 and 225";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
@@ -534,18 +598,6 @@ sub assignInsuredInfo
 #					$queryStatment = $queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
 #					$self->populateAddress($insured->getEmployerAddress(), $queryStatment);
 					$insured->setEmploymentStatus($row[1]);
-					$queryStatment = "select extra
-							from insurance, invoice_billing
-							where invoice_billing.invoice_id = $invoiceId
-								and invoice_billing.bill_sequence = " . $insured->getBillSequence().
-								" and invoice_billing.invoice_item_id is NULL
-								and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
-								" and invoice_billing.bill_ins_id = insurance.ins_internal_id";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$insured->setTypeCode($row[0]);
 				}
 			}
 		}
@@ -1234,6 +1286,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Group Number' => [$insured, [\&App::Billing::Claim::Insured::setPolicyGroupOrFECANo, \&App::Billing::Claim::Insured::setPolicyGroupName, \&App::Billing::Claim::Insured::setInsurancePlanOrProgramName], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/HMO-PPO/Indicator' => [$insured, \&App::Billing::Claim::Insured::setHMOIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/BCBS/Plan Code' => [$insured, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/E-Remitter ID' => [$payer, \&App::Billing::Claim::Payer::setId, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Name' => [[$insured2, $payer2, $payer2], [\&App::Billing::Claim::Insured::setInsurancePlanOrProgramName, \&App::Billing::Claim::Payer::setId, \&App::Billing::Claim::Payer::setName], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Payment Source' => [$payer2, \&App::Billing::Claim::Payer::setSourceOfPayment, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Champus Branch' => [$payer2, \&App::Billing::Claim::Payer::setChampusSponsorBranch, COLUMNINDEX_VALUE_TEXT],
@@ -1257,6 +1310,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Group Number' => [$insured2, [\&App::Billing::Claim::Insured::setPolicyGroupOrFECANo, \&App::Billing::Claim::Insured::setPolicyGroupName, \&App::Billing::Claim::Insured::setInsurancePlanOrProgramName], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/HMO-PPO/Indicator' => [$insured2, \&App::Billing::Claim::Insured::setHMOIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/BCBS/Plan Code' => [$insured2, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/E-Remitter ID' => [$payer2, \&App::Billing::Claim::Payer::setId, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Name' => [[$insured3, $payer3, $payer3], [\&App::Billing::Claim::Insured::setInsurancePlanOrProgramName, \&App::Billing::Claim::Payer::setId, \&App::Billing::Claim::Payer::setName], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Payment Source' => [$payer3, \&App::Billing::Claim::Payer::setSourceOfPayment, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Champus Branch' => [$payer3, \&App::Billing::Claim::Payer::setChampusSponsorBranch, COLUMNINDEX_VALUE_TEXT],
@@ -1280,6 +1334,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Group Number' => [$insured3, [\&App::Billing::Claim::Insured::setPolicyGroupOrFECANo, \&App::Billing::Claim::Insured::setPolicyGroupName, \&App::Billing::Claim::Insured::setInsurancePlanOrProgramName], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/HMO-PPO/Indicator' => [$insured3, \&App::Billing::Claim::Insured::setHMOIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/BCBS/Plan Code' => [$insured3, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/E-Remitter ID' => [$payer3, \&App::Billing::Claim::Payer::setId, COLUMNINDEX_VALUE_TEXT],
 
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Name' => [[$insured4, $payer4, $payer4], [\&App::Billing::Claim::Insured::setInsurancePlanOrProgramName, \&App::Billing::Claim::Payer::setId, \&App::Billing::Claim::Payer::setName], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Payment Source' => [$payer4, \&App::Billing::Claim::Payer::setSourceOfPayment, COLUMNINDEX_VALUE_TEXT],
@@ -1304,6 +1359,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Group Number' => [$insured4, [\&App::Billing::Claim::Insured::setPolicyGroupOrFECANo, \&App::Billing::Claim::Insured::setPolicyGroupName, \&App::Billing::Claim::Insured::setInsurancePlanOrProgramName], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/HMO-PPO/Indicator' => [$insured4, \&App::Billing::Claim::Insured::setHMOIndicator, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/BCBS/Plan Code' => [$insured4, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/E-Remitter ID' => [$payer4, \&App::Billing::Claim::Payer::setId, COLUMNINDEX_VALUE_TEXT],
 
 	};
 
@@ -1640,7 +1696,9 @@ sub setProperPayer
 			foreach $payer (@$payers)
 			{
 				my $payerName = $payer->getName();
-				$queryStatment = "select  id from ref_envoy_payer where name = \'$payerName\'";
+
+				#$queryStatment = "select  id from ref_epayer where name = \'$payerName\'";
+				$queryStatment = "select a.value_text from invoice_attribute a, invoice i where i.invoice_id = $invoiceId and i.invoice_id = a.parent_id and item_name = 'Insurance/Primary/E-Remitter ID'";
 				$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 				$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 				@tempRow = $sth->fetchrow_array();

@@ -27,8 +27,8 @@ sub formatData
 	my $refClaimInsured = $inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}];
 	my $refClaimCareReceiver = $inpClaim->{careReceiver};
 	my $refSourceOfPayment = {'MEDICARE' => 'C', 'MEDICADE' => 'D', 'CHAMPUS' => 'H', 'CHAMPVA' => ' ', 'GROUP' => ' ', 'FECA' => ' ', 'OTHER' => 'Z'};
-	
-my %nsfType = (NSF_HALLEY . "" =>    
+	print "\n". $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId();
+my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%1s%1s%-2s%-5s%-4s%-17s%-16s%-20s%-17s%-16s%1s%-15s%-15s%1s%1s%2s%-17s%-8s%-20s%-10s%-2s%1s%-3s%1s%-8s%1s%1s%-7s%-25s%-15s%-1s%-28s%-7s%-9s",
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
@@ -46,7 +46,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimInsured->getHMOIndicator(),0,1), # PPO/HMO Indicator
 	substr($refClaimInsured->getHMOId(),0,15),  	 # PPO/HMO Id
 	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
+	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1),
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToPatient()),
 	substr($refClaimInsured->getSsn(), 0, 17),
@@ -83,7 +83,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($refClaimInsured->getHMOIndicator(),0,1), # PPO/HMO Indicator
 	substr($refClaimInsured->getHMOId(),0,15),  	 # PPO/HMO Id
 	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
+	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1),
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToPatient()),
 	substr($refClaimInsured->getSsn(), 0, 17),
@@ -106,12 +106,12 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,										 # medigap id
 	)
   );
-  
+
   return $nsfType{$nsfType};
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'AUF',
 	'Billing Interface/Validating NSF Output',
@@ -176,8 +176,8 @@ sub formatData
 {
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
-	
-my %nsfType = (NSF_HALLEY . "" =>	
+
+my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%-30s%-30s%-20s%-2s%-9s%7s%7s%7s%7s%7s%7s%1d%-2s%-2s%-2s%1s%-2s%1s%-8s%-8s%7s%-8s%-8s%-8s%-8s%-8s%-9s%-15s%-8s%-9s%-15s%-8s%-9s%-9s%-1s%-8s",
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
@@ -203,23 +203,23 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}]->getEffectiveDate(),0,8), # Insurance Card effective date
 	substr($inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}]->getTerminationDate(),0,8), # Insurance Card Termination Date
 	$self->numToStr(5,2,$inpClaim->getBalance()), # Balance Due
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
-	$spaces, # Filler 
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
+	$spaces, # Filler
 	$spaces, # Contract agreement Indicator
 	$spaces, # Filler local
 	),
-	NSF_ENVOY . "" =>	
+	NSF_ENVOY . "" =>
 	sprintf("%-3s%-2s%-17s%-30s%-30s%-20s%-2s%-9s%7s%7s%7s%7s%7s%7s%1d%-2s%-2s%-2s%1s%-2s%1s%-8s%-8s%7s%-63s%-68s",
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
@@ -249,12 +249,12 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces	 # Filler local
 	)
  );
- 
+
  	return $nsfType{$nsfType};
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'AUF',
 	'Billing Interface/Output NSF Object',
@@ -311,8 +311,8 @@ sub formatData
 	my $spaces = ' ';
 	my $refClaimInsured = $inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}];
 	my $refClaimInsuredAddress = $refClaimInsured->{address};
-	
-my %nsfType = (NSF_HALLEY . "" =>	
+
+my %nsfType = (NSF_HALLEY . "" =>
 	sprintf('%-3s%-2s%-17s%-18s%-12s%-30s%-20s%-2s%-9s%-10s%-8s%-8s%-18s%-15s%-30s%-30s%-20s%-2s%-9s%-12s%-25s%-20s',
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
@@ -320,7 +320,7 @@ my %nsfType = (NSF_HALLEY . "" =>
   	substr($refClaimInsuredAddress->getAddress1(), 0, 18),
   	$spaces,											#address1 filler
 	$spaces,
-	substr($refClaimInsuredAddress->getCity(), 0, 20), 
+	substr($refClaimInsuredAddress->getCity(), 0, 20),
 	substr($refClaimInsuredAddress->getState(), 0, 2),
 	substr($refClaimInsuredAddress->getZipCode(), 0, 5) . $self->numToStr(9 - length($refClaimInsuredAddress->getZipCode()),0,"0") ,
 	substr($refClaimInsuredAddress->getTelephoneNo(), 0, 10),
@@ -345,7 +345,7 @@ my %nsfType = (NSF_HALLEY . "" =>
   	substr($refClaimInsuredAddress->getAddress1(), 0, 18),
   	$spaces,											#address1 filler
 	$spaces,
-	substr($refClaimInsuredAddress->getCity(), 0, 20), 
+	substr($refClaimInsuredAddress->getCity(), 0, 20),
 	substr($refClaimInsuredAddress->getState(), 0, 2),
 	substr($refClaimInsuredAddress->getZipCode(), 0, 5) . $self->numToStr(9 - length($refClaimInsuredAddress->getZipCode()),0,"0") ,
 	substr($refClaimInsuredAddress->getTelephoneNo(), 0, 10),
@@ -363,12 +363,12 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces
 	)
   );
-	
-	return $nsfType{$nsfType};	
+
+	return $nsfType{$nsfType};
 }
 
 @CHANGELOG =
-( 
+(
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/06/2000', 'AUF',
 	'Billing Interface/Output NSF Object',
 	'Multiple payers logic has been implemented in DA2 by passing payer number as a key of  hash $flag '],
@@ -416,12 +416,12 @@ my %nsfType = (NSF_ENVOY . "" =>
 	$spaces
 	)
   );
-  
+
   	return $nsfType{$nsfType};
 }
 
 @CHANGELOG =
-( 
+(
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/06/2000', 'AUF',
 	'Billing Interface/Output NSF Object',
 	'Multiple payers logic has been implemented in DA@ by passing payer number as a key of  hash $flag '],

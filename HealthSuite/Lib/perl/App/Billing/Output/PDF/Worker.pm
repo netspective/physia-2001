@@ -44,8 +44,8 @@ use constant FORM_HEIGHT => 661.5;
 use constant LINE_SPACING => 22.5;
 use constant MEDICARE_EXTRA_SPACE => 4.5;
 use constant STARTX_BOX3_SPACE => 205;    # DISTANCE B/W STARTING X AND BOX3
-use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E 
+use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E
 use constant STARTX_BOX24ADATE_SPACE => 67; # DISTANCE B/W STARTING X AND BOX24AD
 use constant STARTX_BOX24B_SPACE => 127; # DISTANCE B/W STARTING X AND BOX24B
 use constant STARTX_BOX24C_SPACE => 149; # DISTANCE B/W STARTING X AND BOX24C
@@ -57,17 +57,17 @@ use constant STARTX_BOX24H_SPACE => 436; # DISTANCE B/W STARTING X AND BOX24H
 use constant STARTX_BOX24I_SPACE => 459; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24J_SPACE => 478; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24K_SPACE => 500; # DISTANCE B/W STARTING X AND BOX24J
-use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A 
-use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A 
-use constant BLACK_DASH => 4.5; # 
-use constant WHITE_DASH => 1.125; # 
-use constant CELL_PADDING_Y => 1.125; # 
-use constant CELL_PADDING_X => 2.25; # 
+use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A
+use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A
+use constant BLACK_DASH => 4.5; #
+use constant WHITE_DASH => 1.125; #
+use constant CELL_PADDING_Y => 1.125; #
+use constant CELL_PADDING_X => 2.25; #
 use constant DATA_PADDING_X => 9;
 use constant BOX24_HEIGHT => 8;
 
-use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE 
+use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE
 
 use constant DATA_RED => 0.0;
 use constant DATA_GREEN => 0.0;
@@ -135,7 +135,7 @@ sub box3ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth()); 
+	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth());
 
 	my $temp =
 		 {
@@ -253,19 +253,19 @@ sub box29ClaimData
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my @amount  = split (/\./ , abs($claim->getAmountPaid));
-	
-#	pdflib::PDF_show_xy($p , $amount[0], $box29X + 45 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
-#	pdflib::PDF_show_xy($p , $amount[1], $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
-#	pdflib::PDF_stroke($p);
+#	my @amount  = split (/\./ , abs($claim->getAmountPaid));
+
+	pdflib::PDF_show_xy($p , "0", $box29X + 45 - pdflib::PDF_stringwidth($p ,"0", $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , "00", $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
+	pdflib::PDF_stroke($p);
 
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 #	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],
