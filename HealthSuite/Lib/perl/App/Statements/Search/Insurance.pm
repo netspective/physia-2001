@@ -38,7 +38,7 @@ $STMTFMT_SEL_INSURANCE = qq{
 			     FROM org_association assn
 			     WHERE assn.assn_org_internal_id = ins.owner_org_id
 			     AND   assn.org_internal_id = ?
-			     AND   assn.org_assn_type  = 110 
+			     AND   assn.org_assn_type  = 100 
 			     AND   assn.org_assn_status = 0
 			     )
 			    ) 
