@@ -22,7 +22,7 @@ sub handler
 	{
 		$r->content_type('text/html');
     	$r->send_http_header();
-    	$r->print("<h1>Perl Compilation Errors:</h1><font color=red>$@</font>");
+    	$r->print("<h1>Perl Runtime Errors:</h1><font color=red>$@</font>");
 	}
 }
 
