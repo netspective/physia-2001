@@ -62,6 +62,7 @@ sub initialize
 		new App::Dialog::Field::Organization::ID(
 			caption =>'Employer ID',
 			name => 'rel_id',
+			addType => 'employer',
 			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		),
 		new CGI::Dialog::Field(

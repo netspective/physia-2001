@@ -118,7 +118,7 @@ sub initialize
 						name => 'language',
 						),
 
-		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name'),
+		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor', 'Patient', 'Physician', 'Nurse', 'Staff']),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
 		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation', options => FLDFLAG_REQUIRED),
 		#
