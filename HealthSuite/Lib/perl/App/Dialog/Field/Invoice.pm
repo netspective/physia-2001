@@ -63,10 +63,10 @@ sub new
 				name => "servtype$nameSuffix",
 				size => 6,
 				findPopup => '/lookup/servicetype'),
-		new CGI::Dialog::Field(type => 'bool',
-				style => 'check',
-				caption => 'Lab',
-				name => 'lab_indicator'),
+		#new CGI::Dialog::Field(type => 'bool',
+		#		style => 'check',
+		#		caption => 'Lab',
+		#		name => 'lab_indicator'),
 	];
 
 	return CGI::Dialog::MultiField::new($type, %params);
