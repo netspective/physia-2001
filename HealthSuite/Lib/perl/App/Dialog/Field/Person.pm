@@ -168,7 +168,7 @@ use Schema::Utilities;
 use vars qw(@ISA @PERSON_TYPES);
 @ISA = qw(CGI::Dialog::Field);
 
-@PERSON_TYPES = ('Superuser', 'Administrator', 'Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient');
+@PERSON_TYPES = ('Superuser', 'Administrator', 'Physician', 'Referring-Doctor', 'Nurse', 'Staff', 'Guarantor', 'Patient');
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
 
