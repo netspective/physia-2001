@@ -215,7 +215,6 @@ sub execute
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 			item_name => 'WorkList',
 			value_text => $_,
-			value_int =>  1,
 			_debug => 0
 		);
 	}
@@ -233,8 +232,7 @@ sub execute
 			parent_org_id => $page->session('org_internal_id') || undef,
 			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 			item_name => 'WorkList',
-			value_text => $_,
-			value_int =>  1,
+			value_int => $_,
 			_debug => 0
 		);
 	}

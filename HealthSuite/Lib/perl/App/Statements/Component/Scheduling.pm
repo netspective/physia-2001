@@ -180,7 +180,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	},
 	
 	'sel_worklist_facilities' => qq{
-		select value_text as facility_id
+		select value_int as facility_id
 		from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
