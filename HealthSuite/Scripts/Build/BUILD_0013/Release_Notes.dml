@@ -19,7 +19,8 @@
 		</deliverable>		
 	
 		<deliverable id="1131">
-			Referring physician field in add claim has been changed to a drop-down.
+			Referring physician field in add claim has been changed back to a lookup that is
+			based on the new referring doctor search dialog from Main Menu (see bug 461).
 		</deliverable>
 		
 		<deliverable id="1128">
@@ -100,7 +101,9 @@
 		</deliverable>	
 
 		<deliverable id="732">
-			Ability to add pre-payments.
+			Ability to add pre-payments. Prepayments can now be made from the Apply Personal
+			Payment option from the patient summary choose action. It has been removed from the
+			personal payment dialog that is used for line items.
 		</deliverable>				
 		
 		<deliverable id="468">
