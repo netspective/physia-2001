@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<web-app>
+	<!-- setup external classes -->
+	<classpath id='C:\Projects\Framework\tools\idea\classes'/>
+	<classpath id='C:\utils\java\jakarta-log4j-1.1.2\dist\lib\log4j.jar'/>
+	<classpath id='C:\utils\dbms\oracle\ora81\jdbc\lib\classes12.zip'/>
+
+	<!-- setup utility servlet aliases -->
+	<servlet>
+		<servlet-name>AppComponentsExplorer</servlet-name>
+		<servlet-class>com.xaf.ace.AppComponentsExplorerServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AppComponentsExplorer</servlet-name>
+		<url-pattern>/ace/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- setup database connections -->
+	<context-param>
+	  <param-name>default-data-source</param-name>
+	  <param-value>jdbc/cura</param-value>
+	</context-param>
+
+	<resource-ref>
+	  <res-ref-name>jdbc/cura</res-ref-name>
+	  <res-type>javax.sql.DataSource</res-type>
+	  <init-param driver-name="oracle.jdbc.driver.OracleDriver"/>
+	  <init-param url="jdbc:oracle:thin:@mobilis:1521:mobilis"/>
+	  <init-param user="cura"/>
+	  <init-param password="cura"/>
+	  <init-param max-connections="20"/>
+	  <init-param enable-transaction="false"/>
+	</resource-ref>
+
+</web-app>

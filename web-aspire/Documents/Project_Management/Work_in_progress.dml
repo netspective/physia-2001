@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+
+<article>
+	<project name="ASPire Migration WIP">
+
+		<summary>
+			ASPire Migration (Perl/iHOS to Java/XAF) work in progress.
+		</summary>
+		<project-attribute name="Team Leader">Shahid N. Shah</project-attribute>
+		<project-attribute name="Chief Engineer">Shahbaz Javeed</project-attribute>
+		<project-attribute name="Last Update"/>
+		<project-attribute name="Resources"/>
+
+		<task>
+			<name>Project Management</name>
+			<task>
+				<name>Identify goals of the Migration Project -- why are we doing this?</name>
+				<resource>Amir</resource>
+				<resource>Bob</resource>
+				<resource>Shahid</resource>
+			</task>
+			<task>
+				<name>Identify potential clients and what specific features they would be interested in ("all" is, of course, unacceptable).</name>
+				<resource>Amir</resource>
+				<resource>Bob</resource>
+			</task>
+			<task>
+				<name>Identify total pool of funds available after the initial monies expended.</name>
+				<resource>Amir</resource>
+			</task>
+			<task>
+				<name>Identify other potential human resources available on a part-time basis.</name>
+				<resource>Shahid</resource>
+			</task>
+			<task>
+				<name>Agree on general terms for XAF licensing: royalty structure, ownership, etc.</name>
+			</task>
+			<task>
+				<name>Create CVS repository for ASPire code.</name>
+				<resource>Shahid</resource>
+			</task>
+		</task>
+
+		<task>
+			<name>User Interface Management</name>
+			<resource>Shahbaz</resource>
+			
+			<task><name>Page Management and Navigation</name></task>
+			
+			<task>
+				<name>Dialogs</name>
+				<task><name>Identify all dialog types (simple, editors, etc) in ASPire.</name></task>
+				<task><name>Split files so that each package is in a separate xml file.</name><completed>100</completed></task>
+				<task><name>Create a <i>metrics</i> summary for Perl/iHOS dialogs that is similar to XAF metrics to ensure that translation is complete (nothing is missing).</name><completed>85</completed></task>
+				<task><name>Open each dialog and compare between iHOS/Perl version and Java/XAF version to ensure that translation is accurate.</name></task>
+				<task>
+					<name>Configure package names correctly</name>
+					<task><name>App::Dialog::DialogYY should be app.dialog_yy</name><completed>100</completed></task>
+					<task><name>App::Dialog::PkgXX::DialogYY should be pkg_xx.dialog_yy</name><completed>100</completed></task>
+					<task><name>App::Dialog::Attribute::DialogYY should be attr.dialog_yy</name><completed>100</completed></task>
+					<task><name>App::Dialog::Attribute::XX::DialogYY should be attr_xx.dialog_yy</name><completed>100</completed></task>
+					<completed>100</completed>
+				</task>
+				<task><name>Rename all dialogs to not have a dialog_ prefixed to their names</name><completed>100</completed></task>
+				<task><name>Identify all dialog flags that need to be translated to XAF (and ensure they exist in XAF).</name><completed>100</completed></task>
+				<task><name>Identify all dialog attributes that have anything with a dollar ($) sign -- these will need to be replaced with XAF equivalents after further analysis (like $Command and $command).</name><completed>100</completed></task>
+				<task>
+					<name>Dialog Fields</name>
+					<comments>
+						In the case of the tasks that say <i>Identify</i>, the action should be to 
+						create a feature in the generator script that creates a separate log file
+						with specific reports/logs.
+					</comments>
+					<task><name>Some field.select statements' choices attribute have entire select statements embedded inside the XML.  Remove these and put them in a separate sql-statements package named "dialogs" and refer to them when writing out the XML for the field.select.</name></task>
+					<task><name>Assure that all targets of query: value sources are valid statements</name></task>
+					<task><name>Make trim="yes" a default attribute</name><completed>100</completed></task>
+					<task><name>Convert all field.select's with a choices of "Yes;No" to a field.boolean of the "yesno" variety</name></task>
+					<task><name>Remove style="combo" and size="1" attributes as defaults from field.select statements</name><completed>100</completed></task>
+					<task><name>Remove all <i>perl-ref</i> attributes.</name><completed>100</completed></task>
+					<task><name>Assure that caption names don't have colon [:] in the caption names. Anything with a colon in considered a value source.</name><completed>100</completed></task>
+					<task><name>Remove all <i>default</i> attributes (like size=24 and max-length=1024).</name><completed>100</completed></task>
+					<task><name>Identify all field types used in ASPire (list of ref of all $field objects with dupes removed).</name><completed>80</completed></task>
+					<task><name>Identify common field types that don't exist in XAF that ASPire needs (float, integer, etc).</name></task>
+					<task><name>Identify all iHOS/ASPire attributes that are not being generated in XAF (preHtml, postHtml, etc).</name></task>
+					<task><name>Translate all <i>special</i> field types that exist in ASPire to XAF field types (IDs, Insurance, Procedures, etc)</name></task>
+					<task><name>Identify all field attributes that have anything with a dollar ($) sign -- these will need to be replaced with XAF equivalents after further analysis (like $Command and $command).</name><completed>100</completed></task>
+					<task><name>Try and figure out the difference between <i>hint</i> and <i>hints</i> attributes in iHOS and create equivalents in XAF.</name></task>
+					<task><name>Add all popup/lookup buttons and URLs.</name></task>
+					<task><name>Connect all field.select query choices to statement manager queries.</name></task>
+				</task>
+			</task>
+			
+			<task><name>Appointment Scheduling</name></task>
+			<task><name>Worklists</name></task>
+			<task><name>Lookup Management</name></task>
+			<task><name>Popups</name></task>
+			<task><name>Query Management</name></task>
+		</task>
+
+		<task>
+			<name>Database Management</name>
+			<task><name>Schema</name></task>
+			<task>
+				<name>Query Definitions (in HealthSuite/Database/QDL folder)</name>
+				<task><name>Identify the differences in elements and attributes required by XAF versus those required by iHOS.</name></task>
+				<task><name>Either create a script or perform manual replacement of elements and attributes to convert QDLs from iHOS to XAF.</name></task>
+			</task>
+			<task><name>RDBMS Portability</name></task>
+			<task><name>SQL Statements</name></task>
+			<task><name>SQL Components</name></task>
+		</task>
+
+		<task>
+			<name>Architecture</name>
+			<task><name>PDF Generation</name></task>
+		</task>
+	</project>
+</article>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<access-control name="default">
+		<permission name="app">
+			<generate-permissions name="dialog" class="com.xaf.form.DialogManagerFactory"/>
+			
+			<permission name="module_a">
+				<permission name="feature_0">
+					<permission name="feature_0_0"/>
+					<permission name="feature_0_1"/>
+					<permission name="feature_0_2"/>
+					<permission name="feature_0_3"/>
+					<permission name="feature_0_4"/>
+				</permission>
+				<permission name="feature_1" inherit="/app/module_a"/>
+			</permission>							
+		</permission>
+		
+		<permission name="role">
+			<permission name="super-user">
+				<grant permission="/app/module_a/feature_0/feature_0_0"/>
+			</permission>
+			<permission name="data-admin">
+				<grant permission="/app"/>
+				<grant permission="/dialog"/>
+				<revoke permission="/app/module_a/feature_0/feature_0_1"/>
+			</permission>
+		</permission>
+	</access-control>
+</xaf>

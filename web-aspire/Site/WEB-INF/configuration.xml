@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+
+<xaf>
+    <configuration>
+        <property name="system.projects-root" value="C:/Projects"/>
+        <property name="framework.root-path" value="${system.projects-root}/Framework"/>
+        <property name="app.project-root" value="${system.projects-root}/web-aspire"/>
+
+        <property name="framework.shared.root-path" value="${framework.root-path}/web-shared"/>
+        <property name="framework.shared.root-url" value="/shared"/>
+        <property name="framework.shared.docs-path" value="${framework.shared.root-path}/docs"/>
+        <property name="framework.shared.docs-url" value="${framework.shared.root-url}/docs"/>
+        <property name="framework.shared.resources-path" value="${framework.shared.root-path}/resources"/>
+        <property name="framework.shared.resources-url" value="${framework.shared.root-url}/resources"/>
+        <property name="framework.shared.css-path" value="${framework.shared.resources-path}/css"/>
+        <property name="framework.shared.css-url" value="${framework.shared.resources-url}/css"/>
+        <property name="framework.shared.images-path" value="${framework.shared.resources-path}/images"/>
+        <property name="framework.shared.images-url" value="${framework.shared.resources-url}/images"/>
+        <property name="framework.shared.scripts-path" value="${framework.shared.resources-path}/scripts"/>
+        <property name="framework.shared.scripts-url" value="${framework.shared.resources-url}/scripts"/>
+        <property name="framework.shared.xslt-path" value="${framework.shared.resources-path}/xslt"/>
+        <property name="framework.shared.xslt-url" value="${framework.shared.resources-url}/xslt"/>
+        <property name="framework.shared.dialog.field.popup-image-src" value="${framework.shared.images-url}/dialog/magnifying-glass-sm.gif"/>
+
+        <property name="framework.ace.root-url" value="${create-app-url:/ace}"/>
+        <property name="framework.ace.xslt-path" value="${framework.shared.xslt-path}/ace"/>
+        <property name="framework.ace.xslt-url" value="${framework.shared.xslt-url}/ace"/>
+        <property name="framework.ace.images-root-url" value="${framework.shared.images-url}/ace"/>
+        <property name="framework.ace.acl-browser-xsl" value="${framework.ace.xslt-path}/acl-browser.xsl"/>
+        <property name="framework.ace.config-browser-xsl" value="${framework.ace.xslt-path}/config-browser.xsl"/>
+        <property name="framework.ace.docs-browser-xsl" value="${framework.ace.xslt-path}/docs-browser.xsl"/>
+        <property name="framework.ace.metrics-browser-xsl" value="${framework.ace.xslt-path}/metrics-browser.xsl"/>
+        <property name="framework.ace.properties-browser-xsl" value="${framework.ace.xslt-path}/properties-browser.xsl"/>
+        <property name="framework.ace.query-defn-browser-xsl" value="${framework.ace.xslt-path}/query-defn-browser.xsl"/>
+        <property name="framework.ace.schema-browser-xsl" value="${framework.ace.xslt-path}/schema-browser.xsl"/>
+        <property name="framework.ace.schema-generator-xsl" value="${framework.shared.xslt-path}/schema-gen/generic.xsl"/>
+        <property name="framework.ace.sql-browser-xsl" value="${framework.ace.xslt-path}/sql-browser.xsl"/>
+        <property name="framework.ace.ui-browser-xsl" value="${framework.ace.xslt-path}/dialogs-browser.xsl"/>
+        <properties name="framework.ace.transform">
+            <property name="dml" value="${framework.ace.xslt-path}/article-transform.xsl"/>
+            <property name="tpml" value="${framework.ace.xslt-path}/test-plan-transform.xsl"/>
+        </properties>
+        <properties name="framework.ace.bookmarks">
+            <property name="tagdoc,Tag Docs" value="${framework.shared.docs-url}/tagdoc/xaf.html"/>
+            <property name="javadoc,Java Docs" value="${framework.shared.docs-url}/javadoc/index.html"/>
+            <property name="project,Project Docs" value="${app.documents-root-path}"/>
+            <property name="framework,Framework Docs" value="${framework.shared.docs-path}/project"/>
+        </properties>
+        <property name="framework.ace.login.dialog-class" value="com.xaf.ace.LoginDialog"/>
+        <property name="framework.ace.login.user-id.cookie-name" value="sparx-ace-user-id"/>
+        <property name="framework.ace.login.user.session-attr-name" value="ace-authenticated-user"/>
+        <property name="framework.ace.login.user-name" value="ace"/>
+        <property name="framework.ace.login.user-password" value="ace"/>
+        <property name="framework.ace.metrics.filesys.ignore-case" value="yes"/>
+        <property name="framework.ace.metrics.filesys.code-extensions" value="asp,java,js,jsp,sql,xml,xsl"/>
+        <properties name="framework.ace.monitor.logs">
+            <property name="xaf.debug.page" value="style-text"/>
+            <property name="xaf.debug.security" value="style-text"/>
+            <property name="xaf.debug.sql" value="style-text"/>
+            <property name="xaf.monitor.page" value="style-tab,Date,Host,NDC,Object,Object-id,Render-time,Source"/>
+            <property name="xaf.monitor.security" value="style-tab,Date,Host,NDC,Activity,App User,User Org,Remote User,Remote Host,Remote Addr,Permissions,Roles"/>
+            <property name="xaf.monitor.sql" value="style-tab,Date,Host,NDC,SQL Statement,Ok,Conn,Bind,SQL,Total,Source"/>
+        </properties>
+        <property name="app.database-root-path" value="${app.project-root}/Database"/>
+        <property name="app.documents-root-path" value="${app.project-root}"/>
+        <property name="app.site-root-path" value="${app.project-root}/Site"/>
+        <property name="app.web-inf-root-path" value="${app.site-root-path}/WEB-INF"/>
+        <property name="app.site-temp-path" value="${app.site-root-path}/temp"/>
+        <property name="app.report-file-store-path" value="${app.site-temp-path}/reports"/>
+        <property name="app.report-file-download-url" value="${create-app-url:/temp/reports}"/>
+
+        <property name="app.navigate.root-caption" value="Welcome to CURA"/>
+        <property name="app.navigate.root-path" value="${servlet-context-path:/}" final="yes"/>
+        <property name="app.navigate.root-url" value="${create-app-url:/}"/>
+        <property name="app.navigate.skin-jsp" value="navigate-skin.jsp"/>
+		<property name="app.navigate.login.dialog-class" value="com.xaf.security.LoginDialog"/>
+        <property name="app.navigate.login.user-id.cookie-name" value="xaf_user_id_02"/>
+        <property name="app.navigate.login.user.session-attr-name" value="authenticated-user"/>
+
+        <property name="app.ui.root-path" value="${app.web-inf-root-path}/ui"/>
+        <property name="app.ui.source-file" value="${app.ui.root-path}/dialogs.xml"/>
+
+        <property name="app.sql.root-path" value="${app.web-inf-root-path}/sql"/>
+        <property name="app.sql.source-file" value="${app.sql.root-path}/statements.xml"/>
+
+        <property name="app.security.root-path" value="${app.web-inf-root-path}/security"/>
+        <property name="app.security.acl-file" value="${app.security.root-path}/access-control.xml"/>
+
+        <property name="app.schema.source-path" value="${app.database-root-path}/schema-src"/>
+        <property name="app.schema.source-file" value="${app.schema.source-path}/schema.xml"/>
+
+        <system-property name="javax.xml.parsers.DocumentBuilderFactory" value="org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"/>
+        <system-property name="com.netspective.sparx.DatabaseContext.class" value="com.xaf.db.BasicDatabaseContext"/>
+
+        <property name="app.jndi.ldap.context-factory" value="com.sun.jndi.ldap.LdapCtxFactory"/>
+        <properties name="app.jndi.ldap.provider-urls">
+            <property name="primary" value="ldap://jbwksta10:389"/>
+            <property name="secondary" value="ldap://jbwksta10:389"/>
+        </properties>
+        <property name="app.jndi.ldap.security-authentication" value="simple"/>
+        <property name="app.jndi.ldap.environment" value="Software Engineering"/>
+        <property name="app.jndi.ldap.database-context" value="ou=Software Engineering,ou=Environment,ou=eimo,ou=Applications,ou=NBCS-DC,dc=arc,dc=org"/>
+
+
+        <!-- <property name="app.data-src.default" value="jdbc/otrack"/> -->
+    </configuration>
+</xaf>

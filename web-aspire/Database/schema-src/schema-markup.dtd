@@ -1,0 +1,114 @@
+
+<!-- ** BASIC DATA DICTIONARY ******************************************** -->
+
+<!ENTITY % DATATYPE.TEXT "(#PCDATA)">
+<!ENTITY % DATATYPE.INTEGER "(#PCDATA)">
+<!ENTITY % DATATYPE.ENUM "(#PCDATA)">
+<!ENTITY % DATATYPE.BOOLEAN "(yes | no)">
+
+<!-- ********************************************************************* -->
+
+<!ELEMENT schema (datatype | tabletype | include | table | data)+>
+	<!ATTLIST schema name CDATA #REQUIRED>
+
+	<!ELEMENT datatype (description?, (sqldefn | composite)?, sqlwritefmt?, dbmscustom?, size?, transform*, validate*, default?, cache*, table*)>
+		<!ATTLIST datatype name CDATA #REQUIRED>
+		<!ATTLIST datatype type CDATA #IMPLIED>
+		<!ATTLIST datatype parentref CDATA #IMPLIED>
+		<!ATTLIST datatype selfref CDATA #IMPLIED>
+		<!ATTLIST datatype lookupref CDATA #IMPLIED>
+		<!ATTLIST datatype required (yes | no | dbms) "no">
+		<!ATTLIST datatype calc (no | trigger) "no">
+		<!ATTLIST datatype unique %DATATYPE.BOOLEAN; "no">
+		<!ATTLIST datatype indexed (yes | no | bitmap) "no">
+		<!ATTLIST datatype primarykey %DATATYPE.BOOLEAN; "no">
+		<!ATTLIST datatype group CDATA #IMPLIED> <!-- DEPRECATED -->
+		<!ATTLIST datatype abbrev CDATA #IMPLIED>
+		<!ATTLIST datatype sqldefn CDATA #IMPLIED>
+		<!ATTLIST datatype sqlwritefmt CDATA #IMPLIED>
+		<!ATTLIST datatype size CDATA #IMPLIED>
+		<!ATTLIST datatype default CDATA #IMPLIED>
+		<!ATTLIST datatype cache CDATA #IMPLIED>
+		<!ATTLIST datatype textsearch CDATA #IMPLIED> <!-- NEEDS TO BE IMPLEMENTED -->
+		<!ELEMENT sqldefn %DATATYPE.TEXT;>
+		<!ELEMENT sqlwritefmt %DATATYPE.TEXT;>
+		<!ELEMENT composite (column)+>
+		<!ELEMENT size %DATATYPE.INTEGER;>
+		<!ELEMENT default %DATATYPE.TEXT;>
+		<!ELEMENT cache %DATATYPE.TEXT;>
+		<!ELEMENT dbmscustom (oracle)+>
+			<!ELEMENT oracle (ctldatatype)>
+				<!ELEMENT ctldatatype %DATATYPE.TEXT;>
+
+	<!ELEMENT include EMPTY>
+		<!ATTLIST include file CDATA #REQUIRED>
+		<!ATTLIST include ifdefined CDATA #IMPLIED>
+		<!ATTLIST include ifnotdefined CDATA #IMPLIED>
+
+	<!ELEMENT tabletype (description?, parent?, param*, column*, data?, enum*)>
+		<!ATTLIST tabletype name CDATA #REQUIRED>
+		<!ATTLIST tabletype abbrev CDATA #IMPLIED>
+		<!ATTLIST tabletype type CDATA #IMPLIED>
+		<!ATTLIST tabletype parent CDATA #IMPLIED>
+		<!ATTLIST tabletype group CDATA #IMPLIED> <!-- DEPRECATED -->
+		<!ELEMENT parent %DATATYPE.TEXT;>
+		<!ELEMENT param %DATATYPE.TEXT;>
+			<!ATTLIST param name CDATA #REQUIRED>
+
+	<!ELEMENT table (description?, parent?, param*, column*, data?, enum*)>
+		<!ATTLIST table name CDATA #REQUIRED>
+		<!ATTLIST table abbrev CDATA #IMPLIED>
+		<!ATTLIST table type CDATA #IMPLIED>
+		<!ATTLIST table parent CDATA #IMPLIED>
+		<!ATTLIST table group CDATA #IMPLIED> <!-- DEPRECATED -->
+
+	<!ELEMENT column (description?, transform*, validate*, dbmscustom?, cache*, table*)>
+		<!ATTLIST column name CDATA #REQUIRED>
+		<!ATTLIST column type CDATA "text">
+		<!ATTLIST column parentref CDATA #IMPLIED>
+		<!ATTLIST column selfref CDATA #IMPLIED>
+		<!ATTLIST column lookupref CDATA #IMPLIED>
+		<!ATTLIST column size CDATA #IMPLIED>
+		<!ATTLIST column primarykey %DATATYPE.BOOLEAN; "no">
+		<!ATTLIST column required (yes | no | dbms) "no">
+		<!ATTLIST column calc (no | trigger) "no">
+		<!ATTLIST column unique %DATATYPE.BOOLEAN; "no">
+		<!ATTLIST column uniquegrp CDATA #IMPLIED>
+		<!ATTLIST column uniquegrppos CDATA #IMPLIED> <!-- NEEDS TO BE IMPLEMENTED -->
+		<!ATTLIST column indexed (yes | no | bitmap) "no">
+		<!ATTLIST column indexgrp CDATA #IMPLIED>
+		<!ATTLIST column indexgrppos CDATA #IMPLIED> <!-- NEEDS TO BE IMPLEMENTED -->
+		<!ATTLIST column descr CDATA #IMPLIED>
+		<!ATTLIST column default CDATA #IMPLIED>
+		<!ATTLIST column group CDATA #IMPLIED> <!-- DEPRECATED -->
+		<!ATTLIST column abbrev CDATA #IMPLIED>
+		<!ATTLIST column cache CDATA #IMPLIED>
+		<!ATTLIST column caption CDATA #IMPLIED> <!-- DEPRECATED -->
+		<!ATTLIST column textsearch CDATA #IMPLIED> <!-- NEEDS TO BE IMPLEMENTED -->
+
+	<!ELEMENT description %DATATYPE.TEXT;>
+
+	<!ELEMENT validate %DATATYPE.TEXT;> <!-- NOT IMPLEMENTED - DO WE NEED? -->
+		<!ATTLIST validate method (constraint | trigger) #REQUIRED>
+		<!ATTLIST validate type (numset | numrange | textset) #REQUIRED>
+		<!ATTLIST validate set CDATA #REQUIRED>
+		<!ATTLIST validate setdelim CDATA ",">
+
+	<!ELEMENT transform %DATATYPE.TEXT;> <!-- NOT IMPLEMENTED - NEED? -->
+		<!ATTLIST transform method (uppercase | lowercase) #REQUIRED>
+
+	<!ELEMENT data (import | row | enum | delimrow | delimrows)*>
+		<!ATTLIST data table CDATA #IMPLIED>  <!-- needed only when self-standing (not inside table) -->
+		<!ATTLIST data delim CDATA ",">
+		<!ATTLIST data blanks (keep | ignore | null) "ignore">
+		<!ELEMENT import EMPTY>
+			<!ATTLIST import method (load) #REQUIRED>
+			<!ATTLIST import src CDATA #REQUIRED>
+		<!ELEMENT delimrow %DATATYPE.TEXT;>
+		<!ELEMENT delimrows %DATATYPE.TEXT;>
+		<!ELEMENT row (col)*>
+			<!ELEMENT col %DATATYPE.TEXT;>
+				<!ATTLIST col name CDATA #IMPLIED>
+		<!ELEMENT enum %DATATYPE.TEXT;>
+			<!ATTLIST enum id CDATA #IMPLIED>
+			<!ATTLIST enum abbrev CDATA #IMPLIED>

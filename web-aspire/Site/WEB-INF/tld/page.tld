@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<taglib>
+	<tlibversion>1.0</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>app</shortname>
+	<uri>http://xaf.org/xaf-page.tld</uri>
+
+	<tag>
+		<name>page</name>
+		<tagclass>app.PageTag</tagclass>
+
+		<attribute>
+			<name>title</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>heading</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>permission</name>
+			<rtexprvalue>true</rtexprvalue>			
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>link</name>
+		<tagclass>app.AnchorTag</tagclass>
+
+		<attribute>
+			<name>url</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>hint</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>
