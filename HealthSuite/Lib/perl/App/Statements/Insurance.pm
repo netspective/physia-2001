@@ -384,6 +384,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			ins.group_number,
 			ins.insured_id,
 			ins.member_number,
+			ins.employer_org_id,
 			TO_CHAR(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
 			remit_payer_id,
 			TO_CHAR(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
