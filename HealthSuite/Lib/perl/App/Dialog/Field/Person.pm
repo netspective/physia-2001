@@ -178,7 +178,7 @@ sub isValid
 				else
 				{
 					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
-					$types = "Responsible Party" if $types eq "Guarantor";
+					#$types = "Responsible Party" if $types eq "Guarantor";
 				}
 				unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
 				{

@@ -99,7 +99,7 @@ sub new
 	my ($type, %params) = @_;
 
 	$params{findPopup} = '/lookup/org/id' unless $params{findPopup};
-	return CGI::Dialog::Field::new($type, %params);
+	return App::Dialog::Field::Organization::ID::new($type, %params);
 }
 
 
