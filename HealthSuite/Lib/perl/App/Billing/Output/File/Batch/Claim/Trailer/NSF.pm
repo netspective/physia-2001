@@ -59,7 +59,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$self->numToStr(5,2,abs($container->{totalDeductibleAmount})),
 	$self->numToStr(5,2,abs($container->{totalCoinsuranceAmount})),
 	$self->numToStr(5,2,abs($inpClaim->{payer}->getAmountPaid())), # payer total amount paid
-	$self->numToStr(5,2,abs($inpClaim->getAmountPaid())), # patient amount paid i.e. total adjusted amount from invoice
+	$self->numToStr(5,2,abs($inpClaim->getTotalChargePaid())), # patient amount paid i.e. total adjusted amount from invoice
 	$self->numToStr(5,2,abs($container->{totalPurchaseServiceCharges})),
 	$spaces, # provider discount amount
 	$spaces, # remarks

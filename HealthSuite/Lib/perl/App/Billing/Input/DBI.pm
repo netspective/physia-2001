@@ -2390,7 +2390,24 @@ sub populateItems
 	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges == 0) ? 'N' : 'Y');
 	$currentClaim->{treatment}->setOutsideLabCharges(($outsideLabCharges == 0) ? undef : $outsideLabCharges);
 	$currentClaim->setTotalCharge($claimCharge[INVOICE_ITEM_LAB] + $claimCharge[INVOICE_ITEM_SERVICE]);
-	$currentClaim->setTotalChargePaid($claimChargePaid);
+
+ 	$queryStatment = qq
+ 	{
+		select sum(iia.net_adjust)
+		from invoice_item_adjust iia, invoice_item ii
+		where iia.adjustment_type in (0,1,2,3)
+		and (not iia.pay_type in (5,8) or iia.pay_type is null)
+		and iia.parent_id = ii.item_id
+		and ii.parent_id = $invoiceId
+ 	};
+
+	$sth = $self->{dbiCon}->prepare("$queryStatment");
+	$sth->execute or  $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+
+	my @row = $sth->fetchrow_array();
+	$currentClaim->setTotalChargePaid($row[0]);
+
+#	$currentClaim->setTotalChargePaid($claimChargePaid);
 }
 
 sub populateAdjustments
