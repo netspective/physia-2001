@@ -31,13 +31,12 @@ $STMTFMT_SEL_INVOICETYPE = qq{
 		to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
 	FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o
 	WHERE
-		%whereCond%
+	%whereCond%
 	AND iit.parent_id (+) = i.invoice_id
-	AND i.invoice_status = ist.id
-	AND ib.invoice_id = i.invoice_id
-	AND ib.invoice_item_id is NULL
-	AND ib.bill_sequence = 1
+	AND ib.bill_id (+) = i.billing_id
+	AND ist.id = i.invoice_status
 	AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+	AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 	GROUP BY
 		i.invoice_id,
 		i.total_items,
@@ -299,7 +298,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 			and item_type in (?,?)
 		},
-	'selInvoiceBillingPrimary' => q{
+	'selInvoiceBillingCurrent' => qq{
+		select *
+		from invoice_billing
+		where bill_id = ?
+		},
+	'selInvoiceBillingPrimary' => qq{
 		select *
 		from invoice_billing
 		where invoice_id = ?
@@ -313,11 +317,30 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_id = ?
 		order by bill_sequence
 		},
+	'selAllAttributesExclHistory' => qq{
+		select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB, value_block,
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateEnd,
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB			
+		from invoice_attribute
+		where parent_id = ?
+			and NOT item_name = 'Invoice/History/Item'
+		},
+	'selPostSubmitAttributes' => qq{
+		select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			value_block
+		from invoice_attribute
+		where parent_id = ?
+			and value_intB = 1
+			and item_name not like 'Invoice/TWCC%'
+		},
 	'delPostSubmitAttributes' => q{
 		delete
 		from invoice_attribute
 		where parent_id = ?
 			and value_intB = 1
+			and item_name not like 'Invoice/TWCC%'
 		},
 	'delPostSubmitAddresses' => q{
 		delete
@@ -357,7 +380,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and adjustment_type = 3
 		},
 	'selItemAdjustments' => q{
-		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
+		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.payer_type, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
 			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount,
 			adjust_codes, net_adjust, data_text_a,
 			pat.caption as pay_type, adm.caption as adjustment_type,
@@ -369,16 +392,21 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and iia.adjustment_type = adm.id (+)
 		and iia.pay_type = pat.id (+)
 		},
+	'selItemAdjustmentsByItemParent' => q{
+		select *
+		from invoice_item_adjust
+		where parent_id = ?
+		},
 	'selAllInvoiceTypeForClient' =>
 		{
 				_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
-				whereCond => 'upper(client_id) = ? and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
+				whereCond => 'upper(client_id) = ? and (owner_type = 1 and owner_id = ?)',
 				publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
 		},
 	'selNonVoidInvoiceTypeForClient' =>
 		{
 				_stmtFmt => $STMTFMT_SEL_INVOICETYPE,
-				whereCond => 'upper(client_id) = ? and invoice_status != 16 and ((owner_type = 0 and owner_id = client_id) or (owner_type = 1 and owner_id = ?))',
+				whereCond => 'upper(client_id) = ? and invoice_status != 16 and (owner_type = 1 and owner_id = ?)',
 				publishDefn => $STMTRPTDEFN_DEFAULT_PERSON,
 		},
 	'selInvoiceTypeForOrg' =>
