@@ -6,6 +6,7 @@ use strict;
 use DBI::StatementManager;
 use App::Statements::Catalog;
 use App::Statements::Person;
+use App::Statements::Org;
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
@@ -48,7 +49,8 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 	'product' => 200,
 	'hcpcs' => 210
 );
-
+my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_INTEGER;
+my $FS_TEXT = 'Fee Schedule';
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Fee Schedule');
@@ -58,7 +60,24 @@ sub new
 	delete $self->{schema};  # make sure we don't store this!
 
 	croak 'schema parameter required' unless $schema;
+	my $phy_field = new App::Dialog::Field::MultiPerson::ID(caption => 'Physician ID',
+			name => 'physician_id',			
+			types => ['Physician'],
+	);
+	my $org_field =new App::Dialog::Field::MultiOrg::ID(caption => ' Site Organization ID ',	
+			name => 'org_id',
+			),		
+	
+	$phy_field->clearFlag(FLDFLAG_IDENTIFIER);				
+
 	$self->addContent(
+	
+		new CGI::Dialog::Field(type=>'hidden',
+					name=>'org_item_id',
+					),
+		new CGI::Dialog::Field(type=>'hidden',
+					name=>'phy_item_id',
+					),					
 		new CGI::Dialog::Field(caption => 'Internal Catalog ID',
 			name => 'internal_catalog_id',
 			options => FLDFLAG_READONLY,
@@ -89,12 +108,15 @@ sub new
 			name => 'description',
 			type => 'memo',
 		),
+		
+		
 		new CGI::Dialog::Field(caption => 'RVRBS Multiplier',
 			name => 'rvrbs_multiplier',
 			type => 'float', 
 			minValue => 0,
-		),
-		
+		),	
+		$phy_field,
+		$org_field,		
 		new App::Dialog::Field::Catalog::ID(caption => 'Parent Fee Schedule ID',
 	      		name => 'parent_catalog_id',
 	      		type => 'integer',
@@ -160,10 +182,25 @@ sub populateData_update
 	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
 		$page->field('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN,
 		'Capitated Contract'
-	);
+	);	
 	
+	my $orgFS = $STMTMGR_CATALOG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selOrgIdLinkedFS',$page->field('internal_catalog_id'));
+	my $orgList=undef;
+	foreach my $org_fs_data (@$orgFS)
+	{
+		$orgList .=$orgList ? ",$org_fs_data->{'org_id'}" :  $org_fs_data->{'org_id'};
+	}
+	
+	my $perFS = $STMTMGR_CATALOG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selPersonIdLinkedFS',$page->field('internal_catalog_id'));
+	my $perList=undef;
+	foreach my $phy_fs_data (@$perFS)
+	{
+		$perList .=$perList ? ",$phy_fs_data->{'person_id'}" :  $phy_fs_data->{'person_id'};
+	}	
 	$page->field('capitated_contract', 1) if $recExist->{value_int};
 	$page->field('add_mode', 0);
+	$page->field('org_id',$orgList);
+	$page->field('physician_id',$perList);
 }
 
 sub populateData_remove
@@ -200,7 +237,9 @@ sub execute
 	my $catalogType = $page->field('catalog_type');
 	my $status = $page->field('status');
 	my $internalCatalogId = $page->field('internal_catalog_id');
-		
+	my $phy_Id = $page->field('physician_id');
+	my $org_Id = $page->field('org_id');		
+	
 	my $newId = $page->schemaAction(
 		'Offering_Catalog', $command,
 		internal_catalog_id => $command eq 'add' ? undef : $internalCatalogId,
@@ -214,15 +253,58 @@ sub execute
 		_debug => 0
 	);
 
-	$page->field('internal_catalog_id', $newId);
+	$page->field('internal_catalog_id', $newId) if $command eq 'add';
 	
 	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId || $newId , 'Capitated Contract', 
 		App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 'sel_Catalog_Attribute',
 		value_int => defined $page->field('capitated_contract') ? 1 : 0,
 	) if $command ne 'remove';
 
+	savePerOrgAttr ($page,$phy_Id,$org_Id,$command);
+
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
+}
+
+sub savePerOrgAttr
+{
+	my ($page,$phyId,$orgId,$command) =@_;
+	my @phyList = split(/\s*,\s*/,$phyId);
+	my @orgList = split(/\s*,\s*/,$orgId);
+	my $fsId = $page->field('internal_catalog_id');
+	#Clear out old Assoicatation if this is and update
+	$STMTMGR_CATALOG->execute($page,STMTMGRFLAG_NONE,'delPersonIdLinkedFS',$fsId);
+	$STMTMGR_CATALOG->execute($page,STMTMGRFLAG_NONE,'delOrgIdLinkedFS',$fsId);
+	if($command ne 'remove')
+	{
+		foreach (@phyList)
+		{
+			$page->schemaAction(
+					'Person_Attribute', 'add' ,
+					item_id => $page->field('phy_item_id') || undef,
+					parent_id => $_,
+					item_name => $FS_TEXT,
+					item_type => 0,
+					value_type => $FS_ATTRR_TYPE,
+				value_int => $fsId,			
+			)if $_;
+		}
+	
+		foreach (@orgList)
+		{
+			my $orgParentId =  $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $_);		
+			$page->schemaAction(
+					'Org_Attribute', 'add',
+					item_id => $page->field('org_item_id') || undef,
+					parent_id => $orgParentId,
+					item_name => $FS_TEXT,
+					item_type => 0,
+					value_type => $FS_ATTRR_TYPE,
+					value_int => $fsId,		
+			) if $orgParentId;
+		}
+	}
+
 }
 
 sub saveAttribute
