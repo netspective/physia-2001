@@ -115,6 +115,7 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1);
 	my $personId = $page->param('person_id');
 
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
