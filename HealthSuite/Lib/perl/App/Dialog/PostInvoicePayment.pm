@@ -78,8 +78,13 @@ sub new
 
 		new CGI::Dialog::Field(
 				name => 'pay_type',
-				caption => 'Payment Type', 
-				enum => 'Payment_Type'),
+				caption => 'Payment Type',
+				enum => 'Payment_Type',
+				options => FLDFLAG_REQUIRED | FLDFLAG_PREPENDBLANK,
+				onChangeJS => qq{showFieldsOnValues(event, [@{[App::Universal::ADJUSTMENTPAYTYPE_PREPAY]}], ['prepay_comments']);  },
+				),
+
+		new CGI::Dialog::Field(caption => 'Reason for Pre-payment', name => 'prepay_comments', size => 50),
 
 		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code', name => 'pay_method_fields',
 			fields => [
@@ -206,13 +211,31 @@ sub populateData
 	}
 }
 
-#sub customValidate
-#{
-#	my ($self, $page) = @_;
+sub customValidate
+{
+	my ($self, $page) = @_;
 
-#	my $payType = $page->field('pay_type');
 
-#}
+	#Invalidate if Pre-payment is selected and total amount is applied to line items. Pre-payments become their own  line item. This only occurs for personal payments.
+	my $payType = $page->field('pay_type');
+	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY)
+	{
+		my $appliedExists;
+		my $payTypeField = $self->getField('pay_type');
+		my $lineCount = $page->param('_f_line_count');
+		for(my $line = 1; $line <= $lineCount; $line++)
+		{
+			my $amtApplied = $page->param("_f_item_$line\_amount_applied");
+			my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
+			if($writeoffAmt ne '' || $amtApplied ne '')
+			{
+				$appliedExists = 1;
+			}
+		}
+		
+		$payTypeField->invalidate($page, "Cannot apply 'Pre-payment' to 'Outstanding Items'") if $appliedExists;
+	}
+}
 
 sub execute
 {
@@ -230,14 +253,69 @@ sub execute
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 	my $payMethod = $paidBy eq 'insurance' ? App::Universal::ADJUSTMENTPAYMETHOD_CHECK : $page->field('pay_method');
 	my $payerId = $paidBy eq 'insurance' ? $page->field('orgpayer_internal_id') : $page->field('payer_id');
+	my $payerIdDisplay = $page->field('payer_id');
 	my $payRef = $page->field('pay_ref');
 	my $payType = $page->field('pay_type');
 
 	my $totalAmtRecvd = $page->field('total_amount') || $page->field('check_amount') || 0;
 
+	if($payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal')
+	{
+		my $itemId = $page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_id => $invoiceId,
+			item_type => App::Universal::INVOICEITEMTYPE_ADJUST,
+			_debug => 0
+		);
+
+		my $prepayComments = $page->field('prepay_comments');
+		my $adjItemId = $page->schemaAction(
+			'Invoice_Item_Adjust', 'add',
+			adjustment_type => defined $adjType ? $adjType : undef,
+			adjustment_amount => defined $totalAmtRecvd ? $totalAmtRecvd : undef,
+			parent_id => $itemId || undef,
+			pay_date => $todaysDate || undef,
+			pay_method => defined $payMethod ? $payMethod : undef,
+			pay_ref => $payRef || undef,
+			payer_type => defined $payerType ? $payerType : undef,
+			payer_id => $payerId || undef,
+			pay_type => defined $payType ? $payType : undef,
+			comments => $prepayComments || undef,
+			_debug => 0
+		);
+
+		#Create history attribute for this adjustment
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => "Pre-payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
+			value_textB => "$prepayComments " . "Batch ID: $batchID"|| undef,
+			value_date => $todaysDate,
+			_debug => 0
+		);
+
+		#Create attribute for batchId
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/Payment/Batch ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $batchID || undef,
+			value_date => $batchDate || undef,
+			value_int => $adjItemId || undef,
+			_debug => 0
+		);
+	}
+
+
+
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
+		next if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal';
+
 		my $itemId = $page->param("_f_item_$line\_item_id");
 
 		#update item if it is being suppressed
@@ -283,9 +361,7 @@ sub execute
 		);
 
 
-		#Create history attribute for this adjustment
-		my $itemCPT = $page->param("_f_item_$line\_item_adjustments");
-		my $payerIdDisplay = $page->field('payer_id');
+		#Create history attribute for this adjustment		
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
