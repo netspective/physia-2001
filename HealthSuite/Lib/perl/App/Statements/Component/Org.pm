@@ -152,21 +152,21 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	AND	oa.item_name = 'Fee Schedule'
 	AND	oa.item_type = 0
 	AND	oa.value_type = @{[ App::Universal::ATTRTYPE_INTEGER ]}
-	AND	oa.value_int = oc.internal_catalog_id 
+	AND	oa.value_int = oc.internal_catalog_id
 	ORDER BY oc.catalog_id
 	},
 	sqlvar_entityName => 'Org',
 	sqlStmtBindParamDescr => ['Org Internal ID for Fee Schedules'],
-	publishDefn => 
+	publishDefn =>
 	{
-		frame => 
+		frame =>
 		{
 			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-feeschedule-org?home=#homeArl#',
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
-		},   
-		columnDefn => 
-			[								
-			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#param.org_id#/catalog/#3#/#0#>#0#</A>'  },			
+		},
+		columnDefn =>
+			[
+			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#param.org_id#/catalog/#3#/#0#>#0#</A>'  },
 			{colIdx => 1,  dAlign => 'left'},
 			],
 		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-feeschedule-org/#4#?home=#homeArl#',
@@ -191,14 +191,14 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.edit',
 		frame => { heading => 'Edit Associated Fee Schedule' },
-		banner => 
+		banner =>
 		{
 			actionRows =>
 			[
 			{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-feeschedule-org?home=#param.home#'>Associated Fee Schedules</A> }, url => 'x', },
 			],
 		},
-		stdIcons =>	
+		stdIcons =>
 		{
 			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-feeschedule-org/#4#?home=#param.home#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-feeschedule-org/#4#?home=#param.home#',
 		},
@@ -206,7 +206,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId]); },
 	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId  =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panel'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId  =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panelEdit'); },			
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId =$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id')); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeschedules', [$orgId], 'panelEdit'); },
 },
 
 
@@ -215,25 +215,31 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.alerts' => {
 	sqlStmt => qq{
-		select 	trans_id, trans_type, caption, detail
-		from 	transaction
-		where	trans_owner_type = 1
-		and 	trans_owner_id =
-		(select org_internal_id
-			from org
-			where owner_org_id = :2 AND
+		SELECT
+			trans_id,
+			trans_type,
+			caption,
+			detail,
+			trans_subtype
+		FROM 	transaction
+		WHERE	trans_owner_type = 1
+		AND 	trans_owner_id =
+		(
+			SELECT org_internal_id
+			FROM org
+			WHERE owner_org_id = :2 AND
 			org_id = :1
 		)
-		and	trans_type between 8000 and 8999
-		and	trans_status = 2
-		order by trans_begin_stamp desc
+		AND	trans_type between 8000 and 8999
+		AND	trans_status = 2
+		ORDER BY trans_subtype,	 trans_begin_stamp desc
 		},
 	sqlStmtBindParamDescr => ['Org ID for Transaction Table'],
 	publishDefn => {
 			columnDefn => [
 				#{ colIdx => 0, dataFmt => '&{fmt_stripLeadingPath:0}:', dAlign => 'RIGHT' },
 				#{ colIdx => 1,  dataFmt => '#1#', dAlign => 'LEFT' },
-				{ head => 'Alerts', dataFmt => '#2#<br/><I>#3#</I>' },
+				{ head => 'Alerts', dataFmt => '<b>#4#</b>: #2#<br/><I>#3#</I>' },
 			],
 			bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#homeArl#',
 			frame => {
@@ -937,8 +943,136 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+'org.miscNotes' => {
+	sqlStmt => qq{
+			SELECT
+				value_type,
+				item_id,
+				parent_id,
+				item_name,
+				value_text,
+				value_textB,
+				%simpleDate:value_date%,
+				%simpleDate:value_dateB%
+				from  Org_Attribute
+			WHERE  	parent_id =
+				(
+					SELECT org_internal_id
+					FROM org
+					WHERE owner_org_id = :2 AND
+					org_id = :1
+				)
+			AND item_name = 'Org Notes'
 
+		},
+		sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
 
-);
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => 'Org Notes #4#: #5# (#6#, #7#)' },
+		],
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-notes?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Org Notes' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Org Notes' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-misc-notes?home=#param.home#'>Org Notes</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.miscNotes',  [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.miscNotes',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.miscNotes',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.miscNotes',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+},
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'org.listAssociatedOrgs' => {
+	sqlStmt => qq{
+			SELECT
+				org_id,
+				name_primary,
+
+				DECODE (o.parent_org_id, '', 'Parent Org', 'Child Org')
+			FROM  	Org o
+			WHERE  	parent_org_id =
+				(
+					SELECT org_internal_id
+					FROM org
+					WHERE owner_org_id = :2 AND
+					org_id = :1
+				)
+			OR
+				org_internal_id =
+				(
+					SELECT owner_org_id
+					FROM org
+					WHERE owner_org_id = :2 AND
+					org_id = :1
+				)
+
+		},
+		sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{
+				colIdx => 2,
+				dataFmt => {
+					'Parent Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #2#)",
+					'Child Org' => "#1# (<A HREF = '/org/#0#/profile'>#0#</A>, #2#)",
+				},
+			},
+
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Parent And Child Orgs' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
+},
+
+),
 
 1;
