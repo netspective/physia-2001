@@ -11,6 +11,7 @@ use App::Dialog::Field::Person;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use Date::Manip;
+#use App::Dialog::Field::Scheduling;
 use App::Statements::Worklist::WorklistCollection;
 use vars qw(@ISA %RESOURCE_MAP);
 my $ACCOUNT_RECK_DATE = App::Universal::TRANSTYPE_ACCOUNTRECKDATE;
@@ -33,8 +34,8 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new App::Dialog::Field::Person::ID(types => ['Patient'],name => 'person_id', caption => 'Person ID', type => 'memo', options => FLDFLAG_READONLY),
-			new CGI::Dialog::Field(name => 'invoice_id', caption => 'Invoice ID', type => 'memo', options => FLDFLAG_READONLY),			
+			new App::Dialog::Field::Person::ID(types => ['Patient'],name => 'person_id', caption => 'Person ID',  options => FLDFLAG_READONLY),
+			new CGI::Dialog::Field(name => 'invoice_id', caption => 'Invoice ID', options => FLDFLAG_READONLY),			
 			new CGI::Dialog::Field(name => 'reckdate', caption => 'Reck Date',futureOnly => 1, type => 'date',options=>FLDFLAG_REQUIRED ,defaultValue => ''),																
 		);
 		$self->{activityLog} =
