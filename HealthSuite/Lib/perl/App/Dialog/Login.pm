@@ -31,13 +31,6 @@ sub new
 				options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
 				),
 		new CGI::Dialog::Field(
-				caption => 'Login As',
-				name => 'categories',
-				type => 'select',
-				onValidate => \&validateLoginType, onValidateData => $self,
-				options => FLDFLAG_REQUIRED | FLDFLAG_PERSIST,
-				),
-		new CGI::Dialog::Field(
 				name => 'password', caption => 'Password', type => 'password',
 				onValidate => \&validatePassword, onValidateData => $self,
 				options => FLDFLAG_REQUIRED | FLDFLAG_HOME,
@@ -121,29 +114,6 @@ sub validatePassword
 	}
 }
 
-sub validateLoginType
-{
-	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
-
-	my $personId = uc($page->field('person_id'));
-	my $orgId = uc($page->field('org_id'));
-	my $loginType = $page->field('categories');
-	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
-	my $ok = 0;
-	foreach (@{$categories})
-	{
-		$page->addDebugStmt("loginType = [$loginType] and category = [$_]");
-		if ($_ eq $loginType)
-		{
-			$ok = 1;
-			last;
-		}
-	}
-	$page->addDebugStmt("ok = [$ok]");
-	return ("Login Type not valid for $personId in $orgId") unless $ok;
-	return();
-}
-
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
@@ -151,8 +121,7 @@ sub makeStateChanges
 	$page->setFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 	$page->property('login_status', App::Page::LOGINSTATUS_DIALOG);
 	$self->setFieldFlags('clear_sessions', FLDFLAG_INVISIBLE);
-	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
-	$self->populateLoginTypes($page) if ($personId && $orgId);
+
 	#
 	# show the "start" selection box if the destination page is the home page or the
 	# logout page
@@ -168,41 +137,12 @@ sub makeStateChanges
 	$page->field('nextaction_redirecturl', '/' . $page->param('arl')) if $hideStartInfo;
 }
 
-sub populateLoginTypes
-{
-	my ($self, $page) = @_;
-	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
-	if ($personId && $orgId)
-	{
-		my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
-		my @loginTypes = '';
-		foreach my $category(@{$categories})
-		{
-			push(@loginTypes, $category);
-		}
-		$self->getField('categories')->{selOptions} = join ';', @loginTypes;
-		return 1 if scalar @{$categories} > 1;
-		return 0;
-	}
-	# it's ok, we don't have a person_id or org_id yet
-	$self->setFieldFlags('categories', FLDFLAG_INVISIBLE);
-	return 1;
-}
-
-sub populateValues
-{
-	my ($self, $page) = @_;
-	$self->SUPER::populateValues($page);
-	$self->populateLoginTypes($page);
-}
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
 	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $orgId);
 	my $personFlags = App::Universal::PERSONFLAG_ISPATIENT;
-
 	foreach (@$categories)
 	{
 		$personFlags |= App::Universal::PERSONFLAG_ISPATIENT if uc($_) eq 'PATIENT';
@@ -213,11 +153,10 @@ sub execute
 		$personFlags |= App::Universal::PERSONFLAG_ISSTAFF if $_ =~ /^(Physician|Nurse|Staff|Administrator)$/i;
 	}
 
-	my $loginList = $self->getField('categories')->{selOptions};
-	my $loginType = $page->field('categories');
-	$page->createSession($personId, $orgId, {loginType => $loginType, loginList => $loginList, categories => $categories, personFlags => $personFlags });
+	$page->createSession($personId, $orgId, { categories => $categories, personFlags => $personFlags });
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
+
 	$self->handlePostExecute($page, $command, $flags);
 	return 'Welcome to Physia.com, ' . $page->session('user_id');
 }
