@@ -14,6 +14,31 @@ my $FILLED =App::Universal::TRANSSTATUS_FILLED;
 my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT; 
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
+'procAnalysis' => {
+	sqlStmt => qq{
+			select MAX((SELECT p.short_sortable_name FROM person p where p.person_id= provider)) as short_sortable_name,
+			MAX((SELECT tt.caption FROM Transaction_type tt WHERE tt.id = trans_type)) as visit_type,
+			nvl(i.code,'UNK') as code,
+			MAX(NVL((SELECT r.name FROM ref_cpt r WHERE r.cpt=i.code),'N/A')) as proc,
+			sum(i.unit_cost) as unit_cost,
+			sum(i.units) units,
+			i.invoice_date,
+			trunc(invoice_date,'MM') as month_date,
+			trunc(invoice_date,'YYYY') as year_date					
+			from invoice_charges i
+			where (:1 IS NULL OR provider= :1 )
+			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
+			AND to_date(:3,'MM/DD/YYYY')
+			AND (:4 IS NULL OR :4 = i.facility)
+			AND (:5 IS NULL OR :5 <=i.code)
+			AND (:6 is NULL OR :6 >=i.code)			
+			AND owner_org_id = :7			
+			group by nvl(i.code,'UNK'),trunc(invoice_date,'MM') ,trunc(invoice_date,'YYYY') ,i.invoice_date,
+			provider,trans_type
+			order by 1,2,7 asc
+			},
+	sqlStmtBindParamDescr => ['Provider ID for yearToDateReceiptProcAnalysis View'],
+	},
 	'sel_providerreceipt' =>
 	{
 		sqlStmt=>
