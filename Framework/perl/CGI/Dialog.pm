@@ -82,7 +82,7 @@ sub findPopup_as_html
 	if(my $arl = $self->{findPopup})
 	{
 		return qq{
-			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}');"><img src='$self->{popup}->{imgsrc}' border=0></a>
+			<a href="javascript:doFindLookup(document.$dialogName, document.$dialogName.$fieldName, '$arl', '$self->{findPopupAppendValue}', null, null, document.$dialogName.$self->{findPopupControlField});"><img src='$self->{popup}->{imgsrc}' border=0></a>
 		};
 	}
 	return '';

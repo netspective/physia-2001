@@ -28,43 +28,80 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID', name => 'catalog_id', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID', 
+			name => 'catalog_id', 
+			options => FLDFLAG_REQUIRED,
+			findPopup => '/lookup/catalog',
+		),
+
 		#new CGI::Dialog::Field::TableColumn(caption => 'Fee Schedule Item ID', name => 'catalog_id',
 		#		schema => $schema, column => 'Offering_Catalog_Entry.catalog_id',
 		#		findPopup => '/lookup/catalog/id', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field::TableColumn(caption => 'Item Name', name => 'name',
-			schema => $schema, column => 'Offering_Catalog_Entry.name', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(type => 'enum',
-					enum => 'Catalog_Entry_Type',
-					caption => 'Fee Schedule Entry Type',
-					name => 'entry_type',
-					options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(type => 'enum',
-					enum => 'Catalog_Entry_Status',
-					caption => 'Status',
-					name => 'status',
-					options => FLDFLAG_REQUIRED),
 
+		new CGI::Dialog::Field::TableColumn(caption => 'Item Name', 
+			name => 'name',
+			schema => $schema, 
+			column => 'Offering_Catalog_Entry.name', 
+			options => FLDFLAG_REQUIRED
+		),
 		new CGI::Dialog::Field(type => 'enum',
-					enum => 'Catalog_Entry_Cost_Type',
-					caption => 'Cost Type',
-					name => 'cost_type', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field( caption => 'Unit Cost', name => 'unit_cost', size => 10, maxLength => 8, options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field( caption => 'Units Available', name => 'units_avail',size => 5, maxLength => 8),
+			enum => 'Catalog_Entry_Type',
+			caption => 'Fee Schedule Entry Type',
+			name => 'entry_type',
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::Field(type => 'enum',
+			enum => 'Catalog_Entry_Status',
+			caption => 'Status',
+			name => 'status',
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::Field(type => 'enum',
+			enum => 'Catalog_Entry_Cost_Type',
+			caption => 'Cost Type',
+			name => 'cost_type', options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::Field( caption => 'Unit Cost', 
+			name => 'unit_cost', 
+			size => 10, 
+			maxLength => 8, 
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::Field( caption => 'Units Available', 
+			name => 'units_avail',
+			size => 5, 
+			maxLength => 8
+		),
 		new CGI::Dialog::MultiField(caption =>'Code/Modifier',
 			fields => [
-				new CGI::Dialog::Field::TableColumn(caption => 'Code', name => 'code',
-					schema => $schema, column => 'Offering_Catalog_Entry.code',options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field::TableColumn(caption => 'Modifier', name => 'modifier',
-					schema => $schema, column => 'Offering_Catalog_Entry.modifier'),
-			]),
-
-		new CGI::Dialog::Field::TableColumn(caption => 'Description', name => 'description',
-			schema => $schema, column => 'Offering_Catalog_Entry.description', size => '50'),
-		new CGI::Dialog::Field::TableColumn(caption => 'Parent Entry ID', name => 'parent_entry_id',
-			schema => $schema, column => 'Offering_Catalog_Entry.parent_entry_id',
-			findPopup => '/lookup/catalog/group/code'),
-		);
+				new CGI::Dialog::Field::TableColumn(caption => 'Code', 
+					name => 'code',
+					schema => $schema, 
+					column => 'Offering_Catalog_Entry.code',
+					options => FLDFLAG_REQUIRED
+				),
+				new CGI::Dialog::Field::TableColumn(caption => 'Modifier', 
+					name => 'modifier',
+					schema => $schema, 
+					column => 'Offering_Catalog_Entry.modifier'
+				),
+			]
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Description', 
+			name => 'description',
+			schema => $schema, 
+			column => 'Offering_Catalog_Entry.description', 
+			size => '50'
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Parent Entry ID', 
+			name => 'parent_entry_id',
+			schema => $schema, 
+			column => 'Offering_Catalog_Entry.parent_entry_id',
+			findPopup => '/lookup/catalog/detail/itemValue',
+			findPopupControlField => '_f_catalog_id',
+		),
+	);
+	
 	$self->{activityLog} =
 		{
 			scope =>'offering_catalog_entry',
@@ -78,7 +115,6 @@ sub new
 		#	schema => $schema, column => 'Catalog_Item.default_units'),
 		#new CGI::Dialog::Field::TableColumn(caption => 'Available Units', name => 'units_avail',
 		#	schema => $schema, column => 'Catalog_Item.units_avail'),
-
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 					nextActions_add => [

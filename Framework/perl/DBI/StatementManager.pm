@@ -673,6 +673,28 @@ sub createHierHtml
 		createHtmlFromData($dbpage, $flags, $data, $publDefn, $publParams);
 }
 
+sub createHtmlCustom
+{
+	my ($self, $dbpage, $flags, $name, $bindColsRef, $publDefn, $publParams) = @_;
+
+	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
+
+	prepareStatementColumns($dbpage, $flags, $stmtHdl, $publDefn) unless exists $publDefn->{columnDefn};
+	return
+		createHtmlFromStatement($dbpage, $flags, $stmtHdl, $publDefn, $publParams);
+}
+
+sub createHierHtmlCustom
+{
+	my ($self, $dbpage, $flags, $name, $bindColsRef, $publDefn, $publParams) = @_;
+
+	my ($data, $stmtHdl) = $self->getRowsAsArrayTree($dbpage, $flags | STMTMGRFLAG_FLATTREE, $name, @$bindColsRef);
+
+	prepareStatementColumns($dbpage, $flags, $stmtHdl, $publDefn) unless exists $publDefn->{columnDefn};
+	return
+		createHtmlFromData($dbpage, $flags, $data, $publDefn, $publParams);
+}
+
 sub getAttribute
 {
 	my $data = getRowAsHash(@_);

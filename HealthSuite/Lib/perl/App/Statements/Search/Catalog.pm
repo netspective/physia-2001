@@ -5,10 +5,11 @@ package App::Statements::Search::Catalog;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use Devel::ChangeLog;
+
 use Data::Publish;
 
-use vars qw(@ISA @EXPORT @CHANGELOG $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGITEM_COLUMNS $STMTRPTDEFN_DEFAULT $STMTRPTDEFN_DEFAULT_ITEM);
+use vars qw(@ISA @EXPORT $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGITEM_COLUMNS 
+	$STMTRPTDEFN_DEFAULT $STMTRPTDEFN_DEFAULT_ITEM);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CATALOG_SEARCH);
 
@@ -66,7 +67,7 @@ $STMTRPTDEFN_DEFAULT =
 		},
 	columnDefn =>
 			[
-				{ head => 'ID', url => 'javascript:chooseItem("/search/catalog/detail/#&{?}#", "#&{?}#", true)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+				{ head => 'ID', url => 'javascript:chooseItem("/search/catalog/detail/#&{?}#", "#&{?}#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
 				{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
 				{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
 			],
@@ -79,11 +80,10 @@ my $STMTRPTDEFN_ORG =
 		actionRows =>
 		[
 			{
-                                caption => qq{
-                                        <a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
-                                        <a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a
->
-                                },
+				caption => qq{
+					<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+					<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a>
+				},
 
 				#caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
 				#url => '/org/#session.org_id#/dlg-add-catalog'
@@ -119,7 +119,7 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 			[
 				{ head => 'ID',
 					#url => '/search/catalog/detail/#0#',
-					url => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
+					url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-catalog-item/#0#", "#0#", false)',
 					dataFmt => '&{level_indent:0}#0#',
 					tDataFmt => '&{count:0} Entries',
 					options => PUBLCOLFLAG_DONTWRAP
@@ -264,17 +264,4 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 
 );
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Catalog',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/20/2000', 'MM',
-		'Search/Catalog',
-		'Added functionality to the update/delete icons and changed the STMTFMT_SEL_CATALOGENTRY query.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-		'Search/Catalog',
-		'Changed the urls from create/... to org/.... '],
-
-);
 1;

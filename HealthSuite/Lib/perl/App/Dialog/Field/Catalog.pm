@@ -109,7 +109,7 @@ sub new
 		$params{type} = 'text';
 		$params{size} = 16;
 		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/catalog/id';
+		$params{findPopup} = '/lookup/catalog';
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }

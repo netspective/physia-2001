@@ -711,7 +711,7 @@ var activeFindWinControl = null;
 var activeFindARL = null;
 var activeFindAppendValue = '';
 
-function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features)
+function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
 {
 	if(prefill == null)
 		prefill = true;
@@ -725,13 +725,19 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 
 	if(appendValue == null) appendValue = '';
 	activeFindAppendValue = appendValue;
+	
+	var newArl = arl;
 
+	if(controlField != '')
+	{
+		newArl = replaceString(arl, 'itemValue', controlField.value);
+	}
 	//
 	// do the actual opening of the find popup window; it will be the job
 	// of the popup window to check the value of activeFindWinControl and
 	// either automatically populate the control or do something else
 	//
-	var popUpWindow = open(arl, WINDOWNAME_FINDPOPUP, features == null ? "width=600,height=500,scrollbars,resizable" : features);
+	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ? "width=600,height=500,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
 

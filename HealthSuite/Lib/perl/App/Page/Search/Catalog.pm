@@ -7,8 +7,9 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Catalog;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use Data::Publish;
+
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
 sub getForm
@@ -49,49 +50,30 @@ sub execute
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
 	my $bindParams = [uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
-
+	
 	$self->addContent(
 		'<CENTER>',
-		$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ["sel_catalog_$type$appendStmtName", 0, 4], $bindParams,
-			#[
-			#	['Schedule', '<A HREF=\'/dialog/Catalog/update/%0\' STYLE="text-decoration:none">%0</A>'],
-			#	['Items', '<A HREF="/search/catalog/detail/%0" STYLE="text-decoration:none">%1</A> [<A HREF="/create/catalogitem/%0" STYLE="text-decoration:none">Add</A>]', undef, 'RIGHT'],
-			#	['Name'],
-			#	['Description'],
-			#]
-		),
+			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
+				["sel_catalog_$type$appendStmtName", 0, 4], $bindParams,),
 		'</CENTER>'
-		);
+	);
+
 	return 1;
 }
 
 sub execute_detail
 {
 	my ($self, $expression) = @_;
-
+	
 	$self->addContent(
 		'<CENTER>',
-		$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalog_detail', 0, 8],
-			[uc($expression)],
-			#[
-			#	['Code', '<A HREF=\'/search/catalog/detail/%0\' STYLE="text-decoration:none">%0</A>'],
-			#	['Cost', undef, undef, 'RIGHT', CREATEOUPUT_COLFLAG_CURRENCY],
-			#	['Entry ID', undef, undef, 'RIGHT'],
-			#]
+			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
+				['sel_catalog_detail', 0, 8],	[uc($expression)],
 		),
 		'</CENTER>'
-		);
-
-	return 1;
+	);
+	
+	return 1;	
 }
-@CHANGELOG =
-(
 
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Catalog',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Catalog',
-		'Changed the urls from create/... to org/.... '],
-);
 1;
