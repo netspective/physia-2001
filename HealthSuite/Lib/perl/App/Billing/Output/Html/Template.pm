@@ -401,7 +401,7 @@ sub populateDiagnosis
 sub populateClaim
 {
 	my ($self, $claim) = @_;
-	my $physicianAddress = $physician->getAddress();
+#	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 	$data->{claimAcceptAssignmentN} = uc($claim->getAcceptAssignment) eq 'N' ? "Checked" : "";
 	$data->{claimAcceptAssignmentY} = (uc($claim->getAcceptAssignment) eq 'Y') || ($claim->getAcceptAssignment eq '') ? "Checked" : "";
