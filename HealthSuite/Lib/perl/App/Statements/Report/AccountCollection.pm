@@ -22,24 +22,37 @@ $STMTMGR_REPORT_ACCOUNT_COLLECTION = new App::Statements::Report::AccountCollect
 	{
 		sqlStmt => qq
 		{
-			select
-				p1.complete_name patient_name,
-				t.trans_owner_id patient_id,
+			select distinct
+				p1.simple_name patient_name,
+				t1.trans_owner_id patient_id,
 				i.balance,
-				round(sysdate - i.invoice_date) age,
-				p2.complete_name provider_name,
-				t.provider_id provider_id,
-				t.detail notes
-			from invoice i, person p1, person p2, transaction t
+				trunc(sysdate - i.invoice_date) age,
+				p2.simple_name provider_name,
+				t1.provider_id provider_id,
+				t2.detail notes
+			from
+				invoice i,
+				person p1,
+				person p2,
+				transaction t1,
+				person_org_category poc,
+				(
+					select * from	transaction
+					where trans_type = $NOTES
+				) t2
 			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
 			and i.balance > 0
-			and i.invoice_id = t.trans_invoice_id
-			and t.trans_owner_id = p1.person_id
-			and t.provider_id = p2.person_id
-			and t.trans_status = $ACTIVE
-			and t.trans_type in ($OWNER, $NOTES)
-			and t.trans_subtype = 'Owner'
-			and t.billing_facility_id = :3
+			and i.invoice_status <> 16
+			and i.invoice_id = t1.trans_invoice_id
+			and t1.trans_owner_id = p1.person_id
+			and t1.trans_owner_id = t2.trans_owner_id (+)
+			and p1.person_id = poc.person_id
+			and poc.org_internal_id = :3
+			and t1.provider_id = p2.person_id
+			and t1.trans_status = $ACTIVE
+			and t1.trans_type = $OWNER
+			and t1.trans_subtype = 'Owner'
+			order by trunc(sysdate - i.invoice_date) desc
 		},
 
 		sqlStmtBindParamDescr => ['Date Range and Org Internal Id'],
