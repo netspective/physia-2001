@@ -12,6 +12,13 @@
 		<build-manager>Lloyd Brodsky</build-manager>
 		<tested-date> TBD </tested-date>
 		<release-date>TBD </release-date>
+		<overview>
+		Duplicate of Build 22
+		</overview>
+		<br/>	
+		<description>
+		This is a list of Build 22 tasks assigned to Prosys
+		</description>	
 	</release-info>
 
 	<deliverables>
