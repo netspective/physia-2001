@@ -185,21 +185,28 @@ sub buildSqlStmt
 		
 		$columns = qq{to_char(Invoice.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
 			$submitDate	
-			Invoice_Billing.bill_to_id as bill_to, 
+			decode(Invoice_Billing.bill_party_type,0,Invoice_Billing.bill_to_id,1,Invoice_Billing.bill_to_id,(select org_id FROM ORG WHERE org_internal_id = Invoice_Billing.bill_to_id)) as  bill_to_id,			
 			product_name as insurance_product,	
 			plan_name as insurance_plan, 
 			total_cost as total_charge, 
 			total_adjust, 
 			Invoice.invoice_id, 
-			Invoice.client_id
+			Invoice.client_id,
+			(select ia.value_text 
+			 FROM insurance_attribute  ia
+			 WHERE ia.parent_id = Insurance.parent_ins_id
+			 AND ia.item_name = 'Contact Method/Telephone/Primary' ) as phone_number
+			 
+			
+			
 		};
 		
-		$groupBy = qq{order by invoice_date, bill_to};
+		$groupBy = qq{order by 3,1};
 	}
 
 	my $html = qq{
 		select $columns
-			from $transTable Insurance, Invoice_Billing, Invoice_Status, Invoice
+			from $transTable Insurance, Invoice_Billing, Invoice_Status, Invoice 
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -209,7 +216,9 @@ sub buildSqlStmt
 				and Invoice_Status.id = Invoice.invoice_status
 				and Invoice_Billing.invoice_id = Invoice.invoice_id
 				$payerTypeCond
-				and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
+				and Insurance.ins_internal_id (+)= Invoice_Billing.bill_ins_id
+				and Invoice_Billing.bill_sequence=1
+				and Invoice_BIlling.invoice_item_id is NULL
 				$insuranceNameCond
 				$insuranceProductCond
 				$insurancePlanCond
@@ -276,14 +285,15 @@ sub prepare_detail_status
 	my $publishDefn = {
 		columnDefn =>
 		[
-			{head => 'Claim ID', colIdx => 7, dAlign => 'right',
+			{head => 'Bill To',groupBy=>'#2#' ,sAlign=>'left',colIdx => 2, dAlign => 'left',hAlign=>'left'},
+			{head => 'Claim ID', colIdx => 7, dAlign => 'center',
 				url => q{javascript:chooseItemForParent('/invoice/#7#/summary') },
 				hint => 'View Invoice Summary',
 			},
 			{head => 'Inquiry', colIdx => 7, dAlign => 'center',
 				dataFmt => q{<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0>},
-				url => q{javascript:chooseItemForParent('/invoice/#7#/dlg-add-claim-inquiry') },
-				hint => 'Add Inquiry Notes for Claim #7#',
+				#url => q{javascript:chooseItemForParent('/invoice/#7#/dlg-add-claim-inquiry') },
+				#hint => 'Add Inquiry Notes for Claim #7#',
 			},
 			{head => 'Patient ID', colIdx => 8, dAlign => 'center',
 				url => q{javascript:chooseItemForParent('/person/#8#/account')},
@@ -291,17 +301,18 @@ sub prepare_detail_status
 			},
 			{head => 'Invoice Date', colIdx => 0,},
 			{head => 'Submit Date', colIdx => 1,},
-			{head => 'Bill To', colIdx => 2, dAlign => 'center'},
+			#{head => 'Bill To', ,colIdx => 2, dAlign => 'center'},
 			{head => 'Insurance Product', colIdx => 3, dAlign => 'center'},
 			{head => 'Insurance Plan', colIdx => 4, dAlign => 'center'},
 			{head => 'Total Charge', colIdx => 5, 
-				dformat => 'currency', tAlign => 'RIGHT', 
+				dformat => 'currency', tAlign => 'RIGHT', summarize=>'sum',
 				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
 			},
 			{head => 'Total Adjust', colIdx => 6, 
-				dformat => 'currency', tAlign => 'RIGHT', 
-				tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+				dformat => 'currency', tAlign => 'RIGHT', summarize=>'sum',
+				#tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
 			},
+			{head =>'Contact Number' , colIdx =>9},
 		],
 	};
 	
