@@ -5,6 +5,7 @@ package App::Statements::Transaction;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_TRANSACTION);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -19,8 +20,13 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				and transaction.related_to = rel.id
 		},
 	'selTransactionById' => qq{
-		select * from transaction
-			where trans_id = ?
+		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id, trans_type, trans_subtype, trans_status,
+			caption, detail, code, billing_facility_id, service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to, data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT'), to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT'),
+			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT'), to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT')
+		from transaction
+		where trans_id = ?
 		},
         'selTransactionByData_num_a' => qq{
                 select * from transaction
@@ -161,7 +167,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			where id = ?
 		},
 	'selTransCreateClaim' => qq{
-		select trans_id, trans_type, caption as subject, provider_id, care_provider_id,
+		select trans_id, trans_type, caption as subject, provider_id, care_provider_id, parent_event_id,
 				service_facility_id, billing_facility_id, bill_type, data_text_a as ref_id, data_text_b as comments
 		from transaction
 		where trans_id = ?
