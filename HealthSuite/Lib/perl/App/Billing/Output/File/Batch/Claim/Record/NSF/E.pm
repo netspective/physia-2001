@@ -123,7 +123,8 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($tempDiagnosis[1], 0, 5),  # if 1 then print else space
 	substr($tempDiagnosis[2], 0, 5),  # if 1 then print else space 
 	substr($tempDiagnosis[3], 0, 5),  # if 1 then print else space
-	substr($inpClaim->{payToProvider}->getAssignIndicator(),0,1),    # assignment indicator
+	#substr($inpClaim->{payToProvider}->getAssignIndicator(),0,1),    # assignment indicator
+	'A',
 	substr($inpClaim->{payToProvider}->getSignatureIndicator(),0,1), # signature indicator
 	substr($inpClaim->{payToProvider}->getSignatureDate(),0,8),					# signature date
 	substr($refClaimTreatment->getOutsideLab() == 'Y' ? $inpClaim->{renderingOrganization}->getName() : $spaces , 0, 22),
