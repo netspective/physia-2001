@@ -2156,7 +2156,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					from person_attribute a where  a.value_type in (@{[ App::Universal::ATTRTYPE_SPECIALTY ]}) and a.item_id = b.item_id)value_int
 			from 	person_attribute b
 			where 	parent_id = ?
-			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
+			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]})
 			and     item_name not in('Nurse/Title', 'RN', 'Driver/License', 'Employee')
 			order by value_int
 		},
@@ -2197,6 +2197,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-state?home=#param.home#'>State</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-accreditation?home=#param.home#'>Accreditation</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-specialty?home=#param.home#'>Specialty</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-provider-number?home=#param.home#'>Provider Number</A> } },
 		],
 		},
 		stdIcons =>	{
