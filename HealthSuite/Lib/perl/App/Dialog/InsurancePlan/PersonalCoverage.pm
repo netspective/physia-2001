@@ -253,9 +253,9 @@ sub populateData_add
 		return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 		my $personId = $page->param('person_id');			
 		my $insSequence = $page->field('bill_sequence');
-		$insSequence = $insSequence + 1;
+		my $newInsSequence = $insSequence + 1;
 		$insSequence > 4 ? 0 : $insSequence;
-		$page->field('bill_sequence', $insSequence);
+		$page->field('bill_sequence', $newInsSequence);
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
 		my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;		
