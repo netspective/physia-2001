@@ -179,7 +179,8 @@ $STMTRPTDEFN_DEFAULT =
 		{
 			head => 'ID',
 			hint => 'Fee Schedule ID #5#', 
-			url => q{javascript:chooseItem('/search/catalog/detail/#5#', '#5#', false)},
+			url => q{javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)},
+			#q{javascript:chooseItem('/search/catalog/detail/#5#', '#0#', false)},
 			#dataFmt => '&{level_indent:0}#0#', 
 			tDataFmt => '&{count:0} Schedules', 
 			options => PUBLCOLFLAG_DONTWRAP,
