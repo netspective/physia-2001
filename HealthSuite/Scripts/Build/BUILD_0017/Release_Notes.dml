@@ -212,6 +212,7 @@
 
 		<deliverable id="1549">
 			Added two more lines for a total of six procedure entries in the Misc Procedure dialog.
+			Additional: Fixed query to retrieve six procedure entries when updating or deleting.
 		</deliverable>
 
 		<deliverable id="1550">
