@@ -16,11 +16,12 @@
 		<field id="description" join="invitem" column="caption" caption="Description"/>
 		<field id="code" join="invitem" column="code" caption="Code"/>
 		<field id="code_type" join="invitem_codetype" column="caption" caption="Code Type"/>
+		<field id="cpt_desc" join="cpt" column="description" caption="CPT Description"/>
 		<field id="modifier" join="invitem" column="modifier" caption="Modifier"/>
 		<field id="unit_cost" join="invitem" column="unit_cost" caption="Unit Cost" ui-datatype="currency"/>
 		<field id="quantity" join="invitem" column="quantity" caption="Quantity" ui-datatype="number"/>
 		<field id="extended_cost" join="invitem" column="extended_cost" caption="Extended Cost" ui-datatype="currency"/>
-		<field id="rel_diags" join="invitem" column="rel_diags" caption="Related Diagnosis"/>
+		<field id="rel_diags" join="invitem" column="rel_diags" caption="ICD9"/>
 		<field id="comments" join="invitem" column="comments" caption="Comments"/>
 		<field id="bill_provider_id" join="main_trans" column="provider_id" caption="Billing Provider ID"/>
 		<field id="bill_provider_name" join="bill_provider" column="simple_name" caption="Billing Provider Name"/>
@@ -95,6 +96,7 @@
 		<join id="srv_facility_addr" table="org_address" requires="srv_facility_org" condition="srv_facility_org.org_internal_id = srv_facility_addr.parent_id (+) AND srv_facility_addr.address_name (+) = 'Mailing'"/>
 		<join id="invoice_attr_batch" table="invoice_attribute" requires="invoice" condition="invoice.invoice_id = invoice_attr_batch.parent_id (+) AND invoice_attr_batch.item_name (+) = 'Invoice/Creation/Batch ID'"/>
 		<join id="invoice_attr_batch_adjust" table="invoice_attribute" requires="invitem_adjust" condition="invitem_adjust.adjustment_id = invoice_attr_batch_adjust.value_int (+) AND invoice_attr_batch_adjust.item_name (+) = 'Invoice/Payment/Batch ID'"/>
+		<join id="cpt" table="ref_cpt" condition="invitem.code = cpt.cpt (+)"/>
 		
 		<view id="all" caption="None">
 			<column id="invoice_id"/>
