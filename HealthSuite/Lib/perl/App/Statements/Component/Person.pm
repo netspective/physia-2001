@@ -3121,7 +3121,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				to_char(tr.data_date_a,'MM/DD/YY'),
 				(SELECT rsd.name
 					FROM ref_service_category rsd , transaction tp
-				 WHERE rsd.serv_category = tp.trans_expire_reason
+				 WHERE rsd.serv_category = tsr.trans_expire_reason
 				 AND	tp.trans_id = tsr.parent_trans_id),
 				(SELECT caption FROM referral_followup_status where id = tr.trans_status_reason),
 				to_char(tr.data_date_b,'MM/DD/YY'),
@@ -3199,9 +3199,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				(
 
 					SELECT rsd.name
-					FROM ref_service_category rsd, transaction t1,transaction t2 where t1.trans_id = t.parent_trans_id
-					AND t2.trans_id = t1.parent_trans_id AND
-					t2.trans_expire_reason = rsd.SERV_CATEGORY
+					FROM ref_service_category rsd, transaction t1 where t1.trans_id = t.parent_trans_id
+					AND t1.trans_expire_reason = rsd.SERV_CATEGORY
 				),
 
 				to_char(data_date_b,'MM/DD/YY'),
