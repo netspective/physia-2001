@@ -33,11 +33,13 @@ use Devel::ChangeLog;
 @ISA = qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure/add";
+use constant NEXTACTION_ONHOLD => "/invoice/%param.invoice_id%/dialog/hold";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
 use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
 use constant NEXTACTION_POSTTRANSFER => "/person/%field.attendee_id%/dlg-add-posttransfer";
 use constant NEXTACTION_CREATECLAIM => "/org/#session.org_id#/dlg-add-claim";
+use constant NEXTACTION_CREATEHOSPCLAIM => "/org/#session.org_id#/dlg-add-claim?isHosp=1";
 use constant NEXTACTION_WORKLIST => "/worklist";
 
 %PROCENTRYABBREV = abbrev qw(place type lab modifier cpt units emergency reference comments);
@@ -75,11 +77,13 @@ sub initialize
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
 							['Add a Procedure', NEXTACTION_ADDPROC],
+							['Place this claim on hold', NEXTACTION_ONHOLD],
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
 							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
 							['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
-							['Add Another Claim', NEXTACTION_CREATECLAIM],
+							['Add Claim', NEXTACTION_CREATECLAIM],
+							['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
 							['Return to Work List', NEXTACTION_WORKLIST],
 							],
 						cancelUrl => $self->{cancelUrl} || undef));
