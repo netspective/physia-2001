@@ -22,10 +22,14 @@ sub new
 	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 16 unless exists $params{maxLength};
 	$params{findPopup} = '/lookup/org/id' unless defined $params{findPopup};
+	$params{addPopup} = undef unless defined $params{addPopup};
 
-	my $addType = $params{addType} || 'main';
-	$params{addPopup} = "/org/#session.org_id#/dlg-add-org-$addType" unless $params{addPopup};
-	$params{addPopupControlField} = '_f_org_id' unless exists $params{addPopupControlField};
+	if($type eq 'App::Dialog::Field::Organization::ID')
+	{
+		my $addType = $params{addType} || 'main';
+		$params{addPopup} = "/org/#session.org_id#/dlg-add-org-$addType" unless $params{addPopup};
+		$params{addPopupControlField} = '_f_org_id' unless exists $params{addPopupControlField};
+	}
 
 	return CGI::Dialog::Field::new($type, %params);
 }
