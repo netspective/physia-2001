@@ -893,7 +893,7 @@ sub define
 		{
 			if(my $assertion = $childNode->{check})
 			{
-				if($assertion == 'parentTblHasSinglePrimaryKey')
+				if($assertion eq 'parentTblHasSinglePrimaryKey')
 				{
 					if(my $parentInst = $self->{parentTblInstance})
 					{
