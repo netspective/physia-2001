@@ -37,8 +37,8 @@ sub processFile
 	my $healthmaintenance = new App::Data::MDL::HealthMaintenance(schema => $schema, db => $schema->{dbh});
 	my $flags = exists $options->{flags} ? $options->{flags} : MDLFLAGS_DEFAULT;
 
-	$schema->setFlag(SCHEMAAPIFLAG_LOGSQL);
-	#$schema->clearFlag(SCHEMAAPIFLAG_EXECSQL);
+	#$schema->setFlag(SCHEMAAPIFLAG_LOGSQL);
+	$schema->clearFlag(SCHEMAAPIFLAG_EXECSQL);
 
 	foreach my $xmlFile (@srcFile)
 	{
@@ -51,8 +51,8 @@ sub processFile
 			$list = [$list] if ref $list eq 'HASH';
 			foreach(@$list)
 			{
-				$person->importStruct($flags, $_);				
-				$person->printErrors();				
+				$person->importStruct($flags, $_);
+				$person->printErrors();
 			}
 		}
 		if(my $list = $struct->{org})
