@@ -30,7 +30,6 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-main">Main Organization</OPTION>
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-dept">Department</OPTION>
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</OPTION>
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-employer">Employer</OPTION>
