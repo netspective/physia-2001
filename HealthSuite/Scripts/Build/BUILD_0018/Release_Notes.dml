@@ -130,7 +130,8 @@
 		
 		<deliverable id="1652">
 			Fixed handling of primary, secondary, tertiary claims (i.e. status changes, functions allowed based on status changes, 
-			reopening of claims and voiding of subsequent claims, etc.)
+			reopening of claims and voiding of subsequent claims, etc.).
+		(Daily Audit Report) : Modified to not double count payment information if previous copy of invoice is re-opend. (example : When primary is modified and secondary was the active claim)
 		</deliverable>		
 
 		<deliverable id="1697">
