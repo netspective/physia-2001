@@ -218,10 +218,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		SELECT
 			trans_id,
 			trans_type,
-			caption,
+			t.caption,
 			detail,
 			trans_subtype
-		FROM 	transaction
+		FROM 	transaction t, alert_priority a
 		WHERE	trans_owner_type = 1
 		AND 	trans_owner_id =
 		(
@@ -232,7 +232,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		)
 		AND	trans_type between 8000 and 8999
 		AND	trans_status = 2
-		ORDER BY trans_subtype,	 trans_begin_stamp desc
+		AND     a.caption = t.trans_subtype
+		ORDER BY a.id desc, trans_begin_stamp desc
 		},
 	sqlStmtBindParamDescr => ['Org ID for Transaction Table'],
 	publishDefn => {
