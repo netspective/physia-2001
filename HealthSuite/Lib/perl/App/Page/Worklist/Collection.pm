@@ -6,101 +6,127 @@ use strict;
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use App::Page;
+use App::Configuration;
 use App::ImageManager;
+use App::Dialog::WorklistSetup;
+
+use CGI::Dialog::DataNavigator;
+use SQL::GenerateQuery;
+
 use DBI::StatementManager;
-use App::Statements::Scheduling;
-use App::Statements::Page;
-use App::Statements::Search::Appointment;
-use App::Statements::Component::WorkList;
-use App::Dialog::CollectionSetup;
-use App::Component::WorkList::Collection;
-use vars qw(@ISA %RESOURCE_MAP);
-@ISA = qw(App::Page::WorkList);
+use App::Statements::Worklist::WorklistCollection;
+
+use Data::Publish;
+use CGI::ImageManager;
+
+use base qw{App::Page::WorkList};
+
+use vars qw(
+	$COLLECTIONARL
+	%RESOURCE_MAP
+	%PUB_COLLECTION
+	$QDL
+	$LIMIT
+);
+
 %RESOURCE_MAP = (
 	'worklist/collection' => {
 			_title =>'Collections Work List',
 			_iconSmall =>'images/page-icons/worklist-collections',
 			_iconMedium =>'images/page-icons/worklist-collections',
-			_views => [
-				{caption => '#param._seldate#', name => 'date',},
+			_views => [				
+				{caption => 'Work List' ,name=>'wl'},			
 				{caption => 'Account Notes', name => 'accountnotes',},
 				{caption => 'Setup', name => 'setup',},
 				],
 		},
 	);
 
-sub prepare_view_date
+$LIMIT =250;
+$QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'InvoiceWorkList.qdl');
+
+$COLLECTIONARL='/worklist/collection';
+
+########################################################
+# Collection Worklist Data
+########################################################
+
+
+%PUB_COLLECTION = (
+	name => 'obs',
+	columnDefn =>
+		[
+			{head => '#', dataFmt => '#{auto_row_number}#',},
+			{head =>'Patient ID', hAlign=> 'left',dAlign => 'left',hint=>'#{name}#',url=>'/person/#{person_id}#/profile',dataFmt=>'#{person_id}#',},			
+			{head =>'Patient Name', hAlign=> 'left',dAlign => 'left',dataFmt=>'#{name}#',},
+			{head =>'Invoice ID', colIdx=>'#{invoice_id}#', hAlign=> 'left',url =>'/invoice/#{invoice_id}#/summary'},
+			{head => 'Event Description', dAlign => 'center', dataFmt=>'#{comments}#' },							
+			{head => 'Balance' , colIdx=>'#{balance}#', dformat => 'currency', dAlign => 'center', url=>'/person/#{person_id}#/account'},
+			{head => 'Age', dAlign => 'center',dataFmt=>'#{age}#'},
+			{head => 'Next Appt', dAlign => 'center',colIdx=>'#{data_date_a}#'},			
+			{head => 'Reck Date', dAlign => 'center',colIdx=>'#{reck_date}#'},			
+			{ head => "Actions", dAlign => 'left' ,
+			   dataFmt => qq{
+					<A HREF="/worklist/collection/dlg-add-account-notes/#{person_id}#"
+						TITLE='Add Account Notes'>
+						<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
+					<A HREF="/worklist/collection/dlg-add-transfer-collection/#{person_id}#/#{invoice_id}#"
+						TITLE='Transfer Patient Account'>
+						<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
+					<A HREF="/worklist/collection/dlg-add-collection-reck-date/#{person_id}#/#{invoice_worklist_id}#"
+						TITLE='Add Reck Date'>
+						<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
+					<A HREF="/worklist/collection/dlg-add-close-collection/#{person_id}#/#{invoice_id}#"
+						TITLE='Close Account'>
+						<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
+                        		},
+			
+			},			
+
+	],
+	dnQuery => \&collectionQuery,
+	#dnDrillDown => \%PUB_OBS_RESULTS,
+	dnARLParams => ['invoice_id'],
+	dnAncestorFmt => 'Collection Worklist',
+);
+
+
+
+########################################################
+# Collection Worklist Query
+########################################################
+sub collectionQuery
 {
-	my ($self) = @_;
-		
-		$self->addContent(qq{
-			<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-				<TR VALIGN=TOP>
-					<TD colspan=3>
-						#component.worklist-collection# <BR>
-					</TD>					
-				</TR>
-				<TR>
-					<TD>&nbsp;</TD>
-				</TR>
-				<TR VALIGN=TOP>
-					<TD>
-						#component.lookup-records#<BR>
-					</TD>
-					<TD>&nbsp;</TD>
-					<TD>
-						#component.create-records# <BR>
-					</TD>
-					<TD>&nbsp;</TD>
-					<TD>
-						#component.navigate-reports-root#
-					</TD>
-				</TR>
-			</TABLE>
-		});
-	
-	return 1;
+	my $self = shift;
+	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
+
+	my $cond1 = $sqlGen->WHERE('owner_id', 'is', $self->session('person_id'));
+	my $cond2 = $sqlGen->WHERE('worklist_status', 'is','Account In Collection' );
+	my $cond3 = $sqlGen->WHERE('worklist_type', 'is','Collection' );
+	my $cond4 = $sqlGen->WHERE('responsible_id', 'is',$self->session('person_id') );
+	my $query = $sqlGen->AND($cond1,$cond2,$cond3,$cond4);
+	$query->outColumns(
+		'owner_id',
+		'person_id',
+		'reck_date',
+		'invoice_id',	
+		'data_date_a',
+		'comments',
+		'name',
+		'balance',
+		'invoice_date',
+		'age',
+		'invoice_worklist_id',
+		'responsible_id'
+	);
+	return $query;
 }
 
 
-sub prepare_view_accountnotes
-{
-my ($self) = @_;
-	
-	$self->addContent(qq{
-	<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-				<TR VALIGN=TOP>
-					<BR>
-					<TD>										      
-						#component.stp-worklist.group-account-notes# <BR>			
-					</TD>					
-				</TR>
-				<TR>
-					<TD>&nbsp;</TD>
-				</TR>
-				<TR VALIGN=TOP>
-					<TD>
-						#component.lookup-records#<BR>
-					</TD>
-					<TD>&nbsp;</TD>
-					<TD>
-						#component.create-records# <BR>
-					</TD>
-					<TD>&nbsp;</TD>
-					<TD>
-						#component.navigate-reports-root#
-					</TD>
-				</TR>
-		</TABLE>
-	
-			
-	});
 
-	return 1;
-};
-
-
+########################################################
+# Collection Worklist Setup View
+########################################################
 
 sub prepare_view_setup
 {
@@ -112,347 +138,215 @@ sub prepare_view_setup
 	return 1;
 }
 
-sub prepare_page_content_footer
+
+
+########################################################
+# Collection Worklist Account Notes View
+########################################################
+
+sub prepare_view_accountnotes
+{
+my ($self) = @_;
+
+        $self->addContent(qq{
+        <TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
+                                <TR VALIGN=TOP>
+                                        <BR>
+                                        <TD>                                                                                  
+                                                #component.stp-worklist.group-account-notes# <BR>
+                                        </TD>
+                                </TR>
+                                <TR>
+                                        <TD>&nbsp;</TD>
+                                </TR>
+                                <TR VALIGN=TOP>
+                                        <TD>
+                                                #component.lookup-records#<BR>
+                                        </TD>
+                                        <TD>&nbsp;</TD>
+                                        <TD>
+                                                #component.create-records# <BR>
+                                        </TD>
+                                        <TD>&nbsp;</TD>
+                                        <TD>
+                                                #component.navigate-reports-root#
+                                        </TD>
+                                </TR>
+                </TABLE>
+
+
+        });
+
+        return 1;
+};
+
+
+########################################################
+# Collection Worklist , Worklist view
+########################################################
+
+sub prepare_view_wl
 {
 	my $self = shift;
-	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'claim'));
-	$self->SUPER::prepare_page_content_footer(@_);
-
-	return 1;
+	# Create html file tabs for each document type
+	my $tabsHtml = $self->setupTabs();
+	#If Refresh value has been set then try to get new invoices to add to the worklist
+	if ($self->param('refresh')==1)
+	{						
+		$self->refreshInvoiceWorkList($self->session('user_id'),$self->session('org_internal_id'));		
+	}
+	# Create the work list dialog
+	my $dlg = new CGI::Dialog::DataNavigator(publDefn => \%PUB_COLLECTION, 
+	topHtml => $tabsHtml,
+	page => $self);
+	my $dlgHtml = $dlg->getHtml($self, 'add');	
+	$self->addContent($dlgHtml);
 }
 
-sub decodeDate
+#################################
+#Refresh the collectors worklist with new data
+###################################3
+sub refreshInvoiceWorkList
 {
-	my ($date) = @_;
-	
-	$date = 'today' unless ParseDate($date);
-	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
-	my @today = Today();
-	
-	if (Delta_Days(@date_, @today) == 0)
-	{
-		return "Today";
-	}
-	elsif ($date_[0] == $today[0])
-	{
-		return UnixDate($date, '%a %b %e');
-	}
-	else
-	{
-		return UnixDate($date, '%a %m/%d/%Y');
-	}
-}
-
-sub prepare_page_content_header
-{
-	my $self = shift;
-
-	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);	
-
-	$self->SUPER::prepare_page_content_header(@_);
-
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) unless ($self->param('noControlBar'));
-
-	return 1;
-}
-
-sub getControlBarHtml
-{
-	my ($self) = @_;
-
-	my $selectedDate = $self->param('_seldate') || 'today';
-	$selectedDate = 'today' unless ParseDate($selectedDate);
-	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
-
-	my $optionIndex;
-
-	my $javascripts = $self->getJavascripts();
-	my $chooseDateOptsHtml = $self->getChooseDateOptsHtml($fmtDate);
-
-	my $nextDay = UnixDate(DateCalc($selectedDate, "+1 day"), '%m-%d-%Y');
-	my $prevDay = UnixDate(DateCalc($selectedDate, "-1 day"), '%m-%d-%Y');
-	my $nDay = $nextDay; $nDay =~ s/\-/\//g;
-	my $pDay = $prevDay; $pDay =~ s/\-/\//g;
-
-	if($self->param('_f_action_change_controls'))
-	{
-		$self->session('showTimeSelect', $self->param('showTimeSelect'));
-		$self->session('time1', $self->param('time1'));
-		$self->session('time2', $self->param('time2'));
-	}
-
-	my @dateSelected = Decode_Date_US($fmtDate);
-	my $timeFieldsHtml;
-	
-	if (Delta_Days(@dateSelected, Today()) == 0)
-	{
-		$self->param('Today', 1);
-
-		my ($time1, $time2, $title1, $title2);
-
-		if ($self->session('showTimeSelect') == 1)
-		{
-			if (! $self->session('time1') || $self->session('time1') !~ /:/) {
-				$time1 = '12:00am';
-				$self->session('time1', $time1);
-			} else {
-				$time1 = $self->session('time1');
-			}
-
-			if (! $self->session('time2') || $self->session('time2') !~ /:/) {
-				$time2 = '11:59pm';
-				$self->session('time2', $time2);
-			} else {
-				$time2 = $self->session('time2');
-			}
-			
-			#$time1 = $self->session('time1') || '12:00am';
-			#$time2 = $self->session('time2') || '11:59pm';
-		}
-		else
-		{
-			if (! $self->session('time1') || $self->session('time1') =~ /:/) {
-				$time1 = 30;
-				$self->session('time1', $time1);
-			} else {
-				$time1 = $self->session('time1');
-			}
-
-			if (! $self->session('time2') || $self->session('time2') =~ /:/) {
-				$time2 = 120;
-				$self->session('time2', $time2);
-			} else {
-				$time2 = $self->session('time2');
-			}
-			
-			#$time1 = $self->session('time1') || 30;
-			#$time2 = $self->session('time2') || 120;
-		}
-
-		#$timeFieldsHtml = qq{
-		#	<SCRIPT>
-		#		function prefillDefaults(Form)
-		#		{
-		#			if (Form.showTimeSelect.options[Form.showTimeSelect.selectedIndex].value == 1)
-		#			{
-		#				Form.time1.value = '12:00am';
-		#				Form.time2.value = '11:59pm';
-		#			}
-		#			else
-		#			{
-		#				Form.time1.value = 30;
-		#				Form.time2.value = 120;
-		#			}
-		#		}
-		#	</SCRIPT>
-		#	&nbsp; &nbsp;
-		#	Time:
-		#	<SELECT name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
-		#		<option value=0>Minutes before/after</option>
-		#		<option value=1>Range from/to</option>
-		#	</SELECT>
-#
-		#	<script>
-		#		setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
-		#	</script>
-#
-		#	&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-		#	&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
-#
-		#	<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-		#	<input type=submit value="Go">
-		#};
-	}
-	else
-	{
-		my ($time1, $time2, $title1, $title2);
-
-		if (! $self->session('time1') || $self->session('time1') !~ /:/) {
-			$time1 = '12:00am';
-			$self->session('time1', $time1);
-		} else {
-			$time1 = $self->session('time1');
-		}
-
-		if (! $self->session('time2') || $self->session('time2') !~ /:/) {
-			$time2 = '11:59pm';
-			$self->session('time2', $time2);
-		} else {
-			$time2 = $self->session('time2');
-		}
+	 my ($self, $collector_id, $org_internal_id) = @_;
+		#First get number of active invoice on collectors worklist (enforce LIMIT)
+		my $count = $STMTMGR_WORKLIST_COLLECTION->getSingleValue($self, STMTMGRFLAG_NONE,'selCollectorRecordCnt',$collector_id,		
+			$org_internal_id);
 		
-
-		
-	}
-
-	return qq{
-	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
-		$javascripts
-		<STYLE>
-			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-			input  { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
-		</STYLE>
-
-		<tr>
-			<FORM name='dateForm' method=POST>
-				<td ALIGN=LEFT>
-					<SELECT onChange="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
-						updatePage(document.dateForm.selDate.value); return false;">
-						$chooseDateOptsHtml
-					</SELECT>
-
-					<A HREF="javascript: showCalendar(document.dateForm.selDate);">
-						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
-
-					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
-					<INPUT size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
-					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
-
-					$timeFieldsHtml
-				</td>
-			</FORM>
-		</tr>
-
-	</TABLE>
-	<br>
-	};
+		#Update records in InvoiceWorklist with new information (appt schedule,event description)
+		$STMTMGR_WORKLIST_COLLECTION->execute($self, STMTMGRFLAG_NONE,'updCollectorRecords',$collector_id,		
+			$org_internal_id) if $count >0;
+			
+		#Get new records for worklist but only allow up to the limited number of records in the worklist at a time
+		#NOW FOR THE FUN PART
+		my $pullNumber = $LIMIT - $count;	
+		my $fmtDate =  UnixDate('today','%m/%d/%Y');
+		my @start_Date = Decode_Date_US($fmtDate);
+		my $name = $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonAttribute',$collector_id,'WorkListCollectionLNameRange',$org_internal_id);
+		my $minLastName = $name->{value_text}||'A';
+		my $maxLastName = $name->{value_textb}||'Z';
+		my $amount= $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonAttribute',$collector_id,'WorkList-Collection-Setup-BalanceAmount-Range',$org_internal_id);	
+		my $minAmount = $amount->{value_float}||1;
+		my $maxAmount = $amount->{value_floatb}||99999;
+		my $range= $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonAttribute',$collector_id,'WorkList-Collection-Setup-BalanceAge-Range',$org_internal_id);	
+		my $minRange = $range->{value_int}||30;
+		my $maxRange = $range->{value_intb}||999;
+		my $minDate=$fmtDate;
+		my $maxDate=$fmtDate;
+		if ($minRange)
+		{
+		    	my @date= Add_Delta_Days (@start_Date,"-".$minRange);
+		 	$maxDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);
+		}
+		if ($maxRange)
+		{
+		    	my @date= Add_Delta_Days (@start_Date,"-".$maxRange);
+		 	$minDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);		
+		}		
+		$STMTMGR_WORKLIST_COLLECTION->execute($self, STMTMGRFLAG_NONE,'pullCollectorRecords',
+			$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$org_internal_id,
+			$collector_id,$fmtDate,$pullNumber) if $pullNumber >0;	
 }
 
-sub getChooseDateOptsHtml
-{
-	my ($self, $date) = @_;
 
-	# Choose Date drop down list
-	my @quickChooseItems =
-		(
-			{ caption => 'Choose Day', value => '' },
-			{ caption => 'Today', value => 'today' },
-			{ caption => 'Yesterday', value => DateCalc('today', '-1 day') },
-			{ caption => 'Tomorrow', value => DateCalc('today', '+1 day') },
-			{ caption => 'Day after Tomorrow', value => DateCalc('today', '+2 days') },
-		);
+########################################################
+# Setup Tabs for Collection Worklist
+########################################################
 
-	my $quickChooseDateOptsHtml = '';
-	foreach (@quickChooseItems)
-	{
-		my $formatDate = UnixDate($_->{value}, '%m/%d/%Y');
-		$quickChooseDateOptsHtml .=  qq{
-			<option value="$formatDate">$_->{caption}</option>
-		};
-	}
-	return $quickChooseDateOptsHtml;
-}
 
-sub initialize
+sub setupTabs
 {
 	my $self = shift;
-	$self->SUPER::initialize(@_);
+	my $RESOURCES = \%App::ResourceDirectory::RESOURCES;
 
-	$self->addLocatorLinks(			
-			['Collection', '/worklist/collection'],
+	my $children = $self->getChildResources($RESOURCES->{'page-worklist'}->{'collection'});
+
+	my @tabs = ();
+	foreach my $child (keys %$children)
+	{
+		my $childRes = $children->{$child};
+		my $id = $childRes->{_id};
+		$id =~ s/^page\-//;
+		my $caption = defined $childRes->{_tabCaption} ? $childRes->{_tabCaption} : (defined $childRes->{_title} ? $childRes->{_title} : 'caption');
+		push @tabs, [ $caption, "/$id", $id ];
+	}
+
+	push @tabs, [ 'Refresh Work List', "$COLLECTIONARL?refresh=1", $COLLECTIONARL ];
+	my $tabsHtml = $self->getMenu_Tabs(
+		App::Page::MENUFLAGS_DEFAULT,
+		'arl_resource',
+		\@tabs,
+		{
+			selColor => '#CDD3DB',
+			selTextColor => 'black',
+			unselColor => '#E5E5E5',
+			unselTextColor => '#555555',
+			highColor => 'navy',
+			leftImage => 'images/design/tab-top-left-corner-white',
+			rightImage => 'images/design/tab-top-right-corner-white'
+		}
 	);
-	
-	# Check user's permission to page
-	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
-	{
-		unless($self->hasPermission("page/worklist/collection"))
-		{
-			$self->disable(
-					qq{
-						<br>
-						You do not have permission to view this information. 
-						Permission page/worklist/patientflow is required.
 
-						Click <a href='javascript:history.back()'>here</a> to go back.
-					});
-		}
-	}
+	return [qq{<br><div align="left"><table border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr>$tabsHtml</tr></table></div>}];
 }
+
+
+########################################################
+# Handle the page display
+########################################################
+
 
 sub handleARL
 {
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
+        my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$self->param('_pm_view', $pathItems->[1] || 'date');
-	$self->param('noControlBar', 1);
-	$self->param('_seldate', 'Today') unless $self->param('_seldate');
-	
-	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
-	{
-		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
-			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
-		}
-	}
-
-	$self->printContents();
-	return 0;
+        unless($self->arlHasStdAction($rsrc, $pathItems, 1))
+        {
+                $self->param('_pm_view', $pathItems->[1] || 'wl');
+        };
+        
+        #If the refresh option is not set then set refresh param to zero
+        unless($params=~m/refresh=1/)
+        {
+        	$self->param('refresh',0) ;
+        }
+        $self->param('_dialogreturnurl', $COLLECTIONARL);
+        $self->printContents();
+        return 0;
 }
 
-sub handleARL_date
-{
-	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$pathItems->[2] =~ s/\-/\//g if defined $pathItems->[1];
-	$self->param('_seldate', $pathItems->[2]);
-	$self->param('noControlBar', 0);
-}
 
 
 sub getContentHandlers
 {
-	return ('prepare_view_$_pm_view=date$');
+     return ('prepare_view_$_pm_view=wl$');
 }
 
-sub getJavascripts
+
+sub initialize
 {
-	my ($self) = @_;
+        my $self = shift;
+        $self->SUPER::initialize(@_);
 
-	return qq{
+        $self->addLocatorLinks(
+                ['Collection', $COLLECTIONARL],
+        );
 
-		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
-
-		<SCRIPT>
-			function updatePage(selectedDate)
-			{
-				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = '/worklist/collection/date/' + dashDate;
-			}
-
-			function chooseEntry2(itemValue, actionObj, destObj)
-			{
-				if(isLookupWindow())
-				{
-					populateControl(itemValue, true);
-					return;
-				}
-
-				if(actionObj == null)
-					actionObj = search_form.item_action_arl_select;
-
-				if(actionObj != null) {
-					var arlFmt = actionObj.options[actionObj.selectedIndex].value;
-					var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
-
-					if (destObj == null)
-					{
-						window.location.href = newArl;
-					}
-					else
-					{
-						if(destObj.selectedIndex == 0)
-							window.location.href = newArl;
-						else
-							doActionPopup(newArl);
-					}
-				}
-			}
-		</SCRIPT>
-	};
+        # Check user's permission to page
+        my $activeView = $self->param('_pm_view');
+        if ($activeView)
+        {
+                unless($self->hasPermission("page/worklist/collection"))
+                {
+                        $self->disable(qq{<br>
+                                You do not have permission to view this information.
+                                Permission page/worklist/verify is required.
+                                Click <a href='javascript:history.back()'>here</a> to go back.
+                        });
+                }
+        }
 }
 
 
