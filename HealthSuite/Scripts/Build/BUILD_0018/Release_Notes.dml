@@ -332,6 +332,10 @@
 			Payer for today now prepopulated when updating claim or checking out a patient.
 		</deliverable>
 		
+		<deliverable id="1890">
+			Updated the url for 'Refills' under 'Choose Action' in Patient Summary page to redirect to Edit Medications.
+		</deliverable>
+
 		<deliverable id="1891">
 			Updated the url for 'Voice Message' under 'Choose Action' in Patient Summary page to showup the new dialog.
 		</deliverable>
