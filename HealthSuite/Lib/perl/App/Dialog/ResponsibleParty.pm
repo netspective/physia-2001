@@ -24,9 +24,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'guarantor' => {
-		heading => '$Command Responsible Party', 
-		_arl => ['party_name'], 
-		_arl_modify => ['party_name'], 
+		heading => '$Command Responsible Party',
+		_arl => ['party_name'],
+		_arl_modify => ['party_name'],
 		_idSynonym => 'Guarantor'
 	},
 );
@@ -47,7 +47,12 @@ sub new
 		#options => FLDFLAG_REQUIRED),
 		#new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
-		new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
+		new CGI::Dialog::MultiField(
+			fields => [
+				new CGI::Dialog::Field(type=> 'ssn', caption => 'Social Security', name => 'ssn'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth',
+							defaultValue => '', futureOnly => 0),
+				]),
 		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
 				fields => [
 						new CGI::Dialog::Field(caption => 'License Number', name => 'license_number'),
@@ -119,6 +124,7 @@ sub execute
 			name_middle => $page->field('name_middle') || undef,
 			name_last => $page->field('name_last') || undef,
 			name_suffix => $page->field('name_suffix') || undef,
+			date_of_birth => $page->field('date_of_birth') || undef,
 			ssn => $page->field('ssn') || undef,
 			_debug => 0
 		);
