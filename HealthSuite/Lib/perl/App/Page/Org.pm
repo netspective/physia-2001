@@ -40,11 +40,11 @@ sub initialize
 {
 	my $self = shift;
 	$self->SUPER::initialize(@_);
-	
+
 	my $orgId = $self->param('org_id');
 	$intOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgId',
 		$self->session('org_internal_id'), $orgId);
-	
+
 	unless($intOrgId)
 	{
 		$self->disable(
@@ -57,8 +57,12 @@ sub initialize
 	}
 
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
+	my $orgAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Business Hours');
 	$self->property('org_type', split(/,/, $self->property('org_category')));
-	
+	$self->property('org_hrs_oper', $orgAttr->{'value_text'});
+	#my $x = $test->{'value_text'};
+	#$self->addDebugStmt("TEST : $x ");
+
 	$self->addLocatorLinks(
 			['Organization Look-up', '/search/org'],
 			[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
@@ -148,6 +152,7 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
 	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
+	$profileLine .=  '&nbsp;Hours of Operation: #property.org_hrs_oper# ' if $self->property('org_hrs_oper');
 
 	my $chooseAction = '';
 	$chooseAction = qq{
@@ -159,6 +164,7 @@ sub prepare_page_content_header
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
+						<OPTION value="/org/#session.org_id#/profile">Go To Parent Org</OPTION>
 					</SELECT>
 					</FONT>
 				<TD>
@@ -260,6 +266,8 @@ sub prepare_view_profile
 					#component.stpt-org.credentials#<BR>
 					#component.stpt-org.departments#
 					#component.stpt-org.feeschedules#<BR>
+					#component.stpt-org.miscNotes#<BR>
+					#component.stpt-org.listAssociatedOrgs#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=60%>
@@ -267,7 +275,7 @@ sub prepare_view_profile
 					#component.stp-org.alerts#<BR>
 					#component.stp-org.insurancePlans#<BR>
 					#component.stpt-org.healthMaintenanceRule#<BR>
-					#component.stpt-org.associatedResourcesStats#<BR>					
+					#component.stpt-org.associatedResourcesStats#<BR>
 					</font>
 				</TD>
 			</TR>
