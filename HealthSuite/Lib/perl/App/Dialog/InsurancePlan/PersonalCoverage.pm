@@ -32,6 +32,7 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
+				new App::Dialog::Field::Person::ID(caption => 'Person ID',types => ['Patient'],	name => 'person_id'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),		
 				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
 				new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/plan_name'),
@@ -193,8 +194,9 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 
-	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);	
-
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);		
+	
+	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if ($page->param('person_id') ne '');
 	#turn guarantor id off if patient is 21 or over
 	if(my $personId = $page->param('person_id'))
 	{
@@ -285,12 +287,13 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	
 	my $productName = $page->field('product_name');
+	my $planName = $page->field('plan_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
+	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
 	my $parentInsId = $planData->{'ins_internal_id'};
 	my $insType = $planData->{'ins_type'};
 	my $editInsIntId = $page->param('ins_internal_id');
-	my $insType = $planData->{'ins_type'};	
+	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 	
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
@@ -299,7 +302,7 @@ sub execute
 				product_name => $page->field('product_name') || undef,
 				plan_name => $page->field('plan_name') || undef,
 				record_type => App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
-				owner_person_id => $page->param('person_id') || undef,
+				owner_person_id => $personId || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
 				bill_sequence => $page->field('bill_sequence') || undef,
 				ins_type => $insType || undef,
