@@ -46,6 +46,7 @@ SDETEST.physia.com =
 SDEDBS04.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = carbon.physia.com)(PORT = 1521))
       (ADDRESS = (PROTOCOL = TCP)(HOST = nitrogen.physia.com)(PORT = 1521))
     )
     (CONNECT_DATA =
