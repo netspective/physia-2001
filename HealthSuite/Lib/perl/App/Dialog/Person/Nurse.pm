@@ -195,6 +195,12 @@ sub initialize
 
 	);
 
+	$self->{activityLog} = {
+		scope =>'person',
+		key => "#field.person_id#",
+		data => "Person '#field.person_id#' <a href='/person/#field.person_id#/profile'>#field.name_first# #field.name_last#</a> as a Nurse"
+	};
+
 	return $self;
 }
 
