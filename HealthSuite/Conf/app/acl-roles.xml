@@ -92,6 +92,9 @@
 		<permission id="Administrator">
 			<allow permission="group/Superuser"/>
 			<deny permission="group/sde" />
+			<deny permission="dlg/org-main/add" />
+			<deny permission="dlg/org-main/update" />
+			<deny permission="dlg/org-main/remove" />
 		</permission>
 	</permissions>
 </accesscontrol>
