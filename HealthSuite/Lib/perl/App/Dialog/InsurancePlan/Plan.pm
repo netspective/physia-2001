@@ -375,12 +375,12 @@ sub execute
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
 
-	$self->handleAttributes($page, $command, $flags, $insIntId, $parentInsId);
+	$self->handleAttributes($page, $command, $flags, $insIntId, $parentInsId, $insOrgId);
 }
 
 sub handleAttributes
 {
-	my ($self, $page, $command, $flags, $insIntId, $parentInsId) = @_;
+	my ($self, $page, $command, $flags, $insIntId, $parentInsId, $insOrgId) = @_;
 
 	$page->schemaAction(
 			'Insurance_Address', $command,
@@ -455,6 +455,7 @@ sub handleAttributes
 		);
 	}
 
+	$page->param('_dialogreturnurl', "/org/$insOrgId/profile");
 	$self->handlePostExecute($page, $command, $flags, undef, "Insurance Plan $command was successful");
 	return '';
 }
