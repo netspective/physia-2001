@@ -1065,7 +1065,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.personnel' => {
 	sqlStmt => qq{
-			select 	p.complete_name, pa.category, pa.person_id, pa.org_internal_id, pa.org_internal_id
+			select 	p.simple_name, pa.category, pa.person_id, pa.org_internal_id
 			from 	person_org_category pa, person p
 			where	pa.org_internal_id =
 				(select org_internal_id
@@ -1073,7 +1073,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 							where owner_org_id = :2 AND
 							org_id = :1
 				)
-				and pa.category in ('Physician', 'Referring-Doctor', 'Nurse', 'Staff', 'Administrator', 'Superuser')
+				and pa.category in ('Physician', 'Nurse', 'Staff', 'Administrator', 'Superuser')
 				and	p.person_id = pa.person_id
 			order by pa.person_id, pa.category, p.complete_name
 		},
@@ -1086,7 +1086,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		bullets => [
 			'/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-personnel/?_f_person_id=#2#&_f_category=#1#&home=/org/#param.org_id#/personnel',
 			{	imgSrc => '/resources/icons/action-edit-update.gif',
-				urlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#4#?home=/org/#param.org_id#/personnel',
+				urlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#param.org_id#/personnel',
 				title => 'Change Password',
 			},
 		],
@@ -1347,7 +1347,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		UNION
 		(select	-1 as value_type, -1 as item_id, '-' as value_text, '-' as value_date,
 			'-', '-', '-', 1 as entity_type
-			from dual			
+			from dual
 		)
 		order by entity_type DESC
 	},
@@ -1360,7 +1360,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		],
 
 		separateDataColIdx => 2,
-		
+
 		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/#7#?home=#homeArl#',
 		frame => {
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -1383,7 +1383,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ 
+				{ caption => qq{
 					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Clearing House Info</A> &nbsp; &nbsp;
 					Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo//0?home=#param.home#'>Individual Clearing House Info</A>
 				}},
