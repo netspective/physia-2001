@@ -63,6 +63,10 @@ sub writeStatementsFile
 	my $now = UnixDate('today', '%m%d%Y_%H%M');
 	my $fileName = 'phy169_' . $now . '.s01';
 	
+	my $headerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-30s%-30s%-20s%-2s%-9s%-16s%-50s%-10s%-7s\n";
+	my $dataFormat = "%1s%-4s%-16s%-10s%-16s%-7s%-7s%-7s%-7s%-7s%429s\n";
+	my $footerFormat = "%1s%-4s%-50s%-30s%-30s%-20s%-2s%-9s%-50s%-50s%-7s%-7s%-7s%-7s%-7s%230s\n";
+	
 	my $fileHandle = new IO::File;
 	open($fileHandle, ">$fileName") || die "Unable to open output file '$fileName': $! \n";
 	
@@ -73,28 +77,30 @@ sub writeStatementsFile
 		
 		$statement->{statementId} = $i++;
 	
-		writeRecord($fileHandle, getHeaderRecord($statement));
+		writeRecord($fileHandle, $headerFormat, getHeaderRecord($statement));
 		
 		for my $invoice (@{$statement->{invoices}})
 		{
-			writeRecord($fileHandle, getDetailRecord($statement, $invoice));
+			writeRecord($fileHandle, $dataFormat, getDetailRecord($statement, $invoice));
 		}
 		
-		writeRecord($fileHandle, getFooterRecord($statement));
+		writeRecord($fileHandle, $footerFormat, getFooterRecord($statement));
 	}
 }
 
 sub writeRecord
 {
-	my ($fileHandle, @record) = @_;
+	my ($fileHandle, $format, @record) = @_;
+	print $fileHandle sprintf($format, @record);
+}
+
+sub numToStr
+{
+	my ($number) = @_;
 	
-	my $numFields = @record -1;
-	for my $i (0..$numFields)
-	{
-		print $fileHandle '"' . $record[$i] . '"';
-		print $fileHandle ',' if $i < $numFields;
-	}
-	print $fileHandle "\n";
+	my $str = sprintf("%08.2f", $number);
+	$str =~ s/\.//g;
+	return $str;
 }
 
 sub getHeaderRecord
@@ -112,7 +118,7 @@ sub getHeaderRecord
 		$statement->{clientId},
 		$statement->{patientName},
 		$TODAY,
-		sprintf($currencyFormat, $statement->{amountDue}),
+		numToStr($statement->{amountDue}),
 	);
 }
 
@@ -126,11 +132,12 @@ sub getDetailRecord
 		$invoice->{invoiceId},
 		$invoice->{invoiceDate},
 		$invoice->{careProviderId},
-		sprintf($currencyFormat, $invoice->{totalCost}),
-		sprintf($currencyFormat, $invoice->{insuranceReceipts}),
-		sprintf($currencyFormat, $invoice->{totalAdjust}),
-		sprintf($currencyFormat, $invoice->{patientReceipts}),
-		sprintf($currencyFormat, $invoice->{balance}),
+		numToStr($invoice->{totalCost}),
+		numToStr($invoice->{insuranceReceipts}),
+		numToStr($invoice->{totalAdjust}),
+		numToStr($invoice->{patientReceipts}),
+		numToStr($invoice->{balance}),
+		' ',
 	);
 }
 
@@ -141,15 +148,15 @@ sub getFooterRecord
 	return (
 		'F',
 		$statement->{statementId},
-		getPersonAddress($statement->{careProviderId}) 
-			|| getPersonAddress($statement->{billingProviderId}),
+		getPersonAddress($statement->{billingProviderId}),
 		'PAYMENT DUE UPON RECEIPT',
 		'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS',
-		sprintf($currencyFormat, $statement->{agingCurrent}),
-		sprintf($currencyFormat, $statement->{aging30}),
-		sprintf($currencyFormat, $statement->{aging60}),
-		sprintf($currencyFormat, $statement->{aging90}),
-		sprintf($currencyFormat, $statement->{aging120}),
+		numToStr($statement->{agingCurrent}),
+		numToStr($statement->{aging30}),
+		numToStr($statement->{aging60}),
+		numToStr($statement->{aging90}),
+		numToStr($statement->{aging120}),
+		' ',
 	);
 }
 
@@ -158,7 +165,15 @@ sub getOrgAddress
 	my ($orgInternalId) = @_;
 	
 	my $org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddress', $orgInternalId);
-	return ($org->{name_primary}, $org->{line1}, $org->{line2}, $org->{city}, $org->{state}, $org->{zip});
+	if (defined $org)
+	{
+		return ($org->{name_primary} || ' ', $org->{line1} || ' ', $org->{line2} || ' ', 
+			$org->{city} || ' ', $org->{state} || ' ', $org->{zip} || ' ');
+	}
+	else
+	{
+		return (' ', ' ', ' ', ' ', ' ', ' ');
+	}
 }
 
 sub getPersonAddress
@@ -166,13 +181,21 @@ sub getPersonAddress
 	my ($personId) = @_;
 	
 	my $person = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_personAddress', $personId);
-	return ($person->{complete_name}, $person->{line1}, $person->{line2}, $person->{city}, $person->{state}, $person->{zip});
+	
+	if (defined $person)
+	{
+		return ($person->{complete_name} || ' ', $person->{line1} || ' ', $person->{line2} || ' ', 
+			$person->{city} || ' ', $person->{state} || ' ', $person->{zip} || ' ');
+	}
+	else
+	{
+		return (' ', ' ', ' ', ' ', ' ', ' ');
+	}
 }
 
 sub getSendToAddress
 {
 	my ($billToId, $billPartyType) = @_;
-
 	return $billPartyType < 2 ? getPersonAddress($billToId) : getOrgAddress($billToId);
 }
 

@@ -59,18 +59,28 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 	
 	'sel_orgAddress' => qq{
-		SELECT name_primary, line1, line2, city, state, zip
+		SELECT name_primary, line1, line2, city, state, replace(zip, '-', null) as zip
 		FROM Org_Address, Org
 		WHERE org_internal_id = :1
 			and Org_Address.parent_id = Org.org_internal_id
 	},
 	
 	'sel_personAddress' => qq{
-		SELECT complete_name, line1, line2, city, State, zip
+		SELECT complete_name, line1, line2, city, State, replace(zip, '-', null) as zip
 		FROM Person_Address, Person
 		WHERE person_id = ?
 			and Person_Address.parent_id = Person.person_id
-	},	
+	},
+	
+	'sel_submittedClaims_perOrg' => qq{
+		select invoice_id
+		from Invoice
+		where invoice_status = @{[ App::Universal::INVOICESTATUS_SUBMITTED]}
+			and cr_org_internal_id = ?
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY]}
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT]}
+		order by invoice_id
+	},
 		
 );
 	
