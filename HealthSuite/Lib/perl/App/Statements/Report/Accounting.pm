@@ -135,6 +135,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND tt.id (+)= i.trans_type
 			AND r.cpt(+)=i.code
 			AND p.person_id = i.provider
+			AND (i.service_begin_date >= to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT') OR :8 is NULL)
+			AND (i.service_end_date <= to_date(:9,'$SQLSTMT_DEFAULTDATEFORMAT') OR :9 is NULL)
 			group by p.simple_name,
 				tt.caption,
 				NVL(i.code,'UNK'),
@@ -529,13 +531,15 @@ aic.batch_id,
 					    (person_pay+insurance_pay+refund)
 					    ) as a_r,
 					to_char(invoice_date,'YYYY') as invoice_year
-				FROM 	invoice_charges,org o
+				FROM 	invoice_charges, org o
 				WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND (facility = :3 OR :3 is NULL)
 				AND (provider =:4 OR :4 is NULL)
 				AND o.org_internal_id = invoice_charges.facility
 				AND o.owner_org_id = :5
+				AND (invoice_charges.service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
+				AND (invoice_charges.service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
 				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 				ORDER BY 13, to_char(invoice_date,'MM')
 		},
@@ -583,6 +587,11 @@ aic.batch_id,
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND 	a.invoice_status <> 15
 			AND	entire_invoice_balance <> 0
+			AND a.invoice_id in 
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+				)			
 			GROUP BY bill_to_id
 			--having sum(total_pending) <> 0
 		},
@@ -636,6 +645,11 @@ aic.batch_id,
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
 			AND	p.person_id (+) = a.person_id
+			AND a.invoice_id in 
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+				)			
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id,
 			p.simple_name
 			having sum(balance)<> 0
@@ -797,6 +811,11 @@ aic.batch_id,
 			 )
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND a.invoice_id in 
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+				)			
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
@@ -853,6 +872,11 @@ aic.batch_id,
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
+			AND a.invoice_id in 
+				(select parent_id from invoice_item ii
+					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+				)			
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
 			having sum(balance)<> 0
 		},
