@@ -8,6 +8,7 @@ var elemPattern_visitTemplate = "mdl/clinical-documentation/templates/template[@
 /* setup global variabls */
 
 var srcLoaded = false;
+var templateLoaded = false;
 var fieldDefns = null;
 var templates = null;
 var activeTemplate = null;
@@ -23,15 +24,25 @@ function ConditionalFieldInfo(fieldId, fieldDefn)
 	this.fieldDefn = fieldDefn;
 }
 
-function loadSource(srcFileName)
+function loadSource(srcFileName, templateFileName)
 {
 	/* load data */
 
+	var templateDoc;
 	var srcDoc = new ActiveXObject("Microsoft.XMLDOM");
 	srcDoc.async = false;
+	
 	if(! srcDoc.load(srcFileName))
 	{
-		alert("Unable to load " + srcFileName + ".");
+		var alertMsg;
+		
+		if (arguments.length == 2) {
+			alertMsg = "Unable to load data dictionary from " + srcFileName + "...";
+		} else {
+			alertMsg = "Unable to load " + srcFileName + "...";
+		}
+
+		alert(alertMsg);
 		return false;
 	}
 
@@ -39,8 +50,26 @@ function loadSource(srcFileName)
 
 	srcLoaded = true;
 	fieldDefns = srcDoc.selectSingleNode(elemPattern_fieldDefns);
-	templates = srcDoc.selectSingleNode(elemPattern_templates);
-	activeTemplate = srcDoc.selectSingleNode(elemPattern_visitTemplate);
+
+	if (arguments.length == 2) {
+		templateDoc = new ActiveXObject("Microsoft.XMLDOM");
+		templateDoc.async = false;
+
+		if(! templateDoc.load(templateFileName))
+		{
+			alert("Unable to load templates from " + templateFileName + ".");
+			return false;
+		}
+		
+		templateLoaded = true;
+
+		templates = templateDoc.selectSingleNode(elemPattern_templates);
+		activeTemplate = templateDoc.selectSingleNode(elemPattern_visitTemplate);
+	} else {
+		templates = srcDoc.selectSingleNode(elemPattern_templates);
+		activeTemplate = srcDoc.selectSingleNode(elemPattern_visitTemplate);
+	}
+
 	fieldControlMap = new Array(); 
 	fieldGroupNormalsMap = new Array();
 	fieldOptionsCache = new Array();
