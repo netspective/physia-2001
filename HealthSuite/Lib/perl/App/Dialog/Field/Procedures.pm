@@ -31,6 +31,7 @@ sub new
 	$params{type} = 'procedures';
 	$params{lineCount} = 4 unless exists $params{count};
 	$params{allowComments} = 1 unless exists $params{allowComments};
+	$params{allowQuickRef} = 0 unless exists $params{allowQuickRef};
 
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -354,7 +355,7 @@ sub getHtml
 		}
 	}
 
-	my ($dialogName, $lineCount, $allowComments, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
+	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
@@ -441,6 +442,31 @@ sub getHtml
 		</TR>
 	} if $lineZeroErrMsgs;
 
+	my $quickRefHtml = qq{
+			<TD>
+				<TABLE CELLSPACING=0 CELLPADDING=2 BORDER=1>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My ICDs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_myproc_diags_static" >@{[ $icdPerHtml ]} </SELECT></NOBR></TD>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our ICDs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_diags_static" >@{[ $icdOrgHtml ]} </SELECT></NOBR></TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My CPTs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_myproc_cpts_static" >@{[ $cptPerHtml ]} </SELECT></NOBR></TD>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our CPTs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_cpts_static" >@{[ $cptOrgHtml ]} </SELECT></NOBR></TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD COLSPAN=2><FONT $textFontAttrs>Service Places/Types</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_places_static" >@{[ $placeHtml ]} </SELECT></NOBR>
+						<NOBR><SELECT SIZE=5 NAME="_f_types_static" >@{[ $serviceTypeHtml ]} </SELECT></NOBR>
+						</TD>
+					</TR>
+				</TABLE>
+			</TD>
+	} if $allowQuickRef;
+
 	my $removeHd = $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
 	return qq{
 		<TR valign=top $bgColorAttr>
@@ -484,28 +510,7 @@ sub getHtml
 					$linesHtml
 				</TABLE>
 			</TD>
-			<TD>
-				<TABLE CELLSPACING=0 CELLPADDING=2 BORDER=1>
-					<TR VALIGN=TOP>
-						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My ICDs</FONT><BR>
-						<NOBR><SELECT SIZE=5 NAME="_f_myproc_diags_static" >@{[ $icdPerHtml ]} </SELECT></NOBR></TD>
-						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our ICDs</FONT><BR>
-						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_diags_static" >@{[ $icdOrgHtml ]} </SELECT></NOBR></TD>
-					</TR>
-					<TR VALIGN=TOP>
-						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My CPTs</FONT><BR>
-						<NOBR><SELECT SIZE=5 NAME="_f_myproc_cpts_static" >@{[ $cptPerHtml ]} </SELECT></NOBR></TD>
-						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our CPTs</FONT><BR>
-						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_cpts_static" >@{[ $cptOrgHtml ]} </SELECT></NOBR></TD>
-					</TR>
-					<TR VALIGN=TOP>
-						<TD BGCOLOR=#DDDDDD COLSPAN=2><FONT $textFontAttrs>Service Places/Types</FONT><BR>
-						<NOBR><SELECT SIZE=5 NAME="_f_places_static" >@{[ $placeHtml ]} </SELECT></NOBR>
-						<NOBR><SELECT SIZE=5 NAME="_f_types_static" >@{[ $serviceTypeHtml ]} </SELECT></NOBR>
-						</TD>
-					</TR>
-				</TABLE>
-			</TD>
+			$quickRefHtml
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
 		</TR>
 	};
