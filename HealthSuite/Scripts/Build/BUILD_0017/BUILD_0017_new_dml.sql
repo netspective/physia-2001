@@ -48,5 +48,9 @@ select
 	value_dateb
 from Invoice_Attribute where item_name = 'Invoice/History/Item';
 
+prompt Add new attribute value type
+
+insert into Attribute_Value_Type (id, caption, dialog_params, group_name, remarks) values (560, 'Board Certification', 'type="text"', 'Certificate', 'This is the board name assigned to a provider code');
+
 
 commit;
