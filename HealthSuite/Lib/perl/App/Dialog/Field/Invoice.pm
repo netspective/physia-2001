@@ -864,11 +864,11 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $payType = $page->field('pay_type');
-	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY;
+	my $paidBy = $page->param('paidBy');
+	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal';
 
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $clientId = $page->field('client_id');
-	my $paidBy = $page->param('paidBy');
 	my $totalPayRcvd = $page->field('check_amount') || $page->field('total_amount');
 	my $totalAmtApplied = 0;
 	my $totalInvoiceBalance = 0;
