@@ -12,7 +12,6 @@ use App::Dialog::Field::Person;
 use App::Dialog::Field::Address;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::Association;
-
 use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
@@ -58,6 +57,7 @@ sub initialize
 							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor']),
 							new CGI::Dialog::Field(caption => ' Self', type => 'bool', style => 'check', name => 'resp_self'),
 						]),
+		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Self', options => FLDFLAG_REQUIRED),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -170,6 +170,14 @@ sub customValidate
 		{
 			$relationship->invalidate($page, "Please provide either '$relationship->{caption}' or '$relationSelf->{caption}'");
 		}
+	}
+	if ($page->field('party_name') && $page->field('rel_type') eq'Self')
+	{
+		$relationship->invalidate($page, "Select 'Relationship' otherthan 'Self' when there is a 'Responsible Party'");
+	}
+	elsif($page->field('resp_self') && $page->field('rel_type') ne'Self')
+	{
+		$relationSelf->invalidate($page, "Should select 'Relationship' as 'Self' when 'Self' is selected as 'Responsible Party'");
 	}
 }
 
