@@ -601,10 +601,10 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	'del_worklist_orgvalue' => qq{
 		delete from Person_Attribute
 		where 
-			parent_id = ?
-			and parent_org_id = ?
+			parent_id = :1
+			and parent_org_id = :2
 			and value_type = $RESOURCE_ORG_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Org'
+			and item_name = :3
 	},
 	'del_worklist_textvalue' => qq{
 		delete from Person_Attribute
@@ -614,53 +614,54 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	},
 	'del_worklist_associated_physicians' => qq{
 		delete from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Physician'
+			and item_name = :3
 	},
 
 	'sel_worklist_available_products' => qq{
-	select i.ins_internal_id as product_id, product_name 
-		from insurance i, org where record_type = 1
-		AND	i.owner_org_id = org.org_internal_id
-		AND	org.owner_org_id = ?
+		select i.ins_internal_id as product_id, product_name 
+		from insurance i, org 
+		where record_type = 1
+			AND	i.owner_org_id = org.org_internal_id
+			AND	org.owner_org_id = :1
 		order by product_name
 	},
 	'sel_worklist_associated_products' => qq{
 		select pa.value_int as product_id, i.product_name
 		from Person_Attribute pa, Insurance i
 		where 
-			parent_id = ?
-			and parent_org_id = ?
+			parent_id = :1
+			and parent_org_id = :2
 			and i.ins_internal_id = pa.value_int
 			and pa.value_type = $INT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Product'
+			and item_name = :3
 		order by i.product_name
 	},
 	'sel_worklist_all_products' =>qq{
 		select 	pa.value_int 
 		FROM 	Person_Attribute pa
 		WHERE	pa.value_type = $INT_VALUE_TYPE
-		AND	item_name = 'WorkList-Collection-Setup-Product'
+		AND	item_name = :3
 		AND	parent_id = :1
 		AND	parent_org_id = :2
 		AND	value_int = -1
 	},
 	'del_worklist_associated_products' => qq{
 		delete from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $INT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Product'
+			and item_name = :3
 	},
 
 	'del_worklist_lastname_range' => qq{
 		delete from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $TEXT_VALUE_TYPE
-			and item_name = 'WorkListCollectionLNameRange'
+			and item_name = :3
 	},
 	'sel_worklist_lastname_range' => qq{
 		select value_text, value_textB as lnameto
@@ -670,34 +671,42 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			and value_type = $TEXT_VALUE_TYPE
 			and item_name = 'WorkListCollectionLNameRange'
 	},
+	'sel_worklist_lastname_range2' => qq{
+		select value_text, value_textB as lnameto
+		from Person_Attribute
+		where parent_id = :1
+			and parent_org_id = :2 
+			and value_type = $TEXT_VALUE_TYPE
+			and item_name = :3
+	},
 	'del_worklist_balance_age_range' => qq{
 		delete from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $INT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-BalanceAge-Range'
+			and item_name = :3
 	},
 	'sel_worklist_balance_age_range' => qq{
 		select value_int, value_intB as balance_age_to from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $INT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-BalanceAge-Range'
+			and item_name = :3
 	},
 	'del_worklist_balance_amount_range' => qq{
 		delete from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $FLOAT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-BalanceAmount-Range'
+			and item_name = :3
 	},
 	'sel_worklist_balance_amount_range' => qq{
 		select value_float, value_floatB as balance_amount_to
 		from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $FLOAT_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-BalanceAmount-Range'
+			and item_name = :3
 	},
 	'sel_worklist_person_assoc' => qq{
 		select value_text as resource_id
@@ -719,6 +728,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				and value_type = $PERSON_ASSOC_VALUE_TYPE
 				and item_name = 'WorkList-Collection-Setup-Physician')
 	},
+	
 	'sel_worklist_available_physicians' => qq{
 		select distinct p.person_id, p.complete_name,p.name_last
 		from person p, person_org_category pcat
@@ -727,16 +737,19 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			and category='Physician'
 		order by p.name_last
 	},
+	
 	'sel_worklist_associated_physicians' => qq{
 		select pa.value_text as person_id, p.complete_name,p.name_last
 		from Person_Attribute pa, Person p
 		where 
-			parent_id = ?
+			parent_id = :1
 			and p.person_id = pa.value_text
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Physician'
+			and item_name = :2
 		order by p.name_last
 	},
+	
+	
 	'sel_worklist_text' => qq{
 		select value_text as resource_id
 		from Person_Attribute
@@ -754,10 +767,10 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	'sel_worklist_facilities' => qq{
 		select value_text as facility_id
 		from Person_Attribute
-		where parent_id = ?
-			and parent_org_id = ?
+		where parent_id = :1
+			and parent_org_id = :2
 			and value_type = $RESOURCE_ORG_VALUE_TYPE
-			and item_name = 'WorkList-Collection-Setup-Org'
+			and item_name = :3
 	},
 	'selPhysicianFromOrg' => qq{
 		select distinct p.person_id, p.complete_name from person p, person_org_category pcat
@@ -774,6 +787,25 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			and item_name = ?
 		order by column_no
 	},
+	
+	'sel_claim_statuses' => qq{
+		select id, caption from Invoice_Status order by id
+	},
+	
+	'sel_worklist_claim_status' => qq{
+		select value_int as status_id
+		from Person_Attribute
+		where parent_id = :1
+			and parent_org_id = :2
+			and item_name = :3
+	},
+	
+	'del_worklist_claim_status' => qq{
+		delete from Person_Attribute
+		where parent_id = :1
+			and parent_org_id = :2
+			and item_name = :3
+	}
 );
 
 1;

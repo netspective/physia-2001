@@ -106,7 +106,7 @@ sub prepare_view_setup
 {
 	my ($self) = @_;
 	
-	my $dialog = new App::Dialog::CollectionSetup(schema => $self->{schema});
+	my $dialog = new App::Dialog::WorklistSetup::Collection(schema => $self->{schema});
 	$self->addContent('<br>');
 	$dialog->handle_page($self, 'add');
 	return 1;

@@ -140,7 +140,7 @@ foreach my $report (@reports)
 					};
 		/P020/		and do {
 						$message = "Payer Accepted Claim";
-						$status = App::Universal::INVOICESTATUS_AWAITPAYMENT;
+						$status = App::Universal::INVOICESTATUS_AWAITINSPAYMENT;
 						last;
 					};
 		/P030/		and do {
@@ -150,7 +150,7 @@ foreach my $report (@reports)
 					};
 		/P031/		and do {
 						$message = "Payer Returned Warning";
-						$status = App::Universal::INVOICESTATUS_AWAITPAYMENT;
+						$status = App::Universal::INVOICESTATUS_AWAITINSPAYMENT;
 						last;
 					};
 		/P040/		and do {
@@ -259,7 +259,6 @@ sub changeInvoiceStatus
 	return $page->schemaAction(0, 'Invoice', 'update', 
 		invoice_id => $invoice,
 		invoice_status => $status,
-		flags => App::Universal::INVOICESTATUS_INTNLREJECT || App::Universal::INVOICESTATUS_EXTNLREJECT 
-				|| App::Universal::INVOICESTATUS_AWAITPAYMENT ? 0 : $invoiceInfo->{flags},
+		flags => App::Universal::INVOICESTATUS_AWAITINSPAYMENT ? 0 : $invoiceInfo->{flags},
 	);
 }

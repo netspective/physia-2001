@@ -13,63 +13,15 @@ use App::Statements::Org;
 
 use Date::Manip;
 
-use vars qw(@ISA %RESOURCE_MAP @ITEM_TYPES @EXPORT
-	%PATIENT_URLS
-	%PHYSICIAN_URLS
-	%ORG_URLS
-	%APPT_URLS
-	$patientDefault
-	$physicianDefault
-	$orgDefault
-	$apptDefault
-);
+use vars qw(%RESOURCE_MAP);
 
-@ISA = qw(CGI::Dialog);
+use base qw(CGI::Dialog);
 
-%RESOURCE_MAP = (
-	'wl-collection-setup' => {},
-);
+%RESOURCE_MAP = ();
 
-@ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
-
-%PATIENT_URLS = (
-	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
-	'View Chart' => {arl => '/person/itemValue/chart', title => 'View Chart'},
-	'View Account' => {arl => '/person/itemValue/account', title => 'View Account'},
-	'Make Appointment' => {arl => '/worklist/patientflow/dlg-add-appointment/itemValue', title => 'Make Appointment'},
-);
-
-%PHYSICIAN_URLS = (
-	'View Profile' => {arl => '/person/itemValue/profile', title => 'View Profile'},
-	'View Schedule' => {arl => '/schedule/apptcol/itemValue', title => 'View Schedule'},
-	'Add Template' => {arl => '/worklist/patientflow/dlg-add-template/itemValue', title => 'Add Schedule Template'},
-);
-
-%ORG_URLS = (
-	'View Profile' => {arl => '/org/itemValue/profile', title => 'View Profile'},
-	'View Fee Schedules' => {arl => '/org/itemValue/catalog', title => 'View Fee Schedules'},
-);
-
-%APPT_URLS = (
-	'Reschedule' => {arl => '/worklist/patientflow/dlg-reschedule-appointment/itemValue', title => 'Reschedule Appointment'},
-	'Cancel' => {arl => '/worklist/patientflow/dlg-cancel-appointment/itemValue', title => 'Cancel Appointment'},
-	'No-Show' => {arl => '/worklist/patientflow/dlg-noshow-appointment/itemValue', title => 'No-Show Appointment'},
-	'Update' => {arl => '/worklist/patientflow/dlg-update-appointment/itemValue', title => 'Update Appointment'},
-);
-
-$patientDefault = 'View Profile';
-$physicianDefault = 'View Profile';
-$orgDefault = 'View Profile';
-$apptDefault = 'Update';
-
-@EXPORT = qw(%PATIENT_URLS %PHYSICIAN_URLS %ORG_URLS %APPT_URLS @ITEM_TYPES);
-
-sub new
+sub initialize
 {
-	my $self = CGI::Dialog::new(@_, id => 'worklistCollectionSetup',
-	heading => 'Collection Worklist Setup',
-	headColor => "LIGHTSTEELBLUE",
-	);
+	my $self = shift;
 
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
@@ -83,7 +35,6 @@ sub new
 		caption => '',
 		multiDualCaptionLeft => 'Available Physicians',
 		multiDualCaptionRight => 'Selected Physicians',
-		width => '150',
 		size => '5',
 		fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
 		fKeyStmt => 'sel_worklist_available_physicians',
@@ -99,39 +50,9 @@ sub new
 		multiDualCaptionLeft => 'Available Facilities',
 		multiDualCaptionRight => 'Selected Facilities',		
 		type => 'select',
-		width => '150',
 		size => '5',
-		#hints => 'Choose one or more Facilities to monitor.'
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
-
-	my $patientSelOptions;
-	for my $key (reverse sort(keys %PATIENT_URLS))
-	{
-		#$patientSelOptions .= "$key:$PATIENT_URLS{$key}->{arl},";
-		$patientSelOptions .= "$key:$key,";
-	}
-
-	my $physSelOptions;
-	for my $key (reverse sort(keys %PHYSICIAN_URLS))
-	{
-		#$physSelOptions .= "$key:$PHYSICIAN_URLS{$key}->{arl},";
-		$physSelOptions .= "$key:$key,";
-	}
-
-	my $orgSelOptions;
-	for my $key (reverse sort(keys %ORG_URLS))
-	{
-		#$orgSelOptions .= "$key:$ORG_URLS{$key}->{arl},";
-		$orgSelOptions .= "$key:$key,";
-	}
-
-	my $apptSelOptions;
-	for my $key (reverse sort(keys %APPT_URLS))
-	{
-		#$apptSelOptions .= "$key:$APPT_URLS{$key}->{arl},";
-		$apptSelOptions .= "$key:$key,";
-	}
 
 	$self->addContent(		
 
@@ -142,26 +63,25 @@ sub new
 		$facilitiesField,
 
 		new CGI::Dialog::Subhead(heading => 'Insurance Providers'),
-			new CGI::Dialog::Field(type => 'select',
-							defaultValue=>'0', 
-							selOptions=>"Selected:0;All:1", 
-							name => 'product_select', 
-							caption => 'Products',
-							onChangeJS => qq{showFieldsOnValues(event, [0], ['products']);}),					
-			new CGI::Dialog::Field(
-				name => 'products',
-				style => 'multidual',
-				type => 'select',
-				caption => '',
-				multiDualCaptionLeft => 'Available Products',
-				multiDualCaptionRight => 'Selected Products',
-				width => '150',
-				size => '5',
-				fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
-				fKeyStmt => 'sel_worklist_available_products',
-				fKeyStmtBindSession => ['org_internal_id'],
-				hints => ''
-			),							
+		new CGI::Dialog::Field(type => 'select',
+			defaultValue=>'0', 
+			selOptions=>"Selected:0;All:1", 
+			name => 'product_select', 
+			caption => 'Products',
+			onChangeJS => qq{showFieldsOnValues(event, [0], ['products']);}),
+		new CGI::Dialog::Field(
+			name => 'products',
+			style => 'multidual',
+			type => 'select',
+			caption => '',
+			multiDualCaptionLeft => 'Available Products',
+			multiDualCaptionRight => 'Selected Products',
+			size => '5',
+			fKeyStmtMgr => $STMTMGR_WORKLIST_COLLECTION,
+			fKeyStmt => 'sel_worklist_available_products',
+			fKeyStmtBindSession => ['org_internal_id'],
+			hints => ''
+		),							
 
 		new CGI::Dialog::Subhead(heading => 'Patients Last Name'),
 		new CGI::Dialog::MultiField(caption =>'Enter range:',
@@ -229,10 +149,7 @@ sub new
 					minValue=>1,					
 				),
 			]),
-
 	);
-
-	$self->addFooter(new CGI::Dialog::Buttons);
 
 	return $self;
 }
@@ -246,13 +163,16 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
+
 	my $userId =  $page->session('user_id');
 	my $sessOrgId = $page->session('org_internal_id');
+	my $itemNamePrefix = $page->property('itemNamePrefix');
 	
 	#Check if the all products option was selected if so get all products move to list
 	#if so hide the product list box
-	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId);
+	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 
+		'sel_worklist_all_products', $userId, $sessOrgId, $itemNamePrefix . '-Product');
+		
 	if($productsAll->{value_int} == -1)
 	{
 		$self->addPostHtml(
@@ -275,9 +195,11 @@ sub populateData
 	my $userId =  $page->session('user_id');
 	my $sessOrgId = $page->session('org_internal_id');
 
+	my $itemNamePrefix = $page->param('itemNamePrefix');
+	
 	# Populate the selected physicians
 	my $physicianList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_associated_physicians', $userId);
+		STMTMGRFLAG_NONE, 'sel_worklist_associated_physicians', $userId,  $itemNamePrefix . '-Physician');
 	my @physicians = ();
 	for (@$physicianList)
 	{
@@ -286,26 +208,26 @@ sub populateData
 	$page->field('physician_list', @physicians);
 
 	#Get products
-	
 	#Check if the all products option was selected if so get all products move to list
 	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId);
+		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId, $itemNamePrefix . '-Product');
 	if($productsAll->{value_int} == -1)
 	{
-		$page->field('product_select',1);
+		$page->field('product_select', 1);
 		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 			STMTMGRFLAG_NONE, 'sel_worklist_available_products',  $sessOrgId);
 		my @products = ();
 		for (@$productsList)
 		{
-	#		push(@products, $_->{product_id});
+			#push(@products, $_->{product_id});
 		}
 		$page->field('products', @products);		
 	}
 	else
 	{
 		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-			STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId);
+			STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId, 
+			$itemNamePrefix . '-Product');
 		my @products = ();
 		for (@$productsList)
 		{
@@ -313,9 +235,10 @@ sub populateData
 		}
 		$page->field('products', @products);
 	}
+	
 	# Populate the selected facilities
 	my $facilityList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $userId, $sessOrgId);
+		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $userId, $sessOrgId, $itemNamePrefix . '-Org');
 	my @facilities = ();
 	for (@$facilityList)
 	{
@@ -323,40 +246,21 @@ sub populateData
 	}
 	$page->field('facility_list', @facilities);
 
-	for my $itemType (@ITEM_TYPES)
-	{
-		my $name = $itemType . 'OnSelect';
-
-		if ($page->session($name))
-		{
-			$page->field($name, $page->session($name));
-		}
-		else
-		{
-			my $itemName = 'WorklistCollection/' . "\u$itemType" . '/OnSelect';
-			my $preference = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE,
-				'selSchedulePreferences', $userId, $itemName);
-
-			if (my $itemUrl = $preference->{resource_id})
-			{
-				$page->session($name, $itemUrl);
-				$page->field($name, $itemUrl);
-			}
-		}
-	}
-
 	my $LastNameRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_lastname_range', $userId, $sessOrgId);
+		STMTMGRFLAG_NONE, 'sel_worklist_lastname_range2', $userId, $sessOrgId,
+		$page->param('wl_LNameRange'));
 	$page->field('LastNameFrom', $LastNameRange->{value_text});
 	$page->field('LastNameTo', $LastNameRange->{lnameto});
 
 	my $BalanceAgeRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_balance_age_range', $userId, $sessOrgId);
+		STMTMGRFLAG_NONE, 'sel_worklist_balance_age_range', $userId, $sessOrgId,
+		$itemNamePrefix . '-BalanceAge-Range');
 	$page->field('BalanceAgeMin', $BalanceAgeRange->{value_int});
 	$page->field('BalanceAgeMax', $BalanceAgeRange->{balance_age_to});
 
 	my $BalanceAmountRange = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_balance_amount_range', $userId, $sessOrgId);
+		STMTMGRFLAG_NONE, 'sel_worklist_balance_amount_range', $userId, $sessOrgId,
+		$itemNamePrefix . '-BalanceAmount-Range');
 	$page->field('BalanceAmountMin', $BalanceAmountRange->{value_float});
 	$page->field('BalanceAmountMax', $BalanceAmountRange->{balance_amount_to});
 }
@@ -369,21 +273,16 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $userId =  $page->session('user_id');
+	my $userId = $page->session('user_id');
 	my $orgId =  $page->session('org_id') || undef;
-	my $orgIntId = undef;
-	if ($orgId)
-	{
-		$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);	
-	}
-	else 
-	{
-		$orgIntId = undef;	
-	}
 
+	my $orgIntId = $orgId ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+		$page->session('org_internal_id'), $orgId) : undef;
+
+	my $itemNamePrefix = $page->param('itemNamePrefix');
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_associated_physicians', $userId, $orgIntId);
+		'del_worklist_associated_physicians', $userId, $orgIntId, $itemNamePrefix . '-Physician');
 	my @physicians = $page->field('physician_list');
 	for (@physicians)
 	{
@@ -393,14 +292,14 @@ sub execute
 			parent_id => $userId,
 			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
-			item_name => 'WorkList-Collection-Setup-Physician',
+			item_name => $itemNamePrefix . '-Physician',
 			value_text => $_,
 			_debug => 0
 		);
 	}
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_orgvalue', $userId, $orgIntId);
+		'del_worklist_orgvalue', $userId, $orgIntId, $itemNamePrefix . '-Org');
 	my @facilities = $page->field('facility_list');
 	for (@facilities)
 	{
@@ -410,14 +309,14 @@ sub execute
 			parent_id => $userId,
 			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
-			item_name => 'WorkList-Collection-Setup-Org',
+			item_name => $itemNamePrefix . '-Org',
 			value_text => $_,
 			_debug => 0
 		);
 	}
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_associated_products', $userId, $orgIntId);
+		'del_worklist_associated_products', $userId, $orgIntId, $itemNamePrefix . '-Product');
 	if($page->field('product_select'))
 	{
 		$page->schemaAction(
@@ -426,7 +325,7 @@ sub execute
 			parent_id => $userId,
 			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_INTEGER || undef,
-			item_name => 'WorkList-Collection-Setup-Product',
+			item_name => $itemNamePrefix . '-Product',
 			value_int => -1,
 			_debug => 0
 		);
@@ -442,17 +341,16 @@ sub execute
 				parent_id => $userId,
 				parent_org_id => $orgIntId,
 				value_type => App::Universal::ATTRTYPE_INTEGER || undef,
-				item_name => 'WorkList-Collection-Setup-Product',
+				item_name => $itemNamePrefix . '-Product',
 				value_int => $_,
 				_debug => 0
 			);
 		}
 	}
 
-
 	# Add the Last-name range preference
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_lastname_range', $userId, $orgIntId);
+		'del_worklist_lastname_range', $userId, $orgIntId, $page->param('wl_LNameRange'));
 	my $strLastNameFrom = $page->field('LastNameFrom');
 	my $strLastNameTo = $page->field('LastNameTo');
 	$strLastNameFrom =~ s/\s+//g;
@@ -468,7 +366,7 @@ sub execute
 		parent_id => $userId,
 		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_TEXT,,
-		item_name => 'WorkListCollectionLNameRange',
+		item_name => $page->param('wl_LNameRange'),
 		value_text => $strLastNameFrom,
 		value_textB => $strLastNameTo,
 		_debug => 0
@@ -476,7 +374,7 @@ sub execute
 
 	# Update balance age
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_balance_age_range', $userId, $orgIntId);
+		'del_worklist_balance_age_range', $userId, $orgIntId, $itemNamePrefix . '-BalanceAge-Range');
 	my $intMinAge = $page->field('BalanceAgeMin');
 	my $intMaxAge = $page->field('BalanceAgeMax');
 	if (length $intMinAge == 0)
@@ -493,7 +391,7 @@ sub execute
 		parent_id => $userId,
 		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_INTEGER,,
-		item_name => 'WorkList-Collection-Setup-BalanceAge-Range',
+		item_name => $itemNamePrefix . '-BalanceAge-Range',
 		value_int => $intMinAge,
 		value_intB => $intMaxAge,
 		_debug => 0
@@ -501,7 +399,7 @@ sub execute
 
 	# Update balance amount range
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_balance_amount_range', $userId, $orgIntId);
+		'del_worklist_balance_amount_range', $userId, $orgIntId, $itemNamePrefix . '-BalanceAmount-Range');
 	my $intMinAmount = $page->field('BalanceAmountMin');
 	my $intMaxAmount = $page->field('BalanceAmountMax');
 	if (length $intMinAmount == 0)
@@ -518,13 +416,11 @@ sub execute
 		parent_id => $userId,
 		parent_org_id => $orgIntId,
 		value_type => App::Universal::ATTRTYPE_FLOAT,,
-		item_name => 'WorkList-Collection-Setup-BalanceAmount-Range',
+		item_name => $itemNamePrefix . '-BalanceAmount-Range',
 		value_float => $intMinAmount,
 		value_floatB => $intMaxAmount,
 		_debug => 0
 	);
-
-	$self->handlePostExecute($page, $command, $flags, '/worklist/collection');
 }
 
 sub customValidate

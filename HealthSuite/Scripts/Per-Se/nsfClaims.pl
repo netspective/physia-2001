@@ -121,7 +121,8 @@ sub transmitNSFfiles
 		return;
 	}
 	
-	$ftpCommands .= qq{bye
+	$ftpCommands .= qq{dir
+		bye
 	!!!
 	};
 

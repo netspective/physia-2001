@@ -59,7 +59,7 @@
 		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
 		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
 		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
-		<column name="owner_id" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
+		<column name="owner_id" indexed="yes" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
 		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
 		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
 		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
