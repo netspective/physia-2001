@@ -12,9 +12,7 @@ use strict;
 use Carp;
 use App::Billing::Driver;
 require App::Billing::Locale::USCodes;
-use Devel::ChangeLog;
 
-use vars qw(@CHANGELOG);
 
 use constant VALIDATORFLAGS_DEFAULT => 0;
 use constant GREATER => 7;
@@ -877,32 +875,5 @@ sub getDiagnosisPtr
 	return $ptr;
 
 }
-
-
-
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/23/1999', 'AUF',
-	'Billing Interface/Validator.pm',
-	'App::Billing::Locale::USCodes class has now been introduced and its functions are used in ' . 
-	'functions checkValidAddress and checkValidTelephoneNo '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'AUF',
-	'Billing Interface/Validator.pm',
-	'Function getZipCodes has been replaced with getAreaCodes in checkValidTelephoneNo function'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/01/2000', 'AUF',
-	'Billing Interface/Validator.pm',
-	'Function getDiagnosisPtr has been added which returs diagnosis code pointer on the basis of diagnosis code'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/05/2000', 'AUF',
-	'Billing Interface/Validator.pm',
-	'Now Locale::USCodes is being used as a package rather then a module'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/10/2000', 'AUF',
-	'Billing Interface/Validator.pm',
-	'Modification in checkValidValues is done, now it will trap any character or word outside the given list'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/12/2000', 'AUF',
-	'Billing Interface/Validator.pm',
-	'A new parmeter has been added in checkValidValues method and its value could be either CHECK_EXACT_VALUES or CHECK_CHARACTERS']
-);
 
 1;
