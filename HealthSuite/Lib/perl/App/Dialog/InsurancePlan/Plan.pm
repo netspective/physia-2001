@@ -206,8 +206,8 @@ sub populateData_update
 
 	# Populating the fields while updating the dialog
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
-
 	my $insIntId = $page->param('ins_internal_id');
+
 	if(! $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId))
 	{
 		$page->addError("Ins Internal ID '$insIntId' not found.");
@@ -255,16 +255,17 @@ sub execute
 	my $parentInsId = $recordData->{'ins_internal_id'};
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $insType = $recordData->{'ins_type'};
-
+	my $insOrgId = $page->field('ins_org_id');
+	my $planName = $page->field('plan_name');
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
 				ins_internal_id => $editInsIntId || undef,
 				parent_ins_id => $parentInsId || undef,
 				product_name => $productName || undef,
-				plan_name => $page->field('plan_name') || undef,
+				plan_name => $planName || undef,
 				record_type => App::Universal::RECORDTYPE_INSURANCEPLAN || undef,
 				owner_org_id => $page->param('org_id') || undef,
-				ins_org_id => $page->field('ins_org_id') || undef,
+				ins_org_id => $insOrgId || undef,
 				ins_type => $insType || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,
 				coverage_end_date => $page->field('coverage_end_date') || undef,
@@ -278,6 +279,12 @@ sub execute
 				remit_payer_name => $page->field('remit_payer_name') || undef,
 				_debug => 0
 			);
+
+	if ($command eq 'update')
+	{
+		my $insIntId = $page->param('ins_internal_id');
+		my $updateData = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selUpdateCoverage', $insOrgId, $productName, $planName, $insIntId);
+	}
 
 	$insIntId = $command eq 'add' ? $insIntId : $editInsIntId;
 
