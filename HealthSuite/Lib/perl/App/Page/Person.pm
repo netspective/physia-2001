@@ -221,6 +221,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-add-referral?home=$homeArl">Add Service Request</OPTION>
 			<OPTION value="/person/$personId/dlg-add-appointment?_dialogreturnurl=/person/$personId">Schedule Appointment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl">Add Claim</OPTION>
+			<OPTION value="/person/$personId/dlg-add-claim?home=$homeArl&isHosp=1">Add Hospital Claim</OPTION>
 			<OPTION value="/person/$personId/dlg-add-invoice?home=$homeArl">Add Invoice</OPTION>
 			<OPTION value="/person/$personId/dlg-update-$updateCategory?home=$homeArl">Edit Profile</OPTION>
 			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
