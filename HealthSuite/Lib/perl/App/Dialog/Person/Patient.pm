@@ -256,7 +256,7 @@ sub execute_add
 		_debug => 0
 		) if $page->field('chart_number') ne '';
 
-	$self->handleContactInfo($page, $command, $flags, 'patient');
+	$self->handleContactInfo($page, $command, $flags, 'Patient');
 }
 
 sub execute_update
