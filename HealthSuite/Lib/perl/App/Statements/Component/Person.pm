@@ -960,7 +960,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				SELECT 	b.org_id
 				FROM org b
 				WHERE b.org_internal_id = i.ins_org_id
-			) AS org_id
+			) AS org_id,
+			(
+				SELECT 	g.org_id
+				FROM org g
+				WHERE guarantor_type = @{[App::Universal::GUARANTOR_ORG]}
+				AND  g.org_internal_id = i.guarantor_id
+
+			)
 		FROM insurance i
 		WHERE record_type = 3
 		AND owner_person_id = ?
@@ -975,7 +982,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				colIdx => 15,
 				dataFmt => {
 					'0' => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party)',
-					'1' => '<A HREF = "/org/#14#/profile">#12#</A> (Third Party)',
+					'1' => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party)',
 					''  => '<A HREF = "/org/#7#/profile">#16#</A>(#5# #13#): #4#, #2#',
 				},
 			},
