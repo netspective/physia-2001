@@ -1564,9 +1564,9 @@ sub storeInsuranceInfo
 	my $ptEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDPART;		#221
 	my $selfEmployAttr = App::Universal::ATTRTYPE_SELFEMPLOYED;		#222
 	my $retiredAttr = App::Universal::ATTRTYPE_RETIRED;				#223
-	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;		#224
+	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;			#224
 	my $ptStudentAttr = App::Universal::ATTRTYPE_STUDENTPART;		#225
-	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
+	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;		#226
 
 	my $clientId = $invoice->{client_id};
 	my $billingId = $invoice->{billing_id};
@@ -2212,9 +2212,48 @@ sub customValidate
 			#$field->invalidate($page, $html);
 		}
 	}
+	
+	explosionCodeValidate($self, $page);
 }
 
+sub explosionCodeValidate
+{
+	my ($self, $page) = @_;
 
+	my $sessOrgIntId = $page->session('org_internal_id');
+
+	#VALIDATION OF FEE SCHED RESULTS FOR CHILDREN OF EXPLOSION CODES
+
+	my $cptCode = $page->field('procedure');
+	my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
+	if($miscProcChildren->[0]->{code})
+	{
+		my $servBeginDate = $page->field('service_begin_date');
+		my @listFeeSchedules = ($page->field('fee_schedules_catalog_ids'));
+
+		my $cptModfField = $self->getField('cptModfField')->{fields}->[0];
+
+		foreach my $child (@{$miscProcChildren})
+		{
+			my $childCode = $child->{code};
+			my $modifier = $child->{modifier};
+			my $fs_entry = App::IntelliCode::getFSEntry($page, $childCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+			my $count_type = scalar(@$fs_entry);
+			if ($count_type == 0)
+			{
+				$cptModfField->invalidate($page,"Unable to find Code '$childCode' in fee schedule(s) " . join ",",@listFeeSchedules);
+			}
+			elsif ($count_type > 1)
+			{
+				$cptModfField->invalidate($page,"Procedure found in multiple fee schedules.");
+			}
+			elsif(length($fs_entry->[0]->[$INTELLICODE_FS_SERV_TYPE]) < 1)
+			{ 	
+				$cptModfField->invalidate($page,"Check that Service Type is set for Fee Schedule Entry '$childCode' in fee schedule $fs_entry->[0]->[$INTELLICODE_FS_ID_NUMERIC]" );
+			}
+		}
+	}
+}
 
 sub getMultiSvcTypesHtml
 {
@@ -2238,7 +2277,6 @@ sub getMultiSvcTypesHtml
 	return $html;
 }
 
-
 sub getMultiPricesHtml
 {
 	my ($self, $page, $fsResults) = @_;
@@ -2260,11 +2298,22 @@ sub getMultiPricesHtml
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	my $invoiceId = $page->param('invoice_id');
 
-	if($command eq 'add' || $command eq 'update')
+	my $invoiceId = $page->param('invoice_id');
+	my $cptCode = $page->field('procedure');
+	my $mainTransId = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceMainTransById', $invoiceId);
+	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $mainTransId);
+
+	#if cpt is a misc procedure code, get children and create invoice item for each child
+	my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $page->session('org_internal_id'), $cptCode);
+	if($miscProcChildren->[0]->{code} && $command eq 'add')
 	{
-		execute_addOrUpdate($self, $page, $command, $flags);
+		createExplosionItems($self, $page, $command, $mainTransData, $miscProcChildren);
+		$self->handlePostExecute($page, $command, $flags);
+	}
+	elsif($command eq 'add' || $command eq 'update')
+	{
+		execute_addOrUpdate($self, $page, $command, $flags, $mainTransData);
 		$self->handlePostExecute($page, $command, $flags);
 	}
 	else
@@ -2276,7 +2325,7 @@ sub execute
 
 sub execute_addOrUpdate
 {
-	my ($self, $page, $command, $flags) = @_;
+	my ($self, $page, $command, $flags, $mainTransData) = @_;
 
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
@@ -2321,12 +2370,9 @@ sub execute_addOrUpdate
 	}
 
 	## get short name for cpt code
-	my $cptCode = $page->field('procedure');
-	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCodes[0]);
 
 	#get service place based on service facility, then convert code to its id
-	my $mainTransId = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceMainTransById', $invoiceId);
-	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $mainTransId);
 	my $servPlace = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $mainTransData->{service_facility_id}, 'HCFA Service Place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace->{value_text});
 
@@ -2339,7 +2385,7 @@ sub execute_addOrUpdate
 			item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			code => $cptCode || undef,
+			code => $cptCodes[0] || undef,
 			code_type => $codeType || undef,
 			caption => $cptShortName->{name} || undef,
 			modifier => $page->field('procmodifier') || undef,
@@ -2359,10 +2405,7 @@ sub execute_addOrUpdate
 		);
 
 
-
-
 	## ADD HISTORY ATTRIBUTE
-
 	my $action = '';
 	$action = 'Added' if $command eq 'add';
 	$action = 'Updated' if $command eq 'update';
@@ -2372,12 +2415,120 @@ sub execute_addOrUpdate
 			parent_id => $invoiceId,
 			item_name => 'Invoice/History/Item',
 			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => "$action $cptCode",
+			value_text => "$action $cptCodes[0]",
 			value_textB => $comments || undef,
 			value_date => $todaysDate || undef,
 			_debug => 0
 	);
 
+
+	## UPDATE FEE SCHEDULES ATTRIBUTE
+	if(my $feeSchedItemId = $page->field('fee_schedules_item_id'))
+	{
+		$page->schemaAction(
+				'Invoice_Attribute', 'update',
+				item_id => $feeSchedItemId,
+				value_text => $page->field('fee_schedules_catalog_ids') || undef,
+				value_textB => $page->field('fee_schedules') || undef,
+				_debug => 0
+		);
+	}
+}
+
+sub createExplosionItems
+{
+	my ($self, $page, $command, $mainTransData, $miscProcChildren) = @_;
+	my $invoiceId = $page->param('invoice_id');
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+
+	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $mainTransData->{service_facility_id}, 'HCFA Service Place');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
+	my $explCode = $page->field('procedure');
+	my $servBeginDate = $page->field('service_begin_date');
+	my $servEndDate = $page->field('service_end_date');
+	my $quantity = $page->field('procunits');
+	my $comments = $page->field('comments');
+	my $emg = $page->field('emg') == 1 ? 1 : 0;
+	my @listFeeSchedules = ($page->field('fee_schedules_catalog_ids'));
+
+	#icd info
+	my @relDiags = $page->field('procdiags');					#diags for this particular procedure
+	my @claimDiags = split(/\s*,\s*/, $page->field('claim_diags'));		#all diags for a claim
+	my @diagCodePointers = ();
+	my $claimDiagCount = @claimDiags;
+	foreach my $relDiag (@relDiags)
+	{
+		foreach my $claimDiagNum (1..$claimDiagCount)
+		{
+			if($relDiag eq $claimDiags[$claimDiagNum-1])
+			{
+				push(@diagCodePointers, $claimDiagNum);
+			}
+		}
+	}
+	#---------
+
+	my $cptCode;
+	my $cptShortName;
+	my $modifier;
+	foreach my $child (@{$miscProcChildren})
+	{
+		$cptCode = $child->{code};
+		$modifier = $child->{modifier};
+		$cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+
+		my $fs_entry = App::IntelliCode::getFSEntry($page, $cptCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
+		#my $use_fee;
+		#my $count = 0;
+		my $count_type = scalar(@$fs_entry);
+		foreach(@$fs_entry)
+		{
+			my $servType = $_->[$INTELLICODE_FS_SERV_TYPE];
+			my $codeType = $_->[$INTELLICODE_FS_CODE_TYPE];
+			my $unitCost = $_->[$INTELLICODE_FS_COST];
+			my $ffsFlag = $_->[$INTELLICODE_FS_FFS_CAP];
+			my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
+
+			my $extCost = $unitCost * $quantity;
+			$page->schemaAction('Invoice_Item', $command,
+				#item_id => $page->param("_f_proc_$line\_item_id") || undef,
+				parent_id => $invoiceId,
+				service_begin_date => $servBeginDate || undef,							#default for service start date is today
+				service_end_date => $servEndDate || undef,								#default for service end date is today
+				hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
+				hcfa_service_type => defined $servTypeId ? $servTypeId : undef,			#default for service type is 2 for consultation
+				modifier => $modifier || undef,
+				quantity => $quantity || undef,
+				emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
+				item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
+				code => $cptCode || undef,
+				code_type => $codeType || undef,
+				caption => $cptShortName->{name} || undef,
+				comments => $comments || undef,
+				unit_cost => $unitCost || undef,
+				extended_cost => $extCost || undef,
+				rel_diags => join(', ', @relDiags) || undef,									#the actual icd (diag) codes
+				data_text_a => join(', ', @diagCodePointers) || undef,						#the diag code pointers
+				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
+			);
+		}
+
+		## ADD HISTORY ATTRIBUTE
+		my $action = '';
+		$action = 'Added' if $command eq 'add';
+		$action = 'Updated' if $command eq 'update';
+
+		$page->schemaAction(
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId,
+				item_name => 'Invoice/History/Item',
+				value_type => App::Universal::ATTRTYPE_HISTORY,
+				value_text => "$action $cptCode (child of explosion code $explCode)",
+				value_textB => $comments || undef,
+				value_date => $todaysDate || undef,
+				_debug => 0
+		);
+	}
 
 	## UPDATE FEE SCHEDULES ATTRIBUTE
 	if(my $feeSchedItemId = $page->field('fee_schedules_item_id'))
