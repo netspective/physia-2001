@@ -16,6 +16,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
+my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
 
 %RESOURCE_MAP=('close-account' => { transType => $ACCOUNT_OWNER, heading => 'Close Account',  _arl => ['person_id','trans_id'], _arl_modify => ['trans_id'] ,
 				     _idSynonym => [
@@ -62,7 +64,6 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	$page->field('person_id',$page->param('person_id'));
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	#$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
 }
 
 sub execute
@@ -71,17 +72,55 @@ sub execute
 	
 	$command = 'update';
 	my $closed_by = $page->session('user_id');
-	my $del_notes  = $page->field('notes');# eq 'Retain Notes' ? 0 : 1;	
-	
-	#Close all collection records on the account even ifthey are owned by some else on org
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'closeCollectionById',"Account Closed by $closed_by",$page->param('person_id'),$page->session('user_id'));
-	
-	#Remove Reck Date for collection
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delReckDateById',$page->param('person_id'),$page->session('user_id'));
-	
-	#Delete Account notes ifthe user wants otherwise they will appear next time a collection notice is opened on this account owner
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $del_notes;
-	$self->handlePostExecute($page, $command, $flags );
+	my $del_notes  = $page->field('notes');
+	my $close_msg = "Account Closed by $closed_by";
+	my $first =1;
+	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountInfoById',$page->param('person_id'),$page->session('user_id'));
+	$page->beginUnitWork();
+	foreach (@$dataInvoice)
+	{
+		#Mark record as inactive
+		$page->schemaAction
+			(
+				'Transaction', 'update',                        
+				trans_id =>$_->{trans_id},
+                		trans_status => $INACTIVE	,			
+				trans_subtype => 'Account Closed',			
+                	);
+                #Mark Reck as inactive for Account
+                $page->schemaAction
+                	(
+                		'Transaction', 'update',  
+                		trans_id =>$_->{trans_reck_id},
+                		trans_status => $INACTIVE	,			
+                	)if $_->{trans_reck_id} ;		               
+                	
+                #Perform the following actions only once
+		if($first)
+		{	
+			$first =0;                
+			#Obtain account/invoice information for collectors that 
+			#transferd there account to this user
+                	my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'));                	
+			foreach my $data (@$transferData)         
+	                {
+				#Mark account inactive 
+				$page->schemaAction
+				(
+					'Transaction', 'update',                        
+					trans_id =>$data->{trans_id},
+	                		trans_status => $INACTIVE,	,			
+					trans_subtype => 'Account Closed',			
+	                	);                	
+	                	#Mark notes records as inactive for anyone that transfer the account to this user
+	                	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$data->{'provider_id'},$page->param('person_id')) if $page->field('notes');
+	                }
+	                #Mark notes records inactive for current collector
+	           	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $page->field('notes'); 
+		}	         		
+	}
+	$page->endUnitWork();
+	$self->handlePostExecute($page, $command, $flags );		
 	return "\u$command completed.";
 }
 

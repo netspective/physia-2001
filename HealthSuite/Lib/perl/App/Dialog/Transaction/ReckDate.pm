@@ -51,15 +51,16 @@ sub new
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;	
 	$page->field('person_id',$page->param('person_id'));		
+
 	my $transId = $page->param('trans_id');
 	
 	my $reck_date = 
 			$STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selReckInfoById', 
 	   		$transId) if defined $transId && $transId gt '';		   			
 	   		
-	$page->field('reckdate',$reck_date->{'trans_begin_stamp'});
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;	
+	$page->field('reckdate',$reck_date->{'reck_date'});	
 }
 
 sub execute
@@ -83,7 +84,6 @@ sub execute
 	                );
 			
 	$self->handlePostExecute($page, $command, $flags );
-	return "\uTransfer completed.";
 }
 
 

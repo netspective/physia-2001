@@ -18,6 +18,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 my $ACCOUNT_OWNER = App::Universal::TRANSTYPE_ACCOUNT_OWNER;
+my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
 
 %RESOURCE_MAP = ('transfer-account' => {transType => $ACCOUNT_OWNER, heading => 'Transfer Account',  _arl => ['person_id','trans_id'], _arl_modify => ['trans_id'] ,
 			_idSynonym => [
@@ -36,7 +38,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new CGI::Dialog::Field(name => 'person_id', caption => 'Person ID', type => 'memo', options => FLDFLAG_READONLY),
+			new CGI::Dialog::Field(name => 'person_id', caption => 'Person ID', type => 'text', options => FLDFLAG_READONLY),
 			new App::Dialog::Field::Person::ID(name => 'transfer_id', caption =>'Transfer To', options => FLDFLAG_REQUIRED, hints => 'Collector to Transfer Account'),			
 			new CGI::Dialog::Field(name => 'detail', caption => 'Reason For Transfer', type => 'memo', options => FLDFLAG_REQUIRED),
 			new CGI::Dialog::Field(name => 'trans_begin_stamp', caption => 'Date', type => 'date'),	
@@ -61,12 +63,14 @@ sub populateData
 
 sub customValidate
 {
-	my ($self, $page) = @_;
+	my ($self, $page) = @_;;	
+	my $fieldTrans = $self->getField('transfer_id');
 	unless ($page->param('trans_id'))
 	{
-		my $field = $self->getField('person_id');	
-		$field->invalidate($page,"Make sure you are a collector for this account.  Transfer account only from 'today' worklist"); 		
+		my $fieldPerson = $self->getField('person_id');
+		$fieldPerson->invalidate($page,"Make sure you are a collector for this account.  Transfer account only from 'today' worklist"); 		
 	}
+	$fieldTrans->invalidate($page,"Unable to transfer account to self") if $page->field('transfer_id') eq $page->session('user_id');
 }
 
 sub execute
@@ -89,25 +93,83 @@ sub execute
 		detail => $page->field('detail') || undef,     
 		trans_status => $transStatus,             
 	);
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranCollectionById', $page->param('person_id'),$page->session('user_id'),$new_owner,
-	$page->session('_session_id'), $page->session('user_id'),$page->session('org_internal_id'),"Transfered From $old_owner" );
-	$page->schemaAction(   'Transaction', $command,                        
-		                trans_owner_id => $page->param('person_id') || undef,
-		                provider_id => $page->session('user_id') ||undef,
-		                trans_owner_type => 0, 		                
-		                caption =>'Transfer Account',
-		                trans_subtype =>'Account Transfered',
-		                trans_status =>2,
-		                trans_status_reason =>"Account Transfered to $new_owner",
-		                trans_id =>$page->param('trans_id'),
-		                _debug => 0
-		                );		
-	#Remove Reck Date for collection
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delReckDateById',$page->param('person_id'),$page->session('user_id'));
+	my $new_msg = "Transfered From $old_owner";
+	my $old_msg = "Account Transfered to $new_owner";
 	
-	#Transfer notes to new collector	                
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranAccountNotesById',$new_owner,$page->session('user_id'),$page->param('person_id'));	
-	$self->handlePostExecute($page, $command, $flags);
+	#Get All invoices assoicated with this account
+	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountInfoById',$page->param('person_id'),$page->session('user_id'));
+	$page->beginUnitWork();
+	my $first=1;
+	foreach (@$dataInvoice)
+	{
+		#Create an attribute for each transaction record that will track who owns the account now
+		#
+		$page->schemaAction
+			(
+				'Trans_Attribute', 'add',
+				parent_id =>$_->{trans_id},
+				item_type =>1,
+				item_name =>'Account/Transfer/Owner',
+				value_type =>0,
+				value_text =>$page->field('transfer_id'),
+				value_textB =>$page->param('person_id'),
+			);
+		
+		#Add records to the new collector if needed
+		$page->schemaAction
+			(   	'Transaction', 'add',                        
+		                trans_owner_id =>$page->param('person_id'),
+		                provider_id => $page->field('transfer_id') ,
+		                trans_owner_type => 0, 
+		                 caption =>'Account Owner',
+		                trans_subtype =>'Owner',
+		                trans_status =>$ACTIVE,
+		                trans_type => $ACCOUNT_OWNER,  
+		                initiator_type =>0,
+		                initiator_id =>$page->session('user_id'), 	
+		                billing_facility_id => $page->session('org_internal_id'),
+		                trans_status_reason =>$new_msg,
+				data_num_a => $_->{invoice_id} ,		
+                	) unless $STMTMGR_WORKLIST_COLLECTION->getSingleValue($page,STMTMGRFLAG_NONE,'selCollectionRecordById',
+                		$page->param('person_id'),$page->field('transfer_id'),$_->{'invoice_id'}) ;
+                	
+		#Mark record as transfered
+		$page->schemaAction
+			(
+				'Transaction', 'update',                        
+				trans_id =>$_->{trans_id},
+				trans_subtype => 'Account Transfered',
+				caption =>'Transfer Account',
+				trans_status_reason => $old_msg,				
+                	);
+                	
+		if($first)
+		{	
+			$first =0;
+                	#Mark Reck Date as inactive for Account Only one reck date for an account
+                	$page->schemaAction
+                	(
+                		'Transaction', 'update',  
+                		trans_id =>$_->{trans_reck_id},
+                		trans_status => $INACTIVE
+                	)if $_->{trans_reck_id} ;
+                	#Check if this account was transfered here is so reset the transfer to owner
+			my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'));                	
+			foreach my $data (@$transferData)
+			{
+				$page->schemaAction
+				(
+					'Trans_Attribute','update',
+					item_id =>$data->{item_id},
+					value_text =>$page->field('transfer_id')
+				);
+			}
+			
+		}
+		
+	}
+	$page->endUnitWork();
+	$self->handlePostExecute($page, $command, $flags );	
 	return "\uTransfer completed.";
 }
 
