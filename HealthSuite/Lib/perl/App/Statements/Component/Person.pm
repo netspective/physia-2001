@@ -239,7 +239,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, value_block, cr_user_id
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Phone Message'
@@ -250,7 +250,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => '#6# (#5#): #4#' },
+			{ dataFmt => '#8# (#5#): #4#' },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-phone-message?home=/#param.arl#' },
