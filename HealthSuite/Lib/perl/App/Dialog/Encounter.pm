@@ -296,19 +296,19 @@ sub makeStateChanges
 	my $invoiceFlags = $invoiceInfo->{flags};
 	if($invoiceFlags & $attrDataFlag)
 	{
-		$self->setFieldFlags('trans_type', FLDFLAG_READONLY);
-		$self->setFieldFlags('accident', FLDFLAG_READONLY);
-		$self->setFieldFlags('accident_state', FLDFLAG_READONLY);
-		$self->setFieldFlags('deduct_balance', FLDFLAG_READONLY);
-		$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
-		$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
-		$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
-		$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
-		$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
-		$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
-		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
-		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
-		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
+		#$self->setFieldFlags('trans_type', FLDFLAG_READONLY);
+		#$self->setFieldFlags('accident', FLDFLAG_READONLY);
+		#$self->setFieldFlags('accident_state', FLDFLAG_READONLY);
+		#$self->setFieldFlags('deduct_balance', FLDFLAG_READONLY);
+		#$self->setFieldFlags('primary_ins_phone', FLDFLAG_READONLY);
+		#$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
+		#$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
+		#$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
+		#$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
+		#$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
+		#$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
+		#$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
+		#$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
 		#$self->setFieldFlags('comments', FLDFLAG_READONLY);
 	}
 }
@@ -341,7 +341,7 @@ sub populateData
 		$page->field('attendee_id', $invoiceInfo->{client_id});
 		#$page->field('reference', $invoiceInfo->{reference});
 		$page->field('current_status', $invoiceInfo->{invoice_status});
-		$page->field('proc_diags', $invoiceInfo->{claim_diags});
+		$page->param('_f_proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
 		$page->field('old_invoice_id', $invoiceId);	#this is needed if the current claim is being edited but has already been submitted. if this is the case, a new claim is being
 											#created that is an exact copy of the submitted claim.
@@ -502,13 +502,159 @@ sub setPayerFields
 	
 }
 
+sub voidInvoice
+{
+	my ($self, $page, $command, $flags, $oldInvoiceId) = @_;
+
+	my $sessOrg = $page->session('org_id');
+	my $sessUser = $page->session('user_id');
+	my $personId = $page->field('attendee_id');
+	my $parentTransId = $page->field('trans_id');
+	my $timeStamp = $page->getTimeStamp();
+
+	#CONSTANTS -------------------------------------------
+
+	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
+	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+	my $transType = App::Universal::TRANSTYPEACTION_VOID;
+
+	#-------------------------------------------------------------
+
+	my $transInfo = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $parentTransId);
+	my $billType = $transInfo->{bill_type};
+	my $transId = $page->schemaAction(
+		'Transaction', 'add',
+		trans_type => defined $transType ? $transType : undef,
+		trans_status => defined $transStatus ? $transStatus : undef,
+		parent_event_id => $transInfo->{parent_event_id} || undef,
+		parent_trans_id => $parentTransId || undef,
+		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		trans_owner_id => $personId || undef,
+		trans_begin_stamp => $timeStamp || undef,
+		caption => $transInfo->{subject} || undef,
+		provider_id => $transInfo->{provider_id} || undef,
+		care_provider_id => $transInfo->{care_provider_id} || undef,
+		service_facility_id => $transInfo->{service_facility_id} || undef,
+		billing_facility_id => $transInfo->{billing_facility_id} || undef,
+		bill_type => defined $billType ? $billType : undef,
+		data_text_a => $transInfo->{ref_id} || undef,
+		data_text_b => $transInfo->{comments} || undef,
+		_debug => 0
+	);
+
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $oldInvoiceId);
+	my @claimDiags = split(/\s*,\s*/, $invoiceInfo->{claim_diags});
+	my $invoiceType = $invoiceInfo->{invoice_type};
+	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
+	my $claimType = $invoiceInfo->{invoice_subtype};
+	my $totalAdjust = $invoiceInfo->{total_adjust};
+	my $totalCost = 0 - $invoiceInfo->{total_cost};
+	my $balance = $totalCost - $totalAdjust;
+	my $invoiceId = $page->schemaAction(
+		'Invoice', 'add',
+		parent_invoice_id => $oldInvoiceId || undef,
+		invoice_type => defined $invoiceType ? $invoiceType : undef,
+		invoice_subtype => defined $claimType ? $claimType : undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		invoice_date => $page->getDate() || undef,
+		main_transaction => $transId || undef,
+		submitter_id => $sessUser || undef,
+		claim_diags => join(', ', @claimDiags) || undef,
+		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		owner_id => $sessOrg || undef,
+		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		client_id => $personId || undef,
+		total_items => $invoiceInfo->{total_items} || undef,
+		total_adjust => $totalAdjust || undef,
+		total_cost => $totalCost || undef,
+		balance => $balance || undef,
+		_debug => 0
+	);
+
+	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $oldInvoiceId);
+	foreach my $item (@{$lineItems})
+	{
+		my $itemType = $item->{item_type};
+		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
+
+		my $extCost = 0 - $item->{extended_cost};
+		my $itemTotalAdjust = $item->{total_adjust};
+		my $itemBalance = $extCost - $itemTotalAdjust;
+		my $emg = $item->{emergency};
+		$page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_id => $invoiceId || undef,
+		#	service_begin_date => $item->{service_begin_date} || undef,
+		#	service_end_date => $item->{service_end_date} || undef,
+			hcfa_service_place => $item->{hcfa_service_place} || undef,
+			hcfa_service_type => $item->{hcfa_service_type} || undef,
+			modifier => $item->{modifier} || undef,
+			quantity => $item->{quantity} || undef,
+			emergency => defined $emg ? $emg : undef,
+			item_type => defined $itemType ? $itemType : undef,
+			code => $item->{code} || undef,
+			caption => $item->{caption} || undef,
+			comments =>  $item->{comments} || undef,
+			unit_cost => $item->{unit_cost} || undef,
+			rel_diags => $item->{rel_diags} || undef,
+			data_text_a => $item->{data_text_a} || undef,
+			extended_cost => $extCost || undef,
+			total_adjust => $itemTotalAdjust || undef,
+			balance => $itemBalance || undef,
+			_debug => 0
+		);
+	}
+
+	#add history attribute
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "This invoice is a voided copy of claim $oldInvoiceId. Transaction performed by $sessUser",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	#add old invoice's billing records	
+	my $billingInfo = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceBillingRecs', $oldInvoiceId);
+	foreach my $billingRec (@{$billingInfo})
+	{
+		my $billSeq = $billingRec->{bill_sequence};
+		my $billPartyType = $billingRec->{bill_party_type};
+		$page->schemaAction(
+			'Invoice_Billing', 'add',
+			invoice_id => $invoiceId || undef,
+			bill_sequence => defined $billSeq ? $billSeq : undef,
+			bill_party_type => defined $billPartyType ? $billPartyType : undef,
+			bill_to_id => $billingRec->{bill_to_id} || undef,
+			bill_ins_id => $billingRec->{bill_ins_id} || undef,
+			bill_amount => $billingRec->{bill_amount} || undef,
+			bill_pct => $billingRec->{bill_pct} || undef,
+			bill_date => $billingRec->{bill_date} || undef,
+			bill_status => $billingRec->{bill_status} || undef,
+			bill_result => $billingRec->{bill_result} || undef,
+			_debug => 0
+		);
+	}
+}
+
 sub handlePayers
 {
 	my ($self, $page, $command, $flags) = @_;
 
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
-	$command = $command eq 'update' && ($invoiceFlags & $attrDataFlag) ? 'add' : $command;
+	#$command = $command eq 'update' && ($invoiceFlags & $attrDataFlag) ? 'add' : $command;
+	if($command eq 'update' && ($invoiceFlags & $attrDataFlag))
+	{
+		$command = 'add';
+		my $oldInvoiceId = $page->field('old_invoice_id');
+		voidInvoice($self, $page, $command, $flags, $oldInvoiceId);
+	}
 
 
 	my $personId = $page->field('attendee_id');
@@ -533,7 +679,7 @@ sub handlePayers
 	my $fakeProdNameThirdParty = App::Universal::INSURANCE_FAKE_CLIENTBILL;
 	my $fakeProdNameSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
 
-	# -----------------------------------------------------
+	# ------------------------------------------------------------
 
 
 	my $payer = $page->field('payer');
@@ -763,9 +909,9 @@ sub addTransactionAndInvoice
 		main_transaction => $transId || undef,
 		submitter_id => $page->session('user_id') || undef,
 		claim_diags => join(', ', @claimDiags) || undef,
-		owner_type => App::Universal::ENTITYTYPE_ORG,
+		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
 		owner_id => $page->session('org_id') || undef,
-		client_type => App::Universal::ENTITYTYPE_PERSON,
+		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		client_id => $personId || undef,
 		_debug => 0
 	);
