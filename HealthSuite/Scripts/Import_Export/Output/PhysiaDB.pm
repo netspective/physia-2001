@@ -11,7 +11,7 @@ use base qw(Driver::Output::PhysiaDB);
 use App::Universal;
 
 my $mainOrgInternalId;
-my $crUserId  = 'IMPORT_PHYSIAT';
+my $crUserId  = 'IMPORT_FKM';
 my $CHECKDIR=`pwd`;
 chomp $CHECKDIR;
 
@@ -58,6 +58,154 @@ sub close
 	}
 }
 
+
+
+
+sub loadInsuranceData
+{
+	my $self = shift;	
+	my $org = shift;	
+	my $prodCount=0;
+	my $planCount=0;
+	my $flags=0;	
+
+	my $command='add';
+	my $numProducts = $org->insuranceProduct_size;
+	for(my $loop=0;$loop<=$numProducts;$loop++)
+	{
+		$prodCount++;
+		my $insuranceProduct=$org->insuranceProduct($loop);		
+		next unless $insuranceProduct;
+		#if loadIndicator is skip then do not load this insurance Product
+		if ($insuranceProduct->loadIndicator ne 'S')
+		{
+			my $insIntId = $self->schemaAction($flags,
+				'Insurance',$command,
+				cr_user_id => $crUserId,
+				product_name => $insuranceProduct->productName,
+				record_type => App::Universal::RECORDTYPE_INSURANCEPRODUCT,
+				owner_org_id => $mainOrgInternalId, 
+				ins_org_id => $org->id,
+				ins_type => $insuranceProduct->productType,
+			);					
+			$insuranceProduct->id($insIntId);
+			$self->schemaAction($flags,
+				'Insurance_Address', $command,
+				cr_user_id => $crUserId,
+				parent_id => $insIntId,
+				address_name => 'Billing',
+				line1 => defined $insuranceProduct->billingAddress ? $insuranceProduct->billingAddress->addressLine1 : undef,
+				line2 => defined $insuranceProduct->billingAddress ? $insuranceProduct->billingAddress->addressLine2 : undef,
+				city =>  defined $insuranceProduct->billingAddress ?$insuranceProduct->billingAddress->city : undef,
+				state => defined $insuranceProduct->billingAddress ? $insuranceProduct->billingAddress->state : undef,
+				zip =>  defined $insuranceProduct->billingAddress ? $insuranceProduct->billingAddress->zipCode : undef,
+			);
+
+			$self->schemaAction($flags,
+				'Insurance_Attribute', $command,
+				cr_user_id => $crUserId,
+				parent_id => $insIntId,
+				item_name => 'Contact Method/Telephone/Primary',
+				_debug => 0
+			);
+		}
+		my $numPlans = $insuranceProduct->insurancePlan_size;
+		for (my $inner_loop=0;$inner_loop<=$numPlans;$inner_loop++)
+		{
+			my $insurancePlan = $insuranceProduct->insurancePlan($inner_loop);		
+			
+			#if loadIndicator is skip then do not load this insurance plan
+			next if $insurancePlan ->loadIndicator eq 'S';
+			$planCount++;
+			my $insIntId=$self->schemaAction($flags,
+				'Insurance', $command,
+				cr_user_id => $crUserId,
+				parent_ins_id => $insuranceProduct->id,
+				product_name => $insuranceProduct->productName,
+				plan_name => $insurancePlan->planName,
+				record_type => App::Universal::RECORDTYPE_INSURANCEPLAN,
+				owner_org_id => $mainOrgInternalId, #main Org
+				ins_org_id => $org->id, #insurance Org
+				ins_type => $insuranceProduct->productType ,
+			);	
+			$insurancePlan->id($insIntId);
+			$self->schemaAction($flags,
+				'Insurance_Address', $command,
+				cr_user_id => $crUserId,
+				parent_id => $insurancePlan->id,
+				address_name => 'Billing',
+				line1 => defined $insurancePlan->billingAddress ? $insurancePlan->billingAddress->addressLine1 : undef,
+				line2 => defined $insurancePlan->billingAddress ?  $insurancePlan->billingAddress->addressLine2 : undef,
+				city => defined $insurancePlan->billingAddress ?  $insurancePlan->billingAddress->city : undef,
+				state => defined $insurancePlan->billingAddress ?  $insurancePlan->billingAddress->state : undef,
+				zip => defined $insurancePlan->billingAddress ?  $insurancePlan->billingAddress->zipCode : undef,
+			);	
+	
+			$self->schemaAction($flags,
+					'Insurance_Attribute', $command,
+					cr_user_id => $crUserId,
+					parent_id =>$insurancePlan->id,
+					item_name => 'Contact Method/Telephone/Primary',
+					value_type => App::Universal::ATTRTYPE_PHONE,
+				);		
+			$self->schemaAction($flags,
+					'Insurance_Attribute', $command,
+					cr_user_id => $crUserId,
+					parent_id => $insurancePlan->id,
+					item_name => 'Contact Method/Fax/Primary',
+					value_type =>App::Universal::ATTRTYPE_FAX,
+			);		
+		};		
+	};
+
+	my $counts={planCount=>$planCount,productCount=>$prodCount};
+	return $counts;
+}
+
+sub InsuranceData
+{
+	my $self = shift;	
+	my $context = $self->context();
+	my $collection = $self->dataModel();
+	my $parentId=undef;
+	my $ownerOrg=undef;
+	my $orgCount=0;
+	my $productCount=0;
+	my $planCount=0;	
+	my $totalProductCount=0;
+	my $totalPlanCount=0;	
+
+	
+	#Get the information for the main org (this assumes there is only one main org)
+	my $orgData = $collection->getFirstOrgOfType('InsuranceOrg');	
+	while ($orgData)
+	{
+	
+		#Load Main Org
+		my $insName= $orgData->orgId;
+		$mainOrgInternalId = $orgData->ownerOrg->id;
+		$self->reportStatus("Loaing Insurance Data For $insName.......");	
+
+		$orgCount++;		
+		#Load All Insurance Product and Plan for this Org
+		my $counts=$self->loadInsuranceData($orgData);
+		$productCount=$counts->{'productCount'};
+		$planCount=$counts->{'planCount'};				
+		$totalProductCount += $productCount;
+		$totalPlanCount +=$planCount;
+		
+		#Get Next Main Org
+		$orgData = $collection->getNextOrgOfType('InsuranceOrg');
+	}		
+		$self->reportStatus("Finished Loading Insurance Product/Plan ......\n");	
+		$self->reportStatus("Insurance Products Loaded			: $totalProductCount");   
+		$self->reportStatus("Insurance Plans  	Loaded			: $totalPlanCount");	
+		$self->reportStatus("-----------------------------------------\n");			
+}
+
+
+
+
 sub loadOrgData
 {
 	my $self=shift;
@@ -69,10 +217,11 @@ sub loadOrgData
 	my $type = ref $orgData;
 	my $orgId = $orgData->orgId;
 	
+	#If org should be skip the return
+	return if $orgData->loadIndicator eq 'S';
 	#!!!!!!!FIX THIS !!!!!!
-	#Check if org_id is exists
+	#Check if org_id is exists	
 	
-	#If no orgId build one
 	unless ($orgId)
 	{
 		my $name = uc(substr($orgData->orgName,0,15));
@@ -83,7 +232,15 @@ sub loadOrgData
 	#Create Core Attributes
 	my $mainOrg = $type eq 'App::DataModel::MainOrg' ? 1 : 0;
 	my $parentOrg = $mainOrg ? undef :$orgData->parentOrg->id;
-	my $ownerOrg = $mainOrg ? undef : $orgData->parentOrg->id;		
+	my $ownerOrg = $mainOrg ? undef : $orgData->parentOrg->id;	
+	unless($orgData->orgType)
+	{
+		if($type eq 'App::DataModel::InsuranceOrg')
+		{
+			$orgData->orgType('Insurance');
+		};
+	};
+	
 	my $orgIntId = $self->schemaAction(
 			$flags,'Org', $command,
 			cr_user_id => $crUserId,
@@ -125,6 +282,7 @@ sub loadOrgData
 	#Create Phone Record
 	$self->schemaAction(
 			$flags,'Org_Attribute', $command,
+			cr_user_id => $crUserId,
 			parent_id => $orgData->id,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_PHONE,
@@ -134,6 +292,7 @@ sub loadOrgData
 	#Create fax Record
 	$self->schemaAction(
 			$flags,'Org_Attribute', $command,
+			cr_user_id => $crUserId,
 			parent_id => $orgData->id,
 			item_name => 'Primary',
 			value_type => App::Universal::ATTRTYPE_FAX,
@@ -206,7 +365,9 @@ sub loadPersonData
 	my $personId = $STMTMGR_EXTERNAL->getSingleValue($context,STMTMGRFLAG_DYNAMICSQL,"select create_unique_person_id(:1,:2,:3) from dual",$fName,$mName,$lName);
 	my $type = ref $personData;
 
-
+	#If person should not be loaded then return
+	return if $personData->loadIndicator eq 'S';
+	
 	#create Core Person Record
 	$self->schemaAction(
 			$flags,'Person', $command,
@@ -226,10 +387,8 @@ sub loadPersonData
 	#Create Address record
 	$self->schemaAction(
 			$flags,'Person_Address', $command,			
-			parent_id => $personId ,
+			parent_id => $personData->id ,
 			address_name => 'Home',
-			#Add as Primary
-			
 			cr_user_id => $crUserId,	
 			line1 => $personData->homeAddress->addressLine1,
 			line2 => $personData->homeAddress->addressLine2,
@@ -242,7 +401,7 @@ sub loadPersonData
 	$self->schemaAction(
 			$flags,'Person_Attribute', $command,
 			cr_user_id => $crUserId,	
-			parent_id => $personId,
+			parent_id => $personData->id,
 			item_name => 'Home',
 			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $personData->homePhone,
@@ -250,7 +409,7 @@ sub loadPersonData
 	$self->schemaAction(
 			$flags,'Person_Attribute', $command,
 			cr_user_id => $crUserId,	
-			parent_id => $personId,
+			parent_id => $personData->id,
 			item_name => 'Work',
 			value_type => App::Universal::ATTRTYPE_PHONE,
 			value_text => $personData->workPhone,
@@ -269,7 +428,7 @@ sub loadPersonData
 			my $status = $personData->employment->employmentStatus;
 			$self->schemaAction(
 				$flags,'Person_Attribute', 'add',
-				parent_id => $personId,
+				parent_id => $personData->id,
 				cr_user_id => $crUserId,				
 				value_type => $status,
 				value_int => $orgInternalId,
@@ -281,13 +440,42 @@ sub loadPersonData
 		#Create Chart Number Record
 		$self->schemaAction(
 			$flags,'Person_Attribute', $command,
-			parent_id => $personId,
+			parent_id => $personData->id,
 			cr_user_id => $crUserId,
 			parent_org_id => $mainOrgInternalId,
 			item_name => 'Patient/Chart Number',
 			value_type => 0,
 			value_text => $personData->chartNumber,
-		) if defined $personData->chartNumber;				
+		) if defined $personData->chartNumber;	
+
+
+		my $size = $personData->insurance_size;				
+		for (my $loop=0;$loop<=$size;$loop++)
+		{
+		
+			#Coverage Record
+			my $coverage = $personData->insurance($loop);			
+			my $insuranceProduct = $coverage->insuranceProduct;
+			my $insurancePlan = $coverage->insurancePlan;
+			my $insOrg = $insuranceProduct->insOrg;
+			#Create Insurance Coverage Record				
+			my $insIntId = $self->schemaAction($flags,
+				'Insurance', $command,
+				cr_user_id => $crUserId,
+				parent_ins_id			=> $insurancePlan->id || $insuranceProduct->id,
+				product_name			=> $insuranceProduct->productName,
+				plan_name			=> $insurancePlan->planName,
+				record_type			=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
+				owner_person_id			=> $personData->id,
+				ins_org_id			=> $insOrg->id,
+				owner_org_id			=> $mainOrgInternalId,
+				bill_sequence			=> $coverage->sequence,
+				ins_type			=> $insuranceProduct->productType,
+				group_name			=> $coverage->groupName,
+				group_number			=> $coverage->groupNumber,
+				member_number			=> $coverage->memberNumber,
+				);		
+		}
 	}
 	
 }
@@ -321,6 +509,7 @@ sub loadPersonOrgCategory
 	
 	#person Catgeory
 	my $id = $personData->id;
+	return if $personData->loadIndicator eq 'S';
 	$self->schemaAction(
 				$flags, 'Person_Org_Category', $command,
 				cr_user_id=>$crUserId,
@@ -413,12 +602,18 @@ sub transformDataModel
 {
 	my $self = shift;	
 
+	#Turn Off auto-commit
 	
 	#Load Org data 
 	$self->OrgData();	
 	
+	#Load Insurance Data
+	$self->InsuranceData();
+	
 	#Load Person Data
 	$self->PersonData();
+	
+	#if not errors commit-code
 
 	return $self->errors_size == 0 ? 1 : 0;	
 }
