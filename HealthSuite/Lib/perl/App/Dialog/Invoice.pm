@@ -380,7 +380,7 @@ sub addTransactionAndInvoice
 			quantity => defined $quantity ? $quantity : undef,
 			unit_cost => defined $unitCost ? $unitCost : undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			balance => defined $extCost ? $extCost : undef,
+			#balance => defined $extCost ? $extCost : undef,
 			comments => $page->param("_f_item_$line\_comments") || undef,
 			_debug => 0
 		);
@@ -391,14 +391,14 @@ sub addTransactionAndInvoice
 
 
 	## Update total_items, total_cost, balance for invoice
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		total_items => defined $itemCount ? $itemCount : undef,
-		total_cost => defined $invoiceTotal ? $invoiceTotal : undef,
-		balance => defined $invoiceTotal ? $invoiceTotal : undef,
-		_debug => 0
-	);
+	#$page->schemaAction(
+	#	'Invoice', 'update',
+	#	invoice_id => $invoiceId || undef,
+	#	total_items => defined $itemCount ? $itemCount : undef,
+	#	total_cost => defined $invoiceTotal ? $invoiceTotal : undef,
+	#	balance => defined $invoiceTotal ? $invoiceTotal : undef,
+	#	_debug => 0
+	#);
 
 
 

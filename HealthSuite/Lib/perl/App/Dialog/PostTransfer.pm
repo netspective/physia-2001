@@ -61,17 +61,6 @@ sub new
 	return $self;
 }
 
-#sub makeStateChanges
-#{
-#	my ($self, $page, $command, $dlgFlags) = @_;
-#	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-#}
-
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#}
-
 sub customValidate
 {
 	my ($self, $page) = @_;
@@ -131,7 +120,8 @@ sub execute
 	handleTransferFromInvoice($self, $page, $command, $flags);
 	handleTransferToInvoice($self, $page, $command, $flags);
 
-	$self->handlePostExecute($page, $command, $flags);
+	my $personId = $page->param('person_id');
+	$page->redirect("/person/$personId/account");
 }
 
 sub handleTransferFromInvoice
@@ -145,8 +135,6 @@ sub handleTransferFromInvoice
 
 	my $transferAmt = $page->field('trans_from_amt');
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
-	my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $fromInvoiceId, $itemType);
-	my $itemSeq = $totalDummyItems + 1;
 
 	my $itemId = $page->schemaAction(
 			'Invoice_Item', 'add',
@@ -154,7 +142,6 @@ sub handleTransferFromInvoice
 			item_type => defined $itemType ? $itemType : undef,
 			total_adjust => defined $transferAmt ? $transferAmt : undef,
 			balance => defined $transferAmt ? $transferAmt : undef,
-			data_num_c => $itemSeq,
 			_debug => 0
 	);
 
@@ -169,7 +156,7 @@ sub handleTransferFromInvoice
 			adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
-			net_adjust => defined $transferAmt ? $transferAmt : undef,
+			#net_adjust => defined $transferAmt ? $transferAmt : undef,
 			comments => $comments || undef,
 			_debug => 0
 	);
@@ -178,31 +165,29 @@ sub handleTransferFromInvoice
 
 	#Update the invoice
 
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $fromInvoiceId);
+	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $fromInvoiceId);
 
-	my $totalAdjustForInvoice = $invoice->{total_adjust} + $transferAmt;
-	my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+	#my $totalAdjustForInvoice = $invoice->{total_adjust} + $transferAmt;
+	#my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
 
-	$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $fromInvoiceId || undef,
-			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-			balance => defined $invoiceBalance ? $invoiceBalance : undef,
-			_debug => 0
-	);
+	#$page->schemaAction(
+		#	'Invoice', 'update',
+		#	invoice_id => $fromInvoiceId || undef,
+		#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+		#	balance => defined $invoiceBalance ? $invoiceBalance : undef,
+		#	_debug => 0
+	#);
 
 
 
 	#Create history attribute for this adjustment
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
-	my $description = "Credit of \$$transferAmt transferred to invoice $toInvoiceId";
-
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $fromInvoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $description,
+			value_text => "Credit of \$$transferAmt transferred to invoice $toInvoiceId",
 			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0
@@ -221,16 +206,13 @@ sub handleTransferToInvoice
 	my $transferAmt = $page->field('trans_from_amt');
 	my $totalAdjust = 0 - $transferAmt;
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
-	my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $toInvoiceId, $itemType);
-	my $itemSeq = $totalDummyItems + 1;
 
 	my $itemId = $page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $toInvoiceId,
 			item_type => defined $itemType ? $itemType : undef,
 			total_adjust => defined $totalAdjust ? $totalAdjust : undef,
-			balance => defined $totalAdjust ? $totalAdjust : undef,
-			data_num_c => $itemSeq,
+			#balance => defined $totalAdjust ? $totalAdjust : undef,
 			_debug => 0
 	);
 
@@ -245,7 +227,7 @@ sub handleTransferToInvoice
 			adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
-			net_adjust => defined $totalAdjust ? $totalAdjust : undef,
+			#net_adjust => defined $totalAdjust ? $totalAdjust : undef,
 			comments => $comments || undef,
 			_debug => 0
 	);
@@ -254,31 +236,29 @@ sub handleTransferToInvoice
 
 	#Update the invoice
 
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $toInvoiceId);
+	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $toInvoiceId);
 
-	my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjust;
-	my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
+	#my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjust;
+	#my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
 
-	$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $toInvoiceId || undef,
-			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-			balance => defined $invoiceBalance ? $invoiceBalance : undef,
-			_debug => 0
-	);
+	#$page->schemaAction(
+	#		'Invoice', 'update',
+	#		invoice_id => $toInvoiceId || undef,
+	#		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+	#		balance => defined $invoiceBalance ? $invoiceBalance : undef,
+	#		_debug => 0
+	#);
 
 
 
 	#Create history attribute for this adjustment
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
-	my $description = "Amount \$$transferAmt was transferred from invoice $fromInvoiceId";
-
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $toInvoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $description,
+			value_text => "Amount \$$transferAmt was transferred from invoice $fromInvoiceId",
 			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0

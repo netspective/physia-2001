@@ -17,6 +17,7 @@ use CGI::Dialog;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::Invoice;
+use App::Dialog::Field::BatchDateID;
 use App::Dialog::Field::Procedures;
 use App::Universal;
 
@@ -629,10 +630,10 @@ sub voidInvoicePostSubmit
 		owner_id => $invoiceInfo->{owner_id} || undef,
 		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		client_id => $personId || undef,
-		total_items => $invoiceInfo->{total_items} || undef,
+		#total_items => $invoiceInfo->{total_items} || undef,
 		#total_adjust => $totalAdjust || undef,
-		total_cost => $totalCost || undef,
-		balance => $balance || undef,
+		#total_cost => $totalCost || undef,
+		#balance => $balance || undef,
 		_debug => 0
 	);
 
@@ -669,7 +670,7 @@ sub voidInvoicePostSubmit
 			data_text_a => $item->{data_text_a} || undef,
 			data_num_a => $item->{data_num_a} || undef,
 			extended_cost => $extCost || undef,
-			balance => $itemBalance || undef,
+			#balance => $itemBalance || undef,
 			_debug => 0
 		);
 	}
@@ -1640,7 +1641,7 @@ sub billCopay
 		parent_id => $invoiceId || undef,
 		item_type => defined $itemType ? $itemType : undef,
 		extended_cost => defined $copayAmt ? $copayAmt : undef,
-		balance => defined $copayAmt ? $copayAmt : undef,
+		#balance => defined $copayAmt ? $copayAmt : undef,
 		_debug => 0
 	);
 
@@ -1666,18 +1667,18 @@ sub billCopay
 
 	#UPDATE INVOICE
 
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $totalItems = $invoice->{total_items} + 1;
-	my $totalCost = $invoice->{total_cost} + $copayAmt;
-	my $invBalance = $totalCost + $invoice->{total_adjust};
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		total_items => defined $totalItems ? $totalItems : undef,
-		total_cost => defined $totalCost ? $totalCost : undef,
-		balance => defined $invBalance ? $invBalance : undef,
-		_debug => 0
-	);
+	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	#my $totalItems = $invoice->{total_items} + 1;
+	#my $totalCost = $invoice->{total_cost} + $copayAmt;
+	#my $invBalance = $totalCost + $invoice->{total_adjust};
+	#$page->schemaAction(
+	#	'Invoice', 'update',
+	#	invoice_id => $invoiceId || undef,
+	#	total_items => defined $totalItems ? $totalItems : undef,
+	#	total_cost => defined $totalCost ? $totalCost : undef,
+	#	balance => defined $invBalance ? $invBalance : undef,
+	#	_debug => 0
+	#);
 
 
 	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
@@ -1707,10 +1708,8 @@ sub handleProcedureItems
 	#convert place to it's foreign key id
 	my $servPlace = $page->param('_f_proc_service_place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace);
-	#$page->addDebugStmt("code=$servPlace");
-	#$page->addDebugStmt("id=$servPlaceId");
 	my $lineCount = $page->param('_f_line_count');
-	#$page->addError('stop');
+
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
@@ -1758,7 +1757,7 @@ sub handleProcedureItems
 
 
 		$record{extended_cost} = $record{unit_cost} * $record{quantity};
-		$record{balance} = $record{extended_cost};
+		#$record{balance} = $record{extended_cost};
 
 
 		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
@@ -1772,33 +1771,33 @@ sub handleProcedureItems
 
 		#UPDATE INVOICE
 
-		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+		#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
-		my $totalItems = $invoice->{total_items};
-		if($command eq 'add')
-		{
-			$totalItems = $invoice->{total_items} + 1;
-		}
+		#my $totalItems = $invoice->{total_items};
+		#if($command eq 'add')
+		#{
+		#	$totalItems = $invoice->{total_items} + 1;
+		#}
 
-		my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-		my $totalCostForInvoice = 0;
-		my $totalAdjustForInvoice = 0;
-		foreach my $item (@{$allInvItems})
-		{
-			$totalCostForInvoice += $item->{extended_cost};
-			$totalAdjustForInvoice += $item->{total_adjust};
-		}
+		#my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+		#my $totalCostForInvoice = 0;
+		#my $totalAdjustForInvoice = 0;
+		#foreach my $item (@{$allInvItems})
+		#{
+		#	$totalCostForInvoice += $item->{extended_cost};
+		#	$totalAdjustForInvoice += $item->{total_adjust};
+		#}
 
-		my $invBalance = $totalCostForInvoice + $totalAdjustForInvoice;
+		#my $invBalance = $totalCostForInvoice + $totalAdjustForInvoice;
 
-		$page->schemaAction('Invoice', 'update',
-			invoice_id => $invoiceId,
-			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-			total_items => defined $totalItems ? $totalItems : undef,
-			balance => defined $invBalance ? $invBalance : undef,
-			_debug => 0
-		);
+		#$page->schemaAction('Invoice', 'update',
+		#	invoice_id => $invoiceId,
+		#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+		#	total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+		#	total_items => defined $totalItems ? $totalItems : undef,
+		#	balance => defined $invBalance ? $invBalance : undef,
+		#	_debug => 0
+		#);
 	}
 }
 
@@ -1829,7 +1828,7 @@ sub voidProcedureItem
 			unit_cost => $invItem->{unit_cost} || undef,
 			quantity => $invItem->{quantity} || undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			balance => defined $itemBalance ? $itemBalance : undef,
+			#balance => defined $itemBalance ? $itemBalance : undef,
 			emergency => defined $emg ? $emg : undef,
 			#comments => $comments || undef,
 			hcfa_service_place => defined $invItem->{hcfa_service_place} ? $invItem->{hcfa_service_place} : undef,
@@ -1851,24 +1850,24 @@ sub voidProcedureItem
 
 	## UPDATE INVOICE TO WHICH ITEM BELONGS
 
-	my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-	my $totalCostForInvoice = '';
-	foreach my $item (@{$allInvItems})
-	{
-		$totalCostForInvoice += $item->{extended_cost};
-	}
+	#my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+	#my $totalCostForInvoice = '';
+	#foreach my $item (@{$allInvItems})
+	#{
+	#	$totalCostForInvoice += $item->{extended_cost};
+	#}
 
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
-	my $totalItems = $invoice->{total_items} - 1;
-	$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $invoiceId || undef,
-			total_items => defined $totalItems ? $totalItems : undef,
-			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-			balance => defined $invBalance ? $invBalance : undef,
-			_debug => 0
-		);
+	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	#my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+	#my $totalItems = $invoice->{total_items} - 1;
+	#$page->schemaAction(
+	#		'Invoice', 'update',
+	#		invoice_id => $invoiceId || undef,
+	#		total_items => defined $totalItems ? $totalItems : undef,
+	#		total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+	#		balance => defined $invBalance ? $invBalance : undef,
+	#		_debug => 0
+	#	);
 
 
 

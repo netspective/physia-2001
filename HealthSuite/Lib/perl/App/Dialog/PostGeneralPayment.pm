@@ -122,22 +122,6 @@ sub populateData
 	$page->field('payer_id', $personId);
 }
 
-sub customValidate
-{
-	my ($self, $page) = @_;
-
-	#my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
-	#my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
-	#unless($page->param('_p_batch_id') || $page->field('batch_id'))
-	#{
-	#	$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
-	#}
-	#unless($page->param('_p_batch_date') || $page->field('batch_date'))
-	#{
-	#	$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
-	#}
-}
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -169,18 +153,15 @@ sub execute
 			my $totalAdjustForItemAndItemAdjust = 0 - $payAmt;
 
 			my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
-			my $totalDummyItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_NONE, 'selInvoiceItemCountByType', $invoiceId, $itemType);
-			my $itemSeq = $totalDummyItems + 1;
 
-			my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
+			#my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
 																# payment, there is no charge and the balance should be negative.
 			my $itemId = $page->schemaAction(
 				'Invoice_Item', 'add',
 				parent_id => $invoiceId,
 				item_type => defined $itemType ? $itemType : undef,
-				total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				balance => defined $itemBalance ? $itemBalance : undef,
-				data_num_c => $itemSeq,
+				#total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+				#balance => defined $itemBalance ? $itemBalance : undef,
 				_debug => 0
 			);
 
@@ -199,7 +180,7 @@ sub execute
 				pay_ref => $payRef || undef,
 				payer_type => $payerType || 0,
 				payer_id => $payerId || undef,
-				net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
+				#net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 				data_text_a => $authRef || undef,
 				pay_type => defined $payType ? $payType : undef,
 				comments => $comments || undef,
@@ -209,16 +190,13 @@ sub execute
 			#Update the invoice
 
 			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-
-			my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjustForItemAndItemAdjust;
-			my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-
+			my $invoiceBalance = $invoice->{total_cost} + ($invoice->{total_adjust} + (0 - $payAmt));
 			$page->schemaAction(
 				'Invoice', 'update',
 				invoice_id => $invoiceId || undef,
 				invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
-				total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-				balance => defined $invoiceBalance ? $invoiceBalance : undef,
+				#total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+				#balance => defined $invoiceBalance ? $invoiceBalance : undef,
 				_debug => 0
 			);
 

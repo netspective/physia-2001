@@ -190,29 +190,6 @@ sub populateData
 	}
 }
 
-sub customValidate
-{
-	my ($self, $page) = @_;
-
-	#my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
-	#my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
-	#unless($page->param('_p_batch_id') || $page->field('batch_id'))
-	#{
-	#	$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
-	#}
-	#unless($page->param('_p_batch_date') || $page->field('batch_date'))
-	#{
-	#	$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
-	#}
-
-	#my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
-	#my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	#if($page->param('paidBy') eq 'insurance' && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
-	#{
-	
-	#}
-}
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -249,7 +226,7 @@ sub execute
 			'Invoice_Item', 'update',
 			item_id => $itemId,
 			total_adjust => defined $totalItemAdjust ? $totalItemAdjust : undef,
-			balance => defined $itemBalance ? $itemBalance : undef,
+			#balance => defined $itemBalance ? $itemBalance : undef,
 			_debug => 0
 		);
 
@@ -260,7 +237,7 @@ sub execute
 		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
 		$writeoffCode = $writeoffAmt eq '' || $writeoffCode == App::Universal::ADJUSTWRITEOFF_FAKE_NONE ? undef : $writeoffCode;
 
-		my $netAdjust = 0 - $totalAdjsMade;
+		#my $netAdjust = 0 - $totalAdjsMade;
 		my $comments = $page->param("_f_item_$line\_comments");
 		my $adjItemId = $page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
@@ -277,7 +254,7 @@ sub execute
 			payer_id => $payerId || undef,
 			writeoff_code => defined $writeoffCode ? $writeoffCode : 'NULL',
 			writeoff_amount => $writeoffAmt || undef,
-			net_adjust => defined $netAdjust ? $netAdjust : undef,
+			#net_adjust => defined $netAdjust ? $netAdjust : undef,
 			comments => $comments || undef,
 			_debug => 0
 		);
@@ -326,8 +303,8 @@ sub execute
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
-		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-		balance => defined $invoiceBalance ? $invoiceBalance : undef,
+	#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+	#	balance => defined $invoiceBalance ? $invoiceBalance : undef,
 		_debug => 0
 	);
 
