@@ -81,7 +81,7 @@
 		<column name="view_caption" type="text" size="255" descr="The caption to show to the user for this view-type"/>
 		<column name="view_arl" type="text" size="255" descr="The arl to use for the user for this view-type"/>
 	</table>
-	
+
 	<table name="Person_Medication" abbrev="PerMed" type="Audit,Secure">
 		<description>Stores patient medication information including past and current medications and prescriptions</description>
 		<column name="permed_id" type="autoinc" primarykey="yes" descr="Unique record indentification"/>
@@ -313,7 +313,7 @@
 	<table name="Invoice" type="Audit,Secure,Restrict_Rows">
 		<description>A bill for services rendered, usually associated with an appointment</description>
 		<column name="invoice_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice"/>
-		<column name="parent_invoice_id" selfref="Invoice.invoice_id" descr="Any parent invoice that this invoice may belong to (as a child)"/>
+		<column name="parent_invoice_id" indexed="yes" selfref="Invoice.invoice_id" descr="Any parent invoice that this invoice may belong to (as a child)"/>
 		<column name="invoice_number" type="text" size="32" descr="The owner's specific invoice number (their format)"/>
 		<column name="invoice_status" indexed="yes" lookupref="Invoice_Status" descr="The current status of the invoice"/>
 		<column name="invoice_type" lookupref="Invoice_Type" descr="The type of invoice"/>
