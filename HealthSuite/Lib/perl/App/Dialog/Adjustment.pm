@@ -32,29 +32,18 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::MultiField(caption =>'Adjustment Type/Amount', name => 'adjust_info',
-			fields => [
-				new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.adjustment_type',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-				new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.adjustment_amount',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
-						]),
-
 		new CGI::Dialog::Field::TableColumn(
-							caption => 'Adjustment Type',
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.adjustment_type',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							caption => 'Adjustment Amount', 
+							schema => $schema, column => 'Invoice_Item_Adjust.adjustment_amount', 
+							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+							options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::Field::TableColumn(
 							caption => 'Payer',
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.payer_id',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+							options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::MultiField(caption =>'Plan Allow/Paid', name => 'plan_info',
 			fields => [
@@ -65,17 +54,12 @@ sub new
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.plan_paid',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+							options => FLDFLAG_REQUIRED)
 						]),
 
-		new CGI::Dialog::MultiField(caption =>'Pay Date/Type',
-			fields => [
-				new CGI::Dialog::Field(caption => 'Pay Date', name => 'pay_date', type => 'date', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-				new CGI::Dialog::Field::TableColumn(
-							schema => $schema,
-							column => 'Invoice_Item_Adjust.pay_type',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
-						]),
+
+		new CGI::Dialog::Field::TableColumn(caption => 'Payment Type', schema => $schema, column => 'Invoice_Item_Adjust.pay_type', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),						
 
 		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code',
 			fields => [
@@ -135,10 +119,11 @@ sub makeStateChanges
 
 	$self->heading("Make \u$payType Payment");
 
-	$self->updateFieldFlags('adjust_info', FLDFLAG_INVISIBLE, $isInsurance);
+	$self->updateFieldFlags('adjustment_amount', FLDFLAG_INVISIBLE, $isInsurance);
+	$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
+	
 	$self->updateFieldFlags('plan_info', FLDFLAG_INVISIBLE, $isPersonal);
 	$self->updateFieldFlags('adjust_codes', FLDFLAG_INVISIBLE, $isPersonal);
-	$self->updateFieldFlags('adjustment_type', FLDFLAG_INVISIBLE, $isPersonal);
 }
 
 sub populateData
@@ -241,7 +226,7 @@ sub execute_add
 		my $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
 		$payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
 
-		my $adjType = $page->field('adjustment_type');
+		my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 		my $payType = $page->field('pay_type');
 		my $payMethod = $page->field('pay_method');
 		my $netAdjust = 0 - $page->field('adjustment_amount') - $page->field('plan_paid') - $page->field('writeoff_amount');
@@ -253,7 +238,7 @@ sub execute_add
 				parent_id => $itemId || undef,
 				plan_allow => $page->field('plan_allow') || undef,
 				plan_paid => $page->field('plan_paid') || undef,
-				pay_date => $page->field('pay_date') || undef,
+				pay_date => $todaysDate,
 				pay_type => defined $payType ? $payType : undef,
 				pay_method => defined $payMethod ? $payMethod : undef,
 				pay_ref => $page->field('pay_ref') || undef,

@@ -11,7 +11,7 @@ use App::Statements::Catalog;
 use App::Statements::Insurance;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use App::Dialog::Field::OutstandingInvoices;
+use App::Dialog::Field::Invoice;
 use App::Universal;
 use Date::Manip;
 use Devel::ChangeLog;
@@ -38,7 +38,9 @@ sub new
 					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 					options => FLDFLAG_REQUIRED),
 
-		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number',
+		new CGI::Dialog::Field::TableColumn(caption => 'Payment Type', schema => $schema,	column => 'Invoice_Item_Adjust.pay_type', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
+		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number', name => 'pay_method_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
@@ -64,7 +66,7 @@ sub new
 		new CGI::Dialog::Field(type => 'currency', caption => "Payment for Today's Visit", name => 'adjustment_amount'),
 
 		new CGI::Dialog::Subhead(heading => 'Outstanding Invoices', name => 'outstanding_heading'),
-		new App::Dialog::Field::OutstandingInvoices(name =>'invoices_list'),
+		new App::Dialog::Field::OutstandingInvoices(name =>'outstanding_invoices_list'),
 
 	);
 	$self->{activityLog} =
@@ -81,7 +83,6 @@ sub new
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
 	#if param invoice id is NULL, don't want to show invoice-specific fields
@@ -99,30 +100,33 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	if(my $invoiceId = $page->param('invoice_id'))
+	if($page->param('posting_action') ne 'refund')
 	{
-		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-		$page->field('invoice_id', $invoiceId);
-		my $balanceDisplay = $invoiceInfo->{balance} ? "\$$invoiceInfo->{balance}" : "\$0";
-		$page->field('balance', $balanceDisplay);
-		$page->field('payer_id', $invoiceInfo->{client_id});
-
-		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
-		my $endDateDisplay = '';
-		if($itemServDates->{service_end_date})
+		if(my $invoiceId = $page->param('invoice_id'))
 		{
-			$endDateDisplay = $itemServDates->{service_end_date} ne  $itemServDates->{service_begin_date} ? "- $itemServDates->{service_end_date}" : '';
-		}
-		my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
-		$page->field('service_dates', $dateDisplay);
+			my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+			$page->field('invoice_id', $invoiceId);
+			my $balanceDisplay = $invoiceInfo->{balance} ? "\$$invoiceInfo->{balance}" : "\$0";
+			$page->field('balance', $balanceDisplay);
+			$page->field('payer_id', $invoiceInfo->{client_id});
 
-		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
-		my $copayDisplay = $invoiceCopayItem->{balance} ? "\$$invoiceCopayItem->{balance}" : "\$0";
-		$page->field('copay_due', $copayDisplay);
-	}
-	elsif(my $personId = $page->param('person_id'))
-	{
-		$page->field('payer_id', $personId);	
+			my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
+			my $endDateDisplay = '';
+			if($itemServDates->{service_end_date})
+			{
+				$endDateDisplay = $itemServDates->{service_end_date} ne  $itemServDates->{service_begin_date} ? "- $itemServDates->{service_end_date}" : '';
+			}
+			my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
+			$page->field('service_dates', $dateDisplay);
+
+			my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
+			my $copayDisplay = $invoiceCopayItem->{balance} ? "\$$invoiceCopayItem->{balance}" : "\$0";
+			$page->field('copay_due', $copayDisplay);
+		}
+		elsif(my $personId = $page->param('person_id'))
+		{
+			$page->field('payer_id', $personId);	
+		}
 	}
 }
 
@@ -170,7 +174,7 @@ sub execute
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
 			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
-			#my $payType = $page->field('pay_type');		# leave this out for now or until it is asked to be put in the dialog
+			my $payType = $page->field('pay_type');
 
 			$page->schemaAction(
 					'Invoice_Item_Adjust', 'add',
@@ -184,9 +188,9 @@ sub execute
 					payer_id => $payerId || undef,
 					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 					data_text_a => $page->field('auth_ref') || undef,
+					pay_type => defined $payType ? $payType : undef,
 					#plan_allow => undef,
 					#plan_paid => undef,
-					#pay_type => undef,
 					#writeoff_code => undef,
 					#writeoff_amount => undef,
 					#adjust_codes => undef,
@@ -268,12 +272,12 @@ sub execute
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
 			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
-			#my $payType = $page->field('pay_type');		# leave this out for now or until it is asked to be put in the dialog
+			my $payType = $page->field('pay_type');
 
 			$page->schemaAction(
 					'Invoice_Item_Adjust', 'add',
 					adjustment_type => defined $adjType ? $adjType : undef,
-					adjustment_amount => $page->field('adjustment_amount') || undef,
+					adjustment_amount => defined $payAmt ? $payAmt : undef,
 					parent_id => $itemId || undef,
 					pay_date => $todaysDate || undef,
 					pay_method => defined $payMethod ? $payMethod : undef,
@@ -282,9 +286,9 @@ sub execute
 					payer_id => $payerId || undef,
 					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 					data_text_a => $page->field('auth_ref') || undef,
+					pay_type => defined $payType ? $payType : undef,
 					#plan_allow => undef,
 					#plan_paid => undef,
-					#pay_type => undef,
 					#writeoff_code => undef,
 					#writeoff_amount => undef,
 					#adjust_codes => undef,
@@ -330,8 +334,9 @@ sub execute
 				);
 		}
 	}
-
+	
 	$self->handlePostExecute($page, $command, $flags);
+
 }
 
 1;

@@ -106,6 +106,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where client_id = ?
 			and balance > 0
 		},
+	'selCreditInvoicesByClient' => q{
+		select * from invoice
+		where client_id = ?
+			and balance < 0
+		},
 	'selInvoicesByType' => q{
 		select * from invoice
 		where invoice_type = ?

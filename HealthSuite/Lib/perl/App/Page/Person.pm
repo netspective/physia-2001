@@ -20,6 +20,7 @@ use App::Dialog::Person::Physician;
 use App::Dialog::Person::Nurse;
 use App::Dialog::Adjustment;
 use App::Dialog::PostGeneralPayment;
+use App::Dialog::PostRefund;
 
 use App::Page::Search;
 
@@ -217,13 +218,32 @@ sub prepare_dialog_postpayment
 	my $personId = $self->param('person_id');
 
 	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
-	my ($payType, $invoiceId) = split(/,/, $dialogCmd);
+	my ($action, $invoiceId) = split(/,/, $dialogCmd);
 	$self->param('invoice_id', $invoiceId);
-	$self->param('payment', $payType);
+	$self->param('posting_action', $action);
 	#$self->addDebugStmt($payType);
 
 	my $cancelUrl = "/person/$personId/account";
 	my $dialog = new App::Dialog::PostGeneralPayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+
+	$self->addContent('<p>');
+	return $self->prepare_view_account();
+}
+
+sub prepare_dialog_postrefund
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+
+	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	#my ($action, $invoiceId) = split(/,/, $dialogCmd);
+	#$self->param('invoice_id', $invoiceId);
+	#$self->param('posting_action', $action);
+	#$self->addDebugStmt($payType);
+
+	my $cancelUrl = "/person/$personId/account";
+	my $dialog = new App::Dialog::PostRefund(schema => $self->getSchema(), cancelUrl => $cancelUrl);
 	$dialog->handle_page($self, $dialogCmd);
 
 	$self->addContent('<p>');
