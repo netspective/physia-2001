@@ -204,8 +204,7 @@ sub makeStateChanges
 		#$self->updateFieldFlags('insured_guarantor_ids', FLDFLAG_INVISIBLE, $patientAge < 21 ? 0 : 1);
 		#$self->updateFieldFlags('insured_id', FLDFLAG_INVISIBLE, $patientAge < 21 ? 1 : 0);
 		my $insuredId = $patientAge < 21 ? '' : $personId;
-		$page->field('insured_id', $insuredId);
-		
+		$page->field('insured_id', $insuredId);		
 	}
 }
 
