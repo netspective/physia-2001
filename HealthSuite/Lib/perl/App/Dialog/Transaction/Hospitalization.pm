@@ -91,16 +91,17 @@ sub makeStateChanges
 	$self->setFieldFlags('patient_id', FLDFLAG_READONLY) if ($command =~ /update/);
 }
 
-sub populateData_update
+sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	my $transId = $page->param('trans_id');
-
-	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
-	$page->field('patient_id', $page->field('trans_owner_id'));
+	if(my $transId = $page->param('trans_id'))
+	{
+		$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
+		$page->field('patient_id', $page->field('trans_owner_id'));
+	}
 }
 
 sub execute
