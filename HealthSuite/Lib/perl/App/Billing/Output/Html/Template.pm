@@ -293,7 +293,7 @@ sub populateOtherInsured
 				$data->{otherInsuredSexM} = $insured2->getSex() eq 'M' ? "Checked" : "";
 				$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
 				$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
-				$data->{otherInsuredInsurancePlanOrProgramName} = $insured1->getMedigapNo; # $insured2->getInsurancePlanOrProgramName;
+				$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getMedigapNo; # $insured2->getInsurancePlanOrProgramName;
 				my $groupNumber = $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName;
 				$data->{otherInsuredPolicyGroupName} =  "MEDIGAP " . $groupNumber;
 			}

@@ -2137,7 +2137,7 @@ sub box9dClaimData
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 			if(uc($insured1->getInsurancePlanOrProgramName) eq "MEDICARE")
 			{
-				pdflib::PDF_show_xy($p , $insured1->getMedigapNo, $box9dX + CELL_PADDING_X + DATA_PADDING_X, $box9dY - 3 * FORM_FONT_SIZE);
+				pdflib::PDF_show_xy($p , $insured2->getMedigapNo, $box9dX + CELL_PADDING_X + DATA_PADDING_X, $box9dY - 3 * FORM_FONT_SIZE);
 			}
 			else
 			{
