@@ -20,7 +20,7 @@ use Data::Publish;
 use Text::CSV;
 
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.10 2000-12-18 14:58:24 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.11 2000-12-28 20:02:10 frank_major Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 
@@ -594,7 +594,9 @@ sub customValidate
 			my $numParams = $ph =~ s/\?/\?/g;
 			my $optParams = $ph =~ s/\[/\[/g;
 			my $canGrow = $ph =~ /\+/;
-			
+			#Set NumParams to 1 one if a placeHolder is not defined for condition
+			#Could also define a placeHolder for all types
+			$numParams = 1 unless defined $condOpData->{placeholder};			
 			if ($numCriteria > $numParams && ! $canGrow)
 			{
 				my $gridFld = $self->getField('params');

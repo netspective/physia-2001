@@ -6,7 +6,7 @@
 	<query-defn id="invoice" caption="Invoice" db="Oracle">
 
 		<!-- Fields -->
-		<field id="invoice_id" caption="Claim #" join="invoice" column="invoice_id"/>
+		<field id="invoice_id" caption="Claim #" join="invoice" column="invoice_id" ui-datatype="integer"/>
 		<field id="row_num" column="rownum"/>
 		<field id="owner_id" join="invoice" column="owner_id"/>
 		<field id="total_items" join="invoice" caption="Item Count" column="total_items"/>
