@@ -88,6 +88,10 @@
 			Missing Encounter.
 		</deliverable>
 
+		<deliverable id="1573">
+			Now the Main Org can be updated only by the Administrator.
+		</deliverable>
+		
 		<deliverable id="1580">
 			Copied claim info to demo database.  Added EDI reports.
 		</deliverable>
