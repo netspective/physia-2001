@@ -27,7 +27,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		heading => '$Command Referring Doctor',
 		_arl => ['person_id'],
 		_arl_modify => ['person_id'],
-		_idSynonym => 'referring-doctor'
+		_idSynonym => 'Referring-Doctor'
 	},
 );
 
