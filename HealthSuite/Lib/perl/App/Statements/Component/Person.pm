@@ -1597,7 +1597,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%
 			from 	person_attribute
 			where 	parent_id = ?
-			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]})
+			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
 	publishDefn => {
@@ -1632,7 +1632,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-certificate-license?home=#param.home#'>License</A> } },
 				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-certificate-state?home=#param.home#'>State</A> } },
 				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-certificate-accreditation?home=#param.home#'>Accreditation</A> } },
-			],
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-certificate-specialty?home=#param.home#'>Specialty</A> } },
+		],
 		},
 		stdIcons =>	{
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
