@@ -23,6 +23,7 @@ $STMTFMT_SEL_PERSON = qq{
 					and per.person_id = att.parent_id(+)
 					and att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
 					and att.item_name(+) = '$ITEMNAME_PATH'
+					and cat.org_id = ? 
 					and %whereCond%
 					%catCond%
 			%orderBy%
@@ -102,14 +103,14 @@ my %personTemplates = (
 	'sel_dob' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'per.date_of_birth = ?',
+			 whereCond => "per.date_of_birth = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
 			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'per.date_of_birth like ?',
+			 whereCond => "to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') like ?",
 			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
