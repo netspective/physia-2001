@@ -27,6 +27,7 @@ begin
           invoice_date = :new.invoice_date,
           invoice_type = :new.invoice_type,
           invoice_subtype = :new.invoice_subtype,
+          invoice_status = :new.invoice_status,
           submitter_id = :new.submitter_id,
           client_type = :new.client_type,
           client_id = :new.client_id,
