@@ -4504,7 +4504,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				},
 				columnDefn =>
 				[
-				{colIdx => 1,hint=>"Add Order Entry to #1#" , url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#',hAlign=>'left', head => 'Lab Name',},
+				{colIdx => 1,hint=>"Add Order Entry to #1#" , url=>'/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&org_id=#0#',hAlign=>'left', head => 'Lab Name',},
 				{colIdx => 3, hAlign=>'left', head => 'Patient Lab Requests'},
 				],
 
@@ -4531,7 +4531,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				[
 				{colIdx => 1,hint=>"Add Order Entry to #1#" , hAlign=>'left', head => 'Lab Company',},
 				{colIdx => 3, dAlign=>'right', head => 'Entries'},
-				{dAlign=>'right', dataFmt=>'Add', url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#', hint=>'Add Ancillary Test Entry'},
+				{dAlign=>'right', dataFmt=>'Add', url=>'/person/#param.person_id#/dlg-add-lab-order/#0#?home=#homeArl#&org_id=#0#', hint=>'Add Ancillary Test Entry'},
 				],
 	},
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderSummary', [$page->session('org_internal_id'),$personId], 'panel'); },
