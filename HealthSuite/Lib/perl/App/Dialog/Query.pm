@@ -6,10 +6,9 @@ use strict;
 use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use App::Dialog::Field::DataGrid;
 use SQL::GenerateQuery;
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.1 2000-09-12 15:24:30 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.2 2000-09-12 15:35:09 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 %RESOURCE_MAP=();
