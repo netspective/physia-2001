@@ -17,13 +17,14 @@ use enum qw(BITMASK:STMTMGRFLAG_ NULLIFNAMENOTFOUND DYNAMICSQL DEBUG
 	CACHE REPLACEVARS FLATTREE);
 
 use vars qw(@ISA @EXPORT $ALL_STMT_MANAGERS $SQLSTMT_DEFAULTDATEFORMAT
-	$SQLSTMT_DEFAULTCURRENCYFORMAT $SQLSTMT_DEFAULTSTAMPFORMAT %REPORT_STYLE);
+	$SQLSTMT_DEFAULTCURRENCYFORMAT $SQLSTMT_DEFAULTTIMEFORMAT $SQLSTMT_DEFAULTSTAMPFORMAT %REPORT_STYLE);
 
 use constant STMTMGRFLAGS_NONE => 0;
 
 @ISA    = qw(Exporter);
 @EXPORT = qw(
 	$SQLSTMT_DEFAULTDATEFORMAT
+	$SQLSTMT_DEFAULTTIMEFORMAT
 	$SQLSTMT_DEFAULTSTAMPFORMAT
 	$SQLSTMT_DEFAULTCURRENCYFORMAT
 	$ALL_STMT_MANAGERS
@@ -43,6 +44,7 @@ use constant STMTPUBLCALLBACKKEY => 'publishFunc';
 use constant STMTPUBLDEFNKEY_BASE => 'publishDefn';
 
 $SQLSTMT_DEFAULTDATEFORMAT     = 'MM/DD/YYYY';
+$SQLSTMT_DEFAULTTIMEFORMAT     = 'HH12:MI AM';
 $SQLSTMT_DEFAULTSTAMPFORMAT	   = 'MM/DD/YYYY HH12:MI AM';
 $SQLSTMT_DEFAULTCURRENCYFORMAT = 'L999G999G990D99';
 
@@ -308,6 +310,19 @@ sub getSingleValueList
 	}
 	return $list;
 }
+
+sub getRowsAsArray
+{
+	my $stmtHdl = execute(@_);
+	my @tableRows;
+	
+	while (my $currentRowRef = $stmtHdl->fetch()) {
+		push @tableRows, [ @{$currentRowRef} ];
+	}
+	
+	return \@tableRows;
+}
+
 
 sub getRowAsArray
 {
@@ -781,6 +796,24 @@ sub removeCachedData
 {
 	my ($self, $id) = @_;
 	delete $self->{$id};
+}
+
+sub createText
+{
+	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams, $pubD) = @_;
+	
+	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
+	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
+	my $publDefn = $self->{"_dpd_$defnName"} || {};
+	$publDefn = $pubD if $pubD;
+
+	$publParams = {} unless $publParams;
+	$publParams->{stmtId} = $name unless exists $publParams->{stmtId};
+
+	prepareStatementColumns($dbpage, $flags, $stmtHdl, $publDefn) unless exists $publDefn->{columnDefn};
+	
+	return
+		createHtmlFromStatement($dbpage, $flags, $stmtHdl, $publDefn, $publParams);
 }
 
 1;
