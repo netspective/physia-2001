@@ -105,7 +105,7 @@
 			<allow permission="group/Superuser"/>
 			<deny permission="group/sde" />
 			<deny permission="dlg/org-main/add" />
-			<deny permission="dlg/org-main/update" />
+			<deny permission="page/search/adhocquery" />
 			<deny permission="dlg/org-main/remove" />
 		</permission>
 	</permissions>
