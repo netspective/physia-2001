@@ -261,25 +261,26 @@ sub execute_add
 	my $personId = $page->field('person_id');
 	my $relTextId = $page->field('rel_id');
 	my $relId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relTextId);
-	if($relId ne '')
-	{
-		my $occupation = $page->field('occupation') eq '' ? 'Unknown' : $page->field('occupation');
-		$occupation = "\u$occupation";
 
-		$page->schemaAction(
-				'Person_Attribute', 'add',
-				parent_id => $personId || undef,
-				item_name => $occupation || undef,
-				value_type => $page->field('value_type') || undef,
-				value_int => $relId || undef,
-				value_text => $relTextId || undef,
-				value_textB => $page->field('phone_number') || undef,
-				#value_date => $page->field('begin_date') || undef,
-				_debug => 0
-		);
+	my $occupation = $page->field('occupation');
+	$occupation = "\u$occupation";
+
+	$page->schemaAction(
+			'Person_Attribute', 'add',
+			parent_id => $personId || undef,
+			item_name => $occupation || undef,
+			value_type => $page->field('value_type') || undef,
+			value_int => $relId || undef,
+			value_text => $relTextId || undef,
+			value_textB => $page->field('phone_number') || undef,
+			#value_date => $page->field('begin_date') || undef,
+			_debug => 0
+	);
 
 
 		#third check if employer has any workers comp plans and if so attach to person
+	if($relId ne '')
+	{
 		my $wrkCompValueType = App::Universal::ATTRTYPE_INSGRPWORKCOMP;
 		if(my $orgHasWorkCompPlans = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByValueType', $relId, $wrkCompValueType))
 		{
@@ -347,7 +348,7 @@ sub execute_update
 	my $patientTransData =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selDataByTransTypeAndCaption', $personId);
 	my $transId = $patientTransData->{'trans_id'};
 	my $transStatus = $page->field('inactivate_record') ne '' ? App::Universal::TRANSSTATUS_ACTIVE : App::Universal::TRANSSTATUS_INACTIVE;
-	my $commandInactive = $page->field('inactive_patient_item_id') eq '' ? 'add' : 'update';
+	my $commandInactive = $page->field('inactive_patient_item_id') eq '' || $transId eq '' ? 'add' : 'update';
 	if ($page->field('inactivate_record') || $page->field('inactive_patient_item_id'))
 	{
 		$page->schemaAction(
