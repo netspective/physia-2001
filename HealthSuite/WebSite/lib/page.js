@@ -701,6 +701,11 @@ function setSelectedValue(selectObj, value)
 // Find/Lookup popup window support
 //****************************************************************************
 
+function prepare_doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
+{
+	alert("prepare_doFindLookup");
+}
+
 //
 // these are global variable used for sending information
 // to the findPopup window (they are set in doFindLookup and
@@ -725,7 +730,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 
 	if(appendValue == null) appendValue = '';
 	activeFindAppendValue = appendValue;
-	
+
 	var newArl = arl;
 
 	if(controlField != '')
@@ -938,7 +943,7 @@ function validateHours(Form)
 {
 	startHour = new Number(Form._f_start_hour.value);
 	endHour   = new Number(Form._f_end_hour.value);
-	
+
 	if (endHour < startHour && startHour != '' && endHour != '')
 	{
 		alert("End Hour must be greater than or equal to Start Hour");
