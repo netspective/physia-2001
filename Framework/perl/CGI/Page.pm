@@ -294,7 +294,7 @@ sub selfHiddenFormFields
     {
 		push(@hiddens, qq{<INPUT TYPE="HIDDEN" NAME="$_" VALUE="$replaceParams{$_}">}) if defined $replaceParams{$_};
 	}
-	
+
 	join("\n", @hiddens);
 }
 
@@ -390,7 +390,7 @@ sub replaceRedirectVars
 #       SO, IF YOU UPDATE THE REGEXP, DO IT THERE, TOO!
 #
 # It can be called with a reference to a scalar string or a scalar string.  It will return
-# the string in the same type it was called with.  It is preferred to call using 
+# the string in the same type it was called with.  It is preferred to call using
 # scalar references for performance and memory
 sub replaceVars
 {
@@ -564,7 +564,7 @@ sub beginUnitWork
 	$self->{errUnitWork}=[];
 	$self->{valUnitWork}=undef;
 	$self->{sqlDump}=undef;
-	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;	
+	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;
 	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;
 	return 1;
 }
@@ -574,8 +574,8 @@ sub endUnitWork
 	my $self = shift;
 	$self->{sqlUnitWork}.= "END;  ";
 	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});
-	$self->{schemaFlags}&= ~SCHEMAAPIFLAG_UNITSQL;		
-	$self->{sqlUnitWork}=undef;		
+	$self->{schemaFlags}&= ~SCHEMAAPIFLAG_UNITSQL;
+	$self->{sqlUnitWork}=undef;
 	if (scalar(@{$self->{errUnitWork}}))
 	{
 		$self->addError($self->{sqlMsg}) if $self->{sqlMsg} ;
@@ -594,16 +594,16 @@ sub unitWork
 
 sub storeSql
 {
-	my ($self, $sql,$vals,$errors) = @_;	
+	my ($self, $sql,$vals,$errors) = @_;
 	my $out_vals = join ",",@{$vals};
-	$self->{cntUnitWork}++;	
+	$self->{cntUnitWork}++;
 	if(scalar(@{$errors}) > 0)
 	{
-		
+
 		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors} <br> $sql $out_vals");
 	}
 	$self->{sqlUnitWork}.= $sql . ";\n";
-	$self->{sqlDump}.= "<b> Line $self->{cntUnitWork} </b>" . $sql .  "<BR> <font color=red>$out_vals</font> <BR>" ;	
+	$self->{sqlDump}.= "<b> Line $self->{cntUnitWork} </b>" . $sql .  "<BR> <font color=red>$out_vals</font> <BR>" ;
 	push(@{$self->{valUnitWork}},@{$vals});
 }
 
@@ -743,16 +743,16 @@ sub setupACL
 {
 	my $self = shift;
 	my ($dbh, $session) = ($self->{db}, $self->{session});
-	
+
     # TODO: Update this select once the PERSON_ORG_CATEGORY table is removed.
     my $getRolesSth = $dbh->prepare(qq{
-                select role_name 
-                from role_name, person_org_role 
-                where person_id = :1 and org_internal_id = :2 and 
-                role_name.role_name_id = person_org_role.role_name_id 
+                select role_name
+                from role_name, person_org_role
+                where person_id = :1 and org_internal_id = :2 and
+                role_name.role_name_id = person_org_role.role_name_id
                 UNION
-				select category as role_name from person_org_category 
-				where person_id = :1 and org_internal_id = :2 
+				select category as role_name from person_org_category
+				where person_id = :1 and org_internal_id = :2
                 });
 	my $roles = ($session->{aclRoleNames} = []);
 	#$getRolesSth->execute($session->{user_id}, $session->{org_internal_id}, $session->{user_id}, $session->{org_internal_id});
@@ -775,12 +775,12 @@ sub setupACL
 			$defaultPermissions = $defaultPermissions->union($groupInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
 		}
 	}
-	
+
     my $permissions = $defaultPermissions;
     my $getPermsSth = $dbh->prepare(qq{
-                select rp.role_activity_id, rp.permission_name 
+                select rp.role_activity_id, rp.permission_name
 				from person_org_role por, role_permission rp
-				where rp.role_activity_id = ? and por.person_id = ? and por.org_internal_id = ? and 
+				where rp.role_activity_id = ? and por.person_id = ? and por.org_internal_id = ? and
                 por.role_name_id = rp.role_name_id and por.org_internal_id = rp.org_internal_id
                 });
     for my $activity (0, 1)
@@ -789,9 +789,9 @@ sub setupACL
 		while(my $row = $getPermsSth->fetch())
 		{
 			if(my $permInfo = $permIds->{$row->[1]})
-			{	
+			{
 				# if activity type is 0 or null, we're granting otherwise we're revoking
-				$permissions = $row->[0] ? 
+				$permissions = $row->[0] ?
 					$permissions->diff($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]) :
 					$permissions->union($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
 			};
@@ -875,10 +875,10 @@ sub hasPermission
 	my $self = shift;
 
 	my $disableSecurity = 0;
-	
+
 	if (defined ($ENV{HS_NOSECURITY}))
 	{
-		if ( ($ENV{HS_NOSECURITY} ? 1 : 0) ) 
+		if ( ($ENV{HS_NOSECURITY} ? 1 : 0) )
 		{
 			$disableSecurity = 1;
 		}
@@ -914,26 +914,49 @@ sub hasPermission
 use CGI::Cookie;
 
 sub getActiveSession
-{	
+{
 	my %cookies = fetch CGI::Cookie;
+	my $session;
+
 	if(my $sessionCookie = $cookies{SESSIONID_COOKIENAME()})
 	{
 		my $schema = new Schema::API(xmlFile => $CONFDATA_SERVER->file_SchemaDefn);
 		$schema->connectDB($CONFDATA_SERVER->db_ConnectKey);
-		
-		my $sessionKey = $sessionCookie->value();
-		my ($ec, $em);
-		my %session;
-		tie %session, 'CGI::Session::DBI', $sessionKey,
-			{
-				dbh => $schema->{dbh},
-				remote_addr => $ENV{REMOTE_ADDR},
-				errorCode_ref => \$ec,
-				errorMsg_ref => \$em,
-			};
-		return \%session;
+
+		eval {
+			my $sth = $schema->{dbh}->prepare(q{
+				SELECT
+					s.person_id AS person_id,
+					o.org_id AS org_id
+				FROM
+					session s,
+					org o
+				WHERE
+					s.org_internal_id = o.org_internal_id AND
+					s.session_id = ? AND
+					s.remote_host = ?
+			});
+			$sth->execute($sessionCookie->value(), $ENV{REMOTE_ADDR});
+			$session = $sth->fetchrow_hashref;
+		};
+		if ($@)
+		{
+			# log the error but continue
+			warn $@;
+			undef $@;
+		}
+		#my ($ec, $em);
+		#my %session;
+		#tie %session, 'CGI::Session::DBI', $sessionKey,
+		#	{
+		#		dbh => $schema->{dbh},
+		#		remote_addr => $ENV{REMOTE_ADDR},
+		#		errorCode_ref => \$ec,
+		#		errorMsg_ref => \$em,
+		#	};
+		#return \%session;
 	}
-	return undef;
+	return $session;
 }
 
 1;
