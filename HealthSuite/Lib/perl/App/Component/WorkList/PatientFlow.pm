@@ -143,8 +143,8 @@ sub getComponentHtml
 
 	if ($page->session('showTimeSelect'))
 	{
-		$time1 = $page->session('time1') || '12:00am';
-		$time2 = $page->session('time2') || '11:59pm';
+		$time1 = $page->session('time1') || '12:00 AM';
+		$time2 = $page->session('time2') || '11:59 PM';
 	}
 	else
 	{

@@ -212,14 +212,14 @@ sub getControlBarHtml
 		if ($self->session('showTimeSelect') == 1)
 		{
 			if (! $self->session('time1') || $self->session('time1') !~ /:/) {
-				$time1 = '12:00am';
+				$time1 = '12:00 AM';
 				$self->session('time1', $time1);
 			} else {
 				$time1 = $self->session('time1');
 			}
 
 			if (! $self->session('time2') || $self->session('time2') !~ /:/) {
-				$time2 = '11:59pm';
+				$time2 = '11:59 PM';
 				$self->session('time2', $time2);
 			} else {
 				$time2 = $self->session('time2');
@@ -242,14 +242,18 @@ sub getControlBarHtml
 			}
 		}
 
+		my $javascriptValidate;
+		$javascriptValidate = qq{ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)"}
+			if $self->param('showTimeSelect');
+		
 		$timeFieldsHtml = qq{
 			<SCRIPT>
 				function prefillDefaults(Form)
 				{
 					if (Form.showTimeSelect.value == 1)
 					{
-						Form.time1.value = '12:00am';
-						Form.time2.value = '11:59pm';
+						Form.time1.value = '12:00 AM';
+						Form.time2.value = '11:59 PM';
 					}
 					else
 					{
@@ -260,17 +264,19 @@ sub getControlBarHtml
 			</SCRIPT>
 			&nbsp; &nbsp;
 			Time:
-			<SELECT class='controlBar' name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
+			<SELECT class='controlBar' name=showTimeSelect onChange="prefillDefaults(document.dialog);">
 				<option value=0>Minutes before/after</option>
 				<option value=1>Range from/to</option>
 			</SELECT>
 
 			<script>
-				setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
+				setSelectedValue(document.dialog.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
 			</script>
 
-			&nbsp;<input class='controlBar' name=time1 size=7 maxlength=7 value=$time1 title="$title1">
-			&nbsp;<input class='controlBar' name=time2 size=7 maxlength=7 value=$time2 title="$title2">
+			&nbsp;<input class='controlBar' name=time1 size=8 maxlength=8 value='$time1' title="$title1" 
+				$javascriptValidate>
+			&nbsp;<input class='controlBar' name=time2 size=8 maxlength=8 value='$time2' title="$title2" 
+				$javascriptValidate>
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input class='controlBar' type=submit value="Go">
@@ -281,32 +287,32 @@ sub getControlBarHtml
 		my ($time1, $time2, $title1, $title2);
 
 		if (! $self->session('time1') || $self->session('time1') !~ /:/) {
-			$time1 = '12:00am';
+			$time1 = '12:00 AM';
 			$self->session('time1', $time1);
 		} else {
 			$time1 = $self->session('time1');
 		}
 
 		if (! $self->session('time2') || $self->session('time2') !~ /:/) {
-			$time2 = '11:59pm';
+			$time2 = '11:59 PM';
 			$self->session('time2', $time2);
 		} else {
 			$time2 = $self->session('time2');
 		}
-
 
 		$timeFieldsHtml = qq{
 			&nbsp; &nbsp;
 			Time:
 			<INPUT class='controlBar' name=showTimeSelect value="Range from/to" READONLY>
 
-			&nbsp;<input class='controlBar' name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input class='controlBar' name=time2 size=6 value=$time2 title="$title2">
+			&nbsp;<input class='controlBar' name=time1 size=8 maxlength=8 value='$time1' title="$title1"
+				ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)">
+			&nbsp;<input class='controlBar' name=time2 size=8 maxlength=8 value='$time2' title="$title2"
+				ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)">
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input class='controlBar' type=submit value="Go">
 		};
-
 	}
 
 	return qq{
@@ -318,14 +324,14 @@ sub getControlBarHtml
 		</STYLE>
 
 		<tr>
-			<FORM name='dateForm' method=POST onSubmit="updatePage(document.dateForm.selDate.value)">
+			<FORM name='dialog' method=POST>
 				<td ALIGN=LEFT>
-					<SELECT class='controlBar' onChange="document.dateForm.selDate.value = this.value;
-						updatePage(document.dateForm.selDate.value); return false;">
+					<SELECT class='controlBar' onChange="document.dialog.selDate.value = this.value;
+						updatePage(document.dialog.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
 
-					<A HREF="javascript: showCalendar(document.dateForm.selDate, 1);">
+					<A HREF="javascript: showCalendar(document.dialog.selDate, 1);">
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
 
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
