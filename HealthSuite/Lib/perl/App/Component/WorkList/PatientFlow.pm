@@ -327,10 +327,10 @@ sub getComponentHtml
 			$_->{invoice_id} ? $copay : undef,
 
 			$accountBalance,
-			$_->{invoice_id},
+			$_->{parent_invoice_id} || $_->{invoice_id},
 			$_->{patient_id},
 
-			$_->{invoice_id} ? qq{
+			$_->{invoice_id} && $_->{inv_status} > 3 ? qq{
 				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">
 					Print</a>
 			}

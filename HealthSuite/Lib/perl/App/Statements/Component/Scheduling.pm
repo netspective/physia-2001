@@ -58,7 +58,8 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	Appt_Type.caption as appt_type,
 	replace(Appt_Attendee_Type.caption, ' Patient', '') as patient_type,
 	Invoice_Status.caption as invoice_status,
-	ea.value_intB as flags, o.org_id as facility_name
+	ea.value_intB as flags, o.org_id as facility_name, Invoice.invoice_status as inv_status,
+	parent_invoice_id
 	from Org o, Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 		Person patient, Event_Attribute ea, Event e
 };
