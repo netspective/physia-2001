@@ -240,7 +240,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{ caption => qq{ Add
 					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personphone?home=#homeArl#'>Telephone</A>,
 					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personemail?home=#homeArl#'>E-mail</A>,
-					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personphone?home=#homeArl#'>Mobile</A>,
+					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personphone?_f_attr_name=Cellular&home=#homeArl#'>Mobile</A>,
 					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personpager?home=#homeArl#'>Pager</A>,
 					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personfax?home=#homeArl#'>Fax</A>, or
 					<A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-contact-personinternet?home=#homeArl#'>Web Page (URL)</A> }
