@@ -110,14 +110,6 @@ $STMTRPTDEFN_TEMPLATEINFO =
 # -------------------------------------------------------------------------------------------
 $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
-	'del_SessionPhysicians' => qq{
-		delete from Person_Attribute
-		where parent_id = ?
-			and value_type = App::Universal::ATTRTYPE_RESOURCEPERSON
-			and item_name = 'SessionPhysicians'
-			and value_int = 1
-	},
-
 	'sel_events_at_facility' =>
 	{
 		sqlStmt => $STMTFMT_SEL_EVENTS,
@@ -135,6 +127,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where parent_id = ?
 			and value_int > ?
 			and item_name like 'Preference/Schedule/DayView/Column%'
+			and parent_org_id = ?
 	},
 
 	'selCompleteName' => qq{
@@ -209,6 +202,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			and item_name = 'Preference/Schedule/DayView/Column'
 			and value_int = ?
 			and org_internal_id (+) = to_number(value_textb)
+			and Person_Attribute.parent_org_id = ?
 	},
 
 	'selApptSheetTimes' => qq{
@@ -237,6 +231,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select count(*) from Person_Attribute
 		where parent_id = ?
 			and item_name = 'Preference/Schedule/DayView/Column'
+			and parent_org_id = ?
 	},
 
 	'selPopulateTemplateDialog' => qq{
@@ -290,6 +285,16 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		from Person_Attribute
 		where parent_id = ?
 			and item_name = ?
+		order by column_no
+	},
+
+	'selSchedulePreferencesByOrg' => qq{
+		select item_id, value_text as resource_id, value_textb as facility_id,
+			value_int as column_no, value_intb as offset
+		from Person_Attribute
+		where parent_id = ?
+			and item_name = ?
+			and parent_org_id = ?
 		order by column_no
 	},
 
@@ -429,6 +434,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where parent_id = ?
 			and value_type = $ASSOC_VALUE_TYPE
 			and item_name = 'Physician'
+			and parent_org_id = ?
 	},
 
 	'selRovingPhysicianTypes' => qq{

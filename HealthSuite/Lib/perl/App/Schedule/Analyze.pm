@@ -497,7 +497,8 @@ sub findResourceIds
 	else
 	{
 		my $assocResources = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_worklist_resources', $page->session('user_id'), $WORKLIST_ITEMNAME);
+			'sel_worklist_resources', $page->session('user_id'), $WORKLIST_ITEMNAME,
+			$page->session('org_internal_id'));
 
 		for (@$assocResources) {
 			push(@$arrayRef, $_->{resource_id});
@@ -510,7 +511,7 @@ sub findFacilityIds
 	my ($self, $page, $arrayRef) = @_;
 	
 	my $assocFacilities = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-		'sel_worklist_facilities', $page->session('user_id'));
+		'sel_worklist_facilities', $page->session('user_id'), $page->session('org_internal_id'));
 
 	for (@$assocFacilities) {
 		push(@$arrayRef, $_->{facility_id});

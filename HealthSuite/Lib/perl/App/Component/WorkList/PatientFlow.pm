@@ -157,23 +157,24 @@ sub getComponentHtml
 	my $startTime = $startDate . " $time1";
 	my $endTime   = $startDate . " $time2";
 
+	my $orgInternalId = $page->session('org_internal_id');
 	my $appts;
 	if ($page->param('Today'))
 	{
 		if ($page->session('showTimeSelect') == 0)
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today', $time1, $time2, $user_id, $user_id);
+				'sel_events_worklist_today', $time1, $time2, $user_id, $orgInternalId, $user_id, $orgInternalId);
 		} else
 		{
 			$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_events_worklist_today_byTime', $startTime, $endTime, $user_id, $user_id);
+				'sel_events_worklist_today_byTime', $startTime, $endTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
 		}
 	}
 	else
 	{
 		$appts = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-			'sel_events_worklist_not_today', $startTime, $endTime, $user_id, $user_id);
+			'sel_events_worklist_not_today', $startTime, $endTime, $user_id, $orgInternalId, $user_id, $orgInternalId);
 	}
 
 	my @data = ();

@@ -72,12 +72,14 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
 			and item_name = '$WORKLIST_ITEMNAME'
+			and parent_org_id = ?
 		)
 	and e.facility_id in (
 		select value_int from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
 			and item_name = '$WORKLIST_ITEMNAME'
+			and parent_org_id = ?
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
@@ -94,7 +96,7 @@ my $STAMPFORMAT = 'mm/dd/yyyy hh12:miam';
 
 $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	'sel_events_worklist_today' => {
-		_stmtFmt => qq{
+		sqlStmt => qq{
 			select $STMTFMT_SEL_EVENTS_WORKLIST
 			where	$STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
@@ -108,7 +110,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	},
 
 	'sel_events_worklist_today_byTime' => {
-		_stmtFmt => qq{
+		sqlStmt => qq{
 			select $STMTFMT_SEL_EVENTS_WORKLIST
 			where	$STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
@@ -162,6 +164,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
 			and item_name = ?
+			and parent_org_id = ?
 	},
 	
 	'sel_worklist_resources' => qq{
@@ -170,6 +173,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
 			and item_name = ?
+			and parent_org_id = ?
 	},
 
 	'del_worklist_facilities' => qq{
@@ -177,6 +181,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
 			and item_name = '$WORKLIST_ITEMNAME'
+			and parent_org_id = ?
 	},
 	
 	'sel_worklist_facilities' => qq{
@@ -185,6 +190,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
 			and item_name = '$WORKLIST_ITEMNAME'
+			and parent_org_id = ?
 	},
 	
 );

@@ -193,7 +193,7 @@ sub populateData_update
 	my $column = $page->param('column');
 
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
-		'selColumnPreference', $userID, $column);
+		'selColumnPreference', $userID, $column, $page->session('org_internal_id'));
 	
 	$page->field('column', $column+1);
 	$self->populateHourFields($page);
@@ -222,9 +222,11 @@ sub execute
 	my $userID = $page->session('user_id');
 	my $column = $page->param('column');
 	my $colNumber;
+	my $orgInternalId = $page->session('org_internal_id');
 
 	if ($command eq 'add') {
-		$colNumber = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 'selNumPreferences', $userID);
+		$colNumber = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_NONE, 
+			'selNumPreferences', $userID, $orgInternalId);
 	} else {
 		$colNumber = $page->param('column');
 	}
@@ -237,12 +239,13 @@ sub execute
 			_debug => 0
 		);
 
-		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_NONE, 'updSchedulingPref', $userID, $column);
+		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_NONE, 'updSchedulingPref', $userID, 
+			$column, $orgInternalId);
 	}
 	else
 	{
 		my $facility_internal_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-			'selOrgId', $page->session('org_internal_id'), $page->field('facility_id'));
+			'selOrgId', $orgInternalId, $page->field('facility_id'));
 		
 		my $newItemID = $page->schemaAction(
 		'Person_Attribute', $command,
@@ -253,6 +256,7 @@ sub execute
 			value_intB  => $page->field('date_offset'),
 			parent_id   => $userID,
 			item_name   => 'Preference/Schedule/DayView/Column',
+			parent_org_id => $orgInternalId,
 			_debug => 0
 		);
 	}

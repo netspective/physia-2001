@@ -13,6 +13,7 @@ use App::ImageManager;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Component::Scheduling;
 use App::Statements::Search::Appointment;
 
 use vars qw(%RESOURCE_MAP);
@@ -23,7 +24,9 @@ use base 'App::Page';
 			{caption => 'Assign', name => 'assign',},
 			],
 		},
-	);
+);
+
+my $WORKLIST_ITEMNAME = 'WorkList';
 
 # ------------------------------------------------------------------------------------------
 
@@ -324,7 +327,7 @@ sub prepare_view_apptsheet
 	else # Day View
 	{
 		my $preferences = $self->readPreferences('Preference/Schedule/DayView/Column', 1);
-		$preferences = $self->createDayViewPreferences() if (@$preferences < 1);
+		$preferences = $self->createDayViewPreferences() unless scalar @{$preferences} >= 1;
 
 		if (@{$preferences}) {
 			for my $pref (@{$preferences})
@@ -697,13 +700,14 @@ sub readPreferences
 
 	my $preference;
 	my $userID = $self->session('user_id');
+	my $orgId  = $self->session('org_internal_id');
 
 	if ($multiple) {
 		$preference = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
-			'selSchedulePreferences', $userID, $itemName);
+			'selSchedulePreferencesByOrg', $userID, $itemName, $orgId);
 	} else {
 		$preference = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
-			'selSchedulePreferences', $userID, $itemName);
+			'selSchedulePreferencesByOrg', $userID, $itemName, $orgId);
 	}
 
 	return $preference;
@@ -784,13 +788,14 @@ sub saveViewPreference
 sub createDayViewPreferences
 {
 	my ($self) = @_;
-
+	
 	my $userID = $self->session('user_id');
 	my $orgID  = $self->session('org_internal_id');
 	my $itemName = 'Preference/Schedule/DayView/Column';
 
-	my $assocResources = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
-		'selAssociatedResources', $userID);
+	my $assocResources = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+		'sel_worklist_resources', $self->session('user_id'), $WORKLIST_ITEMNAME,
+		$self->session('org_internal_id'));
 
 	my $col = 0;
 	for (@$assocResources)
@@ -802,7 +807,8 @@ sub createDayViewPreferences
 			item_name   => $itemName,
 			value_text  => $_->{resource_id},
 			value_int   => $col++,
-			value_textB => $_->{facility_id} || $orgID
+			value_textB => $_->{facility_id} || $orgID,
+			parent_org_id  => $orgID,
 		);
 	}
 

@@ -148,7 +148,7 @@ sub populateData
 	$self->getField('physician_list')->{fKeyStmtBindPageParams} = $sessOrgId;
 
 	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
-		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'), 'WorkList');
+		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'), 'WorkList', $sessOrgId);
 
 	my @physicians = ();
 	for (@$physicansList)
@@ -159,7 +159,7 @@ sub populateData
 	$page->field('physician_list', @physicians);
 	
 	my $facilityList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
-		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $page->session('user_id'));
+		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $page->session('user_id'), $sessOrgId);
 
 	my @facilities = ();
 	for (@$facilityList)
@@ -201,9 +201,10 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	
 	my $userId =  $page->session('user_id');
+	my $orgInternalId = $page->session('org_internal_id');
 	
 	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_resources', $userId, 'WorkList');
+		'del_worklist_resources', $userId, 'WorkList', $orgInternalId);
 
 	my @physicians = $page->field('physician_list');
 	for (@physicians)
@@ -216,12 +217,13 @@ sub execute
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
 			item_name => 'WorkList',
 			value_text => $_,
+			parent_org_id => $orgInternalId,
 			_debug => 0
 		);
 	}
 	
 	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_facilities', $userId);
+		'del_worklist_facilities', $userId, $orgInternalId);
 
 	my @facilities = $page->field('facility_list');
 	for (@facilities)
@@ -234,6 +236,7 @@ sub execute
 			value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 			item_name => 'WorkList',
 			value_int => $_,
+			parent_org_id => $orgInternalId,
 			_debug => 0
 		);
 	}
