@@ -86,6 +86,15 @@
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
 		</deliverable>
+		<deliverable id="1383">
+			UI:  Deleted the 'Find by State, City and Zip' in the Org Search page.
+		</deliverable>		
+		<deliverable id="1352">
+			UI : Updated the login dialog to check if the person logged in belongs to 
+			     'Physician', 'Staff', 'Nurse', 'Adminstrator' or 'Superuser' category. 
+			     Updated the 'Personnel' component in the 'Personnel' tab of an Org, to delete a person's 
+			     category from the 'Person_Org_Category' table.
+		</deliverable>				
 	</deliverables>
 </release-notes>
 
