@@ -1,6 +1,6 @@
-@load_pre
-@load_post
-@load_tables-code
+--@load_pre
+--@load_post
+--@load_tables-code
 
 rem ###############################################################
 rem
@@ -234,6 +234,10 @@ END;
 /
 SET FEEDBACK ON
 
-select object_type, object_name from user_objects where status='INVALID' order by object_type;
+select object_type, object_name from user_objects where status='INVALID'
+order by object_type, object_name;
 
-select constraint_name, constraint_type from user_constraints where status='DISABLED' order by constraint_name;
+select constraint_name, constraint_type from user_constraints where status='DISABLED'
+order by constraint_name;
+
+select trigger_name from user_triggers where status='DISABLED' order by trigger_name;
