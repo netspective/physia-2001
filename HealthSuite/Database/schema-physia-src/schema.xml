@@ -8,6 +8,12 @@
 	<include file="typedefs.xml"/>
 	<include file="typedef-attribute.xml"/>
 
+
+	<table name="Referral_Service_Description" abbrev="RefServDescr">
+		<description>table to populate drop-down list in hds dialoge</description>
+		<column name="service_description" type="text" size="255" descr="Service Description"/>
+	</table>
+
 	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
 		<description>A person, such as a doctor, a nurse, a receptionist, or a patient</description>
 		<!-- column name="person_internal_id" type="autoinc" primarykey="yes" descr="Unique person record identification (in entire system) for internal use"/ -->
