@@ -20,9 +20,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Person);
 
-%RESOURCE_MAP = ( 'physician' => { heading => '$Command Physician/Provider', 
-				  _arl => ['person_id'], 
-				  _arl_modify => ['person_id'], 
+%RESOURCE_MAP = ( 'physician' => { heading => '$Command Physician/Provider',
+				  _arl => ['person_id'],
+				  _arl_modify => ['person_id'],
 				  _idSynonym => 'Physician' },);
 
 sub initialize
@@ -246,31 +246,41 @@ sub customValidate
 	my $command = $self->getActiveCommand($page);
 
 	return () if ($command eq 'remove' || $command eq 'update');
-
-	#my $specialty1 = $self->getField('specialty1')->{fields}->[0];
-	#my $seq1 = $self->getField('specialty1')->{fields}->[1];
+	my $personId = $page->field('person_id');
 	my $specialty2 = $self->getField('specialty2')->{fields}->[0];
-	#my $seq2 = $self->getField('specialty2')->{fields}->[1];
 	my $specialty3 = $self->getField('specialty3')->{fields}->[0];
-	#my $seq3 = $self->getField('specialty3')->{fields}->[1];
 	my $medSpecCode = $page->field('specialty_code');
 	my $medSpecCode2 = $page->field('specialty2_code');
 	my $medSpecCode3 = $page->field('specialty3_code');
-	#my $specSeq1 = $page->field('value_int1');
-	#my $specSeq2 = $page->field('value_int2');
-	#my $specSeq3 = $page->field('value_int3');
-	my $personId = $page->field('person_id');
+	my $specSeq1 = $page->field('value_int1');
+	my $specSeq2 = $page->field('value_int2');
+	my $specSeq3 = $page->field('value_int3');
+	my $specValid2 = $self->getField('specialty2')->{fields}->[1];
+	my $specValid3 = $self->getField('specialty3')->{fields}->[1];
 
 
 	if	($medSpecCode ne '' && ($medSpecCode eq $medSpecCode2))
 	{
 		$specialty2->invalidate($page, "Cannot add the same Specialty more than once for $personId");
 	}
+
 	if (($medSpecCode2 ne '' && ($medSpecCode2 eq $medSpecCode3)) ||
 		($medSpecCode3 ne '' && ($medSpecCode3 eq $medSpecCode)))
 	{
 		$specialty3->invalidate($page, "Cannot add the same Specialty more than once for $personId");
 	}
+
+	if ($specSeq2 ne '' && ($specSeq2 eq $specSeq1 || $specSeq2 eq $specSeq3) && $specSeq2 ne App::Universal::SPECIALTY_UNKNOWN)
+	{
+		$specValid2->invalidate($page, "The same 'Specialty Sequence' cannot be added more than once.");
+	}
+
+	if ($specSeq3 ne '' && ($specSeq3 eq $specSeq1 || $specSeq3 eq $specSeq2) && $specSeq3 ne App::Universal::SPECIALTY_UNKNOWN)
+	{
+		$specValid3->invalidate($page, "The same 'Specialty Sequence' cannot be added more than once.");
+	}
+
+
 }
 
 sub execute_add
