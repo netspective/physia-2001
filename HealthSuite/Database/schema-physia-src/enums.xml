@@ -11,7 +11,7 @@
 		<enum>Inactive (System Forced Logout)</enum>
 		<enum>Inactive (Timeout)</enum>
 	</table>
-	
+
 	<table name="Org_Role_Status" abbrev="RoleStat" type="Enumeration">
 		<enum>Active</enum>
 		<enum>Suspended</enum>
@@ -143,12 +143,13 @@
 	</table>
 
 	<table name="Bill_Sequence" type="Enumeration">
-		<enum>Inactive</enum>
-		<enum>Primary</enum>
-		<enum>Secondary</enum>
-		<enum>Tertiary</enum>
-		<enum>Quaternary</enum>
-		<enum>Workers Comp</enum>
+		<enum id="1">Primary</enum>
+		<enum id="2">Secondary</enum>
+		<enum id="3">Tertiary</enum>
+		<enum id="4">Quaternary</enum>
+		<enum id="5">Terminated</enum>
+		<enum id="6">Workers Comp</enum>
+		<enum id="99">Inactive</enum>
 	</table>
 
 	<table name="Appt_Attendee_Type" abbrev="ApPty" type="Enumeration">
