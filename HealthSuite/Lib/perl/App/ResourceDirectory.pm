@@ -116,8 +116,6 @@ use App::Dialog::Attribute::Directive::Physician;
 use App::Dialog::Attribute::EmploymentBenefit;
 use App::Dialog::Attribute::PreventiveCare;
 use App::Dialog::Attribute::MiscNotes;
-use App::Dialog::Attribute::PhoneMessage;
-use App::Dialog::Attribute::RefillRequest;
 
 use App::Dialog::Catalog;
 use App::Dialog::CatalogItem;
@@ -156,6 +154,9 @@ use App::Dialog::Transaction::Hospitalization;
 use App::Dialog::Transaction::Medication;
 use App::Dialog::Transaction::TestsMeasurements;
 use App::Dialog::Transaction::Immunization;
+use App::Dialog::Transaction::PhoneMessage;
+use App::Dialog::Transaction::RefillRequest;
+
 #use App::Dialog::UserProblems;
 use App::Dialog::WorkersComp;
 use App::Dialog::AttachWorkersComp;
@@ -579,8 +580,8 @@ $SEARCH_CLASSES = {
 					_idSynonym => 'ins-' . App::Universal::RECORDTYPE_PERSONALCOVERAGE },
 	'health-rule' => {_class => 'App::Dialog::HealthMaintenance', heading => '$Command Health Maintenance Rule', _arl => ['rule_id']},
 	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
-	'phone-message' => {_class => 'App::Dialog::Attribute::PhoneMessage', transType => App::Universal::TRANSTYPE_PC_TELEPHONE, heading => '$Command Phone Message', _arl => ['person_id'] , _arl_modify => ['trans_id'], _idSynonym => 'trans-' .App::Universal::TRANSTYPE_PC_TELEPHONE() },
-	'refill-request' => {_class => 'App::Dialog::Attribute::RefillRequest', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Refill Request', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-refillreq-' .App::Universal::ATTRTYPE_TEXT() },
+	'phone-message' => {_class => 'App::Dialog::Transaction::PhoneMessage', transType => App::Universal::TRANSTYPE_PC_TELEPHONE, heading => '$Command Phone Message', _arl => ['person_id'] , _arl_modify => ['trans_id'], _idSynonym => 'trans-' .App::Universal::TRANSTYPE_PC_TELEPHONE() },
+	'refill-request' => {_class => 'App::Dialog::Transaction::RefillRequest', transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, heading => '$Command Refill Request', _arl => ['person_id'] , _arl_modify => ['trans_id'], _idSynonym => 'trans-refill-' .App::Universal::TRANSTYPE_PRESCRIBEMEDICATION() },
 	'procedure' => 'App::Dialog::Procedure',
 	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
