@@ -23,6 +23,7 @@ use base 'App::Page';
 		{caption => 'Schedule', name => 'apptsheet',},
 		{caption => 'Assign', name => 'assign',},
 		{caption => 'handleWaitingList', name => 'handleWaitingList',},
+		#{caption => 'Patient Lookup', name => 'patientLookup',},
 		],
 	},
 );
@@ -510,6 +511,7 @@ sub prepare_page_content_header
 	$self->{page_menu_sibling} = [
 			['Appointments', "$urlPrefix/apptsheet", 'apptsheet'],
 			['Assign', "$urlPrefix/assign/$today/$today", 'assign'],
+			['Patient Lookup', "/search/patient", ''],
 		];
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
 
