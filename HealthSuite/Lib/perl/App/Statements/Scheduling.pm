@@ -169,16 +169,14 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	
 	'sel_voidInvoice' => qq{
 		select Invoice.invoice_id, to_char(value_date - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			as void_stamp, Invoice_Attribute.cr_user_id
-		from Invoice_Attribute, Invoice, Transaction, Event
+			as void_stamp, Invoice_History.cr_user_id
+		from Invoice_History, Invoice, Transaction, Event
 		where Event.event_id = :2
 			and Transaction.parent_event_id = Event.event_id
 			and Invoice.main_transaction = Transaction.trans_id
 			and Invoice.invoice_status = @{[ App::Universal::INVOICESTATUS_VOID ]}
-			and Invoice_Attribute.parent_id = Invoice.invoice_id
-			and Invoice_Attribute.item_name = 'Invoice/History/Item'
-			and Invoice_Attribute.value_type = @{[ App::Universal::ATTRTYPE_HISTORY ]}
-			and Invoice_Attribute.value_text = 'Voided claim'
+			and Invoice_History.parent_id = Invoice.invoice_id
+			and Invoice_History.value_text = 'Voided claim'
 	},
 
 	# --------------------------------------------------------------------------------------------
