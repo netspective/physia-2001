@@ -179,7 +179,7 @@ sub populateTemplate
 	$self->populatePhysician($claim);
 	$self->populateOrganization($claim);
 	$self->populateTreatment($claim);
-	$self->populateClaim($claim);
+	$self->populateClaim($claim, $procesedProc);
 	$self->populatePayer($claim);
 	my $tb = $self->populateProcedures($claim, $procesedProc);
 	$self->populateDiagnosis($claim, $tb);
@@ -405,7 +405,7 @@ sub populateDiagnosis
 
 sub populateClaim
 {
-	my ($self, $claim) = @_;
+	my ($self, $claim, $procesedProc) = @_;
 #	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 	$data->{claimAcceptAssignmentN} = uc($claim->getAcceptAssignment) eq 'N' ? "Checked" : "";
@@ -417,8 +417,6 @@ sub populateClaim
 	$data->{claimConditionRelatedToAutoAccidentPlace} = uc($claim->getConditionRelatedToAutoAccidentPlace);
 	$data->{claimConditionRelatedToOtherAccidentY} = uc($claim->getConditionRelatedToOtherAccident) eq 'Y' ? "Checked" : "";
 	$data->{claimConditionRelatedToOtherAccidentN} = uc($claim->getConditionRelatedToOtherAccident) eq 'N' ? "Checked" : "";
-	$data->{claimAmountPaid} = abs($claim->getTotalChargePaid);
-	$data->{claimBalance} = abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid));
 	$data->{claimProgramNameChampus} = uc($claim->getProgramName) eq 'CHAMPUS' ? "Checked" : "";
 	$data->{claimProgramNameChampva} = uc($claim->getProgramName) eq 'CHAMPVA' ? "Checked" : "";
 	$data->{claimProgramNameGHP} = uc($claim->getProgramName) eq 'GROUP HEALTH PLAN' ? "Checked" : "";
@@ -426,7 +424,11 @@ sub populateClaim
 	$data->{claimProgramNameMedicare} = uc($claim->getProgramName) eq 'MEDICARE' ? "Checked" : "";
 	$data->{claimProgramNameOther} = uc($claim->getProgramName) eq 'OTHER' ? "Checked" : "";
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
-	$data->{claimTotalCharge} = $claim->getTotalCharge;
+
+	$data->{claimTotalCharge} = "Contd";
+	$data->{claimAmountPaid} =  "Contd";
+	$data->{claimBalance} =  "Contd";
+
 	my $physician = $claim->getRenderingProvider();
 	$data->{transProviderName} = $physician->{completeName};
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
@@ -535,7 +537,16 @@ sub diagnosisTable
 	my $procedures = $claim->{procedures};
 	for my $i (0..$#$procedures)
 	{
-		if (($diag <= 4) && ($procCount <= 6) && ($processedProc->[$i] != 1))
+		my $procedure = $procedures->[$i];
+		if (uc($procedure->getItemStatus) eq "VOID")
+		{
+			$processedProc->[$i] = 1;
+		}
+	}
+		
+	for my $i (0..$#$procedures)
+	{
+		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
 		{
 			my $procedure = $procedures->[$i];
 			$cod = $procedure->getDiagnosis;
@@ -568,5 +579,16 @@ sub diagnosisTable
 	return 	[\%diagTable, \@targetproc];
 }
 
+sub populateFinalCharges
+{
+	
+	my ($self, $claim) = @_;
+	my $data = $self->{data};
+	
+	$data->{claimTotalCharge} = $claim->getTotalCharge;
+	$data->{claimAmountPaid} = abs($claim->getTotalChargePaid);
+	$data->{claimBalance} = abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid));
+
+}
 
 1;

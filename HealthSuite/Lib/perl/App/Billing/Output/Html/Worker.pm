@@ -140,8 +140,12 @@ sub populateClaim
 	$data->{claimProgramNameMedicare} = uc($claim->getProgramName) eq 'MEDICARE' ? "Checked" : "";
 	$data->{claimProgramNameOther} = uc($claim->getProgramName) eq 'OTHER' ? "Checked" : "";
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
-	$data->{claimTotalCharge} = $claim->getTotalCharge;
-	$data->{claimBalance} = $claim->getTotalCharge;
+#	$data->{claimTotalCharge} = $claim->getTotalCharge;
+#	$data->{claimBalance} = $claim->getTotalCharge;
+	$data->{claimTotalCharge} = "Contd";
+	$data->{claimAmountPaid} =  "Contd";
+	$data->{claimBalance} =  "Contd";
+
 	$data->{transProviderName} = $physician->getName();
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
 

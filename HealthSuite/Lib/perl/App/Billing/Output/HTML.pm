@@ -56,13 +56,18 @@ sub generateHTML
 	my $once = 0;
 	my $template = new Text::Template(SOURCE => $tempPath);
 	my $pp = $self->setPrimaryProcedure($claim);
-	while ($self->allProcTraverse($procesedProc, $claim) eq "0" || ($once < 1))
+	while ($self->allProcTraverse($procesedProc, $claim) eq "0")
 	{
 		$htmlTemplate->populateTemplate($claim, $procesedProc);
+		if ($self->allProcTraverse($procesedProc, $claim) eq "1")
+		{
+			$htmlTemplate->populateFinalCharges($claim);
+		}
 		push @html, $template->fill_in(HASH => $htmlTemplate->{data});
 		$htmlTemplate->doInit;
 		$once++;
 	}
+	
 	$self->reversePrimaryProcedure($claim, $pp);
 	return join('', @html);
 }
@@ -77,7 +82,7 @@ sub allProcTraverse
 	{
 		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum;
 	}
-	return $sum >= $#$procs ? 1 : 0;
+	return $sum >= ($#$procs + 1)? 1 : 0;
 }
 
 sub setPrimaryProcedure

@@ -1292,14 +1292,14 @@
                       </tr>
                       <tr class="cell">
                         <td class="cell">$</td>
-                        <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimTotalCharge);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
-                        <td class="cell r decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                        <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimTotalCharge); $d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
+                        <td class="cell r decimal chrg2" align="right"><strong>{$claimTotalCharge eq "Contd" ? "&nbsp" : ($d[1] eq "" ? "00" : $d[1])}<strong></td>
                         <td class="cell">$</td>
                         <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimAmountPaid);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
-                        <td class="cell r decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                        <td class="cell r decimal chrg2" align="right"><strong>{$claimTotalCharge eq "Contd" ? "&nbsp" : ($d[1] eq "" ? "00" : $d[1])}<strong></td>
                         <td class="cell">$</td>
                         <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimBalance);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
-                        <td class="cell decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                        <td class="cell decimal chrg2" align="right"><strong>{$claimTotalCharge eq "Contd" ? "&nbsp" : ($d[1] eq "" ? "00" : $d[1])}<strong></td>
                       </tr>
                     </table>
                   </td>
