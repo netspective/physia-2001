@@ -4,8 +4,11 @@ use strict;
 
 use constant NSFDEST_ARRAY => 0;
 use constant NSFDEST_FILE => 1;
+
 use constant NSF_HALLEY => '0';
 use constant NSF_ENVOY => '1';
+use constant NSF_THIN => '2';
+
 use constant DEFAULT_VFLAGS => 0;
 
 use App::Billing::Claims;
@@ -28,6 +31,8 @@ sub main
 
 	my $cs = shift;
 	die "Usage Example:  $0 sde_prime/sde\@sdedbs02" unless $cs;
+	
+	my $nsfType = shift || NSF_HALLEY;
 
 	$cs =~ /(.*?)\/(.*?)\@(.*)/;
 	my ($userName, $password, $twoTask) =  ($1, $2, $3);
@@ -71,7 +76,7 @@ sub main
 						outFile => $NSF_FILE_NAME,
 						claimList => $claimList,
 						validationMgr => $valMgr,
-						nsfType => NSF_HALLEY,
+						nsfType => $nsfType,
 						FLAG_STRIPDASH => '1',
 					);
 
