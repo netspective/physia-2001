@@ -89,10 +89,6 @@ sub isValid
 	my @insFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_insurance_catalogs'));
 
 	# ------------------------------------------------------------------------------------------------------------------------
-
-
-
-
 	#munir's old icd validation for checking if the same icd code is entered in twice
 	foreach (@diagCodes)
 	{
@@ -106,7 +102,6 @@ sub isValid
 	{
 		$self->invalidate($page, 'Cannot enter the same ICD code more than once.');
 	}
-
 
 	my @errors = ();
 	my $lineCount = $page->param('_f_line_count');
@@ -149,6 +144,7 @@ sub isValid
 				$self->invalidate($page, "[<B>P$line</B>] Service begin date $servicedatebegin should be earlier than the end date $servicedateend");
 			}
 		}
+		
 		#if($serviceplace =~ m/^(\d+)$/)
 		#{
 		#	# $1 is the check to see if it is an integer
@@ -161,6 +157,7 @@ sub isValid
 		#{
 		#	$self->invalidate($page, "[<B>P$line</B>] The service place code $serviceplace should be an integer. Please verify");
 		#}
+
 		if($servicetype =~ m/^(\d+)$/)
 		{
 			# $1 is the check to see if it is an integer
@@ -173,14 +170,15 @@ sub isValid
 		{
 			$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype should be an integer. Please verify");
 		}
-		if($procedure =~ m/^(\d+)$/)
-		{
+
+		#if($procedure =~ m/^(\d+)$/)
+		#{
 			# $1 is the check to see if it is an integer
-			if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericCPTCode', $1)))
-			{
+		#	if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericCPTCode', $1)))
+		#	{
 				#$self->invalidate($page, "[<B>P$line</B>] The CPT code $procedure is not valid. Please verify");
-			}
-		}
+		#	}
+		#}
 		#elsif($procedure !~ m/^(\d+)$/)
 		#{
 		#	$self->invalidate($page, "[<B>P$line</B>] The CPT code was not found.");
@@ -217,7 +215,7 @@ sub isValid
 				push(@actualDiagCodes, $diagCodes[$diagNumber-1]);
 			}
 
-			@actualDiagCodes = join(', ', @actualDiagCodes);
+			# @actualDiagCodes = join(', ', @actualDiagCodes);
 			$page->param("_f_proc_$line\_actual_diags", @actualDiagCodes);
 		}
 		elsif($diags eq '')
@@ -274,7 +272,8 @@ sub isValid
 			$page, App::IntelliCode::INTELLICODEFLAG_SKIPWARNING,
 			sex => $gender,
 			dateOfBirth => $dateOfBirth,
-			diags => \@diagCodes,
+			#diags => \@diagCodes,
+			diags => \@actualDiagCodes,
 			procs => \@procs,
 		);
 
@@ -337,8 +336,6 @@ sub getHtml
 			$serviceTypeHtml = $serviceTypeHtml . qq{ <OPTION>$serviceTypeId->{id}</OPTION> };
 		}
 
-
-
 	my @lineMsgs = ();
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
@@ -365,7 +362,6 @@ sub getHtml
 
 		$readOnly = $invoiceFlags & $attrDataFlag ? 'READONLY' : '';
 	}
-
 
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
