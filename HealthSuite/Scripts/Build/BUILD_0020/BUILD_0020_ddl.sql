@@ -8,7 +8,7 @@ alter table Sch_Verify     add (XRAYCOPAY NUMBER(12,2));
 alter table Sch_Verify_Aud add (XRAYCOPAY NUMBER(12,2));
 start tables-code/Sch_Verify
 
--BUG 2008 - FKM - Added new columns to lab_order_entry table
+--BUG 2008 - FKM - Added new columns to lab_order_entry table
 alter table Lab_Order_Entry add (CAPTION            VARCHAR2(64));
 alter table Lab_Order_Entry add (LAB_CODE           VARCHAR2(64));
 alter table Lab_Order_Entry add (CHARGE_CODE        VARCHAR2(64));
@@ -26,3 +26,5 @@ alter table Lab_Order_Entry_Aud add (MODIFIER           VARCHAR2(64));
 alter table Lab_Order_Entry_Aud add (PANEL_TEST_NAME    VARCHAR2(512));
 start tables-code/Lab_Order_Entry
 
+--NO BUG - MAF - Added new column to invoice_item_adjust table
+alter table Invoice_Item_Adjust add (PARENT_INV_ID	NUMBER(16));
