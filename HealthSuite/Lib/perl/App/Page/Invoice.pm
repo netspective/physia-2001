@@ -1762,6 +1762,9 @@ sub prepare_page_content_header
 	my $claimType = $claim->getInvoiceSubtype();
 	my $totalItems = $claim->getTotalItems();
 	my $invoiceBalance = $claim->{balance};
+	my $invoiceTotalAdj = $claim->{total_adjust};
+
+	#check submission order of claim
 	my $submissionOrder = '';
 	if($invType == $hcfaInvoiceType)
 	{
@@ -1774,6 +1777,14 @@ sub prepare_page_content_header
 	foreach (@{$claim->{diagnosis}})
 	{
 		push(@allDiags, $_->getDiagnosis());
+	}
+
+
+	#check if any adjustments exist for this invoice
+	my $noAdjsExist = '';
+	unless($STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selItemAdjustmentsByInvoiceId', $invoiceId))
+	{
+		$noAdjsExist = 1;
 	}
 
 
@@ -1849,8 +1860,8 @@ sub prepare_page_content_header
 						@{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
 						@{[ $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
-						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 
 						<!-- @{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]} -->
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
