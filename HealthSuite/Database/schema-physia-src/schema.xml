@@ -846,6 +846,7 @@
 	<include file="reference.xml"/>
 	<include file="documents.xml"/>
 	<include file="organization.xml"/>
+	<include file="lab_test.xml"/>
 	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
 
 </schema>
