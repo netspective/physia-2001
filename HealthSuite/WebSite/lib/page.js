@@ -886,7 +886,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	// either automatically populate the control or do something else
 	//
 	var popUpWindow = open(newArl, WINDOWNAME_FINDPOPUP, features == null ?
-		"location, width=600,height=600,scrollbars,resizable" : features);
+		"location, status, width=600,height=600,scrollbars,resizable" : features);
 	popUpWindow.focus();
 }
 
@@ -918,7 +918,7 @@ function populateControl(what, closeWindow, secondItem)
 		else
 			parent.opener.activeFindWinControl.value = what;
 
-		if (secondItem != null)
+		if (secondItem != null && parent.opener.secondaryFindWinControl)
 		{
 			parent.opener.secondaryFindWinControl.value = secondItem;
 		}
