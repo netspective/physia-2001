@@ -9,11 +9,27 @@
 	</release-info>
 	
 	<deliverables>
+	
+		<deliverable id="915">
+			Initial implementation of a Verifications Work List.
+		</deliverable>
+
 		<deliverable id="1010">
 			Fixed problem where case sensitivity was changing the sort order of
 			names like SCHMIDT and Schmidt (the previous behavior was that SCHMIDT and
 			schmidt names would show up in different parts of the list; now they show
 			up next to each other).
 		</deliverable>
+
+		<deliverable id="1017">
+			Prevent discarded appointments from appearing in the Appointments Component
+			on the Patient's chart page.
+		</deliverable>
+
+		<deliverable id="1018">
+			Return to the Patient's profile page after scheduling an appointment from the
+			Care Providers Component.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
