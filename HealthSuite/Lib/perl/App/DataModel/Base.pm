@@ -296,7 +296,7 @@ subclass 'App::DataModel::Organization' =>
 	parentOrg=>'App::DataModel::Organization',
 	ownerOrg=>'App::DataModel::Organization',
 	orgType=>'$',
-	assoicatedOrg=>'%';
+	#assoicatedOrg=>'%',
 }, -parent => 'App::DataModel::Base';
 
 
