@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Person" db="Oracle">
+
+		<!-- Fields -->
+		<field id="person_id" caption="Person ID" view="person" column="person_id"/>
+		<field id="row_num" caption="Row" column="rownum"/>
+		<field id="ssn" caption="SSN" view="person" column="SSN"/>
+		<field id="name_first" caption="First Name" view="person" column="name_first"/>
+		<field id="name_middle" caption="Middle Name" view="person" column="name_middle"/>
+		<field id="name_last" caption="Last Name" view="person" column="name_last"/>
+		<field id="name_suffix" caption="Name Suffix" view="person" column="name_suffix"/>
+		<field id="simple_name" caption="Full Name" view="person" column="simple_name"/>
+		<field id="dob" caption="Bate of Birth" view="person" column="date_of_birth"/>
+		<field id="age" caption="Age" view="person" column="age"/>
+		<field id="gender" caption="Gender" view="gender" column="caption"/>
+		<field id="marital_status" caption="Marital Status" view="mstat" column="caption"/>
+		<field id="ethnicity" caption="Ethnicity" view="per_ethnicity" column="member_name"/>
+		<field id="language" caption="Language" view="per_language" column="member_name"/>
+		<field id="home_address_line_1" caption="Home Address - Line 1" view="per_addr_home" column="line1"/>
+		<field id="home_address_line_2" caption="Home Address - Line 2" view="per_addr_home" column="line2"/>
+		<field id="home_address_city" caption="Home Address - City" view="per_addr_home" column="city"/>
+		<field id="home_address_state" caption="Home Address - State" view="per_addr_home" column="state"/>
+		<field id="home_address_zip" caption="Home Address - Zip Code" view="per_addr_home" column="zip"/>
+		<field id="work_address_line_1" caption="Work Address - Line 1" view="per_addr_work" column="line1"/>
+		<field id="work_address_line_2" caption="Work Address - Line 2" view="per_addr_work" column="line2"/>
+		<field id="work_address_city" caption="Work Address - City" view="per_addr_work" column="city"/>
+		<field id="work_address_state" caption="Work Address - State" view="per_addr_work" column="state"/>
+		<field id="work_address_zip" caption="Work Address - Zip Code" view="per_addr_work" column="zip"/>
+		<field id="alt_address_line_1" caption="Alternate Address - Line 1" view="per_addr_alt" column="line1"/>
+		<field id="alt_address_line_2" caption="Alternate Address - Line 2" view="per_addr_alt" column="line2"/>
+		<field id="alt_address_city" caption="Alternate Address - City" view="per_addr_alt" column="city"/>
+		<field id="alt_address_state" caption="Alternate Address - State" view="per_addr_alt" column="state"/>
+		<field id="alt_address_zip" caption="Alternate Address - Zip Code" view="per_addr_alt" column="zip"/>
+		<field id="any_address_line_1" caption="Any Address - Line 1" view="per_addr_any" column="line1"/>
+		<field id="any_address_line_2" caption="Any Address - Line 2" view="per_addr_any" column="line2"/>
+		<field id="any_address_city" caption="Any Address - City" view="per_addr_any" column="city"/>
+		<field id="any_address_state" caption="Any Address - State" view="per_addr_any" column="state"/>
+		<field id="any_address_zip" caption="Any Address - Zip Code" view="per_addr_any" column="zip"/>
+		<field id="home_phone" caption="Home Phone Number" view="per_attr_phone_home" column="value_text"/>
+		<field id="work_phone" caption="Work Phone Number" view="per_attr_phone_work" column="value_text"/>
+		<field id="cell_phone" caption="Cellular Phone Number" view="per_attr_phone_cell" column="value_text"/>
+		<field id="alt_phone" caption="Alternate Phone Number" view="per_attr_phone_alt" column="value_text"/>
+		<field id="any_phone" caption="Any Phone Number" view="per_attr_phone_any" column="value_text"/>
+		<field id="home_fax" caption="Home Fax Number" view="per_attr_fax_home" column="value_text"/>
+		<field id="work_fax" caption="Work Fax Number" view="per_attr_fax_work" column="value_text"/>
+		<field id="alt_fax" caption="Alternate Fax Number" view="per_attr_fax_alt" column="value_text"/>
+		<field id="any_fax" caption="Any Fax Number" view="per_attr_fax_any" column="value_text"/>
+		<field id="category" caption="Category" view="per_org_category" column="category"/>
+		<field id="category_org" view="per_org_category" column="org_internal_id"/>
+		<field id="account" caption="Account #" view="per_account" column="value_text"/>
+		<field id="chart" caption="Chart #" view="per_chart" column="value_text"/>
+		<field id="created" caption="Date Created" view="person" column="cr_stamp"/>
+		<field id="createdby" caption="Created By" view="person" column="cr_user_id" lookup-url="/lookup/person"/>
+
+		<!-- Views -->
+		<view include="abc.person*" filter="abcd=def"/>
+		<view id="person" table="person" autoinclude="1"/>
+		<view id="per_org_category" table="person_org_category" condition="per_org_category.person_id (+) = person.person_id"/>
+		<view id="gender" table="gender" condition="gender.id (+) = person.gender"/>
+		<view id="mstat" table="marital_status" condition="mstat.id (+) = person.marital_status"/>
+		<view id="per_ethnicity" table="person_ethnicity" condition="per_ethnicity.parent_id (+) = person.person_id"/>
+		<view id="per_language" table="person_language" condition="per_language.parent_id (+) = person.person_id"/>
+		<view id="per_addr_home" table="person_address" condition="per_addr_home.parent_id (+) = person.person_id AND per_addr_home.address_name (+) = 'Home'"/>
+		<view id="per_addr_work" table="person_address" condition="per_addr_work.parent_id (+) = person.person_id AND per_addr_work.address_name (+) = 'Work'"/>
+		<view id="per_addr_alt" table="person_address" condition="per_addr_alt.parent_id (+) = person.person_id AND per_addr_alt.address_name (+) = 'Alternate'"/>
+		<view id="per_addr_any" table="person_address" condition="per_addr_any.parent_id (+) = person.person_id"/>
+		<view id="per_attr_phone_home" table="person_attribute" condition="per_attr_phone_home.parent_id (+) = person.person_id AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Home'"/>
+		<view id="per_attr_phone_work" table="person_attribute" condition="per_attr_phone_work.parent_id (+) = person.person_id AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Work'"/>
+		<view id="per_attr_phone_cell" table="person_attribute" condition="per_attr_phone_cell.parent_id (+) = person.person_id AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Cellular'"/>
+		<view id="per_attr_phone_alt" table="person_attribute" condition="per_attr_phone_alt.parent_id (+) = person.person_id AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Alternate'"/>
+		<view id="per_attr_phone_any" table="person_attribute" condition="per_attr_phone_any.parent_id = person.person_id AND per_attr_phone_any.value_type = #constant.ATTRTYPE_PHONE#"/>
+		<view id="per_attr_fax_home" table="person_attribute" condition="per_attr_fax_home.parent_id (+) = person.person_id AND per_attr_fax_home.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_home.item_name (+) = 'Home'"/>
+		<view id="per_attr_fax_work" table="person_attribute" condition="per_attr_fax_work.parent_id (+) = person.person_id AND per_attr_fax_work.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_work.item_name (+) = 'Work'"/>
+		<view id="per_attr_fax_alt" table="person_attribute" condition="per_attr_fax_alt.parent_id (+) = person.person_id AND per_attr_fax_alt.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_alt.item_name (+) = 'Alternate'"/>
+		<view id="per_attr_fax_any" table="person_attribute" condition="per_attr_fax_any.parent_id (+) = person.person_id AND per_attr_fax_any.value_type (+) = #constant.ATTRTYPE_FAX#"/>
+		<view id="per_account" table="person_attribute" condition="per_account.parent_id (+) = person.person_id AND per_account.value_type (+) = 0 AND per_account.item_name (+) = 'Patient/Account Number'"/>
+		<view id="per_chart" table="person_attribute" condition="per_chart.parent_id (+) = person.person_id AND per_chart.value_type (+) = 0 AND per_chart.item_name (+) = 'Patient/Chart Number'"/>
+		
+		<!-- Styles -->
+		<output-style id="default" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="upper({name_last})"/>
+			<order-by id="upper({name_first})"/>
+			<order-by id="dob"/>
+			<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+		</output-style>
+		<output-style id="nurse" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="upper({name_last})"/>
+			<order-by id="upper({name_first})"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Nurse"/>
+			</and-conditions>
+		</output-style>
+		<output-style id="physician" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="name_last"/>
+			<order-by id="name_first"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Physician"/>
+			</and-conditions>
+		</output-style>
+		<output-style id="staff" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="name_last"/>
+			<order-by id="name_first"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Staff"/>
+			</and-conditions>
+		</output-style>
+		<output-style id="patient" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="name_last"/>
+			<order-by id="name_first"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Patient"/>
+			</and-conditions>
+		</output-style>
+		<output-style id="administrator" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="name_last"/>
+			<order-by id="name_first"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Administrator"/>
+			</and-conditions>
+		</output-style>
+		<output-style id="administrator" distinct="yes">
+			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+			<column id="name_last"/>
+			<column id="name_first"/>
+			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
+			<column id="ssn"/>
+			<column id="home_phone"/>
+			<column id="account"/>
+			<column id="chart"/>
+			<column id="category"/>
+			<order-by id="name_last"/>
+			<order-by id="name_first"/>
+			<order-by id="dob"/>
+			<and-conditions>
+				<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="category" comparison="is" criteria="Administrator"/>
+			</and-conditions>
+		</output-style>
+
+	</query-defn>
+</component>
+
+
