@@ -479,7 +479,7 @@ sub formatData
 	my $renderingProvider = $inpClaim->{renderingProvider};
 	
 my %nsfType = (NSF_HALLEY . "" =>	
-	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-3s%-36s%-1s%-1s%-1s',
+	sprintf('%-3s%-2s%-17s%-17s%-33s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-20s%-12s%-1s%-15s%-15s%-3s%-36s%-1s%-1s',
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($Patient->getAccountNo(),0,17),
