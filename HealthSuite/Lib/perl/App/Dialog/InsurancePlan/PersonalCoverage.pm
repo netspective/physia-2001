@@ -166,7 +166,7 @@ sub new
 					schema => $schema,
 					column => 'Insurance.indiv_deduct_remain'),
 				new CGI::Dialog::Field::TableColumn(
-					caption => 'Family Deductible Amounts',
+					caption => 'Family Deductible Remaining',
 					schema => $schema,
 				column => 'Insurance.family_deduct_remain'),
 				],
@@ -312,7 +312,8 @@ sub customValidate
 		else
 		{
 			my $productField = $self->getField('product_name');
-			$productField->invalidate($page, "Insurance Product '$page->field('product_name')' does not exist");
+			my $newProductHref = "javascript:doActionPopup('/org-p/" . $page->session('org_id') . "/dlg-add-ins-product?_f_product_name=" . $page->field('product_name') . "')";
+			$productField->invalidate($page, "Insurance Product '" . $page->field('product_name') . qq{' does not exist. <a href="$newProductHref">Create it now?</a>});
 		}
 	}
 
@@ -332,7 +333,8 @@ sub customValidate
 		}
 		else
 		{	
-			$planField->invalidate($page, "Insurance Plan '$page->field('plan_name')' does not exist");
+			my $newPlanHref = "javascript:doActionPopup('/org-p/" . $page->session('org_id') . "/dlg-add-ins-plan?_f_plan_name=" . $page->field('plan_name') . "')";
+			$planField->invalidate($page, "Insurance Plan '" . $page->field('plan_name') . qq{' does not exist. <a href="$newPlanHref">Create it now?</a>});
 		}
 	}
 	
