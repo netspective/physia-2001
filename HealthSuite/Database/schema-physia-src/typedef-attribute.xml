@@ -8,7 +8,7 @@
 		<description>An attribute that further describes its parent row</description>
 		<column name="item_id" type="autoinc" primarykey="yes" descr="The unique item identification"/>
 
-		<column name="parent_id" parentref="$parentref$" indexed="yes" descr="The owner of the item"/>
+		<column name="parent_id" parentref="$parentref$" indexed="yes" required="yes" descr="The owner of the item"/>
 		<column name="item_type" lookupref="Attribute_Type" required="yes" indexed="yes" default="0"/>
 		<column name="item_name" type="text" size="128" indexed="yes" descr="The complete designation (like abc/def/xxx)"/>
 		<column name="name_sort" type="text" size="64" descr="If any alternate sorting is required, provide it here"/>
