@@ -711,6 +711,692 @@
 		</data>
 	</table>
 
+
+	<table name="HCFA1500_Modifier_Code" abbrev="HcfaMod" type="Lookup">
+		<description>List of Modifiers. Includes EPSDT and workers comp modifiers.</description>
+		<data>
+			<row>
+				<col name="id">0</col>
+				<col name="caption">Microsurgery</col>
+				<col name="abbrev">20</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">1</col>
+				<col name="caption">Prolonged Evaluation and Management Services</col>
+				<col name="abbrev">21</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">2</col>
+				<col name="caption">Unusual Procedural Services</col>
+				<col name="abbrev">22</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">3</col>
+				<col name="caption">Unusual Anesthesia</col>
+				<col name="abbrev">23</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">4</col>
+				<col name="caption">Unrelated Eval and Mngmnt Services by Same Physician During a Postoperative Period</col>
+				<col name="abbrev">24</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">5</col>
+				<col name="caption">Significant, Separately Identifiable Evaluation and Mgmt Services by the Same Physician/Day of the Procedure/Service</col>
+				<col name="abbrev">25</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">6</col>
+				<col name="caption">Professional Component</col>
+				<col name="abbrev">26</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">7</col>
+				<col name="caption">Mandated Services</col>
+				<col name="abbrev">32</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Anesthesia by Surgeon</col>
+				<col name="abbrev">47</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">9</col>
+				<col name="caption">Bilateral Procedure</col>
+				<col name="abbrev">50</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">10</col>
+				<col name="caption">Multiple Procedures</col>
+				<col name="abbrev">51</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">Reduced Services</col>
+				<col name="abbrev">52</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">Discontinued Procedure</col>
+				<col name="abbrev">53</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">13</col>
+				<col name="caption">Surgical Care Only</col>
+				<col name="abbrev">54</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">14</col>
+				<col name="caption">Postoperative Management Only</col>
+				<col name="abbrev">55</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Preoperative Management Only</col>
+				<col name="abbrev">56</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">16</col>
+				<col name="caption">Decision for Surgery</col>
+				<col name="abbrev">57</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">17</col>
+				<col name="caption">Staged or Related Procedure or Service by the Same Physician During the Postoperative Period</col>
+				<col name="abbrev">58</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">18</col>
+				<col name="caption">Distinct Procedural Service</col>
+				<col name="abbrev">59</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">19</col>
+				<col name="caption">Two Surgeons</col>
+				<col name="abbrev">62</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">20</col>
+				<col name="caption">Surgical Team</col>
+				<col name="abbrev">66</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">21</col>
+				<col name="caption">Repeat Procedure by Same Physician</col>
+				<col name="abbrev">76</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">Repeat Procedure by Another Physician</col>
+				<col name="abbrev">77</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">23</col>
+				<col name="caption">Return to the Operating Room for a Related Procedure During the Postoperative Period</col>
+				<col name="abbrev">78</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">24</col>
+				<col name="caption">Unrelated Procedure or Service by the Same Physician During the Postoperative Period</col>
+				<col name="abbrev">79</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">25</col>
+				<col name="caption">Assistant Surgeon</col>
+				<col name="abbrev">80</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">26</col>
+				<col name="caption">Minimum Assistant Surgeon</col>
+				<col name="abbrev">81</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">27</col>
+				<col name="caption">Assistant Surgeon When Qualified Resident Surgeon not Available</col>
+				<col name="abbrev">82</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">28</col>
+				<col name="caption">Reference (Outside) Laboratory</col>
+				<col name="abbrev">90</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">29</col>
+				<col name="caption">Multiple Modifiers</col>
+				<col name="abbrev">99</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">30</col>
+				<col name="caption">Left Side</col>
+				<col name="abbrev">LT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">31</col>
+				<col name="caption">Right Side</col>
+				<col name="abbrev">RT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">32</col>
+				<col name="caption">Upper Left Eyelid</col>
+				<col name="abbrev">E1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">33</col>
+				<col name="caption">Lower Left Eyelid</col>
+				<col name="abbrev">E2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">34</col>
+				<col name="caption">Upper Right Eyelid</col>
+				<col name="abbrev">E3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">35</col>
+				<col name="caption">Lower Right Eyelid</col>
+				<col name="abbrev">E4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">36</col>
+				<col name="caption">Left Hand, thumb</col>
+				<col name="abbrev">FA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">37</col>
+				<col name="caption">Left Hand, second digit</col>
+				<col name="abbrev">F1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">38</col>
+				<col name="caption">Left Hand, third digit</col>
+				<col name="abbrev">F2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">39</col>
+				<col name="caption">Left Hand, fourth digit</col>
+				<col name="abbrev">F3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">40</col>
+				<col name="caption">Left Hand, fifth digit</col>
+				<col name="abbrev">F4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">41</col>
+				<col name="caption">Right Hand, thumb</col>
+				<col name="abbrev">F5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">42</col>
+				<col name="caption">Right Hand, second digit</col>
+				<col name="abbrev">F6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">43</col>
+				<col name="caption">Right Hand, third digit</col>
+				<col name="abbrev">F7</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">44</col>
+				<col name="caption">Right Hand, fourth digit</col>
+				<col name="abbrev">F8</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">45</col>
+				<col name="caption">Right Hand, fifth digit</col>
+				<col name="abbrev">F9</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">46</col>
+				<col name="caption">Left Circumflex, coronary artery</col>
+				<col name="abbrev">LC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">47</col>
+				<col name="caption">Left anterior descending coronary artery</col>
+				<col name="abbrev">LD</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">48</col>
+				<col name="caption">Right coronary artery</col>
+				<col name="abbrev">RC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">49</col>
+				<col name="caption">Ambulance service provided under arrangement</col>
+				<col name="abbrev">QM</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">50</col>
+				<col name="caption">Ambulance service furnished directly by provider</col>
+				<col name="abbrev">QN</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">51</col>
+				<col name="caption">Repeat laboratory test performed on the same day</col>
+				<col name="abbrev">QR</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">52</col>
+				<col name="caption">Left Foot, great toe</col>
+				<col name="abbrev">TA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">53</col>
+				<col name="caption">Left Foot, second digit</col>
+				<col name="abbrev">T1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">54</col>
+				<col name="caption">Left Foot, third digit</col>
+				<col name="abbrev">T2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">55</col>
+				<col name="caption">Left Foot, fourth digit</col>
+				<col name="abbrev">T3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">56</col>
+				<col name="caption">Left Foot, fifth digit</col>
+				<col name="abbrev">T4</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">57</col>
+				<col name="caption">Right Foot, great toe</col>
+				<col name="abbrev">T5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">58</col>
+				<col name="caption">Right Foot, second digit</col>
+				<col name="abbrev">T6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">59</col>
+				<col name="caption">Right Foot, third digit</col>
+				<col name="abbrev">T7</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">60</col>
+				<col name="caption">Right Foot, fourth digit</col>
+				<col name="abbrev">T8</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">61</col>
+				<col name="caption">Right Foot, fifth digit</col>
+				<col name="abbrev">T9</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">62</col>
+				<col name="caption">Private Office Physician</col>
+				<col name="abbrev">O5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">63</col>
+				<col name="caption">Private Office Physician Asst</col>
+				<col name="abbrev">O6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">64</col>
+				<col name="caption">Informal reciprocal arrangement</col>
+				<col name="abbrev">Q5</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">65</col>
+				<col name="caption">Locum tenens or temporary arrangement</col>
+				<col name="abbrev">Q6</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">66</col>
+				<col name="caption">Excision/destruction due to signs and symptoms</col>
+				<col name="abbrev">EX</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">67</col>
+				<col name="caption">Lesion is actinic keratosis</col>
+				<col name="abbrev">2A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">68</col>
+				<col name="caption">Injection necessary as the oral route contraindicated</col>
+				<col name="abbrev">OC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">69</col>
+				<col name="caption">Emergency Treatment</col>
+				<col name="abbrev">ET</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">70</col>
+				<col name="caption">Injection into joints, sheaths, trigger points necessary</col>
+				<col name="abbrev">JI</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">71</col>
+				<col name="caption">Injectable medication is accepted treatment of choice</col>
+				<col name="abbrev">6A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">72</col>
+				<col name="caption">Temp over 102 high level antibiotics required</col>
+				<col name="abbrev">6B</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">73</col>
+				<col name="caption">Anesthesia services by anesthesiologist</col>
+				<col name="abbrev">AA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">74</col>
+				<col name="caption">Medical direction of employees by anesthesiologist</col>
+				<col name="abbrev">AB</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">75</col>
+				<col name="caption">Medical direction of other employees</col>
+				<col name="abbrev">AC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">76</col>
+				<col name="caption">Supervision of more than 4 concurrent services</col>
+				<col name="abbrev">AD</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">77</col>
+				<col name="caption">Medically directed 2 concurrent procedures</col>
+				<col name="abbrev">QJ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">78</col>
+				<col name="caption">Medically directed 3 concurrent procedures</col>
+				<col name="abbrev">QO</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">79</col>
+				<col name="caption">Medically directed 4 concurrent procedures</col>
+				<col name="abbrev">QQ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">80</col>
+				<col name="caption">Physician</col>
+				<col name="abbrev">7D</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">81</col>
+				<col name="caption">Advanced Practice Nurse or CNM</col>
+				<col name="abbrev">AL</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">82</col>
+				<col name="caption">Physician Assistant</col>
+				<col name="abbrev">AN</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">83</col>
+				<col name="caption">Psychologist</col>
+				<col name="abbrev">7A</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">84</col>
+				<col name="caption">Social Worker</col>
+				<col name="abbrev">AJ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">85</col>
+				<col name="caption">Visiting Nurse</col>
+				<col name="abbrev">7C</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">86</col>
+				<col name="caption">Antepartum care</col>
+				<col name="abbrev">D1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">87</col>
+				<col name="caption">Postpartum care</col>
+				<col name="abbrev">D2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">88</col>
+				<col name="caption">Delivery</col>
+				<col name="abbrev">D3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">89</col>
+				<col name="caption">CRNA medically directed by anesthesiologist</col>
+				<col name="abbrev">QX</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">90</col>
+				<col name="caption">CRNA not medically directed</col>
+				<col name="abbrev">QZ</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">91</col>
+				<col name="caption">Technical Component</col>
+				<col name="abbrev">TC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">92</col>
+				<col name="caption">Acute Treatment</col>
+				<col name="abbrev">AT</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">93</col>
+				<col name="caption">Necessary Equipment is in Physicians Office</col>
+				<col name="abbrev">PO</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">94</col>
+				<col name="caption">Physician assistant rendering services</col>
+				<col name="abbrev">PA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">95</col>
+				<col name="caption">Kidney Donor</col>
+				<col name="abbrev">Q3</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">96</col>
+				<col name="caption">Service performed by resident under supervision</col>
+				<col name="abbrev">GC</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">97</col>
+				<col name="caption">Physician Assistant acting as asst surgeon</col>
+				<col name="abbrev">AS</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">98</col>
+				<col name="caption">Nurse Practitioner rural team member</col>
+				<col name="abbrev">AK</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">99</col>
+				<col name="caption">Physician services in rural HPSA</col>
+				<col name="abbrev">QB</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">100</col>
+				<col name="caption">Medical direction of one CRNA</col>
+				<col name="abbrev">QY</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">101</col>
+				<col name="caption">Physician services in urban HPSA</col>
+				<col name="abbrev">QU</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">102</col>
+				<col name="caption">Waiver of Liability</col>
+				<col name="abbrev">GA</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">103</col>
+				<col name="caption">MMI Office Visit Level 1</col>
+				<col name="abbrev">L1WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">104</col>
+				<col name="caption">MMI Office Visit Level 2</col>
+				<col name="abbrev">L2WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">105</col>
+				<col name="caption">MMI Office Visit Level 3</col>
+				<col name="abbrev">L3WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">106</col>
+				<col name="caption">MMI Office Visit Level 4</col>
+				<col name="abbrev">L4WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">107</col>
+				<col name="caption">MMI Office Visit Level 5</col>
+				<col name="abbrev">L5WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">108</col>
+				<col name="caption">Treating physician exams/performs</col>
+				<col name="abbrev">WP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">109</col>
+				<col name="caption">Review of the report only</col>
+				<col name="abbrev">RP</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">110</col>
+				<col name="caption">Greater than or equal to 2 yrs</col>
+				<col name="abbrev">L1</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">111</col>
+				<col name="caption">Greater than or equal to 1 yr, less than 2</col>
+				<col name="abbrev">L2</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">112</col>
+				<col name="caption">Less than 1 yr</col>
+				<col name="abbrev">L3</col>
+				<col name="result">2</col>
+			</row>
+		</data>
+	</table>
+
+
 	<table name="HCFA1500_Service_Place_Code" abbrev="HcfaPos" type="Lookup">
 		<description>List of Place of Service. Provided by Envoy Exhibit 5 for processing NSF claims.</description>
 		<data>
