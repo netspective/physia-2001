@@ -13,7 +13,7 @@ use constant DATEFORMAT_USA => 1;
 sub new
 {
 	my ($type, %param) = @_;
-	
+
 	$param{dateOfServiceFrom} = undef;
 	$param{dateOfServiceTo} = undef;
 	$param{placeOfService} = undef;
@@ -36,7 +36,10 @@ sub new
 	$param{balance} = undef;
 	$param{totalAdjustments} = undef;
 	$param{reference} = undef;
-	
+	$param{cptName} = undef;
+	$param{itemType} = undef;
+	$param{caption} = undef;
+
 	return bless \%param, $type;
 }
 
@@ -114,13 +117,13 @@ sub setComments
 {
 	my ($self, $value) = @_;
 	$self->{comments} = $value;
-}	
+}
 
 sub getComments
 {
 	my $self = shift;
 	return $self->{comments};
-}	
+}
 
 sub setDiagnosis
 {
@@ -131,7 +134,7 @@ sub setDiagnosis
 sub getDiagnosis
 {
 	my ($self) = @_;
-	
+
 	return $self->{diagnosis};
 }
 
@@ -144,7 +147,7 @@ sub setDisallowedCostContainment
 sub getDisallowedCostContainment
 {
 	my ($self) = @_;
-	
+
 	return $self->{disallowedCostContainment};
 }
 
@@ -157,7 +160,7 @@ sub setDisallowedOther
 sub getDisallowedOther
 {
 	my ($self) = @_;
-	
+
 	return $self->{disallowedOther};
 }
 
@@ -180,7 +183,7 @@ sub getDateOfServiceFrom
 
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateOfServiceFrom}) : $self->{dateOfServiceFrom};
 }
-	
+
 sub getDateOfServiceTo
 {
 	my ($self, $formatIndicator) = @_;
@@ -255,7 +258,7 @@ sub setDateOfServiceFrom
 	$value = $self->convertDateToCCYYMMDD($value);
 	$self->{dateOfServiceFrom} = $value;
 }
-	
+
 sub setDateOfServiceTo
 {
 	my ($self,$value) = @_;
@@ -274,7 +277,7 @@ sub setTypeOfService
 {
 	my ($self,$value) = @_;
 	$value = (length($value) == 1) ? '0' . $value : $value;
-	
+
 	$self->{typeOfService} = $value;
 }
 
@@ -326,7 +329,7 @@ sub setEmergency
 					'' => 'N',
 
 				};
-					
+
 	$self->{emergency} = $temp->{uc($value)};
 }
 
@@ -344,7 +347,7 @@ sub convertDateToCCYYMMDD
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-						
+
 
 	$date =~ s/-//g;
 	if(length($date) == 7)
@@ -353,27 +356,27 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
+
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','convertDateToCCYYMMDD implemented here. its basic function is to convert the date format from dd-mmm-yy to CCYYMMDD'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','Change log is implemented'],

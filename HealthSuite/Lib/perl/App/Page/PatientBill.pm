@@ -8,6 +8,14 @@ use App::Page::Invoice;
 use Devel::ChangeLog;
 use DBI::StatementManager;
 use App::Statements::Org;
+use Data::Publish;
+
+use App::Billing::Claims;
+use App::Billing::Input::DBI;
+use App::Billing::Validators;
+
+use Date::Manip;
+use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
 
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(App::Page);
@@ -15,45 +23,260 @@ use vars qw(@ISA @CHANGELOG);
 sub prepare
 {
 	my ($self) = @_;
+
+	my $claim = $self->property('activeClaim');
+	my $invoiceId = $claim->{id};
+
+	my $patientHtml = $self->getPatientHtml($claim->{careReceiver});
+	my $orgHtml = $self->getOrgHtml($claim);
+
+	my $previousBalance = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE,
+		'sel_previousBalance', $invoiceId, $invoiceId);
+
+	my @data = ();
+	for my $i (0..(@{$claim->{procedures}} -1))
+	{
+		my $procedure = $claim->{procedures}->[$i];
+		my @rowData = (
+			formatDate($procedure->{dateOfServiceFrom}),
+			$procedure->{cptName},
+			$procedure->{extendedCost} || 0,
+			$procedure->{totalAdjustments},
+		);
+		
+		push(@data, \@rowData);
+	}
 	
-	my $orgId = $self->param('org_id')  || $self->session('org_id');
-	my $invoiceId = $self->param('invoice_id');
+	for my $i (0..(@{$claim->{otherItems}} -1))
+	{
+		my $procedure = $claim->{otherItems}->[$i];
+		my @rowData = (
+			formatDate($procedure->{dateOfServiceFrom}),
+			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			$procedure->{extendedCost},
+			$procedure->{totalAdjustments} || 0,
+		);
+		
+		push(@data, \@rowData);
+	}
+
+	my $totalCoPay = 0;
+	for my $i (0..(@{$claim->{copayItems}} -1))
+	{
+		my $procedure = $claim->{copayItems}->[$i];
+		my @rowData = (
+			formatDate($procedure->{dateOfServiceFrom}),
+			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			#$procedure->{extendedCost},
+			undef,
+			$procedure->{totalAdjustments} || 0,
+		);
+		
+		$totalCoPay += ($procedure->{extendedCost} + $procedure->{totalAdjustments});
+		
+		push(@data, \@rowData);
+	}
 	
-	my $orgInfo = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE,
-		'sel_payToOrgInfo', $invoiceId);
+	for my $i (0..(@{$claim->{adjItems}} -1))
+	{
+		my $procedure = $claim->{adjItems}->[$i];
+		my @rowData = (
+			formatDate($procedure->{dateOfServiceFrom}),
+			$procedure->{cptName} || decodeType($procedure->{itemType}),
+			$procedure->{extendedCost},
+			$procedure->{totalAdjustments} || 0,
+		);
 		
-	my $personInfo = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE,
-		'sel_personDataFromInvoice', $invoiceId);
+		push(@data, \@rowData);
+	}
+	
+	my $totalDue = $previousBalance->{balance} + $claim->{balance};
+	
+	my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Org::PUBLISH_DEFN);
+	my $sysdate = UnixDate('today', '%m/%d/%Y');
+	
+	my $futureAppts = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
+		'sel_futureAppointments', $claim->{careReceiver}->{id});
 		
-	my $clientId = $personInfo->{person_id};
+	my $apptHtml = qq{
+		<TR>
+			<TD>
+				<b><u>Next Appointment</u>:</b>
+			</TD>
+		</TR>
+	};
+	
+	for (@{$futureAppts})
+	{
+		$apptHtml .= qq{
+			<TR>
+				<TD> $_->{appt_time} </TD>
+				<TD> $_->{subject} </TD>
+			</TR>
+		};
+	}
+	
+	my $pageContent = qq{
+		<SPAN style="font-family:Verdana; font-size:10pt">
+			<CENTER>
+				$orgHtml<br><br><br>
+	
+				<TABLE width=70%>
+					<TR>
+						<TD align=left>$patientHtml</TD>
+						<TD align=center valign=top> <b>$claim->{id}</b></TD>
+						<TD align=right valign=top>$sysdate</TD>
+					</TR>
+				
+					<TR>
+						<TD>&nbsp;</TD>
+					</TR>
+					<TR>
+						<TD colspan=3 align=center>
+							$html
+						</TD>
+					</TR>
+
+					<TR>
+						<TD>&nbsp;</TD>
+					</TR>
+					
+					<TR>
+						<TD colspan=3 align=center>
+							<TABLE>
+								<TR>
+									<TD>Previous Balance:</TD>
+									<TD align=right>@{[ FORMATTER->format_price($previousBalance->{balance}, 2) ]}</TD>
+								</TR>
+								<TR>
+									<TD>Today's Total:</TD>
+									<TD align=right>@{[ FORMATTER->format_price($claim->{totalCharge}, 2) ]}</TD>
+								</TR>
+								<TR>
+									<TD>Total Due:</TD>
+									<TD align=right>@{[ FORMATTER->format_price($totalDue, 2) ]}</TD>
+								</TR>
+								<TR>
+									<TD>Total Due From Patient:</TD>
+									<TD align=right>@{[ FORMATTER->format_price($totalCoPay, 2) ]}</TD>
+								</TR>
+							</TABLE>
+						</TD>
+					</TR>
+					
+					<TR>
+						<TD>&nbsp;</TD>
+					</TR>
+					
+					<TR>
+						<TD colspan=3>
+							<TABLE>
+								$apptHtml
+							</TABLE>
+						</TD>
+					</TR>
+				</TABLE>
 		
-	my $invoiceCostItems = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
-		'sel_invoiceCostItems', $invoiceId);
-		
-	my $paymentAmount = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE,
-		'sel_invoicePaymentAmount', $invoiceId);
-		
-	my $previousBalance = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE,
-		'sel_previousBalance', $clientId, $invoiceId);
+			</CENTER>
+		</SPAN>
+	};
+	
 	
 	$self->addContent(qq{
-		$orgInfo->{name_primary} <br>
-		$orgInfo->{complete_addr_html} <br>
-		$orgInfo->{phone} <br>
+		<center>
+		<table bgcolor='#DDDDDD' cellspacing=1 width=100%>
+			<tr><td>
+				<table width=100% bgcolor=white>
+					<tr>
+						<td>$pageContent</td>
+					</tr>
+				</table>
+			</td></tr>
+		</table>
 		
-		$personInfo->{complete_name} <br>
-		$personInfo->{complete_addr_html} <br>
-		
-		@{[ $STMTMGR_ORG->createHtml($self, STMTMGRFLAG_CACHE, 'sel_invoiceCostItems', [$invoiceId]) ]}
-		
-		Payment: $paymentAmount <br>
-		
-		Previous Balance: $previousBalance
-		
-		
+		</center>
 	});
 
 	return 1;
+}
+
+sub decodeType
+{
+	my ($type) = @_;
+	
+	$type = App::Schedule::Utilities::Trim($type);
+	
+	SWITCH: {
+		if ($type == 3) {
+			return 'Co-Pay';
+			last SWITCH;
+		}
+		if ($type == 4) {
+			return 'Co-Insurance';
+			last SWITCH;
+		}
+		if ($type == 5) {
+			return 'Payment - Thank You';
+			last SWITCH;
+		}
+		if ($type == 6) {
+			return 'Deductible';
+			last SWITCH;
+		}
+	}
+}
+
+sub formatDate
+{
+	my ($date) = @_;
+	return UnixDate(ParseDate($date), '%m/%d/%Y');
+}
+
+sub formatPhone
+{
+	my ($phone) = @_;
+	
+	my ($area, $ph3, $ph4);
+	
+	$area = substr($phone, 0, 3);
+	$ph3  = substr($phone, 3, 3);
+	$ph4  = substr($phone, 6, 4);
+	
+	return "($area) $ph3-$ph4" if $area && $ph3 && $ph4;
+}
+
+sub getPatientHtml
+{
+	my ($self, $person) = @_;
+
+	my $addr = $person->{address};
+	return qq{
+		<b>$person->{firstName} $person->{middleInitial} $person->{lastName}</b> ($person->{id})<br>
+		$addr->{address1}<br>
+		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
+		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
+	};
+}
+
+sub getOrgHtml
+{
+	my ($self, $claim) = @_;
+	
+	my $org = $claim->{renderingOrganization};
+	my $org1 = $claim->{payToOrganization};
+	
+	my $addr = $org->{address};
+	my $addr1 = $org1->{address};
+
+	return qq{
+		<b style="font-size:13pt">$org->{name}</b> <br>
+		<b>($org->{id})<br>
+		$addr->{address1}<br>
+		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
+		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
+		@{[ formatPhone($addr->{telephoneNo} || $addr1->{telephoneNo}) ]}
+		</b>
+	};
 }
 
 sub prepare_page_content_footer
@@ -72,6 +295,36 @@ sub initialize
 {
 	my $self = shift;
 	$self->SUPER::initialize(@_);
+
+	my $claimList = new App::Billing::Claims;
+	my $valMgr = new App::Billing::Validators;
+
+	$self->property('claimList', $claimList);
+	$self->property('valMgr', $valMgr);
+
+	my $input = new App::Billing::Input::DBI;
+	$input->registerValidators($valMgr);
+
+	my $invoiceId = $self->param('invoice_id');
+	eval
+	{
+		$input->populateClaims($claimList, dbiHdl => $self->getSchema()->{dbh},
+					invoiceIds => [$invoiceId], valMgr => $valMgr);
+		my $st = $claimList->getStatistics;
+		if($valMgr->haveErrors())
+		{
+			my $errors = $valMgr->getErrors();
+			push(@{$self->{page_content}}, join('<li>', @$errors));
+		}
+		else
+		{
+			my $claim = $claimList->{claims}->[0];
+			$self->property('activeClaim', $claim);
+		}
+	};
+	$self->addError($@) if $@;
+
+	return 1;
 }
 
 sub handleARL
@@ -82,7 +335,7 @@ sub handleARL
 	$self->param('invoice_id', $pathItems->[0]);
 	$self->param('org_id', $pathItems->[1]);
 	$self->param('patient_id', $pathItems->[2]);
-	
+
 	$self->printContents();
 	return 0;
 }
