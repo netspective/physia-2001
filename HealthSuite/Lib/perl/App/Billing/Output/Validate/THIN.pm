@@ -53,8 +53,6 @@ use constant CHECK_CHARACTERS => 60;
 
 			# Validations for BA1
 			
-			
-			
 		}
 	],
 
@@ -64,7 +62,34 @@ use constant CHECK_CHARACTERS => 60;
 		sub
 		{
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);			
-	   	
+
+			# validation for DA0
+				   	
+		#	my $payerCount = $claim->getClaimType();
+		
+			for my $payerLoop(0..3)
+			
+			{
+				# Payer Organization ID
+				if ($payerLoop > 0)
+				{
+					if($claim->{policy}->[$payerLoop - 1]->getName() eq 'Medicare')
+					{
+						$self->isRequired($claim->{insured}->[0]->getMedigapNo(), $claim,'DA0:Payer Organization ID(Medigap number)');
+					}
+				}	
+				
+				
+				#Insured ID Number
+				if ($payerLoop > 0)
+				{
+					if($claim->{policy}->[$payerLoop - 1]->getName() eq 'Medicare')
+					{
+						$self->isRequired($claim->{insured}->[0]->getSsn(),$claim,'DA0:Insured ID(For Medigap)');					
+					}
+				}
+			}	
+	
 
 				
 		}
@@ -84,7 +109,7 @@ sub validate
 	 
 #	 my $t0 = new Benchmark;
 
-	 $payerId = $claim->getProgrammerName();
+	 $payerId = $claim->getProgramName();
     
 #    if ($claim->getPayerId() =~ m/^VN/)
 #    {

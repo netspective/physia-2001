@@ -414,9 +414,9 @@ sub validateD
 
 	# checks for Claim Filing Indicator
 
-	my $payerCount = $tempClaim->getClaimType();
+#	my $payerCount = $tempClaim->getClaimType();
 		
-	for my $payerLoop(0..$payerCount)
+	for my $payerLoop(0..3)
 	{
 	
 		$self->isRequired($tempClaim->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator');

@@ -362,9 +362,10 @@ sub validateD
 
 	# checks for Claim Filing Indicator
 
-	my $payerCount = $tempClaim->getClaimType();
+	#my $payerCount = $tempClaim->getClaimType();
+	
 		
-	for my $payerLoop(0..$payerCount)
+	for my $payerLoop(0..3)
 	{
 	
 		$self->isRequired($tempClaim->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator');
@@ -395,7 +396,20 @@ sub validateD
 		}
 	
 		# checks for Payer Organization ID
-		$self->isRequired($tempClaim->{policy}->[$payerLoop]->getPayerId(), $tempClaim,'DA0:Payer Organization ID');
+		
+		if ($payerLoop > 0)
+		{
+			
+			if($tempClaim->{policy}->[$payerLoop - 1]->getName() eq 'Medicare')
+			{	
+				
+				$self->isRequired($tempClaim->{insured}->[0]->getMedigapNo(), $tempClaim,'DA0:Payer Organization ID(Medigap number)');
+			}
+			else
+			{
+				$self->isRequired($tempClaim->{policy}->[$payerLoop]->getPayerId(), $tempClaim,'DA0:Payer Organization ID');
+			}
+		}
 	
 		# checks for Payer Claim office Number
 	
@@ -486,6 +500,14 @@ sub validateD
 		}	
 	
 		#Insured ID Number
+		if ($payerLoop > 0)
+		{
+			if($tempClaim->{policy}->[$payerLoop - 1]->getName() eq 'Medicare')
+			{
+				$self->isRequired($tempClaim->{insured}->[0]->getSsn(),$tempClaim,'DA0:Insured ID(For Medigap)');					
+			}
+		}
+
 		if($tempClaim->getFilingIndicator() =~ m/['P','M']/)
 		{
 			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID');
@@ -1172,6 +1194,20 @@ sub validateY
 sub validate
 {
 	my ($self,$valMgr,$callSeq,$vFlags,$claim) = @_;
+	
+	
+	$self->{claim} = $claim;
+    $self->{valMgr} = $valMgr;
+    
+	
+	$self->validateA($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateB($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateC($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateD($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateE($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateF($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateX($valMgr,$callSeq,$vFlags,$claim);
+	$self->validateY($valMgr,$callSeq,$vFlags,$claim);
 }
 
 
@@ -1193,7 +1229,6 @@ sub getName
 sub getCallSequences
 {
 	my $self =  shift;
-
 	return 'HALLEY';
 }
 
