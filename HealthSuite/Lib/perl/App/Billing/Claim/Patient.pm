@@ -126,7 +126,6 @@ sub getSignature
 sub setSignature
 {
 	my ($self,$value) = @_;
-
 	$self->{signature} = $value;
 }
 
@@ -161,10 +160,14 @@ sub setRelationshipToInsured
 			'10' => '02',
 			'12' => '03',
 			'99' => '99',
+			'50' => '99',
+			'11' => '18',
 			'SELF' => '01',
 			'SPOUSE' => '02',
 			'CHILD' => '03',
 			'OTHER' => '99',
+			'PARENT' => '11',
+			'EMPLOYER' => '99',
 		};
 	
 	$self->{relationshipToInsured} = $temp->{uc($value)};

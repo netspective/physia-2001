@@ -221,7 +221,7 @@ sub populatePatient
 	$data->{patientInsuredRelationSelf} = (uc($patient->getRelationshipToInsured) =~ /01|1|SELF/) ? "checked" : "";
 	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /02|2|SPOUSE/) ? "checked" : "";	
 	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /03|3|05|06|CHILD/) ? "checked" : "";	
-	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /04|4|07|08|09|10|11|12|13|14|15|16|17|18|19|99|OTHER/) ? "checked" : "";	
+	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /04|4|07|08|09|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";	
 	$data->{patientStatusSingle} = uc(($patient->getStatus) =~ /S/) ? "checked" : "";
 	$data->{patientStatusMarried} = uc($patient->getStatus) =~ /M/ ? "checked" : "";
 	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";	
@@ -283,8 +283,8 @@ sub populateOtherInsured
 		{
 			if (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
 			{
-				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
-				$data->{otherInsuredName} = "none";
+#				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
+#				$data->{otherInsuredName} = "none";
 			}
 		}
 
@@ -294,7 +294,7 @@ sub populateOtherInsured
 sub populatePhysician
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getPayToProvider();
+	my $physician = $claim->getRenderingProvider();
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 

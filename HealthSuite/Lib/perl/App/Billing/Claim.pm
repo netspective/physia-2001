@@ -21,6 +21,10 @@ use constant PRIMARY => 0;
 use constant SECONDARY => 1;
 use constant TERTIARY => 2;
 use constant QUATERNARY => 3;
+use constant BILLSEQ_PRIMARY_PAYER => 1;
+use constant BILLSEQ_SECONDARY_PAYER => 2;
+use constant BILLSEQ_TERTIARY_PAYER => 3;
+use constant BILLSEQ_QUATERNARY_PAYER => 4;
 
 
 sub new
@@ -902,19 +906,18 @@ sub setConditionRelatedToEmployment
 			'Y' => 'Y',
 			'N' => 'N',
 		};
-	return $self->{conditionRelatedToEmployment} = $temp->{$value};
+	$self->{conditionRelatedToEmployment} = $temp->{$value};
 }
 
 sub getClaimType
 {
 	my ($self) = @_;
 	
-	my $billSeq = [ 
-			BILLSEQ_PRIMARY_PAYER => PRIMARY,
-			BILLSEQ_SECONDARY_PAYER => SECONDARY,
-			BILLSEQ_TERTIARY_PAYER =>  TERTIARY,
-			BILLSEQ_QUATERNARY_PAYER => QUATERNARY
-			];
+	my $billSeq = [];
+			$billSeq->[BILLSEQ_PRIMARY_PAYER] = PRIMARY;
+			$billSeq->[BILLSEQ_SECONDARY_PAYER] = SECONDARY;
+			$billSeq->[BILLSEQ_TERTIARY_PAYER] =  TERTIARY;
+			$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
 
 	return $billSeq->[$self->{claimType}] + 0;
 }
@@ -930,14 +933,14 @@ sub setBillSeq
 {
 	my ($self,$value) = @_;
 
-	return $self->{billSeq} = $value;
+	$self->{billSeq} = $value;
 }
 
 sub setClaimType
 {
 	my ($self,$value) = @_;
 
-	return $self->{claimType} = $value;
+	$self->{claimType} = $value;
 }
 
 
@@ -950,7 +953,7 @@ sub setConditionRelatedToAutoAccident
 			'Y' => 'Y',
 			'N' => 'N',
 		};
-	return $self->{conditionRelatedToAutoAccident} = $temp->{$value};
+	$self->{conditionRelatedToAutoAccident} = $temp->{$value};
 }
 
 sub setConditionRelatedToOtherAccident
@@ -961,14 +964,14 @@ sub setConditionRelatedToOtherAccident
 			'Y' => 'Y',
 			'N' => 'N',
 		};
-	return $self->{conditionRelatedToOtherAccident} = $temp->{$value};
+	$self->{conditionRelatedToOtherAccident} = $temp->{$value};
 }
 
 sub setConditionRelatedToAutoAccidentPlace
 {
 	my ($self,$value) = @_;
 	
-	return $self->{conditionRelatedToAutoAccidentPlace} = $value;
+	$self->{conditionRelatedToAutoAccidentPlace} = $value;
 }
 
 sub claimProcessor

@@ -119,12 +119,7 @@ sub processClaims
 			}
 
 		$self->reversePrimaryProcedure($claim, $pp);
-
-##			$self->newPage($p);  # code to draw back of form
-##			$self->drawBack($p);
-##			$self->endPage($p);
 		}
-
 	}
 	$self->closeAndDestroy($p);
 }	
@@ -1626,6 +1621,7 @@ sub populatePDf
 	$self->box9cClaimData($p, $Claim, $cordinates);
 	$self->box9dClaimData($p, $Claim, $cordinates);
 	$self->box12ClaimData($p, $Claim, $cordinates);
+	$self->box13ClaimData($p, $Claim, $cordinates);
 	$self->box14ClaimData($p, $Claim, $cordinates);
 	$self->box15ClaimData($p, $Claim, $cordinates);
 	$self->box16ClaimData($p, $Claim, $cordinates);
@@ -1837,6 +1833,7 @@ sub box6ClaimData
 			'11' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'12' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'13' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
+			'50' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'14' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'15' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'16' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
@@ -2231,7 +2228,7 @@ sub box13ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "", $box13X + CELL_PADDING_X + $capAlign + 30, $box13Y - 7 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , (uc($claim->{careReceiver}->getSignature()) =~ /M|B/) ? 'Signature on File' : "", $box13X + CELL_PADDING_X + $capAlign + 50, $box13Y - 7 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2753,13 +2750,13 @@ sub box25ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	pdflib::PDF_show_xy($p , $claim->{payToProvider}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p , $claim->{renderingProvider}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
 	my $temp = {
 			'S' => $box25X + CELL_PADDING_X + 112.5 + CHECKED_BOX_X,
 			'E' => $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X,
 			};
 	
-	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{payToProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{payToProvider}->getTaxTypeId)});
+	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{renderingProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{renderingProvider}->getTaxTypeId)});
 	pdflib::PDF_stroke($p);
 }
 
@@ -2894,7 +2891,7 @@ sub box33ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $physician = $claim->{payToProvider};
+	my $physician = $claim->{renderingProvider};
 	my $add = $physician->getAddress();
 
 	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );

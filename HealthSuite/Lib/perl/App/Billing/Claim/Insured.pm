@@ -105,13 +105,17 @@ sub setRelationshipToInsured
 	my $temp = 
 		{ 
 			'0' => '01',
-			'1' => '02',
-			'3' => '03',
-			'4' => '99',
+			'10' => '02',
+			'12' => '03',
+			'99' => '99',
+			'50' => '99',
+			'11' => '18',
 			'SELF' => '01',
 			'SPOUSE' => '02',
 			'CHILD' => '03',
 			'OTHER' => '99',
+			'PARENT' => '11',
+			'EMPLOYER' => '99',
 		};
 	
 	$self->{relationshipToInsured} = $temp->{uc($value)};

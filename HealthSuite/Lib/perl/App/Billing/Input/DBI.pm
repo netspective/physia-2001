@@ -345,7 +345,7 @@ sub assignPatientInsurance
 	{
 		$queryStatment = "select org.name_primary, ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
 									ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
-									ins.ins_type
+									ins.ins_type, Ins.member_number
 							from org, insurance ins, invoice_billing
 							where invoice_billing.invoice_id = $invoiceId
 								and invoice_billing.invoice_item_id is NULL
@@ -359,7 +359,7 @@ sub assignPatientInsurance
 		@row = $sth->fetchrow_array();
 		$claim->setProgramName($ins[$row[8]]);
 		$patient->setRelationshipToInsured($row[1]);
-		$insured = $claim->{insured}->[$billSeq->[$claim->getClaimType]];
+		$insured = $claim->{insured}->[$claim->getClaimType];
 		$insured->setInsurancePlanOrProgramName($row[0]);
 		$insured->setRelationshipToInsured($row[1]);
 		$insured->setPolicyGroupOrFECANo($row[3]);
@@ -368,10 +368,11 @@ sub assignPatientInsurance
 		$insured->setTerminationDate($row[6]);
 		$insured->setPolicyGroupName($row[7]);
 		$insured->setBillSequence($row[2]);
+		$insured->setSsn($row[9]);
 	}
 
 	$queryStatment = "select org.name_primary, ins.group_number, ins.rel_to_insured, Invoice_billing.bill_sequence,
-					ins.insured_id, to_char(coverage_begin_date, \'dd-MON-yyyy\'), to_char(coverage_end_date,\'dd-MON-yyyy\')
+					ins.insured_id, to_char(coverage_begin_date, \'dd-MON-yyyy\'), to_char(coverage_end_date,\'dd-MON-yyyy\'), ins.member_number
 					from org, insurance ins, invoice_billing
 					where invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
 						" and invoice_billing.invoice_item_id is NULL
@@ -399,6 +400,7 @@ sub assignPatientInsurance
 				$insured->setId($row[4]);
 				$insured->setEffectiveDate($row[5]);
 				$insured->setTerminationDate($row[6]);
+				$insured->setSsn($row[7]);
 			}
 		}
 	}
@@ -438,7 +440,7 @@ sub assignOtherInsuredInfo
 					$insured->setDateOfBirth($row[3]);
 					$insured->setSex($row[4]);
 					$insured->setStatus($row[5]);
-					$insured->setSsn($row[6]);
+#					$insured->setSsn($row[6]); this is now populated in patient insurance with ins.member_number
 					$insured->setId($row[7]);
 
 					$queryStatment = "select attr.value_text
@@ -489,7 +491,6 @@ sub assignOtherInsuredAddressInfo
 	my $insureds = $claim->{insured};
 	my $insured;
 	my $no = $claim->getClaimType();
-
 	foreach $insured (@$insureds)
 	{
 		if (($claim->getStatus() ne INVOICESTATUS_SUBMITTED) || ($insured ne $insureds->[$no]))
@@ -707,6 +708,10 @@ sub assignServiceBilling
 		$orgId = $row[0];
 		$renderingProvider->setId($row[0]);
 		$renderingProvider->setName($row[1]);
+		$renderingProvider->setLastName($row[1]);
+		$renderingProvider->setMiddleInitial("");
+		$renderingProvider->setFirstName("");
+
 		$renderingProvider->setFederalTaxId($row[2]);
 
 		my $renderingProviderAddress = new App::Billing::Claim::Address;
@@ -792,7 +797,6 @@ sub assignPolicy
 	while (@row1 = $sth1->fetchrow_array())
 	{
 		$seqNum = $row1[1] + 0;
-#		$recordType = $row1[2] + 0;
 		$payer = $payers->[$billSeq->[$seqNum]];
 		if ($payer ne "")
 		{
@@ -894,12 +898,12 @@ sub assignPolicy
 				elsif ($row1[3] == BILL_PARTY_TYPE_PERSON)
 				{
 					my $pid = $row1[0];
-					$queryStatment = "select name_last, name_middle, name_first from person where person_id = \'$pid\'";
+					$queryStatment = "select complete_name from person where person_id = \'$pid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
-					$payer->setName($row[0]. ' ' . $row[1] . ' ' . $row[2]);
+					$payer->setName($row[0]);
 
 			 		$queryStatment = "select line1, line2, city, state, zip, country from person_address where parent_id = \'$pid\' and address_name = \'Home\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
@@ -985,6 +989,8 @@ sub assignInvoiceProperties
 	my $payer2 = new App::Billing::Claim::Payer;
 	my $payer3 = new App::Billing::Claim::Payer;
 	my $payer4 = new App::Billing::Claim::Payer;
+	$insured->setAddress($insuredAddress);
+	$payer->setAddress($payerAddress);
 	$payer2->setAddress(new App::Billing::Claim::Address);
 	$payer3->setAddress(new App::Billing::Claim::Address);
 	$payer4->setAddress(new App::Billing::Claim::Address);
@@ -1163,6 +1169,7 @@ sub assignInvoiceProperties
 	{
 		my $tp1 = ${$currentPolicy->[0]};
 		my $ti1 = ${$currentPolicy->[1]};
+
 		${$currentPolicy->[0]} = $payer;
     	${$currentPolicy->[1]} = $insured;
 		$payer = $tp1;
@@ -1188,8 +1195,6 @@ sub assignInvoiceProperties
 
 	$payToOrganization->setAddress($payToOrganizationAddress);
 	$patient->setAddress($patientAddress);
-	$insured->setAddress($insuredAddress);
-	$payer->setAddress($payerAddress);
 	$payToProvider->setAddress($payToProviderAddress);
 	$renderingProvider->setAddress($renderingProviderAddress);
 	$self->setproperRenderingProvider($claim, $renderingProvider, $renderingOrganization);
@@ -1621,6 +1626,8 @@ sub getId
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'SSI','Billing Interface/Input DBI','The multiple payer and insured object are populated according to Invoice_billing table.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/20/2000', 'SSI','Billing Interface/Input DBI','Signature  is now populated from value textB of person_attribute'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/20/2000', 'SSI','Billing Interface/Input DBI','Workers compensation plan is also included'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','complete_name is used in payer when bill party type is person'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','insured SSN is now populated from insurance.member_number '],
 
 );
 
