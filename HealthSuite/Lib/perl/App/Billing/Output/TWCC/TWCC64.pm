@@ -965,6 +965,16 @@ sub boxTopData
 
 	my $properties =
 			{
+				'text' => $claim->{insured}->[$claim->getClaimType]->getPolicyGroupOrFECANo,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + 30,
+				'y' => $y - 6
+			};
+	$report->drawText($p, $properties);
+	
+	$properties =
+			{
 				'text' => $claim->getId,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
@@ -972,20 +982,7 @@ sub boxTopData
 				'y' => $y - 15
 			};
 	$report->drawText($p, $properties);
-	my $claimType = $claim->getClaimType();
-	my $insured = $claim->{insured}->[$claimType];
 
-	$properties =
-			{
-				'text' => $insured->getPolicyGroupOrFECANo,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 20,
-				'y' => $y - 6
-			};
-
-	$report->drawText($p, $properties);
-	
 }
 
 sub box1Data

@@ -1050,26 +1050,24 @@ sub fillData
 sub boxTopData
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	my $claimType = $claim->getClaimType();
-	my $insured = $claim->{insured}->[$claimType];
-
 
 	my $properties =
+			{
+				'text' => $claim->{insured}->[$claim->getClaimType]->getPolicyGroupOrFECANo,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + 25,
+				'y' => $y - 6
+			};
+	$report->drawText($p, $properties);
+
+	$properties =
 			{
 				'text' => $claim->getId,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + 50,
 				'y' => $y - 16
-			};
-	$report->drawText($p, $properties);
-	$properties =
-			{
-				'text' => $insured->getPolicyGroupOrFECANo,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 20,
-				'y' => $y - 6
 			};
 	$report->drawText($p, $properties);
 }
