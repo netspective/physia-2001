@@ -1,0 +1,2 @@
+insert into Attribute_Value_Type (id, caption, dialog_params, group_name, remarks) values (227, 'Unemployed', 'type="text"', 'Association', 'The patient''s employment is unemployed. Stored in value_text in ''person_attribute'' table');
+commit;
