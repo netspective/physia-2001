@@ -157,7 +157,7 @@ sub processClaim
 
 	for my $payersLoop (1..$payerCount)
 	{
-		if ($tempClaim->{policy}->[$payersLoop - 1]->{name} ne '') 
+		if ($tempClaim->{policy}->[$payersLoop - 1]->{name} ne '')
 		{
 			if(&{$recordCreationCondition->{$payerType}->{DA0}} == 1)
 			{
@@ -219,6 +219,9 @@ sub processClaim
    	{
 	   	for my $i (0..$#$proceduresCount)
    		{
+			my $procedure = $tempClaim->getProcedure($i);
+			if (uc($procedure->getItemStatus) ne "VOID")
+			{
 
 			if(&{$recordCreationCondition->{$payerType}->{FA0}} == 1)
 			{
@@ -238,44 +241,9 @@ sub processClaim
 	    	$self->setSequenceNo($self->getSequenceNo()+1);
 	   		$self->incCountXXX('fA0XXX');
 	   		$self->incCountXXX('fXXX');
+			}
 		}
 	 }
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('fXXX');
-	# $self->{FB0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB0;
-    # push(@$outArray,$self->{FB0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('fXXX');
-	# $self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
-    # push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('fXXX');
-	# $self->{FB2Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB2;
-    # push(@$outArray,$self->{FB2Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('fXXX');
-	# $self->{FE0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FE0;
-    # push(@$outArray,$self->{FE0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('gXXX');
-	# $self->{GC0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::GC0;
-    # push(@$outArray,$self->{GC0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('gXXX');
-	# $self->{GDatObj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::GDat;
-    # push(@$outArray,$self->{GDatObj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
-
-
-   	# $self->setSequenceNo(1);
-   	# $self->incCountXXX('hXXX');
-	# $self->{HA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::HA0;
-    # push(@$outArray,$self->{HA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $payerType));
 
 	$self->setSequenceNo(1);
 	$self->incCountXXX('xXXX');
@@ -315,50 +283,4 @@ sub prepareClaimTrailer
 }
 
 
-#sub getTime
-#{
-#	my $date = localtime();
-#	my @timeStr = ($date =~ /(\d\d):(\d\d):(\d\d)/);
-
-#	return $timeStr[0].$timeStr[1].$timeStr[2];
-#}
-
-#sub getDate
-#{
-
-#	my $self = shift;
-
-#	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
-#				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
-#				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
-#						};
-
-#	my $date = localtime();
-#	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
-#	my @dateStr = ($month, substr(localtime(),8,2), substr(localtime(),20,4));
-
-#	@dateStr = reverse(@dateStr);
-
-#	$dateStr[1] =~ s/ /0/;
-
-#	return $dateStr[0].$dateStr[2].$dateStr[1];
-
-#}
-
-
-#sub numToStr
-#{
-#	my($self,$len,$lenDec,$tarString) = @_;
-#	my @temp1 = split(/\./,$tarString);
-#	$temp1[0]=substr($temp1[0],0,$len);
-#	$temp1[1]=substr($temp1[1],0,$lenDec);
-
-#	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-#	return $fg;
-#}
-
 1;
-
-
-
-
