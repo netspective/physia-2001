@@ -446,5 +446,9 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 			Reopened: Unrequired dose, start date, and quantity in add medication dialog.
 		</deliverable>
 
+		<deliverable id="1975">
+			Account for Standard/Daylight time when displaying Notes time.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
