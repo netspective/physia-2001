@@ -314,7 +314,10 @@ sub execute
 			_debug => 0
 		);
 		
-		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
+		if($invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+		{
+			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
+		}
 	}
 
 
