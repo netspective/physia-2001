@@ -239,18 +239,26 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, value_block, cr_user_id
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Not Read',1,'Read'), cr_user_id
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Phone Message'
+			and value_int is null
+			and value_intB = 0			
+			union
+                        select  value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Not Read',1,'Read'), cr_user_id
+                                from  Person_Attribute
+                        where   parent_id = ?
+                        and item_name = 'Phone Message'
+                        and value_int is not null
 
 		},
-		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table, Person ID for Attribute Table'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => '#8# (#5#): #4#' },
+			{ dataFmt => "<A HREF='/person/#8#/profile'>#8#</A> (#5#): #4#" },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-phone-message?home=/#param.arl#' },
@@ -283,10 +291,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		},
 	},
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId,$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId,$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId,$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId,$personId], 'panelTransp'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -311,7 +319,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => '#6# (#5#): #4# (#7#)' },
+			{ dataFmt => "<A HREF='/person/#6#/profile'>#6#</A> (#5#): #4# (#7#)" },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-refill-request?home=/#param.arl#' },
