@@ -1998,24 +1998,26 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.hospitalizationSurgeriesTherapies' => {
 	sqlStmt => qq{
-			select  %simpleDate:trans_begin_stamp%, related_data, trans_status_reason,
-				provider_id, caption, data_num_a, detail, data_text_c, trans_type, trans_id
-			from 	transaction
+			select  %simpleDate:trans_begin_stamp%, org.name_primary, org.org_id, provider_id, caption, data_num_a, detail, data_text_c, 
+				trans_type, trans_id, %simpleDate:trans_end_stamp%, auth_ref, data_text_a, data_text_b
+			from 	org, transaction
 			where 	trans_type between 11000 and 11999
 			and 	trans_owner_id = ?
 			and 	trans_status = 2
+			and service_facility_id = org.org_internal_id
 		},
 	sqlStmtBindParamDescr => ['Person ID for Transaction Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 3, head => 'Provider', dataFmt => '#1# (#2#)<BR>Admitted by <A HREF ="/person/#3#/profile">#3#</A> (#0#)<BR>Room: #4#, Duration Of Stay: #5#, Orders: #6#, Procedures: #7#' },
-			#{ head => 'Hospitalaziation', dataFmt => '<b>#1#, #2#</b><BR>Room:#4#, Duration Of Stay:#5# <BR>Orders:#6#, Procedures:#7#' },
+			{ colIdx => 3, head => 'Provider',
+				dataFmt => '#1# (<A HREF ="/org/#2#/profile">#2#</A>)<BR>Admitted by <A HREF ="/person/#3#/profile">#3#</A> (#0#), Discharged (#10#)<BR>Room: #4#, Prior Auth: #11#<BR>ICD(s): #6#, CPT(s): #7#' },
+			#{ head => 'Hospitalization', dataFmt => '<b>#1#, #2#</b><BR>Room:#4#, Duration Of Stay:#5# <BR>Orders:#6#, Procedures:#7#' },
 			#{ colIdx => 1, head => 'Hospital', dataFmt => '#1#' },
-			#{ colIdx => 2, head => 'Reason', dataFmt => '#2#' },
+			#{ colIdx => 2, head => 'Hospital Id', dataFmt => '#2#' },
 			#{ colIdx => 3, head => 'Provider', dataFmt => '#3#' },
 			#{ colIdx => 4, head => 'Room', dataFmt => '#4#', dAlign => 'RIGHT' },
 			#{ colIdx => 5, head => 'Duration', dataFmt => '#5#' },
-			#{ colIdx => 4, head => 'Orders', dataFmt => '#6#' },
+			#{ colIdx => 4, head => 'Diagnoses', dataFmt => '#6#' },
 			#{ colIdx => 5, head => 'Procedures', dataFmt => '#7#', dAlign => 'RIGHT' },
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#9#?home=#homeArl#',
