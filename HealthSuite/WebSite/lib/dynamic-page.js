@@ -1,4 +1,3 @@
-
 /* setup constants */
 
 var elemPattern_fieldDefns    = "mdl/clinical-documentation/field-defns";
@@ -191,8 +190,8 @@ function createFieldOptionsHtml(controlId, fieldNode, style, extraAttrs)
 	var html = '';
 	var fieldCount = optionsNode.childNodes.length;
 	var defaultValue = fieldNode.getAttribute('default') ? fieldNode.getAttribute('default') : '';
-	if (defaultValue && defaultValue != '')
-		__debug = confirm (fieldNode.getAttribute('id') + ' (' + fieldNode.getAttribute('type') + ') [' + style + ']\nfieldNode.getAttribute(default) = ' + fieldNode.getAttribute('default'));
+//	if (defaultValue && defaultValue != '')
+//		__debug = confirm (fieldNode.getAttribute('id') + ' (' + fieldNode.getAttribute('type') + ') [' + style + ']\nfieldNode.getAttribute(default) = ' + fieldNode.getAttribute('default'));
 	
 	if(style == 'anchor')
 	{
@@ -258,6 +257,20 @@ function createTemplateHtml(template)
 function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 {	
 	if(fieldNode == null) return "fieldNode should not be null in " + funcName(arguments.callee);
+	
+//	if (fieldNode.length) {
+//		alert ('createFieldHtml...\nfieldNode.length = ' + fieldNode.length);
+
+//		for (var x = 0; x <= fieldNode.length; x ++) {
+
+//			var temp = fieldNode[x];
+
+//			alert ('fieldNode[' + x + '] = ' + temp.getAttribute('id'));
+
+//		}
+
+//	}
+	
 	if(fieldNode.getAttribute('idref') != null)
 	{
 		var fieldDefnId = fieldNode.getAttribute('idref');
@@ -287,8 +300,10 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 //	var sectionId = sectionName + '_' + count;
 	var fieldNodeId = fieldNode.getAttribute('id');
 	var sectionId = (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId;
-	var sectionClassSuffix = (fieldNode.getAttribute('expanded') == 'yes') ? '_expanded' : '';
+	var sectionClassSuffix = (fieldNode.getAttribute('expanded') == 'yes' || fieldType == 'grid') ? '_expanded' : '';
 	var sectionDisplayAttribute = (fieldNode.getAttribute('expanded') == 'yes') ? '' : 'display:none';
+	var sectionIcon = (fieldNode.getAttribute('expanded') == 'yes') ? 'minus.gif' : 'plus.gif';
+//	var fieldName = ((parentPrefix == '') ? '' : parentPrefix + '.') + fieldNode.getAttribute ('id');
 	
 	if(fieldType == 'container' || fieldType == 'grid')
 	{
@@ -327,10 +342,23 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		if (__nodebug == false && __debug == true) {
 			__debug = confirm ('createFieldHtml...\nsectionId = ' + sectionId + '\nsectLevel = ' + level + '\n\ncontentsHtml = [' + contentsHtml.length + '] ' + contentsHtml);
 		}
+
+		if(fieldNode.getAttribute('condition-field') != null)
+		{
+			sectionClassSuffix += '_conditional';
+			var fieldId = '_df_.' + fieldNode.getAttribute('condition-field');
+			addConditionalField(fieldId, fieldNode, sectionId);
+		}
+
 		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">\n';
-		html += '\t<div id="'+ sectionId +'_head" class="section_head' + sectionClassSuffix + '" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
+		if (fieldNode.getAttribute ('bareheading') != 'yes')
+			html += '\t<div id="'+ sectionId +'_head" class="section_head' + sectionClassSuffix + '" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="' + imagePrefix + sectionIcon + '" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
 		html += '\t<div id="'+ sectionId +'_body" class="section_body' + sectionClassSuffix + '" sectLevel="'+level+'" style="' + sectionDisplayAttribute + '">\n';
 		html += '\t\t' + contentsHtml + '\n\t</div>\n</div>\n';
+		if (fieldNode.getAttribute('condition-field') != null) {
+//			__debug = confirm ('adding a div around a conditional section...\nid = ' + sectionId + '_area');
+			html = '<div id="' + sectionId + '_area" class="section_field_area_conditional">' + html + '</div>';
+		}
 	}
 	else if (fieldType == 'text' || fieldType == 'float' || fieldType == 'percentage' || fieldType == 'currency' || fieldType == 'integer' || fieldType == 'time' || fieldType == 'date')
 	{
@@ -377,11 +405,6 @@ function prepareFieldHtml_caption(fieldNode, level, count, namePrefix, style)
 	return '<span '+ style +' id="'+ namePrefix +'_label" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="section_field_label">'+fieldNode.getAttribute('caption')+':</span>';
 }
 
-//function createGridFieldHtml(fieldNode)
-//{
-//	return '<input>';
-//}
-
 function addGridRow(theTable, level, count, parent, namePrefix) {
 	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
 	var tableObject = document.all[theTable];
@@ -392,6 +415,7 @@ function addGridRow(theTable, level, count, parent, namePrefix) {
 	var gridXMLName = gridName.replace (/\./g, '/');
 	var gridFieldNode = getFieldById (gridXMLName);
 	var gridId = gridFieldNode.getAttribute ('id');
+//	alert ('addGridRow...\ngridFieldNode.length = ' + gridFieldNode.length + '\ngridId = ' + gridId)
 
 	var theRow = tableObject.insertRow ();
 	var cellData = prepareFieldHtml_gridrowArray (gridFieldNode, level, count, parent, gridName);
@@ -408,11 +432,15 @@ function prepareFieldHtml_gridrowArray(fieldNode, level, count, parent, namePref
 	var dataRowPrototype = '';
 	var dataRowArray = new Array ();
 	var parentPrefix = (namePrefix ? namePrefix + '.' : '') + fieldNode.getAttribute('id');
+	var gridId = fieldNode.getAttribute ('id');
 	if (__nodebug == false) __debug = confirm ('prepareFieldHtml_gridRowArray...\nnamePrefix = ' + namePrefix + '\nparentPrefix = ' + parentPrefix);
+//	alert ('prepareFieldHtml_gridRowArray...\nfieldNode.length = ' + fieldNode.length + '\ngridId = ' + gridId)
 
 	for (var i = 0; i < fieldCount; i++)
 	{
 		var childFieldDefn = fieldNode.childNodes[i];
+//		alert ('prepareFieldHtml_gridrowArray...\nchildFieldDefn = ' + childFieldDefn.getAttribute('id') + '\nchildFieldDefn.length = ' + childFieldDefn.length);
+
 		var widgetHtml = createFieldHtml (childFieldDefn, level, count, parent, parentPrefix);
 		dataRowArray [dataRowArray.length] = widgetHtml;
 	}
@@ -461,7 +489,8 @@ function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 		headRow += '<td class="section_field_grid_head">'+childFieldDefn.getAttribute('caption')+'</td>';
 		dataRowPrototype += '<td class="section_field_grid_data">'+createFieldHtml(childFieldDefn, level + 1, count, parent, parentPrefix)+'</td>';
 	}
-	headRow += '<td class="section_field_grid_add" onClick="addGridRow(\'' + tableName + '\')">Add...</td>';
+	if (fieldNode.getAttribute ('append') != 'no')
+		headRow += '<td class="section_field_grid_add" onClick="addGridRow(\'' + tableName + '\')">Add...</td>';
 	headRow = '<tr>' + headRow + '</tr>';
 	dataRowPrototype = '<tr>' + dataRowPrototype + '</tr>';
 	var html = '<table id="' + tableName + '" class="section_field_grid">'+headRow+dataRowPrototype;
@@ -685,14 +714,14 @@ function chooseSection(sectId, toggle)
 
 		if(sectionBodyElem.style.display == 'none')
 		{
-			sectionIconsElem.innerHTML = '<img src="/resources/images/icons/minus.gif"> ';
+			sectionIconsElem.innerHTML = '<img src="' + imagePrefix + 'minus.gif"> ';
 			sectionBodyElem.className = 'section_body_expanded';
 			sectionHeadElem.className = 'section_head_expanded';
 			sectionBodyElem.style.display = '';
 		}
 		else
 		{
-			sectionIconsElem.innerHTML = '<img src="/resources/images/icons/plus.gif"> ';
+			sectionIconsElem.innerHTML = '<img src="' + imagePrefix + 'plus.gif"> ';
 			sectionBodyElem.className = 'section_body';
 			sectionHeadElem.className = 'section_head';
 			sectionBodyElem.style.display = 'none';
@@ -700,7 +729,7 @@ function chooseSection(sectId, toggle)
 	}
 	else
 	{
-		sectionIconsElem.innerHTML = '<img src="/resources/images/icons/minus.gif"> ';
+		sectionIconsElem.innerHTML = '<img src="' + imagePrefix + 'minus.gif"> ';
 		sectionBodyElem.className = 'section_body_expanded';
 		sectionHeadElem.className = 'section_head_expanded';
 		sectionBodyElem.style.display = '';
