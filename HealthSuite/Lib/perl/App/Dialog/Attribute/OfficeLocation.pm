@@ -131,6 +131,7 @@ sub execute
 		_debug => 0
 	);
 
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
