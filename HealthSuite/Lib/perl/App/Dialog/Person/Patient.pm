@@ -44,20 +44,7 @@ sub initialize
 			);
 	$self->SUPER::initialize();
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'ethnicity',
-				lookup => 'ethnicity',
-				style => 'multicheck',
-				caption => 'Ethnicity',
-				hints => 'You may choose more than one ethnicity type.',
-				invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 
-				#new CGI::Dialog::Field(caption => 'Preferred Day For Appointment', name => 'prefer_day', type => 'memo', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
-
-		#new CGI::Dialog::MultiField(caption =>'Responsible Party', name => 'responsible', hints => "Please provide either an existing Person ID or Select 'Self'",
-		#		fields => [
-		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor'], hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
-		#				]),
-		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', options => FLDFLAG_REQUIRED),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
