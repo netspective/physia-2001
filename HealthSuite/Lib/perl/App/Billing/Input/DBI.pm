@@ -807,7 +807,7 @@ sub assignBillingFacility
 
 	$payToOrganization->setId($row[0]);
 	$payToOrganization->setName($row[1]);
-	$self->populateAddress($payToOrganization->getAddress(), "org_address", $row[2], "Mailing");
+	$self->populateAddress($payToOrganization->getAddress(), "org_address", $row[2], "Payment");
 	$self->populateContact($payToOrganization->getAddress(), "org_attribute", $row[2], "Primary", CONTACT_METHOD_TELEPHONE);
 }
 
