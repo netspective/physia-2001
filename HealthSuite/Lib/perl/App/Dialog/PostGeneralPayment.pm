@@ -146,7 +146,17 @@ sub execute
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $payerType = App::Universal::ENTITYTYPE_PERSON;
+	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+
+	my $batchId = $page->field('batch_id');
+	my $batchDate = $page->field('batch_date');
+	my $payerId = $page->field('payer_id');
+	my $payMethod = $page->field('pay_method');
+	my $payType = $page->field('pay_type');
+	my $payRef = $page->field('pay_ref');
+	my $authRef = $page->field('auth_ref');
 
 	if($page->field('total_amount') > 0)
 	{
@@ -178,11 +188,6 @@ sub execute
 
 
 			# Create adjustment for the item
-			my $payerType = App::Universal::ENTITYTYPE_PERSON;
-			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-			my $payMethod = $page->field('pay_method');
-			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
-			my $payType = $page->field('pay_type');
 			my $comments = $page->param("_f_invoice_$line\_comments");
 			my $adjItemId = $page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
@@ -191,11 +196,11 @@ sub execute
 				parent_id => $itemId || undef,
 				pay_date => $todaysDate || undef,
 				pay_method => defined $payMethod ? $payMethod : undef,
-				pay_ref => $page->field('pay_ref') || undef,
+				pay_ref => $payRef || undef,
 				payer_type => $payerType || 0,
 				payer_id => $payerId || undef,
 				net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				data_text_a => $page->field('auth_ref') || undef,
+				data_text_a => $authRef || undef,
 				pay_type => defined $payType ? $payType : undef,
 				comments => $comments || undef,
 				_debug => 0
@@ -211,6 +216,7 @@ sub execute
 			$page->schemaAction(
 				'Invoice', 'update',
 				invoice_id => $invoiceId || undef,
+				invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
 				total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 				balance => defined $invoiceBalance ? $invoiceBalance : undef,
 				_debug => 0
@@ -218,13 +224,12 @@ sub execute
 
 
 			#Create history attribute for this adjustment
-			my $description = "Personal payment made by $payerId";
 			$page->schemaAction(
 				'Invoice_Attribute', 'add',
 				parent_id => $invoiceId || undef,
 				item_name => 'Invoice/History/Item',
 				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => $description,
+				value_text => "Personal payment made by $payerId",
 				value_textB => $comments || undef,
 				value_date => $todaysDate,
 				_debug => 0
@@ -235,15 +240,30 @@ sub execute
 				parent_id => $invoiceId || undef,
 				item_name => 'Invoice/Payment/Batch ID',
 				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $page->field('batch_id') || undef,
-				value_date => $page->field('batch_date') || undef,
+				value_text => $batchId || undef,
+				value_date => $batchDate || undef,
 				value_int => $adjItemId || undef,
 				_debug => 0
 			);
+
+			if($invoiceBalance == 0)
+			{
+				$page->schemaAction(
+					'Invoice_Attribute', 'add',
+					parent_id => $invoiceId || undef,
+					item_name => 'Invoice/History/Item',
+					value_type => defined $historyValueType ? $historyValueType : undef,
+					value_text => 'Closed',
+					value_date => $todaysDate,
+					_debug => 0
+				);
+				
+				App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
+			}
 		}
 	}
 	
-	$self->handlePostExecute($page, $command, $flags);
+	$page->redirect("/person/$payerId/account");
 }
 
 1;

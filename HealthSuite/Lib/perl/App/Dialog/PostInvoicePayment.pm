@@ -217,6 +217,7 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
 	my $paidBy = $page->param('paidBy');
 	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
@@ -283,16 +284,14 @@ sub execute
 
 
 		#Create history attribute for this adjustment
-		my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 		my $itemCPT = $page->param("_f_item_$line\_item_adjustments");
 		my $payerIdDisplay = $page->field('payer_id');
-		my $description = "\u$paidBy payment made by '$payerIdDisplay'";
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $description,
+			value_text => "\u$paidBy payment made by '$payerIdDisplay'",
 			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0
@@ -326,10 +325,26 @@ sub execute
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
+		invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
 		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
 		balance => defined $invoiceBalance ? $invoiceBalance : undef,
 		_debug => 0
 	);
+
+	if($invoiceBalance == 0)
+	{
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => 'Closed',
+			value_date => $todaysDate,
+			_debug => 0
+		);
+		
+		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
+	}
 
 
 	$page->redirect("/invoice/$invoiceId/summary");
