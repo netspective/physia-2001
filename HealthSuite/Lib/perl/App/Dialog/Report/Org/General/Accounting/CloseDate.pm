@@ -281,8 +281,8 @@ sub execute
 				close ASCIIREPORT;
 			}
 
-	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) .  '<br><br>' .$html;
-		#$html .= '<br><br>' . createHtmlFromData($page, 0, \@data, publishDefn($docName));
+		$html .= '<br><br>' . createHtmlFromData($page, 0, \@data, publishDefn($docName));
+		return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) .  '<br><br>' .$html;
 
 	}
 
