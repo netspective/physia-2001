@@ -200,6 +200,7 @@ sub getComponentHtml
 		$apptMinutes = stamp2minutes($_->{appointment_time});
 
 		next if $oldEventId == $_->{event_id};
+		next if $_->{parent_id};
 
 		my $alertExists = $STMTMGR_COMPONENT_SCHEDULING->recordExists($page, STMTMGRFLAG_NONE,
 			'sel_alerts', $_->{patient_id});
