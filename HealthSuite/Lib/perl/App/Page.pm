@@ -138,7 +138,7 @@ sub recordActivity
 sub incrementViewCount
 {
 	my ($self, $caption, $arl) = @_;
-	
+
 	unless($caption)
 	{
 		return unless $self->flagIsSet(PAGEFLAG_RECORD_VIEWCOUNT);
@@ -147,12 +147,12 @@ sub incrementViewCount
 	my ($scope, $key) = ($1, $2) if $self->referer() =~ m!http://.*?/(.*?)/(.*?)/.*!;
 	my $sessionId = $self->session('_session_id');
 	my $userId    = $self->session('user_id');
-	
+
 	my @arlItems = split(/\//, $self->param('arl'));
 	my $rsrc = $arlItems[0];
-	
+
 	my $paramKey = $self->param($rsrc . '_id');
-	
+
 	unless ($scope eq $rsrc && $key eq $paramKey)
 	{
 		if ($STMTMGR_PAGE->recordExists($self, STMTMGRFLAG_NONE, 'sel_SessionInfo', $userId, $rsrc, $paramKey))
@@ -161,7 +161,7 @@ sub incrementViewCount
 		}
 		else
 		{
-			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'ins_newKey', $sessionId, $userId, $rsrc, $paramKey, 
+			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'ins_newKey', $sessionId, $userId, $rsrc, $paramKey,
 				$caption, $arl);
 		}
 	}
@@ -936,7 +936,7 @@ sub arlHasStdAction
 			$self->param('_compParamStartIndex', $startArlIndex+1);
 		}
 	}
-	
+
 
 	# if we get to here, it wasn't a standard action
 	return 0;
@@ -968,6 +968,10 @@ sub printContents
 	$self->prepare_page_body();
 	return unless $self->send_http_header();
 	return unless $self->send_page_header();
+
+	$self->dumpParams() if $self->param('_debug_params');
+	$self->dumpCookies() if $self->param('_debug_cookies');
+
 	$self->send_page_body();
 
 }
