@@ -183,7 +183,7 @@ sub makeStateChanges
 		$self->updateFieldFlags('email', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('internet', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('ids_heading', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('tax_id', FLDFLAG_INVISIBLE, 1);
+		#$self->updateFieldFlags('tax_id', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('emp_id', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('state_id', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('medicaid_id', FLDFLAG_INVISIBLE, 1);
