@@ -52,7 +52,6 @@ sub execute
 		value_date => $page->field('value_date') || undef,
 		_debug => 0
 	);
-
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }

@@ -22,7 +22,6 @@ sub new
 	my $schema = $self->{schema};
 
 	delete $self->{schema};  # make sure we don't store this!
-
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(

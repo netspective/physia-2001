@@ -57,9 +57,9 @@ sub initialize
 	{
 		$self->addContent(
 			new CGI::Dialog::Field(type => 'bool',
-									caption => $prefFlagCaption,
-									style => 'check',
-									name => 'preferred_flag')
+						caption => $prefFlagCaption,
+						style => 'check',
+						name => 'preferred_flag')
 		);
 	}
 

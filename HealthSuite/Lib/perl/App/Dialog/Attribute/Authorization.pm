@@ -59,11 +59,13 @@ sub execute
 		$itemName = 'Signature Source';
 		$authCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selAuthSignatureCaption', $authorization);
 	}
+	
 	elsif($valueType == App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN)
 	{
 		$itemName = 'Provider Assignment';
 		$authCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selAuthAssignCaption', $authorization);
 	}
+	
 	elsif($valueType == App::Universal::ATTRTYPE_AUTHINFORELEASE)
 	{
 		$itemName = 'Information Release';

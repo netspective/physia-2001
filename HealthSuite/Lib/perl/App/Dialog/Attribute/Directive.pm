@@ -29,7 +29,6 @@ sub initialize
 		key => "#param.person_id#",
 		data => "Advance Directive to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
-
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 }
 

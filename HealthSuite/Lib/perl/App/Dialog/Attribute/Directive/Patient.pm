@@ -19,7 +19,6 @@ use vars qw(@ISA @CHANGELOG);
 sub initialize
 {
 	my $self = shift;
-
 	$self->heading('$Command Patient Directive');
 
 	$self->addContent(

@@ -47,7 +47,6 @@ sub populateData
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-
 	my $itemId = $page->param('item_id');
 	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 }

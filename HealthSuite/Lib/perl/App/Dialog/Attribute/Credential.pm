@@ -41,6 +41,7 @@ sub new
 			key => "#param.org_id#",
 			data => "Credentials '#field.attr_name#' to <a href='/org/#param.org_id#/profile'>#param.org_id#</a>"
 		};
+		
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
 }

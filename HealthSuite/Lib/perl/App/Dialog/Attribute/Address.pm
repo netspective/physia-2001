@@ -71,6 +71,7 @@ sub customValidate
 			$dialogItem->invalidate($page, "The '$addressName' address already exists for $parentId.") :
 			();
 	}
+	
 	elsif($table eq 'Org_Address')
 	{
 		my $parentId = $page->param('org_id');

@@ -34,6 +34,7 @@ sub new
 		);
 
 	}
+	
 	elsif($id eq 'attachworkerscomp')
 	{
 		$self->addContent(

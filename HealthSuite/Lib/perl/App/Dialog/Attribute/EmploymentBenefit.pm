@@ -60,7 +60,6 @@ sub populateData
 	my $benefits = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 	$page->field('attr_name', $benefits->{'item_name'});
 	$page->field('value_text', $benefits->{'value_text'});
-
 }
 
 sub execute

@@ -35,6 +35,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo'),
 
 	);
+	
 	$self->{activityLog} =
 	{
 		level => 1,
