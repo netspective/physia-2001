@@ -11,8 +11,6 @@ use Devel::ChangeLog;
 
 use vars qw(@CHANGELOG);
 
-
-
 use constant FORM_RED => 0.7;
 use constant FORM_GREEN => 0.0;
 use constant FORM_BLUE => 0.0;
@@ -113,7 +111,7 @@ sub processClaims
 			{
 				$self->newPage($p);
 				$cordinates = $self->drawForm($p);
-				$self->populatePDf($p,$claim, $cordinates, $procesedProc);
+				$self->populatePDF($p,$claim, $cordinates, $procesedProc);
 				$self->endPage($p);
 				$once++;
 			}
@@ -1590,7 +1588,7 @@ sub box33
 }
 
 
-sub populatePDf
+sub populatePDF
 {
 	my ($self, $p, $Claim, $cordinates, $procesedProc)  = @_;
 	
@@ -2594,7 +2592,8 @@ sub box25ClaimData
 			'E' => $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X,
 			};
 	
-	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{payToProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{payToProvider}->getTaxTypeId)});
+#	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{payToProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{payToProvider}->getTaxTypeId)});
+	pdflib::PDF_show_xy($p , 'X', $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{payToProvider}->getFederalTaxId)});
 	pdflib::PDF_stroke($p);
 }
 

@@ -168,6 +168,11 @@ sub setRelationshipToInsured
 			'OTHER' => '99',
 			'PARENT' => '11',
 			'EMPLOYER' => '99',
+			'01' => '01',
+			'02' => '02',
+			'03' => '03',
+			'99' => '99',
+			'11' => '11',
 		};
 	
 	$self->{relationshipToInsured} = $temp->{uc($value)};

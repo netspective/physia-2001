@@ -268,14 +268,14 @@ sub getAcceptAssignment
 	return $self->{acceptAssignment};
 }
 
-sub setBCBSPlanCode	
+sub setBcbsPlanCode
 {
 	my($self, $value) = @_;
 	$self->{bcbsPlanCode} = $value;
 }
 
 
-sub getBCBSPlanCode	
+sub getBcbsPlanCode	
 {
 	my $self = shift;
 	return $self->{bcbsPlanCode};

@@ -303,10 +303,10 @@ sub populatePhysician
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
 	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
-#	$data->{physicianTaxTypeIdEin} = uc($physician->getTaxTypeId) eq 'E' ? "Checked" : "";
+	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne '' ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
 #	$data->{physicianPin} = $physician->getPIN;
-	$data->{physicianGrp} = $physician->getGRP;
+#	$data->{physicianGrp} = $physician->getGRP;
 }
 
 sub populateOrganization
@@ -394,26 +394,6 @@ sub populateClaim
 	$data->{transProviderName} = $claim->getTransProviderName();
 }
 
-sub populateProcedurespre
-{
-	my ($self, $claim, $procesedProc) = @_;
-	my $tb = $self->diagnosisTable($claim, $procesedProc);
-	my $procedures = $claim->{procedures};
-	my $procedureNo = 1;
-
-	my $sortedCharges = $self->feeSort($claim);
-	my $amount = $sortedCharges->{'sorted amount'};
-
-	for($procedureNo = 0; $procedureNo <= $#$procedures; $procedureNo++)
-	{
-		my $procedure = $claim->{procedures}->[$sortedCharges->{$amount->[$procedureNo]}];
-		if ($procedure ne "")
-		{
-			$self->populateProcedure($procedure, $procedureNo);
-		}
-	}
-}
-
 sub populateProcedures
 {
 	my ($self, $claim, $procesedProc) = @_;
@@ -485,40 +465,6 @@ sub populateProcedure
 }
 
 
-sub populateProcedurePre
-{
-	my ($self, $procedure, $i) = @_;
-	my $data = $self->{data};
-	$i ++;
-	$data->{'procedure' . $i . 'DateOfServiceFrom'} = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);
-	$data->{'procedure' . $i . 'DateOfServiceTo'} = $procedure->getDateOfServiceTo(DATEFORMAT_USA);
-	$data->{'procedure' . $i . 'PlaceOfService'} = $procedure->getPlaceOfService;
-	$data->{'procedure' . $i . 'TypeOfService'}	= $procedure->getTypeOfService;
-	$data->{'procedure' . $i . 'Cpt'} = $procedure->getCPT;
-	$data->{'procedure' . $i . 'Modifier'} = $procedure->getModifier;
-	my $ptr = $procedure->getDiagnosisCodePointer;
-	$data->{'procedure' . $i . 'DiagnosisCodePointer'} = join (' ', @$ptr);
-	$data->{'procedure' . $i . 'Charges'} = $procedure->getCharges;
-	$data->{'procedure' . $i . 'DaysOrUnits'} = substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3);
-	$data->{'procedure' . $i . 'Emergency'}	 = $procedure->getEmergency;
-}
-
-sub feeSortPre
-{
-	my ($self, $claim) = @_;
-
-	my $procedures = $claim->{procedures};
-	my %charges;
-	my	$procedure;
-	for my $i (0..$#$procedures)
-	{
-		$procedure = $procedures->[$i];	
-		$charges{$procedure->getCharges()} = $i;
-	}
-	my @as = sort {$b <=> $a} keys %charges;
-	$charges{'sorted amount'} = \@as;
-	return \%charges;
-}
 
 
 sub diagnosisTable

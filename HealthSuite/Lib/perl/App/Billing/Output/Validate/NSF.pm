@@ -462,12 +462,11 @@ sub validateD
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('0'));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('123456789','NONE','UNKNOWN','INDIVIDUAL','SELF'));
 			
-			print "SSN No ",$tempClaim->{insured}->[$payerLoop]->getSsn()  ,"\n";
 
 			if ($tempClaim->{insured}->[$payerLoop]->getSsn() ne '')
 			{
 				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',($tempClaim->{insured}->[$tempClaim->getClaimType()]->getSsn()));
-				print "Checking SSN Equivalent " . "\n";
+			
 			}
 			
 			
@@ -612,7 +611,7 @@ sub validateD
 		# Supplemental Insurance Indicator
 		if($tempClaim->{insured}->[$payerLoop]->getOtherInsuranceIndicator()	ne '')
 		{
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getOtherInsuranceIndicator(),('I','P','M','S','W','X','Y','Z'));
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getOtherInsuranceIndicator(),$tempClaim, ('I','P','M','S','W','X','Y','Z'));
 		}
 	
 		# Medicaid ID number
@@ -1175,14 +1174,14 @@ sub validateF
 		# checks for COB Indicator
 		if ($currentProcedure->getCOB() ne '')
 		{
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$tempClaim,$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',(0..9,'A'..'Z'));			
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',(0..9,'A'..'Z'));			
 			if ($currentProcedure->getCOB() =~ /['A'..'Z']/)
 			{
-				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$tempClaim,$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',(0..9));
+				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',(0..9));
 			}	
 			elsif($currentProcedure->getCOB() =~ /[0..9]/)
 			{
-				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS, '','',$tempClaim,$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',('A'..'Z'));
+				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS, '','',$currentProcedure->getCOB(),$tempClaim,'FA0:COB Indicator',('A'..'Z'));
 			}
 		}
 		
