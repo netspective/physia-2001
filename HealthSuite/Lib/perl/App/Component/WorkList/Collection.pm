@@ -121,7 +121,11 @@ sub getComponentHtml
 		my $appt= $STMTMGR_WORKLIST_COLLECTION ->getSingleValue($page, 
 			STMTMGRFLAG_NONE, 'selNextApptById', $_->{person_id},$startDate);	
 		$_->{descr} = 'Self Pay';  
-		if ($balance->{balance} < 0)
+		if($_->{reason})
+		{
+			$_->{descr} = $_->{reason};  
+		}
+		elsif ($balance->{balance} < 0)
 		{
 			$_->{descr} = 'Credit';  
 		}

@@ -76,7 +76,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	{			
 	
 		
-		SELECT	p.person_id , to_date('01/31/1800','MM/DD/YYYY')
+		SELECT	p.person_id , to_date('01/31/1800','MM/DD/YYYY'),NULL as reason
 		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
 			person_attribute pl,person_attribute pa, person_attribute pb,
 			transaction t, invoice i, invoice_billing ib, person_org_category pog
@@ -129,8 +129,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			     )
 			)			
 		UNION
-		SELECT 	t.trans_owner_id  as person_id,nvl(tr.trans_begin_stamp,to_date('01/31/1800','MM/DD/YYYY'))
-			
+		SELECT 	t.trans_owner_id  as person_id,nvl(tr.trans_begin_stamp,to_date('01/31/1800','MM/DD/YYYY')),			
+			t.trans_status_reason as reason		
 		FROM 	transaction t ,transaction tr 
 		WHERE 	t.trans_type = $ACCOUNT_OWNER
 		AND 	t.trans_status = $ACTIVE
