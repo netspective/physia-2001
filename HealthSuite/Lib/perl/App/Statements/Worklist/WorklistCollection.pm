@@ -76,7 +76,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	{			
 	
 		
-		SELECT	p.person_id , to_date('01/31/1800','MM/DD/YYYY'),NULL as reason
+		SELECT	p.person_id ,NULL as reason
 		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
 			person_attribute pl,person_attribute pa, person_attribute pb,
 			transaction t, invoice i, invoice_billing ib, person_org_category pog
@@ -129,19 +129,23 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			     )
 			)			
 		UNION
-		SELECT 	t.trans_owner_id  as person_id,nvl(tr.trans_begin_stamp,to_date('01/31/1800','MM/DD/YYYY')),			
+		SELECT 	t.trans_owner_id  as person_id	,		
 			t.trans_status_reason as reason		
-		FROM 	transaction t ,transaction tr 
+		FROM 	transaction t 
 		WHERE 	t.trans_type = $ACCOUNT_OWNER
 		AND 	t.trans_status = $ACTIVE
-		AND 	t.trans_owner_id = tr.trans_owner_id (+)
 		AND 	t.trans_subtype = 'Owner'
 		AND	t.provider_id = :1
-		AND 	tr.trans_owner_id (+) = t.trans_owner_id
+		AND NOT EXISTS
+		(SELECT tr.trans_owner_id
+		FROM 	transaction tr
+		WHERE	tr.trans_owner_id  = t.trans_owner_id
 		AND 	tr.trans_type (+)= $ACCOUNT_RECK_DATE 
 		AND 	tr.provider_id (+)= :1	
 		AND 	tr.trans_status (+)= $ACTIVE
-		ORDER by 2 asc , 1 
+		AND	trunc(tr.trans_begin_stamp)>to_date(:2,'MM/DD/YYYY')
+		)		
+		ORDER by 1 
 
 	},						
 	'selectBalanceAgeById' => qq
