@@ -2227,6 +2227,8 @@ sub prepare_page_content_footer
 {
 	my $self = shift;
 
+	return 1 if $self->param('_stdAction') eq 'dialog';
+
 	unless($self->flagIsSet(PAGEFLAG_ISPOPUP))
 	{
 		push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'claim'));
