@@ -47,6 +47,9 @@
 		<deliverable id="1340">
 			Added next actions to checkin, checkout, create claim, and post personal payment dialogs.
 		</deliverable>
+		<deliverable id="893">
+			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
+		</deliverable>
 
 	</deliverables>
 </release-notes>
