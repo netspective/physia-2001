@@ -449,7 +449,7 @@ sub setPayerFields
 	push(@payerList, $thirdParty) if $thirdParty;
 
 	my $thirdPartyOther = 'Third-Party Payer';
-	#push(@payerList, $thirdPartyOther);
+	push(@payerList, $thirdPartyOther);
 
 	my $selfPay = 'Self-Pay';
 	push(@payerList, $selfPay);
