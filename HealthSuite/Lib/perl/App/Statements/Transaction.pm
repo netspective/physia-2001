@@ -343,6 +343,15 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			FROM 	referral_source_type
 			ORDER BY caption
 		},
+	'selServiceSourceTypeByTransId' => qq
+	{
+			SELECT
+				r.caption
+			FROM 	referral_source_type r, transaction t
+			WHERE t.trans_id = ?
+			AND   t.caption= r.id
+		},
+
 	'selIntakeService' => qq
 		{
 			SELECT
@@ -429,9 +438,9 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			to_char(data_date_b, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_b,
 			trans_status_reason, related_data, caption, trans_substatus_reason,
 			modifier,unit_cost,quantity
-			
+
 			FROM 	transaction t
-			WHERE	t.parent_trans_id = :1		
+			WHERE	t.parent_trans_id = :1
 			AND	t.trans_type = @{[App::Universal::TRANSTYPEPROC_SERVICE_REQUEST_PROCEDURE]}
 			ORDER BY trans_id asc
 		},
@@ -445,12 +454,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			to_char(data_date_a, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_a,
 			to_char(data_date_b, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS data_date_b,
 			trans_status_reason, related_data, caption, trans_substatus_reason,
-			modifier,unit_cost,quantity			
+			modifier,unit_cost,quantity
 			FROM 	transaction t
-			WHERE	t.trans_id = :1		
+			WHERE	t.trans_id = :1
 			AND	t.trans_type = @{[App::Universal::TRANSTYPEPROC_SERVICE_REQUEST_PROCEDURE]}
 			ORDER BY trans_id asc
-		},		
+		},
 	'selReferralProcedureData' =>qq
 		{
 			SELECT 	trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
@@ -463,12 +472,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			trans_status_reason, related_data, caption, trans_substatus_reason,
 			modifier,unit_cost,quantity,
 			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_begin_stamp,
-			to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp			
+			to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp
 			FROM 	transaction t
-			WHERE	t.parent_trans_id = :1		
+			WHERE	t.parent_trans_id = :1
 			AND	t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
 			ORDER BY trans_id asc
-		},		
+		},
 );
 
 
