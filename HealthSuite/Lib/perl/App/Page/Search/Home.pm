@@ -311,6 +311,33 @@ sub prepare
 						<a href="/schedule/dlg-add-appttype?">Appointment Type</a>
 					</font>
 				</td></tr></table>
+				<p>
+				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
+					$IMAGETAGS{'icons/sde'}
+				</td><td valign="middle">
+					<font face="arial,helvetica" size="5" color="navy"><b>Utilities / Functions</b></font>
+				</td></tr><tr><td colspan=2>
+					<img src="/resources/design/bar.gif" height=1 width=100%><br>
+				</td></tr><tr valign=top bgcolor=white><td align="right">
+					$IMAGETAGS{'icons/arrow_right_red'}
+
+				</td><td>
+					<font face="arial,helvetica" size=2>
+						<b>Print Destination</b>
+						<a href="/utilities/printerSpec" title="Select paper-claim printer">Paper Claims Printer</a>
+					</font>
+				</td></tr><tr valign=top bgcolor=white><td align="right">
+					$IMAGETAGS{'icons/arrow_right_red'}
+
+				</td><td>
+					<font face="arial,helvetica" size=2>
+						<b>Paper Claims</b>
+						<a href="/utilities" title="Create a new batch of paper claims for printing">Create new Batch</a>,
+						<a href="/paperclaims" title="Print a batch of paper claims">Print</a>
+					</font>
+				</td></tr></table>
+			</td></tr></table>
+				
 			</td></tr></table>
 			</center>
 		});
