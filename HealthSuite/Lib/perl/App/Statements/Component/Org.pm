@@ -10,6 +10,7 @@ use Data::Publish;
 use App::Statements::Component;
 use App::Statements::Org;
 use App::Statements::Catalog;
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_ORG $PUBLDEFN_CONTACTMETHOD_DEFAULT
@@ -1185,6 +1186,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'org.listAssociatedOrgs' => {
 	sqlStmt => qq{
+
 			SELECT
 				org_id,
 				name_primary,
@@ -1206,6 +1208,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 					WHERE owner_org_id = :2 AND
 					org_id = :1
 				)
+			AND rownum <= $LIMIT
 			ORDER BY org_id
 
 		},
