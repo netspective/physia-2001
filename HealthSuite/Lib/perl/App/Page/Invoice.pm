@@ -193,7 +193,7 @@ sub getProcedureHtml
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Svc</B></TD>
 							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>CPT/HCPCS</B></TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Diag</B></TD>
 							<TD>&nbsp;</TD>
@@ -240,14 +240,14 @@ sub getProceduresHtml
 		my $itemStatus = $procedure->{itemStatus};
 		my $emg = $procedure->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
 
-		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId,$lineSeq";
-		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId,$lineSeq";
+		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId";
+		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId";
 		my $editProcImg = '';
 		my $voidProcImg = '';
 		if($invStatus < $submitted && $itemStatus ne 'void')
 		{
-			$editProcImg = "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0></a>";
-			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0></a>";
+			$editProcImg = "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>";
+			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>";
 		}
 
 		## ---Removed 'P' and replaced it with a quick link that displays all items and allows distribution of personal payment
@@ -299,7 +299,8 @@ sub getProceduresHtml
 
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $procedure->{modifier});
 		my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $procedure->{cpt});
-		my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
+		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $procedure->{codeType});
+		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
 		push(@rows, qq{
 			<TR>
@@ -405,7 +406,8 @@ sub getProceduresHtml
 
 		my $modifierCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selGenericModifier', $voidItem->{modifier});
 		my $cptCaption = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $voidItem->{cpt});
-		my $cptAndModTitle = "CPT: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
+		my $codeCaption = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selCatalogEntryTypeCapById', $voidItem->{codeType});
+		my $cptAndModTitle = "$codeCaption: $cptCaption->{name}" . "\n" . "Modifier: $modifierCaption";
 
 		push(@rows, qq{
 			<TR>
@@ -583,7 +585,7 @@ sub getProceduresHtml
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Svc</B></TD>
 							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>CPT/HCPCS</B></TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Diag</B></TD>
 							<TD>&nbsp;</TD>
@@ -853,9 +855,8 @@ sub prepare_dialog_procedure
 	my $claim = $self->property('activeClaim');
 
 	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
-	my ($action, $itemId, $itemSeq) = split(/,/, $dialogCmd);
+	my ($action, $itemId) = split(/,/, $dialogCmd);
 	$self->param('item_id', $itemId);
-	$self->param('item_seq', $itemSeq);
 
 	$self->addContent('<center><p>', $self->getProceduresHtml($claim), '</p></center>');
 
@@ -863,7 +864,6 @@ sub prepare_dialog_procedure
 	my $dialog = new App::Dialog::Procedure(schema => $self->getSchema(), cancelUrl => $cancelUrl);
 	$dialog->handle_page($self, $action);
 
-	#$self->addContent('<p>', App::Page::Search::getSearchBar($self, 'catalog/cpt'));
 	$self->addContent('<p>');
 	return $self->prepare_view_summary();
 }
