@@ -35,7 +35,16 @@
 			Added Contract Catalog component and dialogs to app.  
 			UI : The Catalog Page now has sub-tabs for Fee Schedules and Contract and the ability to add edit.  
 			Testing of the Fee Schedules and the contracts should be done since the change could impact either
-		</deliverable>	
+		</deliverable>
+		<deliverable id="1038">
+			added selection constraints to aged patient receivables and insurance receivables reports
+		</deliverable>
+		<deliverable id="793">
+			New referring doctor report
+		</deliverable>
+		<deliverable id="1152">
+			PDF printing on secondary claims (it was already there;confirmed its existence)
+		</deliverable>
 
 	</deliverables>
 </release-notes>
