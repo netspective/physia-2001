@@ -2734,19 +2734,20 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 		SELECT
 			%simpleDate:trans_begin_stamp - :1%,
-			simple_name,
-			related_data,
-			trans_status_reason,
-			provider_id, caption,
-			data_num_a,
-			detail,
-			data_text_c,
+			initcap(simple_name) as simple_name,
+			provider_id, 
+			caption as room_number,
+			data_num_a as duration_days,
+			detail as diags,
+			data_text_c as procedures,
 			data_text_a,
 			consult_id,
 			trans_id,
 			trans_type,
-			trans_owner_id
+			trans_owner_id,
+			org.name_primary
 		FROM
+			org,
 			transaction,
 			person
 		WHERE
@@ -2765,14 +2766,24 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			) AND
 			trans_status = 2
 			AND (SYSDATE - trans_begin_stamp) <= data_num_a
+			AND org.org_internal_id = transaction.service_facility_id
+		ORDER BY trans_begin_stamp DESC
 		},
 	sqlStmtBindParamDescr => ['Person ID for the person table, Person ID for the Person_Attribute table, Org ID for the Person_Attribute table '],
 	publishDefn => {
 		columnDefn => [
 			{ head => 'My Associated Resources In Patients', dataFmt => '#0#' },
-			{ dataFmt => '<A HREF="/person/#13#/chart">#1#</A> <BR> #2#, #3# <BR> (#4#) <BR> Room: #5#  <BR> Duration of Stay: #6# <BR> Orders: #7# <BR> Procedures: #8#'},
+			{ dataFmt => qq{<A HREF="/person/#11#/chart">#1#</A> <BR> 
+					<b>#12#</b> <BR>
+					(#2#) <br>
+					Room: #3#  <BR> 
+					Duration of Stay: #4# day(s)<BR> 
+					Diagnoses: #5# <BR> 
+					Procedures: #6#
+				}
+			},
 		],
-		bullets => '/person/#13#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#homeArl#',
+		bullets => '/person/#11#/stpe-#my.stmtId#/dlg-update-trans-#10#/#9#?home=#homeArl#',
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-hospitalization?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -3726,25 +3737,36 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.inPatient' => {
 	sqlStmt => qq{
-			select trans_owner_id , related_data,caption,complete_name,consult_id FROM transaction,person
-			WHERE trans_type = @{[App::Universal::TRANSTYPE_ADMISSION]}
-			AND	provider_id = :1
-			AND person.person_id = trans_owner_id
+			select t.trans_owner_id , t.caption as room_number, initcap(p.short_sortable_name)
+				as simple_name, t.consult_id, o.name_primary, %simpleDate:t.trans_begin_stamp - :3%
+				as admit_date, data_num_a
+			FROM org o, person p, transaction t
+			WHERE 
+				t.trans_type BETWEEN 11000 AND 11999
+				AND	t.provider_id = :1
+				AND p.person_id = t.trans_owner_id
+				AND t.trans_status = 2
+				AND t.trans_begin_stamp >= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT') - data_num_a
+				AND o.org_internal_id = t.service_facility_id
+			ORDER by p.name_last
 		},
 		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
 
 			publishDefn => {
 				columnDefn => [
-					{ head=> 'Patient ', colIdx=>3, url => "/person/#0#/profile",hint=>"#3#",dAlign=>'left' ,hAlign=>'left'},
-					{ head=> 'Hospital Room', dataFmt=>"#1# (#2#)",dAlign=>'left',hAlign=>'left'},
-					{ head=> 'Attending MD',dataFmt=>"#4#", dAlign=>'left',hAlign=>'left'},
+					{ head=> 'Patient ', colIdx=>2, url => "/person/#0#/profile",hint=>"#3#",
+						options => PUBLCOLFLAG_DONTWRAP,
+					},
+					{ head=> 'Hospital/Room', 
+						dataFmt => qq{#5# <br> <b>#4#</b> - Room #1# <br> Duration: #6# day(s)},
+						dAlign=>'left',hAlign=>'left'},
 				],
 			},
 			publishDefn_panel =>
 			{
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.static',
-				flags => 0,
+				#flags => 0,
 				frame => { heading => 'Inpatient'
 			},
 			},
@@ -3756,10 +3778,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			},
 
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId, $page->param('_date'), $page->session('GMT_DAYOFFSET')]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId, $page->param('_date'), $page->session('GMT_DAYOFFSET')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId, $page->param('_date'), $page->session('GMT_DAYOFFSET')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId, $page->param('_date'), $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
 },
 
 
@@ -3964,9 +3986,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				# automatically inherits columnDefn and other items from publishDefn
 				style => 'panel.static',
 				flags => 0,
-				frame => { heading => qq{ Date : <INPUT size=10	NAME="timeDate" onChange="parent.location.reload()">
-					<A HREF="javascript:showCalendar(timeDate, 1);"> <img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
-					&nbsp Appointments }
+				frame => { heading => qq{ Date
+						<INPUT size=10	NAME="_date" value='#param._date#' onChange="validateChange_Date(event); updatePage(this.value)">
+						<A HREF="javascript:showCalendar(_date, 1);"> <img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
+						&nbsp Appointments 
+						<INPUT name=person_id type=hidden value='#param.person_id#'>
+					}
 				},
 			},
 			publishDefn_panelTransp =>
@@ -3977,10 +4002,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			},
 
 
-			publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')] ); },
-			publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panel'); },
-			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panelEdit'); },
-			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panelTransp'); },
+			publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('_date')] ); },
+			publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('_date')], 'panel'); },
+			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('_date')], 'panelEdit'); },
+			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('_date')], 'panelTransp'); },
 
 	},
 

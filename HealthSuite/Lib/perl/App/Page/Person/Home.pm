@@ -16,55 +16,73 @@ use vars qw(%RESOURCE_MAP);
 	);
 
 
+sub handleARL
+{
+	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
+
+	unless ($self->arlHasStdAction($rsrc, $pathItems, 1))
+	{
+		$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
+	}
+
+	if (my $date = $pathItems->[2])
+	{
+		$date =~ s/\-/\//g;
+		$self->param('_date', $date);
+	}
+	
+	$self->printContents();
+
+	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
+	return 0;
+}
+
 sub prepare_view
 {
 	my ($self) = @_;
-	#######################################################
-	#DEMO CODE
 	my $categories = $self->session('categories');
-	my $selectedDate = 'today' ;
-	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
-	$self->param('timeDate',$fmtDate);
-	#DEMO CODE
-	#######################################################
+
+	$self->param('_date', UnixDate('today', '%m/%d/%Y')) unless $self->param('_date');
+
 	my $pageHome;
-	#If user is a Physician and the user id is TSAMO then show Physicianm home page
-	#Currently this is only for DEMO
-	if ($CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO && grep {$_ eq 'Physician'} @$categories  )
+
+	if (grep {$_ eq 'Physician'} @$categories)
 	{
 		$pageHome = qq {
-        	<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
-        	<SCRIPT>
-			function updatePage(selectedDate)
-			{
-				alert('TEST');
-				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = './' + dashDate;
-			}
+			<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
+			<SCRIPT>
+				function updatePage(selectedDate)
+				{
+					var dashDate = selectedDate.replace(/\\//g, "-");
+					parent.location = '/person/' + document.all.person_id.value + '/home/' + dashDate;
+				}
 			</SCRIPT>
 			<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
 			<TR VALIGN=TOP>
-			 <TD>
+				<TD>
 					#component.stp-person.scheduleAppts#</BR>
 					#component.stp-person.inPatient#<BR>
 					#component.lookup-records#<BR>
+				</TD>
 
+				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD>
+					 #component.stpt-person.docSign#<BR>
+					 #component.stpt-person.docPhone#<BR>
+					 #component.stpt-person.docRefill#<BR>
+					 #component.stpt-person.docResults#<BR>
+					 #component.stpt-person.clinical#<BR>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+			<TD>
+					#component.stp-person.linkMedicalSite#<BR>
+					#component.news-health#<BR>					
 			</TD>
 			<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 			<TD>
-				   #component.stpt-person.docSign#<BR>
-				   #component.stpt-person.docPhone#<BR>
-				   #component.stpt-person.docRefill#<BR>
-				   #component.stpt-person.docResults#<BR>
-				   #component.stpt-person.clinical#<BR>
-			</TD>
-			<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-			<TD>
-				   #component.stp-person.linkMedicalSite#<BR>
-				   #component.stp-person.linkNonMedicalSite#<BR>
-				   #component.news-top#<BR>
-				   #component.news-health#<BR>
-			</TD>
+					#component.stp-person.linkNonMedicalSite#<BR>
+					#component.news-top#<BR>
 			</TR>
 			</TABLE>
 		};

@@ -34,6 +34,9 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
+		new App::Dialog::Field::Person::ID(name => 'patient_id', caption => 'Patient ID', 
+			options => FLDFLAG_REQUIRED),		
+		
 		new CGI::Dialog::Field::TableColumn(
 			caption => 'Type',schema => $schema,
 			column => 'Transaction.trans_type', typeRange => '11000..11999'),
@@ -42,19 +45,18 @@ sub new
 				new CGI::Dialog::Field(caption => 'Admission Date', name => 'trans_begin_stamp', type => 'date', options => FLDFLAG_REQUIRED, defaultValue => '', futureOnly => 0),
 				new CGI::Dialog::Field(caption => 'Discharge Date', name => 'trans_end_stamp', type => 'date', defaultValue => '', futureOnly => 1)
 			]),
+		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_num_a', size => 4, type => 'integer', maxLength => 4, options => FLDFLAG_REQUIRED, hints => 'Days'),			
+
 		new App::Dialog::Field::OrgType(caption => 'Hospital', name => 'service_facility_id', types => "'HOSPITAL'"),
-		new App::Dialog::Field::Person::ID(name => 'patient_id', caption => 'Patient ID', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'caption', caption => 'Room Number'),
-		new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician'], incSimpleName=>1),
+		new App::Dialog::Field::Person::ID(caption => 'Physician ID', name => 'provider_id', types => ['Physician'], incSimpleName=>1),
 		new CGI::Dialog::Field(name => 'data_text_a',type => 'select', selOptions => 'In;Out', caption => 'In/Out Patient'),
 		new CGI::Dialog::Field(caption => 'Procedures', name => 'data_text_c', hints => 'Enter CPT codes in a comma separated list', findPopup => '/lookup/cpt', findPopupAppendValue => ', ', options => FLDFLAG_TRIM),
 		new CGI::Dialog::Field(caption => 'ICD-9 Codes', name => 'detail', hints => 'Enter ICD-9 codes in a comma separated list', findPopup => '/lookup/icd', findPopupAppendValue => ', ', options => FLDFLAG_TRIM),
 		new CGI::Dialog::Field(name => 'auth_ref', caption => 'Prior Authorization'),
-		new App::Dialog::Field::Person::ID(caption => 'Consulting Physician', name => 'consult_id', types => ['Physician'], incSimpleName=>1),
+		new App::Dialog::Field::Person::ID(caption => 'Consulting Physician ID', name => 'consult_id', types => ['Physician'], incSimpleName=>1),
 		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'data_text_b', types => ['Referring-Doctor'], incSimpleName=>1),
-		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_num_a', size => 4, type => 'integer', maxLength => 4),
-
-
+		
 		#removed on 12/14/00 according karen's doc
 		#new CGI::Dialog::Field(name => 'trans_status_reason', caption => 'Reason For Admission', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Field(type => 'memo', name => 'detail', caption => 'Orders', options => FLDFLAG_REQUIRED),
@@ -65,14 +67,14 @@ sub new
 		level => 1,
 		scope =>'transaction',
 		key => "#param.person_id#",
-		data => "Hospitalization to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		data => "Hospitalization for <a href='/person/#field.patient_id#/profile'>#field.patient_id#</a>"
 	};
 
 	$self->addFooter(
 		new CGI::Dialog::Buttons(
 			nextActions_add => [
 				['Return to Previous Screen', '', 1],
-				['Create Claim for this Entry', "/person/%param.person_id%/dlg-add-claim?isHosp=1&hospId=%param.trans_id%"],
+				['Create Claim for this Entry', "/person/%field.patient_id%/dlg-add-claim?isHosp=1&hospId=%param.trans_id%"],
 				],
 			cancelUrl => $self->{cancelUrl} || undef,
 			),
@@ -86,22 +88,19 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $returnUrl = $page->referer();
-	unless($returnUrl =~ /home$/)
-	{
-		$self->setFieldFlags('patient_id', FLDFLAG_INVISIBLE, 1);
-	}
+	$self->setFieldFlags('patient_id', FLDFLAG_READONLY) if ($command =~ /update/);
 }
 
-sub populateData
+sub populateData_update
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $transId = $page->param('trans_id');
 
 	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransactionById', $transId);
+	$page->field('patient_id', $page->field('trans_owner_id'));
 }
 
 sub execute
