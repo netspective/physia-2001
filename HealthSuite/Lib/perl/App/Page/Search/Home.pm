@@ -30,10 +30,12 @@ sub prepare
 					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
 					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
 						<b>Lookup</b>
-						<a href="/search/person/patient">Patients</a>,
-						<a href="/search/person/physician">Physicians</a>,
-						<a href="/search/person/nurse">Nurses</a>, or
-						<a href="/search/person/staff">Staff Members</a>.
+						<a href="/search/person">People</a>,
+						<a href="/search/patient">Patients</a>,
+						<a href="/search/physician">Physicians</a>,
+						<a href="/search/nurse">Nurses</a>, or
+						<a href="/search/staff">Staff Members</a>.
+						<a href="/search/associate">Associate</a>.
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
