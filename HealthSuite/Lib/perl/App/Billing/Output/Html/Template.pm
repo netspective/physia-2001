@@ -164,7 +164,7 @@ sub new
 		signaturePatientDate => undef,
 		payerName => undef,
 		payerAddress => undef,
-		
+
 	};
 	return bless \%params, $type;
 }
@@ -172,7 +172,7 @@ sub new
 sub populateTemplate
 {
 	my ($self, $claim, $procesedProc) = @_;
-	
+
 	$self->populatePatient($claim);
 	$self->populateInsured($claim);
 	$self->populateOtherInsured($claim);
@@ -191,7 +191,7 @@ sub concatSpace
 	my ($self) = @_;
 	my $key;
 	my $data = $self->{data};
-	
+
 	foreach $key (keys %$data)
 	{
 		$data->{$key} = ($data->{$key} eq "" ? '&nbsp' : $data->{$key});
@@ -202,7 +202,7 @@ sub doInit
 	my ($self) = @_;
 	my $key;
 	my $data = $self->{data};
-	
+
 	foreach $key (keys %$data)
 	{
 		$data->{$key} = undef;
@@ -220,20 +220,20 @@ sub populatePatient
 	$data->{patientDateOfBirth} = $patient->getDateOfBirth(DATEFORMAT_USA);
 	$data->{patientSexM} = $patient->getSex() eq 'M' ? "Checked" : "";
 	$data->{patientSexF} = $patient->getSex() eq 'F' ? "Checked" : "";
-	$data->{patientAccountNo} = $patient->getAccountNo();	
-	$data->{patientAddress} = $patientAddress->getAddress1() . " " . $patientAddress->getAddress2();		
+	$data->{patientAccountNo} = $patient->getAccountNo();
+	$data->{patientAddress} = $patientAddress->getAddress1() . " " . $patientAddress->getAddress2();
 	$data->{patientAddressCity} = $patientAddress->getCity();
-	$data->{patientAddressState} = $patientAddress->getState();		
-	$data->{patientAddressTelephone} = $patientAddress->getTelephoneNo();		
-	$data->{patientAddressZipCode} = $patientAddress->getZipCode();	
+	$data->{patientAddressState} = $patientAddress->getState();
+	$data->{patientAddressTelephone} = $patientAddress->getTelephoneNo();
+	$data->{patientAddressZipCode} = $patientAddress->getZipCode();
 	$data->{patientStatusEmployment} = $patient->getEmploymentStatus() ne "" ? "checked" : "";
 	$data->{patientInsuredRelationSelf} = (uc($patient->getRelationshipToInsured) =~ /01|1|SELF/) ? "checked" : "";
-	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /02|2|SPOUSE/) ? "checked" : "";	
-	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /03|3|05|06|CHILD/) ? "checked" : "";	
-	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /04|4|07|08|09|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";	
+	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /02|2|SPOUSE/) ? "checked" : "";
+	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /03|3|05|06|CHILD/) ? "checked" : "";
+	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /04|4|07|08|09|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
 	$data->{patientStatusSingle} = uc(($patient->getStatus) =~ /S/) ? "checked" : "";
 	$data->{patientStatusMarried} = uc($patient->getStatus) =~ /M/ ? "checked" : "";
-	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";	
+	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";
 	$data->{patientStatusStudentFullTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(FULL-TIME\)|F|0/ ? "checked" : "";
 	$data->{patientStatusStudentPartTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(PART-TIME\)|P|1/ ? "checked" : "";
 	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "Signature on File";
@@ -248,13 +248,13 @@ sub populateInsured
 	my $insured = $claim->{insured}->[$claimType];
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
-    
+
 	$data->{insuredName} = $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
 	$data->{insuredDateOfBirth} = $insured->getDateOfBirth(DATEFORMAT_USA);
 	$data->{insuredSexM} = $insured->getSex() eq 'M' ? "Checked" : "";
 	$data->{insuredSexF} = $insured->getSex() eq 'F' ? "Checked" : "";
 	my $dataA = $claim->{insured}->[$claimType]->getAddress();
-	$data->{insuredAddressCity} = $dataA->getCity;	
+	$data->{insuredAddressCity} = $dataA->getCity;
 	$data->{insuredAddressState} = $dataA->getState;
 	$data->{insuredAddressTelephone} = $dataA->getTelephoneNo;
 	$data->{insuredAddressZipCode} = $dataA->getZipCode;
@@ -262,7 +262,7 @@ sub populateInsured
 	$data->{insuredId} = $claim->{insured}->[$claimType]->getSsn();
 	$insured = $claim->{insured}->[0];
 	$data->{insuredEmployerOrSchoolName} = $insured->getEmployerOrSchoolName;
-	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;	
+	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupName;
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
@@ -278,7 +278,7 @@ sub populateOtherInsured
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-		
+
 		if (($insured2->getInsurancePlanOrProgramName ne ""))
 		{
 			$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
@@ -287,7 +287,7 @@ sub populateOtherInsured
 			$data->{otherInsuredSexM} = $insured2->getSex() eq 'M' ? "Checked" : "";
 			$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
 			$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
-			$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getInsurancePlanOrProgramName;	
+			$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getInsurancePlanOrProgramName;
 			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupName;
 			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo;
 		}
@@ -309,7 +309,7 @@ sub populatePhysician
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 
-	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;	
+	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
 	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
@@ -344,7 +344,7 @@ sub populateTreatment
 	$data->{treatmentHospitilizationDateFrom} = $treatment->getHospitilizationDateFrom(DATEFORMAT_USA);
 	$data->{treatmentHospitilizationDateTo} = $treatment->getHospitilizationDateTo(DATEFORMAT_USA);
 	$data->{treatmentIdOfReferingPhysician} = $treatment->getIDOfReferingPhysician;
-	$data->{treatmentMedicaidResubmission} = $treatment->getMedicaidResubmission;	
+	$data->{treatmentMedicaidResubmission} = $treatment->getMedicaidResubmission;
 	$data->{nameOfReferingPhysicianOrOther} = $treatment->getNameOfReferingPhysicianOrOther;
 	$data->{treatmentOutsideLabY} = uc($treatment->getOutsideLab) eq 'Y' ? "Checked" : "";
 	$data->{treatmentOutsideLabN} = uc($treatment->getOutsideLab) eq 'N' ? "Checked" : "";
@@ -413,7 +413,7 @@ sub populatePayer
 	my $payer = $claim->{policy}->[$claimType];
 	my $payerAddress = $payer->getAddress();
 	my $data = $self->{data};
-    
+
 #    $data->{payerName} = $payer->getName();
     $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
 }
@@ -435,8 +435,11 @@ sub populateProcedures
 			my $procedure = $claim->{procedures}->[$procNo];
 			if ($procedure ne "")
 			{
-				$self->populateProcedure($procedure, $procedureNo, $tb);
-				$procedureNo++;
+				if (uc($procedure->getItemStatus) ne "VOID")
+				{
+					$self->populateProcedure($procedure, $procedureNo, $tb);
+					$procedureNo++;
+				}
 			}
 		}
 		$i++;
@@ -453,7 +456,7 @@ sub feeSort
 	my	$procedure;
 	for my $i (0..$#$targetProcedures)
 	{
-		$procedure = $procedures->[$targetProcedures->[$i]];	
+		$procedure = $procedures->[$targetProcedures->[$i]];
 		$charges{$procedure->getCharges()} = $targetProcedures->[$i] . "," . $charges{$procedure->getCharges()};
 	}
 	my @as = sort {$b <=> $a} keys %charges;
@@ -474,7 +477,7 @@ sub populateProcedure
 	$data->{'procedure' . $i . 'Modifier'} = $procedure->getModifier;
 	my $cod = $procedure->getDiagnosis;
 	$cod =~ s/ //g;
-	my $ptr; 
+	my $ptr;
 	my @diagCodes = split(/,/, $cod);
 	for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 	{
@@ -501,13 +504,13 @@ sub diagnosisTable
 	my $cod;
 	my %diagTable;
 	my $tempCount;
-	
+
 	my $procedures = $claim->{procedures};
 	for my $i (0..$#$procedures)
 	{
 		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
 		{
-			my $procedure = $procedures->[$i];	
+			my $procedure = $procedures->[$i];
 			$cod = $procedure->getDiagnosis;
 		    $cod =~ s/ //g;
 			my @diagCodes = split(/,/, $cod);
@@ -541,8 +544,8 @@ sub diagnosisTable
 
 @CHANGELOG =
 (
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],   
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],   
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],
 
 );
 

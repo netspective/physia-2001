@@ -44,8 +44,8 @@ use constant FORM_HEIGHT => 661.5;
 use constant LINE_SPACING => 22.5;
 use constant MEDICARE_EXTRA_SPACE => 4.5;
 use constant STARTX_BOX3_SPACE => 205;    # DISTANCE B/W STARTING X AND BOX3
-use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E 
+use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E
 use constant STARTX_BOX24ADATE_SPACE => 67; # DISTANCE B/W STARTING X AND BOX24AD
 use constant STARTX_BOX24B_SPACE => 127; # DISTANCE B/W STARTING X AND BOX24B
 use constant STARTX_BOX24C_SPACE => 149; # DISTANCE B/W STARTING X AND BOX24C
@@ -57,17 +57,17 @@ use constant STARTX_BOX24H_SPACE => 436; # DISTANCE B/W STARTING X AND BOX24H
 use constant STARTX_BOX24I_SPACE => 459; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24J_SPACE => 478; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24K_SPACE => 500; # DISTANCE B/W STARTING X AND BOX24J
-use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A 
-use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A 
-use constant BLACK_DASH => 4.5; # 
-use constant WHITE_DASH => 1.125; # 
-use constant CELL_PADDING_Y => 1.125; # 
-use constant CELL_PADDING_X => 2.25; # 
+use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A
+use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A
+use constant BLACK_DASH => 4.5; #
+use constant WHITE_DASH => 1.125; #
+use constant CELL_PADDING_Y => 1.125; #
+use constant CELL_PADDING_X => 2.25; #
 use constant DATA_PADDING_X => 9;
 use constant BOX24_HEIGHT => 8;
 
-use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE 
+use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE
 
 use constant DATA_RED => 0.0;
 use constant DATA_GREEN => 0.0;
@@ -80,7 +80,7 @@ use constant DATA_FONT_NAME => 'Courier';
 @ISA = qw(App::Billing::Output::Driver);
 
 sub processClaims
-{	
+{
 	my ($self, %params) = @_;
 
 	my $claimsList = $params{claimList};
@@ -123,12 +123,12 @@ sub processClaims
 		}
 	}
 	$self->closeAndDestroy($p);
-}	
+}
 
 
 sub drawErrors
 {
-	
+
 	my ($self, $p, $claim) = @_;
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
@@ -204,13 +204,13 @@ sub closeAndDestroy
 sub drawForm
 {
 	my ($self, $p)  = @_;
-	
+
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0); 
-		
+	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
+
 	my $cordinates = $self->drawFormOutline($p);
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0); 
+	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
 	$self->drawHeader($p);
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
 	$self->box1($p, $cordinates);
@@ -268,7 +268,7 @@ sub drawForm
 #	$self->box32($p);
 #	$self->box33($p);
 #	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0); 
+	# pdflib::PDF_setrgbcolor($p, 0.7, 0, 0);
 	$self->drawTrailer($p);
 	return $cordinates;
 }
@@ -276,26 +276,26 @@ sub drawForm
 sub drawHeader
 {
 	my ($self, $p)  = @_;
-	
+
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, 8.0);
 
-	
+
 	pdflib::PDF_show_xy($p , 'PLEASE', START_X, START_Y + FORM_HEIGHT + 59);
 	pdflib::PDF_show_xy($p , 'DO NOT', START_X, START_Y + FORM_HEIGHT + 51);
 	pdflib::PDF_show_xy($p , 'STAPLE', START_X, START_Y + FORM_HEIGHT + 43);
 	pdflib::PDF_show_xy($p , 'IN THIS',START_X, START_Y + FORM_HEIGHT + 35);
 	pdflib::PDF_show_xy($p , 'AREA', START_X, START_Y + FORM_HEIGHT + 27);
-	
+
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , 'APPROVED OMB-0938-0008', START_X + 462, START_Y + FORM_HEIGHT + 68);
-	
+
 	pdflib::PDF_show_xy($p , 'PICA', 2 * START_X, START_Y + FORM_HEIGHT + 2);
 	pdflib::PDF_show_xy($p , 'PICA', START_X + 525, START_Y + FORM_HEIGHT + 2);
 	pdflib::PDF_stroke($p);
-	
+
 	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
 	pdflib::PDF_rect($p, START_X, START_Y + FORM_HEIGHT, 7, 10);
 	pdflib::PDF_rect($p, START_X + 7, START_Y + FORM_HEIGHT, 7, 10);
@@ -325,7 +325,7 @@ sub drawHeader
 sub drawTrailer
 {
 	my ($self, $p)  = @_;
-		
+
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
@@ -344,29 +344,29 @@ sub drawTrailer
 #	pdflib::PDF_show_xy($p , 'FORM', START_X + 4, START_Y - 4 * FORM_FONT_SIZE + 1);
 #	pdflib::PDF_stroke($p);
 
- 
+
 }
 
-sub drawFormOutline 
+sub drawFormOutline
 {
 	my ($self, $p)  = @_;
-	
+
 	my $x;
 	my $y;
 	my $cordinates ={};
 	my $upArr;
-	
+
 	pdflib::PDF_setlinewidth($p, THICK_LINE_WIDTH);
 
 	$self->drawLine($p, START_X, START_Y + FORM_HEIGHT,START_X + FORM_WIDTH, START_Y + FORM_HEIGHT); # on the top
-	$self->drawLine($p, START_X, START_Y + 374,START_X + FORM_WIDTH, START_Y + 374); # middle line 
+	$self->drawLine($p, START_X, START_Y + 374,START_X + FORM_WIDTH, START_Y + 374); # middle line
 	$self->drawLine($p, START_X, START_Y ,START_X + FORM_WIDTH, START_Y ); # on the bottom
-	
+
 	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
 	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + 9, START_X + FORM_WIDTH + 6, START_Y + 370);
 	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y,START_X + FORM_WIDTH , START_Y);
 	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 9, START_Y + 3 , START_Y + 9]); # DOWN
-	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 364, START_Y + 370 , START_Y + 364]); # UP 
+	$self->drawPoly($p,[START_X + FORM_WIDTH + 4, START_X + FORM_WIDTH + 6, START_X + FORM_WIDTH + 8],[START_Y + 364, START_Y + 370 , START_Y + 364]); # UP
 
 	$self->drawLine($p, START_X + FORM_WIDTH + 8, START_Y + 374,START_X + FORM_WIDTH , START_Y + 374);
 	$self->drawLine($p, START_X + FORM_WIDTH + 6, START_Y + FORM_HEIGHT - 4,START_X + FORM_WIDTH + 6, START_Y + 378);
@@ -421,7 +421,7 @@ sub drawFormOutline
 	$cordinates->{box9d} = [START_X , $y - LINE_SPACING ];
 
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 9d  and 12 
+	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 9d  and 12
 	$cordinates->{box12} = [START_X , $y - LINE_SPACING ];
 
 	$self->drawLine($p, START_X + STARTX_BOX3_SPACE, START_Y + FORM_HEIGHT - LINE_SPACING - MEDICARE_EXTRA_SPACE + 1.5, START_X + STARTX_BOX3_SPACE, $y - LINE_SPACING - 1); #   vertical mid  line in  patient address and patient rel
@@ -429,36 +429,36 @@ sub drawFormOutline
 	$y = START_Y + STARTY_MID_SPACE - 1 ;
 	$cordinates->{box14} = [START_X , $y ];
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 14  and 17 
+	$self->drawLine($p, START_X, $y - LINE_SPACING -1, START_X + FORM_WIDTH, $y - LINE_SPACING - 1);   # line dividing 14  and 17
 	$cordinates->{box17} = [START_X , $y - LINE_SPACING - 1 ];
 	$cordinates->{box17a} = [START_X + STARTX_BOX3_SPACE - 14 , $y - LINE_SPACING - 1];
 
 	$y -= LINE_SPACING;
-	$self->drawLine($p, START_X, $y - LINE_SPACING - 1 , START_X + FORM_WIDTH, $y - LINE_SPACING - 1 );   # line dividing 17  and 19 
+	$self->drawLine($p, START_X, $y - LINE_SPACING - 1 , START_X + FORM_WIDTH, $y - LINE_SPACING - 1 );   # line dividing 17  and 19
 	$cordinates->{box19} = [START_X , $y - LINE_SPACING - 1 ];
 
-	$self->drawLine($p, START_X + STARTX_BOX3_SPACE - 14, START_Y + STARTY_MID_SPACE , START_X + STARTX_BOX3_SPACE - 14, $y - LINE_SPACING - 1);   # verical line dividing 14  and 15 
+	$self->drawLine($p, START_X + STARTX_BOX3_SPACE - 14, START_Y + STARTY_MID_SPACE , START_X + STARTX_BOX3_SPACE - 14, $y - LINE_SPACING - 1);   # verical line dividing 14  and 15
 	$cordinates->{box15} = [START_X + STARTX_BOX3_SPACE - 14 , START_Y + STARTY_MID_SPACE ];
 
 	$y = $y - LINE_SPACING - MEDICARE_EXTRA_SPACE;
-	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 19  and 21 
+	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 19  and 21
 	$cordinates->{box21} = [START_X , $y - LINE_SPACING ];
-	
+
 	$y = $y - LINE_SPACING - MEDICARE_EXTRA_SPACE + 3;
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 22  and 23 
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 22  and 23
 	$cordinates->{box23} = [START_X , $y - LINE_SPACING];
 
 	$y = $y -  LINE_SPACING - MEDICARE_EXTRA_SPACE + 3;
-	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 23  and 24F 
+	$self->drawLine($p, START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING  , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 23  and 24F
 	my $start24 = $y -  LINE_SPACING;
 
 	$cordinates->{box24F} = [START_X + STARTX_BOX1A_SPACE, $y - LINE_SPACING];
-	$self->drawLine($p, START_X , $y - LINE_SPACING  , START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING );   # line dividing 21  and 24 
+	$self->drawLine($p, START_X , $y - LINE_SPACING  , START_X + STARTX_BOX24E_SPACE, $y - LINE_SPACING );   # line dividing 21  and 24
 	$cordinates->{box24} = [START_X , $y - LINE_SPACING];
 
-	$self->drawLine($p, START_X, $y - LINE_SPACING - BOX24_HEIGHT, START_X + FORM_WIDTH, $y - LINE_SPACING - BOX24_HEIGHT );   # line dividing 24  and 24 HEADS 
+	$self->drawLine($p, START_X, $y - LINE_SPACING - BOX24_HEIGHT, START_X + FORM_WIDTH, $y - LINE_SPACING - BOX24_HEIGHT );   # line dividing 24  and 24 HEADS
 	$cordinates->{box24HeadA} = [START_X , $y - LINE_SPACING - BOX24_HEIGHT];
-	
+
 	$y = $y - LINE_SPACING - BOX24_HEIGHT;
 	$self->drawLine($p, START_X, $y - LINE_SPACING + 1, START_X + FORM_WIDTH, $y - LINE_SPACING + 1 );   # line dividing 24head  and 24-1
 	$cordinates->{box24_1} = [START_X , $y - LINE_SPACING + 1];
@@ -476,7 +476,7 @@ sub drawFormOutline
 	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-3  and 24-4
 	$cordinates->{box24_4} = [START_X , $y - LINE_SPACING ];
 
-	$y = $y - LINE_SPACING - 1;	
+	$y = $y - LINE_SPACING - 1;
 	$self->drawLine($p, START_X, $y - LINE_SPACING , START_X + FORM_WIDTH, $y - LINE_SPACING );   # line dividing 24-4  and 24-5
 	$cordinates->{box24_5} = [START_X , $y - LINE_SPACING ];
 
@@ -521,7 +521,7 @@ sub drawFormOutline
 	pdflib::PDF_rect($p , START_X + STARTX_BOX24D_SPACE - 3.5, $y + 2.3, 7.5, $startProcY - $y - 2.5); # draw partition of thick block b c,e,f
 	pdflib::PDF_closepath_fill_stroke($p);
 	pdflib::PDF_rect($p , START_X + STARTX_BOX24E_SPACE - 5, $y + 2.3,  7.5, $startProcY - $y - 2.5);
-	pdflib::PDF_closepath_fill_stroke($p); 
+	pdflib::PDF_closepath_fill_stroke($p);
 	pdflib::PDF_rect($p , START_X + STARTX_BOX24F_SPACE - 5, $y + 2.3, 7.5, $startProcY - $y - 2.5);
 	pdflib::PDF_closepath_fill_stroke($p);
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
@@ -532,7 +532,7 @@ sub drawFormOutline
 	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
 	return $cordinates;
 }
-	
+
 
 sub box1
 {
@@ -590,7 +590,7 @@ sub box2
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , '2. PATIENT\'S NAME (Last Name,First Name, Middle Initial)', $box2X + CELL_PADDING_X, $box2Y - CELL_PADDING_Y - FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
@@ -605,7 +605,7 @@ sub box3
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , '3. PATIENT\'S BIRTH DATE', $box3X + CELL_PADDING_X, $box3Y - FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , 'MM        DD        YY', $box3X + CELL_PADDING_X + 12, $box3Y - 2 * FORM_FONT_SIZE );
 	pdflib::PDF_show_xy($p , 'SEX', $box3X + CELL_PADDING_X + 104, $box3Y - 2 * FORM_FONT_SIZE + 3);
@@ -681,7 +681,7 @@ sub box5b
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
-	$self->drawLine($p, $box5bX + $stateSpace, $box5bY, $box5bX + $stateSpace,$cordinates->{box9}->[1]); # draw address line	
+	$self->drawLine($p, $box5bX + $stateSpace, $box5bY, $box5bX + $stateSpace,$cordinates->{box9}->[1]); # draw address line
 	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
 	pdflib::PDF_stroke($p);
 	pdflib::PDF_show_xy($p , 'ZIP CODE', $box5bX + CELL_PADDING_X, $box5bY - CELL_PADDING_Y - FORM_FONT_SIZE);
@@ -701,7 +701,7 @@ sub box6
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , '6. PATIENT RELATIONSHIP TO INSURED ',$box6X + CELL_PADDING_X, $box6Y - FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , 'Self', $box6X + CELL_PADDING_X + 8, $box6Y - 3 * FORM_FONT_SIZE + 2);
 	pdflib::PDF_show_xy($p , 'Spouse', $box6X + CELL_PADDING_X + 36, $box6Y - 3 * FORM_FONT_SIZE + 2);
@@ -760,7 +760,7 @@ sub box7b
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
-	$self->drawLine($p, $box7bX + $stateSpace, $box7bY, $box7bX + $stateSpace,$cordinates->{box9}->[1]); # draw address line	
+	$self->drawLine($p, $box7bX + $stateSpace, $box7bY, $box7bX + $stateSpace,$cordinates->{box9}->[1]); # draw address line
 	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
 	pdflib::PDF_stroke($p);
 	pdflib::PDF_show_xy($p , 'ZIP CODE', $box7bX + CELL_PADDING_X, $box7bY - CELL_PADDING_Y - FORM_FONT_SIZE);
@@ -923,7 +923,7 @@ sub box10
 	pdflib::PDF_show_xy($p , 'YES', $box10X + CELL_PADDING_X + 48, $box10Y - 2 * FORM_FONT_SIZE - 7);
 	pdflib::PDF_show_xy($p , 'NO', $box10X + CELL_PADDING_X + 92, $box10Y - 2 * FORM_FONT_SIZE - 7);
 	pdflib::PDF_show_xy($p , '|______|', $box10X + CELL_PADDING_X + 109, $box10Y - 3 * FORM_FONT_SIZE - 5);
-	
+
 	pdflib::PDF_stroke($p);
 	$box10Cordinates = $cordinates->{box9c};
 	$box10Y = $box10Cordinates->[1];
@@ -1036,7 +1036,7 @@ sub box11d
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , 'd. IS THERE ANOTHER HEALTH BENEFIT PLAN?', $box11dX + CELL_PADDING_X, $box11dY - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'YES', $box11dX + CELL_PADDING_X + 27, $cordinates->{box12}->[1] + 2 );
 	pdflib::PDF_show_xy($p , 'NO', $box11dX + CELL_PADDING_X + 63, $cordinates->{box12}->[1] + 2);
@@ -1253,7 +1253,7 @@ sub box20
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , '20. OUTSIDE LAB?                               $ CHARGES', $box20X + CELL_PADDING_X, $box20Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'YES', $box20X + CELL_PADDING_X + 27, $cordinates->{box21}->[1] + 2 );
 	pdflib::PDF_show_xy($p , 'NO', $box20X + CELL_PADDING_X + 63, $cordinates->{box21}->[1] + 2);
@@ -1328,11 +1328,11 @@ sub box23
 }
 
 sub box24
-{ 
+{
 	my ($self, $p, $cordinates)  = @_;
 	my $box24Cordinates = $cordinates->{box24};
 	my $box24Y = $box24Cordinates->[1];
-	my $box24X = $box24Cordinates->[0]; 
+	my $box24X = $box24Cordinates->[0];
 
 	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
@@ -1340,14 +1340,14 @@ sub box24
 
 	$box24Cordinates = $cordinates->{box24};
 	$box24Y = $box24Cordinates->[1];
-	$box24X = $box24Cordinates->[0]; 
+	$box24X = $box24Cordinates->[0];
 
 	pdflib::PDF_show_xy($p , '24.        A', $box24X + CELL_PADDING_X, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'B', $box24X + CELL_PADDING_X + STARTX_BOX24B_SPACE + 7, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'C', $box24X + CELL_PADDING_X + STARTX_BOX24C_SPACE + 10, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'D', $box24X + CELL_PADDING_X + STARTX_BOX24D_SPACE + 52, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'E', $box24X + CELL_PADDING_X + STARTX_BOX24E_SPACE + 30, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p , 'F', $box24X + CELL_PADDING_X + STARTX_BOX24F_SPACE + 30, $box24Y - FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p , 'F', $box24X + CELL_PADDING_X + STARTX_BOX24F_SPACE + 30, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'G', $box24X + CELL_PADDING_X + STARTX_BOX24G_SPACE + 8, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'H', $box24X + CELL_PADDING_X + STARTX_BOX24H_SPACE + 8, $box24Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , 'I', $box24X + CELL_PADDING_X + STARTX_BOX24I_SPACE + 9, $box24Y - FORM_FONT_SIZE - 1);
@@ -1356,14 +1356,14 @@ sub box24
 
 	$box24Cordinates = $cordinates->{box24HeadA};
 	$box24Y = $box24Cordinates->[1];
-	$box24X = $box24Cordinates->[0]; 
+	$box24X = $box24Cordinates->[0];
 	pdflib::PDF_show_xy($p, 'DATE(S)   OF   SERVICE', $box24X + CELL_PADDING_X + 32, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p, 'From                                     To',$box24X + CELL_PADDING_X + 25, $box24Y - 2 * FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p, 'From                                     To',$box24X + CELL_PADDING_X + 25, $box24Y - 2 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'MM        DD        YY',$box24X + CELL_PADDING_X + 4, $box24Y - 3 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'MM        DD        YY',$box24X + CELL_PADDING_X + STARTX_BOX24ADATE_SPACE + 2, $box24Y - 3 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'Place', $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 2, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p, 'of', $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 5, $box24Y - 2 * FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p, 'of', $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 5, $box24Y - 2 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'Service',$box24X + STARTX_BOX24B_SPACE  + 1, $box24Y - 3 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'Type', $box24X + STARTX_BOX24C_SPACE + CELL_PADDING_X + 3, $box24Y - FORM_FONT_SIZE - 1);
@@ -1371,20 +1371,20 @@ sub box24
 	pdflib::PDF_show_xy($p, 'Service', $box24X + STARTX_BOX24C_SPACE  + 1.5, $box24Y - 3 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'PROCEDURES, SERVICES, OR SUPPLIES', $box24X + STARTX_BOX24D_SPACE, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p, '     (Explain Unusual Circumstances)', $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 16, $box24Y - 2 * FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p, '     (Explain Unusual Circumstances)', $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 16, $box24Y - 2 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'CPT/HCPCS      |    MODIFIER', $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 2, $box24Y - 3 * FORM_FONT_SIZE - 2);
 
 	pdflib::PDF_show_xy($p, 'DIAGNOSIS', $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $box24Y - 2 * FORM_FONT_SIZE + 4);
 	pdflib::PDF_show_xy($p, 'CODE', $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 20, $box24Y - 3 * FORM_FONT_SIZE + 4);
 
-	pdflib::PDF_show_xy($p, '$ CHARGES', $box24X + STARTX_BOX24F_SPACE + CELL_PADDING_X + 14, $box24Y - 3 * FORM_FONT_SIZE + 4);	
+	pdflib::PDF_show_xy($p, '$ CHARGES', $box24X + STARTX_BOX24F_SPACE + CELL_PADDING_X + 14, $box24Y - 3 * FORM_FONT_SIZE + 4);
 
 	pdflib::PDF_show_xy($p, 'DAYS', $box24X + STARTX_BOX24G_SPACE + CELL_PADDING_X, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p, 'OR', $box24X + STARTX_BOX24G_SPACE + CELL_PADDING_X + 2, $box24Y - 2 * FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p, 'OR', $box24X + STARTX_BOX24G_SPACE + CELL_PADDING_X + 2, $box24Y - 2 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'UNITS', $box24X + STARTX_BOX24G_SPACE + 1, $box24Y - 3 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'EPSDT', $box24X + STARTX_BOX24H_SPACE + CELL_PADDING_X, $box24Y - FORM_FONT_SIZE - 1);
-	pdflib::PDF_show_xy($p, 'Family', $box24X + STARTX_BOX24H_SPACE + CELL_PADDING_X, $box24Y - 2 * FORM_FONT_SIZE - 1);	
+	pdflib::PDF_show_xy($p, 'Family', $box24X + STARTX_BOX24H_SPACE + CELL_PADDING_X, $box24Y - 2 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p, 'Plan', $box24X + STARTX_BOX24H_SPACE + CELL_PADDING_X + 2, $box24Y - 3 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'EMG', $box24X + STARTX_BOX24I_SPACE + CELL_PADDING_X + 1, $box24Y - 2 * FORM_FONT_SIZE - 1);
@@ -1392,7 +1392,7 @@ sub box24
 	pdflib::PDF_show_xy($p, 'COB', $box24X + STARTX_BOX24J_SPACE + CELL_PADDING_X + 2, $box24Y - 2 * FORM_FONT_SIZE - 1);
 
 	pdflib::PDF_show_xy($p, 'RESERVED FOR', $box24X + STARTX_BOX24K_SPACE + CELL_PADDING_X + 4, $box24Y -  2 * FORM_FONT_SIZE + 2);
-	pdflib::PDF_show_xy($p, 'LOCAL USE', $box24X + STARTX_BOX24K_SPACE + CELL_PADDING_X + 8, $box24Y - 3 * FORM_FONT_SIZE + 2);	
+	pdflib::PDF_show_xy($p, 'LOCAL USE', $box24X + STARTX_BOX24K_SPACE + CELL_PADDING_X + 8, $box24Y - 3 * FORM_FONT_SIZE + 2);
 
 	pdflib::PDF_stroke($p);
 
@@ -1403,8 +1403,8 @@ sub box24
 
 	foreach $y (@ys)
 	{
-		pdflib::PDF_show_xy($p , $i++ , $box24X - 6 , $y + 6);	
-	
+		pdflib::PDF_show_xy($p , $i++ , $box24X - 6 , $y + 6);
+
 		pdflib::PDF_setdash($p, BLACK_DASH, WHITE_DASH);
 		$self->drawLine($p, $box24X + 21, $y + DATE_LINE_HEIGHT, $box24X + 21,$y);
 		$self->drawLine($p, $box24X + 45, $y + DATE_LINE_HEIGHT, $box24X + 45, $y);
@@ -1460,7 +1460,7 @@ sub box27
 	my $box27Y = $box27Cordinates->[1];
 	my $box27X = $box27Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0); 
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , '27. ACCEPT ASSIGNMENT?', $box27X + CELL_PADDING_X, $box27Y - FORM_FONT_SIZE);
@@ -1479,7 +1479,7 @@ sub box28
 	my $box28Cordinates = $cordinates->{box28};
 	my $box28Y = $box28Cordinates->[1];
 	my $box28X = $box28Cordinates->[0];
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0); 
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , '28. TOTAL CHARGE', $box28X + CELL_PADDING_X, $box28Y - FORM_FONT_SIZE - 1);
@@ -1499,7 +1499,7 @@ sub box29
 	my $box29Cordinates = $cordinates->{box29};
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0); 
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , '29. AMOUNT PAID', $box29X + CELL_PADDING_X, $box29Y - FORM_FONT_SIZE - 1);
@@ -1518,7 +1518,7 @@ sub box30
 	my $box30Cordinates = $cordinates->{box30};
 	my $box30Y = $box30Cordinates->[1];
 	my $box30X = $box30Cordinates->[0];
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0); 
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , '30. BALANCE DUE', $box30X + CELL_PADDING_X, $box30Y - FORM_FONT_SIZE - 1);
@@ -1531,7 +1531,7 @@ sub box30
 	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
 }
 
-sub box31 
+sub box31
 {
 	my ($self, $p, $cordinates)  = @_;
 	my $box31Cordinates = $cordinates->{box31};
@@ -1573,28 +1573,28 @@ sub box33
 	my $box33Y = $box33Cordinates->[1];
 	my $box33X = $box33Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0); 
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , '33. PHYSICIAN\'S, SUPPLIER\'S BILLING NAME, ADDRESS, ZIP CODE', $box33X + CELL_PADDING_X , $box33Y - FORM_FONT_SIZE - 1);
 	pdflib::PDF_show_xy($p , '& PHONE #', $box33X + CELL_PADDING_X + 10, $box33Y - 2 * FORM_FONT_SIZE - 1);
-	
+
 	pdflib::PDF_show_xy($p , 'PIN#', $box33X + CELL_PADDING_X , START_Y + 2);
 	pdflib::PDF_show_xy($p , 'GRP#', $box33X + CELL_PADDING_X + 103, START_Y + 2);
-	
+
 	pdflib::PDF_stroke($p);
-	
+
 	pdflib::PDF_setlinewidth($p, THIN_LINE_WIDTH);
 	$self->drawLine($p, $box33X + CELL_PADDING_X + 100, START_Y, $box33X + CELL_PADDING_X + 100, START_Y + DATE_LINE_HEIGHT);
 	pdflib::PDF_setlinewidth($p, NORMAL_LINE_WIDTH);
-	
+
 }
 
 
 sub populatePDF
 {
 	my ($self, $p, $Claim, $cordinates, $procesedProc)  = @_;
-	
+
 	pdflib::PDF_setrgbcolor($p, DATA_RED, DATA_GREEN, DATA_BLUE);
 	if ($Claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP)
 	{
@@ -1652,8 +1652,8 @@ sub populatePDF
 		$self->carrierData($p, $Claim, $cordinates);
 	}
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
-		
-	
+
+
 }
 
 sub box1ClaimData
@@ -1662,7 +1662,7 @@ sub box1ClaimData
 	my $box1Cordinates = $cordinates->{box1};
 	my $box1Y = $box1Cordinates->[1];
 	my $box1X = $box1Cordinates->[0];
-	my $xCoordinate = 
+	my $xCoordinate =
 		{
 			'MEDICARE' => $box1X + 1 + CHECKED_BOX_X,
 			'MEDICAID' => $box1X + 50 + CHECKED_BOX_X,
@@ -1676,7 +1676,7 @@ sub box1ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	
+
 	my $temp = uc($claim->getProgramName);
 	pdflib::PDF_show_xy($p, 'X', $xCoordinate->{$temp} , $box1Y + CHECKED_BOX_Y - 4 * FORM_FONT_SIZE) if (defined ($xCoordinate->{$temp}));
 	pdflib::PDF_stroke($p);
@@ -1723,7 +1723,7 @@ sub box3ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth()); 
+	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth());
 
 	my $temp =
 		 {
@@ -1820,7 +1820,7 @@ sub box6ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $temp = 
+	my $temp =
 		{
 			'1' => $box6X + CELL_PADDING_X + 21 + CHECKED_BOX_X,
 			'2' => $box6X + CELL_PADDING_X + 58 + CHECKED_BOX_X,
@@ -1852,7 +1852,7 @@ sub box6ClaimData
 			'19' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 			'99' => $box6X + CELL_PADDING_X + 124 + CHECKED_BOX_X,
 		};
-		
+
 	pdflib::PDF_show_xy($p ,'X' , $temp->{uc($claim->{careReceiver}->getRelationshipToInsured)} , $box6Y - 21 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{careReceiver}->getRelationshipToInsured)});
 	pdflib::PDF_stroke($p);
 }
@@ -1924,8 +1924,8 @@ sub box8ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $temp1 = 
-		{ 
+	my $temp1 =
+		{
 			'S' =>   [$box8X + CELL_PADDING_X + 36 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
 			'M' =>  [$box8X + CELL_PADDING_X + 80 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
 			'U' =>    [$box8X + CELL_PADDING_X + 123 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
@@ -1938,7 +1938,7 @@ sub box8ClaimData
 	$box8Cordinates = $cordinates->{box5ZipCode};
 	$box8Y = $box8Cordinates->[1];
 	$box8X = $box8Cordinates->[0] + STARTX_BOX3_SPACE;
-	my $temp2 = 
+	my $temp2 =
 		{
 			'0' =>[$box8X + CELL_PADDING_X + 80 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
 			'1' =>[$box8X + CELL_PADDING_X + 123 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
@@ -1947,9 +1947,9 @@ sub box8ClaimData
 			'STUDENT (FULL-TIME)' =>[$box8X + CELL_PADDING_X + 80 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
 			'STUDENT (PART-TIME)' =>[$box8X + CELL_PADDING_X + 123 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 7 + CHECKED_BOX_Y],
 		};
-		
+
 	pdflib::PDF_show_xy($p , 'X', $temp1->{uc($claim->{careReceiver}->getStatus)}->[0], $temp1->{uc($claim->{careReceiver}->getStatus)}->[1]) if defined  ($temp1->{uc($claim->{careReceiver}->getStatus)});
-	pdflib::PDF_show_xy($p , 'X', $box8X + CELL_PADDING_X + 36 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 6 + CHECKED_BOX_Y) if (($claim->{careReceiver}->getEmploymentStatus ne '5') && ($claim->{careReceiver}->getEmploymentStatus ne "")); 
+	pdflib::PDF_show_xy($p , 'X', $box8X + CELL_PADDING_X + 36 + CHECKED_BOX_X, $box8Y - 3 * FORM_FONT_SIZE - 6 + CHECKED_BOX_Y) if (($claim->{careReceiver}->getEmploymentStatus ne '5') && ($claim->{careReceiver}->getEmploymentStatus ne ""));
 	pdflib::PDF_show_xy($p , 'X', $temp2->{uc($claim->{careReceiver}->getStudentStatus)}->[0], $temp2->{uc($claim->{careReceiver}->getStudentStatus)}->[1]) if defined  ($temp2->{uc($claim->{careReceiver}->getStudentStatus)});
 	pdflib::PDF_stroke($p);
 }
@@ -1963,18 +1963,18 @@ sub box10ClaimData
 	my $box10Cordinates = $cordinates->{box9a};
 	my $box10Y = $box10Cordinates->[1];
 	my $box10X = $box10Cordinates->[0] + STARTX_BOX3_SPACE;
-	my $temp = 
+	my $temp =
 			{
 				'1' => $box10X + CELL_PADDING_X + 36 + CHECKED_BOX_X,
 				'0' => $box10X + CELL_PADDING_X + 80 + CHECKED_BOX_X,
 				'Y' => $box10X + CELL_PADDING_X + 36 + CHECKED_BOX_X,
 				'N' => $box10X + CELL_PADDING_X + 80 + CHECKED_BOX_X,
-				}; 
+				};
 	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->getConditionRelatedToEmployment())}, $box10Y - 3 * FORM_FONT_SIZE - 6 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->getConditionRelatedToEmployment)});
 	$box10Cordinates = $cordinates->{box9b};
 	$box10Y = $box10Cordinates->[1];
 	$box10X = $box10Cordinates->[0] + STARTX_BOX3_SPACE;
-	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->getConditionRelatedToAutoAccident)}, $box10Y - 3 * FORM_FONT_SIZE - 6 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->getConditionRelatedToAutoAccident)}); 
+	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->getConditionRelatedToAutoAccident)}, $box10Y - 3 * FORM_FONT_SIZE - 6 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->getConditionRelatedToAutoAccident)});
 	pdflib::PDF_show_xy($p , uc($claim->getConditionRelatedToAutoAccidentPlace), $box10X + CELL_PADDING_X + 115, $box10Y - 3 * FORM_FONT_SIZE - 2);
 	$box10Cordinates = $cordinates->{box9c};
 	$box10Y = $box10Cordinates->[1];
@@ -2047,7 +2047,7 @@ sub box9bClaimData
 			die "Couldn't set font"  if ($font == -1);
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-			my $date  = $self->returnDate($insured2->getDateOfBirth()); 
+			my $date  = $self->returnDate($insured2->getDateOfBirth());
 			my $temp =
 			 {
 				'1' => $box9bX + CELL_PADDING_X + 120 + CHECKED_BOX_X,
@@ -2058,7 +2058,7 @@ sub box9bClaimData
 				'F' => $box9bX + CELL_PADDING_X + 175 + CHECKED_BOX_X,
 			 };
 			if	($date->[0] ne "")
-			{	
+			{
 
 				pdflib::PDF_show_xy($p , $date->[0], $box9bX + CELL_PADDING_X + DATA_PADDING_X, $box9bY - 3.5 * FORM_FONT_SIZE);
 				pdflib::PDF_show_xy($p , $date->[1], $box9bX + 35, $box9bY - 3.5 * FORM_FONT_SIZE);
@@ -2088,7 +2088,7 @@ sub box9cClaimData
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-			pdflib::PDF_show_xy($p , $insured2->getEmployerOrSchoolName, $box9cX + CELL_PADDING_X + DATA_PADDING_X, $box9cY - 3 * FORM_FONT_SIZE);	
+			pdflib::PDF_show_xy($p , $insured2->getEmployerOrSchoolName, $box9cX + CELL_PADDING_X + DATA_PADDING_X, $box9cY - 3 * FORM_FONT_SIZE);
 			pdflib::PDF_stroke($p);
 		}
 	}
@@ -2142,7 +2142,7 @@ sub box11aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	my $date  = $self->returnDate($claim->{insured}->[0]->getDateOfBirth()); 
+	my $date  = $self->returnDate($claim->{insured}->[0]->getDateOfBirth());
 	my $temp =
 		 {
 			'1' => $box11aX + CELL_PADDING_X + 127 + CHECKED_BOX_X,
@@ -2153,7 +2153,7 @@ sub box11aClaimData
 			'F' => $box11aX + CELL_PADDING_X + 179 + CHECKED_BOX_X,
 		 };
 	if 	($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box11aX + 34, $box11aY - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box11aX + 55, $box11aY - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box11aX + 72, $box11aY - 3.5 * FORM_FONT_SIZE);
@@ -2172,7 +2172,7 @@ sub box11bClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getEmployerOrSchoolName, $box11bX + CELL_PADDING_X + DATA_PADDING_X, $box11bY - 3.5 * FORM_FONT_SIZE);	
+	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getEmployerOrSchoolName, $box11bX + CELL_PADDING_X + DATA_PADDING_X, $box11bY - 3.5 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2203,12 +2203,12 @@ sub box11dClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	my $temp =  
+	my $temp =
 			{
 				'1' => $box11dX + CELL_PADDING_X + 13.5 + CHECKED_BOX_X,
 				'0' => $box11dX + CELL_PADDING_X + 50 + CHECKED_BOX_X,
 			};
-		
+
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
 		if (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
@@ -2262,9 +2262,9 @@ sub box14ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{treatment}->getDateOfIllnessInjuryPregnancy()); 
+	my $date  = $self->returnDate($claim->{treatment}->getDateOfIllnessInjuryPregnancy());
 	if 	($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box14X + 10, $box14Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box14X + 33, $box14Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box14X + 54, $box14Y - 3.5 * FORM_FONT_SIZE);
@@ -2283,9 +2283,9 @@ sub box15ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{treatment}->getDateOfSameOrSimilarIllness()); 
+	my $date  = $self->returnDate($claim->{treatment}->getDateOfSameOrSimilarIllness());
 	if ($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box15X + 72, $box15Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box15X + 95, $box15Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box15X + 114, $box15Y - 3.5 * FORM_FONT_SIZE);
@@ -2305,17 +2305,17 @@ sub box16ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	my $date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkFrom()); 
+	my $date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkFrom());
 	if ($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box16X + 30, $box16Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box16X + 53, $box16Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box16X + 76, $box16Y - 3.5 * FORM_FONT_SIZE);
 	}
-	
-	$date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkTo()); 
+
+	$date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkTo());
 	if 	($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box16X + 135, $box16Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box16X + 156, $box16Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box16X + 177, $box16Y - 3.5 * FORM_FONT_SIZE);
@@ -2362,16 +2362,16 @@ sub box18ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	my $date  = $self->returnDate($claim->{treatment}->getHospitilizationDateFrom()); 
+	my $date  = $self->returnDate($claim->{treatment}->getHospitilizationDateFrom());
 	if 	($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box18X + 34, $box18Y - 3.4 * FORM_FONT_SIZE );
 		pdflib::PDF_show_xy($p , $date->[1], $box18X + 55, $box18Y - 3.4 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box18X + 77, $box18Y - 3.4 * FORM_FONT_SIZE);
 	}
-	$date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkTo()); 
+	$date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkTo());
 	if 	($date->[0] ne "")
-	{	
+	{
 		pdflib::PDF_show_xy($p , $date->[0], $box18X + 134, $box18Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[1], $box18X + 155, $box18Y - 3.5 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box18X + 177, $box18Y - 3.5 * FORM_FONT_SIZE);
@@ -2390,7 +2390,7 @@ sub box20ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $temp = 
+	my $temp =
 			{
 				'Y' => $box20X + CELL_PADDING_X + 13.5 + CHECKED_BOX_X,
 				'N' => $box20X + CELL_PADDING_X + 50 + CHECKED_BOX_X,
@@ -2421,25 +2421,25 @@ sub box21ClaimDataPre
 	{
 		@temp = split (/\./,$claim->{diagnosis}->[0]->getDiagnosis);
 		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1);
-		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1); 
+		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1);
 		}
     if ($claim->{diagnosis}->[1] ne "")
 	{
 		@temp = split (/\./,$claim->{diagnosis}->[1]->getDiagnosis);
-		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 8 * FORM_FONT_SIZE + 4); 
-		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4); 
+		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 8 * FORM_FONT_SIZE + 4);
+		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4);
 		}
 	if ($claim->{diagnosis}->[2] ne "")
 	{
 		@temp = split (/\./,$claim->{diagnosis}->[2]->getDiagnosis);
-		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1); 
-		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1); 
+		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1);
+		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1);
 		}
     if ($claim->{diagnosis}->[3] ne "")
 	{
 		@temp = split (/\./,$claim->{diagnosis}->[3]->getDiagnosis);
-		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE) , $box21Y - 8 * FORM_FONT_SIZE + 4); 
-		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4); 
+		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE) , $box21Y - 8 * FORM_FONT_SIZE + 4);
+		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4);
 		}
 	pdflib::PDF_stroke($p);
 }
@@ -2467,25 +2467,25 @@ sub box21ClaimData
 		{
 		@temp = split (/\./,$dgs1);
 		pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1);
-		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1); 
+		pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1);
 		}
 		if ($dgs->{$dgs1} eq "2")
 		{
 			@temp = split (/\./,$dgs1);
-			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 8 * FORM_FONT_SIZE + 4); 
-			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4); 
+			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + $capAlign + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 8 * FORM_FONT_SIZE + 4);
+			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + $capAlign + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4);
 		}
 		if ($dgs->{$dgs1} eq "3")
 		{
 			@temp = split (/\./,$dgs1);
-			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1); 
-			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1); 
+			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE), $box21Y - 4 * FORM_FONT_SIZE + 1);
+			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3, $box21Y - 4 * FORM_FONT_SIZE + 1);
 		}
 		if ($dgs->{$dgs1} eq "4")
 		{
 			@temp = split (/\./,$dgs1);
-			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE) , $box21Y - 8 * FORM_FONT_SIZE + 4); 
-			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4); 
+			pdflib::PDF_show_xy($p , $temp[0], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize - pdflib::PDF_stringwidth($p ,$temp[0], $font, DATA_FONT_SIZE) , $box21Y - 8 * FORM_FONT_SIZE + 4);
+			pdflib::PDF_show_xy($p , $temp[1], $box21X + CELL_PADDING_X + STARTX_BOX3_SPACE - 3 + $lineSize + 3 , $box21Y - 8 * FORM_FONT_SIZE + 4);
 		}
 		pdflib::PDF_stroke($p);
 	}
@@ -2521,10 +2521,10 @@ sub box23ClaimData
 }
 
 sub box24ClaimData
-{ 
+{
 	my ($self, $p, $claim, $cordinates, $procesedProc)  = @_;
  	my $box24Cordinates = $cordinates->{box24HeadA};
-	my $box24X = $box24Cordinates->[0]; 
+	my $box24X = $box24Cordinates->[0];
 
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
@@ -2554,44 +2554,48 @@ sub box24ClaimData
 
 			if ($procedure ne "")
 			{
+				if (uc($procedure->getItemStatus) ne "VOID")
+				{
+
 				$y = $ys[$procedureNo];
-	
-				my $date  = $self->returnDate($procedure->getDateOfServiceFrom()); 
-				pdflib::PDF_show_xy($p, $date->[0], $box24X + 8, $y + 6);
-				pdflib::PDF_show_xy($p, $date->[1], $box24X + 26, $y + 6);
-				pdflib::PDF_show_xy($p, $date->[2], $box24X + 46, $y + 6);
-			
-				$date  = $self->returnDate($procedure->getDateOfServiceTo()); 
-				pdflib::PDF_show_xy($p, $date->[0], $box24X + STARTX_BOX24ADATE_SPACE + 2, $y + 6);
-				pdflib::PDF_show_xy($p, $date->[1], $box24X + STARTX_BOX24ADATE_SPACE + 22, $y + 6);
-				pdflib::PDF_show_xy($p, $date->[2], $box24X + STARTX_BOX24ADATE_SPACE + 40, $y + 6);
-				pdflib::PDF_show_xy($p, $procedure->getPlaceOfService(), $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 7, $y + 6);
-				pdflib::PDF_show_xy($p, $procedure->getTypeOfService(), $box24X + STARTX_BOX24C_SPACE + CELL_PADDING_X + 4, $y + 6);
-				pdflib::PDF_show_xy($p, $procedure->getCPT(), $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 10, $y + 6);
-				my @modifier = split (/ /, $procedure->getModifier());
-				pdflib::PDF_show_xy($p, $modifier[0], $box24X + STARTX_BOX24D_SPACE + 55, $y + 6);
-				for ($mj = 1; $mj <= $#modifier; $mj++)
-				{
-					pdflib::PDF_show_xy($p, $modifier[1], $box24X + STARTX_BOX24D_SPACE + 75 + ($mj-1) * 12, $y + 6);
-				}
-				$cod = $procedure->getDiagnosis;
-				$cod =~ s/ //g;
-				my @diagCodes = split(/,/, $cod);
-				for	(my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
-				{
-					$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . ","  ;
-				}
-				$ptr = substr($ptr, 0, length($ptr)-1);
+
+					my $date  = $self->returnDate($procedure->getDateOfServiceFrom());
+					pdflib::PDF_show_xy($p, $date->[0], $box24X + 8, $y + 6);
+					pdflib::PDF_show_xy($p, $date->[1], $box24X + 26, $y + 6);
+					pdflib::PDF_show_xy($p, $date->[2], $box24X + 46, $y + 6);
+
+					$date  = $self->returnDate($procedure->getDateOfServiceTo());
+					pdflib::PDF_show_xy($p, $date->[0], $box24X + STARTX_BOX24ADATE_SPACE + 2, $y + 6);
+					pdflib::PDF_show_xy($p, $date->[1], $box24X + STARTX_BOX24ADATE_SPACE + 22, $y + 6);
+					pdflib::PDF_show_xy($p, $date->[2], $box24X + STARTX_BOX24ADATE_SPACE + 40, $y + 6);
+					pdflib::PDF_show_xy($p, $procedure->getPlaceOfService(), $box24X + STARTX_BOX24B_SPACE + CELL_PADDING_X + 7, $y + 6);
+					pdflib::PDF_show_xy($p, $procedure->getTypeOfService(), $box24X + STARTX_BOX24C_SPACE + CELL_PADDING_X + 4, $y + 6);
+					pdflib::PDF_show_xy($p, $procedure->getCPT(), $box24X + STARTX_BOX24D_SPACE + CELL_PADDING_X + 10, $y + 6);
+					my @modifier = split (/ /, $procedure->getModifier());
+					pdflib::PDF_show_xy($p, $modifier[0], $box24X + STARTX_BOX24D_SPACE + 55, $y + 6);
+					for ($mj = 1; $mj <= $#modifier; $mj++)
+					{
+						pdflib::PDF_show_xy($p, $modifier[1], $box24X + STARTX_BOX24D_SPACE + 75 + ($mj-1) * 12, $y + 6);
+					}
+					$cod = $procedure->getDiagnosis;
+					$cod =~ s/ //g;
+					my @diagCodes = split(/,/, $cod);
+					for	(my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
+					{
+						$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . ","  ;
+					}
+					$ptr = substr($ptr, 0, length($ptr)-1);
 #				$ptr =~ s/$,//g;
-				pdflib::PDF_show_xy($p , $ptr , $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $y + 6);
-				$ptr = "";
-				my @amount  = split (/\./ , $procedure->getCharges());
-				pdflib::PDF_show_xy($p , $amount[0], START_X + STARTX_BOX24FC_SPACE - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) - 4, $y + 6);
-				pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), START_X + STARTX_BOX24G_SPACE - pdflib::PDF_stringwidth($p , substr($amount[1] . "00", 0, 2), $font, DATA_FONT_SIZE) - 4, $y + 6);
-				pdflib::PDF_show_xy($p , substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3), $box24X + STARTX_BOX24H_SPACE - 17, $y + 6);
-				pdflib::PDF_show_xy($p , $procedure->getEmergency(), $box24X + STARTX_BOX24I_SPACE + 6, $y + 6);
-				pdflib::PDF_stroke($p);
-				$procedureNo++;
+					pdflib::PDF_show_xy($p , $ptr , $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $y + 6);
+					$ptr = "";
+					my @amount  = split (/\./ , $procedure->getCharges());
+					pdflib::PDF_show_xy($p , $amount[0], START_X + STARTX_BOX24FC_SPACE - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) - 4, $y + 6);
+					pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), START_X + STARTX_BOX24G_SPACE - pdflib::PDF_stringwidth($p , substr($amount[1] . "00", 0, 2), $font, DATA_FONT_SIZE) - 4, $y + 6);
+					pdflib::PDF_show_xy($p , substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3), $box24X + STARTX_BOX24H_SPACE - 17, $y + 6);
+					pdflib::PDF_show_xy($p , $procedure->getEmergency(), $box24X + STARTX_BOX24I_SPACE + 6, $y + 6);
+					pdflib::PDF_stroke($p);
+					$procedureNo++;
+				}
 			}
 		}
 		$i++;
@@ -2641,10 +2645,10 @@ sub box27ClaimData
 	my $box27Y = $box27Cordinates->[1];
 	my $box27X = $box27Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $temp = 
+	my $temp =
 			{
 				'1' => $box27X + CELL_PADDING_X + 1 + CHECKED_BOX_X,
 				'0' => $box27X + CELL_PADDING_X + 39 + CHECKED_BOX_X,
@@ -2663,7 +2667,7 @@ sub box28ClaimData
 	my $box28Y = $box28Cordinates->[1];
 	my $box28X = $box28Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ , $claim->getTotalCharge);
@@ -2681,11 +2685,11 @@ sub box29ClaimData
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ , abs($claim->getAmountPaid));
-	
+
 	pdflib::PDF_show_xy($p , $amount[0] + 0, $box29X + 45 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
 
@@ -2700,7 +2704,7 @@ sub box30ClaimData
 	my $box30Y = $box30Cordinates->[1];
 	my $box30X = $box30Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my @amount  = split (/\./ ,$claim->getBalance);
@@ -2710,7 +2714,7 @@ sub box30ClaimData
 	pdflib::PDF_stroke($p);
 }
 
-sub box31ClaimData 
+sub box31ClaimData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
 	my $box31Cordinates = $cordinates->{box31};
@@ -2751,7 +2755,7 @@ sub box33ClaimData
 	my $box33Y = $box33Cordinates->[1];
 	my $box33X = $box33Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $physician = $claim->{payToOrganization};
@@ -2764,14 +2768,14 @@ sub box33ClaimData
 #	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
 #	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
 	pdflib::PDF_stroke($p);
-	
+
 }
 
 sub carrierData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
@@ -2784,16 +2788,16 @@ sub carrierData
 		pdflib::PDF_show_xy($p , $address->getCity . " " . $address->getState . " " . $address->getZipCode , START_X + 250, START_Y + FORM_HEIGHT + 51 - 2 * FORM_FONT_SIZE);
 		pdflib::PDF_stroke($p);
 	}
-}	
+}
 
 
 
 sub returnDate
 {
 	my ($self,$value) = @_;
-	
+
 	my @date;
-	
+
 #	$date[2] = substr($value,5,10); # this code is for ddmmmyyyy
 #	$date[0] = substr($value,0,2);
 #	$date[1] = substr($value,2,3);
@@ -2816,14 +2820,14 @@ sub diagnosisTable
 	my $cod;
 	my %diagTable;
 	my $tempCount;
-	
+
 	my $procedures = $claim->{procedures};
 
 	for my $i (0..$#$procedures)
 	{
 		if (($diag <= 4) && ($procCount < 6) && ($processedProc->[$i] != 1))
 		{
-			my $procedure = $procedures->[$i];	
+			my $procedure = $procedures->[$i];
 			$cod = $procedure->getDiagnosis;
 		    $cod =~ s/ //g;
 			my @diagCodes = split(/,/, $cod);
@@ -2863,7 +2867,7 @@ sub feeSort
 	my	$procedure;
 	for my $i (0..$#$targetProcedures)
 	{
-		$procedure = $procedures->[$targetProcedures->[$i]];	
+		$procedure = $procedures->[$targetProcedures->[$i]];
 		$charges{$procedure->getCharges()} = $targetProcedures->[$i] . "," . $charges{$procedure->getCharges()};
 	}
 	my @as = sort {$b <=> $a} keys %charges;
@@ -2877,10 +2881,10 @@ sub allProcTraverse
 	my ($self, $procesedProc, $claim) = @_;
 	my $procs = $claim->{procedures};
 	my $sum = 0;
-	
+
 	for my $i (0..$#$procs)
 	{
-		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum; 
+		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum;
 	}
 	return $sum >= $#$procs ? 1 : 0;
 }
@@ -2900,7 +2904,7 @@ sub setPrimaryProcedure
 		if ($procedure ne "")
 		{
 			 $primaryProcedure = $procedure->getDiagnosis() =~ /$dg/ ? $i : -1;
-			
+
 		}
 	}
 	if ($primaryProcedure != -1)
@@ -2925,7 +2929,7 @@ sub reversePrimaryProcedure
 
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],

@@ -472,7 +472,7 @@ sub assignPatientInsurance
 		my $sth1 = $self->{dbiCon}->prepare(qq{$queryStatment});
 		# do the execute statement
 		$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-		
+
 		while(@rowBilling = $sth1->fetchrow_array())
 		{
 			if ($rowBilling[1] eq BILL_PARTY_TYPE_INSURANCE)
@@ -502,11 +502,11 @@ sub assignPatientInsurance
 									" and invoice_billing.bill_ins_id = ins.ins_internal_id
 									and invoice_billing.BILL_SEQUENCE = $rowBilling[2]";
 			}
-	
+
 			$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 			# do the execute statement
 			$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-			
+
 			$insured = $insureds[$billSeq->[$row[3]+0]];
 			if ($insured ne "")
 			{
@@ -527,7 +527,7 @@ sub assignPatientInsurance
 	}
 	$self->assignInsuredInfo($claim, $invoiceId);
 	$self->assignInsuredAddressInfo($claim, $invoiceId);
-	
+
 }
 
 sub assignInsuredInfo
@@ -562,7 +562,7 @@ sub assignInsuredInfo
 					$insured->setDateOfBirth($row[3]);
 					$insured->setSex($row[4]);
 					$insured->setStatus($row[5]);
-					$insured->setSsn($row[6]); 
+					$insured->setSsn($row[6]);
 					$insured->setId($row[7]);
 
 					if ($insured->getBillSequence() ne"")
@@ -1063,7 +1063,7 @@ sub assignPolicy
 							  	}
 						 	}
 						}
-					
+
 						$queryStatment = "select line1, line2, city, state, zip, country
 							from insurance_address
 							where parent_id = (select parent_ins_id
@@ -1423,7 +1423,7 @@ sub assignInvoiceProperties
 	my $sth = $self->{dbiCon}->prepare(qq { $queryStatment});
 	# do the execute statement
 	$sth->execute()  or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	
+
 	while(@row = $sth->fetchrow_array())
 	{
 		if(my $attrInfo = $inputMap->{$row[COLUMNINDEX_ATTRNAME]})
@@ -1612,9 +1612,9 @@ sub setClaimProperties
 	my %atr;
 	my @tempRow;
 	my $diagcount;
-	my $queryStatment = "select  total_cost, INVOICE_STATUS, CLAIM_DIAGS, balance, 
-								Invoice.total_adjust, Invoice_subtype, client_id, 
-								invoice_type, total_items, Invoice_date 
+	my $queryStatment = "select  total_cost, INVOICE_STATUS, CLAIM_DIAGS, balance,
+								Invoice.total_adjust, Invoice_subtype, client_id,
+								invoice_type, total_items, Invoice_date
 								from invoice where invoice_id = $invoiceId";
 	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1823,24 +1823,22 @@ sub populateItems
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
  	$queryStatment = qq{
-		select to_char(service_begin_date, 'dd-MON-yyyy'), 
-			to_char(service_end_date, 'dd-MON-yyyy'), 
-			nvl(HCFA1500_Service_Place_Code.abbrev, } . DEFAULT_PLACE_OF_SERIVCE . qq{) as service_place, 
-			nvl(HCFA1500_Service_Type_Code.abbrev, }. '01' . qq{) as service_type, code, modifier, 
-			unit_cost, quantity, emergency, REL_DIAGS, reference, COMMENTS , item_id, extended_cost, 
-			balance, total_adjust, item_type, flags, invoice_item.caption, to_char(nvl(service_begin_date, 
+		select to_char(service_begin_date, 'dd-MON-yyyy'),
+			to_char(service_end_date, 'dd-MON-yyyy'),
+			nvl(HCFA1500_Service_Place_Code.abbrev, } . DEFAULT_PLACE_OF_SERIVCE . qq{) as service_place,
+			nvl(HCFA1500_Service_Type_Code.abbrev, }. '01' . qq{) as service_type, code, modifier,
+			unit_cost, quantity, emergency, REL_DIAGS, reference, COMMENTS , item_id, extended_cost,
+			balance, total_adjust, item_type, flags, invoice_item.caption, to_char(nvl(service_begin_date,
 			cr_stamp), 'dd-MON-yyyy'), data_text_b, code_type
  		from HCFA1500_Service_Type_Code, HCFA1500_Service_Place_Code, invoice_item
  		where parent_id = $invoiceId
  			and HCFA1500_Service_Place_Code.id (+) = invoice_item.hcfa_service_place
  			and HCFA1500_Service_Type_Code.id (+)  = invoice_item.hcfa_service_type
  	};
- 	
+
 	$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	while(@tempRow = $sth->fetchrow_array())
-	{
-	if (uc($tempRow[20]) ne "VOID")
 	{
 		$procedureObject = new App::Billing::Claim::Procedure;
 		$procedureObject->setDateOfServiceFrom(($tempRow[0]));
@@ -1868,16 +1866,18 @@ sub populateItems
 
 		$self->populateAdjustments($procedureObject, $tempRow[12]);
 		$functionRef = $itemMap[$tempRow[16]];
-		if ($tempRow[16] == INVOICE_ITEM_LAB)
+		if (($tempRow[16] == INVOICE_ITEM_LAB) && (uc($tempRow[20]) ne "VOID"))
 		{
 			$outsideLabCharges = $outsideLabCharges + $tempRow[13]
-			}
-		$claimCharge[$tempRow[16]] = $claimCharge[$tempRow[16]] + $tempRow[13];
-		if ( $functionRef ne "")
+		}
+		if (uc($tempRow[20]) ne "VOID")
+		{
+			$claimCharge[$tempRow[16]] = $claimCharge[$tempRow[16]] + $tempRow[13];
+		}
+		if ($functionRef ne "")
 		{
 			&$functionRef($currentClaim, $procedureObject) ;
 		}
-	}
 	}
 	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges eq "") ? 'N' : 'Y');
 	$currentClaim->{treatment}->setOutsideLabCharges($outsideLabCharges);
