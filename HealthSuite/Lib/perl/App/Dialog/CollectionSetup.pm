@@ -8,7 +8,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 
 use DBI::StatementManager;
-use App::Statements::WorklistCollection;
+use App::Statements::Worklist::WorklistCollection;
 
 use Date::Manip;
 use Devel::ChangeLog;
