@@ -46,7 +46,7 @@ sub initialize
 			caption => 'Patient/Person ID',
 			name => 'person_id',
 			types => ['Person'],
-			options => FLDFLAG_REQUIRED,
+			#options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			postHtml => $postHtml
 		),
