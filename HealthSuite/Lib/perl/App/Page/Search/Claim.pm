@@ -26,7 +26,7 @@ sub getForm
 			<SELECT name="item_action_arl_select">
 				<option value="/invoice/%itemValue%/summary">View Claim</option>
 				<option value="/invoice/%itemValue%/dialog/claim/update">Edit Claim</option>
-				<option value="/invoice/%itemValue%/dialog/insplan">*Post Payment</option>
+				<!-- <option value="/invoice/%itemValue%/dialog/postpayment/personal,%itemValue%">*Post Payment</option> -->
 				<option value="/invoice/%itemValue%/dialog/procedure/add">Add Procedure</option>
 				<option value="/invoice/%itemValue%/submit">Submit Claim for Transfer</option>
 				<option value="/invoice/%itemValue%/dialog/hold">Place On Hold</option>
