@@ -1454,6 +1454,7 @@ sub execute_addOrUpdate
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
 			code => $cptCode || undef,
+			code_type => $codeType || undef,
 			caption => $cptShortName->{name} || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
@@ -1469,7 +1470,6 @@ sub execute_addOrUpdate
 			service_begin_date => $page->field('service_begin_date') || undef,
 			service_end_date => $page->field('service_end_date') || undef,
 			data_text_a => join(', ', @diagCodePointers) || undef,
-			data_text_c => $codeType||undef,
 			data_num_a => $page->field('data_num_a') || undef,
 			_debug => 0
 		);
@@ -1507,7 +1507,6 @@ sub execute_addOrUpdate
 	my $action = '';
 	$action = 'Added' if $command eq 'add';
 	$action = 'Updated' if $command eq 'update';
-	my $itemNum = $page->param('item_seq') || $invoice->{total_items} + 1;
 
 	$page->schemaAction(
 			'Invoice_Attribute', 'add',
@@ -1559,6 +1558,7 @@ sub voidProcedure
 			item_type => defined $voidItemType ? $voidItemType : undef,
 			flags => $invItem->{flags} || undef,
 			code => $cptCode || undef,
+			code_type => $invItem->{code_type} || undef,
 			caption => $invItem->{caption} || undef,
 			modifier => $invItem->{modifier} || undef,
 			rel_diags => $invItem->{rel_diags} || undef,

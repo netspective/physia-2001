@@ -665,6 +665,7 @@ sub voidInvoicePostSubmit
 			emergency => defined $emg ? $emg : undef,
 			item_type => defined $itemType ? $itemType : undef,
 			code => $item->{code} || undef,
+			code_type => $item->{code_type} || undef,
 			caption => $item->{caption} || undef,
 			comments =>  $item->{comments} || undef,
 			unit_cost => $item->{unit_cost} || undef,
@@ -1752,6 +1753,7 @@ sub handleProcedureItems
 			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
 			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
 			code => $cptCode || undef,
+			code_type => $page->param("_f_proc_$line\_code_type") || undef,
 			caption => $cptShortName->{name} || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
@@ -1763,12 +1765,6 @@ sub handleProcedureItems
 
 		$record{extended_cost} = $record{unit_cost} * $record{quantity};
 		$record{balance} = $record{extended_cost};
-
-		my $totalInvItems = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItemCount', $invoiceId, $servItemType, $labItemType);
-		my $itemSeq = 0;
-		$itemSeq = $totalInvItems + 1;
-
-		$record{data_num_c} = $itemSeq || undef;
 
 
 		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
@@ -1832,6 +1828,7 @@ sub voidProcedureItem
 			item_type => defined $voidItemType ? $voidItemType : undef,
 			flags => $invItem->{flags} || undef,
 			code => $cptCode || undef,
+			code_type => $invItem->{code_type} || undef,
 			caption => $invItem->{caption} || undef,
 			modifier => $invItem->{modifier} || undef,
 			rel_diags => $invItem->{rel_diags} || undef,
