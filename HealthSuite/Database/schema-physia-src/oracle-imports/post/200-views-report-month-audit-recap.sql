@@ -33,7 +33,7 @@ SELECT	invoice_id,
 	ffs_flag as ffs_cap,
 	decode(adjustment_type,1,nvl(adjustment_amount,0),0) +
  	decode(writeoff_code,9,writeoff_amount,8,writeoff_amount,0)		 refund,
-	pay_type,
+	pay_method as pay_type,
 	trans_id,
 	trans_type,
 	payer_type,
