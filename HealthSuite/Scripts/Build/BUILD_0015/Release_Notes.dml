@@ -32,6 +32,27 @@
 		<deliverable id="1150">
 			Explosion code pricing has been fixed.
 		</deliverable>
+		<deliverable id="1091">
+			Enhancement to Query.  You can now use the multi-criteria comparison operators like "between" and "is one of".
+			All you need to do is separate multiple values with commas.  The code will now validate that you are entering
+			the correct number of parameters for the operator being used and also use the type validation (i.e. dates are
+			validated as dates)  For example you could enter "Date of Birth" "is between" "1/1/89, 12/31/89" and it would
+			automagically convert the criteria to "01/01/1989, 12/31/1989" and perform the query correctly.
+		</deliverable>
+		<deliverable id="1093">
+			Query conditions are now fully datatype and comparison operator sensitive.  For example if you search for a 
+			date field using an operator that requires a complete value in the criteria (like "is") then it will
+			validate properly and perform the query as "datefield = date('01/01/2000')".  If the operator requires a partial 
+			criteria like "starts with" then it will perform the query using the datefield represented as a string of
+			characters rather than the date itself. "text(datefield) LIKE '01%'"
+		</deliverable>
+		<deliverable id="1307">
+			Fixed a problem where the session timeout was being reset before it was being checked.  Therefore sessions were
+			never being timed out.
+		</deliverable>
+		<deliverable id="99">
+			The person search/lookup now uses browser validation to be sure that a date of birth entered is really a date (thereby avoiding the nasty error message)
+		</deliverable>
 
 	</deliverables>
 </release-notes>
