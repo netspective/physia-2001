@@ -10,6 +10,7 @@ use CGI::Validator::Field;
 use App::Dialog::Person;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Address;
+use App::Dialog::Field::Scheduling;
 use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
@@ -133,7 +134,7 @@ sub initialize
 			]),
 
 		new CGI::Dialog::Subhead(heading => 'Billing Information', name => 'billing_id_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(caption => 'ID Type', name => 'billing_id_type', type => 'select', selOptions => 'Unknown:5;Per Se:1;THINnet:2;Other:3', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::Field(caption => 'ID Type', name => 'billing_id_type', type => 'select', selOptions => 'Per Se:0;THINnet:2;Other:3', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(caption => 'Billing ID',
 			#type => 'foreignKey',
 			name => 'billing_id',
@@ -144,7 +145,7 @@ sub initialize
 #			options => FLDFLAG_PREPENDBLANK,
 			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
-		new CGI::Dialog::Field(caption => 'Effective Date',
+		new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
 			#type => 'foreignKey',
 			name => 'billing_effective_date',
 			type => 'date',
@@ -159,7 +160,7 @@ sub initialize
 			name => 'billing_active',
 			type => 'bool',
 			style => 'check',
-			caption => 'Active',
+			caption => 'Process Live Claims',
 			defaultValue => 0),
 
  		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -413,7 +414,7 @@ sub execute_add
 			item_name => $member,
 			value_type => App::Universal::ATTRTYPE_BILLING_INFO,
 			value_text => $page->field('billing_id') || undef,
-			value_textB => $page->field('billing_active') || undef,
+			value_intB => $page->field('billing_active') || undef,
 			value_int => $page->field('billing_id_type') || undef,
 			value_date => $page->field('billing_effective_date') || undef,
 			_debug => 0,
