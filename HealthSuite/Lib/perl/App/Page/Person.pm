@@ -437,6 +437,7 @@ sub prepare_view_profile
 					#component.stpt-person.emergencyAssociations#<BR>
 					#component.stpt-person.familyAssociations#<BR>
 					#component.stpt-person.additionalData#
+					#component.stpt-person.diagnosisSummary#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -467,12 +468,14 @@ sub prepare_view_profile
 					#component.stp-person.benefits#</BR>				
 					</font>
 				</TD>
+				<!--
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					<font size=1 face=arial>					
 					#component.st-person.diagnosisSummary#<BR>
 					</font>
 				</TD>
+				-->
 				<!--
 				<TD WIDTH=25%>
 					<font size=1 face=arial>
