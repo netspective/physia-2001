@@ -36,11 +36,7 @@ sub new
 	$self->addContent(
 		new App::Dialog::Field::FeeScheduleMatrix(name =>'feescheduleentries'),
 	);
-        $self->addFooter(new CGI::Dialog::Buttons(
-                             nextActions => [
-                                                ['Show Catalog', '/org/#session.org_id#/catalog'],
-                                                ],
-                             cancelUrl => $self->{cancelUrl} || undef));
+        $self->addFooter(new CGI::Dialog::Buttons());
 
 	return $self;
 }
@@ -107,7 +103,7 @@ sub execute
         my $orgId = $page->session('org_id');
 
 	addFeeScheduleEntryItems($self, $page, $command, $flags);
-	$self->handlePostExecute($page, $command, $flags);
+	$self->handlePostExecute($page, $command, $flags, "/org/$orgId/catalog");
 }
 
 1;
