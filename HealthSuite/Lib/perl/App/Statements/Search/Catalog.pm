@@ -44,7 +44,7 @@ $STMTFMT_SEL_CATALOGENTRY = qq{
 		from offering_catalog_entry, catalog_entry_type
 		where 	catalog_id = ?
 			and	offering_catalog_entry.entry_type = catalog_entry_type.id
-		order by entry_type, status, name, code
+		order by entry_type, code, modifier
 };
 
 $STMTRPTDEFN_DEFAULT =
@@ -61,17 +61,18 @@ $STMTRPTDEFN_DEFAULT =
 	},
 
 	stdIcons =>
-		{
-			#addUrlFmt => '/org/#session.org_id#/dlg-add-catalog',
-			updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#',
-			delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#0#',
-		},
+	{
+		#addUrlFmt => '/org/#session.org_id#/dlg-add-catalog',
+		updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#',
+		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#0#',
+	},
 	columnDefn =>
-			[
-				{ head => 'ID', url => 'javascript:chooseItem("/search/catalog/detail/#&{?}#", "#&{?}#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
-				{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
-				{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
-			],
+	[
+		{ head => 'ID', url => 'javascript:chooseItem("/search/catalog/detail/#&{?}#", "#&{?}#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
+		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
+	],
+	bullets => '/org/#session.org_id#/dlg-update-catalog/#0#',
 };
 
 my $STMTRPTDEFN_ORG =
@@ -93,18 +94,19 @@ my $STMTRPTDEFN_ORG =
 	},
 
 	stdIcons =>
-		{
-			#addUrlFmt => '/org/#session.org_id#/dlg-add-catalog',
-			updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#',
-			delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#0#',
-		},
+	{
+		#addUrlFmt => '/org/#session.org_id#/dlg-add-catalog',
+		updUrlFmt => '/org/#session.org_id#/dlg-update-catalog/#0#',
+		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#0#',
+	},
 	columnDefn =>
-			[
-				{ head => 'ID', url => '/org/#session.org_id#/catalog/#&{?}#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
-				{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
-				{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
-				{ head => '', colIdx => 5, hint => 'Add Child Schedule', url => '/org/#session.org_id#/dlg-add-catalog/#0#' }
-			],
+	[
+		{ head => 'ID', url => '/org/#session.org_id#/catalog/#&{?}#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
+		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
+		{ head => '', colIdx => 5, hint => 'Add Child Schedule', url => '/org/#session.org_id#/dlg-add-catalog/#0#' }
+	],
+	bullets => '/org/#session.org_id#/dlg-update-catalog/#0#',	
 };
 
 $STMTRPTDEFN_DEFAULT_ITEM =
