@@ -27,7 +27,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'feescheduleentry', heading => 'Fee Schedule Entries');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'feescheduleentry', heading => 'Add Fee Schedule Entry Costs');
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
 
@@ -53,8 +53,8 @@ sub addFeeScheduleEntryItems
         my $cpts = $page->param('_f_cpts');
         my $feeschedules = $page->param('_f_fs');
 
-        my @allcpts = split(/,/, $cpts);
-        my @allfeeschedules = split(/,/, $feeschedules);
+        my @allcpts = split(/\s*,\s*/, $cpts);
+        my @allfeeschedules = split(/\s*,\s*/, $feeschedules);
 
         my $lineCount = $page->param('_f_line_count');
         my $colCount = $page->param('_f_col_count');
