@@ -1164,7 +1164,8 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	my $acceptAssign = $page->field('accept_assignment') eq '' ? 0 : 1;
+	#for now, we will always default it to 'YES' 8-3-00 MAF (Bug 498)
+	my $acceptAssign = 1; 	#$page->field('accept_assignment') eq '' ? 0 : 1;
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			item_id => $page->field('assignment_item_id') || undef,
@@ -1620,10 +1621,20 @@ sub handleBillingInfo
 	#redirect to next function according to copay due
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
-
 	my $copayAmt = $page->field('copay_amt');
-	if($copayAmt && $page->field('claim_type') == App::Universal::CLAIMTYPE_HMO 
-		&& ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY))
+	my $copayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
+	my $copayItemId = $copayItem->{item_id};
+	my $claimType = $page->field('claim_type');
+	if($claimType != App::Universal::CLAIMTYPE_HMO)
+	{
+		#delete copay item if claim is updated to a non-cap claim type
+		if($copayItemId && $copayItem->{data_text_b} ne 'void')
+		{
+			voidProcedureItem($self, $page, $command, $flags, $invoiceId, $copayItemId);
+		}
+	}
+	
+	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 	{
 		my $lineCount = $page->param('_f_line_count');
 		my $existsOfficeVisitCPT = '';
