@@ -1676,17 +1676,13 @@ sub billCopay
 
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
 	my $invoiceFlags = $page->field('invoice_flags');
-	if($command eq 'add' && ($invoiceFlags & $attrDataFlag))
+	if( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
 	{
 		$page->redirect("/invoice/$invoiceId/summary");
 	}
 	elsif($command eq 'add')
 	{
 		$self->handlePostExecute($page, $command, $flags);
-	}
-	elsif($command eq 'update')
-	{
-		$page->redirect("/invoice/$invoiceId/summary");
 	}
 }
 
