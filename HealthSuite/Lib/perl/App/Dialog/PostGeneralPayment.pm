@@ -22,7 +22,7 @@ use vars qw(@ISA @CHANGELOG);
 
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'adjustment', heading => 'Post Personal Payment');
+	my $self = CGI::Dialog::new(@_, id => 'postpayment', heading => 'Post Personal Payment');
 
 	my $schema = $self->{schema};
 	delete $self->{schema};  # make sure we don't store this!
@@ -100,33 +100,30 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	if($page->param('posting_action') ne 'refund')
+	if(my $invoiceId = $page->param('invoice_id'))
 	{
-		if(my $invoiceId = $page->param('invoice_id'))
-		{
-			my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-			$page->field('invoice_id', $invoiceId);
-			my $balanceDisplay = $invoiceInfo->{balance} ? "\$$invoiceInfo->{balance}" : "\$0";
-			$page->field('balance', $balanceDisplay);
-			$page->field('payer_id', $invoiceInfo->{client_id});
+		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+		$page->field('invoice_id', $invoiceId);
+		my $balanceDisplay = $invoiceInfo->{balance} ? "\$$invoiceInfo->{balance}" : "\$0";
+		$page->field('balance', $balanceDisplay);
+		$page->field('payer_id', $invoiceInfo->{client_id});
 
-			my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
-			my $endDateDisplay = '';
-			if($itemServDates->{service_end_date})
-			{
-				$endDateDisplay = $itemServDates->{service_end_date} ne  $itemServDates->{service_begin_date} ? "- $itemServDates->{service_end_date}" : '';
-			}
-			my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
-			$page->field('service_dates', $dateDisplay);
-
-			my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
-			my $copayDisplay = $invoiceCopayItem->{balance} ? "\$$invoiceCopayItem->{balance}" : "\$0";
-			$page->field('copay_due', $copayDisplay);
-		}
-		elsif(my $personId = $page->param('person_id'))
+		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
+		my $endDateDisplay = '';
+		if($itemServDates->{service_end_date})
 		{
-			$page->field('payer_id', $personId);	
+			$endDateDisplay = $itemServDates->{service_end_date} ne  $itemServDates->{service_begin_date} ? "- $itemServDates->{service_end_date}" : '';
 		}
+		my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
+		$page->field('service_dates', $dateDisplay);
+
+		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
+		my $copayDisplay = $invoiceCopayItem->{balance} ? "\$$invoiceCopayItem->{balance}" : "\$0";
+		$page->field('copay_due', $copayDisplay);
+	}
+	elsif(my $personId = $page->param('person_id'))
+	{
+		$page->field('payer_id', $personId);	
 	}
 }
 
