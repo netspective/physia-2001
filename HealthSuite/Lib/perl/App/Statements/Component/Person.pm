@@ -204,7 +204,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Misc Notes !' },
+		frame => { heading => 'Misc Notes' },
 	},
 	publishDefn_panelTransp =>
 	{
