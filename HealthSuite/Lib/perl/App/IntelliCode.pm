@@ -8,6 +8,7 @@ use DBI::StatementManager;
 use App::Statements::IntelliCode;
 use App::Statements::Search::Code;
 use App::Statements::Org;
+use App::Statements::Person;
 use App::Statements::Catalog;
 use Date::Calc qw(:all);
 use Date::Manip;
@@ -47,6 +48,8 @@ use enum qw(:INTELLICODEERR_
 	NONREPCPT
 	NONCOVCPT
 	ICDNOTREFERENCED
+	DOBREQUIRED
+	SSNREQUIRED
 	);
 
 use vars qw(
@@ -83,6 +86,8 @@ use vars qw(
 	"Procedure '%s' (%s) is a Non-Rep Procedure.",
 	"Procedure '%s' (%s) is a Non-Covered Procedure.",
 	"There is no procedure associated with diagnosis '%s' (%s).",
+	"Date of Birth for %s is required for electronic claim submission.",
+	"SSN for %s is required for electronic claim submission."
 );
 
 undef %ICD_CACHE;
@@ -134,6 +139,10 @@ sub validateCodes
 		return;
 	}
 
+	# validate NSF errors
+	validateNSF($page, $flags, \@errors, %params) if defined $params{personId};
+	#validateNSF($page, $flags, \@errors, %params);
+
 	# validate that all ICDs given are valid codes in the database
 	validateDiags($page, $flags, \@errors, %params);
 
@@ -154,38 +163,32 @@ sub validateCodes
 
 	# validate that CPT is valid for patient's sex
 	cptEdits($page, $flags, $ageFlag, \@errors, %params);
-
+	
 	return @errors;
 }
 
-sub getAgeFlag
+sub validateNSF
 {
-	my ($page, %params) = @_;
-	my ($age, $ageFlag) = (undef, undef);
+	my ($page, $flags, $errorRef, %params) = @_;
+	
+	my $personId = $params{personId};
+	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE,	'selRegistry', $personId);
+	
+	push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_DOBREQUIRED], personLink($personId))) 
+		unless $personInfo->{date_of_birth};
+		
+	push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_SSNREQUIRED], personLink($personId)))
+		unless $personInfo->{ssn};
+}
 
-	if (exists $params{age}) {
-		$age = $params{age};
-	}	elsif (my $dateOfBirth = $params{dateOfBirth}) {
-		my ($mm, $dd, $yyyy);
-		if($dateOfBirth =~ m/\//)
-		{
-			($mm, $dd, $yyyy) = split(/\//, $dateOfBirth);
-		}
-		else
-		{
-			($yyyy, $mm, $dd) = $dateOfBirth =~ m/^(\d\d\d\d)(\d\d)(\d\d)$/;
-		}
-
-		return undef unless check_date($yyyy, $mm, $dd);
-		$age = int(Delta_Days($yyyy, $mm, $dd, Today())/365);
-	}
-
-	$ageFlag |= AGE_NEWBORN if $age < 1;
-	$ageFlag |= AGE_PEDIATRIC if $age <= 17;
-	$ageFlag |= AGE_ADULT if $age >= 14;
-	$ageFlag |= AGE_MATERNAL if ($age >= 12 && $age <= 55 && $params{sex} eq 'F');
-
-	return $ageFlag;
+sub getNSFerrorCount
+{
+	my ($page, $invoiceId, $personId) = @_;
+	
+	my @errors = ();
+	validateNSF($page, 0, \@errors, personId => $personId);
+	
+	return scalar(@errors);
 }
 
 sub validateDiags
@@ -476,6 +479,15 @@ sub cptEdits
 	}
 }
 
+sub personLink
+{
+	my ($personId) = @_;
+
+	return qq{
+		<a HREF='/person/$personId/profile' STYLE="text-decoration:none">$personId</a>
+	};
+}
+
 sub detailLink
 {
 	my ($type, $code) = @_;
@@ -698,6 +710,36 @@ sub calcRVRBS
 				if defined $fsHash->{rvrbs_multiplier};
 		}
 	}
+}
+
+sub getAgeFlag
+{
+	my ($page, %params) = @_;
+	my ($age, $ageFlag) = (undef, undef);
+
+	if (exists $params{age}) {
+		$age = $params{age};
+	}	elsif (my $dateOfBirth = $params{dateOfBirth}) {
+		my ($mm, $dd, $yyyy);
+		if($dateOfBirth =~ m/\//)
+		{
+			($mm, $dd, $yyyy) = split(/\//, $dateOfBirth);
+		}
+		else
+		{
+			($yyyy, $mm, $dd) = $dateOfBirth =~ m/^(\d\d\d\d)(\d\d)(\d\d)$/;
+		}
+
+		return undef unless check_date($yyyy, $mm, $dd);
+		$age = int(Delta_Days($yyyy, $mm, $dd, Today())/365);
+	}
+
+	$ageFlag |= AGE_NEWBORN if $age < 1;
+	$ageFlag |= AGE_PEDIATRIC if $age <= 17;
+	$ageFlag |= AGE_ADULT if $age >= 14;
+	$ageFlag |= AGE_MATERNAL if ($age >= 12 && $age <= 55 && $params{sex} eq 'F');
+
+	return $ageFlag;
 }
 
 1;
