@@ -41,7 +41,10 @@ sub initialize
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
 	$self->property('person_complete_name', "Unknown ID: $personId") unless $self->property('person_complete_name');
-	$self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+
+	my $personCategory = join(', ', @$categories);
+	$self->property('person_org_category', $personCategory);
 
 	unless ($personId eq $userId)
 	{
@@ -103,6 +106,15 @@ sub prepare_page_content_header
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		], ' | ');
 
+	my $profileLine = '<b>Profile: </b>';
+	$profileLine .=  '&nbsp;Category: #property.person_org_category# ' if $self->property('person_org_category');
+	$profileLine .= '&nbsp;SSN #property.person_ssn# ' if $self->property('person_ssn');
+	$profileLine .= '&nbsp;#property.person_gender_caption# ' if $self->property('person_gender_caption');
+	$profileLine .= '&nbsp;Age #property.person_age# ' if $self->property('person_age');
+	$profileLine .= '(#property.person_date_of_birth#) ' if $self->property('person_date_of_birth');
+	$profileLine .= '&nbsp;#property.person_ethnicity# ' if $self->property('person_ethnicity');
+	$profileLine .= '&nbsp;#property.person_marstat_caption# ' if $self->property('person_marstat_caption');
+	$profileLine .=  '&nbsp;Responsible Person: #property.person_responsible# ' if $self->property('person_responsible');
 
 	push(@{$self->{page_content_header}},
 		qq{
@@ -133,7 +145,7 @@ sub prepare_page_content_header
 					<A HREF="/person/$personId/dlg-add-claim/$personId">Create Claim</A> -
 					<A HREF="/person/$personId/dlg-add-medication-prescribe">Prescribe Meds</A>
 					-->
-					Responsible Person : #property.person_responsible#, SSN #property.person_ssn#, #property.person_gender_caption#, Age #property.person_age# (#property.person_date_of_birth#), #property.person_ethnicity#, #property.person_marstat_caption#
+						$profileLine
 					</FONT>
 				</TD>
 				<TD ALIGN=RIGHT>
