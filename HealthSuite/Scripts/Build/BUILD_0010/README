@@ -56,6 +56,8 @@ B864 - Insurance/Personal payment posting errors no longer show inappropriately.
 
 B584 - Validation added to not allow user to apply payment to an item that is greater than the item's charge.
 
+B647 - Created new dialog for posting monthly cap payments.
+
 Prosys Bugs
 
 B361 - Need to setup TWCC forms 61,64 and 69 - ssn and employer information showing now. word wrapping turned on.
