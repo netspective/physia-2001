@@ -195,7 +195,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				     		(nvl(unit_cost,0)),
 				     	 0)
 				     ) as batch_rcpt
-			FROM 	transaction t,trans_attribute  ta,person p
+			FROM 	transaction t,trans_attribute  ta,person p,org
 			WHERE	t.trans_id = ta.parent_id
 			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
 			AND	trans_type = $PAYMENT
@@ -207,9 +207,11 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND 	to_date(:5,'MM/DD/YYYY')
 			AND	provider_id is not null
 			AND	p.person_id (+)= t.provider_id
+			AND	t.receiver_id =org.org_internal_id
+			AND	org.owner_org_id = :6
 			GROUP BY p.simple_name,
 				nvl(data_text_b,data_text_a)
-			ORDER BY 1,3,4,5
+			ORDER BY 1,4,3,5
 
 		},
 	},
@@ -1067,7 +1069,7 @@ aic.batch_id,
 		invoice_charges.invoice_date as invoice_batch_date,
 		invoice_charges.service_begin_date,
 		invoice_charges.service_end_date,
-		invoice_charges.provider as care_provider_id ,
+		invoice_charges.care_provider_id as care_provider_id ,
 		invoice_charges.client_id as patient_id,
 		invoice_charges.code,
 		invoice_charges.caption,
@@ -1205,7 +1207,7 @@ aic.batch_id,
 		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
 		invoice_charges.service_begin_date,
 		invoice_charges.service_end_date,
-		invoice_charges.provider as care_provider_id ,
+		invoice_charges.care_provider_id as care_provider_id ,
 		invoice_charges.client_id as patient_id,
 		invoice_charges.code,
 		invoice_charges.caption,
