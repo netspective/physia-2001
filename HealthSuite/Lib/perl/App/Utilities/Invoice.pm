@@ -112,7 +112,7 @@ sub voidInvoice
 		next if $itemType == App::Universal::INVOICEITEMTYPE_VOID;
 		next if $item->{data_text_b} eq 'void';
 
-		voidInvoiceItem($page, $invoiceId, $item->{item_id});
+		voidInvoiceItem($page, $item->{item_id});
 	}
 
 	changeInvoiceStatus($page, $invoiceId, App::Universal::INVOICESTATUS_VOID);
@@ -136,9 +136,10 @@ sub voidInvoice
 
 sub voidInvoiceItem
 {
-	my ($page, $invoiceId, $itemId) = @_;
+	my ($page, $itemId) = @_;
 
 	my $invItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
+	my $invoiceId = $invItem->{parent_id};
 
 	my $extCost = 0 - $invItem->{extended_cost};
 	my $emg = $invItem->{emergency};
@@ -417,7 +418,7 @@ sub copyInvoiceForNextPayer
 
 
 	#copy all attributes except history items
-	my $attributes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllAttributesExclHistory', $oldInvoiceId);
+	my $attributes = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllAttributesExclHistoryAndTransferred', $oldInvoiceId);
 	foreach my $attr (@{$attributes})
 	{
 		my $valueType = $attr->{value_type};
