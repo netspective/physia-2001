@@ -207,9 +207,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	
 	'selGetVisit' =>qq
 	{
-		SELECT 	count (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0)) 
+		SELECT 	sum (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0)) 
 			as office_visit,                               
-			count (decode(t.trans_type,2020,1,0)) as hospital_visit
+			sum (decode(t.trans_type,2020,1,0)) as hospital_visit
 		FROM	transaction t, invoice i, invoice_attribute ia,org o
 		WHERE	i.main_transaction = t.trans_id
 		AND	ia.parent_id = i.invoice_id
@@ -219,7 +219,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		AND	ia.value_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND 	to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND 	(:3 is NULL OR t.service_facility_id = :3 )
-		AND	t.care_provider_id = :4
+		AND	t.provider_id = :4
                 AND 	(ia.value_text >= :5 OR :5 is NULL)
                 AND 	(ia.value_text <= :6 OR :6 is NULL)		
 		AND 	o.owner_org_id = :7
