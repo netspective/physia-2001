@@ -8,59 +8,88 @@ use Date::Calc qw(:all);
 
 use App::Page;
 use App::ImageManager;
-use Devel::ChangeLog;
-
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
-
+use App::Statements::Component::Person;
 use App::Dialog::CollectionSetup;
-
+use App::Component::WorkList::Collection;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
-	'worklist/collection' => {
-		_views => [
-			{caption => 'Today', name => 'date',},
-			{caption => 'Recent Activity', name => 'recentActivity',},
-			{caption => 'Setup', name => 'setup',},
-			],
-		},
+	'worklist/collection' => {},
 	);
 
 sub prepare_view_date
 {
 	my ($self) = @_;
+		
+		$self->addContent(qq{
+			<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
+				<TR VALIGN=TOP>
+					<TD colspan=3>
+						#component.worklist-collection# <BR>
+					</TD>					
+				</TR>
+				<TR>
+					<TD>&nbsp;</TD>
+				</TR>
+				<TR VALIGN=TOP>
+					<TD>
+						#component.lookup-records#<BR>
+					</TD>
+					<TD>&nbsp;</TD>
+					<TD>
+						#component.create-records# <BR>
+					</TD>
+					<TD>&nbsp;</TD>
+					<TD>
+						#component.navigate-reports-root#
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	
+	return 1;
+}
 
+
+sub prepare_view_accountnotes
+{
+my ($self) = @_;
+	
 	$self->addContent(qq{
-		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-			<TR VALIGN=TOP>
-				<TD colspan=5>
-					#component.worklist#
-				</TD>
-			</TR>
-			<TR>
-				<TD colspan=5>&nbsp;</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.lookup-records#<BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
-					#component.navigate-reports-root#
-				</TD>
-			</TR>
+	<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
+				<TR VALIGN=TOP>
+					<BR>
+					<TD>						
+						#component.stp-person.group-account-notes# <BR>			
+					</TD>					
+				</TR>
+				<TR>
+					<TD>&nbsp;</TD>
+				</TR>
+				<TR VALIGN=TOP>
+					<TD>
+						#component.lookup-records#<BR>
+					</TD>
+					<TD>&nbsp;</TD>
+					<TD>
+						#component.create-records# <BR>
+					</TD>
+					<TD>&nbsp;</TD>
+					<TD>
+						#component.navigate-reports-root#
+					</TD>
+				</TR>
 		</TABLE>
+	
+			
 	});
 
 	return 1;
-}
+};
 
 sub prepare_view_recentActivity
 {
@@ -105,7 +134,7 @@ sub prepare_view_recentActivity
 sub prepare_view_setup
 {
 	my ($self) = @_;
-
+	
 	my $dialog = new App::Dialog::CollectionSetup(schema => $self->{schema});
 	$self->addContent('<br>');
 	$dialog->handle_page($self, 'add');
@@ -117,7 +146,7 @@ sub prepare_page_content_footer
 	my $self = shift;
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
-	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
+	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'claim'));
 	$self->SUPER::prepare_page_content_footer(@_);
 
 	return 1;
@@ -126,11 +155,11 @@ sub prepare_page_content_footer
 sub decodeDate
 {
 	my ($date) = @_;
-
+	
 	$date = 'today' unless ParseDate($date);
 	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
 	my @today = Today();
-
+	
 	if (Delta_Days(@date_, @today) == 0)
 	{
 		return "Today";
@@ -154,18 +183,18 @@ sub prepare_page_content_header
 
 	$self->SUPER::prepare_page_content_header(@_);
 
-	my $heading = "Work List";
+	my $heading = "Collection Work List";
 	my $dateTitle = decodeDate($self->param('_seldate'));
-
+	
 	my $urlPrefix = "/worklist";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			[$dateTitle, "/worklist/date", 'date'],
-			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
+			[$dateTitle, "/worklist/collection/date", 'date'],
+			['Account Notes', "/worklist/collection/accountnotes", 'accountnotes'],
 			['Setup', "/worklist/collection/setup", 'setup', ],
-			#['Setup', "#SETUP", 'setup'],
-
+	
+			
 		], ' | ');
 
 	push(@{$self->{page_content_header}},
@@ -188,7 +217,7 @@ sub prepare_page_content_header
 		</TABLE>
 	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
 
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
 		unless ($self->param('noControlBar'));
 
 	return 1;
@@ -221,7 +250,7 @@ sub getControlBarHtml
 
 	my @dateSelected = Decode_Date_US($fmtDate);
 	my $timeFieldsHtml;
-
+	
 	if (Delta_Days(@dateSelected, Today()) == 0)
 	{
 		$self->param('Today', 1);
@@ -243,7 +272,7 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-
+			
 			#$time1 = $self->session('time1') || '12:00am';
 			#$time2 = $self->session('time2') || '11:59pm';
 		}
@@ -262,44 +291,44 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-
+			
 			#$time1 = $self->session('time1') || 30;
 			#$time2 = $self->session('time2') || 120;
 		}
 
-		$timeFieldsHtml = qq{
-			<SCRIPT>
-				function prefillDefaults(Form)
-				{
-					if (Form.showTimeSelect.options[Form.showTimeSelect.selectedIndex].value == 1)
-					{
-						Form.time1.value = '12:00am';
-						Form.time2.value = '11:59pm';
-					}
-					else
-					{
-						Form.time1.value = 30;
-						Form.time2.value = 120;
-					}
-				}
-			</SCRIPT>
-			&nbsp; &nbsp;
-			Time:
-			<SELECT name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
-				<option value=0>Minutes before/after</option>
-				<option value=1>Range from/to</option>
-			</SELECT>
-
-			<script>
-				setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
-			</script>
-
-			&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
-
-			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-			<input type=submit value="Go">
-		};
+		#$timeFieldsHtml = qq{
+		#	<SCRIPT>
+		#		function prefillDefaults(Form)
+		#		{
+		#			if (Form.showTimeSelect.options[Form.showTimeSelect.selectedIndex].value == 1)
+		#			{
+		#				Form.time1.value = '12:00am';
+		#				Form.time2.value = '11:59pm';
+		#			}
+		#			else
+		#			{
+		#				Form.time1.value = 30;
+		#				Form.time2.value = 120;
+		#			}
+		#		}
+		#	</SCRIPT>
+		#	&nbsp; &nbsp;
+		#	Time:
+		#	<SELECT name=showTimeSelect onChange="prefillDefaults(document.dateForm);">
+		#		<option value=0>Minutes before/after</option>
+		#		<option value=1>Range from/to</option>
+		#	</SELECT>
+#
+		#	<script>
+		#		setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
+		#	</script>
+#
+		#	&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
+		#	&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
+#
+		#	<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
+		#	<input type=submit value="Go">
+		#};
 	}
 	else
 	{
@@ -318,20 +347,20 @@ sub getControlBarHtml
 		} else {
 			$time2 = $self->session('time2');
 		}
+		
 
-
-		$timeFieldsHtml = qq{
-			&nbsp; &nbsp;
-			Time:
-			<INPUT name=showTimeSelect value="Range from/to" READONLY>
-
-			&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
-
-			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
-			<input type=submit value="Go">
-		};
-
+		#$timeFieldsHtml = qq{
+		#	&nbsp; &nbsp;
+		#	Time:
+		#	<INPUT name=showTimeSelect value="Range from/to" READONLY>
+#
+		#	&nbsp;<input name=time1 size=6 value=$time1 title="$title1">
+		#	&nbsp;<input name=time2 size=6 value=$time2 title="$title2">
+#
+		#	<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
+		#	<input type=submit value="Go">
+		#};
+		
 	}
 
 	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
@@ -400,27 +429,9 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	$self->addLocatorLinks(
-		['WorkList', '/worklist'],
+			['WorkList', '/worklist'],
+			['Collection', '/worklist/collection'],
 	);
-
-	# Check user's permission to page
-	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
-	{
-		#unless($self->hasPermission("page/worklist/collection/$activeView"))
-		unless($self->hasPermission("page/worklist/collection"))
-		{
-			$self->disable(
-					qq{
-						<br>
-						You do not have permission to view this information. 
-						Permission page/worklist/collection is required.
-
-						Click <a href='javascript:history.back()'>here</a> to go back.
-					});
-		}
-	}
-
 }
 
 sub handleARL
@@ -478,7 +489,7 @@ sub getJavascripts
 			function updatePage(selectedDate)
 			{
 				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = '/worklist/date/' + dashDate;
+				location.href = '/worklist/collection/date/' + dashDate;
 			}
 
 			function chooseEntry2(itemValue, actionObj, destObj)
@@ -512,5 +523,6 @@ sub getJavascripts
 		</SCRIPT>
 	};
 }
+
 
 1;
