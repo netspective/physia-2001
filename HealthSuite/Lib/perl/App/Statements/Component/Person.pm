@@ -2320,7 +2320,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panel'); },
+  publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelTransp'); },
 },
