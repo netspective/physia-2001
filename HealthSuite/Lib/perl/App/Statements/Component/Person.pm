@@ -3457,6 +3457,43 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 	},
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.bloodGroup' => {
+	sqlStmt => qq{
+			SELECT 	b.caption
+				from  Blood_Type b, Person_Attribute p
+			WHERE  	p.parent_id = ?
+			AND     p.item_name = 'BloodType'
+			AND 	p.value_text = b.id
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => 'Blood Type : #0#' },
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Blood Type' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodGroup', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodGroup', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodGroup', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodGroup', [$personId], 'panelTransp'); },
+},
 
 
 #----------------------------------------------------Doc Short Term Stuff
