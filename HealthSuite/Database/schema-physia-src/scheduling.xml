@@ -92,7 +92,8 @@
 		<column name="deductible" type="currency" descr="Deductible amount"/>
 		<column name="deductible_met" type="currency" descr="The amount of deductible met"/>
 		<column name="ovcopay" type="currency" descr="Office Visit Copay amount"/>
-		<column name="labcopay" type="currency" descr="Lab/XRay Copay amount"/>
+		<column name="labcopay" type="currency" descr="Lab Copay amount"/>
+		<column name="xraycopay" type="currency" descr="XRay Copay amount"/>
 		<column name="referral_required" type="boolean" descr="Whether or not referral is required"/>
 		<column name="sep_copay_xray" type="boolean" descr="Whether or not separate copay for X-ray"/>
 		<column name="lab" type="text" size="128" descr="The Lab Organization "/>

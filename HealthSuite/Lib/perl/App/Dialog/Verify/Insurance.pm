@@ -15,7 +15,7 @@ use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'insurance-records' => { 
 			_arl => ['event_id', 'person_id'],
-			_modes => ['verify'],
+			_modes => ['verify', 'view'],
 		},
 );
 
@@ -69,11 +69,20 @@ sub new
 					column => 'Sch_Verify.ovcopay',
 				),
 
+		new CGI::Dialog::MultiField (
+			fields => [
 				new CGI::Dialog::Field::TableColumn(
-					caption => 'Lab/X-Ray Copay',
+					caption => 'Lab',
 					schema => $schema,
 					column => 'Sch_Verify.labcopay',
 				),
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'X-Ray Copay',
+					schema => $schema,
+					column => 'Sch_Verify.xraycopay',
+				),
+			],
+		),
 		
 		new CGI::Dialog::Field(caption => 'Separate Co-pay for Lab/X-Ray',
 			name => 'sep_copay_xray',
@@ -238,6 +247,7 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
+	$self->updateFieldFlags('verification', FLDFLAG_INVISIBLE, $command =~ m/^(view)$/);
 }
 
 ###############################
@@ -286,6 +296,7 @@ sub execute
 		deductible_met => $page->field('deductible_met') || undef,
 		ovcopay => $page->field('ovcopay') || undef,
 		labcopay => $page->field('labcopay') || undef,
+		xraycopay => $page->field('xraycopay') || undef,
 		referral_required => $page->field('referral_required') || undef,
 		sep_copay_xray => $page->field('sep_copay_xray') || undef,
 		lab => $page->field('lab') || undef,
