@@ -126,7 +126,7 @@ sub execute
 		my $adjType = App::Universal::ADJUSTMENTTYPE_REFUND;
 		my $comments = $page->param("_f_invoice_$line\_comments");
 		my $refundToId = $page->param("_f_invoice_$line\_refund_to_id");
-		my $refundToType = $refundToId ? $page->param("_f_invoice_$line\_refund_to_type") : '';
+		my $refundToType = $page->param("_f_invoice_$line\_refund_to_type") eq 'person' ? App::Universal::ENTITYTYPE_PERSON : App::Universal::ENTITYTYPE_ORG;
 		my $adjItemId = $page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
 				adjustment_type => defined $adjType ? $adjType : undef,

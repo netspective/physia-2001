@@ -463,8 +463,8 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					<SELECT NAME='_f_invoice_$line\_refund_to_type'>
-						<OPTION>Person</OPTION>
-						<OPTION>Organization</OPTION>
+						<OPTION value='person'>Person</OPTION>
+						<OPTION value='org'>Organization</OPTION>
 					</SELECT>
 				</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
