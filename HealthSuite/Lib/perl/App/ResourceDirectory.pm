@@ -434,7 +434,7 @@ $SEARCH_CLASSES = {
 
 	'nurse' => {_class => 'App::Dialog::Person::Nurse', heading => '$Command Nurse', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Nurse' },
 	'patient' => {_class => 'App::Dialog::Person::Patient',heading => '$Command Patient/Person', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Patient'},
-	'responsibleparty' => {_class => 'App::Dialog::ResponsibleParty',heading => '$Command Responsible Party', _arl => ['party_name'], _arl_modify => ['party_name'], _idSynonym => 'ResponsibleParty'},
+	'guarantor' => {_class => 'App::Dialog::ResponsibleParty',heading => '$Command Responsible Party', _arl => ['party_name'], _arl_modify => ['party_name'], _idSynonym => 'Guarantor'},
 	'patientappointments' => {_class => 'App::Dialog::patientAppointments',heading => 'Appointments', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'PatientAppointments'},
 	'physician' => {_class => 'App::Dialog::Person::Physician', heading => '$Command Physician/Provider', _arl => ['person_id'], _arl_modify => ['person_id'], _idSynonym => 'Physician' },
 	'staff' => {_class => 'App::Dialog::Person::Staff', heading => '$Command Staff Member', _arl => ['person_id'], },
