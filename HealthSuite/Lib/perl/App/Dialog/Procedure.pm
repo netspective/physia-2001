@@ -176,391 +176,562 @@ sub populateData
 sub execAction_submit
 {
 	my ($page, $command) = @_;
+	
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 
 	my $invoiceId = $page->param('invoice_id');
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $clientId = $invoice->{client_id};
-
-	my $claimType = $invoice->{invoice_subtype};
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	my $todaysStamp = $page->getTimeStamp();
-
-
-	my $textValueType = App::Universal::ATTRTYPE_TEXT;
-	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
-	my $boolValueType = App::Universal::ATTRTYPE_BOOLEAN;
-	my $currencyValueType = App::Universal::ATTRTYPE_CURRENCY;
-	my $dateValueType = App::Universal::ATTRTYPE_DATE;
-	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
-
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
-	my $uniqPlan = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $invoice->{main_transaction});
+	
 	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
-
-	#----FIRST CREATE THE INVOICE ATTRIBUTES FOR THE OLD HCFA1500!!----#
-
 	my $invoiceFlags = $invoice->{flags};
-
 	unless($invoiceFlags & $attrDataFlag)
 	{
-		my $mainTransId = $invoice->{main_transaction};
-		my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $mainTransId);
-
-
-		##BILLING FACILITY INFORMATION
-		my $billFacilityId = $mainTransData->{billing_facility_id};
-		my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
-		my $billingFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $billFacilityId);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Service Provider/Facility/Billing',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $billingFacilityName,
-				value_textB => $billFacilityId,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Address', $command,
-				parent_id => $invoiceId,
-				address_name => 'Billing',
-				line1 => $billingFacilityAddr->{line1},
-				line2 => $billingFacilityAddr->{line2},
-				city => $billingFacilityAddr->{city},
-				state => $billingFacilityAddr->{state},
-				zip => $billingFacilityAddr->{zip},
-				_debug => 0
-			);
-
-		##SERVICE FACILITY INFORMATION
-		my $servFacilityId = $mainTransData->{service_facility_id};
-		my $serviceFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
-		my $serviceFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $servFacilityId);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Service Provider/Facility/Service',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $serviceFacilityName,
-				value_textB => $servFacilityId,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Address', $command,
-				parent_id => $invoiceId,
-				address_name => 'Service',
-				line1 => $serviceFacility->{line1},
-				line2 => $serviceFacility->{line2},
-				city => $serviceFacility->{city},
-				state => $serviceFacility->{state},
-				zip => $serviceFacility->{zip},
-				_debug => 0
-			);
-
-
-		##PATIENT INFO AND AUTHORIZATIONS
-		my $personData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $clientId);
-		my $personPhone = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selHomePhone', $clientId);
-		my $personAddr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $clientId);
-		my $patSignature = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPATIENTSIGN);
-		my $provAssign = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN);
-		my $infoRelease = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHINFORELEASE);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId || undef,
-				item_name => 'Patient/Signature',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $patSignature->{value_text} || undef,
-				value_textB => $patSignature->{value_textb} || undef,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId || undef,
-				item_name => 'Provider/Assign Indicator',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $provAssign->{value_text} || undef,
-				value_textB => $provAssign->{value_textb} || undef,
-				_debug => 0
-			);
-
-		my $infoRelIndctr = $infoRelease->{value_text} eq 'Yes' ? 1 : 0;
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId || undef,
-				item_name => 'Information Release/Indicator',
-				value_type => defined $boolValueType ? $boolValueType : undef,
-				value_int => defined $infoRelIndctr ? $infoRelIndctr : undef,
-				value_date => $infoRelease->{value_date} || undef,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId || undef,
-				item_name => 'Provider/Signature/Date',
-				value_type => defined $dateValueType ? $dateValueType : undef,
-				value_date => $todaysDate || undef,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Address', $command,
-				parent_id => $invoiceId,
-				address_name => 'Patient',
-				line1 => $personAddr->{line1},
-				line2 => $personAddr->{line2},
-				city => $personAddr->{city},
-				state => $personAddr->{state},
-				zip => $personAddr->{zip},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Name',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{complete_name},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Name/Last',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{name_last},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Name/First',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{name_first},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Name/Middle',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{name_middle},
-				_debug => 0
-			) if $personData->{name_middle} ne '';
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Account Number',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{person_ref},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Contact/Home Phone',
-				value_type => defined $phoneValueType ? $phoneValueType : undef,
-				value_text => $personPhone,
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Personal/Marital Status',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{marstat_caption},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Personal/Gender',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $personData->{gender_caption},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Patient/Personal/DOB',
-				value_type => defined $dateValueType ? $dateValueType : undef,
-				value_date => $personData->{date_of_birth},
-				_debug => 0
-			);
-
-
-		##PATIENT'S EMPLOYMENT STATUS
-
-		my $personEmployStat = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selEmploymentStatusCaption', $clientId);
-		#here's a list of statuses:
-
-		my $ftEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDFULL;	#220
-		my $ptEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDPART;	#221
-		my $selfEmployAttr = App::Universal::ATTRTYPE_SELFEMPLOYED;	#222
-		my $retiredAttr = App::Universal::ATTRTYPE_RETIRED;			#223
-		my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;	#224
-		my $ptStudentAttr = App::Universal::ATTRTYPE_STUDENTPART;	#225
-		my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
-
-		foreach my $employStat (@{$personEmployStat})
-		{
-			my $status = '';
-			$status = $employStat->{caption};
-			$status = 'Retired' if $employStat->{value_type} == $retiredAttr;
-			$status = 'Employed' if $employStat->{value_type} >= $ftEmployAttr && $employStat->{value_type} <= $selfEmployAttr;
-
-			if($status eq 'Employed')
-			{
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Patient/Employment/Status',
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $status,
-						_debug => 0
-					);
-			}
-			elsif($status eq 'Student (Full-Time)' || $status eq 'Student (Part-Time)')
-			{
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Patient/Student/Status',
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $status,
-						_debug => 0
-					);
-			}
-		}
-
-
-		##PATIENT'S PROVIDER INFO, CONDITION RELATED TO, AND REFERRING PHYSICIAN NAME AND ID
-		my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $mainTransData->{provider_id});
-		my $providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $mainTransData->{provider_id}, 'Tax ID', App::Universal::ATTRTYPE_LICENSE);
-		my $providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $mainTransData->{provider_id}, 'UPIN', App::Universal::ATTRTYPE_LICENSE);
-		my $providerSpecialty = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $mainTransData->{provider_id}, 'Primary', App::Universal::ATTRTYPE_SPECIALTY);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Name',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $providerInfo->{complete_name},
-				value_textB => $mainTransData->{provider_id},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Name/First',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $providerInfo->{name_first},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Name/Middle',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $providerInfo->{name_middle},
-				_debug => 0
-			) if $providerInfo->{name_middle} ne '';
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Name/Last',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $providerInfo->{name_last},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/UPIN',
-				value_type => defined $licenseValueType ? $licenseValueType : undef,
-				value_text => $providerUpin->{value_text},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Tax ID',
-				value_type => defined $licenseValueType ? $licenseValueType : undef,
-				value_text => $providerTaxId->{value_text},
-				value_textB => $providerTaxId->{value_textb},
-				_debug => 0
-			);
-
-		$page->schemaAction(
-				'Invoice_Attribute', $command,
-				parent_id => $invoiceId,
-				item_name => 'Provider/Specialty',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $providerSpecialty->{value_text},
-				value_textB => $providerSpecialty->{value_textb},
-				_debug => 0
-			);
-
-
-
-		# INVOICE BILLING INFORMATION
+		storeFacilityInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+		storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
+		storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+		storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
+		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);		
 		
-		#my $invoicePayers = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $invoiceId);
-
-		if($claimType != $selfPay)
+		if($invoice->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY)
 		{
-			##PATIENT'S INSURANCE INFO, INSURED INFO, OTHER INSURED INFO (IF ANY)
+			storeInsuranceInfo($page, $command, $invoiceId, $invoice, $mainTransData);
+		}
+		
+		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);		
+	}
 
-			my $primaryIns = App::Universal::INSURANCE_PRIMARY;
-			my $textValueType = App::Universal::ATTRTYPE_TEXT;
-			my $durationValueType = App::Universal::ATTRTYPE_DURATION;
+	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-			my $personInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $clientId, $primaryIns);
+	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
+	$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $invoiceId,
+			invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
+			submitter_id => $page->session('user_id') || undef,
+			flags => $invoiceFlags | $attrDataFlag,
+			_debug => 0
+		);
+
+
+	## create invoice attribute for history of invoice status
+	$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId,
+			item_name => 'Invoice/History/Item',
+			value_type => App::Universal::ATTRTYPE_HISTORY,
+			value_text => 'Reviewed',
+			value_date => $todaysDate || undef,
+			_debug => 0
+	);
+}
+
+sub storeFacilityInfo
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+
+	##billing facility information
+	my $billFacilityId = $mainTransData->{billing_facility_id};
+	my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
+	my $billingFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $billFacilityId);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Facility/Billing',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $billingFacilityName,
+			value_textB => $billFacilityId,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Address', $command,
+			parent_id => $invoiceId,
+			address_name => 'Billing',
+			line1 => $billingFacilityAddr->{line1},
+			line2 => $billingFacilityAddr->{line2},
+			city => $billingFacilityAddr->{city},
+			state => $billingFacilityAddr->{state},
+			zip => $billingFacilityAddr->{zip},
+			_debug => 0
+		);
+
+	##SERVICE FACILITY INFORMATION
+	my $servFacilityId = $mainTransData->{service_facility_id};
+	my $serviceFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
+	my $serviceFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $servFacilityId);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/Facility/Service',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $serviceFacilityName,
+			value_textB => $servFacilityId,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Address', $command,
+			parent_id => $invoiceId,
+			address_name => 'Service',
+			line1 => $serviceFacility->{line1},
+			line2 => $serviceFacility->{line2},
+			city => $serviceFacility->{city},
+			state => $serviceFacility->{state},
+			zip => $serviceFacility->{zip},
+			_debug => 0
+		);
+}
+
+sub storeAuthorizations
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $boolValueType = App::Universal::ATTRTYPE_BOOLEAN;
+	my $dateValueType = App::Universal::ATTRTYPE_DATE;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+
+	my $clientId = $invoice->{client_id};
+	my $patSignature = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPATIENTSIGN);
+	my $provAssign = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN);
+	my $infoRelease = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $clientId, App::Universal::ATTRTYPE_AUTHINFORELEASE);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId || undef,
+			item_name => 'Patient/Signature',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $patSignature->{value_text} || undef,
+			value_textB => $patSignature->{value_textb} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId || undef,
+			item_name => 'Provider/Assign Indicator',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $provAssign->{value_text} || undef,
+			value_textB => $provAssign->{value_textb} || undef,
+			_debug => 0
+		);
+
+	my $infoRelIndctr = $infoRelease->{value_text} eq 'Yes' ? 1 : 0;
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId || undef,
+			item_name => 'Information Release/Indicator',
+			value_type => defined $boolValueType ? $boolValueType : undef,
+			value_int => defined $infoRelIndctr ? $infoRelIndctr : undef,
+			value_date => $infoRelease->{value_date} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId || undef,
+			item_name => 'Provider/Signature/Date',
+			value_type => defined $dateValueType ? $dateValueType : undef,
+			value_date => $todaysDate || undef,
+			_debug => 0
+		);
+}
+
+sub storePatientInfo
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
+	my $dateValueType = App::Universal::ATTRTYPE_DATE;
+
+	my $clientId = $invoice->{client_id};
+	my $personData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $clientId);
+	my $personPhone = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selHomePhone', $clientId);
+	my $personAddr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $clientId);
+
+	$page->schemaAction(
+			'Invoice_Address', $command,
+			parent_id => $invoiceId,
+			address_name => 'Patient',
+			line1 => $personAddr->{line1},
+			line2 => $personAddr->{line2},
+			city => $personAddr->{city},
+			state => $personAddr->{state},
+			zip => $personAddr->{zip},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Name',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{complete_name},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Name/Last',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{name_last},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Name/First',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{name_first},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Name/Middle',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{name_middle},
+			_debug => 0
+		) if $personData->{name_middle} ne '';
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Account Number',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{person_ref},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Contact/Home Phone',
+			value_type => defined $phoneValueType ? $phoneValueType : undef,
+			value_text => $personPhone,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Personal/Marital Status',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{marstat_caption},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Personal/Gender',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $personData->{gender_caption},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Patient/Personal/DOB',
+			value_type => defined $dateValueType ? $dateValueType : undef,
+			value_date => $personData->{date_of_birth},
+			_debug => 0
+		);
+}
+
+sub storePatientEmployment
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+
+	# a list of employment statuses:
+	my $ftEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDFULL;	#220
+	my $ptEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDPART;	#221
+	my $selfEmployAttr = App::Universal::ATTRTYPE_SELFEMPLOYED;	#222
+	my $retiredAttr = App::Universal::ATTRTYPE_RETIRED;			#223
+	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;	#224
+	my $ptStudentAttr = App::Universal::ATTRTYPE_STUDENTPART;	#225
+	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
+
+	my $personEmployStat = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selEmploymentStatusCaption', $invoice->{client_id});
+	foreach my $employStat (@{$personEmployStat})
+	{
+		my $status = '';
+		$status = $employStat->{caption};
+		$status = 'Retired' if $employStat->{value_type} == $retiredAttr;
+		$status = 'Employed' if $employStat->{value_type} >= $ftEmployAttr && $employStat->{value_type} <= $selfEmployAttr;
+
+		if($status eq 'Employed')
+		{
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Patient/Employment/Status',
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $status,
+					_debug => 0
+				);
+		}
+		elsif($status eq 'Student (Full-Time)' || $status eq 'Student (Part-Time)')
+		{
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Patient/Student/Status',
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $status,
+					_debug => 0
+				);
+		}
+	}
+}
+
+sub storeProviderInfo
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $licenseValueType = App::Universal::ATTRTYPE_LICENSE;
+
+	my $providerId = $mainTransData->{provider_id};
+	my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $providerId);
+	my $providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Tax ID', $licenseValueType);
+	my $providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'UPIN', $licenseValueType);
+	my $providerSpecialty = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Primary', App::Universal::ATTRTYPE_SPECIALTY);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Name',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{complete_name},
+			value_textB => $providerId,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Name/First',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_first},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Name/Middle',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_middle},
+			_debug => 0
+		) if $providerInfo->{name_middle} ne '';
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Name/Last',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerInfo->{name_last},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/UPIN',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerUpin->{value_text},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Tax ID',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerTaxId->{value_text},
+			value_textB => $providerTaxId->{value_textb},
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Specialty',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $providerSpecialty->{value_text},
+			value_textB => $providerSpecialty->{value_textb},
+			_debug => 0
+		);
+}
+
+sub storeInsuranceInfo
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
+	my $dateValueType = App::Universal::ATTRTYPE_DATE;
+	my $durationValueType = App::Universal::ATTRTYPE_DURATION;
+	my $primaryIns = App::Universal::INSURANCE_PRIMARY;
+	my $uniqPlan = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+
+	my $ftEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDFULL;		#220
+	my $ptEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDPART;		#221
+	my $selfEmployAttr = App::Universal::ATTRTYPE_SELFEMPLOYED;		#222
+	my $retiredAttr = App::Universal::ATTRTYPE_RETIRED;				#223
+	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;		#224
+	my $ptStudentAttr = App::Universal::ATTRTYPE_STUDENTPART;		#225
+	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
+
+	my $clientId = $invoice->{client_id};
+
+	my $invoicePayers = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceBillingRecs', $invoiceId);
+	foreach my $payer (@{$invoicePayers})
+	{
+		my $partyType = $payer->{bill_party_type};
+		my $insIntId = $payer->{bill_ins_id};
+	
+		my $payerBillSeq = 'Primary' if $payer->{bill_sequence} == App::Universal::PAYER_PRIMARY;
+		$payerBillSeq = 'Secondary' if $payer->{bill_sequence} == App::Universal::PAYER_SECONDARY;
+		$payerBillSeq = 'Tertiary' if $payer->{bill_sequence} == App::Universal::PAYER_TERTIARY;
+		$payerBillSeq = 'Quaternary' if $payer->{bill_sequence} == App::Universal::PAYER_QUATERNARY;
+
+		if($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
+		{
+			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
+			my $parentInsId = $thirdPartyInsur->{parent_ins_id};
+			my $thirdPartyId = $thirdPartyInsur->{owner_org_id};
+			
+			my $thirdPartyName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $thirdPartyId);
+			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
+			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Third-Party/Org/Name',
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $thirdPartyName,
+					value_textB => $thirdPartyId,
+					_debug => 0
+				);
+		
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => 'Third-Party/Org/Phone',
+					value_type => defined $phoneValueType ? $phoneValueType : undef,
+					value_text => $thirdPartyPhone->{phone},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Address', $command,
+					parent_id => $invoiceId,
+					address_name => 'Third-Party',
+					line1 => $thirdPartyAddr->{line1},
+					line2 => $thirdPartyAddr->{line2},
+					city => $thirdPartyAddr->{city},
+					state => $thirdPartyAddr->{state},
+					zip => $thirdPartyAddr->{zip},
+					_debug => 0
+				);
+		
+		}
+		#elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON)
+		#{
+		#}
+		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS)
+		{
+			my $personInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceForInvoiceSubmit', $insIntId);
+			#next if $personInsur->{bill_sequence} == App::Universal::INSURANCE_WORKERSCOMP;
+			my $insOrgId = $personInsur->{ins_org_id};
+			my $parentInsId = $personInsur->{parent_ins_id};
+
+			#Basic Insurance Information --------------------
+			my $insOrgName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $insOrgId);
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Name",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insOrgName,
+					value_textB => $insOrgId,
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Effective Dates",
+					value_type => defined $durationValueType ? $durationValueType : undef,
+					value_date => $personInsur->{coverage_begin_date},
+					value_dateEnd => $personInsur->{coverage_end_date},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Type",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $personInsur->{claim_type} || undef,
+					value_textB => $personInsur->{extra} || undef,
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Group Number",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $personInsur->{group_name} || $personInsur->{plan_name},
+					value_textB => $personInsur->{group_number} || $personInsur->{policy_number},
+					_debug => 0
+				);
+
+
+
+
+			#HMO-PPO Indicator and BCBS Plan Code --------------------
+			my $ppoHmo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'HMO-PPO/Indicator');
+			my $bcbsCode = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'BCBS Plan Code');
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/HMO-PPO/Indicator",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $ppoHmo->{value_text} || undef,
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/BCBS Plan Code",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $bcbsCode->{value_text} || undef,
+					_debug => 0
+				);
+
+
+
+
+			#Payment Source --------------------
 			my $claimType = $personInsur->{claim_type};
-
-			my $insOrgName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $personInsur->{ins_org_id});
-
-			my $parentId = $personInsur->{parent_ins_id} if $personInsur->{record_type} != $uniqPlan;
-			$parentId = $personInsur->{ins_internal_id} if $personInsur->{record_type} == $uniqPlan;
-
-			my $champusStatus = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentId, 'Champus Status');
-			my $champusBranch = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentId, 'Champus Branch');
-			my $champusGrade = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentId, 'Champus Grade');
-
-			my $ppoHmo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentId, 'HMO-PPO/Indicator');
-			my $bcbsCode = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentId, 'BCBS Plan Code');
-			my $insOrgPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentId);
-			my $insOrgAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentId);
-
-
-			my $relToCaption = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuredRelationship', $personInsur->{rel_to_insured});
-			my $relToCode = '';
-			$relToCode = '01' if $relToCaption eq 'Self';
-			$relToCode = '02' if $relToCaption eq 'Spouse';
-			$relToCode = '18' if $relToCaption eq 'Parent';
-			$relToCode = '03' if $relToCaption eq 'Child';
-			$relToCode = '99' if $relToCaption eq 'Other';
-
 			my $paySource = '';
 			$paySource = 'A' if $claimType eq 'Self-Pay';
 			$paySource = 'B' if $claimType eq 'Workers Compensation';
@@ -582,60 +753,27 @@ sub execAction_submit
 			$paySource = 'X' if $claimType eq 'PPO';
 			$paySource = 'Z' if $claimType eq 'Client Billing' || $claimType eq 'ChampVA' || $claimType eq 'FECA Blk Lung';
 
-
-			#first add insurance info
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Insurance/Primary/Name',
+					item_name => "Insurance/$payerBillSeq/Payment Source",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insOrgName,
-					value_textB => $personInsur->{ins_org_id},
+					value_text => $paySource,
 					_debug => 0
 				);
 
-			#$page->schemaAction(
-			#		'Invoice_Attribute', $command,
-			#		parent_id => $invoiceId,
-			#		item_name => 'Insurance/Primary/Effective Dates',
-			#		value_type => defined $durationValueType ? $durationValueType : undef,
-			#		value_date => $personInsur->{coverage_begin_date},
-			#		value_dateEnd => $personInsur->{coverage_end_date},
-			#		_debug => 0
-			#	);
+
+
+
+			#Champus Information --------------------
+			my $champusStatus = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Champus Status');
+			my $champusBranch = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Champus Branch');
+			my $champusGrade = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Champus Grade');
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Insurance/Primary/Type',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $claimType || undef,
-					value_textB => $personInsur->{extra} || undef,
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'HMO-PPO/Indicator',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $ppoHmo->{value_text} || undef,
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'BCBS Plan Code',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $bcbsCode->{value_text} || undef,
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Champus Branch',
+					item_name => "Insurance/$payerBillSeq/Champus Branch",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusBranch->{value_text} || undef,
 					_debug => 0
@@ -644,7 +782,7 @@ sub execAction_submit
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Champus Status',
+					item_name => "Insurance/$payerBillSeq/Champus Status",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusStatus->{value_text} || undef,
 					_debug => 0
@@ -653,44 +791,32 @@ sub execAction_submit
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Champus Grade',
+					item_name => "Insurance/$payerBillSeq/Champus Grade",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusGrade->{value_text} || undef,
 					_debug => 0
 				);
 
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Payment Source/Primary',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $paySource,
-					_debug => 0
-				);
+
+
+
+			#Insurance Contact Info --------------------
+			my $insOrgPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
+			my $insOrgAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Insurance/Primary/Phone',
+					item_name => "Insurance/$payerBillSeq/Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $insOrgPhone->{phone},
 					_debug => 0
 				);
 
 			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insurance/Primary/Group Number',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsur->{group_name} || $personInsur->{plan_name},
-					value_textB => $personInsur->{group_number} || $personInsur->{policy_number},
-					_debug => 0
-				);
-
-			$page->schemaAction(
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
-					address_name => 'Insurance',
+					address_name => "$payerBillSeq Insurance",
 					line1 => $insOrgAddr->{line1},
 					line2 => $insOrgAddr->{line2},
 					city => $insOrgAddr->{city},
@@ -699,23 +825,136 @@ sub execAction_submit
 					_debug => 0
 				);
 
+
+
+			#Relationship to Insured --------------------
+			my $relToCaption = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuredRelationship', $personInsur->{rel_to_insured});
+			my $relToCode = '';
+			$relToCode = '01' if $relToCaption eq 'Self';
+			$relToCode = '02' if $relToCaption eq 'Spouse';
+			$relToCode = '18' if $relToCaption eq 'Parent';
+			$relToCode = '03' if $relToCaption eq 'Child';
+			$relToCode = '99' if $relToCaption eq 'Other';
 			#patient's relationship to the insured
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => 'Patient/Insured/Relationship',
+					item_name => "Insurance/$payerBillSeq/Patient-Insured/Relationship",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $relToCaption,
 					value_int => $relToCode,
 					_debug => 0
 				);
 
-			#now add insured info
+
+
+			#Insured Information --------------------
 			my $insuredData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $personInsur->{insured_id});
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Name",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{complete_name},
+					value_textB => $insuredData->{person_id},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Name/Last",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{name_last},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Name/First",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{name_first},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Name/Middle",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{name_middle},
+					_debug => 0
+				) if $insuredData->{name_middle} ne '';
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Personal/Marital Status",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{marstat_caption},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Personal/Gender",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{gender_caption},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Personal/DOB",
+					value_type => defined $dateValueType ? $dateValueType : undef,
+					value_date => $insuredData->{date_of_birth},
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Personal/SSN",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $insuredData->{ssn},
+					_debug => 0
+				);
+
+
+
+
+			#Insured's Contact Information
 			my $insuredPhone = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selHomePhone', $personInsur->{insured_id});
 			my $insuredAddr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $personInsur->{insured_id});
-			my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
 
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Contact/Home Phone",
+					value_type => defined $phoneValueType ? $phoneValueType : undef,
+					value_text => $insuredPhone,
+					_debug => 0
+				);
+
+			$page->schemaAction(
+					'Invoice_Address', $command,
+					parent_id => $invoiceId,
+					address_name => "$payerBillSeq Insured",
+					line1 => $insuredAddr->{line1},
+					line2 => $insuredAddr->{line2},
+					city => $insuredAddr->{city},
+					state => $insuredAddr->{state},
+					zip => $insuredAddr->{zip},
+					_debug => 0
+				);
+
+
+
+			#Insured's Employment Info
+			my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
 			foreach my $employer (@{$insuredEmployers})
 			{
 				next if $employer->{value_type} == $retiredAttr;
@@ -730,107 +969,13 @@ sub execAction_submit
 				$page->schemaAction(
 						'Invoice_Attribute', $command,
 						parent_id => $invoiceId,
-						item_name => "Insured/$occupType/Name",
+						item_name => "Insurance/$payerBillSeq/Insured/$occupType/Name",
 						value_type => defined $textValueType ? $textValueType : undef,
 						value_text => $employerName,
 						value_textB => $empStatus,
 						_debug => 0
 					);
 			}
-
-			$page->schemaAction(
-					'Invoice_Address', $command,
-					parent_id => $invoiceId,
-					address_name => 'Insured',
-					line1 => $insuredAddr->{line1},
-					line2 => $insuredAddr->{line2},
-					city => $insuredAddr->{city},
-					state => $insuredAddr->{state},
-					zip => $insuredAddr->{zip},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Name',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{complete_name},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Name/Last',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_last},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Name/First',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_first},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Name/Middle',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_middle},
-					_debug => 0
-				) if $insuredData->{name_middle} ne '';
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Contact/Home Phone',
-					value_type => defined $phoneValueType ? $phoneValueType : undef,
-					value_text => $insuredPhone,
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Personal/Marital Status',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{marstat_caption},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Personal/Gender',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{gender_caption},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Personal/DOB',
-					value_type => defined $dateValueType ? $dateValueType : undef,
-					value_date => $insuredData->{date_of_birth},
-					_debug => 0
-				);
-
-			$page->schemaAction(
-					'Invoice_Attribute', $command,
-					parent_id => $invoiceId,
-					item_name => 'Insured/Personal/SSN',
-					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{ssn},
-					_debug => 0
-				);
-
 
 			##MEDICAID - RESUBMISSION CODE AND ORIGINAL REFERENCE
 
@@ -847,151 +992,46 @@ sub execAction_submit
 			#		);
 			#}
 
-
+			#OLD ATTRIBUTES
 			#Create attributes for secondary insurance (for HCFA Box 11d, 9a-d)
-
-			my $secondaryIns = App::Universal::INSURANCE_SECONDARY;
-			my $secondInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $clientId, $secondaryIns);
-			if($secondInsur->{ins_internal_id})
-			{
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Insurance/Secondary/Group Number',
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $secondInsur->{group_name},
-						value_textB => $secondInsur->{group_number} || $secondInsur->{policy_number},
-						_debug => 0
-					);
-
-				my $claimType = $secondInsur->{claim_type};
-
-				my $paySource = '';
-				$paySource = 'A' if $claimType eq 'Self-Pay';
-				$paySource = 'B' if $claimType eq 'Workers Compensation';
-				$paySource = 'C' if $claimType eq 'Medicare';
-				$paySource = 'D' if $claimType eq 'Medicaid';
-				#$paySource = 'E' if $claimType eq 'Other Federal Program';
-				$paySource = 'F' if $claimType eq 'Insurance';
-				#$paySource = 'G' if $claimType eq 'Blue Cross/Blue Shield';
-				$paySource = 'H' if $claimType eq 'CHAMPUS';
-				$paySource = 'I' if $claimType eq 'HMO';
-				#$paySource = 'J' if $claimType eq 'Federal Employee’s Program (FEP)';
-				#$paySource = 'K' if $claimType eq 'Central Certification';
-				#$paySource = 'L' if $claimType eq 'Self Administered';
-				#$paySource = 'M' if $claimType eq 'Family or Friends';
-				#$paySource = 'N' if $claimType eq 'Managed Care - Non-HMO';
-				$paySource = 'P' if $claimType eq 'BCBS';
-				#$paySource = 'T' if $claimType eq 'Title V';
-				#$paySource = 'V' if $claimType eq 'Veteran’s Administration Plan';
-				$paySource = 'X' if $claimType eq 'PPO';
-				$paySource = 'Z' if $claimType eq 'Client Billing' || $claimType eq 'ChampVA' || $claimType eq 'FECA Blk Lung';
-
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Payment Source/Secondary',
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $paySource,
-						_debug => 0
-					);
-
-				my $otherInsuredData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $secondInsur->{insured_id});
-				my $otherInsuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $secondInsur->{insured_id});
-
-				foreach my $employer (@{$otherInsuredEmployers})
-				{
-					next if $employer->{value_type} == $retiredAttr;
-
-					my $occupType = 'Employer';
-					$occupType = 'School' if $employer->{value_type} == $ftStudentAttr || $employer->{value_type} == $ptStudentAttr;
-
-					my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $employer->{value_type});
-
-					my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_text});
-
-					$page->schemaAction(
-							'Invoice_Attribute', $command,
-							parent_id => $invoiceId,
-							item_name => "Other Insured/$occupType/Name",
-							value_type => defined $textValueType ? $textValueType : undef,
-							value_text => $employerName,
-							value_textB => $empStatus,
-							_debug => 0
-						);
-				}
-
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Other Insured/Personal/Gender',
-						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $otherInsuredData->{gender_caption},
-						_debug => 0
-					);
-
-				$page->schemaAction(
-						'Invoice_Attribute', $command,
-						parent_id => $invoiceId,
-						item_name => 'Other Insured/Personal/DOB',
-						value_type => defined $dateValueType ? $dateValueType : undef,
-						value_date => $otherInsuredData->{date_of_birth},
-						_debug => 0
-					);
-			}
-		}
-
-		##CREATE TRANSACTIONS FOR DIAGNOSES (ICD CODES)
-
-		my @icdCodes = split(/\s*,\s*/, $invoice->{claim_diags});
-		foreach my $icdCode (@icdCodes)
-		{
-			$page->schemaAction(
-					'Transaction', $command,
-					trans_owner_type => App::Universal::ENTITYTYPE_PERSON,
-					trans_owner_id => $clientId,
-					parent_trans_id => $mainTransId,
-					trans_type => App::Universal::TRANSTYPEDIAG_ICD,
-					trans_status => App::Universal::TRANSSTATUS_ACTIVE,
-					init_onset_date => $mainTransData->{init_onset_date} || undef,
-					curr_onset_date => $mainTransData->{curr_onset_date} || undef,
-					billing_facility_id => $billFacilityId,
-					service_facility_id => $servFacilityId,
-					code => $icdCode || undef,
-					provider_id => $mainTransData->{provider_id},
-					care_provider_id => $mainTransData->{care_provider_id},
-					trans_begin_stamp => $todaysStamp || undef,
-					_debug => 0
-				);
+			#	'Payment Source/Secondary',
+			#	'Insurance/Secondary/Group Number',
+			#	"Other Insured/$occupType/Name",
+			#	'Other Insured/Personal/Gender',
+			#	'Other Insured/Personal/DOB',
 		}
 	}
+}
 
+sub createActiveProbTrans
+{
+	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
+	
+	my $personValueType = App::Universal::ENTITYTYPE_PERSON;
+	my $transStatActive = App::Universal::TRANSSTATUS_ACTIVE;
+	my $todaysStamp = $page->getTimeStamp();
 
-
-	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
-
-	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-	$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $invoiceId,
-			invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,
-			submitter_id => $page->session('user_id') || undef,
-			flags => $invoiceFlags | $attrDataFlag,
-			_debug => 0
+	my @icdCodes = split(/\s*,\s*/, $invoice->{claim_diags});
+	foreach my $icdCode (@icdCodes)
+	{
+		$page->schemaAction(
+				'Transaction', $command,
+				trans_owner_type => defined $personValueType ? $personValueType : undef,
+				trans_owner_id => $invoice->{client_id},
+				parent_trans_id => $mainTransData->{trans_id},
+				trans_type => App::Universal::TRANSTYPEDIAG_ICD,
+				trans_status => defined $transStatActive ? $transStatActive : undef,
+				init_onset_date => $mainTransData->{init_onset_date} || undef,
+				curr_onset_date => $mainTransData->{curr_onset_date} || undef,
+				billing_facility_id => $mainTransData->{billing_facility_id},
+				service_facility_id => $mainTransData->{service_facility_id},
+				code => $icdCode || undef,
+				provider_id => $mainTransData->{provider_id},
+				care_provider_id => $mainTransData->{care_provider_id},
+				trans_begin_stamp => $todaysStamp || undef,
+				_debug => 0
 		);
-
-
-	## Then, create invoice attributes for history of invoice status
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'Reviewed',
-			value_textB => $page->field('comments') || undef,
-			value_date => $todaysDate || undef,
-			_debug => 0
-	);
+	}
 }
 
 sub customValidate

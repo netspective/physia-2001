@@ -5,6 +5,7 @@ package App::Statements::Insurance;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_INSURANCE);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -170,6 +171,14 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			from Insurance
 			where ins_internal_id = ?
 		},
+	'selInsuranceForInvoiceSubmit' => qq{
+		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.owner_person_id, ins.group_name, ins.group_number, ins.insured_id, ins.member_number, 
+				to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') , to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') ,
+				ins.rel_to_insured, ins.record_type, ins.extra, ct.caption as claim_type
+				from insurance ins, claim_type ct
+			where ins.ins_internal_id = ?
+				and ct.id = ins_type
+		},
 	'selChildrenPlans' => qq{
 		select *
 			from Insurance
@@ -305,10 +314,9 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				and owner_person_id = ?
 		},
 	'selPersonInsurance' => qq{
-		select ins.ins_internal_id as ins_internal_id, ins.parent_ins_id as parent_ins_id, ins.ins_org_id as ins_org_id,
-				ins.ins_type as ins_type, ins.owner_person_id as owner_person_id, ins.group_name as group_name, ins.group_number as group_number,
-				ins.insured_id as insured_id, ins.member_number as member_number, ins.rel_to_insured as rel_to_insured,
-				ins.record_type as record_type, ins.extra as extra, ct.caption as claim_type
+		select ins.ins_internal_id, ins.parent_ins_id, ins.ins_org_id, ins.ins_type, ins.owner_person_id, ins.group_name, ins.group_number, ins.insured_id, ins.member_number, 
+				to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') , to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') ,
+				ins.rel_to_insured, ins.record_type, ins.extra, ct.caption as claim_type
 				from insurance ins, claim_type ct
 			where ins.owner_person_id = ?
 				and ins.bill_sequence = ?

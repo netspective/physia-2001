@@ -5,6 +5,7 @@ package App::Statements::Invoice;
 use strict;
 use Exporter;
 use DBI::StatementManager;
+use App::Universal;
 
 use vars qw(@ISA @EXPORT $STMTMGR_INVOICE $STMTFMT_SEL_INVOICETYPE $STMTRPTDEFN_DEFAULT_ORG $STMTRPTDEFN_DEFAULT_PERSON);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -126,15 +127,15 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 		},
 	'selServiceDateRangeForAllItems' => q{
-		select  to_char(least(service_begin_date), 'MM/DD/YYYY') as service_begin_date,
-				to_char(greatest(service_end_date), 'MM/DD/YYYY') as service_end_date
+		select  to_char(least(service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+				to_char(greatest(service_end_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date
 		from invoice_item
 		where parent_id = ?
 		},
 	'selInvoiceProcedureItems' => q{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier,
-			unit_cost, quantity, rel_diags, data_num_c,	to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date,
-			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, data_text_a
+			unit_cost, quantity, rel_diags, data_num_c,	to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a
 		from invoice_item
 		where parent_id = ?
 			and item_type in (?,?)
@@ -159,12 +160,10 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 			and item_type in (?,?)
 		},
-	'selInvPrimSecTertBillingParties' => q{
+	'selInvoiceBillingRecs' => q{
 		select *
 		from invoice_billing
 		where invoice_id = ?
-			and bill_sequence in (?,?,?)
-			and invoice_item_id is NULL
 		order by bill_sequence
 		},
 	'delInvoiceBillingParties' => q{
