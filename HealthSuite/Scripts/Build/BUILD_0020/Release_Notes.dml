@@ -83,5 +83,13 @@
 			Closing claims that are paid in full and where user chooses not to submit to next payer.
 		</deliverable>
 
+		<deliverable id="2008">
+			[UI} : Added "*" in front on panel test names.  And if user hover over the panel test name the test included in the panel will be shown.
+		</deliverable>
+
+		<deliverable id="2009">
+			[UI] Service in the "OTHER" catalog  will not be shown as check boxes on the Add Ancillary Test dialog.  The user can look up the tests in the "OTHER" catalog and create a comma delimited list of test.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
