@@ -6,6 +6,8 @@ use App::Billing::Output::Driver;
 use App::Billing::Claims;
 use App::Billing::Output::Html::Template;
 use App::Billing::Output::Html::Worker;
+use App::Billing::Output::Html::FloridaMedicaid;
+
 use Text::Template;
 use vars qw(@ISA);
 use constant EDIT => 1;
@@ -49,7 +51,24 @@ sub createHTML
 sub generateHTML
 {
 	my ($self, $claim, $tempPath) = @_;
-	my $htmlTemplate = ($claim->getInvoiceSubtype() eq 6) ? new App::Billing::Output::Html::Worker() : new App::Billing::Output::Html::Template();
+	
+	my $htmlTemplate;
+	my $insured = $claim->getInsured(0);
+	my $insuranceProductOrPlan = $insured->getInsurancePlanOrProgramName();
+
+	if ($claim->getInvoiceSubtype() eq 6)
+	{
+		$htmlTemplate = new App::Billing::Output::Html::Worker();
+	}
+	elsif ($claim->getInvoiceSubtype() eq 5 && ($insuranceProductOrPlan eq "FLORIDA MEDICAID"))
+	{
+		$htmlTemplate = new App::Billing::Output::Html::FloridaMedicaid();
+	}
+	else
+	{
+		$htmlTemplate = new App::Billing::Output::Html::Template();
+	}
+
 	my @html;
 	my $procesedProc = [];
 	$tempPath = $tempPath eq "" ? 'C:\\hsc-live\\View1500.dat' : $tempPath;

@@ -8,7 +8,9 @@ use pdflib 2.01;
 
 use vars qw(@ISA);
 use App::Billing::Output::PDF::Worker;
+use App::Billing::Output::PDF::FloridaMedicaid;
 
+use constant CLAIM_TYPE_MEDICAID => 5;
 use constant CLAIM_TYPE_WORKCOMP => 6;
 
 
@@ -1611,11 +1613,19 @@ sub populatePDF
 {
 	my ($self, $p, $Claim, $cordinates, $procesedProc)  = @_;
 
+	my $insured = $Claim->getInsured(0);
+	my $insuranceProductOrPlan = $insured->getInsurancePlanOrProgramName();
+
 	pdflib::PDF_setrgbcolor($p, DATA_RED, DATA_GREEN, DATA_BLUE);
 	if ($Claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP)
 	{
 		my $pdfWorker = new App::Billing::Output::PDF::Worker();
 		$pdfWorker->populate($p, $Claim, $cordinates, $procesedProc);
+	}
+	elsif (($Claim->getInvoiceSubtype() == CLAIM_TYPE_MEDICAID) && ($insuranceProductOrPlan eq "FLORIDA MEDICAID"))
+	{
+		my $pdfFlorida = new App::Billing::Output::PDF::FloridaMedicaid();
+		$pdfFlorida->populate($p, $Claim, $cordinates, $procesedProc);
 	}
 	else
 	{
