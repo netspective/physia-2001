@@ -7,6 +7,7 @@ use DBI::StatementManager;
 use App::Statements::Catalog;
 use App::Statements::Person;
 use App::Statements::Search::Code;
+use App::Statements::Search::MiscProcedure;
 
 use Carp;
 
@@ -247,7 +248,7 @@ sub customValidate
 	
 	if (
 		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
-		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_EPSDT,App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
+		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE,App::Universal::CATALOGENTRYTYPE_EPSDT,App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
 	)
 	{
 		my $codeInfo;
@@ -269,10 +270,16 @@ sub customValidate
 				last CASE;			
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_EPSDT) {
-							$codeInfo = $STMTMGR_EPSDT_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
-								'sel_epsdt_code',$code);
-							last CASE;			
+				$codeInfo = $STMTMGR_EPSDT_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
+					'sel_epsdt_code',$code);
+				last CASE;			
 			}
+			if ($entryType == App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE) {
+				$codeInfo = $STMTMGR_MISC_PROCEDURE_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
+					'sel_misc_procedure_code',$code);
+				last CASE;			
+			}
+
 		}
 		
 		unless ($page->param('_f_name'))
