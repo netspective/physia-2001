@@ -2371,6 +2371,9 @@ sub execute_addOrUpdate
 
 	## get short name for cpt code
 	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCodes[0]);
+	my $hcpcsShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericHCPCSCode', $cptCodes[0]);
+	my $epsdtShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericEPSDTCode', $cptCodes[0]);
+	my $codeShortName = $cptShortName->{name} || $hcpcsShortName->{name} || $epsdtShortName->{name};
 
 	#get service place based on service facility, then convert code to its id
 	my $servPlace = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $mainTransData->{service_facility_id}, 'HCFA Service Place');
@@ -2387,7 +2390,7 @@ sub execute_addOrUpdate
 			item_type => defined $itemType ? $itemType : undef,
 			code => $cptCodes[0] || undef,
 			code_type => $codeType || undef,
-			caption => $cptShortName->{name} || undef,
+			caption => $codeShortName || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
 			unit_cost => $unitCost || undef,
@@ -2470,12 +2473,18 @@ sub createExplosionItems
 
 	my $cptCode;
 	my $cptShortName;
+	my $hcpcsShortName;
+	my $epsdtShortName;
+	my $codeShortName;
 	my $modifier;
 	foreach my $child (@{$miscProcChildren})
 	{
 		$cptCode = $child->{code};
 		$modifier = $child->{modifier};
 		$cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		$hcpcsShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericHCPCSCode', $cptCode);
+		$epsdtShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericEPSDTCode', $cptCode);
+		$codeShortName = $cptShortName->{name} || $hcpcsShortName->{name} || $epsdtShortName->{name};
 
 		my $fs_entry = App::IntelliCode::getFSEntry($page, $cptCode, $modifier || undef,$servBeginDate,\@listFeeSchedules);
 		#my $use_fee;
@@ -2503,7 +2512,7 @@ sub createExplosionItems
 				item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
 				code => $cptCode || undef,
 				code_type => $codeType || undef,
-				caption => $cptShortName->{name} || undef,
+				caption => $codeShortName || undef,
 				comments => $comments || undef,
 				unit_cost => $unitCost || undef,
 				extended_cost => $extCost || undef,

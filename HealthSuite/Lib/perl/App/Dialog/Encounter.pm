@@ -1890,8 +1890,12 @@ sub handleProcedureItems
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
 
-	my $lineCount = $page->param('_f_line_count');
+	my $cptShortName;
+	my $hcpcsShortName;
+	my $epsdtShortName;
+	my $codeShortName;
 
+	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
@@ -1929,7 +1933,10 @@ sub handleProcedureItems
 		}
 
 		#get caption for cpt code
-		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		$cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		$hcpcsShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericHCPCSCode', $cptCode);
+		$epsdtShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericEPSDTCode', $cptCode);
+		$codeShortName = $cptShortName->{name} || $hcpcsShortName->{name} || $epsdtShortName->{name};
 
 		#convert type to it's foreign key id
 		my $servType = $page->param("_f_proc_$line\_service_type");
@@ -1948,7 +1955,7 @@ sub handleProcedureItems
 			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
 			code => $cptCode || undef,
 			code_type => $page->param("_f_proc_$line\_code_type") || undef,
-			caption => $cptShortName->{name} || undef,
+			caption => $codeShortName || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
 			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
@@ -1977,13 +1984,23 @@ sub createExplosionItems
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
 
+	my $cptShortName;
+	my $hcpcsShortName;
+	my $epsdtShortName;
+	my $codeShortName;
+
 	my $childCount = scalar(@{$miscProcChildren});
 	foreach my $child (@{$miscProcChildren})
 	{
 		my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
 		my $cptCode = $child->{code};
 		my $modifier = $child->{modifier};
-		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+
+		$cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		$hcpcsShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericHCPCSCode', $cptCode);
+		$epsdtShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericEPSDTCode', $cptCode);
+		$codeShortName = $cptShortName->{name} || $hcpcsShortName->{name} || $epsdtShortName->{name};
+
 		my $quantity = $page->param("_f_proc_$line\_units");
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
@@ -2014,7 +2031,7 @@ sub createExplosionItems
 				item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
 				code => $cptCode || undef,
 				code_type => $codeType || undef,
-				caption => $cptShortName->{name} || undef,
+				caption => $codeShortName || undef,
 				comments => $page->param("_f_proc_$line\_comments") || undef,
 				unit_cost => $unitCost || undef,
 				extended_cost => $extCost || undef,
