@@ -303,9 +303,9 @@ sub prepare_view_catalog
 
 	my @pathItems = split('/', $self->param('arl'));
 
-	if ($pathItems[3])
+	if ($self->param('catalog_id', $pathItems[4]))
 	{
-		$self->param('catalog_id', $pathItems[3]);
+		$self->param('internal_catalog_id', $pathItems[3]);
 		$self->addContent(
 			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalog_detail_org', 0, 8],
 				[$pathItems[3]] ),
@@ -314,7 +314,7 @@ sub prepare_view_catalog
 	else
 	{
 		$self->addContent(
-			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalogs_all_org', 0, 4],
+			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, ['sel_catalogs_all_org', 5, 4],
 				[$self->param('org_id')]) );
 	}
 

@@ -45,7 +45,6 @@ use vars qw(%ITEMTOFIELDMAP %CODE_TYPE_MAP);
 	'hcpcs' => 210
 );
 
-
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Fee Schedule');
@@ -56,29 +55,57 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID',
-						name => 'catalog_id', size => 14,
-						options => FLDFLAG_REQUIRED,
-						postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
-			new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
-						name => 'catalog_type', schema => $schema, value => 0),
-			new CGI::Dialog::Field(caption => 'Fee Schedule Name', name => 'caption', options => FLDFLAG_REQUIRED),
-			new CGI::Dialog::Field(type => 'memo', caption => 'Description', name => 'description'),
-			new CGI::Dialog::Field::TableColumn(caption => 'Parent Fee Schedule ID', name => 'parent_catalog_id',
-						schema => $schema, column => 'Offering_Catalog_Entry.catalog_id',
-						findPopup => '/lookup/catalog/id'),
+		new CGI::Dialog::Field(name => 'internal_catalog_id',
+			type => 'hidden',
+			caption => 'Internal Catalog ID',
+			options => FLDFLAG_READONLY,
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
+		),
+
+		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID',
+			name => 'catalog_id', 
+			size => 20,
+			options => FLDFLAG_REQUIRED,
+			findPopup => '/lookup/catalog',
+		),
+		new CGI::Dialog::Field::TableColumn(type => 'hidden',
+			column => 'offering_catalog_type.id',
+			name => 'catalog_type', schema => $schema, value => 0
+		),
+		new CGI::Dialog::Field(caption => 'Fee Schedule Name', 
+			name => 'caption', 
+			options => FLDFLAG_REQUIRED,
+			size => 45,
+		),
+		new CGI::Dialog::Field(type => 'memo', 
+			caption => 'Description', 
+			name => 'description'
+		),
+		new CGI::Dialog::Field(type => 'float', 
+			caption => 'RVRBS Multiplier', 
+			name => 'rvrbs_multiplier',
+			minValue => 0,
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Parent Fee Schedule ID', 
+			name => 'parent_catalog_id',
+			schema => $schema, 
+			column => 'Offering_Catalog_Entry.catalog_id',
+			findPopup => '/lookup/catalog/'
+		),
+
 #			new CGI::Dialog::Field(type => 'memo', caption => 'Fee Schedule Entries', name => 'feescheduleentries',
 #						cols => 40, rows => 5,
 #						invisibleWhen => (CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE),
 #						hints => 'Format: <b>f.FeeScheduleID,n.ItemName</b>,m.Modifier,u.UnitsAvailable,d.Description,<b>ItemType(item,icd,cpt,proc,procert,service,sercert,product,hcpcs).ItemCode,$UnitCost</b>'),
 			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'feeschedules',types => ['FeeScheduleEntry']),
 			#new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts'),
-			);
+	);
+	
 	$self->{activityLog} =
 	{
 		scope =>'offering_catalog',
 		key => "#field.catalog_id#",
-		data => "FeeSchedule '#field.caption#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
+		data => "FeeSchedule '#field.caption#' <a href='/search/catalog/detail/#field.internal_catalog_id#'>#field.catalog_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(
 							nextActions_add => [
@@ -91,15 +118,11 @@ sub new
 	return $self;
 }
 
-
-
 sub customValidate
 {
 	my ($self, $page) = @_;
-#	validateFeeScheduleEntryTextArea($self, $page);
-
+	#	validateFeeScheduleEntryTextArea($self, $page);
 }
-
 
 #This sub is called from CustomValidate for fee entry validation which is a memo type
 sub validateFeeScheduleEntryTextArea
@@ -115,7 +138,6 @@ sub validateFeeScheduleEntryTextArea
 	my $modifierflag = 0;
 	my $descflag = 0;
 	my $dollarflag = 0;
-
 
 	if(my $addFeeEntries = $page->field('feescheduleentries'))
 	{
@@ -214,8 +236,6 @@ sub validateFeeScheduleEntryTextArea
 
 }
 
-
-
 sub validateEachItemInFeeItemEntryTextArea
 {
 	my ($self, $page, $fieldPrefix, $fieldValue) = @_;
@@ -251,8 +271,6 @@ sub validateEachItemInFeeItemEntryTextArea
 	#	}
 	#}
 
-
-
 }
 
 sub populateData_add
@@ -270,10 +288,16 @@ sub populateData_update
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
-	my $catalogId = $page->param('catalog_id');
+	my $catalogId = $page->param('internal_catalog_id');
 	if(! $STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selCatalogById',$catalogId))
 	{
 		$page->addError("Catalog ID '$catalogId' not found.");
+	}
+	
+	if (my $decimal = $page->field('rvrbs_multiplier'))
+	{
+		$decimal =~ s/^\./0./;
+		$page->field('rvrbs_multiplier', $decimal)
 	}
 }
 
@@ -293,12 +317,14 @@ sub execute
 	my $entryType = $page->field('entry_type');
 	$page->schemaAction(
 			'Offering_Catalog', $command,
+			internal_catalog_id => $command eq 'add' ? undef : $page->field('internal_catalog_id'),
 			catalog_id => $page->field('catalog_id') || undef,
 			org_id => $orgId || undef,
 			catalog_type => defined $catalogType ? $catalogType : 0,
 			#item_id => $page->field('item_id') || $page->param('item_id') || undef,
 			caption => $page->field('caption') || undef,
 			description => $page->field('description') || undef,
+			rvrbs_multiplier => $page->field('rvrbs_multiplier') || undef,
 			parent_catalog_id => $page->field('parent_catalog_id') || undef,
 			_debug => 0
 			);
@@ -364,40 +390,10 @@ sub execute
 #	}
 #
 
+	$page->param('_dialogreturnurl', "/org/$orgId/catalog") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 	#$page->redirect("/org/$orgId/dlg-add-feescheduleentry?_f_fs=%field.feeschedules%&_f_cpts=%field.listofcpts%");
 }
-use constant CATALOG_DIALOG => 'Dialog/FeeSchedule';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/04/2000', 'RK',
-		CATALOG_DIALOG,
-		'Added a dialog called fee schedule. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/05/2000', 'RK',
-		CATALOG_DIALOG,
-		'Updated the dialog and schema-action for Fee Shedule dialog'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/10/2000', 'RK',
-		CATALOG_DIALOG,
-		'Added Session Activity to  Fee Schedule. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/12/2000', 'RK',
-			CATALOG_DIALOG,
-		'Deleted session-activity in execute_add subroutine and added activityLog in the sub new subroutine.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/20/2000', 'MM',
-		CATALOG_DIALOG,
-		'Added a fee schedule entries field and next action field to  Fee Schedule Dialog. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/21/2000', 'RK',
-		CATALOG_DIALOG,
-		'Update the field Catalog Type to a hidden field.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		CATALOG_DIALOG,
-		'Added id for catalog dialog (as catalog) in sub new subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/20/2000', 'MAF',
-		CATALOG_DIALOG,
-		'Implemented new field type for catalog ids.'],
-
-);
-
 
 ##############################################################################
 package App::Dialog::Catalog::Copy;
@@ -419,8 +415,6 @@ use Text::Abbrev;
 
 @ISA = qw(CGI::Dialog);
 
-
-
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => 'Copy Fee Schedule');
@@ -431,16 +425,16 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID (From)',
-						name => 'from_catalog_id', size => 14,
-						options => FLDFLAG_REQUIRED,
-						postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
-			new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
-						name => 'catalog_type', schema => $schema, value => 0),
-			new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID (To)',
-						name => 'to_catalog_id', size => 14,
-						options => FLDFLAG_REQUIRED,),
-			);
+		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID (From)',
+			name => 'from_catalog_id', size => 14,
+			options => FLDFLAG_REQUIRED,
+			postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
+		new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
+			name => 'catalog_type', schema => $schema, value => 0),
+		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID (To)',
+			name => 'to_catalog_id', size => 14,
+			options => FLDFLAG_REQUIRED,),
+	);
 	$self->{activityLog} =
 	{
 		scope =>'offering_catalog',
@@ -452,23 +446,18 @@ sub new
 	return $self;
 }
 
-
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-
 	$page->field('from_catalog_id', $page->param('parent_catalog_id'));
 }
 
 sub getFeeScheduleGrandChildren
 {
 	my ($self, $page, $catalogId) = @_;
-
 	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $catalogId);
-
-
 }
 
 sub execute
@@ -493,7 +482,6 @@ sub execute
 			parent_catalog_id => $fromFeeSchedule->{parent_catalog_id} || undef,
 			_debug => 0
 			);
-
 
 	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $fromCatalogId);
 	if (defined $fromFeeScheduleChild)
@@ -542,8 +530,5 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-
-
 
 1;

@@ -22,7 +22,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selCatalogById' => q{
 		select *
 		from offering_catalog
-		where catalog_id = ?
+		where internal_catalog_id = ?
 		},
 
 	'selParentCatalogByOrgId' => q{

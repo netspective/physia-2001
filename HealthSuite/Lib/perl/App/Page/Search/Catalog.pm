@@ -53,8 +53,10 @@ sub execute
 	
 	$self->addContent(
 		'<CENTER>',
-			$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
-				["sel_catalog_$type$appendStmtName", 0, 4], $bindParams,),
+			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
+			#	["sel_catalog_$type$appendStmtName", 5, 4], $bindParams,),
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 
+				"sel_catalog_$type$appendStmtName", $bindParams,),
 		'</CENTER>'
 	);
 
