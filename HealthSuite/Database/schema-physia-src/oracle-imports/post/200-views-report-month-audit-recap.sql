@@ -1,146 +1,186 @@
 
 -- /* Start of views for the daily audit report  which lists net charges and receipts per day*/
 
-
-
 create or replace view invoice_charges as
-SELECT	i.invoice_id,
-	ia.value_date invoice_date ,
-	(decode(invoice_type,0,nvl(extended_cost, 0),0)) as total_charges, 
-	(decode(invoice_type,1,nvl(extended_cost, 0),0)) as misc_charges ,
-	0 as person_pay ,
-	0 as insurance_pay,
-	0 as charge_adjust ,
-	0 as net_charges,
-	0 as balance_transfer,
-	0 as insurance_write_off ,
-	0 as person_write_off,
+SELECT	invoice_id,
+	adjustment_id as adjustment_id,
+	batch_date as invoice_date ,
+	(decode(invoice_type,0,nvl(charges, 0),0)) as total_charges, 
+	(decode(invoice_type,1,nvl(charges, 0),0)) as misc_charges ,
+	decode (adjustment_type,0,nvl(adjustment_amount,0),0) as person_pay ,
+	nvl(plan_paid,0) as insurance_pay,	
+	( nvl(writeoff_amount,0) ) * -1 as charge_adjust ,	
+	decode(adjustment_type,2,nvl(net_adjust,0),0) as balance_transfer,
+	decode(nvl(payer_type,1),1,nvl(decode(nvl(writeoff_code,0),8,0,9,0,writeoff_amount),0),0)	 as insurance_write_off ,
+	decode(payer_type,0,nvl(decode(nvl(writeoff_code,0),8,0,9,0,writeoff_amount),0),0) as person_write_off ,
 	0 as a_r,
-	nvl(decode(ii.item_type,7,-ii.quantity ,ii.quantity),0) as units ,
-	nvl(decode(ii.item_type,7,-ii.unit_cost,ii.unit_cost),0) as unit_cost,
+	nvl(decode(item_type,7,-units ,units),0) as units ,
+	nvl(decode(item_type,7,-unit_cost,unit_cost),0) as unit_cost,
 	service_facility_id as facility,
-	nvl(t.provider_id,t.care_provider_id) as provider,
-	ia.value_text as batch_id,
-	ii.item_type as item_type,
-	ii.service_end_date as service_begin_date,
-	ii.service_begin_date as service_end_date,
-	ii.code as code, 
-	ii.rel_diags as rel_diags,
-	ii.caption,
-	i.SUBMITTER_ID,
-	i.client_id,
-	ii.hcfa_service_type,
-	i.invoice_type,
-	i.invoice_subtype,
-	nvl(ii.data_num_a,0) as ffs_cap,
-	0 as refund,
-	NULL as pay_type,
-	t.trans_id,
+	nvl(provider_id,care_provider_id) as provider,
+	batch_id,
+	item_type,
+	service_begin_date,
+	service_end_date,
+	code, 
+	rel_diags,
+	caption,
+	SUBMITTER_ID,
+	client_id,
+	hcfa_service_type,
+	invoice_type,
+	invoice_subtype,
+	ffs_flag as ffs_cap,
+	decode(adjustment_type,1,nvl(adjustment_amount,0),0) +
+ 	decode(writeoff_code,9,writeoff_amount,8,writeoff_amount,0)		 refund,
+	pay_type,
+	trans_id,
 	trans_type,
-	i.total_items,
-	to_number(NULL) as payer_type,
-	NULL as payer_id,
-	i.billing_id as billing_id,
-	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
-FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
-WHERE   t.trans_id = i.main_transaction 			
-	AND i.invoice_id = ia.parent_id 
-	AND ii.parent_id  = i.invoice_id
-	AND ia.item_name  = 'Invoice/Creation/Batch ID'		
-	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
-	UNION ALL	
-SELECT	i.invoice_id,
-	(nvl(
-	     (
-              SELECT ia.value_date FROM invoice_attribute ia WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
-	     AND ia.value_int = iia.adjustment_id
-             )
-            ,iia.pay_date
-	     )												
-	)invoice_date,
-	0 as total_charges, 
-	0 as misc_charges ,
-	decode (iia.adjustment_type,0,nvl(iia.adjustment_amount,0),0) as person_pay ,
-	nvl(iia.plan_paid,0) as insurance_pay,	
-	( nvl(iia.writeoff_amount,0) ) * -1 as charge_adjust ,	
-	decode(invoice_type,0,nvl(extended_cost, 0),0) + decode(invoice_type,1,nvl(extended_cost, 0),0) -   nvl(iia.writeoff_amount,0) 	 as net_charges,				
-	decode(iia.adjustment_type,2,nvl(iia.net_adjust,0),0) as balance_transfer,
-	decode(nvl(iia.payer_type,1),1,nvl(decode(iia.writeoff_code,8,0,9,0,iia.writeoff_amount),0),0)	as insurance_write_off ,			
-	decode(iia.payer_type,0,nvl(decode(iia.writeoff_code,8,0,9,0,iia.writeoff_amount),0),0) as person_write_off ,
-	0 as a_r,
-	0 as units ,
-	0 as unit_cost,
-	service_facility_id as facility,
-	nvl(t.provider_id,t.care_provider_id) as provider,
-	(nvl(
-	     (
-              SELECT ia.value_text FROM invoice_attribute ia WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
-	     AND ia.value_int = iia.adjustment_id
-             )
-            ,'AUTO_CREATE_ID'
-	     )												
-	)batch_id,
-	ii.item_type as item_type,
-	ii.service_end_date as service_begin_date,
-	ii.service_begin_date as service_end_date,
-	ii.code as code, 
-	ii.rel_diags as rel_diags,
-	ii.caption,
-	i.SUBMITTER_ID,
-	i.client_id,
-	ii.hcfa_service_type,
-	i.invoice_type,
-	i.invoice_subtype,
-	nvl(ii.data_num_a,0) as ffs_cap,
-	decode(iia.adjustment_type,1,nvl(iia.adjustment_amount,0),0) +
-	decode(iia.writeoff_code,9,iia.writeoff_amount,8,iia.writeoff_amount,0)		as refund,
-	(select pm.caption  FROM payment_method pm WHERE
-	 pm.id = iia.pay_method) pay_type,
-	t.trans_id,
-	trans_type,
-	i.total_items,
-	iia.payer_type as payer_type,
-	iia.payer_id as payer_id,
-	i.billing_id as billing_id,
-	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
-FROM 	invoice i ,  transaction t ,	
-	invoice_item_adjust iia , invoice_item ii
-WHERE   t.trans_id = i.main_transaction 			
-	AND ii.parent_id  = i.invoice_id
-	AND iia.parent_id = ii.item_id
-	AND NOT (invoice_status =15 AND parent_invoice_id is not null);
-			
+	payer_type,
+	payer_id,
+	billing_id,
+	owner_org_id
+FROM	AUTO_INVOICE_CHRG
+
+--create or replace view invoice_charges as
+--SELECT	i.invoice_id,
+--	ia.value_date invoice_date ,
+--	(decode(invoice_type,0,nvl(extended_cost, 0),0)) as total_charges, 
+--	(decode(invoice_type,1,nvl(extended_cost, 0),0)) as misc_charges ,
+--	0 as person_pay ,
+--	0 as insurance_pay,
+--	0 as charge_adjust ,
+--	0 as net_charges,
+--	0 as balance_transfer,
+--	0 as insurance_write_off ,
+--	0 as person_write_off,
+--	0 as a_r,
+--	nvl(decode(ii.item_type,7,-ii.quantity ,ii.quantity),0) as units ,
+--	nvl(decode(ii.item_type,7,-ii.unit_cost,ii.unit_cost),0) as unit_cost,
+--	service_facility_id as facility,
+--	nvl(t.provider_id,t.care_provider_id) as provider,
+--	ia.value_text as batch_id,
+--	ii.item_type as item_type,
+--	ii.service_begin_date as service_begin_date,
+--	ii.service_end_date as service_end_date,
+--	ii.code as code, 
+--	ii.rel_diags as rel_diags,
+--	ii.caption,
+--	i.SUBMITTER_ID,
+--	i.client_id,
+--	ii.hcfa_service_type,
+--	i.invoice_type,
+--	i.invoice_subtype,
+--	nvl(ii.data_num_a,0) as ffs_cap,
+--	0 as refund,
+--	NULL as pay_type,
+--	t.trans_id,
+--	trans_type,
+--	i.total_items,
+--	to_number(NULL) as payer_type,
+--	NULL as payer_id,
+--	i.billing_id as billing_id,
+--	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
+--FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
+--WHERE   t.trans_id = i.main_transaction 			
+--	AND i.invoice_id = ia.parent_id 
+--	AND ii.parent_id  = i.invoice_id
+--	AND ia.item_name  = 'Invoice/Creation/Batch ID'		
+--	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
+--	UNION ALL	
+--SELECT	i.invoice_id,
+--	(nvl(
+---	     (
+--              SELECT ia.value_date FROM invoice_attribute ia WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
+--	     AND ia.value_int = iia.adjustment_id
+--             )
+--            ,iia.pay_date
+--	     )												
+--	)invoice_date,
+--	0 as total_charges, 
+--	0 as misc_charges ,
+--	decode (iia.adjustment_type,0,nvl(iia.adjustment_amount,0),0) as person_pay ,
+--	nvl(iia.plan_paid,0) as insurance_pay,	
+--	( nvl(iia.writeoff_amount,0) ) * -1 as charge_adjust ,	
+--	decode(invoice_type,0,nvl(extended_cost, 0),0) + decode(invoice_type,1,nvl(extended_cost, 0),0) -   nvl(iia.writeoff_amount,0) 	 as net_charges,				
+--	decode(iia.adjustment_type,2,nvl(iia.net_adjust,0),0) as balance_transfer,
+--	decode(nvl(iia.payer_type,1),1,nvl(decode(nvl(iia.writeoff_code,0),8,0,9,0,iia.writeoff_amount),0),0)	as insurance_write_off ,			
+--	decode(iia.payer_type,0,nvl(decode(nvl(iia.writeoff_code,0),8,0,9,0,iia.writeoff_amount),0),0) as person_write_off ,
+--	0 as a_r,
+--	0 as units ,
+--	0 as unit_cost,
+--	service_facility_id as facility,
+--	nvl(t.provider_id,t.care_provider_id) as provider,
+--	(nvl(
+--	     (
+--              SELECT ia.value_text FROM invoice_attribute ia WHERE ia.item_name = 'Invoice/Payment/Batch ID' 
+--	     AND ia.value_int = iia.adjustment_id
+--             )
+--            ,'AUTO_CREATE_ID'
+--	     )												
+--	)batch_id,
+--	ii.item_type as item_type,
+--	ii.service_begin_date as service_begin_date,
+--	ii.service_end_date as service_end_date,
+--	ii.code as code, 
+--	ii.rel_diags as rel_diags,
+--	ii.caption,
+--	i.SUBMITTER_ID,
+--	i.client_id,
+--	ii.hcfa_service_type,
+--	i.invoice_type,
+--	i.invoice_subtype,
+--	nvl(ii.data_num_a,0) as ffs_cap,
+--	decode(iia.adjustment_type,1,nvl(iia.adjustment_amount,0),0) +
+--	decode(iia.writeoff_code,9,iia.writeoff_amount,8,iia.writeoff_amount,0)		as refund,
+--	(select pm.caption  FROM payment_method pm WHERE
+--	 pm.id = iia.pay_method) pay_type,
+--	t.trans_id,
+--	trans_type,
+--	i.total_items,
+--	iia.payer_type as payer_type,
+--	iia.payer_id as payer_id,
+--	i.billing_id as billing_id,
+--	(SELECT owner_org_id FROM org where org_internal_id = service_facility_id) as owner_org_id
+--FROM 	invoice i ,  transaction t ,	
+---	invoice_item_adjust iia , invoice_item ii
+--WHERE   t.trans_id = i.main_transaction 			
+--	AND ii.parent_id  = i.invoice_id
+--	AND iia.parent_id = ii.item_id
+--	AND NOT (invoice_status =15 AND parent_invoice_id is not null);*/
+-			
 
 create or replace view REVENUE_COLLECTION as
-select  provider,
-        invoice_id,
-        invoice_date,
-        decode(ffs_cap,1,decode(h.ABBREV,'04',0,'05',0,(total_charges)),0) as ffs_prof,
-        decode(ffs_cap,1,decode(h.ABBREV,'04',(total_charges),0),0) as x_ray,
-        decode(ffs_cap,1,decode(h.ABBREV,'05',(total_charges),0),0) as lab,
-        decode(ffs_cap,0,decode(h.ABBREV,'04',0,'05',0,(total_charges)),0) as cap_ffs_prof,
-        decode(ffs_cap,0,decode(h.ABBREV,'04',(total_charges),0),0) as cap_x_ray,
-        decode(ffs_cap,0,decode(h.ABBREV,'05',(total_charges),0),0) as cap_lab,
-        decode(ffs_cap,0,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as cap_pmt,        
+select  ic.provider,
+        ic.invoice_id,
+        ic.invoice_date,
+        decode(ic.ffs_cap,1,decode(h.ABBREV,'04',0,'05',0,(ic.total_charges)),0) as ffs_prof,
+        decode(ffs_cap,1,decode(h.ABBREV,'04',(ic.total_charges),0),0) as x_ray,
+        decode(ffs_cap,1,decode(h.ABBREV,'05',(ic.total_charges),0),0) as lab,
+        decode(ffs_cap,0,decode(h.ABBREV,'04',0,'05',0,(ic.total_charges)),0) as cap_ffs_prof,
+        decode(ffs_cap,0,decode(h.ABBREV,'04',(ic.total_charges),0),0) as cap_x_ray,
+        decode(ffs_cap,0,decode(h.ABBREV,'05',(ic.total_charges),0),0) as cap_lab,
+        decode(ffs_cap,0,decode(ic.invoice_type,0,(ic.person_pay+ic.insurance_pay),0),0) as cap_pmt,        
 	0 as cap_month,	        
-        decode(ffs_cap,1,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as ffs_pmt,
-        decode(invoice_type,0,decode(h.ABBREV,'04',0,'05',0,(person_pay+insurance_pay)),0) as prof_pmt,
-        decode(invoice_type,0,decode(h.ABBREV,'05',(person_pay+insurance_pay),0),0) as lab_pmt,
-        decode(invoice_type,0,decode(h.ABBREV,'04',(person_pay+insurance_pay),0),0) as x_ray_pmt,
-        decode(invoice_type,1,(person_pay+insurance_pay),0) as ancill_pmt,
-       	total_items,
-        misc_charges,
-        invoice_subtype,        
+        decode(ic.ffs_cap,1,decode(ic.invoice_type,0,(ic.person_pay+ic.insurance_pay),0),0) as ffs_pmt,
+        decode(ic.invoice_type,0,decode(h.ABBREV,'04',0,'05',0,(ic.person_pay+ic.insurance_pay)),0) as prof_pmt,
+        decode(ic.invoice_type,0,decode(h.ABBREV,'05',(ic.person_pay+ic.insurance_pay),0),0) as lab_pmt,
+        decode(ic.invoice_type,0,decode(h.ABBREV,'04',(ic.person_pay+ic.insurance_pay),0),0) as x_ray_pmt,
+        decode(ic.invoice_type,1,(ic.person_pay+ic.insurance_pay),0) as ancill_pmt,
+       	i.total_items,
+        ic.misc_charges,
+        ic.invoice_subtype,        
         h.abbrev,
-        hcfa_service_type,
-        invoice_type,
-        facility,
-        SUBMITTER_ID,
-        batch_id,
-        trans_type,
-        refund
-FROM    invoice_charges,HCFA1500_Service_Type_Code h
+        ic.hcfa_service_type,
+        ic.invoice_type,
+        ic.facility,
+        ic.SUBMITTER_ID,
+        ic.batch_id,
+        ic.trans_type,
+        ic.refund
+FROM    invoice_charges ic,HCFA1500_Service_Type_Code h,invoice i
 WHERE   hcfa_service_type= h.id(+)
+AND	i.invoice_id = ic.invoice_id
 UNION ALL	
 SELECT  provider_id as provider,
 	to_number(NULL)as invoice_id,
