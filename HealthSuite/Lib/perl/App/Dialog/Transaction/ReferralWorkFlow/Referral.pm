@@ -39,7 +39,7 @@ sub initialize
 		select distinct serv_category,name
 		from REF_SERVICE_CATEGORY
 		order by  name
-		};	
+		};
 	my $maxrows=MAXROWS;
 	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
@@ -142,8 +142,8 @@ sub initialize
 										new CGI::Dialog::Field(type=> 'text', caption => 'MD First name', name => 'mdfirstname'),
 										new CGI::Dialog::Field(type=> 'text', caption => 'Last name', name => 'mdlastname'),
 				]),
-	
-	new CGI::Dialog::Field(caption =>'Source of Referral',
+
+	new CGI::Dialog::Field(caption =>'Source of Service Request',
 					name => 'source',
 					#options => FLDFLAG_PREPENDBLANK,
 					fKeyStmtMgr => $STMTMGR_TRANSACTION,
@@ -270,7 +270,7 @@ sub initialize
 				<TD COLSPAN=2>
 
 					<input type="button" value="Menu" onClick="javascript:clickMenuRef('menu');">
-					<input type='button' value='Followup Worklist' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
+					<input type='button' value='Referral Followup Worklist' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
 					<input type='button' value='Lookup Patient' onClick="javascript:clickMenuRef('search/patient');">
 					<input type='button' value='Add Patient' onClick="javascript:clickMenuRef('org/#session.org_id#/dlg-add-patient');">
 					<input type='button' value='Edit Patient' onClick="javascript:clickMenuRef('search/patient');">

@@ -47,6 +47,8 @@ sub initialize
 		#	fields => [
 				new App::Dialog::Field::Person::ID(caption =>'Intake Coordinator ', name => 'coordinator'),
 				new CGI::Dialog::Field(caption => 'Referral Date',  type => 'date', name => 'ref_date'),
+				new CGI::Dialog::Field(caption => 'Source of Service Request',  name => 'source_referral', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
+
 			#	]),
 		new CGI::Dialog::Subhead(heading => 'Assign provider'),
 		new CGI::Dialog::Field(caption => 'Provider Contact', name => 'contact_provider'),
@@ -55,7 +57,7 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'Provider Phone', name => 'provider_phone', type => 'phone'),
 				new CGI::Dialog::Field(caption => 'Ext', name => 'provider_phone_ext', size =>'4'),
 			]),
-		new CGI::Dialog::Field(caption =>'Provider Org', name => 'provider',findPopup => '/directory-p/ServiceStCityLookup', secondaryFindField => '_f_provider_name'),
+		new CGI::Dialog::Field(caption =>'Provider Org', name => 'provider',findPopup => '/directory-p/ServiceDrillDownLookup', secondaryFindField => '_f_provider_name'),
 		new CGI::Dialog::Field(caption => 'Provider Name', name => 'provider_name'),
 
 		new CGI::Dialog::Subhead(heading => 'Fee Negotiation'),
@@ -107,7 +109,6 @@ sub initialize
 		new CGI::Dialog::Field(caption => 'Description',  type => 'memo',name=>'code_description',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Comment',  type => 'memo',name=>'code_comment',options => FLDFLAG_READONLY,),
 		new CGI::Dialog::Field(caption => 'Service Request Charge',  name => 'service_rate', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
-		new CGI::Dialog::Field(caption => 'Source of Referral',  name => 'source_referral', size => '7', type=>'currency',options => FLDFLAG_READONLY,),
 
 		new CGI::Dialog::Subhead(heading => 'Authorization'),
 		new CGI::Dialog::MultiField(name => 'clientid_num', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -374,7 +375,7 @@ sub handle_page_supplType_special
 						<TD COLSPAN=2>
 
 							<input type="button" value="Menu" onClick="javascript:clickMenu('menu');">
-							<input type='button' value='Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Referral Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
 							<input type='button' value='Lookup Patient' onClick="javascript:clickMenu('search/patient');">
 							<input type='button' value='Add Patient' onClick="javascript:clickMenu('org/#session.org_id#/dlg-add-patient');">
 							<input type='button' value='Edit Patient' onClick="javascript:clickMenu('search/patient');">
@@ -409,7 +410,7 @@ sub handle_page_supplType_special
 						<TD COLSPAN=2>
 
 							<input type="button" value="Menu" onClick="javascript:clickMenu('menu');">
-							<input type='button' value='Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
+							<input type='button' value='Referral Followup Worklist' onClick="javascript:clickMenu('worklist/referral?user=physician');">
 							<input type='button' value='Lookup Patient' onClick="javascript:clickMenu('search/patient');">
 							<input type='button' value='Add Patient' onClick="javascript:clickMenu('org/#session.org_id#/dlg-add-patient');">
 							<input type='button' value='Edit Patient' onClick="javascript:clickMenu('search/patient');">
