@@ -135,27 +135,37 @@ sub addContentOrgType
 	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
-		return;
+		return 1;
 	}
 	if ($type eq 'main')
 	{
 		$excludeGroups = "'dept'";
+		$self->addContent(
+			new CGI::Dialog::Field(name => 'member_name',
+					lookup => 'Org_Type',
+					style => 'multicheck',
+					options => FLDFLAG_REQUIRED,
+					caption => 'Organization <nobr>Type(s)</nobr>',
+					hints => 'You may choose more than one organization type.',
+					fKeyWhere => "group_name not in ($excludeGroups)"),
+		);
+		return 1;
 	}
+
 	if ($type eq 'provider')
 	{
 		$excludeGroups = "'employer', 'insurance', 'ipa', 'other'";
+		$self->addContent(
+			new CGI::Dialog::Field(name => 'member_name',
+					lookup => 'Org_Type',
+					style => 'select',
+					options => FLDFLAG_REQUIRED,
+					caption => 'Organization Type',
+					fKeyWhere => "group_name not in ($excludeGroups)"),
+		);
+		return 1;
 	}
-
-	$self->addContent(
-		new CGI::Dialog::Field(name => 'member_name',
-				lookup => 'Org_Type',
-				style => 'multicheck',
-				options => FLDFLAG_REQUIRED,
-				caption => 'Organization <nobr>Type(s)</nobr>',
-				hints => 'You may choose more than one organization type.',
-				fKeyWhere => "group_name not in ($excludeGroups)"),
-	);
-
+	return 1;
 }
 
 sub makeStateChanges
