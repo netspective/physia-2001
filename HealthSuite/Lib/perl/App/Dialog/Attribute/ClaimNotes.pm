@@ -16,8 +16,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
 
 
-%RESOURCE_MAP=('claim-notes' => { 
-			valueType => App::Universal::ATTRTYPE_INVOICENOTES, 
+%RESOURCE_MAP=('claim-notes' => {
+			valueType => App::Universal::ATTRTYPE_INVOICENOTES,
 			heading => '$Command Claim Notes',
 			_arl => ['invoice_id'], _arl_modify => ['item_id'] ,
 			_idSynonym => 'attr-' . App::Universal::ATTRTYPE_INVOICENOTES()
@@ -43,7 +43,7 @@ sub new
 			level => 1,
 			scope =>'invoice_attribute',
 			key => "#param.invoice_id#",
-			data => "Claim Notes for '#field.invoice_id#' to <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
+			data => "Claim Notes to invoice <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
 		};
 		$self->addFooter(new CGI::Dialog::Buttons);
 		return $self;
@@ -78,7 +78,7 @@ sub execute
 			_debug => 0
 	);
 
-	$page->redirect("/invoice/$invoiceId/notes");
+	$self->handlePostExecute($page, $command, $flags, "/invoice/$invoiceId/notes");
 	return "\u$command completed.";
 }
 
