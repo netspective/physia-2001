@@ -537,7 +537,6 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selTransferInvoicesByClient', $personId);
 	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId);
 	if($creditInvoices->[0]->{invoice_id} eq '')
 	{
@@ -907,6 +906,15 @@ sub getHtml
 		my $itemAdjs = $item->{total_adjust};
 		$totalInvoiceBalance += $itemBalance;
 
+		my $isVoided = $item->{data_text_b};
+		my $readOnly = '';
+		my $voidHtml = '';
+		if($isVoided eq 'void')
+		{
+			$readOnly = 'READONLY';
+			$voidHtml = '(void)';		
+		}
+
 		my $endDateDisplay = '';
 		if(my $endDate = $item->{service_end_date})
 		{
@@ -919,16 +927,16 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_adjustments" VALUE="$itemAdjs"/>
 			<TR VALIGN=TOP>
-				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B> $voidHtml</FONT></TD>
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_allow") ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_allow") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_paid") ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_plan_paid") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
+				<TD><INPUT $readOnly NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
 			</TR>
 		};
 	}
