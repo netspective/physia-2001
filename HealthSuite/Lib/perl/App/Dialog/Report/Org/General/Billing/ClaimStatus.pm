@@ -38,6 +38,13 @@ sub new
 			options => FLDFLAG_REQUIRED,
 		),
 
+		new CGI::Dialog::Field::Duration(
+			name => 'service',
+			caption => 'Start/End Service Date',
+			begin_caption => 'Service Begin Date',
+			end_caption => 'Service End Date',
+		),
+
 		new App::Dialog::Field::Insurance::Plan(caption => 'Claim Number(s)',
 			name => 'claim_numbers',
 			findPopup => '/lookup/claim',
@@ -233,6 +240,11 @@ sub buildSqlStmt
 				and Invoice.owner_type = $typeOrg
 				and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
+				and Invoice.Invoice_ID in (
+					Select Parent_ID from Invoice_Item
+					Where (? Is NULL or Invoice_Item.service_begin_date >= to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT'))
+					and (? Is NULL or Invoice_Item.service_end_date <= to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT'))
+				)
 				$claimNumberCond
 				$invoiceStatusCond
 				and Invoice_Status.id = Invoice.invoice_status
@@ -259,6 +271,8 @@ sub execute
 
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
+	my $serviceBeginDate = $page->field('service_begin_date');
+	my $serviceEndDate = $page->field('service_end_date');
 
 	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
@@ -285,7 +299,7 @@ sub execute
 	};
 
 	my $sqlStmt = $self->buildSqlStmt($page, $flags | FLAG_GETCOUNTS);
-	my $data = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsArray($page, STMTMGRFLAG_DYNAMICSQL, $sqlStmt, $orgIntId, $startDate, $endDate);
+	my $data = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsArray($page, STMTMGRFLAG_DYNAMICSQL, $sqlStmt, $orgIntId, $startDate, $endDate, $serviceBeginDate, $serviceBeginDate, $serviceEndDate, $serviceEndDate);
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $publishDefn);
 
 	my $html = qq{
@@ -294,7 +308,7 @@ sub execute
 		<td>
 			@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL,
 				$sqlStmt,
-				[$orgIntId, $startDate, $endDate], undef, undef, $publishDefn) ]}
+				[$orgIntId, $startDate, $endDate, $serviceBeginDate, $serviceBeginDate, $serviceEndDate, $serviceEndDate], undef, undef, $publishDefn) ]}
 		</td>
 		</tr>
 	</table>
@@ -328,6 +342,8 @@ sub prepare_detail_status
 
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
+	my $serviceBeginDate = $page->field('service_begin_date');
+	my $serviceEndDate = $page->field('service_end_date');
 
 	my $sqlStmt = $self->buildSqlStmt($page);
 
@@ -360,7 +376,7 @@ sub prepare_detail_status
 	};
 
 	my @data = ();
-	my $claimStatus = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt,$page->session('org_internal_id'), $startDate, $endDate);
+	my $claimStatus = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt,$page->session('org_internal_id'), $startDate, $endDate, $serviceBeginDate, $serviceBeginDate, $serviceEndDate, $serviceEndDate);
 	foreach (@$claimStatus)
 	{
 		my $sqlStmtNote = qq{select value_text from invoice_history where cr_user_id = 'EDI_PERSE' AND parent_id = $_->{invoice_id} and rownum < 6 order by item_id asc};
@@ -391,7 +407,7 @@ sub prepare_detail_status
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	#$page->addContent('<b style="font-family:Helvetica; font-size:12pt">('. $page->param('status_caption') . ' Claims) </b><br><br>',
 	#	@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, #| STMTMGRFLAG_DEBUG,
-	#	$sqlStmt,	[$page->session('org_internal_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+	#	$sqlStmt,	[$page->session('org_internal_id'), $startDate, $endDate, $serviceBeginDate, $serviceBeginDate, $serviceEndDate, $serviceEndDate], undef, undef, $publishDefn) ]}
 	#);
 	$page->addContent($html);
 }
