@@ -1114,11 +1114,11 @@ function doActionPopup(arl, autoRefresh, features)
 	var popUpWindow;
 	if (isActionPopupWindow())
 	{
-		popUpWindow = open(arl, '', "width=620,height=600,scrollbars,resizable");
+		popUpWindow = open(arl, '', "location, width=620,height=600,scrollbars,resizable");
 	}
 	else
 	{
-		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "width=620,height=600,scrollbars,resizable");
+		popUpWindow = open(arl, WINDOWNAME_ACTIONPOPUP, "location, width=620,height=600,scrollbars,resizable");
 	}
 	popUpWindow.focus();
 }

@@ -19,11 +19,6 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			select value_text as physician, count(value_text) as count
 			from Event, Event_Attribute
 			where Event_Attribute.item_name = 'Appointment/Attendee/Physician'
-				and value_text in
-					(select value_text from Person_Attribute
-					 where parent_id = ?
-						 and value_type = 250
-					)
 				and facility_id = ?
 				and Event.event_id = Event_Attribute.parent_id
 				and Event.start_time between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -34,8 +29,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Physician', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=physician&physician=#&{?}#")', hint => 'View Details' },
-					{head => 'Count', dAlign => 'right'},
+					{	head => 'Physician', 
+						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=physician&physician=#&{?}#')}, hint => 'View Details' 
+					},
+					{	head => 'Count', dAlign => 'right'},
 				],
 		},
 	},
@@ -68,11 +65,6 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			select caption as patient_type, count(caption) as count, Appt_Attendee_Type.id
 			from Appt_Attendee_Type, Event, Event_Attribute ea2, Event_Attribute ea1
 			where ea1.item_name = 'Appointment/Attendee/Physician'
-				and ea1.value_text in
-					(select value_text from Person_Attribute
-					 where parent_id = ?
-					 	 and value_type = 250
-					)
 				and ea2.item_name = 'Appointment/Attendee/Patient'
 				and ea2.parent_id = ea1.parent_id
 				and Event.event_id = ea1.parent_id
@@ -87,7 +79,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			columnDefn =>
 				[
 					{head => 'Patient type',
-						url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#")', hint => 'View Details' },
+						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=patient_type&patient_type_id=#2#&patient_type_caption=#0#')}, hint => 'View Details' },
 					{head => 'Count', dAlign => 'right'},
 				],
 		},
@@ -120,11 +112,6 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				event_status
 			from Appt_Status, Event, Event_Attribute
 			where item_name = 'Appointment/Attendee/Physician'
-				and value_text in
-					(select value_text from Person_Attribute
-					 where parent_id = ?
-					 	and value_type = 250
-					)
 				and Event.event_id = Event_Attribute.parent_id
 				and facility_id = ?
 				and Event.start_time between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -135,7 +122,9 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		publishDefn => 	{
 			columnDefn =>
 				[
-					{head => 'Appointments', url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#")', hint => 'View Details' },
+					{head => 'Appointments', 
+						url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=appointments&event_status=#2#&caption=#0#')}, hint => 'View Details' 
+					},
 					{head => 'Count', dAlign => 'right'},
 				],
 		},

@@ -26,12 +26,12 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
 	$self->param('_pm_view', $pathItems->[0]);
-	$self->param('execute', 'Go') if $pathItems->[2];  # Auto-execute
+	$self->param('execute', 'Go') if $pathItems->[1];  # Auto-execute
 
 	unless ($self->param('searchAgain'))
 	{
 		my ($resource_id, $facility_id, $action, $fromDate, $toDate, $apptStatus, $eventId) =
-			split(/,/, $pathItems->[1]);
+			@{$pathItems}[1..7];
 
 		$self->param('resource_id', $resource_id);
 		$self->param('facility_id', $facility_id);
@@ -56,10 +56,10 @@ sub getForm
 	my @actionValues = (
 		"/schedule/apptsheet/encounterCheckin/%itemValue%",
 		"/schedule/apptsheet/encounterCheckout/%itemValue%",
-		"/schedule/appointment/cancel/%itemValue%",
-		"/schedule/appointment/reschedule/%itemValue%",
-		"/schedule/appointment/noshow/%itemValue%",
-		"/schedule/appointment/update/%itemValue%",
+		"/schedule/dlg-cancel-appointment/%itemValue%",
+		"/schedule/dlg-reschedule-appointment/%itemValue%",
+		"/schedule/dlg-noshow-appointment/%itemValue%",
+		"/schedule/dlg-update-appointment/%itemValue%",
 	);
 
 	$self->param('item_action_arl_select', $actionValues[$self->param('action')])

@@ -72,7 +72,7 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'Physician/Provider ID',
 			name => 'provider_id',
-			types => ['Physician'],
+			types => ['Patient'],
 		),
 
 		new App::Dialog::Field::Organization::ID(caption => 'Facility ID',
@@ -101,6 +101,9 @@ sub buildSqlStmt
 	my ($self, $page, $flags) = @_;
 	
 	my $facilityId  = $page->field('facility_id');
+	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+		$page->session('org_internal_id'), $facilityId);
+	
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 
@@ -139,14 +142,14 @@ sub buildSqlStmt
 		if ($providerId)
 		{
 			$facilityCond = qq{
-				and upper(Transaction.service_facility_id) = upper('$facilityId')
+				and Transaction.service_facility_id = $internalFacilityId
 			};
 		}
 		else
 		{
 			$facilityCond = qq{
 				and Transaction.trans_id = Invoice.main_transaction
-				and upper(Transaction.service_facility_id) = upper('$facilityId')
+				and Transaction.service_facility_id = $internalFacilityId
 			};
 		}
 	}
@@ -232,7 +235,7 @@ sub execute
 		columnDefn =>
 		[
 			{	head => 'Claims', 
-				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#&status_caption=#0#", null, "width=800,height=600,scrollbars,resizable")',
+				url => q{javascript:doActionPopup('#hrefSelfPopup#&detail=status&invoice_status=#2#&status_caption=#0#', null, 'width=800,height=600,scrollbars,resizable')},
 				hint => 'View Details' 
 			},
 			{head => 'Count', dAlign => 'right'},
@@ -274,16 +277,16 @@ sub prepare_detail_status
 		columnDefn =>
 		[
 			{head => 'Claim ID', colIdx => 7, dAlign => 'right',
-				url => qq{javascript:chooseItemForParent("/invoice/#7#/summary") },
+				url => q{javascript:chooseItemForParent('/invoice/#7#/summary') },
 				hint => 'View Invoice Summary',
 			},
 			{head => 'Inquiry', colIdx => 7, dAlign => 'center',
-				dataFmt => qq{<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0>},
-				url => qq{javascript:chooseItemForParent("/invoice/#7#/dlg-add-claim-inquiry") },
+				dataFmt => q{<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0>},
+				url => q{javascript:chooseItemForParent('/invoice/#7#/dlg-add-claim-inquiry') },
 				hint => 'Add Inquiry Notes for Claim #7#',
 			},
 			{head => 'Patient ID', colIdx => 8, dAlign => 'center',
-				url => qq{javascript:chooseItemForParent("/person/#8#/account")},
+				url => q{javascript:chooseItemForParent('/person/#8#/account')},
 				hint => 'View #8# Account',
 			},
 			{head => 'Invoice Date', colIdx => 0,},
@@ -302,10 +305,9 @@ sub prepare_detail_status
 		],
 	};
 	
-	
 	$page->addContent('<b style="font-family:Helvetica; font-size:12pt">('. $page->param('status_caption') . ' Claims) </b><br><br>',
 		@{[ $STMTMGR_RPT_CLAIM_STATUS->createHtml($page, STMTMGRFLAG_DYNAMICSQL, #| STMTMGRFLAG_DEBUG,
-		$sqlStmt,	[$page->session('org_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
+		$sqlStmt,	[$page->session('org_internal_id'), $startDate, $endDate], undef, undef, $publishDefn) ]}
 	);
 }
 

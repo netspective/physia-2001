@@ -29,6 +29,7 @@ use App::Schedule::Slot;
 use App::Schedule::Utilities;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 use App::Statements::Component::Scheduling;
 
 use enum qw(BITMASK:MULTIRESOURCESEARCH_ SERIAL PARALLEL);
@@ -73,7 +74,7 @@ sub findAvailSlots
 
 		for (@scheduleObjects)
 		{
-			next if $_->{facility_id} !~ /$facility_id/;
+			next if $_->{facility_id} ne $facility_id;
 
 			if ($flag & MULTIRESOURCESEARCH_PARALLEL) {
 				if ($minute_set->empty) {
@@ -246,6 +247,10 @@ sub findEventSlots
 		{
 			$slot->{attributes}->{$key} = Trim($event->{$key});
 		}
+		
+		# Store facility name instead of org_internal_id
+		$slot->{attributes}->{facility_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+			'selId', $slot->{attributes}->{facility_id});
 		
 		if ($event->{event_status}) {
 			$slot->{attributes}->{status} =	($event->{event_status} =~ /1/) ?

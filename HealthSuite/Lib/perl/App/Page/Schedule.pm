@@ -31,7 +31,7 @@ sub handleARL
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	#return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
-	
+
 	$self->param('_dialogreturnurl', '/schedule');
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
@@ -55,7 +55,7 @@ sub handleARL_apptsheet
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
 	# in the ARL, the date will come in as mm-dd-yyyy we need it like mm/dd/yyyy
-	$pathItems->[1] =~ s/\-/\//g if defined $pathItems->[1];
+	$pathItems->[1] =~ s/(\d\d)\-(\d\d)/$1\/$2/g if defined $pathItems->[1];
 	if(my $firstPathItem = $pathItems->[1])
 	{
 		if($firstPathItem eq 'customize') {

@@ -34,33 +34,81 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	my $physField = new App::Dialog::Field::Person::ID(name => 'r_ids',
-		caption => 'Resource(s)',
+		caption => 'Associated Resource(s)',
 		hints => 'Resource(s) and/or select Roving Physician(s)',
 		size => 40,
 		maxLength => 255,
 		findPopupAppendValue => ',',
-		options => FLDFLAG_REQUIRED,
 	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
 	$self->addContent(
-
+		new CGI::Dialog::Subhead(heading => 'General'),
 		new CGI::Dialog::Field(name => 'appt_type_id',
 			caption => 'Appointment Type ID',
 			options => FLDFLAG_READONLY,
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 		),
-
 		new CGI::Dialog::Field::Duration(name => 'effective',
 			caption => 'Effective Dates',
 		),
-
 		new CGI::Dialog::Field::TableColumn(column => 'Appt_Type.caption',
 			caption => 'Caption',
 			schema => $schema,
 			options => FLDFLAG_REQUIRED
 		),
-
+		
+		new CGI::Dialog::Subhead(heading => 'Specifications'),
+		new CGI::Dialog::Field(caption => 'Appointment Duration',
+			name => 'duration',
+			fKeyStmtMgr => $STMTMGR_SCHEDULING,
+			fKeyStmt => 'selApptDuration',
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::MultiField(
+			fields => [			
+				new CGI::Dialog::Field(caption => 'Lead Time',
+					name => 'lead_time',
+					type => 'integer',
+					hints => 'minutes',
+				),
+				new CGI::Dialog::Field(caption => 'Lag Time (minutes)',
+					name => 'lag_time',
+					type => 'integer',
+					hints => 'minutes',
+				),
+			],
+		),
+		new CGI::Dialog::Field(caption => 'Back To Back Appointment Allowed',
+			name => 'back_to_back',
+			type => 'bool',
+			style => 'check',
+			defaultValue => 1,
+		),
+		new CGI::Dialog::Field(caption => 'Multiple Simultaneous Appointments Allowed',
+			name => 'multiple_appts',
+			type => 'bool',
+			style => 'check',
+			defaultValue => 0,
+		),
+		#new CGI::Dialog::MultiField(
+		#	fields => [
+				new CGI::Dialog::Field(caption => 'AM Limits',
+					name => 'am_limits',
+					type => 'integer',
+					hints => 'Max # appointments of this type during AM hours',
+				),		
+				new CGI::Dialog::Field(caption => 'PM Limits',
+					name => 'pm_limits',
+					type => 'integer',
+					hints => 'Max # appointments of this type during PM hours',
+				),
+		#	],
+		#),
+		
+		new CGI::Dialog::Subhead(heading => 'Associated Requirements'),
 		$physField,
 
 		new App::Dialog::Field::RovingResource(physician_field => '_f_r_ids',
@@ -74,22 +122,6 @@ sub new
 			appendMode => 1,
 		),
 
-		new CGI::Dialog::Field(caption => 'Duration',
-			name => 'duration',
-			fKeyStmtMgr => $STMTMGR_SCHEDULING,
-			fKeyStmt => 'selApptDuration',
-			fKeyDisplayCol => 1,
-			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED),
-
-		new CGI::Dialog::Field(name => 'facility_id',
-			caption => 'Facility',
-			fKeyStmtMgr => $STMTMGR_SCHEDULING,
-			fKeyStmt => 'selFacilityList',
-			fKeyDisplayCol => 1,
-			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED
-		),
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -121,23 +153,17 @@ sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	if ($page->param('appt_type_id'))
-	{
-		$self->populateData_update($page, $command, $activeExecMode, $flags);
-	}
-	else
-	{
-		my $startDate = $page->getDate();
-		$page->field('effective_begin_date', $startDate);
-		$page->field('r_ids', $page->param('resource_id'));
-	}
+	my $startDate = $page->getDate();
+	$page->field('effective_begin_date', $startDate);
+	$page->field('r_ids', $page->param('resource_id'));
 }
 
 sub populateData_update
 {	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	my $apptTypeId = $page->param('appt_type_id');
 
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,'selPopulateApptTypeDialog', $apptTypeId);
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
+		'selPopulateApptTypeDialog', $apptTypeId);
 }
 
 ###############################

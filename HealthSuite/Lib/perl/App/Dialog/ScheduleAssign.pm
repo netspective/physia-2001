@@ -13,6 +13,8 @@ use App::Dialog::Field::RovingResource;
 use App::Schedule::ApptSheet;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Org;
+
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -37,7 +39,7 @@ sub new
 		types => ['Physician'],
 		hints => 'Reassign Appointments From this Resource',
 		size => 30,
-		maxLength => 32,
+		maxLength => 64,
 		options => FLDFLAG_REQUIRED
 	);
 	$physFrom->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
@@ -47,7 +49,7 @@ sub new
 		types => ['Physician'],
 		hints => 'To this Resource',
 		size => 30,
-		maxLength => 32,
+		maxLength => 64,
 		options => FLDFLAG_REQUIRED
 	);
 	$physTo->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
@@ -127,8 +129,11 @@ sub execute
 
 	my $facility_id = $page->field('facility_id') || $page->session('org_id');
 
+	my $facility_internal_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
+		'selOrgId', $page->session('org_internal_id'), $facility_id);
+	
 	$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'updAssignResource', $toResourceID,
-		$fromResourceID, $startDate, $endDate, $facility_id);
+		$fromResourceID, $startDate, $endDate, $facility_internal_id);
 
 	$self->handlePostExecute($page, $command, $flags);
 }

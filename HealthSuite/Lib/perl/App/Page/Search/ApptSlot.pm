@@ -28,14 +28,15 @@ sub handleARL
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$self->params('_advanced', 1) if $pathItems->[0] eq 'apptslota';
-	$self->setFlag(App::Page::PAGEFLAG_ISPOPUP) if $rsrc eq 'lookup';
+	#$self->params('_advanced', 1) if $pathItems->[0] eq 'apptslota';
+	#$self->setFlag(App::Page::PAGEFLAG_ISPOPUP) if $rsrc eq 'lookup';
 
 	unless ($self->param('searchAgain')) {
 		if ($pathItems->[1]) {
-			my ($resource_ids, $facility_ids, $start_date, $appt_duration) = split(/,/, $pathItems->[1]);
+			my ($resource_ids, $facility_ids, $start_date, $appt_duration) = 
+				split(/,/, $pathItems->[1]);
+	
 			$start_date =~ s/\-/\//g;
-
 			$self->param('resource_ids', $resource_ids) if $resource_ids;
 			$self->param('facility_ids', $facility_ids) if $facility_ids;
 			$self->param('start_date',  $start_date) if $start_date;
@@ -179,8 +180,9 @@ sub execute
 		visit_type        => $visit_type || -1
 	);
 
-	my $flag = App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
-	$flag = App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL if defined $self->param('parallel_search');
+	my $flag = defined $self->param('parallel_search') ? App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL
+		: App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
+
 	my @available_slots = $sa->findAvailSlots($self, $flag);
 	my $slotsHtml = $self->getSlotsHtml($sa, @available_slots);
 	$self->addContent($slotsHtml);

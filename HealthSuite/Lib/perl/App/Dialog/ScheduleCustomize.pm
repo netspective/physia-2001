@@ -41,7 +41,7 @@ sub new
 		hints => 'Physician ID or select a Roving Physician',
 		options => FLDFLAG_REQUIRED,
 		size => 32,
-		maxLength => 32,
+		maxLength => 64,
 	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
@@ -194,7 +194,7 @@ sub populateData_update
 
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
 		'selColumnPreference', $userID, $column);
-
+	
 	$page->field('column', $column+1);
 	$self->populateHourFields($page);
 }

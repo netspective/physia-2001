@@ -32,7 +32,7 @@ sub new
 
 		new App::Dialog::Field::Person::ID(name => 'resource_id',
 			caption => 'Resource ID',
-			types => ['Physician'],
+			types => ['Patient'],
 			options => FLDFLAG_REQUIRED
 		),
 

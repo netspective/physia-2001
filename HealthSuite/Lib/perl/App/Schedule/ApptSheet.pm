@@ -12,6 +12,7 @@ use Date::Calc qw(:all);
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 
 use enum qw(BITMASK:APPTSHEET_ HEADER BODY CUSTOMIZE BOOKCOUNT TEMPLATE);
 use constant APPTSHEET_ALL => APPTSHEET_HEADER|APPTSHEET_BODY|APPTSHEET_CUSTOMIZE|APPTSHEET_BOOKCOUNT|APPTSHEET_TEMPLATE;
@@ -324,6 +325,7 @@ sub buildHeader
 		my $dateString = Day_of_Week_Abbreviation(Day_of_Week(@date)) . sprintf(" %02d/%02d/%04d", $date[1],$date[2],$date[0]) ;
 		my $resource_id = $self->{inputSpec}[$col][1];
 		my $facility_id = $self->{inputSpec}[$col][2];
+		my $org_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $facility_id);
 
 		my ($resource, $facility) = $self->getResource_Facility($page, $col);
 
@@ -376,17 +378,17 @@ sub buildHeader
 							<select onChange='location.href=this.value'>
 								<option value='#'>Choose Action</option>
 								<option value='$arl'>$altView View</option>
-								<option value='/search/appointment/$resource_id,$facility_id,0,$dashDate,$dashDate/1'>Block Confirm</option>
-								<option value='/search/appointment/$resource_id,$facility_id,2,$dashDate,$dashDate,0/1'>Block Check In</option>
-								<option value='/search/appointment/$resource_id,$facility_id,3,$dashDate,$dashDate,1/1'>Block Check Out</option>
-								<option value='/search/appointment/$resource_id,$facility_id,4,$dashDate,$dashDate/1'>Block Cancel</option>
-								<option value='/search/appointment/$resource_id,$facility_id,5,$dashDate,$dashDate/1'>Block Reschedule</option>
+								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate/1'>Block Confirm</option>
+								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate/0'>Block Check In</option>
+								<option value='/search/appointment/$resource_id/$org_id/1/$dashDate/$dashDate/1'>Block Check Out</option>
+								<option value='/search/appointment/$resource_id/$org_id/2/$dashDate/$dashDate'>Block Cancel</option>
+								<option value='/search/appointment/$resource_id/$org_id/3/$dashDate/$dashDate'>Block Reschedule</option>
 								<option value='/schedule/dlg-add-appointment//$resource_id/$facility_id/'>Add Appointment</option>
 								<option value='#'>*Verify Insurance</option>
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
 								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Add Template</option>
 								<option value='/search/template/$resource_id,$facility_id/1'>View Templates</option>
-								<option value='/search/appointment/$resource_id,$facility_id,0,$dashDate,$dashDate/1'>Print Schedule</option>
+								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate'>Print Schedule</option>
 								$customizeOption
 							</select>
 						</td>
@@ -572,8 +574,9 @@ sub getAppointments
 
 			my $wlHref;
 			if ($slots[$i]->{attributes}->{conflict}) {
+				my $org_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $facility_id);
 				my $wl = $slots[$i]->{attributes}->{conflict} =~ /wait/i ? " [WL]" : " [OB]";
-				$wlHref = qq{<a href="javascript:doActionPopup('/lookup/appointment/$resource_id,$facility_id,5,$date,$date,,$parent_id/1')"
+				$wlHref = qq{<a href="javascript:doActionPopup('/lookup/appointment/$resource_id/$org_id/5/$date/$date//$parent_id')"
 					class='person'>$wl</a>};
 			}
 

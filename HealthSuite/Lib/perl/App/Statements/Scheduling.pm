@@ -19,16 +19,16 @@ use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_
 @EXPORT = qw($STMTMGR_SCHEDULING);
 
 $STMTFMT_SEL_TEMPLATEINFO = qq{
-	select template_id, r_ids as resources, caption, facility_id,
+	select template_id, r_ids as resources, caption, org_id,
 		to_char(start_time, 'hh:miam') as start_time,
 		to_char(end_time, 'hh:miam') as end_time,
 		to_char(effective_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
-		decode(available,0,'NO',1,'YES') as available,
-		facility_id, to_char(cr_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as cr_stamp
-	from Template
-	where r_ids like ?
-		and facility_id like ?
+		decode(available,0,'NO',1,'YES') as available
+	from Org, Template
+	where facility_id = org_internal_id
+		and r_ids like ?
+		and org_id like ?
 		and (available = ? or available = ?)
 	order by r_ids, template_id
 };
@@ -70,11 +70,10 @@ $STMTRPTDEFN_TEMPLATEINFO =
 {
 	columnDefn =>
 		[
-			#{ head => 'ID', url => 'javascript:location.href="/schedule/template/update/#&{?}#"', hint => 'Edit Template #&{?}#'},
-			{ head => 'ID', url => 'javascript:location.href="/org/#session.org_id#/dlg-update-template/#&{?}#"', hint => 'Edit Template #&{?}#'},
-			{ head => 'Resource(s)', url => 'javascript:location.href="/search/template/1/#&{?}#"', hint => 'View #&{?}# Templates'},
+			{ head => 'ID', url => q{javascript:location.href='/org/#session.org_id#/dlg-update-template/#&{?}#'}, hint => 'Edit Template #&{?}#'},
+			{ head => 'Resource(s)', url => q{javascript:location.href='/search/template/1/#&{?}#'}, hint => 'View #&{?}# Templates'},
 			{ head => 'Caption'},
-			{ head => 'Facility', url => 'javascript:location.href="/search/template/1//#&{?}#"', hint => 'View #&{?}# Templates'},
+			{ head => 'Facility', url => q{javascript:location.href='/search/template/1//#&{?}#'}, hint => 'View #&{?}# Templates'},
 			{ head => 'Start Time'},
 			{ head => 'End Time'},
 			{ head => 'Begin'},
@@ -389,7 +388,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'selRovingPhysicianTypes' => qq{
-		select replace(caption, ' ', '_') as caption
+		select translate(caption, '/ ', '__') as caption
 		from Medical_Specialty
 		where group_name = 'Physician Specialty'
 		UNION
