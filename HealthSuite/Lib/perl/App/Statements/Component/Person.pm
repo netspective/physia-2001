@@ -437,7 +437,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		columnDefn => [
 			{ dataFmt => 'Misc Notes (#5#): #4#' },
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-misc-notes/#1#?home=#homeArl#',
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-misc-notes?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
