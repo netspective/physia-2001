@@ -26,7 +26,11 @@ SELECT	i.invoice_id,
 	ii.code as code, 
 	ii.rel_diags as rel_diags,
 	ii.caption,
-	i.SUBMITTER_ID
+	i.SUBMITTER_ID,
+	i.client_id,
+	ii.hcfa_service_type,
+	i.invoice_type,
+	i.invoice_subtype
 FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
@@ -56,7 +60,11 @@ SELECT	i.invoice_id,
 	ii.code as code, 
 	ii.rel_diags as rel_diags,
 	ii.caption,
-	i.SUBMITTER_ID
+	i.SUBMITTER_ID,
+	i.client_id,
+	ii.hcfa_service_type,
+	i.invoice_type,
+	i.invoice_subtype
 FROM 	invoice i ,  transaction t ,	invoice_attribute ia ,
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
