@@ -51,11 +51,14 @@ sub execute
 
 	my $invoiceId = $page->param('invoice_id');
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-
+	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+	my $invoiceFlags = $invoice->{flags};
 	$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId,
 			invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
+			flags => 0,
 			_debug => 0
 		);
 
@@ -71,8 +74,6 @@ sub execute
 	);
 
 	$page->redirect("/invoice/$invoiceId/summary");
-	#$self->handlePostExecute($page, $command, $flags);
-
 }
 
 1;
