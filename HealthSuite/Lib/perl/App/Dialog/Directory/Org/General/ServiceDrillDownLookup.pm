@@ -47,6 +47,8 @@ sub prepare_detail_service
 	my $code = $page->field('service');
 	my $sessionId = $page->session('org_internal_id');
 	my $html =undef;
+	my $actionURL = '/org/#9#/profile';
+
 	#$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data = ();
 	my $pub = {
@@ -60,6 +62,7 @@ sub prepare_detail_service
 			{colIdx => 5,head => 'Phone'},
 			{colIdx => 7,head => 'Fee Schedule', url => "/org/#0#/catalog/#6#/#7#"},
 			{colIdx => 8,head => 'Type'},
+			{colIdx => 9,head => 'Parent Provider',  dataFmt => "<a href=\"$actionURL\" style=\"text-decoration:none\"><img src=\"/resources/images/icons/hand-pointing-to-folder-sm.gif\" border=0></a>" },
 
 
 		],
@@ -79,6 +82,7 @@ sub prepare_detail_service
 			$_->{internal_catalog_id},
 			$_->{catalog_id},
 			$_->{type},
+			$_->{parent_org},
 
 		);
 		push(@data, \@rowData);
