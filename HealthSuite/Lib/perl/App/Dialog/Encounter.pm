@@ -1787,6 +1787,7 @@ sub billCopay
 sub handleProcedureItems
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
+	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $servItemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
@@ -1803,6 +1804,15 @@ sub handleProcedureItems
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
+		my $cptCode = $page->param("_f_proc_$line\_procedure");
+		#if cpt is a misc procedure code, get children and create invoice item for each child
+		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
+		if($miscProcChildren->[0]->{code})
+		{
+			createExplosionItems($self, $page, $command, $line, $invoiceId, $miscProcChildren);
+			next;
+		}
+
 		my $removeProc = $page->param("_f_proc_$line\_remove");
 		my $itemId = $page->param("_f_proc_$line\_item_id");
 		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
@@ -1815,7 +1825,7 @@ sub handleProcedureItems
 			next;
 		}
 
-		my $cptCode = $page->param("_f_proc_$line\_procedure");
+		#get caption for cpt code
 		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
 		#convert type to it's foreign key id
@@ -1825,10 +1835,10 @@ sub handleProcedureItems
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
 			item_id => $itemId || undef,
-			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,		#default for service start date is today
-			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,			#default for service end date is today
+			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,	#default for service start date is today
+			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,		#default for service end date is today
 			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
-			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,				#default for service type is 2 for consultation
+			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,			#default for service type is 2 for consultation
 			modifier => $page->param("_f_proc_$line\_modifier") || undef,				#default for modifier is "mandated services"
 			quantity => $page->param("_f_proc_$line\_units") || undef,					#default for units is 1
 			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
@@ -1838,8 +1848,8 @@ sub handleProcedureItems
 			caption => $cptShortName->{name} || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
-			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,		#the actual icd (diag) codes
-			data_text_a => $page->param("_f_proc_$line\_diags") || undef,			#the diag code pointers
+			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
+			data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
 			data_num_a => $page->param("_f_proc_$line\_ffs_flag") || undef,			#flag indicating if item is ffs
 		);
 
@@ -1852,6 +1862,51 @@ sub handleProcedureItems
 			%record,
 			parent_id => $invoiceId,
 			_debug => 0,
+		);
+	}
+}
+
+sub createExplosionItems
+{
+	my ($self, $page, $command, $line, $invoiceId, $miscProcChildren) = @_;
+
+	my $svcFacility = $page->field('service_facility_id');
+	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
+	my $emg = 0;
+
+	my $childCount = scalar(@{$miscProcChildren});
+	foreach my $child (@{$miscProcChildren})
+	{
+		my $servType = $page->param("_f_proc_$line\_service_type");
+		my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
+
+		my $cptCode = $child->{code};
+		my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
+		
+		my $quantity = $page->param("_f_proc_$line\_units");
+		my $unitCost = $page->param("_f_proc_$line\_charges");
+		my $extCost = $unitCost * $quantity;
+		$page->schemaAction('Invoice_Item', $command,
+			item_id => $page->param("_f_proc_$line\_item_id") || undef,
+			parent_id => $invoiceId,
+			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,	#default for service start date is today
+			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,		#default for service end date is today
+			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
+			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,			#default for service type is 2 for consultation
+			modifier => $child->{modifier} || undef,
+			quantity => $quantity || undef,
+			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
+			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,			#default for item type is service
+			code => $cptCode || undef,
+			code_type => $page->param("_f_proc_$line\_code_type") || undef,
+			caption => $cptShortName->{name} || undef,
+			#comments =>  # || undef,
+			unit_cost => $unitCost || undef,
+			extended_cost => $extCost || undef,
+			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
+			data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
+			data_num_a => $page->param("_f_proc_$line\_ffs_flag") || undef,			#flag indicating if item is ffs
 		);
 	}
 }
