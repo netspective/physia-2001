@@ -629,4 +629,117 @@ sub getHtml
 	};
 }
 
+##############################################################################
+package App::Dialog::Field::InvoiceItems;
+##############################################################################
+
+use strict;
+use Carp;
+use CGI::Validator;
+use CGI::Validator::Field;
+use CGI::Dialog;
+use DBI::StatementManager;
+
+use App::Statements::Person;
+use App::Statements::Org;
+use App::Statements::Catalog;
+use App::Statements::Insurance;
+use App::Universal;
+
+use Date::Manip;
+use Date::Calc qw(:all);
+
+use Devel::ChangeLog;
+use vars qw(@ISA @CHANGELOG);
+
+@ISA = qw(CGI::Dialog::Field);
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	$params{name} = 'items_list' unless exists $params{name};
+	$params{type} = 'invoice_items';
+	$params{lineCount} = 4 unless exists $params{count};
+	$params{allowComments} = 1 unless exists $params{allowComments};
+	$params{allowQuickRef} = 0 unless exists $params{allowQuickRef};
+
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub needsValidation
+{
+	return 1;
+}
+
+sub isValid
+{
+	my ($self, $page, $validator, $valFlags) = @_;
+
+	my $sessUser = $page->session('user_id');
+	my $sessOrg = $page->session('org_id');
+
+	my $personId = $page->field('attendee_id');
+
+	return $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $bgColorAttr = '';
+	my $spacerHtml = '&nbsp;';
+	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+
+	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
+	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+
+		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
+			<TR VALIGN=TOP>
+				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				$removeChkbox
+				<TD><INPUT  NAME='_f_proc_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_description' SIZE=50 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_description") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT  NAME='_f_item_$line\_unit_cost' TYPE='text' size=8 VALUE='@{[ $page->param("_f_item_$line\_unit_cost")  ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+			</TR>
+		};
+		$linesHtml .= qq{
+			<TR>
+				<TD COLSPAN=2 ALIGN=RIGHT><FONT $textFontAttrs><I>Comments:</I></FONT></TD>
+				<TD COLSPAN=5><INPUT CLASS='procinput' NAME='_f_proc_$line\_comments' TYPE='text' size=50 VALUE='@{[ $page->param("_f_proc_$line\_comments") ]}'></TD>
+			</TR>
+		} if $allowComments;
+	}
+
+	return qq{
+		<TR valign=top $bgColorAttr>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+			<TD COLSPAN=2>
+				<TABLE CELLSPACING=0 CELLPADDING=2>
+					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$lineCount"/>
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Qty</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Item/Description</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Cost/Unit</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+					</TR>
+					$linesHtml
+				</TABLE>
+			</TD>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+		</TR>
+	};
+}
+
 1;
