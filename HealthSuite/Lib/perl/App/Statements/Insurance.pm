@@ -349,6 +349,11 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 					and plan_name = ?
 					and record_type = 2
 		},
+	'selInsSequence' => qq{
+					select bill_sequence
+					from insurance
+					where owner_person_id = ?
+		},
 	#---------------------------------------------------------------------
 	'sel_Person_Insurance' => {
 		sqlStmt => qq{
