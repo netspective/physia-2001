@@ -57,7 +57,7 @@ my %pubDefn = (
 		},
 		{head => 'Patient ID', dataFmt => '<a href="/person/#{patient_id}#/account">#{patient_id}#</a>',},
 		{head => 'Claim ID', dataFmt => '<a href="/invoice/#{invoice_id}#/history">#{invoice_id}#</a>',},
-		{head => 'Ins Org ID', dataFmt => '<a href="/org/#{ins_org_id}#/account">#{ins_org_id}#</a>',},
+		{head => 'Ins Org ID', dataFmt => '<a href="/org/#{ins_org_id}#/profile">#{ins_org_id}#</a>',},
 		{head => 'Carrier Phone', dataFmt => '#{ins_phone}#', options => PUBLCOLFLAG_DONTWRAP,},
 		{head => 'Claim Status', dataFmt => '#{invoice_status}#', dAlign => 'center'},
 		{head => 'Balance', colIdx => '#{balance}#', dformat => 'currency'},
@@ -96,9 +96,9 @@ sub claimQuery
 sub prepare_view_resubmit
 {
 	my ($self) = @_;
-	
+
 	my $invoiceId = $self->param('invoice_id');
-	
+
 	$self->addContent(qq{
 		<h3><u>Resubmit Claim</u></h3>
 		<font face=Verdana size=3>
