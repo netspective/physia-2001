@@ -346,6 +346,7 @@ sub customValidate
 	my $specSeq1 = $page->field('value_int1');
 	my $specSeq2 = $page->field('value_int2');
 	my $specSeq3 = $page->field('value_int3');
+	my $specValid1 = $self->getField('specialty1')->{fields}->[1];
 	my $specValid2 = $self->getField('specialty2')->{fields}->[1];
 	my $specValid3 = $self->getField('specialty3')->{fields}->[1];
 
@@ -371,7 +372,23 @@ sub customValidate
 		$specValid3->invalidate($page, "The same 'Specialty Sequence' cannot be added more than once.");
 	}
 
+	if($medSpecCode ne '' && $specSeq1 ne App::Universal::SPECIALTY_UNKNOWN && $specSeq1 ne App::Universal::SPECIALTY_PRIMARY
+	   && ($specSeq1-1 ne  $specSeq2 && $specSeq1-1 > $specSeq3))
+	{
+		$specValid1->invalidate($page, "This 'Specialty Sequence' cannot be added unless the previous sequence is added.");
+	}
 
+	if($medSpecCode2 ne '' && $specSeq2 ne App::Universal::SPECIALTY_UNKNOWN && $specSeq2 ne App::Universal::SPECIALTY_PRIMARY
+	   && ($specSeq2-1 ne $specSeq1 && $specSeq2-1 ne $specSeq3))
+	{
+		$specValid2->invalidate($page, "This 'Specialty Sequence' cannot be added unless the previous sequence is added.");
+	}
+
+	if($medSpecCode3 ne '' && $specSeq3 ne App::Universal::SPECIALTY_UNKNOWN && $specSeq3 ne App::Universal::SPECIALTY_PRIMARY
+	   && ($specSeq3-1 ne $specSeq1 && $specSeq3-1 ne $specSeq2))
+	{
+		$specValid3->invalidate($page, "This 'Specialty Sequence' cannot be added unless the previous sequence is added.");
+	}
 }
 
 sub execute_add
