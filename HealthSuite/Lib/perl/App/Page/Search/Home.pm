@@ -145,9 +145,9 @@ sub prepare
 					<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
-					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, 
+					<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>,
 					<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>, or
-					<a href="/org/#session.org_id#/dlg-add-org-lab">Lab</a>					
+					<a href="/org/#session.org_id#/dlg-add-org-lab">Lab</a>
 				</font>
 			</td></tr></table>
 			<p>
@@ -273,6 +273,17 @@ sub prepare
 				<font face="arial,helvetica" size=2>
 					<b>EDI Reports</b>
 					<a href="/edi" title="View reports from Clearing House">View</a>
+				</font>
+
+			</td></tr><tr valign=top bgcolor=white><td align="right">
+				$IMAGETAGS{'icons/arrow_right_red'}
+
+			</td><td>
+				<font face="arial,helvetica" size=2>
+					<b>Reports</b>
+					<a href="/report/Accounting" title="View reports ">Accounting</a>,&nbsp;
+					<a href="/report/Billing" title="View reports">Billing</a>,&nbsp;
+					<a href="/report/Scheduling" title="View reports">Scheduling</a>
 				</font>
 
 			</td></tr></table>
