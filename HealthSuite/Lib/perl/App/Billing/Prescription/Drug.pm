@@ -19,6 +19,7 @@ sub new
 	$params{allowGeneric} = undef;
 	$params{label} = undef;
 	$params{labelSpanish} = undef;
+	$params{sig} = undef;
 
 	return bless \%params, $type;
 }
@@ -153,6 +154,18 @@ sub getLabelSpanish
 {
 	my ($self) = @_;
 	return $self->{labelSpanish};
+}
+
+sub setSig
+{
+	my ($self, $value) = @_;
+	$self->{sig} = $value;
+}
+
+sub getSig
+{
+	my ($self) = @_;
+	return $self->{sig};
 }
 
 1;
