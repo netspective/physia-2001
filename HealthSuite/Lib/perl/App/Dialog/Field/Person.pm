@@ -108,24 +108,29 @@ sub new
 		$params{size} = 16 unless $params{size};
 		$params{maxLength} = 32 unless $params{maxLength};
 
+		my $lookupType = 'person';
 		if(! $params{findPopup})
 		{
-			my $findModule = 'person';
 			if(my $types = $params{types})
 			{
-				# note -- the following $modNames "override" each other
-				#      -- i.e. if a person is a patient and physician, Physician overrides Patient
-				#         because it comes later in the list
-				foreach my $modName ('Guarantor', 'Patient', 'Staff', 'Nurse', 'Physician')
+				if (scalar(@$types) > 1)
 				{
-					$findModule = "person/\l$modName" if grep { $_ eq $modName } @$types;
+					if (! grep { $_ eq 'patient'} @$types)
+					{
+						$lookupType = 'associate';
+					}
+					else
+					{
+						$lookupType = 'person';
+					}
+				}
+				elsif (scalar(@$types))
+				{
+					$lookupType = (grep {$_ eq $$types[0]} ('Physician', 'Nurse', 'Staff'))[0] || 'person';
 				}
 			}
-			$params{findPopup} = "/lookup/person/id";
-			#$params{findPopup} = "/lookup/$findModule/id";
 		}
-		$params{findPopup} = '/lookup/person/id' unless $params{findPopup};
-		#$params{findPopup} = '/lookup/person/id' unless $params{findPopup};
+		$params{findPopup} = "/lookup/\l$lookupType/id" unless $params{findPopup};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
