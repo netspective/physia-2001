@@ -91,8 +91,21 @@
 		</deliverable>		
 		<deliverable id="1453">
 			Added text payment method to daily and monthly audit detail report
+		</deliverable>	
+		<deliverable id="661">
+			Fixed code to show up only the list of physicians and referral-doctors in the lookup window when the 'Physician/Provider ID' 
+			field is cliked in the 'care provider' dialog of 'care provider' component. The target build for this bug is 16, but was shipped in BUILD_15
+		</deliverable>	
+		<deliverable id="1413">
+			Fixed code to show up only 'Add Physician' or 'Add Referral Doctor' when a person ID that doesn't 
+			exist in the system is added in the 'Physician/Provider ID' field of the 'care	provider' dialog of 
+			'care provider' component. The target build for this bug is 16, but was shipped in BUILD_15
+		</deliverable>	
+		<deliverable id="944">
+			UI : Added a check box under home-phone field of 'Add Patient' dailog to check if the home phone is added or not. 
+			The target build for this bug is 16, but was shipped in BUILD_15. This was reopened in BUILD_16. This bug was fixed 
+			after reopening but did not ship the changes to BUILD_15.
 		</deliverable>		
-	
 	
 	</deliverables>
 </release-notes>
