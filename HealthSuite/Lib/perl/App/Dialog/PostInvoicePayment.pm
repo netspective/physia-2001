@@ -37,7 +37,9 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'alert_off'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'client_id'),
+
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED, findPopup => '/lookup/claim'),
 
 
@@ -98,6 +100,10 @@ sub new
 
 		new CGI::Dialog::Subhead(heading => 'Outstanding Items', name => 'outstanding_heading'),
 		new App::Dialog::Field::OutstandingItems(name =>'outstanding_items_list'),
+		
+		new CGI::Dialog::Field(type => 'select', style => 'radio', selOptions => 'Yes:1;No:2', name => 'next_payer_alert', caption => 'Submit to Next Payer?'),
+		
+		
 	);
 
 	#$self->addFooter(new CGI::Dialog::Buttons(
@@ -136,6 +142,7 @@ sub makeStateChanges
 	$page->param('_p_batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$paidBy Payment");
 	
 	$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 1);
+	$self->setFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 1);
 	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
 	{
 		#if($invoiceId)
@@ -320,18 +327,13 @@ sub execute
 
 
 	#Update the invoice
-	my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-	my $totalAdjustForInvoice = 0;
-	foreach my $item (@{$updatedLineItems})
-	{
-		$totalAdjustForInvoice += $item->{total_adjust};
-	}
 
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-	my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-	my $newStatus = '';
+	my $invoiceBalance = $invoice->{balance};
+	my $newStatus;
 	if($invoiceBalance == 0)
 	{
+		#$page->addError("test($invoice->{balance})");
 		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
 	}
 	else
@@ -346,19 +348,51 @@ sub execute
 		_debug => 0
 	);
 
+	my $newInvoiceId;
 	if($invoiceBalance == 0)
 	{
 		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
+	}
+	elsif($page->field('next_payer_alert') == 1)
+	{
+		$newInvoiceId = App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId, App::Universal::SUBMIT_NEXTPAYER);
 	}
 
 	if(my $paramBatchId = $page->param('_p_batch_id'))
 	{
 		$page->redirect("/org/$sessOrg/dlg-add-batch?_p_batch_id=$paramBatchId&_p_batch_type=$paidBy");
 	}
+	elsif($newInvoiceId)
+	{
+		$page->redirect("/invoice/$newInvoiceId/summary");
+	}
 	else
 	{
-		#$self->handlePostExecute($page, $command, $flags);
 		$page->redirect("/invoice/$invoiceId/summary");
+	}
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	my $paidBy = $page->param('paidBy');
+	if($paidBy eq 'insurance')
+	{
+		my $totalAdjsApplied = $page->field('check_amount');
+		my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
+		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+		my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+		my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
+
+		my $invoiceStat = $invoiceInfo->{invoice_status};
+		if($nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $invoiceInfo->{balance} > 0 && $invoiceInfo->{balance} > $totalAdjsApplied
+			&& ($invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_INTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED))
+		{
+			my $getNextPayerAlert = $self->getField('next_payer_alert');
+			$self->updateFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 0);
+			$getNextPayerAlert->invalidate($page, "Would you like to submit this claim to the next payer?");
+		}
 	}
 }
 
