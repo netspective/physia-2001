@@ -15,10 +15,10 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-%RESOURCE_MAP  = ('tests' => { transType => App::Universal::TRANSTYPE_TESTSMEASUREMENTS, 
-				heading => '$Command Tests/Measurements',  
-				_arl_add => ['person_id'], 
-				_idSynonym => 'trans-' . App::Universal::TRANSTYPE_TESTSMEASUREMENTS() 
+%RESOURCE_MAP  = ('tests' => { transType => App::Universal::TRANSTYPE_TESTSMEASUREMENTS,
+				heading => '$Command Tests/Measurements',
+				_arl_add => ['person_id'],
+				_idSynonym => 'trans-' . App::Universal::TRANSTYPE_TESTSMEASUREMENTS()
 			},);
 
 sub new
@@ -55,6 +55,17 @@ sub new
 
 	return $self;
 }
+
+sub populateData
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+
+	my $timeStamp = $page->getTimeStamp();
+	$page->field('trans_begin_stamp', $timeStamp);
+}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
