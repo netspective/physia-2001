@@ -67,20 +67,11 @@ sub execute
 {
 	my $transType = App::Universal::TRANSTYPE_ACCOUNTRECKDATE;
 	my ($self, $page, $command,$flags) = @_;	
-	$command = 'add';
-	$command ='update'if defined  $page->param('trans_id');	
-	    my $trans_id = $page->schemaAction(
-	                        'Transaction', $command,                        
-	                        trans_owner_id => $page->param('person_id') || undef,
-	                        provider_id => $page->session('user_id') ||undef,
-	                        trans_owner_type => 0, 
-	                        trans_status =>$ACTIVE,
-	                        trans_subtype=>'Reck Date',
-	                        caption =>'Account Reck Date',
-	                        trans_type => $ACCOUNT_RECK_DATE,                        
-	                        trans_begin_stamp => $page->field('reckdate')||undef,	                                      
-	                        trans_id => $page->param('trans_id') ||undef,
-	                     
+	#$command = 'add';
+	 my $trans_id = $page->schemaAction(
+	                        'Transaction', 'update',                                               
+	                        trans_begin_stamp => $page->field('reckdate'),
+	                        trans_id => $page->param('trans_id'),	                     
 	                );
 			
 	$self->handlePostExecute($page, $command, $flags );

@@ -79,51 +79,37 @@ sub execute
 	my $del_notes  = $page->field('notes');
 	my $close_msg = "Account Closed by $closed_by";
 	my $first =1;
-	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountInfoById',$page->param('person_id'),$page->session('user_id'));
-	if (@$dataInvoice)
+	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,STMTMGRFLAG_NONE,'selCloseInvoiceByID',$page->param('trans_id'));
+	my $invoiceID = $dataInvoice->{trans_invoice_id};
+	if ($page->param('trans_id'))
 	{
 		$page->beginUnitWork();
-		foreach (@$dataInvoice)
+		#Mark record as inactive
+		$page->schemaAction
+			(
+			'Transaction', 'update',                        
+			trans_id =>$page->param('trans_id'),
+			trans_status => $INACTIVE	,			
+			trans_subtype => 'Account Closed',			
+			);
+		#Obtain account/invoice information for collectors that
+		#transferd there account to this user
+		my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'),$invoiceID);                	
+		foreach my $data (@$transferData)         
 		{
-			#Mark record as inactive
+			#Mark account inactive 
 			$page->schemaAction
 				(
 				'Transaction', 'update',                        
-				trans_id =>$_->{trans_id},
-				trans_status => $INACTIVE	,			
+				trans_id =>$data->{trans_id},
+				trans_status => $INACTIVE,	,			
 				trans_subtype => 'Account Closed',			
-				);
-			#Mark Reck as inactive for Account
-			$page->schemaAction
-				(
-				'Transaction', 'update',  
-				trans_id =>$_->{trans_reck_id},
-				trans_status => $INACTIVE	,			
-				) if $_->{trans_reck_id};
-			#Perform the following actions only once
-			if($first)
-			{	
-				$first =0;
-				#Obtain account/invoice information for collectors that
-				#transferd there account to this user
-				my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'));                	
-				foreach my $data (@$transferData)         
-				{
-					#Mark account inactive 
-					$page->schemaAction
-						(
-						'Transaction', 'update',                        
-						trans_id =>$data->{trans_id},
-						trans_status => $INACTIVE,	,			
-						trans_subtype => 'Account Closed',			
-						);                	
-					#Mark notes records as inactive for anyone that transfer the account to this user
-					$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$data->{'provider_id'},$page->param('person_id')) if $page->field('notes');
-				}
-				#Mark notes records inactive for current collector
-				$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $page->field('notes'); 
-			}	         		
+				);                	
+			#Mark notes records as inactive for anyone that transfer the account to this user
+			$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$data->{'provider_id'},$page->param('person_id')) if $page->field('notes');
 		}
+		#Mark notes records inactive for current collector
+		$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $page->field('notes'); 
 		$page->endUnitWork();
 	}
 	$self->handlePostExecute($page, $command, $flags );		

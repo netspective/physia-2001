@@ -80,6 +80,8 @@ sub execute
 	my $new_owner = $page->field('transfer_id');
 	my $transStatus =  App::Universal::TRANSSTATUS_ACTIVE;	
 	my $old_owner = $page->session('user_id');
+	
+	#Create Note for Account
 	my $trans_id = $page->schemaAction
 	(
 		'Transaction','add',                  
@@ -96,78 +98,63 @@ sub execute
 	my $new_msg = "Transfered From $old_owner";
 	my $old_msg = "Account Transfered to $new_owner";
 	
-	#Get All invoices assoicated with this account
-	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountInfoById',$page->param('person_id'),$page->session('user_id'));
+	#Get Invoice ID
+	my $dataInvoice = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,STMTMGRFLAG_NONE,'selCloseInvoiceByID',$page->param('trans_id'));
+	my $invoiceID = $dataInvoice->{trans_invoice_id};	
 	$page->beginUnitWork();
-	my $first=1;
-	foreach (@$dataInvoice)
-	{
-		#Create an attribute for each transaction record that will track who owns the account now
-		#
-		$page->schemaAction
-			(
-				'Trans_Attribute', 'add',
-				parent_id =>$_->{trans_id},
-				item_type =>1,
-				item_name =>'Account/Transfer/Owner',
-				value_type =>0,
-				value_text =>$page->field('transfer_id'),
-				value_textB =>$page->param('person_id'),
+	
+	#Create an attribute for the transaction/invoice record so we can track transfer history
+	$page->schemaAction
+		(
+			'Trans_Attribute', 'add',
+			parent_id =>$page->param('trans_id'),
+			item_type =>1,
+			item_name =>'Account/Transfer/Owner',
+			value_type =>0,
+			value_text =>$page->field('transfer_id'),
+			value_textB =>$page->param('person_id'),
 			);
-		
-		#Add records to the new collector if needed
+	
+	#Add records to the new collector if needed
+	$page->schemaAction
+		(   	'Transaction', 'add',                        
+	                trans_owner_id =>$page->param('person_id'),
+	                provider_id => $page->field('transfer_id') ,
+	                trans_owner_type => 0, 
+	                caption =>'Account Owner',
+	                trans_subtype =>'Owner',
+	                trans_status =>$ACTIVE,
+	                trans_type => $ACCOUNT_OWNER,  
+	                initiator_type =>0,
+	                initiator_id =>$page->session('user_id'), 	
+	                billing_facility_id => $page->session('org_internal_id'),
+	                trans_status_reason =>$new_msg,
+			data_num_a => $invoiceID ,		
+			trans_invoice_id => $invoiceID 				
+               	) unless $STMTMGR_WORKLIST_COLLECTION->getSingleValue($page,STMTMGRFLAG_NONE,'selCollectionRecordById',
+               		$page->param('person_id'),$page->field('transfer_id'),$invoiceID) ;
+               	
+	#Mark record as transfered
+	$page->schemaAction
+		(
+			'Transaction', 'update',                        
+			trans_id =>$page->param('trans_id'),
+			trans_subtype => 'Account Transfered',
+			caption =>'Transfer Account',
+			trans_status_reason => $old_msg,				
+               	);
+               	
+        #Check if this invoice was transfer to this user, if is so set the transfer to new owner. 
+        #So when new owner close the invoice all previous owner records will also close.
+	my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'),$invoiceID);                	
+	foreach my $data (@$transferData)
+	{
 		$page->schemaAction
-			(   	'Transaction', 'add',                        
-		                trans_owner_id =>$page->param('person_id'),
-		                provider_id => $page->field('transfer_id') ,
-		                trans_owner_type => 0, 
-		                 caption =>'Account Owner',
-		                trans_subtype =>'Owner',
-		                trans_status =>$ACTIVE,
-		                trans_type => $ACCOUNT_OWNER,  
-		                initiator_type =>0,
-		                initiator_id =>$page->session('user_id'), 	
-		                billing_facility_id => $page->session('org_internal_id'),
-		                trans_status_reason =>$new_msg,
-				data_num_a => $_->{invoice_id} ,		
-				trans_invoice_id => $_->{invoice_id} 				
-                	) unless $STMTMGR_WORKLIST_COLLECTION->getSingleValue($page,STMTMGRFLAG_NONE,'selCollectionRecordById',
-                		$page->param('person_id'),$page->field('transfer_id'),$_->{'invoice_id'}) ;
-                	
-		#Mark record as transfered
-		$page->schemaAction
-			(
-				'Transaction', 'update',                        
-				trans_id =>$_->{trans_id},
-				trans_subtype => 'Account Transfered',
-				caption =>'Transfer Account',
-				trans_status_reason => $old_msg,				
-                	);
-                	
-		if($first)
-		{	
-			$first =0;
-                	#Mark Reck Date as inactive for Account Only one reck date for an account
-                	$page->schemaAction
-                	(
-                		'Transaction', 'update',  
-                		trans_id =>$_->{trans_reck_id},
-                		trans_status => $INACTIVE
-                	)if $_->{trans_reck_id} ;
-                	#Check if this account was transfered here is so reset the transfer to owner
-			my $transferData = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAccountTransferIdById',$page->param('person_id'),$page->session('user_id'));                	
-			foreach my $data (@$transferData)
-			{
-				$page->schemaAction
-				(
-					'Trans_Attribute','update',
-					item_id =>$data->{item_id},
-					value_text =>$page->field('transfer_id')
-				);
-			}
-			
-		}
-		
+		(
+			'Trans_Attribute','update',
+			item_id =>$data->{item_id},
+			value_text =>$page->field('transfer_id')
+		);
 	}
 	$page->endUnitWork();
 	$self->handlePostExecute($page, $command, $flags );	
