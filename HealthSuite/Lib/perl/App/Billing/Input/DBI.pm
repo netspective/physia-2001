@@ -35,6 +35,10 @@ use App::Billing::Validate::HCFA::FECA;
 # use App::Billing::Validate::HCFA::HCFA1500;
 
 
+use DBI::StatementManager;
+use App::Statements::Billing;
+
+
 use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Input::Driver);
@@ -238,6 +242,7 @@ sub populateClaims
 	my @row;
 
 	$self->{valMgr} = $params{valMgr};
+	$self->{page} = $params{page};
 
 	if($params{dbiHdl} ne "")
 	{
@@ -1217,19 +1222,12 @@ sub assignPolicy
 		{
 
 			# check this query
+			my $page = $self->{page};
 
-			$queryStatment = qq
-			{
-				select name_primary, org_id
-				from org
-				where org_internal_id = $row_bill[0]
-			};
-			$sth = $self->{dbiCon}->prepare("$queryStatment");
-			$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-			@row = $sth->fetchrow_array();
+			my $row = $STMTMGR_BILLING->getRowAsHash($page, STMTMGRFLAG_NONE, 'orgNameAndID', $row_bill[0]);
 
-			$payer->setId($row[1]);
-			$payer->setName($row[0]);
+			$payer->setId($row->{org_id});
+			$payer->setName($row->{name_primary});
 			$self->populateAddress($payer->getAddress(), "org_address", $row_bill[0], "Mailing");
 			$self->populateContact($payer->getAddress(), "org_attribute", $row_bill[0], "Primary", CONTACT_METHOD_TELEPHONE);
 		}
@@ -1394,7 +1392,7 @@ sub assignInvoiceProperties
 		'Provider/Workers Comp' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setWorkersComp, \&App::Billing::Claim::Physician::setWorkersComp], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Railroad Medicare' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setRailroadId, \&App::Billing::Claim::Physician::setRailroadId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/EPSDT' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setEPSDT, \&App::Billing::Claim::Physician::setEPSDT], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
-		'Provider/Specialty' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setSpecialityId, \&App::Billing::Claim::Physician::setSpecialityId], [COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/Specialty' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setSpecialityId, \&App::Billing::Claim::Physician::setSpecialityId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Assign Indicator' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setAssignIndicator, \&App::Billing::Claim::Physician::setAssignIndicator], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
 		'Provider/Signature/Date' => [[$payToProvider, $renderingProvider], [\&App::Billing::Claim::Physician::setSignatureDate, \&App::Billing::Claim::Physician::setSignatureDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATE]],
 		'Provider/Name' => [$payToProvider, [\&App::Billing::Claim::Person::setName, \&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1452,6 +1450,7 @@ sub assignInvoiceProperties
 		'Condition/Related To' => [$claim, [ \&App::Billing::Claim::setConditionRelatedTo, \&App::Billing::Claim::setConditionRelatedToAutoAccidentPlace ], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
 		'Prior Authorization Number' => [$treatment, \&App::Billing::Claim::Treatment::setPriorAuthorizationNo, COLUMNINDEX_VALUE_TEXT],
 		'Information Release/Indicator' => [ $claim, [\&App::Billing::Claim::setInformationReleaseIndicator, \&App::Billing::Claim::setInformationReleaseDate], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_DATE]],
+		'Medicaid/Resubmission' => [$treatment, [ \&App::Billing::Claim::Treatment::setMedicaidResubmission, \&App::Billing::Claim::Treatment::setResubmissionReference], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 
 #		'TPO Participation/Indicator' => [$patient, \&App::Billing::Claim::Patient::setTPO, COLUMNINDEX_VALUE_TEXT],
 #		'Multiple/Indicator' => [$patient, \&App::Billing::Claim::Patient::setMultipleIndicator, COLUMNINDEX_VALUE_TEXT],
@@ -1467,7 +1466,6 @@ sub assignInvoiceProperties
 #		'HGB-HCT/Date' => [	$claim, \&App::Billing::Claim::setHGBHCTDate, COLUMNINDEX_VALUE_DATE],
 #		'Serum Creatine/Date' => [$claim, \&App::Billing::Claim::setSerumCreatineDate, COLUMNINDEX_VALUE_DATE],
 #		'Remarks' => [$claim, \&App::Billing::Claim::setRemarks, COLUMNINDEX_VALUE_TEXT],
-#		'Medicaid/Resubmission' => [$treatment, [ \&App::Billing::Claim::Treatment::setMedicaidResubmission, \&App::Billing::Claim::Treatment::setResubmissionReference], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 #		'Laboratory/Indicator' => [$treatment, \&App::Billing::Claim::Treatment::setOutsideLab, COLUMNINDEX_VALUE_TEXT],
 #		'Laboratory/Charges' => [$treatment, \&App::Billing::Claim::Treatment::setOutsideLabCharges, COLUMNINDEX_VALUE_TEXT],
 #		'Documentation/Indicator' => [[$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setDocumentationIndicator,\&App::Billing::Claim::Physician::setDocumentationIndicator], [ COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT]],
