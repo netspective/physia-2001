@@ -235,18 +235,17 @@ begin
 	 i.client_id,
 	 ii.hcfa_service_type,
 	 nvl(ii.data_num_a,0) as ffs_cap,
-	 o.owner_org_id,
+	 i.owner_id,
 	 i.billing_id,
 	 t.trans_type,
 	 i.invoice_subtype,
 	 i.parent_invoice_id	
-FROM 	invoice i,  transaction t, invoice_item ii, org o,  invoice_attribute ia 
+FROM 	invoice i, transaction t, invoice_item ii, invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id(+)     
 	AND ii.parent_id  = i.invoice_id
 	AND ia.item_name(+)  = 'Invoice/Creation/Batch ID'		
 	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
-	AND o.org_internal_id = t.service_facility_id
 	AND ii.item_id = v_item_id;
 
      end loop; 
