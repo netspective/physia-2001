@@ -11,8 +11,14 @@ use App::Statements::Person;
 use App::Statements::Component::Scheduling;
 use Data::Publish;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
+
+%RESOURCE_MAP = (
+	'resourceselector' => {
+		_class => new App::Component::ResourceSelector(),
+		},
+	);
 
 sub initialize
 {
@@ -53,7 +59,7 @@ sub getComponentHtml
 	my $sessOrgId = $page->session('org_id');
 	$dialog->getField('physList')->{fKeyStmtBindPageParams} = $sessOrgId;
 
-	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
+	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'));
 
 	my @physicians = ();
@@ -61,7 +67,7 @@ sub getComponentHtml
 	{
 		push(@physicians, $_->{resource_id});
 	}
-	
+
 	$page->field('physList', @physicians);
 
 	my $fieldHtml = $field->getHtml($page, $dialog);
@@ -76,8 +82,5 @@ sub getComponentHtml
 		</FORM>
 	};
 }
-
-# auto-register instance
-new App::Component::ResourceSelector(id => 'resourceselector');
 
 1;

@@ -5,10 +5,73 @@ package App::Component::SDE::PageInfo;
 use strict;
 use CGI::Component;
 use Data::Publish;
+use Security::AccessControl;
 
-use vars qw(@ISA %DEFNS);
+use vars qw(@ISA %DEFNS %RESOURCE_MAP);
+@ISA = qw(CGI::Component);
 
-@ISA   = qw(CGI::Component);
+%RESOURCE_MAP = (
+	'sde-page-params-no-fields' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'CGI Parameters (no fields)',
+			source => 'paramsnofields',
+			),
+		},
+	'sde-page-params-and-fields' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'CGI Parameters (and fields)',
+			source => 'paramsandfields',
+			),
+		},
+	'sde-page-fields' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Dialog Fields',
+			source => 'fields',
+			),
+		},
+	'sde-page-session' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Session Data',
+			source => 'session',
+			),
+		},
+	'sde-page-cookies' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Cookies',
+			source => 'cookies',
+			),
+		},
+	'sde-page-env' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Environment',
+			source => 'env',
+			),
+		},
+	'sde-page-components' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Components on this page',
+			source => 'components',
+			),
+		},
+	'sde-page-debug' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Debugging Statements',
+			source => 'debug',
+			),
+		},
+	'sde-page-status' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Status Panel',
+			source => 'status',
+			),
+		},
+	'sde-page-acl' => {
+		_class => new App::Component::SDE::PageInfo(
+			heading => 'Access Control List',
+			source => 'acl',
+			),
+		},
+	);
 
 sub init
 {
@@ -140,27 +203,21 @@ sub prepareData_acl
 {
 	my ($self, $page) = @_;
 
-	my $acl = $page->{acl};
+	my $acl = $page->{acl};	
 	my $allPerms = '';
 	foreach my $item (sort keys %{$acl->{permissionIds}})
 	{
 		my $allowed = $page->hasPermission($item) ? '(allowed)' : '';
 		$allPerms .= ($allowed ? '<FONT COLOR=green>' : '') . "$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . " $allowed" . ($allowed ? '</FONT>' : '') . " <BR>";
 	}
-	my $allRoles = '';
-	foreach my $item (sort keys %{$acl->{roleIds}})
-	{
-		next unless $acl->{roleIds}->{$item}->[Security::AccessControl::ROLEINFOIDX_PERMISSIONS];
-		$allRoles .= "$item: " . $acl->{roleIds}->{$item}->[Security::AccessControl::ROLEINFOIDX_PERMISSIONS]->run_list() . "<BR>";
-	}
 
-	my $data = 
+	my $userRoles = $page->session('aclRoleNames');
+	my $data =
 		[
-			['User Roles', join(', ', @{$page->session('aclRoles')})],
+			['User Roles', ref $userRoles eq 'ARRAY' ? join(', ', @{$userRoles}) : '(none)'],
 			['User Permissions', $page->{permissions}->run_list()],
 			['ACL File(s)', join(', ', $acl->{sourceFiles}->{primary}, @{$acl->{sourceFiles}->{includes}})],
 			['All Permissions', $allPerms],
-			['All Roles', $allRoles],
 		];
 	return $data;
 }
@@ -177,66 +234,5 @@ sub getHtml
 
 	return createHtmlFromData($page, $self->{flags}, $data, $self->{publishDefn});
 }
-
-# create instances that will auto-register themselves
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-params-no-fields',
-		heading => 'CGI Parameters (no fields)',
-		source => 'paramsnofields',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-params-and-fields',
-		heading => 'CGI Parameters (and fields)',
-		source => 'paramsandfields',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-fields',
-		heading => 'Dialog Fields',
-		source => 'fields',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-session',
-		heading => 'Session Data',
-		source => 'session',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-cookies',
-		heading => 'Cookies',
-		source => 'cookies',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-env',
-		heading => 'Environment',
-		source => 'env',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-components',
-		heading => 'Components on this page',
-		source => 'components',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-debug',
-		heading => 'Debugging Statements',
-		source => 'debug',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-status',
-		heading => 'Status Panel',
-		source => 'status',
-	);
-
-new App::Component::SDE::PageInfo(
-		id => 'sde-page-acl',
-		heading => 'Access Control List',
-		source => 'acl',
-	);
 
 1;

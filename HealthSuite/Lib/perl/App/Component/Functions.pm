@@ -6,7 +6,7 @@ use strict;
 use CGI::Layout;
 use CGI::Component;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
 
 use constant ON_CHANGE => q{ onchange='document.location.href = this.options[this.selectedIndex].value' };
@@ -67,6 +67,12 @@ use constant CONTENT_HTML => qq{
 	</TABLE>
 };
 
+%RESOURCE_MAP = (
+	'create-records' => {
+		_class => new App::Component::Construct(),
+		},
+	);
+
 sub init
 {
 	my $self = shift;
@@ -79,7 +85,6 @@ sub getHtml
 	createLayout_html($page, $self->{flags}, $self->{layoutDefn}, CONTENT_HTML);
 }
 
-new App::Component::Construct(id => 'create-records');
 
 ##############################################################################
 package App::Component::OnSelect;
@@ -89,7 +94,7 @@ use strict;
 use CGI::Layout;
 use CGI::Component;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
 
 use constant ON_CHANGE => q{ onchange='document.location.href = this.options[this.selectedIndex].value' };
@@ -141,6 +146,12 @@ use constant CONTENT_HTML => qq{
 	</TABLE>
 };
 
+%RESOURCE_MAP = (
+	'on-select' => {
+		_class => new App::Component::OnSelect(),
+		},
+	);
+
 sub init
 {
 	my $self = shift;
@@ -153,7 +164,6 @@ sub getHtml
 	createLayout_html($page, $self->{flags}, $self->{layoutDefn}, CONTENT_HTML);
 }
 
-new App::Component::OnSelect(id => 'on-select');
 
 ##############################################################################
 package App::Component::Lookup;
@@ -163,7 +173,7 @@ use strict;
 use CGI::Layout;
 use CGI::Component;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
 
 use constant CONTENT_HTML => qq{
@@ -191,6 +201,12 @@ use constant CONTENT_HTML => qq{
 	<input name="search_expression"><input type="submit" value="Search">
 };
 
+%RESOURCE_MAP = (
+	'lookup-records' => {
+		_class => new App::Component::Lookup(),
+		},
+	);
+
 sub init
 {
 	my $self = shift;
@@ -204,7 +220,5 @@ sub getHtml
 	my ($self, $page) = @_;
 	createLayout_html($page, $self->{flags}, $self->{layoutDefn}, CONTENT_HTML);
 }
-
-new App::Component::Lookup(id => 'lookup-records');
 
 1;

@@ -8,10 +8,18 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Publish;
 
-use vars qw(@ISA %NEWS %DEFNS);
-
+use vars qw(@ISA %NEWS %DEFNS %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
 %NEWS  = ();
+
+%RESOURCE_MAP = (
+	'news-top' => {
+		_class => new App::Component::News(heading => 'Top News', source => 'topnews'),
+		},
+	'news-health' => {
+		_class => new App::Component::News(heading => 'Health News', source => 'healthnews'),
+		},
+	);
 
 sub init
 {
@@ -56,18 +64,5 @@ sub getNews
 	}
 	return $NEWS{$source};
 }
-
-# create instances that will auto-register themselves
-new App::Component::News(
-		id => 'news-top',
-		heading => 'Top News',
-		source => 'topnews',
-	);
-
-new App::Component::News(
-		id => 'news-health',
-		heading => 'Health News',
-		source => 'healthnews',
-	);
 
 1;

@@ -12,8 +12,14 @@ use App::Statements::Scheduling;
 use App::Statements::Component::Scheduling;
 use Data::Publish;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA   = qw(CGI::Component);
+
+%RESOURCE_MAP = (
+	'facilityselector' => {
+		_class => new App::Component::FacilitySelector(),
+		},
+	);
 
 sub initialize
 {
@@ -56,20 +62,20 @@ sub getComponentHtml
 		hints => 'Choose one or more Facilities to monitor.'
 	);
 	$field->clearFlag(FLDFLAG_REQUIRED);
-			
+
 	$dialog->addContent($field);
-	
-	# populate	
+
+	# populate
 	# --------
-		my $facilityList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
+		my $facilityList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page,
 			STMTMGRFLAG_NONE, 'sel_worklist_facilities', $page->session('user_id'));
-	
+
 		my @facilities = ();
 		for (@$facilityList)
 		{
 			push(@facilities, $_->{facility_id});
 		}
-		
+
 		$page->field('facility_list', @facilities);
 
 	# return
@@ -86,8 +92,5 @@ sub getComponentHtml
 		</FORM>
 	};
 }
-
-# auto-register instance
-new App::Component::FacilitySelector(id => 'facilityselector');
 
 1;

@@ -9,15 +9,35 @@ use File::Spec;
 use App::Configuration;
 use Data::Publish;
 use Exporter;
-
-use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP);
+use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT);
+use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 @ISA   = qw(Exporter CGI::Component);
-
 @EXPORT = qw(NAVGPATHFLAG_STAYATROOT);
+
 %MODULE_FILE_MAP = ();
 %FILE_MODULE_MAP = ();
 
-use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT);
+%RESOURCE_MAP = (
+	'navigate-reports' => {
+		_class => new App::Component::Navigate::FileSys(
+			heading => 'View Report',
+			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
+			rootURL => '/report',
+			rootCaption => 'View Reports',
+			),
+		},
+	'navigate-reports-root' => {
+		_class => new App::Component::Navigate::FileSys(
+			heading => 'View Report',
+			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
+			rootURL => '/report',
+			rootCaption => 'View Reports',
+			flags => NAVGPATHFLAG_STAYATROOT,
+			),
+		},
+	);
+
+
 
 #
 # the following methods are STATIC (no instance required)
@@ -227,19 +247,4 @@ sub getHtml
 				);
 }
 
-new App::Component::Navigate::FileSys(
-	id => 'navigate-reports',
-	heading => 'View Report',
-	rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
-	rootURL => '/report',
-	rootCaption => 'View Reports',
-	);
-
-new App::Component::Navigate::FileSys(
-	id => 'navigate-reports-root',
-	heading => 'View Report',
-	rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
-	rootURL => '/report',
-	rootCaption => 'View Reports',
-	flags => NAVGPATHFLAG_STAYATROOT,
-	);
+1;

@@ -16,7 +16,8 @@ use App::Schedule::Utilities;
 use Data::Publish;
 use Exporter;
 
-use vars qw(@ISA @ITEM_TYPES @EXPORT
+use vars qw(@ISA %RESOURCE_MAP @EXPORT
+	@ITEM_TYPES
 	%PATIENT_URLS
 	%PHYSICIAN_URLS
 	%ORG_URLS
@@ -26,9 +27,7 @@ use vars qw(@ISA @ITEM_TYPES @EXPORT
 	$orgDefault
 	$apptDefault
 );
-
 @ISA   = qw(CGI::Component Exporter);
-
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
 %PATIENT_URLS = (
@@ -62,6 +61,13 @@ $orgDefault = 'View Profile';
 $apptDefault = 'Update';
 
 @EXPORT = qw(%PATIENT_URLS %PHYSICIAN_URLS %ORG_URLS %APPT_URLS @ITEM_TYPES);
+
+%RESOURCE_MAP = (
+	'worklist-patientflow' => {
+		_class => new App::Component::WorkList::PatientFlow(),
+		},
+	);
+
 
 sub initialize
 {
@@ -323,8 +329,5 @@ sub formatStamp
 	}
 
 }
-
-# auto-register instance
-new App::Component::WorkList::PatientFlow(id => 'worklist-patientflow');
 
 1;
