@@ -39,7 +39,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Patient/Person Id', name => 'payer_id', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption => 'Patient/Person ID', name => 'payer_id', options => FLDFLAG_REQUIRED),
 
 		new CGI::Dialog::Field(type => 'currency',
 					caption => 'Total Payment Received',
@@ -85,7 +85,7 @@ sub makeStateChanges
 
 	#make payment fields and list of invoices invisible unless person id exists
 	$self->setFieldFlags('payer_id', FLDFLAG_READONLY, 1);
-	unless(my $personId = $page->param('person_id') || $page->field('payer_id'))
+	unless(my $personId = $page->param('person_id') || $page->param('_payer_id') || $page->field('payer_id'))
 	{
 		$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 0);
 		$self->setFieldFlags('batch_fields', FLDFLAG_INVISIBLE, 1);
@@ -117,7 +117,7 @@ sub populateData
 		$page->field('batch_date', $batchDate);
 	}
 
-	my $personId = $page->param('person_id');
+	my $personId = $page->param('person_id') || $page->param('_payer_id');
 	$page->field('payer_id', $personId);
 }
 
@@ -135,7 +135,6 @@ sub customValidate
 	}
 	$page->field('list_invoices',$list);
 }
-
 
 sub execute
 {

@@ -114,7 +114,7 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
 	my $paidBy = $page->param('paidBy');
@@ -126,10 +126,10 @@ sub makeStateChanges
 	$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 1);
 	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
 	{
-		if($invoiceId)
-		{
-			$self->getField('sel_invoice_id')->invalidate($page, "Claim $invoiceId is 'Self-Pay'. Cannot apply insurance payment to this claim.");
-		}
+		#if($invoiceId)
+		#{
+			#$self->getField('sel_invoice_id')->invalidate($page, "Claim $invoiceId is 'Self-Pay'. Cannot apply insurance payment to this claim.");
+		#}
 
 		$self->updateFieldFlags('payer_id', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, 1);
@@ -162,7 +162,7 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $clientId = $invoiceInfo->{client_id};
@@ -204,7 +204,7 @@ sub execute
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
 	my $paidBy = $page->param('paidBy');
-	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 
 	my $todaysDate = $page->getDate();
 	my $payerType = $paidBy eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
