@@ -230,10 +230,11 @@ sub isValid
 		unless ($charges)
 		{
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
-
+			$page->param("_f_proc_active_catalogs", @allFeeSchedules);
+			
 			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
-			my @storeFeeSchedules = ();
+
 			if($resultCount == 0)
 			{
 				$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
@@ -244,7 +245,6 @@ sub isValid
 				{
 					my $unitCost = $_->[1];
 					$page->param("_f_proc_$line\_charges", $unitCost);
-					push(@storeFeeSchedules, $_->[0]);
 				}
 			}
 			else
@@ -252,7 +252,6 @@ sub isValid
 				my $html = $self->getMultiPricesHtml($page, $line, $fsResults);
 				$self->invalidate($page, $html);
 			}
-			$page->param("_f_proc_active_catalogs", @storeFeeSchedules);
 		}
 
 		#elsif($charges eq '' && ($defaultFeeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
@@ -283,7 +282,6 @@ sub getMultiPricesHtml
 	my ($self, $page, $line, $fsResults) = @_;
 
 	my $html = qq{[<B>P$line</B>] Multiple prices found.  Please select a price for this line item.};
-	my @storeFeeSchedules = ();
 	foreach (@$fsResults)
 	{
 		my $cost = sprintf("%.2f", $_->[1]);
@@ -291,12 +289,7 @@ sub getMultiPricesHtml
 			<input onClick="document.dialog._f_proc_$line\_charges.value=this.value" 
 				type=radio name='_f_multi_price' value=$cost>\$$cost
 		};
-		
-		push(@storeFeeSchedules, $_->[0]);
 	}
-
-	$page->param("_f_proc_active_catalogs", @storeFeeSchedules);
-
 	return $html;
 }
 
