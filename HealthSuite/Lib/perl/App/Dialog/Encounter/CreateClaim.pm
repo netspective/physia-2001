@@ -60,7 +60,7 @@ sub initialize
 {
 	my $self = shift;
 
-	$self->heading('$Command Claim');
+	#$self->heading('$Command Claim');
 
 	$self->SUPER::initialize();
 
@@ -97,6 +97,18 @@ sub makeStateChanges
 	$self->updateFieldFlags('remarks', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('confirmed_info', FLDFLAG_INVISIBLE, 1);
+
+	#if hosp claim, show hosp orgs, otherwise show service orgs
+	if(my $isHosp = $page->param('isHosp'))
+	{
+		$self->heading('Add Hospital Claim');
+		$self->updateFieldFlags('org_fields', FLDFLAG_INVISIBLE, 1);
+	}
+	else
+	{
+		$self->heading('Add Claim');
+		$self->updateFieldFlags('hosp_org_fields', FLDFLAG_INVISIBLE, 1);
+	}
 
 	#turn these fields off if there is no person id
 	if($command eq 'add')
