@@ -131,7 +131,7 @@ sub prepare_page_content_header
 	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR|REFERRING-DOCTOR';
 
 	my $showHome=0;
-	
+
 	my $showMailBox = $personId eq $sessionUserID ? 1 : 0;
 
 	#Get Categories
@@ -173,11 +173,11 @@ sub prepare_page_content_header
 
 	my $category = lc($self->property('person_categories')->[0]) || undef;
 	# If the category isnt one of the predefined four, assume its staff.
+	$category = $category eq 'insured-person' ? 'insured-Person' : $category;
 	my $updateCategory = $category;
-	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient') or ($category eq 'referring-doctor') or ($category eq 'guarantor')) {
+	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient') or ($category eq 'referring-doctor') or ($category eq 'guarantor') or ($category eq 'insured-Person')) {
 		$updateCategory = 'staff';
 	}
-
 	my $profileLine = '<b>Profile: </b>';
 	$profileLine .= '<font color=red>(Account in Collection)</font>' if $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId,$self->session('org_internal_id'));
 	$profileLine .=  '&nbsp;Category: #property.person_org_category# ' if $self->property('person_org_category');
