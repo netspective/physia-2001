@@ -940,8 +940,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					AND org_internal_id = e.facility_id
 				)
 	AND  		e.event_id = ea.parent_id
-	AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
-	AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+	AND e.start_time between to_date(:1|| ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
+	AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5	
+	--AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+	--AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND      at.id = ea.value_int
 	AND      e.event_status in (1,2)
 	AND      at.caption = 'New Patient'
@@ -964,8 +966,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 						AND org_internal_id = e.facility_id
 				)
 		AND  		e.event_id = ea.parent_id
-		AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
-		AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+		--AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+		--AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+		AND e.start_time between to_date(:1|| ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
+		AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5			
 		AND      at.id = ea.value_int
 		AND      e.event_status in (1,2)
 		AND      at.caption = 'Established Patient'
