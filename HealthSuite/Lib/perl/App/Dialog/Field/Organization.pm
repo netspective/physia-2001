@@ -189,7 +189,7 @@ sub new
 				fKeySelCols => "distinct o.org_id, o.name_primary",
 				fKeyDisplayCol => 1,
 				fKeyValueCol => 0,
-				fKeyWhere => "o.org_id=oset.parent_id and UPPER(oset.MEMBER_NAME) in ('FACILITY','CLINIC')",
+				fKeyWhere => "o.org_id=oset.parent_id and UPPER(oset.MEMBER_NAME) in ('FACILITY/SITE','CLINIC')",
 				options => FLDFLAG_REQUIRED,
 				%params);
 }
