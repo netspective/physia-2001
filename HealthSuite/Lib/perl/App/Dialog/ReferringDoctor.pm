@@ -54,7 +54,7 @@ sub new
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 					fields => [
 						new CGI::Dialog::Field(
-							caption => 'Phone',
+							caption => 'Work Phone',
 							type=>'phone',
 							name => 'phone',
 							options => FLDFLAG_REQUIRED,
