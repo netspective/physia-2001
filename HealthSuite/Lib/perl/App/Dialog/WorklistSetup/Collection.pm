@@ -38,7 +38,8 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	
 	$self->SUPER::execute($page, $command, $flags);
-	$self->handlePostExecute($page, $command, $flags, '/worklist/collection');
+	#Force a refresh to occur for the worklist
+	$self->handlePostExecute($page, $command, $flags, '/worklist/collection?refresh=1');
 }
 
 1;
