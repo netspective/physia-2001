@@ -27,7 +27,7 @@ $STMTFMT_SEL_CATALOG = qq{
 		where
 			oc.internal_catalog_id = oce.catalog_id (+) and
 			%whereCond%
-		group by oc.catalog_id, oc.internal_catalog_id, oc.caption, oc.description, 
+		group by oc.catalog_id, oc.internal_catalog_id, oc.caption, oc.description,
 			oc.parent_catalog_id %extraCols%
 		order by oc.catalog_id
 };
@@ -70,7 +70,7 @@ $STMTRPTDEFN_DEFAULT =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', hint => 'Catalog ID #5#', url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'ID', hint => 'Fee Schedule ID #5#', url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
 		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
 	],
@@ -102,12 +102,12 @@ my $STMTRPTDEFN_ORG =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', hint => 'Catalog ID #5#', url => '/org/#session.org_id#/catalog/#5#/#0#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'ID', hint => 'Fee Schedule ID #5#', url => '/org/#session.org_id#/catalog/#5#/#0#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
 		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
 		{ head => '', colIdx => 6, hint => 'Add Child Schedule', url => '/org/#session.org_id#/dlg-add-catalog/#5#' }
 	],
-	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',	
+	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
 
 $STMTRPTDEFN_DEFAULT_ITEM =
