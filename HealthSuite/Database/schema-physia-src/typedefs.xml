@@ -985,6 +985,11 @@
 				<col name="group_name">provider_directory</col>
 			</row>
 			<row>
+				<col name="id">12</col>
+				<col name="caption">Lab</col>
+				<col name="group_name">Lab</col>
+			</row>			
+			<row>
 				<col name="id">99</col>
 				<col name="caption">other</col>
 				<col name="group_name">other</col>
