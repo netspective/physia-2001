@@ -83,6 +83,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Invoice
 			where owner_id = :1
 				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 		},
 	},
 
@@ -91,6 +92,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Invoice 
 			where owner_id = :1
 				and invoice_date < to_date(:2, '$monthFormat')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 		},
 	},
 		
@@ -99,6 +101,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Invoice 
 			where owner_id = :1
 				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 		},
 	},
 
@@ -123,6 +126,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Transaction, Invoice
 			where Invoice.owner_id = :1
 				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 				and Transaction.trans_id = Invoice.main_transaction
 				and Transaction.provider_id = :3
 		},
@@ -133,6 +137,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Transaction, Invoice 
 			where Invoice.owner_id = :1
 				and invoice_date < to_date(:2, '$monthFormat')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 				and Transaction.trans_id = Invoice.main_transaction
 				and Transaction.provider_id = :3
 		},
@@ -143,6 +148,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 			select sum(balance) from Transaction, Invoice 
 			where Invoice.owner_id = :1
 				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
 				and Transaction.trans_id = Invoice.main_transaction
 				and Transaction.provider_id = :3
 		},
