@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.5 2000-12-18 19:32:03 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.6 2000-12-21 16:17:10 radha_kotagiri Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -53,7 +53,7 @@ sub new
 					name => 'dose_units',
 					caption => 'Units',
 					type => 'select',
-					selOptions => 'mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
+					selOptions => 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(
@@ -244,7 +244,7 @@ sub new
 
 		</script>
 	});
-	
+
 	return $self;
 }
 
@@ -265,9 +265,9 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
-	
+
 	my $buttonsField = $self->{_buttons_field};
-	
+
 	my $isNurse = grep {$_ eq 'Nurse'} @{$page->session('categories')};
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
@@ -305,7 +305,7 @@ sub makeStateChanges
 	elsif ($command eq 'update')
 	{
 		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
-		$self->setFieldFlags('approved_by', FLDFLAG_READONLY);		
+		$self->setFieldFlags('approved_by', FLDFLAG_READONLY);
 		$self->setFieldFlags('destination', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
@@ -365,7 +365,7 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
 	if (my $permedId = $page->param('permed_id'))
@@ -396,7 +396,7 @@ sub populateData
 			unless ($field->{name} eq 'dates_multi')
 			{
 				$field->setFlag(FLDFLAG_READONLY);
-			}	
+			}
 		}
 		#$self->clearFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 	}
@@ -503,10 +503,10 @@ sub execute_approve
 	my $results = $self->execute_update(@_);
 
 	my $relatedMessages = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessagesByPerMedId', $page->param('permed_id'));
-	
+
 	my $status = $page->field('status');
 	my $message = $status ? 'This medication/prescription has been approved.' : 'This medication/prescription has been denied';
-	
+
 	foreach my $doc_id (@$relatedMessages)
 	{
 		$page->schemaAction(
