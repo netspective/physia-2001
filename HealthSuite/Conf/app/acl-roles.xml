@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<accesscontrol name="roles">
+	<permissions root="role">
+		<permission id="superuser">
+			<permission id="comp">
+				<permission alias="comp"/>
+			</permission>
+			<permission id="dlg">
+				<permission alias="dlg"/>
+			</permission>
+			<permission id="page">
+				<permission alias="page"/>
+			</permission>
+		</permission>
+		<permission id="data-admin">
+			<permission id="-" alias="dlg/feescheduledataentry/add" />
+			<permission id="-" alias="dlg/feescheduledataentry/add" />
+			<permission id="-" alias="dlg/feescheduleentry/add" />
+			<permission id="-" alias="dlg/staff/add" />
+			<permission id="-" alias="dlg/nurse/add" />
+			<permission id="-" alias="dlg/physician/add" />
+			<permission id="-" alias="dlg/org-main/add" />
+			<permission id="-" alias="dlg/org-ipa/add" />
+			<permission id="-" alias="dlg/org-provider/add" />
+			<permission id="-" alias="dlg/org-insurance/add" />
+			<permission id="-" alias="dlg/org-dept/add" />
+			<permission id="-" alias="dlg/misc-procedure/add" />
+			<permission id="-" alias="dlg/misc-procedure-item/add" />
+			<permission id="-" alias="dlg/appttype/add" />
+			<permission id="-" alias="dlg/template/add" />
+			<permission id="-" alias="dlg/feescheduledataentry/remove" />
+			<permission id="-" alias="dlg/feescheduleentry/remove" />
+			<permission id="-" alias="dlg/staff/remove" />
+			<permission id="-" alias="dlg/nurse/remove" />
+			<permission id="-" alias="dlg/physician/remove" />
+			<permission id="-" alias="dlg/org-main/remove" />
+			<permission id="-" alias="dlg/org-ipa/remove" />
+			<permission id="-" alias="dlg/org-provider/remove" />
+			<permission id="-" alias="dlg/org-insurance/remove" />
+			<permission id="-" alias="dlg/org-dept/remove" />
+			<permission id="-" alias="dlg/misc-procedure/remove" />
+			<permission id="-" alias="dlg/misc-procedure-item/remove" />
+			<permission id="-" alias="dlg/appttype/remove" />
+			<permission id="-" alias="dlg/template/remove" />
+			<permission id="-" alias="dlg/feescheduledataentry/update" />
+			<permission id="-" alias="dlg/feescheduleentry/update" />
+			<permission id="-" alias="dlg/staff/update" />
+			<permission id="-" alias="dlg/nurse/update" />
+			<permission id="-" alias="dlg/physician/update" />
+			<permission id="-" alias="dlg/org-main/update" />
+			<permission id="-" alias="dlg/org-ipa/update" />
+			<permission id="-" alias="dlg/org-provider/update" />
+			<permission id="-" alias="dlg/org-insurance/update" />
+			<permission id="-" alias="dlg/org-dept/update" />
+			<permission id="-" alias="dlg/misc-procedure/update" />
+			<permission id="-" alias="dlg/misc-procedure-item/update" />
+			<permission id="-" alias="dlg/appttype/update" />
+			<permission id="-" alias="dlg/template/update" />
+		</permission>
+	</permissions>
+</accesscontrol>
