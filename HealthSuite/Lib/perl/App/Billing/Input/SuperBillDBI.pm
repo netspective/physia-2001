@@ -4,68 +4,31 @@ package App::Billing::Input::SuperBillDBI;
 
 use strict;
 use Carp;
-use DBI;
 
-use App::Universal;
 use App::Billing::SuperBill::SuperBills;
 use App::Billing::SuperBill::SuperBill;
 use App::Billing::SuperBill::SuperBillComponent;
+
 use App::Billing::Claim::Person;
 use App::Billing::Claim::Organization;
 use App::Billing::Claim::Address;
 
+use DBI::StatementManager;
+use App::Statements::Report::SuperBill;
+
+
 sub new
 {
 	my ($type, %params) = @_;
-
-	$params{UID} = undef;
-	$params{PWD} = undef;
-	$params{connectStr} = undef;
-	$params{dbiCon} = undef;
-
 	return bless \%params, $type;
 }
 
-sub connectDb
-{
-	my ($self, %params) = @_;
-
-	$self->{UID} = $params{UID};
-	$self->{PWD} = $params{PWD};
-	$self->{conectStr} = $params{connectStr};
-
-	my $user = $self->{UID};
-	my $dsn = $self->{conectStr};
-	my $password = $self->{PWD};
-
-	# For Oracle 8
-	$self->{dbiCon} = DBI->connect($dsn, $user, $password, { RaiseError => 1, AutoCommit => 0 }) || die "Unable To Connect to Database... $dsn ";
-
-}
 
 sub populateSuperBill
 {
-	my ($self, $superBills, $orgInternalID, %params) = @_;
+	my ($self, $superBills, $page, %params) = @_;
 
-	$self->makeStatements;
-
-	my $handle = $params{dbiHdl};
-
-	if($handle)
-	{
-		$self->{dbiCon} = $handle;
-	}
-	else
-	{
-		$self->connectDb(%params);
-	}
-
-	$self->populateSuperBillAndPatient($superBills, $orgInternalID, %params);
-
-	unless($handle)
-	{
-		$self->dbDisconnect;
-	}
+	$self->populateSuperBillAndPatient($superBills, $page, %params);
 
 	return 1;
 }
@@ -73,295 +36,160 @@ sub populateSuperBill
 sub populateSuperBillAndPatient
 {
 
-	my ($self, $superBills, $orgInternalID, %params) = @_;
+	my ($self, $superBills, $page, %params) = @_;
 
-	my @row;
+	my $startTime = $params{startTime};
+	my $endTime = $params{endTime};
+	my $physicianID = $params{physicianID};
+	my $eventID = $params{eventID};
+	my $superBillID = $params{superBillID};
 
-#	my $sthMain = $self->prepareStatement('selEvents');
-#	$sthMain->execute($orgInternalID, $orgInternalID);
 
-	my $rows = $params{fetchedRows};
-	my $super_bill_id = $params{superBillID};
-
-	if($rows)
+	if($superBillID ne '')
 	{
-		my $sthOrgTitle = $self->prepareStatement('orgInternalID');
-		my $sthPerson = $self->prepareStatement('personInfo');
-		my $sthAddress = $self->prepareStatement('addressInfo');
-		my $sthContact = $self->prepareStatement('contactInfo');
-		my $sthOrg = $self->prepareStatement('orgInfo');
 
-		foreach my $rowMain (@$rows)
+		my $orgInternalId = 2; #$page->session('org_internal_id');
+
+		my $orgInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'orgInfo', $orgInternalId);
+
+		my $superBill = new App::Billing::SuperBill::SuperBill;
+		$superBill->setOrgName($orgInfo->{name_primary});
+		$superBill->setTaxId($orgInfo->{tax_id});
+		my $patient = new App::Billing::Claim::Person;
+		my $patientAddress = new App::Billing::Claim::Address;
+		$patient->setAddress($patientAddress);
+		$superBill->setPatient($patient);
+		my $doctor = new App::Billing::Claim::Person;
+		$superBill->setDoctor($doctor);
+		my $org = new App::Billing::Claim::Organization;
+		$superBill->setLocation($org);
+		$self->populateSuperBillComponent($superBill, $superBillID);
+		$superBills->addSuperBill($superBill);
+	}
+	else
+	{
+		my $offset = $page->session('GMT_DAYOFFSET');
+		my $orgInternalId = $page->session('org_internal_id');
+
+		my $allEvents;
+
+		if(($startTime ne '') && ($endTime ne ''))
 		{
+			if($physicianID ne '')
+			{
+				$allEvents = $STMTMGR_REPORT_SUPERBILL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSBbyStartEndDatePhysician', $startTime, $endTime, $offset, $orgInternalId, $physicianID);
+			}
+			else
+			{
+				$allEvents = $STMTMGR_REPORT_SUPERBILL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSBbyStartEndDate', $startTime, $endTime, $offset, $orgInternalId);
+			}
+		}
+		elsif($eventID ne '')
+		{
+			$allEvents = $STMTMGR_REPORT_SUPERBILL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSBbyEvents', $eventID, $offset, $orgInternalId);
+		}
+		else
+		{
+		}
 
+		foreach my $rowMain (@$allEvents)
+		{
 			my $superBillID = $rowMain->{superbill_id};
 			my $patientID = $rowMain->{patient};
 			my $doctorID = $rowMain->{physician};
 			my $orgID = $rowMain->{facility_id};
 
-
 			my $superBill = new App::Billing::SuperBill::SuperBill;
 
-			$sthOrgTitle->execute($orgInternalID);
+			my $orgInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'orgInfo', $orgInternalId);
+			$superBill->setOrgName($orgInfo->{name_primary});
+			$superBill->setTaxId($orgInfo->{tax_id});
 
-			@row = $sthOrgTitle->fetchrow_array();
+			$superBill->setDate($rowMain->{start_date});
+			$superBill->setTime($rowMain->{start_time});
 
-			$superBill->setOrgName($row[0]);
-			$superBill->setTaxId($row[1]);
+			# patient info
 
 			my $patient = new App::Billing::Claim::Person;
 			my $patientAddress = new App::Billing::Claim::Address;
-
-			$sthPerson->execute($patientID);
-			@row = $sthPerson->fetchrow_array();
-			$patient->setLastName($row[0]);
-			$patient->setMiddleInitial($row[1]);
-			$patient->setFirstName($row[2]);
-			$patient->setId($row[3]);
-			$patient->setDateOfBirth($row[4]);
-			$patient->setSex($row[5]);
-			$patient->setStatus($row[6]);
-			$patient->setSsn($row[7]);
-			$patient->setName($row[8]);
-
-			$sthAddress->execute($patientID);
-			@row = $sthAddress->fetchrow_array();
-			$patientAddress->setAddress1($row[0]);
-			$patientAddress->setAddress2($row[1]);
-			$patientAddress->setCity($row[2]);
-			$patientAddress->setState($row[3]);
-			$patientAddress->setZipCode($row[4]);
-			$patientAddress->setCountry($row[5]);
-
-			$sthContact->execute($patientID);
-			@row = $sthContact->fetchrow_array();
-			$patientAddress->setTelephoneNo($row[0]);
-
+			my $patientInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'personInfo', $patientID);
+			$patient->setLastName($patientInfo->{name_last});
+			$patient->setMiddleInitial($patientInfo->{name_middle});
+			$patient->setFirstName($patientInfo->{name_last});
+			$patient->setId($patientInfo->{patient_id});
+			$patient->setDateOfBirth($patientInfo->{dob});
+			$patient->setSex($patientInfo->{gender});
+			$patient->setStatus($patientInfo->{marital_status});
+			$patient->setSsn($patientInfo->{ssn});
+			$patient->setName($patientInfo->{simple_name});
+			my $patientAddressInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'personAddressInfo', $patientID);
+			$patientAddress->setAddress1($patientAddressInfo->{line1});
+			$patientAddress->setAddress2($patientAddressInfo->{line2});
+			$patientAddress->setCity($patientAddressInfo->{city});
+			$patientAddress->setState($patientAddressInfo->{state});
+			$patientAddress->setZipCode($patientAddressInfo->{zip});
+			$patientAddress->setCountry($patientAddressInfo->{country});
+			my $patientContactInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'personContactInfo', $patientID);
+			$patientAddress->setTelephoneNo($patientContactInfo->{phone});
 			$patient->setAddress($patientAddress);
-
 			$superBill->setPatient($patient);
 
+			# doctor info
+
 			my $doctor = new App::Billing::Claim::Person;
-
-			$sthPerson->execute($doctorID);
-
-			@row = $sthPerson->fetchrow_array();
-
-			$doctor->setLastName($row[0]);
-			$doctor->setMiddleInitial($row[1]);
-			$doctor->setFirstName($row[2]);
-			$doctor->setId($row[3]);
-			$doctor->setDateOfBirth($row[4]);
-			$doctor->setSex($row[5]);
-			$doctor->setStatus($row[6]);
-			$doctor->setSsn($row[7]);
-			$doctor->setName($row[8]);
-
+			my $doctorInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'personInfo', $doctorID);
+			$doctor->setLastName($doctorInfo->{name_last});
+			$doctor->setMiddleInitial($doctorInfo->{name_middle});
+			$doctor->setFirstName($doctorInfo->{name_last});
+			$doctor->setId($doctorInfo->{patient_id});
+			$doctor->setDateOfBirth($doctorInfo->{dob});
+			$doctor->setSex($doctorInfo->{gender});
+			$doctor->setStatus($doctorInfo->{marital_status});
+			$doctor->setSsn($doctorInfo->{ssn});
+			$doctor->setName($doctorInfo->{simple_name});
 			$superBill->setDoctor($doctor);
 
+			# facility info
+
 			my $org = new App::Billing::Claim::Organization;
-
-			$sthOrg->execute($orgID);
-
-			@row = $sthOrg->fetchrow_array();
-
-			$org->setId($row[0]);
-			$org->setName($row[1]);
-
+			my $facilityInfo = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'orgInfo', $orgID);
+			$org->setId($facilityInfo->{org_id});
+			$org->setName($facilityInfo->{name_primary});
 			$superBill->setLocation($org);
 
-			$self->populateSuperBillComponent($superBill, $superBillID);
+			$self->populateSuperBillComponent($superBill, $superBillID, $page);
 
 			$superBills->addSuperBill($superBill);
 		}
-	}
-	elsif($super_bill_id)
-	{
-			my $superBillID = $super_bill_id;
-
-			my $sthOrgTitle = $self->prepareStatement('orgInternalID');
-
-			my $superBill = new App::Billing::SuperBill::SuperBill;
-
-			$sthOrgTitle->execute($orgInternalID);
-
-			@row = $sthOrgTitle->fetchrow_array();
-
-			$superBill->setOrgName($row[0]);
-			$superBill->setTaxId($row[1]);
-
-			my $patient = new App::Billing::Claim::Person;
-			my $patientAddress = new App::Billing::Claim::Address;
-			$patient->setAddress($patientAddress);
-			$superBill->setPatient($patient);
-			my $doctor = new App::Billing::Claim::Person;
-			$superBill->setDoctor($doctor);
-			my $org = new App::Billing::Claim::Organization;
-			$superBill->setLocation($org);
-			$self->populateSuperBillComponent($superBill, $superBillID);
-			$superBills->addSuperBill($superBill);
 	}
 }
 
 sub populateSuperBillComponent
 {
-	my ($self, $superBill, $superBillID) = @_;
+	my ($self, $superBill, $superBillID, $page) = @_;
 
-	my $sth = $self->prepareStatement('catalogEntryHeader');
-	my $sthCount = $self->prepareStatement('catalogEntryCount');
-	my $sthComp = $self->prepareStatement('catalogEntries');
+	my $headerInfo = $STMTMGR_REPORT_SUPERBILL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'catalogEntryHeader', $superBillID);
 
-
-	$sth->execute($superBillID);
-	while(my @row = $sth->fetchrow_array())
+	foreach my $row (@$headerInfo)
 	{
 		my $superBillComponent = new App::Billing::SuperBill::SuperBillComponent;
 
-		$superBillComponent->setHeader($row[1]);
+		my $header = $row->{entry_id};
+		$superBillComponent->setHeader($row->{name});
 
-		$sthCount->execute($superBillID, $row[0]);
-		my @rowCount = $sthCount->fetchrow_array();
-		$superBillComponent->setCount($rowCount[0]);
+		my $entryCount = $STMTMGR_REPORT_SUPERBILL->getRowAsHash($page, STMTMGRFLAG_NONE, 'catalogEntryCount', $superBillID, $header);
+		$superBillComponent->setCount($entryCount->{entry_count});
 
-		$sthComp->execute($superBillID, $row[0]);
-		while(my @rowComp = $sthComp->fetchrow_array())
+		my $entries = $STMTMGR_REPORT_SUPERBILL->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'catalogEntries', $superBillID, $header);
+		foreach my $entry (@$entries)
 		{
-			$superBillComponent->addCpt($rowComp[1]);
-			$superBillComponent->addDescription($rowComp[2]);
+			$superBillComponent->addCpt($entry->{code});
+			$superBillComponent->addDescription($entry->{name});
 		}
 
 		$superBill->addSuperBillComponent($superBillComponent)
 	}
 
 }
-
-sub dbDisconnect
-{
-	my $self = shift;
-	$self->{dbiCon}->disconnect;
-}
-
-sub makeStatements
-{
-	my $self = shift;
-
-	$self->{statements} =
-	{
-		'selEvents' => qq
-		{
-			select e.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id
-			from event e, event_attribute ea
-			where e.event_id = ea.parent_id
-			and owner_id = ?
-			and e.superbill_id is not null
-			union
-			select apt.superbill_id, ea.value_text as patient, ea.value_textb as physician, facility_id
-			from event e, event_attribute ea, appt_type apt
-			where e.event_id = ea.parent_id
-			and owner_id = ?
-			and e.superbill_id is null
-			and e.appt_type = apt.appt_type_id
-			and apt.superbill_id is not null
-		},
-
-		'orgInternalID' => qq
-		{
-			select name_primary, tax_id
-			from org
-			where org_internal_id = ?
-		},
-
-		'catalogEntryHeader' => qq
-		{
-			select entry_id, name
-			from offering_catalog_entry
-			where catalog_id = ?
-			and parent_entry_id is null
-			and entry_type = 0
-			and status = 1
-			and not name = 'main'
-			order by entry_id
-		},
-
-		'catalogEntryCount' => qq
-		{
-			select count(*)
-			from offering_catalog_entry
-			where catalog_id = ?
-			and parent_entry_id = ?
-			and entry_type = 100
-			and status = 1
-		},
-
-		'catalogEntries' => qq
-		{
-			select entry_id, code, name
-			from offering_catalog_entry
-			where catalog_id = ?
-			and parent_entry_id = ?
-			and entry_type = 100
-			and status = 1
-			order by entry_id
-		},
-
-		'personInfo' => qq
-		{
-			select
-				name_last,
-				name_middle,
-				name_first,
-				person_id,
-				to_char(date_of_birth, 'DD-MON-YYYY'),
-				gender,
-				marital_status,
-				ssn,
-				simple_name
-			from person
-			where person_id = ?
-		},
-
-		'orgInfo' => qq
-		{
-			select org_id, name_primary
-			from org
-			where org_internal_id = ?
-		},
-
-		'addressInfo' => qq
-		{
-			select line1, line2, city, state, zip, country
-			from person_address
-			where parent_id = ?
-			and address_name = 'Home'
-		},
-
-		'contactInfo' => qq
-		{
-			select value_text
-			from person_attribute
-			where parent_id = ?
-			and item_name = 'Home'
-			and value_type = 10
-		},
-	};
-}
-
-sub getStatement
-{
-	my ($self, $statementID) = @_;
-
-	my $statements = $self->{statements};
-	return $statements->{$statementID};
-}
-
-sub prepareStatement
-{
-	my ($self, $statementID) = @_;
-
-
-	my $statements = $self->{statements};
-	return $self->{dbiCon}->prepare($statements->{$statementID});
-}
-
 
 1;

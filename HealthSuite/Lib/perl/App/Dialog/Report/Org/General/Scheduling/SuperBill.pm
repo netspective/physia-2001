@@ -19,7 +19,6 @@ use File::Spec;
 use App::Billing::SuperBill::SuperBills;
 use App::Billing::Input::SuperBillDBI;
 use App::Billing::Output::SuperBillPDF;
-use App::Statements::Report::Scheduling;
 
 use Data::Publish;
 
@@ -76,33 +75,19 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-
 	my $superBills = new App::Billing::SuperBill::SuperBills;
 	my $input = new App::Billing::Input::SuperBillDBI;
 	my $output = new App::Billing::Output::SuperBillPDF;
 
-	my $startTime = $page->field('report_begin_date');
-	my $endTime = $page->field('report_end_date');
 	my $offset = $page->session('GMT_DAYOFFSET');
 	my $orgId = $page->session('org_internal_id');
-	my $physicianID = $page->field('provider_id');
-
-	my $rows;
-
-	if($physicianID ne '')
-	{
-		$rows = $STMTMGR_REPORT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSuperBillsPhysician', $startTime, $endTime, $offset, $orgId, $physicianID);
-	}
-	else
-	{
-		$rows = $STMTMGR_REPORT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selSuperBills', $startTime, $endTime, $offset, $orgId);
-	}
 
 	$input->populateSuperBill(
 		$superBills,
-		$page->session ('org_internal_id'),
-		fetchedRows => $rows,
-		dbiHdl => $page->getSchema()->{dbh}
+		$page,
+		startTime => $page->field('report_begin_date'),
+		endTime => $page->field('report_end_date'),
+		physicianID => $page->field('provider_id')
 	);
 
 	my $theFilename = $page->session ('org_id') . $page->session ('user_id') . time() . ".superbillSample.pdf";
