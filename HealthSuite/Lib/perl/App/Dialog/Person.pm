@@ -39,6 +39,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_emp_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'assoc_phy_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'bill_provider_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'inactive_patient_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -331,6 +332,11 @@ sub populateData
 	$page->field('bill_provider_item_id', $billProviderData->{'item_id'});
 	$page->field('bill_provider', $billProviderData->{'value_text'});
 
+	my $inactivePatient = 'Inactive Patient';
+	my $inactiveData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $inactivePatient);
+	$page->field('inactive_patient_item_id', $inactiveData->{'item_id'});
+	$page->field('inactivate_record', $inactiveData->{'value_int'});
+	$page->field('inactivate_date', $inactiveData->{'value_date'});
 	#my $assocPhysician = 'Physician';
 	#my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
 	#$page->field('assoc_phy_item_id', $assocPhysicianData->{'item_id'});
@@ -680,6 +686,19 @@ sub handleAttrs
 		value_textB => $page->field('physician_type') || undef,
 		_debug => 0
 	);
+
+	my $commandPatientInactive = $command eq 'update' &&  $page->field('inactive_patient_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+		'Person_Attribute', $commandPatientInactive,
+		parent_id => $personId || undef,
+		item_id => $page->field('inactive_patient_item_id') || undef,
+		parent_org_id => $page->session('org_internal_id') ||undef,
+		item_name => 'Inactive Patient',
+		value_type => 0,
+		value_int => $page->field('inactivate_record') || undef,
+		value_date => $page->field('inactivate_date') || undef,
+		_debug => 0
+	) if $member eq 'Patient';
 }
 
 sub customValidate
