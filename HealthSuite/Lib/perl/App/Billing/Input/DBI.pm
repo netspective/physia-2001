@@ -26,14 +26,12 @@ use App::Billing::Validate::HCFA::Medicaid;
 use App::Billing::Validate::HCFA::Medicare;
 use App::Billing::Validate::HCFA::Other;
 use App::Billing::Validate::HCFA::FECA;
-use App::Billing::Validate::HCFA::HCFA1500;
-
+# use App::Billing::Validate::HCFA::HCFA1500;
+# use App::Universal;
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Input::Driver);
 use Devel::ChangeLog;
-
 use vars qw(@CHANGELOG);
-
 use constant INVOICESTATUS_SUBMITTED => 4;
 # constant related with invoice attribute
 use constant COLUMNINDEX_ATTRNAME => 1;
@@ -49,6 +47,7 @@ use constant COLUMNINDEX_VALUE_DATEA => 10;
 use constant COLUMNINDEX_VALUE_DATEB => 11;
 use constant COLUMNINDEX_VALUE_BLOCK => 12; # changed from COLUMNINDEX_VALUE_HTML
 use constant PRE_STATUS => 3;
+use constant PRE_VOID => 16;
 use constant CERTIFICATION_LICENSE => 500;
 use constant PHYSICIAN_SPECIALTY => 540;
 use constant CONTACT_METHOD_TELEPHONE => 10;
@@ -178,6 +177,7 @@ sub populateClaims
 	my $currentClaim;
 	my $populatedObjects;
 	my $flag = 0;
+	my @row;
 	$self->{valMgr} = $params{valMgr};
 	if ($params{dbiHdl} ne "")
 	{
@@ -218,7 +218,13 @@ sub populateClaims
 	my $claims = $claimList->getClaim();
 	for $i (0..$#$targetInvoices)
 	{
-		if ( $claims->[$i]->getStatus() <= PRE_STATUS)
+		my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+		my $queryStatment = " select flags from invoice where INVOICE_id = $targetInvoices->[$i]";
+		my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+
+		$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		if (($claims->[$i]->getStatus() <= PRE_STATUS) || (($claims->[$i]->getStatus() == PRE_VOID) && not($attrDataFlag & $row[0])))
 		{
 			$self->assignInvoicePreSubmit($claims->[$i], $targetInvoices->[$i]);
 		}
@@ -758,6 +764,7 @@ sub assignPayerInfo
 	$self->setProperPayer($invoiceId, $claim);
 }
 
+
 sub assignPolicy
 {
 	my ($self, $claim, $invoiceId) = @_;
@@ -785,7 +792,7 @@ sub assignPolicy
 	if($invoiceSubtype == CLAIM_TYPE_THIRD_PARTY)
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type	
+				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID	
 				from invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.invoice_item_id is NULL
@@ -796,7 +803,7 @@ sub assignPolicy
 	else
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type	
+				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID	
 				from insurance, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.bill_ins_id = insurance.ins_internal_id
@@ -924,7 +931,6 @@ sub assignPolicy
 					@row = $sth->fetchrow_array();
 					$payer->setId($pid);
 					$payer->setName($row[0]);
-
 			 		$queryStatment = "select line1, line2, city, state, zip, country from person_address where parent_id = \'$pid\' and address_name = \'Home\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
@@ -946,16 +952,18 @@ sub assignPolicy
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
-					my $oid = $row1[0];
-					$queryStatment = "select name_primary , org_id  from org where org_id = \'$oid\'";
+					my $ins_id = $row1[4];
+					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME) , INS_ORG_ID from insurance where INS_INTERNAL_ID = $ins_id";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
-			
 					$payer->setId($row[1]);
 					$payer->setName($row[0]);
-			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
+			 		my $oid = $row[0];
+			 		$queryStatment = "select line1, line2, city, state, zip, country
+										from insurance_address
+										where parent_id = \'$oid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -966,12 +974,12 @@ sub assignPolicy
 					$payerAddress->setState($row[3]);
 					$payerAddress->setZipCode($row[4]);
 					$payerAddress->setCountry($row[5]);
-					$queryStatment = "select value_text from org_attribute where parent_id = \'$oid\' and Item_name = \'Contact Method/Telepone/Primary\'";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+#					$queryStatment = "select value_text from org_attribute where parent_id = \'$oid\' and Item_name = \'Contact Method/Telepone/Primary\'";
+#					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$payerAddress->setTelephoneNo($row[0]);
+#					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+#					@row = $sth->fetchrow_array();
+#					$payerAddress->setTelephoneNo($row[0]);
 				}
 			}
 		}
@@ -1143,7 +1151,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Personal/Marital Status' => [$insured, \&App::Billing::Claim::Person::setStatus, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Personal/Gender' => [$insured, \&App::Billing::Claim::Person::setSex, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Personal/DOB' => [$insured, \&App::Billing::Claim::Person::setDateOfBirth, COLUMNINDEX_VALUE_DATE],
-		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Personal/SSN'  => [$insured, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Member Number'  => [$insured, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Contact/Home Phone' => [$insuredAddress, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/Employer/Name'	=> [$insured, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Insurance/' . BILLSEQ_PRIMARY_CAPTION . '/Insured/School/Name'	=> [$insured, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1166,7 +1174,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Personal/Marital Status' => [$insured2, \&App::Billing::Claim::Person::setStatus, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Personal/Gender' => [$insured2, \&App::Billing::Claim::Person::setSex, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Personal/DOB' => [$insured2, \&App::Billing::Claim::Person::setDateOfBirth, COLUMNINDEX_VALUE_DATE],
-		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Personal/SSN'  => [$insured2, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Member Number'  => [$insured2, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Contact/Home Phone' => [$insured2Address, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/Employer/Name'	=> [$insured2, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Insurance/' . BILLSEQ_SECONDARY_CAPTION . '/Insured/School/Name'	=> [$insured2, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1189,7 +1197,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Personal/Marital Status' => [$insured3, \&App::Billing::Claim::Person::setStatus, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Personal/Gender' => [$insured3, \&App::Billing::Claim::Person::setSex, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Personal/DOB' => [$insured3, \&App::Billing::Claim::Person::setDateOfBirth, COLUMNINDEX_VALUE_DATE],
-		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Personal/SSN'  => [$insured3, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Member Number'  => [$insured3, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Contact/Home Phone' => [$insured3Address, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/Employer/Name'	=> [$insured3, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Insurance/' . BILLSEQ_TERTIARY_CAPTION . '/Insured/School/Name'	=> [$insured3, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1213,7 +1221,7 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Personal/Marital Status' => [$insured4, \&App::Billing::Claim::Person::setStatus, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Personal/Gender' => [$insured4, \&App::Billing::Claim::Person::setSex, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Personal/DOB' => [$insured4, \&App::Billing::Claim::Person::setDateOfBirth, COLUMNINDEX_VALUE_DATE],
-		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Personal/SSN'  => [$insured4, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
+		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Member Number'  => [$insured4, \&App::Billing::Claim::Person::setSsn , COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Contact/Home Phone' => [$insured4Address, \&App::Billing::Claim::Address::setTelephoneNo, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/Employer/Name'	=> [$insured4, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/Insured/School/Name'	=> [$insured4, [\&App::Billing::Claim::Insured::setEmployerOrSchoolName, \&App::Billing::Claim::Person::setEmploymentStatus], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1385,7 +1393,6 @@ sub payersRemainingProperties
 			}
 		}
 	}
-
 }
 
 sub setproperRenderingProvider
@@ -1896,6 +1903,7 @@ sub getId
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/06/2000', 'SSI', 'Billing Interface/Input DBI','Patient-Insured is changed to Patient-Insured/Relationship'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/23/2000', 'SSI', 'Billing Interface/Input DBI','Pay to org tax id is now pulling form invoice_attribue in both pre and post submit cases. Pay To Org/Tax ID(item path)'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/24/2000', 'SY', 'Billing Interface/Input DBI','Change the query, to fetch the values of invoice_type, invoice_subtype and total_items'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/24/2000', 'SY', 'Billing Interface/Input DBI','New Invoice Status (void) Implmented.'],
 
 );
 
