@@ -67,7 +67,7 @@
 				<col name="caption">Phone</col>
 				<col name="group_name">Text</col>
 				<col name="dialog_params">type="phone"</col>
-				<col name="remarks">Data type for phone number.Stored in value_text in person_attribute table</col>
+				<col name="remarks">Data type for phone number. Stored in value_text in person_attribute table</col>
 			</row>
 			<row>
 				<col name="id">15</col>
@@ -110,6 +110,13 @@
 				<col name="group_name">Text</col>
 				<col name="dialog_params">type="ssn"</col>
 				<col name="remarks">Data type for social security number. Stored in ssn in person table</col>
+			</row>
+			<row>
+				<col name="id">70</col>
+				<col name="caption">Contact</col>
+				<col name="group_name">Text</col>
+				<col name="dialog_params">type="contact"</col>
+				<col name="remarks">Data type for contact names. Stored in value_text in org_attribute table</col>
 			</row>
 			<row>
 				<col name="id">100</col>
