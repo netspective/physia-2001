@@ -63,7 +63,7 @@
 		<enum id="10">Visits</enum>
 	</table>
 
-	<table name="Referral_Service_Description" abbrev="IntSr" type="Org_Lookup">
+	<table name="Referral_Service_Descr" abbrev="IntSr" type="Org_Lookup">
 		<enum id="0">BGS Bone Growth Stim</enum>
 		<enum id="1">CPM Elbow CPM</enum>
 		<enum id="2">CPM Hand CPM</enum>
