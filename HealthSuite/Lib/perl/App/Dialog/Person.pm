@@ -40,6 +40,9 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'assoc_phy_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'bill_provider_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'inactive_patient_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'language_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'ethnicity_item_id'),
+
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -110,14 +113,15 @@ sub initialize
 						style => 'multicheck',
 						caption => 'Ethnicity',
 						hints => 'You may choose more than one ethnicity type.'),
+		new CGI::Dialog::Field(	caption => 'Other Ethnicity',name => 'other_ethnicity'),
 		new CGI::Dialog::Field(
-						selOptions => "English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese",
+						selOptions => "English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other",
 						caption => 'Language Spoken',
 						style => 'multicheck',
 						type => 'select',
 						name => 'language',
 						),
-
+		new CGI::Dialog::Field(	caption => 'Other Language',name => 'other_language'),
 		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor', 'Patient', 'Physician', 'Nurse', 'Staff']),
 							#hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'"),
 		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation', options => FLDFLAG_REQUIRED),
@@ -348,6 +352,11 @@ sub populateData
 	#my $assocPhysicianData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $assocPhysician);
 	#$page->field('assoc_phy_item_id', $assocPhysicianData->{'item_id'});
 	#$page->field('value_text', $assocPhysicianData->{'value_text'});
+
+	my $otherLanguage = 'Other Language';
+	my $otherLanguageData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $otherLanguage);
+	$page->field('language_item_id', $otherLanguageData->{'item_id'});
+	$page->field('other_language', $otherLanguageData->{'value_text'});
 }
 
 sub handleContactInfo
@@ -532,13 +541,13 @@ sub handleRegistry
 				_debug => 0
 			) if $member ne 'Patient';
 
-	$page->schemaAction(
-					'Person_Attribute', $command,
-					parent_id => $personId || undef,
-					item_name => 'BloodType' || undef,
-					value_type => App::Universal::ATTRTYPE_TEXT,
-					value_text => $page->field('blood_type') || undef,
-					_debug => 0
+		$page->schemaAction(
+				'Person_Attribute', $command,
+				parent_id => $personId || undef,
+				item_name => 'BloodType' || undef,
+				value_type => App::Universal::ATTRTYPE_TEXT,
+				value_text => $page->field('blood_type') || undef,
+				_debug => 0
 		);
 	}
 
@@ -704,6 +713,28 @@ sub handleAttrs
 		value_date => $page->field('inactivate_date') || undef,
 		_debug => 0
 	) if $member eq 'Patient';
+
+	my $commandEthnicity = $command eq 'update' &&  $page->field('ethnicity_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+				'Person_Attribute', $commandEthnicity,
+				parent_id => $page->field('person_id')  || undef,
+				item_name => 'Other Ethnicity',
+				item_id   =>  $page->field('ethnicity_item_id') || undef,
+				value_type => App::Universal::ATTRTYPE_TEXT,
+				value_text => $page->field('other_ethnicity')  || undef,
+				_debug => 0
+	) if ($page->field('other_ethnicity') ne '');
+
+	my $commandLanguage = $command eq 'update' &&  $page->field('language_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+				'Person_Attribute', $commandLanguage,
+				parent_id => $page->field('person_id')  || undef,
+				item_name => 'Other Language',
+				item_id   =>  $page->field('language_item_id') || undef,
+				value_type => App::Universal::ATTRTYPE_TEXT,
+				value_text => $page->field('other_language')  || undef,
+				_debug => 0
+	) if ($page->field('other_language') ne '');
 }
 
 sub customValidate
