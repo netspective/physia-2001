@@ -309,7 +309,9 @@ sub checkValidValues
 
 				if ($value !~ /[@values]{$m}/)
 				{
-					$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
+					$self->{valMgr}->addError($self->getId . "  " . $self->{claim}->getPayerId() . "  " . $self->{claim}->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
+					#$self->{valMgr}->addError($self->getId . "  " . $self->{claim}->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
+
 					return;
 				}
 
