@@ -70,6 +70,7 @@ sub prepare_page_content_header
 			['ICD', "$urlPrefix/icd", 'icd'],
 			['CPT', "$urlPrefix/cpt", 'cpt'],
 			['HCPCS', "$urlPrefix/cpt", 'hcpcs'],
+			['EPSDT', "$urlPrefix/epsdt", 'epsdt'],
 			['Schedule Template', "$urlPrefix/template", 'template'],
 			['User Sessions', "$urlPrefix/session", 'session'],
 		]);
