@@ -1734,7 +1734,7 @@ sub assignInvoiceProperties
 	my $sthHist = $self->{dbiCon}->prepare("$queryStatment");
 	$sthHist->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
 
-	while(my @row = $sth->fetchrow_array())
+	while(my @row = $sthHist->fetchrow_array())
 	{
 		$claim->setInvoiceHistoryDate($row[0]);
 		$claim->setInvoiceHistoryAction($row[1]);
