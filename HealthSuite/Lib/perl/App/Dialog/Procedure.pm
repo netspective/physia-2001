@@ -165,8 +165,10 @@ sub populateData
 
 	$page->field('claim_diags', $STMTMGR_INVOICE->getSingleValue($page, 0, 'selClaimDiags', $invoiceId));
 
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
+	$page->field('proccharge', $page->field('alt_cost'));
 	$page->field('', $page->getDate());
 	my $sqlStampFmt = $page->defaultSqlStampFormat();
 	my $itemId = $page->param('item_id');
@@ -283,8 +285,6 @@ sub hmoCapWriteoff
 
 		$totalAdjForItems += $netAdjust;
 	}
-
-
 
 	## update the invoice
 	my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjForItems;
@@ -879,9 +879,6 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
-
-
-
 			#HMO-PPO Indicator and BCBS Plan Code --------------------
 			my $ppoHmo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'HMO-PPO/Indicator');
 			my $bcbsCode = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'BCBS Plan Code');
@@ -902,8 +899,6 @@ sub storeInsuranceInfo
 					value_text => $bcbsCode->{value_text} || undef,
 					_debug => 0
 				);
-
-
 
 
 			#Payment Source --------------------
@@ -938,9 +933,6 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
-
-
-
 			#Champus Information --------------------
 			my $champusStatus = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Champus Status');
 			my $champusBranch = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $parentInsId, 'Champus Branch');
@@ -973,9 +965,6 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
-
-
-
 			#Insurance Contact Info --------------------
 			my $insOrgPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
 			my $insOrgAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
@@ -1001,8 +990,6 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
-
-
 			#Relationship to Insured --------------------
 			my $relToCaption = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuredRelationship', $personInsur->{rel_to_insured});
 			my $relToCode = '';
@@ -1021,8 +1008,6 @@ sub storeInsuranceInfo
 					value_int => $relToCode || undef,
 					_debug => 0
 				);
-
-
 
 			#Insured Information --------------------
 			my $insuredData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $personInsur->{insured_id});
@@ -1111,8 +1096,6 @@ sub storeInsuranceInfo
 					value_text => $personInsur->{member_number} || undef,
 					_debug => 0
 				);
-
-
 
 			#Insured's Contact Information
 			my $insuredPhone = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selHomePhone', $personInsur->{insured_id});
@@ -1228,7 +1211,7 @@ sub customValidate
 	my ($self, $page) = @_;
 
 	#GET ITEM COST FROM FEE SCHEDULE
-	unless($page->field('proccharge'))
+	if (! $page->field('proccharge') && ! $page->field('alt_cost'))
 	{
 		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];
 		my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
@@ -1267,7 +1250,6 @@ sub customValidate
 			my $field = $self->getField('alt_cost');
 			my $html = $self->getMultiPricesHtml($page, $fsResults);
 			$field->invalidate($page, $html);
-			
 		}
 	}
 }
@@ -1413,9 +1395,6 @@ sub execute_addOrUpdate
 			_debug => 0
 		);
 
-
-
-
 	## ADD HISTORY ATTRIBUTE
 
 	my $action = '';
@@ -1502,8 +1481,6 @@ sub voidProcedure
 			balance => defined $invBalance ? $invBalance : undef,
 			_debug => 0
 		);
-
-
 
 	## ADD HISTORY ATTRIBUTE
 	$page->schemaAction(
