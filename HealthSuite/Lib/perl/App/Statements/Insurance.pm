@@ -195,6 +195,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				and bs.id = i.bill_sequence
 				and i.bill_sequence in (1,2,3,4)
 				and ct.group_name = 'insurance'
+			order by bill_sequence
 		UNION
 		select wk.plan_name, 'Workers Compensation' as group_name, '' as bill_seq, '2' as myorder
 			from insurance wk
@@ -377,7 +378,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 	'selUpdateAndAddInsSeq' => qq{
 					update insurance
 					set bill_sequence = 99
-					where owner_person_id = ?
+					where ins_internal_id = ?
 					and bill_sequence = ?
 		},
 	#--------------------------------------------------------------------------------------------------------------------------------------
