@@ -218,6 +218,10 @@ sub makeStateChanges
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('ethnicity', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
 	#if ($command eq 'update' || $command eq 'remove')
 	#$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove'  ;
 	my $personId = $page->param('person_id');
