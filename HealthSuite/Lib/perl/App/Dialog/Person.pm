@@ -125,7 +125,7 @@ sub makeStateChanges
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
 
 	if($page->param('_lcm_ispopup'))
 	{
@@ -385,12 +385,14 @@ sub handleRegistry
 			_debug => 0
 		);
 
+	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+
 	if($command eq 'add')
 	{
 		$page->schemaAction(
 				'Person_Org_Category', $command,
 				person_id => $personId || undef,
-				org_id => $page->session('org_id') || undef,
+				org_id => $orgId || undef,
 				category => $member || undef,
 				_debug => 0
 			);
@@ -432,12 +434,12 @@ sub handleRegistry
 sub handleAttrs
 {
 	my ($self, $page, $command, $flags, $member, $personId) = @_;
-
+	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_id => $page->field('phy_type_item_id') || undef,
-			parent_org_id => $page->session('org_id') ||undef,
+			parent_org_id => $orgId ||undef,
 			item_name => 'Physician/Type',
 			value_type => 0,
 			value_text => $page->field('physician_type') || undef,
@@ -447,7 +449,7 @@ sub handleAttrs
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
-			parent_org_id => $page->session('org_id') ||undef,
+			parent_org_id => $orgId ||undef,
 			item_name => 'Misc Notes' ,
 			value_text => $page->field('misc_notes') || undef,
 			_debug => 0
@@ -456,7 +458,7 @@ sub handleAttrs
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
-			parent_org_id => $page->session('org_id') ||undef,
+			parent_org_id => $orgId ||undef,
 			item_name => 'Job Code' ,
 			value_text => $page->field('job_code') || undef,
 			value_textB => $page->field('job_title') || undef,
@@ -500,7 +502,8 @@ sub customValidate
 	}
 	else
 	{
-		my $orgId = $page->session('org_id');
+		my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+
 		my $ssNum = $self->getField('ssndatemf')->{fields}->[0];
 		my $firstName = $self->getField('person_id')->{fields}->[0];
 		my $lastName = $self->getField('person_id')->{fields}->[2];
@@ -526,7 +529,8 @@ sub execute_remove
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $personId = $page->field('person_id');
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->param('org_id') ne '' ? $page->param('org_id') : $page->session('org_id');
+
 
 	$page->schemaAction(
 			'Person', $command,
