@@ -16,6 +16,7 @@ use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
+use constant MAXID => 25;
 
 use App::Universal;
 use Date::Manip;
@@ -46,6 +47,8 @@ sub new
 		#options => FLDFLAG_REQUIRED),
 		#new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
+		new App::Dialog::Field::Address(caption=>'Work Address', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'address'),
+
 		new CGI::Dialog::MultiField(
 					name => 'phone_fax',
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -65,32 +68,111 @@ sub new
 						),
 					],
 			),
-		new CGI::Dialog::MultiField(
+
+		new CGI::Dialog::Field(type => 'hidden', name => 'phy_type_item_id'),
+
+		new CGI::Dialog::Subhead(heading => 'License ID Numbers', name => 'id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::DataGrid(
+			caption =>'',
+			name => 'id_numbers',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			rows => MAXID,
+			rowFields => [
+				{
+					_class => 'CGI::Dialog::Field',
+					type => 'select',
+					selOptions => 'DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT',
+					caption => 'License',
+					name => 'id_name',
+					options => FLDFLAG_PREPENDBLANK,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					onChangeJS => qq{showHideRows('id_numbers', 'id_name', @{[ MAXID ]});},
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Number',
+					name => 'id_num',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					type=> 'date',
+					caption => 'Exp Date',
+					name => 'id_exp_date',
+					defaultValue => '',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Facility ID',
+					name => 'id_facility',
+					fKeyStmtMgr => $STMTMGR_ORG,
+					fKeyStmt => 'selChildFacilityOrgs',
+					fKeyDisplayCol => 0,
+					fKeyValueCol => 0,
+					type => 'select',
+					fKeyStmtBindSession => ['org_internal_id'],
+					options => FLDFLAG_PREPENDBLANK,
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-					fields => [
-						new CGI::Dialog::Field(
-							caption => 'UPIN Number',
-							name    => 'upin_num',
-						),
-						new CGI::Dialog::Field(
-							caption => 'Exp Date',
-							name    => 'upin_date',
-						),
-						new CGI::Dialog::Field(
-							caption => 'Facility ID',
-							name    => 'upin_facility',
-							fKeyStmtMgr => $STMTMGR_ORG,
-							fKeyStmt => 'selChildFacilityOrgs',
-							fKeyDisplayCol => 0,
-							fKeyValueCol => 0,
-							type => 'select',
-							fKeyStmtBindSession => ['org_internal_id'],
-							options => FLDFLAG_PREPENDBLANK,
-							invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-						),
-					],
-			),
+				},
+			]),
+		new CGI::Dialog::Subhead(heading => 'Provider Numbers', name => 'provider_id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
+		new CGI::Dialog::DataGrid(
+			caption =>'',
+			name => 'prov_id_numbers',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			rows => MAXID,
+			rowFields => [
+				{
+					_class => 'CGI::Dialog::Field',
+					type => 'select',
+					selOptions => 'Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification',
+					caption => 'License',
+					name => 'prov_id_name',
+					options => FLDFLAG_PREPENDBLANK,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					onChangeJS => qq{showHideRows('prov_id_numbers', 'prov_id_name', @{[ MAXID ]});},
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Number',
+					name => 'prov_id_num',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					type=> 'date',
+					caption => 'Exp Date',
+					name => 'prov_id_exp_date',
+					defaultValue => '',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Facility ID',
+					name => 'prov_id_facility',
+					fKeyStmtMgr => $STMTMGR_ORG,
+					fKeyStmt => 'selChildFacilityOrgs',
+					fKeyDisplayCol => 0,
+					fKeyValueCol => 0,
+					type => 'select',
+					fKeyStmtBindSession => ['org_internal_id'],
+					options => FLDFLAG_PREPENDBLANK,
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				},
+			]),
+
+
 	);
+
+	$self->addPostHtml(qq{
+		<script language="JavaScript1.2">
+		<!--
+
+		showHideRows('id_numbers', 'id_name', @{[ MAXID ]});
+		showHideRows('prov_id_numbers', 'prov_id_name', @{[ MAXID ]});
+
+		// -->
+		</script>
+	});
+
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
 							['View Referring Doctor Summary', "/person/%field.person_id%/profile", 1],
@@ -186,18 +268,79 @@ sub execute
 			_debug => 0
 		);
 
-	my $facility = $page->field('upin_facility') ne '' ? $page->field('upin_facility') : $page->session('org_id');
 	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => "UPIN",
-			value_type => App::Universal::ATTRTYPE_PROVIDER_NUMBER,
-			value_text => $page->field('upin_num') || undef,
-			value_textB => "UPIN",
-			name_sort  => $facility,
-			value_dateEnd => $page->field('upin_date') || undef,
+			'Person_Address', $command,
+			parent_id => $personId,
+			address_name => 'Work',
+			line1 => $page->field('addr_line1'),
+			line2 => $page->field('addr_line2') || undef,
+			city => $page->field('addr_city'),
+			state => $page->field('addr_state'),
+			zip => $page->field('addr_zip'),
 			_debug => 0
-		)if $page->field('upin_num') ne '' && $command eq 'add';
+		) if $page->field('addr_line1') ne '';
+
+	my $facility = $page->field('upin_facility') ne '' ? $page->field('upin_facility') : $page->session('org_id');
+	my $y = '';
+	for (my $x = 1; $y !=1; $x++)
+	{
+		my $idName = "id_name_$x";
+		my $idNum = "id_num_$x";
+		my $idDate = "id_exp_date_$x";
+		my $idFacility = "id_facility_$x";
+		my $facility = $page->field("$idFacility") ne '' ? $page->field("$idFacility") : $page->session('org_id');
+
+		if ($idName ne '')
+		{
+
+			$page->schemaAction(
+					'Person_Attribute', $command,
+					parent_id => $personId || undef,
+					item_name => $page->field("$idName") || undef,
+					value_type => App::Universal::ATTRTYPE_LICENSE,
+					value_text => $page->field("$idNum") || undef,
+					value_textB => $page->field("$idName") || undef,
+					name_sort  => $facility,
+					value_dateEnd => $page->field("$idDate") || undef,
+					_debug => 0
+			)if $page->field("$idName") ne '';
+
+		}
+
+		$y = $page->field("$idName") ne '' ? '' : 1;
+	};
+
+	#Provider Numbers
+
+	my $q = '';
+	for (my $p = 1; $q !=1; $p++)
+	{
+		my $idPName = "prov_id_name_$p";
+		my $idPNum = "prov_id_num_$p";
+		my $idPDate = "prov_id_exp_date_$p";
+		my $idPFacility = "prov_id_facility_$p";
+		my $pFacility = $page->field("$idPFacility") ne '' ? $page->field("$idPFacility") : $page->session('org_id');
+
+		if ($idPName ne '')
+		{
+
+			$page->schemaAction(
+					'Person_Attribute', $command,
+					parent_id => $personId || undef,
+					item_name => $page->field("$idPName") || undef,
+					value_type => App::Universal::ATTRTYPE_PROVIDER_NUMBER,
+					value_text => $page->field("$idPNum") || undef,
+					value_textB => $page->field("$idPName") || undef,
+					name_sort  => $pFacility,
+					value_dateEnd => $page->field("$idPDate") || undef,
+					_debug => 0
+			)if $page->field("$idPName") ne '';
+
+		}
+
+		$q = $page->field("$idPName") ne '' ? '' : 1;
+	};
+
 	$self->handlePostExecute($page, $command, $flags);
 }
 
