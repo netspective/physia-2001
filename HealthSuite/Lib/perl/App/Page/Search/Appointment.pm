@@ -141,6 +141,8 @@ sub getForm
 		<SELECT name='order_by'>
 			<option value="time">Appointment Time</option>
 			<option value="name">Patient Name</option>
+			<option value="account">Account Number</option>
+			<option value="chart">Chart Number</option>
 		</SELECT>
 		<script>
 			setSelectedValue(document.search_form.order_by, '@{[ $self->param('order_by')]}');
@@ -288,6 +290,22 @@ sub execute
 				{
 					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE,
 						'sel_appointment_orderbyName', $gmtDayOffset, $gmtDayOffset, $facilityId,
+						"$convFromStamp", "$convToStamp", $resourceId, $apptStatusFrom, $apptStatusTo,
+						$self->session('org_internal_id')
+					);
+				}
+				elsif ($self->param('order_by') eq 'account')
+				{
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+						'sel_appointment_orderbyAccount', $gmtDayOffset, $gmtDayOffset, $facilityId,
+						"$convFromStamp", "$convToStamp", $resourceId, $apptStatusFrom, $apptStatusTo,
+						$self->session('org_internal_id')
+					);
+				}
+				elsif ($self->param('order_by') eq 'chart')
+				{
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+						'sel_appointment_orderbyChart', $gmtDayOffset, $gmtDayOffset, $facilityId,
 						"$convFromStamp", "$convToStamp", $resourceId, $apptStatusFrom, $apptStatusTo,
 						$self->session('org_internal_id')
 					);
