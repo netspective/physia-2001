@@ -68,7 +68,7 @@ sub execute
 		$appendStmtName = '_like';
 	}
 
-	my $bindParams = [$expression];
+	my $bindParams = [uc($expression)];
 
 	$self->addContent(
 		'<CENTER>',
