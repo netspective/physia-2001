@@ -30,126 +30,95 @@ sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'sessionphysicians');
 	my $schema = $self->{schema};
-	my $sessOrg = $self->{sessionOrg};
-	my $orgId = $self->{orgId};
 
 	delete $self->{schema};  # make sure we don't store this!
 
 	croak 'schema parameter required' unless $schema;
-
-	$self->addContent(	new CGI::Dialog::Field(type => 'hidden', name => 'attr_path')  );
+	
 	$self->addContent(
-			new CGI::Dialog::Field(caption => 'Physician Name',
-										#type => 'foreignKey',
-										name => 'value_text',
-										style => 'multicheck',
-										hints => 'You may choose more than one Physician.',
-										fKeyStmtMgr => $STMTMGR_PERSON,
-										fKeyStmt => 'selResourceAssociations',
-										#fKeyTable => 'person p, person_org_category pcat',
-										#fKeySelCols => "distinct p.person_id, p.complete_name",
-										fKeyDisplayCol => 1,
-										fKeyValueCol => 0,
-										#fKeyWhere => "p.person_id=pcat.person_id and pcat.org_id='$sessOrg' and category='Physician'",
-										options => FLDFLAG_REQUIRED,
-										readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE)
-			);
+		new CGI::Dialog::Field(caption => 'Physician',
+			name => 'physician_list',
+			style => 'multicheck',
+			fKeyStmtMgr => $STMTMGR_PERSON,
+			fKeyStmt => 'selResourceAssociations',
+			fKeyStmtBindSession => ['org_internal_id'],
+			fKeyDisplayCol => 1,
+			fKeyValueCol => 0,
+			size => 5,
+		),
 
-		$self->{activityLog} =
-		{
-				level => 1,
-				scope =>'person_attribute',
-				key => "#param.person_id#",
-				data => "Associated Resource '#field.value_text#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
-		};
+		#new CGI::Dialog::Field(
+		#	caption => 'Physician',
+		#	name => 'physician_list',
+		#	style => 'multidual',
+		#	fKeyStmtMgr => $STMTMGR_PERSON,
+		#	fKeyStmt => 'selResourceAssociations',
+		#	fKeyDisplayCol => 1,
+		#	fKeyValueCol => 0,
+		#	size => 5,
+		#	multiDualCaptionLeft => 'Available Physicians',
+		#	multiDualCaptionRight => 'Selected Physicians',
+		#),		
+	);
+
+	$self->{activityLog} =
+	{
+		level => 1,
+		scope =>'person_attribute',
+		key => "#param.person_id#",
+		data => "Associated Resource '#field.physician_list#' for <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+	};
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
-}
-
-sub _customValidate
-{
-	my ($self, $page) = @_;
-
-	my $command = $self->getActiveCommand($page);
-	return () if $command ne 'add';
-	my $itemId = $page->param('item_id');
-	my $physicianName = $self->getField('value_text');
-	my $sessOrg = $self->{sessionOrg};
-	my $itemName = 'Physician';
-	my $parentId = $page->param('person_id');
-
-	my $physicianList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-
-
-		if ($physicianList->{'value_int'} eq 1)
-		{
-			$physicianName->invalidate($page, " A list of Physicians allready exists. Modify the existing record to change the list.");
-		}
-
 }
 
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	my $sessOrgId = $page->session('org_internal_id');
-	$self->getField('value_text')->{fKeyStmtBindPageParams} = $sessOrgId;
 }
 
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	my $itemId = $page->param('item_id');
-	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	my @physicians = split(/,/, $physicansList->{value_text});
-	$page->field('value_text', @physicians);
+	my $orgInternalId = $page->session('org_internal_id');
+	my $physicansList = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, 
+		STMTMGRFLAG_NONE, 'sel_worklist_resources', $page->session('user_id'), 'WorkList', $orgInternalId);
+
+	my @physicians = ();
+	for (@$physicansList)
+	{
+		push(@physicians, $_->{resource_id});
+	}
+	
+	$page->field('physician_list', @physicians);
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	
 	my $parentId =  $page->param('person_id');
-	my $physiciansString = join(',', $page->field('value_text'));
-	my $physicansList = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selSessionPhysicians', $parentId);
-	my $itemId = $physicansList->{'item_id'};
-
-	if ($itemId ne '' && $command eq 'add')
-	{
-		$command = 'update';
-	}
-
-	$page->schemaAction(
-		'Person_Attribute',	$command,
-		item_id => $command eq 'add' ? undef : $itemId,
-		parent_id => $page->param('person_id'),
-		parent_org_id => $page->session('org_internal_id') || undef,
-		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
-		item_name => 'SessionPhysicians',
-		value_text => $physiciansString,
-		value_int =>  1,
-		_debug => 0
-	);
-
-	my $userId = $page->session('user_id');
+	my $orgInternalId = $page->session('org_internal_id');
 
 	$STMTMGR_COMPONENT_SCHEDULING->execute($page, STMTMGRFLAG_NONE,
-		'del_worklist_resources', $userId, 'Physician');
+		'del_worklist_resources', $parentId, 'WorkList', $orgInternalId);
 
-	my @physicians = $page->field('value_text');
+	my @physicians = $page->field('physician_list');
 	for (@physicians)
 	{
 		$page->schemaAction(
 			'Person_Attribute',	'add',
 			item_id => undef,
-			parent_id => $userId,
+			parent_id => $parentId,
 			parent_org_id => $page->session('org_internal_id') || undef,
 			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON || undef,
-			item_name => 'Physician',
+			item_name => 'WorkList',
 			value_text => $_,
-			value_int =>  1,
+			parent_org_id => $orgInternalId,
 			_debug => 0
 		);
 	}

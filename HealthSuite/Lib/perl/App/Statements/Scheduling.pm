@@ -7,8 +7,7 @@ use Exporter;
 use DBI::StatementManager;
 use App::Universal;
 
-my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
-my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
+my $EVENTATTRTYPE_APPOINTMENT = App::Universal::EVENTATTRTYPE_APPOINTMENT;
 my $ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEPERSON;
 
 use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_SEL_TEMPLATEINFO
@@ -50,8 +49,8 @@ $STMTFMT_SEL_EVENTS = qq{
 		to_char(e.start_time,'yyyy,mm,dd') as start_day,
 		e.duration,
 		e.event_id,
-		ep1.value_text as patient_id,
-		ep2.value_text as resource_id,
+		ea.value_text as patient_id,
+		ea.value_textB as resource_id,
 		patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
 		patient.complete_name as patient_complete_name,
 		e.subject,
@@ -68,20 +67,17 @@ $STMTFMT_SEL_EVENTS = qq{
 		at.caption as appt_type,
 		e.appt_type as appt_type_id
 	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat,
-		Person patient, Event_Attribute ep2, Event_Attribute ep1, Event_Type et, Event e
+		Person patient, Event_Attribute ea, Event e
 	where e.start_time between to_date(?, 'yyyy,mm,dd')
 			and to_date(?, 'yyyy,mm,dd')
 		and e.discard_type is null
 		and e.event_status in (0,1,2)
 		%facility_clause%
-		and et.id = e.event_type
-		and ep1.parent_id = e.event_id
-		and ep1.value_type = $EVENTATTRTYPE_PATIENT
-			and ep1.value_text = patient.person_id
-		and ep2.parent_id = ep1.parent_id
-		and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-		and upper(ep2.value_text) = upper(?)
-		and aat.id = ep1.value_int
+		and ea.parent_id = e.event_id
+		and ea.value_text = patient.person_id
+		and upper(ea.value_textB) = upper(?)
+		and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
+		and aat.id = ea.value_int
 		and stat.id = e.event_status
 		and at.appt_type_id (+) = e.appt_type
 		%orderByClause%
@@ -184,14 +180,12 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			to_char(e.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id, at.caption as appt_type,
-			ep1.value_text as attendee_id, ep1.value_int as attendee_type,
-			ep2.value_text as care_provider_id, '2' as bill_type
-		from Appt_Type at, event_attribute ep1, event_attribute ep2, event e
+			ea.value_text as attendee_id, ea.value_int as attendee_type,
+			ea.value_textB as care_provider_id, '2' as bill_type
+		from Appt_Type at, Event_Attribute ea, Event e
 		where e.event_id = ?
-			and ep1.parent_id = e.event_id
-			and ep2.parent_id = ep1.parent_id
-			and ep1.item_name='Appointment/Attendee/Patient'
-			and ep2.item_name='Appointment/Attendee/Physician'
+			and ea.parent_id = e.event_id
+			and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 			and at.appt_type_id(+) = e.appt_type
 	},
 
@@ -268,18 +262,14 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			to_char(e.start_time, '$timeFormat') as appt_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
-			ep1.value_text as attendee_id,
-			ep1.value_int as patient_type,
-			ep2.value_text as resource_id,
-			e.appt_type,
-			at.caption as appt_type_caption
-		from appt_type at, event_attribute ep2, event_attribute ep1, event e
+			ea.value_text as attendee_id,
+			ea.value_int as patient_type,
+			ea.value_textB as resource_id,
+			e.appt_type
+		from Event_Attribute ea, event e
 		where event_id = :1
-			and ep1.parent_id = e.event_id
-			and ep1.value_type = $EVENTATTRTYPE_PATIENT
-			and ep2.parent_id = ep1.parent_id
-			and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-			and at.appt_type_id (+) = e.appt_type
+			and ea.parent_id = e.event_id
+			and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 	},
 
 	'selApptTypeById' => qq{
@@ -316,7 +306,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		from Event_Attribute, Event
 		where event_id = ?
 		and Event_Attribute.parent_id = Event.event_id
-		and Event_Attribute.value_type = $EVENTATTRTYPE_PATIENT
+		and Event_Attribute.value_type = $EVENTATTRTYPE_APPOINTMENT
 	},
 
 	'selEffectiveTemplate' =>
@@ -414,73 +404,6 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where facility_id = ?
 	},
 
-	'selPatientApptHistory' => qq{
-		select to_char(e.start_time,'$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time, e.duration,
-			ep1.value_text as patient_id, ep2.value_text as resource_id,
-			e.subject, et.caption as event_type,
-			Appt_Status.Caption, e.facility_id,
-			to_char(e.checkin_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
-			to_char(e.checkout_stamp,'$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp
-		from Appt_Status, Person patient, Person provider,
-			Event_Attribute ep2, Event_Attribute ep1,
-			Event_Type et, Event e
-		where e.start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-				and to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-			and et.id = e.event_type
-			and ep1.parent_id = e.event_id
-			and ep1.value_type = $EVENTATTRTYPE_PATIENT
-				and ep1.value_text = ?
-				and ep1.value_text = patient.person_id
-			and ep2.parent_id = ep1.parent_id
-			and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-				and ep2.value_text = provider.person_id
-			and Appt_Status.id = e.event_status
-		order by e.start_time DESC
-	},
-
-	#
-	# expects bind parameters:
-	#   1: start date/time stamp
-	#   2: end date/time stamp
-	#   3: facility_id
-	#   4: user_id
-	#   5: user_id (same as 4)
-	#
-	'selMyAndAssociatedResourceAppts' => qq{
-		select to_char(e.start_time, 'hh:miam') as start_time,
-			e.duration, e.event_id,	ep1.value_text as patient_id, ep2.value_text as resource_id,
-			patient.complete_name as patient_complete_name,
-			e.subject, et.caption as event_type, aat.caption as patient_type,
-			e.remarks, e.event_status, Appt_Status.caption as appt_status
-		from 	Appt_Status, Appt_Attendee_type aat, Person patient, Person provider,
-			Event_Attribute ep2, Event_Attribute ep1,
-			Event_Type et, Event e
-		where e.start_time between to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			and e.discard_type is null
-			and e.event_status in (0,1,2)
-			and e.facility_id = ?
-			and et.id = e.event_type
-			and ep1.parent_id = e.event_id
-			and ep1.value_type = $EVENTATTRTYPE_PATIENT
-				and ep1.value_text = patient.person_id
-			and ep2.parent_id = ep1.parent_id
-			and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-				and ep2.value_text = provider.person_id
-			and
-			(	ep2.value_text = ? or
-				ep2.value_text in
-				(select value_text from person_attribute
-					where parent_id = ?
-						and value_type = $ASSOC_VALUE_TYPE
-						and item_name = 'Physician'
-				)
-			)
-			and aat.id = ep1.value_int
-			and Appt_Status.id = e.event_status
-		order by e.start_time
-	},
-
 	'selAssociatedResources' => qq{
 		select value_text as resource_id, value_textb as facility_id
 		from Person_Attribute
@@ -545,19 +468,17 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	'selAppointmentConflictCheck' => qq{
 		select to_char(start_time, 'hh24mi') as start_minute,
 			to_char(start_time,'yyyy,mm,dd') as start_day, duration,
-			event_id,	ea1.value_text as patient_id, ea2.value_text as resource_id,
+			event_id,	ea.value_text as patient_id, ea.value_textB as resource_id,
 			Event.parent_id, Event.appt_type
-		from 	Event_Attribute ea2, Event_Attribute ea1, Event
+		from 	Event_Attribute ea, Event
 		where start_time between to_date(?, 'yyyy,mm,dd')
 			and to_date(?, 'yyyy,mm,dd')
 			and discard_type is null
 			and event_status in (0,1,2)
 			and facility_id = ?
-			and ea1.parent_id = event_id
-			and ea1.value_type = $EVENTATTRTYPE_PATIENT
-			and ea2.parent_id = ea1.parent_id
-			and ea2.value_type = $EVENTATTRTYPE_PHYSICIAN
-			and ea2.value_text = ?
+			and ea.parent_id = event_id
+			and ea.value_textB = ?
+			and ea.value_type = $EVENTATTRTYPE_APPOINTMENT
 		order by nvl(Event.parent_id, 0), event_id
 	},
 
@@ -582,7 +503,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'updCleanUpWaitingList0' => qq{
 		update Event_Attribute set value_intB = NULL
-		where value_type = $EVENTATTRTYPE_PATIENT
+		where value_type = $EVENTATTRTYPE_APPOINTMENT
 			and value_intB <= 0
 	},
 
@@ -607,23 +528,20 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		from Event_Attribute, Event
 		where Event.parent_id = ?
 			and Event_Attribute.parent_id = Event.event_id
-			and Event_Attribute.value_type = $EVENTATTRTYPE_PATIENT
+			and Event_Attribute.value_type = $EVENTATTRTYPE_APPOINTMENT
 		union
 		select 'None' as value_text, 9999999999999999 as event_id from Dual
 		order by event_id
 	},
 
 	'sel_futureAppointments' => {
-		_stmtFmt => qq{
-			select 	to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
-				eadoc.value_text as physician, e.subject
-			from 	event_attribute eaper, event_attribute eadoc, event e
+		sqlStmt => qq{
+			select to_char(e.start_time, 'mm/dd/yyyy HH12:MI AM') appt_time,
+				ea.value_textB as physician, e.subject
+			from 	event_attribute ea, event e
 			where e.start_time > sysdate
-				and eaper.parent_id = e.event_id
-				and	eaper.value_text = ?
-				and	eaper.item_name like '%Patient'
-				and	eadoc.parent_id = e.event_id
-				and	eadoc.item_name like '%Physician'
+				and ea.parent_id = e.event_id
+				and	ea.value_text = ?
 			order by e.start_time
 		},
 	},

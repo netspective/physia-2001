@@ -13,11 +13,6 @@ use vars qw(
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_COMPONENT_SCHEDULING);
 
-my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
-my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
-my $PERSON_ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEPERSON;
-my $FACILITY_ASSOC_VALUE_TYPE = App::Universal::ATTRTYPE_RESOURCEORG;
-
 my $WORKLIST_ITEMNAME = 'WorkList';
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -43,7 +38,7 @@ $STMTRPTDEFN_WORKLIST =
 
 my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	patient.name_last || ', ' || substr(patient.name_first,1,1) as patient,
-	ep2.value_text as physician,
+	ea.value_textB as physician,
 	e.facility_id as facility,
 	%simpleStamp:e.start_time% as appointment_time,
 	%simpleStamp:e.checkin_stamp% as checkin_time,
@@ -55,41 +50,39 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	replace(Appt_Attendee_Type.caption, ' Patient', '') as patient_type,
 	Invoice_Status.caption as invoice_status
 	from Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
-		Person patient, Event_Attribute ep2, Event_Attribute ep1, Event e
+		Person patient, Event_Attribute ea, Event e
 };
 
 my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 	%timeSelectClause%
 	and e.discard_type is null
 	and e.event_status in (0,1,2)
-	and ep1.parent_id = e.event_id
-	and ep1.value_type = $EVENTATTRTYPE_PATIENT
-		and ep1.value_text = patient.person_id
-	and ep2.parent_id = ep1.parent_id
-	and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-	and ep2.value_text in (
+	and ea.parent_id = e.event_id
+	and ea.value_text = patient.person_id
+	and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+	and ea.value_textB in (
 		select value_text from Person_Attribute
 		where parent_id = ?
-			and value_type = $PERSON_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 		)
 	and e.facility_id in (
 		select value_int from Person_Attribute
 		where parent_id = ?
-			and value_type = $FACILITY_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
 	and Appt_Type.appt_type_id = e.appt_type
-	and Appt_Attendee_Type.id = ep1.value_int
+	and Appt_Attendee_Type.id = ea.value_int
 	and Invoice_Status.id(+) = Invoice.invoice_status
 };
 
 my $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY = qq{
-	e.start_time, ep2.value_text
+	e.start_time, ea.value_text
 };
 
 my $STAMPFORMAT = 'mm/dd/yyyy hh12:miam';
@@ -131,11 +124,6 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			order by $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY
 		},
 		
-		#timeSelectClause => qq{
-		#	e.start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT') 
-		#		and to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
-		#},
-		
 		timeSelectClause => qq{
 			e.start_time between to_date(?, '$STAMPFORMAT')
 				and to_date(?, '$STAMPFORMAT')
@@ -162,7 +150,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	'del_worklist_resources' => qq{
 		delete from Person_Attribute
 		where parent_id = ?
-			and value_type = $PERSON_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 			and item_name = ?
 			and parent_org_id = ?
 	},
@@ -171,7 +159,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		select value_text as resource_id
 		from Person_Attribute
 		where parent_id = ?
-			and value_type = $PERSON_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 			and item_name = ?
 			and parent_org_id = ?
 	},
@@ -179,7 +167,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	'del_worklist_facilities' => qq{
 		delete from Person_Attribute
 		where parent_id = ?
-			and value_type = $FACILITY_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 	},
@@ -188,12 +176,11 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		select value_int as facility_id
 		from Person_Attribute
 		where parent_id = ?
-			and value_type = $FACILITY_ASSOC_VALUE_TYPE
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEORG ]}
 			and item_name = '$WORKLIST_ITEMNAME'
 			and parent_org_id = ?
 	},
 	
 );
 	
-
 1;

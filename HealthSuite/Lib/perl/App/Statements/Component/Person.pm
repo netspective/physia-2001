@@ -2235,23 +2235,25 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.associatedSessionPhysicians' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, item_name, value_text, value_int
-			from 	person_attribute
-			where 	parent_id = ?
-			and 	value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
-			and 	item_name = 'SessionPhysicians'
-			and value_int = 1
-		},
+		select value_text as resource_id
+		from Person_Attribute
+		where parent_id = ?
+			and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
+			and item_name = 'WorkList'
+			and parent_org_id = ?
+			order by 1
+	},
+
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Record', dataFmt => 'Session Set Of Physicans: #3#' },
+			{ head => 'Record', dataFmt => '#0#' },
 
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		#bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		frame => {
-			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-session-physicians?home=#homeArl#',
-			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+			#addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-session-physicians?home=#homeArl#',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-resource-session-physicians?home=#homeArl#',
 		},
 	},
 	publishDefn_panel =>
@@ -2274,18 +2276,18 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-session-physicians?home=#param.home#'>Session Set Of Physicians</A> } },
+				#{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-resource-session-physicians?home=#param.home#'>Session Set Of Physicians</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#',
-			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			#updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#',
+			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelTransp'); },
 },
 
 
@@ -2293,43 +2295,40 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.myAssociatedResourceAppointments' => {
 	sqlStmt => qq{
-			select to_char(e.start_time, 'hh:miam') as start_time,
-				ep2.value_text as resource_id,
-				patient.complete_name as patient_complete_name,
-				e.subject,
-				et.caption as event_type,
-				aat.caption as patient_type,
-				e.remarks,
-				ep1.value_text as patient_id,
-				e.event_id, patient.person_id
-			from 	Appt_Status, Appt_Attendee_type aat, Person patient, Person provider,
-				Event_Attribute ep2, Event_Attribute ep1,
-				Event_Type et, Event e
-			where 	e.start_time between to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-				and e.discard_type is null
-				and e.event_status in (0,1,2)
-				and et.id = e.event_type
-				and ep1.parent_id = e.event_id
-				and ep1.item_name='Appointment/Attendee/Patient'
-					and ep1.value_text = patient.person_id
-				and ep2.parent_id = ep1.parent_id
-				and ep2.item_name='Appointment/Attendee/Physician'
-					and ep2.value_text = provider.person_id
-				and
-				(	ep2.value_text = ? or
-					ep2.value_text in
-					(select value_text
-						from person_attribute
-						where parent_id = ?
-							and item_name = 'Physician'
-							and value_type = 250
-					)
+		select to_char(e.start_time, 'hh:miam') as start_time,
+			ea.value_textB as resource_id,
+			patient.complete_name as patient_complete_name,
+			e.subject,
+			at.caption as appt_type,
+			aat.caption as patient_type,
+			e.remarks,
+			ea.value_text as patient_id,
+			e.event_id, patient.person_id
+		from 	Appt_Status, Appt_Attendee_type aat, Person patient, Person provider,
+			Event_Attribute ea, Appt_Type at, Event e
+		where e.start_time between to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			and to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			and e.discard_type is null
+			and e.event_status in (0,1,2)
+			and at.appt_type_id (+) = e.appt_type
+			and ea.parent_id = e.event_id
+			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+			and ea.value_text = patient.person_id
+			and ea.value_textB = provider.person_id
+			and
+			(	ea.value_textB = ? or
+				ea.value_textB in
+				(select value_text
+					from person_attribute
+					where parent_id = ?
+						and item_name = 'WorkList'
+						and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 				)
-				and aat.id = ep1.value_int
-				and Appt_Status.id = e.event_status
-			order by e.start_time
-		},
+			)
+			and aat.id = ea.value_int
+			and Appt_Status.id = e.event_status
+		order by e.start_time
+	},
 	sqlStmtBindParamDescr => ['sysdate starting at 12 AM, sysdate at midnight, Org ID for event table, Person ID for Event_Attribute table, Person ID for Person_Attribute table '],
 	publishDefn => {
 		columnDefn => [
@@ -2399,8 +2398,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			provider_id in
 			(select value_text from person_attribute
 				where parent_id = ?
-					and value_type = 250
-					and item_name = 'Physician'
+					and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
+					and item_name = 'WorkList'
 			)
 		)
 		and 	trans_status = 2

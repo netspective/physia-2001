@@ -258,19 +258,16 @@ sub getComponentHtml
 
 			qq{<nobr>
 				<A HREF='javascript:alert("Confirm Appointment with $_->{patient_id}")'
-				TITLE='Confirm Appointment'>$IMAGETAGS{'icons/people-list'}</A>
+				TITLE='Confirm Appointment'>$IMAGETAGS{'icons/verify-appointment-incomplete'}</A>
 
 				<A HREF='javascript:alert("Verify Insurance for $_->{patient_id}")'
-				TITLE='Verify Insurance'>
-				<IMG SRC='/resources/icons/verify-insurance-complete.gif' BORDER=0></A>
+				TITLE='Verify Insurance'>$IMAGETAGS{'icons/verify-insurance-incomplete'}</A>
 
 				<A HREF='javascript:alert("Verify Medical Records for $_->{patient_id}")'
-				TITLE='Verify Medical Records'>
-				<IMG SRC='/resources/icons/verify-medical-complete.gif' BORDER=0></A>
+				TITLE='Verify Medical Records'>$IMAGETAGS{'icons/verify-medical-incomplete'}</A>
 
 				<A HREF='javascript:alert("Verify Prerequisites for $_->{patient_id}")'
-				TITLE='Verify Prerequisites'>
-				<IMG SRC='/resources/icons/verify-personal-incomplete.gif' BORDER=0></A>
+				TITLE='Verify Prerequisites'>$IMAGETAGS{'icons/verify-personal-incomplete'}</A>
 				</nobr>
 			},
 

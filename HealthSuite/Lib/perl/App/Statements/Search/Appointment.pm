@@ -13,8 +13,11 @@ use vars qw(@ISA @EXPORT $STMTMGR_APPOINTMENT_SEARCH $STMTFMT_SEL_APPOINTMENT
 @EXPORT = qw($STMTMGR_APPOINTMENT_SEARCH);
 
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+
 my $EVENTATTRTYPE_PATIENT = App::Universal::EVENTATTRTYPE_PATIENT;
 my $EVENTATTRTYPE_PHYSICIAN = App::Universal::EVENTATTRTYPE_PHYSICIAN;
+
+my $EVENTATTRTYPE_APPOINTMENT = App::Universal::EVENTATTRTYPE_APPOINTMENT;
 
 $STMTRPTDEFN_DEFAULT =
 {
@@ -61,7 +64,7 @@ $STMTRPTDEFN_DEFAULT =
 my $APPOINTMENT_COLUMNS = qq
 {	patient.simple_name,
 	TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
-	ep2.value_text AS resource_id,
+	ea.value_textB AS resource_id,
 	aat.caption AS patient_type,
 	event.subject,
 	pa.value_text as home_phone,
@@ -79,9 +82,7 @@ my $APPOINTMENT_COLUMNS = qq
 my $APPOINTMENT_TABLES = qq{
 	Person patient,
 	Appt_Attendee_Type aat,
-	Event_Attribute ep2,
-	Event_Attribute ep1,
-	Event_Type et,
+	Event_Attribute ea,
 	Event,
 	Appt_Status stat,
 	Org,
@@ -102,16 +103,13 @@ $APPOINTMENT_TABLES
 			AND Event.start_time BETWEEN
 				TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			AND ep1.parent_id = event.event_id
-			AND ep2.parent_id = event.event_id
-			AND ep1.value_type = $EVENTATTRTYPE_PATIENT
-			AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-			AND patient.person_id = ep1.value_text
-			AND upper(ep2.value_text) LIKE upper(?)
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = $EVENTATTRTYPE_APPOINTMENT
+			AND patient.person_id = ea.value_text
+			AND upper(ea.value_textB) LIKE upper(?)
 			AND Event.event_status = stat.id
 			AND stat.id BETWEEN ? and ?
-			AND aat.id = ep1.value_int
-			AND et.id = event.event_type
+			AND aat.id = ea.value_int
 			AND Event.owner_id = ?
 			AND at.appt_type_id (+) = Event.appt_type
 			AND pa.parent_id = patient.person_id (+)
@@ -131,15 +129,12 @@ $APPOINTMENT_COLUMNS
 $APPOINTMENT_TABLES
 		WHERE
 			event.facility_id = org.org_internal_id
-			AND (event.parent_id = ?)
-			AND ep1.parent_id = event.event_id
-			AND ep2.parent_id = event.event_id
-			AND ep1.value_type = $EVENTATTRTYPE_PATIENT
-			AND ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
-			AND patient.person_id = ep1.value_text
+			AND event.parent_id = ?
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = $EVENTATTRTYPE_APPOINTMENT
+			AND patient.person_id = ea.value_text
 			AND stat.id = event.event_status
-			AND aat.id = ep1.value_int
-			AND et.id = event.event_type
+			AND aat.id = ea.value_int
 			AND event.owner_id = ?
 			AND at.appt_type_id (+) = Event.appt_type
 			AND pa.parent_id = patient.person_id (+)			

@@ -301,6 +301,12 @@
 				<col name="dialog_params">type="text"</col>
 			</row>
 			<row>
+				<col name="id">333</col>
+				<col name="caption">Appointment</col>
+				<col name="group_name">Code</col>
+				<col name="dialog_params">type="text"</col>
+			</row>
+			<row>
 				<col name="id">340</col>
 				<col name="caption">Organization</col>
 				<col name="group_name">Code</col>

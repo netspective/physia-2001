@@ -276,8 +276,8 @@ sub handleApptType
 		my $startMinute  = hhmm2minutes($event->{start_minute}) + $dayMinutes +1;
 		my $endMinute    = $startMinute + $apptDuration -2;
 
-		$startMinute -= $apptType->{lead_time} if $apptType->{lead_time};
-		$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
+		#$startMinute -= $apptType->{lead_time} if $apptType->{lead_time};
+		#$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
 
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("$startMinute-$endMinute");
 	}
@@ -353,7 +353,7 @@ sub processApptTypeRules
 	{
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("");
 	}
-	
+
 	if ($event->{appt_type_id} == $self->{appt_type})
 	{
 		my $dayMinutes = $day * 24 *60;
@@ -378,7 +378,9 @@ sub processApptTypeRules
 			$effectiveMinuteSet = $effectiveMinuteSet->union("$startMinute-$endMinute");
 		}
 
-		if ($apptTypeRef->{$key}->{$apptTime} < $apptType->{num_sim})
+		if ($apptTypeRef->{$key}->{$apptTime} < $apptType->{num_sim} || 
+			($apptType->{multiple} && ! $apptType->{num_sim})
+		)
 		{
 			my $rawStartTime = hhmm2minutes($event->{start_minute}) + $dayMinutes;
 			my $rawEndTime = $rawStartTime + $apptDuration;

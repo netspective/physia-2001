@@ -229,6 +229,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow)$/);
 	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update)$/);
 	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add)$/);
+	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^update$/);
 }
 
 sub makeStateChanges_cancel
@@ -297,7 +298,10 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $eventId = $page->param('event_id');
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPopulateAppointmentDialog', $eventId);
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+		'selPopulateAppointmentDialog', $eventId);
+	$page->param('old_appt_date', $page->field('appt_date'));
+	$page->param('old_appt_time', $page->field('appt_time'));
 }
 
 sub populateData_cancel
@@ -336,6 +340,9 @@ sub customValidate
 
 	if ($page->field('conflict_check'))
 	{
+		return if ($page->param('old_appt_date') eq $page->field('appt_date') && 
+			$page->param('old_appt_time') eq $page->field('appt_time'));
+		
 		unless ($self->validateMultiAppts($page))
 		{
 			$self->validateAvailTemplate($page);
@@ -375,7 +382,7 @@ sub validateAvailTemplate
 		: App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
 
 	my @available_slots = $sa->findAvailSlots($page, $flag, $page->field('event_id'));
-	
+
 	my $html = "<b>Available times per Templates</b>: ";
 	my $availTimes;
 	
@@ -394,7 +401,6 @@ sub validateAvailTemplate
 	my $apptMinutesRange = "$apptBeginMinutes-$apptEndMinutes";
 
 	my $field = $self->getField('appt_date_time')->{fields}->[0];
-	my $personId = uc($page->field('attendee_id'));
 
 	if ((!defined $availSlot->{minute_set} || !$availSlot->{minute_set}->superset($apptMinutesRange))
 		&& $page->param('_f_whatToDo') ne 'cancel' && $page->param('_f_whatToDo') ne 'override')
@@ -469,7 +475,7 @@ sub findConflictEvent
 	my $endMinutes   = $startMinutes + $page->field('duration') -2;
 	my $minuteRange  = "$startMinutes-$endMinutes";
 	my $apptSlot     = new Set::IntSpan($minuteRange);
-
+	
 	my $events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selAppointmentConflictCheck', $startDate, $endDate, $page->field('facility_id'),
 			$page->field('resource_id'));
@@ -489,12 +495,13 @@ sub findConflictEvent
 		{
 			next if ($event->{patient_id} eq $page->field('attendee_id'));
 			next if ($event->{parent_id});
-			next if ($event->{appt_type} == $page->field('appt_type') 
+			next if ( $event->{appt_type} == $page->field('appt_type') && $page->field('appt_type')
 				&& $start_minute == $startMinutes -1);
 				
 			return ($event->{event_id}, $event->{patient_id});
 		}
 	}
+
 	return (undef, undef);
 }
 
@@ -566,18 +573,11 @@ sub execute
 				$page->schemaAction(
 					'Event_Attribute', 'add',
 					parent_id => $apptID,
-					item_name => 'Appointment/Attendee/Patient',
-					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
+					item_name => 'Appointment',
+					value_type => App::Universal::EVENTATTRTYPE_APPOINTMENT,
 					value_text => $page->field('attendee_id') || undef,
+					value_textB => $page->field('resource_id') || undef,
 					value_int => $page->field('patient_type') || 0,
-					_debug => 0
-					);
-				$page->schemaAction(
-					'Event_Attribute', 'add',
-					parent_id => $apptID,
-					item_name => 'Appointment/Attendee/Physician',
-					value_type => App::Universal::EVENTATTRTYPE_PHYSICIAN,
-					value_text => $page->field('resource_id') || undef,
 					_debug => 0
 					);
 			}
@@ -653,20 +653,13 @@ sub execute
 				$page->schemaAction(
 					'Event_Attribute', 'add',
 					parent_id => $apptID,
-					item_name => 'Appointment/Attendee/Patient',
-					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
+					item_name => 'Appointment',
+					value_type => App::Universal::EVENTATTRTYPE_APPOINTMENT,
 					value_text => $page->field('attendee_id') || undef,
+					value_textB => $page->field('resource_id') || undef,
 					value_int => $page->field('patient_type') || 0,
 					_debug => 0
 					);
-				$page->schemaAction(
-					'Event_Attribute', 'add',
-					parent_id => $apptID,
-					item_name => 'Appointment/Attendee/Physician',
-					value_type => App::Universal::EVENTATTRTYPE_PHYSICIAN,
-					value_text => $page->field('resource_id') || undef,
-					_debug => 0
-				);
 			}
 
 			$self->handleWaitingList($page, $eventId);

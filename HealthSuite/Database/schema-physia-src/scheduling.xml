@@ -83,13 +83,17 @@
 	<table name="Ins_Verify" abbrev="InsVer" type="Audit,Secure">
 		<description> Insurance Verification Data (per Appointment).</description>
 		<column name="event_id" lookupref="Event.event_id" descr="The event_id of the Appointment"/>
-
-
-
-		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Entry"/>
-		<column name="chain_id" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
-		<column name="appt_type_id" lookupref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
-		<column name="sequence" type="integer" descr="Index number indicating the sequence of this entry in the chain"/>
+		<column name="effective_begin_date" type="date" descr="The effective start date of the Insurance"/>
+		<column name="deductible" type="currency" descr="Deductible amount"/>
+		<column name="deductible_met" type="currency" descr="The amount of deductible met"/>
+		<column name="referral_required" type="boolean" descr="Whether or not referral is required"/>
+		<column name="sep_copay_xray" type="boolean" descr="Whether or not separate copay for X-ray"/>
+		<column name="lab" lookupref="Org.org_internal_id" descr="The Lab organization ID"/>
+		<column name="provider_id" lookupref="Person.person_id" descr="The Primary Care Physician"/>
+		<column name="coverage_req" type="text" size="512" descr="Coverage Required"/>
+		<column name="coverage_on" type="text" size="512" descr="Coverage on"/>
+		<column name="referral_or_precert" type="boolean" descr="Referral or Pre-Cert on Out Patient"/>
+		
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
 	</table>
 	

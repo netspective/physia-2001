@@ -159,10 +159,12 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		and value_type = @{[App::Universal::ATTRTYPE_FAMILY]}
 		},
 	'selResourceAssociations' => qq{
-		select distinct p.person_id, p.complete_name from person p, person_org_category pcat
+		select distinct p.person_id, p.complete_name, name_last, name_first, name_middle
+		from person p, person_org_category pcat
 		 where p.person_id=pcat.person_id
-		 and pcat.org_internal_id= ?
-		 and category='Physician'
+		 	and pcat.org_internal_id= ?
+		 	and category='Physician'
+		 order by name_last, name_first, name_middle
 		},
 	'selSessionPhysicians' => qq{
 		select *
