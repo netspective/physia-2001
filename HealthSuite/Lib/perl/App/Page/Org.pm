@@ -28,6 +28,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_views => [
 			{caption => 'Summary', name => 'profile',},
 			{caption => 'Insurance', name => 'insurance',},
+			{caption => 'Clearing House', name => 'clearinghouse',},
 			{caption => 'Personnel', name => 'personnel',},
 			{caption => 'Catalog', name => 'catalog',},
 			{caption => 'Account', name => 'account',},
@@ -59,10 +60,12 @@ sub initialize
 
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
 	my $orgAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Business Hours');
-	my $orgClearHouseAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Clearing House ID');
+	my $orgClearHouseAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Organization Default Clearing House ID');
+	my @clearingHouseName = ('', 'Per-Se', 'THINet');
+
 	$self->property('org_type', split(/,/, $self->property('org_category')));
 	$self->property('org_hrs_oper', $orgAttr->{'value_text'});
-	$self->property('org_clear_house', $orgClearHouseAttr->{'value_text'});
+	$self->property('org_clear_house', $clearingHouseName [$orgClearHouseAttr->{'value_int'}]);
 	#my $x = $test->{'value_text'};
 	#$self->addDebugStmt("TEST : $x ");
 
@@ -109,6 +112,7 @@ sub prepare_page_content_header
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/profile", 'profile'],
 			['Insurance', "$urlPrefix/insurance", 'insurance'],
+			['Clearing House', "$urlPrefix/clearinghouse", 'clearinghouse'],
 			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
 			['Catalog', "$urlPrefix/catalog", 'catalog'],
 			['Account', "$urlPrefix/account", 'account'],
@@ -299,12 +303,12 @@ sub prepare_view_insurance
 
 	my $orgId = $self->param('org_id');
 
-	if ($orgId)
-	{
-		#$self->param('catalog_id', $pathItems[3]);
-			$STMTMGR_COMPONENT_ORG->createHierHtml($self, STMTMGRFLAG_NONE, ['org.insurancePlans', 0, 1],
-				[$orgId]),
-	}
+#	if ($orgId)
+#	{
+#		#$self->param('catalog_id', $pathItems[3]);
+#			$STMTMGR_COMPONENT_ORG->createHierHtml($self, STMTMGRFLAG_NONE, ['org.insurancePlans', 0, 1],
+#				[$orgId]),
+#	}
 	#else
 	#{
 	#	$self->addContent(
@@ -404,21 +408,36 @@ sub prepare_view_account
 		);
 }
 
-sub prepare_view_insurance
+sub prepare_view_clearinghouse
 {
 	my ($self) = @_;
 	my $orgId = $self->param('org_id');
-	$self->addContent(qq{
-		<TABLE>
-			<TR VALIGN=TOP>
-				<TD WIDTH=30%>
-					<font size=1 face=arial>
-						#component.stpt-org.billinginfo#<BR>
-					</font>
-				</TD>
-			</TR>
-		</TABLE>
-	});
+	
+	if ($STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $orgId)) {
+		$self->addContent(qq{
+			<TABLE>
+				<TR VALIGN=TOP>
+					<TD WIDTH=30%>
+						<font size=1 face=arial>
+							#component.stpt-org.billinginfo#<BR>
+						</font>
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	} else {
+		$self->addContent(qq{
+			<TABLE>
+				<TR VALIGN=TOP>
+					<TD WIDTH=30%>
+						<font size=1 face=arial color=red>
+							<i>Clearing House data is only applicable to main organizations.</i><BR>
+						</font>
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	}
 
 	return 1;
 }
