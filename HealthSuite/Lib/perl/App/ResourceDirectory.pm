@@ -134,6 +134,7 @@ use App::Dialog::Person::Nurse;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Staff;
+use App::Dialog::PostGeneralPayment;
 use App::Dialog::Procedure;
 #use App::Dialog::Slot;
 use App::Dialog::Template;
@@ -537,6 +538,7 @@ $SEARCH_CLASSES = {
 
 	'procedure' => 'App::Dialog::Procedure',
 	'adjustment' => 'App::Dialog::Adjustment',
+	'postgeneralpayment' => 'App::Dialog::PostGeneralPayment',
 	#'slot' => 'App::Dialog::Slot',
 	'template' => {_class => 'App::Dialog::Template', _arl_modify => ['template_id'],},
 	'userproblem' => 'App::Dialog::UserProblems',
