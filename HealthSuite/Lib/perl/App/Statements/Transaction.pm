@@ -22,6 +22,10 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		select * from transaction
 			where trans_id = ?
 		},
+        'selTransactionByData_num_a' => qq{
+                select * from transaction
+                        where data_num_a = ?
+                },
 	'selTransAndICDNameByTransId' => qq{
 		select code, curr_onset_date, trans_id, trans_type, r.name as icdname
 			from transaction, ref_icd r
