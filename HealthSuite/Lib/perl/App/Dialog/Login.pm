@@ -187,8 +187,17 @@ sub getOrgProfile
 	my ($self, $page, $personId) = @_;
 
 	my $orgs = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selValidOrgs', $personId);
-	my $defaultOrg = $page->cookie('defaultOrg') || $orgs->[0]->{org_id};
+	my $defaultOrg = $orgs->[0]->{org_id};
 	my $defaultOrgIntId = $orgs->[0]->{org_internal_id};
+	if (my $cookieOrg = $page->cookie('defaultOrg'))
+	{
+		if (my ($cookieOrgIntId) = map {$_->{org_internal_id}} grep {$_->{org_id} eq $cookieOrg} @$orgs)
+		{
+			$defaultOrg = $cookieOrg;
+			$defaultOrgIntId = $cookieOrgIntId;
+		}
+		# else there not a member of the cookie's defaultOrg, keep the default instead
+	}
 	return ([map {$_->{org_id}} @$orgs], $defaultOrg, $defaultOrgIntId);
 }
 
