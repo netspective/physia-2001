@@ -377,7 +377,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		FROM	org
 		WHERE	owner_org_id = :1 
 		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 OR :2 IS NULL)
-		AND	upper(category) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
+		AND	upper(category) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
 		ORDER BY org_id
 	},
 
