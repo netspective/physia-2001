@@ -75,12 +75,12 @@ sub new
 				end_caption => 'To Date'
 				),
 		#new App::Dialog::Field::ServicePlaceType(caption => 'Service Place'),
-		new CGI::Dialog::Field(
-				caption => 'Service Place',
-				name => "servplace",
-				size => 6, options => FLDFLAG_REQUIRED,
-				defaultValue => 11,				
-				findPopup => '/lookup/serviceplace'),
+		#new CGI::Dialog::Field(
+		#		caption => 'Service Place',
+		#		name => "servplace",
+		#		size => 6, options => FLDFLAG_REQUIRED,
+		#		#defaultValue => 11,				
+		#		findPopup => '/lookup/serviceplace'),
 		new CGI::Dialog::Field(type=>'hidden', name => "servtype"),
 					
 		new App::Dialog::Field::ProcedureLine(name=>'cptModfField', caption => 'CPT / Modf'),
@@ -135,16 +135,14 @@ sub new
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-
-	my $invoiceId = $page->param('invoice_id');
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-
-	$self->setFieldFlags('alt_cost', FLDFLAG_INVISIBLE, 1);
-	$self->setFieldFlags('units_emg_fields', FLDFLAG_INVISIBLE, 1);
-
 
 	my $procItem = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItem = App::Universal::INVOICEITEMTYPE_LAB;
+	my $invoiceId = $page->param('invoice_id');
+
+	$self->setFieldFlags('alt_cost', FLDFLAG_INVISIBLE, 1);
+	$self->setFieldFlags('units_emg_fields', FLDFLAG_INVISIBLE, 1);
 
 	if($command eq 'add')
 	{
@@ -155,14 +153,6 @@ sub makeStateChanges
 
 		if($numOfHashes > 0)
 		{
-			$page->field('servplace', $serviceInfo->[$idx]->{hcfa_service_place});
-			#$self->setFieldFlags('servplace', FLDFLAG_READONLY);
-
-			#if($page->field('servtype') eq '')
-			#{
-			#	$page->field('servtype', $serviceInfo->[$idx]->{hcfa_service_type});
-			#}
-
 			if($page->field('service_begin_date') eq '')
 			{
 				$page->field('service_begin_date', $serviceInfo->[$idx]->{service_begin_date});
@@ -1924,9 +1914,14 @@ sub execute_addOrUpdate
 	my $cptCode = $page->field('procedure');
 	my $cptShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericCPTCode', $cptCode);
 
-	my $servPlace = $page->field('servplace');
+	#get service place based on service facility, then convert code to its id
+	my $mainTransId = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceMainTransById', $invoiceId);
+	my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $mainTransId);
+	my $servPlace = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $mainTransData->{service_facility_id}, 'HCFA Service Place');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace->{value_text});
+
+	#convert service type code to its id
 	my $servType = $page->field('servtype');
-	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace);
 	my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
 
 	$page->schemaAction(

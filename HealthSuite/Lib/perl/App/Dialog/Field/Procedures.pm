@@ -432,6 +432,8 @@ sub getHtml
 	#get service place code from service facility org
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('person_id');
+	
+	#two lines below have been removed. service code is being determined in encounter.pm according to the service org that was selected
 	my $svcFacility = $page->field('service_facility_id') || $sessOrgIntId;
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
 	my $cptOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByORG', $sessOrgIntId);
@@ -661,17 +663,18 @@ sub getHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><FONT $textFontAttrs>Service Place</FONT></TD>
-						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<!-- <TD><FONT $textFontAttrs>Service Place</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD> -->
 						<TD><FONT $textFontAttrs>Default Fee Schedule(s)</FONT></TD>
 					</TR>
 					<TR VALIGN=TOP>
 						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> 
+						<!-- <TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> 
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						-->
 						<TD><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'>
 							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_default_catalog, '/lookup/catalog', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 					</TR>

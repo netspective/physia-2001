@@ -363,8 +363,9 @@ sub populateData
 
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 		
-		my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
-		$page->param('_f_proc_service_place', $servPlaceCode);
+		#taken off the UI
+		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
+		#$page->param('_f_proc_service_place', $servPlaceCode);
 		
 		my $totalProcs = scalar(@{$procedures});
 		foreach my $idx (0..$totalProcs-1)
@@ -1759,8 +1760,10 @@ sub handleProcedureItems
 	my @feeSchedules = $page->param('_f_proc_default_catalog');
 	
 	#convert place to it's foreign key id
-	my $servPlace = $page->param('_f_proc_service_place');
-	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $servPlace);
+	my $svcFacility = $page->field('service_facility_id');
+	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
+	my $servPlaceId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceByAbbr', $svcPlaceCode->{value_text});
+
 	my $lineCount = $page->param('_f_line_count');
 
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -1792,7 +1795,7 @@ sub handleProcedureItems
 			item_id => $itemId || undef,
 			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,		#default for service start date is today
 			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,			#default for service end date is today
-			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#default for place is 11
+			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
 			hcfa_service_type => defined $servTypeId ? $servTypeId : undef,				#default for service type is 2 for consultation
 			modifier => $page->param("_f_proc_$line\_modifier") || undef,				#default for modifier is "mandated services"
 			quantity => $page->param("_f_proc_$line\_units") || undef,					#default for units is 1
