@@ -7,6 +7,7 @@
 	<include file="lookups.xml"/>
 	<include file="typedefs.xml"/>
 	<include file="typedef-attribute.xml"/>
+	<include file="devices.xml"/>
 
 
 	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
