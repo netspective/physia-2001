@@ -26,10 +26,6 @@ use constant PERMISSIONINFOIDX_LISTINDEX        => 0;
 use constant PERMISSIONINFOIDX_ID               => 1;
 use constant PERMISSIONINFOIDX_CHILDPERMISSIONS => 2;
 
-use constant ROLEINFOIDX_LISTINDEX   => 0;
-use constant ROLEINFOIDX_ID          => 1;
-use constant ROLEINFOIDX_PERMISSIONS => 2;
-
 use enum qw(BITMASK:RESTRICTPERMISSIONFLAG_ OWNERPERSON OWNERORG CUSTOM);
 use constant RESTRICTPERMISSIONFLAGS_DEFAULT => 0;
 
@@ -56,8 +52,6 @@ sub new
 			defineVars => {},
 			permissionIds   => {}, # key is permission name, value is index in permissionsList
 			permissionList  => [], # key is ID, value is permission name
-			roleIds => {},
-			roleList => [],
 		};
 
 	my %dontKeepParams = (xmlObjNode => 1, xmlFile => 1, dbConnectKey => 1);
@@ -80,6 +74,10 @@ sub new
 
 	return $self;
 }
+
+#
+#----- XML-based definition
+#
 
 sub defineVar
 {
@@ -159,73 +157,55 @@ sub definePermissions
 	my $permissionIds = $self->{permissionIds};
 
 	my $newIndex = scalar(@$permissionList);
-	my $parentId = '';
-	foreach (@parentNodes)
+	my $aliasInfo = undef;
+	if(my $alias = $activeNode->{alias})
 	{
-		$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
-		$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+		$newIndex = $aliasInfo->[PERMISSIONINFOIDX_LISTINDEX] if $aliasInfo;
 	}
-	my $activeId = ($parentId ? "$parentId/" : '') . ($activeNode->{root} || $activeNode->{id});
-	my $permissionInfo = [ $newIndex, $activeId, new Set::IntSpan ];
-	push(@$permissionList, $permissionInfo);
-	$permissionIds->{$activeId} = $permissionInfo;
-	$permissionInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+	
+	my $parentId = '';
+	if(my $alias = $activeNode->{alias})
+	{
+		if($aliasInfo = $permissionIds->{$alias})
+		{
+			my $aliasPermissions = $aliasInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
+			if($activeNode->{type} eq 'exclude')
+			{
+				foreach (@parentNodes)
+				{
+					$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
+					$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->diff($aliasPermissions);
+				}
+			}
+			else
+			{
+				foreach (@parentNodes)
+				{
+					$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
+					$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasPermissions);
+				}
+			}
+		}
+	}
+	else
+	{	
+		foreach (@parentNodes)
+		{
+			$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
+			$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+		}
+		my $activeId = ($parentId ? "$parentId/" : '') . ($activeNode->{root} || $activeNode->{id});
+		my $permissionInfo = [ $newIndex, $activeId, new Set::IntSpan ];
+		push(@$permissionList, $permissionInfo);
+		$permissionIds->{$activeId} = $permissionInfo;
+		$permissionInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+	}
 
 	foreach my $childNode (@{$activeNode->{Kids}})
 	{
 		if($childNode->isa('ControlXML::permission'))
 		{
 			$self->definePermissions($childNode, @parentNodes, $activeNode);
-		}
-	}
-}
-
-sub defineRoles
-{
-	my ($self, $activeNode, @parentNodes) = @_;
-
-	my $roleList = $self->{roleList};
-	my $roleIds = $self->{roleIds};
-	my $permissionIds = $self->{permissionIds};
-
-	my $newIndex = scalar(@$roleList);
-	my $parentId = '';
-	foreach (@parentNodes)
-	{
-		$parentId .= ($parentId ? '/' : '') . ($_->{root} || $_->{id});
-	}
-	my $activeId = ($parentId ? "$parentId/" : '') . ($activeNode->{root} || $activeNode->{id});
-	my $roleInfo = [ $newIndex, $activeId, new Set::IntSpan ];
-	push(@$roleList, $roleInfo);
-	$roleIds->{$activeId} = $roleInfo;
-
-	foreach my $childNode (@{$activeNode->{Kids}})
-	{
-		if($childNode->isa('ControlXML::role'))
-		{
-			$self->defineRoles($childNode, @parentNodes, $activeNode);
-		}
-		elsif($childNode->isa('ControlXML::grant'))
-		{
-			if(my $permissionInfo = $permissionIds->{$childNode->{permission}})
-			{
-				$roleInfo->[ROLEINFOIDX_PERMISSIONS] = $roleInfo->[ROLEINFOIDX_PERMISSIONS]->union($permissionInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]);
-			}
-			else
-			{
-				die "grant permission '$childNode->{permission}' in role '$activeId' does not exist";
-			}
-		}
-		elsif($childNode->isa('ControlXML::revoke'))
-		{
-			if(my $permissionInfo = $permissionIds->{$childNode->{permission}})
-			{
-				$roleInfo->[ROLEINFOIDX_PERMISSIONS] = $roleInfo->[ROLEINFOIDX_PERMISSIONS]->diff($permissionInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]);
-			}
-			else
-			{
-				die "revoke permission '$childNode->{permission}' in role '$activeId' does not exist";
-			}
 		}
 	}
 }
@@ -257,10 +237,6 @@ sub define
 				$self->definePermissions($childNode);
 
 			}
-			elsif($childNode->isa('ControlXML::roles'))
-			{
-				$self->defineRoles($childNode);
-			}
 			elsif($childNode->isa('ControlXML::include'))
 			{
 				# some includes may be conditional, depending upon a variable like "build"
@@ -290,6 +266,46 @@ sub define
 	}
 }
 
+#
+#----- run-time definitions (adding/updating during execution)
+#
+
+sub addPermissons
+{
+	my ($self, @newIds) = @_;
+
+	my $permissionList = $self->{permissionList};
+	my $permissionIds = $self->{permissionIds};
+
+	foreach my $activeId (@newIds)
+	{
+		# ignore duplicate permissions (don't override)
+		next if $permissionIds->{$activeId};
+	
+		my @parentNodes = split(/\//);
+		pop @parentNodes; # the last part is the real ID, previous is the "permission 'path'"
+		
+		# first make sure that all the parents of the new permission get updated
+		my $newIndex = scalar(@$permissionList);
+		my $parentId = '';
+		foreach (@parentNodes)
+		{
+			$parentId .= ($parentId ? '/' : '') . $_;
+			$permissionIds->{$parentId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+		}
+		
+		# now add the new permission
+		my $permissionInfo = [ $newIndex, $activeId, new Set::IntSpan ];
+		push(@$permissionList, $permissionInfo);
+		$permissionIds->{$activeId} = $permissionInfo;
+		$permissionInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->insert($newIndex);
+	}
+}
+
+#
+#----- querying functions
+#
+
 sub getPermissionsDict
 {
 	return $_[0]->{permissionIds};
@@ -298,16 +314,6 @@ sub getPermissionsDict
 sub getPermissionsList
 {
 	return $_[0]->{permissionList};
-}
-
-sub getRolesDict
-{
-	return $_[0]->{roleIds};
-}
-
-sub getRolesList
-{
-	return $_[0]->{roleList};
 }
 
 sub getPermissionInfo
@@ -342,53 +348,24 @@ sub getPermissionInfo
 	return @output;
 }
 
-sub getRoleInfo
+#
+# combine all the named permissions into a single Set::IntSpan object
+#
+
+sub combinePermissions
 {
 	my $self = shift;
-	my $dictionary = $self->{roleIds};
-	my $list = $self->{roleList};
 
-	if(scalar(@_) == 1 && ! ref $_[0])
+	my $dictionary = $self->{permissionIds};
+	my $allPermissions = new Set::IntSpan;
+	foreach (@_)
 	{
-		my $item = $_[0];
-		my $info = ($item =~ m/^\d+$/ ? ($dictionary->{item}) : ($list->[$item]));
-		return $info unless wantarray;
-		return ($info) if wantarray;
-	}
-
-	my @output = ();
-	foreach my $item (@_)
-	{
-		if(ref $item eq 'ARRAY')
+		if(my $permInfo = $dictionary->{$_})
 		{
-			foreach my $item (@$item)
-			{
-				push(@output, ($item =~ m/^\d+$/ ? ($dictionary->{item}) : ($list->[$item])));
-			}
-		}
-		else
-		{
-			push(@output, ($item =~ m/^\d+$/ ? ($dictionary->{item}) : ($list->[$item])));
+			$allPermissions = $allPermissions->union($permInfo->[PERMISSIONINFOIDX_CHILDPERMISSIONS]);
 		}
 	}
-	return @output;
-}
-
-sub getPermissionsForRoles
-{
-	my ($self, $roles) = @_;
-	my $permissions = new Set::IntSpan;
-	my $allRoles = $self->{roleIds};
-
-	foreach ($roles)
-	{
-		if(my $roleInfo = $allRoles->{$_})
-		{
-			$permissions = $roleInfo->[ROLEINFOIDX_PERMISSIONS]->union($permissions);
-		}
-	}
-
-	return $permissions;
+	return $allPermissions;
 }
 
 sub dumpACL
@@ -398,12 +375,6 @@ sub dumpACL
 	foreach my $item (sort keys %{$self->{permissionIds}})
 	{
 		print "$item: " . $self->{permissionIds}->{$item}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . "\n";
-	}
-	print "Roles (and their permissions indexes)\n";
-	foreach my $item (sort keys %{$self->{roleIds}})
-	{
-		next unless $self->{roleIds}->{$item}->[ROLEINFOIDX_PERMISSIONS];
-		print "$item: " . $self->{roleIds}->{$item}->[ROLEINFOIDX_PERMISSIONS]->run_list() . "\n";
 	}
 }
 

@@ -297,9 +297,9 @@ sub new
 	$params{onKeyPressJS} = ONKEYPRESSJS_DEFAULT unless exists $params{onKeyPressJS};
 	$params{size} = 24 unless $params{size};
 
-	$params{requiredInvalidMsg} = ($params{caption} ? "$params{caption} is required (can not be blank)." : '') if ! exists $params{requiredInvalidMsg};
-	$params{lengthInvalidMsg} = ($params{caption} ? "$params{caption} is too long (can be at most $params{maxLength} characters)." : '') if ! exists $params{lengthInvalidMsg};
-	$params{regExpInvalidMsg} = ($params{caption} ? "Data formatting error in $params{caption}. Format is $params{regExpValidate}" : '')  if ! exists $params{regExpInvalidMsg};
+	$params{requiredInvalidMsg} = (defined $params{caption} ? "$params{caption} is required (can not be blank)." : '') if ! exists $params{requiredInvalidMsg};
+	$params{lengthInvalidMsg} = (defined $params{caption} && defined $params{maxLength} ? "$params{caption} is too long (can be at most $params{maxLength} characters)." : '') if ! exists $params{lengthInvalidMsg};
+	$params{regExpInvalidMsg} = (defined $params{caption} && defined $params{regExpValidate} ? "Data formatting error in $params{caption}. Format is $params{regExpValidate}" : '')  if ! exists $params{regExpInvalidMsg};
 
 	# other possibilities:
 	#  $params{formatValue}, if defined is a subroutine used to format the data before validating
@@ -310,11 +310,11 @@ sub new
 
 	# setup flags for easier run-time checking of options
 	#
-	$params{flags} |= $params{options} if exists $params{options};
-	$params{flags} |= FLDFLAG_CONDITIONAL_READONLY if exists $params{readOnlyWhen};
-	$params{flags} |= FLDFLAG_CONDITIONAL_INVISIBLE if exists $params{invisibleWhen};
-	$params{flags} |= FLDFLAG_FORMATVALUE if exists $params{formatValue};
-	$params{flags} |= FLDFLAG_CUSTOMVALIDATE if exists $params{onValidate};
+	$params{flags} |= $params{options} if (exists $params{options} && defined $params{options});
+	$params{flags} |= FLDFLAG_CONDITIONAL_READONLY if (exists $params{readOnlyWhen} && defined $params{readOnlyWhen});
+	$params{flags} |= FLDFLAG_CONDITIONAL_INVISIBLE if (exists $params{invisibleWhen} && defined $params{invisibleWhen});
+	$params{flags} |= FLDFLAG_FORMATVALUE if (exists $params{formatValue} && defined $params{formatValue});
+	$params{flags} |= FLDFLAG_CUSTOMVALIDATE if (exists $params{onValidate} && defined $params{onValidate});
 
 	return bless \%params, $class;
 }

@@ -54,7 +54,7 @@ sub insert
     }
     my $insertSth = $self->{insert_sth};
     my $updateOrgSth = $self->{updateorg_sth};
-
+    
     my $args = $session->{args};
     my $sessData = $session->{data};
     my $serialized = nfreeze $sessData;
@@ -77,7 +77,7 @@ sub insert
 		$updateOrgSth->bind_param(1, $args->{org_id});
 		$updateOrgSth->bind_param(2, $sessionId);
 	    $updateOrgSth->execute;
-	    $updateOrgSth->finish;
+	    $updateOrgSth->finish;	    
 	}
 }
 

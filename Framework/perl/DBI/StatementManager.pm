@@ -209,7 +209,7 @@ sub execute
 		my @params = @_;
 		grep
 		{
-			s/\#(\w+)\.(.*?)\#/
+			s/\#(\w+)\.([\w\-\.]*)\#/
 				if(my $method = $dbpage->can($1))
 				{
 					&$method($dbpage, $2);
@@ -651,7 +651,7 @@ sub createHtml
 	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
 	my $publDefn = $self->{"_dpd_$defnName"} || {};
 	$publDefn = $pubD if $pubD;
-	
+
 	$publParams = {} unless $publParams;
 	$publParams->{stmtId} = $name unless exists $publParams->{stmtId};
 
