@@ -32,7 +32,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Address (Line 2)', name => "${prefix}line2", size => 36, maxLength => 128, postHtml => '<br>', ),
 		new CGI::Dialog::Field(caption => 'City', name => "${prefix}city", size => 16, maxLength => 64, flags => FLDFLAG_INLINECAPTION, ),
 		new CGI::Dialog::Field(caption => 'State', name => "${prefix}state", size => 2, maxLength => 2, flags => FLDFLAG_INLINECAPTION, ),
-		new CGI::Dialog::Field(type => 'zipcode', caption => 'Zip', name => "${prefix}zip", flags => FLDFLAG_INLINECAPTION, ),
+		new CGI::Dialog::Field(type => 'text', caption => 'Zip', name => "${prefix}zip", flags => FLDFLAG_INLINECAPTION, ),
 	];
 
 	return CGI::Dialog::Field::new($type, %params);
@@ -72,7 +72,8 @@ sub isValid
 		}	
 	}
 	
-	if ($zipCode ne '')
+	#This is a temp fix for allowing non US zip codes.
+	if ($zipCode ne '' && $state ne 'XX')
 	{	
 		if (not(App::Billing::Locale::USCodes::isValidZipCode($state, $zipCode)))	
 		{		
