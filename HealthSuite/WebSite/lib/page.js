@@ -908,6 +908,12 @@ function chooseItem(arlFmt, itemValue, inNewWin)
 		populateControl(itemValue, true);
 		return;
 	}
+	
+	if(isActionPopupWindow())
+	{
+		parent.close();
+		return;
+	}
 
 	var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
 
@@ -1097,8 +1103,10 @@ function isActionPopupWindow()
 	// we check parent.window.name because the populateControl will be called
 	// from the "content" frame of the findPopup window
 	//
-	var flag = window.name == WINDOWNAME_ACTIONPOPUP && opener.activeActionWindow != null ? true : false;
-	//alert(flag);
+	var windowName = new String(this.window.name);
+	var re = new RegExp(WINDOWNAME_ACTIONPOPUP);
+	var flag = ( (windowName.search(re) != -1) && (opener.activeActionWindow != null) ) ? true : false;
+
 	return flag;
 }
 

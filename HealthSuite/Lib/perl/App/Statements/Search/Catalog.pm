@@ -101,10 +101,9 @@ my $STMTRPTDEFN_ORG =
 			{
 				caption => qq{
 					<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
-					<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a>
+					<a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a> |
+					<a href='/org/#session.org_id#/dlg-add-catalog-copy'>Copy Fee Schedule and its Entries</a>
 				},
-				#caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
-				#url => '/org/#session.org_id#/dlg-add-catalog'
 			},
 		],
 	},

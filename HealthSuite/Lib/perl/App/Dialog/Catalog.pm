@@ -66,11 +66,12 @@ sub new
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDATE,
 		),
 
-		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID',
+		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule Name',
 			name => 'catalog_id', 
 			size => 20,
 			options => FLDFLAG_REQUIRED,
-			findPopup => '/lookup/catalog',
+			postHtml => "&nbsp; <a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing Fee Schedule</a>"
+			#findPopup => '/lookup/catalog',
 		),
 		new CGI::Dialog::Field::TableColumn(
 			name => 'catalog_type',
@@ -79,7 +80,7 @@ sub new
 			schema => $schema, 
 			value => 0
 		),
-		new CGI::Dialog::Field(caption => 'Fee Schedule Name', 
+		new CGI::Dialog::Field(caption => 'Fee Schedule Caption', 
 			name => 'caption', 
 			options => FLDFLAG_REQUIRED,
 			size => 45,
@@ -105,6 +106,7 @@ sub new
 			style => 'check',
 			defaultValue => 0,
 		),
+		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
 	);
 	
 	$self->{activityLog} =
@@ -124,18 +126,13 @@ sub new
 	return $self;
 }
 
-sub customValidate
-{
-	my ($self, $page) = @_;
-	#	validateFeeScheduleEntryTextArea($self, $page);
-}
-
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 	$page->field('parent_catalog_id', $page->param('parent_catalog_id'));
+	$page->field('add_mode', 1);
 }
 
 sub populateData_update
@@ -162,11 +159,30 @@ sub populateData_update
 	);
 	
 	$page->field('capitated_contract', 1) if $recExist->{value_int};
+	$page->field('add_mode', 0);
 }
 
 sub populateData_remove
 {
 	populateData_update(@_);
+}
+
+sub checkDupName
+{
+	my ($self, $page) = @_;
+	
+	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
+		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_id'));
+
+	my $field = $self->getField('catalog_id');
+	$field->invalidate($page, qq{Fee Schedule Name already exists for this Org.}) 
+		if $catalogExists;
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	$self->checkDupName($page) if $page->field('add_mode');
 }
 
 sub execute
@@ -222,13 +238,134 @@ sub saveAttribute
 	return $newItemId;
 }
 
+1;
+
+##############################################################################
+package App::Dialog::Catalog::Copy;
+##############################################################################
+
+use Carp;
+use CGI::Dialog;
+use CGI::Validator::Field;
+use DBI::StatementManager;
+use App::Statements::Catalog;
+
+use vars qw(@ISA %RESOURCE_MAP);
+@ISA = qw(CGI::Dialog);
+
 %RESOURCE_MAP = (
-	'catalog' => {
-		_class => 'App::Dialog::Catalog',
-		_arl_add => ['parent_catalog_id'],
-		_arl_modify => ['internal_catalog_id'],
-		_arl_remove => ['internal_catalog_id'],
-	},
+	'catalog-copy' => {},
 );
+
+sub new
+{
+	my $self = CGI::Dialog::new(@_, id => 'catalog-copy', heading => 'Copy Fee Schedule');
+
+	my $schema = $self->{schema};
+	delete $self->{schema};  # make sure we don't store this!
+
+	croak 'schema parameter required' unless $schema;
+
+	$self->addContent(
+		new App::Dialog::Field::Catalog::ID(caption => 'Existing Fee Schedule ID',
+			name => 'internal_catalog_id',
+			options => FLDFLAG_REQUIRED,
+			findPopup => '/lookup/catalog',
+		),
+		new CGI::Dialog::Subhead(heading => '', name => ''),
+		
+		new App::Dialog::Field::Catalog::ID::New(caption => 'New Fee Schedule Name',
+			name => 'catalog_id',
+			size => 25,
+			hints => 'Textual Name, not the numeric ID',
+			options => FLDFLAG_REQUIRED,
+		),
+		new CGI::Dialog::Field(caption => 'New Fee Schedule Caption', 
+			name => 'caption',
+			size => 45,
+			hints => 'Same as Source if not specified',			
+		),
+		new CGI::Dialog::Field(caption => 'New Fee Schedule Description',
+			name => 'description',
+			type => 'memo',
+		),
+	
+	);
+	
+	$self->addFooter(new CGI::Dialog::Buttons);
+
+	return $self;
+}
+
+sub checkDupName
+{
+	my ($self, $page) = @_;
+	
+	my $catalogExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
+		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_id'));
+
+	my $field = $self->getField('catalog_id');
+	$field->invalidate($page, qq{Fee Schedule Name already exists for this Org.}) 
+		if $catalogExists;
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	$self->checkDupName($page);
+}
+
+sub execute
+{
+	my ($self, $page, $command, $flags) = @_;
+	
+	my $orgId = $page->param('org_id');
+	
+	my $existingCatalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selCatalogById', $page->field('internal_catalog_id'));
+	
+	my $newInternalCatalogId = $page->schemaAction(
+		'Offering_Catalog', 'add',
+		internal_catalog_id => undef,
+		catalog_id => $page->field('catalog_id') || undef,
+		org_id => $orgId || undef,
+		catalog_type => 0,
+		caption => $page->field('caption') || $existingCatalog->{caption} || undef,
+		description => $page->field('description') || $existingCatalog->{description} || undef,
+		rvrbs_multiplier =>  $existingCatalog->{rvrbs_multiplier} || undef,
+		parent_catalog_id => $existingCatalog->{parent_catalog_id} || undef,
+		_debug => 0
+	);
+
+	my $attribute = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'sel_Catalog_Attribute', $page->field('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN,
+		'Capitated Contract');
+
+	App::Dialog::Catalog::saveAttribute($page, 'OfCatalog_Attribute', $newInternalCatalogId, 
+		'Capitated Contract', App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 
+		'sel_Catalog_Attribute', value_int => defined $attribute->{value_int} ? 
+		$attribute->{value_int} : 0,
+	);	
+
+	my $sessionId = $page->session('_session_id');
+	my $userId = $page->session('user_id');
+	my $internalCatalogId = $page->field('internal_catalog_id');
+	
+	my $insertStmt = qq{
+		insert into Offering_Catalog_Entry (cr_session_id, cr_stamp, cr_user_id, cr_org_id,
+			catalog_id, parent_entry_id, entry_type, flags, status, code, modifier, name, default_units,
+			cost_type, unit_cost, description, units_avail)
+		(select '$sessionId', sysdate, '$userId', '$orgId', $newInternalCatalogId, parent_entry_id, 
+			entry_type, flags, status, code, modifier, name, default_units, cost_type, unit_cost,
+			description, units_avail 
+		from Offering_Catalog_Entry where catalog_id = $internalCatalogId)
+	};
+	
+	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
+	
+	$page->param('_dialogreturnurl', "/org/$orgId/catalog");
+	$self->handlePostExecute($page, $command, $flags);
+}
+
 
 1;

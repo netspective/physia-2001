@@ -374,12 +374,10 @@ sub importTXGULFfs
 	my $dataCollection = $params{collection} || new App::Data::Collection;
 
 	die "\nPlease set Environment Variable ORG_ID for this import." unless exists $ENV{ORG_ID};
-	die "\nPlease set Environment Variable CATALOG_ID_OFFSET for this import." 
+	die "\nPlease set Environment Variable CATALOG_ID_OFFSET for this import.\nIts value should be max(internal_catalog_id) +1 from Offering_Catalog." 
 		unless exists $ENV{CATALOG_ID_OFFSET};
 	
 	print "\n";
-	
-	goto IMPORT_ENTRIES;
 	
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 		srcFile=> File::Spec->catfile($properties->{dataSrcRTXgulfPath}, 'TXGULF Fee Schedules.xls'),
@@ -415,9 +413,7 @@ sub importTXGULFfs
 	}
 
 	# ---------------------------------------------------------------------------------------
-	
-	IMPORT_ENTRIES:
-	
+
 	$importer = new App::Data::Obtain::TXgulf::FeeSchedules;
 	$dataCollection = $params{collection} || new App::Data::Collection;
 	print "\n";
@@ -447,7 +443,7 @@ sub importTXGULFfs
 			insertStmt => "insert into Offering_Catalog_Entry
 				(catalog_id, entry_type, flags, status, code, name, default_units, cost_type, unit_cost,
 				description)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
 			verifyCountStmt => "select count(*) from Offering_Catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}",
 		);
 		$exporter->printErrors();

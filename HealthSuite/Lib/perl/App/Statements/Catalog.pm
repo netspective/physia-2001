@@ -19,12 +19,16 @@ my $SEL_CATALOG_ENTRY = qq{
 };
 
 $STMTMGR_CATALOG = new App::Statements::Catalog(
-	'selCatalogById' => q{
+	'selCatalogById' => qq{
 		select *
 		from offering_catalog
 		where internal_catalog_id = ?
 	},
-
+	'sel_catalog_by_id_orgId' => qq{
+		select * from Offering_catalog
+		where catalog_id = ?
+			and org_id = ?
+	},
 	'selParentCatalogByOrgId' => q{
 		select *
 		from offering_catalog
@@ -236,14 +240,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where code = upper(?)
 			and (modifier = ? or modifier is NULL)
 			and catalog_id = ?
-			and cr_org_id = ?
 	},
 	'sel_catalogEntry_by_code_catalog' => qq{
 		select * from Offering_Catalog_Entry
 		where code = upper(?)
 			and modifier is NULL
 			and catalog_id = ?
-			and cr_org_id = ?			
 	},
 
 );

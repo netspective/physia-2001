@@ -557,15 +557,13 @@ sub getItemCost
 		if ($modifier)
 		{
 			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_catalogEntry_by_code_modifier_catalog', $cpt, $modifier, $fs, 
-				$page->session('org_id')
+				'sel_catalogEntry_by_code_modifier_catalog', $cpt, $modifier, $fs
 			);
 		}
 		else
 		{
 			$entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'sel_catalogEntry_by_code_catalog', $cpt, $fs, $page->session('org_id')
-			);
+				'sel_catalogEntry_by_code_catalog', $cpt, $fs);
 		}
 
 		for my $entry (@{$entries})
