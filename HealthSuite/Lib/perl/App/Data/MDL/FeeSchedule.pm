@@ -61,6 +61,7 @@ sub importCatalog
 	#my $catId = $catalog->{id};
 	my $internalId = $self->schemaAction($flags, 'Offering_Catalog', 'add',
 				catalog_id => $catalog->{'id'} || undef,
+				org_id     => $catalog->{'org-id'} || undef,
 				catalog_type =>  $self->translateEnum($flags,"Offering_Catalog_Type", $catalog->{type} || 'Fee Schedule') || undef,
 				caption => $catalog->{'fee-caption'} || undef,
 				parent_catalog_id => $parentCatalog || undef,
