@@ -48,12 +48,12 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 	FLDFLAG_DEFAULTCAPTION
 	);
 
-use constant ONKEYPRESSJS_DEFAULT    => 'processKeypress_default(event)';
-use constant ONKEYPRESSJS_FLOATNUM   => 'processKeypress_float(event)';
-use constant ONKEYPRESSJS_INTNUM     => 'processKeypress_integer(event)';
-use constant ONKEYPRESSJS_ALPHAONLY  => 'processKeypress_alphaonly(event)';
-use constant ONKEYPRESSJS_INTDASH    => 'processKeypress_integerdash(event)';
-use constant ONKEYPRESSJS_IDENTIFIER => 'processKeypress_identifier(event)';
+use constant ONKEYPRESSJS_DEFAULT    => 'return processKeypress_default(event)';
+use constant ONKEYPRESSJS_FLOATNUM   => 'return processKeypress_float(event)';
+use constant ONKEYPRESSJS_INTNUM     => 'return processKeypress_integer(event)';
+use constant ONKEYPRESSJS_ALPHAONLY  => 'return processKeypress_alphaonly(event)';
+use constant ONKEYPRESSJS_INTDASH    => 'return processKeypress_integerdash(event)';
+use constant ONKEYPRESSJS_IDENTIFIER => 'return processKeypress_identifier(event)';
 use constant ONBLUR_SSN              => 'validateChange_SSN(event)';
 use constant ONBLUR_DATE           => 'validateChange_Date(event)';
 use constant ONBLUR_STAMP          => 'validateChange_Stamp(event)';
