@@ -108,10 +108,15 @@ var dialogFields = {};
 
 var KEYCODE_ENTER = 13;
 var FIELDFLAG_NEXTFIELDONENTERKEY = 0x0001;
+var LOWER_TO_UPPER_CASE=32;
+
 
 var numKeysRange   = [48, 57];
 var periodKeyRange = [46, 46];
 var dashKeyRange   = [45, 45];
+var upperAlphaRange = [65,90];
+var lowAlphaRange  = [97,122];
+var underScoreKeyRange = [95,95];
 var validDateStrings = ["today", "now", "tomorrow", "yesterday"];
 var validTimeStrings = [validDateStrings, "noon", "midnight"];
 var validNumbers =  ["0","1","2","3","4","5","6","7","8","9"];
@@ -228,6 +233,14 @@ function keypressAcceptAny(event, flags, acceptKeyRanges)
 	// if we get to here, it means we didn't accept any of the ranges
 	event.returnValue = false;
 }
+
+function processKeypress_identifier(event, flags)
+{
+	if (event.keyCode >= lowAlphaRange[0] && event.keyCode <= lowAlphaRange[1])
+		event.keyCode = event.keyCode - LOWER_TO_UPPER_CASE;
+	keypressAcceptAny(event, flags, [numKeysRange, dashKeyRange,lowAlphaRange,upperAlphaRange,underScoreKeyRange]);
+}
+
 
 function processKeypress_default(event, flags)
 {
