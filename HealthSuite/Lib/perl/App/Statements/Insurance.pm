@@ -418,6 +418,22 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 					where parent_id = ?
 					and item_name = 'Fee Schedule'
 		},
+	'selUpdatePlanAndCoverage' => qq{
+					   update insurance
+					   set ins_type = ?,
+					   product_name = ?
+					   ins_org_id = ?
+					   where product_name = ?
+					   and ins_org_id = ?
+					   and record_type in (2, 3)
+		},
+	'selUpdateCoverage' => qq{
+					   update insurance
+					   set ins_org_id = ?,
+					   product_name = ?,
+					   plan_name = ?
+					   where parent_ins_id = ?
+		},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {
 		sqlStmt => qq{
