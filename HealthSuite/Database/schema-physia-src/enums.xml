@@ -78,6 +78,21 @@
 		<enum>Not applicable</enum>
 	</table>
 
+	<table name="Month" type="Enumeration">
+		<enum>January</enum>
+		<enum>February</enum>
+		<enum>March</enum>
+		<enum>April</enum>
+		<enum>May</enum>
+		<enum>June</enum>
+		<enum>July</enum>
+		<enum>August</enum>
+		<enum>September</enum>
+		<enum>October</enum>
+		<enum>November</enum>
+		<enum>December</enum>
+	</table>
+
 	<table name="Marital_Status" abbrev="MarStat" type="Enumeration">
 		<enum>Unknown</enum>
 		<enum>Single</enum>
