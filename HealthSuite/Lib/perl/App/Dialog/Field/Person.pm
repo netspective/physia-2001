@@ -351,7 +351,7 @@ sub getHtml
 	my $html;	
 	if ((grep {$_ eq 'Patient'} @{$self->{types}})||$self->{incSimpleName})
 	{
-		$page->addError("Include");
+		#$page->addError("Include");
 		my $value = $page->field($self->{name});
 		#Get the name for the person
 		my $patData = $STMTMGR_PERSON->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonSimpleNameById',$value);
