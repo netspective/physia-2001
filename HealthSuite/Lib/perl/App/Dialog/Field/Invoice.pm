@@ -827,7 +827,7 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
-	my $isPayer = $page->param('isPayer');
+	my $paidBy = $page->param('paidBy');
 	my $totalPayRcvd = $page->field('check_amount') || $page->field('total_amount');
 	my $totalAmtApplied = 0;
 	my $totalInvoiceBalance = 0;
@@ -845,7 +845,7 @@ sub isValid
 		if($itemPayment > $totalPayRcvd)
 		{
 			my $amtDiff = $itemPayment - $totalPayRcvd;
-			$isPayer eq 'insurance' ? 
+			$paidBy eq 'insurance' ? 
 				$self->invalidate($page, "Line $line: 'Plan Paid' exceeds 'Check Amount' by \$$amtDiff") 
 				: $self->invalidate($page, "Line $line: 'Amount Paid' exceeds 'Total Amount' by \$$amtDiff");
 		}
@@ -858,7 +858,7 @@ sub isValid
 	if($totalAmtApplied > $totalPayRcvd)
 	{
 		my $amtExceeded = $totalAmtApplied - $totalPayRcvd;
-		$isPayer eq 'insurance' ? 
+		$paidBy eq 'insurance' ? 
 			$self->invalidate($page, "The total amount applied exceeds the 'Check Amount' by \$$amtExceeded. Please reconcile.")
 			: $self->invalidate($page, "The total amount applied exceeds the total amount entered by \$$amtExceeded. Please reconcile.");
 	}
@@ -898,9 +898,9 @@ sub getHtml
 
 	#get invoice items which can have payments applied to them
 	my $linesHtml = '';
-	my $invoiceId = $page->param('invoice_id');
-	my $isPayer = $page->param('isPayer');
-	my $outstandItems = $isPayer eq 'insurance' ?
+	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $paidBy = $page->param('paidBy');
+	my $outstandItems = $paidBy eq 'insurance' ?
 		$STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB)
 		: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
 
@@ -963,20 +963,20 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				@{[ $isPayer eq 'insurance' ? 
+				@{[ $paidBy eq 'insurance' ? 
 				"<TD><INPUT NAME='_f_item_$line\_plan_allow' TYPE='text' size=10 VALUE='$planAllow'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_item_$line\_plan_paid' TYPE='text' size=10 VALUE='$planPaid'></TD>"
 				: '' ]}
 				
-				@{[ $isPayer eq 'personal' ? 
+				@{[ $paidBy eq 'personal' ? 
 				"<TD><INPUT NAME='_f_item_$line\_amount_applied' TYPE='text' size=10 VALUE='$amtApplied'></TD>"
 				: '' ]}
 
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_item_$line\_writeoff_amt' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_writeoff_amt") ]}'></TD>
 
-				@{[ $isPayer eq 'personal' ? 
+				@{[ $paidBy eq 'personal' ? 
 				"<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					<SELECT NAME='_f_item_$line\_writeoff_code' TYPE='text'>
@@ -1009,7 +1009,7 @@ sub getHtml
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						@{[ $isPayer eq 'insurance' ? 
+						@{[ $paidBy eq 'insurance' ? 
 						"<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Allow</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Plan Paid</FONT></TD>
