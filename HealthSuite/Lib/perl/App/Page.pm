@@ -693,7 +693,6 @@ sub prepare_page_body
 		return 0 unless $self->prepare_page_content_header();
 	}
 	return
-		$self->prepare_page_content_body() &&
 		$self->prepare_page_content_footer();
 }
 
@@ -745,18 +744,6 @@ sub prepare_page_content_header
 			<TR HEIGHT=1><TD BGCOLOR=BLACK><IMG SRC="/resources/design/transparent-line.gif"></TD><TD BGCOLOR=LIGHTSTEELBLUE><IMG SRC="/resources/design/transparent-line.gif"></TD></TR>
 		</TABLE>
 		});
-}
-
-sub prepare_page_content_body
-{
-	my $self = shift;
-
-	if($self->{flags} & PAGEFLAG_CONTENTINPANES)
-	{
-		push(@{$self->{page_content}}, $self->getPaneMgrHtml());
-	}
-
-	return 1;
 }
 
 sub prepare_page_content_footer
