@@ -44,4 +44,53 @@ sub initializeContext
 	}
 }
 
+sub runSQL
+{
+	my ($sqlFile, @params) = @_;
+	$sqlFile = File::Spec->catfile($Main::BUILDIR, $sqlFile);
+	my $logFile = $sqlFile . ".log";
+
+	die "Missing required '$sqlFile'. Aborted.\n" unless (-f $sqlFile);
+	system(qq{
+		cd @{[ $CONFDATA_SERVER->path_SchemaSQL ]}
+		(	echo "---------------------------------------"
+			date
+			echo "---------------------------------------"
+		) >> $logFile
+		$ENV{ORACLE_HOME}/bin/sqlplus -s $Main::sqlPlusKey <<-!!! >> $logFile 2>&1
+			\@ $sqlFile @params
+			exit;
+		!!!
+	});
+}
+
+sub connectDB
+{
+	my $page = new App::Data::MDL::Module();
+	$page->{schema} = undef;
+	$page->{schemaFlags} = SCHEMAAPIFLAG_LOGSQL | SCHEMAAPIFLAG_EXECSQL;
+
+	if($CONFDATA_SERVER->db_ConnectKey() && $CONFDATA_SERVER->file_SchemaDefn())
+	{
+		my $schemaFile = $CONFDATA_SERVER->file_SchemaDefn();
+		print STDOUT "Loading schema from $schemaFile\n";
+		$page->{schema} = new Schema::API(xmlFile => $schemaFile);
+
+		my $connectKey = $CONFDATA_SERVER->db_ConnectKey();
+		print STDOUT "Connecting to $connectKey\n";
+
+		$page->{schema}->connectDB($connectKey);
+		$page->{db} = $page->{schema}->{dbh};
+
+		my $sqlPlusKey = $connectKey;
+		$sqlPlusKey =~ s/dbi:Oracle://;
+
+		return ($page, $sqlPlusKey);
+	}
+	else
+	{
+		die "DB Schema File and Connect Key are required!";
+	}
+}
+
 1;
