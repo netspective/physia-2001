@@ -28,11 +28,17 @@ sub initialize
 	my $self = shift;
 
 	$self->heading('$Command Nursing Staff');
-
+	$self->addContent(
+			new App::Dialog::Field::Person::ID::New(caption => 'Nursing Staff ID',
+							name => 'person_id',
+							options => FLDFLAG_REQUIRED,
+							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+						postHtml => $postHtml),
+			);
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
-		
+
 		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,),
 
 		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -94,19 +100,19 @@ sub initialize
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
 
-	);	
-	
+	);
+
 	return $self;
 }
 
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);	
-	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove';	
+	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove';
 
 	my $personId = $page->param('person_id');
 
@@ -210,7 +216,7 @@ sub execute_add
 		parent_org_id => $page->session('org_id') || undef,
 		_debug => 0
 	);
-	
+
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
