@@ -11,6 +11,10 @@ use vars qw(@EXPORT @ISA);
 
 use constant SEARCH_RESULTS_LIMIT => 250;
 
+#GUARANTOR TYPE
+use constant GUARANTOR_PERSON => 0;
+use constant GUARANTOR_ORG => 1;
+
 #ROLE ACTIVITY
 use constant ROLE_GRANT => 0;
 use constant ROLE_REVOKE => 1;
