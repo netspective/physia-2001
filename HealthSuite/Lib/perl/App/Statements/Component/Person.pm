@@ -1268,16 +1268,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			actionRows =>
 			[
 				{
-					caption => qq{ Choose <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-exists?home=#param.home#'>Insurance Plan</A> },
-					hints => ''
+					caption => qq{ Choose <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-coverage?home=#param.home#'>Personal Insurance Coverage</A> },
 				},
 				{
-					caption => qq{ Add Unique <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-unique?home=#param.home#'>Insurance Plan</A> },
-					hints => ''
-				},
-				{
-					caption => qq{ Choose <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-person-attachworkerscomp?home=#param.home#'>Workers Compensation Plan</A> },
-					hints => ''
+					caption => qq{ Choose <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-ins-thirdparty?home=#param.home#'>Third Party Payer</A> },
 				},
 			],
 		},
