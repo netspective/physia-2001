@@ -34,20 +34,24 @@ sub new
 	my $resourcesField = 	new CGI::Dialog::Field(
 		caption => 'Physician',
 		name => 'physician_list',
-		style => 'multicheck',
-		hints => 'Choose one or more Physicians to monitor.',
+		style => 'multidual',
 		fKeyStmtMgr => $STMTMGR_PERSON,
 		fKeyStmt => 'selResourceAssociations',
 		fKeyDisplayCol => 1,
 		fKeyValueCol => 0,
+		size => 5,
+		multiDualCaptionLeft => 'Available Physicians',
+		multiDualCaptionRight => 'Selected Physicians',
 	);
 	
 	my $facilitiesField = new App::Dialog::Field::OrgType(
 		caption => 'Facility',
 		name => 'facility_list',
-		style => 'multicheck',
+		style => 'multidual',
 		types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
-		hints => 'Choose one or more Facilities to monitor.'
+		size => 5,
+		multiDualCaptionLeft => 'Available Facilities',
+		multiDualCaptionRight => 'Selected Facilities',		
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
 
