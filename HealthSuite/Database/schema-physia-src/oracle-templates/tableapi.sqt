@@ -1,0 +1,10 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+$OUT = "";
+$templOutputFile = "";
+
+$processor->createAllProcs();
+}
+

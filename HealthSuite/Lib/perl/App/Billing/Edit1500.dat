@@ -1,0 +1,1322 @@
+<html>
+  <head>
+    <title>HEALTH INSURANCE CLAIM FORM</title>
+    <meta name="GENERATOR" content="Microsoft FrontPage 3.0">
+  </head>
+
+  <style>
+    table.cell \{
+      background-color: white;
+      font-family: tahoma;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 8pt;
+      color: red;
+      height: 100%;
+      width: 100%;
+    \}
+    tr.std \{
+      vertical-align: top;
+      height: 50;
+    \}
+    tr.high \{
+      vertical-align: top;
+      height: 100;
+    \}
+    tr.prochead \{
+      vertical-align: top;
+      height: 10;
+    \}
+    tr.cell \{
+      vertical-align: top;
+    \}
+    td.t \{
+      border-top: solid 1px red;
+    \}
+    td.b \{
+      border-bottom: solid 1px red;
+    \}
+    td.st \{
+      border-top: solid 2px red;
+    \}
+    td.sb \{
+      border-bottom: solid 2px red;
+    \}
+    td.r \{
+      border-right: solid 1px red;
+    \}
+    td.rd \{
+      border-right: dashed 1px red;
+    \}
+    td.cell \{
+      text-indent: 5;
+      \}
+    td.inp \{
+      padding-left: 5;
+    \}
+    td.cola \{
+      width: 35%;
+    \}
+    td.colb \{
+      width: 8%;
+    \}
+    td.colc \{
+      width: 8%;
+    \}
+    td.cold \{
+      width: 35%;
+    \}
+    td.cole \{
+      width: 14%;
+    \}
+    td.colf \{
+      width: 30%;
+    \}
+    td.colg \{
+      width: 10%;
+    \}
+    td.colh \{
+      width: 10%;
+    \}
+    td.coli \{
+      width: 10%;
+    \}
+    td.colj \{
+      width: 10%;
+    \}
+    td.colk \{
+      width: 30%;
+    \}
+    td.cold1 \{
+      width: 40%;
+    \}
+    td.cold2 \{
+      width: 20%;
+    \}
+    td.phone \{
+      font-weight: bold;
+      font-size: 12pt;
+    \}
+    td.decimal \{
+      width: 10%;
+    \}
+    td.chrg1 \{
+      width: 70%;
+    \}
+    td.chrg2 \{
+      width: 70%;
+    \}
+    td.c \{
+      text-align: center;
+    \}
+    td.num \{
+      text-align: right;
+      vertical-align: bottom;
+      padding-right: 5;
+    \}
+    td.vbc \{
+      text-align: center;
+      vertical-align: bottom;
+    \}
+    input.std \{
+      font-family: courier;
+      font-style: normal;
+      font-size: 8pt;
+      color: black;
+    \}
+    input.size240 \{
+      width: 20em;
+    \}
+    input.size144 \{
+      width: 12em;
+    \}
+    input.size96 \{
+      width: 8em;
+    \}
+    input.size72 \{
+      width: 6em;
+    \}
+    input.size60 \{
+      width: 4.5em;
+    \}
+    input.size48 \{
+      width: 4em;
+    \}
+    input.size36 \{
+      width: 3em;
+    \}
+    input.size24 \{
+      width: 2em;
+    \}
+
+    #main \{
+      background-color: white;
+      border: solid 1px red;
+      width: 1000;
+      align: top;
+    \}
+    #ltop \{
+      width: 650;
+    \}
+    #lbot \{
+      width: 650;
+    \}
+    #rtop \{
+      width: 375;
+    \}
+    #rbot \{
+      width: 375;
+    \}
+
+  </style>
+
+  <body>
+    <form name="HCFA" action="mailto:yousuf@prosys.com.pk?Subject=HCFA" method="POST" enctype="text/plain">
+      <div align="center">
+        <table id="main" border="0" cellspacing="0" cellpadding="0" width="50">
+          <tr>
+            <td valign="top">
+              <table id="ltop" border="0" cellspacing="0" cellpadding="0">
+                <tr class="std">
+                  <td class="b r st" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">1.MEDICARE</td>
+                        <td class="cell">MEDICAID</td>
+                        <td class="cell">CHAMPUS</td>
+                        <td class="cell">CHAMPVA</td>
+                        <td class="inp">GROUP<br>HEALTH PLAN</td>
+                        <td class="inp">FECA<br>BLK LUNG</td>
+                        <td class="cell">OTHER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td><input type="radio" name="rbClaimProgramName" value="MEDICARE"><em>(Medicare #)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="MEDICAID"><em>(Medicaid #)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="CHAMPUS"><em>(Sponsor's SSN)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="CHAMPVA"><em>(VA File #)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="GHP"><em>(SSN or ID)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="FECA"><em>(SSN)</em></td>
+                        <td><input type="radio" name="rbClaimProgramName" value="OTHER"><em>(ID)</em></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">2. PATIENT'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtpatientName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">3. PATIENT'S BIRTH DATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd c">&nbsp<input type="text" name="txtPatientDateOfBirthMM" class ="std size24"></td>
+                        <td class="cell rd c">&nbsp<input type="text" name="txtPatientDateOfBirthDD" class ="std size24"></td>
+                        <td class="cell c">&nbsp<input type="text" name="txtPatientDateOfBirthYY" class ="std size48"></td>
+                        <td class="cell" align="right">M<input type="radio" name="rbPatientSex" value="M"></td>
+                        <td class="cell">F<input type="radio" name="rbPatientSex" value="F"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">5. PATIENT'S ADDRESS (No., Street)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddress" class ="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="4">6. PATIENT RELATIONSHIP TO INSURED</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">Self<input type="radio" name="rbPatientInsuredRelation" value="SELF"></td>
+                        <td class="cell">Spouse<input type="radio" name="rbPatientInsuredRelation" value="SPOUSE"></td>
+                        <td class="cell">Child<input type="radio" name="rbPatientInsuredRelation" value="CHILD"></td>
+                        <td class="cell">Other<input type="radio" name="rbPatientInsuredRelation" value="OTHER"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r" width="220">CITY</td>
+                        <td class="cell">STATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="220">&nbsp<input type="text" name="txtPatientAddressCity" class ="std size96"></td>
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddressState" class ="std size24"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r" rowspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="6">8. PATIENT STATUS</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="right">Single</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatus" value="SINGLE"></td>
+                        <td class="cell" align="right">Married</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatus" value="MARRIED"></td>
+                        <td class="cell" align="right">Other</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatus" value="OTHER"><br></td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="right">Employed</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatusEmployment" value="EMPLOYED"></td>
+                        <td class="cell" align="right">Full-Time<br>Student</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatusEmployment" value="FULLTIMESTD"></td>
+                        <td class="cell" align="right">Part-Time<br>Student</td>
+                        <td class="cell"><input type="radio" name="rbPatientStatusEmployment" value="PARTTIMESTD"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r">ZIP CODE</td>
+                        <td class="cell" colspan="4">TELEPHONE (Include Area Code)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="50%">&nbsp<input type="text" name="txtPatientAddressZipCode" class ="std size60"></td>
+                        <td class="cell phone">(</td>
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddressTelephoneCode" class ="std size36"></td>
+                        <td class="cell phone">)</td>
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddressTelephone" class="std size72"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">9. OTHER INSURED'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">10. IS PATIENT'S CONDITION RELATED TO:</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">a. OTHER INSURED'S POLICY OR GROUP NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp <input type="text" name="txtOtherInsuredPolicyGroupNumber" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">a. EMPLOYMENT? (CURRENT OR PREVIOUS)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="radio" name="rbConditionRelatedToEmploymentPatient" value="YES">YES</td>
+                        <td class="cell"><input type="radio" name="rbConditionRelatedToEmploymentPatient" value="NO">NO</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">b. OTHER INSURED'S DATE OF BIRTH</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd c">&nbsp<input type="text" name="txtOtherInsuredDateOfBirthMM" class="std size24"></td>
+                        <td class="cell rd c">&nbsp<input type="text" name="txtOtherInsuredDateOfBirthDD" class="std size24"></td>
+                        <td class="cell c">&nbsp<input type="text" name="txtOtherInsuredDateOfBirthYY" class="std size48"></td>
+                        <td class="cell" align="right">M<input type="radio" name="rbOtherInusuredSex" value="M"></td>
+                        <td class="cell">F<input type="radio" name="rbOtherInusuredSex" value="F"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">b. AUTO ACCIDENT?</td>
+                        <td class="cell">PLACE (State)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="radio" name="rbConditionRelatedToAutoAccident" value="YES">YES</td>
+                        <td class="cell"><input type="radio" name="rbConditionRelatedToAutoAccident" value="NO">NO</td>
+                        <td class="cell"><input type="text" name="txtConditionRelatedToAutoAccidentPlace" class="std size24"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">c. EMPLOYER'S NAME OR SCHOOL NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtEmployerNamerOrSchoolName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">c. OTHER ACCIDENT?</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="radio" name="rbConditionRelatedToOtherAccident" value="YES">YES</td>
+                        <td class="cell"><input type="radio" name="rbConditionRelatedToOtherAccident" value="YES">NO</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">d. INSURANCE PLAN NAME OR PROGRAM NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsurancePlanNamerOrProgramName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">10d. RESERVED FOR LOCAL USE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtReservedForLocalUse" class="std size240">
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="high">
+                  <td class="r b" colspan ="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" align="center" colspan="2"><b>READ BACK OF FORM BEFORE COMPLETING &amp SIGNING THIS FORM.<b></td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">12.&nbsp</td>
+                        <td>PATIENT’S OR AUTHORIZED PERSON’S SIGNATURE I authorize the release of any medical or other information necessary
+                            to process this claim. I also request payment of government benefits either to myself or to the party who accepts assignment below.
+                        </td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" colspan="2">
+                          SIGNED &nbsp <input type="text" name="txtPatientSignature" class="std size240">
+                          &nbsp &nbsp DATE &nbsp <input type="text" name="txtPatientSignatureDate" class="std size96">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td valign="top">
+              <table id="rtop" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" width="60%">1a. INSURED'S I.D. NUMBER</td>
+                        <td class="cell" width="40%">(FOR PROGRAM IN ITEM 1)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" colspan="2"> &nbsp<input type="text" name="txtInsuredId" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">4. INSURED'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">7. INSURED'S ADDRESS (No., Street)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredAddress" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r" width="220">CITY</td>
+                        <td class="cell">STATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="220">&nbsp<input type="text" name="txtInsuredAddressCity" class="std size96"></td>
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredAddressState" class="std size24"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r">ZIP CODE</td>
+                        <td class="cell" colspan="4">TELEPHONE (Include Area Code)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="50%">&nbsp<input type="text" name="txtInsuredAddressZipCode" class="std size60"></td>
+                        <td class="cell phone">(</td>
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddressTelephoneCode" class="std size36"></td>
+                        <td class="cell phone">)</td>
+                        <td class="cell">&nbsp<input type="text" name="txtPatientAddressTelephone" class="std size72"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">11. INSURED'S POLICY GROUP OR FECA NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredPolicyGroupName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">a. INSURED'S DATE OF BIRTH</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd c">&nbsp<input type="text" name="txtInsuredDateOfBirthMM" class="std size24"></td>
+                        <td class="cell rd c">&nbsp<input type="text" name="txtInsuredDateOfBirthDD" class="std size24"></td>
+                        <td class="cell c">&nbsp<input type="text" name="txtInsuredDateOfBirthYY" class="std size48"></td>
+                        <td class="cell" align="right">M<input type="radio" name="rdInsuredSex" value="M"></td>
+                        <td class="cell">F<input type="radio" name="rdInsuredSex" value="F"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">b. EMPLOYER'S NAME OR SCHOOL NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtInsuredEmployerOrSchoolName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">c. INSURANCE PLAN NAME OR PROGRAM NAME</td>
+                      </tr>
+                      <tr class="cell">
+                         <td class="cell">&nbsp<input type="text" name="txtInsuredInsurancePlanOrProgramName" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="4">d. IS THERE ANOTHER HEALTH BENEFIT PLAN?</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><input type="radio" name="rbAnotherHealthBenefitPlan" value="YES">YES</td>
+                        <td class="cell">&nbsp</td>
+                        <td class="cell"><input type="radio" name="rbAnotherHealthBenefitPlan" value="NO">NO</td>
+                        <td class="cell" align="right"><b><em>If yes,</em></b> return to and complete item 9 a-d.</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="high">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">13.&nbsp</td>
+                        <td>INSURED’S OR AUTHORIZED PERSON’S SIGNATURE I authorize
+                            payment of medical benefits to the undersigned physician or supplier
+                            for services described below.
+                        </td>
+                      </tr>
+                      <tr class="cell">
+                         <td class="cell" colspan="2">
+                           SIGNED &nbsp<input type="text" name="txtInsuredSignature" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <table id="lbot" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b r st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="3">14. DATE OF CURRENT:</td>
+                        <td rowspan="3"><img href="C:\tri.bmp"></td>
+                        <td rowspan="3">ILLNESS (First symptom) OR<br>INJURY (Accident) OR<br>PREGNANCY (LMP)</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell rd c"> &nbsp<input type="text" name="txtTreatmentDateOfIllnessInjuryPregnancyMM" class="std size24"></td>
+                        <td class="cell rd c"> &nbsp<input type="text" name="txtTreatmentDateOfIllnessInjuryPregnancyDD" class="std size24"></td>
+                        <td class="cell c"> &nbsp<input type="text" name="txtTreatmentDateOfIllnessInjuryPregnancyy" class="std size48"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="4">15. IF PATIENT HAS HAD SAME OR SIMILAR ILLNESS.</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell" width="50%">GIVE FIRST DATE</td>
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentDateOfSameOrSimilarIllnessMM" class="std size24"></td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentDateOfSameOrSimilarIllnessDD" class="std size24"></td>
+                        <td class="cell c"><input type="text" name="txtTreatmentDateOfSameOrSimilarIllnessYY" class="std size48"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">17. NAME OF REFERRING PHYSICIAN OR OTHER SOURCE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtNameOfReferingPhysicianOrOther" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">17a. I.D. NUMBER OF REFERRING PHYSICIAN</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtIdOfReferingPhysicianOrOther" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r b" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class ="cell">19. RESERVED FOR LOCAL USE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp<input type="text" name="txtReservedForLocalUse2" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan ="2">21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY. (RELATE ITEMS 1,2,3 OR 4 TO ITEM 24E BY LINE)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width ="50%">1. &nbsp<input type="text" name="txtTreatmentDiagnosisPrimary" class="std size144"></td>
+                        <td class="cell" width ="50%">3. &nbsp<input type="text" name="txtTreatmentDiagnosisTertiary" class="std size144"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" valign ="center" width ="50%">2. &nbsp<input type="text" name="txtTreatmentDiagnosisOther1" class="std size144"></td>
+                        <td class="cell" valign ="center" width ="50%">4. &nbsp<input type="text" name="txtTreatmentDiagnosisOther2" class="std size144"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="prochead">
+                        <td class="cell t r b cola">24. A</td>
+                        <td class="cell t r b colb c">B</td>
+                        <td class="cell t r b colc c">C</td>
+                        <td class="cell t r b cold c">D</td>
+                        <td class="cell t b cole c">E</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="6" align="center">DATE(S) OF SERVICE</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td class="cell" align="center">From</td>
+                              <td class="cell">&nbsp</td>
+                              <td class="cell">&nbsp</td>
+                              <td class="cell" align="center">To</td>
+                              <td class="cell">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell c">MM</td>
+                              <td class="cell c">DD</td>
+                              <td class="cell c">YY</td>
+                              <td class="cell c">MM</td>
+                              <td class="cell c">DD</td>
+                              <td class="cell c">YY</td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r c" valign="center">Place<br>of<br>Service</td>
+                        <td class="b r c" valign="center">Type<br>of<br>Service</td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="2" align="center">PROCEDURES, SERVICES OR SUPPLIES</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell" colspan="2" align="center">(Explain Unusual Circumstances)</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1c">CPT/HCPCS</td>
+                              <td class="cell c">MODIFIER</td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b c" valign="center">DIAGNOSIS<br>CODE</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure1DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure1DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure1DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure1DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure1DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure1DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure1PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure1TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure1Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure1Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure1Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure1DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure2DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure2DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure2DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure2DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure2DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure2DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure2PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure2TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure2Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure2Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure2Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure2DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure3DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure3DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure3DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure3DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure3DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure3DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure3PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure3TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure3Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure3Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure3Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure3DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure4DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure4DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure4DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure4DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure4DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure4DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure4PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure4TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure4Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure4Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure4Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure4DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure5DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure5DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure5DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure5DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure5DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure5DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure5PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure5TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure5Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure5Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure5Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure5DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure6DateOfServiceFromMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure6DateOfServiceFromDD" class="std size24"></td>
+                              <td class="cell r vbc"><input type="text" name="txtProcedure6DateOfServiceFromYY" class="std size48"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure6DateOfServiceToMM" class="std size24"></td>
+                              <td class="cell rd vbc"><input type="text" name="txtProcedure6DateOfServiceToDD" class="std size24"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure6DateOfServiceToYY" class="std size48"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure6PlaceOfService" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure6TypeOfService" class="std size24"></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1 vbc"><input type="text" name="txtProcedure6Cpt" class="std size72"></td>
+                              <td class="cell rd cold2 vbc"><input type="text" name="txtProcedure6Modifier1" class="std size36"></td>
+                              <td class="cell vbc"><input type="text" name="txtProcedure6Modifier2" class="std size72"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b vbc"><br><input type="text" name="txtProcedure6DiagnosisCodePointer" class="std size48"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="sb r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="std">
+                        <td class="b r" width="40%">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">25. FEDERAL TAX I.D. NUMBER</td>
+                              <td class="cell">SSN</td>
+                              <td class="cell">EIN</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell"> &nbsp<input type="text" name="txtPhysicianTaxTypeIdSsn" class="std size144"></td>
+                              <td class="cell"><input type="radio" name="chkPhysicianTaxTypeId"></td>
+                              <td class="cell"><input type="radio" name="chkPhysicianTaxTypeId"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">26. PATIENT'S ACCOUNT NO.</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell"> &nbsp<input type="text" name="txtPatientAccountNo" class="std size144"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">27.&nbsp</td>
+                              <td>ACCEPT ASSIGNMENT?<br>(For govt. claims, see back)</td>
+                            </tr>
+                            <tr class="cell">
+                              <td>&nbsp</td>
+                              <td><input type="radio" name="rbClaimAcceptAssignment" value="YES">YES<input type="radio" name="rbClaimAcceptAssignment" value="NO">NO</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr class="high">
+                        <td class="r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">31.&nbsp</td>
+                              <td colspan="2">SIGNATURE OF PHYSICIAN OR SUPPLIER<br>
+                                              INCLUDING DEGREES OR CREDENTIALS<br>
+                                              (I certify that the statements on the reverse<br>
+                                              apply to this bill and are made a part thereof.)
+                              </td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td class="cell">SIGNED &nbsp<input type="text" name="txtPhysicianSignature" class="std size144"></td>
+                              <td class="cell">DATE &nbsp<input type="text" name="txtPhysicianSignatureDate" class="std size96"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td colspan="2">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">32.&nbsp</td>
+                              <td>NAME AND ADDRESS OF FACILITY WHERE SERVICES WERE<br>
+                                  RENDERED (If other than home or office)
+                              </td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td>&nbsp<input type="text" name="txtOrganizationName" class="std size240"><br>&nbsp<input type="text" name="txtOrganizationAddress" class="std size240"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td valign="top">
+              <table id="rbot" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b st">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell" height="30%" width="30%">
+                        <td class="cell" colspan="8">16. DATES PATIENT UNABLE TO WORK IN CURRENT OCCUPATION</td>
+                      </tr>
+                      <tr class="cell" height="30%" width="30%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                        <td class="cell c">&nbsp</td>
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell" align="right">FROM</td>
+                        <td class="cell rd c"><input type="text" name="txtDatePatientUnableToWorkFromMM" class="std size24"></td>
+                        <td class="cell rd c" align="left"><input type="text" name="txtDatePatientUnableToWorkFromDD" class="std size24"></td>
+                        <td class="cell c"><input type="text" name="txtDatePatientUnableToWorkFromYY" class="std size36"></td>
+                        <td class="cell" align="right">TO</td>
+                        <td class="cell rd c"><input type="text" name="txtDatePatientUnableToWorkToMM" class="std size24"></td>
+                        <td class="cell rd c"><input type="text" name="txtDatePatientUnableToWorkToDD" class="std size24"></td>
+                        <td class="cell c"><input type="text" name="txtDatePatientUnableToWorkToYY" class="std size36"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="8">18. HOSPITALIZATION DATES RELATED TO CURRENT SERVICES</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                        <td class="cell c">&nbsp</td>
+                        <td class="cell c">MM</td>
+                        <td class="cell c">DD</td>
+                        <td class="cell c">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell" align="right">FROM</td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentHospitilizationDateFromMM" class="std size24"></td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentHospitilizationDateFromDD" class="std size24"></td>
+                        <td class="cell c"><input type="text" name="txtTreatmentHospitilizationDateFromYY" class="std size24"></td>
+                        <td class="cell" align="right">TO</td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentHospitilizationDateToMM" class="std size24"></td>
+                        <td class="cell rd c"><input type="text" name="txtTreatmentHospitilizationDateToDD" class="std size24"></td>
+                        <td class="cell c"><input type="text" name="txtTreatmentHospitilizationDateToYY" class="std size36"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">20. OUTSIDE LAB?</td>
+                        <td class="cell c" colspan="2">$ CHARGES</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r">
+                          <input type="radio" name="rbTreatmentOutsideLab" value="YES">YES
+                          <input type="radio" name="rbTreatmentOutsideLab" value="NO">NO
+                        </td>
+                        <td class="cell r" align="right"><input type="text" name="txtTreatmentOutsideLabCharges" class="std size60">&nbsp</td>
+                        <td class="cell decimal" align="left"> &nbsp<input type="text" name="txtTreatmentOutsideLabChargesDecimal" class="std size24"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">22. MEDICAID RESUBMISSION CODE</td>
+                        <td class="cell">ORIGINAL REF. NO</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r"> &nbsp<input type="text" name="txtTreatmentMedicaidResubmission" class="std size240"></td>
+                         <td class="cell "> &nbsp<input type="text" name="txtTreatmentResubmissionReference" class="std size96"></td>
+                        </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td>
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">23. PRIOR AUTHORIZATION NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"> &nbsp<input type="text" name="txtTreatmentPriorAuthorizationNo" class="std size240"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td>
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="prochead">
+                        <td class="cell t r b colf c">F</td>
+                        <td class="cell t r b colg c">G</td>
+                        <td class="cell t r b colh c">H</td>
+                        <td class="cell t r b coli c">I</td>
+                        <td class="cell t r b colj c">J</td>
+                        <td class="cell t b colk c">K</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r vbc">$ CHARGES</td>
+                        <td class="b r vbc">DAYS<br>OR<br>UNITS</td>
+                        <td class="b r vbc">EPSDT<br>Family<br>Plan</td>
+                        <td class="b r vbc">EMG</td>
+                        <td class="b r vbc">COB</td>
+                        <td class="b vbc">RESERVED FOR<br>LOCAL USE</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure1Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure1Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure1DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure1EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure1Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure1COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure1ReservedForLocal" class="std size96"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure2Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure2Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure2DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure2EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure2Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure2COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure2ReservedForLocal" class="std size96"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure3Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure3Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure3DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure3EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure3Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure3COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure3ReservedForLocal" class="std size96"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure4Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure4Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure4DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure4EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure4Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure4COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure4ReservedForLocal" class="std size96"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure5Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure5Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure5DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure5EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure5Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure5COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure5ReservedForLocal" class="std size96"></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd num chrg1"> <br><input type="text" name="txtProcedure6Charges1" class="std size60"></td>
+                              <td class="cell num chrg2"><br><input type="text" name="txtProcedure6Charges2" class="std size24"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure6DaysOrUnits" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure6EPSDTFamilyPlan" class="std size24"></td>
+                        <td class="b r vbc"><br><input type="text" name="txtProcedure6Emergency" class="std size24"></td>
+                        <td class="b r vbc"><input type="text" name="txtProcedure6COB" class="std size24"></td>
+                        <td class="b vbc"><input type="text" name="txtProcedure6ReservedForLocal" class="std size96"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std" valign="top">
+                  <td class="cell b" valign = "top">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0" valign="top">
+                      <tr class="cell" valign="top">
+                        <td class="cell r " colspan="3" valign="top">28. TOTAL CHARGE</td>
+                         <td class="cell r" colspan="3" valing="top">29. AMOUNT PAID</td>
+                         <td class="cell" colspan="3" valing="top">30. BALANCE DUE</td>
+                      </tr>
+                      <tr class="cell" valign="top">
+                        <td class="cell">$</td>
+                        <td class="cell rd c"><input type="text" name="txtclaimTotalCharge" class="std size60"></td>
+                        <td class="cell r decimal c"><input type="text" name="txtclaimTotalChargeDecimal" class="std size24"></td>
+                        <td class="cell">$</td>
+                        <td class="cell rd c"><input type="text" name="txtclaimAmountPaid" class="std size60"></td>
+                        <td class="cell r decimal c"><input type="text" name="txtclaimAmountPaidDecimal" class="std size24"></td>
+                        <td class="cell">$</td>
+                        <td class="cell rd c"><input type="text" name="txtclaimBalance" class="std size60"></td>
+                        <td class="cell decimal c"><input type="text" name="txtclaimBalanceDecimal" class="std size24"></td>
+
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr height ="102">
+                  <td class="cell sb">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">33.</td>
+                        <td colspan="2">PHYSICIAN’S OR SUPPLIER’S BILLING NAME, ADDRESS, <br>&amp CITY, ZIP CODE, PHONE #</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp</td>
+                        <td colspan="2"><input type="text" name="txtphysicianName" class="std" size="20">,<input type="text" name="txtphysicianAddress" class="std" size="20"><br><input type="text" name="txtphysicianCity" class="std size96">,<input type="text" name="txtphysicianZipCode" class="std size60">,<input type="text" name="txtphysicianTelephone" class="std size96"></td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell r">PIN# <input type="text" name="txtPIN" class="std size96"></td>
+                        <td class="cell">GRP# <input type="text" name="txtGRP" class="std size96"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <input type="submit" value="Send">
+      </div
+    </form>
+  </body>
+</html>

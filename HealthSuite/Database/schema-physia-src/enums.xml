@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia-enums">
+	<include file="generic-datatypes.xml"/>
+
+	<table name="Session_Status" abbrev="SesStat" type="Enumeration">
+		<enum>Active</enum>
+		<enum>Inactive (User Normal Logout)</enum>
+		<enum>Inactive (User Forced Logout)</enum>
+		<enum>Inactive (System Forced Logout)</enum>
+		<enum>Inactive (Timeout)</enum>
+	</table>
+
+	<table name="Session_Activity_Type" abbrev="SesActv" type="Enumeration">
+		<enum>Record</enum>
+		<enum>Page</enum>
+	</table>
+
+	<table name="Session_Action_Type" abbrev="SesAct" type="Enumeration">
+		<enum>View</enum>
+		<enum>Add</enum>
+		<enum>Update</enum>
+		<enum>Remove</enum>
+	</table>
+
+	<table name="Login_Type" abbrev="LgiType" type="Enumeration">
+		<enum>None</enum>
+		<enum>Specific (specified in Login table)</enum>
+	</table>
+
+	<table name="Entity_Type" abbrev="EntType" type="Enumeration">
+		<enum>Person</enum>
+		<enum abbrev="Org">Organization</enum>
+		<enum abbrev="Trn">Transaction</enum>
+	</table>
+
+	<table name="Permit_Member_Type" abbrev="PermMem" type="Enumeration">
+		<enum>Owner</enum>
+		<enum>Person</enum>
+		<enum>Organization</enum>
+	</table>
+
+	<table name="Permission_Type" abbrev="PermTyp" type="Enumeration">
+		<enum>Allow All</enum>
+		<enum>Allow All, Deny Some</enum>
+		<enum>Deny All, Allow Some</enum>
+		<enum>Allow Owner, Deny All</enum>
+		<enum>Allow Owner, Deny All, Allow Some</enum>
+		<enum>Allow Care Provider, Allow Owner, Deny All</enum>
+		<enum>Allow Care Provider, Allow Owner, Deny All, Allow Some</enum>
+		<enum>Allow Care Provider, Deny All</enum>
+		<enum>Allow Care Provider, Deny All, Allow Some</enum>
+		<enum>Allow Physician, Deny All</enum>
+		<enum>Allow Physician, Deny All, Allow Some</enum>
+		<enum id="999">No Default</enum>
+	</table>
+
+	<table name="Gender" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>Male</enum>
+		<enum>Female</enum>
+		<enum abbrev="N/A">Not applicable</enum>
+	</table>
+
+	<table name="Marital_Status" abbrev="MarStat" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>Single</enum>
+		<enum>Married</enum>
+		<enum>Partner</enum>
+		<enum>Legally Separated</enum>
+		<enum>Divorced</enum>
+		<enum>Widowed</enum>
+		<enum>Not applicable</enum>
+	</table>
+
+	<table name="Blood_Type" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>A</enum>
+		<enum>B</enum>
+		<enum>AB</enum>
+		<enum>O</enum>
+	</table>
+
+	<table name="Personal_Multibirth" abbrev="PrMtbth" type="Enumeration">
+		<enum id="1">Singleton</enum>
+		<enum id="2">Twin</enum>
+		<enum id="3">Triplet</enum>
+		<enum id="4">Quadruplet</enum>
+		<enum id="5">Quintuplet</enum>
+		<enum id="6">Septuplet</enum>
+	</table>
+
+	<table name="Personal_Birthorder" abbrev="PrBthOr" type="Enumeration">
+		<enum id="1">First</enum>
+		<enum id="2">Second</enum>
+		<enum id="3">Third</enum>
+		<enum id="4">Fourth</enum>
+		<enum id="5">Fifth</enum>
+		<enum id="6">Sixth</enum>
+		<enum id="7">Seventh</enum>
+		<enum id="8">Eighth</enum>
+		<enum id="9">Ninth</enum>
+		<enum id="10">Tenth</enum>
+		<enum id="11">Eleventh</enum>
+		<enum id="12">Twelvth</enum>
+	</table>
+
+	<table name="Appt_Duration" type="Enumeration">
+		<enum id="10">10 minutes</enum>
+		<enum id="15">15 minutes</enum>
+		<enum id="20">20 minutes</enum>
+		<enum id="30">30 minutes</enum>
+		<enum id="45">45 minutes</enum>
+		<enum id="60">1 hour</enum>
+	</table>
+
+	<table name="Deduct_Type" type="Enumeration">
+		<enum>None</enum>
+		<enum>Individual</enum>
+		<enum>Family</enum>
+		<enum>Both</enum>
+	</table>
+
+	<table name="Tax_Id_Type" type="Enumeration">
+		<enum>Employer Identification Number</enum>
+		<enum>Social Security Number</enum>
+		<enum>Corporate Name</enum>
+	</table>
+
+	<table name="Bill_Sequence" type="Enumeration">
+		<enum>Inactive</enum>
+		<enum>Primary</enum>
+		<enum>Secondary</enum>
+		<enum>Tertiary</enum>
+		<enum>Quaternary</enum>
+		<enum>Workers Comp</enum>
+	</table>
+
+	<table name="Appt_Attendee_Type" abbrev="ApPty" type="Enumeration">
+		<enum>New Patient</enum>
+		<enum>Established Patient</enum>
+		<enum>Temporary Patient</enum>
+	</table>
+
+	<table name="Appt_Status" abbrev="ApStat" type="Enumeration">
+		<enum>Scheduled</enum>
+		<enum>In Progress</enum>
+		<enum>Complete</enum>
+		<enum>Discard</enum>
+	</table>
+
+	<table name="Appt_Discard_Type" abbrev="ApDisc" type="Enumeration">
+		<enum>Cancel</enum>
+		<enum>No Show</enum>
+		<enum>Patient Reschedule</enum>
+		<enum>Org Reschedule</enum>
+	</table>
+
+	<table name="HCFA1500_Modifier_Code" abbrev="HcfaMod" type="Enumeration">
+		<param name="capsize">128</param>
+		<enum id="20">20 Microsurgery</enum>
+		<enum id="21">21 Prolonged Evaluation and Management Services</enum>
+		<enum id="22">22 Unusual Procedural Services</enum>
+		<enum id="23">23 Unusual Anesthesia</enum>
+		<enum id="24">24 Unrelated Eval and Mngmnt Services by Same Physician During a Postoperative Period</enum>
+		<enum id="25">25 Significant, Separately Identifiable Evaluation and Mgmt Services by the Same Physician/Day of the Procedure/Service</enum>
+		<enum id="26">26 Professional Component</enum>
+		<enum id="32">32 Mandated Services</enum>
+		<enum id="47">47 Anesthesia by Surgeon</enum>
+		<enum id="50">50 Bilateral Procedure</enum>
+		<enum id="51">51 Multiple Procedures</enum>
+		<enum id="52">52 Reduced Services</enum>
+		<enum id="53">53 Discontinued Procedure</enum>
+		<enum id="54">54 Surgical Care Only</enum>
+		<enum id="55">55 Postoperative Management Only</enum>
+		<enum id="56">56 Preoperative Management Only</enum>
+		<enum id="57">57 Decision for Surgery</enum>
+		<enum id="58">58 Staged or Related Procedure or Service by the Same Physician During the Postoperative Period</enum>
+		<enum id="59">59 Distinct Procedural Service</enum>
+		<enum id="62">62 Two Surgeons</enum>
+		<enum id="66">66 Surgical Team</enum>
+		<enum id="76">76 Repeat Procedure by Same Physician</enum>
+		<enum id="77">77 Repeat Procedure by Another Physician</enum>
+		<enum id="78">78 Return to the Operating Room for a Related Procedure During the Postoperative Period</enum>
+		<enum id="79">79 Unrelated Procedure or Service by the Same Physician During the Postoperative Period</enum>
+		<enum id="80">80 Assistant Surgeon</enum>
+		<enum id="81">81 Minimum Assistant Surgeon</enum>
+		<enum id="82">82 Assistant Surgeon When Qualified Resident Surgeon not Available</enum>
+		<enum id="90">90 Reference (Outside) Laboratory</enum>
+		<enum id="99">99 Multiple Modifiers</enum>
+	</table>
+
+	<table name="Trans_Related_To" abbrev="TrnRel" type="Enumeration">
+		<enum>Employment</enum>
+		<enum>Auto Accident</enum>
+		<enum>Other Accident</enum>
+	</table>
+
+	<table name="Medication_Type" abbrev="MedType" type="Enumeration">
+		<enum>Encounter</enum>
+		<enum>Maintenance</enum>
+		<enum>Permanent</enum>
+	</table>
+
+	<table name="Invoice_Type" type="Enumeration">
+		<enum>HCFA 1500 Claim</enum>
+		<enum>Services Rendered</enum>
+	</table>
+
+	<table name="Inv_Item_Type" type="Enumeration">
+		<enum>Invoice</enum>
+		<enum>Service</enum>
+		<enum>Lab</enum>
+		<enum>Co-pay</enum>
+		<enum>Co-insurance</enum>
+		<enum>Adjustment</enum>
+		<enum>Deductible</enum>
+	</table>
+
+	<table name="Transaction_Status" type="Enumeration">
+		<enum>Unknown</enum>
+		<enum>Not Required</enum>
+		<enum>Active</enum>
+		<enum>Inactive</enum>
+	</table>
+
+	<table name="Invoice_Status" type="Enumeration">
+		<enum>Created</enum>
+		<enum>Incomplete</enum>
+		<enum>Pending</enum>
+		<enum>On Hold</enum>
+		<enum>Submitted</enum>
+		<enum>Approved Internal</enum>
+		<enum>Rejected Internal</enum>
+		<enum>Transferred</enum>
+		<enum>Rejected External</enum>
+		<enum>Approved External</enum>
+		<enum>Electronically Transmitted to Carrier</enum>
+		<enum>Transmitted to Carrier via Paper</enum>
+		<enum>Awaiting Payment</enum>
+		<enum>Appealed</enum>
+		<enum>Payments Applied</enum>
+		<enum>Closed</enum>
+	</table>
+
+	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
+		<enum>Payment</enum>
+		<enum>Manual</enum>
+		<enum>Transfer</enum>
+	</table>
+
+	<table name="Payment_Type" abbrev="PayTyp" type="Enumeration">
+		<enum>Pre-payment</enum>
+		<enum>Deductible</enum>
+		<enum>Co-pay</enum>
+		<enum>Post-payment</enum>
+	</table>
+
+	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">
+		<enum>Cash</enum>
+		<enum>Check</enum>
+		<enum>Debit Card</enum>
+		<enum>Refund</enum>
+		<enum>Discount</enum>
+		<enum>Professional Discount</enum>
+		<enum>Credit</enum>
+		<enum>MasterCard</enum>
+		<enum>VISA</enum>
+		<enum>AMEX</enum>
+		<enum>Discover</enum>
+		<enum>Diners Club</enum>
+	</table>
+
+	<table name="Offering_Catalog_Type" abbrev="OfCatTy" type="Enumeration">
+		<enum>Fee Schedule</enum>
+	</table>
+
+	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
+		<enum>Inactive</enum>
+		<enum>Active</enum>
+	</table>
+
+	<table name="Catalog_Entry_Cost_Type" abbrev="CatItmCt" type="Enumeration">
+		<enum>No Cost</enum>
+		<enum>Specific Dollar</enum>
+		<enum>Multiple of Group</enum>
+		<enum>Multiple of Parent</enum>
+		<enum>Medicare Value</enum>
+		<enum>Multiple of RVU</enum>
+		<enum>UCR 75% Value</enum>
+	</table>
+
+	<table name="Invoice_Bill_Party_Type" abbrev="BillParTy" type="Enumeration">
+		<enum>Client</enum>
+		<enum>Third-party Person</enum>
+		<enum>Third-party Organization</enum>
+		<enum>Third-party Insurance Organization</enum>
+	</table>
+
+	<table name="Survey_Item_Type" abbrev="SurItemTy" type="Enumeration">
+		<enum>Question</enum>
+		<enum>Statement</enum>
+		<enum>Heading</enum>
+		<enum>Subhead</enum>
+	</table>
+
+	<table name="Insurance_Record_Type" abbrev="InsRecTy" type="Enumeration">
+		<enum>Category (arbitrary grouping of other records)</enum>
+		<enum>Insurance Product (child of an insurance org)</enum>
+		<enum>Insurance Plan (child of an insurance product)</enum>
+		<enum>Personal Coverage (optional child of insurance plan)</enum>
+	</table>
+
+</schema>

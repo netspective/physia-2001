@@ -1,0 +1,97 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template takes a single $table instance of the Table object and
+	# creates the complete SQL necessary to drop the existing table and create
+	# a new table with all columns, types, constraints, and indexes. This
+	# template creates both the primary table and audit table (if any) and
+	# creates all sequences necessary for both tables.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$isAuditableTable = $table->isTableType('Audit');
+	$isSecuredTable = $table->isTableType('Secure');
+	$isEnumTable = $table->isTableType('Enumeration');
+
+	# if a table doesn't have any columns, don't bother writing out the structure
+	# the template will still execute, but setting file name to "" makes sure that
+	# the file is not written
+	$templOutputFile = "" unless $table->hasColumns();
+	
+	$triggersCount = 0;
+}
+
+Prompt Creating Code for Table {$tableName};
+
+{
+	$OUT = $processor->createTableTriggerSql($table, 'master');
+	$triggersCount++ if $OUT;
+}
+{
+	$OUT = $isAuditableTable ? $processor->createTableTriggerSql($table, 'audit') : '';
+	$triggersCount++ if $OUT;
+}
+{
+	my @justColNames = ();
+	my @oldColNames = ();
+	my @newColNames = ();
+	foreach $col (@{$table->getColumnGroups('sorted_by_group', '_primaryKeys', 'secure', 'audit', '_nonPrimaryKeys')})
+	{
+		push(@justColNames, $col->{name});
+		push(@oldColNames, ":old.$col->{name}");
+		push(@newColNames, ":new.$col->{name}");
+	}
+	my $justColNamesCS = join(', ', @justColNames);
+	my $oldColNamesCS = join(', ', @oldColNames);
+	my $newColNamesCS = join(', ', @newColNames);
+	
+	my $logUpdChanges = qq{
+			insert into $tableName\_AUD
+				(RET_METHOD, $justColNamesCS) values
+				('U', $oldColNamesCS);
+		};
+	my $logDelChanges = qq{
+			insert into $tableName\_AUD
+				(RET_METHOD, $justColNamesCS) values
+				('D', $oldColNamesCS);
+		};
+	
+	$logUpdChanges =~ s/^\t\t//;
+	$logDelChanges =~ s/^\t\t//;
+	
+	$OUT = qq{
+		create or replace trigger AUDU_$tableName
+		before update on $tableName
+		for each row
+		begin
+			$logUpdChanges
+		end;
+		/
+		show errors;
+
+		create or replace trigger AUDD_$tableName
+		after delete on $tableName
+		for each row
+		begin
+			$logDelChanges
+		end;
+		/
+		show errors;
+	};
+	
+	$OUT =~ s/^\t\t//gm;
+	$OUT = '' unless $isAuditableTable;
+	$triggersCount++ if $OUT;
+}
+{
+	$templOutputFile = "" unless $triggersCount;
+	$OUT = '';
+}

@@ -1,0 +1,377 @@
+##############################################################################
+package App::Statements::Insurance;
+##############################################################################
+
+use strict;
+use Exporter;
+use DBI::StatementManager;
+
+use vars qw(@ISA @EXPORT $STMTMGR_INSURANCE);
+@ISA    = qw(Exporter DBI::StatementManager);
+@EXPORT = qw($STMTMGR_INSURANCE);
+
+$STMTMGR_INSURANCE = new App::Statements::Insurance(
+
+	'selGroupInsurance' => qq{
+		select 	o.INS_INTERNAL_ID, o.product_name, o.INS_ORG_ID, o.INS_TYPE, o.plan_name, o.GROUP_NUMBER, o.GROUP_NAME, o.POLICY_NUMBER,
+			o.INDIV_DEDUCTIBLE_AMT, o.FAMILY_DEDUCTIBLE_AMT, o.PERCENTAGE_PAY, o.THRESHOLD, o.COPAY_AMT,
+			ct.caption as ins_type_caption
+		from insurance o, claim_type ct
+		where o.ins_type = ct.id
+			and o.product_name = ?
+		},
+	'selInsuranceGroup' => qq{
+		select 	i.INS_ORG_ID, i.INS_TYPE, i.plan_name, i.GROUP_NUMBER, i.GROUP_NAME, i.POLICY_NUMBER,
+			i.INDIV_DEDUCTIBLE_AMT, i.FAMILY_DEDUCTIBLE_AMT, i.PERCENTAGE_PAY, i.THRESHOLD, i.COPAY_AMT,
+			ct.caption as ins_type_caption
+		from 	insurance i, claim_type ct
+		where 	i.ins_type = ct.id
+		and 	i.ins_internal_id = ?
+		},
+	'selInsuranceAttr' => q{
+		select *
+		from insurance_attribute
+		where parent_id = ?
+			and item_name = ?
+		},
+	'selInsOrgData' => qq{
+		select *
+			from org
+			where org_id = ?
+		},
+	'selInsurancePlansForOrg' => qq{
+		select INS_INTERNAL_ID, product_name, INS_ORG_ID, INS_TYPE, plan_name, GROUP_NUMBER, o.GROUP_NAME, POLICY_NUMBER,
+			INDIV_DEDUCTIBLE_AMT, FAMILY_DEDUCTIBLE_AMT, PERCENTAGE_PAY, THRESHOLD, COPAY_AMT,
+			ct.caption as ins_type_caption
+		from insurance o, claim_type ct
+		where
+			ct.id = o.ins_type and
+			ins_org_id = ? and
+			record_type in (2, 3) and
+			NOT ins_type = 6
+		},
+	'selWorkersCompPlansForOrg' => qq{
+		select ins_internal_id, product_name, ins_org_id, remit_type, remit_payer_id, remit_payer_name, ins_type
+		from insurance
+		where ins_org_id = ?
+			and ins_type = ?
+			and record_type in (?, ?, ?, ?)
+		},
+	'selWorkersCompPlanInfo' => qq{
+		select ins_internal_id, product_name, ins_org_id, remit_type, remit_payer_id, remit_payer_name, ins_type
+		from insurance
+		where product_name = ?
+			and ins_type = 6
+		},
+	'selInsurancePayerPhone' => qq{
+		select item_id, value_text as phone
+		from insurance_attribute
+		where parent_id = ?
+			and item_name = 'Contact Method/Telephone/Primary'
+		},
+	'selInsurancePayerFax' => qq{
+		select item_id, value_text as fax
+		from insurance_attribute
+		where parent_id = ?
+			and item_name = 'Contact Method/Fax/Primary'
+		},
+	'delInsurancePlanAttrs' => qq{
+		delete
+		from insurance_attribute
+		where parent_id = ?
+		},
+	'selInsPlanAttributesForOrg' => qq{
+		select item_id, value_text as product_name, value_textB as plan_name, value_int as ins_internal_id
+		from org_attribute
+		where parent_id = ? and item_name like ?
+		},
+	'selSpecificWrkCmpAttr' => qq{
+		select *
+		from org_attribute
+		where parent_id = ? and value_int = ? and value_type = ?
+		},
+	'selAllWrkCmpAttr' => qq{
+		select *
+		from org_attribute
+		where value_int = ? and value_type = ?
+		},
+	'selInsurance' => qq{
+		select *
+		from insurance
+		where owner_person_id = ?
+		order by coverage_end_date desc, bill_sequence
+		},
+	'selInsuranceByInsType' => qq{
+		select *
+		from insurance
+		where owner_person_id = ?
+			and ins_type = ?
+		},
+	'selInsuranceGroupData' => qq{
+		select INS_ORG_ID, INS_TYPE, plan_name, GROUP_NUMBER, GROUP_NAME, POLICY_NUMBER, RECORD_TYPE,
+			INDIV_DEDUCTIBLE_AMT, FAMILY_DEDUCTIBLE_AMT, PERCENTAGE_PAY, THRESHOLD, COPAY_AMT,
+			ct.caption as ins_type_caption
+			from insurance i, claim_type ct
+			where i.ins_type = ct.id AND i.product_name = ?
+		},
+	'selEmployerWorkersCompPlans' => qq{
+		select oa.value_text as ins_id, oa.value_textB as group_name
+			from org_attribute oa, person_attribute pa, insurance ins
+			where
+				(pa.value_type in (220, 221)) and
+				(pa.value_text = oa.parent_id) and
+				(pa.parent_id = ?) and
+				(oa.value_type = 361)
+		union
+			select ins.product_name, group_name
+			from org, insurance ins, person_attribute pa
+			where
+				org.org_id = ins.ins_org_id and
+				ins.ins_type = 6 and
+				(((pa.value_type in (220, 221)) and
+				(pa.value_text = org.org_id) and
+				(pa.parent_id=?)))
+		},
+	'selPatientHasPlan' => qq{
+		select ins_internal_id
+			from insurance
+			where product_name = ?
+			and owner_person_id = ?
+			and ins_type = ?
+		},
+
+	'selInsuranceGroupName' => qq{
+		select group_name
+			from insurance
+			where product_name = ?
+		},
+	'selPlanByInsIdAndRecordType' => qq{
+		select *
+			from insurance ins
+			where product_name = ?
+			and record_type = ?
+		},
+	'selInsuranceData' => qq{
+		select *
+			from Insurance
+			where ins_internal_id = ?
+		},
+	'selChildrenPlans' => qq{
+		select *
+			from Insurance
+			where parent_ins_id = ?
+		},
+	'selInsuranceAddr' => qq{
+		select line1 as addr_line1, line2 as addr_line2, city as addr_city,	state as addr_state,
+			zip as addr_zip, country as addr_country, item_id
+		from insurance_address
+		where parent_id = ? and address_name = 'Billing'
+		},
+	'selInsuranceAddrWithOutColNameChanges' => qq{
+		select line1, line2, city, state, zip, country
+		from insurance_address
+		where parent_id = ?
+			and address_name = 'Billing'
+		},
+	'selPayerChoicesByOwnerPersonId' => qq{
+		select plan_name, product_name, '2' as myorder
+			from insurance
+			where owner_person_id = ?
+				and record_type = 3
+				and bill_sequence != 99
+		UNION
+		(select '' as plan_name, '' as product_name, '1' as myorder
+			from dual)
+		UNION
+		(select 'Self-pay' as plan_name, '8888888888', '3' as myorder
+			from dual)
+		UNION
+		(select 'Client Billing' as plan_name, '7777777777', '4' as myorder
+			from dual)
+		UNION
+		(select 'Other Payer' as plan_name, '9999999999', '5' as myorder
+			from dual)
+		order by myorder
+		},
+	'selAllWorkCompByOwnerId' => qq{
+		select plan_name, product_name
+			from insurance
+			where owner_person_id = ?
+				and ins_type = 6
+		},
+	'selInsuranceByOwnerAndProductName' => qq{
+		select *
+			from insurance
+			where product_name = ?
+			and owner_person_id = ?
+		},
+	'selInsuranceByBillSequence' => qq{
+		select *
+			from insurance
+			where bill_sequence = ?
+				and owner_person_id = ?
+		},
+	'selInsuranceBillCaption' => qq{
+		select caption
+			from bill_sequence
+			where id = ?
+		},
+	'selInsurancePlanData' => qq{
+		select *
+			from insurance
+			where product_name = ?
+			and record_type in (?, ?, ?, ?)
+		},
+	'selInsuranceGroupName' => qq{
+		select group_name
+			from insurance
+			where product_name = ?
+		},
+	'selPersonPlanExists' => qq{
+		select product_name
+			from insurance
+			where product_name = ?
+			and record_type = ?
+			and owner_person_id = ?
+		},
+	'selInsuredRelationship' => qq{
+		select caption
+		from insured_relationship
+		where id = ?
+		},
+	'selNewPlanExists' => qq{
+		select product_name
+			from insurance
+			where product_name = ?
+		},
+	'selDoesPlanExists' => qq{
+		select ins_internal_id
+			from insurance
+			where product_name = ?
+		},
+	'selDoesPlanExistsForPerson' => qq{
+		select ins_internal_id
+			from insurance
+			where product_name = ?
+			and owner_person_id = ?
+		},
+	'selIsPlanUnique' => qq{
+		select ins_internal_id
+			from insurance
+			where product_name = ?
+			and record_type = ?
+		},
+	'selIsPlanWorkComp' => qq{
+		select ins_internal_id
+			from insurance
+			where product_name = ?
+			and ins_type = ?
+		},
+	#'selInsuranceEncounterDialog' => qq{
+		#select ins_internal_id, product_name, ins_type, copay_amt, bill_sequence,
+			#ins_org_id, group_name
+			#from insurance
+			#where bill_sequence = ?
+			#and owner_person_id = ?
+		#},
+
+	'selExistsPlanForPerson' => qq{
+		select ins_internal_id
+				from insurance
+				where ins_type = ?
+				and owner_person_id = ?
+		},
+	'selPersonInsurance' => qq{
+		select ins.ins_internal_id as ins_internal_id, ins.parent_ins_id as parent_ins_id, ins.ins_org_id as ins_org_id,
+				ins.ins_type as ins_type, ins.owner_person_id as owner_person_id, ins.group_name as group_name, ins.group_number as group_number,
+				ins.insured_id as insured_id, ins.member_number as member_number, ins.rel_to_insured as rel_to_insured,
+				ins.record_type as record_type, ins.extra as extra, ct.caption as claim_type
+				from insurance ins, claim_type ct
+			where ins.owner_person_id = ?
+				and ins.bill_sequence = ?
+				and ct.id = ins_type
+		},
+
+	'selPersonInsuranceId' => qq{
+			select *
+				from insurance
+				where ins_org_id = ?
+				and product_name = ?
+				 and ins_type = ?
+		},
+
+	'selPatientWorkersCompPlan' => qq{
+			select *
+			from insurance
+			where product_name = ?
+			and ins_type = 6
+		},
+	'selEmpExistPlan' => qq{
+			select  distinct ins.product_name
+				from person_attribute patt, insurance ins
+				where patt.parent_id = ?
+				and patt.value_type between 220 and 226
+				and patt.value_text = ins.ins_org_id
+				and ins.record_type = 6
+		},
+	'selInsuredRelation' => qq{
+			select  id, caption
+				from Insured_Relationship
+		},
+	'selPpoHmoIndicator' => qq{
+			select  caption, abbrev
+				from PPO_HMO_Indicator
+		},
+	'selInsTypeCode' => qq{
+			select  caption, abbrev
+				from insurance_type_code
+				where group_name = 'UI'
+		},
+	'selInsPlan' => qq{
+				select  *
+					from insurance
+					where product_name = ?
+					and plan_name = ?
+					and record_type = 2
+		},
+	#---------------------------------------------------------------------
+	'sel_Person_Insurance' => {
+		sqlStmt => qq{
+				select 	decode(bill_sequence,0,'Primary',1,'Secondary',2,'Tertiary',3,'Inactive','','W. Comp'),
+					plan_name, ins_org_id
+				from 	insurance
+				where 	owner_person_id = ?
+				order by coverage_end_date desc, bill_sequence
+				},
+		sqlStmtBindParamDescr => ['Person ID'],
+		publishDefn => {
+			columnDefn => [
+				{ head => 'billingSequence', dataFmt => '#&{?}#: #1# (#2#)' },
+			],
+		},
+		publishDefn_panel =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel',
+			frame => { heading => 'Health Coverage' },
+		},
+		publishDefn_panelEdit =>
+		{
+			# automatically inherites columnDefn and other items from publishDefn
+			style => 'panel.edit',
+			frame => { heading => 'Health Coverage' },
+			banner => {
+				actionRows =>
+				[
+					{ caption => 'Hello #session.user_id#', url => 'test' },
+				],
+			},
+			stdIcons =>	{
+				updUrlFmt => 'dlg-update-person-address/#0#', delUrlFmt => 'dlg-remove-person-address/#0#',
+			},
+		},
+
+	}
+);
+
+1;

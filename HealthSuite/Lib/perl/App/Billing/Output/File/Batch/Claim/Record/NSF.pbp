@@ -1,0 +1,14 @@
+[Settings]
+script=C:\ActivePerl\lib\App\Billing\Output\File\Batch\Claim\Record\NSF.pm
+args=
+pathinfo=
+exec_dir=C:\ActivePerl\lib\App\Billing\Output\File\Batch\Claim\Record
+itype=0
+
+[Wizard]
+form=
+errout=
+dout=
+rout=
+parse=0
+out=0

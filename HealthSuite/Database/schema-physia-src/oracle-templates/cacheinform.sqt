@@ -1,0 +1,55 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates SQL code specific to tables that have cache
+	# references of type "inform". It simply checks to see if such columns
+	# exist, and if so calls a global procedure of the form pkg_Cache.upd<tablename>
+	# where <tablename> is the table to inform of a cache update. Note that
+	# pkg_Cache.upd<tablename> will only be called if the column's value changes.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};	
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+	
+	my $firstPriKey = $table->{colsByGroup}->{_primaryKeys}->[0];
+	foreach my $col (@{$table->{colsInOrder}})
+	{
+		# don't bother with columns that have no cacherefs
+		next if ! $col->{cacheRefs};
+
+		# now see if there are any "inform" type cacherefs
+		my @updates = ();
+		foreach my $cacheref (@{$col->{cacheRefs}})
+		{
+			my ($type, $ref) = split(/:/, $cacheref);
+			next if $type ne 'inform' && $type ne 'copy';
+
+			warn "$tableName->$templNameFull can't handle multiple primary keys yet."
+				unless scalar(@{$table->{colsByGroup}->{_primaryKeys}}) == 1;
+
+			my ($fTable, $fCol) = split(/\./, $ref);
+			push(@updates, "	pkg_Cache.update$fTable('$type', '\L$fCol\E', '\L$tableName\E', '\L$col->{name}\E', :new.$firstPriKey->{name}, :new.$col->{name});");
+		}
+
+		if(@updates)
+		{
+			$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => $col->{name},
+				time => 'after', action => 'update',
+				code => 
+				[
+					"if :new.$col->{name} != :old.$col->{name} then",
+					@updates,
+					"end if;",
+				]);
+		}
+	}
+}
+

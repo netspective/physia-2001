@@ -1,0 +1,535 @@
+<?xml version="1.0"?>
+<!DOCTYPE schema SYSTEM "schema-markup.dtd">
+
+<schema name="physia">
+	<include file="datatypes.xml"/>
+	<include file="enums.xml"/>
+	<include file="lookups.xml"/>
+	<include file="typedefs.xml"/>
+	<include file="typedef-attribute.xml"/>
+
+	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
+		<description>A person, such as a doctor, a nurse, a receptionist, or a patient</description>
+		<column name="person_id" type="entity_id" primarykey="yes" descr="Unique ID for a person (in our system)"/>
+		<column name="person_ref" type="text" size="32" descr="A reference account number/id (in the user's system)"/>
+		<column name="ssn" type="socsec" descr="Social Security number"/>
+		<column name="name_prefix" type="text" size="16"/>
+		<column name="name_first" type="text" required="yes" size="32"/>
+		<column name="name_middle" type="text" size="32"/>
+		<column name="name_last" type="text" required="yes" size="32"/>
+		<column name="name_suffix" type="text" size="16"/>
+		<column name="short_name" type="text" calc="trigger" size="42" descr="[first letter of name_first] [name_last]"/>
+		<column name="simple_name" type="text" calc="trigger" size="96" descr="[name_first] [name_last]"/>
+		<column name="complete_name" type="text" calc="trigger" size="128" descr="[name_prefix] [name_first] [name_middle] [name_last] [name_suffix]"/>
+		<column name="short_sortable_name" type="text" calc="trigger" size="42" descr="[name_last], [first letter of name_first]"/>
+		<column name="complete_sortable_name" type="text" calc="trigger" size="128" descr="[name_last], [name_first] [name_middle]"/>
+		<column name="gender" lookupref="Gender" default="0" descr="Gender"/>
+		<column name="marital_status" lookupref="Marital_Status" default="0" descr="Marital status"/>
+		<column name="date_of_birth" type="date" descr="Date of Birth"/>
+		<column name="age" type="integer" descr="Actual age (only required if date_of_birth is NULL or not known)"/>
+		<column name="ethnicity" type="text_set" descr="The primary/secondary ethnicity or race [comma-separated if more than one]"/>
+		<column name="language" type="text_set" descr="Language(s) a person speaks [comma-separated if more than one]"/>
+		<column name="language2" type="lookup_set" lookupsetref="Gender" descr="Language(s) a person speaks [comma-separated if more than one]"/>
+		<column name="login_type" lookupref="Login_Type" descr="The login information for this person">
+			<table name="$parenttbl_name$_Login" abbrev="$parenttbl_abbrev$Lgi" type="Audit,Secure">
+				<column name="person_id" parentref="$parenttbl_name$.$parenttbl_prikey$" uniquegrp="orgperson" indexed="yes" descr="The person for whom login information is specified"/>
+				<column name="org_id" lookupref="Org.org_id" indexed="yes" uniquegrp="orgperson" descr="The organization for which login information is supplied"/>
+				<column name="password" type="text" size="16" descr="The login password"/>
+				<column name="quantity" type="integer" default="1" descr="The number of times login is allowed from different sessions"/>
+			</table>
+		</column>
+	</table>
+
+	<table name="Person_Session" abbrev="PerSess">
+		<description>An active session of a user connected to the application</description>
+		<column name="session_id" type="session_id" primarykey="yes" descr="An application-generated unique session ID"/>
+		<column name="status" lookupref="Session_Status.id" required="yes" default="0" descr="The current status of the session (0:active, 1:inactive, etc)"/>
+		<column name="person_id" parentref="Person.person_id" required="yes" descr="The ID of the person that owns the session"/>
+		<column name="org_id" lookupref="Org.org_id" descr="The organization (if any) from where session is being used"/>
+		<column name="remote_host" type="text" size="128" descr="Remote host information that should be stored for security purposes"/>
+		<column name="remote_addr" type="text" size="32" required="yes" descr="Remote address information that should be kept for security purposes"/>
+		<column name="first_access" type="stamp" required="yes" default="sysdate" descr="The first known time the session was access/used"/>
+		<column name="last_access" type="stamp" required="yes" descr="The last known time the session was accessed/used"/>
+		<column name="session_data_size" type="longint" descr="The size (in bytes) of the arbitrary session data"/>
+		<column name="session_data" type="datablock" descr="Any arbitrary session-specific data."/>
+	</table>
+
+	<table name="PerSess_Activity" abbrev="SesAct">
+		<description>All the activities undertaken by a user during a session</description>
+		<column name="session_id" parentref="Person_Session.session_id" indexed="yes" descr="The session ID for the activity"/>
+		<column name="activity_type" lookupref="Session_Activity_Type" required="yes" descr="The type of activity undertaken"/>
+		<column name="activity_stamp" type="stamp" required="yes" default="sysdate" descr="The date/time the activity was undertaken"/>
+		<column name="action_type" lookupref="Session_Action_Type" required="yes" descr="The type of action undertaken"/>
+		<column name="action_scope" type="text" size="48" descr="The general scope of the change (for showing a menu, etc) -- like person, org, etc."/>
+		<column name="action_key" type="text" size="48" descr="The key for the record/thing that was the focus of the activity"/>
+		<column name="detail_level" type="integer" indexed="yes" descr="The level of detail (zero is highest level -- for viewing/sorting purposes where user may only want to see 'high-level' activities)"/>
+		<column name="activity_data" type="text" size="1024" descr="Any activity-specific data (to show to end user)"/>
+	</table>
+
+	<table name="Org" type="Audit,Secure,Restrict_Rows">
+		<description>An organization, such as a physician's private practice, a hospital, or an insurance company</description>
+		<column name="org_id" type="entity_id" primarykey="yes" descr="Unique ID for company or organization"/>
+		<column name="parent_org_id" selfref="org.org_id" descr="ID for parent organization"/>
+		<column name="category" type="text_set" descr="Type(s) of organization [comma-separated if more than one]"/>
+		<column name="tax_id" type="text" descr="Tax ID"/>
+		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
+		<column name="name_trade" type="text" size="128" descr="Trade name of organization"/>
+		<column name="time_zone" type="text" size="6" descr="Time zone that the organization operates in"/>
+	</table>
+
+	<table name="Person_Org_Category" abbrev="PerOCatg" type="Audit,Secure">
+		<description>The category to which a person belongs for a particular organization</description>
+		<column name="person_id" parentref="Person.person_id" primarykey="yes" descr="Unique ID for person"/>
+		<column name="org_id" parentref="Org.org_id" primarykey="yes" descr="Unique ID for company or organization"/>
+		<column name="category" type="text" size="32" descr="The category to which person belongs"/>
+	</table>
+
+	<table name="Insurance" abbrev="InsRec" type="Audit,Secure,Restrict_Rows">
+		<description>An insurance record that belongs to a person or organization</description>
+		<column name="ins_internal_id" type="autoinc" primarykey="yes" descr="Unique insurance record identification (in entire system) for internal use"/>
+		<column name="product_name" type="entity_id" descr="The ID given to an insurance product (by an end-user)"/>
+		<column name="record_type" lookupref="Insurance_Record_Type" descr="The type of information held in this record"/>
+		<column name="parent_ins_id" lookupref="Insurance.ins_internal_id" descr="If this record was 'inherited' from an existing record, then this is the original record id (otherwise NULL)"/>
+		<column name="owner_person_id" lookupref="Person.person_id" descr="The person for whom the insurance coverage information is being defined (NULL if not a coverage record)"/>
+		<column name="owner_org_id" lookupref="Org.org_Id" descr="The provider org for whom the insurance product/plan/coverage information is being defined"/>
+		<column name="ins_org_id" lookupref="Org.org_Id" descr="Organization policy is under (insurance firm) -- NULL if not constrained"/>
+		<column name="employer_org_id" lookupref="Org.org_Id" descr="The employer's org id, if any"/>
+		<column name="ins_type" lookupref="Claim_Type" required="yes" descr="Insurance group/policy type"/>
+		<column name="plan_name" type="text" size="64" descr="Name of the plan"/>
+		<column name="policy_number" type="text" size="32" descr="Policy number (if applicable)"/>
+		<column name="group_number" type="text" size="32" descr="Group number (if record_type is group)"/>
+		<column name="group_name" type="text" size="32" descr="Group name (if record_type is group)"/>
+		<column name="member_number" type="text" size="32" descr="Member number (if applicable, mainly for Person Plan)"/>
+		<column name="indiv_deductible_amt" type="currency" descr="Individual person deductable amount"/>
+		<column name="family_deductible_amt" type="currency" descr="Family deductable amount"/>
+		<column name="indiv_deduct_remain" type="currency" descr="The amount of deductible remaining in (individual)"/>
+		<column name="family_deduct_remain" type="currency" descr="The amount of deductible remaining in (family)"/>
+		<column name="percentage_pay" type="percentage" descr="Percentage of bill paid by insurance company until annual usage reaches threshhold"/>
+		<column name="threshold" type="currency" descr="Dollar amount after which insurance company pays 100% of the bill"/>
+		<column name="copay_amt" type="currency" descr="Co-pay amount"/>
+		<column name="coverage" type="duration" descr="Date range group policy was active"/>
+		<column name="bill_sequence" lookupref="Bill_Sequence" descr="Primary, secondary, or tertiary insurance (if record type is person plan)"/>
+		<column name="insured" type="entity" descr="ID of person on the policy (if record type is person plan)"/>
+		<column name="insured_name" type="text" size="64" descr="Name of insured party (trigger-filled if insured_id is NOT NULL, otherwise fill it appropriately)"/>
+		<column name="rel_to_insured" lookupref="Insured_Relationship.id" descr="Relationship to insured party (from Insured_Relationship lookup)"/>
+		<column name="guarantor" type="entity" descr="ID of guarantor (if record type is person plan)"/>
+		<column name="guarantor_name" type="text" size="64" descr="Name of guarantor (trigger-filled if guarantor_id is NOT NULL, otherwise fill it appropriately)"/>
+		<column name="rel_to_guarantor" lookupref="Insured_Relationship.id" descr="Relationship to insured party (from Insured_Relationship lookup)"/>
+		<column name="remit_type" lookupref="Bill_Remittance_Type" descr="How the bill is transmitted (paper, electronic, etc)"/>
+		<column name="remit_payer_id" type="text" size="64" descr="The id (if required) for this insurance plan/group for electronic remittance"/>
+		<column name="remit_payer_name" type="text" size="256" descr="The name given to the primary remittance id record"/>
+		<column name="extra" type="text" size="512" descr="Any extra information needed for insurance record"/>
+	</table>
+
+	<table name="Event" abbrev="Event" type="Audit,Secure,Restrict_Rows">
+		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
+		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
+		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
+		<column name="owner_id" parentref="Org.org_id" required="yes" descr="The owning organization with which event was made"/>
+		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
+		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
+		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
+		<column name="facility_id" lookupref="Org.org_id" descr="The location where the event will take place"/>
+		<column name="start_time" type="stamp" required="yes" descr="The starting time of the event"/>
+		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
+		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
+		<column name="scheduled_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="scheduled_stamp" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
+		<column name="checkin_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="checkin_stamp" type="stamp" descr="The date/time when the patient was checked in"/>
+		<column name="checkout_by_id" lookupref="Person.person_id" descr="The person who checked the patient out"/>
+		<column name="checkout_stamp" type="stamp" descr="The date/time when the patient was checked out"/>
+		<column name="discard_type" lookupref="Appt_Discard_Type" descr="The type of discard (cancel, no-show, etc)"/>
+		<column name="discard_by_id" lookupref="Person.person_id" descr="The person (employee) who cancelled, no-showed, or rescheduled"/>
+		<column name="discard_stamp" type="stamp" descr="The date/time when the event was cancelled, no-showed, or rescheduled"/>
+		<column name="discard_remarks" type="text" size="512" descr="Any remarks for cancellation/noshow, etc"/>
+	</table>
+
+	<table name="Resource_Item" abbrev="Res" type="Audit,Secure,Restrict_Rows">
+		<description>A specific physical resource such as the blue room or the new EKG, which may be linked to another resource item</description>
+		<column name="resource_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific resource"/>
+		<column name="parent_id" selfref="resource_item.resource_id" descr="Parent Resource, if any"/>
+		<column name="owner_id" parentref="Org.org_id" required="yes" descr="The organization which owns the resource"/>
+		<column name="resource_type" lookupref="Resource_Type" required="yes" descr="The type of resource (based on a lookup)"/>
+		<column name="status" type="boolean" required="yes" descr="The status of the resource, as in Active or Inactive"/>
+		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the resource"/>
+		<column name="provider_id" lookupref="Person.person_id" descr="The provider primarily associated with the resource"/>
+		<column name="facility_id" lookupref="Org.org_id" descr="The location where the resource is housed"/>
+		<column name="duration" type="integer" required="yes" descr="The normal duration of a single use of the resource"/>
+		<column name="portable" type="boolean" required="yes" descr="Can the resource be move from room to room within the facility"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the resource"/>
+	</table>
+
+	<table name="Template" abbrev="Templ" type="Audit,Secure,Restrict_Rows">
+		<description>A predefined block of time during which a resource is available or unavailable for scheduling events</description>
+		<column name="template_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific template"/>
+		<!--	<column name="attendee" type="entity" required="yes" descr="Resource/Person to which template applies"/> 	-->
+		<column name="r_ids" type="text_set" required="yes" descr="Resource/Person(s) to which template applies"/>
+		<column name="status" required="yes" type="boolean" descr="Should this template time block be considered active?"/>
+		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the template"/>
+		<column name="effective_begin_date" type="date" descr="The effective start date this template"/>
+		<column name="effective_end_date" type="date" descr="The effective end date for this template"/>
+		<column name="start_time" type="time" descr="The start time"/>
+		<column name="end_time" type="time" descr="The end time"/>
+		<column name="available" type="boolean" required="yes" descr="Is this time block Available or Unavailable for scheduling events?"/>
+		<column name="facility_id" lookupref="Org.org_id" descr="The location to which the time block applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="patient_types" type="text_set" size="16" abbrev="ptypes" descr="Limit this template to particular type of patient(s) -- should be one or more comma-separated items enums in Appt_Attendee_Type table"/>
+		<column name="visit_types" type="text_set" size="64" abbrev="vtypes" descr="Limit this template to particular type of visit(s) -- should be one or more comma-separated Visit-Type items enums in Transaction_Type table"/>
+		<column name="days_of_month" type="text" abbrev="dom" descr="Days-of-Month specification (cron style)"/>
+		<column name="months" type="text" descr="Months specification (cron style)"/>
+		<column name="days_of_week" type="text" abbrev="dow" descr="Weekday specification (cron style)"/>
+		<column name="preferences" type="text" size="1024" descr="Any preferences noted by Physician regarding scheduling during this block of time"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the template"/>
+	</table>
+
+	<table name="Appt_Type" abbrev="ApType" parent="Reference_Item" type="Audit,Secure,Restrict_Rows">
+		<description>Appointment Type.  A template for appointments.</description>
+		<column name="appt_type_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Appt Type"/>
+		<column name="r_ids" type="text_set" required="yes" descr="Resource(s) to which the Appt Type applies"/>
+		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the Appt Type"/>
+		<column name="effective_begin_date" type="date" descr="The effective start date this Appt Type"/>
+		<column name="effective_end_date" type="date" descr="The effective end date for this Appt TYpe"/>
+		<column name="facility_id" lookupref="Org.org_id" descr="The location to which the Appt Type applies, e.g. Office, Clinic, or Hospital"/>
+		<column name="duration" type="integer" required="yes" descr="The duration of the appointment in minutes"/>
+	</table>
+
+	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">
+		<description>A business action between an organization and a person, which includes details about the person at that point in time, and which may be linked to another transaction</description>
+		<column name="trans_id" type="autoinc" primarykey="yes" descr="Uniqe ID for a specific transaction"/>
+		<column name="trans_owner" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
+		<column name="parent_event_id" indexed="yes" lookupref="Event.event_id" descr="Any parent event (like an appointment) that this transaction may belong to (as a child)"/>
+		<column name="parent_trans_id" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
+		<column name="trans_type" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
+		<column name="trans_subtype" type="text" descr="Any other type information specific to Trans_Type"/>
+		<column name="trans_status" lookupref="Transaction_Status.id" required="yes" default="0" descr="The current status of this transaction (inactive, active, other, etc)"/>
+		<column name="trans_status_reason" type="text" size="128" descr="The reason the transaction is in its current status"/>
+		<column name="trans_substatus" type="longint" descr="The current status of this transaction (varies depending upon subtype)"/>
+		<column name="trans_substatus_reason" type="text" size="128" descr="The reason the transaction is in its current status (varies depending upon subtype)"/>
+		<column name="caption" type="text" size="128" descr="Freeform text explanation of transaction (summary)"/>
+		<column name="detail" type="text" size="512" descr="Freeform text explanation of transaction (detail)"/>
+		<column name="code" type="text" size="32" descr="If transaction is a diagnosis, this is an ICD-9, if procedure then it is a CPT"/>
+		<column name="modifier" type="text" size="32" descr="Any modifier code (needed for CPTs if transaction is a procedure)"/>
+		<column name="billing_facility_id" lookupref="org.org_id" descr="Facility where billing should be tracked"/>
+		<column name="service_facility_id" lookupref="org.org_id" descr="Facility where transaction took place"/>
+		<column name="provider_id" lookupref="person.person_id" descr="Person performing transaction for billing and care purposes"/>
+		<column name="care_provider_id" lookupref="person.person_id" descr="Person performing transaction (as a care giver if billing provider is different)"/>
+		<column name="consult_id" lookupref="person.person_id" descr="Person performing transaction (as a consultant)"/>
+		<column name="initiator" type="entity" descr="Entity initiating transaction"/>
+		<column name="processor" type="entity" descr="Entity processing the transaction"/>
+		<column name="receiver" type="entity" descr="Entity receiving transaction"/>
+		<column name="trans_seq" type="integer" descr="If this transaction needs to be ordered under its parent, this is the sequence (used for sequencing ICD/CPT codes)"/>
+		<column name="bill_type" lookupref="Claim_Type" descr="Type of insurance plan: self-pay, Medicare, Medicaid, Workers Compensation"/>
+		<column name="unit_cost" type="currency" descr="Billable charge for this transaction/procedure"/>
+		<column name="quantity" type="integer" descr="Quantity needed of transaction"/>
+		<column name="related_to" lookupref="Trans_Related_To" descr="What source is this transaction related to?"/>
+		<column name="related_data" type="text" size="64" descr="Any additional data need for related_to field"/>
+		<column name="auth_by" type="text" size="128" descr="Person/Group that authorized this transaction"/>
+		<column name="auth_ref" type="text" size="32" descr="The actual authorization number of the tranaction"/>
+		<column name="auth_date" type="date" descr="Date authorization took place"/>
+		<column name="auth_expire" type="date" descr="Date authorization expires"/>
+		<column name="curr_onset_date" type="date" descr="Refers to the date of the first symptom of the patient's current illness (needed for some items like the chief complaint -- Box 14 of 1500)"/>
+		<column name="init_onset_date" type="date" descr="Refers to the date a patient had the same or similar illness (if any) (needed for some items like the chief complaint -- Box 15 of 1500)"/>
+		<column name="trans" type="stamp_range" descr="Time stamp range"/>
+		<column name="trans_expire" type="date" descr="Date that the transaction entire should expire (type dependant)"/>
+		<column name="trans_expire_reason" type="text" size="128" descr="The reason the transaction should expire on given date"/>
+		<column name="data_text_a" type="text" size="512" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_text_b" type="text" size="512" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_text_c" type="text" size="512" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_flag_a" type="boolean" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_flag_b" type="boolean" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_flag_c" type="boolean" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_num_a" type="float" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_num_b" type="float" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_num_c" type="float" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_date_a" type="date" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_date_b" type="date" descr="Extra data, dependent upon transaction type"/>
+		<column name="data_date_c" type="date" descr="Extra data, dependent upon transaction type"/>
+		<column name="display_summary" type="text" size="1024" descr="Text to display for this transaction in a summary view (derived)"/>
+	</table>
+
+	<table name="Offering_Catalog" abbrev="OffCat" type="Audit,Secure,Restrict_Rows">
+		<description>
+			Product, service, and other offerings including pricing.
+			Contains fee schedules, products list, service codes, and other items that can go onto an invoice.
+		</description>
+		<column name="catalog_id" type="text" size="32" primarykey="yes" descr="Unique name for the catalog (user-defined)"/>
+		<column name="caption" type="text" size="64" required="yes" descr="Quick overview of the catalog"/>
+		<column name="catalog_type" lookupref="Offering_Catalog_Type" descr="The type of information held in this record"/>
+		<column name="org_id" lookupref="Org.org_id" descr="The entity that owns the catalog"/>
+		<column name="parent_catalog_id" selfref="Offering_Catalog.catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
+		<column name="description" type="text" size="1024" descr="Detailed description of the catalog"/>
+	</table>
+
+	<table name="Offering_Catalog_Entry" abbrev="OCatEnt" type="Audit,Secure">
+		<description>Contains the actual entries in a product, service, or other catalog (like fees, repricing information, etc).</description>
+		<column name="catalog_id" parentref="Offering_Catalog.catalog_id" descr="The catalog to which entry belongs"/>
+		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
+		<column name="parent_entry_id" selfref="Offering_Catalog_Entry.entry_id" indexed="yes" descr="If this item is a child of another item (like a group)"/>
+		<column name="entry_type" lookupref="Catalog_Entry_Type" indexed="yes" descr="The type of item (procedure, service, product, etc)"/>
+		<column name="flags" type="longint" default="0" descr="Any item-specific bitmask flags (see source code)"/>
+		<column name="status" lookupref="Catalog_Entry_Status" descr="The status of this catalog item"/>
+		<column name="code" type="text" size="32" indexed="yes" descr="The item code, CPT code, or other identifer"/>
+		<column name="modifier" type="text" size="32" indexed="yes" descr="Any item-specific code modifier"/>
+		<column name="name" type="text" size="64" descr="The item name, alternate CPT text, or other unique information (overrides REF_CPT, REF_ICD, REF_HCPCS if not null)"/>
+		<column name="default_units" type="integer" default="1" descr="The default number of units to count for this item"/>
+		<column name="cost_type" lookupref="Catalog_Entry_Cost_Type" required="yes" default="0" descr="The manner in which the cost is provided (actual, percentage, etc)"/>
+		<column name="cost_rel" type="text" descr="If the cost is related to something else, this is the 'something else'"/>
+		<column name="unit_cost" type="currency" descr="The cost per unit of this item (either a calculated value or a specific amount)"/>
+		<column name="description" type="text" size="1024" descr="The description of the item (overrides REF_CPT, REF_ICD, REF_HCPCS if not null)"/>
+		<column name="taxable" type="boolean" descr="Whether or not the item is taxed"/>
+		<column name="units_avail" type="longint" descr="The number of units on-hand (if it's an inventory item)"/>
+		<column name="data_text" type="text" size="64" descr="Any extra data needed for this item"/>
+		<column name="data_num" type="float" descr="Any extra data needed for this item"/>
+		<column name="data_date" type="date" descr="Any extra data needed for this item"/>
+	</table>
+
+	<table name="Offering_CatEntry_Price" abbrev="OCEntPr" type="Audit,Secure">
+		<description>If pricing of a catalog entry is dependent upon locality, zip code, etc. then this table contains that information.</description>
+		<column name="price_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
+		<column name="entry_id" parentref="Offering_Catalog_Entry.entry_id" descr="The catalog entry for which price information is provided"/>
+		<column name="flags" type="longint" default="0" descr="Any item-specific bitmask flags (see source code)"/>
+		<column name="cost_type" lookupref="Catalog_Entry_Cost_Type" required="yes" default="0" descr="The manner in which the cost is provided (actual, percentage, etc)"/>
+		<column name="cost_rule" type="text" size="64" descr="depends upon cost_type, but can be county, state, zip code, or other location information (or some other rule entirely)"/>
+		<column name="cost_rel" type="text" descr="If the cost is related to something else, this is the 'something else'"/>
+		<column name="unit_cost" type="currency" descr="The cost per unit of this item (either a calculated value or a specific amount)"/>
+		<column name="taxable" type="boolean" descr="Whether or not the item is taxed"/>
+	</table>
+
+	<table name="Invoice" type="Audit,Secure,Restrict_Rows">
+		<description>A bill for services rendered, usually associated with an appointment</description>
+		<column name="invoice_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice"/>
+		<column name="invoice_number" type="text" size="32" descr="The owner's specific invoice number (their format)"/>
+		<column name="invoice_status" lookupref="Invoice_Status" descr="The current status of the invoice"/>
+		<column name="invoice_type" lookupref="Invoice_Type" descr="The type of invoice"/>
+		<column name="invoice_subtype" type="integer" descr="The subtype of invoice (depending upon the type)"/>
+		<column name="invoice_date" type="date" required="yes" descr="The date the invoice was created"/>
+		<column name="submit_date" type="date" descr="The date the invoice was submitted"/>
+		<column name="flags" type="longint" default="0" descr="Any invoice-specific bitmask flags (see source code)"/>
+		<column name="claim_diags" type="text_set" abbrev="diag" descr="All ICD-9 codes for a claim"/>
+		<column name="reference" type="text" size="32" descr="Any specific reference identifier given by user/submitter"/>
+		<column name="submitter_id" lookupref="person.person_id" required="yes" descr="The person who is creating/submitting the invoice"/>
+		<column name="main_transaction" indexed="yes" parentref="transaction.trans_id" required="yes" descr="The identifier of the main transaction that the invoice is being created for"/>
+		<column name="owner" type="entity" descr="Information about which entity is creating/sending the invoice (sender)"/>
+		<column name="client" type="entity" descr="Information about which entity that received the products/service"/>
+		<column name="total_cost" type="currency" calc="trigger" descr="The total cost of the invoice (maintained automatically)"/>
+		<column name="total_items" type="integer" calc="trigger" descr="The total number of items (minus 'phantom' adjustment items) in the invoice"/>
+		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice"/>
+		<column name="balance" type="currency" calc="trigger" descr="The total_cost - total_adjust (maintained automatically)"/>
+		<column name="data_text_a" type="text" size="128" descr="Extra data"/>
+		<column name="data_text_b" type="text" size="128" descr="Extra data"/>
+		<column name="data_text_c" type="text" size="128" descr="Extra data"/>
+	</table>
+
+	<table name="Invoice_Item" abbrev="InvItem" type="Audit,Secure,">
+		<description>An individual line item on a invoice</description>
+		<column name="item_id" type="autoinc" primarykey="yes" descr="Unique ID for specific invoice line item record"/>
+		<column name="parent_id" parentref="Invoice.invoice_id" descr="The parent Invoice"/>
+		<column name="item_type" lookupref="Inv_Item_Type" descr="The primary item type"/>
+		<column name="item_subtype" type="integer" descr="Secondary information about the item type (perhaps describing some attributes)"/>
+		<column name="parent_item_id" selfref="Invoice_Item.item_id" descr="The parent item ID, if a parent-child relationship is required"/>
+		<column name="item_group" type="text" size="64" descr="If multiple items are to be grouped, this is the group name the item belongs in"/>
+		<column name="item_group_pos" type="integer" descr="If multiple items are to be grouped, this is the position within its group that it belongs in (sort key)"/>
+		<column name="hcfa_service_place" lookupref="HCFA1500_Service_Place_Code" descr="HCFA code for where service took place"/>
+		<column name="hcfa_service_type" lookupref="HCFA1500_Service_Type_Code" descr="HCFA code for what service took place"/>
+		<column name="other_service_place" type="text" size="255" descr="If the hcfa_service_place is not descriptive enough, this further describes place of service"/>
+		<column name="service" type="duration" descr="For HCFA 1500, the service start/end date(s)"/>
+		<column name="flags" type="longint" default="0" descr="Any item-specific bitmask flags (see source code)"/>
+		<column name="emergency" type="boolean" descr="True if this item was an emergency service item"/>
+		<column name="caption" type="text" size="96" descr="The description that should be shown on the invoice/bill"/>
+		<column name="code" type="text" size="32" descr="Usually a CPT code or code for the service/product"/>
+		<column name="modifier" type="text" size="32" descr="HCFA code for any special modifier to 'code' column"/>
+		<column name="other_modifier" type="text" size="32" descr="CPT or other code modifier"/>
+		<column name="unit_cost" type="currency" descr="Billable charge for this transaction/procedure"/>
+		<column name="quantity" type="integer" descr="Quantity needed of transaction"/>
+		<column name="extended_cost" type="currency" descr="Total cost for this charge/transaction (usually unit_cost * quantity)"/>
+		<column name="writeoff_code" type="text" size="32" descr="Any writeoffs' codes"/>
+		<column name="writeoff_amount" type="currency" descr="Any writeoffs' amounts"/>
+		<column name="rel_diags" type="text" size="255" descr="Related diagnosis codes (comma-separated)"/>
+		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice item (maintained automatically)"/>
+		<column name="balance" type="currency" calc="trigger" descr="The extended_cost - total_adjust (maintained automatically)"/>
+		<column name="reference" type="text" size="128" descr="Stores arbitrary reference information (like insurance information)"/>
+		<column name="comments" type="text" size="512" descr="General comments from the user"/>
+
+		<column name="data_text_a" type="text" size="64" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_text_b" type="text" size="64" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_text_c" type="text" size="64" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_flag_a" type="boolean" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_flag_b" type="boolean" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_flag_c" type="boolean" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_num_a" type="float" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_num_b" type="float" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_num_c" type="float" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_date_a" type="date" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_date_b" type="date" descr="Extra data, dependent upon invoice item type"/>
+		<column name="data_date_c" type="date" descr="Extra data, dependent upon invoice item type"/>
+	</table>
+
+	<table name="Invoice_Billing" abbrev="InvBill" type="Audit,Secure">
+		<column name="bill_id" type="autoinc" primarykey="yes" descr="Unique billing identifier"/>
+		<column name="invoice_id" lookupref="Invoice.invoice_id" required="yes" descr="The invoice item for which billing information is being defined"/>
+		<column name="invoice_item_id" lookupref="Invoice_Item.item_id" descr="The invoice item for which billing information is being defined (if needed)"/>
+		<column name="assoc_bill_id" lookupref="Invoice_billing.bill_id" descr="Associated parent bill_id (if any)"/>
+		<column name="bill_sequence" lookupref="Bill_Sequence" descr="Primary, secondary, or tertiary insurance (if record type is person plan)"/>
+		<column name="bill_party_type" lookupref="Invoice_Bill_Party_Type" required="yes" descr="The party that should be billed for this item"/>
+		<column name="bill_to_id" type="text" size="32" descr="The ID of the person or organization being billed"/>
+		<column name="bill_ins_id" lookupref="Insurance.ins_internal_id" descr="Internal insurance ID for insurance org (if billing an insurance)"/>
+		<column name="bill_amount" type="currency" descr="The amount of the total invoice to bill to this party"/>
+		<column name="bill_pct" type="percentage" descr="The percentage of the total invoice being billed to this party"/>
+		<column name="bill_date" type="date" descr="Date bill was sent"/>
+		<column name="bill_status" type="text" size="128" descr="Status of the latest bill"/>
+		<column name="bill_result" type="text" size="128" descr="Result of the latest bill"/>
+	</table>
+
+	<table name="Invoice_Item_Adjust" abbrev="InvItmAdj" type="Audit,Secure">
+		<description>An adjustment to an invoice item, such as a payment, discount, or write-off</description>
+		<column name="adjustment_id" type="autoinc" primarykey="yes" descr="Uniqe ID for specific adjustment record"/>
+		<column name="adjustment_type" lookupref="Adjust_Method" descr="The type of adjustment"/>
+		<column name="adjustment_amount" type="currency" descr="The actual amount paid"/>
+		<column name="bill_id" lookupref="Invoice_Billing.bill_id" descr="The billing record if adjustment is being made in response to a bill"/>
+		<column name="flags" type="longint" default="0" descr="Any adjustment-specific bitmask flags (see source code)"/>
+		<column name="payer" type="entity" descr="Person/organization/entity making the payment(s)"/>
+		<column name="parent_id" parentref="Invoice_Item.item_id" descr="The charge for which the adjustment is being made"/>
+		<column name="plan_allow" type="currency" descr="Total that health plan will allow"/>
+		<column name="plan_paid" type="currency" descr="Total that health plan paid"/>
+		<column name="deductible" type="currency" descr="Total that applied towards deductible"/>
+		<column name="copay" type="currency" descr="Total co-pay provided"/>
+		<column name="submit_date" type="date" descr="Date charges were submitted"/>
+		<column name="pay_date" type="date" descr="Date payment provided"/>
+		<column name="pay_type" lookupref="Payment_Type" descr="The type of payment"/>
+		<column name="pay_method" lookupref="Payment_Method" descr="The method of payment"/>
+		<column name="pay_ref" type="text" size="128" descr="Any reference text that goes with pmt type (card #, check #)"/>
+		<column name="writeoff_code" type="text" size="32" descr="Any writeoffs' codes"/>
+		<column name="writeoff_amount" type="currency" descr="Any writeoffs' amounts"/>
+		<column name="adjust_codes" type="text" size="32" descr="Adjustment code(s)"/>
+		<column name="net_adjust" type="currency" calc="trigger" descr="The real adjustment (taking into account writeoff, payment, etc. maintained automatically)"/>
+		<column name="comments" type="text" size="512" descr="General comments for the adjustment"/>
+		<column name="data_text_a" type="text" size="64" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_text_b" type="text" size="64" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_text_c" type="text" size="64" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_flag_a" type="boolean" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_flag_b" type="boolean" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_flag_c" type="boolean" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_num_a" type="float" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_num_b" type="float" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_num_c" type="float" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_date_a" type="date" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_date_b" type="date" descr="Extra data, dependent upon adjustment type"/>
+		<column name="data_date_c" type="date" descr="Extra data, dependent upon adjustment type"/>
+	</table>
+
+	<table name="Person_Address" abbrev="PerAddr" type="Address">
+		<param name="parentref">person.person_id</param>
+	</table>
+	<table name="Org_Address" abbrev="OrgAddr" type="Address">
+		<param name="parentref">org.org_id</param>
+	</table>
+	<table name="Invoice_Address" abbrev="InvAddr" type="Address">
+		<param name="parentref">invoice.invoice_id</param>
+	</table>
+	<table name="Insurance_Address" abbrev="InsAddr" type="Address">
+		<param name="parentref">insurance.ins_internal_id</param>
+	</table>
+
+	<table name="Person_Attribute" abbrev="PerAttr" type="Attribute">
+		<param name="parentref">Person.person_id</param>
+		<column name="parent_org_id" lookupref="Org.org_id" indexed="yes" descr="When an attribute applies only to a person in a particular organization, this is that organization's id (NULL if the attribute belongs to a person in any organization)"/>
+	</table>
+	<table name="Person_Data_Block" abbrev="PerDtaBlk" type="Data_Block">
+		<param name="parentref">person.person_id</param>
+	</table>
+	<table name="Org_Attribute" abbrev="OrgAttr" type="Attribute">
+		<param name="parentref">Org.org_id</param>
+	</table>
+	<table name="Insurance_Attribute" abbrev="InsAttr" type="Attribute">
+		<param name="parentref">Insurance.ins_internal_id</param>
+	</table>
+	<table name="Trans_Attribute" abbrev="TransAttr" type="Attribute">
+		<param name="parentref">Transaction.trans_id</param>
+	</table>
+	<table name="Invoice_Attribute" abbrev="InvAttr" type="Attribute">
+		<param name="parentref">Invoice.invoice_id</param>
+	</table>
+	<table name="Event_Attribute" abbrev="EventAttr" type="Attribute">
+		<param name="parentref">Event.event_id</param>
+	</table>
+	<table name="Rsrc_Attribute" abbrev="RsrcAttr" type="Attribute">
+		<param name="parentref">Resource_item.resource_id</param>
+	</table>
+	<table name="Templ_Attribute" abbrev="TemplAttr" type="Attribute">
+		<param name="parentref">Template.template_id</param>
+	</table>
+
+	<table name="OfCatalog_Attribute" abbrev="OCtAttr" type="Attribute">
+		<param name="parentref">Offering_Catalog.catalog_id</param>
+	</table>
+
+	<table name="OfCatEntry_Attribute" abbrev="OCtEnAttr" type="Attribute">
+		<param name="parentref">Offering_Catalog_Entry.entry_id</param>
+	</table>
+
+	<table name="Survey" abbrev="Survey" type="Audit,Secure">
+		<description>???</description>
+		<column name="survey_id" type="longint" primarykey="yes" descr="Unique ID for survey"/>
+		<column name="owner" type="entity" descr="Person/organization who created the survey"/>
+		<column name="parent_id" selfref="survey.survey_id" descr="Parent-child relationship between surveys"/>
+		<column name="prev_id" selfref="survey.survey_id" descr="Previous survey in display sequence"/>
+		<column name="next_id" selfref="survey.survey_id" descr="Next survey in display sequence"/>
+		<column name="caption" type="text" size="64" required="yes" descr="Free form note describing survey"/>
+		<column name="instructions" type="text" size="1024" descr="Instructions on how to fill out survey"/>
+		<column name="dialog_attrs" type="text" size="255" descr="Special attributes like mulitple columns etc."/>
+	</table>
+
+	<table name="Survey_Item" abbrev="SurItem" type="Audit,Secure">
+		<description>???</description>
+		<column name="item_id" type="text" size="16" primarykey="yes" descr="Uniqe ID for individual survey question"/>
+		<column name="item_type" lookupref="Survey_Item_Type" required="yes" descr="Type of survey element: question, heading, etc."/>
+		<column name="owner" type="entity" descr="Person/organization who created the survey item"/>
+		<column name="survey_id" parentref="survey.survey_id" required="yes" descr="Survey which owns this item"/>
+		<column name="item_text" type="text" size="1024" descr="Survey question text"/>
+		<column name="sort_seq" type="integer" descr="Sequence of question in survey"/>
+		<column name="response_types" type="text" size="16" descr="Can be mixture of single-character letters: (T)ext, (I)nteger, (F)loat, (B)oolean-Yes/No Combo, (C)heckbox-alone, C(H)eckbox, (D)ate, (S)elect, (M)ultiselect, Select Checkbo(X)es, D(U)ration"/>
+		<column name="default_choices" type="text" size="1024" descr="Comma delimited text for answer choices"/>
+		<column name="default_choice_delim" type="text" size="8" descr="Delimeter used to seperate multiple choices within a single answer"/>
+		<column name="default_bool" type="boolean" descr="Answer type is yes/no, true/false"/>
+		<column name="default_text" type="text" size="512" descr="Answer type is fill in the blank"/>
+		<column name="default_int" type="integer" descr="Answer type is a number value"/>
+		<column name="default_float" type="float" descr="Answer type is a calculated value"/>
+		<column name="default_date" type="duration" descr="Answer type is a date or duration value"/>
+	</table>
+
+	<table name="Survey_Response" abbrev="SurResp" type="Audit,Secure">
+		<description>???</description>
+		<column name="response_id" type="autoinc" primarykey="yes" descr="Uniqe ID for response to a question"/>
+		<column name="respondent" type="entity" descr="Person answering the question"/>
+		<column name="item_id" parentref="Survey_Item.item_id" descr="Question being answered"/>
+		<column name="item_text" type="text" size="1024" descr="Question text"/>
+		<column name="response_bool" type="boolean" descr="Response: yes/no format"/>
+		<column name="response_text" type="text" size="512" descr="Response in freeform text format"/>
+		<column name="response_int" type="integer" descr="Response in number format"/>
+		<column name="response_float" type="float" descr="Response in a calaculated format"/>
+		<column name="response_date" type="duration" descr="Response in a date format"/>
+	</table>
+
+	<table name="Hlth_Maint_Rule" abbrev="HlthRl" parent="Reference_Item" type="Audit,Secure">
+		<description>Rules specified by user to specify preventive care measures for different patients (based on age, sex, etc)</description>
+		<column name="rule_id" type="text" size="16" primarykey="yes" descr="Identifier for measure"/>
+		<column name="org_id" lookupref="Org.Org_Id" descr="Org ID to which this measure belongs"/>
+		<column name="gender" lookupref="Gender.id" descr="For gender-specific measure"/>
+		<column name="start_age" type="integer" descr="Min age measure can be performed"/>
+		<column name="end_age" type="integer" descr="Max age measure can be performed"/>
+		<column name="age_metric" lookupref="Time_Metric.id" descr="Unit by which age is measured"/>
+		<column name="measure" type="text" size="255" descr="Procedure to be performed"/>
+		<column name="periodicity" type="integer" descr="Period between next performance of measures"/>
+		<column name="periodicity_metric" lookupref="Time_Metric.id" descr="Unit by which periodicity is measured"/>
+		<column name="diagnoses" type="text_set" abbrev="diag" descr="Diagnoses related to measure"/>
+		<column name="directions" type="text" size="2048" descr="Any directions by which measure should be performed"/>
+		<column name="source" type="text" size="255" descr="Source of measure"/>
+		<column name="src_begin_date" type="date" descr="Date at which measure is valid"/>
+		<column name="src_end_date" type="date" descr="Date at which measure is invalid"/>
+	</table>
+
+	<include file="reference.xml"/>
+	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
+
+</schema>

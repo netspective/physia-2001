@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<accesscontrol name="default">
+	<permissions root="pm">
+		<permission id="scheduling">
+			<permission id="today"/>
+			<permission id="schedule"/>
+			<permission id="checkin"/>
+			<permission id="checkout"/>
+			<permission id="template"/>
+		</permission>
+		<permission id="person">
+			<permission id="home">
+				<restrict type="owner-person"/>
+			</permission>
+			<permission id="profile"/>
+			<permission id="physician"/>
+			<permission id="staff"/>
+			<permission id="patient"/>
+			<permission id="pane">
+				<permission id="contact-methods">
+					<permission id="view"/>
+					<permission id="insert"/>
+					<permission id="update"/>
+					<permission id="delete"/>
+				</permission>
+			</permission>
+		</permission>
+	</permissions>
+
+	<roles root="pm">
+		<role id="superuser">
+			<grant permission="pm"/>
+		</role>
+		<role id="admin">
+			<grant permission="pm"/>
+			<revoke permission="pm/person/staff"/>
+		</role>
+		<role id="physician">
+			<grant permission="pm/person/pane/contact-methods"/>
+		</role>
+		<role id="physician-assistant">
+			<grant permission="pm"/>
+			<revoke permission="pm/person/pane/contact-methods/update"/>
+		</role>
+		<role id="nurse">
+			<grant permission="pm"/>
+		</role>
+		<role id="front-desk">
+			<grant permission="pm/person/pane/contact-methods"/>
+		</role>
+	</roles>
+</accesscontrol>

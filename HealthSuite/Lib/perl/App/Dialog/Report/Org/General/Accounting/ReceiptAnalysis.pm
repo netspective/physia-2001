@@ -1,0 +1,64 @@
+##############################################################################
+package App::Dialog::Report::Org::General::Accounting::ReceiptAnalysis;
+##############################################################################
+
+use strict;
+use Carp;
+use App::Dialog::Report;
+use App::Universal;
+
+use CGI::Dialog;
+use CGI::Validator::Field;
+use DBI::StatementManager;
+
+use App::Statements::Component::Invoice;
+
+use vars qw(@ISA $INSTANCE);
+
+@ISA = qw(App::Dialog::Report);
+
+sub new
+{
+	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-receipt-analysis', heading => 'Receipt Analysis');
+
+	$self->addContent(
+			new App::Dialog::Field::Person::ID(caption =>'Provider ID', name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			);
+	$self->addFooter(new CGI::Dialog::Buttons);
+
+	$self;
+}
+
+#sub populateData
+#{
+#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+#
+#	$page->field('person_id', $page->session('person_id'));
+#}
+
+
+sub execute
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $personId = $page->field('person_id');
+
+
+	if ( $personId ne '')
+	{
+		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.receiptAnalysis', [$personId]);
+	}
+	else
+	{
+		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.receiptAnalysisAll');
+	}
+
+
+
+}
+
+
+# create a new instance which will automatically add it to the directory of
+# reports
+#
+$INSTANCE = new __PACKAGE__;

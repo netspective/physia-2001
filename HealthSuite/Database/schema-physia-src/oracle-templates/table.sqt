@@ -1,0 +1,186 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template takes a single $table instance of the Table object and
+	# creates the complete SQL necessary to drop the existing table and create
+	# a new table with all columns, types, constraints, and indexes. This
+	# template creates both the primary table and audit table (if any) and
+	# creates all sequences necessary for both tables.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$isAuditableTable = $table->isTableType('Audit');
+	$isSecuredTable = $table->isTableType('Secure');
+	$isEnumTable = $table->isTableType('Enumeration');
+
+	# if a table doesn't have any columns, don't bother writing out the structure
+	# the template will still execute, but setting file name to "" makes sure that
+	# the file is not written
+	$templOutputFile = "" unless $table->hasColumns();
+}
+
+Prompt Creating Objects for Table {$tableName};
+
+BEGIN
+{	
+	$OUT = "";
+	if(exists $table->{colsByType}->{autoinc})
+	{
+		foreach (@{$table->{colsByType}->{autoinc}})
+		{
+			$OUT .= "	execArbitrarySql('drop sequence $table->{abbrev}\_$_->{name}_SEQ');\n";
+		}
+	}
+	$OUT .= "	execArbitrarySql('drop sequence $table->{abbrev}\_RET_VERSION_ID_SEQ');\n" if $isAuditableTable;
+	$OUT .= "	execArbitrarySql('drop table $tableName cascade constraints');";
+	$OUT .= "\n	execArbitrarySql('drop table $tableName\_AUD cascade constraints');" if $isAuditableTable;
+}
+END;
+/
+{
+	$OUT = "";
+	#
+	# create all of the sequences needed by this table and appropriate triggers
+	#
+	if(exists $table->{colsByType}->{autoinc})
+	{
+		foreach (@{$table->{colsByType}->{autoinc}})
+		{
+			$OUT .= "create sequence $table->{abbrev}\_$_->{name}_SEQ increment by 1 start with 1 nomaxvalue nocache nocycle;\n";
+			$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => $_->{name}, 
+				code =>
+				[
+					"if :new.$_->{name} is NULL then",
+					"	select $table->{abbrev}\_$_->{name}_SEQ.nextval into :new.$_->{name} from dual;",
+					"end if;",
+				]);
+		}
+	}
+	if($isAuditableTable)
+	{
+		$OUT .= "create sequence $table->{abbrev}\_RET_VERSION_ID_SEQ increment by 1 start with 1 nomaxvalue nocache nocycle;\n";
+		$processor->addTriggerCode(table => $tableName, scope => 'audit', type => 'table',
+			code =>
+			[
+				"if :new.RET_VERSION_ID is NULL then",
+				"	select $table->{abbrev}\_RET_VERSION_ID_SEQ.nextval into :new.RET_VERSION_ID from dual;",
+				"end if;",
+			]);
+	}
+}
+create table {$tableName}
+(
+{
+	# the "indexes" array is a global, so no "my" in front
+	@indexes = ();
+	
+	#
+	# create all of the columns
+	#
+	my $colDefnFmt = "\t%-" . $table->{maxColNameLen} . "s %s";
+	my $colConstrFmt = "\tconstraint %s %s %s";
+	my @columns = ();
+	my @constraints = ();
+	my @remarks = ();
+	my $priKeyColNames = $table->getColumnGroups('names_cs', '_primaryKeys');
+
+	push(@constraints, "\tconstraint " . uc("$tableName") . "_PK PRIMARY KEY ($priKeyColNames) USING INDEX TABLESPACE TS_INDEXES") if $priKeyColNames;
+	foreach $col (@{$table->getColumnGroups('sorted_by_group', '_primaryKeys', 'secure', 'audit', '_nonPrimaryKeys')})
+	{
+		my $colDefn = sprintf($colDefnFmt, uc($col->{name}), uc($col->{sqldefn}));
+		$colDefn .= " default $col->{default}" if exists $col->{default};
+		$colDefn .= " constraint " . uc("$col->{table}->{abbrev}_$col->{name}_REQ NOT NULL") if $col->{primarykey} || $col->{required};
+
+		push(@columns, $colDefn);
+		push(@constraints, "\tconstraint " . uc("$col->{table}->{abbrev}_$col->{name}_UNQ UNIQUE") . "($col->{name}) USING INDEX TABLESPACE TS_INDEXES") if $col->{unique};
+		
+		if(exists $col->{ref})
+		{
+			my $fkeyConstr = "constraint " . uc("$col->{table}->{abbrev}_$col->{name}_FK FOREIGN KEY") . "($col->{name}) references $col->{foreignCol}->{table}->{name}($col->{foreignCol}->{name}) on delete cascade";
+			if($col->{refForward})
+			{
+				push(@remarks, "\t/* forward ref: $fkeyConstr */");
+				$processor->storeForwardRef($tableName, $fkeyConstr);
+			}
+			else
+			{
+				push(@constraints, "\t$fkeyConstr");
+			}
+		}
+		
+		if(my $indexType = $col->{indexed})
+		{
+			my $typeSpec = $indexType == 1 ? '' : 'bitmap ';
+			push(@indexes, "create index $typeSpec\U$tableAbbrev\E_\U$col->{name}\E on $tableName ($col->{name}) TABLESPACE TS_INDEXES;");
+		}
+	}
+	
+	if(scalar(keys %{$table->{colsInUniqueGroups}}) > 0)
+	{
+		foreach $groupName (sort keys %{$table->{colsInUniqueGroups}})
+		{
+			my $allColsInGroup = $table->getColumnGroups('names_cs', "_uniquegrp_$groupName");
+			push(@constraints, "\tconstraint " . uc("$tableName\_$groupName\_UNQ UNIQUE") . "($allColsInGroup) USING INDEX TABLESPACE TS_INDEXES");
+		}
+	}
+	
+	$OUT = join(",\n", @columns);
+	$OUT .= ",\n" . join(",\n", @constraints) if @constraints;
+	$OUT .= "\n" . join("\n", @remarks) if @remarks;
+}
+);
+{
+	# create all the required indexes
+	#
+	if(scalar(keys %{$table->{colsInIndexGroups}}) > 0)
+	{
+		foreach $groupName (sort keys %{$table->{colsInIndexGroups}})
+		{
+			my $allColsInGroup = $table->getColumnGroups('names_cs', "_indexgrp_$groupName");
+			push(@indexes, "create index $typeSpec\U$tableAbbrev\E_\U$groupName\E on $tableName ($allColsInGroup) tablespace TS_INDEXES;");
+		}
+	}	
+	$OUT = @indexes ? (join("\n", @indexes) . "\n") : '';
+}
+
+{
+	$OUT = "";
+	# now create the audit table, which is the same as the primary but without constraints
+	# plus additional tracking fields
+	if($isAuditableTable)
+	{
+		$OUT = "create table $tableName\_AUD\n(\n";
+		
+		my $colDefnFmt = "\t%-" . $table->{maxColNameLen} . "s %s";
+		my @columns = ();
+
+		push(@columns, sprintf($colDefnFmt, "RET_VERSION_ID", "NUMBER(12)"));
+		
+		# NOTE!
+		# RET_SESSION_ID should be a foreign key, but the audit triggers started mutating!
+		#
+		# push(@columns, sprintf($colDefnFmt, "RET_SESSION_ID", "NUMBER(12) constraint $table->{abbrev}\_RET_SESS_ID_FK references APP_SESSION(session_id)")) if $isSecuredTable;
+		push(@columns, sprintf($colDefnFmt, "RET_SESSION_ID", "NUMBER(12)")) if $isSecuredTable;
+
+		push(@columns, sprintf($colDefnFmt, "RET_USER_ID", "VARCHAR2(32) default user"));
+		push(@columns, sprintf($colDefnFmt, "RET_STAMP", "DATE default sysdate"));
+		push(@columns, sprintf($colDefnFmt, "RET_METHOD", "CHAR(1) constraint $table->{abbrev}\_RET_METHOD_CHK check (ret_method in ('U', 'D'))"));
+
+		# in the Audit table we're not putting any constraints ('cause it's just a log of the data!)
+		foreach $col (@{$table->getColumnGroups('sorted_by_group', '_primaryKeys', 'secure', 'audit', '_nonPrimaryKeys')})
+		{
+			push(@columns, sprintf($colDefnFmt, uc($col->{name}), uc($col->{sqldefn})));
+		}
+		$OUT .= join(",\n", @columns);
+		$OUT .= ",\n" . "\tconstraint " . uc("$tableName\_AUD") . "_PK PRIMARY KEY (ret_version_id) USING INDEX TABLESPACE TS_INDEXES";
+		$OUT .= "\n);\n\n";
+	}
+}

@@ -1,0 +1,32 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates alter commands that add foreign-key references
+	# for tables that have circular references (can't define one before
+	# another). The reference is stored in the table template, but the 
+	# final alter table command is given here.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#
+	$OUT = "";
+
+	if(exists $processor->{forwardRefs} && scalar(keys %{$processor->{forwardRefs}}) > 0)
+	{
+		$templOutputPathId = 'tables';
+		$templOutputFile = "Forward_Ref_Alters";
+	
+		foreach my $tableName (sort keys %{$processor->{forwardRefs}})
+		{
+			$OUT .= "alter table $tableName add\n(\n";
+			$OUT .= "\t" . join(",\n\t", @{$processor->{forwardRefs}->{$tableName}});
+			$OUT .= "\n);\n\n";
+		}		
+	}
+	else
+	{
+		$templOutputFile = "";
+	}
+}

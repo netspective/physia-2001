@@ -1,0 +1,23 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates SQL code specific to a table.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};	
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'parent_id',
+		action => 'insert or update', code => ":new.parent_id := pkg_Entity.cleanupEntityId(:new.parent_id);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'complete_addr_html',
+		action => 'insert or update', code => ":new.complete_addr_html := pkg_Entity.createAddress(pkg_Entity.ADDRSTYLE_HTML, :new.line1, :new.line2, :new.city, :new.state, :new.zip);");
+}
+

@@ -1,0 +1,33 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates Oracle SQL code specific to a table.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};	
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+	
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'table', action => 'insert', time => 'after',
+		code => 
+		[
+			"insert into REF_ICDStem_Usage (icd_stem, person_id, org_id, read_count) values (getLeadingToken(:new.parent_id, '.'), :new.person_id, :new.org_id, 1);",
+		]);
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'table', action => 'update', time => 'after',
+		code => 
+		[
+			"if :new.person_id is NULL then",
+			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id is NULL and org_id = :new.org_id;",
+			"else",
+			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id = :new.person_id and org_id = :new.org_id;",
+			"end if;",
+		]);
+}
+

@@ -1,0 +1,39 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates Oracle SQL code specific to a table.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$tableName = $table->{name};	
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+	
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'person_id',
+		action => 'insert', code => ":new.person_id := pkg_Entity.cleanupEntityId(:new.person_id);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'short_name',
+		action => 'insert or update', code => ":new.short_name := pkg_Entity.createPersonName(pkg_Entity.PNAMESTYLE_SHORT, :new.name_prefix, :new.name_first, :new.name_middle, :new.name_last, :new.name_suffix);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'simple_name',
+		action => 'insert or update', code => ":new.simple_name := pkg_Entity.createPersonName(pkg_Entity.PNAMESTYLE_SIMPLE, :new.name_prefix, :new.name_first, :new.name_middle, :new.name_last, :new.name_suffix);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'complete_name',
+		action => 'insert or update', code => ":new.complete_name := pkg_Entity.createPersonName(pkg_Entity.PNAMESTYLE_COMPLETE, :new.name_prefix, :new.name_first, :new.name_middle, :new.name_last, :new.name_suffix);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'short_sortable_name',
+		action => 'insert or update', code => ":new.short_sortable_name := pkg_Entity.createPersonName(pkg_Entity.PNAMESTYLE_SHORT_SORTABLE, :new.name_prefix, :new.name_first, :new.name_middle, :new.name_last, :new.name_suffix);");
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'complete_sortable_name',
+		action => 'insert or update', code => ":new.complete_sortable_name := pkg_Entity.createPersonName(pkg_Entity.PNAMESTYLE_SORTABLE, :new.name_prefix, :new.name_first, :new.name_middle, :new.name_last, :new.name_suffix);");
+
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'table', action => 'insert or update',
+		code => 
+		[
+			"if :new.date_of_birth is not null and :new.age is not null then",
+			"	RAISE_APPLICATION_ERROR(-20001, 'both date_of_birth and age can not be specified together');",
+			"end if;"
+		]);
+}
+

@@ -1,0 +1,41 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template creates Oracle SQL code specific to an Association table.
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+	
+	$tableName = $table->{name};	
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+	
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'insured_id',
+		time => 'before', action => 'insert or update',
+		code => 
+		[
+			"if :new.insured_id is not NULL then",
+			"	:new.insured_name := pkg_Entity.getEntityDisplay(:new.insured_type, :new.insured_id);",
+			"end if;",
+			"if :new.insured_name is not NULL and :new.rel_to_insured is null then",
+			"	:new.rel_to_insured := 0;",
+			" end if;",  # if this line doesn't have a space preceding the "e" it doesn't generate! BUG! 
+		]);
+		
+	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => 'guarantor_id',
+		time => 'before', action => 'insert or update',
+		code => 
+		[
+			"if :new.guarantor_id is not NULL then",
+			"	:new.guarantor_name := pkg_Entity.getEntityDisplay(0, :new.guarantor_id);",
+			"end if;",
+		]);		
+}
+
+
+

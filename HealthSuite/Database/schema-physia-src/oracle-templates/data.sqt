@@ -1,0 +1,154 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	# 
+	# This template takes a single $data instance of the TableData object and
+	# creates a list of SQL statements that will populate the given table
+	# with the provided data. It is also responsible for creating any SQL*Load
+	# files (.ctl) [see below for details].
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $data      -- the active TableData object to process
+
+	use Text::ParseWords;
+	
+	$OUT = "";
+	$table = undef;
+	if(exists $processor->{schema}->{tables}->{byName}->{$data->{tableName}})
+	{
+		$table = $processor->{schema}->{tables}->{byName}->{$data->{tableName}};
+	}
+	else
+	{
+		die "Unable to find table named $data->{tableName} from $data object";
+	}
+	$isEnumTable = $table->isTableType('Enumeration');
+
+	$templOutputPathId = 'data';
+	$templOutputFile = $table->{name};
+	
+	# since data can be called multiple times, we want to make sure our files are
+	# never appended (just overwritten)
+	$templAllowAppend = 0;
+	
+	if(@{$data->{rows}})
+	{
+		$OUT .= "Prompt ----------------------------------------------------------------------;\n";
+		$OUT .= "Prompt Adding data for Table $table->{name};\n";
+		$OUT .=	"Prompt ----------------------------------------------------------------------;\n\n";
+
+		my $rowIdx = 0;
+		my $foundEnumIdCol = 0;
+		foreach $row (@{$data->{rows}})
+		{
+			my %colData = ();
+			if(ref($row) eq 'HASH')
+			{
+				%colData = %{$row};
+				
+				# if id is not set and this is an enum table, then the id with $rowIdx
+				# __id is special syntax handled by $table->createInsertSql (check that code)
+				#
+				$colData{__id} = $rowIdx if $isEnumTable;
+			}
+			else
+			{
+				my @csvValues = quotewords($data->{delim}, 0, $row);
+				my $colIdx = 0;
+				foreach (@csvValues)
+				{
+					my $column = $table->{colsInOrder}->[$colIdx];
+					if($_ eq '')
+					{
+						if($data->{blanks} ne 'ignore')
+						{
+							$colData{$column->{name}} = 'NULL' if $data->{blanks} eq 'null';
+							$colData{$column->{name}} = '' if $data->{blanks} eq 'keep';
+						}
+					}
+					else
+					{
+						$colData{$column->{name}} = $_;
+					}
+					$colIdx++;
+				}
+			}
+
+			my ($sql, $errors) = $table->createInsertSql(\%colData);
+			$OUT .= "$sql;\n";
+			$OUT .= "Error(s): \n" . join("\n", @{$errors}) . "\n" if @{$errors};
+			$rowIdx++;
+		}
+	}
+	else
+	{
+		# don't write out any data if the file doesn't have any rows
+		$templOutputFile = "";
+	}
+}
+{ 
+	# 
+	# This portion of the template creates an ORACLE CTL load file for any tables
+	# that have import files specified. The CTL files are pretty simple
+	# and link directly to the output file. The template automatically
+	# checks to see if any specific ctldatatype is defined for a 
+	# particular column and uses it if appropriate. 
+	# 
+	# NOTE: this template creates its own datafiles (as opposed to
+	#       sending a string back to the processor for writing).
+	#	
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $data      -- the active TableData object to process
+	#   $table     -- this is derived from the $data->{tableName} ABOVE
+	#	
+
+	# we're doing our own template writing so make sure that the processor doesn't
+	# try to write anything out as well
+	$OUT = "";
+
+	if(@{$data->{import}})
+	{
+
+		my $importIdx = 0;
+		foreach my $importData (@{$data->{import}})
+		{
+			my @columnData = ();
+			my $fmt = "\t%-" . $table->{maxColNameLen} . "s %s";
+			foreach $col (@{$table->{colsInOrder}})
+			{
+				my $loadType = 
+						exists $col->{dbmscustom}->{oracle}->{ctldatatype} ?
+							uc($col->{dbmscustom}->{oracle}->{ctldatatype}) : '';
+				push(@columnData, sprintf($fmt, uc($col->{name}), $loadType));
+			}
+			my $columns = join(",\n", @columnData);
+
+			# NOTE: there's a tab inside the FIELD TERMINATED BY " "
+			#
+			my $ctlOutput = 
+			qq{LOAD DATA
+					INFILE '$importData->{src}'
+					replace
+				INTO TABLE $table->{name}
+					FIELDS TERMINATED BY "	"
+					TRAILING NULLCOLS
+				(
+				$columns
+				)
+			};
+
+			# cleanup formatting done for code-display purposes
+			$ctlOutput =~ s/^\t\t\t\t//gm;
+
+			$processor->saveFile(
+					path => 'ctls',
+					fileName => $importIdx > 0 ? "$table->{name}_$importIdx\.ctl" : "$table->{name}.ctl",
+					dataRef => \$ctlOutput
+					);
+			$importIdx++;
+		}
+	}
+}

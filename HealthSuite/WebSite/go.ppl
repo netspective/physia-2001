@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+use strict;
+use CGI qw(:standard);
+use App::ResourceDirectory;
+
+#
+# if this page is being called from an HTTP error handler,
+# try to locate the right page by dynamically creating an
+# ARL (application resource locator)
+#
+# format: 404;http://blah.blah.blah/blah/blah?xyz=1
+# we strip out the 404;http://blah.blah/blah and take
+# everything else
+#
+if($ENV{QUERY_STRING} =~ /^(\d\d\d);(\w+:\/\/)(\S+?\/)(.*)/)
+{
+	App::ResourceDirectory::handleARL($4);
+}
+else
+{
+	App::ResourceDirectory::handleARL(param('arl'));
+}

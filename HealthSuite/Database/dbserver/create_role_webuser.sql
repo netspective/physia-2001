@@ -1,0 +1,11 @@
+create role webuser;
+
+grant create session to webuser;
+grant alter session to webuser;
+grant create table to webuser;
+grant create view to webuser;
+grant create procedure to webuser;
+grant create sequence to webuser;
+grant create synonym to webuser;
+grant create trigger to webuser;
+grant create database link to webuser;

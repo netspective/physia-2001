@@ -1,0 +1,46 @@
+prompt -----------------------------------------------------------------------;
+prompt Results of running { $templNameFull };
+prompt -----------------------------------------------------------------------;
+{
+	#
+	# This template creates SQL code specific to a table
+	# with columns of type "text_set"
+	#
+	# GLOBAL DEFINITIONS EXPECTED IN TEMPLATE NAMESPACE
+	#   $processor -- the SchemaProcessor object (to obtain the schema)
+	#   $table     -- the active Table object to process
+	#
+	$OUT = "";
+
+	$flagName = 'addtriggers';
+	$flagValue = 'text_set';
+	$tableName = $table->{name};
+	$tableAbbrev = $table->{abbrev};
+	$templOutputFile = "";            # we're not planning to write out any data
+
+	my $firstPriKey = $table->{colsByGroup}->{_primaryKeys}->[0];
+	foreach my $col (@{$table->{colsInOrder}})
+	{
+		next unless exists $col->{templateFlags}->{$flagName};
+		next unless $col->{templateFlags}->{$flagName} eq $flagValue;
+
+		$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => $col->{name},
+			time => 'after', action => 'insert',
+			code => "pkg_Set.AssignSetMembers('$tableName\_\u$col->{name}', :new.$firstPriKey->{name}, :new.$col->{name});");
+
+		$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => $col->{name},
+			time => 'after', action => 'delete',
+			code => "delete from $tableName\_\u$col->{name} where parent_id = :old.$firstPriKey->{name};");
+
+
+		$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'column', column => $col->{name},
+			time => 'after', action => 'update',
+			code =>
+			[
+				"if :new.$col->{name} != :old.$col->{name} then",
+				"	pkg_Set.AssignSetMembers('$tableName\_\u$col->{name}', :new.$firstPriKey->{name}, :new.$col->{name});",
+				"end if;",
+			]);
+	}
+}
+

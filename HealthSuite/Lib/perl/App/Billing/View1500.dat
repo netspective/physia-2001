@@ -1,0 +1,1310 @@
+<html>
+  <head>
+    <title>HEALTH INSURANCE CLAIM FORM</title>
+    <meta name="GENERATOR" content="Microsoft FrontPage 3.0">
+  </head>
+
+  <style>
+    strong \{
+      font-family: helvetica;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 8pt;
+      color: black;
+    \}
+
+    table.cell \{
+      background-color: white;
+      font-family: tahoma;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 8pt;
+      color: red;
+      height: 100%;
+      width: 100%;
+    \}
+
+    tr.std \{
+      vertical-align: top;
+      height: 50;
+    \}
+    tr.high \{
+      vertical-align: top;
+      height: 100;
+    \}
+    tr.prochead \{
+      vertical-align: top;
+      height: 10;
+    \}
+    tr.cell \{
+      vertical-align: top;
+    \}
+
+    td.t \{
+      border-top: solid 1px red;
+    \}
+    td.b \{
+      border-bottom: solid 1px red;
+    \}
+    td.st \{
+      border-top: solid 2px red;
+    \}
+    td.sb \{
+      border-bottom: solid 2px red;
+    \}
+    td.r \{
+      border-right: solid 1px red;
+    \}
+    td.rd \{
+      border-right: dashed 1px red;
+    \}
+    td.cell \{
+      text-indent: 5;
+    \}
+    td.inp \{
+      padding-left: 5;
+    \}
+    td.cola \{
+      width: 35%;
+    \}
+    td.colb \{
+      width: 8%;
+    \}
+    td.colc \{
+      width: 8%;
+    \}
+    td.cold \{
+      width: 35%;
+    \}
+    td.cole \{
+      width: 14%;
+    \}
+    td.colf \{
+      width: 30%;
+    \}
+    td.colg \{
+      width: 10%;
+    \}
+    td.colh \{
+      width: 10%;
+    \}
+    td.coli \{
+      width: 10%;
+    \}
+    td.colj \{
+      width: 10%;
+    \}
+    td.colk \{
+      width: 30%;
+    \}
+    td.cold1 \{
+      width: 40%;
+    \}
+    td.cold2 \{
+      width: 20%;
+    \}
+
+    td.phone \{
+      font-weight: bold;
+      font-size: 12pt;
+    \}
+
+    td.decimal \{
+      width: 10%;
+    \}
+
+    td.month \{
+      width: 14%;
+    \}
+
+    td.year \{
+      width: 22%;
+    \}
+
+    td.chrg1 \{
+      padding-right: 5;
+    \}
+
+    td.chrg2 \{
+      padding-right: 5;
+    \}
+
+    input.std \{
+      font-family: helvetica;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 8pt;
+      color: black;
+    \}
+
+    #main \{
+      background-color: white;
+      border: solid 1px red;
+      width: 1000;
+      align: top;
+    \}
+    #ltop \{
+      width: 650;
+    \}
+    #lbot \{
+      width: 650;
+    \}
+    #rtop \{
+      width: 350;
+    \}
+    #rbot \{
+      width: 350;
+    \}
+
+  </style>
+
+  <body>
+    <form>
+      <div align="center">
+        <table id="main" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td valign="top">
+              <table id="ltop" border="0" cellspacing="0" cellpadding="0">
+                <tr class="std">
+                  <td class="b r st" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">1.MEDICARE</td>
+                        <td class="cell">MEDICAID</td>
+                        <td class="cell">CHAMPUS</td>
+                        <td class="cell">CHAMPVA</td>
+                        <td class="inp">GROUP<br>HEALTH PLAN</td>
+                        <td class="inp">FECA<br>BLK LUNG</td>
+                        <td class="cell">OTHER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td><input type="checkbox" name="cb1" value="Medicare" {$claimProgramNameMedicare eq "&nbsp" ? disabled : $claimProgramNameMedicare}><em>(Medicare #)</em></td>
+                        <td><input type="checkbox" name="cb2" value="Medicaid" {$claimProgramNameMedicaid eq "&nbsp" ? disabled : $claimProgramNameMedicaid}><em>(Medicaid #)</em></td>
+                        <td><input type="checkbox" name="cb3" value="Champus" {$claimProgramNameChampus eq "&nbsp" ? disabled : $claimProgramNameChampus}><em>(Sponser's SSN)</em></td>
+                        <td><input type="checkbox" name="cb4" value="Champva" {$claimProgramNameChampva eq "&nbsp" ? disabled : $claimProgramNameChampva}><em>(VA File #)</em></td>
+                        <td><input type="checkbox" name="cb5" value="Group" {$claimProgramNameGHP eq "&nbsp" ? disabled : $claimProgramNameGHP}><em>(SSN or ID)</em></td>
+                        <td><input type="checkbox" name="cb6" value="Feca" {$claimProgramNameFECA eq "&nbsp" ? disabled : $claimProgramNameFECA}><em>(SSN)</em></td>
+                        <td><input type="checkbox" name="cb7" value="Other" {$claimProgramNameOther eq "&nbsp" ? disabled : $claimProgramNameOther}><em>(ID)</em></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">2. PATIENT'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong> {$patientName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">3. PATIENT'S BIRTH DATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd" align="center"><strong>{$patientDateOfBirth ne "&nbsp" ? substr($patientDateOfBirth,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$patientDateOfBirth ne "&nbsp" ? substr($patientDateOfBirth,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$patientDateOfBirth ne "&nbsp" ? substr($patientDateOfBirth,6,4) : "&nbsp"}<strong></td>
+                        <td class="cell" align="right">M<input type="checkbox" name="cb8" value="Male" {$patientSexM eq "&nbsp" ? disabled : $patientSexM}></td>
+                        <td class="cell">F<input type="checkbox" name="cb9" value="Female" {$patientSexF eq "&nbsp" ? disabled : $patientSexF}></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">5. PATIENT'S ADDRESS (No., Street)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$patientAddress}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="4">6. PATIENT RELATIONSHIP TO INSURED</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">Self<input type="checkbox" name="cb10" value="Self" {$patientInsuredRelationSelf  eq "&nbsp" ? disabled : $patientInsuredRelationSelf}></td>
+                        <td class="cell">Spouse<input type="checkbox" name="cb11" value="Spouse" {$patientInsuredRelationSpouse eq "&nbsp" ? disabled : $patientInsuredRelationSpouse}></td>
+                        <td class="cell">Child<input type="checkbox" name="cb12" value="Child" {$patientInsuredRelationChild eq "&nbsp" ? disabled : $patientInsuredRelationChild}></td>
+                        <td class="cell">Other<input type="checkbox" name="cb13" value="Other" {$patientInsuredRelationOther eq "&nbsp" ? disabled : $patientInsuredRelationOther}></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r" width="220">CITY</td>
+                        <td class="cell">STATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="220"><strong>{$patientAddressCity}<strong></td>
+                        <td class="cell"><strong>{$patientAddressState}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r" rowspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="6">8. PATIENT STATUS</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="right">Single</td>
+                        <td class="cell"><input type="checkbox" name="cb15" value="Married" {$patientStatusSingle eq "&nbsp" ? disabled : $patientStatusSingle}></td>
+                        <td class="cell" align="right">Married</td>
+                        <td class="cell"><input type="checkbox" name="cb14" value="Single" {$patientStatusMarried eq "&nbsp" ? disabled : $patientStatusMarried}></td>
+                        <td class="cell" align="right">Other</td>
+                        <td class="cell"><input type="checkbox" name="cb16" value="Other" {$patientStatusOther eq "&nbsp" ? disabled : $patientStatusOther}><br></td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="right">Employed</td>
+                        <td class="cell"><input type="checkbox" name="cb17" value="Emplyed" {$patientStatusEmployment eq "&nbsp" ? disabled : $patientStatusEmployment}></td>
+                        <td class="cell" align="right">Full-Time<br>Student</td>
+                        <td class="cell"><input type="checkbox" name="cb18" value="FTime" {$patientStatusStudentFullTime eq "&nbsp" ? disabled : $patientStatusStudentFullTime}></td>
+                        <td class="cell" align="right">Part-Time<br>Student</td>
+                        <td class="cell"><input type="checkbox" name="cb19" value="PTime" {$patientStatusStudentPartTime eq "&nbsp" ? disabled : $patientStatusStudentPartTime}></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r">ZIP CODE</td>
+                        <td class="cell" colspan="4">TELEPHONE (Include Area Code)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="50%"><strong>{$patientAddressZipCode}<strong></td>
+                        <td class="cell phone">(</td>
+                        <td class="cell"><strong>{$patientAddressTelephone ne "&nbsp" ? substr($patientAddressTelephone,0, 3) : "&nbsp"}<strong></td>
+                        <td class="cell phone">)</td>
+                        <td class="cell"><strong>{$patientAddressTelephone ne "&nbsp" ? substr($patientAddressTelephone,4, 12) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">9. OTHER INSURED'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$otherInsuredName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">10. IS PATIENT'S CONDITION RELATED TO:</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">a. OTHER INSURED'S POLICY OR GROUP NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"> <strong>{$otherInsuredPolicyGroupName} <strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">a. EMPLOYMENT? (CURRENT OR PREVIOUS)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="checkbox" name="cb8" value="Yes" {$claimConditionRelatedToEmploymentPatientY eq "&nbsp" ? disabled : $claimConditionRelatedToEmploymentPatientY}>YES</td>
+                        <td class="cell"><input type="checkbox" name="cb9" value="No" {$claimConditionRelatedToEmploymentPatientN eq "&nbsp" ? disabled : $claimConditionRelatedToEmploymentPatientN}>NO</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">b. OTHER INSURED'S DATE OF BIRTH</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd" align="center"><strong>{$otherInsuredDateOfBirth ne "&nbsp" ? substr($otherInsuredDateOfBirth,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$otherInsuredDateOfBirth ne "&nbsp" ? substr($otherInsuredDateOfBirth,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$otherInsuredDateOfBirth ne "&nbsp" ? substr($otherInsuredDateOfBirth,6,4) : "&nbsp"}<strong></td>
+                        <td class="cell" align="right">M<input type="checkbox" name="cb8" value="Male" {$otherInsuredSexM eq "&nbsp" ? disabled : $otherInsuredSexM}></td>
+                        <td class="cell">F<input type="checkbox" name="cb9" value="Female" {$otherInsuredSexF eq "&nbsp" ? disabled : $otherInsuredSexF}></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">b. AUTO ACCIDENT?</td>
+                        <td class="cell">PLACE (State)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="checkbox" name="cb8" value="Yes" {$claimConditionRelatedToAutoAccidentY eq "&nbsp" ? disabled : $claimConditionRelatedToAutoAccidentY}>YES</td>
+                        <td class="cell"><input type="checkbox" name="cb9" value="No" {$claimConditionRelatedToAutoAccidentN eq "&nbsp" ? disabled : $claimConditionRelatedToAutoAccidentN}>NO</td>
+                        <td class="cell"><strong>{$claimConditionRelatedToAutoAccidentPlace}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">c. EMPLOYER'S NAME OR SCHOOL NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$otherInsuredEmployerOrSchoolName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="2">c. OTHER ACCIDENT?</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width="30%"><input type="checkbox" name="cb8" value="Yes" {$claimConditionRelatedToOtherAccidentY eq "&nbsp" ? disabled : $claimConditionRelatedToOtherAccidentY}>YES</td>
+                        <td class="cell"><input type="checkbox" name="cb9" value="No" {$claimConditionRelatedToOtherAccidentN eq "&nbsp" ? disabled : $claimConditionRelatedToOtherAccidentN}>NO</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">d. INSURANCE PLAN NAME OR PROGRAM NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$otherInsuredInsurancePlanOrProgramName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">10d. RESERVED FOR LOCAL USE</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="high">
+                  <td class="r b" colspan ="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" align="center" colspan="2"><b>READ BACK OF FORM BEFORE COMPLETING &amp SIGNING THIS FORM.<b></td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">12.&nbsp</td>
+                        <td>PATIENT'S OR AUTHORIZED PERSON'S SIGNATURE I authorize the release of any medical or other information necessary
+                            to process this claim. I also request payment of government benefits either to myself or to the party who accepts assignment below.
+                        </td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" colspan="2">
+                          SIGNED_____________________________________________________________
+                          &nbsp &nbsp DATE____________________
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td valign="top">
+              <table id="rtop" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">1a. INSURED'S I.D. NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredId}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">4. INSURED'S NAME (Last Name, First Name, Middle Initial)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">7. INSURED'S ADDRESS (No., Street)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredAddress}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r" width="220">CITY</td>
+                        <td class="cell">STATE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="220"><strong>{$insuredAddressCity}<strong></td>
+                        <td class="cell"><strong>{$insuredAddressState}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell r">ZIP CODE</td>
+                        <td class="cell" colspan="4">TELEPHONE (Include Area Code)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r" width="50%"><strong>{$insuredAddressZipCode}<strong></td>
+                        <td class="cell phone">(</td>
+                        <td class="cell"><strong>{$insuredAddressTelephone ne "&nbsp" ? substr($insuredAddressTelephone,0,3) : "&nbsp"}<strong></td>
+                        <td class="cell phone">)</td>
+                        <td class="cell"><strong>{$insuredAddressTelephone ne "&nbsp" ? substr($insuredAddressTelephone,4,10) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">11. INSURED'S POLICY GROUP OR FECA NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredPolicyGroupName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="5">a. INSURED'S DATE OF BIRTH</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                        <td class="cell" colspan="2" align="center">SEX</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell rd" align="center"><strong>{$insuredDateOfBirth ne "&nbsp" ? substr($insuredDateOfBirth,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$insuredDateOfBirth ne "&nbsp" ? substr($insuredDateOfBirth,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$insuredDateOfBirth ne "&nbsp" ? substr($insuredDateOfBirth,6,4) : "&nbsp"}<strong></td>
+                        <td class="cell" align="right">M<input type="checkbox" name="cb8" value="Male" {$insuredSexM eq "&nbsp" ? disabled : $insuredSexM}></td>
+                        <td class="cell">F<input type="checkbox" name="cb9" value="Female" {$insuredSexF eq "&nbsp" ? disabled : $insuredSexF}></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">b. EMPLOYER'S NAME OR SCHOOL NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredEmployerOrSchoolName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">c. INSURANCE PLAN NAME OR PROGRAM NAME</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$insuredInsurancePlanOrProgramName}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan="4">d. IS THERE ANOTHER HEALTH BENEFIT PLAN?</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><input type="checkbox" name="cb8" value="Yes" {$insuredAnotherHealthBenefitPlanY eq "&nbsp" ? disabled : $insuredAnotherHealthBenefitPlanY}>YES</td>
+                        <td class="cell">&nbsp</td>
+                        <td class="cell"><input type="checkbox" name="cb9" value="No" {$insuredAnotherHealthBenefitPlanN eq "&nbsp" ? disabled : $insuredAnotherHealthBenefitPlanN}>NO</td>
+                        <td class="cell" align="right"><b><em>If yes,</em></b> return to and complete item 9 a-d.</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="high">
+                  <td class="b">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">13.&nbsp</td>
+                        <td>INSURED'S OR AUTHORIZED PERSON'S SIGNATURE I authorize
+                            payment of medical benefits to the undersigned physician or supplier
+                            for services described below.
+                        </td>
+                      </tr>
+                      <tr class="cell">
+                         <td class="cell" colspan="2">
+                           SIGNED_______________________________________
+                         </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <table id="lbot" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b r st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="3">14. DATE OF CURRENT:</td>
+                        <td rowspan="3"><img href="C:\tri.bmp"></td>
+                        <td rowspan="3">ILLNESS (First symptom) OR<br>INJURY (Accident) OR<br>PREGNANCY (LMP)</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell rd" align="center"><strong>{$treatmentDateOfIllnessInjuryPregnancy ne "&nbsp" ? substr($treatmentDateOfIllnessInjuryPregnancy,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$treatmentDateOfIllnessInjuryPregnancy ne "&nbsp" ? substr($treatmentDateOfIllnessInjuryPregnancy,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$treatmentDateOfIllnessInjuryPregnancy ne "&nbsp" ? substr($treatmentDateOfIllnessInjuryPregnancy,6,4) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r st">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="4">15. IF PATIENT HAS HAD SAME OR SIMILAR ILLNESS.</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell" width="50%">GIVE FIRST DATE</td>
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell rd" align="center"><strong>{$treatmentDateOfSameOrSimilarIllness ne "&nbsp" ? substr($treatmentDateOfSameOrSimilarIllness,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$treatmentDateOfSameOrSimilarIllness ne "&nbsp" ? substr($treatmentDateOfSameOrSimilarIllness,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$treatmentDateOfSameOrSimilarIllness ne "&nbsp" ? substr($treatmentDateOfSameOrSimilarIllness,6,4) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">17. NAME OF REFERRING PHYSICIAN OR OTHER SOURCE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$nameOfReferingPhysicianOrOther}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td class="b r">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell">17a. I.D. NUMBER OF REFERRING PHYSICIAN</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$treatmentIdOfReferingPhysician}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r b" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class ="cell" >19. RESERVED FOR LOCAL USE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp</td>
+                      </tr>
+              	    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" colspan ="2">21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY. (RELATE ITEMS 1,2,3 OR 4 TO ITEM 24E BY LINE)</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell" width ="50%">1. &nbsp<strong>{$treatmentDiagnosisPrimary}<strong></td>
+                        <td class="cell" width ="50%">3. &nbsp<strong>{$treatmentDiagnosisTertiary}<strong></td>
+                      </tr>
+              	    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="cell">
+                        <td class="cell" valign ="center" width ="50%">2. &nbsp<strong>{$treatmentDiagnosisSecondary}<strong></td>
+                        <td class="cell" valign ="center" width ="50%">4. &nbsp<strong>{$treatmentDiagnosisOther}<strong></td>
+                      </tr>
+              	  </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="prochead">
+                        <td class="cell t r b cola">24. A</td>
+                        <td class="cell t r b colb" align="center">B</td>
+                        <td class="cell t r b colc" align="center">C</td>
+                        <td class="cell t r b cold" align="center">D</td>
+                        <td class="cell b cole" align="center">E</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="6" align="center">DATES(S) OF SERVICE</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td class="cell" align="center">From</td>
+                              <td class="cell">&nbsp</td>
+                              <td class="cell">&nbsp</td>
+                              <td class="cell" align="center">To</td>
+                              <td class="cell">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell" align="center">MM</td>
+                              <td class="cell" align="left">DD</td>
+                              <td class="cell" align="left">YY</td>
+                              <td class="cell" align="center">MM</td>
+                              <td class="cell" align="left">DD</td>
+                              <td class="cell" align="left">YY</td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center">Place<br>of<br>Service</td>
+                        <td class="b r" align="center" valign="center">Type<br>of<br>Service</td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="2" align="center">PROCEDURES, SERVICES OR SUPPLIES</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell" colspan="2" align="center">(Explain Unusual Circumstances)</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center">CPT/HCPCS</td>
+                              <td class="cell" align="center">MODIFIER</td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center">DIAGNOSIS<br>CODE</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure1DateOfServiceFrom ne "&nbsp" ? substr($procedure1DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure1DateOfServiceFrom ne "&nbsp" ? substr($procedure1DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure1DateOfServiceFrom ne "&nbsp" ? substr($procedure1DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure1DateOfServiceTo ne "&nbsp" ? substr($procedure1DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure1DateOfServiceTo ne "&nbsp" ? substr($procedure1DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure1DateOfServiceTo ne "&nbsp" ? substr($procedure1DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure1PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure1TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure1Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure1Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure1DiagnosisCodePointer}<strong></td>
+                      </tr>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure2DateOfServiceFrom ne "&nbsp" ? substr($procedure2DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure2DateOfServiceFrom ne "&nbsp" ? substr($procedure2DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure2DateOfServiceFrom ne "&nbsp" ? substr($procedure2DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure2DateOfServiceTo ne "&nbsp" ? substr($procedure2DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure2DateOfServiceTo ne "&nbsp" ? substr($procedure2DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure2DateOfServiceTo ne "&nbsp" ? substr($procedure2DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure2PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure2TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure2Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure2Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure2DiagnosisCodePointer}<strong></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure3DateOfServiceFrom ne "&nbsp" ? substr($procedure3DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure3DateOfServiceFrom ne "&nbsp" ? substr($procedure3DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure3DateOfServiceFrom ne "&nbsp" ? substr($procedure3DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure3DateOfServiceTo ne "&nbsp" ? substr($procedure3DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure3DateOfServiceTo ne "&nbsp" ? substr($procedure3DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure3DateOfServiceTo ne "&nbsp" ? substr($procedure3DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure3PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure3TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure3Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure3Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure3DiagnosisCodePointer}<strong></td>
+                      </tr>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure4DateOfServiceFrom ne "&nbsp" ? substr($procedure4DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure4DateOfServiceFrom ne "&nbsp" ? substr($procedure4DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure4DateOfServiceFrom ne "&nbsp" ? substr($procedure4DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure4DateOfServiceTo ne "&nbsp" ? substr($procedure4DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure4DateOfServiceTo ne "&nbsp" ? substr($procedure4DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure4DateOfServiceTo ne "&nbsp" ? substr($procedure4DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure4PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure4TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure4Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure4Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure4DiagnosisCodePointer}<strong></td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure5DateOfServiceFrom ne "&nbsp" ? substr($procedure5DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure5DateOfServiceFrom ne "&nbsp" ? substr($procedure5DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure5DateOfServiceFrom ne "&nbsp" ? substr($procedure5DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure5DateOfServiceTo ne "&nbsp" ? substr($procedure5DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure5DateOfServiceTo ne "&nbsp" ? substr($procedure5DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure5DateOfServiceTo ne "&nbsp" ? substr($procedure5DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure5PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure5TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure5Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure5Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure5DiagnosisCodePointer}<strong></td>
+                      </tr>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell r" colspan="3">&nbsp</td>
+                              <td class="cell" colspan="3">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell rd month" align="center"><strong>{$procedure6DateOfServiceFrom ne "&nbsp" ? substr($procedure6DateOfServiceFrom,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure6DateOfServiceFrom ne "&nbsp" ? substr($procedure6DateOfServiceFrom,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell r year" align="left"><strong>{$procedure6DateOfServiceFrom ne "&nbsp" ? substr($procedure6DateOfServiceFrom,6,4) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure6DateOfServiceTo ne "&nbsp" ? substr($procedure6DateOfServiceTo,0,2) : "&nbsp"}<strong></td>
+                              <td class="cell rd month" align="center"><strong>{$procedure6DateOfServiceTo ne "&nbsp" ? substr($procedure6DateOfServiceTo,3,2) : "&nbsp"}<strong></td>
+                              <td class="cell year" align="left"><strong>{$procedure6DateOfServiceTo ne "&nbsp" ? substr($procedure6DateOfServiceTo,6,4) : "&nbsp"}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure6PlaceOfService}<strong></td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure6TypeOfService}<strong></td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell" colspan="3" align="center">&nbsp</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell r cold1" align="center"><strong>{$procedure6Cpt}<strong></td>
+                              <td class="cell rd cold2" align="center"><strong>{@md = split(/ /,$procedure6Modifier);$md[0]}<strong></td>
+                              <td class="cell" align="center"><strong>{$md[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b" align="center" valign="center"><br><strong>{$procedure6DiagnosisCodePointer}<strong></td>
+                      </tr>
+              	    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="sb r" colspan="2">
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">25. FEDERAL TAX I.D. NUMBER</td>
+                              <td class="cell">SSN</td>
+                              <td class="cell">EIN</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell"><strong>{$physicianFederalTaxId}<strong></td>
+                              <td class="cell"><input type="checkbox" name="cb9" value="Female" {$physicianTaxTypeIdSsn eq "&nbsp" ? disabled : $physicianTaxTypeIdSsn}></td>
+                              <td class="cell"><input type="checkbox" name="cb9" value="Female" {$physicianTaxTypeIdEin eq "&nbsp" ? disabled : $physicianTaxTypeIdEin}></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">26. PATIENT'S ACCOUNT NO.</td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell"><strong>{$patientAccountNo}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">27.&nbsp</td>
+                              <td>ACCEPT ASSIGNMENT?<br>(For govt. claims, see back)</td>
+                            </tr>
+                            <tr class="cell">
+                              <td>&nbsp</td>
+                              <td><input type="checkbox" name="cb9" value="Female" {$claimAcceptAssignmentY eq "&nbsp" ? disabled : $claimAcceptAssignmentY}>YES
+                              <input type="checkbox" name="cb9" value="Female" {$claimAcceptAssignmentN eq "&nbsp" ? disabled : $claimAcceptAssignmentN}>NO</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr class="high">
+                        <td class="r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">31.&nbsp</td>
+                              <td colspan="2">SIGNATURE OF PHYSICIAN OR SUPPLIER<br>
+                                              INCLUDING DEGREES OR CREDENTIALS<br>
+                                              (I certify that the statements on the reverse<br>
+                                              apply to this bill and are made a part thereof.)
+                              </td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td class="cell">SIGNED</td>
+                              <td class="cell">DATE</td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td colspan="2">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell">32.&nbsp</td>
+                              <td>NAME AND ADDRESS OF FACILITY WHERE SERVICES WERE<br>
+                                  RENDERED (If other than home or office)
+                              </td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td><strong> {$organizationName}<br>{$organizationAddress}<br>{$organizationCityStateZipCode}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td valign="top">
+              <table id="rbot" border="0" cellpadding="0" cellspacing="0">
+                <tr class="std">
+                  <td class="b st">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="8">16. DATES PATIENT UNABLE TO WORK IN CURRENT OCCUPATION</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                        <td class="cell">&nbsp</td>
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell" align="right">FROM</td>
+                        <td class="cell rd" align="center"><strong>{$datePatientUnableToWorkFrom ne "&nbsp" ? substr($datePatientUnableToWorkFrom,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$datePatientUnableToWorkFrom ne "&nbsp" ? substr($datePatientUnableToWorkFrom,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$datePatientUnableToWorkFrom ne "&nbsp" ? substr($datePatientUnableToWorkFrom,6,4) : "&nbsp"}<strong></td>
+                        <td class="cell" align="right">TO</td>
+                        <td class="cell rd" align="center"><strong>{$datePatientUnableToWorkTo ne "&nbsp" ? substr($datePatientUnableToWorkTo,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$datePatientUnableToWorkTo ne "&nbsp" ? substr($datePatientUnableToWorkTo,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$datePatientUnableToWorkTo ne "&nbsp" ? substr($datePatientUnableToWorkTo,6,4) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell" height="30%">
+                        <td class="cell" colspan="8">18. HOSPITALIZATION DATES RELATED TO CURRENT SERVICES</td>
+                      </tr>
+                      <tr class="cell" height="30%">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                        <td class="cell">&nbsp</td>
+                        <td class="cell" align="center">MM</td>
+                        <td class="cell" align="center">DD</td>
+                        <td class="cell" align="center">YY</td>
+                      </tr>
+                      <tr class="cell" height="40%">
+                        <td class="cell" align="right">FROM</td>
+                        <td class="cell rd" align="center"><strong>{$treatmentHospitilizationDateFrom ne "&nbsp" ? substr($treatmentHospitilizationDateFrom,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$treatmentHospitilizationDateFrom ne "&nbsp" ? substr($treatmentHospitilizationDateFrom,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$treatmentHospitilizationDateFrom ne "&nbsp" ? substr($treatmentHospitilizationDateFrom,6,4) : "&nbsp"}<strong></td>
+                        <td class="cell" align="right">TO</td>
+                        <td class="cell rd" align="center"><strong>{$treatmentHospitilizationDateTo ne "&nbsp" ? substr($treatmentHospitilizationDateTo,0,2) : "&nbsp"}<strong></td>
+                        <td class="cell rd" align="center"><strong>{$treatmentHospitilizationDateTo ne "&nbsp" ? substr($treatmentHospitilizationDateTo,3,2) : "&nbsp"}<strong></td>
+                        <td class="cell" align="center"><strong>{$treatmentHospitilizationDateTo ne "&nbsp" ? substr($treatmentHospitilizationDateTo,6,4) : "&nbsp"}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">20. OUTSIDE LAB?</td>
+                        <td class="cell" colspan="2" align="center">$ CHARGES</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r">
+                          <input type="checkbox" name="cb9" value="Female" {$treatmentOutsideLabY eq "&nbsp" ? disabled : $treatmentOutsideLabY}>YES
+                          <input type="checkbox" name="cb9" value="Female" {$treatmentOutsideLabN eq "&nbsp" ? disabled : $treatmentOutsideLabN}>NO
+                        </td>
+                        <td class="cell r" align="center"><strong>{$treatmentOutsideLabCharges}<strong></td>
+                        <td class="cell decimal">&nbsp</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">22. MEDICAID RESUBMISSION CODE</td>
+                        <td class="cell">ORIGINAL REF. NO</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell r"><strong>{$treatmentMedicaidResubmission}<strong></td>
+                        <td class="cell"><strong>{$treatmentResubmissionReference}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td>
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">23. PRIOR AUTHORIZATION NUMBER</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell"><strong>{$treatmentPriorAuthorizationNo}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td>
+                    <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                      <tr class="prochead">
+                        <td class="cell t r b colf" align="center">F</td>
+                        <td class="cell t r b colg" align="center">G</td>
+                        <td class="cell t r b colh" align="center">H</td>
+                        <td class="cell t r b coli" align="center">I</td>
+                        <td class="cell t r b colj" align="center">J</td>
+                        <td class="cell t b colk" align="center">K</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r" align="center" valign="center">$ CHARGES</td>
+                        <td class="b r" align="center" valign="center">DAYS<br>OR<br>UNITS</td>
+                        <td class="b r" align="center" valign="center">EPSDT<br>Family<br>Plan</td>
+                        <td class="b r" align="center" valign="center">EMG</td>
+                        <td class="b r" align="center" valign="center">COB</td>
+                        <td class="b" align="center" valign="center">RESERVED FOR<br>LOCAL USE</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure1Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure1DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure1Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure2Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure2DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure2Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure3Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure3DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure3Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure4Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure4DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure4Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure5Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure5DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure5Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+                      <tr class="std">
+                        <td class="b r">
+                          <table class="cell" border="0" cellspacing="0" cellpadding="0">
+                            <tr class="cell">
+                              <td class="cell rd chrg1" valign="center" align="right" width ="70%"> <br><strong> {@pc = split(/\./,$procedure6Charges); $pc[0] eq "&nbsp" ? "&nbsp" : $pc[0]}<strong></td>
+                              <td class="cell chrg2" valign="center" align="right" width ="30%">&nbsp<br><strong>{($pc[0] ne "&nbsp") && ($pc[1] eq "") ? "00" : $pc[1]}<strong></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td class="b r" align="center" valign="center"><br><strong>{$procedure6DaysOrUnits}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b r" align="center" valign="center"><br><strong>&nbsp{$procedure6Emergency}<strong></td>
+                        <td class="b r" align="center" valign="center">&nbsp</td>
+                        <td class="b" align="center" valign="center">&nbsp</td>
+                      </tr>
+              	    </table>
+                  </td>
+                </tr>
+                <tr class="std">
+                  <td class="cell b">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell r" colspan="3">28. TOTAL CHARGE</td>
+                         <td class="cell r" colspan="3">29. AMOUNT PAID</td>
+                         <td class="cell" colspan="3">30. BALANCE DUE</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">$</td>
+                        <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimTotalCharge);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
+                        <td class="cell r decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                        <td class="cell">$</td>
+                        <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimAmountPaid);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
+                        <td class="cell r decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                        <td class="cell">$</td>
+                        <td class="cell rd chrg2" align="right"><strong>{@d = split(/\./,$claimBalance);$d[0] eq "&nbsp" ? "0" : $d[0]}<strong></td>
+                        <td class="cell decimal chrg2" align="right"><strong>{$d[1] eq "" ? "00" : $d[1]}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr height ="102">
+                  <td class="cell sb">
+                    <table class="cell" border="0" cellpadding="0" cellspacing="0">
+                      <tr class="cell">
+                        <td class="cell">33.</td>
+                        <td colspan="2">PHYSICIAN'S, SUPPLIER'S BILLING NAME, ADDRESS, ZIP CODE<br>&amp PHONE #</td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp</td>
+                        <td colspan="2"><strong>{$physicianName}<br>{$physicianAddress}<br>{$physicianCityStateZipCode}
+                        </td>
+                      </tr>
+                      <tr class="cell">
+                        <td class="cell">&nbsp</td>
+                        <td class="cell r">PIN# <strong>{$physicianPin}<strong></td>
+                        <td class="cell">GRP# <strong>{$physicianGrp}<strong></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </form>
+  </body>
+</html>
