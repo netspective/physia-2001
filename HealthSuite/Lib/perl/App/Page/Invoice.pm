@@ -1525,6 +1525,7 @@ sub prepare_page_content_header
 
 	$self->SUPER::prepare_page_content_header(@_);
 
+	my $sessOrg = $self->session('org_id');
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 
 	my $created = App::Universal::INVOICESTATUS_CREATED;
@@ -1592,6 +1593,7 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Post Insurance Payment</option>" : '' ]}
+						<option value="/person/$clientId/dlg-add-postbatchpayment">Post Batch Personal Payments</option>
 						<option value="/invoice/$invoiceId/dlg-add-postpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
