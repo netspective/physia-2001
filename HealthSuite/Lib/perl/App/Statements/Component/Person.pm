@@ -311,9 +311,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	FROM    person_attribute pa,
 		offering_catalog oc
 	WHERE   pa.parent_id = :1
-	AND	pa.item_name = 'Fee Schedules'
+	AND	pa.item_name = 'Fee Schedule'
 	AND	pa.item_type = 0
-	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
+	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_INTEGER ]}
 	AND	pa.value_int = oc.internal_catalog_id
 	ORDER BY oc.catalog_id
 	},
