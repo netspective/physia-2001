@@ -52,9 +52,6 @@ use vars qw(
 	%AGE
 );
 
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
-
 @ERROR_MESSAGES =
 (
 	"ICD '%s' is not a valid ICD",
@@ -194,7 +191,7 @@ sub validateDiags
 	for (@{$diagsRef})
 	{
 		my $icd = uc($_);
-		
+
 		unless ($ICD_CACHE{$icd}->{icd})
 		{
 			$ICD_CACHE{$icd} = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
@@ -326,6 +323,8 @@ sub __validateProcs
 sub crossChecks
 {
 	my ($page, $flags, $errorRef, %params) = @_;
+	return if $flags & INTELLICODEFLAG_SKIPWARNING;
+
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	my %diagReferenced = ();
@@ -334,7 +333,7 @@ sub crossChecks
 	{
 		my ($cpt, $modifier) = (uc($_->[0]), $_->[1]);
 		next unless ($CPT_CACHE{$cpt}->{cpt} || $CPT_CACHE{$cpt}->{hcpcs});
-		
+
 		my $count = scalar(@$_) -1;
 		my @diags = @$_[2..$count];
 
@@ -361,7 +360,7 @@ sub crossChecks
 	}
 
 	return if $flags & INTELLICODEFLAG_SKIPWARNING;
-	
+
 	my $diagsRef = (ref $params{diags} eq 'ARRAY') ? $params{diags} : [$params{diags}];
 
 	for my $icd (@{$diagsRef})
@@ -461,7 +460,7 @@ sub mutualExclusiveEdits
 {
 	my ($page, $flags, $errorRef, %params) = @_;
 	return if $flags & INTELLICODEFLAG_SKIPWARNING;
-	
+
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	for my $i (0..(@$procsRef)-1)
@@ -487,7 +486,7 @@ sub compoundEdits
 {
 	my ($page, $flags, $errorRef, %params) = @_;
 	return if $flags & INTELLICODEFLAG_SKIPWARNING;
-	
+
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	for my $i (0..(@$procsRef)-1)
@@ -533,7 +532,7 @@ sub icdEdits
 		}
 
 		return if $flags & INTELLICODEFLAG_SKIPWARNING;
-		
+
 		if ($ICD_CACHE{$icd}->{comorbidity_complication}) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_COMORBIDITYICD], detailLink('icd', $icd), $icdName));
 		}
@@ -578,9 +577,9 @@ sub cptEdits
 		unless ($params{sex} =~ /$cptSex/i || (! $cptSex)) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDSEXFORCPT], detailLink('cpt', $cpt), $cptName, $SEX{$cptSex}));
 		}
-		
+
 		return if $flags & INTELLICODEFLAG_SKIPWARNING;
-		
+
 		if ($CPT_CACHE{$cpt}->{unlisted}) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_UNLISTEDCPT], detailLink('cpt', $cpt), $cptName));
 		}
@@ -637,7 +636,7 @@ sub __incrementUsage
 		{
 			next unless $CPT_CACHE{$code}->{cpt};
 		}
-		
+
 		if ($STMTMGR_INTELLICODE->recordExists($page, STMTMGRFLAG_NONE, $selName1, $code, $person_id, $org_id))
 		{
 			$STMTMGR_INTELLICODE->execute($page, STMTMGRFLAG_NONE, $updName1, $code, $person_id, $org_id);
@@ -673,16 +672,16 @@ sub getItemCost
 	for my $i (0..(@$fsRef -1))
 	{
 		my $fs = $fsRef->[$i];
-		
+
 		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
-	
+
 		for my $entry (@{$entries})
 		{
 			push(@buffer, [$fs, $entry]);
 		}
 	}
-	
+
 	return \@buffer;
 }
 
@@ -694,25 +693,25 @@ sub _getItemCost
 	for my $i (0..(@$fsRef -1))
 	{
 		my $fs = $fsRef->[$i];
-		
+
 		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
-	
+
 		for my $entry (@{$entries})
 		{
 			push(@buffer, [$fs, $entry->{unit_cost}]);
 		}
 	}
-	
+
 	if (scalar @buffer == 0)
 	{
-		return (2, "No price found for this Code/Modifier/Fee_Schedule combination.");		
+		return (2, "No price found for this Code/Modifier/Fee_Schedule combination.");
 	}
 	elsif (scalar @buffer == 1)
 	{
 		return (0, $buffer[0]->[1]);
 	}
-	else 
+	else
 	{
 		return (1, \@buffer);
 	}
@@ -828,36 +827,6 @@ sub __getItemCost
 	#	}
 	#}
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/25/2000', 'TVN',
-		'IntelliCode',
-		'Receive array of ICD codes for each procedure.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/21/2000', 'TVN',
-		'IntelliCode',
-		'Added check for unreferenced ICD.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/20/2000', 'TVN',
-		'IntelliCode',
-		'Optimized for maximum performance when incrementUsage.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/06/2000', 'TVN',
-			'IntelliCode',
-		'Completed Hyper-Link Codes to Detailed Search.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/07/2000', 'TVN',
-			'IntelliCode',
-		'Implement additional CPT and ICD edits.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/08/2000', 'TVN',
-			'IntelliCode',
-		'Completed CPT and ICD edits.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/14/2000', 'TVN',
-		'IntelliCode',
-		'Added sub incrementUsage to increment read_counts of the Ref_xxx_Usage tables.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/30/2000', 'MAF',
-		'IntelliCode',
-		'Added sub getItemCost to return cost of cpt code or all explosion code entries.'],
-
-);
-
 
 1;
 
