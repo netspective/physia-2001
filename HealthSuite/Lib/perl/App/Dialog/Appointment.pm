@@ -215,7 +215,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Action',
 			name => 'verify_action',
 			choiceDelim =>',',
-			selOptions => "Talked to Patient,Left Message, Unable to Reach, Incorrect Phone Number",
+			selOptions => "Talked to Patient:Talked to Patient,Left Message:Left Message, Unable to Reach:Unable to Reach, Incorrect Phone Number:Incorrect Phone Number",
 			type => 'select',
 			style => 'radio',
 			options => FLDFLAG_REQUIRED,

@@ -223,7 +223,8 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	},
 
 	'sel_populateAppConfirmDialog' => qq{
-		select app_verified_by, app_verify_date from Sch_Verify where event_id = ?
+		select app_verified_by, app_verify_date, verify_action
+		from Sch_Verify where event_id = ?
 	},
 
 	'sel_populateMedVerifyDialog' => qq{
