@@ -181,10 +181,11 @@ sub isValid
 				#$self->invalidate($page, "[<B>P$line</B>] The CPT code $procedure is not valid. Please verify");
 			}
 		}
-		elsif($procedure !~ m/^(\d+)$/)
-		{
-			$self->invalidate($page, "[<B>P$line</B>] The CPT code was not found.");
-		}
+		#elsif($procedure !~ m/^(\d+)$/)
+		#{
+		#	$self->invalidate($page, "[<B>P$line</B>] The CPT code was not found.");
+		#}
+
 		if($modifier ne '')
 		{
 			if($modifier =~ m/^(\d+)$/)
@@ -233,8 +234,6 @@ sub isValid
 			$self->invalidate($page, "[<B>P$line</B>] The dollar amount $charges is not valid. Please verify");
 		}
 
-
-
 		## INTELLICODE VALIDATION
 		my @procs = ();
 		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
@@ -252,7 +251,7 @@ sub isValid
 			my $resultCount = scalar(@$fsResults);
 			if($resultCount == 0)
 			{
-				$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for CPT code '$procedure' and modifier '$modifier'");
+				$self->invalidate($page, "[<B>P$line</B>] No unit cost was found for code '$procedure' and modifier '$modifier'");
 			}
 			elsif($resultCount == 1)
 			{
@@ -270,19 +269,19 @@ sub isValid
 			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
 		}
 
-		#@errors = App::IntelliCode::validateCodes
-		#	(
-		#		$page, 0,
-		#		sex => $gender,
-		#		dateOfBirth => $dateOfBirth,
-		#		diags => \@diagCodes,
-		#		procs => \@procs,
-		#	);
+		@errors = App::IntelliCode::validateCodes
+		(
+			$page, App::IntelliCode::INTELLICODEFLAG_SKIPWARNING,
+			sex => $gender,
+			dateOfBirth => $dateOfBirth,
+			diags => \@diagCodes,
+			procs => \@procs,
+		);
 
-		#foreach (@errors)
-		#{
-		#	$self->invalidate($page, "[<B>P$line</B>] $_");
-		#}
+		foreach (@errors)
+		{
+			$self->invalidate($page, "[<B>P$line</B>] $_");
+		}
 	}
 
 	return @errors || $page->haveValidationErrors() ? 0 : 1;
@@ -427,9 +426,11 @@ sub getHtml
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || ($line == 1 ? 'From' : '')]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
 					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || ($line == 1 ? 'To' : '') ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_service_type' TYPE='text' VALUE='@{[ $page->param("_f_proc_$line\_service_type") ]}' size=2>
+					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_service_type, '/lookup/servicetype', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)"><A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
+				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
+					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags")]}'></TD>
@@ -506,11 +507,14 @@ sub getHtml
 						<TD><FONT $textFontAttrs>Default Fee Schedule(s)</FONT></TD>
 					</TR>
 					<TR VALIGN=TOP>
-						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+						<TD><NOBR><INPUT TYPE="TEXT" SIZE=20 NAME="_f_proc_diags"  VALUE='@{[ $page->param("_f_proc_diags") ]}'>
+							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_diags, '/lookup/icd', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> <A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
+						<TD><NOBR><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_service_place"  VALUE='@{[ $page->param("_f_proc_service_place") || $svcPlaceCode->{value_text} ]}'> 
+							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_service_place, '/lookup/serviceplace', ',');"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'></TD>
+						<TD><INPUT $readOnly TYPE="TEXT" SIZE=20 NAME="_f_proc_default_catalog"  VALUE='@{[ $page->param("_f_proc_default_catalog") ]}'>
+							<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_default_catalog, '/lookup/catalog', ',', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR></TD>
 					</TR>
 					$nonLinesHtml
 				</TABLE>

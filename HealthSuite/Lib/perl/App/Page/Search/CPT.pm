@@ -25,8 +25,10 @@ sub getForm
 	my ($self, $flags) = @_;
 	my $search_type = $self->param('search_type') || "description";
 	my $search_compare = $self->param('search_compare');
+	
+	my $hcpcsSearchChecked = "checked" if $self->param('hcpcs_search');
 
-	return ('Lookup CPT-4 code/description', qq{
+	return ('Lookup CPT-4 or HCPCS code/description', qq{
 		<CENTER>
 		<NOBR>
 		<select name="search_type">
@@ -40,6 +42,8 @@ sub getForm
 			<option value="is">is</option>
 		</select>
 		<input name="search_expression" value="@{[$self->param('search_expression')]}">
+		<input name='hcpcs_search' type=checkbox $hcpcsSearchChecked>
+		HCPCS Search &nbsp; &nbsp;
 		<input type=submit name="execute" value="Go">
 		</NOBR>
 		</CENTER>
@@ -72,13 +76,24 @@ sub execute
 	my $bindParams = [uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
 
-
-	$self->addContent(
-		'<CENTER>',
-		$STMTMGR_CPT_CODE_SEARCH->createHtml
-			($self, STMTMGRFLAG_NONE, "sel_cpt_$type$appendStmtName", $bindParams,),
-		'</CENTER>'
-	);
+	if ($self->param('hcpcs_search'))
+	{
+		$self->addContent(
+			'<CENTER>',
+			$STMTMGR_HCPCS_CODE_SEARCH->createHtml
+				($self, STMTMGRFLAG_NONE, "sel_hcpcs_$type$appendStmtName", $bindParams,),
+			'</CENTER>'
+		);
+	}
+	else
+	{
+		$self->addContent(
+			'<CENTER>',
+			$STMTMGR_CPT_CODE_SEARCH->createHtml
+				($self, STMTMGRFLAG_NONE, "sel_cpt_$type$appendStmtName", $bindParams,),
+			'</CENTER>'
+		);			
+	}
 
 	return 1;
 }

@@ -6,12 +6,13 @@ use strict;
 use Set::Scalar;
 use DBI::StatementManager;
 use App::Statements::IntelliCode;
+use App::Statements::Search::Code;
 use App::Statements::Catalog;
 use Date::Calc qw(:all);
 use App::Page::Search;
 use App::Data::Manipulate;
 
-use enum qw(BITMASK:INTELLICODEFLAG_ ICDARRAY ICDARRAYINDEX);
+use enum qw(BITMASK:INTELLICODEFLAG_ ICDARRAY ICDARRAYINDEX SKIPWARNING);
 
 use enum qw(BITMASK:AGE_ ADULT MATERNAL NEWBORN PEDIATRIC);
 use enum qw(:ICDFLAG_ INVALIDCPTLIST);
@@ -115,7 +116,7 @@ sub validateCodes
 	#  See AppSites\practice-management\debug\testIntelliCode.ppl for example.
 	# );
 
-	$flags = INTELLICODEFLAG_ICDARRAY unless $flags;
+	#$flags = INTELLICODEFLAG_ICDARRAY unless $flags;
 
 	my @errors = ();
 
@@ -261,6 +262,59 @@ sub validateProcs
 					$hash->{flags} |= CPTFLAG_INVALIDMUTEXCLLIST;
 				}
 			}
+			else
+			{
+				$CPT_CACHE{$cpt} = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash
+					($page, STMTMGRFLAG_NONE, 'sel_hcpcs_code', $cpt);
+			}
+		}
+
+		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDCPT], $cpt))
+			unless ($CPT_CACHE{$cpt}->{cpt} || $CPT_CACHE{$cpt}->{hcpcs});
+		push(@$errorRef, sprintf("Can not check comprehensive compounds CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDCOMPOUNDLIST;
+		push(@$errorRef, sprintf("Can not check mutually exclusive CPTs list for CPT $cpt (error loading set)")) if $CPT_CACHE{$cpt}->{flags} & CPTFLAG_INVALIDMUTEXCLLIST;
+	}
+}
+
+sub __validateProcs
+{
+	my ($page, $flags, $errorRef, %params) = @_;
+	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
+
+	for (@$procsRef)
+	{
+		my $cpt = uc($_->[0]);
+
+		unless ($CPT_CACHE{$cpt}->{cpt})
+		{
+			$CPT_CACHE{$cpt} = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE,
+				'selCptData', $cpt);
+
+			if ($CPT_CACHE{$cpt})
+			{
+				my $hash = $CPT_CACHE{$cpt};
+				$hash->{flags} = 0 unless exists $hash->{flags};
+				eval
+				{
+					$hash->{comprehensive_compound_cpts} = new Set::Scalar(split(',', $hash->{comprehensive_compound_cpts}));
+				};
+				if($@)
+				{
+					push(@$errorRef, "Unable to create comprehensive_compound_cpts run_list for cpt $cpt: $@");
+					$hash->{comprehensive_compound_cpts} = new Set::Scalar();
+					$hash->{flags} |= CPTFLAG_INVALIDCOMPOUNDLIST;
+				}
+				eval
+				{
+					$hash->{mutual_exclusive_cpts} = new Set::Scalar(split(',', $hash->{mutual_exclusive_cpts}));
+				};
+				if($@)
+				{
+					push(@$errorRef, "Unable to create mutual_exclusive_cpts run_list for cpt $cpt: $@");
+					$hash->{mutual_exclusive_cpts} = new Set::Scalar();
+					$hash->{flags} |= CPTFLAG_INVALIDMUTEXCLLIST;
+				}
+			}
 		}
 
 		push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDCPT], $cpt)) unless ($CPT_CACHE{$cpt}->{cpt});
@@ -279,7 +333,7 @@ sub crossChecks
 	for (@$procsRef)
 	{
 		my ($cpt, $modifier) = (uc($_->[0]), $_->[1]);
-		next unless ($CPT_CACHE{$cpt}->{cpt});
+		next unless ($CPT_CACHE{$cpt}->{cpt} || $CPT_CACHE{$cpt}->{hcpcs});
 		
 		my $count = scalar(@$_) -1;
 		my @diags = @$_[2..$count];
@@ -306,6 +360,8 @@ sub crossChecks
 		}
 	}
 
+	return if $flags & INTELLICODEFLAG_SKIPWARNING;
+	
 	my $diagsRef = (ref $params{diags} eq 'ARRAY') ? $params{diags} : [$params{diags}];
 
 	for my $icd (@{$diagsRef})
@@ -404,6 +460,8 @@ sub __crossChecks
 sub mutualExclusiveEdits
 {
 	my ($page, $flags, $errorRef, %params) = @_;
+	return if $flags & INTELLICODEFLAG_SKIPWARNING;
+	
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	for my $i (0..(@$procsRef)-1)
@@ -428,6 +486,8 @@ sub mutualExclusiveEdits
 sub compoundEdits
 {
 	my ($page, $flags, $errorRef, %params) = @_;
+	return if $flags & INTELLICODEFLAG_SKIPWARNING;
+	
 	my $procsRef = (ref $params{procs} eq 'ARRAY') ? $params{procs} : [[$params{procs}]];
 
 	for my $i (0..(@$procsRef)-1)
@@ -472,6 +532,8 @@ sub icdEdits
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDAGEFORICD], detailLink('icd', $icd), $icdName, $icdAgeText));
 		}
 
+		return if $flags & INTELLICODEFLAG_SKIPWARNING;
+		
 		if ($ICD_CACHE{$icd}->{comorbidity_complication}) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_COMORBIDITYICD], detailLink('icd', $icd), $icdName));
 		}
@@ -516,6 +578,9 @@ sub cptEdits
 		unless ($params{sex} =~ /$cptSex/i || (! $cptSex)) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_INVALIDSEXFORCPT], detailLink('cpt', $cpt), $cptName, $SEX{$cptSex}));
 		}
+		
+		return if $flags & INTELLICODEFLAG_SKIPWARNING;
+		
 		if ($CPT_CACHE{$cpt}->{unlisted}) {
 			push(@$errorRef, sprintf($ERROR_MESSAGES[INTELLICODEERR_UNLISTEDCPT], detailLink('cpt', $cpt), $cptName));
 		}
