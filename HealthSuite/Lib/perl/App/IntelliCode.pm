@@ -565,7 +565,7 @@ sub getItemCost
 
 sub getItemPrice
 {
-	my ($page, $cpt, $modifier, $bufferRef, $fs) = @_;
+	my ($page, $cpt, $modifier, $bufferRef, $fs, $ffsFlag) = @_;
 	
 	my $orgId = $page->session('org_id');
 
@@ -582,8 +582,8 @@ sub getItemPrice
 			'sel_catalogEntry_by_code_catalog', $cpt, $fs);
 	}
 
-	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}) ])
-		if exists $entry->{unit_cost};
+	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), 
+		$ffsFlag || $entry->{flags} ]) if exists $entry->{unit_cost};
 }
 
 sub defaultToFFS
@@ -596,7 +596,7 @@ sub defaultToFFS
 		
 	if (my $fs = $ffs->{internal_catalog_id})
 	{
-		getItemPrice($page, $cpt, $modifier, $bufferRef, $fs);		
+		getItemPrice($page, $cpt, $modifier, $bufferRef, $fs, 1);
 	}
 }
 
