@@ -98,7 +98,9 @@ sub makeStateChanges
 		{
 			$self->updateFieldFlags('payer_fields', FLDFLAG_INVISIBLE, 1);
 			$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
+			#$self->updateFieldFlags('deduct_fields', FLDFLAG_INVISIBLE, 1);
 			$self->updateFieldFlags('deduct_balance', FLDFLAG_INVISIBLE, 1);
+			$self->updateFieldFlags('primary_ins_phone', FLDFLAG_INVISIBLE, 1);
 		}
 	}
 
