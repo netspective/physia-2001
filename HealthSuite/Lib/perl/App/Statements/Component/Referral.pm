@@ -27,9 +27,9 @@ $STMTRPTDEFN_WORKLIST =
 {
 	columnDefn =>
 	[
-		{colIdx => 1, head => 'ID', dAlign => 'left', url => "#8#"},
-		{colIdx => 2, head => 'Status', dAlign => 'left'},
-		{colIdx => 3, head => 'Patient', dAlign => 'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
+		{colIdx => 1, head => 'ID', dAlign => 'left'},
+		#{colIdx => 2, head => 'Status', dAlign => 'left'},
+		{colIdx => 3, head => 'Patient',hAlign=>'left', url => "javascript:doActionPopup('/person/#3#/profile')"},
 		{colIdx => 4, head => 'Referral Type', dAlign => 'center'},
 		{colIdx => 5, head => 'Date of Request', dAlign => 'center'},
 		{colIdx => 6, head => 'Intake Coordinator', dAlign => 'center'},
@@ -43,8 +43,8 @@ $STMTRPTDEFN_AUTH_WORKLIST =
 {
 	columnDefn =>
 	[
-		{colIdx => 0, head => 'Referral ID ', dAlign => 'left'},
-		{colIdx => 1, head => 'Intake ID', dAlign => 'left', url => "#7#"},
+		{colIdx => 0, head => 'Service Request ID ', dAlign => 'left'},
+		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#7#"},
 		{colIdx => 2, head => 'Review Date ', dAlign => 'left'},
 		{colIdx => 3, head => 'SSN', dAlign => 'left'},
 		{colIdx => 4, head => 'Last Name', dAlign => 'left'},
@@ -123,7 +123,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 
 	'sel_referral_authorization' => qq{
 		SELECT
-			parent_trans_id as referral_id,
+			(SELECT parent_trans_id FROM transaction WHERE trans_id = t.parent_trans_id) as referral_id,
 			trans_id as intake_id,
 			 data_date_a as review_date,
 			 consult_id as patient,
