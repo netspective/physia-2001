@@ -30,13 +30,13 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'feescheduledataentry' => {
 			heading => '$Command Fee Schedule Entry', 
-			_arl => ['catalog_id'], 
+			_arl => ['internal_catalog_id'], 
 		},
 );
 
 my $CPT_CODE=App::Universal::CATALOGENTRYTYPE_CPT;
 my $CPT_HCPCS=App::Universal::CATALOGENTRYTYPE_HCPCS;
-
+my $FS_CATALOG_TYPE = 0;
 sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'feescheduledataentry', heading => 'Fee Schedule Entries');
@@ -49,10 +49,11 @@ sub new
 	$self->addContent(
                         new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 						name => 'catalog_id',
-						type => 'integer',
+						#type => 'integer',
 						options => FLDFLAG_REQUIRED,
 						#findPopup => '/lookup/catalog',
-						hints => 'Numeric Fee Schedule ID'),
+						#hints => 'Numeric Fee Schedule ID'
+						),
                         new CGI::Dialog::Field(	caption => 'CPTs', 
                         			name => 'listofcpts', 
                         			size => 70, 
@@ -70,9 +71,9 @@ sub new
 sub populateData
 {
 	my ($self, $page, $command) = @_;
-	return unless $page->param('catalog_id');	
-	my $internalId = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdById',$page->session('org_internal_id'),$page->param('catalog_id'));
-	$page->field('catalog_id',$internalId->{internal_catalog_id}) if $internalId->{internal_catalog_id};
+	return unless $page->param('internal_catalog_id');	
+	my $internalId = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdById',$page->session('org_internal_id'),$page->param('internal_catalog_id'));
+	$page->field('catalog_id',$internalId->{catalog_id}) if $internalId->{internal_catalog_id};
 	
 }
 
@@ -90,7 +91,7 @@ sub customValidate
 	my ($self, $page) = @_;
 	
 	my $cpts = $page->field('listofcpts');
-	my $fs = $page->field('catalog_id');
+	my $fs;
 	my $fsField = $self->getField('catalog_id');
 	my $cptField = $self->getField('listofcpts');
         $cpts =~ s/\s//g;         
@@ -105,7 +106,11 @@ sub customValidate
         my $gpciItemName = 'Medicare GPCI Location';		
 	my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute',$page->session('org_internal_id'), $gpciItemName);
 	$fsField->invalidate($page, "Medicare GPCI Location is not set for $orgName")	unless $org->{value_text};
-        
+
+	my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType', 
+			$page->session('org_internal_id'),$page->field('catalog_id'),$FS_CATALOG_TYPE);     
+	$fs = $catalog->{internal_catalog_id};
+	$page->param('internal_catalog_id',$fs);
         #Make sure Fee schedule has a multipler specificed
         my $fsHash = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogById', $fs);
         if(!defined $fsHash->{catalog_id})
@@ -114,7 +119,7 @@ sub customValidate
         }
         else
         {
-        	$fsField->invalidate($page, "Fee Schedule $fs ($fsHash->{catalog_id}) does not have a RVRBS multiplier.") unless defined $fsHash->{rvrbs_multiplier};
+        	$fsField->invalidate($page, "Fee Schedule '$fsHash->{catalog_id}' does not have a RVRBS multiplier.") unless defined $fsHash->{rvrbs_multiplier};
         }
         
         foreach my $check (@sortCpt)
@@ -159,7 +164,7 @@ sub execute
 	my ($self, $page, $command, $flags, $member) = @_;
 
 	my $cpts = $page->field('listofcpts');
-	my $fs = $page->field('catalog_id');
+	my $fs = $page->param('internal_catalog_id');
 	my $fsField = $self->getField('catalog_id');
 	my $cptField = $self->getField('listofcpts');
         $cpts =~ s/\s//g;         
@@ -173,6 +178,7 @@ sub execute
         {        	
 		my @cptRange = split(/-/, $check);   			
 		$cptRange[1] = length($cptRange[1]) ? $cptRange[1] : $cptRange[0];		
+		$page->addError("$cptRange[0] <-> $cptRange[1]");
 		#SQL COMMAND TO CREATE RANGE FEE SCHEDULE ENTRIES
 		my $insertStmt = qq{
 			INSERT INTO Offering_Catalog_Entry  (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
