@@ -246,6 +246,7 @@
 		<enum>Appealed</enum>
 		<enum>Closed</enum>
 		<enum>Void</enum>
+		<enum>Paper Claim Printed</enum>
 	</table>
 
 	<table name="Adjust_Method" abbrev="AdjMeth" type="Enumeration">
