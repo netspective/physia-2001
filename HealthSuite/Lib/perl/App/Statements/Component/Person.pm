@@ -2020,7 +2020,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.patientAppointments' => {
 	sqlStmt => qq{
-	    	select 	e.start_time, e.duration, eadoc.value_text, e.subject
+	    	select 	%simpleDate:e.start_time%, to_char(e.start_time, 'HH12:MI AM'), to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'), eadoc.value_text, e.subject
 		from 	event_attribute eaper, event_attribute eadoc, event e
 		where 	eaper.parent_id = e.event_id
 		and	eadoc.parent_id = e.event_id
@@ -2032,10 +2032,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Appointments', dataFmt => '#0# #2# #3# #1#' },
+			{ head => 'Appointments', dataFmt => '#0# #1# - #2# #4# with #3#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#?home=/#param.arl#',
-		separateDataColIdx => 2, # when the date is '-' add a row separator
+		#bullets => 'stpe-#my.stmtId#/dlg-remove-patientappointments?home=/#param.arl#',
+		#separateDataColIdx => 2, # when the date is '-' add a row separator
 	},
 	publishDefn_panel =>
 	{
@@ -2057,11 +2057,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-activeproblems-surgical?home=#param.home#'>Appointments</A> } },
+				#{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-patientappointments?home=#param.home#'>Appointments</A> } },
 			],
 		},
 		stdIcons =>	{
-			 delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
+			# delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId]); },

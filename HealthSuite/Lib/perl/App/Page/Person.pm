@@ -371,6 +371,7 @@ sub prepare_view_profile
 						</TABLE><BR>
 						#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedResources#</BR>
+					#component.stp-person.patientAppointments#</BR>					
 					#component.stp-person.benefits#</BR>
 					#component.stp-person.miscNotes#</BR>
 					</font>
