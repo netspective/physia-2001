@@ -397,9 +397,10 @@
 		<column name="writeoff_amount" type="currency" descr="Any writeoffs' amounts"/>
 		<column name="adjust_codes" type="text" size="32" descr="Adjustment code(s)"/>
 		<column name="net_adjust" type="currency" calc="trigger" descr="The real adjustment (taking into account writeoff, payment, etc. maintained automatically)"/>
-
+<!--
 		<column name="batch_date" type="date" descr="Batch Date for payment "/>
 		<column name="batch_id" type="text" size="128"  descr="Batch Date for payment "/>
+-->
 		<column name="comments" type="text" size="512" descr="General comments for the adjustment"/>
 		<column name="data_text_a" type="text" size="64" descr="Extra data, dependent upon adjustment type"/>
 		<column name="data_text_b" type="text" size="64" descr="Extra data, dependent upon adjustment type"/>
