@@ -466,9 +466,9 @@ sub prepare_page_content_header
 		'_pm_view',
 		[
 			['Schedule', "$urlPrefix/apptsheet", 'apptsheet'],
-			['CheckIn', "/search/appointment/,,2,$today,$today,0/1", 'checkin'],
-			['CheckOut', "/search/appointment/,,3,,$today,1/1", 'checkout'],
-			['Confirm', "/search/appointment/,,0,$today,$nextweek,0/1", 'confirm'],
+			#['CheckIn', "/search/appointment/,,2,$today,$today,0/1", 'checkin'],
+			#['CheckOut', "/search/appointment/,,3,,$today,1/1", 'checkout'],
+			#['Confirm', "/search/appointment/,,0,$today,$nextweek,0/1", 'confirm'],
 			['Assign', "$urlPrefix/assign/$today/$today", 'assign'],
 		], ' | ');
 
