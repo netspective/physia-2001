@@ -52,11 +52,11 @@ sub isValid
 		my $ownerId = $page->param('person_id');
 		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
 		#my $insOrg = $page->field('ins_org_id');
-		#my $ownerOrgId = $page->session('org_internal_id');
+		my $ownerOrgId = $page->session('org_internal_id');
 		#my $orgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrg);
 		#my $planName = $page->field('plan_name');
 		#my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$value, $planName, $recordType, $ownerId, $orgId);
-		my $newProductExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewProductExists',$value);
+		my $newProductExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewProductExists',$value, $ownerOrgId);
 
 
 		$self->invalidate($page, "Product Name '$value' already exists.") if $newProductExists ne '';
@@ -180,12 +180,12 @@ sub isValid
 		my $value = $page->field($self->{name});
 
 		#my $orgId = $page->field('ins_org_id');
-		#my $ownerOrgId = $page->session('org_internal_id');
+		my $ownerOrgId = $page->session('org_internal_id');
 		#my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $orgId);
 
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
-		my $orgPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists', $planName);
+		my $orgPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewPlanExists', $planName, $ownerOrgId);
 
 		$self->invalidate($page, "Plan Name '$value' already exists.") if $orgPlanExists ne '';	}
 
