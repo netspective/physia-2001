@@ -150,7 +150,7 @@ use App::Dialog::Person::Nurse;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Staff;
-use App::Dialog::PostBatchPayment;
+#use App::Dialog::PostBatchPayment;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
