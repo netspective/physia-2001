@@ -856,7 +856,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Group Number",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsur->{group_name} || $personInsur->{plan_name} || undef,
+					value_text => $personInsur->{plan_name} || $personInsur->{product_name} || $personInsur->{group_name} || undef,
 					value_textB => $personInsur->{group_number} || $personInsur->{policy_number} || undef,
 					_debug => 0
 				);
