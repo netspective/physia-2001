@@ -58,15 +58,16 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	my $pub = {
 		columnDefn => [
-			{ colIdx => 0,	head => 'Transaction Date',	hAlign => 'center',	dAlign => 'left',	dataFmt => '#0#' },
-			{ colIdx => 1,	head => 'Service Provider',	hAlign => 'center',	dAlign => 'left',	dataFmt => '#1#' },
-			{ colIdx => 2,	head => 'ICD-9',			hAlign => 'center',	dAlign => 'left',	dataFmt => '#2#' },
-			{ colIdx => 3,	head => 'CPT',				hAlign => 'center',	dAlign => 'left',	dataFmt => '#3#' },
-			{ colIdx => 4,	head => 'Description',		hAlign => 'center',	dAlign => 'left',	dataFmt => '#4#' },
-			{ colIdx => 5,	head => 'Charges',			hAlign => 'center',	dAlign => 'right',	dataFmt => '#5#',	dformat => 'currency' },
-			{ colIdx => 6,	head => 'Adjustment',		hAlign => 'center',	dAlign => 'right',	dataFmt => '#6#',	dformat => 'currency' },
-			{ colIdx => 7,	head => 'Description',		hAlign => 'center', dAlign => 'left',	dataFmt => '#7#' },
-			{ colIdx => 8,	head => 'Balance',			hAlign => 'center',	dAlign => 'right',	dataFmt => '#8#',	dformat => 'currency', summarize => 'sum' },
+			{ colIdx => 0,	head => 'Invoice #',				hAlign => 'center',	dAlign => 'left',		dataFmt => '#0#', groupBy => '#0#' },
+			{ colIdx => 1,	head => 'Transaction Date',	hAlign => 'center',	dAlign => 'left',		dataFmt => '#1#' },
+			{ colIdx => 2,	head => 'Service Provider',	hAlign => 'center',	dAlign => 'left',		dataFmt => '#2#' },
+			{ colIdx => 3,	head => 'ICD-9',						hAlign => 'center',	dAlign => 'left',		dataFmt => '#3#' },
+			{ colIdx => 4,	head => 'CPT',							hAlign => 'center',	dAlign => 'left',		dataFmt => '#4#' },
+			{ colIdx => 5,	head => 'Description',			hAlign => 'center',	dAlign => 'left',		dataFmt => '#5#' },
+			{ colIdx => 6,	head => 'Charges',					hAlign => 'center',	dAlign => 'right',	dataFmt => '#6#',	dformat => 'currency', summarize => 'sum' },
+			{ colIdx => 7,	head => 'Adjustment',				hAlign => 'center',	dAlign => 'right',	dataFmt => '#7#',	dformat => 'currency', summarize => 'sum' },
+			{ colIdx => 8,	head => 'Description',			hAlign => 'center', dAlign => 'left',		dataFmt => '#8#' },
+			{ colIdx => 9,	head => 'Balance',					hAlign => 'center',	dAlign => 'right',	dataFmt => '#9#',	dformat => 'currency', summarize => 'sum' },
 		],
 	};
 
@@ -162,6 +163,7 @@ sub execute
 
 		my $rows1 = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
 #start here
+		my $firstTime = 1;
 		foreach my $row1 (@$rows1)
 		{
 			my $desc;
@@ -245,20 +247,23 @@ sub execute
 			}
 
 			my @rowData = (
+				$row->{invoice_id},
 				$row1->{tr_date},
-				($row1->{diags} ne '') ? $doctor : undef,
+				$firstTime ? (($row1->{diags} ne '') ? $doctor : undef) : undef,
 				$row1->{diags},
 				$row1->{cpt},
 				$row1->{description},
 				$row1->{charges} == 0 ? undef : $row1->{charges},
 				$row1->{adjustment} == 0 ? undef : $row1->{adjustment},
 				$desc,
-				undef
+				$firstTime ? $row->{balance} : undef,
 			);
 			push(@data, \@rowData);
+			$firstTime = undef;
 		}
 
 		my @rowData = (
+			$row->{invoice_id}, #undef,
 			undef,
 			undef,
 			undef,
@@ -267,9 +272,9 @@ sub execute
 			undef,
 			undef,
 			undef,
-			$row->{balance}
+			$row->{balance}, #undef
 		);
-		push(@data, \@rowData);
+#		push(@data, \@rowData);
 	}
 
 	$sqlStmt = qq{ select * from agedpatientdata where patient = '$patientID'};
