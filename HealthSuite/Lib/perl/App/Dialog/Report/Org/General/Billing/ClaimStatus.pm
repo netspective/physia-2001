@@ -158,8 +158,21 @@ sub buildSqlStmt
 	}
 	else
 	{
+		my $invoiceStatus = $page->param('invoice_status');
+		$invoiceStatusCond = qq{and Invoice.invoice_status = $invoiceStatus};
+
+		my $submitDate; 
+		if ($invoiceStatus == 4)
+		{
+			$submitDate = qq{to_char(nvl(submit_date, invoice_date), '$SQLSTMT_DEFAULTDATEFORMAT') as submit_date,};
+		}
+		else
+		{
+			$submitDate = qq{to_char(submit_date, '$SQLSTMT_DEFAULTDATEFORMAT') as submit_date,};
+		}
+		
 		$columns = qq{to_char(Invoice.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
-			to_char(nvl(submit_date, invoice_date), '$SQLSTMT_DEFAULTDATEFORMAT') as submit_date, 
+			$submitDate	
 			Invoice_Billing.bill_to_id as bill_to, 
 			product_name as insurance_product,	
 			plan_name as insurance_plan, 
@@ -170,9 +183,6 @@ sub buildSqlStmt
 		};
 		
 		$groupBy = qq{order by invoice_date, bill_to};
-		
-		my $invoiceStatus = $page->param('invoice_status');
-		$invoiceStatusCond = qq{and Invoice.invoice_status = $invoiceStatus};
 	}
 
 	my $html = qq{
@@ -208,7 +218,7 @@ sub execute
 		columnDefn =>
 		[
 			{	head => 'Claims', 
-				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#", null, "status location width=800,height=600,scrollbars,resizable")',
+				url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=status&invoice_status=#2#", null, "width=800,height=600,scrollbars,resizable")',
 				hint => 'View Details' 
 			},
 			{head => 'Count', dAlign => 'right'},
@@ -249,11 +259,11 @@ sub prepare_detail_status
 	my $publishDefn = {
 		columnDefn =>
 		[
-			{head => 'Claim ID', colIdx => 7,
+			{head => 'Claim ID', colIdx => 7, dAlign => 'right',
 				url => qq{javascript:chooseItemForParent("/invoice/#7#/summary") },
 				hint => 'View Invoice Summary',
 			},
-			{head => 'Patient ID', colIdx => 8,
+			{head => 'Patient ID', colIdx => 8, dAlign => 'center',
 				url => qq{javascript:chooseItemForParent("/person/#8#/account")},
 				hint => 'View #8# Account',
 			},
