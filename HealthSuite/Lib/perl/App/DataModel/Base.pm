@@ -7,16 +7,16 @@ use App::DataModel::Utilities;
 use Class::Generate qw(class subclass);
 
 class 'App::DataModel::Base' =>
-[
+{
 	id =>{type=>'$',post=>q{$id = uc($id);}},
 	sourceId=> '$',
+	loadIndicator=>'$',
 	
-
 	'&equalSourceId'=>q{return 0 unless  ($_[0] && $sourceId);  ($_[0] eq $sourceId) ? return 1 : return 0;},
-];
+};
 
 subclass 'App::DataModel::Collection' =>
-[
+{
 	people => 'App::DataModel::People',
 	orgs => 'App::DataModel::Organizations',
 	
@@ -50,14 +50,14 @@ subclass 'App::DataModel::Collection' =>
 	##################################################
 	#NOTE : Need to a new command to create people and org
 	##################################################	
-], -parent => 'App::DataModel::Base';
+}, -parent => 'App::DataModel::Base';
 
 
 ##################################################
 #Container for Orgs, People, Insurance, Etc
 ##################################################	
 subclass 'App::DataModel::Entities'=>
-[
+{
 	position=>'$',
 	all=>'@App::DataModel::Base',	
 	'&findBySourceID'=>q{	  	
@@ -103,11 +103,11 @@ subclass 'App::DataModel::Entities'=>
 				return undef; 
 			       },			       
 			
-], -parent => 'App::DataModel::Base';	
+}, -parent => 'App::DataModel::Base';	
 	
 
 subclass 'App::DataModel::People' =>
-[
+{
 
 	##################################################
 	#Add personnel
@@ -118,11 +118,11 @@ subclass 'App::DataModel::People' =>
 				&add_all($person);	
 				$org->add_personnel($person) if $org;					
 			    },
-], -parent => 'App::DataModel::Entities';
+}, -parent => 'App::DataModel::Entities';
 
 
 subclass 'App::DataModel::Organizations' =>
-[			
+{			
 	##################################################
 	#Add child org and links for parent and owner orgs
 	##################################################	
@@ -138,7 +138,7 @@ subclass 'App::DataModel::Organizations' =>
 				&add_all($org) if $org;
 			 },
 
-], -parent => 'App::DataModel::Entities';
+}, -parent => 'App::DataModel::Entities';
 
 
 
@@ -147,7 +147,7 @@ subclass 'App::DataModel::Organizations' =>
 #Insured
 #############################################################################
 subclass 'App::DataModel::Person' =>
-[
+{
 	nameFirst => '$',
 	nameLast => '$',
 	nameMiddle => '$',
@@ -166,28 +166,28 @@ subclass 'App::DataModel::Person' =>
 	pager=>'$',
 	email=>'$',
 	homeAddress=>'App::DataModel::Address',	
-], -parent => 'App::DataModel::Base';
+}, -parent => 'App::DataModel::Base';
 
 #Guarantor
 subclass 'App::DataModel::Guarantor' =>
-[
+{
 	relationship=>'$',
 	relationshipName=>'$',	
-], -parent => 'App::DataModel::Person';
+}, -parent => 'App::DataModel::Person';
 
 
 #Insured
 subclass 'App::DataModel::Insured' =>
-[
+{
 	relationship=>'$',
 	relationshipName=>'$',
 	insuredPersonEmployer=>'$',
-], -parent => 'App::DataModel::Person';
+}, -parent => 'App::DataModel::Person';
 
 
 #Patient
 subclass 'App::DataModel::Patient' =>
-[
+{
 	accountNumber=>'$',
 	chartNumber=>'$', 	
 	driverLicenseNumber=>'$',
@@ -200,26 +200,46 @@ subclass 'App::DataModel::Patient' =>
 	careProvider=>'App::DataModel::Physician',
 	careProviderSpecialty =>'$',
 	insurance=>'@App::DataModel::InsuranceCoverage',
+	'&link_insuranceCoverage' =>q{
+				my $coverage=$_[0];
+				my $plan=$_[1];
+				my $product=$_[2];	
+				if($coverage)
+				{
+					&add_insurance($coverage);
+					my $ptr=&last_insurance;
+					$ptr->insuranceProduct($product) if ($product);
+					$ptr->insurancePlan($plan) if($plan);										
+					if($plan)
+					{
+						$plan->add_insuranceCoverage($coverage);
+					};
+					if($product)
+					{
+						$product->add_insuranceCoverage($coverage);
+					};
+				};				
+			     },	
 	
-], -parent => 'App::DataModel::Person';
+}, -parent => 'App::DataModel::Person';
 
 #Referring Doc
 subclass 'App::DataModel::ReferringDoctor' =>
-[
+{
 	
-], -parent => 'App::DataModel::Person';
+}, -parent => 'App::DataModel::Person';
 
 #Associate
 subclass 'App::DataModel::Associate' =>
-[
+{
 	personType=>'@',
 	jobTitle=>'$',
 	jobCode=>'$',	
-], -parent => 'App::DataModel::Person';
+}, -parent => 'App::DataModel::Person';
 
 #Physician
 subclass 'App::DataModel::Physician' =>
-[
+{
 	billIdType=>'$', 	#Perse, Envoy,etc
 	billId=>'$',	 	#Doc ID for Perse,Envoy,etc
 	billEffectiveDate=>'$',
@@ -231,25 +251,25 @@ subclass 'App::DataModel::Physician' =>
 	providerLicense=>'@App::DataModel::Certification',	
 	boardCertification=>'@App::DataModel::Certification',
 	stateLicense=>'App::DataModel::Certification',
-], -parent => 'App::DataModel::Associate';
+}, -parent => 'App::DataModel::Associate';
 
 
 #Nurse
 subclass 'App::DataModel::Nurse' =>
-[
+{
 	nursingLicense =>'App::DataModel::Certification',
 	licenseCertification =>'@App::DataModel::Certification',
 	associatedPhysician =>'@App::DataModel::Physician',		
-], -parent => 'App::DataModel::Associate';
+}, -parent => 'App::DataModel::Associate';
 
 #Staff Member
 subclass 'App::DataModel::StaffMember' =>
-[
+{
 	jobTitle=>'$',
 	jobCode=>'$',
 	employment=>'App::DataModel::Employment',	
 	certification=>'@App::DataModel::Certification'
-], -parent => 'App::DataModel::Associate';
+}, -parent => 'App::DataModel::Associate';
 
 
 #############################################################################
@@ -259,7 +279,7 @@ subclass 'App::DataModel::StaffMember' =>
 
 #Org
 subclass 'App::DataModel::Organization' =>
-[
+{
 	orgId=>{type=>'$',post=>q{$orgId= uc($orgId);}},
 	orgName=>'$',
 	orgBusinessName=>'$',
@@ -276,46 +296,53 @@ subclass 'App::DataModel::Organization' =>
 	parentOrg=>'App::DataModel::Organization',
 	ownerOrg=>'App::DataModel::Organization',
 	orgType=>'$',	
-], -parent => 'App::DataModel::Base';
+}, -parent => 'App::DataModel::Base';
 
 
 #MainOrg
 subclass 'App::DataModel::MainOrg' =>
-[
+{
 	ids=>'App::DataModel::IDNumbers',	
 	childrenOrgs=>'@App::DataModel::Organization',
 	personnel=>'@App::DataModel::Person',
-], -parent => 'App::DataModel::Organization';
+}, -parent => 'App::DataModel::Organization';
 
 
 #DepartMent
 subclass 'App::DataModel::Department' =>
-[
+{
 	serviceInfo=>'App::DataModel::ServiceInformation',
-], -parent => 'App::DataModel::Organization';
+}, -parent => 'App::DataModel::Organization';
 
 #AssociatedProvider
 subclass 'App::DataModel::AssociatedProvider' =>
-[
+{
 	ids=>'App::DataModel::IDNumbers',
    	serviceInformation=>'App::DataModel::ServiceInformation',
-], -parent => 'App::DataModel::Organization';
+}, -parent => 'App::DataModel::Organization';
 
 #Employer
 subclass 'App::DataModel::Employer' =>
-[   	
-], -parent => 'App::DataModel::Organization';
+{   	
+}, -parent => 'App::DataModel::Organization';
 
 #InsuranceOrg
 subclass 'App::DataModel::InsuranceOrg' =>
-[
-	insuranceProduct=>'@App::DataModel::InsuranceProduct'
-], -parent => 'App::DataModel::Organization';
+{
+	insuranceProduct=>'@App::DataModel::InsuranceProduct',
+	'&findInsProductBySourceID'=>q{	  	
+					foreach  my $entity (&insuranceProduct)
+					{
+						return $entity if $entity->equalSourceId($_[0]);
+					}
+					return undef;
+			   	      },		
+}, -parent => 'App::DataModel::Organization';
 
 #IPA
 subclass 'App::DataModel::IPA' =>
-[	
-], -parent => 'App::DataModel::Organization';
+{	
+}, -parent => 'App::DataModel::Organization';
 
 
 #############################################################################
@@ -324,7 +351,7 @@ subclass 'App::DataModel::IPA' =>
 
 #Insurance Product
 subclass 'App::DataModel::InsuranceProduct' =>
-[
+{
 	productName=>'$',
 	productType=>'$',
 	FeeScheduleID=>'$',
@@ -334,12 +361,19 @@ subclass 'App::DataModel::InsuranceProduct' =>
    	phone=>'$',
    	fax=>'$',  
 	remittance=>'App::DataModel::Remittance',
-], -parent => 'App::DataModel::Base';
+	'&findInsPlanBySourceID'=>q{	  	
+					foreach  my $entity (&insurancePlan)
+					{
+						return $entity if $entity->equalSourceId($_[0]);
+					}
+					return undef;
+			   	      },			
+}, -parent => 'App::DataModel::Base';
 
 
 #Insurance Plan
 subclass 'App::DataModel::InsurancePlan' =>
-[
+{
 	remittance=>'App::DataModel::Remittance',
    	planName=>'$',
 	planDate=>'App::DataModel::Duration',
@@ -347,12 +381,12 @@ subclass 'App::DataModel::InsurancePlan' =>
 	insuranceProduct=>'App::DataModel::InsuranceProduct',
 	officeCoPay=>'$',
 	deductible=>'App::DataModel::Deductible',	
-], -parent => 'App::DataModel::Base';
+}, -parent => 'App::DataModel::Base';
 
 
 #Insurance Coverage
 subclass 'App::DataModel::InsuranceCoverage' =>
-[
+{
 	planDate=>'App::DataModel::Duration',
 	insuredPerson=>'App::DataModel::Insured',
 	sequence=>'$',
@@ -365,70 +399,70 @@ subclass 'App::DataModel::InsuranceCoverage' =>
 	insuranceProduct=>'App::DataModel::InsuranceProduct',
 	insurancePlan=>'App::DataModel::InsurancePlan',	
 	officeCoPay=>'$',		
-], -parent => 'App::DataModel::Base';
+}, -parent => 'App::DataModel::Base';
 
 #############################################################################
 #Misc Classes
 #############################################################################
 subclass 'App::DataModel::Deductible'=>
-[
+{
 	individual=>'$',
 	family=>'$',
 	individualRemaining =>'$',
 	familyRemaining =>'$',	
-],-parent =>'App::DataModel::Base';
+},-parent =>'App::DataModel::Base';
 
 subclass 'App::DataModel::Duration'=>
-[
+{
 	beginDate=>'$',
 	endDate=>'$',
-], -parent =>'App::DataModel::Base';
+}, -parent =>'App::DataModel::Base';
 
 subclass 'App::DataModel::Employment'=>
-[
+{
 	employmentStatus=>'$',
 	occupation=>'$',
 	employmentPhoneNumber=>'$',	
 	employeeID=>'$',
 	employeeExpDate=>'$',	
 	org=>'App::DataModel::Employer'
-], -parent =>'App::DataModel::Base';
+}, -parent =>'App::DataModel::Base';
 
 subclass 'App::DataModel::Address'=>
-[
+{
 	addressLine1=>'$',
 	addressLine2=>'$',
 	city=>'$',
 	state=>'$',
 	zipCode=>'$',		
-], -parent =>'App::DataModel::Base';
+}, -parent =>'App::DataModel::Base';
 
 subclass 'App::DataModel::Certification'=>
-[
+{
 	name=>'$',
 	number=>'$',
 	ExpDate=>'$',
 	State=>'$',
 	FacilityId=>'$'
-], -parent =>'App::DataModel::Base';
+}, -parent =>'App::DataModel::Base';
 
 
 subclass 'App::DataModel::Remittance'=>
-[
+{
 	remittanceType=>'$',
    	remittancePayerId=>'$',    
    	remitPayerName=>'$', 
-], -parent =>'App::DataModel::Base';
+}, -parent =>'App::DataModel::Base';
 
 subclass 'App::DataModel::ServiceInformation'=>
-[
+{
 	HCFAServicePlace=>'$',
 	medicareGPCILocation=>'$',
 	medicareFacilityPricing=>'$',	
-], -parent=>'App::DataModel::Base';
+}, -parent=>'App::DataModel::Base';
 
 subclass 'App::DataModel::IDNumbers'=>
-[
+{
 	taxId=>'$',
 	employerId =>'$',       
    	stateId=>'$', 
@@ -437,5 +471,5 @@ subclass 'App::DataModel::IDNumbers'=>
 	blueCrossBlueShieldId =>'$',       
    	medicareId =>'$',       
    	CLIAId =>'$',	
-], -parent=>'App::DataModel::Base';
+}, -parent=>'App::DataModel::Base';
 1;
