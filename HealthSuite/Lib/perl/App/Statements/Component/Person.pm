@@ -1580,7 +1580,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.testsAndMeasurements' => {
 	sqlStmt => qq{
-			select tm.trans_owner_id, to_char(tm.trans_begin_stamp, 'mm/dd/yyyy HH:MI PM'),tm.data_text_b,tm.data_text_a,tc.no_of_tests
+			select tm.trans_owner_id, to_char(tm.trans_begin_stamp - ?, 'mm/dd/yyyy HH:MI PM'),tm.data_text_b,tm.data_text_a,tc.no_of_tests
 			from testsandmeasurements tm, testsandmeasurementscount tc
 			where tm.trans_owner_id = tc.trans_owner_id
 			and tm.data_text_b = tc.data_text_b
@@ -1630,10 +1630,26 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		#	updUrlFmt => 'dlg-update-person-address/#0#', delUrlFmt => 'dlg-remove-person-address/#0#',
 		#},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$personId], 'panelTransp'); },
+	publishComp_st => sub {
+								my ($page, $flags, $personId) = @_;
+								$personId ||= $page->param('person_id');
+								$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$page->session('GMT_DAYOFFSET'), $personId]);
+							},
+	publishComp_stp => sub {
+								my ($page, $flags, $personId) = @_;
+								$personId ||= $page->param('person_id');
+								$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$page->session('GMT_DAYOFFSET'), $personId], 'panel');
+							},
+	publishComp_stpe => sub {
+								my ($page, $flags, $personId) = @_;
+								$personId ||= $page->param('person_id');
+								$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit');
+							},
+	publishComp_stpt => sub {
+								my ($page, $flags, $personId) = @_;
+								$personId ||= $page->param('person_id');
+								$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.testsAndMeasurements', [$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp');
+							},
 },
 
 #----------------------------------------------------------------------------------------------------------------------
