@@ -321,7 +321,7 @@ sub executePrePayment
 	);
 	$page->session('batch_id', $batchId);
 
-	$page->redirect("/person/$payerId/account");
+	$page->param('_dialogreturnurl', "/person/$payerId/account");
 }
 
 sub executePostPayment
@@ -421,7 +421,7 @@ sub executePostPayment
 		}
 	}
 
-	$page->redirect("/person/$payerId/account");
+	$page->param('_dialogreturnurl', "/person/$payerId/account");
 }
 
 1;

@@ -379,15 +379,15 @@ sub execute
 
 	if(my $paramBatchId = $page->param('_p_batch_id'))
 	{
-		$page->redirect("/org/$sessOrg/dlg-add-batch?_p_batch_id=$paramBatchId&_p_batch_type=$paidBy");
+		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-batch?_p_batch_id=$paramBatchId&_p_batch_type=$paidBy");
 	}
 	elsif($newInvoiceId)
 	{
-		$page->redirect("/invoice/$newInvoiceId/summary");
+		$page->param('_dialogreturnurl', "/invoice/$newInvoiceId/summary");
 	}
 	else
 	{
-		$page->redirect("/invoice/$invoiceId/summary");
+		$page->param('_dialogreturnurl', "/invoice/$invoiceId/summary");
 	}
 
 	$self->handlePostExecute($page, $command, $flags);
