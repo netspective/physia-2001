@@ -84,9 +84,9 @@ sub isValid
 		}
 		$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
 	}
-	
+
 	my @insFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_insurance_catalogs'));
-	
+
 	# ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -168,7 +168,7 @@ sub isValid
 				$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype is not valid. Please verify");
 			}
 		}
-		elsif($servicetype !~ m/^(\d+)$/)
+		elsif($servicetype !~ m/^(\d+)$/ && $servicetype ne '')
 		{
 			$self->invalidate($page, "[<B>P$line</B>] The service type code $servicetype should be an integer. Please verify");
 		}
@@ -265,7 +265,7 @@ sub isValid
 		}
 		elsif($charges eq '' && ($feeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
 		{
-			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");		
+			$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
 		}
 
 		#@errors = App::IntelliCode::validateCodes
@@ -293,10 +293,51 @@ sub getHtml
 	my $bgColorAttr = '';
 	my $spacerHtml = '&nbsp;';
 	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+	my $cptOrgHtml = '';
+	my $icdOrgHtml = '';
+	my $cptPerHtml = '';
+	my $icdPerHtml = '';
+
+	my $placeHtml = '';
+	my $serviceTypeHtml = '';
 
 	#get service place code from service facility org
 	my $svcFacility = $page->field('service_facility_id') || $page->session('org_id');
 	my $svcPlaceCode = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $svcFacility, 'HCFA Service Place');
+	my $cptOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByORG', $page->session('org_id'));
+	my $icdOrgCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByORG', $page->session('org_id'));
+	my $cptPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15CPTsByPerson', $page->session('person_id'));
+	my $icdPerCodes = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selTop15ICDsByPerson', $page->session('person_id'));
+	my $servicePlaceIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServicePlaceId');
+	my $serviceTypeIds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAllServiceTypeId');
+
+	foreach my $cptOrgCode (@{$cptOrgCodes})
+		{
+			$cptOrgHtml = $cptOrgHtml . qq{ <OPTION>$cptOrgCode->{parent_id}</OPTION> };
+		}
+	foreach my $icdOrgCode (@{$icdOrgCodes})
+		{
+			$icdOrgHtml = $icdOrgHtml . qq{ <OPTION>$icdOrgCode->{parent_id}</OPTION> };
+		}
+	foreach my $cptPerCode (@{$cptPerCodes})
+		{
+			$cptPerHtml = $cptPerHtml . qq{ <OPTION>$cptPerCode->{parent_id}</OPTION> };
+		}
+	foreach my $icdPerCode (@{$icdPerCodes})
+		{
+			$icdPerHtml = $icdPerHtml . qq{ <OPTION>$icdPerCode->{parent_id}</OPTION> };
+		}
+	foreach my $placeId (@{$servicePlaceIds})
+		{
+			$placeHtml = $placeHtml . qq{ <OPTION>$placeId->{id}</OPTION> };
+		}
+	foreach my $serviceTypeId (@{$serviceTypeIds})
+		{
+			$serviceTypeHtml = $serviceTypeHtml . qq{ <OPTION>$serviceTypeId->{id}</OPTION> };
+		}
+
+
+
 	my @lineMsgs = ();
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
@@ -406,7 +447,7 @@ sub getHtml
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
 			<TD COLSPAN=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
-					<INPUT NAME="_f_proc_insurance_catalogs" VALUE='@{[ $page->param("_f_proc_insurance_catalogs") ]}'/>
+					<INPUT TYPE="HIDDEN" NAME="_f_proc_insurance_catalogs" VALUE='@{[ $page->param("_f_proc_insurance_catalogs") ]}'/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
@@ -441,6 +482,28 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Charge</FONT></TD>
 					</TR>
 					$linesHtml
+				</TABLE>
+			</TD>
+			<TD>
+				<TABLE CELLSPACING=0 CELLPADDING=2 BORDER=1>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My ICDs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_myproc_diags_static" >@{[ $icdPerHtml ]} </SELECT></NOBR></TD>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our ICDs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_diags_static" >@{[ $icdOrgHtml ]} </SELECT></NOBR></TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>My CPTs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_myproc_cpts_static" >@{[ $cptPerHtml ]} </SELECT></NOBR></TD>
+						<TD BGCOLOR=#DDDDDD><FONT $textFontAttrs>Our CPTs</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_ourproc_cpts_static" >@{[ $cptOrgHtml ]} </SELECT></NOBR></TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD BGCOLOR=#DDDDDD COLSPAN=2><FONT $textFontAttrs>Service Places/Types</FONT><BR>
+						<NOBR><SELECT SIZE=5 NAME="_f_places_static" >@{[ $placeHtml ]} </SELECT></NOBR>
+						<NOBR><SELECT SIZE=5 NAME="_f_types_static" >@{[ $serviceTypeHtml ]} </SELECT></NOBR>
+						</TD>
+					</TR>
 				</TABLE>
 			</TD>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
