@@ -12,6 +12,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
 %RESOURCE_MAP = (
 	'search/hcpcs' => {},
+	'search/210' => {},
 	);
 
 sub getForm
