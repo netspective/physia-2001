@@ -24,6 +24,10 @@ my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
+runSQL('BUILD_0012A_add_invoice_id_to_transaction.sql');
+runSQL('BUILD_0012A_create_additional_indexes.sql');
+runSQL('BUILD_0012A_load_pre_post_code.sql');
+
 makeSymbolicLink();
 
 ######## END UPGRADE SCRIPT #########
