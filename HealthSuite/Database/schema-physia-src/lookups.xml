@@ -80,7 +80,7 @@
 		<enum>Asian-American</enum>
 	</table>
 
-	<table name="Family_Relationship" type="Lookup">
+	<table name="Family_Relationship" abbrev="FMRel" type="Lookup">
 		<enum>Other</enum>
 		<enum>Mother</enum>
 		<enum>Father</enum>
