@@ -39,5 +39,13 @@
 			Removed ability to change passwords and personnel categories from factory security settings. Now available to Administrator and Superuser only
 		</deliverable>
 
+		<deliverable id="216">
+			Added the time_zone to show up along with the hours of operation on the profile Header line
+		</deliverable>
+
+		<deliverable id="694">
+			Fixed code to show up the alerts in the priority order
+		</deliverable>
+
 	</deliverables>
 </release-notes>
