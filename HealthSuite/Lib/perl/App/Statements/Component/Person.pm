@@ -2984,7 +2984,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 			SELECT 	trans_id,
 			        DECODE(parent_trans_id,'','Service Request','Referral') as parent_trans_id,
-			        parent_trans_id,
+			        DECODE(trans_type,6010,(SELECT parent_trans_id FROM TRANSACTION WHERE t.parent_trans_id = trans_id),parent_trans_id),
 			        %simpleDate:trans_end_stamp%,
 			        %simpleDate:data_date_b%,
 			        (
