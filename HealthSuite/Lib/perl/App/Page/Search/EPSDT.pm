@@ -12,7 +12,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
 %RESOURCE_MAP = (
 	'search/epsdt' => {},
-	"search/App::Universal::CATALOGENTRYTYPE_EPSDT" => {},
+	'search/220' => {},
 	);
 
 sub getForm
