@@ -188,19 +188,13 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $totalPayRcvd = $page->field('total_amount');					#total amount paid
-	my $payAmtForThisVisit = $page->field('adjustment_amount');			#amount paid for today's visit
-	my $totalAmtEntered = $payAmtForThisVisit;
-	my $totalBalance = $page->param('_f_total_balance');	#total patient balance
+	my $totalAmtEntered = 0;
+	my $totalBalance = $page->param('_f_total_balance');				#total patient balance
+	my $creditWarned = $page->field('credit_warning_flag');
 
-	#validation for 'This Visit' invoice
-	if($payAmtForThisVisit > $totalPayRcvd)
-	{
-		my $diff = $payAmtForThisVisit - $totalPayRcvd;
-		$self->invalidate($page, "Amount entered for 'This Visit' exceeds 'Total Payment Received' by \$$diff");
-	}
 
 	#validation for each invoice listed
-	#calculate the total amount entered for each oustanding invoice in addition to amount paid for today's visit
+	#calculate the total amount entered for each oustanding invoice
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
@@ -213,7 +207,7 @@ sub isValid
 		if($payAmt > $totalPayRcvd)
 		{
 			my $amtDiff = $payAmt - $totalPayRcvd;
-			$self->invalidate($page, "Line $line (Invoice $invoiceId): Amount entered exceeds 'Total Payment Received' by \$$amtDiff");
+			$self->invalidate($page, "Line $line (Invoice $invoiceId) - Amount entered exceeds 'Total Payment Received' by \$$amtDiff");
 		}
 
 		$totalAmtEntered += $payAmt;
@@ -238,6 +232,12 @@ sub isValid
 		{
 			$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
 		}
+	}
+	elsif($totalAmtEntered > $totalBalance && ! $creditWarned)
+	{
+		my $credit = $totalBalance - $totalAmtEntered;
+		$self->invalidate($page, "WARNING: This payment will put a credit of \$$credit on this patient's account balance (excluding non-Self-Pay invoices). Click 'OK' to continue.");
+		$page->field('credit_warning_flag', 1);
 	}
 
 	return $page->haveValidationErrors() ? 0 : 1;
@@ -266,7 +266,7 @@ sub getHtml
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $isBatch = $page->param('batch_id');
 	my $outstandInvoices = $isBatch ? $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllOutstandingInvoicesByClient', $personId, $sessOrgIntId)
-								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selOutstandingInvoicesByClient', $personId, $sessOrgIntId);
+								: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selSelfPayOutstandingInvoicesByClient', $personId, $sessOrgIntId);
 	my $totalInvoices = scalar(@{$outstandInvoices});
 	my $totalBalance = 0;
 	for(my $line = 1; $line <= $totalInvoices; $line++)
@@ -844,10 +844,15 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
+	my $sessOrgIntId = $page->session('org_internal_id');
+	my $clientId = $page->field('client_id');
 	my $paidBy = $page->param('paidBy');
 	my $totalPayRcvd = $page->field('check_amount') || $page->field('total_amount');
 	my $totalAmtApplied = 0;
 	my $totalInvoiceBalance = 0;
+	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $clientId, $sessOrgIntId);
+	my $creditWarned = $page->field('credit_warning_flag');
+
 
 	#validation for each item listed
 	my $lineCount = $page->param('_f_line_count');
@@ -892,6 +897,21 @@ sub isValid
 			$self->invalidate($page, "There is a payment remainder of \$$payRcvdAndPayAppliedDiff.");
 		}
 	}
+	elsif($totalAmtApplied > $totalPatientBalance && ! $creditWarned)
+	{
+		my $credit = $totalPatientBalance - $totalAmtApplied;
+		if($totalPatientBalance < 0)
+		{
+			$self->invalidate($page, "WARNING: This patient currently has a credit of \$$totalPatientBalance on their account balance. 
+								This payment will increase the credit to \$$credit. Click 'OK' to continue.");
+		}
+		else
+		{
+			$self->invalidate($page, "WARNING: This payment will put a credit of \$$credit on this patient's account balance. Click 'OK' to continue.");
+		}
+		
+		$page->field('credit_warning_flag', 1);
+	}
 
 	return $page->haveValidationErrors() ? 0 : 1;
 }
@@ -931,7 +951,7 @@ sub getHtml
 		my $itemType = $item->{item_type};
 		my $itemTypeCap = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selItemTypeCaption', $itemType);
 		next if $itemType == App::Universal::INVOICEITEMTYPE_COINSURANCE 
-			|| $itemType == App::Universal::INVOICEITEMTYPE_ADJUST 
+			#|| $itemType == App::Universal::INVOICEITEMTYPE_ADJUST 
 			|| $itemType == App::Universal::INVOICEITEMTYPE_VOID;
 		next if $item->{data_text_b} eq 'void';
 
@@ -1005,7 +1025,27 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_item_$line\_comments' TYPE='text' size=25 VALUE='@{[ $page->param("_f_item_$line\_comments") ]}'></TD>
 			</TR>
-		};
+		} if $itemType != App::Universal::INVOICEITEMTYPE_ADJUST;
+
+		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_existing_adjs" VALUE="$itemAdjs"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
+			<TR VALIGN=TOP>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				<TD><FONT $textFontAttrs>$dateDisplay</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemCPT</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemAdjs</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$itemBalance</TD>
+				<TD COLSPAN=7><FONT SIZE=1>&nbsp;</FONT></TD>
+			</TR>
+		} if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
 	}
 
 	return qq{

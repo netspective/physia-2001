@@ -36,6 +36,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient/Person Id', name => 'payer_id', options => FLDFLAG_REQUIRED),

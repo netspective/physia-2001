@@ -36,6 +36,8 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'client_id'),
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED),
 
 
@@ -164,6 +166,7 @@ sub populateData
 	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
 	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	$page->field('client_id', $invoiceInfo->{client_id});
 	my $paidBy = $page->param('paidBy');
 	if($paidBy eq 'insurance')
 	{
