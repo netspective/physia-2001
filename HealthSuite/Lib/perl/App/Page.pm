@@ -591,7 +591,7 @@ sub send_page_header
 		};
 
 	$self->replaceVars(\$html);
-	if (defined wantarray) {
+	if (defined wantarray and wantarray eq 'TRUE') {
 		return "<head>\n$html\n</head>\n";
 	} else {
 		print "<head>\n$html\n</head>\n";
@@ -1082,7 +1082,7 @@ sub printContents
 	$self->initialize();
 	$self->prepare_page_body();
 
-#	if ($psOptions) {
+	if ($psOptions) {
 		$self->setFlag (PAGEFLAG_IGNORE_BODYHEAD);
 		$self->setFlag (PAGEFLAG_IGNORE_BODYFOOT);
 
@@ -1107,7 +1107,7 @@ sub printContents
 		$self->clearFlag (PAGEFLAG_IGNORE_BODYHEAD);
 		$self->clearFlag (PAGEFLAG_IGNORE_BODYFOOT);
 
-#	}
+	}
 
 	if ($self->send_http_header()) {
 		print "<html>\n";
