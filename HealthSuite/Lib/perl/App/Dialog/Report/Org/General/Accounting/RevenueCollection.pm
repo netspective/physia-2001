@@ -60,7 +60,7 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('batch_begin_date', $page->param('_f_batch_begin_date')|| $startDate);
 	$page->field('batch_end_date', $page->param('_f_batch_begin_end')||$startDate);
-	$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
+	#$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
 	$page->field('title',"Revenue and Collection(s)");
 }
 
