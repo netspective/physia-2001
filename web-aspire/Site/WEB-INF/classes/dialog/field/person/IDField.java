@@ -11,6 +11,7 @@ import com.xaf.db.DatabaseContext;
 import com.xaf.sql.StatementManagerFactory;
 import com.xaf.sql.StatementManager;
 import com.xaf.value.ListSource;
+import com.xaf.value.QueryResultsListValue;
 import org.w3c.dom.Element;
 import org.apache.oro.text.perl.Perl5Util;
 
@@ -83,6 +84,7 @@ public class IDField extends DialogField {
 		try {
 			status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selRegistry", new Object[] { personID });
 		} catch (Exception e) {
+			invalidate(dc, e.toString());
 			status = false;
 		}
 		if (!status) {
@@ -94,6 +96,7 @@ public class IDField extends DialogField {
 		try {
 			status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "person.selCategory", new Object[] { personID, dc.getSession().getAttribute("org_internal_id") });
 		} catch (Exception e) {
+			invalidate(dc, e.toString());
 			status = false;
 		}
 		if (!status) {
@@ -114,6 +117,8 @@ public class IDField extends DialogField {
 			SelectChoicesList scl = new SelectChoicesList();
 			int numChoices = 0;
 
+			QueryResultsListValue qrlv = new QueryResultsListValue();
+
 			try {
 				String sqlStatement = "select distinct(person_id), category from person_org_category where category in " + personType.translateFlagValueToSqlSet (allowedPersonTypes);
 				StatementManager.ResultInfo ri = StatementManager.executeSql(dbContext, dc, dataSrcId, sqlStatement, null);
@@ -126,10 +131,9 @@ public class IDField extends DialogField {
 			} catch (Exception e) {
 			}
 
-			ListSource ls = new ListSource();
-			ls.setChoices(scl);
+			qrlv.setChoices(scl);
 
-			idSelectField.setListSource(ls);
+			idSelectField.setListSource(qrlv);
 		}
 	}
 

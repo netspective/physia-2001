@@ -61,7 +61,7 @@ public class NewField extends DialogField {
 	}
 
 	public boolean isValid (DialogContext dc) {
-		boolean status = true;
+		boolean status = super.isValid(dc);
 
 		if (dc.getDataCommand() != DialogContext.DATA_CMD_ADD) return status;
 

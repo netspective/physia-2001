@@ -59,5 +59,9 @@ public class AssociationField extends DialogField
 		relationshipField = new SelectField("rel_type", "Relationship", SelectField.SELECTSTYLE_COMBO);
 		relationshipField.setHint("Select an existing relationship type or select 'Other' and fill in the 'Other' field");
 		otherRelationshipField = new TextField("other_rel_type", "Other");
+
+		addChildField(relationshipField);
+		addChildField(otherRelationshipField);
+		addChildField(otherRelationshipField);
 	}
 }

@@ -33,9 +33,6 @@ public class IDField extends DialogField
 		super.importFromXml(elem);
 
 		createFields();
-
-		if (!elem.getAttribute("size").equals("16")) idTextField.setSize(Integer.parseInt(elem.getAttribute("size")));
-		if (!elem.getAttribute("max-length").equals("16")) idTextField.setMaxLength(Integer.parseInt(elem.getAttribute("size")));
 	}
 
 	public boolean isValid(DialogContext dc)
@@ -51,6 +48,7 @@ public class IDField extends DialogField
 			try {
 				status = stmtMgr.stmtRecordExists(dbContext, dc, dataSrcId, "org.selOrgId", new Object[] { dc.getSession().getAttribute("org_internal_id"), orgID });
 			} catch (Exception e) {
+				invalidate(dc, e.toString());
 			}
 
 			if (dc.getDataCommand() == DialogContext.DATA_CMD_ADD)
