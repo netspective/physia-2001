@@ -26,9 +26,6 @@
 		
 		<deliverable id="1183">
 			Check and update the Payer ID right before transmitting claims to Clearing Houses.
-			This is only to satisfy this bug's requirement as written.  As pointed out by Shahid,
-			other data may become stale.  These other data are not addressed by the resolution of
-			this bug.
 		</deliverable>
 		
 	

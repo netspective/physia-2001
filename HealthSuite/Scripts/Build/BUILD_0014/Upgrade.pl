@@ -24,6 +24,7 @@ my $LOGFILE = $BUILDIR . '/' . $0 . '.log';
 #
 ######## BEGIN UPGRADE SCRIPT #########
 
+runSQL('BUILD_0014_add_indexes.sql');
 
 ######## END UPGRADE SCRIPT #########
 
