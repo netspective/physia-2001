@@ -63,6 +63,30 @@ sub inheritHashValues
 		},
 	},
 
+	'panel.static' =>
+	{
+		inherit => 'panel',
+		frame =>
+		{
+			-editUrl => '',
+		},
+	},
+
+	'panel.sde' =>
+	{
+		headFontOpen => '<FONT FACE="Arial,Helvetica" SIZE=1 COLOR=NAVY>',
+		bodyFontOpen => '<FONT FACE="Tahoma,Arial,Helvetica" SIZE=1>',
+		tailFontOpen => '<FONT FACE="Tahoma,Arial,Helvetica" SIZE=1 COLOR=NAVY><B>',
+		rowSepStr => '',
+		frame =>
+		{
+			headColor => 'red',
+			borderColor => 'red',
+			contentColor => '#FFFFFF',
+			heading => 'No Heading Provided',
+		},
+	},
+
 	'panel.edit' =>
 	{
 		inherit => 'panel',
