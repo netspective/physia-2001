@@ -579,7 +579,7 @@ sub formatPlaceHolderData
 	$data = App::Data::Manipulate::trim($data);
 	#Just in case a NULL is passed into a non text field change to undef place holders
 	#do not appear to like NULLs
-	$data = undef if ! m/'\$escapedTextValue\$\'/ && $data eq 'NULL';
+	$data = undef if ! m/'\$escapedTextValue\$\'/ && $data eq 'NULL';	
 	return $data;
 	
 }
@@ -1267,7 +1267,7 @@ sub createInsertSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};      # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 };
 
 	my ($sql, $errors) = ('', []);
 
@@ -1278,9 +1278,10 @@ sub createInsertSql
 	if($self->fillColumnData('_primaryAndRequiredFrontEndKeys', \%colData, \@colNames, \@colValues,\@placeHolder,$errors, $options))
 	{
 		$self->fillColumnData('', \%colData, \@colNames, \@colValues,\@placeHolder, $errors, $options);
- 		$sql = "insert into $self->{name} (" . join(', ', @colNames) . ") values (" . join(', ', @placeHolder) . ")";
+ 		$sql = "insert into $self->{name} (" . join(', ', @colNames) . ") values (" . join(', ', @placeHolder) . ")" if $options->{placeHolder};
+ 		$sql = "insert into $self->{name} (" . join(', ', @colNames) . ") values (" . join(', ', @colValues) . ")" if !$options->{placeHolder};
 	}
-
+	@colValues=() if ! $options->{placeHolder};
 	return ($sql, \@colValues,$errors);
 }
 
@@ -1288,7 +1289,7 @@ sub createUpdateSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};    # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 0, ignoreColsNotFound => 0 , placeHolder =>1 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 0, ignoreColsNotFound => 0 };
 
 	my ($sql, $errors) = ('', []);
 
@@ -1299,42 +1300,49 @@ sub createUpdateSql
 	my @updateColValues = ();
 	my @updatePlaceHolder = ();
 	my @colValues=();
+	my $setStatements;
+	my $whereCond;
+	
 
 	if($self->fillColumnData('_primaryKeys', \%colData, \@priKeyColNames, \@priKeyColValues,\@priPlaceHolder, $errors, $options))
 	{
 		$self->fillColumnData('', \%colData, \@updateColNames, \@updateColValues, \@updatePlaceHolder,$errors, $options);
 
-		my $whereCond = $self->createEquality(\@priKeyColNames, \@priPlaceHolder, " and ");
+		$whereCond = $self->createEquality(\@priKeyColNames, \@priPlaceHolder, " and ") if $options->{placeHolder};
+		$whereCond = $self->createEquality(\@priKeyColNames, \@priKeyColValues, " and ") if ! $options->{placeHolder};
 		unshift(@updateColNames, @priKeyColNames);
 		unshift(@updateColValues, @priKeyColValues);
-		unshift(@updatePlaceHolder,@priPlaceHolder);
+		unshift(@updatePlaceHolder,@priPlaceHolder);		
 		push(@colValues ,@updateColValues, @priKeyColValues);
-		my $setStatements = $self->createEquality(\@updateColNames, \@updatePlaceHolder);
+		$setStatements = $self->createEquality(\@updateColNames, \@updatePlaceHolder) if $options->{placeHolder};
+		$setStatements = $self->createEquality(\@updateColNames, \@updateColValues) if ! $options->{placeHolder};
 
 		$sql = "update $self->{name} set $setStatements where $whereCond";
 	}
-
-	return ($sql, \@colValues,$errors);
+	@colValues=() if ! $options->{placeHolder};	
+	return ($sql, \@colValues,$errors) 
 }
 
 sub createDeleteSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};   # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 };
 
 	my ($sql, $errors) = ('', []);
 
 	my @colNames = ();
 	my @colValues = ();
 	my @placeHolder =();
+	my $whereCond;
 
 	if($self->fillColumnData('_primaryKeys', \%colData, \@colNames, \@colValues,\@placeHolder, $errors, $options))
 	{
-		my $whereCond = $self->createEquality(\@colNames, \@placeHolder, " and ");
+		$whereCond = $self->createEquality(\@colNames, \@placeHolder, " and ")if $options->{placeHolder};
+		$whereCond = $self->createEquality(\@colNames, \@colValues, " and ")if ! $options->{placeHolder};
 		$sql = "delete from $self->{name} where $whereCond";
 	}
-
+	@colValues=() if !$options->{placeHolder};
 	return ($sql, \@colValues,$errors);
 }
 
