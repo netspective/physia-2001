@@ -68,7 +68,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		orgtype => 'lab',
 		_arl => ['org_id'],
 		_idSynonym => 'Lab'
-	},	
+	},
 );
 
 
@@ -80,7 +80,7 @@ sub initialize
 
 	#my $orgIdCaption = $self->{orgtype} eq 'dept' ? 'Department ID' : 'Organization ID';
 	my $orgIdCaption = 'Organization ID';
-
+	my $orgType = $self->{orgtype};
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'clear_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'business_hrs_id'),
@@ -417,7 +417,7 @@ sub initialize
 	$self->{activityLog} = {
 		scope =>'org',
 		key => "#field.org_id#",
-		data => "Organization '#field.org_id#' <a href='/org/#field.org_id#/profile'>#field.name_primary#</a>"
+		data => " $orgType Organization '#field.org_id#' <a href='/org/#field.org_id#/profile'>#field.name_primary#</a>"
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -600,7 +600,7 @@ sub populateData
 		App::Universal::ATTRTYPE_INTEGER
 	);
 	$page->field('fiscal_month',$attribute->{value_int});
-	
+
 	$page->field('time_zone', 'CST6CDT') unless $page->field('time_zone');
 }
 
@@ -938,7 +938,7 @@ sub execute_add
 		value_text => $page->field('area_served') || undef,
 		_debug => 0
 	) if $page->field('area_served') ne '';
-	
+
 	#If Org is a Lab create a Lab,Radiology,Other Catalogs
 	$self->addLabCatalogs($page,$orgIntId) if $page->field('member_name') eq 'Lab';
 
@@ -953,7 +953,7 @@ sub execute_add
 sub addLabCatalogs
 {
 	my $self=shift;
-	my $page=shift;	
+	my $page=shift;
 	my $orgIntId=shift;
 	$page->schemaAction(
 		'Offering_Catalog', 'add',
@@ -963,8 +963,8 @@ sub addLabCatalogs
 		catalog_type=>5,
 		description=>'List of Lab tests',
 		_debug => 0,
-	)	
-	
+	)
+
 }
 
 
