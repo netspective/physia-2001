@@ -37,6 +37,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'injury_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'owner_org_id'),
 		new App::Dialog::Field::Person::ID(
 			caption => 'Patient ID',
 			types => ['Patient'],
@@ -257,6 +258,9 @@ sub populateData
 
 	$page->field('injury_date', $injuryData->{'value_text'});
 	$page->field('injury_item_id', $injuryData->{'item_id'});
+	
+	#If this plan is not owned by this org then make dialog view only
+	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));	
 
 }
 

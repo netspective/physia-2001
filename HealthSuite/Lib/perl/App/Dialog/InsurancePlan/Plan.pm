@@ -42,7 +42,8 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'ins_type'),
-
+			new CGI::Dialog::Field(type => 'hidden', name => 'owner_org_id'),
+			
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id',
 				name => 'ins_org_id',
 				addType => 'insurance',
@@ -243,6 +244,8 @@ sub populateData_add
 	$page->field('fax_item_id', $insFax->{item_id});
 	$page->field('fax', $insFax->{value_text});
 
+
+
 	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule');
 		my @feeList = ();
@@ -296,6 +299,9 @@ sub populateData_update
 
 	my $feeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'selInsuranceAttr_Org', $insIntId, 'Fee Schedule');
+
+	#If this plan is not owned by this org then make dialog view only
+	$self->setDialogViewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
 
 	my @feeList = ();
 	my @feeItemList = ();

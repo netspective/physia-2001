@@ -46,6 +46,7 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'fee_item_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_product_id'),
 			new CGI::Dialog::Field(type => 'hidden', name => 'pre_org_id'),
+			new CGI::Dialog::Field(type => 'hidden', name => 'owner_org_id'),
 
 			#Hidden field to store medigap item_id
 			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),
@@ -152,6 +153,7 @@ sub _makeStateChanges
 	{
 		$cat->{'member_name'} eq 'Insurance' ? $page->field('ins_org_id', $insOrgId) : $page->field('ins_org_id', '');
 	}
+	#If org is not owner of this record make everything read only
 
 }
 
@@ -166,6 +168,10 @@ sub populateData
 			$page->addError("Ins Internal ID '$insIntId' not found.");
 		}
 
+	#If this product is not owned by this org then make dialog view only
+	$self->setDialogviewOnly() if ($page->session('org_internal_id') ne $page->field('owner_org_id'));
+	
+	
 	my $selInsOrgData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $insIntId);
 	my $insOrgInternalId = $selInsOrgData->{'ins_org_id'};
 	my $insOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $insOrgInternalId);
