@@ -166,7 +166,6 @@
 			Corrected Close Date Report.  Will require a Collection Worklist refresh from the front end.
 		</deliverable>
 
-		</deliverable>
 		<deliverable id="1752">
 			A component is created for Presonal Hyperlinks and Bookmarks and it is shown under Person Summary Page.
 		</deliverable>
