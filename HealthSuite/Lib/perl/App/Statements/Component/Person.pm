@@ -239,28 +239,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Not Read',1,'Read'), cr_user_id
-				from  Person_Attribute
-			where  	parent_id = ?
-			and item_name = 'Phone Message'
-			and value_int is null
-			and value_intB = 0			
-			union
-                        select  value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Not Read',1,'Read'), cr_user_id
-                                from  Person_Attribute
-                        where   parent_id = ?
-                        and item_name = 'Phone Message'
-                        and value_int is not null
-
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+				from  Transaction
+			where  	trans_owner_id = ?
+			and caption = 'Phone Message'
+                        and data_num_a is null
+                        union
+                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,4,'Read',5,'Not Read'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+                                from  Transaction
+                        where   trans_owner_id = ?
+                        and caption = 'Phone Message'
+                        and data_num_a is not null
+                        and trans_status = 5
 		},
-		sqlStmtBindParamDescr => ['Person ID for Attribute Table, Person ID for Attribute Table'],
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table, Person ID for Transaction Table'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => "<A HREF='/person/#8#/profile'>#8#</A> (#5#): #4#" },
+			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): #7# (<A HREF='/person/#5#/profile'>#5#</A>)" },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-phone-message?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
@@ -287,7 +286,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-phmsg-#0#/#1#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-refill-#2#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#2#/#0#?home=#param.home#',
 		},
 	},
 
@@ -301,27 +300,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Pending',1,'Filled')
-				from  Person_Attribute
-			where  	parent_id = ?
-			and item_name = 'Refill Request'
-			and value_int is null
-			union
-                        select  value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Pending',1,'Filled')
-                                from  Person_Attribute
-                        where   parent_id = ?
-                        and item_name = 'Refill Request'
-                        and value_int is not null
-			and value_intB = 0
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+				from  Transaction
+			where  	trans_owner_id = ?
+			and caption = 'Refill Request'
+                        and data_num_a is null
+                        union
+                        select  trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id
+                                from  Transaction
+                        where   trans_owner_id = ?
+                        and caption = 'Refill Request'
+                        and data_num_a is not null
+                        and trans_status = 6
 		},
-		sqlStmtBindParamDescr => ['Person ID for Attribute Table', 'Person ID for Attribute Table'],
+		sqlStmtBindParamDescr => ['Person ID for Transaction Table', 'Person ID for Transaction Table'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => "<A HREF='/person/#6#/profile'>#6#</A> (#5#): #4# (#7#)" },
+			{ dataFmt => "<A HREF='/person/#9#/profile'>#9#</A> (#6#): #7# (#3#)" },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-trans-refill-#2#/#0#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-refill-request?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
@@ -348,7 +347,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-refillreq-#0#/#1#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-trans-#2#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-refill-#2#/#0#?home=#param.home#',
 		},
 	},
 
