@@ -162,8 +162,8 @@ sub execute
 {
 	my ($self) = @_;
 
-	my @resource_ids = split(/,/, $self->param('resource_ids'));
-	my @facility_ids = split(/,/, $self->param('facility_ids'));
+	my @resource_ids = split(/\s*,\s*/, $self->param('resource_ids'));
+	my @facility_ids = split(/\s*,\s*/, $self->param('facility_ids'));
 
 	my @internalOrgIds = ();
 	for (@facility_ids)
@@ -228,7 +228,8 @@ sub getSlotsHtml
 	for (@slots)
 	{
 		my $resource_id = $_->{resource_id};
-		my $facility_id = $_->{facility_id};
+		my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId',
+			$_->{facility_id});
 		my @minute_ranges = split(/,/, $_->{minute_set}->run_list);
 
 		for (@minute_ranges)

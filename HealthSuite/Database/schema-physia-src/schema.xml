@@ -198,13 +198,14 @@
 		<column name="days_of_week" type="text" abbrev="dow" descr="Weekday specification (cron style)"/>
 		<column name="preferences" type="text" size="1024" descr="Any preferences noted by Physician regarding scheduling during this block of time"/>
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the template"/>
+		<column name="owner_org_id" parentref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns the template"/>
 	</table>
 
 	<table name="Appt_Type" abbrev="ApType" parent="Reference_Item" type="Audit,Secure,Restrict_Rows">
 		<description>Appointment Type.  A template for appointments.</description>
 		<column name="appt_type_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific Appt Type"/>
-		<column name="resource_id" type="text" descr="Unique ID for a specific resource"/>
-		<column name="caption" type="text" size="128" required="yes" descr="The descriptive name of the Appt Type"/>
+		<column name="resource_id" type="text" indexed="yes" descr="Unique ID for a specific resource"/>
+		<column name="caption" type="text" size="128" required="yes" indexed="yes" descr="The descriptive name of the Appt Type"/>
 		<column name="duration" type="integer" required="yes" descr="The duration of the appointment in minutes"/>
 		<column name="lead_time" type="integer" descr="Lead time in minutes before the appointment"/>
 		<column name="lag_time" type="integer" descr="Lag time in minutes after the appointment"/>
@@ -213,6 +214,7 @@
 		<column name="am_limit" type="integer" descr="Limit the number of appointments of this type in AM hours"/>
 		<column name="pm_limit" type="integer" descr="Limit the number of appointments of this type in PM hours"/>
 		<column name="r_ids" type="text" size="128" descr="Additional Resource(s) required for this appointment type"/>
+		<column name="owner_org_id" parentref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns the appt type"/>
 	</table>
 
 	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">

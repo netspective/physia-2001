@@ -19,6 +19,8 @@ use Date::Calc qw(:all);
 
 use App::Dialog::Field::RovingResource;
 use App::Dialog::Field::Organization;
+use App::Dialog::Field::Scheduling;
+
 use App::Schedule::Utilities;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -100,14 +102,31 @@ sub new
 			schema => $schema,
 			column => 'Event.event_type', typeRange => '100..199'
 		),
-		new CGI::Dialog::Field(caption => 'Appointment Time',
-			name => 'start_stamp',
-			hints => $findAvailSlotHint,
-			options => FLDFLAG_REQUIRED
+		
+		new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
+			fields => [
+				new App::Dialog::Field::Scheduling::Date(
+					name => 'appt_date',
+					options => FLDFLAG_REQUIRED,
+				),
+				new App::Dialog::Field::Scheduling::Time(
+					name => 'appt_time',
+					options => FLDFLAG_REQUIRED,
+				),
+			],
+		),
+		
+		new CGI::Dialog::Field(name => 'appt_minute',
+			caption => '(Minute)',
+			choiceDelim =>',',
+			selOptions => "10,20,30,40,50",
+			type => 'select',
+			style => 'radio',
+			onclickJS => q{setField(this.form._f_start_stamp, this.value)},
 		),
 		new CGI::Dialog::Field(caption => 'Check for Conflicts',
 			name => 'conflict_check',
-			type => 'bool', style => 'check', value => 1
+			type => 'bool', style => 'check', value => 1,
 		),
 		new CGI::Dialog::Field(caption => 'Duration',
 			name => 'duration',
@@ -115,7 +134,8 @@ sub new
 			fKeyStmt => 'selApptDuration',
 			fKeyDisplayCol => 1,
 			fKeyValueCol => 0,
-			options => FLDFLAG_REQUIRED
+			options => FLDFLAG_REQUIRED,
+			hints => $findAvailSlotHint,
 		),
 
 		$physField,

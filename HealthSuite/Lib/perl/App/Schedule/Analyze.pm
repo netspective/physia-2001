@@ -404,7 +404,7 @@ sub getTemplates
 				$patientTypeWhereClause
 			)
 			and (Template.visit_types is NULL
-				or not exists (select ID from Transaction_TYpe where id between 2040 and 3000 minus
+				or not exists (select ID from Transaction_TYpe where id>=2040 and id<3000 minus
 					(select to_number(member_name) from Template_Visit_Types where parent_id = template_id)
 				)
 				$visitTypeWhereClause
