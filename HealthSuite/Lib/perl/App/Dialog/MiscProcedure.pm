@@ -6,6 +6,7 @@ use strict;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use App::Statements::Person;
+use App::Statements::Catalog;
 use App::Statements::Search::Code;
 use App::Universal;
 
@@ -16,13 +17,15 @@ use Date::Manip;
 
 use base 'CGI::Dialog';
 use vars qw(%RESOURCE_MAP);
-my $ACTIVE  = App::Universal::TRANSSTATUS_ACTIVE;
-my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+my $CPT_CODE =App::Universal::CATALOGENTRYTYPE_CPT;
+my $HCPCS_CODE = App::Universal::CATALOGENTRYTYPE_HCPCS;
+my $MISC_CODE = App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE;
+my $CATALOG_TYPE = 2;
 my $lines=4;
 
 %RESOURCE_MAP = (
 	'misc-procedure' => { 
-	_arl_modify => ['trans_id']},
+	_arl_modify => ['entry_id']},
 );
 
 sub new
@@ -35,7 +38,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'entry_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
 		new CGI::Dialog::Field(caption => 'Procedure Code',
 			name => 'proc_code',
@@ -125,14 +128,14 @@ sub new
 	$self->{activityLog} =
 		{
 			scope =>'transaction',
-		key => "#field.trans_id#",
-			data => "Misc Procedure Code '#param.proc_code# #field.proc_code#' <a href='/search/miscprocedure/detail/#field.trans_id#'>#field.proc_code#</a>"
+		key => "#field.entry_id#",
+			data => "Misc Procedure Code '#param.proc_code# #field.proc_code#' <a href='/search/miscprocedure/detail/#field.entry_id#'>#field.proc_code#</a>"
 	};
 	
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['Add Another Misc Procedure Code', "/org/#session.org_id#/dlg-add-misc-procedure"],
-			['Show Misc Procedure Codes', '/search/miscprocedure/code/%field.proc_code%'],
+			['Show Misc Procedure Codes', '/search/miscprocedure/code/*'],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -151,21 +154,31 @@ sub populateData_update
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	$page->field('trans_id',$page->param('trans_id'));
+	$page->field('entry_id',$page->param('entry_id'));
 	
-	#Get the first 4 created CPT codes for a Procedure based on item_id order
-	my $proc = $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'sel4MiscProcedureById', $page->param('trans_id'))
-		if ($page->param('trans_id'));	
+	#Get the first 4 created CPT codes for a Procedure based on entry_id order
+	my $proc = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selMiscProcedureById', $page->param('entry_id'))
+		if ($page->param('entry_id'));	
 	my $loop=1;
 	foreach (@{$proc})
 	{
-		$page->field('name',$_->{name} );
-		$page->field('description',$_->{description});
-		$page->field('proc_code',$_->{proc_code});
-		$page->field("cpt_code$loop",$_->{"cpt_code"}); 			
-		$page->field("modifier$loop",$_->{"modifier"});
-		$page->param("item_id$loop",$_->{"item_id"});
-		$loop++;
+		if($_->{code_level} eq '1')
+		{
+			$page->field('name',$_->{name} );
+			$page->field('description',$_->{description});
+			$page->field('proc_code',$_->{code});
+			$page->param("entry_id",$_->{entry_id});
+		}
+		else
+		{
+			$page->field("cpt_code$loop",$_->{code}); 			
+			$page->field("modifier$loop",$_->{modifier});
+			$page->param("entry_id$loop",$_->{entry_id});
+			$page->param("code_type$loop",$_->{entry_type});
+			$page->param("parent_entry_id$loop",$_->{parent_entry_id});
+			$loop++;
+		};
+
 	}
 }
 
@@ -181,15 +194,22 @@ sub customValidate
 	my $code;
 	my $codeInfo;
 	my $cpt_code1;
-	
 	#Validate all CPT_CODES
 	for (my $loop=1;$loop<=$lines;$loop++)
 	{
 		$code=$page->field("cpt_code$loop");		
 		next if $code eq '';
+		$page->param("code_type$loop",$CPT_CODE);
 		$codeInfo = $STMTMGR_CPT_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_cpt_code', $code );	
+		unless ($codeInfo)
+		{		
+			$codeInfo = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_hcpcs_code',$code) ;
+			$page->param("code_type$loop",$HCPCS_CODE);			
+		}
 		$cpt_code1 = $self->getField("code_modifier$loop")->{fields}->[0];
 		$cpt_code1->invalidate($page,qq{Invalid CPT code '$code'}) unless ($codeInfo);	
+		$page->param("cpt_name$loop",$codeInfo->{name});
+		$page->param("cpt_desc$loop",$codeInfo->{description});		
 	}	
 	
 	#check to make sure the new Misc Code is unique for this Org but only if we are adding a new Procedure Code
@@ -197,7 +217,7 @@ sub customValidate
 	{
 		my $proc_code = $page->field('proc_code');
 		my $proc_field = $self->getField('proc_code');
-		$proc_field->invalidate($page,qq{Misc Procedure Code '$proc_code' already exists.})if $STMTMGR_TRANSACTION->recordExists($page,STMTMGRFLAG_NONE,'selMiscProcedureByCode',$proc_code);
+		$proc_field->invalidate($page,qq{Misc Procedure Code '$proc_code' already exists.})if $STMTMGR_CATALOG->recordExists($page,STMTMGRFLAG_NONE,'selMiscProcedureByCode',$proc_code,$page->session('org_internal_id'));
 	}
 }
 
@@ -208,74 +228,77 @@ sub execute
 	my $proc_name = $page->field('name');
 	my $proc_descr = $page->field('description');	
 	my $proc_code = $page->field('proc_code');
-	my $trans_id = $page->param('trans_id');
-	my $status = $ACTIVE;
 	my $number=0;
+	my $orgInternalId = $page->session('org_internal_id') ||undef;
+	my $id;
+	my $procId;
 	
-	# If command is remove change to update so we do not delete transaction and set flag to INACTIVE
-	if ($command eq 'remove')
-	{
-		$command = 'update';
-		$status = $INACTIVE
-	}
-	
-	my $id = $page->schemaAction(	
-		'Transaction', $command,
-		trans_id =>$trans_id,
-		trans_owner_id =>$orgId,
-		trans_owner_type=>App::Universal::ENTITYTYPE_ORG,
-		trans_type=> App::Universal::TRANSTYPEPROC_REGULAR,
-		caption=>$proc_name,
-		detail =>$proc_descr,	
-		trans_status =>$status,
-		code =>$proc_code,
-		trans_subtype =>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
-		trans_id => $trans_id || undef,
-		_debug => 0,
-		);
-	$id = $trans_id if ($command eq 'update');
+
+	#Check if Main 'Misc Procedure Code' Record exists in the Offering_Catalog for this Org.  If not create one
+	$id = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_NONE,'selMiscProcedureInternalID',$orgInternalId);
+	$page->beginUnitWork();
+	$id = $page->schemaAction
+	(	
+		'Offering_Catalog', 'add',
+		org_internal_id =>$orgInternalId,
+		catalog_type =>$CATALOG_TYPE,
+		caption =>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
+		description =>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
+		catalog_id =>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
+	)unless $id;
 		
-	$page->field('trans_id',$id);
+	#Misc Procedure Entry Code (Parent)
+	$procId = $page->schemaAction
+	(
+		'Offering_Catalog_Entry',$command,
+		catalog_id =>$id,
+		entry_type =>$MISC_CODE,
+		code => $proc_code,
+		name => $proc_name,
+		description => $proc_descr,
+		entry_id => $page->param("entry_id")||undef,
+	);
 	
-	#Loop through all fields add save cpt_code as attributes of the main transaction
+	my $parent_id = $page->param("entry_id") || $procId;
+	$page->field('entry_id',$id);
+	
+	#Loop through all fields add save cpt/hcpcs codes as childern of Parent Code
 	for (my $loop=1;$loop<=$lines;$loop++)
-	{
-	
+	{	
+
 		if ($page->field("cpt_code$loop"))
 		{	
-			#Even if the dialog is and update the user can add new CPT_CODE to a Procedure so determine
-			#if current CPT_CODE has an item id
-			$command =  $page->param("item_id$loop") ?  'update' : 'add';
-			$page->schemaAction(	
-			'Trans_Attribute', $command,
-			parent_id=> $id,
-			item_type=>0,
-			item_name=>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
-			value_type =>App::Universal::ATTRTYPE_CPT_CODE,
-			value_text =>$page->field("cpt_code$loop"),		
-			value_textB =>$page->field("modifier$loop"),
-			item_id => $page->param("item_id$loop")||undef,
-			_debug => 0,
-			) 
+			#Even if the dialog is an update the user can add new CPT_CODE to a Procedure so determine
+			#if current CPT_CODE has an entry_id
+			$command =  $page->param("entry_id$loop") ?  'update' : 'add';
+			$page->schemaAction
+			(	
+				'Offering_Catalog_Entry', $command,
+				catalog_id=> $id,
+				entry_type=>$page->param("code_type$loop"),
+				code=>$page->field("cpt_code$loop"),
+				modifier =>$page->field("modifier$loop")||undef,
+				entry_id =>$page->param("entry_id$loop")||undef,
+				parent_entry_id =>$parent_id||undef,
+				name=>$page->param("cpt_name$loop"),
+				description=>$page->param("cpt_desc$loop"),
+			)			
+
 		}
-		elsif($page->param("item_id$loop"))		
+		elsif($page->param("entry_id$loop"))		
 		{
 			#user removed a CPT_CODE so delete the CPT_CODE
-			$page->schemaAction(	
-					'Trans_Attribute', 'remove',
-					parent_id=> $id,
-					item_type=>0,
-					item_name=>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
-					value_type =>App::Universal::ATTRTYPE_CPT_CODE,
-					value_text =>$page->field("cpt_code$loop"),		
-					value_textB =>$page->field("modifier$loop"),
-					item_id => $page->param("item_id$loop")||undef,
-					_debug => 0,
+			$page->schemaAction
+			(	
+					'Offering_Catalog_Entry', 'remove',
+					catalog_id=> $id,
+					entry_id => $page->param("entry_id$loop")||undef,
 			) 
 		}
 	}
-	
-	$page->param('_dialogreturnurl', '/search/miscprocedure/code/%field.proc_code%') if $command ne 'add';
+	$page->endUnitWork();	
+	$page->param('_dialogreturnurl', '/search/miscprocedure/code/*') if $command eq 'remove';
+	$page->param('_dialogreturnurl', '/search/miscprocedure/code/%field.proc_code%') if $command ne 'add' && $command ne 'remove';
 	$self->handlePostExecute($page, $command, $flags);
 }
 

@@ -304,7 +304,7 @@ sub customValidate
 			}
 			if ($entryType == App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE) {
 				$codeInfo = $STMTMGR_MISC_PROCEDURE_CODE_SEARCH->getRowAsHash($page,STMTMGRFLAG_NONE,
-					'sel_misc_procedure_code',$code);
+					'sel_misc_procedure_code',$code,$page->session('org_internal_id'));
 				last CASE;			
 			}
 

@@ -7,7 +7,7 @@ use DBI::StatementManager;
 use App::Statements::Transaction;
 use App::Statements::Person;
 use App::Statements::Search::Code;
-
+use App::Statements::Catalog;
 use Carp;
 
 use CGI::Validator::Field;
@@ -16,13 +16,15 @@ use Date::Manip;
 
 use base 'CGI::Dialog';
 use vars qw(%RESOURCE_MAP);
-my $ACTIVE  = App::Universal::TRANSSTATUS_ACTIVE;
-my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
+
+my $CPT_CODE =App::Universal::CATALOGENTRYTYPE_CPT;
+my $HCPCS_CODE = App::Universal::CATALOGENTRYTYPE_HCPCS;
+my $MISC_CODE = App::Universal::CATALOGENTRYTYPE_MISC_PROCEDURE;
 
 %RESOURCE_MAP = (
 	'misc-procedure-item' => { 
-	_arl_add =>['trans_id'],
-	_arl_modify => ['item_id'],},
+	_arl_add =>['parent_entry_id'],
+	_arl_modify => ['entry_id']},
 );
 
 sub new
@@ -35,7 +37,7 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-		new CGI::Dialog::Field(type => 'hidden', name => 'next_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'catalog_id'),
 		new CGI::Dialog::Field(caption => 'Procedure Code',
 			name => 'proc_code',
 			type => 'text',
@@ -58,14 +60,14 @@ sub new
 			name => 'code_modifier1',
 			fields => [
 				new CGI::Dialog::Field(caption => 'CPT',
-					name => 'cpt_code1',										
+					name => 'cpt_code',										
 					size => 10,
 					findPopup => '/lookup/cpt',
 					findPopupControlField => '_f_cpt_code1',
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Modifier',
-					name => 'modifier1',
+					name => 'modifier',
 					size => 10,					
 				),
 			]
@@ -84,7 +86,7 @@ sub new
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
 			['Add Another Misc Procedure Item', "/org/#session.org_id#/dlg-add-misc-procedure-item/#param.trans_id#"],
-			['Show Current Misc Procedure Items', '/search/miscprocedure/detail/#param.trans_id#'],
+			['Show Current Misc Procedure Items', '/search/miscprocedure/detail/#param.parent_entry_id#'],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -94,35 +96,41 @@ sub new
 sub customValidate
 {
 	my ($self, $page) = @_;
-	my $code=$page->field('cpt_code1');
+	my $code=$page->field('cpt_code');
 	my $codeInfo = $STMTMGR_CPT_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_cpt_code', $code );	
-	my $cpt_code1 = $self->getField('code_modifier1')->{fields}->[0];
-	$cpt_code1->invalidate($page,qq{Invalid CPT code '$code'})unless ($codeInfo);
+	$page->param("code_type",$CPT_CODE);		
+	unless ($codeInfo)
+	{		
+		$codeInfo = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_hcpcs_code',$code) ;
+		$page->param("code_type",$HCPCS_CODE);			
+	}	
+	my $cpt_code = $self->getField('code_modifier1')->{fields}->[0];
+	$cpt_code->invalidate($page,qq{Invalid CPT code '$code'})unless ($codeInfo);
+	$page->param("cpt_name",$codeInfo->{name});	
+	$page->param("cpt_desc",$codeInfo->{description});
 }
 
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;	
-	my $proc = $STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,'selMiscProcedureNameById',$page->param('trans_id'));		
+	my $proc = $STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,'selMiscProcedureNameById',$page->param('parent_entry_id'));		
 }
 
 sub populateData_update
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;	
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	my $proc = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selMiscProcedureById', $page->param('item_id'))
-		if ($page->param('item_id'));	
-	if ($proc)
-	{
-		$page->field('name',$proc->{name} );
-		$page->field('description',$proc->{description});
-		$page->field('proc_code',$proc->{proc_code});
-		$page->field("cpt_code1",$proc->{cpt_code1}); 			
-		$page->field("modifier1",$proc->{modifier1});
-		$page->param("item_id1",$proc->{item_id1});	
-		$page->param('trans_id',$proc->{trans_id});
-		$page->field("next_id",$proc->{nextId});
-	}
+	my $proc = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selMiscProcedureByChildId', $page->param('entry_id'))
+		if ($page->param('entry_id'));	
+	$page->field('name',$proc->{name} );
+	$page->field('description',$proc->{description});
+	$page->field('proc_code',$proc->{proc_code});
+	$page->param("entry_id",$proc->{entry_id});
+	$page->field("cpt_code",$proc->{code}); 			
+	$page->field("modifier",$proc->{modifier});	
+	$page->field("catalog_id",$proc->{catalog_id});
+	$page->param('parent_entry_id',$proc->{parent_entry_id});
+	
 }
 
 sub populateData_remove
@@ -136,25 +144,23 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $orgId = $page->session('org_id');		
-	my $proc_name = $page->field('name');
-	my $proc_descr = $page->field('description');	
-	my $proc_code = $page->field('proc_code');
-	my $trans_id = $page->param('trans_id');
-	my $status = $ACTIVE;
-	
-	$page->schemaAction(
-	'Trans_Attribute', $command,
-	parent_id=> $trans_id,
-	item_type=>0,
-	item_name=>App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT,
-	value_type =>App::Universal::ATTRTYPE_CPT_CODE,
-	value_text =>$page->field("cpt_code1"),		
-	value_textB =>$page->field("modifier1"),
-	item_id => $page->param("item_id1")||undef,
-	_debug => 0
-	) if $page->field("cpt_code1");
+	my $entry_id = $page->param('entry_id')||undef;
+	my $id = $page->field('catalog_id') || undef;
+	my $parent_id = $page->param('parent_entry_id');
+	$page->schemaAction
+	(	
+		'Offering_Catalog_Entry', $command,
+		catalog_id=> $id,
+		entry_type=>$page->param("code_type"),
+		code=>$page->field("cpt_code"),
+		modifier =>$page->field("modifier")||undef,
+		entry_id =>$entry_id,
+		parent_entry_id =>$parent_id,
+		name=>$page->param("cpt_name"),
+		description=>$page->param("cpt_desc"),
+	)if $page->field("cpt_code");
 
-	$page->param('_dialogreturnurl', "/search/miscprocedure/detail/$trans_id") if $command ne 'add';
+	$page->param('_dialogreturnurl', "/search/miscprocedure/detail/$parent_id") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 
