@@ -9,7 +9,7 @@ use CGI::Validator::Field;
 use CGI::ImageManager;
 use App::Universal;
 use Date::Manip;
-use SDE::CVS ('$Id: Login.pm,v 1.18 2000-11-01 19:32:50 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Login.pm,v 1.19 2000-11-01 19:53:33 radha_kotagiri Exp $', '$Name:  $');
 use App::Configuration;
 
 use DBI::StatementManager;
@@ -66,8 +66,8 @@ sub validateUser
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
 
-	return $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selPersonExists', $value) ?
-		() : ("$dialogItem->{caption} '$value' not found.");
+	return $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selPersonCategoryExists', $value) ?
+		() : ("$dialogItem->{caption} '$value' cannot login.");
 }
 
 sub validatePassword
