@@ -20,5 +20,14 @@
 		<deliverable id="1083">
 			This depends on bug 995 which was fixed in the build_12 patch
 		</deliverable>
+		<deliverable id="1033">
+			Change field calculation in Revenue/Collection see bug 1033 for comments
+		</deliverable>
+		<deliverable id="1066">
+			If close date is not the next date in sequence a warning is generated and the 
+			user will be asked to select a check box if they still want to close the date.
+			Also need to re-test that the close date will lock out invoice creation, posting of payments.
+		</deliverable>
+		
 	</deliverables>
 </release-notes>
