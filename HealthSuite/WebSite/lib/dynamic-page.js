@@ -190,6 +190,10 @@ function createFieldOptionsHtml(controlId, fieldNode, style, extraAttrs)
 	
 	var html = '';
 	var fieldCount = optionsNode.childNodes.length;
+	var defaultValue = fieldNode.getAttribute('default') ? fieldNode.getAttribute('default') : '';
+	if (defaultValue && defaultValue != '')
+		__debug = confirm (fieldNode.getAttribute('id') + ' (' + fieldNode.getAttribute('type') + ') [' + style + ']\nfieldNode.getAttribute(default) = ' + fieldNode.getAttribute('default'));
+	
 	if(style == 'anchor')
 	{
 		for (var i = 0; i < fieldCount; i++)
@@ -205,27 +209,30 @@ function createFieldOptionsHtml(controlId, fieldNode, style, extraAttrs)
 	{
 		for (var i = 0; i < fieldCount; i++)
 		{
+			var nodeSelection = (defaultValue != '' && i == defaultValue) ? ' selected' : '';
 			var optionNode = optionsNode.childNodes[i];
 			if(optionNode.getAttribute('normal') != null)
-				html += '<option>'+optionNode.text+' *</option>';
+				html += '<option' + nodeSelection + '>'+optionNode.text+' *</option>';
 			else
-				html += '<option>'+optionNode.text+'</option>';
+				html += '<option' + nodeSelection + '>'+optionNode.text+'</option>';
 		}
 	}
 	else if(style == 'radio')
 	{
 		for (var i = 0; i < fieldCount; i++)
 		{
+			var nodeSelection = (defaultValue != '' && i == defaultValue) ? ' checked' : '';
 			var optionNode = optionsNode.childNodes[i];
-			html += "<input type=radio name='"+controlId+"' "+extraAttrs+" id='"+controlId+i+"' value='"+(optionNode.getAttribute('value') != null ? optionNode.getAttribute('value') : i)+"'> <label for='"+controlId+i+"'>"+optionNode.text+"</label>&nbsp;&nbsp; ";
+			html += "<input type=radio name='"+controlId+"' "+extraAttrs+" id='"+controlId+i+"' value='"+(optionNode.getAttribute('value') != null ? optionNode.getAttribute('value') : i) + "'" + nodeSelection + "> <label for='"+controlId+i+"'>"+optionNode.text+"</label>&nbsp;&nbsp; ";
 		}
 	}
 	else if(style == 'checkbox')
 	{
 		for (var i = 0; i < fieldCount; i++)
 		{
+			var nodeSelection = (defaultValue != '' && i == defaultValue) ? ' checked' : '';
 			var optionNode = optionsNode.childNodes[i];
-			html += "<input type=checkbox name='"+controlId+"' "+extraAttrs+" id='"+controlId+i+"' value='"+(optionNode.getAttribute('value') != null ? optionNode.getAttribute('value') : i)+"'> <label for='"+controlId+i+"'>"+optionNode.text+"</label>&nbsp;&nbsp; ";
+			html += "<input type=checkbox name='"+controlId+"' "+extraAttrs+" id='"+controlId+i+"' value='"+(optionNode.getAttribute('value') != null ? optionNode.getAttribute('value') : i) + "'" + nodeSelection + "> <label for='"+controlId+i+"'>"+optionNode.text+"</label>&nbsp;&nbsp; ";
 		}
 	}
 	
@@ -280,6 +287,8 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 //	var sectionId = sectionName + '_' + count;
 	var fieldNodeId = fieldNode.getAttribute('id');
 	var sectionId = (parentPrefix != null && parentPrefix != '') ? (parentPrefix + '.' + fieldNodeId) : fieldNodeId;
+	var sectionClassSuffix = (fieldNode.getAttribute('expanded') == 'yes') ? '_expanded' : '';
+	var sectionDisplayAttribute = (fieldNode.getAttribute('expanded') == 'yes') ? '' : 'display:none';
 	
 	if(fieldType == 'container' || fieldType == 'grid')
 	{
@@ -319,8 +328,8 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 			__debug = confirm ('createFieldHtml...\nsectionId = ' + sectionId + '\nsectLevel = ' + level + '\n\ncontentsHtml = [' + contentsHtml.length + '] ' + contentsHtml);
 		}
 		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">\n';
-		html += '\t<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
-		html += '\t<div id="'+ sectionId +'_body" class="section_body" sectLevel="'+level+'" style="display:none">\n';
+		html += '\t<div id="'+ sectionId +'_head" class="section_head' + sectionClassSuffix + '" sectLevel="'+level+'">\n\t\t<span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>\n\t\t' + normalsHtml + '\n\t</div>\n';
+		html += '\t<div id="'+ sectionId +'_body" class="section_body' + sectionClassSuffix + '" sectLevel="'+level+'" style="' + sectionDisplayAttribute + '">\n';
 		html += '\t\t' + contentsHtml + '\n\t</div>\n</div>\n';
 	}
 	else if (fieldType == 'text' || fieldType == 'float' || fieldType == 'percentage' || fieldType == 'currency' || fieldType == 'integer' || fieldType == 'time' || fieldType == 'date')
@@ -368,10 +377,10 @@ function prepareFieldHtml_caption(fieldNode, level, count, namePrefix, style)
 	return '<span '+ style +' id="'+ namePrefix +'_label" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="section_field_label">'+fieldNode.getAttribute('caption')+':</span>';
 }
 
-function createGridFieldHtml(fieldNode)
-{
-	return '<input>';
-}
+//function createGridFieldHtml(fieldNode)
+//{
+//	return '<input>';
+//}
 
 function addGridRow(theTable, level, count, parent, namePrefix) {
 	if (__nodebug == false) __debug = confirm ('tableName = ' + tableName + '\ngridName = ' + gridName);
@@ -517,6 +526,7 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	var parentNode = fieldNode.parentNode;
 	var parentNodeName = parentNode.getAttribute('id');
 	var parentNodeType = parentNode.getAttribute('type');
+	var defaultValue = fieldNode.getAttribute('default') ? fieldNode.getAttribute('default') : ''; 
 	fieldControlMap[fieldName] = fieldNode;
 	
 	if (document.all[fieldName]) {
@@ -541,16 +551,16 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	if (fieldNode.getAttribute('type') == 'text') {
 		if(fieldNode.getAttribute('lines') == null)
 		{
-			fieldHtml = '<input sectLevel="'+level+'" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="text" name="'+fieldName+'" size="' + getFieldSizeByType (fieldNode.getAttribute('type')) + '">';
+			fieldHtml = '<input sectLevel="'+level+'" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" onchange="handleEvent_onchange(this)" class="text" name="'+fieldName+'" size="' + getFieldSizeByType (fieldNode.getAttribute('type')) + ((defaultValue && defaultValue != '') ? '" value="' + defaultValue : '') + '">';
 		}
 		else
 		{
 			addLabelStyle = 'style="vertical-align: top"';
-			fieldHtml = '<textarea sectLevel="'+level+'" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" class="text" onchange="handleEvent_onchange(this)" name="'+fieldName+'" cols="50" rows="'+fieldNode.getAttribute('lines')+'"></textarea>';
+			fieldHtml = '<textarea sectLevel="'+level+'" onfocus="handleEvent_onfocus(this)" onblur="handleEvent_onblur(this)" class="text" onchange="handleEvent_onchange(this)" name="'+fieldName+'" cols="50" rows="'+fieldNode.getAttribute('lines')+'">' + ((defaultValue && defaultValue != '') ? defaultValue : '') + '</textarea>';
 		}
 	} else {
 		/* Create a text field with data-dependent validation */
-		fieldHtml = '<input sectLevel="'+level+'" onfocus="' + fieldNode.getAttribute('type') + '_onfocus(this)" onblur="' + fieldNode.getAttribute('type') + '_onblur(this)" onchange="' + fieldNode.getAttribute('type') + '_onchange(this)" class="text" name="'+fieldName+'" size="' + getFieldSizeByType (fieldNode.getAttribute('type')) + '">';
+		fieldHtml = '<input sectLevel="'+level+'" onfocus="' + fieldNode.getAttribute('type') + '_onfocus(this)" onblur="' + fieldNode.getAttribute('type') + '_onblur(this)" onchange="' + fieldNode.getAttribute('type') + '_onchange(this)" class="text" name="'+fieldName+'" size="' + getFieldSizeByType (fieldNode.getAttribute('type')) + ((defaultValue && defaultValue != '') ? '" value="' + defaultValue : '') + '">';
 	}
 	
 	var icons = '<span style="font-family: wingdings; width: 15"></span>';
