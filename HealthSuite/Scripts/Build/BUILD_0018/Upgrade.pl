@@ -34,6 +34,7 @@ App::External::runSQL('BUILD_0018_ddl.sql');
 App::External::runSQL('BUILD_0018_dml.sql');
 App::External::runSQL('BUILD_0018_analyze_schema.sql', $schemaName);
 App::External::runSQL('BUILD_0018_compile_invalid_and_disabled.sql');
+App::External::runSQL('BUILD_0018_load_auto_invoice.sql');
 
 
 ######## END UPGRADE SCRIPT #########
