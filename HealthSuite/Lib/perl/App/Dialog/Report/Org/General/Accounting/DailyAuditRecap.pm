@@ -70,8 +70,9 @@ sub prepare_detail_payment
 	my $pub = {
 		columnDefn =>
 		[
-			{head => 'Invoice ID', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
+			{head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
 			{head => 'Physican', dAlign => 'left',},
+			{head => 'Patient',dAlign =>'left' , hAlign =>'left'},
 			{head => 'Proc Code', dAlign => 'center'},		
 			{head => 'Proc Name', dAlign => 'center'},		
 			{head => 'Service From', dAlign => 'center'},			
@@ -95,6 +96,7 @@ sub prepare_detail_payment
 		(	
 			$_->{invoice_id},			
 			$_->{care_provider_id},
+			$_->{patient_id},
 			$_->{code}||"UNK",
 			$_->{caption},
 			$_->{service_begin_date},
