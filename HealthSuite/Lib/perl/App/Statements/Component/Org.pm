@@ -444,17 +444,17 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.FSCatalogDetail' => {
 	sqlStmt => qq{
 			SELECT
-				code AS code,
-				modifier AS modifier,
+				oce.code AS code,
+				oce.modifier AS modifier,
 				catalog_entry_type.caption AS Type,
-				name,
+				oce.name,
 				--description AS description,
-				DECODE(flags, 0, NULL, '(FFS)'),
-				unit_cost AS price,
+				DECODE(oce.flags, 0, NULL, '(FFS)'),
+				oce.unit_cost AS price,
 				--default_units AS uoh,
 				'Add',
-				parent_entry_id,
-				entry_id AS ID,
+				oce.parent_entry_id,
+				oce.entry_id AS ID,
 				oc.internal_catalog_id
 			FROM
 				catalog_entry_type,
@@ -465,9 +465,9 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			AND	oc.org_internal_id = :2
 			AND	oce.entry_type = catalog_entry_type.id
 			ORDER BY
-				entry_type,
-				code,
-				modifier
+				oce.entry_type,
+				oce.code,
+				oce.modifier
 		},
 	sqlvar_entityName => 'Contract_Catalog',
 	sqlStmtBindParamDescr => ['Contract ID and Org Internal ID'],
