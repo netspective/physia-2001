@@ -89,7 +89,7 @@ sub getTableListAsRows
 		my $children .= scalar(@{$_->{childTables}}) > 0 ? getTableListAsRows($self, $_->{childTables}, $level+1) : '';
 		my $indent = $level > 0 ? "<td>&nbsp;&nbsp;</td>" : '';
 		my $aClass = $level == 0 ? 'tableNameParToc' : 'tableNameChlToc';
-		$rows .= "<tr>$indent<td><font face='Tahoma,Arial' size='2'><a class='$aClass' href='table/$_->{name}'>$_->{name}</a></font>$children</td></tr>";
+		$rows .= "<tr>$indent<td><font face='Tahoma,Arial' size='2'><a class='$aClass' href='/sde/table/$_->{name}'>$_->{name}</a></font>$children</td></tr>";
 	}
 
 	return "<table border=0 cellspacing=0 cellpadding=0>$rows</table>";
@@ -318,7 +318,7 @@ sub prepare_TableStruct
 		my $selectAll = $self->escape("select * from $table->{name}");
 		$html .= qq{
 			<table border=0 cellspacing=0>$rows</table>
-			<h1>$table->{name} <a href='/sde-p/table/$table->{name}?query=$selectAll'>Data</a></h1>
+			<h1>$table->{name} <a href='table/$table->{name}?query=$selectAll'>Data</a></h1>
 			$curData
 			};
 
@@ -356,8 +356,7 @@ sub prepare_ColumnDetail
 				foreach my $fRefQualified (@{$col->{foreignRefs}})
 				{
 					my $fRef = $self->{schema}->{columns}->{byQualifiedName}->{uc($fRefQualified)};
-					my $fKeyHref = "window.open('$self->{selfref}?frame=tablestruct&table=$fRef->{table}->{name}', 'tbl_$fRef->{name}', 'width=550,height=400,scrollbars,resizable');";
-					push(@foreignRefs, "<a href='#' onclick=\"$fKeyHref\">$fRefQualified</a>");
+					push(@foreignRefs, "<a href='$fRef->{table}->{name}'>$fRefQualified</a>");
 				}
 			}
 			my $fRefsHtml = @foreignRefs ? join("<br>", @foreignRefs) : '';
@@ -369,8 +368,7 @@ sub prepare_ColumnDetail
 				foreach my $cRefQualified (@{$col->{cacheRefs}})
 				{
 					my $cRef = $self->{schema}->{columns}->{byQualifiedName}->{uc($cRefQualified)};
-					my $cKeyHref = "window.open('$self->{selfref}?frame=tablestruct&table=$cRef->{table}->{name}', 'tbl_$cRef->{name}', 'width=550,height=400,scrollbars,resizable');";
-					push(@cacheRefs, "<a href='#' onclick=\"$cKeyHref\">$cRefQualified</a>");
+					push(@cacheRefs, "<a href='$cRef->{table}->{name}'>$cRefQualified</a>");
 				}
 			}
 			my $cRefsHtml = @cacheRefs ? join("<br>", @cacheRefs) : '';
@@ -381,8 +379,7 @@ sub prepare_ColumnDetail
 				foreach my $uTypeQualified (@{$col->{useTypeRefs}})
 				{
 					my $uTypeRef = $self->{schema}->{columns}->{byQualifiedName}->{uc($uTypeQualified)};
-					my $uTypeKeyHref = "window.open('$self->{selfref}?frame=tablestruct&table=$uTypeRef->{table}->{name}', 'tbl_$uTypeRef->{name}', 'width=550,height=400,scrollbars,resizable');";
-					push(@useTypeRefs, "<a href='#' onclick=\"$uTypeKeyHref\">$uTypeQualified</a>");
+					push(@useTypeRefs, "<a href='$uTypeRef->{table}->{name}'>$uTypeQualified</a>");
 				}
 			}
 			my $uTypesHtml = @useTypeRefs ? join("<br>", @useTypeRefs) : '';
