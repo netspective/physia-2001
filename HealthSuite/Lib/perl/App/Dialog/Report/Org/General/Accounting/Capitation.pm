@@ -12,6 +12,7 @@ use CGI::Validator::Field;
 use DBI::StatementManager;
 use Data::Publish;
 use App::Statements::Report::ClaimStatus;
+use App::Statements::Org;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::BatchDateID;
@@ -159,6 +160,7 @@ sub execute
 			and t.trans_id = ta.parent_id
 			and ta.item_name = 'Monthly Cap/Payment/Batch ID'
 			and t.receiver_id = o.org_internal_id
+			and o.owner_org_id = @{[ $page->session('org_internal_id')]}
 			$batchIDClause1
 			$batchDateClause1
 			$planClause1
@@ -166,7 +168,7 @@ sub execute
 			$physicianClause1
 			$orgClause1
 		union
-		select
+		select distinct
 			ins.plan_name plan,
 			ins.product_name product,
 			t.care_provider_id provider,
@@ -187,6 +189,7 @@ sub execute
 			and ib.bill_id = i.billing_id
 			and ib.bill_ins_id = ins.ins_internal_id
 			and t.trans_id = i.main_transaction
+			and t.billing_facility_id = @{[ $page->session('org_internal_id')]}
 			$batchIDClause2
 			$batchDateClause2
 			$planClause2
@@ -197,7 +200,7 @@ sub execute
 	};
 
 	my $rows = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
-	my ($query0, $query1, $query2, $row0, $row1, $row2, $org_id, $amount, $month, $copay_expected, $copay_received, $patients_seen, @rowData);
+	my ($query0, $query1, $query2, $row0, $rows1, $rows2, $org_id, @rowData);
 	my @data = ();
 
 	foreach my $row (@$rows)
@@ -216,17 +219,7 @@ sub execute
 		my $physicianClauseB =qq { and t.care_provider_id = '$row->{provider}'} if($row->{provider} ne '');
 		my $orgClauseB =qq { and t.service_facility_id = $row->{org_id}} if($row->{org_id} ne '');
 
-		$query0 = qq{
-						select org_id
-						from org
-						where org_internal_id = $row->{org_id}
-					};
-
-		$row0 = $STMTMGR_RPT_CLAIM_STATUS->getRowAsHash($page,STMTMGRFLAG_DYNAMICSQL,$query0);
-		if ($row0 ne '')
-		{
-			$org_id = $row0->{org_id};
-		}
+		$org_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId',$row->{org_id});
 
 		$query1 = qq{
 						select
@@ -260,16 +253,14 @@ sub execute
 							m.caption
 					};
 
-		$row1 = $STMTMGR_RPT_CLAIM_STATUS->getRowAsHash($page,STMTMGRFLAG_DYNAMICSQL,$query1);
-		if ($row1 ne '')
+		$rows1 = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$query1);
+		my (@amount, @month, @copay_expected, @copay_received, @patients_seen);
+		my ($count1, $count2);
+		foreach my $row1 (@$rows1)
 		{
-			$amount = $row1->{cap_amount};
-			$month = $row1->{month};
-		}
-		else
-		{
-			$amount = undef;
-			$month = undef;
+			$amount[$count1] = $row1->{cap_amount};
+			$month[$count1] = $row1->{month};
+			$count1++;
 		}
 
 		$query2 = qq{
@@ -310,32 +301,31 @@ sub execute
 						t.service_facility_id
 					};
 
-		$row2 = $STMTMGR_RPT_CLAIM_STATUS->getRowAsHash($page,STMTMGRFLAG_DYNAMICSQL,$query2);
-		if ($row2 ne '')
+		$rows2 = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$query2);
+		foreach my $row2 (@$rows2)
 		{
-			$copay_expected = $row2->{copay_expected};
-			$copay_received = $row2->{copay_received};
-			$patients_seen = $row2->{patients_seen};
-		}
-		else
-		{
-			$copay_expected = undef;
-			$copay_received = undef;
-			$patients_seen = undef;
+			$copay_expected[$count2] = $row2->{copay_expected};
+			$copay_received[$count2] = $row2->{copay_received};
+			$patients_seen[$count2] = $row2->{patients_seen};
+			$count2++;
 		}
 
-		my @rowData = (
-		$row->{provider},
-		$org_id,
-		$row->{product},
-		$row->{plan},
-		$month,
-		$amount,
-		$copay_expected,
-		$copay_received,
-		$patients_seen,
-		);
-		push(@data, \@rowData);
+		my $maxCount = ($count1 > $count2) ? $count1 : $count2;
+		for my $i(0..$maxCount - 1)
+		{
+			my @rowData = (
+			$row->{provider},
+			$org_id,
+			$row->{product},
+			$row->{plan},
+			$month[$i],
+			$amount[$i],
+			$copay_expected[$i],
+			$copay_received[$i],
+			$patients_seen[$i],
+			);
+			push(@data, \@rowData);
+		}
 	};
 
 	my $html = createHtmlFromData($page, 0, \@data, $pub);
