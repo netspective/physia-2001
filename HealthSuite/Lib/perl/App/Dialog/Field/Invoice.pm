@@ -18,7 +18,8 @@ sub new
 		new CGI::Dialog::Field(
 				caption => 'Procedure',
 				name => "procedure$nameSuffix",
-				type => 'integer', size => 8,
+				#type => 'integer', 
+				size => 8,
 				options => FLDFLAG_REQUIRED,
 				findPopup => '/lookup/cpt'),
 		new CGI::Dialog::Field(

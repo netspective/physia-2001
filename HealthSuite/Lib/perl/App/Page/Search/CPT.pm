@@ -73,20 +73,13 @@ sub execute
 	my $bindParams = [uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
 
-	my $javascript = App::Page::Search::getJavaScript();
+
 	$self->addContent(
-		$javascript,
 		'<CENTER>',
-		$STMTMGR_CPT_CODE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_cpt_$type$appendStmtName", $bindParams,
-#			[
-#				['Code', q{<A HREF="javascript:chooseItem2('/lookup/cpt/detail/%0', %0, true)"
-#					STYLE="text-decoration:none" title="Lookup Detailed Data"> %0</A>}],
-#				['Name'],
-#				['Description'],
-#			]
-		),
+		$STMTMGR_CPT_CODE_SEARCH->createHtml
+			($self, STMTMGRFLAG_NONE, "sel_cpt_$type$appendStmtName", $bindParams,),
 		'</CENTER>'
-		);
+	);
 
 	return 1;
 }
@@ -195,9 +188,7 @@ sub execute_detail
 		</table>
 	};
 
-	my $javaScript = App::Page::Search::getJavaScript();
 	$self->addContent(
-		$javaScript,
 		'<CENTER>',
 		$details,
 		'</CENTER>'

@@ -803,6 +803,23 @@ function chooseItem(arlFmt, itemValue, inNewWin)
 		window.location.href = newArl;
 }
 
+function chooseItem2(arlFmt, itemValue, inNewWin, features)
+{
+	if(isLookupWindow())
+	{
+		populateControl(itemValue, true);
+		return;
+	}
+
+	var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
+	if(inNewWin) {
+		var popUpWindow = open(newArl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=440,scrollbars,resizable" : features);
+		popUpWindow.focus();
+	}
+	else
+		window.location.href = newArl;
+}
+
 //****************************************************************************
 // Action popup window support
 //****************************************************************************

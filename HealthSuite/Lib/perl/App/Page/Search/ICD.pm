@@ -69,22 +69,11 @@ sub execute
 	}
 	my $bindParams = [uc($expression)];
 
-	my $javaScript = App::Page::Search::getJavaScript();
 	$self->addContent(
-		$javaScript,
 		'<CENTER>',
-		$STMTMGR_CATALOG_CODE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_icd_$type$appendStmtName", $bindParams,
-#			[
-#				['Code', q{<A HREF="javascript:chooseItem2('/lookup/icd/detail/%0', %0, true)"
-#					STYLE="text-decoration:none" title="Lookup Detailed Data">%0</A>}],
-#				['Name'],
-#				['Description'],
-#				['Sex'],
-#				['Age'],
-#			]
-		),
+		$STMTMGR_CATALOG_CODE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_icd_$type$appendStmtName", $bindParams,),
 		'</CENTER>'
-		);
+	);
 
 	return 1;
 }
@@ -108,8 +97,6 @@ sub execute_detail
 			<a HREF="javascript:chooseItem2('/lookup/cpt/detail/$_', $_, true)"> $_ </a>
 		};
 	}
-
-	#my $icdHtml = qq{<a HREF="javascript:chooseItem2('/lookup/icd/detail/$icdHash->{icd}', $icdHash->{icd}, true)">$icdHash->{icd}</a>};
 
 	my $details = qq{
 		<style>
@@ -215,9 +202,7 @@ sub execute_detail
 		</table>
 	};
 
-	my $javaScript = App::Page::Search::getJavaScript();
 	$self->addContent(
-		$javaScript,
 		'<CENTER>',
 		$details,
 		'</CENTER>'
