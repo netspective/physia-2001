@@ -7,9 +7,8 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Claim;
-use Devel::ChangeLog;
 use Date::Manip qw(ParseDate UnixDate);
-use vars qw(@ISA  @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(App::Page::Search);
 
 sub getForm
@@ -69,6 +68,7 @@ sub getForm
 			<option value="patientid" selected>Patient ID</option>
 			<option value="ssn">Patient SSN</option>
 			<option value="date">Date of Visit</option>
+			<option value="servicedate">Service Date</option>
 			<option value="upin">Physician UPIN</option>
 			<option value="insurance">Payer</option>
 			<option value="employer">Employer</option>
@@ -93,7 +93,7 @@ sub execute
 	my $status = $self->param('search_status');
 	my $type = $self->param('search_type');
 
-	if($type eq 'date' && $expression ne '*' && ! ParseDate($expression))
+	if(($type eq 'date' || $type eq 'servicedate') && $expression ne '*' && ! ParseDate($expression))
 	{
 		$self->addContent("<font face='arial' color='darkred'>Invalid date format '$expression'. Please enter date as 'MM/DD/YYYY'.</font>");
 
@@ -130,12 +130,5 @@ sub execute
 
 	return 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-			'Search/Claim',
-		'Changed the urls from create/... to org/.... '],
-);
 
 1;
