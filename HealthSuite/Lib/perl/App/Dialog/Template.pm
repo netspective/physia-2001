@@ -164,6 +164,14 @@ sub new
 			]),
 	);
 
+	$self->{activityLog} =
+		{
+			scope =>'Sch_Template',
+			key => "#field.template_id#",
+			data => "template 'Template ID <a href='/search/template'>#field.template_id#</a>'"
+		};
+
+	$self->addFooter(new CGI::Dialog::Buttons);
 	#$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self->addFooter(new CGI::Dialog::Buttons(
@@ -218,7 +226,7 @@ sub populateData_update
 
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $templateID = $page->param('template_id');
-	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 		'selPopulateTemplateDialog', $gmtDayOffset, $templateID);
 
   $page->field('days_of_week', split(',', $page->field('days_of_week')));
@@ -299,6 +307,7 @@ sub execute
 	_debug => 0,
 	);
 
+	$page->field('template_id', $newTemplateID) if $command eq 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 

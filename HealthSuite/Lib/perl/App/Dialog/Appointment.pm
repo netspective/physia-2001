@@ -620,7 +620,7 @@ sub findConflictEvent
 
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 	my $events = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-		'selAppointmentConflictCheck', $gmtDayOffset, $gmtDayOffset, $startDate, $gmtDayOffset, 
+		'selAppointmentConflictCheck', $gmtDayOffset, $gmtDayOffset, $startDate, $gmtDayOffset,
 		$endDate, $gmtDayOffset, $page->field('facility_id'), $page->field('resource_id'));
 
 	for my $event (@$events)
@@ -749,6 +749,8 @@ sub execute
 					appt_type => $page->field('appt_type') || undef,
 					_debug => 0
 				);
+
+				$page->field('event_id', $apptID);
 				if ($apptID gt 0)
 				{
 					$page->schemaAction(
