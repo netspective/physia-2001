@@ -100,7 +100,7 @@ sub execute
 	);
 
 	my $sampleLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutputHREF, $theFilename);
-	$page->addContent (qq {<b>PDF Generated: </b><i><a href="$sampleLink">Sample Report</a></i>});
+	$page->addContent (qq {<b>SuperBill Generated: </b><i><a href="$sampleLink">Click here to view</a></i>});
 
 }
 
