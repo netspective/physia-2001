@@ -98,7 +98,7 @@ sub makeStateChanges
 		$personId = uc($personId);
 		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
 		{
-			if($page->field('payer') eq '')
+			if($page->field('payer') eq '' || $personId ne $page->field('attendee_id'))
 			{
 				my $payerField = $self->getField('payer');
 				$payerField->invalidate($page, 'Please choose a primary payer for this claim.');
