@@ -34,10 +34,10 @@
 			+ Revenue and Collection report - Physician ID 
 			+ Capitation / Utilization report - Physician ID 
 			+ Daily Audit - Physician ID 
-+ Invoices - Earning column Payer 
+			+ Invoices - Earning column Payer
 		</deliverable>
 		<deliverable id="943">
-			UI: Simple names now showing next to all person id fields (where possible).
+			UI: Simple names now showing next to all person id fields where possible.
 		</deliverable>
 
 		<deliverable id="963">
