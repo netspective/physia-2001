@@ -426,6 +426,20 @@
 				<col name="remarks">Physicians specialties (primary, secondary, etc)</col>
 			</row>
 			<row>
+				<col name="id">550</col>
+				<col name="caption">Insurance Company Provider Id</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">This is the id code assigned by an insurance company to a provider code which authorizes the provider to bill the insurance company for service rendered</col>
+			</row>
+			<row>
+				<col name="id">570</col>
+				<col name="caption">Tax Id</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">Code assigned by a government to a person or a corporation for tax purposes</col>
+			</row>
+			<row>
 				<col name="id">600</col>
 				<col name="caption">Licensing</col>
 				<col name="group_name">Credentials</col>
