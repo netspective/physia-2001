@@ -545,6 +545,8 @@ sub copyInvoiceForNextPayer
 				writeoff_code => defined $writeoffCode ? $writeoffCode : 'NULL',
 				writeoff_amount => $adjust->{writeoff_amount} || undef,
 				comments => $adjust->{comments} || undef,
+				data_text_a => $adjust->{data_text_a} || undef,	#this field is used for authorization reference/code
+				data_date_a => $adjust->{data_date_a} || undef,	#this is used for credit card exp date
 				data_num_a => 1,			#this indicates that this adjustment came from the child invoice (ex. this adjustment came from the primary and is being copied to secondary)
 				_debug => 0
 			);
