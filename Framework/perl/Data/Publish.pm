@@ -167,7 +167,7 @@ sub fmt_stamp
 {
 	my $page = shift;
 	my $stamp = &ParseDate(shift);
-	my $stampFormat = $page->session('FORMAT_STAMP') || '%l';
+	my $stampFormat = $page->session('FORMAT_STAMP') || '%b %e %I:%M %p';
 	$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 	return &UnixDate($stamp, $stampFormat);
 }
@@ -926,7 +926,7 @@ sub createHtmlFromStatement
 					'fmt_stamp' => sub
 					{
 						my $stamp = &ParseDate($rowRef->[$_[0]]);
-						my $stampFormat = $page->session('FORMAT_STAMP') || '%l';
+						my $stampFormat = $page->session('FORMAT_STAMP') || '%b %e %I:%M %p';
 						$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('DAYLIGHT_TZ') );
 						return &UnixDate($stamp, $stampFormat);
 					},
