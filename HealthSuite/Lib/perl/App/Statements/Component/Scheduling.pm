@@ -219,7 +219,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 
 	'sel_MostRecentVerify' => qq{
 		select * from Sch_Verify where person_id = :1
-		and ins_verify_date = (select max(ins_verify_date) from Sch_Verify where person_id = :1)
+			and cr_stamp = (select max(cr_stamp) from Sch_Verify where person_id = :1)
 	},
 
 	'sel_populateAppConfirmDialog' => qq{
