@@ -72,7 +72,7 @@ sub initialize
 
 			new CGI::Dialog::Field(type=>'email', caption => 'Email', name => 'email', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 			new CGI::Dialog::Field(type=>'url', caption => 'Website', name => 'internet', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
-			new CGI::Dialog::MultiField(caption =>'Org Contact/Phone', name => 'org_contact', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
+			new CGI::Dialog::MultiField(caption =>'Billing Contact/Phone', name => 'org_contact', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE,
 				fields => [
 					new CGI::Dialog::Field(invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE, caption => 'Contact', name => 'contact_name'),
 					new CGI::Dialog::Field(type=>'phone', caption => 'Phone', name => 'contact_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
@@ -428,7 +428,7 @@ sub execute_add
 			'Org_Attribute', $command,
 			parent_id => $page->field('org_id'),
 			item_name => 'Contact Information',
-			value_type => defined $textValueType ? $textValueType : undef,
+			value_type => App::Universal::ATTRTYPE_BILLING_PHONE || undef,
 			value_text => $page->field('contact_phone') || undef,
 			value_textB => $page->field('contact_name') || undef,
 			_debug => 0
