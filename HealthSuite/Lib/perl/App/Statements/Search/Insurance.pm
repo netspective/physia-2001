@@ -32,7 +32,16 @@ $STMTFMT_SEL_INSURANCE = qq{
 			ins.ins_internal_id = addr.parent_id
 			AND org.org_internal_id = ins.ins_org_id
 			AND	%whereCond% 
-			AND ins.owner_org_id = ?
+			AND ( (ins.owner_org_id = ?)
+			     OR EXISTS
+			    (SELECT 1 
+			     FROM org_association assn
+			     WHERE assn.assn_org_internal_id = ins.owner_org_id
+			     AND   assn.org_internal_id = ?
+			     AND   assn.org_assn_type  = 110 
+			     AND   assn.org_assn_status = 0
+			     )
+			    ) 
 			%catCond%
 		ORDER BY 1
 	)
