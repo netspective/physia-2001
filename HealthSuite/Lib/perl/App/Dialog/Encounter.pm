@@ -1128,7 +1128,7 @@ sub addTransactionAndInvoice
 	#create attributes, items, billing info, handle hmo cap, then redirect
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
 	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
-	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command eq 'add';
+	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
 	handleHmoCapChanges($self, $page, $command, $invoiceId);
 	handleRedirect($self, $page, $command, $flags, $invoiceId);
 }
