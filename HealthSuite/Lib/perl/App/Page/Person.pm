@@ -493,7 +493,6 @@ sub prepare_view_profile
 								<TD>#component.stp-person.certification#</TD>
 							</TR>
 						</TABLE><BR>
-					#component.stp-person.recentlyVisitedPatients#<BR>
 					#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedSessionPhysicians#<BR>
 					#component.stp-person.benefits#</BR>				
