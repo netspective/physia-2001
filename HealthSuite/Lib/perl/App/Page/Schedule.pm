@@ -212,7 +212,7 @@ sub prepare_view_apptcol
 {
 	my ($self) = @_;
 
-	my $date = ParseDate($self->param('date')) || "today";
+	my $date = ParseDate($self->param('date') || 'today');
 	my $formattedDate = UnixDate ($date, '%m/%d/%Y');
 	$self->param('dialog', 'fake');
 
@@ -286,7 +286,7 @@ sub prepare_view_apptsheet
 		return 1;
 	}
 
-	my $selectedDate = ParseDate($self->param('_seldate')) || "today";
+	my $selectedDate = ParseDate($self->param('_seldate') || 'today');
 	my $formattedDate = UnixDate ($selectedDate, '%m/%d/%Y');
 
 	my @inputSpec = ();
@@ -519,13 +519,13 @@ sub getApptSheetHeaderHtml
 	my @actionOptions = (
 		{arl => '/person/%itemValue%/profile', caption => 'View Summary'},
 		{arl => '/person/%itemValue%/account', caption => 'View Account'},
-		{arl => '/person/%itemValue%/dlg-add-claim', caption => 'Create Claim'},
+		{arl => '/person/%itemValue%/dlg-add-claim', caption => 'Add Claim'},
 		{arl => '/schedule/apptsheet/encounterCheckin/%itemValue%', caption => 'Check In'},
 		{arl => '/schedule/apptsheet/encounterCheckout/%itemValue%', caption => 'Check Out'},
-		{arl => '/schedule/appointment/cancel/%itemValue%', caption => 'Cancel'},
-		{arl => '/schedule/appointment/noshow/%itemValue%', caption => 'No Show'},
-		{arl => '/schedule/appointment/reschedule/%itemValue%', caption => 'Reschedule'},
-		{arl => '/schedule/appointment/update/%itemValue%', caption => 'Edit Appointment'},
+		{arl => '/schedule/dlg-cancel-appointment/%itemValue%', caption => 'Cancel'},
+		{arl => '/schedule/dlg-noshow-appointment/%itemValue%', caption => 'No Show'},
+		{arl => '/schedule/dlg-reschedule-appointment/%itemValue%', caption => 'Reschedule'},
+		{arl => '/schedule/dlg-update-appointment/%itemValue%', caption => 'Edit Appointment'},
 	);
 
 	my $actionOptionsHtml = '';
