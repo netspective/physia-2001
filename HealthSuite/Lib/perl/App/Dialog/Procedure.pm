@@ -16,6 +16,7 @@ use CGI::Dialog;
 use App::Dialog::OnHold;
 use CGI::Validator::Field;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
 
@@ -249,14 +250,9 @@ sub execAction_submit
 
 		if($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
 		{
-			$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => App::Universal::ATTRTYPE_HISTORY,
+			addHistoryItem($page, $invoiceId,
 				value_text => 'Closed',
 				value_date => $todaysDate,
-				_debug => 0
 			);
 		}
 		else
@@ -273,17 +269,12 @@ sub execAction_submit
 				_debug => 0
 			);
 
-			# create invoice attribute for history of invoice status
+			# create invoice history item for invoice status
 			my $action = $resubmitFlag == 1 ? 'Resubmitted' : 'Submitted';
 			$action = $printFlag ? 'HCFA Printed' : $action;
-			$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId,
-				item_name => 'Invoice/History/Item',
-				value_type => App::Universal::ATTRTYPE_HISTORY,
+			addHistoryItem($page, $invoiceId,
 				value_text => $action,
-				value_date => $todaysDate || undef,
-				_debug => 0
+				value_date => $todaysDate,
 			);
 		}
 	#}
@@ -302,7 +293,6 @@ sub copyInvoice
 	my $todaysDate = $page->getDate();
 	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
 	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
 	my @claimDiags = split(/\s*,\s*/, $oldInvoiceInfo->{claim_diags});
 	my $invoiceType = $oldInvoiceInfo->{invoice_type};
@@ -506,26 +496,17 @@ sub copyInvoice
 		_debug => 0
 	);
 
-	#add new history attributes
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $newInvoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	#add new history items
+	addHistoryItem($page, $newInvoiceId,
 		value_text => 'Created claim',
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $newInvoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $newInvoiceId,
 		value_text => "This invoice is a resubmitted copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>",
 		value_date => $todaysDate,
-		_debug => 0
 	);
+
 
 
 	#update old invoice - status, parent invoice
@@ -536,25 +517,16 @@ sub copyInvoice
 		invoice_status => App::Universal::INVOICESTATUS_CLOSED,
 	);
 
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $oldInvoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $oldInvoiceId,
 		value_text => "The remaining balance has been carried over to claim <A HREF='/invoice/$newInvoiceId/summary'>$newInvoiceId</A>",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $oldInvoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	addHistoryItem($page, $oldInvoiceId,
 		value_text => 'Closed',
 		value_date => $todaysDate,
-		_debug => 0
 	);
+
 
 	return $newInvoiceId;
 }
@@ -606,15 +578,10 @@ sub hmoCapWriteoff
 	}
 
 
-	## create invoice attribute for history of these adjustments
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'Auto-generated writeoffs for HMO Capitated claim',
-			value_date => $todaysDate || undef,
-			_debug => 0
+	## create invoice history for these adjustments
+	addHistoryItem($page, $invoiceId,
+		value_text => 'Auto-generated writeoffs for HMO Capitated claim',
+		value_date => $todaysDate,
 	);
 }
 
@@ -2433,20 +2400,14 @@ sub execute_addOrUpdate
 		);
 
 
-	## ADD HISTORY ATTRIBUTE
+	## ADD HISTORY ITEM
 	my $action = '';
 	$action = 'Added' if $command eq 'add';
 	$action = 'Updated' if $command eq 'update';
-
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => "$action $cptCodes[0]",
-			value_textB => $comments || undef,
-			value_date => $todaysDate || undef,
-			_debug => 0
+	addHistoryItem($page, $invoiceId,
+		value_text => "$action $cptCodes[0]",
+		value_textB => $comments || undef,
+		value_date => $todaysDate,
 	);
 
 
@@ -2551,20 +2512,14 @@ sub createExplosionItems
 			);
 		}
 
-		## ADD HISTORY ATTRIBUTE
+		## ADD HISTORY ITEM
 		my $action = '';
 		$action = 'Added' if $command eq 'add';
 		$action = 'Updated' if $command eq 'update';
-
-		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId,
-				item_name => 'Invoice/History/Item',
-				value_type => App::Universal::ATTRTYPE_HISTORY,
-				value_text => "$action $cptCode (child of explosion code $explCode)",
-				value_textB => $comments || undef,
-				value_date => $todaysDate || undef,
-				_debug => 0
+		addHistoryItem($page, $invoiceId,
+			value_text => "$action $cptCode (child of explosion code $explCode)",
+			value_textB => $comments || undef,
+			value_date => $todaysDate,
 		);
 	}
 
@@ -2634,16 +2589,10 @@ sub voidProcedure
 
 
 
-	## ADD HISTORY ATTRIBUTE
-	$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => "Voided $cptCode",
-			#value_textB => $comments || undef,
-			value_date => $todaysDate || undef,
-			_debug => 0
+	## ADD HISTORY ITEM
+	addHistoryItem($page, $invoiceId,
+		value_text => "Voided $cptCode",
+		value_date => $todaysDate,
 	);
 }
 
