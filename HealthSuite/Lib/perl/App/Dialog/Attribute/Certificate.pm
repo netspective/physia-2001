@@ -42,22 +42,30 @@ sub customValidate
 
 	my $pId = $self->getField('value_text');
 	my $sName = $self->getField('value_int');
+	my $licenseNum = $self->getField('value_dateend');
 	my $itemId = $page->param('item_id');
 	my $sequence = $page->field('value_int');
 	my $personId = $page->param('person_id');
 	my $specialty = $page->field('value_text');
+	my $specialtyValType = App::Universal::ATTRTYPE_SPECIALTY;
+	my $valueType = $self->{valueType};
 	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne "&SEQUENCE_SPECIALTY_UNKNOWN";
 
-	if (($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}) && $sequence >=SEQUENCE_SPECIALTY_PRIMARY && $sequence <=SEQUENCE_SPECIALTY_QUATERNARY)
+	if ($valueType eq $specialtyValType  && ($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}) && $sequence >=SEQUENCE_SPECIALTY_PRIMARY && $sequence <=SEQUENCE_SPECIALTY_QUATERNARY)
 	{
 		$sName->invalidate($page, "This 'Specialty Sequence' already exists for $personId");
 	}
 
 	my $specialtyExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtyExists', $personId, $specialty);
 
-	if (($specialtyExists->{'value_text'} eq $specialty) && ($itemId ne $specialtyExists->{'item_id'}))
+	if ($valueType eq $specialtyValType && ($specialtyExists->{'value_text'} eq $specialty) && ($itemId ne $specialtyExists->{'item_id'}))
 	{
 		$pId->invalidate($page, "This 'Specialty' already exists for $personId");
+	}
+
+	if($page->field('value_textb') eq 'Nursing/License' && ($page->field('value_int') eq '' || $page->field('value_dateend') eq ''))
+	{
+		$licenseNum->invalidate($page, "'Expiration Date' and 'License Required' should be entered when the license is 'Nursing/License' ");
 	}
 }
 
