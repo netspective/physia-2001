@@ -63,16 +63,21 @@ sub isValid
 	$self->SUPER::isValid($page, $validator, $valFlags);
 	#if($valid)
 	#{
-	if ($state || $zipCode ne '')
+	if ($state ne '')
 	{
 		if (not(App::Billing::Locale::USCodes::isValidState($state)))	
 		{				
 			$self->invalidate($page, "Invalid State: $state");
+			return();
 		}	
-
+	}
+	
+	if ($zipCode ne '')
+	{	
 		if (not(App::Billing::Locale::USCodes::isValidZipCode($state, $zipCode)))	
 		{		
 			$self->invalidate($page, "Invalid Zip Code: $zipCode ");
+			return();
 		}
 	}
 	#}
