@@ -29,7 +29,7 @@ sub formatData
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
+	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
 	substr($refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
@@ -45,7 +45,7 @@ sub formatData
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
 	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToInsured()),
-	substr($refClaimInsured->getId(), 0, 17),
+	substr($refClaimInsured->getSsn(), 0, 17),
 	$spaces,  # insured id filler
 	substr($refClaimInsured->getLastName(), 0, 20),
 	substr($refClaimInsured->getFirstName(), 0, 10),
@@ -83,7 +83,11 @@ sub formatData
 	'In DA0 in place of Payer Office Claim Number last four characters of Payer ID are used'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/06/2000', 'AUF',
 	'Billing Interface/Validating NSF Output',
-	'Multiple payers logic has been implemented in DA0 by passing payer number as a key of  hash $flag ']
+	'Multiple payers logic has been implemented in DA0 by passing payer number as a key of  hash $flag '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value in DA0']
+
 
 );
 
