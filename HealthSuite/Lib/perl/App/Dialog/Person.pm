@@ -20,8 +20,7 @@ use App::Statements::Person;
 
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 @ISA = qw(CGI::Dialog);
 
 
@@ -84,7 +83,7 @@ sub initialize
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Birth', name => 'date_of_birth', defaultValue => '', futureOnly => 0),
 				]),
 
-		new CGI::Dialog::MultiField(caption =>'Gender / Marital Status',
+		new CGI::Dialog::MultiField(
 			fields => [
 					new CGI::Dialog::Field(type=> 'enum', enum => 'Gender', caption => 'Gender', name => 'gender', options => FLDFLAG_REQUIRED),
 					new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
@@ -96,7 +95,7 @@ sub initialize
 
 		# CONTACT METHODS
 		new CGI::Dialog::Subhead(heading => 'Contact Methods', name => 'contact_methods_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::MultiField(caption =>'Home/Work Phone', name => 'home_work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		new CGI::Dialog::MultiField(name => 'home_work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(type => 'phone', caption => 'Home Phone', name => 'home_phone', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				new CGI::Dialog::Field(type => 'phone', caption => 'Work Phone', name => 'work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -607,50 +606,5 @@ sub execute_remove
 
 	return '';
 }
-use constant PERSON_DIALOG => 'Dialog/Person';
-use constant PERSON_SESSION => 'Session/Person';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/28/1999', 'MAF',
-		PERSON_DIALOG,
-		'Moved the patient, physician, nurse dialogs code to this file '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/28/1999', 'RK',
-		PERSON_DIALOG,
-		'Moved the customvalidation subroutine from patient.pm, physician.pm, nurse.pm to this file'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/30/1999', 'RK',
-		PERSON_DIALOG,
-		'Updated the field Employment Status (ie added Unknown Status to the Status list).'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/31/1999', 'RK',
-		PERSON_DIALOG,
-		'Added a new multi field called Preferred Day/Time.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/31/1999', 'RK',
-		PERSON_DIALOG,
-		'Added a validation in the custom Validate subroutine to inform the user that a person with the same First and Last name already exists. It displays the SSN of the existing record.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/03/2000', 'RK',
-			PERSON_DIALOG,
-		'Made minor code changes to fix the  Personal Data pane updating '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/04/2000', 'RK',
-			PERSON_SESSION,
-		'Added the execute function in handle registry sub-routine to display the list of session-activities in the session tab '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/17/2000', 'RK',
-			PERSON_SESSION,
-		'Updated the subroutine makeStateChanges to make the complete_name field as updatable.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/18/2000', 'RK',
-			PERSON_DIALOG,
-		'Added fields called Specialty 2, Specialty 3 and Affiliation/Other Affiliations/Exp Date in Physician Dialog '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/20/2000', 'RK',
-			PERSON_DIALOG,
-		'Updated the subroutine customValidate and shifted the added the field Create Record to the function name() in the package Person::Name. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/06/2000', 'MAF',
-			PERSON_DIALOG,
-		'Added a Delete Record checkbox when in update mode. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'MAF',
-			PERSON_DIALOG,
-		'Cleaned up and reorganized code in all the person dialogs. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'MAF',
-			PERSON_DIALOG,
-		'Customized code (headings, updates, removes, next actions, etc.) according to person type. '],
-);
 
 1;

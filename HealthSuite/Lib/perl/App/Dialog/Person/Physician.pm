@@ -16,8 +16,7 @@ use App::Statements::Org;
 use App::Statements::Person;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(App::Dialog::Person);
 
@@ -52,8 +51,9 @@ sub initialize
 						fKeyStmt => 'selMedicalSpeciality',
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
+						options => FLDFLAG_PREPENDBLANK,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 
 				]),
 
@@ -66,8 +66,9 @@ sub initialize
 						fKeyStmt => 'selMedicalSpeciality',
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
+						options => FLDFLAG_PREPENDBLANK,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int2', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int2', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 				]),
 
 		new CGI::Dialog::MultiField(caption => '3. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty3',
@@ -79,8 +80,9 @@ sub initialize
 						fKeyStmt => 'selMedicalSpeciality',
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
+						options => FLDFLAG_PREPENDBLANK,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int3', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int3', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 				]),
 
 		new CGI::Dialog::MultiField(caption => 'Affiliation/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -237,38 +239,29 @@ sub customValidate
 
 	return () if ($command eq 'remove' || $command eq 'update');
 
-	my $specialty1 = $self->getField('specialty1')->{fields}->[0];
-	my $seq1 = $self->getField('specialty1')->{fields}->[1];
+	#my $specialty1 = $self->getField('specialty1')->{fields}->[0];
+	#my $seq1 = $self->getField('specialty1')->{fields}->[1];
 	my $specialty2 = $self->getField('specialty2')->{fields}->[0];
-	my $seq2 = $self->getField('specialty2')->{fields}->[1];
+	#my $seq2 = $self->getField('specialty2')->{fields}->[1];
 	my $specialty3 = $self->getField('specialty3')->{fields}->[0];
-	my $seq3 = $self->getField('specialty3')->{fields}->[1];
+	#my $seq3 = $self->getField('specialty3')->{fields}->[1];
 	my $medSpecCode = $page->field('specialty_code');
 	my $medSpecCode2 = $page->field('specialty2_code');
 	my $medSpecCode3 = $page->field('specialty3_code');
-	my $specSeq1 = $page->field('value_int1');
-	my $specSeq2 = $page->field('value_int2');
-	my $specSeq3 = $page->field('value_int3');
+	#my $specSeq1 = $page->field('value_int1');
+	#my $specSeq2 = $page->field('value_int2');
+	#my $specSeq3 = $page->field('value_int3');
 	my $personId = $page->field('person_id');
 
-	if ($medSpecCode2 eq $medSpecCode3 || $medSpecCode2 eq $medSpecCode)
+
+	if	($medSpecCode ne '' && ($medSpecCode eq $medSpecCode2))
 	{
 		$specialty2->invalidate($page, "Cannot add the same Specialty more than once for $personId");
 	}
-
-	if ($medSpecCode3 eq $medSpecCode2 || $medSpecCode3 eq $medSpecCode)
+	if (($medSpecCode2 ne '' && ($medSpecCode2 eq $medSpecCode3)) ||
+		($medSpecCode3 ne '' && ($medSpecCode3 eq $medSpecCode)))
 	{
 		$specialty3->invalidate($page, "Cannot add the same Specialty more than once for $personId");
-	}
-
-	if (($specSeq2 eq $specSeq3 || $specSeq2 eq $specSeq1) && $specSeq2 ne '5')
-	{
-		$seq2->invalidate($page, "Cannot add the same 'Specialty Sequence' more than once for $personId");
-	}
-
-	if (($specSeq3 eq $specSeq2 || $specSeq3 eq $specSeq1) && $specSeq3 ne '5')
-	{
-		$seq3->invalidate($page, "Cannot add the same 'Specialty Sequence' more than once for $personId");
 	}
 }
 
@@ -536,45 +529,5 @@ sub execute_remove
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
 
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-
-use constant PHYSICIAN_DIALOG => 'Dialog/Physician';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/14/1999', 'MAF',
-		PHYSICIAN_DIALOG,
-		'Added entries for multiple state licenses in the Physician dialog.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/23/1999', 'MAF',
-		PHYSICIAN_DIALOG,
-		'Changed item_name for state licenses.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/23/1999', 'RK',
-		PHYSICIAN_DIALOG,
-		'Made a validation for the field ssn not to add an existing ssn while creating a new physician record. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/18/1999', 'RK',
-		PHYSICIAN_DIALOG,
-		'Added schema actions for the fields Specialty2 and Specialty3 and Affiliations '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/27/1999', 'MAF',
-		PHYSICIAN_DIALOG,
-		'Finally completed adding list of Specialties to db.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/27/1999', 'MAF',
-		PHYSICIAN_DIALOG,
-		"Changed item name 'Physician/Specialty' to 'Physician/Specialty/xxxxary'. Informed Prosys."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		PHYSICIAN_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/29/2000', 'RK',
-		PHYSICIAN_DIALOG,
-		'Changed the urls from create/... to org/.... '],
-
-);
 
 1;
