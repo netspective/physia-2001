@@ -19,7 +19,7 @@ use Date::Manip;
 use Date::Calc qw(:all);
 use App::IntelliCode;
 use vars qw(@ISA);
-
+use constant FAKESELFPAY_INSINTID => -1111;
 @ISA = qw(CGI::Dialog::Field);
 
 sub new
@@ -39,9 +39,6 @@ sub needsValidation
 {
 	return 1;
 }
-
-
-
 
 sub isValid
 {
@@ -79,24 +76,15 @@ sub isValid
 	my @insFeeSchedules = ();
 	my @usedFS=();
 	my $payer = $page->field('payer');
-	my @singlePayer = split('\(', $payer);
+	my @singlePayer = split(/\s*,\s*/, $payer);
 	
 	#GET FEE SCHEDULES ASSOICATED WITH THE PROIVDER ,THE ORG AND THE INSURANCE
 	
 	######################################################################################################################
 	#THIS IF/ELSE BLOCK NEEDS WORK TO MAKE SURE IT DETERMINES PAYER CORRECTLY
-	if($singlePayer[0] eq 'Primary')
+	unless($singlePayer[0] == FAKESELFPAY_INSINTID)
 	{
-			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-				'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
-	}
-	elsif ($singlePayer[0] eq 'Third-Party' || $singlePayer[0] eq 'Self-Pay' || $singlePayer[0] eq 'Third-Party Payer')
-	{
-		
-	}	
-	elsif($singlePayer[0] =~ m/^\d+$/)
-	{
-		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $singlePayer[0]);
+		$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,'selInsuranceData', $singlePayer[0]);
 	}
 	######################################################################################################################
 	
@@ -385,6 +373,7 @@ sub explosionCodeValidate
 	my $sessOrgIntId = $page->session('org_internal_id');
 
 	#VALIDATION OF FEE SCHED RESULTS FOR CHILDREN OF EXPLOSION CODES
+
 	my $lineCount = $page->param('_f_line_count');
 	#my $getProcListField = $self->getField('procedures_list');
 	if(length($page->field('payer')) >0)
@@ -400,7 +389,7 @@ sub explosionCodeValidate
 			{
 				my $servBeginDate = $page->param("_f_proc_$line\_dos_begin");
 				my @listFeeSchedules = ($page->param("_f_proc_$line\_fs_used"));
-				#$page->addError("encounter: @listFeeSchedules");
+
 				foreach my $child (@{$miscProcChildren})
 				{
 					my $childCode = $child->{code};
@@ -430,6 +419,7 @@ sub getMultiPricesHtml
 	my ($self, $page, $line, $fsResults) = @_;
 
 	my $html = qq{[<B>P$line</B>] Multiple prices found.  Please select a price for this line item.};
+
 	foreach (@$fsResults)
 	{
 		my $cost = sprintf("%.2f", $_->[1]);
@@ -438,10 +428,9 @@ sub getMultiPricesHtml
 				type=radio name='_f_multi_price' value=$cost>\$$cost
 		};
 	}
+
 	return $html;
 }
-
-
 
 sub getMultiSvcTypesHtml
 {
