@@ -62,6 +62,30 @@ detail report.
 		<deliverable id="1247">
 			Loaded thin net payer IDs.  Also changed the E-Remit Payer lookup to include payer source (PerSE,ThinNet,etc)
 		</deliverable>
+
+
+		<deliverable id="1152">
+			Option to submit to next payer after an insurance payment is made.
+		</deliverable>
+		<deliverable id="1149">
+			When payment reversal is made to a Closed invoice, status is changed back to Payments Applied.
+		</deliverable>
+		<deliverable id="1150">
+			Misc procedure codes (explosion codes) implemented.
+		</deliverable>
+		<deliverable id="1205">
+			Fixed arls for Next Actions in the Plan and Product dialogs so "UIE" error no longer shows.
+		</deliverable>
+		<deliverable id="1210">
+			History item for payments are now being done at the invoice level, instead of per item.
+		</deliverable>
+		<deliverable id="1140">
+			Session batch id created to follow session user.
+		</deliverable>
+		<deliverable id="1238">
+			Activity log for checkout hardcoded to 'Add'.
+		</deliverable>
+
 	
 	</deliverables>
 </release-notes>
