@@ -9,9 +9,7 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use App::InvoiceUtilities;
-use App::Dialog::Field::Invoice;
-use Date::Manip;
+use App::Utilities::Invoice;
 
 use vars qw(@ISA %RESOURCE_MAP );
 @ISA = qw(CGI::Dialog);
@@ -38,51 +36,12 @@ sub new
 	return $self;
 }
 
-sub populateData
-{
-	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-
-}
-
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
 	my $invoiceId = $page->param('invoice_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $invoiceStatus = $invoice->{invoice_status};
-	my $invoiceFlags = $invoice->{flags};
-
-	#Delete auto writeoffs only if the claim was just submitted then placed on hold. Do not want to delete for other statuses passed submitted 
-	#because at that point resubmission or submission to next payer may take place (so you don't want to change writeoff data).
-	if($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED)
-	{
-		my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-		foreach my $item (@{$items})
-		{
-			$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delAutoWriteoffAdjustmentsForItem', $item->{item_id});
-		}
-	}
-
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId,
-		invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
-		flags => $invoiceStatus == App::Universal::INVOICESTATUS_SUBMITTED ? $invoiceFlags &~ App::Universal::INVOICEFLAG_DATASTOREATTR : $invoiceFlags,
-		_debug => 0
-	);
-
-
-	## Add history item
-	addHistoryItem($page, $invoiceId,
-		value_text => 'On Hold',
-		value_textB => $page->field('reason') || undef,
-		value_date => $todaysDate,
-	);
-
+	placeOnHold($page, $invoiceId, $page->param('transferred'));
 
 	$page->redirect("/invoice/$invoiceId/summary");
 }

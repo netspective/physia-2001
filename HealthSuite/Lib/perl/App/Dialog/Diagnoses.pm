@@ -9,7 +9,7 @@ use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Dialog::Field::Invoice;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
@@ -54,8 +54,6 @@ sub execute
 	my $invoiceId = $page->param('invoice_id');
 	my $sessOrgIntID = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-
 	my @claimDiags = split(/\s*,\s*/, $page->field('diagcodes'));
 
 	#App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrgIntID);
@@ -67,13 +65,7 @@ sub execute
 			_debug => 0
 		);
 
-
-	## Add history item
-	addHistoryItem($page, $invoiceId,
-		value_text => 'Diagnosis codes modified',
-		value_textB => $page->field('comments') || undef,
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $invoiceId, value_text => 'Diagnosis codes modified', value_textB => $page->field('comments') || undef);
 
 
 	$self->handlePostExecute($page, $command, $flags);

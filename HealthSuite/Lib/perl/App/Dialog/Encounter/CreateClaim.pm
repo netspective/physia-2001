@@ -15,7 +15,7 @@ use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Catalog;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use Text::Abbrev;
 
 use vars qw(@ISA  %PROCENTRYABBREV %RESOURCE_MAP);
@@ -149,70 +149,34 @@ sub makeStateChanges
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
-	#$page->beginUnitWork("Unable to add claim");
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
-
-	#$page->endUnitWork();
 }
 
 sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
-	#$page->beginUnitWork("Unable to update claim");
+	my $invoiceFlags = $page->field('invoice_flags');
+	my $claimType = $page->field('claim_type');
+	my $invoiceStatus = $page->field('current_status');
+
+	if($claimType != App::Universal::CLAIMTYPE_SELFPAY && ($invoiceStatus == App::Universal::INVOICESTATUS_ETRANSFERRED || 
+		$invoiceStatus == App::Universal::INVOICESTATUS_MTRANSFERRED || $invoiceStatus == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED) )
+	{
+		$command = 'add';
+		voidInvoice($page, $page->field('old_invoice_id'));
+	}
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 	addHistoryItem($page, $page->param('invoice_id'), value_text => 'Updated');
-
-	$self->handlePostExecute($page, $command, $flags);
-	#$page->endUnitWork();
 }
 
 sub execute_remove
 {
 	my ($self, $page, $command, $flags) = @_;
-	#$page->beginUnitWork("Unable to void claim");
 
-	my $sessUser = $page->session('user_id');
 	my $invoiceId = $page->param('invoice_id');
-
-	my $lineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-	foreach my $item (@{$lineItems})
-	{
-		my $itemType = $item->{item_type};
-		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
-		next if $itemType == App::Universal::INVOICEITEMTYPE_VOID;
-		next if $item->{data_text_b} eq 'void';
-
-		voidInvoiceItem($page, $invoiceId, $item->{item_id});
-	}
-
-
-	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		_debug => 0
-	);
-
-
-	#CREATE NEW VOID TRANSACTION FOR VOIDED CLAIM
-	my $transType = App::Universal::TRANSTYPEACTION_VOID;
-	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
-	$page->schemaAction(
-		'Transaction', 'add',
-		parent_trans_id => $page->field('trans_id') || undef,
-		parent_event_id => $page->field('parent_event_id') || undef,
-		trans_type => defined $transType ? $transType : undef,
-		trans_status => defined $transStatus ? $transStatus : undef,
-		trans_status_reason => "Claim $invoiceId has been voided by $sessUser",
-		_debug => 0
-	);
-
-	addHistoryItem($page, $invoiceId, value_text => 'Voided claim');
-
-	#$page->endUnitWork();
+	voidInvoice($page, $invoiceId);
 	$page->redirect("/invoice/$invoiceId/summary");
 }
 

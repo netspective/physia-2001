@@ -159,7 +159,6 @@ sub handle_page
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	#$page->beginUnitWork("Unable to checkout patient");
 
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $eventStatus = App::Universal::EVENTSTATUS_COMPLETE;
@@ -181,21 +180,10 @@ sub execute
 	}
 
 	my $invoiceId = $page->param('invoice_id');
-	my $copay = $page->field('copay');
 
 	$page->param('encounterDialog', 'checkout');
-	if(! $invoiceId)
-	{
-		App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
-
-		#$page->endUnitWork();
-	}
-	elsif($invoiceId)
-	{
-		App::Dialog::Encounter::handlePayers($self, $page, 'update', $flags);
-
-		#$page->endUnitWork();
-	}
+	$command = $invoiceId ? 'update' : 'add';
+	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 }
 
 1;
