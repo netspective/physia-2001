@@ -125,7 +125,7 @@ sub execute_add
 
 	my $personId = $page->field('person_id');
 	my $member = 'Staff';
-
+	$page->beginUnitWork("Unable to add Staff");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	$page->schemaAction(
@@ -139,6 +139,7 @@ sub execute_add
 	) if $page->field('emp_id') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'staff');
+	$page->endUnitWork();
 }
 
 sub execute_update
@@ -146,9 +147,9 @@ sub execute_update
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'staff';
-
+	$page->beginUnitWork("Unable to update Staff");	
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 sub execute_remove
@@ -156,9 +157,9 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Staff';
-
+	$page->beginUnitWork("Unable to remove Staff");	
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 1;

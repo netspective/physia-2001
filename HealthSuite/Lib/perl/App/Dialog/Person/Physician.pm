@@ -300,7 +300,7 @@ sub execute_add
 
 	my $personId = $page->field('person_id');
 	my $member = 'Physician';
-
+	$page->beginUnitWork("Unable to add Physician");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	my $medSpecCode = $page->field('specialty_code');
@@ -562,6 +562,7 @@ sub execute_add
 	) if $page->field('provider_identif_num') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'Physician');
+	$page->endUnitWork();
 }
 
 sub execute_update
@@ -569,9 +570,9 @@ sub execute_update
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Physician';
-
+	$page->beginUnitWork("Unable to update Physician");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 sub execute_remove
@@ -579,9 +580,9 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Physician';
-
+	$page->beginUnitWork("Unable to delete Physician");
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 1;

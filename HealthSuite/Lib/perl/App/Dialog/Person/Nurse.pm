@@ -294,7 +294,8 @@ sub execute_add
 
 	my $personId = $page->field('person_id');
 	my $member = 'Nurse';
-
+	#Group all add transcations
+	$page->beginUnitWork("Unable to add Nurse");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	$page->schemaAction(
@@ -353,7 +354,7 @@ sub execute_add
 		) if $page->field('rn_number') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'nurse');
-
+	$page->endUnitWork();
 }
 
 sub execute_update
@@ -361,9 +362,10 @@ sub execute_update
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Nurse';
-
+	#Group all update transcations
+	$page->beginUnitWork("Unable to update Nurse");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 sub execute_remove
@@ -371,9 +373,9 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Nurse';
-
+	$page->beginUnitWork("Unable to delete Nurse");
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 

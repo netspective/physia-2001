@@ -233,6 +233,9 @@ sub execute_add
 
 	#first create registry
 	my $member = 'Patient';
+	
+	#Group all add transcations
+	$page->beginUnitWork("Unable to add Patient");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	#second create employment attribute
@@ -314,6 +317,7 @@ sub execute_add
 		) if $page->field('chart_number') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'Patient');
+	$page->endUnitWork();
 }
 
 sub execute_update
@@ -321,9 +325,10 @@ sub execute_update
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Patient';
-
+	#Group all update transcations
+	$page->beginUnitWork("Unable to update Patient");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 sub execute_remove
@@ -331,9 +336,10 @@ sub execute_remove
 	my ($self, $page, $command, $flags) = @_;
 
 	my $member = 'Patient';
-
+	#Group all removed transcations
+	$page->beginUnitWork("Unable to delete Patient");
 	$self->SUPER::execute_remove($page, $command, $flags, $member);
-
+	$page->endUnitWork();
 }
 
 1;
