@@ -12,6 +12,7 @@ use Date::Manip;
 use Schema::API;
 use App::Configuration;
 use Security::AccessControl;
+use Set::IntSpan;
 
 use vars qw(@ISA $VERSION);
 
@@ -53,13 +54,12 @@ sub new
 	$self->{db} = undef;
 	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;
 	$self->loadSchema();
-	
+
 	#Unit Of Work variables
-	$self->{sqlUnitWork}=undef;
-	$self->{valUnitWork}=undef;
-	$self->{errUnitWork}=[];
-	$self->{cntUnitWork}=0;
-	
+	$self->{sqlUnitWork} = undef;
+	$self->{valUnitWork} = undef;
+	$self->{errUnitWork} = [];
+	$self->{cntUnitWork} = 0;
 
 	# setup default formats, can be overriden for each organization
 	$self->{defaultUnixDateFormat} = '%m/%d/%Y';
@@ -76,6 +76,7 @@ sub new
 	# setup access-control
 	$self->{aclFile} = $params{aclFile} || $CONFDATA_SERVER->file_AccessControlDefn;
 	$self->{acl} = new Security::AccessControl(xmlFile => $self->{aclFile});
+	$self->{permissions} = new Set::IntSpan;
 
 	$self->{flags} = exists $params{flags} ? $params{flags} : 0;
 
@@ -365,7 +366,7 @@ sub replaceRedirectVars
 	# do replacements for %session.xxx%, %param.xxx% or %field.xxx% or
 	# any other page method that returns a single value
 	#
-	$src =~ s/\%(\w+)\.(.*?)\%/
+	$src =~ s/\%(\w+)\.([\w\-\.]*)\%/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -389,7 +390,7 @@ sub replaceVars
 	# NOTE: FOR PERFORMANCE, A COPY OF THIS SUBSTITION ALSO EXISTS IN DBI::StatementManager and
 	#       App::Page. SO, IF YOU UPDATE THE REGEXP, DO IT THERE, TOO!
 	#
-	$src =~ s/\#(\w+)\.(.*?)\#/
+	$src =~ s/\#(\w+)\.([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -527,16 +528,16 @@ sub getSchema {	$_[0]->{schema}; }
 sub executeSql
 {
 	my ($self, $stmhdl) = @_;
-	my $rc;	
+	my $rc;
 	eval
 	{
-		$rc = $stmhdl->execute(@{$self->{valUnitWork}});	
+		$rc = $stmhdl->execute(@{$self->{valUnitWork}});
 	};
 	if($@||!$rc)
 	{
 		$self->addError(join ("<br>",$@,$self->{db}->errstr));
 		return 0;
-	}	
+	}
 	return $rc;
 }
 
@@ -547,24 +548,24 @@ sub beginUnitWork
 	$self->{cntUnitWork}=0;
 	$self->{errUnitWork}=[];
 	$self->{valUnitWork}=undef;
-	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;		
-	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;		
-	return 1;	
+	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;
+	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;
+	return 1;
 }
 
 sub endUnitWork
 {
-	my $self = shift;			
-	$self->{sqlUnitWork}.= "END;  "; 	
-	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});	
-	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;		
+	my $self = shift;
+	$self->{sqlUnitWork}.= "END;  ";
+	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});
+	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;
 	$self->{sqlUnitWork}='';
 	if (scalar(@{$self->{errUnitWork}}))
 	{
 		$self->addError(join ("<br>",@{$self->{errUnitWork}}));
 		return 0;
 	}
-	return $self->executeSql($stmhdl);	
+	return $self->executeSql($stmhdl);
 }
 
 
@@ -580,9 +581,9 @@ sub storeSql
 	$self->{cntUnitWork}++;
 	if(scalar(@{$errors}) > 0)
 	{
-		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors}");			
+		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors}");
 	}
-	$self->{sqlUnitWork}.= $sql . ";  "; 
+	$self->{sqlUnitWork}.= $sql . ";  ";
 	push(@{$self->{valUnitWork}},@{$vals});
 }
 
@@ -718,20 +719,51 @@ sub createSession
 	return $self->{session}->{_session_id};
 }
 
+sub setupACL
+{
+	my $self = shift;
+	my ($dbh, $session) = ($self->{db}, $self->{session});
+	
+    my $getRolesSth = $dbh->prepare(qq{
+                select role_name 
+                from role_name, person_org_role 
+                where person_id = ? and org_id = ? and 
+                role_name.role_name_id = person_org_role.role_name_id 
+                });
+	my $roles = ($session->{aclRoleNames} = []);
+	$getRolesSth->execute($session->{user_id}, $session->{org_id});
+	while(my $row = $getRolesSth->fetch())
+	{
+		push(@$roles, $row->[0]);
+	}
+	$getRolesSth->finish();
+
+    my $permissions = new Set::IntSpan;
+	my $permIds = $self->{acl}->{permissionIds};
+    my $getPermsSth = $dbh->prepare(qq{
+                select rp.role_activity_id, rp.permission_name 
+				from person_org_role por, role_permission rp
+				where por.person_id = ? and por.org_id = ? and 
+                por.role_name_id = rp.role_name_id
+                });                
+	$getPermsSth->execute($session->{user_id}, $session->{org_id});
+	while(my $row = $getPermsSth->fetch())
+	{
+		if(my $permInfo = $permIds->{$row->[1]})
+		{	
+			# if activity type is 0 or null, we're granting otherwise we're revoking
+			$permissions = $row->[0] ? 
+				$permissions->diff($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]) :
+				$permissions->union($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
+		};
+	}
+	$getPermsSth->finish();
+	$session->{aclPermissions} = $permissions;
+}
+
 sub establishSession
 {
 	my $self = shift;
-
-	# right now only one machine will be "secure"
-	#if($self->remote_addr() !~ /209\.207\.182\.[0-9]+/)
-	#{
-	#	$self->{session} =
-	#	{
-	#		user_id => 'SJONES',
-	#		org_id  => 'CLMEDGRP',
-	#	};
-	#	return $self->sessionStatus(SESSIONTYPE_SIMULATESECURE);
-	#}
 
 	#
 	# see if we have an existing session
@@ -750,6 +782,8 @@ sub establishSession
 					timeOutSeconds => $self->{sessTimeoutSecs},
 				};
 			$self->{session} = \%session;
+			$self->setupACL() unless exists $session{aclPermissions};
+			$self->{permissions} = $session{aclPermissions};
 		};
 		if($@)
 		{
@@ -791,12 +825,24 @@ sub establishSession
 # ACL/PERMISSION MANAGEMENT ROUTINES
 #-----------------------------------------------------------------------------
 
-sub permit
+#
+# return TRUE if the current user has any one of the permissions passed in
+# (pass in as many permissions as needed)
+#
+sub hasPermission
 {
-	my ($self, $permission) = @_;
-	return 1 if $_[0]->{sessStatus} == SESSIONTYPE_SIMULATESECURE;
+	my $self = shift;
 
-	my $acl = $self->{acl};
+	my $permIds = $self->{acl}->{permissionIds};
+	foreach (@_)
+	{
+		if(my $permInfo = $permIds->{$_})
+		{
+			return 1 if $self->{permissions}->member($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_LISTINDEX]);
+		}
+	}
+	
+	return 0;
 }
 
 1;

@@ -6,9 +6,6 @@ use strict;
 use CGI::Layout;
 use App::Universal;
 
-use vars qw(%DIRECTORY);
-%DIRECTORY = ();
-
 sub new
 {
 	my $type = shift;
@@ -25,8 +22,6 @@ sub new
 	} unless exists $self->{layoutDefn};
 	$self->init(%params) if $self->can('init');
 
-	my $id = $self->{id} || die 'id is required';
-	$DIRECTORY{$id} = $self;
 	return $self;
 }
 
