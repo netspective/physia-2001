@@ -23,7 +23,7 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Dialog::Budget;
-use App::Dialog::BillingCycle;
+#use App::Dialog::BillingCycle;
 use App::Statements::Worklist::WorklistCollection;
 use App::Page::Search;
 use App::Configuration;
@@ -38,6 +38,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Activity', name => 'activity',},
 			{caption => 'Home', name => 'home',},
 			{caption => 'Face Sheet', name => 'facesheet',},
+			{caption => 'Associate', name => 'associate',},	
+			{caption => 'Home', name=>'home',},			
 			],
 		_iconMedium => 'icon-m/person',
 		},
@@ -135,12 +137,50 @@ sub prepare_page_content_header
 	my $personId = $self->param('person_id');
 	my $urlPrefix = "/person/$personId";
 
+
+	my $sessionUserID = $self->session('user_id');
+	#
+	my $showSummary=0;
+	my $summaryList = 'ALL_CATEGORIES';
+	
+	my $showChart=0;
+	my $chartList = 'PATIENT';
+	
+	my $showAccount=0;
+	my $accountList = 'PATIENT|GUARANTOR';
+	
+	my $showActivity=0;
+	my $activityList = '';
+	
+	my $showAssociate=0;
+	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR';
+	
+	my $showHome=0;
+	
+	#Get Categories
+	my $categories = $self->property('person_categories');			
+
+	#Add all options
+	push (@$categories,'ALL_CATEGORIES');
+	$showSummary=1 if grep {uc($_)=~m/$summaryList/} @$categories;
+	$showChart=1 if grep {uc($_)=~m/$chartList/} @$categories;
+	$showAccount=1 if grep {uc($_)=~m/$accountList/} @$categories;
+	$showAssociate=1 if grep {uc($_)=~m/$assoicateList/} @$categories;
+	$showActivity=1 if grep {uc($_)=~m/$activityList/} @$categories;
+	
+	#Only show home option is person is looking at their page
+	$showHome=1 if ($personId eq $sessionUserID);
+	
+
+
 	$self->{page_heading} = $self->property('person_simple_name');
 	$self->{page_menu_sibling} = [
-			['Summary', "$urlPrefix/profile", 'profile'],
-			['Chart', "$urlPrefix/chart", 'chart'],
-			['Account', "$urlPrefix/account", 'account'],
-			['Activity', "$urlPrefix/activity", 'activity'],
+			$showHome ? ['Home', "$urlPrefix/home",'home'] : undef,	
+			$showSummary ? ['Summary', "$urlPrefix/profile", 'profile']: undef,
+			$showChart ? ['Chart', "$urlPrefix/chart", 'chart']: undef,
+			$showAccount ? ['Account', "$urlPrefix/account", 'account'] : undef,,
+			$showActivity ? ['Activity', "$urlPrefix/activity", 'activity'] : undef,
+			$showAssociate ? ['Associate', "$urlPrefix/associate",'associate'] : undef,		
 			#['Face Sheet', "javascript:doActionPopup(\"/person-p/$personId/facesheet\")", 'facesheet'],
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		];
@@ -578,6 +618,33 @@ sub prepare_view_facesheet
 	$self->addContent($content);
 }
 
+
+sub prepare_view_associate
+{
+	my ($self, $flags, $colors, $fonts, $viewParamValue) = @_;
+	$self->addContent(qq{
+		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
+			<TR VALIGN=TOP>
+				<TD>
+				<font size=1 face=arial>
+				#component.stp-person.attendance#<BR>
+				#component.stp-person.certification#<BR>
+				#component.stp-person.affiliations#<BR>
+				#component.stp-person.benefits#<BR>				
+				</font>
+				</TD>
+				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD>
+				<font size=1 face=arial>				
+				#component.stpt-person.feeschedules#<BR>
+				#component.stpt-person.associatedSessionPhysicians#<BR>
+				</font>
+				</TD>				
+			</TR>
+		</TABLE>
+	});				
+}
+
 sub prepare_view_profile
 {
 	my ($self) = @_;
@@ -586,69 +653,40 @@ sub prepare_view_profile
 	my $personId = $self->param('person_id');
 	my $personCategories = $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_internal_id'));
 	my $category = $personCategories->[0];
+	
+	my $careProvider='';
+	my $authorization='';
+	my $categories = $self->property('person_categories');	
+	if (grep {uc($_) eq 'PATIENT'} @$categories)
+	{
+		$careProvider = '#component.stpt-person.careProviders#<BR>' ;
+		$authorization = '#component.stp-person.authorization#<BR>';
+	}
 	$self->addContent(qq{
 		<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD>
 					<font size=1 face=arial>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
-					#component.stpt-person.patientInfo#<BR>
 					#component.stpt-person.officeLocation#
-					#component.stpt-person.phoneMessage#<BR>
 					#component.stpt-person.insurance#<BR>
-					#component.stpt-person.careProviders#<BR>
+					$careProvider
 					#component.stpt-person.employmentAssociations#<BR>
 					#component.stpt-person.emergencyAssociations#<BR>
 					#component.stpt-person.familyAssociations#<BR>
-					#component.stpt-person.additionalData#
-					#component.stpt-person.diagnosisSummary#<BR>
-					#component.stpt-person.feeschedules#<BR>
+					#component.stpt-person.additionalData#<BR>						
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
 					#component.stp-person.miscNotes#<BR>
-					<font size=1 face=arial>
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
-						<TR VALIGN=TOP>
-							<TD>#component.stp-person.alerts#</TD>
-							<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-							<TD>#component.stp-person.activeMedications#</TD>
-						</TR>
-					</TABLE><BR>
+					#component.stp-person.alerts#<BR>							
 					#component.stp-person.refillRequest#<BR>
-					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
-					#component.stp-person.activeProblems#<BR>
-					#component.stp-person.authorization#<BR>
-						<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
-							<TR VALIGN=TOP>
-								<TD>#component.stp-person.attendance#</TD>
-								<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-								<TD>#component.stp-person.certification#</TD>
-							</TR>
-						</TABLE><BR>
-					#component.stp-person.affiliations#<BR>
-					#component.stp-person.associatedSessionPhysicians#<BR>
-					#component.stp-person.benefits#</BR>
+					#component.stp-person.phoneMessage#<BR>					
+					$authorization			
 					</font>
 				</TD>
-				<!--
-				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD>
-					<font size=1 face=arial>
-					#component.st-person.diagnosisSummary#<BR>
-					</font>
-				</TD>
-				-->
-				<!--
-				<TD WIDTH=25%>
-					<font size=1 face=arial>
-					#component.stpt-person.allergies#<BR>
-					#component.stpt-person.preventiveCare#<BR>
-					#component.stpt-person.advancedDirectives#<BR>
-					</font>
-				</TD>
-				-->
+
 			</TR>
 		</TABLE>
 	});
@@ -693,6 +731,7 @@ sub prepare_view_chart
 					#component.stpt-person.advancedDirectives#<BR>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
 					#component.stpt-person.insurance#<BR>
+					#component.stpt-person.diagnosisSummary#
 					</font>
 				</TD>
 			</TR>
