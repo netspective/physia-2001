@@ -461,6 +461,7 @@
 		<column name="payer" type="entity" descr="Person/organization/entity making the payment(s)"/>
 		<column name="refund_to" type="entity" descr="Person/organization/entity receiving the refund"/>
 		<column name="parent_id" indexed="yes" parentref="Invoice_Item.item_id" descr="The charge for which the adjustment is being made"/>
+		<column name="parent_inv_id" indexed="yes" parentref="Invoice.invoice_id" descr="The invoice for which the adjustment is being made"/>
 		<column name="plan_allow" type="currency" descr="Total that health plan will allow"/>
 		<column name="plan_paid" type="currency" descr="Total that health plan paid"/>
 		<column name="deductible" type="currency" descr="Total that applied towards deductible"/>
