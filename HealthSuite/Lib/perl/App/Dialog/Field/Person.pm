@@ -27,7 +27,7 @@ sub new
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
 
-	$params{type} = 'text';
+	$params{type} = 'identifier';
 	$params{size} = 16;
 	$params{maxLength} = 32;
 
@@ -104,7 +104,7 @@ sub new
 
 	else
 	{
-		$params{type} = 'text';
+		$params{type} = 'identifier';
 		$params{size} = 16 unless $params{size};
 		$params{maxLength} = 32 unless $params{maxLength};
 
