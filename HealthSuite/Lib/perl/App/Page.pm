@@ -573,6 +573,8 @@ sub getLogStructHtml
 sub initialize
 {
 	my $self = shift;
+	$ENV{TZ} = $self->session('timezone');
+	
 	$self->addLocatorLinks(
 			["$IMAGETAGS{'images/icons/home-sm'} Home", '/home'],
 		);
@@ -868,7 +870,7 @@ sub prepare_page_content_header
 			<td valign=center>&nbsp;<b><font face="helvetica" size="4">@{[ $self->{page_heading} || $resourceMap->{_title} ]}</font></b></td>
 			<td align="right">
 				<font face="tahoma,arial,helvetica" style="font-size: 8pt" color="navy">
-				Updated @{[ UnixDate('today', '%a %b %d %i:%M %p') ]}
+				Updated @{[ UnixDate('today', '%a %b %d %i:%M %p') ]} @{[ $self->session('TZ') ]}
 				</font>
 				&nbsp;
 			</td>
