@@ -32,9 +32,9 @@ sub new
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
-			new App::Dialog::Field::Organization::ID(caption =>'Organization ID', name => 'org_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
-			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', 
 						fields => [
 			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
 			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
