@@ -11,8 +11,7 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
 
-use App::Statements::Component::Invoice;
-
+use App::Statements::Report::Accounting;
 use vars qw(@ISA $INSTANCE);
 
 @ISA = qw(App::Dialog::Report);
@@ -35,16 +34,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $personId = $page->field('person_id');
-
-	if ( $personId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedPatientData', [$personId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedPatientDataAll');
-	}
-
+	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient', [$personId]);
 
 
 }

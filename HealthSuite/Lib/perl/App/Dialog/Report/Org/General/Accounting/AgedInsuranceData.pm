@@ -13,6 +13,7 @@ use DBI::StatementManager;
 use App::Statements::Org;
 
 use App::Statements::Component::Invoice;
+use App::Statements::Report::Accounting;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -23,7 +24,7 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-aged-insurance-data', heading => 'Aged Insurance Receivables');
 
 	$self->addContent(
-			new App::Dialog::Field::Organization::ID(caption => 'Insurance Organization ID', name => 'ins_org_id'),
+			new App::Dialog::Field::Organization::ID(caption => 'Payer Organization ID', name => 'ins_org_id'),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -37,18 +38,7 @@ sub execute
 
 	my $orgId = $page->field('ins_org_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
-
-	if ( $orgId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedInsuranceData', [$orgIntId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.agedInsuranceDataAll');
-	}
-
-
-
+	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId]);
 }
 
 
