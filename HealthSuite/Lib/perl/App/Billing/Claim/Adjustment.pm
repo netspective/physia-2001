@@ -2,18 +2,17 @@
 package App::Billing::Claim::Adjustment;
 ##############################################################################
 
-use strict;
-
 #
 # this object encapsulates a single "procedure" line in the HCFA 1500
 #
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
+
+use strict;
 use constant DATEFORMAT_USA => 1;
+
 sub new
 {
 	my ($type, %param) = @_;
-	
+
 	$param{adjsutId} = undef;
 	$param{adjustType} = undef;
 	$param{adjustAmt} = undef;
@@ -141,7 +140,7 @@ sub getSubmitDate
 	my ($self, $formatIndicator) = @_;
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{submitDate}) : $self->{submitDate};
 }
-	
+
 sub setSubmitDate
 {
 	my ($self,$value) = @_;
@@ -155,7 +154,7 @@ sub getPayDate
 	my ($self, $formatIndicator) = @_;
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{payDate}) : $self->{payDate};
 }
-	
+
 sub setPayDate
 {
 	my ($self,$value) = @_;
@@ -180,13 +179,13 @@ sub setPayType
 {
 	my ($self, $value) = @_;
 	$self->{payType} = $value;
-}	
+}
 
 sub getPayType
 {
 	my $self = shift;
 	return $self->{payType};
-}	
+}
 
 sub setCopay
 {
@@ -271,6 +270,7 @@ sub setFlags
 	my ($self,$value) = @_;
 	$self->{flags} = $value;
 }
+
 sub getBillId
 {
 	my $self = shift;
@@ -322,11 +322,12 @@ sub setAdjsutId
 sub convertDateToCCYYMMDD
 {
 	my ($self, $date) = @_;
-	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
-				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
-				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
-						};
-						
+	my $monthSequence =
+	{
+		JAN => '01', FEB => '02', MAR => '03', APR => '04',
+		MAY => '05', JUN => '06', JUL => '07', AUG => '08',
+		SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
+	};
 	$date =~ s/-//g;
 	if(length($date) == 7)
 	{
@@ -334,30 +335,22 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
 }
-
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','Adjustment implemented'],
-
-);
 
 1;

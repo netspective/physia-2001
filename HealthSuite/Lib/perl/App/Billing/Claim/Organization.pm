@@ -2,17 +2,19 @@
 package App::Billing::Claim::Organization;
 ##############################################################################
 
+#
+#   -- here is the organization's data
+#   -- that is required in a HCFA 1500 or NSF output
+#
+
 use strict;
+
 use App::Billing::Claim::Entity;
 
 use vars qw(@ISA);
 
 @ISA = qw(App::Billing::Claim::Entity);
 
-#
-#   -- here is the organization's data
-#   -- that is required in a HCFA 1500 or NSF output
-#
 sub new
 {
 	my ($type) = shift;
@@ -50,145 +52,125 @@ sub setTaxTypeId
 {
 	my ($self,$value) = @_;
 	my $temp =
-		{
-		   '0' => 'E',
-		   '1' => 'S',
-		   '2' => 'X',
-		   };
+	{
+		'0' => 'E',
+		'1' => 'S',
+		'2' => 'X',
+	};
 	$self->{taxTypeId} = $temp->{$value};
 }
 
 sub getTaxTypeId
 {
 	my ($self) = @_;
-
 	return $self->{taxTypeId};
-
 }
 
 sub getTaxId
 {
 	my ($self) = @_;
-
 	return $self->{taxId};
 }
 
 sub setTaxId
 {
 	my ($self,$value) = @_;
-
 	$self->{taxId} = $value;
 }
 
 sub getUPin
 {
 	my ($self) = @_;
-
 	return $self->{uPin};
 }
 
 sub setUPin
 {
 	my ($self,$value) = @_;
-
 	$self->{uPin} = $value;
 }
 
 sub getCLIA
 {
 	my ($self) = @_;
-
 	return $self->{CLIA};
 }
 
 sub setCLIA
 {
 	my ($self,$value) = @_;
-
 	$self->{CLIA} = $value;
 }
 
 sub getEmployerNumber
 {
 	my ($self) = @_;
-
 	return $self->{employerNumber};
 }
 
 sub setEmployerNumber
 {
 	my ($self,$value) = @_;
-
 	$self->{employerNumber} = $value;
 }
 
 sub getMedicaidId
 {
 	my ($self) = @_;
-
 	return $self->{medicaidId};
 }
 
 sub setMedicaidId
 {
 	my ($self,$value) = @_;
-
 	$self->{medicaidId} = $value;
 }
 
 sub getMedicareId
 {
 	my ($self) = @_;
-
 	return $self->{medicareId};
 }
 
 sub setMedicareId
 {
 	my ($self,$value) = @_;
-
 	$self->{medicareId} = $value;
 }
 
 sub getWorkersComp
 {
 	my ($self) = @_;
-
 	return $self->{workersComp};
 }
 
 sub setWorkersComp
 {
 	my ($self,$value) = @_;
-
 	$self->{workersComp} = $value;
 }
 
 sub getBCBSId
 {
 	my ($self) = @_;
-
 	return $self->{bcbsId};
 }
 
 sub setBCBSId
 {
 	my ($self,$value) = @_;
-
 	$self->{bcbsId} = $value;
 }
 
 sub getType
 {
 	my ($self) = @_;
-
 	return $self->{type};
 }
 
 sub setType
 {
 	my ($self,$value) = @_;
-
 	$self->{type} = $value;
 }
 
@@ -196,7 +178,6 @@ sub setOrganizationType
 {
 	my ($self,$value) = @_;
 	$self->{organizationType} = $value;
-
 }
 
 sub getOrganizationType
@@ -222,7 +203,6 @@ sub getGRP
 sub getFederalTaxId
 {
 	my $self = shift;
-
 	return ($self->{federalTaxId} eq "" ? $self->{taxId} : $self->{federalTaxId});
 }
 
@@ -255,6 +235,7 @@ sub setName
 	my ($self,$value) = @_;
 	$self->{name} = $value;
 }
+
 sub setFederalTaxId
 {
 	my ($self,$value) = @_;

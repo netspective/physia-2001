@@ -2,63 +2,41 @@
 package App::Billing::Claim::Patient;
 ##############################################################################
 
-use strict;
-use App::Billing::Claim::Person;
-use App::Billing::Claim::Entity;
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
-use vars qw(@ISA);
-
-use constant DATEFORMAT_USA => 1;
-@ISA = qw(App::Billing::Claim::Person);
-
 #
 #   -- This modlue contains all patient's data
 #   -- which is given in HCFA 1500 Form
 #
 
-use constant DEFAULT_RELATION_SHIP_TO_INSURED => '01';
+use strict;
+
+use App::Billing::Claim::Person;
+use App::Billing::Claim::Entity;
+
+use vars qw(@ISA);
+
+use constant DATEFORMAT_USA => 1;
+
+@ISA = qw(App::Billing::Claim::Person);
 
 sub new
 {
 	my ($type) = shift;;
 	my $self = new App::Billing::Claim::Person(@_);
 	$self->{accountNo} = undef;
-	$self->{relationshipToInsured} = undef;
 	$self->{signature} = undef;
-	$self->{tpo} = undef;
+	$self->{tpo} = undef;		# to be removed
 	$self->{legalIndicator} = undef;
-	$self->{poNumber} = undef;
-	$self->{multipleIndicator} = undef;
-	$self->{legalRepData} = undef;
-	$self->{lastSeenDate} = undef;
+	$self->{multipleIndicator} = undef;		# to be removed
+	$self->{lastSeenDate} = undef;		# to be removed
 	$self->{signatureDate} = undef;
 	$self->{visitDate} = undef;
 
 	return bless $self, $type;
 }
 
-sub getPoNumber
-{
-
-	my $self = shift;
-
-	return $self->{poNumber};
-}
-
-sub setPoNumber
-{
-
-	my ($self, $value) = @_;
-
-	$self->{poNumber} = $value;
-}
-
 sub getLastSeenDate
 {
-
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{lastSeenDate}) : $self->{lastSeenDate};
 }
 
@@ -70,58 +48,45 @@ sub setLastSeenDate
 	$self->{lastSeenDate} = $value;
 }
 
-
 sub getTPO
 {
-
 	my $self = shift;
-
 	return $self->{tpo};
 }
 
 sub setTPO
 {
 	my ($self, $value) = @_;
-
 	$self->{tpo} = $value;
 }
 
 sub getlegalIndicator
 {
-
 	my $self = shift;
-
 	return $self->{legalIndicator};
 }
 
 sub setlegalIndicator
 {
 	my ($self, $value) = @_;
-
 	$self->{legalIndicator} = $value;
 }
 
-
 sub getMultipleIndicator
 {
-
 	my $self = shift;
-
 	return $self->{multipleIndicator};
 }
 
 sub setMultipleIndicator
 {
 	my ($self, $value) = @_;
-
 	$self->{multipleIndicator} = $value;
 }
 
 sub getSignature
 {
-
 	my $self = shift;
-
 	return $self->{signature};
 }
 
@@ -145,52 +110,14 @@ sub setSignatureDate
 
 sub getAccountNo
 {
-
 	my $self = shift;
-
 	return $self->{accountNo};
 }
 
 sub setAccountNo
 {
 	my ($self, $value) = @_;
-
 	$self->{accountNo} = $value;
-}
-
-sub getRelationshipToInsured
-{
-	my ($self) = @_;
-#	print (($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured});
-	return ($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured};
-}
-
-sub setRelationshipToInsured
-{
-	my ($self, $value) = @_;
-	my $temp =
-		{
-			'0' => '01',
-			'10' => '02',
-			'12' => '03',
-			'99' => '99',
-			'50' => '99',
-			'11' => '18',
-			'SELF' => '01',
-			'SPOUSE' => '02',
-			'CHILD' => '03',
-			'OTHER' => '99',
-			'PARENT' => '11',
-			'EMPLOYER' => '99',
-			'01' => '01',
-			'02' => '02',
-			'03' => '03',
-			'99' => '99',
-			'11' => '11',
-		};
-
-#	$self->{relationshipToInsured} = $temp->{uc($value)};
-	$self->{relationshipToPatient} = length($value) == 1 ? "0" . $value : $value;
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
@@ -205,7 +132,6 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	{
 		return "";
 	}
-
 }
 
 sub getVisitDate
@@ -219,17 +145,5 @@ sub setVisitDate
 	my ($self, $value) = @_;
 	$self->{visitDate} = $value;
 }
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Patient','setLastSeenDate use convertDateToCCYYMMDD  to change the date formats'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Patient','Patient relationship to insured has domain form 0 => 01,1 => 02,3 => 03,4 => 99,SELF => 01,SPOUSE => 02,CHILD => 03,OTHER => 99'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Patient','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to dd-mmm-yy'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Patient','getLastSeenDate can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/20/2000', 'SSI', 'Billing Interface/Claim Patient','Patient Relation ship to insured value updated'],
-
-);
 
 1;

@@ -1,18 +1,19 @@
 ##############################################################################
 package App::Billing::Claim::Procedure;
 ##############################################################################
-use strict;
 
 #
 # this object encapsulates a single "procedure" line in the HCFA 1500
 #
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
+
+use strict;
+
 use constant DATEFORMAT_USA => 1;
+
 sub new
 {
 	my ($type, %param) = @_;
-	
+
 	$param{dateOfServiceFrom} = undef;
 	$param{dateOfServiceTo} = undef;
 	$param{placeOfService} = undef;
@@ -25,7 +26,6 @@ sub new
 	$param{familyPlan} = undef;
 	$param{emergency} = undef;
 	$param{cob} = undef;
-	$param{localUse} = undef;
 	$param{disallowedCostContainment} = undef;
 	$param{disallowedOther} = undef;
 	$param{diagnosis} = undef;
@@ -36,7 +36,7 @@ sub new
 	$param{totalAdjustments} = undef;
 	$param{reference} = undef;
 	$param{flags} = undef;
-	$param{caption} = undef;	
+	$param{caption} = undef;
 	$param{adjustments} = [];
 	$param{itemType} = undef;
 	$param{paymentDate} = undef;
@@ -45,7 +45,6 @@ sub new
 
 	return bless \%param, $type;
 }
-
 
 sub setCodeType
 {
@@ -58,7 +57,6 @@ sub getCodeType
 	my $self = shift;
 	return $self->{codeType};
 }
-
 
 sub setItemStatus
 {
@@ -184,13 +182,13 @@ sub setComments
 {
 	my ($self, $value) = @_;
 	$self->{comments} = $value;
-}	
+}
 
 sub getComments
 {
 	my $self = shift;
 	return $self->{comments};
-}	
+}
 
 sub setDiagnosis
 {
@@ -201,7 +199,6 @@ sub setDiagnosis
 sub getDiagnosis
 {
 	my ($self) = @_;
-	
 	return $self->{diagnosis};
 }
 
@@ -226,20 +223,7 @@ sub setDisallowedOther
 sub getDisallowedOther
 {
 	my ($self) = @_;
-	
 	return $self->{disallowedOther};
-}
-
-sub getLocalUse
-{
-	my $self = shift;
-	return $self->{localUse};
-}
-
-sub setLocalUse
-{
-	my ($self, $value) = @_;
-	$self->{localUse} = $value;
 }
 
 sub getDateOfServiceFrom
@@ -247,7 +231,7 @@ sub getDateOfServiceFrom
 	my ($self, $formatIndicator) = @_;
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateOfServiceFrom}) : $self->{dateOfServiceFrom};
 }
-	
+
 sub getDateOfServiceTo
 {
 	my ($self, $formatIndicator) = @_;
@@ -321,7 +305,7 @@ sub setDateOfServiceFrom
 	$value = $self->convertDateToCCYYMMDD($value);
 	$self->{dateOfServiceFrom} = $value;
 }
-	
+
 sub setDateOfServiceTo
 {
 	my ($self,$value) = @_;
@@ -383,14 +367,13 @@ sub setEmergency
 {
 	my ($self,$value) = @_;
 	my $temp =
-				{
-					'YES' => 'Y',
-					'NO' => 'N',
-					'0' => 'N',
-					'1' => 'Y',
-					'' => 'N',
-				};
-					
+	{
+		'YES' => 'Y',
+		'NO' => 'N',
+		'0' => 'N',
+		'1' => 'Y',
+		'' => 'N',
+	};
 	$self->{emergency} = $temp->{uc($value)};
 }
 
@@ -403,11 +386,12 @@ sub setCOB
 sub convertDateToCCYYMMDD
 {
 	my ($self, $date) = @_;
-	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
-				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
-				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
-						};
-						
+	my $monthSequence =
+	{
+		JAN => '01', FEB => '02', MAR => '03', APR => '04',
+		MAY => '05', JUN => '06', JUL => '07', AUG => '08',
+		SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
+	};
 	$date =~ s/-//g;
 	if(length($date) == 7)
 	{
@@ -415,20 +399,18 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-				
-	if ($date ne "")			
+	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
 	}
-	else 
+	else
 	{
 		return "";
 	}
@@ -437,32 +419,13 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 sub addAdjustments
 {
 	my $self = shift;
-
 	my $adjustmentsListRef = $self->{adjustments};
 	foreach (@_)
 	{
 		die 'only App::Billing::Claim::Adjustment objects are allowed here'
 			unless $_->isa('App::Billing::Claim::Adjustment');
-		
 		push(@{$adjustmentsListRef}, $_);
 	}
 }
-
-@CHANGELOG =
-( 
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','convertDateToCCYYMMDD implemented here. its basic function is to convert the date format from dd-mmm-yy to CCYYMMDD'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','Change log is implemented'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Procedure','setDateOfServiceFrom,setDateOfServiceTo use convertDateToCCYYMMDD  to change the date formats'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/22/1999', 'SSI', 'Billing Interface/Claim Procedure','Emergency indicator now has domain Y,N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/22/1999', 'SSI', 'Billing Interface/Claim Procedure','Type of service is converted to two digit value'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Procedure','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to ddmmyyyy'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Procedure','getDateOfServiceFrom,getDateOfServiceTo can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/18/1999', 'SSI', 'Billing Interface/Claim Procedure','Emergency indicator set as 1=>Y, 0 =>N'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/18/2000', 'SSI', 'Billing Interface/Claim Procedure','reference property added which holds a reference number in invoice item'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/28/2000', 'SSI', 'Billing Interface/Claim Procedure','flags, caption properties added which holds flags, caption per invoice item'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/28/2000', 'SSI', 'Billing Interface/Claim Procedure','adjustments property added which holds a adjustments for each invoice item'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/06/2000', 'SSI', 'Billing Interface/Claim Procedure','payment date property added which holds a payment date for copay and adjustment items'],
-);
 
 1;

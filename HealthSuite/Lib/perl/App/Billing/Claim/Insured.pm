@@ -2,20 +2,23 @@
 package App::Billing::Claim::Insured;
 ##############################################################################
 
-use strict;
-use App::Billing::Claim::Person;
-use App::Billing::Claim::Entity;
-use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
-use constant DATEFORMAT_USA => 1;
-@ISA = qw(App::Billing::Claim::Person);
-
 #
 #   -- This modlue contains all insured's data
 #   -- which is given in HCFA 1500 Form
 #
+
+use strict;
+
+use App::Billing::Claim::Person;
+use App::Billing::Claim::Entity;
+
+use vars qw(@ISA);
+
+@ISA = qw(App::Billing::Claim::Person);
+
 use constant DEFAULT_RELATION_SHIP_TO_PATIENT => '01';
+use constant DATEFORMAT_USA => 1;
+
 sub new
 {
 	my ($type) = shift;
@@ -32,7 +35,7 @@ sub new
 	$self->{hmoId} = undef;
 	$self->{effectiveDate} = undef;
 	$self->{terminationDate} = undef;
-	$self->{billSequence} = undef;
+	$self->{billSequence} = undef;		# to be removed
 	$self->{bcbsPlanCode} = undef;
 	$self->{memberNumber} = undef;
 	$self->{medigapNo} = undef;
@@ -64,7 +67,6 @@ sub setMedigapNo
 	$self->{medigapNo} = $value;
 }
 
-
 sub getBillSequence
 {
 	my ($self) = @_;
@@ -80,7 +82,6 @@ sub setBillSequence
 sub getEffectiveDate
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{effectiveDate}) : $self->{effectiveDate};
 }
 
@@ -95,7 +96,6 @@ sub setEffectiveDate
 sub getTerminationDate
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{terminationDate}) : $self->{terminationDate};
 }
 
@@ -107,42 +107,15 @@ sub setTerminationDate
 	$self->{terminationDate} = $value;
 }
 
-
 sub getRelationshipToPatient
 {
 	my ($self) = @_;
-
 	return (($self->{relationshipToPatient} eq "") ? DEFAULT_RELATION_SHIP_TO_PATIENT : $self->{relationshipToPatient});
 }
 
 sub setRelationshipToPatient
 {
 	my ($self, $value) = @_;
-	my $temp =
-		{
-			'0' => '01',
-			'SELF' => '01',
-
-			'2' => '02',
-			'10' => '02',
-			'SPOUSE' => '02',
-
-			'3' => '03',
-			'03' => '03',
-			'12' => '03',
-			'CHILD' => '03',
-
-			'99' => '99',
-			'50' => '99',
-			'OTHER' => '99',
-			'EMPLOYER' => '99',
-
-			'11' => '18',
-
-			'PARENT' => '11',
-		};
-
-#	$self->{relationshipToPatient} = $temp->{uc($value)};
 	$self->{relationshipToPatient} = length($value) == 1 ? "0" . $value : $value;
 }
 
@@ -194,7 +167,6 @@ sub setHMOId
 	$self->{hmoId} = $value;
 }
 
-
 sub getOtherInsuranceIndicator
 {
 	my $self = shift;
@@ -212,7 +184,6 @@ sub getPolicyGroupOrFECANo
 	my $self = shift;
 	return $self->{policyGroupOrFECANo};
 }
-
 
 sub getInsurancePlanOrProgramName
 {
@@ -238,7 +209,6 @@ sub setPolicyGroupOrFECANo
 	$self->{policyGroupOrFECANo} = $value;
 }
 
-
 sub setInsurancePlanOrProgramName
 {
 	my ($self, $value) = @_;
@@ -249,12 +219,12 @@ sub setAcceptAssignment
 {
 	my ($self, $treat) = @_;
 	my $temp =
-		{
-			'0' => 'N',
-			'NO'  => 'N',
-			'1'  => 'Y',
-			'YES'  => 'Y',
-		};
+	{
+		'0' => 'N',
+		'NO'  => 'N',
+		'1'  => 'Y',
+		'YES'  => 'Y',
+	};
 	$self->{acceptAssignment} = $temp->{uc($treat)};
 }
 
@@ -270,22 +240,10 @@ sub setBcbsPlanCode
 	$self->{bcbsPlanCode} = $value;
 }
 
-
 sub getBcbsPlanCode
 {
 	my $self = shift;
 	return $self->{bcbsPlanCode};
 }
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute relationshipToPatient is added to reflect the insured relation to patient.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute acceptAssignment is added to reflect the Assignment of Benefit for the insured.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/18/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute billSequence added to reflect the sequence of insured for the bill.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/01/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute BCBSPlanCode is added to reflect the BCBSP plan Code of insured.'],
-
-);
 
 1;

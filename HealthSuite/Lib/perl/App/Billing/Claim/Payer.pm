@@ -2,17 +2,18 @@
 package App::Billing::Claim::Payer;
 ##############################################################################
 
-use strict;
-use App::Billing::Claim::Entity;
-use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
-@ISA = qw(App::Billing::Claim::Entity);
-
 #
 #   -- here is the organization's data
 #   -- that is required in a HCFA 1500 or NSF output
 #
+use strict;
+
+use App::Billing::Claim::Entity;
+
+use vars qw(@ISA);
+
+@ISA = qw(App::Billing::Claim::Entity);
+
 sub new
 {
 	my ($type) = shift;
@@ -32,8 +33,8 @@ sub new
 	$self->{champusSponsorBranch} = undef;
 	$self->{champusSponsorGrade} = undef;
 	$self->{champusSponsorStatus} = undef;
-	$self->{billSequence} = undef;
-	$self->{payerId} = undef; # envoy id for payer
+	$self->{billSequence} = undef;		# to be removed
+	$self->{payerId} = undef; # E-Remitter Payer ID
 	$self->{type} = undef;
 	$self->{insType} = undef;
 	$self->{insurancePlanOrProgramName}	= undef;
@@ -60,32 +61,27 @@ sub setInsurancePlanOrProgramName
 	$self->{insurancePlanOrProgramName} = $value;
 }
 
-
 sub getType
 {
 	my ($self) = @_;
-
 	return $self->{type};
 }
 
 sub setType
 {
 	my ($self,$value) = @_;
-
 	$self->{type} = $value;
 }
 
 sub getInsType
 {
 	my ($self) = @_;
-
 	return $self->{insType};
 }
 
 sub setInsType
 {
 	my ($self,$value) = @_;
-
 	$self->{insType} = $value;
 }
 
@@ -124,6 +120,7 @@ sub getChampusSponsorGrade
 	my ($self) = @_;
 	return $self->{champusSponsorGrade};
 }
+
 sub setChampusSponsorStatus
 {
 	my ($self, $value) = @_;
@@ -140,22 +137,20 @@ sub setAcceptAssignment
 {
 	my ($self, $treat) = @_;
 	my $temp =
-		{
-			'0' => 'N',
-			'NO' => 'N',
-			'N' => 'N',
-			'1'  => 'Y',
-			'YES'  => 'Y',
-			'Y'  => 'Y',
-
-		};
+	{
+		'0' => 'N',
+		'NO' => 'N',
+		'N' => 'N',
+		'1'  => 'Y',
+		'YES'  => 'Y',
+		'Y'  => 'Y',
+	};
 	$self->{acceptAssignment} = $temp->{uc($treat)};
 }
 
 sub getAcceptAssignment
 {
 	my ($self) = @_;
-
 	return $self->{acceptAssignment};
 }
 
@@ -168,7 +163,6 @@ sub setSourceOfPayment
 sub getSourceOfPayment
 {
 	my ($self) = @_;
-
 	return $self->{sourceOfPayment};
 }
 
@@ -220,7 +214,6 @@ sub getAddress
 	return $self->{address};
 }
 
-
 sub setName
 {
 	my ($self, $value) = @_;
@@ -260,42 +253,36 @@ sub setPayerId
 sub setFirstName
 {
 	my ($self, $value) = @_;
-
 	$self->{firstName} = $value;
 }
 
 sub setLastName
 {
 	my ($self, $value) = @_;
-
 	$self->{lastName} = $value;
 }
 
 sub setMiddleInitial
 {
 	my ($self, $value) = @_;
-
 	$self->{middleInitial} = $value;
 }
 
 sub getFirstName
 {
 	my ($self) = @_;
-
 	return $self->{firstName};
 }
 
 sub getLastName
 {
 	my ($self) = @_;
-
 	return $self->{lastName}
 }
 
 sub getMiddleInitial
 {
 	my ($self) = @_;
-
 	return $self->{middleInitial};
 }
 
@@ -306,16 +293,6 @@ sub printVal
 	{
 		print " payer $key = " . $self->{$key} . " \n";
 	}
-
 }
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'SSI','Billing Interface/Claim Patient','A new attribute amountpaid is added which will reflect the amount paid by the payer in claim.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI','Billing Interface/Claim Patient','A new attribute billSequence is added which will reflect the billing Sequence for the payer in claim.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/22/2000', 'SSI','Billing Interface/Claim Patient','A new attribute payerId is added which will reflect the envoy Id for the payer in claim.'],
-);
-
 
 1;
