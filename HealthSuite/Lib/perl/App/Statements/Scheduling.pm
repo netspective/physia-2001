@@ -387,7 +387,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
 		from Appt_Type
 		where owner_org_id = :1
-		order by caption
+		order by upper(caption)
 	},
 
 	'sel_ApptTypesDropDown' => qq{
