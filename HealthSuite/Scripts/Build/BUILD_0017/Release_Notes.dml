@@ -396,6 +396,9 @@
 			Additional: Next actions added back in. Removed certain options to avoid getting redirect error.
 		</deliverable>
 
+		<deliverable id="1674">
+			Report (revenue Collection ) :  Changed report to use service provider info instead of billing provider info
+		</deliverable>
 		<deliverable id="1676">
 			Report (total recv) :  Corrected SQL to not multi count patient that have more then one role.  FIX : fixed detail report also
 		</deliverable>
