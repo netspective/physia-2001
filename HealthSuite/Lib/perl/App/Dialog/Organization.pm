@@ -398,15 +398,18 @@ sub initialize
 		data => " $orgType Organization '#field.org_id#' <a href='/org/#field.org_id#/profile'>#field.name_primary#</a>"
 	};
 
-	$self->addFooter(new CGI::Dialog::Buttons(
-		nextActions_add => [
-			['View Org Summary', "/org/%field.org_id%/profile", 1],
-			['Add Another Org', "/org/#session.org_id#/dlg-add-org-$self->{orgtype}"],
+	my @addAction = (['View Org Summary', "/org/%field.org_id%/profile", 1]);
+	push (@addAction ,['Add Ancillary Location', "/org/#session.org_id#/dlg-add-lab-location?_f_org_id=%field.org_id%"]) if ($self->{orgtype} eq 'ancillary');
+	push @addAction ,(
+			
 			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product?_f_ins_org_id=%field.org_id%"],
 			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan?_f_ins_org_id=%field.org_id%"],
 			['Go to Directory', "/search/org/id/%field.org_id%"],
 			['Return to Home', "/person/#session.user_id#/home"],
-			['Go to Work List', "/worklist"],
+			['Go to Work List', "/worklist"],);
+	$self->addFooter(new CGI::Dialog::Buttons(
+		nextActions_add => [
+			@addAction
 		],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -903,8 +906,6 @@ sub execute_add
 		_debug => 0
 	) if $page->field('area_served') ne '';
 
-	#If Org is a Lab create a Lab,Radiology,Other Catalogs
-	$self->addLabCatalogs($page,$orgIntId) if $page->field('member_name') eq 'Ancillary Service';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
@@ -913,25 +914,6 @@ sub execute_add
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
-
-sub addLabCatalogs
-{
-	my $self=shift;
-	my $page=shift;
-	my $orgIntId=shift;
-	my $name_id = $page->field('org_id')."_Lab_Test";
-	$page->schemaAction(
-		'Offering_Catalog', 'add',
-		org_internal_id => $orgIntId,
-		catalog_id =>"Lab_Test",
-		caption =>$name_id,
-		catalog_type=>5,
-		description=>'List of Lab tests',
-		_debug => 0,
-	)
-
-}
-
 
 sub execute_update
 {

@@ -24,7 +24,7 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 
 %RESOURCE_MAP = (
 	'lab-test' => {
-		_arl_add =>['internal_catalog_id'],
+		_arl_add =>['internal_catalog_id','catalog_type'],
 		_arl_modify => ['entry_id']
 	},
 );
@@ -71,6 +71,11 @@ sub new
 				caption =>'Caption',
 			},
 			{	_class => 'CGI::Dialog::Field',		
+				name=>"code",
+				type=>'text',
+				caption =>'Charge Code',
+			}	,			
+			{	_class => 'CGI::Dialog::Field',		
 				name=>"doc_price",
 				type=>'currency',
 				caption =>'Physician Cost',
@@ -105,6 +110,7 @@ sub new
 								#options => FLDFLAG_REQUIRED ,
 								name=>"test_caption"),
 				],),					
+				new CGI::Dialog::Field(caption=>"Charge Code", type=>'text',name=>"code"),			
 				new CGI::Dialog::Field(caption=>"Physician Cost", type=>'currency',name=>"doc_price"),			
 				new CGI::Dialog::Field(caption=>"Patient Cost", type=>'currency',name=>"pat_price")
 				);
@@ -119,11 +125,9 @@ sub new
 		),	
 		
 		new CGI::Dialog::Field(caption => 'Test Type',
-			type => 'select',
-			name => 'lab_type',
-			fKeyStmtMgr => $STMTMGR_LAB_TEST,
-			fKeyStmt => 'selTestType',		
-			options => FLDFLAG_REQUIRED ,
+			type => 'hidden',
+			name=>'test_type',
+			options=>FLDFLAG_READONLY
 		),		
 		new CGI::Dialog::Field( caption => 'Test Selection', 						
 					type => 'select',
@@ -131,7 +135,7 @@ sub new
 					name => 'panel_test',
 					options => FLDFLAG_REQUIRED,
 					onChangeJS => qq{setMode(event);}
-					),	
+					),						
 		new CGI::Dialog::MultiField
 		(caption =>'Panel ID/Caption', name => "panel_id_name",
 			options => FLDFLAG_REQUIRED,
@@ -190,7 +194,7 @@ sub new
 	my $pos=-1;
 	for (my $loop=1;$loop<MAXROWS;$loop++)
 	{
-		$pos+=5;
+		$pos+=6;
 		my $field = $self->getField("panel")->{fields}->[$pos];
 		my $nextField=$loop+1;
 		$field->{postHtml}=qq{<A HREF = javascript:changePanel($nextField);>$IMAGETAGS{'icons/arrow-down-blue'}</A>};	
@@ -224,6 +228,7 @@ sub new
 		function setSingle(mode)
 		{
 			setIdDisplay('test',mode);			
+			setIdDisplay('code',mode);			
 			setIdDisplay('doc_price',mode);			
 			setIdDisplay('pat_price',mode);								
 		}				
@@ -257,7 +262,7 @@ sub new
 sub populateData_add
 {
 	my ($self, $page, $command, $flags) = @_;
-	$page->field('lab_type',$page->param('lab_type'));	
+	$page->field('lab_type',$page->param('catalog_type'));	
 	$page->field('org_id',$page->param('org_id'));	
 	$page->field('internal_catalog_id',$page->param('internal_catalog_id'));
 	$page->addError("Lab Catalog does not exist.") unless $page->param('internal_catalog_id');	
@@ -272,14 +277,16 @@ sub populateData_update
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	my $id = $page->param('entry_id');	
 	my $data=  $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$id);	
+	$page->field('test_group',$data->{parent_entry_id}||undef);
 	if ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL)
 	{
 		$self->addPostHtml(qq{<script language="JavaScript1.2">setIdDisplay("panel_id_name",'none');setIdDisplay("panel",'none');</script>});						
 		$page->field('org_id',$page->param('org_id'));	
 		if($data->{modifier} eq 'Single Test')
 		{
-			$page->field('test_id',$data->{code});
-		 	$page->field('test_caption',$data->{name});
+			$page->field('test_id',$data->{name});
+		 	$page->field('test_caption',$data->{description});
+		 	$page->field('code',$data->{code});		 	
 			$page->field('doc_price',$data->{unit_cost});	
 			$page->field('pat_price',$data->{data_num});			
 			$page->field('panel_test',0);
@@ -294,7 +301,7 @@ sub populateData_update
 			$page->field('entry_id',$id);	
 			$page->field('internal_catalog_id',$data->{catalog_id});	
 			$page->field('panel_name',$data->{name});
-			$page->field('panel_id',$data->{code});		
+			$page->field('panel_id',$data->{description});		
 			$page->field('entry_id',$id);
 			$page->field('lab_type',$data->{entry_type});				
 			#Get Children record of this parent
@@ -303,17 +310,24 @@ sub populateData_update
 			$self->addPostHtml(qq{<script language="JavaScript1.2">setSingle('none');setPanel('block'); </script>});		
 			foreach (@$dataChild)
 			{
-				$page->field("test_id_$loop",$_->{code});
-				$page->field("test_caption_$loop",$_->{name});	
+				$page->field("test_id_$loop",$_->{name});
+				$page->field("test_caption_$loop",$_->{description});	
 				$page->field("doc_price_$loop",$_->{unit_cost});	
 				$page->field("pat_price_$loop",$_->{unit_cost});				
 				$page->field("entry_id_$loop",$_->{entry_id});
-				$self->addPostHtml(qq{<script language="JavaScript1.2">changePanel($loop); </script>});			
+		 		$page->field("code_$loop",$_->{code});		 						
+				$self->addPostHtml(qq{<script language="JavaScript1.2">changePanel($loop); </script>});							
 				$loop++;	
 			};
 			$self->addPostHtml(qq{<script language="JavaScript1.2">setSingle('none');setPanel('block'); </script>});
 			
-		}		
+		}	
+		
+		#Set Heading for Dialog
+		my $catalogData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('internal_catalog_id')||undef);	
+		my $com =ucfirst($command) ;
+		my $type = ucfirst(lc($catalogData->{caption}));
+		$self->{heading}="$com $type Test";		
 	}
 	else
 	{
@@ -328,11 +342,13 @@ sub configureDialog
 	my ($self, $page,$command,$panel) = @_;
 
 	#Set Test Selection to read only if this is a update or delete
-	my $type = $STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'selCatalogEntryTypeCapById',$page->field('lab_type')||300);	
+	
+	#Set Heading for Dialog
+	my $catalogData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogById',$page->field('internal_catalog_id')||undef);	
 	my $com =ucfirst($command) ;
+	my $type = ucfirst(lc($catalogData->{caption}));
 	$self->{heading}="$com $type Test";
-	$self->setFieldFlags('panel_test',FLDFLAG_READONLY) if $command ne 'add';	
-	$self->setFieldFlags('lab_type',FLDFLAG_READONLY) if $page->field('lab_type');
+	$page->field('test_type',$type);
 	#Reset Dialog
 	$self->addPostHtml(qq{<script language="JavaScript1.2">setIdDisplay("panel_id_name",'none');setIdDisplay("panel",'none');</script>});						
 	if($panel)
@@ -399,16 +415,22 @@ sub saveSingleTest
 	my $doc_price =$page->field('doc_price');
 	my $pat_price =$page->field('pat_price');	
 	my $entry_type = $page->field('lab_type');
+	my $parent_id = $page->field('test_group');
+	my $code = $page->field("code");		
 	$page->schemaAction(
 		'Offering_Catalog_Entry',$command,
 		entry_id=>$page->field('entry_id')||undef,
-		code=>$lab_id,
 		modifier=>'Single Test',
-		name=>$caption,
+		#name=>$panelName,
+		#code=>$panelId,
+		name=>$lab_id,
+		description=>$caption,
+		code=>$code,
 		unit_cost =>$doc_price,
 		data_num =>$pat_price,		
-		entry_type =>$entry_type,
-		catalog_id=>$page->field('internal_catalog_id'),		
+		entry_type =>App::Universal::CATALOGENTRYTYPE_SERVICE,
+		catalog_id=>$page->field('internal_catalog_id'),	
+		parent_entry_id=>$parent_id,
 	);
 };
 
@@ -418,19 +440,23 @@ sub savePanelTest
 	my $panelName = $page->field('panel_name');	
 	my $panelId = $page->field('panel_id');		
 	my $entry_type = $page->field('lab_type');
-	
+	my $code = $page->field("code");	
 	my $doc_total=0;
 	my $pat_total=0;
-
+	my $parentGroup = $page->field('test_group');
 	#Save Group Info
 	my $parentId=$page->schemaAction(
 		'Offering_Catalog_Entry',$command,
 		entry_id=>$page->field('entry_id')||undef,
 		modifier=>'Panel Test',	
-		name=>$panelName,
-		code=>$panelId,
-		entry_type =>$entry_type,
+		#name=>$panelName,
+		#code=>$panelId,
+		name=>$panelId,
+		description=>$panelName,
+		code=>$code,
+		entry_type =>App::Universal::CATALOGENTRYTYPE_SERVICE,
 		catalog_id=>$page->field('internal_catalog_id'),
+		parent_entry_id =>$parentGroup,
 	);
 	
 	#Save Test Panel
@@ -445,7 +471,7 @@ sub savePanelTest
 		my $price = $page->field("doc_price_$loop");			
 		my $price2 = $page->field("pat_price_$loop");					
 		my $entry_id = $page->field("entry_id_$loop");
-		
+		my $code = $page->field("code_$loop");
 		next unless ($test_id || $page->field("entry_id_$loop"));
 		
 		#Even if the dialog is an update the user can add new test  to a panel so determine
@@ -460,10 +486,13 @@ sub savePanelTest
 			entry_id=>$page->field("entry_id_$loop") ||undef,
 			unit_cost=>$price,	
 			data_num=>$price2,
-			name=>$cap,
-			code=>$test_id,
+			#name=>$cap,
+			#code=>$test_id,
+			name=>$test_id,
+			description=>$cap,
+			code=>$code,
 			parent_entry_id =>$parentId,
-			entry_type =>$entry_type,
+			entry_type =>App::Universal::CATALOGENTRYTYPE_SERVICE,
 			catalog_id=>$page->field('internal_catalog_id')		
 			);
 			$doc_total+=$price;
@@ -503,7 +532,7 @@ sub execute
 	{
 		$self->saveSingleTest($page,$command,$flags);
 	}	
-	$page->param('_dialogreturnurl', '/org/%param.org_id%/catalog?catalog=labtest_detail&labtest_detail=%field.lab_type%') if $command ne 'add';
+	$page->param('_dialogreturnurl', '/org/%param.org_id%/catalog?catalog=labtest_detail&labtest_detail=%field.internal_catalog_id%') if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags, undef);			
 	return ;
 }
