@@ -39,6 +39,7 @@ use App::IntelliCode;
 use App::Page::Search;
 
 use constant DATEFORMAT_USA => 1;
+use constant PHONEFORMAT_USA => 1;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
@@ -81,12 +82,13 @@ sub getPersonHtml
 	}
 
 	my $addr = $person->{address};
+	my $phone = $addr->getTelephoneNo(PHONEFORMAT_USA);
 	return qq{
 		$person->{firstName} $person->{middleInitial} $person->{lastName} ($person->{id})<br>
 		$addr->{address1}<br>
 		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
 		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
-		$addr->{telephoneNo}
+		$phone
 	};
 }
 
@@ -101,12 +103,34 @@ sub getOrgHtml
 	}
 
 	my $addr = $org->{address};
+	my $phone = $addr->getTelephoneNo(PHONEFORMAT_USA);
 	return qq{
 		$org->{name} ($org->{id})<br>
 		$addr->{address1}<br>
 		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
 		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
-		$addr->{telephoneNo}
+		$phone
+	};
+}
+
+sub getPayerHtml
+{
+	my ($self, $payer, $planOrProductName) = @_;
+
+	my @info = ();
+	foreach (sort keys %$payer)
+	{
+		push(@info, "$_ = $payer->{$_}<BR>");
+	}
+
+	my $addr = $payer->{address};
+	my $phone = $addr->getTelephoneNo(PHONEFORMAT_USA);
+	return qq{
+		@{[ $planOrProductName ? $planOrProductName : $payer->{name} ]} ($payer->{id})<br>
+		$addr->{address1}<br>
+		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
+		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
+		$phone
 	};
 }
 
@@ -855,27 +879,6 @@ sub getItemsHtml
 			</TR>
 		</TABLE>
 		};
-}
-
-sub getPayerHtml
-{
-	my ($self, $payer, $planOrProductName) = @_;
-
-	my @info = ();
-	foreach (sort keys %$payer)
-	{
-		push(@info, "$_ = $payer->{$_}<BR>");
-	}
-
-	my $addr = $payer->{address};
-
-	return qq{
-		@{[ $planOrProductName ? $planOrProductName : $payer->{name} ]} ($payer->{id})<br>
-		$addr->{address1}<br>
-		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
-		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
-		$addr->{telephoneNo}
-	};
 }
 
 sub getHistoryHtml
