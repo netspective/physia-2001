@@ -1,0 +1,97 @@
+Beginning DB Comparison at 10/13/2000 12:23:33 AM
+  Reference Database : sdedbs04
+            Username : pro_test
+            Schema   : PRO_TEST
+
+ Comparison Database : sdedbs03
+            Username : pro_new
+            Schema   : PRO_NEW
+
+***************************************************************
+* Objects in Reference DB that are missing from Comparison DB *
+***************************************************************
+  INDEX TRANS_INVOICE_ID
+  LOB SYS_LOB0000011514C00023$$
+  LOB SYS_LOB0000011524C00028$$
+  LOB SYS_LOB0000011945C00010$$
+  SEQUENCE TVN_SEQ
+  TABLE ORG_INS
+  VIEW INVOICE_CHARGES_TEST
+
+***************************************************************
+* Objects in Comparison DB that are not in Reference DB       *
+***************************************************************
+  INDEX TRANS_TRANS_INVOICE_ID
+  LOB SYS_LOB0000003556C00010$$
+  LOB SYS_LOB0000006737C00023$$
+  LOB SYS_LOB0000006747C00028$$
+  TABLE RECORD_COUNT
+
+***************************************************************
+* Columns in Reference DB that are missing from Comparison DB *
+***************************************************************
+  INVOICE_CHARGES_TEST.INVOICE_ID
+  INVOICE_CHARGES_TEST.INVOICE_DATE
+  INVOICE_CHARGES_TEST.TOTAL_CHARGES
+  INVOICE_CHARGES_TEST.MISC_CHARGES
+  INVOICE_CHARGES_TEST.PERSON_PAY
+  INVOICE_CHARGES_TEST.INSURANCE_PAY
+  INVOICE_CHARGES_TEST.CHARGE_ADJUST
+  INVOICE_CHARGES_TEST.NET_CHARGES
+  INVOICE_CHARGES_TEST.BALANCE_TRANSFER
+  INVOICE_CHARGES_TEST.INSURANCE_WRITE_OFF
+  INVOICE_CHARGES_TEST.PERSON_WRITE_OFF
+  INVOICE_CHARGES_TEST.A_R
+  INVOICE_CHARGES_TEST.UNITS
+  INVOICE_CHARGES_TEST.UNIT_COST
+  INVOICE_CHARGES_TEST.FACILITY
+  INVOICE_CHARGES_TEST.PROVIDER
+  INVOICE_CHARGES_TEST.BATCH_ID
+  INVOICE_CHARGES_TEST.ITEM_TYPE
+  INVOICE_CHARGES_TEST.SERVICE_BEGIN_DATE
+  INVOICE_CHARGES_TEST.SERVICE_END_DATE
+  INVOICE_CHARGES_TEST.CODE
+  INVOICE_CHARGES_TEST.REL_DIAGS
+  INVOICE_CHARGES_TEST.CAPTION
+  INVOICE_CHARGES_TEST.SUBMITTER_ID
+  INVOICE_CHARGES_TEST.CLIENT_ID
+  INVOICE_CHARGES_TEST.HCFA_SERVICE_TYPE
+  INVOICE_CHARGES_TEST.INVOICE_TYPE
+  INVOICE_CHARGES_TEST.INVOICE_SUBTYPE
+  INVOICE_CHARGES_TEST.FFS_CAP
+  INVOICE_CHARGES_TEST.REFUND
+  INVOICE_CHARGES_TEST.PAY_TYPE
+  INVOICE_CHARGES_TEST.TRANS_ID
+  INVOICE_CHARGES_TEST.TRANS_TYPE
+  INVOICE_CHARGES_TEST.TOTAL_ITEMS
+  INVOICE_CHARGES_TEST.PAYER_TYPE
+  INVOICE_CHARGES_TEST.PAYER_ID
+  INVOICE_CHARGES_TEST.BILLING_ID
+  INVOICE_CHARGES_TEST.OWNER_ORG_ID
+  ORG_INS.ORG_ID
+  ORG_INS.ORG_NAME
+  PLAN_TABLE.PARTITION_START
+  PLAN_TABLE.PARTITION_STOP
+  PLAN_TABLE.PARTITION_ID
+  PLAN_TABLE.DISTRIBUTION
+
+***************************************************************
+* Columns in Comp DB that are not in or different from Ref DB *
+***************************************************************
+  Ref Column PLAN_TABLE.SEARCH_COLUMNS Data Precision is 
+ Comp Column PLAN_TABLE.SEARCH_COLUMNS Data Precision is 0
+  Ref Column PLAN_TABLE.OTHER Column ID is 23
+ Comp Column PLAN_TABLE.OTHER Column ID is 20
+  RECORD_COUNT.TABLE_NAME is Missing
+  RECORD_COUNT.TMSTMP is Missing
+  RECORD_COUNT.REC_COUNT is Missing
+
+***************************************************************
+* Differences in Object Source Code                           *
+***************************************************************
+ *** None ***
+
+***************************************************************
+* Differences in SQL Text of Views                            *
+***************************************************************
+ *** None ***
