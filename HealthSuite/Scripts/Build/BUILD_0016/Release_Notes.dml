@@ -23,7 +23,9 @@
 		<deliverable id="893">
 			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
 		</deliverable>
-
+		<deliverable id="937">
+			Updated the 'Catalog' tab in 'insurance orgs' to showup only the fee-schedules that are related to that insurance org.
+		</deliverable>
 		<deliverable id="952">
 			New query function will handle lookup
 		</deliverable>
@@ -130,12 +132,20 @@
 			UI: Fixed the code to not to show up the Mr and Mrs in the 'My Associated Resources Appointments' component of the
 			User's home page
 		</deliverable>
-
+		
+		<deliverable id="1416">
+			Fixed the code to not to show up the blank screen after updating an insurance-product from the search page
+		</deliverable>
+		
 		<deliverable id="1419">
 			Created text-based reports for the details of MAR and DAR.
 			These are currently in production.
 		</deliverable>
 
+		<deliverable id="1421">
+			UI : Added a multifield in the 'Add Patient' dialog to add the 'Primary Care Provider'
+		</deliverable>
+		
 		<deliverable id="1424">
 			Added safeguards before adding invoice attributes and updating invoice status while parsing
 			claims status report files from Perse.  Deleted extraneous invoice attributes.
@@ -164,7 +174,10 @@
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
 		</deliverable>
-
+		<deliverable id="1470">
+			UI: Added a new person-type called 'Insured Person' for 'Personal Insurance Coverage' dialog and 
+			    added link called 'Insured Persons' in the lookups of Main menu.
+		</deliverable>
 		<deliverable id="none">
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
