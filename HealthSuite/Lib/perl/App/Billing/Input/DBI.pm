@@ -251,8 +251,10 @@ sub assignInvoicePreSubmit
 {
 	my ($self, $claim, $invoiceId) = @_;
 
+	print "b  pat \n";
 	$self->assignPatientInfo($claim, $invoiceId);
 	$self->assignPatientAddressInfo($claim, $invoiceId);
+	print "b  ins \n";
 	$self->assignPatientInsurance($claim, $invoiceId);
 	$self->assignPatientEmployment($claim, $invoiceId);
 	$self->assignProviderInfo($claim, $invoiceId);
@@ -1380,9 +1382,11 @@ sub assignInvoiceProperties
 
 	my $queryStatment = " select ITEM_ID, ITEM_NAME, VALUE_TEXT, VALUE_TEXTB, VALUE_INT, VALUE_INTB, VALUE_FLOAT, VALUE_FLOATB, to_char(VALUE_DATE, \'dd-MON-yyyy\'), to_char(VALUE_DATEEND, \'dd-MON-yyyy\'), to_char(VALUE_DATEA, \'dd-MON-yyyy\'), to_char(VALUE_DATEB, \'dd-MON-yyyy\'), VALUE_BLOCK from invoice_attribute where parent_id = $invoiceId ";
 	my $sth = $self->{dbiCon}->prepare(qq { $queryStatment});
-
+	print $queryStatment . "\n";
 	# do the execute statement
 	$sth->execute()  or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	print " done \n";
+
 	while(@row = $sth->fetchrow_array())
 	{
 		if(my $attrInfo = $inputMap->{$row[COLUMNINDEX_ATTRNAME]})
@@ -1464,7 +1468,7 @@ sub assignInvoiceProperties
 
 	return \@objects;
 }
-
+# 4312448
 sub payersRemainingProperties
 {
 	my ($self, $payers, $invoiceId, $claim) = @_;
@@ -1576,9 +1580,9 @@ sub setClaimProperties
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@tempRow = $sth->fetchrow_array();
 	my $diagnosis;
-	$tempRow[2] =~ s/\s*//g;
+	$tempRow[2] =~ s/ //g;
 
-	my @diagnosisCodes = split (/\s*,\s*/, $tempRow[2]);
+	my @diagnosisCodes = split (/,/, $tempRow[2]) ;
 	my $diagCount;
 	my @ins;
 	$ins[CLAIM_TYPE_SELF] = "OTHER";
@@ -1641,28 +1645,28 @@ sub setClaimProperties
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{otherItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{adjItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 	$tempItems = $currentClaim->{copayItems};
 	for($count = 0;$count <= $#$tempItems; $count++)
 	{
 		$tempDiagnosisCodes = $self->diagnosisPtr($currentClaim, $tempItems->[$count]->getDiagnosis);
-		my @tempDiagnosisCodes1 = split(/\s*/, $tempDiagnosisCodes);
+		my @tempDiagnosisCodes1 = split(/ /, $tempDiagnosisCodes);
 		$tempItems->[$count]->setDiagnosisCodePointer(\@tempDiagnosisCodes1);
 	}
 }
@@ -1683,7 +1687,7 @@ sub diagnosisPtr
 			$count++;
 		}
 	}
-	my @diagCodes = split(/\s*,\s*/, $codes);
+	my @diagCodes = split(/,/, $codes);
 	for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 	{
 		$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . " " . $ptr;

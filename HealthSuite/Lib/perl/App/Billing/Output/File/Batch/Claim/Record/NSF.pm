@@ -56,7 +56,7 @@ sub diagnosisPtr
 
 		for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 		{
-			$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . " " . $ptr;
+			$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . $ptr;
 		}
 		
 	return $ptr;
