@@ -1157,7 +1157,7 @@ sub box6Data
 
 	$properties =
 			{
-				'text' => $claim->{payToOrganization}->getFederalTaxId,
+				'text' => $claim->{payToOrganization}->getTaxId,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,

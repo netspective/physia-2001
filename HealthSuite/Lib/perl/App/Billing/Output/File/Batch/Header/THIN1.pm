@@ -58,12 +58,6 @@ sub formatData
 		$taxId =~ s/-//g;
 		$taxIdType = 'S';
 	}
-	#elsif($claimPayToProvider->getFederalTaxId() ne '')
-	#{
-	#	$taxId = $claimPayToProvider->getFederalTaxId();
-	#	$taxId =~ s/-//g;
-	#	$taxIdType = 'E';
-	#}
 	else
 	{
 		$taxIdType = '';

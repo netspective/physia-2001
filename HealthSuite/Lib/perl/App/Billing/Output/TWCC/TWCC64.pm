@@ -56,33 +56,33 @@ sub new
 }
 
 sub printReport
-{	
+{
 	my ($self, $p, $claim) = @_;
 	my $report = new App::Billing::Output::PDF::Report();
 	$report->newPage($p);
 	$self->drawForm($p, $claim, $report);
-	$self->fillData($p, $claim, $report);		
+	$self->fillData($p, $claim, $report);
 	$report->endPage($p);
-}	
+}
 
 
 sub drawForm
 {
-	my ($self, $p, $claim, $report) = @_ ;	
+	my ($self, $p, $claim, $report) = @_ ;
 
 	my $mainBoxX = LEFT_MARGIN;
 	my $mainBoxY = TOP_MARGIN - MAIN_BOX_Y;
 
-	my $properties = 
+	my $properties =
 	{
 		'text' =>"TEXAS WORKERS' COMPENSATION COMMISSION",
 		'x' => LEFT_MARGIN,
-		'y' => TOP_MARGIN, 
+		'y' => TOP_MARGIN,
 		'fontWidth' => 7
 	};
 	$report->drawText($p, $properties);
-	
-	$properties = 
+
+	$properties =
 	{
 		'text' =>"Mail this form to the WORKERS' COMPENSATION INSURANCE CARRIER",
 		'x' => LEFT_MARGIN,
@@ -91,11 +91,11 @@ sub drawForm
 	};
 	$report->drawText($p,$properties);
 
-	$properties = 
+	$properties =
 	{
 		'text' =>"SPECIFIC AND SUBSEQUENT MEDICAL REPORT",
 		'fontName' => BOLD_FONT_NAME,
-		'fontWidth' => 10, 
+		'fontWidth' => 10,
 		'x' => LEFT_MARGIN + 130,
 		'y' => TOP_MARGIN - HEADING_Y
 	};
@@ -103,12 +103,12 @@ sub drawForm
 
 	my $rightBoxX=LEFT_MARGIN + 333;
 	my $rightBoxY=TOP_MARGIN - 0;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' =>"TWCC#",
 						'fontWidth' => 7,
 						'x' => $rightBoxX,
@@ -124,7 +124,7 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $rightBoxX + 28,
 						'y1' => $rightBoxY - 15,
 						'x2' => $rightBoxX + 28 + 118,
@@ -137,14 +137,14 @@ sub drawForm
 						'x2' => $rightBoxX + 54 + 110,
 						'y2' => $rightBoxY - 24
 					}
-				]					
+				]
 			};
-					
+
 	$report->drawBox($p, $rightBoxX, $rightBoxY, RIGHT_BOX_WIDTH, RIGHT_BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 	$properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"1. Injured Employee's Name (Last, First, M.I.)",
@@ -158,7 +158,7 @@ sub drawForm
 
 	$properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"2. Date of Birth",
@@ -168,12 +168,12 @@ sub drawForm
 					}
 				],
 			};
-						
+
 	$report->drawBox($p, $mainBoxX + BOX1_WIDTH, $mainBoxY, BOX2_WIDTH, BOX_HEIGHT, NO_LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 	$properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"8. Date of Injury",
@@ -183,12 +183,12 @@ sub drawForm
 					}
 				]
 			};
-						
+
 	$report->drawBox($p, $mainBoxX + MAIN_BOX_WIDTH/2, $mainBoxY, MAIN_BOX_WIDTH/4, BOX_HEIGHT , NO_LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 	$properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"9. Social Security Number",
@@ -198,13 +198,13 @@ sub drawForm
 					}
 				]
 			};
-						
+
 	$report->drawBox($p, $mainBoxX + MAIN_BOX_WIDTH * 3/4 , $mainBoxY, MAIN_BOX_WIDTH/4, BOX_HEIGHT,  NO_LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"3. Employee's Mailing Address (Street or P.O. Box)",
 						'fontWidth' => 7,
@@ -218,7 +218,7 @@ sub drawForm
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"10. Employer's Name",
 						'fontWidth' => 7,
@@ -232,7 +232,7 @@ sub drawForm
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"City                                   State             Zip Code                 Phone No.",
 						'fontWidth' => 7,
@@ -252,7 +252,7 @@ sub drawForm
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"11. Employer's Mailing Address (Street or P.O. Box)",
 						'fontWidth' => 7,
@@ -266,7 +266,7 @@ sub drawForm
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"4. Date of Visit",
 						'fontWidth' => 7,
@@ -280,7 +280,7 @@ sub drawForm
 	$properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"5. Doctor's Name and Title",
 						'fontWidth' => 7,
@@ -294,7 +294,7 @@ sub drawForm
 	$properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"City                                                    State                                          Zip Code",
 					'fontWidth' => 7,
@@ -308,7 +308,7 @@ sub drawForm
 	$properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"6. Federal Tax I.D. No.",
 					'fontWidth' => 7,
@@ -322,7 +322,7 @@ sub drawForm
 	$properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"7. Professional License No.",
 					'fontWidth' => 7,
@@ -337,7 +337,7 @@ sub drawForm
 	$properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"12. Insurance Carrier",
 					'fontWidth' => 7,
@@ -347,45 +347,45 @@ sub drawForm
 			]
 	};
 	$report->drawBox($p, $mainBoxX + MAIN_BOX_WIDTH/2, $mainBoxY - 4 * BOX_HEIGHT, MAIN_BOX_WIDTH/2, BOX_HEIGHT, NO_LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 #diagnosis
-	
+
 	my $box13X = $mainBoxX;
 	my $box13Y= $mainBoxY - 5 * BOX_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "13. Diagnosis (ICD-9 Codes and Descriptions)       Relate Diagnosis to Procedure by Reference to Letters a, b, c)",
 						'fontWidth' => 7,
 						'x' => $box13X,
 						'y' => $box13Y
 					},
-					{	
+					{
 						'text' => "a)  ____  ____  ____  .  ____  ____ " ,
 						'fontWidth' => 7,
 						'x' => $box13X + 18,
 						'y' => $box13Y - LINE_SPACING * 1 - 3
 					},
-					{	
+					{
 						'text' => "b)  ____  ____  ____  .  ____  ____ " ,
 						'fontWidth' => 7,
 						'x' => $box13X + 18,
 						'y' => $box13Y - LINE_SPACING * 2 - 3
 					},
-					{	
+					{
 						'text' => "c)  ____  ____  ____  .  ____  ____ ",
 						'fontWidth' => 7,
 						'x' => $box13X + 18,
-						'y' => $box13Y - LINE_SPACING * 3 - 3 
+						'y' => $box13Y - LINE_SPACING * 3 - 3
 					}
 				],
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box13X + 360,
 						'y1' => $box13Y - LINE_SPACING * .8,
 						'x2' => $box13X + MAIN_BOX_WIDTH - 15,
@@ -414,42 +414,42 @@ sub drawForm
 
 	my $box14X = $mainBoxX;
 	my $box14Y= $box13Y - BOX13_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "14.      Treatment at this Visit  or       Procedure Performed in Hospital      (CPT Code and Modifiers, If Necessary, and Description)" . SPC x 32 . "15.",
 						'fontWidth' => 7,
 						'x' => $box14X,
 						'y' => $box14Y - 1
 					},
-					{	
+					{
 						'text' => "DO NOT INCLUDE OFFICE VISIT",
 						'fontWidth' => 7,
 						'x' => $box14X + 206,
 						'y' => $box14Y - LINE_SPACING - 1
 					},
-					{	
+					{
 						'text' => "____  ____  ____  ____  ____  .  ____  ____  .  ____  ____" ,
 						'fontWidth' => 7,
 						'x' => $box14X + 33,
 						'y' => $box14Y - LINE_SPACING * 2 - BOX14_PADDING
 					},
-					{	
+					{
 						'text' => "____  ____  ____  ____  ____  .  ____  ____  .  ____  ____" ,
 						'fontWidth' => 7,
 						'x' => $box14X + 33,
 						'y' => $box14Y - LINE_SPACING * 3 - BOX14_PADDING
 					},
-					{	
+					{
 						'text' => "____  ____  ____  ____  ____  .  ____  ____  .  ____  ____" ,
 						'fontWidth' => 7,
 						'x' => $box14X + 33,
 						'y' => $box14Y - LINE_SPACING * 4 - BOX14_PADDING
 					},
-					{	
+					{
 						'text' => "____  ____  ____  ____  ____  .  ____  ____  .  ____  ____" ,
 						'fontWidth' => 7,
 						'x' => $box14X + 33,
@@ -462,15 +462,15 @@ sub drawForm
 						'height' => 7,
 						'width' => 7,
 						'x' => $box14X + 15,
-						'y' => $box14Y - 9 
+						'y' => $box14Y - 9
 					},
 					{
 						'height' => 7,
 						'width' => 7,
 						'x' => $box14X + 105,
-						'y' => $box14Y - 9 
+						'y' => $box14Y - 9
 					}
-				]				
+				]
 			};
 	$report->drawBox($p, $box14X, $box14Y, MAIN_BOX_WIDTH, BOX14_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
@@ -483,32 +483,32 @@ sub drawForm
 
 	my $box16X = $mainBoxX;
 	my $box16Y= $box14Y - BOX14_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "16. ANTICIPATED Dates the Injured employee May :      (Please Complete All Dates)",
 						'fontWidth' => 7,
 						'x' => $box16X,
 						'y' => $box16Y
 					},
-					{	
+					{
 						'text' => "a) Return to Limited Type of Work:" . SPC x 30 . "b) Achieve Maximum Medical Improvement:" . SPC x 30 . "c) Return to Full-time Work:",
 						'fontWidth' => 7,
 						'x' => $box16X + 8,
-						'y' => $box16Y - 10 
-					},				
+						'y' => $box16Y - 10
+					},
 				]
 			};
 	$report->drawBox($p, $box16X, $box16Y, MAIN_BOX_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 	$properties =
 	{
 		'text' =>"MAY ATTACH TEST RESULTS OR FURTHER WRITTEN INFORMATION",
 		'x' => $mainBoxX + 133,
-		'y' => $mainBoxY - 610, 
+		'y' => $mainBoxY - 610,
 		'fontWidth' => 7
 	};
 	$report->drawText($p, $properties);
@@ -516,25 +516,25 @@ sub drawForm
 #box 17 start
 	my $box17X = $mainBoxX;
 	my $box17Y= $box16Y - BOX_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "17.  Reason for Report:",
 						'fontWidth' => 7,
 						'x' => $box17X,
 						'y' => $box17Y
 					},
-					
+
 					{
 						'text' => "Subsequent Medical Report (due every 60 days after initial report)",
 						'fontWidth' => 7,
 						'x' => $box17X + 21,
 						'y' => $box17Y - BOX17_SPACING
 					},
-					
+
 					{
 						'text' => "Released to Return to Work:" . SPC x 21 . "Limited Activity" . SPC x 28 . "Normal Activity" . SPC x 7 . "Date",
 						'fontWidth' => 7,
@@ -559,7 +559,7 @@ sub drawForm
 						'x' => $box17X + 114,
 						'y' => $box17Y - 6 * BOX17_SPACING
 					},
-					
+
 					{
 						'text' => "Discharge from:" . SPC x 34 . "Name of Hospital:" . SPC x 96 . "Discharge Date:",
 						'fontWidth' => 7,
@@ -570,25 +570,25 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box17X + 329,
 						'y1' => $box17Y - 34,
 						'x2' => $box17X + 414,
 						'y2' => $box17Y - 34,
 					},
-					{	
+					{
 						'x1' => $box17X + 195,
 						'y1' => $box17Y - 102,
 						'x2' => $box17X + 195 + 173,
 						'y2' => $box17Y - 102,
 					},
-					{	
+					{
 						'x1' => $box17X + 431,
 						'y1' => $box17Y - 60,
 						'x2' => $box17X + 516,
 						'y2' => $box17Y - 60,
 					},
-					{	
+					{
 						'x1' => $box17X + 431,
 						'y1' => $box17Y - 102,
 						'x2' => $box17X + 516,
@@ -601,7 +601,7 @@ sub drawForm
 						'height' => 7,
 						'width' => 7,
 						'x' => $box17X + BOX17_LINE_PADDING,
-						'y' => $box17Y - BOX17_PADDING - BOX17_SPACING 
+						'y' => $box17Y - BOX17_PADDING - BOX17_SPACING
 					},
 					{
 						'height' => 7,
@@ -634,26 +634,26 @@ sub drawForm
 						'y' => $box17Y - BOX17_PADDING - 2 * BOX17_SPACING
 					}
 				]
-									
+
 			};
-					
+
 	$report->drawBox($p, $box17X, $box17Y, MAIN_BOX_WIDTH, BOX17_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	$report->drawBox($p, $box17X + 195, $box17Y - 38, 173, BOX17_SPACING, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE);
 	$report->drawBox($p, $box17X + 195, $box17Y - 38 - BOX17_SPACING, 173, BOX17_SPACING, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE);
 	$report->drawBox($p, $box17X + 195, $box17Y - 38 - 2 * BOX17_SPACING, 173, BOX17_SPACING, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE);
 	$report->drawBox($p, $box17X + 195, $box17Y - 38 - 3 * BOX17_SPACING, 173, BOX17_SPACING, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE);
-	
+
 #box 17 end
 
 	my $box18X = $mainBoxX;
 	my $box18Y= $box17Y - BOX17_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "18.  Changes in Injured Employee's Condition, including Clinical Assessment and Test Results",
 						'fontWidth' => 7,
 						'x' => $box18X,
@@ -663,7 +663,7 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box18X + 298,
 						'y1' => $box18Y - BOX17_SPACING,
 						'x2' => $box18X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
@@ -677,19 +677,19 @@ sub drawForm
 						'y2' => $box18Y - 2 * BOX17_SPACING,
 					}
 				]
-									
+
 			};
-					
+
 	$report->drawBox($p, $box18X, $box18Y, MAIN_BOX_WIDTH, BOX18_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box19X = $mainBoxX;
 	my $box19Y= $box18Y - BOX18_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "19.  Treatment Plan *",
 						'fontWidth' => 7,
 						'x' => $box19X,
@@ -699,7 +699,7 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box19X + 74,
 						'y1' => $box19Y - BOX17_SPACING,
 						'x2' => $box19X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
@@ -720,36 +720,36 @@ sub drawForm
 						'y2' => $box19Y - 3 * BOX17_SPACING,
 					}
 				]
-									
+
 			};
-					
+
 	$report->drawBox($p, $box19X, $box19Y, MAIN_BOX_WIDTH, BOX19_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box20X = $mainBoxX;
 	my $box20Y= $box19Y - BOX19_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "20.  Referrals",
 						'fontWidth' => 7,
 						'x' => $box20X,
 						'y' => $box20Y - BOX17_PADDING
 					}
-				]								
+				]
 			};
 	$report->drawBox($p, $box20X, $box20Y, MAIN_BOX_WIDTH, BOX20_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box21X = $mainBoxX;
 	my $box21Y= $box20Y - BOX20_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "21.  Medications or Durable Medical Equipment",
 						'fontWidth' => 7,
 						'x' => $box21X,
@@ -759,41 +759,41 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box21X + 156,
 						'y1' => $box21Y - BOX17_SPACING,
 						'x2' => $box21X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
 						'y2' => $box21Y - BOX17_SPACING,
 					}
-				]				
+				]
 			};
 	$report->drawBox($p, $box21X, $box21Y, MAIN_BOX_WIDTH, BOX21_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box22X = $mainBoxX;
 	my $box22Y= $box21Y - BOX21_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "22.  Prognosis",
 						'fontWidth' => 7,
 						'x' => $box22X,
 						'y' => $box22Y - BOX17_PADDING
 					}
-				]								
+				]
 			};
 	$report->drawBox($p, $box22X, $box22Y, MAIN_BOX_WIDTH, BOX22_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box23X = $mainBoxX;
 	my $box23Y= $box22Y - BOX22_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "23.  Compliance by Injured Employee with Recommended Treatment",
 						'fontWidth' => 7,
 						'x' => $box23X,
@@ -803,42 +803,42 @@ sub drawForm
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box23X + 222,
 						'y1' => $box23Y - BOX17_SPACING,
 						'x2' => $box23X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
 						'y2' => $box23Y - BOX17_SPACING,
 					},
-					{	
+					{
 						'x1' => $box23X + BOX17_LINE_PADDING,
 						'y1' => $box23Y - 2 * BOX17_SPACING,
 						'x2' => $box23X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
 						'y2' => $box23Y - 2 * BOX17_SPACING,
 					}
-				]				
+				]
 			};
 	$report->drawBox($p, $box23X, $box23Y, MAIN_BOX_WIDTH, BOX23_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
 	my $box24X = $mainBoxX;
 	my $box24Y= $box23Y - BOX23_HEIGHT;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' => "24.  Signature of Doctor",
 						'fontWidth' => 7,
 						'x' => $box24X,
 						'y' => $box24Y - BOX17_PADDING
 					},
-					{	
+					{
 						'text' => "Date",
 						'fontWidth' => 7,
 						'x' => $box24X + 405,
 						'y' => $box24Y - BOX17_PADDING
 					},
-					{	
+					{
 						'text' => "Address",
 						'fontWidth' => 7,
 						'x' => $box24X + BOX17_LINE_PADDING,
@@ -847,25 +847,25 @@ sub drawForm
 				],
 			lines =>
 				[
-					{	
+					{
 						'x1' => $box24X + 78,
 						'y1' => $box24Y - BOX17_SPACING,
 						'x2' => $box24X + MAIN_BOX_WIDTH - 116,
 						'y2' => $box24Y - BOX17_SPACING,
 					},
-					{	
+					{
 						'x1' => $box24X + MAIN_BOX_WIDTH - 95 ,
 						'y1' => $box24Y - BOX17_SPACING,
 						'x2' => $box24X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
 						'y2' => $box24Y - BOX17_SPACING,
 					},
-					{	
+					{
 						'x1' => $box24X + 43,
 						'y1' => $box24Y - 2 * BOX17_SPACING,
 						'x2' => $box24X + MAIN_BOX_WIDTH - BOX17_LINE_PADDING,
 						'y2' => $box24Y - 2 * BOX17_SPACING,
 					}
-				]				
+				]
 			};
 	$report->drawBox($p, $box24X, $box24Y, MAIN_BOX_WIDTH, BOX24_HEIGHT, LEFT_LINE, RIGHT_LINE, NO_TOP_LINE, BOTTOM_LINE, $properties);
 
@@ -874,16 +874,16 @@ sub drawForm
 	{
 		'text' =>"TWCC 64  (Rev. 4/92)",
 		'x' => $mainBoxX,
-		'y' => $mainBoxY - 638, 
+		'y' => $mainBoxY - 638,
 		'fontWidth' => 7
 	};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 	{
 		'text' =>"Rule 133.102 and 133.103",
 		'x' => $mainBoxX + MAIN_BOX_WIDTH - 85 ,
-		'y' => $mainBoxY - 638, 
+		'y' => $mainBoxY - 638,
 		'fontWidth' => 7
 	};
 	$report->drawText($p, $properties);
@@ -892,7 +892,7 @@ sub drawForm
 	{
 		'text' =>"*Note If no additional treatment is necessary, physical therapy orders must be included in specific treatments to be performed, the frequency of",
 		'x' => $mainBoxX,
-		'y' => $mainBoxY - 584, 
+		'y' => $mainBoxY - 584,
 		'fontWidth' => 8
 	};
 	$report->drawText($p, $properties);
@@ -901,7 +901,7 @@ sub drawForm
 	{
 		'text' =>"treatments: and if necessary for continued therapy past 30 days, a re-evaluation by the treating doctor.",
 		'x' => $mainBoxX,
-		'y' => $mainBoxY - 584 - LINE_SPACING, 
+		'y' => $mainBoxY - 584 - LINE_SPACING,
 		'fontWidth' => 8
 	};
 	$report->drawText($p, $properties);
@@ -912,10 +912,10 @@ sub fillData
 {
 
 	my($self, $p, $claim, $report) = @_;
-	
+
 	my $mainBoxX = LEFT_MARGIN;
 	my $mainBoxY = TOP_MARGIN - MAIN_BOX_Y;
-	
+
 	$self->boxTopData($p, $claim, LEFT_MARGIN + 333, TOP_MARGIN, $report);
 	$self->box1Data($p, $claim, $mainBoxX, $mainBoxY, $report);
 	$self->box2Data($p, $claim, $mainBoxX + BOX1_WIDTH, $mainBoxY, $report);
@@ -972,7 +972,7 @@ sub boxTopData
 				'y' => $y - 6
 			};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 			{
 				'text' => $claim->getId,
@@ -991,8 +991,8 @@ sub box1Data
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $patient = $claim->{careReceiver};
-	my $employeeName = $patient->getLastName . ", " . $patient->getFirstName . " " . $patient->getMiddleInitial . "."; 
-		
+	my $employeeName = $patient->getLastName . ", " . $patient->getFirstName . " " . $patient->getMiddleInitial . ".";
+
 	my $properties =
 			{
 				'text' => $employeeName,
@@ -1075,7 +1075,7 @@ sub box6Data
 
 	$properties =
 			{
-				'text' => $claim->{payToOrganization}->getFederalTaxId,
+				'text' => $claim->{payToOrganization}->getTaxId,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1116,7 +1116,7 @@ sub box8Data
 			};
 	$report->drawText($p, $properties);
 }
-	
+
 sub box9Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
@@ -1131,7 +1131,7 @@ sub box9Data
 			};
 	$report->drawText($p, $properties);
 }
-	
+
 sub box10Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
@@ -1293,7 +1293,7 @@ sub box14Data
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + 40,
-				'y' => $y - 21 - ($i * LINE_SPACING) 
+				'y' => $y - 21 - ($i * LINE_SPACING)
 			};
 		$report->drawText($p, $properties);
 
@@ -1303,7 +1303,7 @@ sub box14Data
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + 112,
-				'y' => $y - 21 - ($i * LINE_SPACING) 
+				'y' => $y - 21 - ($i * LINE_SPACING)
 			};
 		$report->drawText($p, $properties);
 	}
@@ -1314,16 +1314,16 @@ sub box15Data
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	my $tmp;
 	my $ptr;
-		
+
 	for $i(0..3)
 	{
 		last if ($claim->{'procedures'}->[$i] eq "");
-		my $ptr = $claim->{'procedures'}->[$i]->getDiagnosisCodePointer; 
+		my $ptr = $claim->{'procedures'}->[$i]->getDiagnosisCodePointer;
 		$tmp = join(' ', @$ptr);
 		$tmp =~ s/1/a/;
 		$tmp =~ s/2/b/;
 		$tmp =~ s/3/c/;
-		
+
 		$properties =
 			{
 				'text' => $tmp,
@@ -1377,7 +1377,7 @@ sub box17Data
 
 	my $arr1 = [12,25,38,92]; 		# reason for report check boxes
 	my $arr2 = [142,244];			# activity type check boxes
-	
+
 	my $reason = $claim->{treatment}->getReasonForReport;
 	my $textX = "x" if $reason > 0;
 	$properties =
@@ -1389,8 +1389,8 @@ sub box17Data
 				'y' => $y - $arr1->[$reason - 1]
 			};
 	$report->drawText($p, $properties);
-	
-	if ($reason == 2) 
+
+	if ($reason == 2)
 	{
 		$properties =
 			{
@@ -1413,7 +1413,7 @@ sub box17Data
 		$report->drawText($p, $properties);
 	}
 
-	if ($reason == 3) 
+	if ($reason == 3)
 	{
 		$properties =
 			{
@@ -1465,7 +1465,7 @@ sub box17Data
 		$report->drawText($p, $properties);
 	}
 
-	if ($reason == 4) 
+	if ($reason == 4)
 	{
 		$properties =
 			{
@@ -1496,7 +1496,7 @@ sub box18Data
 
 	my $data = $claim->{treatment}->getChangeInCondition;
 	$self->printMultiLine($p, $x, $y, $report, $data, 300, 3);
-	
+
 }
 
 sub box19Data
@@ -1570,10 +1570,10 @@ sub printMultiLine
 	my($self, $p, $x, $y, $report, $data, $firstXPos, $numLines) = @_;
 
 	my $first;
-	my $last;	
+	my $last;
 	my $i=0;
 	$rest = $data;
-	
+
 	while ($rest ne "" and $i < $numLines)
 	{
 		if ($i==0)

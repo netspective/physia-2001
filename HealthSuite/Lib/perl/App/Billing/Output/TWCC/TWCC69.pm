@@ -51,20 +51,20 @@ sub new
 }
 
 sub printReport
-{	
+{
 	my ($self, $p, $claim) = @_;
 	my $report = new App::Billing::Output::PDF::Report();
 	$report->newPage($p);
 	$self->drawForm($p, $claim, $report);
-	$self->fillData($p, $claim, $report);		
+	$self->fillData($p, $claim, $report);
 	$report->endPage($p);
-}	
+}
 
 sub drawForm
 {
 	my($self, $p, $claim, $report) = @_;
 
-	
+
 	my $mainBoxX = LEFT_MARGIN;
 	my $mainBoxY = TOP_MARGIN - MAIN_BOX_Y;
 
@@ -86,7 +86,7 @@ sub drawForm
 	$self->box15($p, $claim, $mainBoxX, $mainBoxY - 7 * BOX_HEIGHT, $report);
 
 	my $box16Y = $mainBoxY - 8 * BOX_HEIGHT;
-	
+
 	$self->box16($p, $claim, $mainBoxX, $box16Y, $report);
 	$self->box17($p, $claim, $mainBoxX, $box16Y - BOX16_HEIGHT, $report);
 	$self->box18($p, $claim, $mainBoxX, $box16Y - BOX16_HEIGHT - BOX17_HEIGHT, $report);
@@ -127,7 +127,7 @@ sub fillData
 	$self->box15Data($p, $claim, $mainBoxX, $mainBoxY - 7 * BOX_HEIGHT, $report);
 
 	my $box16Y = $mainBoxY - 8 * BOX_HEIGHT;
-	
+
 	$self->box17Data($p, $claim, $mainBoxX, $box16Y - BOX16_HEIGHT, $report);
 	$self->box18Data($p, $claim, $mainBoxX, $box16Y - BOX16_HEIGHT - BOX17_HEIGHT, $report);
 
@@ -136,30 +136,30 @@ sub fillData
 	$self->box19Data($p, $claim, $mainBoxX, $box19Y, $report);
 	$self->box20Data($p, $claim, $mainBoxX, $box19Y - BOX19_HEIGHT, $report);
 	$self->box22Data($p, $claim, $mainBoxX, $box19Y - BOX19_HEIGHT - BOX20_HEIGHT, $report);
-	
+
 }
 
 sub header
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	my $properties = 
-	{	
+	my $properties =
+	{
 		'text' =>"Send To TWCC OFFICE Handling Claim, If known, or",
 		'x' => LEFT_MARGIN,
-		'y' => TOP_MARGIN, 
+		'y' => TOP_MARGIN,
 		'fontWidth' => 8
 	};
 	$report->drawText($p, $properties);
-	$properties = 
-	{	
+	$properties =
+	{
 		'text' =>"TEXAS WORKERS\' COMPENSATION COMMISSION",
 		'x' => LEFT_MARGIN,
 		'y' => TOP_MARGIN - LINE_SPACING,
 		'fontWidth' => 7
 	};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 	{
 		'text' =>"4000 South IH-35, Southfield Building",
@@ -182,7 +182,7 @@ sub header
 	{
 		'text' =>"REPORT OF MEDICAL EVALUATION",
 		'fontName' => BOLD_FONT_NAME,
-		'fontWidth' => 10, 
+		'fontWidth' => 10,
 		'x' => LEFT_MARGIN + HEADING_X,
 		'y' => TOP_MARGIN - HEADING_Y
 	};
@@ -190,12 +190,12 @@ sub header
 
 	my $rightBoxX = LEFT_MARGIN + 312;
 	my $rightBoxY = TOP_MARGIN;
-	
+
 	$properties =
 			{
 			texts =>
 				[
-					{	
+					{
 						'text' =>"TWCC#",
 						'fontWidth' => 7,
 						'x' => $rightBoxX,
@@ -211,7 +211,7 @@ sub header
 
 			lines =>
 				[
-					{	
+					{
 						'x1' => $rightBoxX + 30,
 						'y1' => $rightBoxY - 15,
 						'x2' => $rightBoxX + 30 + 165,
@@ -224,20 +224,20 @@ sub header
 						'x2' => $rightBoxX + 55 + 140,
 						'y2' => $rightBoxY - 25
 					}
-				]					
+				]
 			};
-					
+
 	$report->drawBox($p, $rightBoxX, $rightBoxY, RIGHT_BOX_WIDTH, RIGHT_BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
-	
+
 }
-	
+
 sub box1
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"1. Injured Employee's Name (Last, First, M.I.)",
@@ -251,13 +251,13 @@ sub box1
 }
 
 sub box2
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 
 	my $properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"2. Social Security Number",
@@ -271,13 +271,13 @@ sub box2
 }
 
 sub box3
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	
+
 	my $properties =
 			{
-			texts => 
+			texts =>
 				[
 					{
 						'text' =>"3. Date of Injury",
@@ -290,15 +290,15 @@ sub box3
 	$report->drawBox($p, $x, $y, MAIN_BOX_WIDTH/4, BOX_HEIGHT , NO_LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
 
 }
-	
+
 sub box4
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"4. Injured Employee's Mailing Address (Street or P.O. Box)",
 						'fontWidth' => 7,
@@ -331,13 +331,13 @@ sub box4
 
 
 sub box5
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"5. Phone Number",
 						'fontWidth' => 7,
@@ -357,13 +357,13 @@ sub box5
 
 
 sub box6
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"6. Employer's Business Name",
 						'fontWidth' => 7,
@@ -376,13 +376,13 @@ sub box6
 }
 
 sub box7
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"7. Workers' Compensation Insurance Carrier",
 					'fontWidth' => 7,
@@ -395,13 +395,13 @@ sub box7
 }
 
 sub box8
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"8. Employer's Mailing Address (Street or P.O. Box)",
 						'fontWidth' => 7,
@@ -432,13 +432,13 @@ sub box8
 }
 
 sub box9
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"9. Doctor's Name, Title and Speciality",
 						'fontWidth' => 7,
@@ -451,18 +451,18 @@ sub box9
 }
 
 sub box10
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"10. Date of Visit",
 						'fontWidth' => 7,
 						'x' => $x,
-						'y' => $y 
+						'y' => $y
 					}
 				]
 		};
@@ -470,13 +470,13 @@ sub box10
 }
 
 sub box11
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"11. Doctor's Mailing Address (Street or P.O. Box)",
 						'fontWidth' => 7,
@@ -507,13 +507,13 @@ sub box11
 }
 
 sub box12
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
 		{
 			texts =>
-				[	
+				[
 					{
 						'text' =>"12. Phone Number",
 						'fontWidth' => 7,
@@ -532,13 +532,13 @@ sub box12
 }
 
 sub box13
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"13. Professional License Number",
 					'fontWidth' => 7,
@@ -553,11 +553,11 @@ sub box13
 sub box14
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"14. Diagnosis (ICD-9 Codes)",
 					'fontWidth' => 7,
@@ -583,13 +583,13 @@ sub box14
 }
 
 sub box15
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>"15. Federal Tax Identification No.",
 					'fontWidth' => 7,
@@ -602,13 +602,13 @@ sub box15
 }
 
 sub box16
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "16.  Please attach a narrative history of the employee's medical condition(s) including but not limited to:",
 					'fontWidth' => 7,
@@ -625,19 +625,19 @@ sub box16
 					'text' => "b)  findings of previous examinations, treatments and responses to treatments",
 					'fontWidth' => 7,
 					'x' => $x + 43,
-					'y' => $y - 2 * LINE_SPACING - 2 
+					'y' => $y - 2 * LINE_SPACING - 2
 				},
 				{
 					'text' => "    not previously reported to the insurance carrier and the Commission by the doctor making this report.",
 					'fontWidth' => 7,
 					'x' => $x + 43,
-					'y' => $y - 3 * LINE_SPACING - 2 
+					'y' => $y - 3 * LINE_SPACING - 2
 				},
 				{
 					'text' => "c)  a description of the results of the most recent clinical evaluation of the employee.",
 					'fontWidth' => 7,
 					'x' => $x + 43,
-					'y' => $y - 4 * LINE_SPACING - 2 
+					'y' => $y - 4 * LINE_SPACING - 2
 				}
 			]
 	};
@@ -645,13 +645,13 @@ sub box16
 }
 
 sub box17
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "MAXIMUM MEDICAL IMPROVEMENT",
 					'fontWidth' => 7,
@@ -705,13 +705,13 @@ sub box17
 
 
 sub box18
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "IMPAIRMENT RATING",
 					'fontWidth' => 7,
@@ -761,13 +761,13 @@ sub box18
 
 
 sub boxNotice
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "IMPROTANT NOTICE TO THE INJURED EMPLOYEE AND THE INSURANCE CARRIER:  THE FIRST IMPAIRMENT RATING",
 					'fontWidth' => 9,
@@ -793,13 +793,13 @@ sub boxNotice
 
 
 sub box19
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "19. Doctor Type: (check appropriate block)" . SPC x 100 . "Required Medical Examination Doctor",
 					'fontWidth' => 7,
@@ -852,13 +852,13 @@ sub box19
 
 
 sub box20
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' => "20.  Signature of Doctor __________________________________________________________________      21.  Date of this Report ____________________",
 					'fontWidth' => 7,
@@ -871,13 +871,13 @@ sub box20
 }
 
 sub box22
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		texts =>
-			[	
+			[
 				{
 					'text' =>  "22. A doctor, other than the treating doctor or designated doctor, who certifies maximum medical improvement must send this Report of Medical Evaluation (TWCC-89) to",
 					'fontWidth' => 6.8,
@@ -992,10 +992,10 @@ sub footer
 		'text' =>"TWCC 69  (Rev. 5/94)",
 		'fontWidth' => 7,
 		'x' => $x,
-		'y' => $y 
+		'y' => $y
 	};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 	{
 		'text' =>"Rule 134",
@@ -1042,9 +1042,9 @@ sub boxTopData
 }
 
 sub box1Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{careReceiver}->getLastName . ", " . $claim->{careReceiver}->getFirstName . " " . $claim->{careReceiver}->getMiddleInitial . ".",
@@ -1057,9 +1057,9 @@ sub box1Data
 }
 
 sub box2Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{insured}->[$claim->getClaimType]->getSsn,
@@ -1072,9 +1072,9 @@ sub box2Data
 }
 
 sub box3Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{treatment}->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA),
@@ -1085,9 +1085,9 @@ sub box3Data
 	};
 	$report->drawText($p, $properties);
 }
-	
+
 sub box4Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1099,7 +1099,7 @@ sub box4Data
 		'y' => $y - DATA_TOP_PADDING
 	};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 	{
 		'text' => $claim->{careReceiver}->{address}->getCity,
@@ -1135,7 +1135,7 @@ sub box4Data
 
 
 sub box5Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1151,7 +1151,7 @@ sub box5Data
 
 
 sub box6Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1166,7 +1166,7 @@ sub box6Data
 }
 
 sub box7Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1181,7 +1181,7 @@ sub box7Data
 }
 
 sub box8Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1226,7 +1226,7 @@ sub box8Data
 }
 
 sub box9Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1241,9 +1241,9 @@ sub box9Data
 }
 
 sub box10Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{careReceiver}->getVisitDate,
@@ -1256,7 +1256,7 @@ sub box10Data
 }
 
 sub box11Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1268,7 +1268,7 @@ sub box11Data
 		'y' => $y - DATA_TOP_PADDING
 	};
 	$report->drawText($p, $properties);
-	
+
 	$properties =
 	{
 		'text' => $claim->{renderingProvider}->{address}->getCity,
@@ -1303,7 +1303,7 @@ sub box11Data
 }
 
 sub box12Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	my $properties =
@@ -1318,9 +1318,9 @@ sub box12Data
 }
 
 sub box13Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{renderingProvider}->getProfessionalLicenseNo,
@@ -1335,7 +1335,7 @@ sub box13Data
 sub box14Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $diagCode0 = $claim->{'diagnosis'}->[0]->getDiagnosis if ($claim->{'diagnosis'}->[0] ne "");
 	my $properties =
 	{
@@ -1343,10 +1343,10 @@ sub box14Data
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 55,
-		'y' => $y - 12 
+		'y' => $y - 12
 	};
 	$report->drawText($p, $properties);
-	
+
 	my $diagCode1 = $claim->{'diagnosis'}->[1]->getDiagnosis if ($claim->{'diagnosis'}->[1] ne "");
 	$properties =
 	{
@@ -1354,10 +1354,10 @@ sub box14Data
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 170,
-		'y' => $y - 12 
+		'y' => $y - 12
 	};
 	$report->drawText($p, $properties);
-	
+
 	my $diagCode2 = $claim->{'diagnosis'}->[2]->getDiagnosis if ($claim->{'diagnosis'}->[2] ne "");
 	$properties =
 	{
@@ -1382,12 +1382,12 @@ sub box14Data
 }
 
 sub box15Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
-		'text' => $claim->{payToOrganization}->getFederalTaxId,
+		'text' => $claim->{payToOrganization}->getTaxId,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + DATA_LEFT_PADDING,
@@ -1397,17 +1397,17 @@ sub box15Data
 }
 
 sub box17Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	my $tmp = $claim->{treatment}->getMaximumImprovement();
-	my $textX = "x"; # if ($tmp == 0 or $tmp == 1); 
+	my $textX = "x"; # if ($tmp == 0 or $tmp == 1);
 	my $arrTmp = [27,54];
 	my $arrDateX = [80,310];
 	my $arrDateY = [34,53];
-	
+
 	my $properties =
 	{
-		'text' => $textX, 
+		'text' => $textX,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 7,
@@ -1427,9 +1427,9 @@ sub box17Data
 }
 
 sub box18Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $properties =
 	{
 		'text' => $claim->{treatment}->getImpairmentRating,
@@ -1442,11 +1442,11 @@ sub box18Data
 }
 
 sub box19Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	my $arr1 = [23,102,162];
 	my $arr2 = [295,380];
-	
+
 	my $t1 = $claim->{treatment}->getDoctorType;
 	my $textX = "x" if $t1 ne "";
 	my $properties =
@@ -1458,7 +1458,7 @@ sub box19Data
 		'y' => $y - 14
 	};
 	$report->drawText($p, $properties);
-	
+
 	my $t2 = $claim->{treatment}->getExaminingDoctorType;
 	my $textX2 = "x" if $t2 ne "";
 	$properties =
@@ -1474,7 +1474,7 @@ sub box19Data
 }
 
 sub box20Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
 	$properties =
@@ -1490,9 +1490,9 @@ sub box20Data
 }
 
 sub box22Data
-{	
+{
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	
+
 	my $arrtmp = [280,15];
 	my $t1 = $claim->{treatment}->getMaximumImprovementAgreement;
 	my $textX = "x"; # if ($t1 == 0 or $t1 == 1);
@@ -1544,12 +1544,12 @@ sub box22Data
 sub getDate
 {
 	my($self) = @_;
-	
+
 	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-	
+
 	my $date = localtime();
 	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
 	my @dateStr = ($month, substr(localtime(),8,2), substr(localtime(),20,4));
@@ -1558,7 +1558,7 @@ sub getDate
 
 	$dateStr[1] =~ s/ /0/;
 
-	return $dateStr[2] . "/" . $dateStr[1] . "/" . $dateStr[0];	
+	return $dateStr[2] . "/" . $dateStr[1] . "/" . $dateStr[0];
 }
 
 1;

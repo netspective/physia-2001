@@ -59,12 +59,6 @@ sub formatData
 		$taxId =~ s/-//g;
 		$taxIdType = 'E';
 	}
-	elsif($claimPayToProvider->getFederalTaxId() ne '')
-	{
-		$taxId = $claimPayToProvider->getFederalTaxId();
-		$taxId =~ s/-//g;
-		$taxIdType = 'E';
-	}
 	else
 	{
 		$taxIdType = '';
@@ -88,7 +82,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
-  	  $self->numToStr(9,0,$taxId),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$taxId),  # ne '') ? $claimCareProvider->getTaxId() : $spaces,
 	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($taxIdType,0,1), # taxId Type
 	  $spaces, # reserved filler
@@ -119,7 +113,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()), # batch no
 	  $self->numToStr(6,0,$container->getSequenceNo()),  # batch id
-  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getTaxId() : $spaces,
 	  $spaces, # reserved
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  $spaces, # national provider id
@@ -150,7 +144,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
-  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getTaxId() : $spaces,
 	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  substr((($firstClaim->getFilingIndicator() eq 'P') && ($firstClaim->getSourceOfPayment() eq 'C')) ? $claimPayToProvider->getMedicareId() : $spaces,0,10), # medicare no.
