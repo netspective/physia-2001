@@ -462,12 +462,19 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.emergencyAssociations' => {
 	sqlStmt => qq{
 
-			select 	value_type, item_id, item_name, value_text, value_textb
-			from 	person_attribute
+			select 	value_type, item_id, item_name,
+				(select p.person_id
+					from person p
+						where p.person_id = b.value_text)person_id, value_textb,
+				(select a.value_text
+					from person_attribute a
+						where a.value_int = 0
+						and a.item_id = b.item_id)value_text
+			from 	person_attribute b
 			where	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_EMERGENCY ]}
-			and 	item_name != 'Guarantor'
-			and 	item_name != 'Responsible Party'
+			and 	item_name not in( 'Guarantor', 'Responsible Party')
+
 		},
 				#UNION ALL
 			#					select 0 as value_type, 1 as item_id, 'a' as item_name, value_text as value_text, 'b' as value_textb, person_id
@@ -476,13 +483,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Emergency Contact', dataFmt => '<A HREF ="/person/#3#/profile">#3#</A> (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)' },
+			{ head => 'Emergency Contact', dataFmt => '<A HREF ="/person/#3#/profile">#3#</A>#5# (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)' },
 			#{ colIdx => 2, head => 'Relation', dataFmt => '&{fmt_stripLeadingPath:2}:', dAlign => 'RIGHT' },
 			#{ colIdx => 3, head => 'Name', dataFmt => '#3#', dAlign => 'LEFT' },
 			#{ colIdx => 4, head => 'Phone', dataFmt => '(#4#)', options => PUBLCOLFLAG_DONTWRAP },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-assoc-emergency?home=/#param.arl#' },
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-assoc-contact-emergency?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
@@ -504,7 +511,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-assoc-emergency?home=#param.home#'>Emergency Contact</A> } },
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-assoc-contact-emergency?home=#param.home#'>Emergency Contact</A> } },
 			],
 		},
 		stdIcons =>	{
@@ -522,21 +529,28 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.familyAssociations' => {
 	sqlStmt => qq{
-			select	value_type, item_id, item_name, value_text, value_textb
-			from 	person_attribute
+			select 	value_type, item_id, item_name,
+				(select p.person_id
+					from person p
+						where p.person_id = b.value_text)person_id, value_textb,
+				(select a.value_text
+					from person_attribute a
+						where a.value_int = 0
+						and a.item_id = b.item_id)value_text
+			from 	person_attribute b
 			where	parent_id = ?
 			and	value_type = @{[ App::Universal::ATTRTYPE_FAMILY ]}
 		},
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Family Contact', dataFmt => '<A HREF ="/person/#3#/profile">#3#</A> (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)' },
+			{ head => 'Family Contact', dataFmt => '<A HREF ="/person/#3#/profile">#3#</A>#5# (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>)' },
 			#{ colIdx => 2, head => 'Relation', dataFmt => '&{fmt_stripLeadingPath:2}:', dAlign => 'RIGHT' },
 			#{ colIdx => 3, head => 'Name', dataFmt => '#3#', dAlign => 'LEFT'},
 			#{ colIdx => 4, head => 'Phone', dataFmt => '(#4#)', options => PUBLCOLFLAG_DONTWRAP },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-assoc-family?home=/#param.arl#' },
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-assoc-contact-family?home=/#param.arl#' },
 
 	},
 	publishDefn_panel =>
@@ -559,7 +573,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-assoc-family?home=#param.home#'>Family Contact</A> } },
+				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-assoc-contact-family?home=#param.home#'>Family Contact</A> } },
 			],
 			icons => { data => [ { imgSrc => '/resources/icons/square-lgray-sm.gif' } ] },
 		},
