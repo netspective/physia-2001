@@ -313,7 +313,7 @@ sub hidden_as_html
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $fieldName = $page->fieldPName($self->{name});
-	return "<input type='hidden' name='$fieldName' value='" . $page->field($self->{name}) . "'>";
+	return qq{<input type="hidden" name="$fieldName" value="$page->field($self->{name})">};
 }
 
 sub separator_as_html
@@ -550,7 +550,7 @@ sub select_as_html
 		foreach (@{$choices})
 		{
 			next if ! $_->[0];
-			$html .= "<input type='hidden' name='$fieldName' value='$value'>";
+			$html .= qq{<input type='hidden' name='$fieldName' value="$value">};
 			push(@captions, $_->[1]);
 		}
 		$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, join($self->{choiceReadOnlyDelim}, @captions));
@@ -656,11 +656,11 @@ sub getHtml
 		{
 			my $javaScript = $self->generateJavaScript($page);
 			my $onFocus = $self->{hint} ? " onFocus='clearField(this)'" : '';
-			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, "<input name='$fieldName' type=$self->{type} value='$value' size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>");
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<input name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
 		}
 		else
 		{
-			$html = "<input type='hidden' name='$fieldName' value='$value'>";
+			$html = qq{<input type='hidden' name='$fieldName' value="$value">};
 			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
 		}
 	}
@@ -1255,7 +1255,7 @@ sub getHtml
 		my $activeAction = $page->param(NEXTACTION_PARAMNAME);
 		foreach(@$actionsList)
 		{
-			push(@nextActions, qq{ <OPTION VALUE='$_->[1]' @{[ $activeAction ? ($activeAction eq $_->[1] ? 'SELECTED' : '') : ($_->[2] ? 'SELECTED' : '') ]}>$_->[0]</OPTION> });
+			push(@nextActions, qq{ <OPTION VALUE="$_->[1]" @{[ $activeAction ? ($activeAction eq $_->[1] ? ' SELECTED' : '') : ($_->[2] ? ' SELECTED' : '') ]}>$_->[0]</OPTION> });
 		}
 	}
 	my $nextActions = @nextActions ? qq{ <FONT FACE=Arial,Helvetica SIZE=2 STYLE="font-size:8pt; font-family: tahoma,arial"><B>Next Action:</B> </FONT><SELECT NAME='_f_nextaction_redirecturl' style='font-size:8pt; font-family: tahoma,arial,helvetica'>@{[ join('', @nextActions) ]}</SELECT> } : '';
@@ -2094,10 +2094,10 @@ sub getHtml
 	{
 		my $refererFieldName = $page->fieldPName(FIELDNAME_REFERER);
 		my $actualReferer = $page->referer();
-		push(@dlgHouskeepingHiddens, "<input type='hidden' name='$refererFieldName' value='$actualReferer'>");
+		push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$refererFieldName" value="$actualReferer">});
 	}
 	my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
-	push(@dlgHouskeepingHiddens, "<input type='hidden' name='$execModeFieldName' value='$newExecMode'>");
+	push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$execModeFieldName" value="$newExecMode">});
 
 	my $formAction = "/" . $page->param('arl');
 	$formAction =~ s/\?.*$//;
