@@ -24,6 +24,6 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
-ALL mail -s "[CVS Alert-commit] %{sv}" cvsalert-commit@physia.com
+ALL mail -s "[CVS Alert-commit] %{sv}" cvsalert-commit@physia.com; echo "\n\n***\n*** DON'T FORGET TO UPDATE YOUR RELEASE NOTES\n***\n\n"
 ^HealthSuite (date; cat; (sleep 2; cd /u/vusr_auto/projects/HealthSuite; umask 002; /usr/bin/cvs -wq update -d) &) >>$CVSROOT/CVSROOT/updatelog 2>&1
 ^Framework (date; cat; (sleep 2; cd /u/vusr_auto/projects/Framework; umask 002; /usr/bin/cvs -wq update -d) &) >>$CVSROOT/CVSROOT/updatelog 2>&1
