@@ -9,6 +9,7 @@ use Date::Manip;
 use DBI::StatementManager;
 use App::Universal;
 use App::Statements::Component;
+my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_REFERRAL $STMTRPTDEFN_WORKLIST $STMTRPTDEFN_AUTH_WORKLIST
@@ -43,12 +44,13 @@ $STMTRPTDEFN_AUTH_WORKLIST =
 	columnDefn =>
 	[
 		{colIdx => 0, head => 'Service Request ID ', dAlign => 'left'},
-		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#7#"},
+		{colIdx => 1, head => 'Referral ID', dAlign => 'left', url => "#8#"},
 		{colIdx => 2, head => 'Follow Up Date ', dAlign => 'left'},
 		{colIdx => 3, head => 'SSN', dAlign => 'left'},
 		{colIdx => 4, head => 'Last Name', dAlign => 'left'},
 		{colIdx => 5, head => 'First Name', dAlign => 'left'},
-		{colIdx => 6, head => 'Follow Up', hAlign => 'left'},
+		{colIdx => 6, head => 'Service', hAlign => 'left'},
+		{colIdx => 7, head => 'Follow Up', hAlign => 'left'},
 	],
 };
 
@@ -59,41 +61,45 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		from person where person_id = ?
 	},
 	'sel_referrals_open' => qq{
-		select
-			t.trans_id as referral_id,
-			t.initiator_id as org_id,
-			t.consult_id as patient,
-			aa.value_int as claim_number,
-			t.trans_substatus_reason as requested_service,
-			--%simpleDate:trans_end_stamp%,
-			decode(to_char(t.trans_end_stamp, 'YYYY'),
-			to_char(sysdate, 'YYYY'),
-			to_char(t.trans_end_stamp, 'Mon DD'),
-			to_char(t.trans_end_stamp, 'MM/DD/YY')) as trans_end_stamp,
-			NVL((select tt.trans_id from transaction tt where tt.trans_type = 6010 and tt.parent_trans_id = t.trans_id
-				and rownum < 2 and t.trans_status = 2), t.trans_id) as trans_id_mod,
-			t.trans_subtype as intake_coordinator,
-			t.trans_substatus_reason as ref_status,
-			p.ssn as ssn
-		from transaction t, trans_attribute aa, person p, person_org_category po
-		where
-		t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
-		and t.trans_substatus_reason in ('Assigned', 'Unassigned')
-		and aa.parent_id = t.trans_id
-		and aa.item_name = 'Referral Insurance'
-		and t.consult_id = p.person_id
-		and po.person_id = p.person_id
+		select *
+		from (
+			select
+				t.trans_id as referral_id,
+				t.initiator_id as org_id,
+				t.consult_id as patient,
+				aa.value_int as claim_number,
+				t.trans_substatus_reason as requested_service,
+				--%simpleDate:trans_end_stamp%,
+				decode(to_char(t.trans_end_stamp, 'YYYY'),
+				to_char(sysdate, 'YYYY'),
+				to_char(t.trans_end_stamp, 'Mon DD'),
+				to_char(t.trans_end_stamp, 'MM/DD/YY')) as trans_end_stamp,
+				NVL((select tt.trans_id from transaction tt where tt.trans_type = 6010 and tt.parent_trans_id = t.trans_id
+					and rownum < 2 and t.trans_status = 2), t.trans_id) as trans_id_mod,
+				t.trans_subtype as intake_coordinator,
+				t.trans_substatus_reason as ref_status,
+				p.ssn as ssn
+			from transaction t, trans_attribute aa, person p, person_org_category po
+			where
+			t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL]}
+			and t.trans_substatus_reason in ('Assigned', 'Unassigned')
+			and aa.parent_id = t.trans_id
+			and aa.item_name = 'Referral Insurance'
+			and t.consult_id = p.person_id
+			and po.person_id = p.person_id
 
-		and po.org_internal_id = ?
-		and exists
-				(
-					select tn.trans_id
-					from transaction tn, transaction tp
-					where tp.parent_trans_id = t.trans_id
-					and   tn.parent_trans_id = tp.trans_id
-					and   (tn.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or tn.trans_status_reason IS NULL)
-				)
-		order by t.trans_id DESC
+			and po.org_internal_id = ?
+			and exists
+					(
+						select tn.trans_id
+						from transaction tn, transaction tp
+						where tp.parent_trans_id = t.trans_id
+						and   tn.parent_trans_id = tp.trans_id
+						and   (tn.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or tn.trans_status_reason IS NULL)
+					)
+			order by t.trans_id DESC
+			)
+			where rownum <= $LIMIT
 	},
 
 	'sel_referrals_physician' => qq{
@@ -125,59 +131,75 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 				where parent_id = ? and value_type = $ATTRITYPE_RESOURCE_PERSON and item_name = 'WorkList'))
 			)
 		)
+		and rownum <= $LIMIT
 		order by trans_id DESC
 	},
 
 	'sel_referral_authorization' => qq{
-		SELECT
-			(SELECT parent_trans_id FROM transaction WHERE trans_id = t.parent_trans_id) as referral_id,
-			trans_id as intake_id,
-			 data_date_a as review_date,
-			 consult_id as patient,
-			 (
-			 	SELECT r.caption
-			 	FROM referral_followup_status r
-				WHERE r.id=t.trans_status_reason
-				) AS follow_up,
-		         initiator_id as org_id,
-		         p.ssn as ssn,
-		         p.name_last as last_name,
-		         p.name_first as first_name
-		FROM     transaction t, person p, person_org_category po
-		WHERE    t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
-		AND      t.consult_id = p.person_id
-		AND      po.person_id = p.person_id
-		AND      po.org_internal_id = ?
-		AND 		(t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or t.trans_status_reason IS NULL)
-		ORDER BY trans_id DESC
-	},
+		SELECT *
+		FROM (
+			SELECT
+				(SELECT parent_trans_id FROM transaction WHERE trans_id = t.parent_trans_id) as referral_id,
+				trans_id as intake_id,
+				 data_date_a as review_date,
+				 consult_id as patient,
+				 (
+					SELECT r.caption
+					FROM referral_followup_status r
+					WHERE r.id=t.trans_status_reason
+					) AS follow_up,
+						initiator_id as org_id,
+						p.ssn as ssn,
+						p.name_last as last_name,
+						p.name_first as first_name,
+						(
+							SELECT caption
+							FROM   referral_service_descr rs
+							WHERE rs.id = t.caption
+						) AS service
+			FROM     transaction t, person p, person_org_category po
+			WHERE    t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
+			AND      t.consult_id = p.person_id
+			AND      po.person_id = p.person_id
+			AND      po.org_internal_id = ?
+			AND 		(t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or t.trans_status_reason IS NULL)
+			ORDER BY trans_id DESC
+		)
+		WHERE rownum <= $LIMIT
+		},
 
-	'sel_referral_authorization_user' => qq{
-		SELECT
-			parent_trans_id as referral_id,
-			trans_id as intake_id,
-			data_date_a as review_date,
-			consult_id as patient,
-			consult_id as patient,
-			 (
-				SELECT r.caption
-				FROM referral_followup_status r
-				WHERE r.id=t.trans_status_reason) AS follow_up,
-		        initiator_id as org_id,
-		        p.ssn as ssn,
-		        p.name_last as last_name,
-		        p.name_first as first_name
-		FROM    transaction t, person p, person_org_category po
-		WHERE   t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
-		AND 	care_provider_id  = ?
-		AND     t.consult_id = p.person_id
-		AND 	po.person_id = p.person_id
-		AND     po.org_internal_id = ?
-		AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
-		ORDER BY trans_id DESC
-	},
-
-
+		'sel_referral_authorization_user' => qq{
+			SELECT *
+			FROM (
+				SELECT
+					parent_trans_id as referral_id,
+					trans_id as intake_id,
+					data_date_a as review_date,
+					consult_id as patient,
+					 (
+						SELECT r.caption
+						FROM referral_followup_status r
+						WHERE r.id=t.trans_status_reason) AS follow_up,
+						  initiator_id as org_id,
+						  p.ssn as ssn,
+						  p.name_last as last_name,
+						  p.name_first as first_name,
+						  (
+								SELECT caption
+								FROM   referral_service_descr rs
+							WHERE rs.id = t.caption
+							) AS service
+				FROM    transaction t, person p, person_org_category po
+				WHERE   t.trans_type = @{[App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION]}
+				AND 	care_provider_id  = ?
+				AND     t.consult_id = p.person_id
+				AND 	po.person_id = p.person_id
+				AND     po.org_internal_id = ?
+				AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
+				ORDER BY trans_id DESC
+				)
+				WHERE rownum <= $LIMIT
+			},
 );
 
 1;
