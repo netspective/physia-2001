@@ -406,17 +406,17 @@ sub prepare_view_home
 	#DEMO CODE
 	my $categories = $self->session('categories');
 	my $selectedDate = 'today' ;
-	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');	
+	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 	$self->param('timeDate',$fmtDate);
 	#DEMO CODE
-	#######################################################	
+	#######################################################
 	my $pageHome;
 	#If user is a Physicina and the user id is TSAMO then show Physicianm home page
 	#Currently this is only for DEMO
-	if ($CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO && grep {$_ eq 'Physician'} @$categories  )	
+	if ($CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO && grep {$_ eq 'Physician'} @$categories  )
 	{
                 $pageHome =qq
-                {               
+                {
         		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
         		<SCRIPT>
 			function updatePage(selectedDate)
@@ -430,9 +430,9 @@ sub prepare_view_home
                	 	<TR VALIGN=TOP>
                	 	 <TD>
                	 	        #component.stp-person.scheduleAppts#</BR>
-               	 	        #component.stp-person.inPatient#<BR>                        
-               	 	        #component.lookup-records#<BR>   
-		
+               	 	        #component.stp-person.inPatient#<BR>
+               	 	        #component.lookup-records#<BR>
+
                  	</TD>
                  	<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
                  	<TD>
@@ -444,14 +444,14 @@ sub prepare_view_home
                  	<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
                  	<TD>
                  	       #component.stp-person.linkMedicalSite#<BR>
-                 	       #component.stp-person.linkNonMedicalSite#<BR>                                         	
+                 	       #component.stp-person.linkNonMedicalSite#<BR>
                  	       #component.news-top#<BR>
                  	       #component.news-health#<BR>
                 	</TD>
                 	</TR>
                 	</TABLE>
-                }	
-        } 
+                }
+        }
         else
         {
 		$pageHome = qq
@@ -523,11 +523,11 @@ sub prepare_view_facesheet
 {
 	my ($self) = @_;
 
-	my $personId = $self->param('person_id');	
+	my $personId = $self->param('person_id');
 	my $accountInfo = $STMTMGR_WORKLIST_COLLECTION->recordExists($self, STMTMGRFLAG_NONE, 'selInColl', $personId) ? '<font color=red>(Account in Collection)</font>' : '';
 	my $content = qq{
 		<center><h2>Patient Profile Summary</h2></center>
-		
+
 		<p align=right>
 			@{[ UnixDate('today', '%g') ]}<br>
 			#session.user_id#
@@ -575,9 +575,9 @@ sub prepare_view_facesheet
 			</TR>
 		</TABLE>
 	};
-	
+
 	$self->replaceVars(\$content);
-	
+
 	# strip all of the images because we don't want them linked
 	#
 	$content =~ s!<A.*?><IMG.*action-(add|edit).*?></A>!!g;
@@ -687,7 +687,8 @@ sub prepare_view_chart
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.surgicalProcedures#<BR>
-					#component.stp-person.testsAndMeasurements#
+					#component.stp-person.testsAndMeasurements#<BR>
+					#component.stp-person.bloodGroup#<BR>
 					</font>
 				</TD>
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
