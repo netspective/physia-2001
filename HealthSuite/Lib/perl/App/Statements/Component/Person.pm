@@ -184,7 +184,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.miscNotes' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text
+			select 	value_type, item_id, parent_id, item_name, value_text, value_date
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'
@@ -195,9 +195,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [		
-			{ dataFmt => 'Misc Notes: #4#' },
+			{ dataFmt => 'Misc Notes (#5#): #4#' },
 		],	
-		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
