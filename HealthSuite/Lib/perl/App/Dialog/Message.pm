@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.6 2000-12-26 15:49:42 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.7 2000-12-28 20:19:31 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -36,6 +36,7 @@ sub new
 			maxLength => 255,
 			findPopupAppendValue => ',',
 			options => FLDFLAG_REQUIRED,
+			type => 'not_an_identifier',
 	);
 	$toField->clearFlag(FLDFLAG_IDENTIFIER);
 
@@ -45,6 +46,7 @@ sub new
 			size => 40,
 			maxLength => 255,
 			findPopupAppendValue => ',',
+			type => 'not_an_identifier',
 	);
 	$ccField->clearFlag(FLDFLAG_IDENTIFIER);
 
@@ -260,7 +262,7 @@ sub execute
 		$messageData->{'cc'} = $page->field('cc') unless defined $messageData->{'cc'};
 		$messageData->{'rePatient'} = $page->field('patient_id') unless defined $messageData->{'rePatient'};
 		$messageData->{'deliverRecords'} = $page->field('deliver_records') ? 1 : 0 unless defined $messageData->{'deliverRecords'};
-		$messageData->{'docDestIds'} = $messageData->{'to'} . ', ' . $messageData->{'cc'};
+
 		$self->sendMessage($page, %$messageData);
 	}
 	else
@@ -290,7 +292,7 @@ sub sendMessage
 	my $page = shift;
 	my %messageData = @_;
 
-	my $docDestIds = join(', ', split(/\s*,\s*/, $messageData{'docDestIds'}));
+	my $docDestIds = join(', ', split(/\s*,\s*/, $messageData{'to'} . ', ' . $messageData{'cc'}));
 
 	my $messageId = $self->saveMessage($page, \%messageData,
 		doc_mime_type => 'text/plain',
@@ -421,7 +423,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.6 2000-12-26 15:49:42 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.7 2000-12-28 20:19:31 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
