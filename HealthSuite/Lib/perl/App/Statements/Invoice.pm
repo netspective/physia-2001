@@ -326,7 +326,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice_attribute
 		where parent_id = ?
 			and item_name = 'Invoice/History/Item'
-		order by value_date desc, cr_stamp desc
+		order by cr_stamp desc
 		},
 	'selAdjTypeCaption' => q{
 		select caption
