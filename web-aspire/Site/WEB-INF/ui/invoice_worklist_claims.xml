@@ -5,7 +5,36 @@
 		<dialog name="reckdate_claims_wl_invoice" heading="reckdate_claims_wl_invoice">
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.text caption="User ID" read-only="yes" name="user_id"/>
-			<field.date caption="Reck Date" max-length="10" name="reck_date" size="10"/>
+			<field.scheduling.date name="reck_date" caption="Reck Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Reck Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3600
+				formatValue => CODE(0x8617e70)
+				hint => 
+				hints => 
+				lengthInvalidMsg => Reck Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => reck_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				options => 16
+				popup => HASH(0xba14e14)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Reck Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Reck Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 			<field.memo caption="Comments" name="comments" size="24"/>
 			<field.text hidden="yes" name="owner_id" caption="owner_id"/>
 
@@ -23,7 +52,36 @@
 			<field.text caption="Date" read-only="yes" name="date"/>
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.text caption="Transfer From" read-only="yes" name="user_id"/>
-			<field.text caption="Transfer To" required="yes" hint="Collector to Transfer Account" max-length="16" name="responsible_id" size="16"/>
+			<field.person.id name="responsible_id" caption="Transfer To"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-
+				addPopupControlField => _f_person_id
+				caption => Transfer To
+				findPopup => /lookup/associate/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => Collector to Transfer Account
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Transfer To is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => responsible_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xc022e14)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Transfer To is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba6974c)
+			-->
 			<field.memo caption="Reason For Transfer" name="comments" size="24"/>
 
 		</dialog>

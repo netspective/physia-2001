@@ -9,9 +9,94 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<!-- Unimplemented field type=not_an_identifier -->
-			<!-- Unimplemented field type=not_an_identifier -->
-			<field.text caption="Regarding Patient"  max-length="16" name="patient_id" size="16"/>
+			<field.person.id name="to" caption="To"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => NONE
+				addPopupControlField => _f_person_id
+				caption => To
+				findPopup => /lookup/person/id
+				findPopupAppendValue => ,
+				flags => 528
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => To is too long (can be at most 255 characters).
+				maxLength => 255
+				message => 
+				name => to
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba4ed38)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => To is required (can not be blank).
+				size => 40
+				type => not_an_identifier
+			-->
+			<field.person.id name="cc" caption="CC"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => NONE
+				addPopupControlField => _f_person_id
+				caption => CC
+				findPopup => /lookup/person/id
+				findPopupAppendValue => ,
+				flags => 512
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => CC is too long (can be at most 255 characters).
+				maxLength => 255
+				message => 
+				name => cc
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba3ed14)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => CC is required (can not be blank).
+				size => 40
+				type => not_an_identifier
+			-->
+			<field.person.id name="patient_id" caption="Regarding Patient"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Regarding Patient
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Regarding Patient is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => patient_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc00030c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Regarding Patient is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba6fe00)
+			-->
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
 			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
@@ -33,7 +118,30 @@
 			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.text  max-length="-1" name="existing_notes"/>
+			<field.message.notes name="existing_notes" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => 
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg =>  is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => existing_notes
+				onKeyPressJS => return processKeypress_default(event)
+				popup => HASH(0xc024e08)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg =>  is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
 			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
 
@@ -46,9 +154,94 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<!-- Unimplemented field type=not_an_identifier -->
-			<!-- Unimplemented field type=not_an_identifier -->
-			<field.text caption="Regarding Patient"  max-length="16" name="patient_id" size="16"/>
+			<field.person.id name="to" caption="To"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => NONE
+				addPopupControlField => _f_person_id
+				caption => To
+				findPopup => /lookup/person/id
+				findPopupAppendValue => ,
+				flags => 528
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => To is too long (can be at most 255 characters).
+				maxLength => 255
+				message => 
+				name => to
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba687d4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => To is required (can not be blank).
+				size => 40
+				type => not_an_identifier
+			-->
+			<field.person.id name="cc" caption="CC"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => NONE
+				addPopupControlField => _f_person_id
+				caption => CC
+				findPopup => /lookup/person/id
+				findPopupAppendValue => ,
+				flags => 512
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => CC is too long (can be at most 255 characters).
+				maxLength => 255
+				message => 
+				name => cc
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc00aa58)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => CC is required (can not be blank).
+				size => 40
+				type => not_an_identifier
+			-->
+			<field.person.id name="patient_id" caption="Regarding Patient"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Regarding Patient
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Regarding Patient is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => patient_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc024e50)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Regarding Patient is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba138f8)
+			-->
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
 			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
@@ -68,7 +261,30 @@
 			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.text  max-length="-1" name="existing_notes"/>
+			<field.message.notes name="existing_notes" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => 
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg =>  is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => existing_notes
+				onKeyPressJS => return processKeypress_default(event)
+				popup => HASH(0xba7843c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg =>  is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
 			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
 

@@ -1,6 +1,42 @@
 <?xml version="1.0"?>
 
 <xaf>
+	<register-field tag-name="field.address" class="dialog.field.UnitedStatesAddressField"/>
+	<register-field tag-name="field.allinvoices" class="dialog.field.AllInvoicesField"/>
+	<register-field tag-name="field.association" class="dialog.field.AssociationField"/>
+	<register-field tag-name="field.attribute.name" class="dialog.field.attribute.NameField"/>
+	<register-field tag-name="field.batchdateid" class="dialog.field.BatchDateIDField"/>
+	<register-field tag-name="field.catalog.id" class="dialog.field.catalog.IDField"/>
+	<register-field tag-name="field.catalog.id.new" class="dialog.field.catalog.id.NewField"/>
+	<register-field tag-name="field.diagnoses" class="dialog.field.DiagnosesField"/>
+	<register-field tag-name="field.diagnosescheckbox" class="dialog.field.DiagnosesCheckboxField"/>
+	<register-field tag-name="field.feeschedulematrix" class="dialog.field.FeeScheduleMatrixField"/>
+	<register-field tag-name="field.insurance.plan" class="dialog.field.insurance.PlanField"/>
+	<register-field tag-name="field.insurance.plan.new" class="dialog.field.insurance.plan.NewField"/>
+	<register-field tag-name="field.insurance.product" class="dialog.field.insurance.ProductField"/>
+	<register-field tag-name="field.insurance.product.new" class="dialog.field.insurance.product.NewField"/>
+	<register-field tag-name="field.invoiceitems" class="dialog.field.InvoiceItemsField"/>
+	<register-field tag-name="field.multiorg.id" class="dialog.field.multiorg.IDField"/>
+	<register-field tag-name="field.multiperson.id" class="dialog.field.multiperson.IDField"/>
+	<register-field tag-name="field.organization.id" class="dialog.field.organization.IDField"/>
+	<register-field tag-name="field.organization.id.new" class="dialog.field.organization.id.NewField"/>
+	<register-field tag-name="field.outstandinginvoices" class="dialog.field.OutstandingInvoicesField"/>
+	<register-field tag-name="field.outstandingitems" class="dialog.field.OutstandingItemsField"/>
+	<register-field tag-name="field.person.id" class="dialog.field.person.IDField"/>
+	<register-field tag-name="field.person.id.new" class="dialog.field.person.id.NewField"/>
+	<register-field tag-name="field.person.name" class="dialog.field.person.NameField"/>
+	<register-field tag-name="field.procedurechargeunits" class="dialog.field.ProcedureChargeUnitsField"/>
+	<register-field tag-name="field.procedureline" class="dialog.field.ProcedureLineField"/>
+	<register-field tag-name="field.procedures" class="dialog.field.ProceduresField"/>
+	<register-field tag-name="field.refundinvoices" class="dialog.field.RefundInvoicesField"/>
+	<register-field tag-name="field.rovingresource" class="dialog.field.RovingResourceField"/>
+	<register-field tag-name="field.scheduling.ampm" class="dialog.field.scheduling.AMPMField"/>
+	<register-field tag-name="field.scheduling.date" class="dialog.field.scheduling.DateField"/>
+	<register-field tag-name="field.scheduling.datetimeonly" class="dialog.field.scheduling.DateTimeOnlyField"/>
+	<register-field tag-name="field.scheduling.datetimeplus" class="dialog.field.scheduling.DateTimePlusField"/>
+	<register-field tag-name="field.scheduling.minutes" class="dialog.field.scheduling.MinutesField"/>
+	<register-field tag-name="field.twcc60" class="dialog.field.TWCC60Field"/>
+	<register-field tag-name="field.message.notes" class="dialog.field.message.NotesField"/>
 	<include file="app.xml"/>
 	<include file="admin.xml"/>
 	<include file="association.xml"/>

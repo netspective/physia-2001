@@ -3,7 +3,36 @@
 <xaf>
 	<dialogs package="invoice_worklist_collection">
 		<dialog name="close_collection" heading="Close Invoice Collection">
-			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.person.id name="person_id" caption="Person ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Person ID
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 548
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 36
+				popup => HASH(0xba4083c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Person ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xb9f49a0)
+			-->
 			<field.text caption="Invoice" read-only="yes" name="invoice_id"/>
 			<field.select caption="notes"  name="notes" choices="Retain Notes=0;Delete Notes=1" style="radio"/>
 			<!--  -->
@@ -11,7 +40,36 @@
 		</dialog>
 
 		<dialog name="collection_reck_date" heading="Collection Reck Date">
-			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.person.id name="person_id" caption="Person ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Person ID
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 548
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 36
+				popup => HASH(0xba46d2c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Person ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba6fcd4)
+			-->
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.date caption="Reck Date" name="reckdate" size="12"/>
 

@@ -4,8 +4,67 @@
 	<dialogs package="verify">
 		<dialog name="insurance_records" heading="insurance_records">
 			<field.text hidden="yes" name="event_id" caption="event_id"/>
-			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
-			<field.date caption="Effective Date" max-length="10" name="effective_begin_date" size="10"/>
+			<field.person.id name="person_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 548
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 36
+				popup => HASH(0xc024e08)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 25
+				type => text
+				types => ARRAY(0xc0002d0)
+			-->
+			<field.scheduling.date name="effective_begin_date" caption="Effective Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Effective Date
+				defaultValue => 
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3600
+				formatValue => CODE(0x8617e70)
+				futureOnly => 0
+				hint => 
+				hints => 
+				lengthInvalidMsg => Effective Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => effective_begin_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				options => 16
+				popup => HASH(0xc039014)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Effective Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Effective Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 			<field.composite caption="*"  name="text_field">
 				<field.currency caption="Deductible"  name="deductible" size="10"/>
 				<field.currency caption="Met To-Date"  name="deductible_met" size="10"/>
@@ -18,7 +77,36 @@
 			</field.composite>
 			<field.boolean caption="Separate Co-pay for Lab/X-Ray"  name="sep_copay_xray" style="check"/>
 			<field.text caption="Lab"  name="lab" size="40"/>
-			<field.text caption="PCP ID"  max-length="16" name="provider_id" size="25"/>
+			<field.person.id name="provider_id" caption="PCP ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => PCP ID
+				findPopup => /lookup/physician-ref/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => PCP ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => provider_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc02af18)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => PCP ID is required (can not be blank).
+				size => 25
+				type => text
+				types => ARRAY(0xc024f58)
+			-->
 			<field.text caption="Coverage Required"  name="coverage_req" size="40"/>
 			<field.text caption="Coverage On the Following"  name="coverage_on" size="40"/>
 			<field.boolean caption="Referral or Pre-Cert on Out Patient"  name="referral_or_precert" style="check"/>
@@ -38,8 +126,68 @@
 			<field.text caption="Fertility Testing"  name="fertility_test" size="40"/>
 			<field.text caption="Circumcisions"  name="circumcision" size="40"/>
 			<field.text caption="Ins Rep Name"  name="ins_rep_name" size="40"/>
-			<field.text caption="Verified By" required="yes" max-length="16" name="ins_verified_by" size="20"/>
-			<field.date caption="Verify Date" max-length="10" name="ins_verify_date" size="10"/>
+			<field.person.id name="ins_verified_by" caption="Verified By"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Staff
+				addPopupControlField => _f_person_id
+				caption => Verified By
+				findPopup => /lookup/associate/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Verified By is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => ins_verified_by
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba59f7c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Verified By is required (can not be blank).
+				size => 20
+				type => text
+				types => ARRAY(0xba295fc)
+				useShortForm => 1
+			-->
+			<field.scheduling.date name="ins_verify_date" caption="Verify Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Verify Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3600
+				formatValue => CODE(0x8617e70)
+				futureOnly => 0
+				hint => 
+				hints => 
+				lengthInvalidMsg => Verify Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => ins_verify_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				options => 16
+				popup => HASH(0xc026570)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Verify Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Verify Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 			<field.select caption="Verification" required="yes" name="verification" choices="Complete=2, Partial=1" style="radio"/>
 			<!--  -->
 
@@ -47,17 +195,195 @@
 
 		<dialog name="medical" heading="medical">
 			<field.text hidden="yes" name="event_id" caption="event_id"/>
-			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
-			<field.text caption="Verified By" required="yes" max-length="16" name="med_verified_by" size="20"/>
-			<field.date caption="Verify Date" max-length="10" name="med_verify_date" size="10"/>
+			<field.person.id name="person_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 548
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 36
+				popup => HASH(0xba4d558)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 25
+				type => text
+				types => ARRAY(0xc02ed30)
+			-->
+			<field.person.id name="med_verified_by" caption="Verified By"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Staff
+				addPopupControlField => _f_person_id
+				caption => Verified By
+				findPopup => /lookup/associate/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Verified By is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => med_verified_by
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xc036950)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Verified By is required (can not be blank).
+				size => 20
+				type => text
+				types => ARRAY(0xc02b170)
+				useShortForm => 1
+			-->
+			<field.scheduling.date name="med_verify_date" caption="Verify Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Verify Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3600
+				formatValue => CODE(0x8617e70)
+				futureOnly => 0
+				hint => 
+				hints => 
+				lengthInvalidMsg => Verify Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => med_verify_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				options => 16
+				popup => HASH(0xc021f9c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Verify Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Verify Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 
 		</dialog>
 
 		<dialog name="personal_records" heading="personal_records">
 			<field.text hidden="yes" name="event_id" caption="event_id"/>
-			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
-			<field.text caption="Verified By" required="yes" max-length="16" name="per_verified_by" size="20"/>
-			<field.date caption="Verify Date" max-length="10" name="per_verify_date" size="10"/>
+			<field.person.id name="person_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 548
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 36
+				popup => HASH(0xba74b4c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 25
+				type => text
+				types => ARRAY(0xba4ab44)
+			-->
+			<field.person.id name="per_verified_by" caption="Verified By"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Staff
+				addPopupControlField => _f_person_id
+				caption => Verified By
+				findPopup => /lookup/associate/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Verified By is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => per_verified_by
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xc02b098)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Verified By is required (can not be blank).
+				size => 20
+				type => text
+				types => ARRAY(0xc028a90)
+				useShortForm => 1
+			-->
+			<field.scheduling.date name="per_verify_date" caption="Verify Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Verify Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3600
+				formatValue => CODE(0x8617e70)
+				futureOnly => 0
+				hint => 
+				hints => 
+				lengthInvalidMsg => Verify Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => per_verify_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				options => 16
+				popup => HASH(0xba6e6bc)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Verify Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Verify Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 
 		</dialog>
 

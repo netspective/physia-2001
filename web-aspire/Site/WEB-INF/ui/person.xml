@@ -3,7 +3,33 @@
 <xaf>
 	<dialogs package="person">
 		<dialog name="physician" heading="$Command Physician/Provider">
-			<field.text caption="Physician/Provider ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.person.id.new name="person_id" caption="Physician/Provider ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Physician/Provider ID
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 552
+				hint => 
+				hints => To use the ID autosuggestion feature, leave this field blank
+				lengthInvalidMsg => Physician/Provider ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc0266a8)
+				postHtml => &lt;a href="
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Physician/Provider ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
 			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
@@ -19,7 +45,36 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Doctor to bill for this provider
+				findPopup => /lookup/physician/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Doctor to bill for this provider is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => bill_provider
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc0241c4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba63168)
+			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
 				<field.text caption="Code"  name="job_code"/>
@@ -29,12 +84,32 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.composite caption="*"  name="person_id">
-				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
-				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
-				<field.text caption="Middle Name"  name="name_middle" size="8"/>
-				<field.text caption="Suffix"  name="name_suffix" size="16"/>
-			</field.composite>
+			<field.person.name name="person_id" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => person_id
+				fields => ARRAY(0xc02503c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 294912
+				hint => 
+				hints => 
+				lengthInvalidMsg => person_id is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_default(event)
+				options => 32768
+				popup => HASH(0xc024dfc)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => person_id is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.boolean caption="Add record"  name="create_record" style="check"/>
 			<field.composite caption="*"  name="ssndatemf">
 				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
@@ -54,12 +129,63 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
-			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.person.id name="party_name" caption="Responsible Party"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Guarantor
+				addPopupControlField => _f_person_id
+				caption => Responsible Party
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Responsible Party is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => party_name
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc02c070)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Responsible Party is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xc024134)
+			-->
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Relationship To Responsible Party/Other Relationship Name
+				fields => ARRAY(0xc02bf38)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => Relationship To Responsible Party/Other Relationship Name is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xc02d760)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Relationship To Responsible Party/Other Relationship Name is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.composite caption="Driver's License Number/State"  name="license_num_state">
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
@@ -75,13 +201,35 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.composite caption="Home Address" required="yes" name="address">
-				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
-				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
-				<field.text caption="Zip"  name="addr_zip"/>
-			</field.composite>
+			<field.address name="address" caption="Home Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Home Address
+				fields => ARRAY(0xc03668c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 530
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Home Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => address
+				namePrefix => addr_
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xc039308)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Home Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.email caption="Email"  max-length="1024" name="email"/>
 			<field.text hidden="yes" name="phy_type_item_id" caption="phy_type_item_id"/>
 			<field.separator heading="License ID Numbers" name="id_numbers_section"/>
@@ -390,7 +538,36 @@
 				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs"/>
 				<!--  -->
 			</field.composite>
-			<field.date caption="Effective Date" max-length="10" name="billing_effective_date" size="10"/>
+			<field.scheduling.date name="billing_effective_date" caption="Effective Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Effective Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3586
+				formatValue => CODE(0x8617e70)
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Effective Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => billing_effective_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				popup => HASH(0xc0d1ee8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Effective Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Effective Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 			<field.separator heading="Certification/Accreditations" name="cert_for_physician"/>
 			<field.composite caption="1. Specialty/Sequence"  name="specialty1">
 				<field.select caption="1. Specialty" prepend-blank="yes" name="specialty_code" choices="query:person.selMedicalSpeciality"/>
@@ -438,7 +615,33 @@
 		</dialog>
 
 		<dialog name="nurse" heading="$Command Nurse">
-			<field.text caption="Nurse ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.person.id.new name="person_id" caption="Nurse ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Nurse ID
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 552
+				hint => 
+				hints => To use the ID autosuggestion feature, leave this field blank
+				lengthInvalidMsg => Nurse ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc022008)
+				postHtml => &lt;a href="
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Nurse ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
 			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
@@ -454,7 +657,36 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Doctor to bill for this provider
+				findPopup => /lookup/physician/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Doctor to bill for this provider is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => bill_provider
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba453b4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xac09b28)
+			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
 				<field.text caption="Code"  name="job_code"/>
@@ -464,12 +696,32 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.composite caption="*"  name="person_id">
-				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
-				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
-				<field.text caption="Middle Name"  name="name_middle" size="8"/>
-				<field.text caption="Suffix"  name="name_suffix" size="16"/>
-			</field.composite>
+			<field.person.name name="person_id" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => person_id
+				fields => ARRAY(0xac099d8)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 294912
+				hint => 
+				hints => 
+				lengthInvalidMsg => person_id is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_default(event)
+				options => 32768
+				popup => HASH(0xac098f4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => person_id is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.boolean caption="Add record"  name="create_record" style="check"/>
 			<field.composite caption="*"  name="ssndatemf">
 				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
@@ -489,12 +741,63 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
-			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.person.id name="party_name" caption="Responsible Party"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Guarantor
+				addPopupControlField => _f_person_id
+				caption => Responsible Party
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Responsible Party is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => party_name
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc039008)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Responsible Party is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xc02d790)
+			-->
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Relationship To Responsible Party/Other Relationship Name
+				fields => ARRAY(0xc034fd8)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => Relationship To Responsible Party/Other Relationship Name is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xc0391b8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Relationship To Responsible Party/Other Relationship Name is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.composite caption="Driver's License Number/State"  name="license_num_state">
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
@@ -510,13 +813,35 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.composite caption="Home Address" required="yes" name="address">
-				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
-				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
-				<field.text caption="Zip"  name="addr_zip"/>
-			</field.composite>
+			<field.address name="address" caption="Home Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Home Address
+				fields => ARRAY(0xc00a9e0)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 530
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Home Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => address
+				namePrefix => addr_
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xc03b97c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Home Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.email caption="Email"  max-length="1024" name="email"/>
 			<field.text hidden="yes" name="nurse_title_item_id" caption="nurse_title_item_id"/>
 			<field.separator heading="Certification" name="cert_for_nurse"/>
@@ -551,7 +876,33 @@
 		</dialog>
 
 		<dialog name="staff" heading="$Command Staff Member">
-			<field.text caption="Staff ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.person.id.new name="person_id" caption="Staff ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Staff ID
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 552
+				hint => 
+				hints => To use the ID autosuggestion feature, leave this field blank
+				lengthInvalidMsg => Staff ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba5633c)
+				postHtml => &lt;a href="
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Staff ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
 			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
@@ -567,7 +918,36 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Doctor to bill for this provider
+				findPopup => /lookup/physician/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Doctor to bill for this provider is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => bill_provider
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc027648)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xc00a8cc)
+			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
 				<field.text caption="Code"  name="job_code"/>
@@ -577,12 +957,32 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.composite caption="*"  name="person_id">
-				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
-				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
-				<field.text caption="Middle Name"  name="name_middle" size="8"/>
-				<field.text caption="Suffix"  name="name_suffix" size="16"/>
-			</field.composite>
+			<field.person.name name="person_id" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => person_id
+				fields => ARRAY(0xc0273fc)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 294912
+				hint => 
+				hints => 
+				lengthInvalidMsg => person_id is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_default(event)
+				options => 32768
+				popup => HASH(0xc030078)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => person_id is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.boolean caption="Add record"  name="create_record" style="check"/>
 			<field.composite caption="*"  name="ssndatemf">
 				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
@@ -602,12 +1002,63 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
-			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.person.id name="party_name" caption="Responsible Party"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Guarantor
+				addPopupControlField => _f_person_id
+				caption => Responsible Party
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Responsible Party is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => party_name
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc034cc0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Responsible Party is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba22c90)
+			-->
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Relationship To Responsible Party/Other Relationship Name
+				fields => ARRAY(0xc02eef8)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => Relationship To Responsible Party/Other Relationship Name is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xc0390e0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Relationship To Responsible Party/Other Relationship Name is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.composite caption="Driver's License Number/State"  name="license_num_state">
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
@@ -623,13 +1074,35 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.composite caption="Home Address" required="yes" name="address">
-				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
-				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
-				<field.text caption="Zip"  name="addr_zip"/>
-			</field.composite>
+			<field.address name="address" caption="Home Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Home Address
+				fields => ARRAY(0xc02b110)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 530
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Home Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => address
+				namePrefix => addr_
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba2439c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Home Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.email caption="Email"  max-length="1024" name="email"/>
 			<field.composite caption="Employee ID/Exp Date"  name="text_field">
 				<field.text caption="Employee ID"  name="emp_id"/>
@@ -661,7 +1134,34 @@
 
 		<dialog name="patient" heading="$Command Patient/Person">
 			<field.text hidden="yes" name="resp_self" caption="resp_self"/>
-			<field.text caption="Patient/Person ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.person.id.new name="person_id" caption="Patient/Person ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Patient/Person ID
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 552
+				hint => 
+				hints => To use the ID autosuggestion feature, leave this field blank
+				lengthInvalidMsg => Patient/Person ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba6e800)
+				postHtml => &lt;a href="
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient/Person ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba5633c)
+			-->
 			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
 			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
@@ -677,7 +1177,36 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Doctor to bill for this provider
+				findPopup => /lookup/physician/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Doctor to bill for this provider is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => bill_provider
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba49504)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba69704)
+			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
 				<field.text caption="Code"  name="job_code"/>
@@ -687,12 +1216,32 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.composite caption="*"  name="person_id">
-				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
-				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
-				<field.text caption="Middle Name"  name="name_middle" size="8"/>
-				<field.text caption="Suffix"  name="name_suffix" size="16"/>
-			</field.composite>
+			<field.person.name name="person_id" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => person_id
+				fields => ARRAY(0xc02306c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 294912
+				hint => 
+				hints => 
+				lengthInvalidMsg => person_id is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_default(event)
+				options => 32768
+				popup => HASH(0xba684a4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => person_id is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.boolean caption="Add record"  name="create_record" style="check"/>
 			<field.composite caption="*"  name="ssndatemf">
 				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
@@ -712,12 +1261,63 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
-			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.person.id name="party_name" caption="Responsible Party"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Guarantor
+				addPopupControlField => _f_person_id
+				caption => Responsible Party
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Responsible Party is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => party_name
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba139d0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Responsible Party is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba6e6bc)
+			-->
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Relationship To Responsible Party/Other Relationship Name
+				fields => ARRAY(0xc0369e0)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => Relationship To Responsible Party/Other Relationship Name is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba7744c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Relationship To Responsible Party/Other Relationship Name is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.composite caption="Driver's License Number/State"  name="license_num_state">
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
@@ -733,16 +1333,66 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.composite caption="Home Address" required="yes" name="address">
-				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
-				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
-				<field.text caption="Zip"  name="addr_zip"/>
-			</field.composite>
+			<field.address name="address" caption="Home Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Home Address
+				fields => ARRAY(0xc03db38)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 530
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Home Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => address
+				namePrefix => addr_
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xb9f1638)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Home Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.email caption="Email"  max-length="1024" name="email"/>
 			<field.separator heading="Employment" name="occup_heading"/>
-			<field.text caption="Employer ID"  max-length="16" name="rel_id" size="16"/>
+			<field.organization.id name="rel_id" caption="Employer ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-org-employer
+				addPopupControlField => _f_org_id
+				addType => employer
+				caption => Employer ID
+				findPopup => /lookup/org/id
+				findPopupAppendValue => 
+				flags => 546
+				hint => 
+				hints => 
+				invisibleWhen => 1024
+				lengthInvalidMsg => Employer ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => rel_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc02b200)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Employer ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.select caption="Employment Status"  name="value_type" choices="query:person.selEmpStatus"/>
 			<!--  -->
 			<field.text caption="Occupation"  name="occupation"/>
@@ -754,7 +1404,36 @@
 			</field.composite>
 			<field.separator heading="Care Provider" name="text_field"/>
 			<field.composite caption="*"  name="care_specialty">
-				<field.text caption="Care Provider ID"  max-length="16" name="care_provider" size="16"/>
+				<field.person.id name="care_provider" caption="Care Provider ID"/>
+				<!-- Total Field contents:
+					_spacerWidth => 0
+					addPopup => /org/#session.org_id#/dlg-add-Physician
+					addPopupControlField => _f_person_id
+					caption => Care Provider ID
+					findPopup => /lookup/physician-ref/id
+					findPopupAppendValue => 
+					flags => 544
+					hint => 
+					hints => 
+					idEntryStyle => 0
+					incSimpleName => 1
+					lengthInvalidMsg => Care Provider ID is too long (can be at most 16 characters).
+					maxLength => 16
+					message => 
+					name => care_provider
+					onKeyPressJS => return processKeypress_identifier(event)
+					options => 32
+					popup => HASH(0xc03c9bc)
+					postHtml => 
+					preHtml => 
+					priKey => 0
+					readOnly => 0
+					regExpInvalidMsg => 
+					requiredInvalidMsg => Care Provider ID is required (can not be blank).
+					size => 16
+					type => text
+					types => ARRAY(0xba3642c)
+				-->
 				<field.select caption="Specialty" prepend-blank="yes" name="specialty" choices="query:person.selMedicalSpeciality"/>
 				<!--  -->
 			</field.composite>

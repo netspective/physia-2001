@@ -4,22 +4,100 @@
 	<dialogs package="attr_association">
 		<dialog name="assoc_contact_family" heading="$Command Family Contact">
 			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
-			<field.text caption="Person ID"  hint="Please provide an existing Person ID. A link will be created between the patient and contact." max-length="16" name="rel_id" size="16"/>
+			<field.person.id name="rel_id" caption="Person ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-patient
+				addPopupControlField => _f_person_id
+				addType => patient
+				caption => Person ID
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => Please provide an existing Person ID. A link will be created between the patient and contact.
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => rel_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba43eac)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Person ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
 			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
 			<field.separator heading="Contact Information" name="contact_heading"/>
-			<field.composite caption="*" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.association name="relation" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => relation
+				fields => ARRAY(0xba36904)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 262160
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => relation is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba455e8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => relation is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
 			<field.date caption="Begin Date" name="begin_date" size="12"/>
 
 		</dialog>
 
 		<dialog name="assoc_employment" heading="$Command Employment">
-			<field.text caption="Employer ID"  max-length="16" name="rel_id" size="16"/>
+			<field.organization.id name="rel_id" caption="Employer ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-org-employer
+				addPopupControlField => _f_org_id
+				addType => employer
+				caption => Employer ID
+				findPopup => /lookup/org/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				lengthInvalidMsg => Employer ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => rel_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba4845c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Employer ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.select caption="Employment Status"  name="value_type" choices="query:person.selEmpStatus"/>
 			<!--  -->
 			<field.text caption="Occupation"  name="rel_type"/>
@@ -33,22 +111,102 @@
 
 		<dialog name="assoc_contact_emergency" heading="$Command Emergency Contact">
 			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
-			<field.text caption="Person ID"  hint="Please provide an existing Person ID. A link will be created between the patient and contact." max-length="16" name="rel_id" size="16"/>
+			<field.person.id name="rel_id" caption="Person ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-patient
+				addPopupControlField => _f_person_id
+				addType => patient
+				caption => Person ID
+				findPopup => /lookup/person/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => Please provide an existing Person ID. A link will be created between the patient and contact.
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => rel_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba2445c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Person ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
 			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
 			<field.separator heading="Contact Information" name="contact_heading"/>
-			<field.composite caption="*" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
-				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
-				<!--  -->
-				<field.text caption="Other"  name="other_rel_type"/>
-			</field.composite>
+			<field.association name="relation" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => relation
+				fields => ARRAY(0xba0eca0)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 262160
+				hint => 
+				hints => Select an existing relationship type or select 'Other' and fill in the 'Other' field
+				lengthInvalidMsg => relation is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => relation
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xb9f47f0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => relation is required (can not be blank).
+				size => 24
+				type => text
+			-->
 			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
 			<field.date caption="Begin Date" name="begin_date" size="12"/>
 
 		</dialog>
 
 		<dialog name="assoc_provider" heading="$Command Care Provider">
-			<field.text caption="Physician/Provider ID" required="yes" hint="Please provide an existing Person ID." max-length="16" name="value_text" size="16"/>
+			<field.person.id name="value_text" caption="Physician/Provider ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Physician/Provider ID
+				findPopup => /lookup/physician-ref/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => Please provide an existing Person ID.
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Physician/Provider ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => value_text
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba3a054)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Physician/Provider ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba36b2c)
+			-->
 			<field.boolean caption="Is Primary Physician?"  hint="Please check the check-box if the Physician is Primary Physician " name="value_int" style="check"/>
 			<field.select caption="Specialty"  name="value_textb" choices="query:person.selMedicalSpeciality"/>
 			<!--  -->

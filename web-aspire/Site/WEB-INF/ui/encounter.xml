@@ -39,11 +39,64 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
-				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
-				<field.date caption="Batch Date" name="batch_date" size="12"/>
-			</field.composite>
-			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Batch ID Date
+				fields => ARRAY(0xba4ee1c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Batch ID Date is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => batch_fields
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				orgInternalIdFieldName => service_facility_id
+				popup => HASH(0xba4fe1c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Batch ID Date is required (can not be blank).
+				size => 24
+				type => text
+			-->
+			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => attendee_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba58ca4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba2c0e0)
+			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
 			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
@@ -84,7 +137,36 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
+				addPopupControlField => _f_person_id
+				caption => Referring Physician ID
+				findPopup => /lookup/referring-Doctor/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Referring Physician ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => ref_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xc0001a4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba7753c)
+			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
 				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
@@ -105,7 +187,34 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<!-- Unimplemented field type=procedures -->
+			<field.procedures name="procedures_list" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				allowComments => 1
+				allowQuickRef => 0
+				caption => procedures_list
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 262144
+				hint => 
+				hints => 
+				lengthInvalidMsg => procedures_list is too long (can be at most 1024 characters).
+				lineCount => 6
+				maxLength => 1024
+				message => 
+				name => procedures_list
+				onKeyPressJS => return processKeypress_default(event)
+				popup => HASH(0xba26fb0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => procedures_list is required (can not be blank).
+				size => 24
+				type => procedures
+			-->
 
 		</dialog>
 
@@ -146,11 +255,64 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
-				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
-				<field.date caption="Batch Date" name="batch_date" size="12"/>
-			</field.composite>
-			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Batch ID Date
+				fields => ARRAY(0xba606ac)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Batch ID Date is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => batch_fields
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				orgInternalIdFieldName => service_facility_id
+				popup => HASH(0xba604cc)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Batch ID Date is required (can not be blank).
+				size => 24
+				type => text
+			-->
+			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => attendee_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba65b6c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xb9f19ec)
+			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
 			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
@@ -191,7 +353,36 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
+				addPopupControlField => _f_person_id
+				caption => Referring Physician ID
+				findPopup => /lookup/referring-Doctor/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Referring Physician ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => ref_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba58d10)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba0fde0)
+			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
 				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
@@ -212,7 +403,34 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<!-- Unimplemented field type=procedures -->
+			<field.procedures name="procedures_list" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				allowComments => 1
+				allowQuickRef => 0
+				caption => procedures_list
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 262144
+				hint => 
+				hints => 
+				lengthInvalidMsg => procedures_list is too long (can be at most 1024 characters).
+				lineCount => 6
+				maxLength => 1024
+				message => 
+				name => procedures_list
+				onKeyPressJS => return processKeypress_default(event)
+				popup => HASH(0xba37438)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => procedures_list is required (can not be blank).
+				size => 24
+				type => procedures
+			-->
 
 		</dialog>
 
@@ -253,11 +471,64 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
-				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
-				<field.date caption="Batch Date" name="batch_date" size="12"/>
-			</field.composite>
-			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Batch ID Date
+				fields => ARRAY(0xba75a9c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Batch ID Date is too long (can be at most -1 characters).
+				maxLength => -1
+				message => 
+				name => batch_fields
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				orgInternalIdFieldName => service_facility_id
+				popup => HASH(0xba78124)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Batch ID Date is required (can not be blank).
+				size => 24
+				type => text
+			-->
+			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Patient
+				addPopupControlField => _f_person_id
+				caption => Patient ID
+				findPopup => /lookup/patient/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => attendee_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xc000384)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Patient ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba1ca74)
+			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
 			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
@@ -298,7 +569,36 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
+				addPopupControlField => _f_person_id
+				caption => Referring Physician ID
+				findPopup => /lookup/referring-Doctor/id
+				findPopupAppendValue => 
+				flags => 544
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 1
+				lengthInvalidMsg => Referring Physician ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => ref_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 32
+				popup => HASH(0xba66bf4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xba36b68)
+			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
 				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
@@ -319,7 +619,34 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<!-- Unimplemented field type=procedures -->
+			<field.procedures name="procedures_list" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				allowComments => 1
+				allowQuickRef => 0
+				caption => procedures_list
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 262144
+				hint => 
+				hints => 
+				lengthInvalidMsg => procedures_list is too long (can be at most 1024 characters).
+				lineCount => 6
+				maxLength => 1024
+				message => 
+				name => procedures_list
+				onKeyPressJS => return processKeypress_default(event)
+				popup => HASH(0xba6ac94)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => procedures_list is required (can not be blank).
+				size => 24
+				type => procedures
+			-->
 
 		</dialog>
 

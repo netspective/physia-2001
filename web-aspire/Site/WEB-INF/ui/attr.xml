@@ -3,13 +3,71 @@
 <xaf>
 	<dialogs package="attr">
 		<dialog name="contact_orginternet" heading="$Command URL">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba1c774)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="employment_salinfo" heading="$Command Salary Information">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba1a0c8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
@@ -29,19 +87,135 @@
 		</dialog>
 
 		<dialog name="billinginfo" heading="$Command Electronic Billing Information">
-			<field.text caption="Physician ID" required="yes" max-length="16" name="person_id" size="16"/>
-			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.person.id name="person_id" caption="Physician ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-Physician
+				addPopupControlField => _f_person_id
+				caption => Physician ID
+				findPopup => /lookup/physician/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				idEntryStyle => 0
+				incSimpleName => 0
+				lengthInvalidMsg => Physician ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => person_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xb9e8e64)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Physician ID is required (can not be blank).
+				size => 16
+				type => text
+				types => ARRAY(0xb9d23b0)
+			-->
+			<field.organization.id name="org_id" caption="Organization ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-org-main
+				addPopupControlField => _f_org_id
+				caption => Organization ID
+				findPopup => /lookup/org/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				lengthInvalidMsg => Organization ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => org_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba44098)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Organization ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.select caption="Clearing House"  name="billing_id_type" choices="Per-Se=0; THINet=2; Other=3"/>
 			<!--  -->
 			<field.text caption="Billing ID" required="yes" name="billing_id" size="16"/>
-			<field.date caption="Effective Date" max-length="10" name="billing_effective_date" size="10"/>
+			<field.scheduling.date name="billing_effective_date" caption="Effective Date"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Effective Date
+				defaultValue => 11/09/2001
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 3584
+				formatValue => CODE(0x8617e70)
+				hint => 
+				hints => 
+				lengthInvalidMsg => Effective Date is too long (can be at most 10 characters).
+				maxLength => 10
+				message => 
+				name => billing_effective_date
+				onBlurJS => validateChange_Date(event)
+				onKeyPressJS => return processKeypress_default(event)
+				onValidate => CODE(0x8617a50)
+				popup => HASH(0xc008fb4)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => Effective Date has an invalid date (format is 'MM/DD/YYYY').
+				requiredInvalidMsg => Effective Date is required (can not be blank).
+				size => 10
+				type => date
+			-->
 			<field.boolean caption="Process Live Claims"  name="billing_active" style="check"/>
 
 		</dialog>
 
 		<dialog name="credential" heading="$Command Credentils">
-			<field.select caption="ID Caption" required="yes" name="value_textb" choices=";Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#;Railroad Medicare#"/>
-			<!--  -->
+			<field.attribute.name name="value_textb" caption="ID Caption"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.value_textb#
+				caption => ID Caption
+				choiceDelim => ;
+				choiceReadOnlyDelim => , 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => 
+				lengthInvalidMsg => ID Caption is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => value_textb
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba25710)
+				postHtml => 
+				preHtml => 
+				priKey => 1
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => ID Caption is required (can not be blank).
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				selOptions => ;Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#;Railroad Medicare#
+				size => 1
+				style => combo
+				type => select
+				valueDelim => :
+				valueType => 
+			-->
 			<field.text caption="ID Number" required="yes" name="value_text"/>
 
 		</dialog>
@@ -54,13 +228,34 @@
 
 		<dialog name="address_org" heading="$Command Address">
 			<field.text caption="Name"  name="address_name"/>
-			<field.composite caption="Address" required="yes" name="text_field">
-				<field.text caption="Address (Line 1)"  max-length="128" name="line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="city" size="16"/>
-				<field.text caption="State"  max-length="2" name="state" size="2"/>
-				<field.text caption="Zip"  name="zip"/>
-			</field.composite>
+			<field.address name="text_field" caption="Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Address
+				fields => ARRAY(0xba5551c)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => 
+				lengthInvalidMsg => Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => text_field
+				namePrefix => 
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xb9d7ee0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 
 		</dialog>
 
@@ -74,13 +269,71 @@
 		</dialog>
 
 		<dialog name="contact_orgfax" heading="$Command Fax">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xc0016e8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="contact_orgbilling" heading="$Command Billing Contact">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba40680)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
@@ -100,56 +353,283 @@
 		</dialog>
 
 		<dialog name="person_additional" heading="$Command Additional Data">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba05460)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="contact_personpager" heading="$Command Pager">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba4059c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="address_person" heading="$Command Address">
 			<field.text caption="Name"  name="address_name"/>
-			<field.composite caption="Address" required="yes" name="text_field">
-				<field.text caption="Address (Line 1)"  max-length="128" name="line1" size="36"/>
-				<field.text caption="Address (Line 2)"  max-length="128" name="line2" size="36"/>
-				<field.text caption="City"  max-length="64" name="city" size="16"/>
-				<field.text caption="State"  max-length="2" name="state" size="2"/>
-				<field.text caption="Zip"  name="zip"/>
-			</field.composite>
+			<field.address name="text_field" caption="Address"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				caption => Address
+				fields => ARRAY(0xb9d2260)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 528
+				hint => 
+				hints => 
+				lengthInvalidMsg => Address is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => text_field
+				namePrefix => 
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xb9f3378)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Address is required (can not be blank).
+				size => 24
+				type => text
+			-->
 
 		</dialog>
 
 		<dialog name="contact_orgphone" heading="$Command Telephone">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba3b688)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="benefit_other" heading="$Command Other Benefit">
-			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="Caption"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => Caption
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Caption is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xb9f3330)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Caption is required (can not be blank).
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text caption="Value" required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="contact_orgemail" heading="$Command E-mail">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba43f0c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="benefit_retirement" heading="$Command Retirement Benefit">
-			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="Caption"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => Caption
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Caption is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba36a84)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Caption is required (can not be blank).
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text caption="Value" required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="preventivecare" heading="$Command Measure">
 			<field.text hidden="yes" name="cpt_name" caption="cpt_name"/>
-			<field.text caption="Problem" required="yes" name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="Problem"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => Problem
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Problem is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba18958)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Problem is required (can not be blank).
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text caption="Measure" required="yes" name="value_text"/>
 			<field.composite caption="Measure Frequency/Number Of Times"  name="text_field">
 				<field.select caption="Frequency"  name="frequency" choices=" = 0;Weekly=1;Monthly=2;Annually=3"/>
@@ -180,13 +660,71 @@
 		</dialog>
 
 		<dialog name="contact_personfax" heading="$Command Fax">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba455dc)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="contact_personphone" heading="$Command Telephone">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba126c0)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
@@ -199,7 +737,37 @@
 		</dialog>
 
 		<dialog name="benefit_insurance" heading="$Command Insurance Benefit">
-			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="Caption"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => Caption
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 536
+				hint => 
+				hints => 
+				lengthInvalidMsg => Caption is too long (can be at most 1024 characters).
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 16
+				popup => HASH(0xba4848c)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				readOnlyWhen => 1024
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Caption is required (can not be blank).
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text caption="Value" required="yes" name="value_text"/>
 
 		</dialog>
@@ -211,7 +779,36 @@
 		</dialog>
 
 		<dialog name="contact_personemail" heading="$Command E-mail">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xb9d69c8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
@@ -231,19 +828,103 @@
 		</dialog>
 
 		<dialog name="contact_personinternet" heading="$Command URL">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xba3b688)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="employment_empinfo" heading="$Command Employment Information">
-			<field.text  name="attr_name"/>
+			<field.attribute.name name="attr_name" caption="*"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => 
+				attrNameFmt => #field.attr_name#
+				caption => 
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				findPopup => 
+				findPopupAppendValue => 
+				flags => 512
+				hint => 
+				hints => 
+				lengthInvalidMsg => 
+				maxLength => 1024
+				message => 
+				name => attr_name
+				onKeyPressJS => return processKeypress_default(event)
+				options => 0
+				popup => HASH(0xb9f3234)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => 
+				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
+				size => 24
+				type => text
+				valueType => 
+			-->
 			<field.text required="yes" name="value_text"/>
 
 		</dialog>
 
 		<dialog name="office_location" heading="$Command Office Location">
-			<field.text caption="Location Org ID" required="yes" max-length="16" name="value_text" size="16"/>
+			<field.organization.id name="value_text" caption="Location Org ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-org-main
+				addPopupControlField => _f_org_id
+				caption => Location Org ID
+				findPopup => /lookup/org/id
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				lengthInvalidMsg => Location Org ID is too long (can be at most 16 characters).
+				maxLength => 16
+				message => 
+				name => value_text
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xb9d22a8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Location Org ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 			<field.text caption="Office/Room/Suite#"  name="value_textb" size="7"/>
 			<field.boolean caption="Default"  name="value_int" style="check"/>
 

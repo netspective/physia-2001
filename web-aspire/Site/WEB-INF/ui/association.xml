@@ -6,7 +6,33 @@
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Organization ID" read-only="yes" name="parent_id"/>
 			<field.text hidden="yes" name="value_int" caption="value_int"/>
-			<field.text caption="Fee Schedule ID" required="yes" max-length="32" name="catalog_id" size="16"/>
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-catalog
+				addPopupControlField => _f_catalog_id
+				caption => Fee Schedule ID
+				findPopup => /lookup/catalog
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				lengthInvalidMsg => Fee Schedule ID is too long (can be at most 32 characters).
+				maxLength => 32
+				message => 
+				name => catalog_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba53904)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Fee Schedule ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 
 		</dialog>
 
@@ -14,7 +40,33 @@
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Organization ID" read-only="yes" name="parent_id"/>
 			<field.text hidden="yes" name="value_int" caption="value_int"/>
-			<field.text caption="Fee Schedule ID" required="yes" max-length="32" name="catalog_id" size="16"/>
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+			<!-- Total Field contents:
+				_spacerWidth => 0
+				addPopup => /org/#session.org_id#/dlg-add-catalog
+				addPopupControlField => _f_catalog_id
+				caption => Fee Schedule ID
+				findPopup => /lookup/catalog
+				findPopupAppendValue => 
+				flags => 560
+				hint => 
+				hints => 
+				lengthInvalidMsg => Fee Schedule ID is too long (can be at most 32 characters).
+				maxLength => 32
+				message => 
+				name => catalog_id
+				onKeyPressJS => return processKeypress_identifier(event)
+				options => 48
+				popup => HASH(0xba407b8)
+				postHtml => 
+				preHtml => 
+				priKey => 0
+				readOnly => 0
+				regExpInvalidMsg => 
+				requiredInvalidMsg => Fee Schedule ID is required (can not be blank).
+				size => 16
+				type => text
+			-->
 
 		</dialog>
 
