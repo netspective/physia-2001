@@ -897,6 +897,10 @@ sub hasPermission
 		{
 			return 1 if $self->{permissions}->member($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_LISTINDEX]);
 		}
+		else
+		{
+			$self->addError("Permission '$_' does not exist in the ACL.");
+		}
 	}
 
 	return 0;
