@@ -398,6 +398,7 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 		<deliverable id="1903">
 			First dose and ongoing fields added to prescription dialog.
 			Reopened: Fixed fields as specified.
+			Reopened: Fixed dialog.
 		</deliverable>
 
 		<deliverable id="1905">
