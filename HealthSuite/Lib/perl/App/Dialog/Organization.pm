@@ -9,6 +9,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::Insurance;
 use App::Dialog::Field::Address;
+use App::Dialog::Field::Scheduling;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
@@ -280,7 +281,6 @@ sub initialize
 	if ($self->{orgtype} eq 'main')
 	{
 		$self->addContent(
-
 			new CGI::Dialog::MultiField(
 				fields => [
 					new CGI::Dialog::Field(caption => 'Clearing House',
@@ -293,15 +293,9 @@ sub initialize
 						name => 'org_billing_id',
 						size => 16,
 					),
-					new CGI::Dialog::Field(caption => 'Effective Date',
+					new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
 						name => 'org_billing_effective_date',
 						type => 'date',
-					),
-
-					new CGI::Dialog::Field(caption => 'Active',
-						name => 'org_billing_active',
-						type => 'bool',
-						style => 'check',
 					),
 				],
 			),
@@ -573,16 +567,19 @@ sub populateData
 	$page->field('business_hours', $businessAttribute->{value_text});
 	$page->field('business_hrs_id', $businessAttribute->{item_id});
 
-	my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-		App::Universal::ATTRTYPE_BILLING_INFO
-	);
+	if ($self->{orgtype} eq 'main')
+	{
+		my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
+			App::Universal::ATTRTYPE_BILLING_INFO
+		);
 
-	$page->field('org_billing_id_type', $clearHouseData->{value_int});
-	$page->field('org_billing_id', $clearHouseData->{value_text});
-	$page->field('org_billing_active', $clearHouseData->{value_intb});
-	$page->field('org_billing_effective_date', $clearHouseData->{value_date});
-	$page->field('org_billing_item_id', $clearHouseData->{item_id});
+		$page->field('org_billing_id_type', $clearHouseData->{value_int});
+		$page->field('org_billing_id', $clearHouseData->{value_text});
+
+		$page->field('org_billing_effective_date', $clearHouseData->{value_date});
+		$page->field('org_billing_item_id', $clearHouseData->{item_id});
+	}
 
 	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Area Served',
@@ -853,15 +850,15 @@ sub execute_add
 
 	$page->schemaAction(
 		'Org_Attribute', $command,
+		item_id => undef,
 		parent_id => $orgIntId,
 		item_name => 'Organization Default Clearing House ID',
 		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 		value_text => $page->field('org_billing_id') || undef,
-		value_intB => ($page->field('org_billing_active') ? 1 : 0),
 		value_int => $page->field('org_billing_id_type') || undef,
 		value_date => $page->field('org_billing_effective_date') || undef,
 		_debug => 0
-	) if ($page->field ('org_billing_item_id') eq '');
+	) if ($self->{orgtype} eq 'main');
 
 	$page->schemaAction(
 			'Org_Address', $command,
@@ -983,19 +980,17 @@ sub execute_update
 			_debug => 0
 		);
 
-	my $clearHouseCommand = $page->field('org_billing_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-		'Org_Attribute', $clearHouseCommand,
+		'Org_Attribute', 'update',
 		parent_id => $orgIntId,
 		item_id => $page->field('org_billing_item_id'),
 		item_name => 'Organization Default Clearing House ID',
 		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 		value_text => $page->field('org_billing_id') || undef,
-		value_intB => ($page->field('org_billing_active') ? 1 : 0),
 		value_int => $page->field('org_billing_id_type') || undef,
 		value_date => $page->field('org_billing_effective_date') || undef,
 		_debug => 0
-	) unless ($page->field('org_billing_item_id') eq '');
+	) if $page->field('org_billing_item_id') && ($self->{orgtype} eq 'main');
 
 		my $areaCommand = $page->field('area_served_id') eq '' ? 'add' : $command;
 		$page->schemaAction(
