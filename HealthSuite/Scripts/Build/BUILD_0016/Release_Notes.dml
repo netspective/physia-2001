@@ -50,6 +50,21 @@
 		<deliverable id="893">
 			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
 		</deliverable>
+		
+		<deliverable id="1368">
+			Created text-based reports for "Receipt analysis, Aged insurance and pt receivables,
+			revenue and collection, DAR, MAR and under Billing Section of reporting the Claims status."
+			These are currently in production.
+		</deliverable>
+
+		<deliverable id="1419">
+			Created text-based reports for the details of MAR and DAR.
+			These are currently in production.
+		</deliverable>
+
+		<deliverable id="1437">
+			Reversed the sender and recipient on phone messages.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
