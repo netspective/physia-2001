@@ -9,6 +9,7 @@ use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
 use App::Statements::Person;
+use App::Statements::Catalog;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
@@ -205,7 +206,7 @@ sub _importContactMethods
 		$self->itemMissingMsg($flags, 'No contactmethods found.');
 		return;
 	}
-
+	my $parentNewId = $parentId;
 	my $attrTable = "$parentTblPrefix\_Attribute";
 	my $addrTable = "$parentTblPrefix\_Address";
 	unless($parentId)
@@ -220,10 +221,9 @@ sub _importContactMethods
 		foreach my $item (@$list)
 		{
 			my $type = $PHONE_TYPE_MAP{$item->{type} || 'voice'};
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
+
 			$self->schemaAction($flags, $attrTable, 'add',
-				parent_id => $parentId,
+				parent_id => $parentNewId,
 				item_name => $parentTblPrefix ne "Insurance" ? "$item->{name}" : "Contact Method/$type/$item->{name}",
 				value_type => $type eq 'Telephone' ? App::Universal::ATTRTYPE_PHONE : App::Universal::ATTRTYPE_FAX,
 				value_textB => $item->{name},
@@ -239,7 +239,7 @@ sub _importContactMethods
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, $attrTable, 'add',
-				parent_id => $parentId,
+				parent_id => $parentNewId,
 				item_name => $parentTblPrefix ne "Insurance" ? "$item->{name}" : "Contact Method/Email/$item->{name}",
 				value_type => App::Universal::ATTRTYPE_EMAIL,
 				value_textB => $item->{name},
@@ -255,7 +255,7 @@ sub _importContactMethods
 				#my $dv = new Dumpvalue;
 				#$dv->dumpValue($item);
 				$self->schemaAction($flags, $attrTable, 'add',
-					parent_id => $parentId,
+					parent_id => $parentNewId,
 					item_name => $parentTblPrefix ne "Insurance" ? "$item->{name}" : "Contact Method/Internet/$item->{name}",
 					value_type => App::Universal::ATTRTYPE_URL,
 					value_textB => $item->{name},
@@ -272,7 +272,7 @@ sub _importContactMethods
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, $addrTable, 'add',
 				address_name => $item->{name},
-				parent_id => $parentId,
+				parent_id => $parentNewId,
 				line1 => $item->{street},
 				line2 => exists $item->{street2} ? $item->{street2} : undef,
 				city => $item->{city},
@@ -285,9 +285,18 @@ sub _importContactMethods
 
 sub importContactMethods
 {
-	my ($self, $flags, $contacts, $parentStruct) = @_;
-	$self->_importContactMethods($flags, $contacts, $parentStruct, $self->{parentTblPrefix}, $parentStruct->{$self->{parentIdKey_attrs}});
+	my ($self, $flags, $contacts, $parentStruct, $internalOrgId) = @_;
+	my $preFix = $self->{parentTblPrefix};
+	if ($preFix ne 'Org')
+	{
+		$self->_importContactMethods($flags, $contacts, $parentStruct, $self->{parentTblPrefix}, $parentStruct->{$self->{parentIdKey_attrs}});
+	}
+	else
+	{
+		$self->_importContactMethods($flags, $contacts, $parentStruct,$self->{parentTblPrefix}, $internalOrgId);
+	}
 }
+
 
 sub importAssociations
 {
@@ -295,7 +304,7 @@ sub importAssociations
 	$self->itemMissingMsg($flags, 'No associations found.') unless $assocs;
 	return unless $assocs;
 
-	my $parentId = $parentStruct->{$self->{parentIdKey_attrs}};
+	my $parentId =  $self->{parentTblPrefix} ne 'Org' ? $parentStruct->{$self->{parentIdKey_attrs}} : $parentStruct;
 	my $attrTable = $self->{parentTblPrefix_attrs};
 	if(my $list = $assocs->{employment})
 	{
@@ -303,11 +312,16 @@ sub importAssociations
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $orgId = $item->{_text};
+			my $ownerOrg = $item->{'owner-org'};
+			my $ownerInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+			my $orgInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerInternalId, $orgId);
 			$self->schemaAction($flags, $attrTable, 'add',
 				parent_id => $parentId,
 				item_name => "$item->{occupation}",
 				value_type => $ASSOC_EMPLOYMENT_TYPE_MAP{exists $item->{status} ? $item->{status} : 'employed-fulltime'},
-				value_text => $item->{_text});
+				value_text => $item->{_text},
+				value_int  => $orgInternalId);
 		}
 	}
 
@@ -365,31 +379,37 @@ sub importInsurance
 	my ($self, $flags, $insurance, $parentStruct) = @_;
 	$self->itemMissingMsg($flags, 'No insurance records found.') unless $insurance;
 	return unless $insurance;
-	my $ownerId = $parentStruct->{id};
 
 	if(my $list = $insurance->{coverage})
 	{
+		my $ownerId = $parentStruct->{id};
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-
 			my $insOrgId = $item->{'insurance-org'};
-			my $ownerOrg = $item->{'owner-org'};
+			my $primaryOrg = $item->{'ins-org-owner'};
+			my $primaryOwnerOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $primaryOrg);
+			my $primaryInsOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $primaryOwnerOrgId, $insOrgId);
+
+
 			my $productName = $item->{'ins-id'};
 			my $planName = $item->{'policy-name'};
 			my $guarantor = $item->{guarantor};
+			my $ownerOrg = $item->{'owner-org'};
+			my $ownerOrgInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+
+			my $guarantorInternalId = $ownerOrg ne '' ? $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgInternalId, $guarantor) : $guarantor;
 			my $guarantorType = $item->{'guarantor-type'};
 			my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
-			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
+			my $planData = $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $primaryInsOrgId);
 			my $insInternalId = $planData->{'ins_internal_id'};
 			my $feeschedule =  $STMTMGR_INSURANCE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInsuranceAttr', $insInternalId, 'Fee Schedule');
 			my $insType = $item->{'ins-type'} ne '' ? $item->{'ins-type'} : $planData->{'ins_type'};
 			my $insIntId = $self->schemaAction($flags, "Insurance", 'add',
-								ins_org_id 		=> $insOrgId || undef,
+								ins_org_id 		=> $primaryInsOrgId || undef,
 								record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 								owner_person_id => $ownerId || undef,
-								owner_org_id    =>  $ownerOrg || undef,
-								guarantor_id    => $guarantor || undef,
+								owner_org_id    =>  $primaryOwnerOrgId || undef,
 								guarantor_type  => $guarantorType || undef,
 								parent_ins_id 	=> $planData->{'ins_internal_id'} || undef,
 								product_name  	=> $item->{'ins-id'} || undef,
@@ -405,6 +425,7 @@ sub importInsurance
 								indiv_deduct_remain => $item->{'indiv-deduct-remain'} || undef,
 								family_deduct_remain => $item->{'family-deduct-remain'} || undef,
 								ins_type 		=> $insType || undef,
+								guarantor_id            => $guarantorInternalId || undef,
 								coverage_begin_date => $item->{begindate} || undef,
 								coverage_end_date => $item->{enddate} || undef,
 								percentage_pay => $planData->{percentage_pay} || undef,
@@ -433,8 +454,7 @@ sub importInsurance
 				#		value_text => $feeschedule->{'value_text'});
 				if ($insType  == App::Universal::CLAIMTYPE_CLIENT)
 				{
-					my $dv = new Dumpvalue;
-					$dv->dumpValue($insIntId);
+
 					my $mailingAddress = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $guarantor, 'Mailing');
 					$self->schemaAction($flags,"Insurance_Address", 'add',
 								parent_id    => $insIntId || undef,
@@ -473,12 +493,18 @@ sub importInsurance
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $insOrgId = $item->{'insurance-org'};
+			my $primaryOrg = $item->{'ins-org-owner'};
+			my $primaryOwnerId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $primaryOrg);
+			my $primaryInsOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $primaryOwnerId, $insOrgId);
 
+			my $ownerOrg = $item->{'owner-org'};
+			my $primaryOwnerOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
 			my $insIntId =  $self->schemaAction($flags, "Insurance", 'add',
 							product_name => $item->{'ins-id'} || undef,
-							owner_org_id => $ownerId || undef,
+							owner_org_id => $primaryOwnerId || undef,
 							ins_type      => $INSURANCE_TYPE_MAP{exists $item->{'insurance-type'} ? $item->{'insurance-type'} :'Insurance'},
-							ins_org_id    => $item->{'insurance-org'} || undef,
+							ins_org_id    => $primaryInsOrgId || undef,
 							#ins_type      => $self->translateEnum($flags, "Claim_Type", $item->{'insurance-type'}),
 							record_type   => App::Universal::RECORDTYPE_INSURANCEPRODUCT || undef);
 
@@ -488,15 +514,20 @@ sub importInsurance
 						value_type => 0,
 						value_text => $item->{'hmo-ppo'});
 
+
 			my @fee = split(', ', $item->{feeschedule});
 
 			foreach my $feeSch (@fee)
 			{
+				my $internalCatalogId = $STMTMGR_CATALOG->getSingleValue($self, STMTMGRFLAG_NONE, 'selInternalIdByCatalog', $feeSch);
+				my $dv = new Dumpvalue;
+				$dv->dumpValue("FEE SCHED: $feeSch, $internalCatalogId");
+
 				$self->schemaAction($flags,"Insurance_Attribute", 'add',
 						parent_id => $insIntId,
 						item_name => 'Fee Schedule',
 						value_type => 0,
-						value_text => $feeSch);
+						value_text => $internalCatalogId)if $internalCatalogId ne '';
 			}
 
 			#if($item->{'record-type'} eq App::Universal::RECORDTYPE_INSURANCEPLAN)
@@ -588,12 +619,4 @@ sub importinsPlan
 	}
 }
 
-use constant INSURANCE_DIALOG => 'Dialog/Insurance';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/23/1999', 'RK',
-		INSURANCE_DIALOG,
-		'Added schema action for test data to add the feeschedule in the insurance plan.'],
-);
 1;
