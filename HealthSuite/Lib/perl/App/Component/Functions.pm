@@ -18,10 +18,10 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-patient">Patient</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-physician">Physician</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-nurse">Nurse</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-staff">Staff Member</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-patient">Patient</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-physician">Physician</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-nurse">Nurse</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-staff">Staff Member</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
@@ -30,12 +30,12 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-main">Main Organization</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-dept">Department</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-provider">Associated Provider</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-employer">Employer</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-insurance">Insurance</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-org-ipa">IPA</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-main">Main Organization</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-dept">Department</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-employer">Employer</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-insurance">Insurance</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-org-ipa">IPA</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
@@ -44,11 +44,11 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-claim">Claim</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-catalog">Fee Schedule</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-catalog-item">Fee Schedule Item</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-ins-product">Insurance Product</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-ins-plan">Insurance Plan</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-claim">Claim</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
@@ -57,9 +57,9 @@ use constant CONTENT_HTML => qq{
 			<TD>
 				<SELECT @{[ ON_CHANGE ]}>
 					<OPTION>Select type</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-appointment">Appointment</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-template">Schedule Template</OPTION>
-					<OPTION VALUE="/org/#session.org_internal_id#/dlg-add-appttype">Appointment Type</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-appointment">Appointment</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-template">Schedule Template</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-appttype">Appointment Type</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
