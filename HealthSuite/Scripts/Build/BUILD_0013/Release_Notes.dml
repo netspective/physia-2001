@@ -28,6 +28,14 @@
 			user will be asked to select a check box if they still want to close the date.
 			Also need to re-test that the close date will lock out invoice creation, posting of payments.
 		</deliverable>
-		
+		<deliverable id="461">
+			UI:  Added a new dialog for 'Referring Doctor' and added a link in the Main menu to add the 'Referring Doctor'.
+		</deliverable>
+		<deliverable id="1026">
+			UI:  Added a new component called 'Closing Date Information' in the Org Profile'.
+		</deliverable>	
+		<deliverable id="788">
+			UI:  Added a new option called 'Unemployed' in the 'Employment' drop-down list'.
+		</deliverable>		
 	</deliverables>
 </release-notes>
