@@ -16,7 +16,114 @@ use vars qw(
 @ISA    = qw(Exporter App::Statements::Component);
 @EXPORT = qw($STMTMGR_COMPONENT_PERSON);
 
+my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
+
 $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
+#----------------------------------------------------------------------------------------------------------------------
+'person.account-notes' => {
+	
+				
+				sqlStmt => qq{
+					select  trans_owner_id, detail,trans_id,trans_type
+					from transaction
+					where trans_owner_id = :1 and
+					provider_id = :2 and
+					trans_status = 2 and
+					trans_type = $ACCOUNT_NOTES				
+				},
+				sqlStmtBindParamDescr => ['Person ID for transaction table'],
+				publishDefn => {
+						columnDefn => [
+							
+													
+							{ head => 'Account Notes', dataFmt => '#&{?}#<br/><I>#1#</I>' },
+						],
+						bullets => 'stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=/#param.arl#',
+						frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-account-notes?home=/#param.arl#' },
+					},
+					publishDefn_panel =>
+					{
+						# automatically inherites columnDefn and other items from publishDefn
+						style => 'panel',
+						frame => { heading => 'Account Notes' },
+					},
+					publishDefn_panelTransp =>
+					{
+						# automatically inherites columnDefn and other items from publishDefn
+						style => 'panel.transparent',
+						inherit => 'panel',
+					},
+					publishDefn_panelEdit =>
+					{
+						# automatically inherites columnDefn and other items from publishDefn
+						style => 'panel.edit',
+						frame => { heading => 'Edit Account Notes' },
+						banner => {
+							actionRows =>
+							[
+								{	url => '#param.home#/../stpe-#my.stmtId#/dlg-add-alert-person?home=#param.home#',
+									caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-account-notes/#param.person_id#?home=#param.home#'>Account Notes</A> },
+								},
+							],
+						},
+						stdIcons =>	{
+							updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-trans-#3#/#param.person_id#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#/#0#?home=#param.home#'
+						},
+		},
+		
+				publishComp_st => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId] ); },
+				publishComp_stp => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id');  $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panel'); },
+				publishComp_stpe => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelEdit'); },
+				publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.account-notes', [$personId,$sessionId], 'panelTransp'); },
+		},
+		
+
+'person.group-account-notes' => {
+			
+			sqlStmt => qq{
+				select complete_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
+				trans_owner_id
+				from transaction, person
+				where provider_id = ? and
+				trans_owner_id = person_id and 
+				trans_status = 2 and
+				trans_type = $ACCOUNT_NOTES
+				group by complete_name,trans_owner_id
+			},
+			sqlStmtBindParamDescr => ['Person ID for transaction table'],
+			
+			publishDefn => {
+				columnDefn => [
+					{ head=> 'Patient Name', url => "../../person/#4#/profile" },
+					#{ head=> 'Notes#', dAlign => 'right' ,url => './stpe-person.alerts/#4#?home=/#param.arl#' },
+					{ head=> 'Notes#', dAlign => 'right' ,url => './stpe-person.account-notes?home=/#param.arl#&person_id=#4#' },
+					#{ head=> 'Notes#', dAlign => 'right' ,url => './stpe-person.alerts/dlg-add-alert-person/#4#/?home=/#param.arl#' },
+					{ head=> 'First  Note Date' },
+					{ head=> 'Last Note Date' },
+				],				
+			},
+			publishDefn_panel =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.static',
+				flags => 0,
+				frame => { heading => 'Account Notes' },
+			},
+			publishDefn_panelTransp =>
+			{
+				# automatically inherits columnDefn and other items from publishDefn
+				style => 'panel.transparent.static',
+				inherit => 'panel',
+			},			
+	
+	
+			publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId] ); },
+			publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panel'); },
+			publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panelEdit'); },
+			publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.group-account-notes', [$personId], 'panelTransp'); },
+	},
+	
+
 
 #----------------------------------------------------------------------------------------------------------------------
 
