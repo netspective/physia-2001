@@ -3,6 +3,7 @@ package App::Dialog::Transaction::PhoneMessage;
 ##############################################################################
 
 use DBI::StatementManager;
+use Data::TextPublish;
 use App::Statements::Person;
 use App::Statements::Transaction;
 use App::Statements::Device;
@@ -145,15 +146,20 @@ sub execute
 	my $status =  $page->field('status', $phoneStatus);
 	my $userId = $page->session('user_id');
 	my $printerName = $page->field('printerQueue');
+	my $phoneMessage = $page->field('phone_message');
 
-	my $printerMessage = "--------------------------------------------\n";
+	my $providerInformation = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $page->field('provider'));
+	my $callerInformation = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $page->field('person_called'));
+	Data::TextPublish::wrapMessage (\$phoneMessage, 72);
+
+	my $printerMessage = ("-" x 72)."\n";
 	$printerMessage .= "MESSAGE \n";
-	$printerMessage .= "--------------------------------------------\n";
-	$printerMessage .= "To: ".$page->field('provider')."\n";
-	$printerMessage .= "From: ".$page->field('person_called')."\n";
-	$printerMessage .= "Time: ".$page->field('time')."\n";
-	$printerMessage .= "Message:\n".$page->field('phone_message')."\n";
-	$printerMessage .= "--------------------------------------------\n\n";
+	$printerMessage .= ("-" x 72)."\n";
+	$printerMessage .= "     To: ".$providerInformation->{'complete_name'}." (".$page->field('provider').")\n";
+	$printerMessage .= "   From: ".$callerInformation->{'complete_name'}." (".$page->field('person_called').")\n";
+	$printerMessage .= "   Time: ".$page->field('time')."\n";
+	$printerMessage .= "Message:\n".$phoneMessage."\n";
+	$printerMessage .= ("-" x 72)."\n\n";
 
 	App::Device::echoToPrinter ($printerName, $printerMessage) unless ($printerName eq '');
 
