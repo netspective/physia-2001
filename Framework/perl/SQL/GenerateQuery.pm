@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.4 2000-10-05 16:35:51 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.5 2000-10-05 17:02:56 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views);
 use vars qw(%CACHE $COMPARISONS);
@@ -177,7 +177,6 @@ sub views
 		die "View data must be a hash ref" unless ref($value) eq 'HASH';
 
 		# Add it to the Psuedo-Hash
-		print "Adding view $id\n";
 		push @{$self->{views}}, $value;
 		$self->{views}->[0]->{$id} = $#{$self->{views}};
 		return $value;
@@ -333,7 +332,6 @@ sub parseView
 			}
 		}
 	}
-	#$self->views($id, $view);
 	return \@conditions;
 }
 
