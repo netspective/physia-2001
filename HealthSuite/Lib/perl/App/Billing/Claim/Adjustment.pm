@@ -13,7 +13,7 @@ sub new
 {
 	my ($type, %param) = @_;
 
-	$param{adjsutId} = undef;
+	$param{adjustId} = undef;
 	$param{adjustType} = undef;
 	$param{adjustAmt} = undef;
 	$param{billId} = undef;
@@ -36,7 +36,46 @@ sub new
 	$param{comments} = undef;
 	$param{authRef} = undef;
 	$param{parentId} = undef;
+	$param{refundToId} = undef;
+	$param{inherited} = undef;
+	$param{cardExpDate} = undef;
 	return bless \%param, $type;
+}
+
+sub setRefundToId
+{
+	my ($self, $value) = @_;
+	$self->{refundToId} = $value;
+}
+
+sub getRefundToId
+{
+	my $self = shift;
+	return $self->{inherited};
+}
+
+sub setInherited
+{
+	my ($self, $value) = @_;
+	$self->{inherited} = $value;
+}
+
+sub getInherited
+{
+	my $self = shift;
+	return $self->{writeoffCode};
+}
+
+sub setCardExpiryDate
+{
+	my ($self, $value) = @_;
+	$self->{cardExpDate} = $value;
+}
+
+sub getCardExpiryDate
+{
+	my $self = shift;
+	return $self->{cardExpDate};
 }
 
 sub setWriteoffCode
@@ -310,13 +349,13 @@ sub setAdjustType
 sub getAdjsutId
 {
 	my $self = shift;
-	return $self->{adjsutId};
+	return $self->{adjustId};
 }
 
 sub setAdjsutId
 {
 	my ($self,$value) = @_;
-	$self->{adjsutId} = $value;
+	$self->{adjustId} = $value;
 }
 
 sub convertDateToCCYYMMDD

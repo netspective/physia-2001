@@ -2388,13 +2388,13 @@ sub populateAdjustments
 			flags,
 			payer_type,
 			payer_id,
-			parent_id,
 			plan_allow,
 			plan_paid,
 			deductible,
 			copay,
 			to_char(submit_date, 'DD-MON-YYYY'),
 			to_char(pay_date, 'DD-MON-YYYY'),
+			pay_type,
 			pay_method,
 			pay_ref,
 			writeoff_code,
@@ -2403,7 +2403,10 @@ sub populateAdjustments
 			net_adjust,
 			comments,
 			data_text_a,
-			parent_id
+			parent_id,
+			refund_to_id,
+			data_num_a,
+			data_date_a
 		from invoice_item_adjust
 		where parent_id = $ItemId
 	};
@@ -2439,6 +2442,9 @@ sub populateAdjustments
 		$adjustment->setComments($tempRow[20]);
 		$adjustment->setAuthRef($tempRow[21]);
 		$adjustment->setParentId($tempRow[22]);
+		$adjustment->setRefundToId($tempRow[23]);
+		$adjustment->setInherited($tempRow[24]);
+		$adjustment->setCardExpiryDate($tempRow[25]);
 
 		$procedure->addAdjustments($adjustment);
 	}
