@@ -19,6 +19,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 	'search/associate' => {},
 	'search/referring-Doctor' => {},
 	'search/physician-ref' => {},
+	'search/insured-Person' => {}
 	);
 
 sub getForm
@@ -65,6 +66,7 @@ sub getForm
 	}
 	my $searchType = $flags & SEARCHFLAG_SEARCHBAR ? 'Person' : $self->param('_pm_view');
 	$searchType = 'referring-doctor' if $searchType eq 'referring-Doctor';
+	$searchType = 'insured-person' if $searchType eq 'insured-Person';
 	return ('Lookup a' . ((grep {$_ eq substr($self->param('_pm_view'),0,1)} ('a','e','i','o','u')) ? 'n ' : ' ') .
 		$searchType,
 		qq{
