@@ -278,6 +278,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				and parent_id = ?
 				and value_text = ?
 		},
+	'selPhysicianSpecialty' => qq{
+					select value_textB, item_id
+					from person_attribute
+					where value_type = 210
+					and parent_id = ?
+					and value_text = ?
+					and value_textB = ?
+		},
 	'selEmploymentStatus' => qq{
 		select caption
 			from attribute_value_type
