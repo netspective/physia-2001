@@ -55,13 +55,13 @@ sub prepare_page_content_header
 			['Add...'],
 			['Patient', "/org/#session.org_id#/dlg-add-patient", 'patient'],
 			['Claim', "/org/#session.org_id#/dlg-add-claim", 'claim'],
-			['Appointment', "/org/#session.org_id#/dlg-add-appointment", 'appointment'],
+			['Appointment', "/schedule/dlg-add-appointment?_dialogreturnurl=/menu", 'appointment'],
 			['Appointment Type', "/org/#session.org_id#/dlg-add-appttype", 'appttype'],
 			['Insurance Org', "/org/#session.org_id#/dlg-add-org-insurance", 'insurance'],
 			['Insurance Product', "/org/#session.org_id#/dlg-add-ins-product", 'insproduct'],
 			['Insurance Plan', "/org/#session.org_id#/dlg-add-ins-plan", 'insplan'],
 			['Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 'catalog'],
-			['Schedule Template', "/org/#session.org_id#/dlg-add-template", 'template'],
+			['Schedule Template', "/schedule/dlg-add-template?_dialogreturnurl=/menu", 'template'],
 		]);
 
 
@@ -225,9 +225,9 @@ sub prepare
 			</td><td>
 				<font face="arial,helvetica" size=2>
 					<b>Add</b> a new
-					<a href="/org/#session.org_id#/dlg-add-appointment">Appointment</a>
-					<a href="/org/#session.org_id#/dlg-add-template">Schedule Template</a>, or
-					<a href="/org/#session.org_id#/dlg-add-appttype">Appointment Type</a>
+					<a href="/schedule/dlg-add-appointment?_dialogreturnurl=/menu">Appointment</a>
+					<a href="/schedule/dlg-add-template?_dialogreturnurl=/menu">Schedule Template</a>, or
+					<a href="/schedule/dlg-add-appttype?">Appointment Type</a>
 				</font>
 			</td></tr></table>
 		</td></tr></table>
