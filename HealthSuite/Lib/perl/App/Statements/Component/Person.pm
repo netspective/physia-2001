@@ -4299,14 +4299,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 			Select	org_id,name_primary,org_internal_id,
 			(SELECT count (*)
-			FROM 	lab_order lo
+			FROM 	person_lab_order lo
 			WHERE 	lo.person_id = :2
 			AND	lo.lab_internal_id = org.org_internal_id
 			) as entry
 			FROM	org ,ORG_CATEGORY oc
 			WHERE  	owner_org_id= :1
 			AND	oc.parent_id = org.org_internal_id
-			AND	oc.member_name='Lab'
+			AND	oc.member_name='Ancillary Service'
 			order by org_id
 			},
 	sqlvar_entityName => 'OrgInternal ID for LAB',
@@ -4358,7 +4358,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.labOrderDetail' => {
 	sqlStmt => qq{
 			Select	lo.lab_order_id,lo.date_order,lo.provider_id, los.caption
-			FROM	org ,lab_order lo, lab_order_status los
+			FROM	org ,person_lab_order lo, lab_order_status los
 			WHERE  	owner_org_id= :1
 			AND	lo.lab_internal_id = org.org_internal_id
 			AND 	lo.lab_internal_id = :2
