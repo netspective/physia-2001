@@ -89,10 +89,10 @@ sub populateData
 	if ($command eq 'view')
 	{
 		my $newReadLen = $CONFDATA_SERVER->db_BlobLongReadLength();
-		my $oldReadLen = $page->{dbh}->{LongReadLen};
-		$page->{dbh}->{LongReadLen} = $newReadLen;
+		my $oldReadLen = $page->{db}->{LongReadLen};
+		$page->{db}->{LongReadLen} = $newReadLen;
 		my $content = $STMTMGR_DOCUMENT->getRowAsArray($page, STMTMGRFLAG_NONE, 'selDocumentContentById', $page->param('doc_id'));
-		$page->{dbh}->{LongReadLen} = $oldReadLen;
+		$page->{db}->{LongReadLen} = $oldReadLen;
 		my $buffer = $content->[0] ? $content->[0] : $content->[1];
 		my $mime = $page->field('doc_mime_type');
 
