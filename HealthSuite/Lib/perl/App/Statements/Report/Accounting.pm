@@ -247,7 +247,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(balance_transfer) balance_transfer,											
 		sum(person_pay) person_pay,
 		sum(insurance_pay) insurance_pay ,	
-		sum(person_write_off) person_write_off
+		sum(person_write_off) person_write_off,
+		sum(refund) as refund
 	FROM 	invoice_charges
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
