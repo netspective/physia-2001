@@ -37,6 +37,10 @@
 	</release-info>
 
 	<deliverables>
+		<deliverable id="1954">
+			Showing all line items when editing a claim.
+		</deliverable>
+
 		<deliverable id="1983">
 			Removed specified claim statuses from Claim Worklist Setup.
 		</deliverable>
