@@ -519,7 +519,7 @@ sub copyInvoice
 		parent_id => $newInvoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "This invoice is a resubmitted copy of invoice $oldInvoiceId",
+		value_text => "This invoice is a resubmitted copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>",
 		value_date => $todaysDate,
 		_debug => 0
 	);
@@ -538,7 +538,7 @@ sub copyInvoice
 		parent_id => $oldInvoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "The remaining balance has been carried over to claim $newInvoiceId",
+		value_text => "The remaining balance has been carried over to claim <A HREF='/invoice/$newInvoiceId/summary'>$newInvoiceId</A>",
 		value_date => $todaysDate,
 		_debug => 0
 	);

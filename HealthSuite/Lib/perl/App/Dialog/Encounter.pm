@@ -789,7 +789,7 @@ sub voidInvoicePostSubmit
 		parent_id => $invoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "This invoice is a voided copy of invoice $oldInvoiceId",
+		value_text => "This invoice is a voided copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>",
 		value_date => $todaysDate,
 		_debug => 0
 	);
@@ -800,7 +800,7 @@ sub voidInvoicePostSubmit
 		parent_id => $oldInvoiceId,
 		item_name => 'Invoice/History/Item',
 		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Invoice $invoiceId is a voided copy of this invoice",
+		value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a voided copy of this invoice",
 		value_date => $todaysDate,
 		_debug => 0
 	);
@@ -1445,7 +1445,7 @@ sub handleInvoiceAttrs
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => "This invoice is a new copy of invoice $oldInvoiceId which has been submitted and voided",
+			value_text => "This invoice is a new copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A> which has been submitted and voided",
 			#value_textB => $page->field('comments') || undef,
 			value_date => $todaysDate,
 			_debug => 0
@@ -1456,7 +1456,7 @@ sub handleInvoiceAttrs
 			parent_id => $oldInvoiceId,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => "Invoice $invoiceId is a new copy of this invoice",
+			value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice",
 			value_date => $todaysDate,
 			_debug => 0
 		);
