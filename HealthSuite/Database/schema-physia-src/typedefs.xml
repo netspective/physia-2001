@@ -955,8 +955,18 @@
 				<col name="group_name">ipa</col>
 			</row>
 			<row>
+				<col name="id">10</col>
+				<col name="caption">main_dir_entry</col>
+				<col name="group_name">provider_directory</col>
+			</row>
+			<row>
+				<col name="id">11</col>
+				<col name="caption">location_dir_entry</col>
+				<col name="group_name">provider_directory</col>
+			</row>
+			<row>
 				<col name="id">99</col>
-				<col name="caption">Other</col>
+				<col name="caption">other</col>
 				<col name="group_name">other</col>
 			</row>
 		</data>
