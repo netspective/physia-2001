@@ -33,7 +33,7 @@ sub new
 			new CGI::Dialog::Field(name => 'claim_status',
 				caption => 'Claim Status',
 				fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,									
-				fKeyStmt => 'sel_claim_status',
+				fKeyStmt => 'sel_claim_status_used',
 				fKeyDisplayCol => 0,
 				fKeyValueCol => 1,
 				style => 'multicheck',	
