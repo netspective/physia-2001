@@ -332,8 +332,6 @@
 			Report (FAR)  Modified query so pre-payment invoices were included	
 			Note  Also test that service date filter is working as expected.
 		</deliverable>
-
-	</deliverables>
-
+		
 	</deliverables>
 </release-notes>
