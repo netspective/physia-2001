@@ -313,6 +313,8 @@
 		<deliverable id="1873">
 			Perl error from link after updating a plan has been fixed.
 		</deliverable>
-
+		<deliverable id="1886">
+			Fixed code to not to show up duplicate entries.
+		</deliverable>
 	</deliverables>
 </release-notes>
