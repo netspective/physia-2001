@@ -1303,6 +1303,8 @@ sub addProcedureItems
 	my $servItemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
 
+	my @feeSchedules = $page->param('_f_proc_default_catalog');
+
 	my $lineCount = $page->param('_f_line_count');
 
 	for(my $line = 1; $line <= $lineCount; $line++)
