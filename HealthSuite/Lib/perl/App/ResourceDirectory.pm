@@ -102,6 +102,7 @@ use App::Dialog::Attribute::Certificate::Accreditation;
 use App::Dialog::Attribute::Certificate::Affiliation;
 use App::Dialog::Attribute::Certificate::License;
 use App::Dialog::Attribute::Certificate::State;
+use App::Dialog::Attribute::Certificate::Specialty;
 use App::Dialog::Attribute::Attendance;
 use App::Dialog::Attribute::Address;
 use App::Dialog::Attribute::Default;
@@ -299,6 +300,7 @@ $SEARCH_CLASSES = {
 	'affiliation' => {_class => 'App::Dialog::Attribute::Certificate::Affiliation', valueType => App::Universal::ATTRTYPE_AFFILIATION, heading => '$Command Affiliation', _arl => ['person_id'], _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_AFFILIATION() },
 	'certificate-license' => {_class => 'App::Dialog::Attribute::Certificate::License', valueType => App::Universal::ATTRTYPE_LICENSE, heading => '$Command License', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_LICENSE() },
 	'certificate-state' => {_class => 'App::Dialog::Attribute::Certificate::State', valueType => App::Universal::ATTRTYPE_STATE, heading => '$Command State License', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_STATE() },
+	'certificate-specialty' => {_class => 'App::Dialog::Attribute::Certificate::Specialty', valueType => App::Universal::ATTRTYPE_SPECIALTY, heading => '$Command Specialty', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_SPECIALTY() },
 	'preventivecare' => {_class => 'App::Dialog::Attribute::PreventiveCare', valueType => App::Universal::PREVENTIVE_CARE, heading => '$Command Measure', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::PREVENTIVE_CARE() },
 	'allergy-medication' => {_class => 'App::Dialog::Attribute::Allergy', valueType => App::Universal::MEDICATION_ALLERGY, group => 'Medication Allergy', heading => '$Command Medication Allergy', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::MEDICATION_ALLERGY() },
 	'allergy-environmental' => {_class => 'App::Dialog::Attribute::Allergy', valueType => App::Universal::ENVIRONMENTAL_ALLERGY, group => 'Environmental Allergy', heading => '$Command Environmental Allergy', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ENVIRONMENTAL_ALLERGY() },
