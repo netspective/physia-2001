@@ -239,7 +239,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.phoneMessage' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textb
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Phone Message'
@@ -250,9 +250,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => 'Phone Message for #6# (#5#): #4#' },
+			{ dataFmt => '#6# (#5#): #4#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-phone-message?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
@@ -279,7 +279,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-phmsg-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-phmsg-#0#/#1#?home=#param.home#',
 		},
 	},
 
@@ -287,6 +287,60 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelTransp'); },
+},
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.refillRequest' => {
+	sqlStmt => qq{
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB
+				from  Person_Attribute
+			where  	parent_id = ?
+			and item_name = 'Refill Request'
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => '#6# (#5#): #4#' },
+		],
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=/#param.arl#',
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-refill-request?home=/#param.arl#' },
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Refill Request' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Refill Request' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-refill-request?home=#param.home#'>Refill Request</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-refillreq-#0#/#1#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelTransp'); },
 },
 
 
