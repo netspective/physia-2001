@@ -288,7 +288,7 @@ sub populateData
 	$STMTMGR_ORG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
 	my $orgData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
 
-	$page->field('org_owner_id_hidden', $orgData->{'owner_org_id'});
+	$page->field('org_owner_id_hidden', $orgData->{owner_org_id});
 
 	my $categories = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selCategory', $orgId);
 	my @categories = split(/\s,\s/, $categories);
@@ -548,7 +548,7 @@ sub execute_update
 	);
 
 	saveAttribute($page, 'Org_Attribute', $orgId, 'Medicare GPCI Location', 0,
-		value_text => $page->field('medicare_gpci'),
+		value_text => $page->field('medicare_gpci') || undef,
 		value_int  => $page->field('medicare_facility_type') || 0,
 	);
 
