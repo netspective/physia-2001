@@ -213,12 +213,12 @@ sub printHeader
 	$self->printLabel($p, $patientX, $patientY - LINE_HEIGHT, $report, 'Address: '); # . '_' x  int((.58 * BOX_WIDTH)/5));
 	$self->printLabel($p, $dateX, $patientY - LINE_HEIGHT, $report, 'Phone #: '); # . '_' x int((.10 * BOX_WIDTH)/5));
 
-	$self->printData($p, $patientX, $patientY, $report, $prescription->{patient}->getName, 70, 0);
+	$self->printData($p, $patientX, $patientY, $report, $prescription->{patient}->getName . ", DOB:(" . $prescription->{patient}->getDateOfBirth(1) . ")", 70, 0);
 	$self->printData($p, $dateX, $patientY, $report, $prescription->getDate(1), 45, 0 );
 	my $patientAddress = $prescription->{patient}->{address}->getAddress1 . " " .
 						$prescription->{patient}->{address}->getAddress2 . " " .
 						$prescription->{patient}->{address}->getCity . ", " .
-						$prescription->{patient}->{address}->getState . ". " .
+						$prescription->{patient}->{address}->getState . " " .
 						$prescription->{patient}->{address}->getZipCode;
 	$self->printData($p, $patientX, $patientY - LINE_HEIGHT, $report, $patientAddress, 70,0);
 	$self->printData($p, $dateX, $patientY - LINE_HEIGHT, $report, $prescription->{patient}->{address}->getTelephoneNo(1), 45, 0);
