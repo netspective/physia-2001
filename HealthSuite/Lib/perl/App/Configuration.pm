@@ -27,8 +27,11 @@ struct(ServerConfigData => [
 	path_OrgDirectory => '$',
 	path_Conf => '$',
 	path_AppConf => '$',
+	# Next two for invoices...
 	path_PDFOutput => '$',
 	path_PDFOutputHREF => '$',
+	path_PDFSuperBillOutput => '$',
+	path_PDFSuperBillOutputHREF => '$',
 	path_EDIData => '$',
 	path_PerSeEDIData => '$',
 	path_PerSeEDIDataIncoming => '$',
@@ -66,6 +69,7 @@ use constant PATH_DIRECTORY	 => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Dire
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
 use constant PATH_TEMP       => File::Spec->catfile('temp');
 use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
+use constant PATH_OUTPUTSUPERBILLPDF  => File::Spec->catfile(PATH_TEMP, 'superbills');
 use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
 use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
 use constant PATH_EDIDATA    => File::Spec->catfile(defined $ENV{HS_EDIDATA} ? $ENV{HS_EDIDATA} : '/home/vusr_edi');
@@ -151,6 +155,8 @@ sub getDefaultConfig
 	$config->path_AppConf(PATH_APPCONF);
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
 	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
+	$config->path_PDFSuperBillOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTSUPERBILLPDF));
+	$config->path_PDFSuperBillOutputHREF(File::Spec->catfile('', PATH_OUTPUTSUPERBILLPDF));
 	$config->path_EDIData(PATH_EDIDATA);
 	$config->path_PerSeEDIData(File::Spec->catfile(PATH_EDIDATA, 'per-se'));
 	$config->path_PerSeEDIDataIncoming(File::Spec->catfile($config->path_PerSeEDIData(), 'incoming'));
@@ -271,7 +277,8 @@ die "Unable to find configuration for 'account-$userName', 'group-$groupName' or
 createPath(
 	$CONFDATA_SERVER->path_SchemaSQL,
 	$CONFDATA_SERVER->path_temp,
-	$CONFDATA_SERVER->path_PDFOutput
+	$CONFDATA_SERVER->path_PDFOutput,
+	$CONFDATA_SERVER->path_PDFSuperBillOutput,
 );
 requirePath(
 	$CONFDATA_SERVER->path_Database,
