@@ -567,7 +567,7 @@ sub hmoCapWriteoff
 	{
 		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY 
 			|| $proc->{item_type} == App::Universal::INVOICEITEMTYPE_DEDUCTIBLE || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_VOID;
-		#next if $proc->{data_num_a};			#data_num_a indicates that this item is FFS (null if it isn't)
+		next if $proc->{data_num_a};			#data_num_a indicates that this item is FFS (null if it isn't)
 		next if $proc->{data_text_b} eq 'void';	#data_text_b indicates that this item has been voided
 		
 		my $writeoffAmt = $proc->{balance};
