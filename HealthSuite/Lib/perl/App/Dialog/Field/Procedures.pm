@@ -383,12 +383,12 @@ sub getHtml
 		my $emgHtml = '';
 		if($invoiceFlags & $attrDataFlag)
 		{
-			$emgHtml = $emg eq 'on' ? "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/>Emergency</FONT>" : '';		
+			$emgHtml = $emg eq 'on' ? "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>" : '';		
 		}
 		else
 		{
 			my $checked = $emg eq 'on' ? 'CHECKED' : '';
-			$emgHtml = "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' TYPE='CHECKBOX' VALUE='on' $checked><FONT $textFontAttrs/>Emergency</FONT>";
+			$emgHtml = "<INPUT CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' TYPE='CHECKBOX' VALUE='on' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
 		}
 
 		$linesHtml .= qq{
