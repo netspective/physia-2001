@@ -769,27 +769,45 @@ sub importRegistry
 			my $registryNames = $registry->{names};
 
 			$self->schemaAction($flags, 'Person', 'add',
-				person_id => $personId,
-				name_prefix => exists $registryNames->{prefix} ? $registryNames->{prefix} : undef,
-				name_last => $registryNames->{last},
-				name_middle => $registryNames->{middle},
-				name_first => $registryNames->{first},
-				name_suffix => exists $registryNames->{suffix} ? $registryNames->{suffix} : undef,
-				gender => exists $registry->{gender} ? $self->translateEnum($flags, "Gender", $registry->{gender}) : undef,
-				marital_status => exists $registry->{'marital-status'} ? $self->translateEnum($flags, "Marital_Status", $registry->{'marital-status'}) : undef,
-				date_of_birth => exists $registry->{'birth-date'} ? $registry->{'birth-date'} : undef,
-				ssn => exists $registry->{ssn} ? $registry->{ssn} : undef,
-				age => exists $registry->{age} ? $registry->{age} : undef,
-				#category => join(',', @cat) || undef,
-				language => join(',', @lang) || undef,
-				ethnicity => $registry->{ethnicity});
+						person_id => $personId,
+						name_prefix => exists $registryNames->{prefix} ? $registryNames->{prefix} : undef,
+						name_last => $registryNames->{last},
+						name_middle => $registryNames->{middle},
+						name_first => $registryNames->{first},
+						name_suffix => exists $registryNames->{suffix} ? $registryNames->{suffix} : undef,
+						gender => exists $registry->{gender} ? $self->translateEnum($flags, "Gender", $registry->{gender}) : undef,
+						marital_status => exists $registry->{'marital-status'} ? $self->translateEnum($flags, "Marital_Status", $registry->{'marital-status'}) : undef,
+						date_of_birth => exists $registry->{'birth-date'} ? $registry->{'birth-date'} : undef,
+						ssn => exists $registry->{ssn} ? $registry->{ssn} : undef,
+						age => exists $registry->{age} ? $registry->{age} : undef,
+						#category => join(',', @cat) || undef,
+						language => join(',', @lang) || undef,
+						ethnicity => $registry->{ethnicity}
+					);
 
 			$self->schemaAction($flags, 'Person_Attribute', 'add',
-									parent_id => $personId,
-									item_name => 'Person/Name/LastFirst',
-									value_type => 0,
-									value_int => 1
-								);
+						parent_id => $personId,
+						item_name => 'Person/Name/LastFirst',
+						value_type => 0,
+						value_int => 1
+					);
+
+			$self->schemaAction(
+						'Person_Attribute', 'add',
+						parent_id => $personId || undef,
+						item_name => 'Guarantor' || undef,
+						value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
+						value_text => $registry->{responsible-person} || undef,
+						value_int => 1
+					);
+
+			$self->schemaAction(
+						'Person_Attribute', 'add',
+						parent_id => $personId || undef,
+						item_name => 'BloodType' || undef,
+						value_type => 0,
+						value_text => 0
+					);
 
 
 	}
