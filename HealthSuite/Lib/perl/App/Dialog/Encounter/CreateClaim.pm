@@ -95,7 +95,15 @@ sub makeStateChanges
 	if($command eq 'add')
 	{
 		my $personId = $page->param('person_id') || $page->field('attendee_id');
-		unless($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
+		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
+		{
+			if($page->field('payer') eq '')
+			{
+				my $payerField = $self->getField('payer');
+				$payerField->invalidate($page, 'Please choose a primary payer for this claim.');
+			}
+		}
+		else
 		{
 			$self->updateFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
 			#$self->updateFieldFlags('deduct_fields', FLDFLAG_INVISIBLE, 1);

@@ -103,7 +103,7 @@ sub initialize
 
 
 
-		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
 
 		new CGI::Dialog::Field(caption => 'Third-Party Payer for Today', name => 'other_payer'),
 
