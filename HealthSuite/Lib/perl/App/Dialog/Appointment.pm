@@ -303,7 +303,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|confirm)$/);
 	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update|confirm)$/);
 	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add|confirm)$/);
-	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command !~ m/^(add)$/);
+	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^(cancel|noshow|confirm)$/);
 
 	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
