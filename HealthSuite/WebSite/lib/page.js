@@ -563,8 +563,6 @@ function validateTime(fieldName, inTime)
 	if (a.length == 1)
 		time = a[0] == "a" ? "AM" : "PM";
 	var a = splitNotInArray(inTime, validNumbers);
-	for (i in a)
-		a[i] = parseInt(a[i]);
 	if (a.length == 0 || a.length > 2)
 	{
 		if (inTime.length > 0)
@@ -858,7 +856,7 @@ var activeFindARL = null;
 var activeFindAppendValue = '';
 var secondaryFindWinControl = null;
 
-function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, 
+function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features,
 	controlField, hiddenPopulateField)
 {
 	if(prefill == null)
@@ -924,7 +922,7 @@ function populateControl(what, closeWindow, secondItem)
 		{
 			parent.opener.secondaryFindWinControl.value = secondItem;
 		}
-		
+
 		parent.opener.activeFindWinControl.title = 'lookup result: ' + what;
 		populated = true;
 	}
@@ -1244,16 +1242,16 @@ function setField(_field, _value, _re, _default)
 {
 	if (_re == null && _default == null)
 	{
-		_field.value = _value;	
+		_field.value = _value;
 	}
 	else
 	{
 		var curVal = _field.value;
-		if (curVal == '') 
+		if (curVal == '')
 		{
 			curVal = _default;
 		}
-		
+
 		regExpr = new RegExp(_re);
 		var newValue = curVal.replace(regExpr, _value);
 		_field.value = newValue;
