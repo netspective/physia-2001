@@ -1,4 +1,4 @@
-whenever sqlerror exit sql.sqlcode
+whenever sqlerror exit sql.sqlcode rollback
 
 insert into HCFA1500_Modifier_Code (id, caption, abbrev, result) values (113, 'TWCC 73 form', '73', 2);
 insert into HCFA1500_Modifier_Code (id, caption, abbrev, result) values (114, 'TWCC 73 form when requested by the carrier', 'RR', 2);
