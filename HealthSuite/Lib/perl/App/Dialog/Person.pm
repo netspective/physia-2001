@@ -229,7 +229,7 @@ sub populateData
 	my $nurseLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseLicense);
 	$page->field('nurse_license_item_id', $nurseLicenseData->{'item_id'});
 	$page->field('rn_number', $nurseLicenseData->{'value_text'});
-	$page->field('rn_number_exp_date', $nurseLicenseData->{'value_date'});
+	$page->field('rn_number_exp_date', $nurseLicenseData->{'value_dateend'});
 	$page->field('check_license', $nurseLicenseData->{'value_int'});
 
 	my $nurseTitle = 'Nurse/Title';
@@ -494,9 +494,10 @@ sub handleAttrs
 			parent_id => $page->field('person_id'),
 			item_id => $page->field('nurse_license_item_id') || undef,
 			item_name => 'Nursing/License',
-			value_type => App::Universal::ATTRTYPE_TEXT,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('rn_number')  || undef,
-			value_date => $page->field('rn_number_exp_date') || undef,
+			value_textB => 'Nursing/License',
+			value_dateEnd => $page->field('rn_number_exp_date') || undef,
 			value_int => $page->field('check_license')  || undef,
 			_debug => 0
 		)if $member eq 'Nurse';
