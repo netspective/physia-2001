@@ -1677,7 +1677,7 @@ sub handleRedirect
 	my @errors = checkIntellicodeErrors($self, $page, $invoiceId);
 	if(@errors && $hospClaim != 1)
 	{
-		$page->redirect("/invoice/$invoiceId/error");
+		$page->redirect("/invoice/$invoiceId/summary");
 	}
 	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
 	{
