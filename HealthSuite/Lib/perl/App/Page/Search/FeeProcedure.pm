@@ -31,12 +31,18 @@ sub getForm
 	my $ffs = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_NONE,'sel_catalog_by_id_orgId', 'FFS', $self->session('org_internal_id'));
 	push @listFee,$ffs->{internal_catalog_id} if $ffs;
 	
+	#Sort the list fee so we can remove dups
+	my @sortFee = sort @listFee; 
+	my $prev_value=undef;
+	
 	#Build drop down with all searchable fee schedules
-	foreach my $ele (@listFee)	
+	foreach my $ele (@sortFee)	
 	{
+		
 		#Get the text name for the fee schedule and display that
 		my $ele_name = $STMTMGR_CATALOG->getRowAsHash($self,STMTMGRFLAG_NONE,'selCatalogById',$ele);	
-		$fee_schedules.=qq{<option value=$ele>$ele_name->{catalog_id}</option>} if $ele_name->{catalog_id};
+		$fee_schedules.=qq{<option value=$ele>$ele_name->{catalog_id}</option>} if $ele_name->{catalog_id} && $prev_value ne $ele;
+		$prev_value = $ele;
 	}
 	
 	$fee_schedules.=qq{</select>};	
