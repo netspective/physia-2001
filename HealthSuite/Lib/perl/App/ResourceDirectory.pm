@@ -632,6 +632,7 @@ $WORKLIST_CLASSES = {
 	'personnel' => {_class => 'App::Dialog::Personnel', heading => '$Command Personnel', _arl => ['person_id']},
 	'loginType' => {_class => 'App::Dialog::LoginType', heading => 'Change Login Type', _arl => ['person_id']},
 	'referral' => {_class => 'App::Dialog::Transaction::Referral', heading => 'Add Referral', _arl => ['person_id']},
+	'eligibility' => {_class => 'App::Dialog::Eligibility', heading => 'Check Eligibility'},
 
 );
 
