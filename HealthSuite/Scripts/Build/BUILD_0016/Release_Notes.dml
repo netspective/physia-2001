@@ -104,6 +104,8 @@
 
 		<deliverable id="1297">
 			Report (financial analysis report) :  Changed calc for A/R column
+
+			FIX : Added Logic for Fiscal year, modified A/R calc to include all previous months in the fiscal year
 		</deliverable>
 
 		<deliverable id="1325">
@@ -217,6 +219,8 @@
 		<deliverable id="1463">
 			Report (Total Recv.) Created new report which shows all outstanding balances whether it is a 
 			pending insurance balance or patient balance.
+
+			FIX : Added new columns for Total Amount , Total Pending, Total Balance
 		</deliverable>
 		
 		<deliverable id="1464">
