@@ -25,6 +25,8 @@
 			<allow permission="dlg/misc-procedure-item/add" />
 			<allow permission="dlg/appttype/add" />
 			<allow permission="dlg/template/add" />
+			<allow permission="dlg/personnel/add" />
+			<allow permission="dlg/password/add" />
 			<allow permission="dlg/feescheduledataentry/remove" />
 			<allow permission="dlg/feescheduleentry/remove" />
 			<allow permission="dlg/catalog/remove" />
@@ -39,9 +41,11 @@
 			<allow permission="dlg/org-insurance/remove" />
 			<allow permission="dlg/org-dept/remove" />
 			<allow permission="dlg/misc-procedure/remove" />
+			<allow permission="dlg/personnel/remove" />
 			<allow permission="dlg/misc-procedure-item/remove" />
 			<allow permission="dlg/appttype/remove" />
 			<allow permission="dlg/template/remove" />
+			<allow permission="dlg/password/remove" />
 			<allow permission="dlg/feescheduledataentry/update" />
 			<allow permission="dlg/feescheduleentry/update" />
 			<allow permission="dlg/catalog/update" />
@@ -58,6 +62,8 @@
 			<allow permission="dlg/misc-procedure/update" />
 			<allow permission="dlg/misc-procedure-item/update" />
 			<allow permission="dlg/template/update" />
+			<allow permission="dlg/personnel/update" />
+			<allow permission="dlg/password/update" />
 		</permission>
 		<permission id="sde">
 			<allow permission="page/sde" />
