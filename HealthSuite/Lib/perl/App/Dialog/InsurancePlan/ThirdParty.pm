@@ -50,7 +50,30 @@ sub new
 					selOptions => 'Person:person;Organization:org',
 					caption => 'Payer for Today Type',
 					name => 'guarantor_type'),
-				])
+				]),
+
+				new CGI::Dialog::Field(
+					caption => 'Begin Date',
+					name => 'coverage_begin_date',
+					type => 'date',
+					options => FLDFLAG_REQUIRED,
+					pastOnly => 1,
+					defaultValue => '',
+					),
+				new CGI::Dialog::Field(
+					caption => 'End Date',
+					name => 'coverage_end_date',
+					invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+					type => 'date',
+					defaultValue => '',
+					),
+				new CGI::Dialog::Field(
+					type => 'bool',
+					style => 'check',
+					caption => 'Inactive Payer',
+					name => 'inactive_payer',
+					invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+				),
 
 			);
 
@@ -113,6 +136,9 @@ sub populateData
 	my $thirdPartyType = $thirdParty->{guarantor_type};
 	my $guarantorType = $thirdPartyType eq 1 ? 'org' : 'person';
 	$page->field('guarantor_type', $guarantorType);
+	$thirdParty->{bill_sequence} eq App::Universal::INSURANCE_INACTIVE ? $page->field('inactive_payer', 1) : $page->field('inactive_payer', '');
+	$page->field('coverage_begin_date', $thirdParty->{coverage_begin_date});
+	$page->field('coverage_end_date', $thirdParty->{coverage_end_date});
 	my $insOrgId = '';
 
 	if ($guarantorType eq 'org')
@@ -134,7 +160,9 @@ sub execute
 	my $ownerOrgId = $page->session('org_internal_id');
 	my $guarantorType = $otherPayerType eq 'person' ? App::Universal::ENTITYTYPE_PERSON : App::Universal::ENTITYTYPE_ORG;
 	my $guarantor = $otherPayerType eq 'person' ? $page->field('guarantor_id') : $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $page->field('guarantor_id'));
-
+	my $sequence = $page->field('inactive_payer');
+	my $billSequence = $page->field('inactive_payer') ne '' ? App::Universal::INSURANCE_INACTIVE : undef;
+	$page->addDebugStmt("TEST: $billSequence, $sequence, $command");
 	$page->schemaAction(
 			'Insurance', $command,
 			ins_internal_id => $editInsIntId || undef,
@@ -144,6 +172,9 @@ sub execute
 			ins_type => App::Universal::CLAIMTYPE_CLIENT || undef,
 			guarantor_id => $guarantor || undef,
 			guarantor_type  => $guarantorType,
+			bill_sequence   => $billSequence,
+			coverage_begin_date		=> $page->field('coverage_begin_date') || undef,
+			coverage_end_date		=> $page->field('coverage_end_date') || undef,
 			_debug => 0
 		);
 
