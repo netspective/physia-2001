@@ -1,3 +1,5 @@
+#!/usr/bin/perl -w
+
 use strict;
 
 use constant NSFDEST_ARRAY => 0;
