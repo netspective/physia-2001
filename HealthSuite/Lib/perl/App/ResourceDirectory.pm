@@ -147,6 +147,7 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Dialog::Procedure;
+#use App::Dialog::Invoice;
 #use App::Dialog::Slot;
 use App::Dialog::Template;
 use App::Dialog::Transaction::ActiveProblems;
@@ -584,6 +585,7 @@ $SEARCH_CLASSES = {
 	'postgeneralpayment' => 'App::Dialog::PostGeneralPayment',
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
+	#'invoice' => 'App::Dialog::Invoice',
 	#'slot' => 'App::Dialog::Slot',
 	'template' => {_class => 'App::Dialog::Template', _arl_modify => ['template_id'], _arl_add => ['resource_id'],},
 	'userproblem' => 'App::Dialog::UserProblems',
