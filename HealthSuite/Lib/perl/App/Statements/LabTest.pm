@@ -26,11 +26,18 @@ $STMTMGR_LAB_TEST = new App::Statements::LabTest(
 		FROM lab_test_panel
 		WHERE parent_id= :1
 	},
+	'selTestItems'=>qq
+	{
+		SELECT entry_id,description
+		FROM	offering_catalog_entry
+		WHERE	catalog_id = :1
+		AND	parent_entry_id IS NULL
+	},
 	'selTestType'=>qq
 	{
 		SELECT id,caption
-		FROM catalog_entry_type
-		WHERE id IN (300,310,999)
+		FROM offering_catalog_type
+		WHERE id IN (5,6,7)
 	},
 	'countXray'=>qq
 	{
@@ -63,36 +70,19 @@ $STMTMGR_LAB_TEST = new App::Statements::LabTest(
 		FROM lab_test_panel
 		WHERE parent_id = :1
 	},
-	'sel_available_labs'=>qq
+	
+	'selSelectTestByParentId'=>qq
 	{
-		SELECT 	oce.entry_id,oce.name
-		FROM 	offering_catalog oc, offering_catalog_entry oce			
-		WHERE 	oc.org_internal_id= :1
-		AND	oc.internal_catalog_id = oce.catalog_id
-		AND	oce.entry_type =300
-		AND	oce.parent_entry_id is NULL		
+		SELECT	loe.test_entry_id, oce.catalog_id
+		FROM	lab_order_entry loe, offering_catalog_entry oce
+		WHERE	loe.test_entry_id = oce.entry_id
+		AND	parent_id = :1
 	},
-	'sel_available_xray'=>qq
-	{
-		SELECT 	oce.entry_id,oce.name
-		FROM 	offering_catalog oc, offering_catalog_entry oce			
-		WHERE 	oc.org_internal_id= :1
-		AND	oc.internal_catalog_id = oce.catalog_id
-		AND	oce.entry_type =310
-		AND	oce.parent_entry_id is NULL		
-	},
-	'sel_available_other'=>qq
-	{
-		SELECT 	oce.entry_id,oce.name
-		FROM 	offering_catalog oc, offering_catalog_entry oce			
-		WHERE 	oc.org_internal_id= :1
-		AND	oc.internal_catalog_id = oce.catalog_id
-		AND	oce.entry_type =999
-		AND	oce.parent_entry_id is NULL
-	},
+
 	'selLabOrderByID'=>qq
 	{
-		SELECT 	l.*, o.org_id ,o.name_primary
+		SELECT 	l.*, o.org_id ,o.name_primary,o.org_internal_id, to_char(l.date_done,'$SQLSTMT_DEFAULTTIMEFORMAT') as done_time,
+		to_char(l.date_order,'$SQLSTMT_DEFAULTTIMEFORMAT') as order_time		
 		FROM 	person_lab_order l, org o
 		WHERE 	lab_order_id = :1
 		AND	l.lab_internal_id = o.org_internal_id

@@ -117,6 +117,14 @@ $STMTMGR_ORG = new App::Statements::Org(
 		AND	value_int = :2
 		AND	item_name = :3
 		},
+	'selOrgIDByOrgType' =>qq
+		{
+			select distinct o.org_id,o.org_internal_id
+			FROM	org o , org_category oc
+			WHERE  	o.org_internal_id = oc.parent_id
+			AND	o.owner_org_id = :1
+			AND	oc.member_name = :2
+		},
 
 	'selAttribute' => qq{
 		select * from org_attribute
@@ -182,7 +190,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 		where item_id = ?
 		},
 	'selAddresses' => qq{
-		select parent_id, address_name, complete_addr_html
+		select parent_id, address_name, complete_addr_html,item_id
 		from org_address where parent_id = ?
 		order by address_name
 		},
