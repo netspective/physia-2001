@@ -66,3 +66,5 @@ start tables-code/Document
 --bug 1863
 
 alter table person_medication add (sale_units varchar2(32));
+alter table person_medication_aud add (sale_units varchar2(32));
+start tables-code/Person_Medication
