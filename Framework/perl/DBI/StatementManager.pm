@@ -511,8 +511,11 @@ sub getRowsAsArrayTree
 		{
 			if(my $parentId = $record->[$parentIdColIdx])
 			{
-				push(@{$allRecords{$parentId}->[-1]->{_kids}}, $record);
-				$record->[-1]->{_moved} = 1;
+				if(exists $allRecords{$parentId})
+				{
+					push(@{$allRecords{$parentId}->[-1]->{_kids}}, $record);
+					$record->[-1]->{_moved} = 1;
+				}
 			}
 		}
 
