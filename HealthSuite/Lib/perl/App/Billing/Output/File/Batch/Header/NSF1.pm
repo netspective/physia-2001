@@ -72,9 +72,9 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # provider XTID
 	  $spaces, # other no2.
 	  substr(($claimPayToProvider->getTaxTypeId() =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,18),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getLastName() : $spaces,0,20),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getFirstName() : $spaces,0,10),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getMiddleInitial() : $spaces,0,1),
+	  substr($claimPayToProvider->getLastName(),0,20),
+	  substr($claimPayToProvider->getFirstName(),0,10),
+	  substr($claimPayToProvider->getMiddleInitial(),0,1),
 	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
 	  $spaces, # speciality license code
 	  $spaces, # state license number

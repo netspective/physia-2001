@@ -17,7 +17,7 @@ use constant DATEFORMAT_USA => 1;
 #   -- which is given in HCFA 1500 Form
 #
 
-use constant DEFAULT_RELATION_SHIP_TO_INSURED => 01; 
+use constant DEFAULT_RELATION_SHIP_TO_INSURED => '01'; 
 
 sub new
 {
@@ -160,8 +160,8 @@ sub setAccountNo
 sub getRelationshipToInsured
 {
 	my ($self) = @_;
-	
-	return $self->{relationshipToInsured} eq "" ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured};
+	print (($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured});
+	return ($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured};
 }
 
 sub setRelationshipToInsured

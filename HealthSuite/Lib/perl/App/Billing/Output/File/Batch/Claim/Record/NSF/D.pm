@@ -48,7 +48,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
-	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToPatient()),
+	substr($refClaimInsured->getRelationshipToPatient(),0,2),
 	substr($refClaimInsured->getSsn(), 0, 17),
 	$spaces,  # insured id filler
 	substr($refClaimInsured->getLastName(), 0, 20),
