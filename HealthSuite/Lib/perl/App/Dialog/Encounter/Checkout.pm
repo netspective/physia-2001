@@ -97,7 +97,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	#$page->beginUnitWork("Unable to checkout patient");
 
-	my $eventId = $page->field('event_id');
+	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
