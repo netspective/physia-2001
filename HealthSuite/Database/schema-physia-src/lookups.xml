@@ -1414,7 +1414,7 @@
 			</row>
 			<row>
 				<col name="id">116</col>
-				<col name="caption">Item or service provided as routine care in an approved clinical trial</col>
+				<col name="caption">Item or service prov. as routine care in an apprv. clin. trial</col>
 				<col name="abbrev">QV</col>
 				<col name="result">2</col>
 			</row>
