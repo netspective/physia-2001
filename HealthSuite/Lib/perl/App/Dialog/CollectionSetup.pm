@@ -9,7 +9,6 @@ use CGI::Validator::Field;
 
 use DBI::StatementManager;
 use App::Statements::WorklistCollection;
-use App::Dialog::Field::MultiselectBis;
 
 use Date::Manip;
 use Devel::ChangeLog;
