@@ -148,7 +148,7 @@ sub prepare_page_content_header
 						<OPTION>Choose Action</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
-						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
+						<OPTION value="/org/#param.org_id#/dlg-update-org-dir-entry">Edit Profile</OPTION>
 						<OPTION value="/org/#session.org_id#/account">Apply Payment</OPTION>
 						<OPTION value="/org/#session.org_id#/profile">Go To Parent Org</OPTION>
 					</SELECT>
@@ -302,7 +302,7 @@ sub prepare_view_catalog
 	{
 		$self->param('internal_catalog_id', $pathItems[3]);
 		#Determine if service type of catalog
-		my $catalog = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selCatalogById', $self->param('internal_catalog_id'));		
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selCatalogById', $self->param('internal_catalog_id'));
 		if($catalog->{catalog_type} eq '1')
 		{
 			$self->addContent('#component.stp-org.serviceCatalogEntry#');
@@ -313,7 +313,7 @@ sub prepare_view_catalog
 		}
 	}
 	else
-	{	
+	{
 		$self->addContent('#component.stp-org.serviceCatalog#');
 	}
 
