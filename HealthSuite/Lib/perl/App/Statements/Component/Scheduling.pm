@@ -158,7 +158,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		delete from Person_Attribute
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = ?
 	},
 	
 	'sel_worklist_resources' => qq{
@@ -166,7 +166,7 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 		from Person_Attribute
 		where parent_id = ?
 			and value_type = $PERSON_ASSOC_VALUE_TYPE
-			and item_name = 'WorkList'
+			and item_name = ?
 	},
 
 	'del_worklist_facilities' => qq{
