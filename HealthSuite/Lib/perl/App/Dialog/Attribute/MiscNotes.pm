@@ -26,7 +26,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'value_text', caption => 'Property Name', type => 'memo', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(name => 'value_text', caption => 'Misc Notes', type => 'memo', options => FLDFLAG_REQUIRED),
 	);
 	$self->{activityLog} =
 	{
