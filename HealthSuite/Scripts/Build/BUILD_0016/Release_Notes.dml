@@ -45,6 +45,10 @@
 			sequence has been added to the physician or not
 		</deliverable>
 
+		<deliverable id="1114">
+			UI: On the collection worklist if a claim has been submitted to next payer (which causes the invoices to be copied).  On the collection worklist the new invoice number will appear with the old invoice number in parentheses.		
+		</deliverable>
+
 		<deliverable id="1163">
 			TWCC 60 Form: dialog and pdf complete.
 		</deliverable>
