@@ -107,12 +107,12 @@ sub makeStateChanges
 	#if hosp claim, show hosp orgs, otherwise show service orgs
 	if(my $isHosp = $page->param('isHosp'))
 	{
-		$self->heading('Add Hospital Claim');
+		$self->heading('$Command Hospital Claim');
 		$self->updateFieldFlags('org_fields', FLDFLAG_INVISIBLE, 1);
 	}
 	else
 	{
-		$self->heading('Add Claim');
+		$self->heading('$Command Claim');
 		$self->updateFieldFlags('hosp_org_fields', FLDFLAG_INVISIBLE, 1);
 	}
 
