@@ -57,11 +57,13 @@ sub getForm
 		Find:
 		<select name="search_status" style="color: darkred">
 			<option value="all" selected>All</option>
-			<option value="incomplete">Incomplete</option>
-			<option value="3">On Hold</option>
-			<option value="2">Pending</option>
+			<!-- <option value="incomplete">Incomplete</option>
+			<option value="2">Pending</option> -->
+			<option value="3">On Hold</option>			
 			<option value="4">Submitted</option>
-			<option value="6">Rejected</option>
+			<option value="5">Transferred</option>
+			<option value="11">Rejected</option>
+			<option value="16">Voided</option>
 		</select>
 		<script>
 			setSelectedValue(document.search_form.search_status, '@{[ $self->param('search_status') || 0 ]}');
