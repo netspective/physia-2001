@@ -17,9 +17,9 @@ $QUERYDIR = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL');
 	'query' => {
 		_idSynonym => ['find'],
 		_title => '#param._page_title#',
-		_iconSmall => 'icons/search',
-		_iconMedium => 'icons/search',
-		_iconLarge => 'icons/search',
+		_iconSmall => 'images/page-icons/query',
+		_iconMedium => 'images/page-icons/query',
+		_iconLarge => 'images/page-icons/query',
 		_views => [],
 		},
 	);
@@ -45,14 +45,32 @@ sub prepare
 		push @{$self->{page_content}}, $dialog->getHtml($self, 'add');
 		if ($self->field('dlg_execmode') eq 'V')
 		{
-			unshift @{$self->{page_content}}, $dialog->getHtml($self, 'add');
+			push @{$self->{page_content}}, $dialog->getHtml($self, 'add');
 		}
-
-		unshift @{$self->{page_content}}, $dialog->{viewTabs} if defined $dialog->{viewTabs};
 
 	}
 	else
 	{
+		# Give them a menu of Query Types
+		#my $children = $self->getChildResources();
+		#my $html = qq{<br>\n<br>\n<p>\n<table align="center" cellpadding="10" cellspacing="5" border="0">};
+		#foreach (sort keys %$children)
+		#{
+		#	my $icon = $IMAGETAGS{$children->{$_}->{_iconMedium}};
+		#	my $title = $children->{$_}->{_title};
+		#	my $description = defined $children->{$_}->{_description} ? $children->{$_}->{_description} : '';
+		#	next unless $icon && $title;
+		#	$title = qq{<font face="Arial,Helvetica" size="4" color="darkred"><b>$title</b></font>};
+		#	$description = qq{<br><font face="Arial,Helvetica" size="2" color="black">$description</font>} if $description;
+		#	$title = qq{<a href="/worklist/$_">$title</a>};
+		#	$html .= "<tr><td>\n$icon<br>\n</td><td>\n$title$description<br>\n</td></tr>";
+		#}
+		#$html .= '</table><p>';
+		#$self->addContent($html);
+
+
+
+
 		my $html = '';
 		$html .= '<br><br><b>Available Queries:</b><br><ul>';
 		foreach (@{$RESOURCE_MAP{query}->{_views}})
@@ -136,11 +154,15 @@ sub handleARL
 # Add views to the %RESOURCE_MAP with all available query types
 
 opendir QUERYDIR, $QUERYDIR;
-my @queries = map {$_ =~ s/\.qdl//;$_} grep {$_ =~ /\.qdl/ && -f "$QUERYDIR/$_"} readdir QUERYDIR;
+my @queries = grep {$_ =~ /\.qdl/ && -f "$QUERYDIR/$_"} readdir QUERYDIR;
 closedir QUERYDIR;
-foreach (@queries)
+foreach (sort @queries)
 {
-	push @{$RESOURCE_MAP{query}->{_views}}, {caption => $_, name => lc($_)};
+	my $sqlGen = new SQL::GenerateQuery(file => "$QUERYDIR/$_");
+	my $id = $sqlGen->id();
+	my $caption = defined $sqlGen->{params}->{caption} ? $sqlGen->{params}->{caption} : $id;
+	my $icon = defined $sqlGen->{params}->{icon} ? $sqlGen->{params}->{icon} : 'images/page-icons/default';
+	push @{$RESOURCE_MAP{query}->{_views}}, {caption => $caption, name => $id, icon => $icon, };
 }
 
 
