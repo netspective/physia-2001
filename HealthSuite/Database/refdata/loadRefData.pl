@@ -488,7 +488,7 @@ sub importThinPayers
 
 	my $importer = new App::Data::Obtain::ThinNet::Payers;
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
-		srcThin => File::Spec->catfile($properties->{dataSrcThinPath}, 'net_payer.dot'),
+		srcThin => File::Spec->catfile($properties->{dataSrcThinPath}, 'net_payer.doc'),
 		);
 	if($importer->haveErrors())
 	{
