@@ -4,6 +4,7 @@ package App::Dialog::Query;
 
 use strict;
 use App::Universal;
+use App::Page;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use CGI::ImageManager;
@@ -12,7 +13,7 @@ use DBI::StatementManager;
 use App::Statements::Org;
 use Data::Publish;
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.4 2000-09-13 23:41:21 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.5 2000-10-05 16:30:33 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 %RESOURCE_MAP=();
@@ -23,16 +24,34 @@ use constant SHOWROWS => 10;
 
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'query', width => '100%');
-	
+	#389cce
+	#126A97
+	my $self = CGI::Dialog::new(@_, id => 'query', width => "100%", headColor => '#CCCCCC', bgColor => '#CCCCCC');
+
 	my $page = $self->{page};
 	my $sqlGen = new SQL::GenerateQuery(file => $page->property('QDL'));
 	$self->{sqlGen} = $sqlGen;
 	my $viewName = $page->param('_query_view') || 'all';
 	my $view = $sqlGen->views($page->param('_query_view'));
 	$self->{view} = $view;
-	
-	my $fieldSelections = 
+	my $queryType = $page->param('_query_type');
+
+	# Add the query view menu tabs
+	if (!($page->{flags} & App::Page::PAGEFLAG_ISPOPUP))
+	{
+		my $viewMenu = [];
+		foreach my $viewName ($sqlGen->views())
+		{
+			push @$viewMenu, [ $sqlGen->views($viewName)->{caption} || "\u$viewName", "/query/$queryType/$viewName", $viewName ];
+		}
+		my $viewMenuHtml = $page->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
+			selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#E5E5E5', unselTextColor => '#555555', highColor => 'navy',
+			leftImage => 'images/design/tab-top-left-corner-white', rightImage => 'images/design/tab-top-right-corner-white'} );
+		$self->{viewTabs} = qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Filters:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>};
+	}
+
+
+	my $fieldSelections =
 		join ';',
 			map {$sqlGen->fields($_)->{caption} . ":" . $sqlGen->fields($_)->{id}}
 				grep {defined $sqlGen->fields($_)->{caption}}
@@ -43,10 +62,10 @@ sub new
 				grep {$sqlGen->comparisons($_)->{placeholder} !~ /\@/}
 					$sqlGen->comparisons();
 	my $joinOps = 'AND;OR';
-	
+
 	my $gridName = 'params';
 	my $maxParams = MAXPARAMS;
-	
+
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'start_row'),
 		new CGI::Dialog::DataGrid(
@@ -108,33 +127,33 @@ sub new
 			],
 		),
 	);
-	
-	
+
+
 	# Setup data scructures necessary for JavaScript
-	my $fieldLookups = 
-		join ", ", 
-			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'lookup-url'} . "'"} 
-				grep {exists $sqlGen->fields($_)->{'lookup-url'}} 
+	my $fieldLookups =
+		join ", ",
+			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'lookup-url'} . "'"}
+				grep {exists $sqlGen->fields($_)->{'lookup-url'}}
 					$sqlGen->fields();
-	my $fieldTypes = 
-		join ", ", 
-			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'ui-datatype'} . "'"} 
+	my $fieldTypes =
+		join ", ",
+			map {$sqlGen->fields($_)->{id} . " : '" . $sqlGen->fields($_)->{'ui-datatype'} . "'"}
 				grep {exists $sqlGen->fields($_)->{'ui-datatype'}}
 					$sqlGen->fields();
-	my $noCriteria = 
+	my $noCriteria =
 		join ", ",
 			map {$sqlGen->comparisons($_)->{id} . " : 1"}
 				grep {defined $sqlGen->comparisons($_)->{value} && $sqlGen->comparisons($_)->{value} eq ''}
 					$sqlGen->comparisons();
-	
+
 	my $showRows = SHOWROWS;
-	
+
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
 		<!--
-		
+
 		var fieldLookups = {$fieldLookups};
-		
+
 		function onChangeField(event)
 		{
 			var myValue = event.srcElement.value;
@@ -159,9 +178,9 @@ sub new
 			}
 			resetStartRow();
 		}
-		
+
 		var noCriteria = {$noCriteria};
-		
+
 		function onChangeComparison(event)
 		{
 			var myValue = event.srcElement.value;
@@ -185,9 +204,9 @@ sub new
 			}
 			resetStartRow();
 		}
-		
+
 		var fieldTypes = {$fieldTypes};
-		
+
 		function onBlurCriteria(event)
 		{
 			var myValue = event.srcElement.value;
@@ -216,7 +235,7 @@ sub new
 			}
 			document.all.dialog.submit();
 		}
-		
+
 		function resetStartRow()
 		{
 			var fieldObj = "document.all._f_start_row";
@@ -224,19 +243,19 @@ sub new
 			if(startRow = eval(fieldObj))
 				startRow.value = 0;
 		}
-		
+
 		function onMouseOverRow(event)
 		{
 			event.srcElement.parentElement.parentElement.parentElement.style.backgroundColor = '#CCCCCC';
 		}
-		
+
 		function onMouseOutRow(event)
 		{
 			event.srcElement.parentElement.parentElement.parentElement.style.backgroundColor = '#FFFFFF';
 		}
-		
+
 		showHideRows('params', 'join', $maxParams);
-		
+
 		//if (destObj = eval('document.all._f_out_destination'))
 		//{
 		//	if (destObj.options[destObj.selectedIndex].text == 'Browser')
@@ -255,11 +274,11 @@ sub new
 		//		setIdStyle('_id_out_printer', 'display', 'none');
 		//	}
 		//}
-		
+
 		// -->
 		</script>
 	});
-	
+
 	return $self;
 }
 
@@ -276,15 +295,16 @@ sub execute
 	my $view = $self->{view};
 	my @outColumns = map {$_->{id}} @{$view->{columns}};
 	my @orderBy = map {$_->{id}} @{$view->{'order-by'}};
+	my @groupBy = map {$_->{id}} @{$view->{'group-by'}};
 	my $distinct = defined $view->{distinct} ? $view->{distinct} : 0;
 	my $condition;
-	
+
 	my $startRow = $page->field('start_row');
 	$startRow = 0 unless $startRow;
 	my $endRow = $startRow + SHOWROWS;
-		
+
 	$page->property(CGI::Dialog::PAGEPROPNAME_INEXEC . '_' . $self->id(), 1);
-	
+
 	# Build user condition
 	my @andConditions = ();
 	my @orConditions = ();
@@ -294,7 +314,7 @@ sub execute
 		my $comparison = $page->field("comparison_$i");
 		my $criteria = $page->field("criteria_$i");
 		my $join = $page->field("join_$i");
-			
+
 		#$page->addDebugStmt("got here $field $comparison $criteria");
 		if ($field)
 		{
@@ -306,12 +326,13 @@ sub execute
 				{
 					$whereField = "TO_CHAR({$field}, 'MM/DD/YYYY')";
 				}
-				
-			}
 
-			push @andConditions, $sqlGen->WHERE($whereField, $comparison, uc($criteria));
+			}
+			my @criteria = split /,\s*/, uc($criteria);
+			@criteria = ('') unless @criteria;
+			push @andConditions, $sqlGen->WHERE($whereField, $comparison, @criteria);
 		}
-		
+
 		if ($join ne 'AND')
 		{
 			push @orConditions, $sqlGen->AND(@andConditions) if @andConditions;
@@ -319,30 +340,33 @@ sub execute
 		}
 		last unless $join;
 	}
-	
+
 	if (@orConditions)
 	{
 		$condition = $#orConditions ? $sqlGen->OR(@orConditions) : $orConditions[0];
 	}
-	
-	
+
+
 	# If the style has a condition, combine it with the user's
 	if (exists $view->{condition} && defined $view->{condition})
 	{
 		$condition = $condition ? $sqlGen->AND($view->{condition}, $condition) : $view->{condition};
 	}
-	
+
 	# Generate the SQL & Bind Params
 	my ($SQL, $bindParams) = $condition->genSQL(
 		outColumns => \@outColumns,
 		orderBy => \@orderBy,
+		groupBy => \@groupBy,
 		distinct => $distinct);
-		
+
 	# Wrap the SQL with an outer SQL to limit results
 	my $cols = join ",\n", map {"\t$_"} @outColumns;
 	$SQL = "SELECT * FROM (\n\nSELECT\n\trownum AS row#,\n$cols\nFROM (\n\n" . $SQL . "\n\n) WHERE rownum <= ?\n\n) WHERE row# > ?";
+	#$page->addDebugStmt("<PRE>$SQL</PRE>");
+	#return;
 	push @{$bindParams}, ($endRow+1), $startRow;
-	
+
 	# Do any variable replacements in the SQL itself
 	$page->replaceVars(\$SQL);
 
@@ -353,15 +377,34 @@ sub execute
 	$publDefn->{bodyRowAttr} = {
 		onMouseOver => q{this.style.cursor='hand';this.style.backgroundColor='#CCCCCC'},
 		onMouseOut => q{this.style.cursor='default';this.style.backgroundColor='#FFFFFF'},
-		onClick => q{alert('You selected: #1#');},
+		onClick => q{alert('You selected #1#');},
 	};
+	if (defined $view->{href})
+	{
+		my $viewHref = $view->{href};
+		$viewHref =~ s/\{(\w+)\}/join('',map {$1 eq $outColumns[$_] ? '#' . ($_+1) . '#' : ''} 0..$#outColumns)/eg;
+		$publDefn->{bodyRowAttr}->{onClick} = qq{document.location = '$viewHref';};
+	}
+	$publDefn->{columnDefn} = [
+		{
+			head => '#',
+			hint => "Query Result Number #0#",
+			dataFmt => '<font color="NAVY">#&{?}#.</font>',
+		},
+	];
+	foreach (@outColumns)
+	{
+		my $defn = {};
+		$defn->{head} = $sqlGen->fields($_)->{caption};
+		push @{$publDefn->{columnDefn}}, $defn;
+	}
 	my $resultHtml = createHtmlFromStatement($page, $stmgrFlags, $stmtHdl, $publDefn, {stmtId => $SQL, maxRows => SHOWROWS});
 	my $nextPageExists = $stmtHdl->fetch();
 	$stmtHdl->finish();
-	
-	# Add the results table to the page	
+
+	# Add the results table to the page
 	$page->addContent('<br><div align="center">' . $resultHtml . '</div>');
-	
+
 	# Add page controls below the results
 	my $pageControlHtml = '<br><center>';
 	$pageControlHtml .= qq{<a href="javascript:changePage(-1)">Prev Page</a>} unless $startRow == 0;
@@ -372,7 +415,7 @@ sub execute
 	}
 	$pageControlHtml .= '</center>';
 	$page->addContent($pageControlHtml);
-	
+
 	return '';
 }
 
