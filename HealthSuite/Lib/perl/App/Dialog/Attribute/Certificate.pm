@@ -74,7 +74,7 @@ sub customValidate
 
 	my $licenseData = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selAttrByItemNameParentNameSort', $personId, $licenseName, $facilityId);
 
-	if ($itemId ne $licenseData->{'item_id'} && $facilityId eq $licenseData->{'name_sort'} && $licenseName eq $licenseData->{'value_textb'})
+	if (($licenseData->{'value_type'} eq App::Universal::ATTRTYPE_LICENSE) && $itemId ne $licenseData->{'item_id'} && $facilityId eq $licenseData->{'name_sort'} && $licenseName eq $licenseData->{'value_textb'})
 	{
 		$fName->invalidate($page, "This license already exists for '$personId' for the facility '$facilityId' ");
 	}
