@@ -30,6 +30,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'item_type'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'claim_diags'),
 
 		new CGI::Dialog::Field::Duration(
 				name => 'illness',
@@ -64,7 +65,7 @@ sub new
 				),
 		new App::Dialog::Field::ServicePlaceType(caption => 'Service Place/Type'),
 		new App::Dialog::Field::ProcedureLine(caption => 'CPT / Modf'),
-		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED, name => 'procdiags'),
 
 		new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', options => FLDFLAG_PERSIST),
 		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units', name => 'proc_charge_fields'),
@@ -121,26 +122,24 @@ sub makeStateChanges
 		my $numOfHashes = scalar (@{$serviceInfo});
 		my $idx = $numOfHashes - 1;
 
-		if($numOfHashes > 0 && $command eq 'add')
+		if($numOfHashes > 0)
 		{
-			if($page->field('servplace') eq '')
-			{
-				$page->field('servplace', $serviceInfo->[$idx]->{data_num_a});
-			}
+			$page->field('servplace', $serviceInfo->[$idx]->{hcfa_service_place});
+			$self->setFieldFlags('servplace', FLDFLAG_READONLY);
 
 			if($page->field('servtype') eq '')
 			{
-				$page->field('servtype', $serviceInfo->[$idx]->{data_num_b});
+				$page->field('servtype', $serviceInfo->[$idx]->{hcfa_service_type});
 			}
 
 			if($page->field('service_begin_date') eq '')
 			{
-				$page->field('service_begin_date', $serviceInfo->[$idx]->{data_date_a});
+				$page->field('service_begin_date', $serviceInfo->[$idx]->{service_begin_date});
 			}
 
 			if($page->field('service_end_date') eq '')
 			{
-				$page->field('service_end_date', $serviceInfo->[$idx]->{data_date_b});
+				$page->field('service_end_date', $serviceInfo->[$idx]->{service_end_date});
 			}
 		}
 	}
@@ -149,12 +148,14 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	my $invoiceId = $page->param('invoice_id');
+
+	$page->field('claim_diags', $STMTMGR_INVOICE->getSingleValue($page, 0, 'selClaimDiags', $invoiceId));
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	$page->field('', $page->getDate());
 	my $sqlStampFmt = $page->defaultSqlStampFormat();
-	my $invoiceId = $page->param('invoice_id');
 	my $itemId = $page->param('item_id');
 
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selProcedure', $itemId);
@@ -1064,7 +1065,8 @@ sub execute
 	my $balance = $extCost + $invItem->{total_adjust};
 
 	my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
-	my @relDiags = split(/\s*,\s*/, $page->field('procdiags'));
+	my @relDiags = $page->field('procdiags');					#diags for this particular procedure
+	my @claimDiags = split(/\s*,\s*/, $page->field('claim_diags'));		#all diags for a claim
 	#my @hcpcsCode = split(/\s*,\s*/, $page->field('hcpcs'));
 	my @cptCodes = split(/\s*,\s*/, $page->field('procedure'));		#there will always be only one value in this array
 
@@ -1075,6 +1077,19 @@ sub execute
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
 	}
 
+	## FIGURE OUT DIAG CODE POINTERS
+	my @diagCodePointers = ();
+	my $claimDiagCount = @claimDiags;
+	foreach my $relDiag (@relDiags)
+	{
+		foreach my $claimDiagNum (1..$claimDiagCount)
+		{
+			if($relDiag eq $claimDiags[$claimDiagNum-1])
+			{
+				push(@diagCodePointers, $claimDiagNum);
+			}
+		}
+	}
 
 
 	$page->schemaAction(
@@ -1096,6 +1111,7 @@ sub execute
 			hcfa_service_type => $page->field('servtype') || 'NULL',
 			service_begin_date => $page->field('service_begin_date') || undef,
 			service_end_date => $page->field('service_end_date') || undef,
+			data_text_a => join(', ', @diagCodePointers) || undef,
 			_debug => 0
 		);
 
