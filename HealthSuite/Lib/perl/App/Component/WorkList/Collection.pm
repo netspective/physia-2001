@@ -120,11 +120,22 @@ sub getComponentHtml
 	    	my @date= Add_Delta_Days (@start_Date,"-".$maxRange);
 	 	$minDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);		
 	}
-
+	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,STMTMGRFLAG_NONE, 'sel_worklist_all_products',
+		$page->session('user_id'), $page->session('org_internal_id'));	
 	#Get new records on the worklist
-	my $person = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selWorkListPop',
+	my $person;
+	if ($productsAll->{value_int}==-1)
+	{
+		$person = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selWorkListPopAll',
 			$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$page->session('org_internal_id'),
 			$page->session('user_id'),$fmtDate);
+	}
+	else
+	{
+		$person = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selWorkListPop',
+			$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$page->session('org_internal_id'),
+			$page->session('user_id'),$fmtDate);
+	}
 	my $count=0;
 	foreach (@$person)
 	{
