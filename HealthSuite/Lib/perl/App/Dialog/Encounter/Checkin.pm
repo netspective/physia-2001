@@ -57,6 +57,7 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$self->updateFieldFlags('checkout_stamp', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('claim_diags', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('procedures_heading', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 }
