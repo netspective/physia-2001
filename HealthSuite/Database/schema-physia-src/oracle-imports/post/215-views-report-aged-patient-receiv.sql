@@ -19,7 +19,7 @@ AND	ii.parent_id = i.invoice_id
 AND	ia.parent_id = i.invoice_id 
 AND	ia.item_name = 'Invoice/Creation/Batch ID'	
 AND 	(invoice_status !=15 or parent_invoice_id is null)
-AND	ib.bill_sequence=1;
+AND 	ib.bill_id = i.billing_id;
 
 
 create or replace view agedpatientdataone as
