@@ -254,23 +254,8 @@ sub getProceduresHtml
 			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>";
 		}
 
-		## ---Removed 'P' and replaced it with a quick link that displays all items and allows distribution of personal payment
-		#my $addPersPayHref = "/invoice/$invoiceId/dialog/adjustment/personal,$itemId";
-		#my $persPayImg = '';
-		#if($itemStatus ne 'void')
-		#{
-		#	$persPayImg = "<a href='$addPersPayHref'><font face='Arial,Helvetica' color=green size=2>P</font></a>";
-		#}
-
-		## ---Removed '$' and replaced it with a quick link that displays all items and allows distribution of insurance payment
-		#my $addInsPayHref = "/invoice/$invoiceId/dialog/adjustment/insurance,$itemId";
-		#my $insPayImg = '';
 		my $itemAdjustmentTotal = $procedure->{totalAdjustments};
 		my $itemExtCost = $procedure->{extendedCost};
-		#if($itemAdjustmentTotal < $procedure->{balance} && $claimType != $selfPay && $itemStatus ne 'void')
-		#{
-		#	$insPayImg = "<a href='$addInsPayHref'><font face='Arial,Helvetica' color=green size=2>\$</font></a>";
-		#}
 
 		$itemAdjustmentTotal = $formatter->format_price($itemAdjustmentTotal);
 		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx');";
@@ -1176,10 +1161,16 @@ sub prepare_view_summary
 							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
 							</FONT>
 						</TD>" : '' ]}
-						@{[ $invStatus != $void && $invStatus != $closed ?
+						@{[ $invStatus != $void && $invStatus != $closed && $claimType == $selfPay ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
+							</FONT>
+						</TD>" : '' ]}
+						@{[ $invStatus != $void && $invStatus != $closed && $claimType != $selfPay ?
+						"<TD>
+							<FONT FACE='Arial,Helvetica' SIZE=2>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Payment</a>
 							</FONT>
 						</TD>" : '' ]}
 					</TR>
@@ -1701,7 +1692,7 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 						
-						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus >= $transferred && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
