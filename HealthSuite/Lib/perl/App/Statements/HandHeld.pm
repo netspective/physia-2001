@@ -51,6 +51,7 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 	'sel_scheduledAppts' => {
 		sqlStmt => $BASE_APPT_SQL,
 		apptStatusClause => qq{AND e.event_status = @{[ App::Universal::EVENTSTATUS_SCHEDULED ]}},
+		sqlStmtBindParamDescr => ["\$page->session('GMT_DAYOFFSET')", 'Date', 'Provider person_id', "\$page->session('org_internal_id')"],
 	},
 
 	'sel_inProgressAppts' => {
@@ -140,23 +141,23 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 
 	'sel_patientActiveMeds' => qq{
 		SELECT
-			tr.trans_type,
-			tr.trans_id,
-			tr.caption as medicine,
-			to_char(tr.trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'),
-			tt.caption as type,
-			tr.provider_id,
-			tr.data_text_a
+			permed_id,
+			med_name,
+			dose,
+			dose_units,
+			TO_CHAR(start_date, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
+			TO_CHAR(end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
+			frequency,
+			num_refills,
+			approved_by
 		FROM
-			transaction_type tt,
-			transaction tr
+			Person_Medication
 		WHERE
-			tr.trans_owner_id = upper(:1)
-			AND tr.trans_type BETWEEN 7000 AND 7999
-			AND tr.trans_owner_type = 0
-			AND tr.trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
-			AND tt.id = tr.trans_type
-		ORDER BY tr.trans_begin_stamp DESC
+			parent_id = upper(:1)
+				and (end_date IS NULL OR end_date > TRUNC(sysdate))
+		ORDER BY
+			start_date DESC,
+			med_name
 	},
 
 	'sel_patientActiveProblems' => qq{
