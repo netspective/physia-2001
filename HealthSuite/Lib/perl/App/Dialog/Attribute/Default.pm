@@ -111,16 +111,28 @@ sub execute_add
 
 	my $valueType = $self->{valueType} || '0';
 	my $prefFlag = $page->field('preferred_flag') eq '' ? 0 : 1;
-
+	my $itemName = '';
 	#get table name
 	my $tableName = '';
+
 	if($personId)
 	{
 		$tableName = 'Person_Attribute';
 	}
+
 	else
 	{
 		$tableName = 'Org_Attribute';
+	}
+
+	if($valueType == App::Universal::ATTRTYPE_TEXT)
+	{
+		$itemName = 'Contact Information';
+	}
+
+	else
+	{
+		$itemName = $page->field('attr_name');
 	}
 
 	my $parentId = $personId || $page->param('org_id');
@@ -129,7 +141,7 @@ sub execute_add
 		$tableName, 'add',
 		parent_id => $parentId,
 		item_id => $page->param('item_id') || undef,
-		item_name => $page->field('attr_name') || undef,
+		item_name => $itemName || undef,
 		value_type => defined $valueType ? $valueType : undef,
 		value_text => $page->field('value_text') || undef,
 		value_textB => $page->field('attr_name') || undef,
