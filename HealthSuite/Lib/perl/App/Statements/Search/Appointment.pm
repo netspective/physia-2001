@@ -20,41 +20,53 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 	[
-		{ head => 'Time', colIdx => 1,
-			url => 'javascript: document.search_form != null ? chooseEntry("#9#") : ""',
+		{ head => 'Time', 
+			colIdx => 1,
+			url => q{javascript: document.search_form != null ? chooseEntry('#9#') : ''},
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 
-		{ head => 'Type',
-			dataFmt => '#5#',
+		{ head => 'Chart',
+			colIdx => 13,
 		},
 
-		{ head => 'Patient', colIdx => 0,
-			url => qq{javascript:chooseItem("/person/#12#/profile")},
+		{ head => 'Account',
+			colIdx => 13,
+		},
+
+		{ head => 'Patient', 
+			colIdx => 0,
+			url => q{javascript:chooseItem('/person/#12#/profile')},
 			hint => "View #12# Profile",
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 
-		{ head => 'Appointment',
-			dataFmt => '#6#',
-		},
+		#{ head => 'Appointment',
+		#	dataFmt => '#6#',
+		#},
 
 		{ head => 'Physician',
-			dataFmt => '#2#',
+			colIdx => 2,
+			url => q{javascript:chooseItem('/search/appointment/#2#')},
+			hint => "View #2# Appointments",
+			#dataFmt => '#2#',
 		},
 
 		{ head => 'Facility',
-			dataFmt => '#7#',
+			colIdx => 7,
+			url => q{javascript:chooseItem('/search/appointment//#7#')},
+			hint => "View #7# Appointments",
+			#dataFmt => '#7#',
 		},
 
-		{ head => 'Scheduled By',
-			dataFmt => '#10#',
-		},
+		#{ head => 'Scheduled By',
+		#	dataFmt => '#10#',
+		#},
 
-		{ head => 'Scheduled Date',
-			dataFmt => '#11#',
-			options => PUBLCOLFLAG_DONTWRAP,
-		},
+		#{ head => 'Scheduled Date',
+		#	dataFmt => '#11#',
+		#	options => PUBLCOLFLAG_DONTWRAP,
+		#},
 
 		#{
 		#	head => 'Details',
@@ -74,28 +86,30 @@ $STMTRPTDEFN_DEFAULT =
 };
 
 my $APPOINTMENT_COLUMNS = 
-qq{		patient.simple_name,
+qq{	patient.simple_name,
 		TO_CHAR(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
 		ep2.value_text AS resource_id,
 		aat.caption AS patient_type,
 		event.subject,
 		et.caption AS event_type,
 		stat.caption,
-		event.facility_id,
+		org.org_id,
 		event.remarks,
 		event.event_id,
 		scheduled_by_id,
 		TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
-		patient.person_id AS patient_id};
+		patient.person_id AS patient_id,
+		'TBD'};
 
 my $APPOINTMENT_TABLES = 
-qq{		person patient,
+qq{	person patient,
 		appt_attendee_type aat,
 		event_attribute ep2,
 		event_attribute ep1,
 		event_type et,
 		event,
-		appt_status stat};		
+		appt_status stat,
+		org};
 
 my $STMTFMT_SEL_APPOINTMENT = qq{
 	SELECT
@@ -103,7 +117,8 @@ $APPOINTMENT_COLUMNS
 	FROM
 $APPOINTMENT_TABLES
 	WHERE
-		event.facility_id LIKE ?
+		org.org_id like ?
+		AND event.facility_id = org.org_internal_id
 		AND event.start_time BETWEEN
 			TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
 			AND TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
@@ -128,7 +143,8 @@ $APPOINTMENT_COLUMNS
 	FROM
 $APPOINTMENT_TABLES
 	WHERE
-		(event.parent_id = ?)
+		event.facility_id = org.org_internal_id
+		AND (event.parent_id = ?)
 		AND ep1.parent_id = event.event_id
 		AND ep2.parent_id = event.event_id
 		AND ep1.value_type = $EVENTATTRTYPE_PATIENT

@@ -125,7 +125,7 @@ $STMTRPTDEFN_NAME_DEFAULT =
 	columnDefn =>
 	[
 		{ head => 'ID', hint => 'Fee Schedule ID #5#', 			
-			url => 'javascript:chooseItem("/search/catalog/name/#0#", "#0#", false)',
+			url => q{javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)},
 			#dataFmt => '&{level_indent:0}#0#', 
 			tDataFmt => '&{count:0} Schedules', 
 			options => PUBLCOLFLAG_DONTWRAP,
@@ -141,9 +141,6 @@ $STMTRPTDEFN_NAME_DEFAULT =
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
-
-
-
 
 
 $STMTRPTDEFN_DEFAULT =
@@ -168,8 +165,7 @@ $STMTRPTDEFN_DEFAULT =
 	columnDefn =>
 	[
 		{ head => 'ID', hint => 'Fee Schedule ID #5#', 
-			url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)',
-			#url => 'javascript:chooseItem("/search/catalog/detailname/#0#", "#0#", false)',
+			url => q{javascript:chooseItem('/search/catalog/detail/#5#', '#5#', false)},
 			#dataFmt => '&{level_indent:0}#0#', 
 			tDataFmt => '&{count:0} Schedules', 
 			options => PUBLCOLFLAG_DONTWRAP,
@@ -185,12 +181,6 @@ $STMTRPTDEFN_DEFAULT =
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
-
-
-
-
-
-
 
 
 
@@ -248,7 +238,7 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 	columnDefn =>
 	[
 		{ head => 'ID',
-			url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-catalog-item/#0#", "#0#", false)',
+			url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-catalog-item/#0#', '#0#', false)},
 			dAlign => 'center',
 			#dataFmt => '&{level_indent:0}#0#',
 			tDataFmt => '&{count:0} Entries',

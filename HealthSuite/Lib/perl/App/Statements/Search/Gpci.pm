@@ -34,7 +34,7 @@ my $BASE_SQL = qq{
 my $PUBLISH_DEFN = {
 	columnDefn =>
 	[
-		{ head => 'ID', url => qq{javascript:chooseItem("/search/gpci/id/#&{?}#", "#&{?}#", false)} },
+		{ head => 'ID', url => q{javascript:chooseItem('/search/gpci/id/#&{?}#', '#&{?}#', false)} },
 		{ head => 'Begin', colIdx => 1},
 		{ head => 'End', colIdx => 2},
 		{ head => 'Locality', colIdx => 3},
@@ -76,7 +76,7 @@ $STMTMGR_GPCI_SEARCH = new App::Statements::Search::Gpci(
 	'sel_GPCI_id' =>
 	{
 		sqlStmt => $BASE_SQL,
-		whereCond => 'gpci_id = ?',
+		whereCond => 'gpci_id like ?',
 		publishDefn => $PUBLISH_DEFN,
 	},
 	
