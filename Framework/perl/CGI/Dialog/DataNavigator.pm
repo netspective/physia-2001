@@ -3,7 +3,7 @@ package CGI::Dialog::DataNavigator;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog);
 
@@ -80,7 +80,7 @@ package CGI::Dialog::DataNavigator::Results;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use Data::Publish;
 use CGI::Dialog;
 use CGI::ImageManager;
@@ -170,6 +170,8 @@ sub createStmt
 		# get the SQL from GenerateQuery
 		($sql, $bindParams) = $queryCond->genSQL();
 	}
+	
+	$page->replaceVars(\$sql);
 
 	# Add the SQL wrapper to rownum restrictions
 	my $cols = join ",\n", map {"\t$_"} $queryCond->outColumns();
@@ -211,17 +213,28 @@ sub createPublDefn
 	my ($page, $sth, $publDefn) = @_;
 	prepareStatementColumns($page, DN_STATEMENT_FLAGS, $sth, $publDefn) unless defined $publDefn->{columnDefn};
 
-	#$publDefn->{select} = {
-	#	type => 'checkbox',
-	#};
-
-	if (exists $publDefn->{dnDrillDown})
+	if (defined $publDefn->{dnMultiRowActions})
 	{
-		$publDefn->{bodyRowAttr} = {
-			onMouseOver => q{this.style.cursor='hand';this.style.backgroundColor='beige'},
-			onMouseOut => q{this.style.cursor='default';this.style.backgroundColor='#FFFFFF'},
-			onClick => qq{handleDrillDown(event, '#rowNum#');},
+		$publDefn->{select} = {
+			type => 'checkbox',
 		};
+	}
+
+	if (defined $publDefn->{dnDrillDown} || defined $publDefn->{dnSelectRowAction})
+	{
+		$publDefn->{bodyRowAttr} = {} unless exists $publDefn->{bodyRowAttr};
+		$publDefn->{bodyRowAttr}{onMouseOver} = q{this.style.cursor='hand';this.style.backgroundColor='beige'};
+		$publDefn->{bodyRowAttr}{onMouseOut} = q{this.style.cursor='default';this.style.backgroundColor='#FFFFFF'};
+
+		if (defined $publDefn->{dnDrillDown})
+		{
+			$publDefn->{bodyRowAttr}{onClick} = qq{handleDrillDown(event, '#rowNum#');};
+		}
+		else
+		{
+			my $href = $publDefn->{dnSelectRowAction};
+			$publDefn->{bodyRowAttr}{onClick} = qq{document.location = '$href'};
+		}
 	}
 
 	# Convert text colIdx's to numbers
@@ -296,7 +309,7 @@ package CGI::Dialog::DataNavigator::Ancestors;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -317,21 +330,24 @@ sub getHtml
 
 	for (0..$drillDepth)
 	{
-		my $imageName = $_ eq $drillDepth ? 'icons/folder-orange-open' : 'icons/folder-orange-closed';
-		$html .= getImageTag('design/transparent-line', {width => 16, height => 13}) x $_;
-		$html .= $IMAGETAGS{$imageName} . '&nbsp;';
-		$html .= qq{<a href="javascript:setDrill($_)">} unless $_ == $drillDepth;
-		my $ancestorFmt = $publDefn->{dnAncestorFmt};
-		if (ref $ancestorFmt eq 'CODE')
+		if (defined $publDefn->{dnAncestorFmt})
 		{
-			$html .= &$ancestorFmt($page, $dialog);
+			my $imageName = $_ eq $drillDepth ? 'icons/folder-orange-open' : 'icons/folder-orange-closed';
+			$html .= getImageTag('design/transparent-line', {width => 16, height => 13}) x $_;
+			$html .= $IMAGETAGS{$imageName} . '&nbsp;';
+			$html .= qq{<a href="javascript:setDrill($_)">} unless $_ == $drillDepth;
+			my $ancestorFmt = $publDefn->{dnAncestorFmt};
+			if (ref $ancestorFmt eq 'CODE')
+			{
+				$html .= &$ancestorFmt($page, $dialog);
+			}
+			else
+			{
+				$html .= $publDefn->{dnAncestorFmt};
+			}
+			$html .= "</a>" unless $_ == $drillDepth;
+			$html .= "<br>\n";
 		}
-		else
-		{
-			$html .= $publDefn->{dnAncestorFmt};
-		}
-		$html .= "</a>" unless $_ == $drillDepth;
-		$html .= "<br>\n";
 
 
 		if (defined $publDefn->{dnDrillDown})
@@ -349,7 +365,7 @@ package CGI::Dialog::DataNavigator::MultiActions;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -364,19 +380,25 @@ sub getHtml
 	my $nextPageExists = $page->property('nextPageExists');
 	my $startRow = $page->field('start_row') || 0;
 	my $outRows = $page->field('out_rows') || 10;
+	
+	my $publDefn = $self->{publDefn};
 
 	my $html = qq{<table cellspacing="0" cellpadding="0" width="100%" border="0" bgcolor="#CDD3DB"><tr>};
 
 	# Add multi-row action buttons
-	#$html .= qq{<td valign="middle">
-	#		<img src="" width="5" height="0">$IMAGETAGS{'images/design/right-to-up-arrow'}<br>
-	#	</td><td valign="middle">
-	#		@{[ $self->getButtonHtml('Sign', href => '/temp/') ]}
-	#	</td><td valign="middle">
-	#		@{[ getImageTag('images/design/arrow-spacer', {width => '8'}) ]}<br>
-	#	</td><td valign="middle">
-	#		@{[ $self->getButtonHtml('File', href => '/temp/') ]}
-	#	</td>
+	if (defined $publDefn->{dnMultiRowActions})
+	{
+		$html .= qq{<td valign="middle">
+				<img src="" width="5" height="0">$IMAGETAGS{'images/design/right-to-up-arrow'}<br>
+			</td><td valign="middle">
+				@{[ $self->getButtonHtml('Sign', href => '/temp/') ]}
+			</td><td valign="middle">
+				@{[ getImageTag('images/design/arrow-spacer', {width => '8'}) ]}<br>
+			</td><td valign="middle">
+				@{[ $self->getButtonHtml('File', href => '/temp/') ]}
+			</td>
+		};
+	}
 
 	# Add a spacer column
 	$html .= qq{<td width="100%"><img src="" width="8" height="1"></td>};
@@ -474,7 +496,7 @@ package CGI::Dialog::DataNavigator::StatusBar;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -497,7 +519,7 @@ package CGI::Dialog::DataNavigator::JavaScript;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.3 2000-11-15 21:41:32 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
