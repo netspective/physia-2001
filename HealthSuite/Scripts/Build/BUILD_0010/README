@@ -74,6 +74,10 @@ B954 - Display Org ID instead of internal Org ID on Available Slots Search.
 
 Special Enhancements:  Allow making multiple appointments using Robert's cool dynamic HTML.
 
+B966 - Closed this bug as it works
+
+B892 - Changed the url in the 'Outstanding Balances' component in the checkin and checkout dialog page
+
 
   
 
