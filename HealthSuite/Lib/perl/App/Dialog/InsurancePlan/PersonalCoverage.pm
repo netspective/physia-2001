@@ -202,12 +202,12 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1) if ($page->param('person_id') ne '');
 	#turn guarantor id off if patient is 21 or over
-	if(my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id'))
-	{
-		my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
-		my $insuredId = $patientAge >= 21 ? $personId : undef;
-		$page->field('insured_id', $insuredId);
-	}
+	#if(my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id'))
+	#{
+	#	my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
+	#	my $insuredId = $patientAge >= 21 ? $personId : undef;
+	#	$page->field('insured_id', $insuredId);
+	#}
 
 	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 
@@ -239,7 +239,7 @@ sub customValidate
 
 	if ($relToInsured != 0 && ($insuredId eq $personId || $insuredId eq ''))
 	{
-		$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is left blank.");
+		$relToInsuredField->invalidate($page, "Must select 'Self' in '$relToInsuredField->{caption}' if '$insuredIdField->{caption}' is '$personId'");
 		$insuredIdField->invalidate($page, "Valid insured ID is needed (other than '$personId') if '$relToInsuredField->{caption}' is other than 'Self.'");
 	}
 
@@ -258,15 +258,28 @@ sub customValidate
 	#{
 	#	$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	#}
-
+	my $sequence = $page->field('bill_sequence');
 	my $previousSequence = $page->field('bill_seq_hidden');
 	my $nextSequence = $previousSequence + 1;
+	my $coverageExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $sequence);
+	my $coverageCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$sequence);
 
+	$billSeq->invalidate($page, "'$coverageCaption' Insurance already exists for '$personId' ") if ($coverageExists != 0 && $sequence <= 4);
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
+	my $seq =1;
+	#$page->addDebugStmt("INS : $seq");
+	for($seq =1; $seq < $sequence; $seq++)
+	{
+		#$page->addDebugStmt("INS : $previousInsExists, $seq");
+		my $previousInsExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $seq);
+		#$page->addDebugStmt("INS : $previousInsExists, $seq");
+		my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$seq);
+		$billSeq->invalidate($page, "'$coverageCaption Insurance' cannot be added because '$coverageCaptionInc Insurance' doesn't exist for '$personId'. ") if $previousInsExists != 1;
 
-	my $sequence = $page->field('bill_sequence');
+	}
 
-	if ($sequence == App::Universal::INSURANCE_INACTIVE)
+
+	if ($command eq 'update' && $sequence == App::Universal::INSURANCE_INACTIVE)
 	{
 
 		if ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $nextSequence) && $nextSequence <=3)
@@ -357,9 +370,10 @@ sub execute
 	my $planName = $page->field('plan_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
-	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName);
+	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_DEBUG, 'selInsPlan', $productName, $planName);
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordTypeProduct);
 	my $parentInsId = $planData->{'ins_internal_id'} ne '' ? $planData->{'ins_internal_id'} : $recordData->{'ins_internal_id'};
+
 	my $insType = $planData->{'ins_type'} ne '' ? $planData->{'ins_type'} : $recordData->{'ins_type'};
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
