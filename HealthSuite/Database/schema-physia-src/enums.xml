@@ -253,7 +253,6 @@
 	<table name="Payment_Type" abbrev="PayTyp" type="Enumeration">
 		<enum>Pre-payment</enum>
 		<enum>Deductible</enum>
-		<enum>Co-pay</enum>
 		<enum>Post-payment</enum>
 	</table>
 
