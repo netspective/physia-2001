@@ -113,7 +113,7 @@
 		<enum id="46">DME Paraffin Refills</enum>
 		<enum id="47">DME Peak Flow Meter</enum>
 		<enum id="48">DME Pelvic Traction Unit</enum>
-		<enum id="59">DME Platform Crutches</enum>
+		<enum id="49">DME Platform Crutches</enum>
 		<enum id="50">DME Pressure Garments/Gloves</enum>
 		<enum id="51">DME Raised Toilet Seat</enum>
 		<enum id="52">DME Reacher</enum>
