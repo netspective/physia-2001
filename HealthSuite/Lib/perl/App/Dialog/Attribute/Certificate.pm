@@ -144,7 +144,7 @@ sub execute
 	my $itemName = '';
 	my $medSpecCode = $page->field('value_text');
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
-	if($valueType == App::Universal::ATTRTYPE_ACCREDITATION || $valueType == App::Universal::ATTRTYPE_AFFILIATION)
+	if($valueType == App::Universal::ATTRTYPE_ACCREDITATION || $valueType == App::Universal::ATTRTYPE_AFFILIATION || $valueType == App::Universal::ATTRTYPE_BOARD_CERTIFICATION)
 	{
 		$itemName = $page->field('value_text');
 	}
