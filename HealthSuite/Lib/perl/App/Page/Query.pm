@@ -7,8 +7,6 @@ use App::Page;
 use App::Universal;
 use App::Configuration;
 use App::Dialog::Query;
-use DBI::StatementManager;
-use App::Statements::Org;
 use File::Spec;
 use base qw(App::Page);
 use vars qw($LIMIT $QUERYDIR %RESOURCE_MAP);
@@ -37,19 +35,9 @@ sub prepare
 		my $dialog = new App::Dialog::Query(page => $self, schema => $self->{schema}, heading => $heading);
 		$self->{queryDialog} = $dialog;
 		push @{$self->{page_content_header}}, $dialog->getHtml($self, 'add');
-		if ($dialog->{SQL})
+		if ($self->field('dlg_execmode') eq 'V')
 		{
-			my $SQL = $dialog->{SQL};
-			my $bindParams = $dialog->{bindParams};
-			#my $debugBind = join '', map {"\t${_}\n"} @$bindParams;
-			#$self->addDebugStmt("<pre><b>SQL STATEMENT:</b>\n$SQL\n\n<b>BIND PARAMS:</b>\n$debugBind</pre>\n");
-			$self->replaceVars(\$SQL);
-			push @{$self->{page_content_header}},
-				$dialog->getHtml($self, 'add'),
-				'<br><br><center>',
-				$STMTMGR_ORG->createHtml($self, STMTMGRFLAG_DYNAMICSQL | STMTMGRFLAG_REPLACEVARS, $SQL, $bindParams),
-				'</center>',
-				$dialog->{pageControlHtml};
+			push @{$self->{page_content_header}}, $dialog->getHtml($self, 'add');
 		}
 	}
 	else
