@@ -25,6 +25,7 @@
 			ORDER BY a.state, a.city
 
 			<params>
+				<param value="request:state"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -69,6 +70,8 @@
 			ORDER BY a.state, a.city
 
 			<params>
+				<param value="request:code"/>
+				<param value="request:state"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -157,6 +160,7 @@
 			ORDER BY a.state, a.city
 
 			<params>
+				<param value="request:code"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -243,6 +247,7 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:code"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -495,6 +500,8 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:code"/>
+				<param value="request:state"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -621,6 +628,8 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:state"/>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -747,6 +756,7 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:state"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -873,6 +883,7 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -999,6 +1010,9 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:code"/>
+				<param value="request:state"/>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -1251,6 +1265,8 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:code"/>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -1377,6 +1393,7 @@
 			ORDER BY o.org_id
 
 			<params>
+				<param value="request:code"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>

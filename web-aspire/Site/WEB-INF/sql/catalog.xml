@@ -59,6 +59,8 @@
 			
 			<params>
 				<param value="request:catalog_id"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
 			</params>
 		</statement>
 
@@ -220,6 +222,7 @@
 			
 			<params>
 				<param value="request:org_internal_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -305,6 +308,9 @@
 			from ref_cpt
 			where cpt = upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericCPT_LikeCode">
@@ -313,6 +319,9 @@
 			from ref_cpt
 			where cpt like upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericCPT_LikeText">
@@ -321,6 +330,10 @@
 			from ref_cpt
 			where (name like ? or description like ?)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericEPSDTCode">
@@ -329,6 +342,9 @@
 			from ref_epsdt
 			where epsdt = upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericEPSDT_LikeCode">
@@ -337,6 +353,9 @@
 			from ref_epsdt
 			where epsdt like upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericEPSDT_LikeText">
@@ -345,6 +364,10 @@
 			from ref_epsdt
 			where (name like ? or description like ?)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericHCPCSCode">
@@ -353,6 +376,9 @@
 			from ref_hcpcs
 			where hcpcs = upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericHCPCS_LikeCode">
@@ -361,6 +387,9 @@
 			from ref_hcpcs
 			where hcpcs like upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericHCPCS_LikeText">
@@ -369,6 +398,10 @@
 			from ref_hcpcs
 			where (name like ? or description like ?)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericICDCode">
@@ -377,6 +410,9 @@
 			from ref_icd
 			where icd = upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericICD_LikeCode">
@@ -385,6 +421,9 @@
 			from ref_icd
 			where icd like upper(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericICD_LikeText">
@@ -393,6 +432,9 @@
 			from ref_icd
 			where (descr like ?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selGenericModifier">
@@ -513,6 +555,7 @@
 			
 			<params>
 				<param value="request:org_internal_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -552,6 +595,7 @@
 			
 			<params>
 				<param value="request:org_internal_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 

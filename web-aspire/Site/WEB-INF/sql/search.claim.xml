@@ -212,6 +212,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:WHERE"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -677,6 +678,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:name_primary"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -988,6 +990,7 @@
 
 			<params>
 				<param value="request:invoice_status"/>
+				<param value="request:name_primary"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -1918,6 +1921,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:name_primary"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -2227,6 +2231,7 @@
 
 			<params>
 				<param value="request:invoice_status"/>
+				<param value="request:name_primary"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -2537,6 +2542,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:name_last"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -2848,6 +2854,7 @@
 
 			<params>
 				<param value="request:invoice_status"/>
+				<param value="request:name_last"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -3932,6 +3939,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:WHERE"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -5021,6 +5029,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:value_text"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -5332,6 +5341,7 @@
 
 			<params>
 				<param value="request:invoice_status"/>
+				<param value="request:value_text"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>

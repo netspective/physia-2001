@@ -49,6 +49,9 @@
 			AND rownum &lt;= 250
 			ORDER BY name
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Payer ID" url=""/>
 				<column heading="Name"/>

@@ -45,6 +45,10 @@
 				<column heading="Name /&lt;BR&gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -142,6 +146,10 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -247,12 +255,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;gt;Add Fee Schedule&amp;lt;/a&amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -450,6 +462,10 @@
 				<column heading="UOH"/>
 				<column heading="" url="/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#"/>
 				<column index="10" heading=""/>
+				<banner>
+
+					<item caption="&lt;b style=&quot;font-size:10pt&quot;&gt;#param.catalog_id# (Fee Schedule ID #param.internal_catalog_id#)&lt;/b&gt; &lt;br&gt; 					&lt;a href='/org/#session.org_id#/dlg-add-catalog/#param.internal_catalog_id#'&gt;Add Fee Schedule&lt;/a&gt; | 					&lt;a href='/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#'&gt;Add Item&lt;/a&gt; 				"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -665,12 +681,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;gt;Add Fee Schedule&amp;amp;lt;/a&amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;gt;Add Fee Schedule&amp;lt;/a&amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -770,12 +790,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;lt;/a&amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;gt;Add Fee Schedule&amp;amp;lt;/a&amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -965,12 +989,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;lt;/a&amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1070,12 +1098,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1175,12 +1207,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1280,12 +1316,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1384,12 +1424,16 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column heading="Action" url=""/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1488,6 +1532,10 @@
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
 				<column index="6" heading="" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+				<banner>
+
+					<item caption=" 					&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt; | 					&lt;a href='/org/#session.org_id#/dlg-add-feescheduledataentry'&gt;Add Fee Schedule Entries&lt;/a&gt; | 					&lt;a href='/org/#session.org_id#/dlg-add-catalog-copy'&gt;Copy Fee Schedule and its Entries&lt;/a&gt; 				"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -1596,12 +1644,16 @@
 				<column heading="Name /&amp;lt;BR&amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;gt;Add Fee Schedule&amp;lt;/a&amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1692,12 +1744,16 @@
 				<column heading="Name /&amp;amp;lt;BR&amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;gt;Add Fee Schedule&amp;amp;lt;/a&amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;gt;Add Fee Schedule&amp;lt;/a&amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1788,12 +1844,16 @@
 				<column heading="Name /&amp;amp;amp;lt;BR&amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;lt;/a&amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;gt;Add Fee Schedule&amp;amp;lt;/a&amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1884,12 +1944,16 @@
 				<column heading="Name /&amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;lt;/a&amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -1980,12 +2044,16 @@
 				<column heading="Name /&amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -2076,12 +2144,16 @@
 				<column heading="Name /&amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -2172,12 +2244,16 @@
 				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}
@@ -2268,12 +2344,16 @@
 				<column heading="Name /&amp;amp;amp;amp;amp;amp;amp;amp;lt;BR&amp;amp;amp;amp;amp;amp;amp;amp;gt;Description"/>
 				<column heading="Contract"/>
 				<column index="1" heading="Entries"/>
+				<banner>
+
+					<item caption="&amp;amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;amp;gt;" url="/org/#session.org_id#/dlg-add-catalog"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => '<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>'
+							caption => '&amp;amp;amp;amp;amp;amp;amp;lt;a href='/org/#session.org_id#/dlg-add-catalog'&amp;amp;amp;amp;amp;amp;amp;gt;Add Fee Schedule&amp;amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;amp;gt;'
 							url => '/org/#session.org_id#/dlg-add-catalog'
 
 						}

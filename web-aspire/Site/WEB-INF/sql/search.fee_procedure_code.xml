@@ -60,6 +60,7 @@
 			
 			<params>
 				<param value="request:internal_catalog_id"/>
+				<param value="request:param0"/>
 			</params>
 			<report>
 				<column heading="Code" url=""/>
@@ -102,6 +103,7 @@
 			
 			<params>
 				<param value="request:internal_catalog_id"/>
+				<param value="request:description"/>
 			</params>
 			<report>
 				<column heading="Code" url=""/>
@@ -144,6 +146,7 @@
 			
 			<params>
 				<param value="request:internal_catalog_id"/>
+				<param value="request:param0"/>
 			</params>
 			<report>
 				<column heading="Code" url=""/>
@@ -186,6 +189,7 @@
 			
 			<params>
 				<param value="request:internal_catalog_id"/>
+				<param value="request:name"/>
 			</params>
 			<report>
 				<column heading="Code" url=""/>
@@ -228,6 +232,7 @@
 			
 			<params>
 				<param value="request:internal_catalog_id"/>
+				<param value="request:param0"/>
 			</params>
 			<report>
 				<column heading="Code" url=""/>

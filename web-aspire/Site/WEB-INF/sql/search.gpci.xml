@@ -28,6 +28,11 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
@@ -96,6 +101,11 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
@@ -164,6 +174,11 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
@@ -232,6 +247,11 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>
@@ -300,6 +320,11 @@
 			)
 			WHERE rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column index="1" heading="Begin"/>

@@ -125,6 +125,9 @@
 			icd like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -228,6 +231,9 @@
 			descr like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>

@@ -191,6 +191,7 @@
 			and o.org_internal_id = Transaction.service_facility_id
 			
 			<params>
+				<param value="request:service_facility_id"/>
 				<param value="request:caption"/>
 				<param value="request:owner_org_id"/>
 			</params>

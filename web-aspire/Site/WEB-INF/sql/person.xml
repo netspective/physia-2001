@@ -13,6 +13,15 @@
 			values
 			(? , sysdate , ? , ? , ? , ? , ? , ?)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+				<param value="request:param3"/>
+				<param value="request:param4"/>
+				<param value="request:param5"/>
+				<param value="request:param6"/>
+			</params>
 		</statement>
 
 		<statement name="insSessionActivity">
@@ -21,6 +30,16 @@
 			(session_id, activity_type, action_type, action_scope, action_key, detail_level, activity_data, person_id ) values
 			(? , ? , ? , ? , ? , ? , ? , ?)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+				<param value="request:param3"/>
+				<param value="request:param4"/>
+				<param value="request:param5"/>
+				<param value="request:param6"/>
+				<param value="request:param7"/>
+			</params>
 		</statement>
 
 		<statement name="selAddresses">
@@ -432,6 +451,10 @@
 			from person p, person_org_category pcat,person_attribute patt
 			where p.person_id=pcat.person_id and p.person_id=patt.parent_id and pcat.org_internal_id= ? and patt.value_type in (220, 221) and patt.value_text= ?
 			
+			<params>
+				<param value="request:org_internal_id"/>
+				<param value="request:value_text"/>
+			</params>
 		</statement>
 
 		<statement name="selPatientAge">
@@ -793,6 +816,7 @@
 			<params>
 				<param value="request:name_last"/>
 				<param value="request:name_first"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -828,6 +852,9 @@
 			and category='Physician'
 			order by upper(name_last), upper(name_first), upper(name_middle)
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="selRoleNameExists">

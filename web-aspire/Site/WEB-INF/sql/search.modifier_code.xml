@@ -46,6 +46,9 @@
 			abbrev like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -75,6 +78,9 @@
 			upper(caption) = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:caption"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -104,6 +110,9 @@
 			upper(caption) like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>

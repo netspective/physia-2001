@@ -92,6 +92,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:state"/>
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
@@ -259,6 +260,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:state"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -425,6 +427,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:org_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -757,6 +760,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:name_primary"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -1089,6 +1093,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:city"/>
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
@@ -1423,6 +1428,8 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:state"/>
+				<param value="request:city"/>
 				<param value="request:zip"/>
 				<param value="request:owner_org_id"/>
 			</params>
@@ -1756,6 +1763,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -1922,6 +1930,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:tax_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -2254,6 +2263,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:org_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -2586,6 +2596,8 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:state"/>
+				<param value="request:city"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>

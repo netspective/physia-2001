@@ -13,6 +13,11 @@
 			values
 			(? , 'ApptSheet Times', ? , ? )
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 		</statement>
 
 		<statement name="selActionOption">
@@ -618,6 +623,9 @@
 			
 			select distinct member_name from Sch_Template_R_Ids where upper(member_name) like ?
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="selSchedulePreferences">
@@ -1041,6 +1049,7 @@
 			
 			<params>
 				<param value="request:parent_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 

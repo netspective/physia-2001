@@ -20,6 +20,9 @@
 			from invoice_item ii,invoice i ,Invoice_Item_Adjust iia
 			where ii.parent_id = i.invoice_id and ii.item_id = iia.parent_id (+) and i.invoice_id= ? 		
 			
+			<params>
+				<param value="request:invoice_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_claim_status">
@@ -62,6 +65,9 @@
 			and ins_org_id is not null
 			AND o.owner_org_id = to_number(?)
 			
+			<params>
+				<param value="request:param0"/>
+			</params>
 		</statement>
 
 		<statement name="sel_invoices">
@@ -79,6 +85,8 @@
 			
 			<params>
 				<param value="request:owner_id"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
 			</params>
 			<report>
 				<column heading="Claims" url=""/>

@@ -46,6 +46,9 @@
 			epsdt like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Description"/>
@@ -75,6 +78,9 @@
 			upper(desciption) = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:desciption"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Description"/>
@@ -104,6 +110,9 @@
 			upper(description) like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Description"/>

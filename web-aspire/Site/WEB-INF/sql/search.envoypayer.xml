@@ -53,6 +53,9 @@
 			id LIKE ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column heading="Name"/>
@@ -87,6 +90,9 @@
 			UPPER(name) = ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:name"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column heading="Name"/>
@@ -121,6 +127,9 @@
 			UPPER(name) LIKE ?
 			AND rownum &lt;= 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="ID" url=""/>
 				<column heading="Name"/>

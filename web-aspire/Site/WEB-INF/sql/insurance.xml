@@ -166,6 +166,7 @@
 			
 			<params>
 				<param value="request:parent_id"/>
+				<param value="request:parent_id"/>
 			</params>
 		</statement>
 
@@ -254,6 +255,7 @@
 			
 			<params>
 				<param value="request:parent_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -689,6 +691,10 @@
 			
 			<params>
 				<param value="request:product_name"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+				<param value="request:param3"/>
 			</params>
 		</statement>
 
@@ -1104,6 +1110,7 @@
 			
 			<params>
 				<param value="request:owner_person_id"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -1169,6 +1176,10 @@
 			<params>
 				<param value="request:ins_org_id"/>
 				<param value="request:ins_type"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+				<param value="request:param3"/>
 			</params>
 		</statement>
 

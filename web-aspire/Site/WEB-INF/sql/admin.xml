@@ -34,6 +34,10 @@
 				<column heading="Role"/>
 				<column heading="Permission"/>
 				<column heading="Status"/>
+				<banner>
+
+					<item caption=" Assign a Role &lt;A HREF= '/admin/#param.org_id#/dlg-add-role-permission'&gt;Permission&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -97,12 +101,16 @@
 				<column heading="Role"/>
 				<column heading="Permission"/>
 				<column heading="Status"/>
+				<banner>
+
+					<item caption=" Assign a Role &amp;lt;A HREF= '/admin/#param.org_id#/dlg-add-role-permission'&amp;gt;Permission&amp;lt;/A&amp;gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
 					actionRows => {
 						0 => {
-							caption => ' Assign a Role <A HREF= '/admin/#param.org_id#/dlg-add-role-permission'>Permission</A> '
+							caption => ' Assign a Role &lt;A HREF= '/admin/#param.org_id#/dlg-add-role-permission'&gt;Permission&lt;/A&gt; '
 
 						}
 

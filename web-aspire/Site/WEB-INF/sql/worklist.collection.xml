@@ -670,6 +670,9 @@
 			and pcat.org_id= ?
 			and category='Physician'
 			
+			<params>
+				<param value="request:org_id"/>
+			</params>
 		</statement>
 
 		<statement name="selReckDataById">
@@ -1015,6 +1018,9 @@
 			and category='Physician'
 			order by p.name_last
 			
+			<params>
+				<param value="request:org_internal_id"/>
+			</params>
 		</statement>
 
 		<statement name="sel_worklist_available_products">
@@ -1154,6 +1160,7 @@
 			and item_name = 'WorkList-Collection-Setup-Physician')
 			
 			<params>
+				<param value="request:org_id"/>
 				<param value="request:parent_id"/>
 			</params>
 		</statement>

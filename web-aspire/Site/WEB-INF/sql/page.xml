@@ -13,6 +13,14 @@
 			values
 			(? , ? , ? , ? , 1 , ? , ? , sysdate , sysdate)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+				<param value="request:param3"/>
+				<param value="request:param4"/>
+				<param value="request:param5"/>
+			</params>
 		</statement>
 
 		<statement name="person.mySessionViewCount">

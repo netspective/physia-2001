@@ -188,6 +188,7 @@
 			ORDER BY i.invoice_id desc
 
 			<params>
+				<param value="request:client_id"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -789,6 +790,8 @@
 			
 			<params>
 				<param value="request:invoice_type"/>
+				<param value="request:invoice_status"/>
+				<param value="request:param0"/>
 			</params>
 		</statement>
 
@@ -983,6 +986,8 @@
 			
 			<params>
 				<param value="request:parent_id"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
 			</params>
 		</statement>
 
@@ -999,6 +1004,8 @@
 			
 			<params>
 				<param value="request:parent_id"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
 			</params>
 		</statement>
 
@@ -1366,6 +1373,7 @@
 			ORDER BY i.invoice_id desc
 
 			<params>
+				<param value="request:client_id"/>
 				<param value="request:owner_id"/>
 			</params>
 			<report>
@@ -1700,6 +1708,7 @@
 			group by upper(client_id)
 			
 			<params>
+				<param value="request:invoice_id"/>
 				<param value="request:invoice_id"/>
 			</params>
 		</statement>

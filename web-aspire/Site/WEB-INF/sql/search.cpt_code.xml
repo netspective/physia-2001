@@ -56,6 +56,9 @@
 			cpt like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -93,6 +96,9 @@
 			upper(description) = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:description"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -130,6 +136,9 @@
 			upper(description) like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -167,6 +176,9 @@
 			upper(name) = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:name"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -204,6 +216,9 @@
 			upper(name) like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -241,6 +256,10 @@
 			upper(name) = ? or upper(description) = ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:name"/>
+				<param value="request:description"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>
@@ -278,6 +297,10 @@
 			upper(name) like ? or upper(description) like ?
 			AND rownum &lt; 250
 
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+			</params>
 			<report>
 				<column heading="Code" url=""/>
 				<column heading="Name"/>

@@ -45,6 +45,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:member_name"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -179,6 +180,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:org_id"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>
@@ -313,6 +315,7 @@
 			WHERE rownum &lt;= 250
 
 			<params>
+				<param value="request:name_primary"/>
 				<param value="request:owner_org_id"/>
 			</params>
 			<report>

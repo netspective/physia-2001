@@ -19,6 +19,10 @@
 				<column index="0" heading="Lab ID"/>
 				<column index="1" heading="Lab Name"/>
 				<column index="3" heading="Actions"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-lab-test?home=#homeArl#'&gt;Test&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -172,6 +176,10 @@
 				<column index="2" heading="Fee Schedule ID"/>
 				<column index="3" heading="Insurance Product"/>
 				<column index="4" heading="Entries"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'&gt;Contract Catalog&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -257,6 +265,10 @@
 				<column index="4" heading="Contract Type"/>
 				<column index="5" type="currency" heading="Price"/>
 				<column index="5" heading="Actions"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.fee_schedule_detail#?home=#homeArl#'&gt;Fee Schedule Item&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -383,6 +395,10 @@
 				<column index="2" heading="Contract Type"/>
 				<column index="3" heading="Entries"/>
 				<column index="6" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+				<banner>
+
+					<item caption=" 						&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt; | 						&lt;a href='/org/#session.org_id#/dlg-add-feescheduledataentry'&gt;Add Fee Schedule Entries&lt;/a&gt; | 						&lt;a href='/org/#session.org_id#/dlg-add-catalog-copy'&gt;Copy Fee Schedule and its Entries&lt;/a&gt; 					"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -481,6 +497,10 @@
 				<column index="2" heading="Contract Type"/>
 				<column index="3" heading="Entries"/>
 				<column index="6" url="/org/#session.org_id#/dlg-add-catalog/#5#"/>
+				<banner>
+
+					<item caption=" 						&lt;a href='/org/#session.org_id#/dlg-add-catalog'&gt;Add Fee Schedule&lt;/a&gt; | 						&lt;a href='/org/#session.org_id#/dlg-add-feescheduledataentry'&gt;Add Fee Schedule Entries&lt;/a&gt; | 						&lt;a href='/org/#session.org_id#/dlg-add-catalog-copy'&gt;Copy Fee Schedule and its Entries&lt;/a&gt; 					"/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -571,6 +591,10 @@
 				<column index="7" type="currency" heading="Physician Cost"/>
 				<column index="8" type="currency" heading="Patient Cost"/>
 				<column index="4" heading="Actions"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-lab-test/#param.labtest_detail#?home=#homeArl#'&gt;Test&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -654,6 +678,10 @@
 				<column index="1" heading="Catalog Name"/>
 				<column index="2" heading="Entries"/>
 				<column heading="Action" url="/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#1#&amp;home=#homeArl#"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-test-catalog/#param.org_id#?home=#homeArl#'&gt;Service Catalog&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -1376,6 +1404,10 @@ SELECT	oc.catalog_id,
 				<column index="1" heading="Name"/>
 				<column index="2" heading="Code Type"/>
 				<column index="4" type="currency" heading="Charge"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#?home=#homeArl#'&gt;Fee Schedule Entry&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -1762,6 +1794,10 @@ SELECT	oc.catalog_id,
 			<report>
 				<column index="0" heading="Code"/>
 				<column index="1" heading="Name"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF='/org/#param.org_id#/dlg-add-service-catalog/#param.internal_catalog_id#?home=#homeArl#'&gt;Service Catalog Entry&lt;/A&gt; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {
@@ -1813,6 +1849,10 @@ SELECT	oc.catalog_id,
 				<column index="2" heading="Caption"/>
 				<column index="3" heading="Description"/>
 				<column url="/org/#param.org_id#/superbills?action=printSample&amp;superbillid=#0#"/>
+				<banner>
+
+					<item caption=" Add &lt;A HREF= '/org/#param.org_id#/superbills?action=new'&gt;Superbill&lt;/A&gt; &amp;nbsp; &amp;nbsp; "/>
+				</banner>
 			</report>
 			<!--
 				banner => {

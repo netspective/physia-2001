@@ -591,6 +591,8 @@
 			
 			<params>
 				<param value="request:owner_id"/>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
 			</params>
 			<report>
 				<column index="0" heading="Invoice ID"/>

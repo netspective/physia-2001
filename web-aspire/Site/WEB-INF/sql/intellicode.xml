@@ -11,6 +11,11 @@
 			insert into REF_CPT_USAGE (parent_id, person_id, org_internal_id, read_count)
 			values (?, ?, ?, 1)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 		</statement>
 
 		<statement name="insHcpcsUsage">
@@ -18,6 +23,11 @@
 			insert into REF_HCPCS_USAGE (parent_id, person_id, org_internal_id, read_count)
 			values (?, ?, ?, 1)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 		</statement>
 
 		<statement name="insIcdUsage">
@@ -25,6 +35,11 @@
 			insert into REF_ICD_USAGE (parent_id, person_id, org_internal_id, read_count)
 			values (?, ?, ?, 1)
 			
+			<params>
+				<param value="request:param0"/>
+				<param value="request:param1"/>
+				<param value="request:param2"/>
+			</params>
 		</statement>
 
 		<statement name="selCptData">
