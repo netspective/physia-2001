@@ -19,8 +19,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 	'billinginfo' => {
 		valueType => App::Universal::ATTRTYPE_BILLING_INFO,
 		heading => '$Command Electronic Billing Information',
-		_arl => ['person_id'],
-		_arl_modify => ['item_id'],
+		_arl_add => ['entity_id', 'entity_type'],
+		_arl_modify => ['item_id', 'entity_type'],
 		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_BILLING_INFO()
 		},
 );
@@ -29,57 +29,36 @@ sub initialize
 {
 	my $self = shift;
 
-	$self->heading('$Command Electronic Billing Information');
+	$self->heading('$Command Clearing House Billing Information');
 
 	$self->addContent(
-		new CGI::Dialog::Field(caption => 'Person ID',
-			name => 'parent_id',
+		new App::Dialog::Field::Person::ID(caption => 'Physician ID',
+			name => 'person_id',
+			types => ['Physician'],
+			options => FLDFLAG_REQUIRED,
 		),
-		
-		new CGI::Dialog::Field(caption => 'Org ID',
+		new App::Dialog::Field::Organization::ID(caption => 'Organization ID',
 			name => 'org_id',
+			options => FLDFLAG_REQUIRED,
 		),
-
 		new CGI::Dialog::Field(caption => 'ID Type',
 			name => 'billing_id_type',
 			type => 'select',
-			selOptions => 'Unknown:5;Per Se:1;THINnet:2;Other:3',
-			value => '5',
+			selOptions => 'Per Se:1; THINnet:2; Other:3',
 		),
-		
 		new CGI::Dialog::Field(caption => 'Billing ID',
-			#type => 'foreignKey',
 			name => 'billing_id',
-#			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			size => 16,
+			options => FLDFLAG_REQUIRED,
 		),
-
-		new CGI::Dialog::Field(caption => 'Effective Date',
-			#type => 'foreignKey',
+		new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
 			name => 'billing_effective_date',
-			type => 'date',
-#			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 		),
-	
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Active',
 			name => 'billing_active',
 			type => 'bool',
 			style => 'check',
-			caption => 'Active',
-			defaultValue => 0),
-			
-		new CGI::Dialog::Field(
-			name => 'org_billing_item_id',
-			type => 'hidden'
-		),
-		
-		new CGI::Dialog::Field(
-			name => 'org_billing_internal_id',
-			type => 'hidden'
-		),
-		
-		new CGI::Dialog::Field(
-			name => 'debug_info',
-			type => 'text'
+			#defaultValue => 1
 		),
 	);
 
@@ -91,95 +70,50 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-	$self->updateFieldFlags('parent_id', FLDFLAG_READONLY, 1) if (($command eq 'update') or ($command eq 'remove'));
-	$self->updateFieldFlags('parent_id', FLDFLAG_INVISIBLE, 1) if ((defined $page->param('org_id')) and not defined $page->param('item_id'));
-	$self->updateFieldFlags('org_id', FLDFLAG_READONLY, 1) if (($command eq 'update') or ($command eq 'remove'));
-	$self->updateFieldFlags('org_id', FLDFLAG_INVISIBLE, 1) if ((defined $page->param('person_id')) and not defined $page->param('item_id'));
+	
+	$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1) 
+		if (($command eq 'update') or ($command eq 'remove'));
+	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, $page->param('entity_type'));
+	
+	$self->updateFieldFlags('org_id', FLDFLAG_READONLY, 1) 
+		if (($command eq 'update') or ($command eq 'remove'));
+	$self->updateFieldFlags('org_id', FLDFLAG_INVISIBLE, ! $page->param('entity_type'));
 }
 
-sub populateData
+sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-#	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	my $itemId = $page->param('item_id');
-	my $orgId = $page->param('org_id');
-	my $billingInfo;
-	my $billingExists = 0;
-	my $orgBillingExists = 0;
-	my $orgRecord = $STMTMGR_ORG->getRowAsArray($page, STMTMGRFLAG_NONE, 'selOwnerOrgId', $orgId) if ($orgId);
-	my $orgIntId = ($orgId ? $orgRecord->[0] : 0);
-	$billingExists = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId) if ($itemId);
+	$page->field('person_id', $page->param('person_id'));	
+	$page->field('org_id', $page->param('org_id'));	
+	$page->field('billing_active', 1);
+}
 
-	# Does a new-style clearing house billing record exist for this org?
-	my $newClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-		App::Universal::ATTRTYPE_BILLING_INFO
-	);
-	my $oldClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
-		App::Universal::ATTRTYPE_TEXT
-	);
+sub populateData_update
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	$page->field ('org_id', $page->param ('org_id'));
-	$page->field ('debug_info', $page->param ('org_id')."($orgIntId)");
-	my $clearHouseData;
-	if ($billingExists) {
-		$billingInfo = $STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-		$page->field ('parent_id', $billingInfo->[2]);
-		$page->field ('billing_id_type', $billingInfo->[9]);
-		$page->field ('billing_id', $billingInfo->[6]);
-		$page->field ('billing_effective_date', $billingInfo->[13]);
-		$page->field ('billing_active', $billingInfo->[7]);
-	} elsif ($newClearHouseDataExists) {
-		# Read the new-style clearing house billing record...
-		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-			App::Universal::ATTRTYPE_BILLING_INFO
-		);
+	my $stmtMgr = $page->param('entity_type') ? $STMTMGR_ORG : $STMTMGR_PERSON;
+	
+	my $attribute = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeById', 
+		$page->param('item_id'));
 
-		# Populate the fields with data from the appropriate columns...
-		$page->field('billing_id_type', $clearHouseData->{value_int});
-		$page->field('billing_id', $clearHouseData->{value_text});
-		$page->field('billing_active', $clearHouseData->{value_textB});
-		$page->field('billing_effective_date', $clearHouseData->{value_date});
-#		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-		$page->field ('parent_id', $page->param('person_id'));
-		$page->field ('org_id', $page->param ('org_id'));
-		$page->field ('org_billing_internal_id', $orgIntId);
-	} elsif ($oldClearHouseDataExists) {
-		# Read the new-style clearing house billing record...
-		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
-			App::Universal::ATTRTYPE_TEXT
-		);
+	$page->field('person_id', $page->param('person_id') || $attribute->{parent_id});	
+	$page->field('org_id', $page->param('org_id'));	
+	$page->field('billing_id_type', $attribute->{value_int});
+	$page->field('billing_id', $attribute->{value_text});
+	$page->field('billing_effective_date', $attribute->{value_date});
+	$page->field('billing_active', $attribute->{value_intb} || 0);
+}
 
-		# Setup the translation mechanism for old-style fields to new-style values...
-		my %clearingHouse = ( 'perse' => 1, 'thinet' => 2 );
-
-		# Populate the fields with data from the appropriate columns...
-		$page->field('billing_id_type', $clearingHouse {lc ($clearHouseData->{value_text})});
-		$page->field('billing_id', $clearHouseData->{value_textB});
-		$page->field('billing_active', 0);
-		$page->field('billing_effective_date', $page->getDate());
-#		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-		$page->field ('parent_id', $page->param('person_id'));
-		$page->field ('org_id', $page->param ('org_id'));
-		$page->field ('org_billing_internal_id', $orgIntId);
-	} else {
-		$page->field ('parent_id', $page->param('person_id'));
-		$page->field ('billing_id_type', 5);
-		$page->field ('billing_effective_date', $page->getDate());
-	}
-
-
-#		my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-#			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-#			App::Universal::ATTRTYPE_BILLING_INFO
-#		);
-		
+sub populateData_remove
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	$self->populateData_update($page, $command, $activeExecMode, $flags);
 }
 
 sub execute
@@ -189,25 +123,10 @@ sub execute
 	my $valueType = $self->{valueType};
 	my $billingActive = $page->field ('billing_active') ? 1 : 0;
 	
-	if (defined $page->param ('person_id')) {
-		# Add a person's billing information record...
-		$page->schemaAction(
-			'Person_Attribute',	$command,
-			parent_id => $page->field('parent_id'),
-			item_name => 'Physician Clearing House ID',
-			item_id => $page->param('item_id') || undef,
-			value_type => $valueType || undef,
-			value_text => $page->field('billing_id') || undef,
-			value_textB => $billingActive,
-			value_int => $page->field('billing_id_type') || undef,
-			value_date => $page->field('billing_effective_date') || undef,
-			_debug => 0
-		);
-	}
-	
-	if (defined $page->param ('org_id')) {
-		my $orgRecord = $STMTMGR_ORG->getRowAsArray($page, STMTMGRFLAG_NONE, 'selOwnerOrgId', $page->param ('org_id'));
-		my $orgIntId = $orgRecord->[0];
+	if ($page->param ('entity_type')) {
+		my $orgRecord = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOwnerOrgId', 
+			$page->param ('org_id'));
+		my $orgIntId = $orgRecord->{org_internal_id};
 		
 		# Add an org's global billing information record...
 		$page->schemaAction(
@@ -217,8 +136,23 @@ sub execute
 			item_name => 'Organization Default Clearing House ID',
 			value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 			value_text => $page->field('billing_id') || undef,
-			value_textB => ($page->field('billing_active') ? 1 : 0),
 			value_int => $page->field('billing_id_type') || undef,
+			value_intB => $billingActive || 0,
+			value_date => $page->field('billing_effective_date') || undef,
+			_debug => 0
+		);
+	}
+	else
+	{
+		$page->schemaAction(
+			'Person_Attribute',	$command,
+			parent_id => $page->field('person_id'),
+			item_name => 'Physician Clearing House ID',
+			item_id => $page->param('item_id') || undef,
+			value_type => $valueType || undef,
+			value_text => $page->field('billing_id') || undef,
+			value_int => $page->field('billing_id_type') || undef,
+			value_intB => $billingActive || 0,
 			value_date => $page->field('billing_effective_date') || undef,
 			_debug => 0
 		);

@@ -1324,37 +1324,44 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.billinginfo' => {
 	sqlStmt => qq{
-		(select	oa.value_type, oa.item_id, oa.value_text, oa.value_textB, oa.value_int, oa.value_date,
-			decode(oa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
-			decode(oa.value_textb,'1','Active','Inactive'),
-			o.org_id
+		(select	oa.value_type, oa.item_id, oa.value_text, %simpleDate:oa.value_date%,
+			decode(oa.value_int, 1,'Per Se',2,'THINet', 'Other'),
+			decode(oa.value_intb, '1','Active', 'Inactive'),
+			o.org_id, 2 as entity_type
 		from	org o, org_attribute oa
-		where	o.org_id = :1
-		and	oa.parent_id = o.org_internal_id
-		and	oa.item_name = 'Organization Default Clearing House ID'
-		and	oa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
-		union	
-		(select	pa.value_type, pa.item_id, pa.value_text, pa.value_textB, pa.value_int, pa.value_date,
-			decode(pa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
-			decode(pa.value_textb,'1','Active','Inactive'),
-			pa.parent_id
-		from	Person_Attribute pa, Org o, Org_Attribute oa, Person_Org_Category poc
-		where	o.org_id = :1
-		and	o.org_internal_id = oa.parent_id
-		and	pa.parent_id = poc.person_id
-		and	poc.org_internal_id = o.org_internal_id
-		and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
+		where	o.owner_org_id = :1
+			and o.org_id = :2
+			and	oa.parent_id = o.org_internal_id
+			and	oa.item_name = 'Organization Default Clearing House ID'
+			and	oa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
+		UNION
+		(select	pa.value_type, pa.item_id, pa.value_text, %simpleDate:pa.value_date%,
+			decode(pa.value_int, 1,'Per Se', 2,'THINet', 'Other'),
+			decode(pa.value_intb,'1','Active', 'Inactive'),
+			pa.parent_id, 0 as entity_type
+		from	Person_Attribute pa, Person_Org_Category poc
+		where	poc.org_internal_id = :1
+			and poc.category = 'Physician'
+			and	pa.parent_id = poc.person_id
+			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]})
+		UNION
+		(select	-1 as value_type, -1 as item_id, '-' as value_text, '-' as value_date,
+			'-', '-', '-', 1 as entity_type
+			from dual			
+		)
+		order by entity_type DESC
 	},
+
 	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
-					{
-						colIdx => 0,
-						dataFmt => "#8# - #7# #6# ID: #2# (Eff: #5#)",
-					},
+			{	dataFmt => "#6# - #5# #4# ID: <b>#2#</b> (Effective: #3#)",
+			},
 		],
 
-		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		separateDataColIdx => 2,
+		
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/#7#?home=#homeArl#',
 		frame => {
 			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
 #			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
@@ -1362,42 +1369,33 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	},
 	publishDefn_panel =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Electronic Billing Information' },
+		frame => { heading => 'Clearing House Billing Information' },
 	},
 	publishDefn_panelTransp =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent',
 		inherit => 'panel',
 	},
 	publishDefn_panelEdit =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Electronic Billing Information' },
+		frame => { heading => 'Edit Clearing House Billing Information' },
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo?home=#param.home#'>Billing Info</A> } },
-		],
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.org_id#/1?home=#param.home#'>Org Clearing House Info</A> } },
+			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#/#7#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->param('org_id')], 'panelEdit'); },
-
-#	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId]); },
-#	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panel'); },
-#	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelEdit'); },
-#	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->session('org_internal_id'), $page->param('org_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->session('org_internal_id'), $page->param('org_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->session('org_internal_id'), $page->param('org_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.billinginfo', [$page->session('org_internal_id'), $page->param('org_id')], 'panelEdit'); },
 },
-
 
 #----------------------------------------------------------------------------------------------------------------------
 

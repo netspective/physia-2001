@@ -2267,54 +2267,51 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.billinginfo' => {
 	sqlStmt => qq{
-			select	value_type, item_id, value_text, value_textb, value_int, %simpleDate:value_date%,
-				decode(value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
-				decode(value_textb,'1','Active','Inactive')
-			from	person_attribute
-			where	parent_id = ?
+		select value_type, item_id, value_text, %simpleDate:value_date%,
+			decode(value_int, 1,'Per Se', 2,'THINet', 'Other'),
+			decode(value_intb, '1','Active', 'Inactive')
+		from	person_attribute
+		where	parent_id = ?
 			and	value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
-			order by value_int
-		},
+		order by value_int
+	},
 	sqlStmtBindParamDescr => ['Person ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
-					{
-						colIdx => 0,
-						dataFmt => "#7# #6# ID: #2# (Eff: #5#)",
-					},
+			{
+				colIdx => 0,
+				dataFmt => "#5# #4# ID: <b>#2#</b> (Effective: #3#)",
+			},
 		],
 
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/0?home=#homeArl#',
 		frame => {
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-#			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		},
 	},
 	publishDefn_panel =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Electronic Billing Information' },
+		frame => { heading => 'Clearing House Billing Information' },
 	},
 	publishDefn_panelTransp =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent',
 		inherit => 'panel',
 	},
 	publishDefn_panelEdit =>
 	{
-		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Electronic Billing Information' },
+		frame => { heading => 'Edit Clearing House Billing Information' },
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.person_id#?home=#param.home#'>Billing Info</A> } },
-		],
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-billinginfo/#param.person_id#/0?home=#param.home#'>Clearing House Billing Info</A> } },
+			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/0?home=#param.home#', 
+			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#/0?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.billinginfo', [$personId]); },
@@ -2830,7 +2827,6 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.accountPanel', [$personId], 'panelStatic'); },
 	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.accountPanel', [$personId], 'panelInDlg'); },
 },
-
 
 #----------------------------------------------------------------------------------------------------------------------
 

@@ -427,15 +427,8 @@ sub prepare_view_clearinghouse
 		});
 	} else {
 		$self->addContent(qq{
-			<TABLE>
-				<TR VALIGN=TOP>
-					<TD WIDTH=30%>
-						<font size=1 face=arial color=red>
-							<i>Clearing House data is only applicable to main organizations.</i><BR>
-						</font>
-					</TD>
-				</TR>
-			</TABLE>
+			<font size=3 face=verdana color=red>
+			Clearing House data is only applicable to main organizations.
 		});
 	}
 

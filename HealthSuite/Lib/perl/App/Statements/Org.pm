@@ -116,7 +116,8 @@ $STMTMGR_ORG = new App::Statements::Org(
 		where parent_id = ? and item_name = ?
 		},
 	'selAttributeById' => qq{
-		select * from org_attribute
+		select org_attribute.*, to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date 
+		from org_attribute
 		where item_id = ?
 		},
 	'selAttributeByValueType' => qq{

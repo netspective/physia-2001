@@ -130,7 +130,7 @@ sub initialize
 	if ($type eq 'provider' || $type eq 'dept' ||$type eq 'main')
 	{
 		$self->addContent(
-		new CGI::Dialog::Field(caption => 'Fiscal Month',
+		new CGI::Dialog::Field(caption => 'Fiscal Year Starts',
 			name => 'fiscal_month',
 			type => 'enum',
 			enum => 'Month',
@@ -169,16 +169,15 @@ sub initialize
 		new CGI::Dialog::MultiField(
 			name => 'hours_and_tzone',
 			fields => [
-				new CGI::Dialog::Field(
-					caption => 'Hours of Operation',
+				new CGI::Dialog::Field(caption => 'Hours of Operation',
 					name => 'business_hours'),
-				new CGI::Dialog::Field::TableColumn(
-					caption => 'Time Zone',
+				new CGI::Dialog::Field(caption => 'Time Zone',
+					name => 'time_zone',
 					type => 'select',
-					selOptions => 'EST;CST;MST;PST',
-					schema => $schema,
-					column => 'Org.time_zone',
-					name => 'time_zone'),
+					selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT',
+					defaultValue => 'CST6CDT',
+					options => FLDFLAG_PERSIST,
+				),
 			],
 		),
 	);
@@ -283,56 +282,36 @@ sub initialize
 	if ($self->{orgtype} eq 'main')
 	{
 		$self->addContent(
-			new CGI::Dialog::Field(
-				caption => 'Clearing House ID Type',
-				name => 'org_billing_id_type',
-				type => 'select',
-				selOptions => 'Unknown:5;Per Se:1;THINet:2;Other:3',
-				value => '5',
-			),
 
-			new CGI::Dialog::Field(
-				caption => 'Clearing House Billing ID',
-				#type => 'foreignKey',
-				name => 'org_billing_id',
-#				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			),
+			new CGI::Dialog::MultiField(
+				fields => [
+					new CGI::Dialog::Field(caption => 'Clearing House',
+						name => 'org_billing_id_type',
+						type => 'select',
+						selOptions => 'Per Se:1; THINet:2; Other:3',
+					),
 
-			new CGI::Dialog::Field(
-				caption => 'Effective Date',
-				#type => 'foreignKey',
-				name => 'org_billing_effective_date',
-				type => 'date',
-#				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			),
+					new CGI::Dialog::Field(caption => 'Billing ID',
+						name => 'org_billing_id',
+						size => 16,
+					),
+					new CGI::Dialog::Field(caption => 'Effective Date',
+						name => 'org_billing_effective_date',
+						type => 'date',
+					),
 
-			new CGI::Dialog::Field(
-				caption => 'Active?',
-				name => 'org_billing_active',
-				type => 'bool',
-				style => 'check',
-				caption => 'Active',
-				defaultValue => 0,
+					new CGI::Dialog::Field(caption => 'Active',
+						name => 'org_billing_active',
+						type => 'bool',
+						style => 'check',
+					),
+				],
 			),
 
 			new CGI::Dialog::Field(
 				name => 'org_billing_item_id',
 				type => 'hidden',
 			),
-
-#			new CGI::Dialog::Field(
-#			caption => 'Clearing House ID',
-#			type=>'select',
-#			options => FLDFLAG_PREPENDBLANK,
-#			selOptions => "Perse;THINet",
-#			name   => 'clear_house'
-#			),
-#
-#			new CGI::Dialog::Field(
-#			caption => 'Clearing House Billing ID',
-#			type=>'text',
-#			name   => 'clear_house_billing_id'
-#			),
 		);
 	}
 
@@ -473,12 +452,12 @@ sub addContentOrgType
 		$excludeGroups = "'dept'";
 		$self->addContent(
 			new CGI::Dialog::Field(name => 'member_name',
-					lookup => 'Org_Type',
-					style => 'multicheck',
-					options => FLDFLAG_REQUIRED,
-					caption => 'Organization <nobr>Type(s)</nobr>',
-					hints => 'You may choose more than one organization type.',
-					fKeyWhere => "group_name not in ($excludeGroups)"),
+				lookup => 'Org_Type',
+				style => 'multicheck',
+				options => FLDFLAG_REQUIRED,
+				caption => 'Organization <nobr>Type(s)</nobr>',
+				hints => 'You may choose more than one organization type.',
+				fKeyWhere => "group_name not in ($excludeGroups)"),
 		);
 		return 1;
 	}
@@ -596,61 +575,16 @@ sub populateData
 	$page->field('business_hours', $businessAttribute->{value_text});
 	$page->field('business_hrs_id', $businessAttribute->{item_id});
 
-	# Does a new-style clearing house billing record exist for this org?
-	my $newClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
+	my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
 		App::Universal::ATTRTYPE_BILLING_INFO
 	);
-	my $oldClearHouseDataExists = $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,
-		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
-		App::Universal::ATTRTYPE_TEXT
-	);
 
-	my $clearHouseData;
-	if ($newClearHouseDataExists) {
-		# Read the new-style clearing house billing record...
-		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-			App::Universal::ATTRTYPE_BILLING_INFO
-		);
-
-		# Populate the fields with data from the appropriate columns...
-		$page->field('org_billing_id_type', $clearHouseData->{value_int});
-		$page->field('org_billing_id', $clearHouseData->{value_text});
-		$page->field('org_billing_active', $clearHouseData->{value_textB});
-		$page->field('org_billing_effective_date', $clearHouseData->{value_date});
-		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-	} elsif ($oldClearHouseDataExists) {
-		# Read the new-style clearing house billing record...
-		$clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Clearing House ID',
-			App::Universal::ATTRTYPE_TEXT
-		);
-
-		# Setup the translation mechanism for old-style fields to new-style values...
-		my %clearingHouse = ( 'perse' => 1, 'thinet' => 2 );
-
-		# Populate the fields with data from the appropriate columns...
-		$page->field('org_billing_id_type', $clearingHouse {lc ($clearHouseData->{value_text})});
-		$page->field('org_billing_id', $clearHouseData->{value_textB});
-		$page->field('org_billing_active', 0);
-		$page->field('org_billing_effective_date', $page->getDate());
-		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-
-		# Update the billing record to the new style...
-#		$page->schemaAction(
-#			'Org_Attribute', 'update',
-#			parent_id => $orgIntId,
-#			item_name => 'Organization Default Clearing House ID',
-#			item_id => $clearHouseData->{item_id} || undef,
-#			value_type => $App::Universal::ATTRTYPE_BILLING_INFO || undef,
-#			value_text => $clearHouseData->{value_textB} || undef,
-#			value_textB => '0',
-#			value_int => $clearingHouse {lc ($clearHouseData->{value_text})} || undef,
-#			value_date => $page->getDate() || undef,
-#			_debug => 0
-#		);
-	}
+	$page->field('org_billing_id_type', $clearHouseData->{value_int});
+	$page->field('org_billing_id', $clearHouseData->{value_text});
+	$page->field('org_billing_active', $clearHouseData->{value_intb});
+	$page->field('org_billing_effective_date', $clearHouseData->{value_date});
+	$page->field('org_billing_item_id', $clearHouseData->{item_id});
 
 	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Area Served',
@@ -676,11 +610,11 @@ sub execute_add
 
 	if ($page->field('member_name') eq 'Main')
 	{
-			@members ='main_dir_entry';
+			@members = 'main_dir_entry';
 	}
 	elsif ($page->field('member_name') eq 'Location')
 	{
-			@members ='location_dir_entry';
+			@members = 'location_dir_entry';
 	}
 	else
 	{
@@ -923,7 +857,7 @@ sub execute_add
 		item_name => 'Organization Default Clearing House ID',
 		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 		value_text => $page->field('org_billing_id') || undef,
-		value_textB => ($page->field('org_billing_active') ? 1 : 0),
+		value_intB => ($page->field('org_billing_active') ? 1 : 0),
 		value_int => $page->field('org_billing_id_type') || undef,
 		value_date => $page->field('org_billing_effective_date') || undef,
 		_debug => 0
@@ -956,50 +890,50 @@ sub execute_add
 	my $orgInternalId = $page->session('org_internal_id');
 	my $catalogId = $page->field('org_id').'_FEE_SCHEDULE';
 	my $catInternalId = $page->schemaAction(
-									'Offering_Catalog', $command,
-									catalog_id => $catalogId || undef,
-									org_internal_id => $orgInternalId || undef,
-									catalog_type => 0,
-									caption => $catalogId || undef,
-									_debug => 0
-								)if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+		'Offering_Catalog', $command,
+		catalog_id => $catalogId || undef,
+		org_internal_id => $orgInternalId || undef,
+		catalog_type => 0,
+		caption => $catalogId || undef,
+		_debug => 0
+	) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
 
 	my$secCatalogId = $page->field('org_id').'_ST';
 	my $catSecIntenalId = $page->schemaAction(
-										'Offering_Catalog', $command,
-										org_internal_id => $orgInternalId || undef,
-										catalog_id => $secCatalogId || undef,
-										catalog_type => 1,
-										caption => $secCatalogId || undef,
-										_debug => 0
-								)if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+			'Offering_Catalog', $command,
+			org_internal_id => $orgInternalId || undef,
+			catalog_id => $secCatalogId || undef,
+			catalog_type => 1,
+			caption => $secCatalogId || undef,
+			_debug => 0
+	) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
 
 	$page->schemaAction(
-				'Org_Attribute', $command,
-				parent_id => $orgIntId,
-				item_name =>  'Fee Schedule',
-				value_type => App::Universal::ATTRTYPE_INTEGER,
-				value_int => $catInternalId || undef,
-				_debug => 0
-		) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+		'Org_Attribute', $command,
+		parent_id => $orgIntId,
+		item_name =>  'Fee Schedule',
+		value_type => App::Universal::ATTRTYPE_INTEGER,
+		value_int => $catInternalId || undef,
+		_debug => 0
+	) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
 
 	$page->schemaAction(
-				'Org_Attribute', $command,
-				parent_id => $orgIntId,
-				item_name =>  'Fee Schedule',
-				value_type => App::Universal::ATTRTYPE_INTEGER,
-				value_int => $catSecIntenalId || undef,
-				_debug => 0
-		) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
+		'Org_Attribute', $command,
+		parent_id => $orgIntId,
+		item_name =>  'Fee Schedule',
+		value_type => App::Universal::ATTRTYPE_INTEGER,
+		value_int => $catSecIntenalId || undef,
+		_debug => 0
+	) if $page->field('member_name') eq 'Main' || $page->field('member_name') eq 'Location';
 
 	$page->schemaAction(
-					'Org_Attribute', $command,
-					parent_id => $orgIntId,
-					item_name =>  'Area Served',
-					value_type => App::Universal::ATTRTYPE_TEXT,
-					value_text => $page->field('area_served') || undef,
-					_debug => 0
-		)if $page->field('area_served') ne '';
+		'Org_Attribute', $command,
+		parent_id => $orgIntId,
+		item_name =>  'Area Served',
+		value_type => App::Universal::ATTRTYPE_TEXT,
+		value_text => $page->field('area_served') || undef,
+		_debug => 0
+	) if $page->field('area_served') ne '';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
@@ -1057,32 +991,21 @@ sub execute_update
 		item_name => 'Organization Default Clearing House ID',
 		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
 		value_text => $page->field('org_billing_id') || undef,
-		value_textB => ($page->field('org_billing_active') ? 1 : 0),
+		value_intB => ($page->field('org_billing_active') ? 1 : 0),
 		value_int => $page->field('org_billing_id_type') || undef,
 		value_date => $page->field('org_billing_effective_date') || undef,
 		_debug => 0
 	) unless ($page->field('org_billing_item_id') eq '');
 
-#	$page->schemaAction(
-#			'Org_Attribute', $clearHouseCommand,
-#			parent_id => $orgIntId,
-#			item_id => $page->field('clear_item_id') || undef,
-#			item_name => 'Clearing House ID',
-#			value_type => App::Universal::ATTRTYPE_TEXT,
-#			value_text => $page->field('clear_house') || undef,
-#			value_textB => $page->field('clear_house_billing_id') || undef,
-#			_debug => 0
-#		);
-
 		my $areaCommand = $page->field('area_served_id') eq '' ? 'add' : $command;
 		$page->schemaAction(
-					'Org_Attribute', $areaCommand,
-					parent_id => $orgIntId,
-					item_name =>  'Area Served',
-					item_id  => $page->field('area_served_id') || undef,
-					value_type => App::Universal::ATTRTYPE_TEXT,
-					value_text => $page->field('area_served') || undef,
-					_debug => 0
+			'Org_Attribute', $areaCommand,
+			parent_id => $orgIntId,
+			item_name =>  'Area Served',
+			item_id  => $page->field('area_served_id') || undef,
+			value_type => App::Universal::ATTRTYPE_TEXT,
+			value_text => $page->field('area_served') || undef,
+			_debug => 0
 		)if $page->field('area_served') ne '';
 
 
