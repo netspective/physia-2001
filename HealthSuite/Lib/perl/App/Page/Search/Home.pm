@@ -61,6 +61,8 @@ sub prepare_page_content_header
 			['Insurance Product', "/org/#session.org_id#/dlg-add-ins-product", 'insproduct'],
 			['Insurance Plan', "/org/#session.org_id#/dlg-add-ins-plan", 'insplan'],
 			['Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 'catalog'],
+			['Batch Payment', "/org/#session.org_id#/dlg-add-batch", 'batch'],
+			['Monthly Cap Payment', "/org/#session.org_id#/dlg-add-postcappayment", 'postcappayment'],
 			['Schedule Template', "/schedule/dlg-add-template?_dialogreturnurl=/menu", 'template'],
 		]);
 
@@ -196,6 +198,7 @@ sub prepare
 					<b>Add</b> a new
 					<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
 					<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
+					<a href="/org/#session.org_id#/dlg-add-postcappayment">Monthly Cap Payment</a>,
 					<a href="/org/#session.org_id#/dlg-add-close-date">Close Date</a>,
 					<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
 					<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
