@@ -89,14 +89,12 @@ sub isValid
 	my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
 		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule');
 
-	my @primaryInsFeeScheds = ();
+	my @insFeeSchedules = ();
 	foreach my $fs (@{$getFeeSchedsForInsur})
 	{
-		push(@primaryInsFeeScheds, $fs->{value_text});
+		push(@insFeeSchedules, $fs->{value_text});
 	}
-	$page->param('_f_proc_insurance_catalogs', @primaryInsFeeScheds);
-	
-	my @insFeeSchedules = $page->param('_f_proc_insurance_catalogs');
+
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	#munir's old icd validation for checking if the same icd code is entered in twice
@@ -226,11 +224,10 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrg);
 
-		#if( $charges eq '' && ($defaultFeeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
 		unless ($charges)
 		{
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
-			$page->param("_f_proc_active_catalogs", @allFeeSchedules);
+			$page->param("_f_proc_active_catalogs", join(',', @allFeeSchedules));
 			
 			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
@@ -254,10 +251,6 @@ sub isValid
 			}
 		}
 
-		#elsif($charges eq '' && ($defaultFeeSchedules[0] eq '' && $insFeeSchedules[0] eq '') )
-		#{
-		#	$self->invalidate($page, "[<B>P$line</B>] 'Charge' is a required field. Cannot leave blank.");
-		#}
 
 		@errors = App::IntelliCode::validateCodes
 		(
@@ -501,7 +494,6 @@ sub getHtml
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
 			<TD COLSPAN=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
-					<INPUT TYPE="HIDDEN" NAME="_f_proc_insurance_catalogs" VALUE='@{[ $page->param("_f_proc_insurance_catalogs") ]}'/>
 					<INPUT TYPE="HIDDEN" NAME="_f_proc_active_catalogs" VALUE='@{[ $page->param("_f_proc_active_catalogs") ]}'/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
