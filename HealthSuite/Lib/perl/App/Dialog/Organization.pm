@@ -966,11 +966,12 @@ sub addLabCatalogs
 	my $self=shift;
 	my $page=shift;
 	my $orgIntId=shift;
+	my $name_id = $page->field('org_id')."_Lab_Test";
 	$page->schemaAction(
 		'Offering_Catalog', 'add',
 		org_internal_id => $orgIntId,
 		catalog_id =>"Lab_Test",
-		caption =>'Lab Test',
+		caption =>$name_id,
 		catalog_type=>5,
 		description=>'List of Lab tests',
 		_debug => 0,
