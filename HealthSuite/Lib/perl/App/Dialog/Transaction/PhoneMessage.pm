@@ -64,8 +64,8 @@ sub new
 	{
 		level => 1,
 		scope =>'transaction',
-		key => "#param.person_id#",
-		data => "Phone Message from <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		key => "#field.person_called#",
+		data => "Phone Message from <a href='/person/#field.person_called#/profile'>#field.person_called#</a>"
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
