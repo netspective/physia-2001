@@ -12,6 +12,20 @@ use vars qw(@EXPORT @ISA);
 use constant SEARCH_RESULTS_LIMIT => 250;
 use constant MAX_APPTS => 2;
 
+#DOCUMENT SPECIFICATION
+use constant DOCSPEC_FOLDER => 0;
+use constant DOCSPEC_MIME => 1000;
+use constant DOCSPEC_INTERNAL => 2000;
+use constant DOCSPEC_EMAIL => 2100;
+use constant DOCSPEC_HL7 => 3000;
+use constant DOCSPEC_HL7XML => 4000;
+use constant DOCSPEC_FAX => 5000;
+
+#DOCUMENT SOURCE TYPES
+use constant DOCSRCTYPE_PHYSIA => 0;
+use constant DOCSRCTYPE_PERSON => 100;
+use constant DOCSRCTYPE_ORG => 200;
+
 #GUARANTOR TYPE
 use constant GUARANTOR_PERSON => 0;
 use constant GUARANTOR_ORG => 1;
@@ -68,7 +82,9 @@ use constant ATTRTYPE_FLOAT => 120;
 use constant ATTRTYPE_CURRENCY => 140;
 use constant ATTRTYPE_DATE => 150;
 use constant ATTRTYPE_DURATION => 160;
-use constant ATTRTYPE_CPT_CODE =>310;
+use constant ATTRTYPE_CPT_CODE => 310;
+use constant ATTRTYPE_PERSON_ID => 330;
+use constant ATTRTYPE_PATIENT_ID => 331;
 use constant ATTRTYPE_HISTORY => 950;
 use constant ATTRTYPE_FAKE_ADDRESS => 99910;
 use constant ATTRTYPE_BILLING_INFO => 960;
