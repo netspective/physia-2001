@@ -71,12 +71,12 @@
 
 	<datatype name="stamp">
 		<sqldefn>date</sqldefn>
-		<sqlwritefmt>to_date('$value$', 'MM/DD/YYYY HH:MI AM')</sqlwritefmt>
+		<sqlwritefmt>to_date('$value$', 'MM/DD/YYYY HH:MI AM') + #session.GMT_DAYOFFSET# </sqlwritefmt>
 	</datatype>
 
 	<datatype name="time">
 		<sqldefn>date</sqldefn>
-		<sqlwritefmt>to_date('$value$', 'HH:MI AM')</sqlwritefmt>
+		<sqlwritefmt>to_date('$value$', 'HH:MI AM') + #session.GMT_DAYOFFSET# </sqlwritefmt>
 	</datatype>
 
 	<datatype name="socsec" type="text" size="11"/>
