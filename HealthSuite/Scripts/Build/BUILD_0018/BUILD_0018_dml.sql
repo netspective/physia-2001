@@ -42,4 +42,11 @@ update TRANS_ADDRESS_AUD set state=upper(state);
 update Adjust_Method set caption = 'Auto Capitated Service Adjustment' where id=3;
 
 
+--bug 1827
+
+insert into Catalog_Entry_Type (id, caption) values (300, 'Labs');
+insert into Catalog_Entry_Type (id, caption) values (310, 'Radiology');
+insert into Catalog_Entry_Type (id, caption) values (999, 'Other');
+
+
 commit;
