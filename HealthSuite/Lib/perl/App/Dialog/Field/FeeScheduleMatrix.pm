@@ -48,8 +48,8 @@ sub getHtml
 	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
 	my $textFontAttrsForTotalBalRow = 'SIZE=2 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:10pt"';
 
-	my $cpts = $page->field('cpts');
-	my $feeschedules = $page->field('fs');
+	my $cpts = $page->param('_f_cpts');
+	my $feeschedules = $page->param('_f_fs');
 
 	if(my @messages = $page->validationMessages($self->{name}))
 	{
@@ -60,7 +60,7 @@ sub getHtml
 
 	my ($dialogName) = ($dialog->formName());
 	
-#	$page->addDebugStmt("cpts are $cpts");
+#	$page->addDebugStmt("cpts are $cpts, feeschedules are $feeschedules");
 	
 	my @allcpts = split(/\s*,\s*/, $cpts);
 	my @allfeeschedules = split(/\s*,\s*/, $feeschedules);
@@ -70,11 +70,16 @@ sub getHtml
 	my $totalCpts = @allcpts;
 #	$page->addDebugStmt("feeschedules are $totalFeeSchedules, $totalCpts, @allfeeschedules");
 
+        for(my $headingline = 0; $headingline < $totalFeeSchedules; $headingline++)
+        {
+                $headingsHtml .= qq{
+                                    <TD ALIGN=CENTER><FONT $textFontAttrs>$allfeeschedules[$headingline]</FONT></TD>
+                                   };
+
+	}
+
 	for(my $line = 0; $line < $totalCpts; $line++)
 	{
-                $headingsHtml .= qq{
-                                    <TD ALIGN=CENTER><FONT $textFontAttrs>$allfeeschedules[$line]</FONT></TD>
-                                   };
 		if($allcpts[$line] =~ '-')
 		{
 			my @cptRange = split(/-/, $allcpts[$line]);
@@ -87,8 +92,8 @@ sub getHtml
 						};
 				for(my $rangecol = 0; $rangecol < $totalFeeSchedules; $rangecol++)
 					{
-						$linesHtml .= qq{
-								<TD><INPUT NAME='_f_amount_$rangeincrement\_$rangecol\_payment' TYPE='float' SIZE=10  VALUE='@{[ $page->param("_f_amount_$rangeincrement\_$rangecol\_payment") ]}'></TD>
+						$linesHtml .= qq{						
+								<TD><INPUT CLASS='fsinput' NAME='_f_amount_$rangeincrement\_$rangecol\_payment' TYPE='text' SIZE=10 VALUE='@{[ $page->param("_f_amount_$rangeincrement\_$rangecol\_payment") ]}' ONBLUR="validateChange_Float(event)"></TD>
 								};
 					}
 
@@ -108,7 +113,7 @@ sub getHtml
 			for(my $col = 0; $col < $totalFeeSchedules; $col++)
 			{
 				$linesHtml .= qq{
-						<TD><INPUT NAME='_f_amount_$line\_$col\_payment' TYPE='float' SIZE=10  VALUE='@{[ $page->param("_f_amount_$line\_$col\_payment") ]}'></TD>
+						<TD><INPUT CLASS='fsinput' NAME='_f_amount_$line\_$col\_payment' TYPE='text' SIZE=10 VALUE='@{[ $page->param("_f_amount_$line\_$col\_payment") ]}' ONBLUR="validateChange_Float(event)"></TD>
 						};
 			}
 			$linesHtml .= qq{
