@@ -249,6 +249,11 @@ sub makeStateChanges
 		$page->field('person_id', $page->param('person_id'));
 		$self->updateFieldFlags('person_id', FLDFLAG_READONLY, 1);
 	}
+	
+	if ($page->field('rel_to_insured') == App::Universal::INSURED_SELF)
+	{
+		$page->field('insured_id', $page->field('person_id'));
+	}
 }
 
 
