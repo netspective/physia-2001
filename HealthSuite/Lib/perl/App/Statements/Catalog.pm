@@ -221,12 +221,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selGenericModifier' => q{
 		select caption
 		from HCFA1500_Modifier_Code
-		where id = ?
+		where abbrev = ?
 	},
 	'selGenericModifierCodeId' => q{
 		select id
 		from HCFA1500_Modifier_Code
-		where id = ?
+		where abbrev = ?
 	},
 	'selModifierCode' => q{
 		select caption
