@@ -21,14 +21,8 @@ sub findPopup_as_html
 
 	return qq{
 		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
-		<SCRIPT>
-			function updatePage(dummy)
-			{
-				return;		
-			}
-		</SCRIPT>
 		<a href="javascript:showCalendar(document.$dialogName.$fieldName);">
-		<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></a>
+			<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></a>
 	};
 }
 

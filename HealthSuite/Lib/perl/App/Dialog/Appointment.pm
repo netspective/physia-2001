@@ -570,7 +570,6 @@ sub execute
 					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
 					value_text => $page->field('attendee_id') || undef,
 					value_int => $page->field('patient_type') || 0,
-					value_intB => $page->field('visit_type') || -1,
 					_debug => 0
 					);
 				$page->schemaAction(
@@ -658,7 +657,6 @@ sub execute
 					value_type => App::Universal::EVENTATTRTYPE_PATIENT,
 					value_text => $page->field('attendee_id') || undef,
 					value_int => $page->field('patient_type') || 0,
-					value_intB => $page->field('visit_type') || -1,
 					_debug => 0
 					);
 				$page->schemaAction(

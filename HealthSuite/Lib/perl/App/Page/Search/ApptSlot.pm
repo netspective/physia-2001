@@ -96,6 +96,18 @@ sub getForm
 	my $patientTypeFieldHtml = $patientTypeField->select_as_html($self, $dialog);
 	my $apptTypeFieldHtml = $apptTypeField->select_as_html($self, $dialog);
 
+	my $chooseDateOptsHtml = qq{
+		<option value="">Choose Day</option>
+		<option value="@{[ UnixDate('today', '%m/%d/%Y') ]}">Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 1 week'), '%m/%d/%Y') ]}">1 week from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 2 weeks'), '%m/%d/%Y') ]}">2 weeks from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 3 weeks'), '%m/%d/%Y') ]}">3 weeks from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 6 weeks'), '%m/%d/%Y') ]}">6 weeks from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 3 months'), '%m/%d/%Y') ]}">3 months from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 6 months'), '%m/%d/%Y') ]}">6 months from Today</option>
+		<option value="@{[ UnixDate(DateCalc('today', '+ 1 year'), '%m/%d/%Y') ]}">1 year from Today</option>
+	};
+	
 	return ('Find next available slot', qq{
 	<CENTER>
 		<nobr>
@@ -123,15 +135,22 @@ sub getForm
 		<nobr>
 		<font face='arial,helvetica' size='2' color=black>
 		Starting
+
+		<SELECT onChange="document.search_form.start_date.value = this.value">
+			$chooseDateOptsHtml
+		</SELECT>
+		
 		<input name='start_date' id='start_date' size=10 maxlength=10 title='Start Date'
 			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}">
-		
+		<A HREF="javascript: showCalendar(document.search_form.start_date);">
+			<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
+
 		<font face='arial,helvetica' size='2' color=black>
 		&nbsp; Duration (minutes)
 		<input name='appt_duration' size=3 value="@{[$self->param('appt_duration') || 10]}">
 		
 		<font face='arial,helvetica' size='2' color=black>
-		&nbsp; Look Ahead
+		&nbsp; Search Duration
 		<select name="search_duration" style="color: navy">
 			<option value="7" >1 week</option>
 			<option value="14">2 weeks</option>

@@ -16,6 +16,7 @@ use App::Statements::Org;
 use App::Schedule::Utilities;
 use Data::Publish;
 use Exporter;
+use CGI::ImageManager;
 
 use vars qw(@ISA %RESOURCE_MAP @EXPORT
 	@ITEM_TYPES
@@ -252,13 +253,12 @@ sub getComponentHtml
 			qq{
 				<A HREF='$apptHref' TITLE='$apptTitle' class=today>
 				@{[ formatStamp($_->{appointment_time}) ]}</A> <br>
-				<strong style="color:#999999">($_->{appt_type})</strong>
+				<nobr><strong style="color:#999999">($_->{appt_type})</strong></nobr>
 			},
 
 			qq{<nobr>
 				<A HREF='javascript:alert("Confirm Appointment with $_->{patient_id}")'
-				TITLE='Confirm Appointment'>
-				<IMG SRC='/resources/icons/verify-appointment-incomplete.gif' BORDER=0></A>
+				TITLE='Confirm Appointment'>$IMAGETAGS{'icons/people-list'}</A>
 
 				<A HREF='javascript:alert("Verify Insurance for $_->{patient_id}")'
 				TITLE='Verify Insurance'>

@@ -51,10 +51,10 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	Invoice.invoice_id,
 	patient.person_id as patient_id,
 	e.event_id,
-	Event_Type.caption as appt_type,
+	Appt_Type.caption as appt_type,
 	replace(Appt_Attendee_Type.caption, ' Patient', '') as patient_type,
 	Invoice_Status.caption as invoice_status
-	from Invoice_Status, Appt_Attendee_Type, Event_Type, Invoice, Transaction,
+	from Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 		Person patient, Event_Attribute ep2, Event_Attribute ep1, Event e
 };
 
@@ -83,7 +83,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
-	and Event_Type.id = e.event_type
+	and Appt_Type.appt_type_id = e.appt_type
 	and Appt_Attendee_Type.id = ep1.value_int
 	and Invoice_Status.id(+) = Invoice.invoice_status
 };

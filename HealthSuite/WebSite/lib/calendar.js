@@ -105,7 +105,7 @@ headingFontStyle = "bold 8pt tahoma";      // TEXT STYLE FOR WEEKDAY ABBREVIATIO
 bottomBorder  = true;        // TRUE/FALSE (WHETHER TO DISPLAY BOTTOM CALENDAR BORDER)
 tableBorder   = 0;            // SIZE OF CALENDAR TABLE BORDER (BOTTOM FRAME) 0=none
 
-
+PAGEUPDATE = 0;
 
 // END USER-EDITABLE SECTION -------------------------------------------------------
 
@@ -170,23 +170,25 @@ function setInitialDate() {
 
 
 // POPUP A WINDOW WITH THE CALENDAR IN IT
-function showCalendar(dateField) {
+function showCalendar(dateField, pageUpdate) {
 
-    // SET INITIAL VALUE OF THE DATE FIELD AND CREATE TOP AND BOTTOM FRAMES
-    setDateField(dateField);
+	if (pageUpdate != null)	PAGEUPDATE = 1;
+	
+	// SET INITIAL VALUE OF THE DATE FIELD AND CREATE TOP AND BOTTOM FRAMES
+	setDateField(dateField);
 
-    // USE THE JAVASCRIPT-GENERATED DOCUMENTS (calDocTop, calDocBottom) IN THE FRAMESET
-    calDocFrameset =
-        "<HTML><HEAD><TITLE>Calendar</TITLE></HEAD>\n" +
-        "<FRAMESET ROWS='60,*' FRAMEBORDER='0'>\n" +
-        "  <FRAME NAME='topCalFrame' marginheight=5 SRC='javascript:parent.opener.calDocTop' SCROLLING='no'>\n" +
-        "  <FRAME NAME='bottomCalFrame' marginheight=8 SRC='javascript:parent.opener.calDocBottom' SCROLLING='no'>\n" +
-        "</FRAMESET>\n";
+	// USE THE JAVASCRIPT-GENERATED DOCUMENTS (calDocTop, calDocBottom) IN THE FRAMESET
+	calDocFrameset =
+			"<HTML><HEAD><TITLE>Calendar</TITLE></HEAD>\n" +
+			"<FRAMESET ROWS='60,*' FRAMEBORDER='0'>\n" +
+			"  <FRAME NAME='topCalFrame' marginheight=5 SRC='javascript:parent.opener.calDocTop' SCROLLING='no'>\n" +
+			"  <FRAME NAME='bottomCalFrame' marginheight=8 SRC='javascript:parent.opener.calDocBottom' SCROLLING='no'>\n" +
+			"</FRAMESET>\n";
 
-		winPrefs = "dependent=yes, width=180, height=190";
-    // DISPLAY THE CALENDAR IN A NEW POPUP WINDOW
-    newWin = window.open("javascript:parent.opener.calDocFrameset", "calWin", winPrefs);
-    newWin.focus();
+	winPrefs = "dependent=yes, width=180, height=190";
+	// DISPLAY THE CALENDAR IN A NEW POPUP WINDOW
+	newWin = window.open("javascript:parent.opener.calDocFrameset", "calWin", winPrefs);
+	newWin.focus();
 }
 
 
@@ -842,7 +844,9 @@ function returnDate(inDay)
     calDateField.focus();
 
     // CLOSE THE CALENDAR WINDOW
-    updatePage(outDate);
+
+		if (PAGEUPDATE == 1) updatePage(outDate);
+    
     newWin.close();
 
 }

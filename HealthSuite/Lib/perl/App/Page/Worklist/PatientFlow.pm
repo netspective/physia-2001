@@ -320,7 +320,7 @@ sub getControlBarHtml
 						$chooseDateOptsHtml
 					</SELECT>
 
-					<A HREF="javascript: showCalendar(document.dateForm.selDate);">
+					<A HREF="javascript: showCalendar(document.dateForm.selDate, 1);">
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
 
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">

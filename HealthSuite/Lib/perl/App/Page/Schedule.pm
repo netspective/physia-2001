@@ -581,7 +581,7 @@ sub getApptSheetHeaderHtml
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
-					<A HREF="javascript: showCalendar(document.dateForm.selDate);">
+					<A HREF="javascript: showCalendar(document.dateForm.selDate, 1);">
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
 
 					&nbsp

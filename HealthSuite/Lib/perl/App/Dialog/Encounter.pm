@@ -98,14 +98,16 @@ sub initialize
 			schema => $schema,
 			column => 'Transaction.trans_type',
 			typeRange => '2000..2999'),
+			
 		new CGI::Dialog::Field::TableColumn(
+			name => 'appt_type',
+			options => FLDFLAG_READONLY,
 			caption => 'Appointment Type',
 			schema => $schema,
-			column => 'Event.event_type', typeRange => '100..199'),
+			column => 'Event.appt_type'),
+			
 		new CGI::Dialog::Field(caption => 'Reason for Visit', name => 'subject', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'memo', caption => 'Symptoms', name => 'remarks'),
-
-
 
 		new CGI::Dialog::Field(name => 'accident',
 				caption => 'Accident?',
@@ -114,8 +116,6 @@ sub initialize
 				fKeyDisplayCol => 0,
 				fKeyValueCol => 1),
 		new CGI::Dialog::Field(caption => 'Place of Auto Accident (State)', name => 'accident_state', size => 2, maxLength => 2),
-
-
 
 		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
 
@@ -128,8 +128,6 @@ sub initialize
 						findPopupControlField => '_f_other_payer_type'),
 				new CGI::Dialog::Field(type => 'select', selOptions => 'Person:person;Organization:org', caption => 'Payer for Today Type', name => 'other_payer_type'),
 			]),
-
-
 
 		#new CGI::Dialog::MultiField(caption => 'Deductible Balance/Insurance Phone', name => 'deduct_fields',
 		#	fields => [
@@ -185,11 +183,7 @@ sub initialize
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
 
-
-
 		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Physician']),
-
-
 
 		new CGI::Dialog::MultiField(caption =>'Similar/Current Illness Dates', name => 'illness_dates',
 			fields => [
@@ -207,11 +201,7 @@ sub initialize
 				new CGI::Dialog::Field(name => 'hospitalization_end_date', type => 'date', defaultValue => '')
 			]),
 
-
-
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
-
-
 
 		new CGI::Dialog::Field(type => 'memo',
 				caption => 'Comments',
@@ -224,8 +214,6 @@ sub initialize
 				postHtml => "</FONT></B>",
 				name => 'confirmed_info',
 				options => FLDFLAG_REQUIRED),
-
-
 
 		new CGI::Dialog::Subhead(heading => 'Procedure Entry', name => 'procedures_heading'),
 		new App::Dialog::Field::Procedures(name =>'procedures_list', lineCount => 3),
@@ -247,16 +235,12 @@ sub makeStateChanges
 		$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
 	}
 
-
-
 	#Set attendee_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id'))
 	{
 		$page->field('attendee_id', $personId);
 		$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 	}
-
-
 
 	#Populate provider id field and org fields with session org's providers
 	my $sessOrgIntId = $page->session('org_internal_id');
@@ -338,7 +322,8 @@ sub populateData
 		$page->field('checkin_stamp', $page->getTimeStamp());
 		$page->field('checkout_stamp', $page->getTimeStamp());
 		$page->field('parent_event_id', $eventId);
-		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selEncountersCheckIn/Out', $eventId);
+		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+			'selEncountersCheckIn/Out', $eventId);
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
 

@@ -183,15 +183,16 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		select e.event_id, e.parent_id, e.facility_id as service_facility_id, e.event_status, e.event_type, e.subject,
 			to_char(e.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
 			e.duration, e.remarks, e.owner_id,
-			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
+			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id, at.caption as appt_type,
 			ep1.value_text as attendee_id, ep1.value_int as attendee_type,
 			ep2.value_text as care_provider_id, '2' as bill_type
-		from event_attribute ep1, event_attribute ep2, event e
+		from Appt_Type at, event_attribute ep1, event_attribute ep2, event e
 		where e.event_id = ?
 			and ep1.parent_id = e.event_id
 			and ep2.parent_id = ep1.parent_id
 			and ep1.item_name='Appointment/Attendee/Patient'
 			and ep2.item_name='Appointment/Attendee/Physician'
+			and at.appt_type_id(+) = e.appt_type
 	},
 
 	'selEventAttribute' => qq{
