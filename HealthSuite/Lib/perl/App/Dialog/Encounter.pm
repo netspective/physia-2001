@@ -1022,10 +1022,12 @@ sub handleBillingInfo
 		}
 		elsif($primPayer == $fakeProdNameThirdParty)
 		{
-			#my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
+			my $thirdPartyId = $page->field('third_party_payer_id');
+			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
 
 			$billParty = $billPartyTypeOrg;
-			$billToId = $page->field('third_party_payer_id');
+			$billToId = $thirdPartyId;
+			$billInsId = $insInfo->{ins_internal_id};
 			#$billAmt = '';
 			#$billPct = '';
 			#$billDate = '';
