@@ -63,8 +63,8 @@ sub new
 	$params{impairmentRating} = undef;
 	$params{doctorType} = undef;
 	$params{examiningDoctorType} = undef;
-	$params{MaximumImprovementAgreement} = undef;
-	$params{ImpairmentRatingAgreement} = undef;
+	$params{maximumImprovementAgreement} = undef;
+	$params{impairmentRatingAgreement} = undef;
 
 	return bless \%params, $type;
 }
@@ -734,7 +734,7 @@ sub setMaximumImprovementAgreement
 sub setImpairmentRatingAgreement
 {
 	my ($self,$value) = @_;
-	$self->{ImpairmentRatingAgreement} = $value;
+	$self->{impairmentRatingAgreement} = $value;
 }
 
 @CHANGELOG =
