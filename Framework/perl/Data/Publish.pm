@@ -9,7 +9,7 @@ use CGI::Layout;
 use Storable qw(dclone);
 
 use vars qw(@ISA @EXPORT %BLOCK_PUBLICATION_STYLE %FORMELEM_STYLE);
-use enum qw(BITMASK:PUBLFLAG_ STDRECORDICONS HASCALLBACKS NEEDSTORAGE HASTAILROW REPLACEDEFNVARS CHECKFORDATASEP HIDEBANNER HIDEHEAD HIDETAIL HIDEROWSEP);
+use enum qw(BITMASK:PUBLFLAG_ STDRECORDICONS HASCALLBACKS NEEDSTORAGE HASTAILROW REPLACEDEFNVARS CHECKFORDATASEP HIDEBANNER HIDEHEAD HIDETAIL HIDEROWSEP HIDESUBTOTAL HASSUBTOTAL);
 use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL);
 
 @ISA    = qw(Exporter);
@@ -18,10 +18,12 @@ use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL
 	PUBLFLAG_HIDEHEAD
 	PUBLFLAG_HIDETAIL
 	PUBLFLAG_HIDEROWSEP
+	PUBLFLAG_HIDESUBTOTAL
 	PUBLCOLFLAG_DONTWRAP
 	PUBLCOLFLAG_DONTWRAPHEAD
 	PUBLCOLFLAG_DONTWRAPBODY
 	PUBLCOLFLAG_DONTWRAPTAIL
+	
 
 	prepareStatementColumns
 	createHtmlFromStatement
@@ -244,30 +246,33 @@ sub prepare_HtmlBlockFmtTemplate
 
 	my ($headFontOpen, $headFontClose) = ($publDefn->{headFontOpen} || '<FONT FACE="Arial,Helvetica" SIZE=2 COLOR=NAVY>', $publDefn->{headFontClose} || '</FONT>');
 	my ($bodyFontOpen, $bodyFontClose) = ($publDefn->{bodyFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2>', $publDefn->{bodyFontClose} || '</FONT>');
-	my ($tailFontOpen, $tailFontClose) = ($publDefn->{tailFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{tailFontClose} || '</B></FONT>');
-
+	my ($tailFontOpen, $tailFontClose) = ($publDefn->{tailFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{tailFontClose} || '</B></FONT>');	
+	my ($subTotalFontOpen, $subTotalFontClose) = ($publDefn->{subTotalFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{subTotalFontClose} || '</B></FONT>');
+	
 	my $columnDefn = $publDefn->{columnDefn};
 	my $publFlags = exists $publDefn->{flags} ? $publDefn->{flags} : 0;
 	my $outColsCount = (scalar(@$columnDefn) * 2) + 1; # because we create "spacer" columns, too
 
-	my ($hSpacer, $dSpacer, $tSpacer) =
+	my ($hSpacer, $dSpacer, $tSpacer,$sSpacer) =
 		(	exists $publDefn->{hSpacer} ? $publDefn->{hSpacer} : "<TH>$headFontOpen&nbsp;&nbsp;$headFontClose</TH>",
 			exists $publDefn->{dSpacer} ? $publDefn->{dSpacer} : "<TH>$bodyFontOpen&nbsp;&nbsp;$bodyFontClose</TH>",
 			exists $publDefn->{tSpacer} ? $publDefn->{tSpacer} : "<TH>$tailFontOpen&nbsp;&nbsp;$tailFontClose</TH>",
-
+			exists $publDefn->{sSpacer} ? $publDefn->{sSpacer} : "<TH>$subTotalFontOpen&nbsp;&nbsp;$subTotalFontClose</TH>",
 		);
 	my $imgPath = exists $publDefn->{imgPath} ? $publDefn->{imgPath} : "/resources";
 	my $colCount = 0;
-	my (@headCols, @bodyCols, @tailCols, @colCallbacks, @colValueCallbacks, @storeCols);
+	my (@headCols, @bodyCols, @tailCols, @subTotalCols, @colCallbacks, @colValueCallbacks, @storeCols);
 
 	foreach (@$columnDefn)
 	{
 		my $colOptions = $_->{options};
 		my $colIdx = exists $_->{colIdx} ? $_->{colIdx} : $colCount;
-		my ($hCellFmt, $dCellFmt, $tCellFmt) =
+		my ($hCellFmt, $dCellFmt, $tCellFmt,$sCellFmt) =
 			(	exists $_->{hCellFmt} ? $_->{hCellFmt} : undef,
 				exists $_->{dCellFmt} ? $_->{dCellFmt} : undef,
-				exists $_->{tCellFmt} ? $_->{tCellFmt} : undef);
+				exists $_->{tCellFmt} ? $_->{tCellFmt} : undef,
+				exists $_->{sCellFmt} ? $_->{sCellFmt} : undef
+				);
 
 		unless(defined $hCellFmt)
 		{
@@ -344,22 +349,53 @@ sub prepare_HtmlBlockFmtTemplate
 			$tDataFmt = "<NOBR>$tDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
 			$tCellFmt = "<TD ALIGN=$tAlign VALIGN=@{[$_->{tVAlign} || 'TOP']}>$tailFontOpen$tDataFmt$tailFontClose</TD>";
 		}
+		
+		#Sets up callbacks and cell format for subtotals
+		unless (defined $sCellFmt)
+		{
 
+			my $sDataFmt = $_->{sDataFmt};
+			my $sAlign = exists $_->{sAlign} ? $_->{sAlign} : undef;
+			if(my $summarize = $_->{summarize})
+			{
+				my $cbackName = $_->{dformat} ? "$summarize\_$_->{dformat}" : $summarize;
+				
+				#Sub total callbacks have a differant name
+				my $subCback=$cbackName."_sub_total";
+				$sDataFmt = "&{$subCback:$colIdx}";
+				$sAlign = 'RIGHT' unless defined $sAlign;
+			}
+			#Doing a group by on a summarized field is ignored
+			elsif (my $groupBy =$_->{groupBy})
+			{
+				#Set sub total flag
+				$sDataFmt =$groupBy;
+				$publFlags |= PUBLFLAG_HASSUBTOTAL;
+			}
+					
+			
+			$sDataFmt ||= '&nbsp;';
+			$sDataFmt = "<NOBR>$sDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
+			$sCellFmt = "<TD ALIGN=$sAlign VALIGN=@{[$_->{sVAlign} || 'TOP']}>$subTotalFontOpen$sDataFmt$subTotalFontClose</TD>";
+		}
 		# replace &{?} with the current column's index and ## with a single pound (for recursive variables or simple # replacements)
 		$hCellFmt =~ s/\&\{\?\}/$colIdx/g;
 		$dCellFmt =~ s/\&\{\?\}/$colIdx/g;
 		$tCellFmt =~ s/\&\{\?\}/$colIdx/g;
+		$sCellFmt =~ s/\&\{\?\}/$colIdx/g;
 
 		unless($publFlags & PUBLFLAG_HASCALLBACKS)
 		{
 			$publFlags |= PUBLFLAG_HASCALLBACKS if $hCellFmt =~ m/\&\{.*?\}/;
 			$publFlags |= PUBLFLAG_HASCALLBACKS if $dCellFmt =~ m/\&\{.*?\}/;
 			$publFlags |= PUBLFLAG_HASCALLBACKS if $tCellFmt =~ m/\&\{.*?\}/;
+			$publFlags |= PUBLFLAG_HASCALLBACKS if $sCellFmt =~ m/\&\{.*?\}/;
 		}
 
 		push(@headCols, $hCellFmt, $hSpacer);
 		push(@bodyCols, $dCellFmt, $dSpacer);
 		push(@tailCols, $tCellFmt, $tSpacer);
+		push(@subTotalCols, $sCellFmt, $sSpacer);
 
 		$colCount++;
 	}
@@ -517,7 +553,7 @@ sub prepare_HtmlBlockFmtTemplate
 		$bannerFmt =~ s/\#fmtdefn\.(\w+)\#/eval("\$$1")/ge;
 	}
 
-	my ($headRowFmt, $bodyRowFmt, $tailRowFmt) =
+	my ($headRowFmt, $bodyRowFmt, $tailRowFmt,$subTotalRowFmt) =
 	(
 		$publFlags & PUBLFLAG_HIDEHEAD ? '' : qq{
 			<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{headBgColor} || 'EEEEDD' ]}>
@@ -536,6 +572,13 @@ sub prepare_HtmlBlockFmtTemplate
 					$tSpacer @{[ join('', @tailCols) ]}
 				</TR>
 		},
+		$publFlags & PUBLFLAG_HIDESUBTOTAL ? '' : qq{
+				$rowSepStr
+				<TR VALIGN=TOP BGCOLOR=@{[ $publDefn->{tailBgColor} || 'DCDCDC ' ]}>
+					$sSpacer @{[ join('', @subTotalCols) ]}
+				</TR>
+		},
+		
 	);
 
 	$publFlags |= PUBLFLAG_CHECKFORDATASEP if exists $publDefn->{separateDataColIdx};
@@ -555,6 +598,7 @@ sub prepare_HtmlBlockFmtTemplate
 		headRowFmt => $headRowFmt,
 		bodyRowFmt => $bodyRowFmt,
 		tailRowFmt => $tailRowFmt,
+		subTotalRowFmt => $subTotalRowFmt,
 		noDataMsg => "<TR><TD COLSPAN=$outColsCount><I>$bodyFontOpen<FONT COLOR=RED>No records found.</FONT>$bodyFontClose</I></TD></TR>",
 	};
 
@@ -716,7 +760,7 @@ sub createHtmlFromStatement
 		}
 
 		$publFlags = $fmt->{flags};
-		my ($rowSepStr, $bodyRowFmt, $levIndentStr) = ($flags & PUBLFLAG_HIDEROWSEP ? '' : $fmt->{rowSepStr}, $fmt->{bodyRowFmt}, $fmt->{levelIndentStr});
+		my ($rowSepStr, $bodyRowFmt, $levIndentStr,$subTotalRowFmt) = ($flags & PUBLFLAG_HIDEROWSEP ? '' : $fmt->{rowSepStr}, $fmt->{bodyRowFmt}, $fmt->{levelIndentStr},$fmt->{subTotalRowFmt});
 		my ($dataSepStr, $dataSepColIdx) = ($fmt->{dataSepStr}, $fmt->{dataSepCheckColIdx});
 		my $checkDataSep = $publFlags & PUBLFLAG_CHECKFORDATASEP;
 
@@ -731,6 +775,7 @@ sub createHtmlFromStatement
 			my $needStorage = $publFlags & PUBLFLAG_NEEDSTORAGE;
 			my @colsToStore = @{$fmt->{storeCols}};
 			my @colValuesStorage = ();
+			my @colSubStorage = ();
 			my @colCallbacks = @{$fmt->{colCallbacks}};
 			my @colValueCallbacks = @{$fmt->{colValueCallbacks}};
 
@@ -758,6 +803,25 @@ sub createHtmlFromStatement
 						my $fmt = FORMATTER->format_price($avg, 2); 
 						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
 					},
+					'sum_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
+					'sum_currency_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
+					'avg_sub_total' => sub 
+					{ 
+						my $store = $colSubStorage[$_[0]]; 
+						my $sum = 0; 
+						grep { $sum += $_ } @{$store}; 
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+					},
+					'avg_currency_sub_total' => sub 
+					{
+						my $store = $colSubStorage[$_[0]]; 
+						my $sum = 0; grep { $sum += $_ } @{$store}; 
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+						my $fmt = FORMATTER->format_price($avg, 2); 
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+					},					
+						
+					
 				);
 			$callbacks{'call'} = sub { my $activeCol = shift; &{$colCallbacks[$activeCol]}($rowRef, $activeCol, $colValuesStorage[$activeCol]); };
 			$callbacks{'callifvaleq'} =	sub	{
@@ -795,32 +859,99 @@ sub createHtmlFromStatement
 						return $info->{_DEFAULT};
 					} else { "callifvalmatch info for column $activeCol not found" };
 				};
-
-			while($rowRef = $stmtHdl->fetch())
+			if ($publFlags & PUBLFLAG_HASSUBTOTAL)
 			{
-				$rowNum++;
-				if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
+				my $groupByTextPrev=undef;
+				my $groupByTextCur=undef;
+				my $data_row = 0;
+				my $outSubTotalRow;
+				my $data;
+				while($rowRef = $stmtHdl->fetch())
 				{
-					push(@outputRows, $dataSepStr);
-				}
-				else
-				{
-					grep
+					$rowNum++;
+					if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
 					{
-						push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
-					} @colsToStore if $needStorage;
-
-					# find the default &{name:ddd} callbacks
-					($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
-					$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
-					push(@outputRows, $outRow, $rowSepStr);
+						push(@outputRows, $dataSepStr);
+						}
+					else
+					{
+					
+					
+						#Set up subtotal cur data
+						($groupByTextCur = $subTotalRowFmt)=~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						$groupByTextPrev=$groupByTextCur unless defined $groupByTextPrev;
+						if ($groupByTextCur ne $groupByTextPrev)
+						{							
+							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+							my $subRow=$data;
+							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+							push(@outputRows,$outSubTotalRow);
+							$groupByTextPrev=$groupByTextCur;
+							@colSubStorage = ();
+								
+						}
+						@$data=@$rowRef;						
+						grep
+						{
+							push(@{$colSubStorage[$_]},$rowRef->[$_]);
+						} @colsToStore if $needStorage;					
+															
+						grep
+						{
+							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
+						} @colsToStore if $needStorage;
+	
+						# find the default &{name:ddd} callbacks
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						push(@outputRows, $outRow, $rowSepStr);
+					}
+				}
+				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+				my $subRow=$data;
+				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+				push(@outputRows,$outSubTotalRow);
+				if($publFlags & PUBLFLAG_HASTAILROW)
+				{
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
+				}				
+			}
+			else
+			{
+			
+				while($rowRef = $stmtHdl->fetch())
+				{
+					$rowNum++;
+					if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
+					{
+						push(@outputRows, $dataSepStr);
+					}
+					else
+					{
+						grep
+						{
+							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
+						} @colsToStore if $needStorage;
+				
+						# find the default &{name:ddd} callbacks
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						push(@outputRows, $outRow, $rowSepStr);
+					}
+				}
+				if($publFlags & PUBLFLAG_HASTAILROW)
+				{
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
 				}
 			}
-			if($publFlags & PUBLFLAG_HASTAILROW)
-			{
-				($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
-				push(@outputRows, $outRow);
-			}
+
+			
+			
+			
+			
+			
 		}
 		else
 		{
@@ -887,7 +1018,7 @@ sub createHtmlFromData
 		}
 
 		$publFlags = $fmt->{flags};
-		my ($rowSepStr, $bodyRowFmt, $levIndentStr) = ($flags & PUBLFLAG_HIDEROWSEP ? '' : $fmt->{rowSepStr}, $fmt->{bodyRowFmt}, $fmt->{levelIndentStr});
+		my ($rowSepStr, $bodyRowFmt, $levIndentStr,$subTotalRowFmt) = ($flags & PUBLFLAG_HIDEROWSEP ? '' : $fmt->{rowSepStr}, $fmt->{bodyRowFmt}, $fmt->{levelIndentStr},$fmt->{subTotalRowFmt});
 		my ($dataSepStr, $dataSepColIdx) = ($fmt->{dataSepStr}, $fmt->{dataSepCheckColIdx});
 		my $checkDataSep = $publFlags & PUBLFLAG_CHECKFORDATASEP;
 
@@ -902,6 +1033,7 @@ sub createHtmlFromData
 			my $needStorage = $publFlags & PUBLFLAG_NEEDSTORAGE;
 			my @colsToStore = @{$fmt->{storeCols}};
 			my @colValuesStorage = ();
+			my @colSubStorage = ();
 			my @colCallbacks = @{$fmt->{colCallbacks}};
 			my @colValueCallbacks = @{$fmt->{colValueCallbacks}};
 
@@ -928,6 +1060,26 @@ sub createHtmlFromData
 						my $fmt = FORMATTER->format_price($avg, 2); 
 						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
 					},
+					
+					'sum_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
+					'sum_currency_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
+					'avg_sub_total' => sub 
+					{ 
+						my $store = $colSubStorage[$_[0]]; 
+						my $sum = 0; 
+						grep { $sum += $_ } @{$store}; 
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+					},
+					'avg_currency_sub_total' => sub 
+					{
+						my $store = $colSubStorage[$_[0]]; 
+						my $sum = 0; grep { $sum += $_ } @{$store}; 
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
+						my $fmt = FORMATTER->format_price($avg, 2); 
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+					},					
+										
+					
 					#'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum / scalar(@{$store}); },
 					#'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum / scalar(@{$store}); my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
 				);
@@ -968,35 +1120,109 @@ sub createHtmlFromData
 					} else { "callifvalmatch info for column $activeCol not found" };
 				};
 
-			#
-			# a "for" loop was used instead of "foreach" because of a problem with closures (callbacks)
-			# -- could never figure out the solution to the problem without _explicity_ assigned $rowRef
-			#
-			for($rowNum = 0; $rowNum <= $#$data; $rowNum++)
-			{
-				$rowRef = $data->[$rowNum];
-				if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
+			#Check if sub total are needed
+			#Move if/else outside of loops for performance
+			if ($publFlags & PUBLFLAG_HASSUBTOTAL)
+			{				
+				my $groupByTextPrev=undef;
+				my $groupByTextCur=undef;
+				my $data_row = 0;
+				my $outSubTotalRow;
+				#
+				# a "for" loop was used instead of "foreach" because of a problem with closures (callbacks)
+				# -- could never figure out the solution to the problem without _explicity_ assigned $rowRef
+				#
+				for($rowNum = 0; $rowNum <= $#$data; $rowNum++)
 				{
-					push(@outputRows, $dataSepStr);
-				}
-				else
-				{
-					grep
+					$rowRef = $data->[$rowNum];
+					if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
 					{
-						push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
-					} @colsToStore if $needStorage;
-
-					# find the default &{name:ddd} callbacks
-					($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
-					$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
-					push(@outputRows, $outRow, $rowSepStr);
+						push(@outputRows, $dataSepStr);
+					}
+					else
+					{
+						
+						#Set up subtotal cur data
+						($groupByTextCur = $subTotalRowFmt)=~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						$groupByTextPrev=$groupByTextCur unless defined $groupByTextPrev;
+						
+						if ($groupByTextCur ne $groupByTextPrev)
+						{							
+							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+							my $subRow=$data->[$data_row];
+							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+							push(@outputRows,$outSubTotalRow);
+							$data_row = $rowNum;
+							$groupByTextPrev=$groupByTextCur;
+							@colSubStorage = ();
+						}
+						
+						grep
+						{
+							push(@{$colSubStorage[$_]},$rowRef->[$_]);
+						} @colsToStore if $needStorage;
+						
+						grep
+						{
+							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
+						} @colsToStore if $needStorage;
+	
+						# find the default &{name:ddd} callbacks
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						push(@outputRows, $outRow, $rowSepStr);
+						
+					}
+				}
+				
+				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+				my $subRow=$data->[$data_row];
+				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+				push(@outputRows,$outSubTotalRow);
+				if($publFlags & PUBLFLAG_HASTAILROW)
+				{					
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
+				}
+			}			
+			else
+			{
+				#
+				# a "for" loop was used instead of "foreach" because of a problem with closures (callbacks)
+				# -- could never figure out the solution to the problem without _explicity_ assigned $rowRef
+				#
+				for($rowNum = 0; $rowNum <= $#$data; $rowNum++)
+				{
+					$rowRef = $data->[$rowNum];
+					if($checkDataSep && $rowRef->[$dataSepColIdx] eq '-')
+					{
+						push(@outputRows, $dataSepStr);
+					}
+					else
+					{
+						grep
+						{
+							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
+						} @colsToStore if $needStorage;
+	
+						# find the default &{name:ddd} callbacks
+						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
+						push(@outputRows, $outRow, $rowSepStr);
+					}
+				}
+				if($publFlags & PUBLFLAG_HASTAILROW)
+				{
+					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
+					push(@outputRows, $outRow);
 				}
 			}
-			if($publFlags & PUBLFLAG_HASTAILROW)
-			{
-				($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
-				push(@outputRows, $outRow);
-			}
+						
+			
+			
+			
+			
+			
 		}
 		else
 		{
