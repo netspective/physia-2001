@@ -338,22 +338,30 @@ sub execute
 	);
 
 
-	#Update the invoice
+	#Update the invoice status
 	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 	my $invoiceBalance = $invoice->{balance};
 	my $newStatus;
-	if($invoiceBalance == 0)
+	if($invoice->{invoice_status} == App::Universal::INVOICESTATUS_ONHOLD || $invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
 	{
-		#$page->addError("test($invoice->{balance})");
-		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
+		$newStatus = App::Universal::INVOICESTATUS_ONHOLD;
+		addHistoryItem($page, $invoiceId,
+			value_text => 'On Hold',
+			value_date => $todaysDate,
+		);
 	}
-	elsif($invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED)
+	elsif($invoiceBalance == 0)
 	{
-		$newStatus = App::Universal::INVOICESTATUS_PAYAPPLIED;
+		$newStatus = $invoice->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY ? App::Universal::INVOICESTATUS_PAYAPPLIED : App::Universal::INVOICESTATUS_CLOSED;
+		$newStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_PAYAPPLIED ? App::Universal::INVOICESTATUS_CLOSED : $newStatus;
+		addHistoryItem($page, $invoiceId,
+			value_text => 'Closed',
+			value_date => $todaysDate,
+		) if $newStatus == App::Universal::INVOICESTATUS_CLOSED;
 	}
 	else
 	{
-		$newStatus = $paidBy eq 'insurance' ? App::Universal::INVOICESTATUS_PAYAPPLIED : $invoice->{invoice_status};
+		$newStatus = App::Universal::INVOICESTATUS_PAYAPPLIED;
 	}
 
 	$page->schemaAction(
@@ -363,6 +371,8 @@ sub execute
 		_debug => 0
 	);
 
+
+	#Redirect
 	my $newInvoiceId;
 	if($invoiceBalance == 0)
 	{
@@ -404,7 +414,7 @@ sub customValidate
 			my $planPaid = $page->param("_f_item_$line\_plan_paid");
 			my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
 			next if $planPaid eq '' && $writeoffAmt eq '';
-			
+
 			$totalAdjsApplied += ($planPaid + $writeoffAmt);
 		}
 

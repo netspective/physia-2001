@@ -43,7 +43,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Patient/Person ID', name => 'payer_id', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption => 'Patient/Person ID', name => 'payer_id', options => FLDFLAG_REQUIRED, incSimpleName=>1),
 
 		new CGI::Dialog::Field(type => 'currency',
 					caption => 'Total Payment Received',
@@ -378,10 +378,13 @@ sub executePostPayment
 
 		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
 		my $invoiceBalance = $invoice->{total_cost} + ($invoice->{total_adjust} + (0 - $payAmt));
+		my $invoiceStatus = $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED;
+		$invoiceStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_ONHOLD ? App::Universal::INVOICESTATUS_ONHOLD : $invoiceStatus;
+		$invoiceStatus = $invoice->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED ? App::Universal::INVOICESTATUS_ONHOLD : $invoiceStatus;
 		$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId || undef,
-			invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : $invoice->{invoice_status},
+			invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
 			_debug => 0
 		);
 
@@ -392,6 +395,13 @@ sub executePostPayment
 			value_date => $todaysDate,
 		);
 
+		if($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED)
+		{
+			addHistoryItem($page, $invoiceId,
+				value_text => 'Closed',
+				value_date => $todaysDate,
+			);
+		}
 
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',

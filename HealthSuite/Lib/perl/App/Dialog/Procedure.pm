@@ -248,14 +248,7 @@ sub execAction_submit
 
 		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-		if($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
-		{
-			addHistoryItem($page, $invoiceId,
-				value_text => 'Closed',
-				value_date => $todaysDate,
-			);
-		}
-		else
+		unless($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
 		{
 			my $invStat = $resubmitFlag == 1 ? App::Universal::INVOICESTATUS_APPEALED : App::Universal::INVOICESTATUS_SUBMITTED;
 			$invStat = $printFlag ? App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED : $invStat;
