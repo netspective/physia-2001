@@ -97,7 +97,6 @@ sub prepare_page_content_header
 			</TD>
 			<TD ALIGN=RIGHT>
 				<FONT FACE="Arial,Helvetica" SIZE=2>
-				<a href='/changes'>Change Log</a> |
 				$functions
 				</FONT>
 			</TD>
