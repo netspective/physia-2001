@@ -128,101 +128,6 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 	#publishComp_stpt => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panelTransp'); },
 },
 
-
-
-#----------------------------------------------------------------------------------------------------------------------
-
-'invoice.receiptAnalysis' => {
-	sqlStmt => qq{
-			select 	y.NAME,
-				y.CATEGORY_NAME,
-				y.TRANSACTION_TYPE,
-				y.POLICYNAME,
-				decode(y.POLICYNAME, NULL,m.PERSONALMONTHAMOUNT,m.INSURANCEMONTHAMOUNT) as MONTHAMOUNT,
-				decode(y.POLICYNAME, NULL,y.PERSONALYEARAMOUNT,y.INSURANCEYEARAMOUNT) as YEARAMOUNT
-			from 	monthToDateReceiptAnalysis m, yearToDateReceiptAnalysis y
-			where	m.PROVIDERID(+) = y.PROVIDERID
-			and	m.CATEGORY_NAME(+) = y.CATEGORY_NAME
-			and	m.TRANSACTION_TYPE(+) = y.TRANSACTION_TYPE
-			and	y.PROVIDERID = ?
-			order by y.CATEGORY_NAME desc
-			},
-	sqlStmtBindParamDescr => ['Provider ID for yearToDateReceiptAnalysis View'],
-	publishDefn => {
-		columnDefn => [
-			{ colIdx => 0, head => 'Name', dataFmt => '#0#' },
-			{ colIdx => 1, head => 'Category Name', dataFmt => '#1#' },
-			{ colIdx => 2, head => 'Transaction Type', dataFmt => '#2#' },
-			{ colIdx => 3, head => 'Policy Name', dataFmt => '#3#' },
-			{ colIdx => 4, head => 'Month To Date', dataFmt => '#4#' },
-			{ colIdx => 5, head => 'Year To Date', dataFmt => '#5#' },
-		],
-	},
-	publishDefn_panel =>
-	{
-		# automatically inherites columnDefn and other items from publishDefn
-		style => 'panel',
-		frame => { heading => 'Monthly Audit Recap' },
-	},
-	publishDefn_panelTransp =>
-	{
-		# automatically inherites columnDefn and other items from publishDefn
-		style => 'panel.transparent',
-		inherit => 'panel',
-	},
-	#publishComp_st => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId]); },
-	#publishComp_stp => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panel'); },
-	#publishComp_stpt => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panelTransp'); },
-},
-
-
-
-#----------------------------------------------------------------------------------------------------------------------
-
-'invoice.receiptAnalysisAll' => {
-	sqlStmt => qq{
-			select 	y.NAME,
-				y.CATEGORY_NAME,
-				y.TRANSACTION_TYPE,
-				y.POLICYNAME,
-				decode(y.POLICYNAME, NULL,m.PERSONALMONTHAMOUNT,m.INSURANCEMONTHAMOUNT) as MONTHAMOUNT,
-				decode(y.POLICYNAME, NULL,y.PERSONALYEARAMOUNT,y.INSURANCEYEARAMOUNT) as YEARAMOUNT
-			from 	monthToDateReceiptAnalysis m, yearToDateReceiptAnalysis y
-			where	m.PROVIDERID(+) = y.PROVIDERID
-			and	m.CATEGORY_NAME(+) = y.CATEGORY_NAME
-			and	m.TRANSACTION_TYPE(+) = y.TRANSACTION_TYPE
-			order by y.CATEGORY_NAME desc
-			},
-	sqlStmtBindParamDescr => ['Provider ID for yearToDateReceiptAnalysis View'],
-	publishDefn => {
-		columnDefn => [
-			{ colIdx => 0, head => 'Name', dataFmt => '#0#' },
-			{ colIdx => 1, head => 'Category Name', dataFmt => '#1#' },
-			{ colIdx => 2, head => 'Transaction Type', dataFmt => '#2#' },
-			{ colIdx => 3, head => 'Policy Name', dataFmt => '#3#' },
-			{ colIdx => 4, head => 'Month To Date', dataFmt => '#4#' },
-			{ colIdx => 5, head => 'Year To Date', dataFmt => '#5#' },
-		],
-	},
-	publishDefn_panel =>
-	{
-		# automatically inherites columnDefn and other items from publishDefn
-		style => 'panel',
-		frame => { heading => 'Monthly Audit Recap' },
-	},
-	publishDefn_panelTransp =>
-	{
-		# automatically inherites columnDefn and other items from publishDefn
-		style => 'panel.transparent',
-		inherit => 'panel',
-	},
-	#publishComp_st => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId]); },
-	#publishComp_stp => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panel'); },
-	#publishComp_stpt => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panelTransp'); },
-},
-
-
-
 #----------------------------------------------------------------------------------------------------------------------
 
 'invoice.procAnalysis' => {
@@ -230,7 +135,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			select p.short_sortable_name,
 			tt.caption as visit_type,
 			nvl(i.code,'UNK') as code,
-			nvl(r.name,'N/A') as proc,	
+			nvl(r.name,'N/A') as proc,
 			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.units,0)) as month_to_date_units,
 			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.unit_cost,0)) as month_to_date_unit_cost,
 			sum(i.units) as year_to_date_units,
@@ -244,10 +149,10 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			AND (p.person_id = :1 OR :1 IS NULL)
 			AND trunc(i.invoice_date,'YYYY') =trunc(to_date(:2,'MM/DD/YYYY'),'YYYY')
 			AND (:3 IS NULL OR :3 = i.facility)
-			AND (:4 IS NULL OR :4 <=i.code) 
+			AND (:4 IS NULL OR :4 <=i.code)
 			AND (:5 is NULL OR :5 >=i.code)
 			AND o.org_internal_id = i.facility
-			AND o.owner_org_id = :6	
+			AND o.owner_org_id = :6
 			AND t.trans_id (+)= i.trans_id
 			AND tt.id (+)= t.trans_type
 			group by r.name,p.short_sortable_name,
@@ -675,7 +580,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				t.caption,
 				tt.caption,
 				p.complete_name,
-				p2.complete_name,				
+				p2.complete_name,
 				nvl(i.total_cost, 0),
 				i.client_id
 			from 	event e, transaction t, org o, transaction_type tt,
