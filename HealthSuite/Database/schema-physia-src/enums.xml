@@ -216,6 +216,7 @@
 		<enum>Co-insurance</enum>
 		<enum>Adjustment</enum>
 		<enum>Deductible</enum>
+		<enum>Void</enum>
 	</table>
 
 	<table name="Transaction_Status" type="Enumeration">
