@@ -3878,6 +3878,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		],
 
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#homeArl#',
+		frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-blood-type?home=#homeArl#',
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 
 	},
 	publishDefn_panel =>
@@ -3900,10 +3904,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-blood-type?home=#param.home#'>Blood Type</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#param.home#',
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-blood-type/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-blood-type/#1#?home=#param.home#',
 		},
 	},
 
