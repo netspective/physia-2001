@@ -31,7 +31,6 @@
 		<column name="comprehensive_compound_flags" type="text" size="4000" descr="List of comprehensive-compound flags"/>
 		<column name="mutual_exclusive_cpts" type="datablock" descr="List of mutually exclusive CPT codes"/>
 		<column name="mutual_exclusive_flags" type="text" size="4000" descr="List of mutually exclusive flags (one for each cpt in mutual_exclusive_cpts column)"/>
-
 		<column name="sex" type="char" descr="M=Male; F=Female; otherwise space"/>
 		<column name="unlisted" type="boolean" descr="True or False"/>
 		<column name="questionable" type="boolean" descr="True or False"/>
@@ -77,6 +76,18 @@
 		<column name="id" type="text" size="16" indexed="yes" descr="The Envoy payer/processor ID"/>
 		<column name="name" type="text" size="256" indexed="yes" descr="The complete name of the payer/processor"/>
 		<column name="ptype" lookupref="Envoy_Payer_Type" indexed="yes" descr="The Envoy payer/processor type"/>
+		<column name="state" type="text" size="2" indexed="yes" descr="2-letter state identifier for BCBS, Medicare, Medicaid"/>
+		<column name="flags" type="longint" descr="Various bit-masked flags (like group policy number required, claim office number required, etc.)"/>
+		<column name="remarks" type="text" size="512" descr="Any additional remarks"/>
+	</table>
+
+	<table name="REF_EPayer" abbrev="EPayer">
+		<column name="id" type="text" size="16" indexed="yes" descr="The Electronic payer/processor ID"/>
+		<column name="id2" type="text" size="16" indexed="yes" descr="The Electronic payer/processor secondary ID"/>
+		<column name="name" type="text" size="256" indexed="yes" descr="Short Description of the Payer"/>
+		<column name="psource" lookupref="Electronic_Payer_Source.id" indexed="yes" descr="The electronic payer source"/>
+		<column name="ptype" lookupref="Electronic_Payer_Type.id" indexed="yes" descr="The electronic payer type"/>
+		<column name="subtype" type="text" size="16" descr="Secondary information about the Payer type (perhaps describing some attributes)"/>
 		<column name="state" type="text" size="2" indexed="yes" descr="2-letter state identifier for BCBS, Medicare, Medicaid"/>
 		<column name="flags" type="longint" descr="Various bit-masked flags (like group policy number required, claim office number required, etc.)"/>
 		<column name="remarks" type="text" size="512" descr="Any additional remarks"/>

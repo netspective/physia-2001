@@ -267,18 +267,20 @@
 			Product, service, and other offerings including pricing.
 			Contains fee schedules, products list, service codes, and other items that can go onto an invoice.
 		</description>
-		<column name="catalog_id" type="text" size="32" primarykey="yes" descr="Unique name for the catalog (user-defined)"/>
+		<column name="internal_catalog_id" type="autoinc" primarykey="yes" descr="Unique identification for the catalog"/>
+		<column name="catalog_id" type="text" size="32" uniquegrp="catalogorg" indexed="yes" descr="Unique name for the catalog (user-defined)"/>
+		<column name="org_id" lookupref="Org.org_id" uniquegrp="catalogorg" indexed="yes" descr="The entity that owns the catalog"/>
 		<column name="caption" type="text" size="64" required="yes" descr="Quick overview of the catalog"/>
 		<column name="catalog_type" lookupref="Offering_Catalog_Type" descr="The type of information held in this record"/>
-		<column name="org_id" lookupref="Org.org_id" descr="The entity that owns the catalog"/>
-		<column name="parent_catalog_id" selfref="Offering_Catalog.catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
+		<column name="parent_catalog_id" selfref="Offering_Catalog.internal_catalog_id" descr="If this catalog extends an existing catalog, then this is the parent catalog id (otherwise NULL)"/>
 		<column name="description" type="text" size="1024" descr="Detailed description of the catalog"/>
 		<column name="effective" type="duration" descr="The effective date(s) of the catalog"/>
+		<column name="rvrbs_multiplier" type="float" descr="RVRBS multiplier"/>
 	</table>
 
 	<table name="Offering_Catalog_Entry" abbrev="OCatEnt" type="Audit,Secure">
 		<description>Contains the actual entries in a product, service, or other catalog (like fees, repricing information, etc).</description>
-		<column name="catalog_id" parentref="Offering_Catalog.catalog_id" descr="The catalog to which entry belongs"/>
+		<column name="catalog_id" parentref="Offering_Catalog.internal_catalog_id" descr="The catalog to which entry belongs"/>
 		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
 		<column name="parent_entry_id" selfref="Offering_Catalog_Entry.entry_id" indexed="yes" descr="If this item is a child of another item (like a group)"/>
 		<column name="entry_type" lookupref="Catalog_Entry_Type" indexed="yes" descr="The type of item (procedure, service, product, etc)"/>

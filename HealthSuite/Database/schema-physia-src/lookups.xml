@@ -72,6 +72,20 @@
 		<enum id="99">Other</enum>
 	</table>
 
+	<table name="Electronic_Payer_Source" abbrev="EPaySrc" type="Lookup">
+		<enum id="0">Direct</enum>
+		<enum id="1">Envoy</enum>
+		<enum id="2">Perse</enum>
+	</table>
+
+	<table name="Electronic_Payer_Type" abbrev="EPayType" type="Lookup">
+		<enum id="1">BCBS</enum>
+		<enum id="2">Medicare</enum>
+		<enum id="3">Medicaid</enum>
+		<enum id="4">Commercial HCFA</enum>
+		<enum id="5">Commercial UB-92</enum>
+	</table>
+
 	<table name="Ethnicity" type="Lookup">
 		<enum>Native-American</enum>
 		<enum>Caucasian</enum>
