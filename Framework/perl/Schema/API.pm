@@ -223,7 +223,7 @@ sub Table::insertRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Insert ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-	$page->storeSql($sql,$errors) if ($page->unitWork());	
+	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
@@ -269,7 +269,7 @@ sub Table::updateRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-	$page->storeSql($sql,$errors) if ($page->unitWork());	
+	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
@@ -313,7 +313,7 @@ sub Table::deleteRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Delete ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-	$page->storeSql($sql,$errors) if ($page->unitWork());	
+	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
