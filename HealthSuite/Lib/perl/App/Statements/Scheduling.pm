@@ -391,12 +391,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'sel_ApptTypesDropDown' => qq{
-		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
+		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption,
+			upper(caption) as upperCaption
 		from Appt_Type
 		where owner_org_id = :1
 		UNION
-		select 0 as appt_type_id, ' ' as caption from Dual
-		order by caption
+		select 0 as appt_type_id, ' ' as caption, ' ' as upperCaption  from Dual
+		order by 3
 	},
 
 	'selResourcesAtFacility' => qq{
