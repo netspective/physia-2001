@@ -21,7 +21,7 @@ use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Dialog::Field::Procedures;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Schedule::Utilities;
 use App::IntelliCode;
 use App::Component::WorkList::PatientFlow;
@@ -42,7 +42,7 @@ sub initialize
 
 	$self->addContent(
 
-		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
+		#item ids for updating the attributes
 		new CGI::Dialog::Field(type => 'hidden', name => 'condition_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'prior_auth_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'resub_number_item_id'),
@@ -56,7 +56,9 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'bill_contact_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
-		#new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'payer_selected_item_id'),
+		#---------------------------------------------------------------------------------------------
+		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'parent_event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
@@ -64,19 +66,17 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
 
+		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'submission_order'),
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'secondary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_ins_id'),
-		#new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
@@ -231,7 +231,11 @@ sub initialize
 			]),
 
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
-		new CGI::Dialog::Field(caption => 'Medicaid Resubmission Number', name => 'resub_number'),
+		new CGI::Dialog::MultiField(caption =>'Medicaid Resubmission Code/Original Ref. No.', name => 'medicaid_fields',
+			fields => [
+				new CGI::Dialog::Field(caption => 'Medicaid Resubmission Code', name => 'resub_number'),
+				new CGI::Dialog::Field(caption => 'Original Reference No.', name => 'orig_ref'),
+			]),
 
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
@@ -326,7 +330,7 @@ sub makeStateChanges
 	my $invoiceStatus = $invoiceInfo->{invoice_status};
 
 	my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
-	unless($submitOrder->{value_int} == 0 || $invoiceStatus > App::Universal::INVOICESTATUS_SUBMITTED)
+	unless($submitOrder->{value_int} == 0)
 	{
 		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
@@ -339,18 +343,18 @@ sub makeStateChanges
 		$self->setFieldFlags('provider_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('org_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('hosp_org_fields', FLDFLAG_READONLY);
-		$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
+		#$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
 		$self->setFieldFlags('billing_contact', FLDFLAG_READONLY);
 		$self->setFieldFlags('billing_phone', FLDFLAG_READONLY);
-		$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
+		#$self->setFieldFlags('illness_dates', FLDFLAG_READONLY);
 		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
-		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
-		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
+		#$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
+		#$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
 	}
 
 	unless($invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_MEDICAID && ($invoiceStatus == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStatus == App::Universal::INVOICESTATUS_CLOSED) )
 	{
-		$self->setFieldFlags('resub_number', FLDFLAG_INVISIBLE, 1);
+		$self->setFieldFlags('medicaid_fields', FLDFLAG_INVISIBLE, 0);
 	}
 }
 
@@ -819,40 +823,17 @@ sub voidInvoicePostSubmit
 	}
 
 	#add history item for void copy
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	addHistoryItem($page, $invoiceId,
-		value_text => "This invoice is a voided copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>",
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $invoiceId, value_text => "This invoice is a voided copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A>");
 
 	#add history item for original (submitted) copy and void it
-	addHistoryItem($page, $oldInvoiceId,
-		value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a voided copy of this invoice",
-		value_date => $todaysDate,
-	);
-
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $oldInvoiceId || undef,
-		invoice_status => App::Universal::INVOICESTATUS_VOID,
-	);
+	addHistoryItem($page, $oldInvoiceId, value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a voided copy of this invoice");
+	$page->schemaAction('Invoice', 'update', invoice_id => $oldInvoiceId || undef, invoice_status => App::Universal::INVOICESTATUS_VOID	);
 }
 
 sub handlePayers
 {
 	my ($self, $page, $command, $flags) = @_;
 	my $sessOrgIntId = $page->session('org_internal_id');
-
-	my $invoiceFlags = $page->field('invoice_flags');
-	my $currStatus = $page->field('current_status');
-	if($command eq 'update' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR))
-	{
-		$command = 'add';
-		my $oldInvoiceId = $page->field('old_invoice_id');
-		voidInvoicePostSubmit($self, $page, $command, $flags, $oldInvoiceId);
-	}
-
-
 	my $personId = $page->field('attendee_id');
 
 	#CONSTANTS -------------------------------------------
@@ -1053,23 +1034,23 @@ sub addTransactionAndInvoice
 	my $editInvoiceId = $page->param('invoice_id');
 	my $editTransId = $page->field('trans_id');
 	my $timeStamp = $page->getTimeStamp();
+	my $onHold = $page->field('on_hold');
 
 	#CONSTANTS -------------------------------------------
+		#invoice constants
+		my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
+		my $invoiceStatus = $onHold ? App::Universal::INVOICESTATUS_ONHOLD : App::Universal::INVOICESTATUS_CREATED;
+		$invoiceStatus = $command eq 'add' ? $invoiceStatus : $page->field('current_status');
 
-	#invoice constants
-	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
-	my $invoiceStatus = $page->field('on_hold') ? App::Universal::INVOICESTATUS_ONHOLD : App::Universal::INVOICESTATUS_CREATED;
+		#entity types
+		my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
+		my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
 
-	#entity types
-	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
-	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
+		#trans status
+		my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 
-	#trans status
-	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
-
-	# other
-	my $condRelToFakeNone = App::Universal::CONDRELTO_FAKE_NONE;
-
+		# other
+		my $condRelToFakeNone = App::Universal::CONDRELTO_FAKE_NONE;
 	#-------------------------------------------------------------------------------------------------------------------------------
 
 	my $serviceProvider = $page->field('care_provider_id');
@@ -1115,7 +1096,6 @@ sub addTransactionAndInvoice
 	my @claimDiags = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 	#App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrgIntId);
 
-	$invoiceStatus = $command eq 'add' ? $invoiceStatus : $page->field('current_status');
 	my $invoiceId = $page->schemaAction(
 		'Invoice', $command,
 		invoice_id => $editInvoiceId || undef,
@@ -1133,10 +1113,24 @@ sub addTransactionAndInvoice
 		_debug => 0
 	);
 
+	#create history items when adding new invoice and/or placing it on hold
+	my $batchId = $page->field('batch_id');
+	addHistoryItem($page, $invoiceId, value_text => 'Created', value_textB => "Creation Batch ID: $batchId") if $command eq 'add';
+	addHistoryItem($page, $invoiceId, value_text => 'On Hold', value_textB => $onHold) if $onHold;
+
+	#reset session batch id with batch id in field
+	$page->session('batch_id', $batchId);
+
+	
 	$invoiceId = $command eq 'add' ? $invoiceId : $editInvoiceId;
 	$page->param('invoice_id', $invoiceId);
 
+	#create attributes, items, billing info, handle hmo cap, then redirect
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
+	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
+	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command eq 'add';
+	handleHmoCapChanges($self, $page, $command, $invoiceId);
+	handleRedirect($self, $page, $command, $flags, $invoiceId);
 }
 
 sub handleInvoiceAttrs
@@ -1145,7 +1139,7 @@ sub handleInvoiceAttrs
 	$command ||= 'add';
 
 	my $sessOrgId = $page->session('org_id');
-	my $todaysDate = $page->getDate();
+	my $claimType = $page->field('claim_type');
 	my $personId = $page->field('attendee_id');
 	my $billingFacility = $page->field('billing_facility_id');
 	my $serviceFacility = $page->field('service_facility_id') || $page->field('hospital_id');
@@ -1170,7 +1164,7 @@ sub handleInvoiceAttrs
 		) if $command ne 'update';
 
 
-	## Check if creation batch id already exists. If not, create it and add history item.
+	## Check if creation batch id already exists. If not, create it.
 	my $creationBatchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
 	if($creationBatchInfo->{item_id} eq '' && $batchId)
 	{
@@ -1183,31 +1177,12 @@ sub handleInvoiceAttrs
 			value_date => $page->field('batch_date') || undef,
 			_debug => 0
 		);
-
-		addHistoryItem($page, $invoiceId,
-			value_text => 'Created',
-			value_textB => "Creation Batch ID: $batchId",
-			value_date => $todaysDate,
-		);
 	}
-
-	if(my $onHold = $page->field('on_hold'))
-	{
-		addHistoryItem($page, $invoiceId,
-			value_text => 'On Hold',
-			value_textB => $onHold,
-			value_date => $todaysDate,
-		);
-	}
-
-	#reset session batch id with batch id in field
-	$page->session('batch_id', $batchId);
 
 
 	## Then, create some invoice attributes for HCFA (the rest are found in the Procedure dialog):
 	#	 Accident Related To, Prior Auth Num, Deduct Balance, Accept Assignment, Ref Physician Name/Id,
 	#	 Illness/Disability/Hospitalization Dates
-
 
 	my $condRelToId = $page->field('accident');
 	my $condition;
@@ -1299,7 +1274,7 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	if($page->field('claim_type') == App::Universal::CLAIMTYPE_MEDICAID)
+	if($claimType == App::Universal::CLAIMTYPE_MEDICAID)
 	{
 		my $resubCommand = 'add';
 		if($page->field('resub_number_item_id'))
@@ -1313,7 +1288,7 @@ sub handleInvoiceAttrs
 				item_name => 'Medicaid/Resubmission',
 				value_type => defined $textValueType ? $textValueType : undef,
 				value_text => $page->field('resub_number') || undef,
-				#value_textB => (reference),
+				value_textB => $page->field('orig_ref') || undef,
 				_debug => 0
 			);
 	}
@@ -1445,33 +1420,17 @@ sub handleInvoiceAttrs
 	);
 
 
+	#if this new claim is a result of an original submitted claim being voided, create history items to link the two
 	my $invoiceFlags = $page->field('invoice_flags');
-	if($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)
+	if($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR && $claimType != App::Universal::CLAIMTYPE_SELFPAY)
 	{
 		my $oldInvoiceId = $page->field('old_invoice_id');
-		addHistoryItem($page, $invoiceId,
-			value_text => "This invoice is a new copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A> which has been submitted and voided",
-			value_date => $todaysDate,
-		);
-
+		addHistoryItem($page, $invoiceId, value_text => "This invoice is a new copy of invoice <A HREF='/invoice/$oldInvoiceId/summary'>$oldInvoiceId</A> which has been submitted and voided"	);
 
 		#update original claim - make it's parent_invoice the new invoice and add history item
-		$page->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $oldInvoiceId || undef,
-			parent_invoice_id => $invoiceId,
-		);
+		$page->schemaAction('Invoice', 'update', invoice_id => $oldInvoiceId || undef, parent_invoice_id => $invoiceId);
 
-		addHistoryItem($page, $oldInvoiceId,
-			value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice",
-			value_date => $todaysDate,
-		);
-	}
-
-	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
-	if($page->field('submission_order') == 0 || $command eq 'add')
-	{
-		handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $command ne 'remove';
+		addHistoryItem($page, $oldInvoiceId, value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice");
 	}
 }
 
@@ -1750,25 +1709,28 @@ sub handleBillingInfo
 		invoice_id => $invoiceId,
 		billing_id => $billId,
 	);
+}
 
+sub handleHmoCapChanges
+{
+	my ($self, $page, $command, $invoiceId) = @_;
 
-	#redirect to next function according to copay due
-	my $invoiceFlags = $page->field('invoice_flags');
 	my $copayAmt = $page->field('copay_amt');
 	my $copayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
 	my $copayItemId = $copayItem->{item_id};
 	my $claimType = $page->field('claim_type');
-	if($claimType != App::Universal::CLAIMTYPE_HMO)
+	if($claimType != App::Universal::CLAIMTYPE_HMO && $command eq 'update')
 	{
+		#delete the auto writeoffs if the claim has been changed from hmocap to something else
+		deleteHmoCapWriteoff($page, $invoiceId);
+
 		#delete copay item if claim is updated to a non-cap claim type
 		if($copayItemId && $copayItem->{data_text_b} ne 'void')
 		{
 			voidInvoiceItem($page, $invoiceId, $copayItemId);
 		}
 	}
-	
-
-	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
+	elsif($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 	{
 		my $lineCount = $page->param('_f_line_count');
 		my $existsOfficeVisitCPT;
@@ -1782,37 +1744,14 @@ sub handleBillingInfo
 
 		if($existsOfficeVisitCPT)
 		{
-			billCopay($self, $page, $command, $flags, $invoiceId);
+			billCopay($self, $page, $command, $invoiceId);
 		}
-		elsif($command eq 'add')
-		{
-			$self->handlePostExecute($page, $command, $flags);
-		}
-		else
-		{
-			$page->redirect("/invoice/$invoiceId/summary");
-		}
-	}
-	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
-	{
-		if ($page->param('encounterDialog') eq 'checkout')
-		{
-			$self->handlePostExecute($page, $command, $flags);
-		}
-		else
-		{
-			$page->redirect("/invoice/$invoiceId/summary");
-		}
-	}
-	elsif($command eq 'add')
-	{
-		$self->handlePostExecute($page, $command, $flags);
 	}
 }
 
 sub billCopay
 {
-	my ($self, $page, $command, $flags, $invoiceId) = @_;
+	my ($self, $page, $command, $invoiceId) = @_;
 
 	my $todaysDate = $page->getDate();
 	my $personId = $page->field('attendee_id');
@@ -1847,21 +1786,6 @@ sub billCopay
 		#bill_status => 'Not paid',
 		_debug => 0
 	);
-
-
-
-	#Need to set invoice id as a param in order for 'Add Procedure' and 'Go to Claim Summary' next actions to work
-	$page->param('invoice_id', $invoiceId) if $command eq 'add';
-
-	my $invoiceFlags = $page->field('invoice_flags');
-	if($command eq 'update' || ($command eq 'add' && $invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR))
-	{
-		$page->redirect("/invoice/$invoiceId/summary");
-	}
-	elsif($command eq 'add')
-	{
-		$self->handlePostExecute($page, $command, $flags);
-	}
 }
 
 sub handleProcedureItems
@@ -2193,27 +2117,92 @@ sub customValidate
 
 sub checkEventStatus
 {
-  my ($self, $page, $eventId) = @_;
+	my ($self, $page, $eventId) = @_;
 
-  my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
-    'sel_eventInfo', $page->session('GMT_DAYOFFSET'), $eventId);
+	my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+	'sel_eventInfo', $page->session('GMT_DAYOFFSET'), $eventId);
 
-  my ($status, $person, $stamp);
+	my ($status, $person, $stamp);
 
-  if ($checkStatus->{event_status} == 2) {
-    $status = 'out';
-    $person = $checkStatus->{checkout_by_id};
-    $stamp  = $checkStatus->{checkout_stamp};
-  } elsif ($checkStatus->{event_status} == 1) {
-    $status = 'in';
-    $person = $checkStatus->{checkin_by_id};
-    $stamp  = $checkStatus->{checkin_stamp};
-  } elsif ($checkStatus->{event_status} == 3) {
-    $status = $checkStatus->{discard_type} . '-ed';
-    $person = $checkStatus->{discard_by_id};
-    $stamp  = $checkStatus->{discard_stamp};
-  }
-  return ($status, $person, $stamp);
+	if ($checkStatus->{event_status} == 2) {
+	$status = 'out';
+	$person = $checkStatus->{checkout_by_id};
+	$stamp  = $checkStatus->{checkout_stamp};
+	} elsif ($checkStatus->{event_status} == 1) {
+	$status = 'in';
+	$person = $checkStatus->{checkin_by_id};
+	$stamp  = $checkStatus->{checkin_stamp};
+	} elsif ($checkStatus->{event_status} == 3) {
+	$status = $checkStatus->{discard_type} . '-ed';
+	$person = $checkStatus->{discard_by_id};
+	$stamp  = $checkStatus->{discard_stamp};
+	}
+
+	return ($status, $person, $stamp);
+}
+
+sub checkIntellicodeErrors
+{
+	my ($self, $page, $invoiceId) = @_;
+
+	my @diags = split(/\s*,\s*/, $page->param("_f_proc_diags"));
+	my @procs = ();
+	my $lineCount = $page->param('_f_line_count');
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		my $cpt = $page->param("_f_proc_$line\_procedure");
+		next unless $cpt;
+		my $modifier = $page->param("_f_proc_$line\_modifier");
+		my $relDiags = $page->param("_f_proc_$line\_actual_diags");
+		push(@procs, [$cpt, $modifier || undef, split(/,/, $relDiags)]);
+	}
+
+	my $personId = $page->field('attendee_id');
+	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $personId);
+	my $sex = 'M' if $personInfo->{gender_caption} eq 'Male';
+	$sex = 'F' if $personInfo->{gender_caption} eq 'Female';
+
+	my @errors = App::IntelliCode::validateCodes
+		(
+			$page, 0,
+			sex => $sex,
+			dateOfBirth => $personInfo->{date_of_birth},
+			diags => \@diags,
+			procs => \@procs,
+			invoiceId => $invoiceId,
+			personId => $personId,
+		);
+
+	return @errors;
+}
+
+sub handleRedirect
+{
+	my ($self, $page, $command, $flags, $invoiceId) = @_;
+
+	my $invoiceFlags = $page->field('invoice_flags');
+	my $hospClaim = $page->param('isHosp');
+
+	my @errors = checkIntellicodeErrors($self, $page, $invoiceId);
+	if(@errors && $hospClaim != 1)
+	{
+		$page->redirect("/invoice/$invoiceId/error");
+	}
+	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & App::Universal::INVOICEFLAG_DATASTOREATTR)) )
+	{
+		if ($page->param('encounterDialog') eq 'checkout')
+		{
+			$self->handlePostExecute($page, $command, $flags);
+		}
+		else
+		{
+			$page->redirect("/invoice/$invoiceId/summary");
+		}
+	}
+	elsif($command eq 'add')
+	{
+		$self->handlePostExecute($page, $command, $flags);
+	}
 }
 
 1;
