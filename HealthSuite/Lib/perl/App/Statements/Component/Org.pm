@@ -2119,7 +2119,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 },
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
-'org.labLocation' => {
+'org.location' => {
 	sqlStmt => qq{
 			select 0 as preferred, 99910 as value_type,  complete_addr_html,item_id,address_name,parent_id
 			from org_address , org where org.org_id = :1
@@ -2144,13 +2144,14 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	},	
 	publishDefn_panel =>
 		{
-			bullets => '/org/#param.org_id#/dlg-update-lab-location/#3#?home=#homeArl#',
+			bullets => '/org/#param.org_id#/dlg-update-#param.dialog_location#-location/#3#?home=#homeArl#',
 			# automatically inherites columnDefn and other items from publishDefn
 			style => 'panel',
 			separateDataColIdx => 2, # when the item_name is '-' add a row separator
 			frame => {
-				heading => 'Ancillary Locations',
+				heading => '#property.org_type# Locations',
 				editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+				addUrl	=> '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-#param.dialog_location#-location?_f_org_id=#param.org_id#&home=#homeArl#',			
 			},
 		},
 		publishDefn_panelTransp =>
@@ -2163,23 +2164,33 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Ancillary Locations' },
+		frame => { heading => 'Edit #property.org_type# Locations' },
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add
-					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-lab-location?_f_org_id=#param.org_id#&home=#homeArl#'>Ancillary Location</A>								
-				},
-				}
+				 { caption => qq{ Add
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-#param.dialog_location#-location?_f_org_id=#param.org_id#&home=#homeArl#'>#property.org_type# Location</A>				
+					},} 
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/org/#param.org_id#/dlg-update-lab-location/#3#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/dlg-remove-lab-location/#3#?home=#homeArl#',
+			updUrlFmt => '/org/#param.org_id#/dlg-update-#param.dialog_location#-location/#3#?home=#homeArl#',
+			delUrlFmt => '/org/#param.org_id#/dlg-remove-#param.dialog_location#-location/#3#?home=#homeArl#',
 		},
 	},		
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panelTransp'); },	
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.labLocation', [$orgId,$page->session('org_internal_id')], 'panelEdit'); },		
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); 
+	my $location = $page->property('org_type') eq 'Ancillary Service' ? 'ancillary' : lc($page->property('org_type'));
+	$page->param('dialog_location',$location);	
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.location', [$orgId,$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); 
+	my $location = $page->property('org_type') eq 'Ancillary Service' ? 'ancillary' : lc($page->property('org_type'));
+	$page->param('dialog_location',$location);	
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.location', [$orgId,$page->session('org_internal_id')], 'panelTransp'); },	
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); 
+	#set page param
+	my $location = $page->property('org_type') eq 'Ancillary Service' ? 'ancillary' : lc($page->property('org_type'));
+	$page->param('dialog_location',$location);
+	$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.location', [$orgId,$page->session('org_internal_id')], 'panelEdit'); },		
 },
 #------------------------------------------------------------------------------------------------------------------------
 

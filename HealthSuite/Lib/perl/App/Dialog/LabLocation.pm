@@ -21,14 +21,27 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = (
-	'lab-location' => {_arl_update => ['item_id'],
-	_arl_remove => ['item_id']},
+	'ancillary-location' => {
+			_arl_update => ['item_id'],
+			_arl_remove => ['item_id'],
+			heading => '$Command Ancillary Location',
+			addressName => 'Ancillary',
+			org_category=>'Ancillary Service'
+			},
+	
+	'pharmacy-location' => {
+		heading => '$Command Pharmacy Location',
+		org_category=>'Pharmacy',
+		addressName => 'Pharmacy',
+		_arl_update => ['item_id'],
+		_arl_remove => ['item_id'],
+	},	
 );
 
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Ancillary Location');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', );
 
 	my $schema = $self->{schema};
 
@@ -46,11 +59,11 @@ sub new
 		new App::Dialog::Field::Organization::ID(caption=>'Ancillary Org ID', 
 					name=>'org_id',
 					addType=>'ancillary',
-					options=>FLDFLAG_REQUIRED,
-					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					options=>FLDFLAG_REQUIRED | FLDFLAG_READONLY,
+					),
 		new CGI::Dialog::Field( caption=>'Location Name',name => 'location_name',options=>FLDFLAG_REQUIRED, type=>'text',size=>'20',maxLength=>'30'),						
 		new App::Dialog::Field::Address(
-			caption=>'Ancillary Address',
+			caption=>$self->{'addressName'} . " Address" ,
 			name => 'address',
 			options=>FLDFLAG_REQUIRED,
 		),		
@@ -77,7 +90,7 @@ sub new
 	{
 		scope =>'org_address',
 		key => "#field.loc_name#",
-		data => "Lab Location",
+		data => "Location",
 	},
 	$self->addFooter(new CGI::Dialog::Buttons(
 	nextActions_add => [	['View Org Summary', "/org/%field.org_id%/profile", 1],
@@ -105,8 +118,8 @@ sub customValidate
 	my $locValue = $page->field('location_name');		
 	
 	#Verfiy Org is Ancillary Type	
-	my $id =  $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selFindOrgWithMemberId', $orgIntId,'Ancillary Service');	
-	$field->invalidate($page, qq{'$fieldValue' is not an Ancillary Service Organization }) unless($id);
+	my $id =  $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selFindOrgWithMemberId', $orgIntId,$self->{org_category});	
+	$field->invalidate($page, qq{'$fieldValue' is not $self->{org_category} Organization }) unless($id);
 	
 	#Verfiy Location Name is unquie 
 	if ($page->field('add_mode'))

@@ -399,7 +399,7 @@ sub initialize
 	};
 
 	my @addAction = (['View Org Summary', "/org/%field.org_id%/profile", 1]);
-	push (@addAction ,['Add Ancillary Location', "/org/#session.org_id#/dlg-add-lab-location?_f_org_id=%field.org_id%"]) if ($self->{orgtype} eq 'ancillary');
+	push (@addAction ,['Add Ancillary Location', "/org/%field.org_id%/dlg-add-ancillary-location?_f_org_id=%field.org_id%"]) if ($self->{orgtype} eq 'ancillary');
 	push @addAction ,(
 			
 			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product?_f_ins_org_id=%field.org_id%"],
