@@ -25,7 +25,17 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		SELECT internal_catalog_id
 		FROM offering_catalog
 		WHERE catalog_id = ?
-	},	
+	},
+	'selMiscProcChildren' => qq
+	{
+		SELECT 	oce2.code, oce2.modifier
+		FROM 	offering_catalog oc, offering_catalog_entry oce, offering_catalog_entry oce2
+		WHERE 	oc.org_internal_id = ?
+		AND	oc.catalog_type = 2
+		AND	oce.catalog_id = oc.internal_catalog_id
+		AND	oce.entry_id = oce2.parent_entry_id
+		AND	oce.code = upper(?)
+	},
 	'selOrgIdLinkedFS' =>qq
 	{
 		SELECT  org_id
