@@ -23,37 +23,37 @@ use vars qw(@ISA %RESOURCE_MAP);
 	'org-main' => {
 		heading => '$Command Main Organization',
 		orgtype => 'main',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Root'
 	},
 	'org-dept' => {
 		heading => '$Command Department Organization',
 		orgtype => 'dept',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Department'
 	},
 	'org-provider' => {
 		heading => '$Command Associated Provider Organization',
 		orgtype => 'provider',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Clinic'
 	},
 	'org-employer' => {
 		heading => '$Command Employer Organization',
 		orgtype => 'employer',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Employer'
 	},
 	'org-insurance' => {
 		heading => '$Command Insurance Organization',
 		orgtype => 'insurance',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Insurance'
 	},
 	'org-ipa' => {
 		heading => '$Command IPA Organization',
 		orgtype => 'ipa',
-		_arl => ['org_id'], 
+		_arl => ['org_id'],
 		_idSynonym => 'Ipa'
 	},
 );
@@ -173,8 +173,8 @@ sub initialize
 		nextActions_add => [
 			['View Org Summary', "/org/%field.org_id%/profile", 1],
 			['Add Another Org', "/org/#session.org_id#/dlg-add-org-$self->{orgtype}"],
-			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product"],
-			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan"],
+			['Add Insurance Product', "/org/%field.org_id%/dlg-add-ins-product?_f_ins_org_id=%field.org_id%"],
+			['Add Insurance Plan', "/org/%field.org_id%/dlg-add-ins-plan??_f_ins_org_id=%field.org_id%"],
 			['Go to Directory', "/search/org/id/%field.org_id%"],
 			['Return to Home', "/person/#session.user_id#/home"],
 		],
