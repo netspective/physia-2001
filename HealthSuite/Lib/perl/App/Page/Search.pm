@@ -51,20 +51,36 @@ sub prepare_page_content_header
 		'_pm_view',
 		[
 			['Lookup...'],
-			['People', "$urlPrefix/person", 'person'],
+			['All Persons', "$urlPrefix/person", 'person'],
+			['Patients', "$urlPrefix/patient", 'patient'],
 			['Claims', "$urlPrefix/claim", 'claim'],
 			['Appointments', "$urlPrefix/appointment", 'appointment'],
 			['Appointment Types', "$urlPrefix/appttype", 'appttype'],
 			['Available Slots', "$urlPrefix/apptslot", 'apptslot'],
 			['Organizations', "$urlPrefix/org", 'org'],
-			['Insurance Plans', "$urlPrefix/insurance", 'insurance'],
+			['Insurance Products', "$urlPrefix/insproduct", 'insproduct'],
+			['Insurance Plans', "$urlPrefix/insplan", 'plan'],
 			['Fee Schedules', "$urlPrefix/catalog", 'catalog'],
 			['ICD', "$urlPrefix/icd", 'icd'],
 			['CPT', "$urlPrefix/cpt", 'cpt'],
 			['HCPCS', "$urlPrefix/cpt", 'hcpcs'],
-			['Service Type', "$urlPrefix/servicetype", 'servicetype'],
 			['Schedule Template', "$urlPrefix/template", 'template'],
 			['User Sessions', "$urlPrefix/session", 'session'],
+		]);
+
+	my $addFunctions = $self->getMenu_ComboBox(App::Page::MENUFLAG_SELECTEDISLARGER,
+		'_pm_view',
+		[
+			['Add...'],
+			['Patient', "/org/#session.org_id#/dlg-add-patient", 'patient'],
+			['Claim', "/org/#session.org_id#/dlg-add-claim", 'claim'],
+			['Appointment', "/org/#session.org_id#/dlg-add-appointment", 'appointment'],
+			['Appointment Type', "/org/#session.org_id#/dlg-add-appttype", 'appttype'],
+			['Insurance Org', "/org/#session.org_id#/dlg-add-org-insurance", 'insurance'],
+			['Insurance Product', "/org/#session.org_id#/dlg-add-ins-product", 'insproduct'],
+			['Insurance Plan', "/org/#session.org_id#/dlg-add-ins-plan", 'insplan'],
+			['Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 'catalog'],
+			['Schedule Template', "/org/#session.org_id#/dlg-add-template", 'template'],
 		]);
 
 	my $formHtml = $searchForm ? qq{
@@ -97,7 +113,7 @@ sub prepare_page_content_header
 			</TD>
 			<TD ALIGN=RIGHT>
 				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
+				$functions $addFunctions
 				</FONT>
 			</TD>
 			</TR>
