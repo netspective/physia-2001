@@ -40,21 +40,29 @@ sub initialize
 {
 	my $self = shift;
 	$self->SUPER::initialize(@_);
+	
 	my $orgId = $self->param('org_id');
-	$intOrgId = $STMTMGR_ORG->getSingleValue($self,STMTMGRFLAG_CACHE,'selOrgId',$self->session('org_internal_id'),$orgId);
+	$intOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgId',
+		$self->session('org_internal_id'), $orgId);
+	
+	unless($intOrgId)
+	{
+		$self->disable(
+			qq{
+				<br>
+				Org '$orgId' does NOT exist in your Organization.
+				Click <a href='javascript:history.back()'>here</a> to go back.
+			}
+		);
+	}
+
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
 	$self->property('org_type', split(/,/, $self->property('org_category')));
-	#$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
-
-	#unless($orgId eq $self->session('org_id'))
-	#{
-		$self->addLocatorLinks(
-				['Organization Look-up', '/search/org'],
-				[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
-			);
-	#}
-	#$self->addDebugStmt(@{[$self->property('org_group_name')]});
-
+	
+	$self->addLocatorLinks(
+			['Organization Look-up', '/search/org'],
+			[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
+		);
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
@@ -63,16 +71,16 @@ sub initialize
 		unless($self->hasPermission("page/org/$activeView"))
 		{
 			$self->disable(
-					qq{
-						<br>
-						You do not have permission to view this information.
-						Permission page/org/$activeView is required.
+				qq{
+					<br>
+					You do not have permission to view this information.
+					Permission page/org/$activeView is required.
 
-						Click <a href='javascript:history.back()'>here</a> to go back.
-					});
+					Click <a href='javascript:history.back()'>here</a> to go back.
+				}
+			);
 		}
 	}
-
 }
 
 sub getContentHandlers

@@ -6,6 +6,7 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
+use Data::Publish;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_SCHEDULING $STMTRPTDEFN_WORKLIST
@@ -49,8 +50,8 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	Appt_Type.caption as appt_type,
 	replace(Appt_Attendee_Type.caption, ' Patient', '') as patient_type,
 	Invoice_Status.caption as invoice_status,
-	ea.value_intB as flags
-	from Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
+	ea.value_intB as flags, o.org_id as facility_name
+	from Org o, Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 		Person patient, Event_Attribute ea, Event e
 };
 
@@ -80,6 +81,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 	and Appt_Type.appt_type_id (+) = e.appt_type
 	and Appt_Attendee_Type.id = ea.value_int
 	and Invoice_Status.id(+) = Invoice.invoice_status
+	and o.org_internal_id = e.facility_id
 };
 
 my $STMTFMT_SEL_EVENTS_WORKLIST_ORDERBY = qq{
@@ -206,6 +208,42 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 	'sel_EventAttribute' => qq{
 		select * from Event_Attribute where parent_id = :1
 			and value_type = :2
+	},
+	
+	'sel_alerts' => qq{
+		select * from Transaction 
+		where trans_owner_id = ?
+			and trans_owner_type = @{[ App::Universal::TRANSSTATUS_DEFAULT ]}
+			and trans_type between 8000 and 8999
+			and trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
+	},
+	
+# ---------------------------------------------------------------------------------------
+	'sel_detail_alerts' => {
+		sqlStmt => qq{
+				select Transaction.caption, detail, Transaction_Type.caption as trans_type, trans_subtype,
+					to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'), 
+					to_char(trans_end_stamp, '$SQLSTMT_DEFAULTDATEFORMAT'),
+					data_text_a, decode (trans_subtype, 'High', 1, 'Medium', 2, 'Low', 3, 3) as subtype_sort
+				from Transaction_Type, Transaction
+				where trans_type between 8000 and 8999
+				and trans_owner_type = 0
+				and trans_owner_id = ?
+				and trans_status = 2
+				and Transaction_Type.id = Transaction.trans_type
+				order by subtype_sort asc, trans_begin_stamp desc
+			},
+		publishDefn => {
+			columnDefn =>
+			[
+				{ head => 'Alerts',
+					dataFmt => qq{<b>#0#</b> <br>
+						#4# - #5#: (#3#) <u>#2#</u>: #6# <br>
+						#1#
+					},
+				},
+			],
+		},
 	},
 );
 	

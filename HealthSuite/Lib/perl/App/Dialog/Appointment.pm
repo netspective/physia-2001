@@ -86,7 +86,6 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'attendee_id',
-			#types => ['Patient'],
 			size => 25,
 			useShortForm => 1,
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
@@ -117,44 +116,51 @@ sub new
 			fKeyValueCol => 0,
 		),
 
-		new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
+		new App::Dialog::Field::Scheduling::DateTime(caption => 'Appointment Date / Time',
 			name => 'appt_date_time',
-			fields => [
-				new App::Dialog::Field::Scheduling::Date(
-					name => 'appt_date',
-					options => FLDFLAG_REQUIRED,
-				),
-				new CGI::Dialog::Field(
-					name => 'appt_time',
-					type => 'time',
-					options => FLDFLAG_REQUIRED,
-				),
-				new CGI::Dialog::Field(
-					name => 'find_avail_slot',
-					type => 'select',
-					selOptions => '',
-					style => 'radio',
-					postHtml => $findAvailSlotHint,
-				),
-			],
+			ordinal => 0,
 		),
+		
+		#new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
+		#	name => 'appt_date_time',
+		#	fields => [
+		#		new App::Dialog::Field::Scheduling::Date(
+		#			name => 'appt_date',
+		#			options => FLDFLAG_REQUIRED,
+		#		),
+		#		new CGI::Dialog::Field(
+		#			name => 'appt_time',
+		#			type => 'time',
+		#			options => FLDFLAG_REQUIRED,
+		#		),
+		#		new CGI::Dialog::Field(
+		#			name => 'find_avail_slot',
+		#			type => 'select',
+		#			selOptions => '',
+		#			style => 'radio',
+		#			postHtml => $findAvailSlotHint,
+		#		),
+		#	],
+		#),
+		
 		#new App::Dialog::Field::Scheduling::Hours(
 		#	caption => 'Appt Time Hour',
 		#	name => 'appt_hour',
-		#	timeField => '_f_appt_time'
+		#	timeField => '_f_appt_time_0'
 		#),
+		
 		new CGI::Dialog::MultiField (
 			name => 'minutes_util',
 			fields => [
 				new App::Dialog::Field::Scheduling::Minutes(
 					caption => 'Appt Time Minute',
 					name => 'appt_minute',
-					timeField => '_f_appt_time'
+					timeField => '_f_appt_time_0'
 				),
 				new App::Dialog::Field::Scheduling::AMPM(
 					caption => 'AM PM',
 					name => 'appt_am',
-					timeField => '_f_appt_time'
+					timeField => '_f_appt_time_0'
 				),
 			],
 		),
@@ -360,8 +366,8 @@ sub populateData_add
 	$startStamp =~ /(.*?) (.*)/;
 	my ($appt_date, $appt_time) = ($1, $2);
 
-	$page->field('appt_date', $appt_date);
-	$page->field('appt_time', $appt_time);
+	$page->field('appt_date_0', $appt_date);
+	$page->field('appt_time_0', $appt_time);
 
 	$page->field('attendee_id', $page->param('person_id'));
 	$page->field('resource_id', $page->param('resource_id'));
@@ -647,7 +653,13 @@ sub execute
 
 		my $itemId = $eventAttribute->{item_id};
 		my $verifyFlags = $eventAttribute->{value_intb};
-		$verifyFlags |= App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT;
+		
+		$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_COMPLETE;
+		$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_PARTIAL;
+		
+		$verifyFlags |= $page->field('verify_action')  eq 'Talked to Patient' ?
+			App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_COMPLETE :
+			App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT_PARTIAL;
 
 		$page->schemaAction(
 			'Event_Attribute', 'update',

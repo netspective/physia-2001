@@ -172,6 +172,15 @@ sub new
 			futureOnly => 0,
 			options => FLDFLAG_REQUIRED,
 		),
+		new CGI::Dialog::Field(caption => 'Verification',
+			name => 'verification',
+			choiceDelim =>',',
+			selOptions => "Complete:2, Partial:1",
+			type => 'select',
+			style => 'radio',
+			options => FLDFLAG_REQUIRED,
+		),
+		
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons());
@@ -294,7 +303,13 @@ sub execute
 
 	my $itemId = $eventAttribute->{item_id};
 	my $verifyFlags = $eventAttribute->{value_intb};
-	$verifyFlags |= App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE;
+	
+	$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE;
+	$verifyFlags &= ~App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_PARTIAL;
+	
+	$verifyFlags |= $page->field('verification') == 2 ? 
+		App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_COMPLETE :
+		App::Component::WorkList::PatientFlow::VERIFYFLAG_INSURANCE_PARTIAL;
 		
 	$page->schemaAction(
 		'Event_Attribute', 'update',

@@ -18,7 +18,8 @@ use Data::Publish;
 use Exporter;
 use CGI::ImageManager;
 
-use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT INSURANCE MEDICAL PERSONAL);
+use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT_COMPLETE APPOINTMENT_PARTIAL 
+	INSURANCE_COMPLETE INSURANCE_PARTIAL MEDICAL PERSONAL);
 
 use vars qw(@ISA %RESOURCE_MAP @EXPORT
 	@ITEM_TYPES
@@ -97,8 +98,6 @@ sub initialize
 					<option value='$arlPrefix/dlg-add-ins-product/'>Add Insurance Product</option>
 					<option value='$arlPrefix/dlg-add-ins-plan/'>Add Insurance Plan</option>
 					<option value='$arlPrefix/dlg-add-assign/'>Reassign Physician</option>
-					<option value='#'>Print Encounter Form</option>
-					<option value='#'>Print Face Sheet</option>
 				</SELECT>
 			}
 		},
@@ -192,10 +191,23 @@ sub getComponentHtml
 	{
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
-
-		$_->{facility_name} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', 
-			$_->{facility});
 		
+		my $alertExists = $STMTMGR_COMPONENT_SCHEDULING->recordExists($page, STMTMGRFLAG_NONE,
+			'sel_alerts', $_->{patient_id});
+		
+		my $alertHtml;
+		if ($alertExists) {
+			#$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
+			#	style="text-decoration:none; color:red; font-weight:bold">Alert</a>
+			#};
+
+			$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
+				class=today title="View $_->{patient_id} Alert(s)"><b>Alert<b></a>
+			};
+			
+			
+		}
+
 		if ($_->{checkin_time} || $_->{checkout_time})
 		{
 			$checkinMinutes  = stamp2minutes($_->{checkin_time});
@@ -232,23 +244,25 @@ sub getComponentHtml
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
 
 		my $flags = $_->{flags};
-		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE ? $IMAGETAGS{'icons/verify-insurance-complete'}
-			: $IMAGETAGS{'icons/verify-insurance-incomplete'};
-		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT ? $IMAGETAGS{'icons/verify-appointment-complete'}
-			: $IMAGETAGS{'icons/verify-appointment-incomplete'};
-		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/verify-medical-complete'}
-			: $IMAGETAGS{'icons/verify-medical-incomplete'};
-		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/verify-personal-complete'}
-			: $IMAGETAGS{'icons/verify-personal-incomplete'};
+		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ? 
+			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ? 
+			$IMAGETAGS{'icons/black_a'} : $IMAGETAGS{'icons/red_a'};
+		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ? 
+			$IMAGETAGS{'icons/green_i'} : $flags & VERIFYFLAG_INSURANCE_PARTIAL ?
+			$IMAGETAGS{'icons/black_i'} : $IMAGETAGS{'icons/red_i'};
 			
-		
+		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/green_m'}
+			: $IMAGETAGS{'icons/red_m'};
+		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/green_p'}
+			: $IMAGETAGS{'icons/red_p'};
+			
 		my @rowData = (
-			qq{
-				<A HREF='/worklist/patientflow/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'><IMG SRC='/resources/icons/square-lgray-hat-sm.gif' BORDER=0></A>
-				<br><nobr>
-				<A HREF='/worklist/patientflow/dlg-cancel-appointment/$_->{event_id}' TITLE='Cancel Appointment'><IMG SRC='/resources/icons/action-edit-remove-x.gif' BORDER=0></A>
-				<A HREF='/worklist/patientflow/dlg-noshow-appointment/$_->{event_id}' TITLE='No-Show Appointment'><IMG SRC='/resources/icons/schedule-noshow.gif' BORDER=0></A>
-				</nobr>
+			qq{<nobr>
+				<A HREF='/worklist/patientflow/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
+				<A HREF='/worklist/patientflow/dlg-cancel-appointment/$_->{event_id}' TITLE='Cancel Appointment'>$IMAGETAGS{'icons/action-edit-remove-x'}</A>
+				<A HREF='/worklist/patientflow/dlg-noshow-appointment/$_->{event_id}' TITLE='No-Show Appointment'>$IMAGETAGS{'icons/schedule-noshow'}</A>
+				</nobr><br>
+				$alertHtml
 			},
 
 			qq{
@@ -281,7 +295,12 @@ sub getComponentHtml
 
 				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}'
 				TITLE='Verify Personal Records'>$perVerifyIcon</A>
+				
+				<A HREF="javascript:doActionPopup('/person/$_->{patient_id}/facesheet')"
+				TITLE='Print Face Sheet'>$IMAGETAGS{'icons/black_f'}</A>
+
 				</nobr>
+				
 			},
 
 			($_->{checkin_time} || $_->{checkout_time}) ? qq{<strong>$_->{checkin_time}</strong><br>
@@ -299,7 +318,6 @@ sub getComponentHtml
 				<a href='/invoice/$_->{invoice_id}' TITLE='View Claim $_->{invoice_id} Summary' class=today><b>$_->{invoice_id}</b></a> <br>
 				<strong style="color:#999999">($_->{invoice_status})</strong>
 			}
-				#: qq{<a href='/create/invoice_id/$_->{patient_id}' class=today>Add</a>},
 				: undef,
 
 			$_->{invoice_id} ? $copay->{balance} : undef,
@@ -314,7 +332,6 @@ sub getComponentHtml
 					Print</a>
 			}
 				: undef,
-
 		);
 
 		push(@data, \@rowData);

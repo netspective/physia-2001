@@ -22,32 +22,36 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				from transaction, trans_related_to  rel
 				where trans_id = ?
 				and transaction.related_to = rel.id
-		},
+	},
 	'selTransactionById' => qq{
-		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id, trans_type, trans_subtype, trans_status,
-			caption, detail, code, billing_facility_id, service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
-			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to, data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
-			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_begin_stamp, to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp,
-			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS init_onset_date, to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS curr_onset_date,
+		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id, 
+			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
+			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to, 
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_begin_stamp,
+			to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp,
+			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS init_onset_date,
+			to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS curr_onset_date,
 			trans_status_reason, related_data, caption, trans_substatus_reason
-		from transaction
+		from Transaction
 		where trans_id = ?
-		},
+	},
 	'selTransactionByData_num_a' => qq{
 		select * from transaction
 		where data_num_a = ?
-		},
+	},
 	'selTransAndICDNameByTransId' => qq{
 		select code, curr_onset_date, trans_id, trans_type, r.name as icdname
 			from transaction, ref_icd r
 			where trans_id = ?
 				and r.icd = code
-		},
+	},
 	'selVisitType' => qq{
 		select id, caption
 			from transaction_type
 			where id>=2040 and id<3000
-		},
+	},
 	#'selPersonActiveProblems' => qq{
 	#	    select t.trans_type, t.trans_id, t.caption, t.code, t.curr_onset_date, t.provider_id,
 	#					ref.descr as code_caption, parent_trans_id, service_facility_id
@@ -98,7 +102,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			from transaction
 			where trans_type between 11000 and 11999
 				and trans_owner_id = ? and trans_status = ?
-		},
+	},
 
 	'selPersonMeasurements' => qq{
 			select trans_id,trans_type,cr_stamp,trans_begin_stamp,data_text_a,data_text_b
@@ -108,13 +112,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 						from transaction tt
 					  	where t.data_text_b = tt.data_text_b and tt.trans_type between 12000 and 12999 and tt.trans_owner_id = ?
 					  	group by tt.data_text_b)
-
-		},
+	},
 
 	'selMeasurementCount' => qq{
 		select count(*) from transaction
 			where trans_type between 12000 and 12999 and trans_owner_id = ? and data_text_b = ?
-		},
+	},
 
 		#
 		# both the selPersonEncounters and selPersonEncounterChildren need to be updated
@@ -140,7 +143,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 					and transaction.code = ref_cpt.code (+)
 				and transaction.code = ref_icd.code (+)
 			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
-		},
+	},
 	'selPersonEncounterChildren' => qq{
 		select trans_id, trans_type, transaction.caption, transaction.code, transaction.modifier, trans_owner_id,
 				pkg_entity.GetEntityDisplay(INITIATOR_TYPE, INITIATOR_ID) as initiator,
@@ -160,47 +163,44 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 					and transaction.code = ref_cpt.code (+)
 				and transaction.code = ref_icd.code (+)
 			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
-	   	},
+ 	},
 	'selTestsEncounter' => qq{
 		select trans_id, trans_type, data_text_a, data_text_b, trans_begin_stamp
 		from transaction
 		where trans_type between 12000 and 12999 and trans_owner_id = ?
-		},
+	},
 	'selCondition' => qq{
 		select caption
-			from trans_related_to
-			where id = ?
-		},
+		from trans_related_to
+		where id = ?
+	},
 	'selTransCreateClaim' => qq{
 		select trans_id, trans_type, caption as subject, provider_id, care_provider_id, parent_event_id,
 				service_facility_id, billing_facility_id, bill_type, data_text_a as ref_id, data_text_b as comments
 		from transaction
 		where trans_id = ?
-		},
+	},
 	'selTransId' => qq{
 		select trans_id
-			from transaction
-			where parent_event_id = ?
-		},
+		from transaction
+		where parent_event_id = ?
+	},
 	'selByTransId' => qq{
 		select *
-			from transaction
-			where trans_id = ?
-		},
+		from transaction
+		where trans_id = ?
+	},
 
 	'selByParentTransId' => qq{
 		select *
-			from transaction
-			where parent_trans_id = ?
-		},
+		from transaction
+		where parent_trans_id = ?
+	},
 	'selUpdateTransStatus' => qq{
 		update transaction
 		set trans_status = 3
 		where parent_trans_id = ?
-		},
-		
-		
-		
+	},
 		
 		
 	####################################################################	
@@ -217,42 +217,39 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		order by ta.item_id asc
 	},
 	'selMiscProcedureById' => qq{
-			select  t.caption as name ,t.detail as description ,t.code as proc_code,
-			ta.value_text as cpt_code1,ta.item_id as item_id1, ta.value_textB modifier1,
-			ta.value_int as nextId, t.trans_id as trans_id
-			from Transaction t, trans_attribute ta
-			where trans_status = $ACTIVE
-			and ta.parent_id = t.trans_id 
-			and ta.item_id = :1
-		},	
+		select  t.caption as name ,t.detail as description ,t.code as proc_code,
+		ta.value_text as cpt_code1,ta.item_id as item_id1, ta.value_textB modifier1,
+		ta.value_int as nextId, t.trans_id as trans_id
+		from Transaction t, trans_attribute ta
+		where trans_status = $ACTIVE
+		and ta.parent_id = t.trans_id 
+		and ta.item_id = :1
+	},	
 	'selMiscProcedureNameById' => qq{
-				select  t.caption as name ,t.detail as description ,t.code as proc_code				
-				from transaction t
-				where trans_status = $ACTIVE				
-				and t.trans_id = :1
-		},	
+		select  t.caption as name ,t.detail as description ,t.code as proc_code				
+		from transaction t
+		where trans_status = $ACTIVE				
+		and t.trans_id = :1
+	},	
 		
-	'selNextProcedureSeq' => qq
-		{
-			select max(value_int)+1
-			FROM trans_attribute ta where ta.parent_id = ?
-			and trans_stauts = $ACTIVE
-		},
-	'selMiscProcedureByCode' =>qq
-		{	
-			select distinct code
-			FROM transaction
-			WHERE code = :1			
-			and trans_type = @{[App::Universal::TRANSTYPEPROC_REGULAR]}
-			and trans_subtype = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
-			and trans_status = $ACTIVE
-		},
-	'selMiscProcedureByTransId' =>qq
-		{
-			select  code
-			FROM transaction t
-			WHERE  trans_id = :1						     
-		},
+	'selNextProcedureSeq' => qq{
+		select max(value_int)+1
+		FROM trans_attribute ta where ta.parent_id = ?
+		and trans_stauts = $ACTIVE
+	},
+	'selMiscProcedureByCode' =>qq{	
+		select distinct code
+		FROM transaction
+		WHERE code = :1			
+		and trans_type = @{[App::Universal::TRANSTYPEPROC_REGULAR]}
+		and trans_subtype = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
+		and trans_status = $ACTIVE
+	},
+	'selMiscProcedureByTransId' =>qq{
+		select  code
+		FROM transaction t
+		WHERE  trans_id = :1						     
+	},
 	####################################################################	
 	#END SQL STATEMENTS FOR MISC PROCEDURE CODES
 	####################################################################
@@ -274,7 +271,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				)
 				and trans_status = 2
 				and person_id = trans_owner_id
-		},
+	},
 );
 
 

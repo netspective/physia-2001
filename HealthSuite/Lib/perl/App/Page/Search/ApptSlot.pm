@@ -230,6 +230,16 @@ sub findFacilityIds
 	my @facility_ids = ();
 	my @internalOrgIds = ();
 	
+	# ------- Special case:  single number org_internal_id passed in from Appointment Dialog
+	if (scalar @facilities == 1 && $facilities[0] =~ /^\d*$/)
+	{
+		my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $facilities[0]);
+		
+		$self->param('facility_ids', $orgId) if ($orgId);
+		return @facilities;
+	}
+	# ------------------- End Special Case
+	
 	for my $f (@facilities)
 	{
 		if ($f =~ /(\%|\*)/)
@@ -262,7 +272,6 @@ sub findFacilityIds
 
 	unless (scalar @internalOrgIds >= 1)
 	{
-		my @orgIds = ();
 		for (@facilities)
 		{
 			chomp;
@@ -271,14 +280,6 @@ sub findFacilityIds
 				$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
 				return (-1);
 			}
-			
-			my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
-			if ($orgId)
-			{
-				push(@orgIds, $orgId);
-				push(@internalOrgIds, $_);
-			}
-			$self->param('facility_ids', join(',', @orgIds));
 		}
 	}
 	

@@ -27,6 +27,53 @@ sub findPopup_as_html
 }
 
 ##############################################################################
+package App::Dialog::Field::Scheduling::DateTime;
+##############################################################################
+
+use strict;
+use CGI::Dialog;
+use CGI::Validator::Field;
+use base 'CGI::Dialog::MultiField';
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	return CGI::Dialog::MultiField::new($type, %params,
+		fields => [
+			new App::Dialog::Field::Scheduling::Date(
+				name => 'appt_date_' . $params{ordinal},
+				options => FLDFLAG_REQUIRED,
+			),
+			new CGI::Dialog::Field(
+				name => 'appt_time_' . $params{ordinal},
+				type => 'time',
+				options => FLDFLAG_REQUIRED,
+			),
+		],
+	);
+}
+
+sub findPopup_as_html
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+	my $dialogName = $dialog->formName();
+	my $dateField = $self->{fields}[0]->{name};
+	my $timeField = $self->{fields}[1]->{name};
+	
+	return qq{
+		<a href="javascript:doFindLookup(this.form, document.dialog._f_$dateField,
+			'/lookup/apptslot/' + document.dialog._f_resource_id.value +	','
+			+ document.dialog._f_facility_id.value + ',,' + document.dialog._f_duration.value
+			+ ',' + document.dialog._f_patient_type.value + ',' + document.dialog._f_appt_type.value
+			+ '/1', null, false, 'location, status, width=700,height=600,scrollbars,resizable',
+			null, document.dialog._f_$timeField);">
+			<img src='/resources/icons/dbdd_ts.gif' title='Find Next Available Slot' 
+			BORDER=0></a>
+	};
+}
+
+##############################################################################
 package App::Dialog::Field::Scheduling::Minutes;
 ##############################################################################
 
