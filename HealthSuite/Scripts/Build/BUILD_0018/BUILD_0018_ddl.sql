@@ -20,16 +20,23 @@ start pre/pkg-set
 --bug 1827
 
 start tables/Lab_Order
+start tables/Lab_Order_Icd
 start tables-code/Lab_Order
 
 analyze table Lab_Order compute statistics for table for all indexes for all columns;
 alter table Lab_Order monitoring;
+analyze table Lab_Order_Icd compute statistics for table for all indexes for all columns;
+alter table Lab_Order_Icd monitoring;
+
 
 start tables/Lab_Order_Entry
+start tables/Lab_Order_Entry_Options
 start tables-code/Lab_Order_Entry
 
 analyze table Lab_Order_Entry compute statistics for table for all indexes for all columns;
 alter table Lab_Order_Entry monitoring;
+analyze table Lab_Order_Entry_Options compute statistics for table for all indexes for all columns;
+alter table Lab_Order_Entry_Options monitoring;
 
 start tables/Lab_Order_Status
 start data/Lab_Order_Status
