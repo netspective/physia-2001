@@ -527,11 +527,33 @@ sub initialize
 	$self->incrementViewCount();
 }
 
+sub getSecurityMessage
+{
+	my $self = shift;
+
+	my $roles = $self->session('aclRoleNames');
+	my $permissions = $self->session('aclPermissions');
+	return qq{
+		<p>
+		If you believe you should have access to this page, please contact Physia Customer Service and
+		give them the following information:
+		
+		<p>
+		<ul>
+			<li>User ID: <font face=Courier><b>#session.user_id#</b></font></li>
+			<li>Org ID: <font face=Courier><b>#session.org_id# (#session.org_internal_id#)</b></font></li>
+			<li>Roles: <font face=Courier><b>@{[ $roles ? join(', ', @$roles) : 'None' ]}</b></font></li>
+			<li>Permissions: <font face=Courier><b>@{[ $permissions ? $permissions->run_list() : 'None' ]}</b></font></li>
+			<li>Request: <font face=Courier><b>#param.arl#</b></font></li>
+		</ul>
+	};
+}
+
 sub disable
 {
 	my $self = shift;
-	$self->setFlag(PAGEFLAG_ISDISABLED);
-	$self->{_disabledMsg} = shift;
+	$self->setFlag(PAGEFLAG_ISDISABLED);	
+	$self->{_disabledMsg} = shift() . $self->getSecurityMessage();
 }
 
 
@@ -883,7 +905,7 @@ sub prepare_stdAction_dialog
 	my $permissionName = "dlg/$dlgId/$dlgCmd";
 	if (!$self->hasPermission($permissionName))		# Check permission to the dialog
 	{
-		$self->addContent("You do not have permissions to the dialog <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.");
+		$self->addContent("You do not have permissions to the dialog <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.", $self->getSecurityMessage());
 	}
 	elsif(my $dlgInfo = $App::ResourceDirectory::RESOURCES{$dlgPrefix . $dlgId})
 	{
@@ -949,7 +971,7 @@ sub prepare_stdAction_component
 	my $permissionName = "comp/$compId";
 	if (!$self->hasPermission($permissionName))		# Check permission to the dialog
 	{
-		$self->addContent("You do not have permissions to the dialog <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.");
+		$self->addContent("You do not have permissions to the component <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.", $self->getSecurityMessage());
 	}
 	elsif(my $component = $App::ResourceDirectory::RESOURCES{$resourceName}{_class})
 	{
