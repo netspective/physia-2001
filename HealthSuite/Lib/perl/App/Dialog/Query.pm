@@ -20,7 +20,7 @@ use Data::Publish;
 use Text::CSV;
 
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.9 2000-11-06 15:28:22 thai_nguyen Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.10 2000-12-18 14:58:24 robert_jenks Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 
@@ -559,6 +559,7 @@ sub customValidate
 	my ($self, $page) = @_;
 	my @outCols = $page->field('out_columns');
 	my @sortCols = $page->field('out_sort');
+	my $sqlGen = $self->{sqlGen};
 
 	foreach my $col (@sortCols)
 	{
@@ -574,6 +575,38 @@ sub customValidate
 			push @outCols, $col;
 			$page->field('out_columns', @outCols);
 		}
+	}
+	
+	foreach my $i (1..MAXPARAMS)
+	{
+		my $field = $page->field("field_$i");
+		my $comparison = $page->field("comparison_$i");
+		my $criteria = $page->field("criteria_$i");
+		my $join = $page->field("join_$i");
+		
+		if ($field)
+		{
+			my @criteria = split /,\s*/, uc($criteria);
+			@criteria = ('') unless @criteria;
+			my $numCriteria = @criteria;
+			my $condOpData = $sqlGen->comparisons($comparison);
+			my $ph = $condOpData->{placeholder};
+			my $numParams = $ph =~ s/\?/\?/g;
+			my $optParams = $ph =~ s/\[/\[/g;
+			my $canGrow = $ph =~ /\+/;
+			
+			if ($numCriteria > $numParams && ! $canGrow)
+			{
+				my $gridFld = $self->getField('params');
+				$gridFld->invalidate($page, "Query Definition Criteria $i must have at least $numParams values separated by commas");
+			}
+			
+			if ($numCriteria < ($numParams - $optParams))
+			{
+				my $gridFld = $self->getField('params');
+				$gridFld->invalidate($page, "Query Definition Criteria $i cannot have less than " . ($numParams - $optParams) . " values");
+			}
+		}				
 	}
 }
 
