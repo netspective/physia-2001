@@ -294,7 +294,7 @@ sub importClaimSubmission
 	my $submitterId = $invoice->{'submitter-id'};
 
 	my $claimType = $invoice->{invoice_subtype};
-	my $todaysDate = UnixDate('today', $self->defaultUnixDateFormat());
+	my $todaysDate = UnixDate('today', $self->defaultUnixStampFormat());
 
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
@@ -853,7 +853,6 @@ sub importClaimSubmission
 	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
 	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-	my $todaysDate = $self->getDate();
 	$self->schemaAction($flags,'Invoice', 'update',
 			invoice_id => $invoiceId,
 			invoice_status => App::Universal::INVOICESTATUS_SUBMITTED,

@@ -167,7 +167,7 @@ sub execAction_submit
 	my $clientId = $invoice->{client_id};
 
 	my $claimType = $invoice->{invoice_subtype};
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
 
 
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -941,7 +941,6 @@ sub execAction_submit
 	#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
 	## Update invoice status, set flag for attributes, enter in submitter_id and date of submission
-	$todaysDate = $page->getDate();
 	$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $invoiceId,
@@ -976,7 +975,7 @@ sub execute
 
 	my $sessOrg = $page->session('org_id');
 	my $sessUser = $page->session('user_id');
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	if($page->field('lab_indicator'))
