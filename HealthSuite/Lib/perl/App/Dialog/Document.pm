@@ -12,6 +12,7 @@ use App::Page;
 use DBI::StatementManager;
 use App::Statements::Document;
 use App::Dialog::Field::Person;
+use App::Configuration;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
@@ -87,7 +88,11 @@ sub populateData
 
 	if ($command eq 'view')
 	{
+		my $newReadLen = $CONFDATA_SERVER->db_BlobLongReadLength();
+		my $oldReadLen = $page->{dbh}->{LongReadLen};
+		$page->{dbh}->{LongReadLen} = $newReadLen;
 		my $content = $STMTMGR_DOCUMENT->getRowAsArray($page, STMTMGRFLAG_NONE, 'selDocumentContentById', $page->param('doc_id'));
+		$page->{dbh}->{LongReadLen} = $oldReadLen;
 		my $buffer = $content->[0] ? $content->[0] : $content->[1];
 		my $mime = $page->field('doc_mime_type');
 
@@ -95,6 +100,25 @@ sub populateData
 		$page->setFlag(PAGEFLAG_CUSTOM);
 		print $page->header(-type => $mime);
 		print $buffer;
+	}
+}
+
+
+sub customValidate
+{
+	my $self = shift;
+	my ($page) = @_;
+
+	my $maxSize = $CONFDATA_SERVER->db_BlobLongReadLength();
+	my $fileName = $page->param('_f_filedata');
+	my $fileInfo = $page->uploadInfo($fileName);
+	my $fh = $page->upload('_f_filedata');
+	my $fileSize = (stat($fh))[7];
+	
+	if ($fileSize >= $maxSize)
+	{
+		my $fileDataField = $self->getField('filedata');
+		$fileDataField->invalidate($page, "Specified file is too big. Cannot be larger than $maxSize bytes.");
 	}
 }
 
@@ -107,11 +131,12 @@ sub execute
 	my $fileInfo = $page->uploadInfo($fileName);
 	my $fh = $page->upload('_f_filedata');
 	my $fileContents = join '', <$fh>;
+	my $fileSize = (stat($fh))[7];
 	
 	my $smallBuffer;
 	my $largeBuffer;
 	
-	if (length($fileContents) > 3999)
+	if ($fileSize >= 4000)
 	{
 		$largeBuffer = \$fileContents;
 	}
@@ -132,13 +157,13 @@ sub execute
 		doc_source_id => $page->session('person_id'),
 		doc_name => $page->field('doc_name') || undef,
 		doc_description => $page->field('doc_description') || undef,
-		doc_orig_stamp => undef,
 		doc_recv_stamp => undef,
 		doc_content_small => ref $smallBuffer ? $$smallBuffer : undef,
 		doc_content_large => ref $largeBuffer ? $$largeBuffer : undef,
 		doc_data_a => $page->field('owner_id') || undef,
 		_debug => 0
 	);
+	$self->handlePostExecute($page, $command, $flags);
 }
 
 
