@@ -13,9 +13,9 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
 use Date::Manip;
-use Devel::ChangeLog;
+
 use constant NEXTACTION_COPYASNEW => "/schedule/template/add/,%field.template_id%";
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog);
 
@@ -235,23 +235,12 @@ sub execute
 	days_of_week => join(',',  $page->field('days_of_week')) || undef,
 	days_of_month => $page->field('days_of_month') || undef,
 	months => join(',',$page->field('months')) || undef,
-	patient_types => join(',',$page->field('patient_types')),
-	visit_types => join(',',$page->field('visit_types')),
+	patient_types => join(',',$page->field('patient_types')) || undef,
+	visit_types => join(',',$page->field('visit_types')) || undef,
 	_debug => 0
 	);
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-use constant TEMPLATE_DIALOG => 'Dialog/Template';
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'TVN',
-		TEMPLATE_DIALOG,
-		'Completed implementation for Roving Resource and added Next Action combo box.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/17/2000', 'RK',
-		TEMPLATE_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
-);
 
 1;

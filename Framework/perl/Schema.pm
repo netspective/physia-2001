@@ -545,6 +545,9 @@ sub formatSqlData
 	my $self = shift;
 	my $data = shift;
 
+	return unless defined $data;
+	$data = App::Data::Manipulate::trim($data);
+	return undef if $data =~ /^$/;
 	return $data if $self->{sqlwritefmt} eq '$value$';
 
 	my $fmt = $self->{sqlwritefmt};
@@ -1194,7 +1197,14 @@ sub createEquality
 	my @equality = ();
 	for(my $i = 0; $i < $count; $i++)
 	{
-		push(@equality, "$namesRef->[$i] = $valuesRef->[$i]");
+		if (defined ($valuesRef->[$i]) && $valuesRef->[$i] ne '')
+		{
+			push(@equality, "$namesRef->[$i] = $valuesRef->[$i]");
+		}
+		else
+		{
+			push(@equality, "$namesRef->[$i] = NULL");
+		}
 	}
 	return join($joinClause, @equality);
 }
@@ -1223,7 +1233,7 @@ sub createUpdateSql
 {
 	my $self = shift;
 	my %colData = %{$_[0]};    # copy this 'cause we're going to modify it locally
-	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 1, ignoreColsNotFound => 0 };
+	my $options = defined $_[1] ? $_[1] : { ignoreUndefs => 0, ignoreColsNotFound => 0 };
 
 	my ($sql, $errors) = ('', []);
 
