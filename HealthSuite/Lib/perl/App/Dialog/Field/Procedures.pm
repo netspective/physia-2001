@@ -162,16 +162,9 @@ sub isValid
 	foreach (@fsText)
 	{
 		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInternalCatalogIdByIdType',
-					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);
-		
-		$list .= $list ? ",$catalog->{internal_catalog_id}" : $catalog->{internal_catalog_id} ;
-		#push(@fsIntIds, $catalog->{internal_catalog_id});
-		#$page->addError("FS Names: $_");
-		#$page->addError("FS Ids: $catalog->{internal_catalog_id}");
-	}
-
-	push ( @defaultFeeSchedules, $list) if $page->param('_f_proc_default_catalog');
-	
+					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);	
+		push ( @defaultFeeSchedules, $catalog->{internal_catalog_id}) if $page->param('_f_proc_default_catalog');		
+	}	
 	# ------------------------------------------------------------------------------------------------------------------------	
 	#munir's old icd validation for checking if the same icd code is entered in twice
 	foreach (@diagCodes)
