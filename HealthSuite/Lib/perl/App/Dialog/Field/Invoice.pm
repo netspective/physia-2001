@@ -529,8 +529,7 @@ use App::Universal;
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::Field);
 
@@ -667,8 +666,7 @@ use App::Universal;
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::Field);
 
@@ -761,8 +759,21 @@ sub getHtml
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE='@{[ $page->param("_f_item_$line\_item_id")]}'/>
 			<TR VALIGN=TOP>
+				<SCRIPT>
+					function onChange_dosBegin_$line(event, flags)
+					{
+						if(event.srcElement.value == 'From')
+							event.srcElement.value = '0';
+						event.srcElement.value = validateDate(event.srcElement.name, event.srcElement.value);
+						if(document.$dialogName._f_item_$line\_dos_end.value == '' || document.$dialogName._f_item_$line\_dos_end.value == 'To')
+							document.$dialogName._f_item_$line\_dos_end.value = event.srcElement.value;
+					}
+				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
+				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_item_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_dos_begin") || 'From' ]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
+					<INPUT $readOnly CLASS='procinput' NAME='_f_item_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_item_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly NAME='_f_item_$line\_quantity' TYPE='text' MAXLENGTH = 3 SIZE=3 VALUE='@{[ $page->param("_f_item_$line\_quantity") || 1 ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT $readOnly NAME='_f_item_$line\_code' SIZE=8 TYPE='text' VALUE='@{[ $page->param("_f_item_$line\_code") ]}'>
@@ -790,6 +801,8 @@ sub getHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						@{[ $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '' ]}
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Dates</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Qty</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Item Code</FONT></TD>
