@@ -561,6 +561,50 @@ sub getHtml
 								document.$dialogName._f_proc_$line\_diags.value = 1;
 						}
 					}
+					function onChange_dosEnd_$line(event, flags)
+					{
+						if(event.srcElement.value == 'To')
+							event.srcElement.value = '0';
+						event.srcElement.value = validateDate(event.srcElement.name, event.srcElement.value);
+						if(document.$dialogName._f_proc_$line\_dos_end.value == '' || document.$dialogName._f_proc_$line\_dos_end.value == 'To')
+							document.$dialogName._f_proc_$line\_dos_end.value = document.$dialogName._f_proc_$line\_dos_begin.value;
+						if(document.$dialogName._f_proc_$line\_dos_end.value <  document.$dialogName._f_proc_$line\_dos_begin.value)
+							alert("'To' date must be same or after 'From' date");
+
+						if(event.srcElement.value != '')
+						{
+							//if(document.$dialogName._f_proc_$line\_units.value == '' || document.$dialogName._f_proc_$line\_units.value == 1)
+								document.$dialogName._f_proc_$line\_units.value = dateDiff(document) + 1;
+
+							function dateDiff(document)
+							{
+								date1 = new Date();
+								date2 = new Date();
+								diff  = new Date();
+
+								if(document.$dialogName._f_proc_$line\_dos_end.value != '' && document.$dialogName._f_proc_$line\_dos_end.value != 'To') 
+								{
+									date1temp = new Date(document.$dialogName._f_proc_$line\_dos_end.value);
+									date1.setTime(date1temp.getTime());
+								}
+								if(document.$dialogName._f_proc_$line\_dos_begin.value != '' && document.$dialogName._f_proc_$line\_dos_begin.value != 'From') 
+								{
+									date2temp = new Date(document.$dialogName._f_proc_$line\_dos_begin.value);
+									date2.setTime(date2temp.getTime());
+								}
+
+								// sets difference date to difference of first date and second date
+
+								diff.setTime(Math.abs(date1.getTime() - date2.getTime()));
+
+								timediff = diff.getTime();
+								
+								days = Math.floor(timediff / (1000 * 60 * 60 * 24)); 
+								timediff = days * (1000 * 60 * 60 * 24);
+								return days;
+							}
+						}
+					}
 					function onChange_procedure_$line(event, flags)
 					{
 						if(document.$dialogName._f_proc_$line\_modifier.value == 'Modf')
@@ -594,7 +638,7 @@ sub getHtml
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
 				<TD><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_dos_begin' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_begin") || 'From' ]}' ONBLUR="onChange_dosBegin_$line(event)"><BR>
-					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
+					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="onChange_dosEnd_$line(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
 										<A HREF="javascript:getFFS();doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/feeprocedure/itemValue',null,false,null,document.$dialogName._f_proc_all_catalogs);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
