@@ -29,6 +29,31 @@ sub initialize
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $pId = $self->getField('value_text');
+	my $sName = $self->getField('value_int');
+	my $itemId = $page->param('item_id');
+	my $sequence = $page->field('value_int');
+	my $personId = $page->param('person_id');
+	my $specialty = $page->field('value_text');
+	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne '1';
+
+	if (($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}))
+	{
+		$sName->invalidate($page, "This 'Specialty Sequence' already exists for $personId");
+	}
+
+	my $specialtyExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtyExists', $personId, $specialty);
+
+	if (($specialtyExists->{'value_text'} eq $specialty) && ($itemId ne $specialtyExists->{'item_id'}))
+		{
+			$pId->invalidate($page, "This 'Specialty' already exists for $personId");
+	}
+}
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
@@ -71,6 +96,7 @@ sub execute
 		value_text => $page->field('value_text') || undef,
 		value_dateEnd => $page->field('value_dateend') ||undef,
 		value_textB => $valueTextB || undef,
+		value_int   => $page->field('value_int') || undef,
 		_debug => 0
 	);
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
