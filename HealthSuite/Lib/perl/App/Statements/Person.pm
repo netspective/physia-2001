@@ -451,6 +451,20 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				and value_type = 40
 				and item_name = 'Primary'
 		},
+
+	'selRoleNameExists' => q{
+			select role_name, role_name_id
+				from role_name
+				where role_name = ?
+		},
+
+	'selPreferredPhoneExists' => q{
+			select value_text
+				from person_attribute
+				where value_type = 10
+				and parent_id = ?
+				and value_int = 1
+		},
 	#
 	# Registration and profile statements/definitions
 	#
