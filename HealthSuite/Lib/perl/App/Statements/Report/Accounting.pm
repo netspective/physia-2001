@@ -166,6 +166,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
 			{
+			reportTitle => 'Aged Insurance Receivables',
 			columnDefn =>
 				[
 				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
@@ -214,6 +215,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
 		publishDefn =>
 			{
+			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
 				{ colIdx => 0, head => 'Patient ID', dataFmt => '<A HREF = "/person/#0#/account">#0#</A>' },
@@ -454,7 +456,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				{ colIdx =>  0, head => 'Start Time', dataFmt => '#0# #1#' },
 				{ colIdx =>  1, head => 'Patient', dataFmt => '#2#'},
 				{ colIdx =>  2, head => 'Reason', dataFmt => '#3#'},
-				{ colIdx =>  3, head => 'Dr #', dataFmt => '#4#'},
+				{ colIdx =>  3, head => 'Dr #', dataFmt => '#4#', groupBy => '#4#'},
 				{ colIdx =>  4, head => 'Doctor', dataFmt => '#5#'},
 				{ colIdx =>  5, head => 'Location', dataFmt => '#6#'},
 				{ colIdx =>  6, head => 'DOB', dataFmt => '#7#'},
