@@ -1,4 +1,4 @@
-create view testsAndMeasurements as
+create or replace view testsAndMeasurements as
 select 	trans_owner_id,trans_begin_stamp, 
 	data_text_b, data_text_a, 0 as no_of_tests
 from 	transaction t
@@ -10,7 +10,7 @@ where 	trans_begin_stamp =
 			group by tt.data_text_b);
 
 
-create view testsAndMeasurementscount as
+create or replace view testsAndMeasurementscount as
 select	trans_owner_id, to_date('01/01/1029', 'MM/DD/YYYY') AS trans_begin_stamp,
 	data_text_b, 'a' as data_text_a, count(*) as no_of_tests
 from 	transaction
