@@ -2333,7 +2333,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.myAssociatedResourceAppointments' => {
 	sqlStmt => qq{
-		select to_char(e.start_time, 'hh:miam') as start_time,
+		select to_char(e.start_time - :1, 'hh:miam') as start_time,
 			ea.value_textB as resource_id,
 			patient.complete_name as patient_complete_name,
 			e.subject,
@@ -2344,8 +2344,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			e.event_id, patient.person_id
 		from 	Appt_Status, Appt_Attendee_type aat, Person patient, Person provider,
 			Event_Attribute ea, Appt_Type at, Event e
-		where e.start_time between to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			and to_date(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+		where e.start_time between to_date(:2, '$SQLSTMT_DEFAULTSTAMPFORMAT') + :1
+			and to_date(:3, '$SQLSTMT_DEFAULTSTAMPFORMAT') + :1
 			and e.discard_type is null
 			and e.event_status in (0,1,2)
 			and at.appt_type_id (+) = e.appt_type
@@ -2354,11 +2354,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			and ea.value_text = patient.person_id
 			and ea.value_textB = provider.person_id
 			and
-			(	ea.value_textB = ? or
+			(	ea.value_textB = :4 or
 				ea.value_textB in
 				(select value_text
 					from person_attribute
-					where parent_id = ?
+					where parent_id = :4
 						and item_name = 'WorkList'
 						and value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
 				)
@@ -2407,10 +2407,44 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-cancel-appointment/#8#?home=#homeArl#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . '12:00 AM'; my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . '11:59 PM'; my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments', [$dateStringAM,$dateStringPM,$personId,$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . '12:00 AM'; my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . '11:59 PM'; my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments', [$dateStringAM,$dateStringPM,$personId,$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . '12:00 AM'; my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . '11:59 PM'; my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments', [$dateStringAM,$dateStringPM,$personId,$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . '12:00 AM'; my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . '11:59 PM'; my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments', [$dateStringAM,$dateStringPM,$personId,$personId], 'panelTransp'); },
+	publishComp_st =>
+		sub {
+			my ($page, $flags, $personId) = @_;
+			$personId ||= $page->session('user_id');
+			my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 12:00 AM';
+			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId]);
+		},
+	publishComp_stp =>
+		sub {
+			my ($page, $flags, $personId) = @_;
+			$personId ||= $page->session('user_id');
+			my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 12:00 AM';
+			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panel');
+		},
+	publishComp_stpe =>
+		sub {
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 12:00 AM';
+			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panelEdit');
+		},
+	publishComp_stpt =>
+		sub {
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $dateStringAM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 12:00 AM';
+			my $dateStringPM = UnixDate('today', $page->defaultUnixDateFormat()) . ' 11:59 PM';
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceAppointments',
+				[$page->session('GMT_DAYOFFSET'), $dateStringAM, $dateStringPM, $personId], 'panelTransp');
+		},
 },
 
 
@@ -2419,7 +2453,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.myAssociatedResourceInPatients' => {
 	sqlStmt => qq{
 		SELECT
-			%simpleDate:trans_begin_stamp%,
+			%simpleDate:trans_begin_stamp - :1%,
 			complete_name,
 			related_data,
 			trans_status_reason,
@@ -2439,12 +2473,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			trans_type BETWEEN 11000 AND 11999 AND
 			person_id = trans_owner_id AND
 			(
-				provider_id = ? OR provider_id IN
+				provider_id = :2 OR provider_id IN
 				(
 					SELECT value_text
 					FROM person_attribute
 					WHERE
-						parent_id = ? AND
+						parent_id = :2 AND
 						value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]} AND
 						item_name = 'WorkList'
 				)
@@ -2489,24 +2523,48 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients', [$personId,$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients', [$personId,$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients', [$personId,$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); my $orgId ||= $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients', [$personId,$personId], 'panelTransp'); },
+	publishComp_st =>
+		sub {
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId]);
+		},
+	publishComp_stp =>
+		sub{
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panel');
+		},
+	publishComp_stpe =>
+		sub {
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit');
+		},
+	publishComp_stpt =>
+		sub {
+			my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id');
+			my $orgId ||= $page->session('org_internal_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.myAssociatedResourceInPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp');
+		},
 },
 
 #----------------------------------------------------------------------------------------------------------------------
 
 'person.mySessionActivity' => {
 	sqlStmt => qq{
-		select  to_char(pa.activity_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_date,
+		select to_char(pa.activity_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as activity_stamp,
 			sat.caption as caption,
 			pa.activity_data as data,
 			pa.action_scope as scope,
 			pa.action_key as action_key
 		from Session_Action_Type sat, perSess_Activity pa
-		where pa.person_id = ?
-			and	pa.activity_stamp >= trunc(sysdate)
+		where pa.person_id = :2
+			and	pa.activity_stamp >= trunc(sysdate) + :1
 			and	sat.id = pa.action_type
 			and 10 > (
 				select count(*) from perSess_Activity pa2
@@ -2551,10 +2609,33 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', [$personId], 'panelTransp'); },
+	publishComp_st => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', 
+				[$page->session('GMT_DAYOFFSET'), $personId]);
+		},
+	publishComp_stp => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', 
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panel'); 
+		},
+	publishComp_stpe => 
+		sub { my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit'); 
+		},
+	publishComp_stpt => 
+		sub {
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.mySessionActivity', 
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp'); 
+		},
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -2643,43 +2724,40 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.patientAppointments' => {
 	sqlStmt => qq{
-		select 	%simpleDate:e.start_time%,
-			to_char(e.start_time, 'HH12:MI AM'),
-			to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'),
+		select 	%simpleDate:e.start_time - :1%,
+			to_char(e.start_time - :1, 'HH12:MI AM'),
 			ea.value_textB,
 			e.subject,
-			to_char(e.start_time, 'MM-DD-YYYY'),
+			to_char(e.start_time - :1, 'MM-DD-YYYY'),
 			1 as group_sort,
-			trunc(e.start_time) as apptdate
+			e.start_time as apptdate
 		from Event_Attribute ea, Event e
 		where ea.parent_id = e.event_id
 			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-			and ea.value_text = ?
+			and ea.value_text = :2
 			and e.event_status != 3
 			and e.start_time > sysdate
 		UNION
-		select 	%simpleDate:sysdate%,
-			to_char(sysdate, 'HH12:MI AM'),
-			to_char(sysdate, 'HH12:MI AM'),
+		select 	%simpleDate:sysdate - :1%,
+			to_char(sysdate - :1, 'HH12:MI AM'),
 			'-',
 			'-',
-			to_char(sysdate, 'MM-DD-YYYY'),
+			to_char(sysdate - :1, 'MM-DD-YYYY'),
 			2 as group_sort,
 			trunc(sysdate) as apptdate
 		from DUAL
 		UNION
-		select 	%simpleDate:e.start_time%,
-			to_char(e.start_time, 'HH12:MI AM'),
-			to_char(e.start_time+(e.duration/1440), 'HH12:MI AM'),
+		select 	%simpleDate:e.start_time - :1%,
+			to_char(e.start_time - :1, 'HH12:MI AM'),
 			ea.value_textB,
 			e.subject,
-			to_char(e.start_time, 'MM-DD-YYYY'),
+			to_char(e.start_time - :1, 'MM-DD-YYYY'),
 			3 as group_sort,
-			trunc(e.start_time) as apptdate
+			e.start_time as apptdate
 		from Event_Attribute ea, Event e
 		where ea.parent_id = e.event_id
 			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-			and ea.value_text = ?
+			and ea.value_text = :2
 			and e.event_status != 3
 			and e.start_time < sysdate
 			and 10 > (select count(*) from Event_Attribute ea2, Event e2
@@ -2696,12 +2774,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Event Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Appointments', dataFmt => '<a href="javascript:location=\'/schedule/apptsheet/#5#\';">#0#</A>:' },
-			{ dataFmt => 'Scheduled with <A HREF="/person/#3#/profile">#3#</A> at #1# <BR>
-					Reason for Visit: #4#'},
+			{ head => 'Appointments', 
+				dataFmt => '<a href="javascript:location=\'/schedule/apptsheet/#4#\';">#0#</A>:' },
+			{ dataFmt => 'Scheduled with <A HREF="/person/#2#/profile">#2#</A> at #1# <BR>
+					Reason for Visit: #3#'},
 
 		],
-		separateDataColIdx => 3, # when the date is '-' add a row separator
+		separateDataColIdx => 2, # when the date is '-' add a row separator
 		frame => {
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-appointment?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -2734,10 +2813,34 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			# delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#4#/#5#?home=#homeArl#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', [  $personId, $personId], 'panelTransp'); },
+	publishComp_st => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->param('person_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments',
+				[$page->session('GMT_DAYOFFSET'), $personId]); 
+		},
+	publishComp_stp => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->param('person_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', 
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panel'); 
+		},
+	publishComp_stpe => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->param('person_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', 
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelEdit'); 
+		},
+	publishComp_stpt => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->param('person_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.patientAppointments', 
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp'); 
+		},
 },
 
 
@@ -2748,9 +2851,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 			select p.complete_name, pvc.view_key  from PerSess_View_Count pvc,
 						person p , Person_Org_Category  pog
-						where p.person_id = pvc.view_key AND pvc.person_id = ? and
+						where p.person_id = pvc.view_key AND pvc.person_id = :2 and
 						pog.person_id = p.person_id AND pog.category = 'Patient'
-						and	pvc.view_latest >= to_date(sysdate)
+						and	pvc.view_latest >= trunc(sysdate) + :1
 			order by pvc.view_latest desc
 
 		},
@@ -2772,9 +2875,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		style => 'panel.transparent',
 		inherit => 'panel',
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelTransp'); },
+	publishComp_st => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId]);
+		},
+	publishComp_stp => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panel'); 
+		},
+	publishComp_stpt => 
+		sub { 
+			my ($page, $flags, $personId) = @_; 
+			$personId ||= $page->session('user_id');
+			$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients',
+				[$page->session('GMT_DAYOFFSET'), $personId], 'panelTransp'); 
+		},
 },
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -3527,25 +3648,19 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 },
 
 
-
-
-
-
-
-
-
 'person.scheduleAppts' =>{
 
-			sqlStmt => qq{SELECT p.person_id,to_char(e.start_time, 'hh:miam') as start_time,a.caption,e.subject as visit,
-			org_id,p.complete_name
-			FROM	person p, event e, event_attribute ePhy, org,appt_status a
-			WHERE	e.event_id = ePhy.parent_id
-			AND	ePhy.item_name = 'Appointment'
-			AND	ePhy.value_textB = :1
-			AND     p.person_id = ePhy.VALUE_TEXT
-			AND	org.org_internal_id (+) = facility_id
-			AND	(to_char(e.start_time,'MM/DD/YYYY') = :2 or to_char(e.start_time,'MM/DD/YYYY') != :2)
-			AND      a.id = e.event_status
+			sqlStmt => qq{
+			SELECT p.person_id,to_char(e.start_time - :1, 'hh:miam') as start_time,
+				a.caption,e.subject as visit, org_id,p.complete_name
+			FROM appt_status a, org, person p, event_attribute ePhy, event e
+			WHERE to_char(e.start_time - :1, '$SQLSTMT_DEFAULTDATEFORMAT') = :3
+				AND ePhy.parent_id = e.event_id
+				AND ePhy.item_name = 'Appointment'
+				AND ePhy.value_textB = :2
+				AND p.person_id = ePhy.VALUE_TEXT
+				AND org.org_internal_id = facility_id
+				AND a.id = e.event_status
 			},
 			sqlStmtBindParamDescr => ['Person ID for transaction table'],
 
@@ -3574,10 +3689,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			},
 
 
-			publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')] ); },
-			publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panel'); },
-			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelEdit'); },
-			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$personId,$page->param('timeDate')], 'panelTransp'); },
+			publishComp_st => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')] ); },
+			publishComp_stp => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panel'); },
+			publishComp_stpe => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panelEdit'); },
+			publishComp_stpt => sub { my ($page, $flags, $personId) = @_;  $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.scheduleAppts', [$page->session('GMT_DAYOFFSET'),$personId,$page->param('timeDate')], 'panelTransp'); },
 
 	},
 
