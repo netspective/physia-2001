@@ -956,10 +956,14 @@ sub addTransactionAndInvoice
 
 	#-------------------------------------------------------------------------------------------------------------------------------
 
+	my $serviceProvider = $page->field('care_provider_id');
+	my $altBillProvider =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $serviceProvider, 'Bill Provider');
+	my $billingProvider = $altBillProvider->{value_text} || $page->field('provider_id');
+
 	my $billingFacility = $page->field('billing_facility_id');
 	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $relTo = $page->field('accident') == $condRelToFakeNone ? '' : $page->field('accident');
-	
+
 	my $transId = $page->schemaAction(
 		'Transaction', $command,
 		trans_id => $editTransId || undef,
@@ -969,8 +973,8 @@ sub addTransactionAndInvoice
 		caption => $page->field('subject') || undef,
 		service_facility_id => $page->field('service_facility_id') || undef,
 		billing_facility_id => $billingFacility || undef,
-		provider_id => $page->field('provider_id') || undef,
-		care_provider_id => $page->field('care_provider_id') || undef,
+		provider_id => $billingProvider || undef,
+		care_provider_id => $serviceProvider || undef,
 		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		trans_owner_id => $personId || undef,
 		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
