@@ -11,6 +11,12 @@ use vars qw(@ISA @EXPORT $STMTMGR_INTELLICODE);
 @EXPORT = qw($STMTMGR_INTELLICODE);
 
 $STMTMGR_INTELLICODE = new App::Statements::IntelliCode(
+	'selServTypeByCode' => qq{	
+		SELECT	service_type 
+		FROM  	REF_Code_Service_Type 
+		WHERE 	:1 between code_min and code_max
+		AND	:2 = entry_type 		
+	},
 
 	'selIcdData' => qq{
 		select * from REF_ICD where icd = ?
