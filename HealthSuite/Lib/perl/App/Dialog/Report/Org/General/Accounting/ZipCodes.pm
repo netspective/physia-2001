@@ -212,6 +212,8 @@ sub execute
 	my $rows = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
 	my @data = ();
 	my $fieldsExist;
+	my $currentTotal = 0;
+	my $currentPercent = 0;
 	foreach (@$rows)
 	{
 		my @rowData = ($_->{zipcode});
@@ -223,18 +225,35 @@ sub execute
 		push (@rowData, sprintf "%3.2f%", ($_->{patients}/$totalPatients) * 100);
 
 		$fieldsExist = $_;
+		$currentTotal += $_->{patients};
+		$currentPercent += (($_->{patients}/$totalPatients) * 100);
 
 		push(@data, \@rowData);
 	};
 
-	my @rowData = ("Total");
-	push (@rowData, ' ') if exists $fieldsExist->{doctor};
-	push (@rowData, ' ') if exists $fieldsExist->{org};
-	push (@rowData, ' ') if exists $fieldsExist->{ins_org};
-	push (@rowData, ' ') if exists $fieldsExist->{product};
-	push (@rowData, $totalPatients);
-	push (@rowData, sprintf "%3.2f%", 100);
-	push (@data, \@rowData);
+	if($fieldsExist ne '')
+	{
+		my @rowData = ("Total");
+		push (@rowData, ' ') if exists $fieldsExist->{doctor};
+		push (@rowData, ' ') if exists $fieldsExist->{org};
+		push (@rowData, ' ') if exists $fieldsExist->{ins_org};
+		push (@rowData, ' ') if exists $fieldsExist->{product};
+		push (@rowData, $currentTotal);
+		push (@rowData, sprintf "%3.2f%", $currentPercent);
+		push (@data, \@rowData);
+	}
+
+	if($fieldsExist ne '')
+	{
+		my @rowData = ("Others");
+		push (@rowData, ' ') if exists $fieldsExist->{doctor};
+		push (@rowData, ' ') if exists $fieldsExist->{org};
+		push (@rowData, ' ') if exists $fieldsExist->{ins_org};
+		push (@rowData, ' ') if exists $fieldsExist->{product};
+		push (@rowData, $totalPatients - $currentTotal);
+		push (@rowData, sprintf "%3.2f%", 100 - $currentPercent);
+		push (@data, \@rowData);
+	}
 
 	my $html = createHtmlFromData($page, 0, \@data, $pub);
 	return $html;
