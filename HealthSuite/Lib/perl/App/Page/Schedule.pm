@@ -18,7 +18,11 @@ use App::Statements::Search::Appointment;
 use vars qw(%RESOURCE_MAP);
 use base 'App::Page';
 %RESOURCE_MAP = (
-	'schedule' => {},
+	'schedule' => {_views => [
+			{caption => 'Schedule', name => 'apptsheet',},
+			{caption => 'Assign', name => 'assign',},
+			],
+		},
 	);
 
 # ------------------------------------------------------------------------------------------
@@ -714,6 +718,24 @@ sub initialize
 	$self->addLocatorLinks(
 			['Schedule', '', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
 		);
+
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/schedule/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/schedule/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 }
 
 sub saveViewPreference

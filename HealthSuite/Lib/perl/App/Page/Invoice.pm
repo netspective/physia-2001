@@ -1561,19 +1561,22 @@ sub initialize
 			[$invoiceId, "/invoice/$invoiceId"],
 		);
 
+	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	#unless($self->hasPermission("page/invoice/$activeView"))
-	unless($self->hasPermission("page/invoice"))
+	if ($activeView) 
 	{
-		$self->disable(
-				qq{
-					<br>
-					You do not have permission to view this information. 
-					Permission page/invoice is required.
+		unless($self->hasPermission("page/invoice/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/invoice/$activeView is required.
 
-					Click <a href='javascript:history.back()'>here</a> to go back.
-				});
-	}
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}	
 
 	return 1;
 }

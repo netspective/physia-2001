@@ -33,6 +33,23 @@ sub initialize
 			['Reports', '/report'],
 			@activePathInfo,
 		);
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/report/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/report/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 }
 
 sub prepare_page_content_header

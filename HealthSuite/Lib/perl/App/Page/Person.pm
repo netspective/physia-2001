@@ -34,6 +34,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Chart', name => 'chart',},
 			{caption => 'Account', name => 'account',},
 			{caption => 'Activity', name => 'activity',},
+			{caption => 'Home', name => 'home',},
 			],
 		},
 	);
@@ -77,33 +78,33 @@ sub initialize
 					Click <a href='javascript:history.back()'>here</a> to go back.
 				});
 	}
-	
-	# Check user's permission
-	my $activeView = $self->param('_pm_view');
-	unless($activeView eq 'home')
-	{
-		#unless($self->hasPermission("page/person/$activeView"))
-		unless($self->hasPermission("page/person"))
-		{
-			$self->disable(
-					qq{
-						<br>
-						You do not have permission to view this information. 
-						Permission page/person is required.
 
-						Click <a href='javascript:history.back()'>here</a> to go back.
-					});
-		}
-	}
-	else
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
 	{
-		unless($personId eq $userId)
+		if ($self->hasPermission("page/person/$activeView"))
+		{
+			if (($activeView eq 'home') && ($personId ne $userId))
+			{
+				$self->disable(
+						qq{
+							<br>
+							You do not have permission to view this information. 
+							Only the user $personId can view this page.
+
+							Click <a href='javascript:history.back()'>here</a> to go back.
+						});
+			}
+		}
+		else 
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information. 
-						Only the user $personId can view this page.
+						Permission page/person/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
@@ -645,7 +646,7 @@ sub handleARL
 	$self->param('person_id', $pathItems->[0]);
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
+	unless ($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
 	}

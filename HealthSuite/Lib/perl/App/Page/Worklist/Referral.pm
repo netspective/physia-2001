@@ -21,7 +21,11 @@ use App::Dialog::CollectionSetup;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
-	'worklist/referral' => {},
+	'worklist/referral' => {
+		_views => [
+			{caption => 'Today', name => 'date',},
+			],
+		},
 	);
 
 sub prepare_view_date
@@ -410,6 +414,23 @@ sub initialize
 	$self->addLocatorLinks(
 		['WorkList', '/worklist'],
 	);
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/worklist/referral/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/worklist/referral/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 }
 
 sub handleARL

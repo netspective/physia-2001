@@ -18,8 +18,20 @@ use App::Dialog::WorklistSetup;
 use base 'App::Page::WorkList';
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
-	'worklist/_default' => {},
-	'worklist/patientflow' => {},
+	'worklist/_default' => {
+		_views => [
+			{caption => 'Today', name => 'date',},
+			{caption => 'Recent Activity', name => 'recentActivity',},
+			{caption => 'Setup', name => 'setup',},
+			],
+		},
+	'worklist/patientflow' => {
+		_views => [
+			{caption => 'Today', name => 'date',},
+			{caption => 'Recent Activity', name => 'recentActivity',},
+			{caption => 'Setup', name => 'setup',},
+			],
+		},
 	);
 
 my $baseArl = '/worklist/patientflow';
@@ -389,6 +401,24 @@ sub initialize
 	$self->addLocatorLinks(
 		['Patient Flow', '/worklist/patientflow'],
 	);
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		#unless($self->hasPermission("page/worklist/patientflow/$activeView"))
+		unless($self->hasPermission("page/worklist/patientflow"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/worklist/patientflow is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 }
 
 sub handleARL

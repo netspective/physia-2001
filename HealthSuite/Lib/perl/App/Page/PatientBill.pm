@@ -337,6 +337,25 @@ sub initialize
 	};
 	$self->addError($@) if $@;
 
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/patientbill/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/patientbill/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}	
+
+
 	return 1;
 }
 

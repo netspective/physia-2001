@@ -175,6 +175,25 @@ sub initialize
 	$self->addLocatorLinks(
 			['Search', '/search'],
 		);
+		
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/search/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/search/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}	
+
+		
 }
 
 sub handleARL

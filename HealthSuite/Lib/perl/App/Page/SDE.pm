@@ -52,6 +52,24 @@ sub initialize
 		.coldescr { font-family: arial, helvetica; font-size: 8pt; color: navy }
 	</style>
 	});
+
+
+	# Check user's permission to page
+	my $activeView = $self->param('_pm_view');
+	if ($activeView) 
+	{
+		unless($self->hasPermission("page/SDE/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/SDE/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 }
 
 sub prepare_page_content_header
