@@ -99,7 +99,7 @@ sub makeStateChanges
 	my $isPersonal = $isPayer eq 'personal';
 	my $isInsurance = $isPayer eq 'insurance';
 
-	$self->heading("Add \u$isPayer Payment");
+	$page->param('batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$isPayer Payment");
 
 	$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, $isInsurance);
 	$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
@@ -124,45 +124,6 @@ sub populateData
 	{	
 		$page->field('payer_id', $invoiceInfo->{client_id});
 	}
-}
-
-sub execute_
-{
-	my ($self, $page, $command, $flags) = @_;
-	$command = 'add';
-
-	my $invoiceId = $page->param('invoice_id');
-	my $isPayer = $page->param('isPayer');
-	if($isPayer eq 'insurance')
-	{
-		insurancePayment($self, $page, $command, $flags, $invoiceId);
-	}
-	elsif($isPayer eq 'personal')
-	{	
-		personalPayment($self, $page, $command, $flags, $invoiceId);
-	}
-
-
-	#Update the invoice
-	my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-	my $totalAdjustForInvoice = 0;
-	foreach my $item (@{$updatedLineItems})
-	{
-		$totalAdjustForInvoice += $item->{total_adjust};
-	}
-
-	my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-	my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-		balance => defined $invoiceBalance ? $invoiceBalance : undef,
-		_debug => 0
-	);
-
-
-	$page->redirect("/invoice/$invoiceId/summary");
 }
 
 sub execute
@@ -272,149 +233,6 @@ sub execute
 
 	$page->redirect("/invoice/$invoiceId/summary");
 
-}
-
-sub insurancePayment
-{
-	my ($self, $page, $command, $flags, $invoiceId) = @_;
-
-	my $todaysDate = $page->getDate();
-	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $payerType = App::Universal::ENTITYTYPE_ORG;
-	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-	my $payMethod = App::Universal::ADJUSTMENTPAYMETHOD_CHECK;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
-
-	my $payerId = $page->field('payer_id');
-
-	my $lineCount = $page->param('_f_line_count');
-	for(my $line = 1; $line <= $lineCount; $line++)
-	{
-		my $payAmt = $page->param("_f_item_$line\_plan_paid");
-		my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
-		next if $payAmt eq '' && $writeoffAmt eq '';
-
-		my $itemId = $page->param("_f_item_$line\_item_id");
-		my $planAllow = $page->param("_f_item_$line\_plan_allow");
-
-		my $totalItemAdjust = $page->param("_f_item_$line\_item_adjustments");
-		my $newTotalAdjust = $totalItemAdjust - ($payAmt + $writeoffAmt);
-		my $itemBalance = $page->param("_f_item_$line\_item_balance") + $newTotalAdjust;
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId,
-			total_adjust => defined $newTotalAdjust ? $newTotalAdjust : undef,
-			balance => defined $itemBalance ? $itemBalance : undef,
-			_debug => 0
-		);
-
-
-		# Create adjustment for the item
-		my $netAdjust = 0 - ($payAmt + $writeoffAmt);
-		my $comments = $page->param("_f_item_$line\_comments");
-		$page->schemaAction(
-			'Invoice_Item_Adjust', 'add',
-			parent_id => $itemId || undef,
-			adjustment_type => defined $adjType ? $adjType : undef,
-			pay_date => $todaysDate || undef,
-			pay_method => defined $payMethod ? $payMethod : undef,
-			pay_ref => $page->field('pay_ref') || undef,
-			payer_type => $payerType || 1,
-			payer_id => $payerId || undef,
-			plan_allow => $planAllow || 'NULL',
-			plan_paid => $payAmt || 'NULL',
-			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
-			net_adjust => defined $netAdjust ? $netAdjust : undef,
-			comments => $comments || undef,
-			_debug => 0
-		);
-
-
-		#Create history attribute for this adjustment
-		my $itemCPT = $page->param("_f_item_$line\_item_adjustments");
-		my $description = "Insurance payment made by '$payerId'";
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $description,
-			value_textB => $comments || undef,
-			value_date => $todaysDate,
-			_debug => 0
-		);
-	}
-}
-
-sub personalPayment
-{
-	my ($self, $page, $command, $flags, $invoiceId) = @_;
-
-	my $todaysDate = $page->getDate();
-	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $payerType = App::Universal::ENTITYTYPE_PERSON;
-	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
-
-	my $payerId = $page->field('payer_id');
-	my $payMethod = $page->field('pay_method');
-	my $lineCount = $page->param('_f_line_count');
-	for(my $line = 1; $line <= $lineCount; $line++)
-	{
-		my $payAmt = $page->param("_f_item_$line\_amount_applied");
-		my $writeoffAmt = $page->param("_f_item_$line\_adjustment_amount");
-		next if $payAmt eq '' && $writeoffAmt eq '';
-
-		my $itemId = $page->param("_f_item_$line\_item_id");
-		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
-		my $totalItemAdjust = $page->param("_f_item_$line\_item_adjustments");
-		my $newTotalAdjust = $totalItemAdjust - ($payAmt + $writeoffAmt);
-		my $itemBalance = $page->param("_f_item_$line\_item_balance") + $newTotalAdjust;
-
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId,
-			total_adjust => defined $newTotalAdjust ? $newTotalAdjust : undef,
-			balance => defined $itemBalance ? $itemBalance : undef,
-			_debug => 0
-		);
-
-
-		# Create adjustment for the item
-		my $netAdjust = 0 - ($payAmt + $writeoffAmt);
-		my $comments = $page->param("_f_item_$line\_comments");
-		$page->schemaAction(
-			'Invoice_Item_Adjust', 'add',
-			parent_id => $itemId || undef,
-			adjustment_type => defined $adjType ? $adjType : undef,
-			adjustment_amount => defined $adjType ? $adjType : undef,
-			pay_date => $todaysDate || undef,
-			pay_method => defined $payMethod ? $payMethod : undef,
-			pay_ref => $page->field('pay_ref') || undef,
-			payer_type => $payerType || 1,
-			payer_id => $payerId || undef,
-			writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
-			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
-			net_adjust => defined $netAdjust ? $netAdjust : undef,
-			comments => $comments || undef,
-			_debug => 0
-		);
-
-
-		#Create history attribute for this adjustment
-
-		my $description = "Personal payment made by '$payerId'";
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => $description,
-			value_textB => $comments || undef,
-			value_date => $todaysDate,
-			_debug => 0
-		);
-	}
 }
 
 1;
