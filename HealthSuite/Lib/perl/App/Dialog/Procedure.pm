@@ -1299,7 +1299,8 @@ sub storeProviderInfo
 sub storeInsuranceInfo
 {
 	my ($page, $command, $invoiceId, $invoice, $mainTransData) = @_;
-	
+	my $sessOrgIntId = $page->session('org_internal_id');
+
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
 	my $dateValueType = App::Universal::ATTRTYPE_DATE;
@@ -1516,12 +1517,14 @@ sub storeInsuranceInfo
 
 
 			#E-Remitter Payer ID --------------------
+			my $clearHouseId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $sessOrgIntId, 'Clearing House ID', $textValueType);
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
 					item_name => "Insurance/$order/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsurPlanOrProd->{remit_payer_id} || $personInsurProduct->{remit_payer_id},
+					value_textB => $clearHouseId->{value_text},
 					value_intB => 1,
 					_debug => 0
 				);
