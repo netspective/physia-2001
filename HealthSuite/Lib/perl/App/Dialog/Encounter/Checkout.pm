@@ -72,10 +72,11 @@ sub getSupplementaryHtml
 		$page->param('person_id', $personId);
 
 		return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, qq{
-							#component.stpd-person.contactMethodsAndAddresses#<BR>
-							#component.stpd-person.extendedHealthCoverage#<BR>
-							#component.stpd-person.careProviders#<BR>
-							#component.stpd-person.authorization#<BR>
+					#component.stpd-person.contactMethodsAndAddresses#<BR>
+					#component.stpd-person.extendedHealthCoverage#<BR>
+					#component.stpd-person.accountPanel#<BR>
+					#component.stpd-person.careProviders#<BR>
+					#component.stpd-person.authorization#<BR>
 			});
 	}
 	return $self->SUPER::getSupplementaryHtml($page, $command);
