@@ -32,11 +32,13 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					    (person_pay+insurance_pay-refund)
 					    ) as a_r,
 					to_char(invoice_date,'YYYY') as invoice_year
-				FROM 	invoice_charges
+				FROM 	invoice_charges,org o
 				WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND (facility = :3 OR :3 is NULL)
 				AND (provider =:4 OR :4 is NULL)		
+				AND o.org_internal_id = invoice_charges.facility
+				AND o.owner_org_id = :5
 				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 				ORDER BY 13, to_char(invoice_date,'MM')
 		},
@@ -67,7 +69,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt => 
 		qq
 		{
-			SELECT 	bill_to_id as insurance_ID , count (invoice_id),
+			SELECT 	bill_to_id as insurance_ID , count (distinct(invoice_id)),
 				sum(balance_0),
 				sum(balance_31),
 				sum(balance_61),
@@ -75,9 +77,11 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_121),			
 				sum(balance_151),
 				sum(total_pending) 
-			FROM	agedpayments
-			WHERE	(bill_plain = :1 or :1 is NULL)	
-			AND	 bill_party_type  in (2,3)
+			FROM	agedpayments a,org 
+			WHERE	(a.bill_plain = :1 or :1 is NULL)	
+			AND	a.bill_party_type  in (2,3)
+			AND	a.bill_plain = org.org_internal_id 
+			AND	org.owner_org_id = :2
 			GROUP BY bill_to_id	
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
@@ -113,10 +117,16 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
 				sum(total_pending)
-			FROM	agedpayments
-			WHERE	(person_id = :1 or :1 is NULL)	
+			FROM	agedpayments a
+			WHERE	(a.person_id = :1 or :1 is NULL)	
 			AND 	(invoice_item_id is NULL  or item_type = 3)
 			AND	bill_party_type in (0,1)
+			AND	person_id IN
+			(
+			 SELECT person_id
+			 FROM 	person_org_category
+			 WHERE  org_internal_id = :2
+			 )
 			GROUP BY person_id
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
@@ -160,13 +170,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
                  AND	ea.value_text = provider
                  AND    ea.parent_id = e.event_id 
                  ))as appt                
-        FROM revenue_collection
+        FROM revenue_collection,org o
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND (facility = :3 OR :3 is NULL)
                 AND (provider =:4 OR :4 is NULL)
                 AND (batch_id >= :5 OR :5 is NULL)
                 AND (batch_id <= :6 OR :6 is NULL)
+		AND o.org_internal_id = revenue_collection.facility
+		AND o.owner_org_id = :7	                
         GROUP by provider
         },
 	
@@ -191,7 +203,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(charge_adjust) as  charge_adjust,
 		sum(person_write_off) as person_write_off,
 		pay_type
-	FROM	invoice_charges
+	FROM	invoice_charges,org o
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 								
 		AND (facility = :2 or :2 IS NULL )
 		AND (provider = :3 or :3 IS NULL)
@@ -200,7 +212,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			(batch_id >= :4 or :4 is NULL) 
 			AND
 			(batch_id <= :5  or :5 is NULL) 		
-		)		
+		)	
+		AND o.org_internal_id = invoice_charges.facility
+		AND o.owner_org_id = :6		
 	group by invoice_id ,
 		invoice_date, 		
 		service_begin_date,
@@ -226,14 +240,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(insurance_pay) insurance_pay ,	
 		sum(person_write_off) person_write_off,
 		sum(refund) as refund
-	FROM 	invoice_charges
+	FROM 	invoice_charges,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
 		AND (provider =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
-		
+		AND o.org_internal_id = invoice_charges.facility
+		AND o.owner_org_id = :7				
 	group by invoice_date
 },			
 
@@ -249,13 +264,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(insurance_pay) insurance_pay ,	
 		sum(person_write_off) person_write_off,
 		sum(refund) as refund
-	FROM 	invoice_charges
+	FROM 	invoice_charges,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT') 
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :3 OR :3 is NULL)
 		AND (provider =:4 OR :4 is NULL)
 		AND (batch_id >= :5 OR :5 is NULL)
 		AND (batch_id <= :6 OR :6 is NULL)
+		AND o.org_internal_id = invoice_charges.facility
+		AND o.owner_org_id = :7	
 		
 	group by to_char(invoice_date,'MM/YYYY') },
 
@@ -278,7 +295,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(insurance_write_off) insurance_write_off,			
 		sum(balance_transfer) balance_transfer,
 		sum(charge_adjust) as  charge_adjust
-	FROM 	invoice_charges
+	FROM 	invoice_charges, org o
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1								
 		AND (facility = :2 or :2 IS NULL )
 		AND (provider = :3 or :3 IS NULL)
@@ -287,7 +304,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			(batch_id >= :4 or :4 is NULL) 
 			AND
 			(batch_id <= :5  or :5 is NULL) 		
-		)		
+		)	
+		AND o.org_internal_id = invoice_charges.facility
+		AND o.owner_org_id = :6
 	group by invoice_id ,
 		to_char(invoice_date,'MM/YYYY') ,		
 		service_begin_date,
