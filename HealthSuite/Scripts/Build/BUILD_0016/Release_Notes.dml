@@ -260,6 +260,12 @@
 			Fixed a bug which caused popup lookup windows to have the complete application title bar
 		</deliverable>
 
+		<deliverable id="1520">
+			Corrected counts for missing encounters in Patient Activity Report.  Also changed the details
+			of Appointments Scheduled to list the appointments scheduled on the selected date regardless
+			of when the appointments were made for.
+		</deliverable>
+
 		<deliverable id="none">
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
