@@ -24,6 +24,7 @@ use vars qw(@ISA @EXPORT %IMAGETAGS);
 	'icon-l/home' => '<IMG SRC="/resources/icons/home.gif" BORDER=0>',
 	'icon-l/people' => '<IMG SRC="/resources/icons/people.gif" BORDER=0>',
 	'icon-l/accounting' => '<IMG SRC="/resources/icons/accounting.gif" BORDER=0>',
+	'icon-m/sde' => '<IMG SRC="/resources/icons/sde.gif" BORDER=0>',
 );
 
 1;
