@@ -2978,52 +2978,121 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId], 'panelTransp'); },
 },
 
+
 #----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-'person.referralAndIntake' => {
+
+'person.childReferral' => {
 	sqlStmt => qq{
-			SELECT 	trans_id,
-			        DECODE(parent_trans_id,'','Service Request','Referral') as parent_trans_id,
-			        DECODE(trans_type,6010,(SELECT parent_trans_id FROM TRANSACTION WHERE t.parent_trans_id = trans_id),parent_trans_id),
-			        %simpleDate:trans_end_stamp%,
-			        %simpleDate:data_date_b%,
-			        (
-					SELECT caption
-					FROM intake_service i
-					WHERE i.id = t.caption
-				) AS caption,
-			        (
-					SELECT r.caption
-					FROM referral_followup_status r
-					WHERE r.id = t.trans_status_reason
-				) AS follow_up,
-				(
-					SELECT org_id
-					FROM org
-					WHERE org_internal_id = t.service_facility_id
-				) AS org_id,
-				trans_type
-			FROM  transaction t
-			WHERE  	consult_id = ?
-			AND trans_type in (6000, 6010)
+			SELECT 	tr.trans_id,
+				to_char(tr.data_date_a,'MM/DD/YY'),
+				(SELECT rsd.caption FROM referral_service_descr rsd, transaction tp 
+				 WHERE rsd.id = tp.trans_expire_reason
+				 AND	tp.trans_id = tsr.parent_trans_id),
+				(SELECT caption FROM referral_followup_status where id = tr.trans_status_reason),
+				to_char(tr.data_date_b,'MM/DD/YY'),				
+				tr.trans_type,
+				(SELECT parent_trans_id FROM transaction where trans_id = tr.parent_trans_id)
+			FROM  transaction tsr, transaction tr
+			WHERE tsr.parent_trans_id = :1
+			AND	tr.parent_trans_id = tsr.trans_id
+			ORDER BY 1 desc
 		},
 		sqlStmtBindParamDescr => ['Trans ID'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-				{
-					colIdx => 1,
-					dataFmt => {
-						'Service Request' => 'Service Request : #0#, Date Of Request : #3#',
-						'Referral' => "Referral (#2#): #0#, Follow Up : #6# (#4#), Service: #5#, Provider: <A HREF = '/org/#7#/profile'>#7#</A>",
-					},
-				},
-
-
-
+		{colIdx => 0, head => 'RID', hHint=>'Referral ID', dAlign => 'center',tDataFmt => '&{count:0} Referrals',
+			url=>'/org/#session.org_id#/dlg-update-trans-6010/#0#'},
+		{colIdx => 1, head => 'Date', hHint=>'Referral Date'},
+		{colIdx => 2, head => 'Type', hHint=>'Referral Type', dAlign => 'center'},
+		{colIdx => 3, head => 'FUD', hHint=>'Follow Up Date', dAlign => 'center'},
+		{colIdx => 4, head => 'Followup', hHint=>'Follow Up Caption', dAlign => 'center'},
+		
 		],
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#6#/#0#?home=#homeArl#',
+		frame => {
+		#addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
+		#editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.static',
+		frame => { heading => 'Referrals' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		#style => 'panel.transparent.static',
+		inherit => 'panel',
+		flags => 0,
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Referrals' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#param.home#'>Service Request</A> } },
+			],
+		},
+		stdIcons =>	{
+			#updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', 
+			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $transId) = @_; $transId ||= $page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.childReferral', [$transId]); },
+	publishComp_stp => sub { my ($page, $flags, $transId) = @_; $transId ||= $page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.childReferral', [$transId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $transId) = @_; $transId ||= $page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.childReferral', [$transId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $transId) = @_; $transId ||= $page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.childReferral', [$transId], 'panelTransp'); },
+	publishComp_stpd => sub { my ($page, $flags, $transId) = @_; $transId ||= $page->param('trans_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.childReferral', [$transId], 'panelInDlg'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.referralAndIntake' => {
+	sqlStmt => qq{
+			SELECT 	trans_id,
+				to_char(data_date_a,'MM/DD/YY'),
+				(SELECT to_char(data_date_a,'MM/DD/YY') FROM transaction where trans_id = t.parent_trans_id),
+				(
+				
+					SELECT rsd.caption
+					FROM referral_service_descr rsd, transaction t1,transaction t2 where t1.trans_id = t.parent_trans_id  
+					AND t2.trans_id = t1.parent_trans_id AND
+					t2.trans_expire_reason = rsd.id
+				),
+				to_char(data_date_b,'MM/DD/YY'),
+				(SELECT caption FROM referral_followup_status where id = trans_status_reason),
+				trans_type,
+				(SELECT parent_trans_id FROM transaction where trans_id = t.parent_trans_id)
+			FROM  transaction t
+			WHERE  	consult_id = ?
+			AND trans_type in (6010)
+			ORDER BY 1 desc
+		},
+		sqlStmtBindParamDescr => ['Trans ID'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+		{colIdx => 0, head => 'RID', hHint=>'Referral ID', dAlign => 'center',tDataFmt => '&{count:0} Referrals',},
+		{colIdx => 1, head => 'Date', hHint=>'Referral Date'},
+		{colIdx => 3, head => 'Type', hHint=>'Referral Type', dAlign => 'center'},
+		{colIdx => 4, head => 'FUD', hHint=>'Follow Up Date', dAlign => 'center'},
+		{colIdx => 5, head => 'Followup', hHint=>'Follow Up Caption', dAlign => 'center'},
+		{colIdx => 7, head => 'SID', hHint=>'Service Request ID', dAlign => 'center',url=>'/org/#session.org_id#/dlg-update-trans-6000/#7#'},
+		{colIdx => 2, head => 'SD', hHint=>'Service Request Date', dAlign => 'center',},
+		
+		],
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#6#/#0#?home=#homeArl#',
 		frame => {
 		addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-referral?_f_person_id=#param.person_id#&home=#homeArl#',
 		editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -3032,14 +3101,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
-		style => 'panel',
+		style => 'panel.static',
 		frame => { heading => 'Service Requests And Referrals' },
 	},
 	publishDefn_panelTransp =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
-		style => 'panel.transparent',
+		#style => 'panel.transparent.static',
 		inherit => 'panel',
+		flags => 0,
 	},
 	publishDefn_panelEdit =>
 	{
@@ -3053,7 +3123,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#8#/#0#?home=#param.home#', 
+			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#8#/#0#?home=#param.home#',
 		},
 	},
 
