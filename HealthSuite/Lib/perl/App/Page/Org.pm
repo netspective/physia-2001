@@ -516,6 +516,7 @@ sub prepare_view_superbills
 				$self->schemaAction(
 					'Offering_Catalog_Entry', 'remove',
 					entry_id => $superbillItem->{entry_id},
+					_debug => 0,
 				);
 			}
 
@@ -541,9 +542,11 @@ sub prepare_view_superbills
 					entry_type => 0,
 					status => 1,
 					cost_type => 0,
-					name => $grp
+					name => $grp,
+					sequence => $i,
 				);
 				
+				my $j = 0;
 				foreach my $cpt (@{$cptList}) {
 					my ($code, $name) = split /:/, $cpt, 2;
 					$self->schemaAction (
@@ -555,7 +558,9 @@ sub prepare_view_superbills
 						code => $code,
 						name => $name,
 						cost_type => 0,
+						sequence => $j,
 					);
+					$j ++;
 				}
 				$i ++;
 			}
@@ -581,9 +586,11 @@ sub prepare_view_superbills
 					entry_type => 0,
 					status => 1,
 					cost_type => 0,
-					name => $grp
+					name => $grp,
+					sequence => $i,
 				);
 				
+				my $j = 0;
 				foreach my $cpt (@{$cptList}) {
 					my ($code, $name) = split /:/, $cpt, 2;
 					$self->schemaAction (
@@ -595,13 +602,15 @@ sub prepare_view_superbills
 						code => $code,
 						name => $name,
 						cost_type => 0,
+						sequence => $j,
 					);
+					$j ++;
 				}
 				$i ++;
 			}
 		}
 		
-		$self->addContent($displayHierarchy);
+		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 	} elsif ($self->param ('action') eq 'new') {
 		$self->addContent(qq{
 			<script src="/lib/superbill.js" language="JavaScript1.2"></script>
@@ -632,7 +641,9 @@ sub prepare_view_superbills
                         
 							<td valign="top" align="center">
 								<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
-								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()">
+								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
+								<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
+								<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
                                         		</td>
 							
 							<td valign="top" align="right">
@@ -793,7 +804,9 @@ sub prepare_view_superbills
                         
 							<td valign="top" align="center">
 								<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
-								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()">
+								<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
+								<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
+								<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
                                         		</td>
 							
 							<td valign="top" align="right">
@@ -881,26 +894,31 @@ sub prepare_view_superbills
 		
 		my $sampleLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutputHREF, $theFilename);
 		$self->addContent (qq {<b>PDF Generated: </b><i><a href="$sampleLink">Sample Report</a></i>});
-	} else {
-		my $html;
-		
-		my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillsByOrgId', $self->param ('org_id'));
-		
-		$html = qq{<a href="/org/#param.org_id#/superbills?action=new">Create Superbill</a><hr>\n<table><p>\n};
-		foreach my $superbillHash (@{$superbillList}) {
-			$html .= qq{
-				<tr>
-					<td align="right" valign="top">
-						<a href="/org/#param.org_id#/superbills?action=edit&superbillid=$superbillHash->{internal_catalog_id}">$superbillHash->{catalog_id}</a>
-					</td>
-					
-					<td align="left" valign="top">
-						<a href="/org/#param.org_id#/superbills?action=edit&superbillid=$superbillHash->{internal_catalog_id}">$superbillHash->{caption}</a>
-					</td>
-			};
+	} elsif ($self->param ('action') eq 'delete') {
+		my $internalCatalogID = $self->param('superbillid');
+
+		if ($internalCatalogID) {
+			# First delete the old superbill...
+			my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
+
+			$self->schemaAction(
+				'Offering_Catalog', 'remove',
+				internal_catalog_id => $internalCatalogID,
+#				_debug => 0
+			);
+			
+			for my $superbillItem (@{$superbillList}) {
+				$self->schemaAction(
+					'Offering_Catalog_Entry', 'remove',
+					entry_id => $superbillItem->{entry_id},
+#					_debug => 0
+				);
+			}
 		}
 		
-		$self->addContent($html);
+		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
+	} else {
+		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 	}
 }
 
