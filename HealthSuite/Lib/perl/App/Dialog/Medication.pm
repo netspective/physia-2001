@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.19 2001-01-10 00:39:00 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.20 2001-01-10 17:58:08 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -49,20 +49,20 @@ sub new
 					name => 'dose',
 					size => 5,
 					type => 'float',
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Units',
 					name => 'dose_units',
 					type => 'select',
 					selOptions => $UNIT_SELOPTIONS,
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_dose_units']);},
 				),
 				new CGI::Dialog::Field(caption => 'Route',
 					name => 'route',
 					type => 'select',
 					selOptions => 'PO;chew;suck;sublingual;inhaled nasally;topically;rectally;vaginally;eyes;OD;OS;ears;SQ;IM;IV',
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 				),
 			],
 		),
@@ -77,7 +77,7 @@ sub new
 					name => 'frequency',
 					type => 'select',
 					selOptions => 'QD;BID;TID;QID;Q2H;Q4H;Q6H;Q8H;Q12H;Other',
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 					onChangeJS => qq{showFieldsOnValues(event, ['Other'], ['other_frequency']);},
 				),
 				new CGI::Dialog::Field(caption => 'PRN',
@@ -115,7 +115,8 @@ sub new
 				new App::Dialog::Field::Scheduling::Date(caption => 'Start Date',
 					name => 'start_date',
 					type => 'date',
-					options => FLDFLAG_REQUIRED,
+					defaultValue => '',
+					#options => FLDFLAG_REQUIRED,
 				),
 				new App::Dialog::Field::Scheduling::Date(caption => 'End Date',
 					name => 'end_date',
@@ -164,13 +165,13 @@ sub new
 					name => 'quantity',
 					size => 5,
 					type => 'float',
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => '# of Refills',
 					name => 'num_refills',
 					type => 'select',
 					selOptions => '0;1;2;3;4;5;6;7;8;9;10;11;12;other',
-					options => FLDFLAG_REQUIRED,
+					#options => FLDFLAG_REQUIRED,
 					onChangeJS => qq{showFieldsOnValues(event, ['other'], ['other_num_refills']);},
 				),
 			],
@@ -392,6 +393,9 @@ sub makeStateChanges
 	}
 	elsif ($command eq 'prescribe' || $command eq 'refill')
 	{
+		$self->setFieldFlags('medication_multi', FLDFLAG_REQUIRED);
+		$self->setFieldFlags('quantity_refills_multi', FLDFLAG_REQUIRED);
+
 		unless ($isNurse || $isPhysician)
 		{
 			$self->setFieldFlags('destination', FLDFLAG_INVISIBLE);
