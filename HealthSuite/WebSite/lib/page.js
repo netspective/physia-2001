@@ -209,7 +209,7 @@ function populateField()
 function isPopupURL()
 {
 	var flag=false;
-	if(eval(parent.opener))
+	if(eval(parent.opener) && eval(parent.opener.activeActionARL))
 	{
 		var pathItems = parent.opener.activeActionARL.split('/');
 		var resource = pathItems[1];
