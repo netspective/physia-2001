@@ -411,7 +411,7 @@ sub handleRegistry
 	{
 		$self->handlePostExecute($page, $command, $flags);
 	}	
-}
+
 
 
 }
