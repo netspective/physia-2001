@@ -244,7 +244,7 @@ sub execAction_submit
 
 		#----NOW UPDATE THE INVOICE STATUS AND SET THE FLAG----#
 
-		if($invoice->{balance} == 0)
+		if($invoice->{balance} == 0 && $claimType != App::Universal::CLAIMTYPE_HMO)
 		{
 			$page->schemaAction(
 				'Invoice_Attribute', 'add',
