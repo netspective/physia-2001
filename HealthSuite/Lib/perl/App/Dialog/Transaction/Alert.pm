@@ -29,7 +29,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 			'trans-' .App::Universal::TRANSTYPE_ALERTINSURANCE(),
 			'trans-' .App::Universal::TRANSTYPE_ALERTMEDICATION(),
 			'trans-' .App::Universal::ATTRTYPE_STUDENTPART(),
-			'trans-' .App::Universal::TRANSTYPE_ALERTACTION()
+			'trans-' .App::Universal::TRANSTYPE_ALERTACTION(),
+			'trans-' .App::Universal::TRANSTYPE_ALERTAPPOINTMENT(),
 		],
 	},
 
