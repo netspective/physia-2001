@@ -243,7 +243,7 @@ sub getControlBarHtml
 		}
 
 		my $javascriptValidate;
-		$javascriptValidate = qq{ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)"}
+		$javascriptValidate = qq{ONBLUR="validateChange_Time(event)"}
 			if $self->param('showTimeSelect');
 		
 		$timeFieldsHtml = qq{
@@ -306,9 +306,9 @@ sub getControlBarHtml
 			<INPUT class='controlBar' name=showTimeSelect value="Range from/to" READONLY>
 
 			&nbsp;<input class='controlBar' name=time1 size=8 maxlength=8 value='$time1' title="$title1"
-				ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)">
+				ONBLUR="validateChange_Time(event)">
 			&nbsp;<input class='controlBar' name=time2 size=8 maxlength=8 value='$time2' title="$title2"
-				ONKEYPRESS="return processKeypress_default(event)" ONBLUR="validateChange_Time(event)">
+				ONBLUR="validateChange_Time(event)">
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input class='controlBar' type=submit value="Go">
