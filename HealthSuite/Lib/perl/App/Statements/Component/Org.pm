@@ -10,10 +10,25 @@ use Data::Publish;
 use App::Statements::Component;
 
 use vars qw(
-	@ISA @EXPORT $STMTMGR_COMPONENT_ORG
+	@ISA @EXPORT $STMTMGR_COMPONENT_ORG $PUBLDEFN_CONTACTMETHOD_DEFAULT
 	);
 @ISA    = qw(Exporter App::Statements::Component);
 @EXPORT = qw($STMTMGR_COMPONENT_ORG);
+
+$PUBLDEFN_CONTACTMETHOD_DEFAULT = {
+	bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#',
+	columnDefn => [
+		{
+			head => 'P',
+			hHint => 'Preferred Method',
+			comments => 'Boolean value indicating whether the contact method is a preferred method or not',
+			dataFmt => ['', '<IMG SRC="/resources/icons/checkmark.gif">'],
+			hint => 'Preferred'
+		},
+		{ head => 'Type', dataFmt => '#4#:', dAlign => 'RIGHT' },
+		{ head => 'Value' },
+	],
+};
 
 $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
@@ -28,7 +43,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Contact Methods' },
+		frame => {
+			heading => 'Contact Methods',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
 	},
 	publishDefn_panelTransp =>
 	{
@@ -45,14 +63,14 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			actionRows =>
 			[
 				{ caption => qq{ Add
-					<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgphone?home=#param.home#'>Telephone</A>,
-					<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgfax?home=#param.home#'>Fax</A>,
-					<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgemail?home=#param.home#'>E-mail</A>,
-					<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#param.home#'>Internet</A> } },
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgphone?home=#homeArl#'>Telephone</A>,
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgfax?home=#homeArl#'>Fax</A>,
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgemail?home=#homeArl#'>E-mail</A>,
+					<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#homeArl#'>Web Page (URL)</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#4#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#4#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#1#/#4#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethods', [$orgId]); },
@@ -73,7 +91,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			# automatically inherites columnDefn and other items from publishDefn
 			style => 'panel',
 			separateDataColIdx => 2, # when the item_name is '-' add a row separator
-			frame => { heading => 'Contact Methods/Addresses' },
+			frame => {
+				heading => 'Contact Methods/Addresses',
+				editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
 		},
 		publishDefn_panelTransp =>
 		{
@@ -91,18 +112,18 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				actionRows =>
 				[
 					{ caption => qq{ Add
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgphone?home=#param.home#'>Telephone</A>,
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgfax?home=#param.home#'>Fax</A>,
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgemail?home=#param.home#'>E-mail</A>,
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#param.home#'>Internet</A>,
-						<A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-contact-orgbilling?home=#param.home#'>Billing Contact</A> }
+						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgphone?home=#homeArl#'>Telephone</A>,
+						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgfax?home=#homeArl#'>Fax</A>,
+						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgemail?home=#homeArl#'>E-mail</A>,
+						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#homeArl#'>Web Page (URL)</A>,
+						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgbilling?home=#homeArl#'>Billing Contact</A> }
 					  },
-					{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-address-org?home=#param.home#'>Physical Address</A> }, url => 'x', },
+					{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-address-org?home=#homeArl#'>Physical Address</A> }, url => 'x', },
 
 				],
 			},
 			stdIcons =>	{
-				updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#5#/#3#?home=#param.home#',
+				updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-#5#/#3#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-#5#/#3#?home=#homeArl#',
 			},
 		},
 		publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.contactMethodsAndAddresses',
@@ -140,8 +161,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 				#{ colIdx => 1,  dataFmt => '#1#', dAlign => 'LEFT' },
 				{ head => 'Alerts', dataFmt => '#2#<br/><I>#3#</I>' },
 			],
-			bullets => 'stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=/#param.arl#',
-			frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-alert-org?home=/#param.arl#' },
+			bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#homeArl#',
+			frame => {
+				addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-alert-org?home=#homeArl#',
+				editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
 	},
 	publishDefn_panel =>
 	{
@@ -163,11 +187,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-alert-org?home=#param.home#'>Alert</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-alert-org?home=#homeArl#'>Alert</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-trans-#1#/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-trans-#1#/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-trans-#1#/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.alerts', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -193,8 +217,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			#{ colIdx => 1, head => 'Trade Name', dataFmt => '#1#' },
 			#{ colIdx => 2, head => 'Category', dataFmt => '#2#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-org/#4#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-attr-0?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org/#4#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-attr-0?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -216,11 +243,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-attr-0?home=#param.home#'>General Information</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-attr-0?home=#homeArl#'>General Information</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-org/#4#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-org/#4#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org/#4#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-org/#4#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.generalInformation', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -249,8 +276,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ head => 'Name', dataFmt => '&{fmt_stripLeadingPath:2}' },
 			{ dataFmt => '#3#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-credential?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-credential?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
 	},
 	publishDefn_panel =>
 	{
@@ -272,11 +302,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-credential?home=#param.home#'>Credentials</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-credential?home=#homeArl#'>Credentials</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.credentials', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -308,8 +338,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 1, head => 'Primary Name', dataFmt => '#1#:' },
 			{ colIdx => 2, head => 'Org ID', dataFmt => '#3#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-org-dept?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-dept?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -331,11 +364,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-org-dept?home=#param.home#'>Department</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-dept?home=#homeArl#'>Department</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-org-dept/#3#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-org-dept/#3#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -364,8 +397,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 2, head => 'Org', dataFmt => '&{fmt_stripLeadingPath:2}:' },
 			{ colIdx => 3, head => 'Org ID', dataFmt => '#3#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-resource-org?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-resource-org?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -387,11 +423,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-resource-org?home=#param.home#'>Associated Organization</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-resource-org?home=#homeArl#'>Associated Organization</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedOrgs', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -420,23 +456,25 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
 	publishDefn => {
 		columnDefn => [
-			#{ head => 'Category', dataFmt => '#1#: <A HREF = "/person/#2#/profile">#0# (#2#)</A>'},
 			{head => 'Name', colIdx => 0, dataFmt => '<A HREF = "/person/#2#/profile">#2# #0#</A>'},
 			{head => 'Type', colIdx => 1, dataFmt => '#1#'},
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#3#/personnel',
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#param.org_id#/personnel',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
-		style => 'panel.static',
-		frame => { heading => 'Personnel', editUrl => 'personnel' },
+		style => 'panel',
+		frame => { heading => 'Personnel' },
 	},
 	publishDefn_panelTransp =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.transparent',
-		frame => { editUrl => 'personnel' },
 		inherit => 'panel',
 	},
 	publishDefn_panelEdit =>
@@ -447,15 +485,15 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-personnel?home=#param.home#'>Personnel</A> }	},
-				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-physician?home=#param.home#'>Physician</A> }	},
-				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-nurse?home=#param.home#'>Nurse</A> }	},
-				#{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-staff?home=#param.home#'>Staff Member</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#'>Personnel</A> }	},
+				#{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-physician?home=#homeArl#'>Physician</A> }	},
+				#{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-nurse?home=#homeArl#'>Nurse</A> }	},
+				#{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-staff?home=#homeArl#'>Staff Member</A> }	},
 			],
 		},
 		stdIcons =>	{
-			#updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#1#/#2#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=#param.home#',
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#3#/personnel', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=/org/#3#/personnel',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#param.org_id#/personnel',
+			delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=/org/#param.org_id#/personnel',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_;  $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$page->param('org_id'),$page->session('org_internal_id')] ); },
@@ -484,7 +522,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		columnDefn => [
 			{ head => 'Category', dataFmt => '#1# #0#(s)' },
 		],
-		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=/#param.arl#',
+		#bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-personnel?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -496,7 +538,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.transparent',
-		frame => { editUrl => 'personnel?home=/#param.arl#' },
+		frame => { editUrl => 'personnel?home=#homeArl#' },
 		inherit => 'panel',
 	},
 	publishDefn_panelEdit =>
@@ -507,13 +549,13 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-physician?home=#param.home#'>Physician</A> }	},
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-nurse?home=#param.home#'>Nurse</A> }	},
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-staff?home=#param.home#'>Staff Member</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-physician?home=#homeArl#'>Physician</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-nurse?home=#homeArl#'>Nurse</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-staff?home=#homeArl#'>Staff Member</A> }	},
 			],
 		},
 		#stdIcons =>	{
-		#	updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#param.home#',
+		#	updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-attr-#1#/#0#?home=#homeArl#',
 		#},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResourcesStats',[$page->param('org_id'),$page->session('org_internal_id')] ); },
@@ -546,8 +588,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 1, head => 'Name' },
 			{ colIdx => 2, head => 'Entries', dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-catalog/#0#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-catalog?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -569,11 +614,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-catalog?home=#param.home#'>Fee Schedule</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog?home=#homeArl#'>Fee Schedule</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-catalog/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-catalog/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -604,8 +649,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 2, head => 'Code' },
 			{ colIdx => 3, head => 'Cost' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-catalog-item?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog-item?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -627,11 +675,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-catalog-item?home=#param.home#'>Catalog Item</A> }	},
+				{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-catalog-item?home=#homeArl#'>Catalog Item</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-catalog-item/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog-item/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-catalog-item/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.catalogItems', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -695,7 +743,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 0, head => 'Policy Name', dataFmt => '#2#(#3#): #4#, #13# (#7#)' },
 			#{ head => 'Plan', dataFmt => '#2# (#1#)' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=/#param.arl#',
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#homeArl#',
+		frame => {
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -720,33 +771,33 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			actionRows =>
 			[
 				{
-					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-product?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Product</A> },
+					caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-ins-product?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Product</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				{
-					caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-plan?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Plan</A> },
+					caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-ins-plan?_f_ins_org_id=#param.org_id#&home=#param.home#'>Insurance Plan</A> },
 					hints => "Insurance Plan offered to org's customers"
 				},
 				#{
-				#	caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-newplan?home=#param.home#'>Insurance Plan</A> },
+				#	caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-ins-newplan?home=#homeArl#'>Insurance Plan</A> },
 				#	hints => "Insurance Plan offered to org's customers"
 				#},
 				#{
-				#	caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-ins-workerscomp?home=#param.home#'>Workers Compensation Plan</A> },
+				#	caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-ins-workerscomp?home=#homeArl#'>Workers Compensation Plan</A> },
 				#	hints => "Worker's Compensation Plan offered to org's customers"
 				#},
 				#{
-				#	caption => qq{ Choose <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-org-attachinsurance?home=#param.home#'>Insurance Plan</A> },
+				#	caption => qq{ Choose <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-attachinsurance?home=#homeArl#'>Insurance Plan</A> },
 				#	hints => "Insurance Plan offered to org's employees"
 				#},
 				#{
-				#	caption => qq{ Choose <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-org-attachworkerscomp?home=#param.home#'>Workers Compensation Plan</A> },
+				#	caption => qq{ Choose <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-org-attachworkerscomp?home=#homeArl#'>Workers Compensation Plan</A> },
 				#	hints => "Worker's Compensation Plan offered to org's employees"
 				#},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-ins-#3#/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-ins-#3#/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.insurancePlans',  [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -773,8 +824,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		columnDefn => [
 			{ head => 'Rule', dataFmt => '#0#: #3#, #4#, #5# (#6#, #7#)' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-health-rule?home=/#param.arl#' },
+		bullets => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=#homeArl#',
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-health-rule?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
@@ -796,11 +850,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-health-rule?home=#param.home#'>Health Maintenance Rule</A> } },
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-health-rule?home=#homeArl#'>Health Maintenance Rule</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-health-rule/#0#?home=#param.home#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-health-rule/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-health-rule/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.healthMaintenanceRule',  [$page->param('org_id'),$page->session('org_internal_id')]); },
