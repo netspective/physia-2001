@@ -540,17 +540,24 @@ aic.batch_id,
 				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND (facility = :3 OR :3 is NULL)
 				AND (provider =:4 OR :4 is NULL)
-				--AND o.org_internal_id = invoice_charges.facility
-				--AND o.owner_org_id = :5
 				AND invoice_charges.owner_org_id = :5	
-				AND (service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
-				AND (service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
-				--AND invoice_charges.invoice_id in 
-				--	(select parent_id from invoice_item ii 
-				--	where (ii.service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') OR :6 is NULL)
-				--	AND (ii.service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR :7 is NULL)
-				--	AND ii.item_type in (0,1,2)
-				--	AND ii.data_text_b is NULL)
+				AND ( :6 IS NULL OR
+					(service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT')	 OR
+					 (   	service_begin_date is NULL 
+					 	AND real_invoice_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') 
+					 	AND (adj_type !=0 or adj_type is NULL)
+					 )
+					)
+				    )	
+				AND (:7 IS NULL OR 
+					(service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR
+					 (
+					 	service_begin_date is NULL 
+					 	AND real_invoice_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') 
+					 	AND (adj_type !=0 or adj_type is NULL)
+					 )
+					) 
+				     )
 				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 				ORDER BY 13, to_char(invoice_date,'MM')
 		},
