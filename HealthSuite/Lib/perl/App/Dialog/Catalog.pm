@@ -304,7 +304,6 @@ sub execute
 		{
 			my @details = split(/[,;]+/);
 			my %record = (	catalog_id => $page->field('catalog_id'),
-					modifier => App::Universal::HCFA1500_MODIFIER_CODE_MANDATED_SERVICES,		#default for modifier is "mandated services"
 					default_units => App::Universal::INVOICEITEM_QUANTITY,				#default for for units is 1
 					description => ''
 					);
