@@ -207,17 +207,83 @@ sub execute
 	{
 #		my $batchIDClauseA = qq { and  ta.value_text = '$row->{batchid}'} if($row->{batchid} ne '');
 #		my $batchDateClauseA = qq { and ta.value_date = to_date('$row->{batchdate}', 'mm/dd/yyyy')} if($row->{batchdate} ne '');
-		my $planClauseA =qq { and t.data_text_b = '$row->{plan}'} if($row->{plan} ne '');
-		my $productClauseA =qq { and t.data_text_a = '$row->{product}'} if($row->{product} ne '');
-		my $physicianClauseA =qq { and t.provider_id = '$row->{provider}'} if($row->{provider} ne '');
-		my $orgClauseA =qq { and t.receiver_id = $row->{org_id}} if($row->{org_id} ne '');
+		my ($planClauseA, $productClauseA, $physicianClauseA, $orgClauseA);
+		my ($planClauseB, $productClauseB, $physicianClauseB, $orgClauseB);
+
+		if($row->{plan} ne '')
+		{
+			$planClauseA =qq { and t.data_text_b = '$row->{plan}'};
+		}
+		else
+		{
+			$planClauseA =qq { and t.data_text_b is null};
+		}
+
+		if($row->{product} ne '')
+		{
+			$productClauseA =qq { and t.data_text_a = '$row->{product}'};
+		}
+		else
+		{
+			$productClauseA =qq { and t.data_text_a is null}
+		}
+
+		if($row->{provider} ne '')
+		{
+			$physicianClauseA =qq { and t.provider_id = '$row->{provider}'};
+		}
+		else
+		{
+			$physicianClauseA =qq { and t.provider_id is null};
+		}
+
+		if($row->{org_id} ne '')
+		{
+			$orgClauseA =qq { and t.receiver_id = $row->{org_id}};
+		}
+		else
+		{
+			$orgClauseA =qq { and t.receiver_id is null};
+		}
 
 #		my $batchIDClauseB = qq { and  ia.value_text = '$row->{batchid}'} if($row->{batchid} ne '');
 #		my $batchDateClauseB = qq { and ia.value_date =  to_date('$row->{batchdate}', 'mm/dd/yyyy')} if($row->{batchdate} ne '');
-		my $planClauseB =qq { and ins.plan_name = '$row->{plan}'} if($row->{plan} ne '');
-		my $productClauseB =qq { and ins.product_name = '$row->{product}'} if($row->{product} ne '');
-		my $physicianClauseB =qq { and t.care_provider_id = '$row->{provider}'} if($row->{provider} ne '');
-		my $orgClauseB =qq { and t.service_facility_id = $row->{org_id}} if($row->{org_id} ne '');
+
+		if($row->{plan} ne '')
+		{
+			$planClauseB =qq { and ins.plan_name = '$row->{plan}'};
+		}
+		else
+		{
+			$planClauseB =qq { and ins.plan_name is null};
+		}
+
+		if($row->{product} ne '')
+		{
+			$productClauseB =qq { and ins.product_name = '$row->{product}'};
+		}
+		else
+		{
+			$productClauseB =qq { and ins.product_name = '$row->{product}'};
+		}
+
+		if($row->{provider} ne '')
+		{
+			$physicianClauseB =qq { and t.care_provider_id = '$row->{provider}'};
+		}
+		else
+		{
+			$physicianClauseB =qq { and t.care_provider_id is null};
+		}
+
+		if($row->{org_id} ne '')
+		{
+			$orgClauseB =qq { and t.service_facility_id = $row->{org_id}} ;
+		}
+		else
+		{
+			$orgClauseB =qq { and t.service_facility_id is null} ;
+		}
 
 		$org_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId',$row->{org_id});
 
