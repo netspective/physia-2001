@@ -87,18 +87,19 @@ sub populateInsured
 sub populatePhysician
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getPayToOrganization();
-	my $physicianAddress = $physician->getAddress();
+	my $physician = $claim->getPayToProvider();
+	my $billingFacility = $claim->getPayToOrganization();
+	my $billingFacilityAddress = $billingFacility->getAddress();
 	my $data = $self->{data};
 
-	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
-	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
-	$data->{physicianFederalTaxId} = $physician->getTaxId eq "" ? $physician->getTaxId : $physician->getTaxId;
-	$data->{physicianName} = $physician->getName;
-	$data->{physicianTaxTypeIdEin} = $physician->getTaxId ne "" ? "Checked" : "";
+	$data->{physicianAddress} = $billingFacilityAddress->getAddress1 . " " . $billingFacilityAddress->getAddress2;
+	$data->{physicianCityStateZipCode} = $billingFacilityAddress->getCity . " " . $billingFacilityAddress->getState . " " . $billingFacilityAddress->getZipCode;
+	$data->{physicianFederalTaxId} = $billingFacility->getTaxId eq "" ? $billingFacility->getTaxId : $billingFacility->getTaxId;
+	$data->{physicianName} = $billingFacility->getName;
+	$data->{physicianTaxTypeIdEin} = $billingFacility->getTaxId ne "" ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
-	$data->{physicianPin} = $physician->getWorkersComp;
-#	$data->{physicianGrp} = $physician->getGRP;
+	$data->{physicianPin} = $physician->getPIN;
+	$data->{physicianGrp} = $billingFacility->getGRP;
 }
 
 sub populateTreatment

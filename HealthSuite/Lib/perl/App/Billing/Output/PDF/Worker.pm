@@ -301,15 +301,15 @@ sub box33ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $physician = $claim->{payToOrganization};
-	my $add = $physician->getAddress();
+	my $physician = $claim->{payToProvider};
+	my $billingFacility = $claim->{payToOrganization};
+	my $add = $billingFacility->getAddress();
 
-	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p ,$billingFacility->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
 	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 5.2 * FORM_FONT_SIZE);
-#	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 6.3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $add->getCity() . "    " . $add->getState() . "    " . $add->getZipCode(), $box33X + CELL_PADDING_X + 10, $box33Y - 7.4 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $physician->getWorkersComp(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
-#	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
+	pdflib::PDF_show_xy($p ,$billingFacility->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
 	pdflib::PDF_stroke($p);
 
 }
