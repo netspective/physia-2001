@@ -238,7 +238,7 @@ $SEARCH_CLASSES = {
 };
 
 $WORKLIST_CLASSES = {
-	'_default' => 'App::Page::WorkList',
+	'_default' => 'App::Page::Worklist::PatientFlow',
 	'patientflow' => 'App::Page::Worklist::PatientFlow',
 	'collection' => 'App::Page::Worklist::Collection',
 };
