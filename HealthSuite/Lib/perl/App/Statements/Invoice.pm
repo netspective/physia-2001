@@ -94,9 +94,9 @@ $STMTRPTDEFN_DEFAULT_ORG =
 									},
 				},
 				{ head => 'Client', colIdx => 8},
-				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
-				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
-				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Charges', colIdx => 5, summarize => 'sum', dformat => 'currency'},
+				{ head => 'Adjust', colIdx => 6, summarize => 'sum', dformat => 'currency'},
+				{ head => 'Balance', colIdx => 7, summarize => 'sum', dformat => 'currency'},
 
 			],
 };
@@ -138,9 +138,9 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 										'3' => '#10#',
 									},
 				},
-				{ head => 'Charges', summarize => 'sum', dformat => 'currency'},
-				{ head => 'Adjust', summarize => 'sum', dformat => 'currency'},
-				{ head => 'Balance', summarize => 'sum', dformat => 'currency'},
+				{ head => 'Charges', colIdx => 5, summarize => 'sum', dformat => 'currency'},
+				{ head => 'Adjust', colIdx => 6, summarize => 'sum', dformat => 'currency'},
+				{ head => 'Balance', colIdx => 7, summarize => 'sum', dformat => 'currency'},
 
 			],
 };
