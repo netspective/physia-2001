@@ -14,7 +14,8 @@ use Date::Manip;
 use App::Statements::Worklist::WorklistCollection;
 use vars qw(@ISA %RESOURCE_MAP);
 my $ACCOUNT_RECK_DATE = App::Universal::TRANSTYPE_ACCOUNTRECKDATE;
-
+my $ACTIVE   = App::Universal::TRANSSTATUS_ACTIVE;
+my $INACTIVE = App::Universal::TRANSSTATUS_INACTIVE;
 @ISA = qw(CGI::Dialog);
 
 %RESOURCE_MAP = ('reck-date' => {transType => $ACCOUNT_RECK_DATE, heading => 'Account Reck Date',  _arl => ['person_id','trans_id'], _arl_modify => ['trans_id'] ,
@@ -71,7 +72,9 @@ sub execute
 	                        'Transaction', $command,                        
 	                        trans_owner_id => $page->param('person_id') || undef,
 	                        provider_id => $page->session('user_id') ||undef,
-	                        trans_owner_type => 0,                        
+	                        trans_owner_type => 0, 
+	                        trans_status =>$ACTIVE,
+	                        trans_subtype=>'Reck Date',
 	                        caption =>'Account Reck Date',
 	                        trans_type => $ACCOUNT_RECK_DATE,                        
 	                        trans_begin_stamp => $page->field('reckdate')||undef,	                                      

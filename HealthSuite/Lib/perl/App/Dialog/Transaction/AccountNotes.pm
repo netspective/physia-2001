@@ -19,9 +19,9 @@ my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 
 
 
-%RESOURCE_MAP=('account-notes' => { transType => 8500, heading => '$Command Account Notes'
+%RESOURCE_MAP=('account-notes' => { transType => 9500, heading => '$Command Account Notes'
 			,  _arl => ['person_id'], _arl_modify => ['trans_id'] ,
-                          _idSynonym => [ 'trans-' . '8500' ]},
+                          _idSynonym => [ 'trans-' . '9500' ]},
                           );
                           
                           

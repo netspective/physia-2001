@@ -38,12 +38,12 @@ sub new
 			new CGI::Dialog::Field(name => 'person_id', caption => 'Person ID', type => 'text', options => FLDFLAG_READONLY),
 			new CGI::Dialog::Field(type => 'select',
 							style => 'radio',
-							selOptions => 'Retain Notes;Delete Notes',
+							selOptions => 'Retain Notes:0;Delete Notes:1',
 							caption => 'notes: ',
 							preHtml => "<B><FONT COLOR=DARKRED>",
 							postHtml => "</FONT></B>",
 							name => 'notes',
-				defaultValue => 'Retain Notes'),
+				defaultValue => '0',),
 																	
 		);
 		$self->{activityLog} =
@@ -70,21 +70,16 @@ sub execute
 	my ($self, $page, $command,$flags) = @_;	
 	
 	$command = 'update';
-	my $new_owner = $page->field('transfer_id');
 	my $closed_by = $page->session('user_id');
-	my $del_notes  = $page->field('notes') eq 'Retain Notes' ? 0 : 1;	
-	my $transType = App::Universal::TRANSTYPE_ACCOUNTRECKDATE;		
-	$page->schemaAction(   'Transaction', $command,                        
-				trans_owner_id => $page->param('person_id') || undef,
-			                provider_id => $page->session('user_id') ||undef,
-			                trans_owner_type => 0, 
-			                 caption =>'Close Account',
-			                trans_subtype =>'Account Closed',
-			                trans_status_reason =>"Account Closed by $closed_by",
-			                trans_type => $ACCOUNT_OWNER,                        		                                                            
-			                trans_id=>$page->param('trans_id'),
-			                _debug => 0
-	       );		
+	my $del_notes  = $page->field('notes');# eq 'Retain Notes' ? 0 : 1;	
+	
+	#Close all collection records on the account even ifthey are owned by some else on org
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'closeCollectionById',"Account Closed by $closed_by",$page->param('person_id'),$page->session('user_id'));
+	
+	#Remove Reck Date for collection
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delReckDateById',$page->param('person_id'),$page->session('user_id'));
+	
+	#Delete Account notes ifthe user wants otherwise they will appear next time a collection notice is opened on this account owner
 	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delAccountNotesById',$page->session('user_id'),$page->param('person_id')) if $del_notes;
 	$self->handlePostExecute($page, $command, $flags );
 	return "\u$command completed.";

@@ -61,19 +61,23 @@ sub execute
 	my ($self, $page, $command,$flags) = @_;	
 	$command = 'update';
 	my $new_owner = $page->field('transfer_id');
-	
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranCollectionById', $page->param('person_id'),$page->session('user_id'),$new_owner);
 	$page->schemaAction(   'Transaction', $command,                        
 		                trans_owner_id => $page->param('person_id') || undef,
 		                provider_id => $page->session('user_id') ||undef,
-		                trans_owner_type => 0, 
-		                 caption =>'Transfer Account',
+		                trans_owner_type => 0, 		                
+		                caption =>'Transfer Account',
 		                trans_subtype =>'Account Transfered',
+		                trans_status =>2,
 		                trans_status_reason =>"Account Transfered to $new_owner",
-		                trans_type => $ACCOUNT_OWNER,                        		                                                            
-		                trans_id=>$page->param('trans_id'),
+		                trans_id =>$page->param('trans_id'),
 		                _debug => 0
-		                );				
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranAccountNotesById',$new_owner,$page->session('user_id'),$page->param('person_id'));
+		                );		
+	#Remove Reck Date for collection
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'delReckDateById',$page->param('person_id'),$page->session('user_id'));
+	
+	#Transfer notes to new collector	                
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranAccountNotesById',$new_owner,$page->session('user_id'),$page->param('person_id'));	
 	$self->handlePostExecute($page, $command, $flags);
 	return "\uTransfer completed.";
 }
