@@ -289,6 +289,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 			where	oc.catalog_type = 4
 			and	oc.org_internal_id = o.org_internal_id
 			and	o.org_id = ?
+			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
 	},
@@ -299,6 +300,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 			where	oc.catalog_type = 4
 			and	oc.org_internal_id = o.org_internal_id
 			and	o.org_id = ?
+			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Org ID'],
 	},
@@ -307,6 +309,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
 			from	Offering_Catalog oc
 			where	oc.internal_catalog_id = ?
+			order by internal_catalog_id
 		},
 		sqlStmtBindParamDescr => ['Catalog ID'],
 	},
@@ -315,6 +318,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 			select	entry_id, parent_entry_id, entry_type, code, name, cost_type, data_text, data_num, data_date
 			from	Offering_Catalog_Entry
 			where	catalog_id = ?
+			order by entry_id
 		},
 		sqlStmtBindParamDescr => ['Catalog ID'],
 	},
