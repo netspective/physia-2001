@@ -98,7 +98,7 @@ sub prepare_detail_payment
 	my $html =undef;	
 	$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
 
-	my $pub = {			
+	my $pub = {
 		columnDefn =>
 		[
 			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
@@ -185,11 +185,11 @@ sub execute
 	my $include_org =$page->field('include_org') ;
 	my $orgIntId;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
-	my $hardCopy = $page->field('printReport');
 	my @data=undef;	
 	my $html;
 	my $textOutputFilename;
 
+	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
 	my $printerAvailable = 1;
 	my $printerDevice;
@@ -199,6 +199,8 @@ sub execute
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 	my $pub ={ 
+		reportTitle => $self->heading(),
+		maxCols => 175,
 		columnDefn =>
 			[
 			{ colIdx =>13 , groupBy=>'#13#', head=>'Facility',hAlign=>'LEFT'},
@@ -214,7 +216,7 @@ sub execute
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },			
 			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },			
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
-			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',sAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'}
+			{ colIdx => 11,head =>'Collection %' ,tAlign=>'RIGHT',sAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'},
 		],
 	};		
 	$orgResult = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selChildernOrgs', 

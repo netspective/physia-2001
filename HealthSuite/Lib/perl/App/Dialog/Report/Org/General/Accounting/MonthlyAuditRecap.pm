@@ -16,6 +16,10 @@ use App::Statements::Component::Invoice;
 use App::Statements::Org;
 use App::Statements::Report::Accounting;
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
 use vars qw(@ISA $INSTANCE);
 
 @ISA = qw(App::Dialog::Report);
@@ -48,6 +52,22 @@ sub new
 							postHtml => "</FONT></B>",
 							name => 'include_org',options=>FLDFLAG_REQUIRED,
 				defaultValue => '0',),			
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -167,8 +187,20 @@ sub execute
 	my $include_org =$page->field('include_org') ;
 	my $html;
 	my $orgResult;
+	my $textOutputFilename;
+
+	my $hardCopy = $page->field('printReport');
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+	
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $pub =
 	{
+		reportTitle => $self->heading(),
 		columnDefn =>
 			[
 			{ colIdx =>13 , groupBy=>'#13#', head=>'Facility',hAlign=>'LEFT'},
@@ -222,7 +254,21 @@ sub execute
 		}
 	}	
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
-	return $html
+	$textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, \@data, $pub);
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	return ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 }
 
 

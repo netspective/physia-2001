@@ -114,6 +114,7 @@ sub execute
 
 	my $allPub =
 	{
+		reportTitle => $self->heading(),
 		columnDefn =>
 			[
 			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },			
@@ -142,6 +143,7 @@ sub execute
 
 	my $collPub =
 	{
+		reportTitle => 'Collection Information',
 		columnDefn =>
 			[
 			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },			
@@ -159,6 +161,7 @@ sub execute
 	};		
 	my $prodPub =
 		{
+			reportTitle => 'Production Information',
 			columnDefn =>
 				[	
 				{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },	

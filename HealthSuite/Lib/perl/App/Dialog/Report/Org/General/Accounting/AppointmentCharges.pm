@@ -93,6 +93,7 @@ sub execute
 #		[$reportBeginDate, $reportEndDate, $page->session('org_internal_id'), $page->session('GMT_DAYOFFSET')]);
 
 	my $pub = {
+		reportTitle => "Appointment Charges",
 		columnDefn => [
 			{ colIdx => 11, head => 'Patient ID', dataFmt => '#11#',},
 			{ colIdx => 0, head => 'Receptionist', dataFmt => '#0#' },
