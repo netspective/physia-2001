@@ -6,16 +6,42 @@ use strict;
 use CGI::Layout;
 use CGI::Component;
 use File::Spec;
+use File::Basename;
 use App::Configuration;
 use Data::Publish;
 use Exporter;
-use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT REPLACEUNDL);
-use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
+use Date::Manip;
+use enum qw(BITMASK:NAVGPATHFLAG_ STAYATROOT);
+use enum qw(BITMASK:NAVGFILEFLAG_ PERLOBJECT RAWTEXT HTML XML PASSTHROUGH TRANSLATEUNDL TRANSLATEDATES);
+use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %FILE_TYPE_MAP %RESOURCE_MAP);
 @ISA   = qw(Exporter CGI::Component);
-@EXPORT = qw(NAVGPATHFLAG_STAYATROOT NAVGPATHFLAG_REPLACEUNDL);
+@EXPORT = qw(NAVGPATHFLAG_STAYATROOT NAVGFILEFLAG_PERLOBJECT NAVGFILEFLAG_RAWTEXT NAVGFILEFLAG_HTML NAVGFILEFLAG_XML);
 
 %MODULE_FILE_MAP = ();
 %FILE_MODULE_MAP = ();
+
+use constant FILEEXTNINFO_FLAGS		=> 0;
+use constant FILEEXTNINFO_ICON		=> 1;
+use constant FILEEXTNINFO_ICONHIGHL	=> 2;
+use constant FILEFLAGS_DEFAULT	=> NAVGFILEFLAG_TRANSLATEUNDL | NAVGFILEFLAG_TRANSLATEDATES;
+
+use constant FILETYPEID_DEFAULT		=> 'DEFAULT';
+use constant FILETYPEID_DIROPEN		=> 'DIRECTORY_OPEN';
+use constant FILETYPEID_DIRCLOSED	=> 'DIRECTORY_CLOSED';
+
+use constant ICONGRAPHIC_SELARROW	=> '/resources/icons/arrow-double-cyan.gif';
+use constant ICONGRAPHIC_PAGE		=> '/resources/icons/report-yellow.gif';
+
+%FILE_TYPE_MAP = (
+	'.pm' => [NAVGFILEFLAG_PERLOBJECT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	'.log' => [NAVGFILEFLAG_RAWTEXT | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	'.txt' => [NAVGFILEFLAG_RAWTEXT | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	'.pdf' => [NAVGFILEFLAG_PASSTHROUGH | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+	
+	FILETYPEID_DIROPEN() => [NAVGFILEFLAG_TRANSLATEUNDL, '/resources/icons/folder-orange-open.gif', ICONGRAPHIC_SELARROW],
+	FILETYPEID_DIRCLOSED() => [NAVGFILEFLAG_TRANSLATEUNDL, '/resources/icons/folder-orange-closed.gif', ICONGRAPHIC_SELARROW],
+	FILETYPEID_DEFAULT() => [NAVGFILEFLAG_RAWTEXT | FILEFLAGS_DEFAULT, ICONGRAPHIC_PAGE, ICONGRAPHIC_SELARROW],
+);
 
 %RESOURCE_MAP = (
 	'navigate-reports' => {
@@ -32,7 +58,7 @@ use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgReports(), 'General'),
 			rootURL => '/report',
 			rootCaption => 'View Reports',
-			flags => NAVGPATHFLAG_STAYATROOT | NAVGPATHFLAG_REPLACEUNDL,
+			flags => NAVGPATHFLAG_STAYATROOT,
 			),
 		},
 	'navigate-directory-panel' => {
@@ -49,7 +75,7 @@ use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 			rootFS => File::Spec->catfile($CONFDATA_SERVER->path_OrgDirectory(), 'General'),
 			rootURL => '/directory',
 			rootCaption => 'Directory',
-			flags => NAVGPATHFLAG_STAYATROOT | NAVGPATHFLAG_REPLACEUNDL,
+			flags => NAVGPATHFLAG_STAYATROOT,
 			),
 		},
 	'navigate-directory-transparent' => {
@@ -62,8 +88,6 @@ use vars qw(@ISA @EXPORT %MODULE_FILE_MAP %FILE_MODULE_MAP %RESOURCE_MAP);
 			),
 		},
 	);
-
-
 
 #
 # the following methods are STATIC (no instance required)
@@ -112,14 +136,15 @@ sub getActivePathInfo
 		$activePath = \@activePath;
 	}
 
-	my ($fsPath, $urlPath) = ($rootFS, $rootURL);
+	my ($fsPath, $urlPath, $typeInfo) = ($rootFS, $rootURL, $FILE_TYPE_MAP{FILETYPEID_DIROPEN()});
+	my ($dirFlags, $openDirIcon) = ($typeInfo->[FILEEXTNINFO_FLAGS], $typeInfo->[FILEEXTNINFO_ICON]);
 	if($style eq 'tree')
 	{
 		my @items = ();
 		my $level = 0;
 		if(my $caption = $styleOptions->{rootCaption})
 		{
-			push(@items, qq{ <IMG SRC='/resources/icons/folder-orange-open.gif'> <A HREF='$urlPath'>$caption</A>});
+			push(@items, qq{ <IMG SRC='$openDirIcon'> <A HREF='$urlPath'>$caption</A>});
 			$level = 1;
 		}
 		foreach (@$activePath)
@@ -127,8 +152,8 @@ sub getActivePathInfo
 			$fsPath = File::Spec->catfile($fsPath, $_);
 			last unless -d $fsPath;
 			$urlPath .= '/' . $_;
-			s/_/ /g if $flags & NAVGPATHFLAG_REPLACEUNDL;
-			push(@items, qq{@{[ '&nbsp;&nbsp'x$level ]} <IMG SRC='/resources/icons/folder-orange-open.gif'> <A HREF='$urlPath'>$_</A>});
+			s/_/ /g if $dirFlags & NAVGFILEFLAG_TRANSLATEUNDL;
+			push(@items, qq{@{[ '&nbsp;&nbsp'x$level ]} <IMG SRC='$openDirIcon'> <A HREF='$urlPath'>$_</A>});
 			$level++;
 		}
 		return join('<BR>', @items);
@@ -150,7 +175,7 @@ sub getActivePathInfo
 sub getActivePathContents
 {
 	my ($flags, $rootFS, $rootURL, $activePath, $style, $highlight) = @_;
-
+	
 	my ($fsPath, $urlPath) = ($rootFS, $rootURL . '/');
 	unless($flags & NAVGPATHFLAG_STAYATROOT)
 	{
@@ -159,13 +184,63 @@ sub getActivePathContents
 	}
 
 	my @items = ();
+
+	my $addPathEntry = sub
+	{
+		my ($entryName, $isDirectory) = @_;
+		
+		my $fullNameAndPath = "$fsPath/$entryName";
+		my ($fileName, $filePath, $fileExtn) = fileparse($_, '\..*');
+		my $fileTypeInfo = $isDirectory ? $FILE_TYPE_MAP{FILETYPEID_DIRCLOSED()} : ($FILE_TYPE_MAP{$fileExtn} || $FILE_TYPE_MAP{FILEFLAGS_DEFAULT()});
+		my $fileTypeFlags = $fileTypeInfo->[FILEEXTNINFO_FLAGS];
+		
+		if($fileTypeFlags & NAVGFILEFLAG_PERLOBJECT)
+		{
+			require $fullNameAndPath;
+			open(MODFILE, $fullNameAndPath) || return;
+			while(<MODFILE>)
+			{
+				if (/^ *package +(\S+);/)
+				{
+					my $moduleName = $1;
+					$FILE_MODULE_MAP{$fullNameAndPath} = $moduleName;
+					$MODULE_FILE_MAP{$moduleName} = $fullNameAndPath;
+
+					no strict 'refs';
+					my $icon = $highlight eq $fileName ? $fileTypeInfo->[FILEEXTNINFO_ICONHIGHL] : $fileTypeInfo->[FILEEXTNINFO_ICON];
+					if(my $instance = ${"$moduleName\::INSTANCE"}) {
+						push(@items, ["$urlPath/$fileName", $instance->heading(), $icon]);
+					} else {
+						push(@items, ["$urlPath/$fileName", $fileName, $icon]);
+					}
+					last;
+				}
+			}
+			close(MODFILE);
+		}
+		else
+		{
+			my $icon = $highlight eq $entryName ? $fileTypeInfo->[FILEEXTNINFO_ICONHIGHL] : $fileTypeInfo->[FILEEXTNINFO_ICON];
+			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEDATES)
+			{
+				$fileName =~ s/^(\d\d\d\d)\-(\d\d)\-(\d\d)\_(\d\d)\-(\d\d)/UnixDate("$3\/$2\/$1 $4:$5", '%F (%T)')/e;
+			}
+			if($fileTypeFlags & NAVGFILEFLAG_TRANSLATEUNDL)
+			{
+				$fileName =~ s/_/ /g;
+			}
+			push(@items, [	$isDirectory ? "$urlPath$entryName" : ($fileTypeFlags & NAVGFILEFLAG_PASSTHROUGH ? "$urlPath$entryName" : "$urlPath?enter=$fullNameAndPath&ecaption=$fileName&eflags=$fileTypeFlags"), 
+							$fileName, $icon]);
+		}
+	};
+
 	if(opendir(ACTIVEPATH, $fsPath))
 	{
 		my @dirs = ();
 		my @files = ();
 		grep
 		{
-			unless(m/^\./) # skip hidden files or subdirectories
+			unless(m/^\./) # skip hidden files and subdirectories
 			{
 				if(-d "$fsPath/$_")	{
 					push(@dirs, $_);
@@ -176,50 +251,14 @@ sub getActivePathContents
 		} readdir(ACTIVEPATH);
 		closedir(ACTIVEPATH);
 
-		if($flags & NAVGPATHFLAG_REPLACEUNDL)
+		foreach (sort @dirs)
 		{
-			foreach (sort @dirs)
-			{
-				my $display = $_;
-				$display =~ s/_/ /g;
-				push(@items, ["$urlPath$_", $display, '/resources/icons/folder-orange-closed.gif']);
-			}
+			&$addPathEntry($_, 1) unless $_ eq 'CVS';
 		}
-		else
-		{
-			foreach (sort @dirs)
-			{
-				push(@items, ["$urlPath$_", $_, '/resources/icons/folder-orange-closed.gif']);
-			}
-		}
+		
 		foreach (sort @files)
 		{
-			my $moduleFile = "$fsPath/$_";
-			my $fileName = $_;
-			require $moduleFile;
-			open(MODFILE, $moduleFile) || return;
-			while(<MODFILE>)
-			{
-				if (/^ *package +(\S+);/)
-				{
-					my $moduleName = $1;
-					$FILE_MODULE_MAP{$moduleFile} = $moduleName;
-					$MODULE_FILE_MAP{$moduleName} = $moduleFile;
-
-					# get rid of extension
-					$fileName =~ s/\..*$//;
-					my $icon = $highlight eq $fileName ? '/resources/icons/arrow-double-cyan.gif' : '/resources/icons/report-yellow.gif';
-
-					no strict 'refs';
-					if(my $instance = ${"$moduleName\::INSTANCE"}) {
-						push(@items, ["$urlPath/$fileName", $instance->heading(), $icon]);
-					} else {
-						push(@items, ["$urlPath/$fileName", $fileName, $icon]);
-					}
-					last;
-				}
-			}
-			close(MODFILE);
+			&$addPathEntry($_, 0);
 		}
 	}
 	else
@@ -250,7 +289,6 @@ sub getActivePathContents
 sub init
 {
 	my $self = shift;
-	$self->{flags} = NAVGPATHFLAG_REPLACEUNDL unless $self->{flags};
 	$self->{publishDefn} =
 	{
 		flags => PUBLFLAG_HIDEHEAD,
