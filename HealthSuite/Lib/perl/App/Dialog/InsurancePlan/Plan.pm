@@ -102,7 +102,6 @@ sub new
 					new CGI::Dialog::Field(caption => 'End Date',
 						name => 'coverage_end_date',
 						type => 'date',
-						futureOnly => 1,
 						defaultValue => ''
 					),
 				]
