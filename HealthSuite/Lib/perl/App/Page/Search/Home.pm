@@ -35,9 +35,9 @@ sub prepare
 						<a href="/search/person">All Persons</a>,
 						<a href="/search/patient">Patients</a>,
 						<a href="/search/physician">Physician/Providers</a>,
-						<a href="/search/nurse">Nurses</a>, or
-						<a href="/search/staff">Staff Members</a>.
-						<a href="/search/associate">Personnel</a>.
+						<a href="/search/nurse">Nurses</a>,
+						<a href="/search/staff">Staff Members</a>, or
+						<a href="/search/associate">Personnel</a>
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
@@ -65,7 +65,7 @@ sub prepare
 						<a href="/search/org">Associated Providers</a>,
 						<a href="/search/org">Employers</a>,
 						<a href="/search/org">Insurers</a>, or
-						<a href="/search/org">IPAs</a>.
+						<a href="/search/org">IPAs</a>
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
@@ -77,7 +77,7 @@ sub prepare
 						<a href="/org/#session.org_id#/dlg-add-org-dept">Department</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-provider">Associated Provider</a>,
 						<a href="/org/#session.org_id#/dlg-add-org-employer">Employer</a>,
-						<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>,
+						<a href="/org/#session.org_id#/dlg-add-org-insurance">Insurance</a>, or
 						<a href="/org/#session.org_id#/dlg-add-org-ipa">IPA</a>
 						record.
 					</TD>
@@ -100,7 +100,7 @@ sub prepare
 						<a href="/search/serviceplace">Service Place</a>,
 						<a href="/search/servicetype">Service Type</a>,
 						<a href="/search/gpci">GPCI</a>, or
-						<a href="/search/epayer">E-Remit Payer</a>.
+						<a href="/search/epayer">E-Remit Payer</a>
 					</TD>
 				</TR>
 			</TABLE>
@@ -117,8 +117,8 @@ sub prepare
 						<b>Lookup</b>
 						<a href="/search/claim">Claims</a>,
 						<a href="/search/catalog">Fee Schedules</a>,
-						<a href="/search/insproduct">Insurance Product</a>,
-						<a href="/search/insplan">Insurance Plan</a>.
+						<a href="/search/insproduct">Insurance Product</a>, or
+						<a href="/search/insplan">Insurance Plan</a>
 					</TD>
 				</TR>
 				<TR VALIGN=TOP BGCOLOR=WHITE>
@@ -127,11 +127,12 @@ sub prepare
 						<FONT FACE="Arial,Helvetica" SIZE=2>
 						<b>Add</b> a new
 						<a href="/org/#session.org_id#/dlg-add-claim">Claim</a>,
+						<a href="/org/#session.org_id#/dlg-add-batch">Batch Payment</a>,
 						<a href="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</a>,
 						<a href="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</a>,
 						<a href="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</a>,
-						<a href="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</a>.
-						<a href="/org/#session.org_id#/dlg-add-ins-coverage">Personal Insurance Coverage</a>.
+						<a href="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</a>, or
+						<a href="/org/#session.org_id#/dlg-add-ins-coverage">Personal Insurance Coverage</a>
 					</TD>
 				</TR>
 			</TABLE>
