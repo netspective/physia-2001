@@ -392,6 +392,13 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and iia.adjustment_type = adm.id (+)
 		and iia.pay_type = pat.id (+)
 		},
+	'selItemAdjustmentsByInvoiceId' => q{
+		select *
+		from invoice_item_adjust iia, invoice_item ii, invoice i
+		where i.invoice_id = ?
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+		},
 	'selItemAdjustmentsByItemParent' => q{
 		select *
 		from invoice_item_adjust
