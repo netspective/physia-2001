@@ -2012,7 +2012,7 @@ sub box9ClaimData
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-#		if ($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName)
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
@@ -2035,12 +2035,19 @@ sub box9aClaimData
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-#		if ($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName)
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-			pdflib::PDF_show_xy($p , $insured2->getPolicyGroupOrFECANo(), $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
+			if(uc($insured1->getInsurancePlanOrProgramName) eq "MEDICARE")
+			{
+				pdflib::PDF_show_xy($p , "MEDIGAP " . ($insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName), $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
+			}
+			else
+			{
+				pdflib::PDF_show_xy($p , $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName, $box9aX + CELL_PADDING_X + DATA_PADDING_X, $box9aY - 3 * FORM_FONT_SIZE - 1);
+			}
 			pdflib::PDF_stroke($p);
 		}
 	}
@@ -2058,7 +2065,7 @@ sub box9bClaimData
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-#		if ($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName)
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
@@ -2100,7 +2107,7 @@ sub box9cClaimData
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-#		if ($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName)
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
@@ -2123,12 +2130,19 @@ sub box9dClaimData
 
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
-#		if ($insured1->getInsurancePlanOrProgramName eq $insured2->getInsurancePlanOrProgramName)
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
 			my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 			die "Couldn't set font"  if ($font == -1);
 			pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-			pdflib::PDF_show_xy($p , $insured2->getInsurancePlanOrProgramName, $box9dX + CELL_PADDING_X + DATA_PADDING_X, $box9dY - 3 * FORM_FONT_SIZE);
+			if(uc($insured1->getInsurancePlanOrProgramName) eq "MEDICARE")
+			{
+				pdflib::PDF_show_xy($p , $insured1->getMedigapNo, $box9dX + CELL_PADDING_X + DATA_PADDING_X, $box9dY - 3 * FORM_FONT_SIZE);
+			}
+			else
+			{
+				pdflib::PDF_show_xy($p , $insured2->getInsurancePlanOrProgramName, $box9dX + CELL_PADDING_X + DATA_PADDING_X, $box9dY - 3 * FORM_FONT_SIZE);
+			}
 			pdflib::PDF_stroke($p);
 		}
 	}
@@ -2144,7 +2158,7 @@ sub box11ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo || $claim->{insured}->[0]->getPolicyGroupName, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_stroke($p);
 
 }
@@ -2386,7 +2400,7 @@ sub box18ClaimData
 		pdflib::PDF_show_xy($p , $date->[1], $box18X + 55, $box18Y - 3.4 * FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $date->[2], $box18X + 77, $box18Y - 3.4 * FORM_FONT_SIZE);
 	}
-	$date  = $self->returnDate($claim->{treatment}->getDatePatientUnableToWorkTo());
+	$date  = $self->returnDate($claim->{treatment}->getHospitilizationDateTo());
 	if 	($date->[0] ne "")
 	{
 		pdflib::PDF_show_xy($p , $date->[0], $box18X + 134, $box18Y - 3.5 * FORM_FONT_SIZE);
@@ -2737,11 +2751,11 @@ sub box31ClaimData
 	my $box31Y = $box31Cordinates->[1];
 	my $box31X = $box31Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME , "default", 0);
 	die "Couldn't set font"  if ($font == -1);
-	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->getTransProviderName(), $box31X + CELL_PADDING_X + 30, START_Y + 6);
-	pdflib::PDF_show_xy($p , $claim->getInvoiceDate(), $box31X + CELL_PADDING_X + 120, START_Y + 6);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $claim->getTransProviderName(), $box31X + CELL_PADDING_X + 0, START_Y + 12);
+	pdflib::PDF_show_xy($p , $claim->getInvoiceDate(), $box31X + CELL_PADDING_X + 100, START_Y + 12);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2799,7 +2813,7 @@ sub carrierData
 	if ($payer ne "")
 	{
 		my $address = $payer->getAddress();
-#		pdflib::PDF_show_xy($p , $payer->getName, START_X + 250, START_Y + FORM_HEIGHT + 51);
+		pdflib::PDF_show_xy($p , $payer->getName, START_X + 250, START_Y + FORM_HEIGHT + 51);
 		pdflib::PDF_show_xy($p , $address->getAddress1, START_X + 250, START_Y + FORM_HEIGHT + 51 - FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $address->getCity . " " . $address->getState . " " . $address->getZipCode , START_X + 250, START_Y + FORM_HEIGHT + 51 - 2 * FORM_FONT_SIZE);
 		pdflib::PDF_stroke($p);

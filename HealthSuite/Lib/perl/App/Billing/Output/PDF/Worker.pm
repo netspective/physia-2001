@@ -101,6 +101,7 @@ sub populate
 	$self->box12ClaimData($p, $Claim, $cordinates);
 	$self->box13ClaimData($p, $Claim, $cordinates);
 
+	$self->box14ClaimData($p, $Claim, $cordinates);
 	$self->box15ClaimData($p, $Claim, $cordinates);
 #	$self->box22ClaimData($p, $Claim, $cordinates);
 	my $dg = $self->box24ClaimData($p, $Claim, $cordinates, $procesedProc);
@@ -290,6 +291,29 @@ sub box29ClaimData
 
 }
 
+sub box33ClaimData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box33Cordinates = $cordinates->{box33};
+	my $box33Y = $box33Cordinates->[1];
+	my $box33X = $box33Cordinates->[0];
+
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	my $physician = $claim->{payToOrganization};
+	my $add = $physician->getAddress();
+
+	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 5.2 * FORM_FONT_SIZE);
+#	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 6.3 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $add->getCity() . "    " . $add->getState() . "    " . $add->getZipCode(), $box33X + CELL_PADDING_X + 10, $box33Y - 7.4 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $physician->getWorkersComp(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
+#	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+	pdflib::PDF_stroke($p);
+
+}
+
 sub carrierData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
@@ -300,7 +324,7 @@ sub carrierData
 
 	if ($address ne "")
 	{
-#		pdflib::PDF_show_xy($p , $payer->getName, START_X + 250, START_Y + FORM_HEIGHT + 51);
+		pdflib::PDF_show_xy($p , $claim->{payer}->getName, START_X + 250, START_Y + FORM_HEIGHT + 51);
 		pdflib::PDF_show_xy($p , $address->getAddress1, START_X + 250, START_Y + FORM_HEIGHT + 51 - FORM_FONT_SIZE);
 		pdflib::PDF_show_xy($p , $address->getCity . " " . $address->getState . " " . $address->getZipCode , START_X + 250, START_Y + FORM_HEIGHT + 51 - 2 * FORM_FONT_SIZE);
 		pdflib::PDF_stroke($p);

@@ -267,8 +267,8 @@ sub populateInsured
 	$insured = $claim->{insured}->[0];
 	$data->{insuredEmployerOrSchoolName} = $insured->getEmployerOrSchoolName;
 	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;
-	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupName;
-	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
+	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo; # || $insured->getPolicyGroupName;
+
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
 }
 
@@ -283,17 +283,31 @@ sub populateOtherInsured
 	if (($insured1 ne "") && ($insured2 ne ""))
 	{
 
-		if (($insured2->getInsurancePlanOrProgramName ne ""))
+		if ($insured2->getInsurancePlanOrProgramName ne "")
 		{
-			$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
-			$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
-			$data->{otherInsuredDateOfBirth} = $insured2->getDateOfBirth(DATEFORMAT_USA);
-			$data->{otherInsuredSexM} = $insured2->getSex() eq 'M' ? "Checked" : "";
-			$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
-			$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
-			$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getInsurancePlanOrProgramName;
-			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupName;
-			$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo;
+			if(uc($insured1->getInsurancePlanOrProgramName) eq "MEDICARE")
+			{
+				$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
+				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
+				$data->{otherInsuredDateOfBirth} = $insured2->getDateOfBirth(DATEFORMAT_USA);
+				$data->{otherInsuredSexM} = $insured2->getSex() eq 'M' ? "Checked" : "";
+				$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
+				$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
+				$data->{otherInsuredInsurancePlanOrProgramName} = $insured1->getMedigapNo; # $insured2->getInsurancePlanOrProgramName;
+				my $groupNumber = $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName;
+				$data->{otherInsuredPolicyGroupName} =  "MEDIGAP " . $groupNumber;
+			}
+			else
+			{
+				$data->{otherInsuredName} = $insured2->getLastName() . " " . $insured2->getFirstName() . " " . $insured2->getMiddleInitial();
+				$data->{insuredAnotherHealthBenefitPlanY} =  "Checked" ;
+				$data->{otherInsuredDateOfBirth} = $insured2->getDateOfBirth(DATEFORMAT_USA);
+				$data->{otherInsuredSexM} = $insured2->getSex() eq 'M' ? "Checked" : "";
+				$data->{otherInsuredSexF} = $insured2->getSex() eq 'F' ? "Checked" : "";
+				$data->{otherInsuredEmployerOrSchoolName} = $insured2->getEmployerOrSchoolName;
+				$data->{otherInsuredInsurancePlanOrProgramName} = $insured2->getInsurancePlanOrProgramName;
+				$data->{otherInsuredPolicyGroupName} = $insured2->getPolicyGroupOrFECANo || $insured2->getPolicyGroupName;
+			}
 		}
 		elsif (($insured1->getInsurancePlanOrProgramName ne "" ) && ($insured2->getInsurancePlanOrProgramName ne ""))
 			{
@@ -349,7 +363,11 @@ sub populateTreatment
 	$data->{treatmentHospitilizationDateTo} = $treatment->getHospitilizationDateTo(DATEFORMAT_USA);
 	$data->{treatmentIdOfReferingPhysician} = $treatment->getIDOfReferingPhysician;
 	$data->{treatmentMedicaidResubmission} = $treatment->getMedicaidResubmission;
-	$data->{nameOfReferingPhysicianOrOther} = $treatment->getNameOfReferingPhysicianOrOther;
+#	$data->{nameOfReferingPhysicianOrOther} = $treatment->getNameOfReferingPhysicianOrOther;
+	if ($treatment->getRefProviderLastName ne "")
+	{
+		$data->{nameOfReferingPhysicianOrOther} = $treatment->getRefProviderLastName . ", " . $treatment->getRefProviderFirstName  . " " . $treatment->getRefProviderMiName;
+	}
 	$data->{treatmentOutsideLabY} = uc($treatment->getOutsideLab) eq 'Y' ? "Checked" : "";
 	$data->{treatmentOutsideLabN} = uc($treatment->getOutsideLab) eq 'N' ? "Checked" : "";
 	$data->{treatmentOutsideLabCharges} = $treatment->getOutsideLabCharges;
@@ -418,7 +436,7 @@ sub populatePayer
 	my $payerAddress = $payer->getAddress();
 	my $data = $self->{data};
 
-#    $data->{payerName} = $payer->getName();
+    $data->{payerName} = $payer->getName();
     $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
 }
 sub populateProcedures

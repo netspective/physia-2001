@@ -73,8 +73,9 @@ sub populateInsured
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
 	$data->{insuredAnotherHealthBenefitPlanN} =  "Checked" ;
 	my $payer = $claim->{payer};
+	$data->{payerName} = $payer->getName();
 	my $payerAddress = $payer->getAddress();
-    $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
+  $data->{payerAddress} = $payerAddress->getAddress1() . " <br> " . $payerAddress->getCity() . " " . $payerAddress->getState(). " " . $payerAddress->getZipCode();
 #	my $address = $claim->getCareReceiver()->getEmployerAddress();
 
 #	if ($address ne "")
@@ -96,7 +97,7 @@ sub populatePhysician
 	$data->{physicianName} = $physician->getName;
 	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne "" ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
-#	$data->{physicianPin} = $physician->getPIN;
+	$data->{physicianPin} = $physician->getWorkersComp;
 #	$data->{physicianGrp} = $physician->getGRP;
 }
 
