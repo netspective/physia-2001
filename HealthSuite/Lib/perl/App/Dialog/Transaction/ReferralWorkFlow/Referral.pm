@@ -33,7 +33,7 @@ sub initialize
 	my $self = shift;
 	$self->SUPER::initialize();
 	my @request=();
-	
+
 	my $maxrows=MAXROWS;
 	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
@@ -41,27 +41,27 @@ sub initialize
 		push(@request,new CGI::Dialog::Field::Duration(caption=>'Date From/To',name=>"date_proc$loop"));
 		push(@request,new CGI::Dialog::MultiField(caption=>'Code/Modf',name=>"code_mod_desc$loop",
 					fields=>[
-						new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9,name=>"code$loop",findPopup => '/lookup/cpt',
+						new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9,name=>"code$loop",findPopup => '/lookup/cpt', secondaryFindField => "_f_description$loop"
 							#onChangeJS=>"setRequestStyle($next,'block');"
 							),
-						new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf$loop"),																			
+						new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf$loop"),
 						],
 						));
-		push(@request,new CGI::Dialog::Field(caption=>'Description', type=>'memo',name=>"description$loop",rows=>2,cols=>45));							
+		push(@request,new CGI::Dialog::Field(caption=>'Description', type=>'memo',name=>"description$loop",rows=>2,cols=>45));
 		push(@request,new CGI::Dialog::MultiField(caption=>'Units/Charge',name=>"unit_charge$loop",
 					fields=>[
 						new CGI::Dialog::Field(caption=>'Units',type=>'integer',size=>5,name=>"unit$loop"),
-						new CGI::Dialog::Field(caption=>'Charge',type=>'currency',size=>9,name=>"charge$loop"),	
+						new CGI::Dialog::Field(caption=>'Charge',type=>'currency',size=>9,name=>"charge$loop"),
 						]
 						));
 		push(@request,new CGI::Dialog::Field(name=>"comment$loop", caption=>'Comments',type=>'text',size=>55,
 				postHtml=>qq{<A HREF = javascript:setRequestStyle($next,'block');>$IMAGETAGS{'icons/arrow-down-blue'}</A>
 						<BR> </BR>}
 				)
-				
-				);			
+
+				);
 		push(@request,new CGI::Dialog::Field(name=>"procedure_id$loop", type=>'hidden'));
-	}	
+	}
 
 
 
@@ -85,14 +85,12 @@ sub initialize
 		new CGI::Dialog::Subhead(heading => 'Problem Information', name => 'problem_heading'),
 
 
-		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code1',findPopup => '/lookup/icd', options => FLDFLAG_TRIM, size => 6),
+		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code1',
+					findPopup => '/lookup/icd', options => FLDFLAG_TRIM, size => 6, secondaryFindField => '_f_icd_desc' ),
 		new CGI::Dialog::Field(
 						caption => 'ICD Description',
 						name => 'icd_desc',
-						findPopup => '/lookup/icd',
-						type => 'memo',
-						rows=>2,
-						findPopupControlField => '_f_icd_code1'
+						type => 'memo'
 					),
 		new CGI::Dialog::Field(caption => 'Date Of Injury', name => 'trans_begin_stamp', type => 'date', pastOnly => 0, defaultValue => ''),
 		new CGI::Dialog::Field(name => 'comments', caption => 'Comments', type => 'memo',rows=>2),
@@ -107,8 +105,8 @@ sub initialize
 			]),
 		new CGI::Dialog::Subhead(heading => 'Procedure Information', name => 'procedure_heading'),
 
-		@request,				
-			
+		@request,
+
 
 		new CGI::Dialog::Subhead(heading => 'Referral Information', name => 'referral_heading'),
 		new CGI::Dialog::MultiField(caption =>'Referring Doctor Name',name => 'mdname',
@@ -158,6 +156,16 @@ sub initialize
 
 	);
 
+	$self->addPostHtml(qq{
+			<script language="JavaScript1.2">
+				function clickMenuRef(url)
+				{
+					var urlNext = url;
+					window.location.href= '/' + urlNext;
+				}
+			</script>
+	});
+
 }
  sub makeStateChanges
  {
@@ -167,7 +175,7 @@ sub initialize
        	$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
       	my $personSessionId = $page->session('person_id');
   	$page->field('intake_coordinator',$personSessionId);
-  	
+
   	my $maxrows=MAXROWS;
   	my $ServiceData=undef;
   	if ($command eq 'add' and  $page->field('person_id'))
@@ -175,7 +183,7 @@ sub initialize
   		$ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $page->field('person_id'))
   	}
  	#Populate the Procedure Information
- 	my $count=0; 	
+ 	my $count=0;
  	if($page->param('trans_id')||$ServiceData)
  	{
  		my $transId =  $page->param('trans_id');# || $ServiceData->{'trans_id'};
@@ -197,13 +205,13 @@ sub initialize
 		{
 			setIdDisplay("code_mod_desc"+line,styleValue);
 			setIdDisplay("date_proc"+line,styleValue);
-			setIdDisplay("unit_charge"+line,styleValue);		
-			setIdDisplay("comment"+line,styleValue);	
+			setIdDisplay("unit_charge"+line,styleValue);
+			setIdDisplay("comment"+line,styleValue);
 			setIdDisplay("description"+line,styleValue);
 		}
 		</script>
 	});
-       
+
 
  }
 
@@ -217,13 +225,34 @@ sub initialize
  	my ($self, $page, $command, $dlgHtml) = @_;
 	my $consult = $page->field('person_id');
       	my $ServiceData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceRequestData', $consult);
+	$page->addContent(qq{
+
+		<TABLE>
+
+			<TR VALIGN=TOP>
+				<TD COLSPAN=2>
+
+					<input type="button" value="Menu" onClick="javascript:clickMenuRef('menu');">
+					<input type='button' value='Followup Worklist' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
+					<input type='button' value='Lookup Patient' onClick="javascript:clickMenuRef('search/patient');">
+					<input type='button' value='Add Patient' onClick="javascript:clickMenuRef('org/#session.org_id#/dlg-add-patient');">
+					<input type='button' value='Edit Patient' onClick="javascript:clickMenuRef('search/patient');">
+					<input type='button' value='Edit Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
+					<input type='button' value='Add Service Request' onClick="javascript:clickMenuRef('worklist/referral');">
+					<input type='button' value='Add Referral' onClick="javascript:clickMenuRef('worklist/referral');">
+					<input type='button' value='Edit Referral' onClick="javascript:clickMenuRef('worklist/referral?user=physician');">
+
+				</TD>
+			</TR>
+		</TABLE>
+	});
 
 	if (($ServiceData eq '' && $command eq 'add') || $command ne 'add' )
 	{
  		$page->addContent(qq{
  			<TABLE ALIGN="Center">
  				<TR>
- 					<TD>$dlgHtml</TD>				
+ 					<TD>$dlgHtml</TD>
  				</TR>
  			</TABLE>
  		});
@@ -240,7 +269,7 @@ sub initialize
  				</TR>
  			<TR><TD COLSPAN=1>&nbsp;</TD></TR>
  				<TR>
- 					<TD>$dlgHtml</TD>					
+ 					<TD>$dlgHtml</TD>
  				</TR>
  			</TABLE>
  		});
@@ -270,12 +299,12 @@ sub initialize
 	{
 
 		my $code = $page->field("code$loop");
-		next unless ($code);		
+		next unless ($code);
 		my $data = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode',$code,$page->session('org_internal_id') );
 		my $field = $self->getField("code_mod_desc$loop")->{fields}->[0];
 		$field->invalidate($page, "Invoice Procedure Code '$code' ") if ($data->{description} eq '' or ! defined $data->{description});
-		
-	}	 	
+
+	}
  }
 
 
@@ -338,22 +367,22 @@ sub initialize
 		$page->field('addr_zip', $orgContactAddress->{'zip'});
 		#Populate the Procedure Information
 		my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$parentTransId);
-	
+
 		my $count=0;
 		foreach (@$serviceProcedures)
 		{
 			$page->field("code$count",$_->{code});
-			$page->field("modf$count",$_->{modifier});		
-			$page->field("description$count",$_->{caption});				
-			$page->field("comment$count",$_->{detail});						
-			$page->field("charge$count",$_->{unit_cost});								
-			$page->field("unit$count",$_->{quantity});	
+			$page->field("modf$count",$_->{modifier});
+			$page->field("description$count",$_->{caption});
+			$page->field("comment$count",$_->{detail});
+			$page->field("charge$count",$_->{unit_cost});
+			$page->field("unit$count",$_->{quantity});
 			#$page->field("procedure_id$count",$_->{trans_id});
 			$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
 			$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
-	
+
 			$count++;
-		}		
+		}
 	}
 }
 
@@ -415,26 +444,26 @@ sub populateData_update
 	$page->field('addr_city', $orgContactAddress->{'city'});
 	$page->field('addr_state', $orgContactAddress->{'state'});
 	$page->field('addr_zip', $orgContactAddress->{'zip'});
-	
+
 	#Populate the Procedure Information
 	my $serviceProcedures =  $STMTMGR_TRANSACTION->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selServiceProcedureData',$page->param('trans_id'));
-	
+
 	my $count=0;
 	foreach (@$serviceProcedures)
 	{
 		$page->field("code$count",$_->{code});
-		$page->field("modf$count",$_->{modifier});		
-		$page->field("description$count",$_->{caption});				
-		$page->field("comment$count",$_->{detail});						
-		$page->field("charge$count",$_->{unit_cost});								
-		$page->field("unit$count",$_->{quantity});	
+		$page->field("modf$count",$_->{modifier});
+		$page->field("description$count",$_->{caption});
+		$page->field("comment$count",$_->{detail});
+		$page->field("charge$count",$_->{unit_cost});
+		$page->field("unit$count",$_->{quantity});
 		$page->field("procedure_id$count",$_->{trans_id});
 		$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
 		$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
 
 		$count++;
 	}
-	
+
 }
 
 sub populateData_remove
@@ -478,7 +507,7 @@ sub execute
 				display_summary => $page->field('comments') || undef,
 				trans_substatus_reason => $page->field('request_service') || undef,
 				trans_status_reason => $page->field('payer') || undef,
-				trans_status => $transStatus, 
+				trans_status => $transStatus,
 				provider_id => $page->field('provider_id') || undef,
 				care_provider_id => $page->field('referral_id') || undef,
 				trans_expire_reason => $page->field('referral_type') || undef,
@@ -565,11 +594,11 @@ sub execute
 	for (my $loop=0;$loop<MAXROWS;$loop++)
 	{
 		my $code = $page->field("code$loop");
-		my $modf = $page->field("modf$loop");		
-		my $desc = $page->field("description$loop");				
-		my $comment = $page->field("comment$loop");						
-		my $charge = $page->field("charge$loop");								
-		my $units = $page->field("unit$loop");		
+		my $modf = $page->field("modf$loop");
+		my $desc = $page->field("description$loop");
+		my $comment = $page->field("comment$loop");
+		my $charge = $page->field("charge$loop");
+		my $units = $page->field("unit$loop");
 		my $startDate = $page->field('date_proc'.$loop.'_begin_date');
 		my $endDate = $page->field('date_proc'.$loop.'_end_date');
 		my $transRequestId =$page->field("procedure_id$loop");
@@ -583,31 +612,31 @@ sub execute
 		#Create Service Request
 		my $transService = $page->schemaAction(
 			'Transaction',$transRequestId ? 'update' : 'add',
-			parent_trans_id =>   $parentTransId,			
+			parent_trans_id =>   $parentTransId,
 			trans_owner_type => $transOwnerType,
 			trans_owner_id =>  $orgInternalId,
 			trans_status =>$transType,
 			trans_id => $transRequestId ,
 			trans_type => $transProcedure ,
-			trans_status => $transStatus,			
-			code=>$code,		
+			trans_status => $transStatus,
+			code=>$code,
 			modifier => $modf,
 			detail=>$comment,
 			unit_cost => $charge,
-			quantity => $units,			
+			quantity => $units,
 			caption=>$desc,
 			data_date_a =>$startDate,
 			data_date_b =>$endDate,
-		);		
-		
+		);
+
 		my $transRef=undef;
-		
+
 		#If service request is already created then get linked referral
 		if($transRequestId)
 		{
-			$transRef =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selReferralProcedureData',$transRequestId);			
+			$transRef =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selReferralProcedureData',$transRequestId);
 		}
-		
+
 		#Populate the Procedure Information
 		#Create Referral for each service request line Copy information from request to referral
 		my $transTypeRef = App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION;
@@ -617,7 +646,7 @@ sub execute
 			parent_trans_id => $transRequestId ||$transService  ,
 			trans_owner_type => $transOwnerType,
 			trans_owner_id =>$orgInternalId,
-			trans_status => $transStatus,	
+			trans_status => $transStatus,
 			trans_id =>$transRef->{trans_id},
 			trans_type => $transTypeRef,
 			care_provider_id =>$page->session('user_id'),
@@ -630,7 +659,7 @@ sub execute
 		);
 		$page->param('refer_id',$transRef->{trans_id} || $referId) unless $first;
 		$first++;
-	}	
+	}
 
 	if ($command eq 'update')
 	{
