@@ -98,6 +98,14 @@
 		<column name="category" type="text" size="32" primarykey="yes" descr="The category to which person belongs"/>
 	</table>
 
+	<table name="Person_Org_Role" abbrev="PerORole" type="Audit,Secure">
+		<description>The role assigned to a person in a particular organization</description>
+		<column name="person_id" parentref="Person.person_id" primarykey="yes" descr="Unique ID for person"/>
+		<column name="org_id" parentref="Org.org_id" primarykey="yes" descr="Unique ID for company or organization"/>
+		<column name="org_role" type="text" size="64" primarykey="yes" descr="The assigned role"/>
+		<column name="role_status" lookupref="Org_Role_Status" descr="The assigned role's current status in given organization"/>
+	</table>
+
 	<table name="Insurance" abbrev="InsRec" type="Audit,Secure,Restrict_Rows">
 		<description>An insurance record that belongs to a person or organization</description>
 		<column name="ins_internal_id" type="autoinc" primarykey="yes" descr="Unique insurance record identification (in entire system) for internal use"/>

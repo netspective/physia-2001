@@ -11,6 +11,12 @@
 		<enum>Inactive (System Forced Logout)</enum>
 		<enum>Inactive (Timeout)</enum>
 	</table>
+	
+	<table name="Org_Role_Status" abbrev="RoleStat" type="Enumeration">
+		<enum>Active</enum>
+		<enum>Suspended</enum>
+		<enum>Inactive</enum>
+	</table>
 
 	<table name="Session_Activity_Type" abbrev="SesActv" type="Enumeration">
 		<enum>Record</enum>
