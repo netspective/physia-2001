@@ -224,6 +224,7 @@ sub new
 		where Org.owner_org_id = ?
 			and Org_Category.parent_id = Org.org_internal_id 
 			and ltrim(rtrim(upper(Org_Category.member_name))) in ($params{types})
+		order by name_primary
 	};
 	
 	return new CGI::Dialog::Field(
