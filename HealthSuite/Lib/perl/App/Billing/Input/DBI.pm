@@ -33,8 +33,6 @@ use App::Billing::Validate::HCFA::FECA;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Input::Driver);
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
 use constant INVOICESTATUS_SUBMITTED => 4;
 use constant INVOICESTATUS_CLOSED => 15;
 
@@ -394,7 +392,7 @@ sub assignPatientAddressInfo
 	$self->setProperPayer($invoiceId, $claim);
 }
 
-sub assignPatientInsurance
+sub assignPatientInsuranceOld
 {
 	my ($self, $claim, $invoiceId) = @_;
 	my @insureds;
@@ -421,7 +419,8 @@ sub assignPatientInsurance
 	$insureds[2] = $claim->{insured}->[2];
 	$insureds[3] = $claim->{insured}->[3];
 
-	my $no = $claim->getBillSeq();
+#	my $no = $claim->getBillSeq();
+	my $no;
 	my $queryStatment;
 	my $sth;
 	my $billSeq = [];
@@ -431,8 +430,8 @@ sub assignPatientInsurance
 	$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
 
 
-	if ($no ne "") # here populate only the current insurer for the bill
-	{
+#	if ($no ne "") # here populate only the current insurer for the bill
+#	{
 		$queryStatment = "select bill_party_type from invoice_billing where invoice_id = $invoiceId and BILL_SEQUENCE = $no";
 		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 		# do the execute statement
@@ -479,7 +478,7 @@ sub assignPatientInsurance
 		$insured->setBillSequence($row[2]);
 		$insured->setMemberNumber($row[9]);
 #		$claim->setInsType($row[8]);
-	}
+#	}
 	if ($no ne "")
 	{
 		my @rowBilling;
@@ -546,6 +545,95 @@ sub assignPatientInsurance
 
 }
 
+sub assignPatientInsurance
+{
+	my ($self, $claim, $invoiceId) = @_;
+	my $insureds;
+	my $patient = $claim->getCareReceiver();
+	my $insured;
+	my @row;
+	my @row1;
+	my @ins;
+	$ins[CLAIM_TYPE_SELF] = "OTHER";
+	$ins[CLAIM_TYPE_INSURANCE] = "GROUP HEALTH PLAN";
+	$ins[CLAIM_TYPE_HMO_CAP] = "GROUP HEALTH PLAN";
+	$ins[CLAIM_TYPE_PPO] = "GROUP HEALTH PLAN";
+	$ins[CLAIM_TYPE_MEDICARE] = "MEDICARE";
+	$ins[CLAIM_TYPE_MEDICAID] = "MEDICAID";
+	$ins[CLAIM_TYPE_WORKCOMP] = "OTHER";
+	$ins[CLAIM_TYPE_THIRD_PARTY] = "OTHER";
+	$ins[CLAIM_TYPE_CHAMPUS] = "CHAMPUS";
+	$ins[CLAIM_TYPE_CHAMPVA] = "CHAMPVA";
+	$ins[CLAIM_TYPE_FECA_BLK_LUNG] = "FECA";
+	$ins[CLAIM_TYPE_BCBS] = "OTHER";
+	$ins[CLAIM_TYPE_HMO_NONCAP] = "GROUP HEALTH PLAN";
+
+	$insureds = $claim->{insured};
+
+	my $no = 0;
+	my $queryStatment;
+	my $sth;
+	my $sth1;
+	my $billSeq = [];
+	$billSeq->[BILLSEQ_PRIMARY_PAYER] = PRIMARY;
+	$billSeq->[BILLSEQ_SECONDARY_PAYER] = SECONDARY;
+	$billSeq->[BILLSEQ_TERTIARY_PAYER] =  TERTIARY;
+	$billSeq->[BILLSEQ_QUATERNARY_PAYER] = QUATERNARY;
+
+
+	$queryStatment = "select bill_party_type, bill_sequence from invoice_billing where invoice_id = $invoiceId and bill_status is null order by bill_sequence";
+	$sth1 = $self->{dbiCon}->prepare(qq{$queryStatment});
+	# do the execute statement
+	$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	while ((@row1 = $sth1->fetchrow_array()) && ($no <= 3))
+	{
+		if ($row1[0] eq BILL_PARTY_TYPE_INSURANCE)
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+					ins.insured_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+					ins.ins_type, Ins.member_number
+					from org, insurance ins, invoice_billing
+					where invoice_billing.invoice_id = $invoiceId
+					and invoice_billing.invoice_item_id is NULL
+					and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+					" and invoice_billing.bill_ins_id = ins.ins_internal_id
+					and ins.ins_org_id = org.org_Internal_id
+					and invoice_billing.BILL_SEQUENCE = $row1[1]";
+		}
+		else
+		{
+			$queryStatment = "select nvl(PLAN_NAME, PRODUCT_NAME), ins.rel_to_insured, invoice_billing.BILL_SEQUENCE, ins.group_number,
+					ins.guarantor_id, to_char(coverage_begin_date,\'dd-MON-yyyy\') , to_char(coverage_end_date, \'dd-MON-yyyy\'), GROUP_NAME,
+					ins.ins_type, Ins.member_number
+					from insurance ins, invoice_billing
+					where invoice_billing.invoice_id = $invoiceId
+					and invoice_billing.invoice_item_id is NULL
+					and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . "," . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION .")" .
+					" and invoice_billing.bill_ins_id = ins.ins_internal_id
+					and invoice_billing.BILL_SEQUENCE = $row1[1]";
+		}
+		$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+		# do the execute statement
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		$patient->setRelationshipToInsured($row[1]);
+		$insured = $insureds->[$no];
+		$insured->setInsurancePlanOrProgramName($row[0]);
+		$insured->setRelationshipToPatient($row[1]);
+		$insured->setPolicyGroupOrFECANo($row[3]);
+		$insured->setId($row[4]);
+		$insured->setEffectiveDate($row[5]);
+		$insured->setTerminationDate($row[6]);
+		$insured->setPolicyGroupName($row[7]);
+		$insured->setBillSequence($row[2]);
+		$insured->setMemberNumber($row[9]);
+		$no++;
+	}
+	$self->assignInsuredInfo($claim, $invoiceId);
+	$self->assignInsuredAddressInfo($claim, $invoiceId);
+
+}
+
 sub assignInsuredInfo
 {
 	my ($self, $claim, $invoiceId) = @_;
@@ -562,9 +650,6 @@ sub assignInsuredInfo
 	{
 		if ($insured ne "")
 		{
-			# ($no ne ($row[3]+ 0)) other insureds of submit. but all pre submit will b covered.
-#			if ($insured ne $insureds->[$no1])
-			{
 				my $insuredId = $insured->getId();
 				if ($insuredId ne "")
 				{
@@ -634,7 +719,7 @@ sub assignInsuredInfo
 					    }
 					}
 				}
-			}
+
 		}
 	}
 }
@@ -647,10 +732,8 @@ sub assignInsuredAddressInfo
 
 	my $insureds = $claim->{insured};
 	my $insured;
-	my $no = $claim->getClaimType();
 	foreach $insured (@$insureds)
 	{
-#		if ($insured ne $insureds->[$no])
 		{
 			my $insuredAddress = $insured->getAddress();
 			my $id = $insured->getId();
@@ -954,7 +1037,7 @@ sub assignServiceBilling
 		$payToOrganization->setAddress($payToOrganizationAddress);
 	}
 
-	$claim->setPayToOrganization($payToOrganization);
+#	$claim->setPayToOrganization($payToOrganization);
 }
 
 sub assignPayerInfo
@@ -970,7 +1053,7 @@ sub assignPolicy
 {
 	my ($self, $claim, $invoiceId) = @_;
 	my $insOrgId;
-	my $seqNum;
+	my $seqNum = 1;
 	my @row;
 	my $payers = $claim->{policy};
 	my $payer;
@@ -997,9 +1080,10 @@ sub assignPolicy
 				from invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.invoice_item_id is NULL
+					and invoice_billing.bill_status is null
 					and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_PERSON . "," . BILL_PARTY_TYPE_ORGANIZATION . ")" .
 					"and invoice_billing.bill_sequence in (" . BILLSEQ_PRIMARY_PAYER . "," . BILLSEQ_SECONDARY_PAYER .
-					"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER .	")";
+					"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER .	") order by invoice_billing.bill_sequence";
 	}
 	else
 	{
@@ -1007,11 +1091,12 @@ sub assignPolicy
 				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID, nvl(insurance.PLAN_NAME, insurance.PRODUCT_NAME)
 				from insurance, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
+					and invoice_billing.bill_status is null
 					and invoice_billing.bill_ins_id = insurance.ins_internal_id
 					and invoice_billing.invoice_item_id is NULL
 					and invoice_billing.bill_party_type in (" . BILL_PARTY_TYPE_INSURANCE . ")" .
 					"and invoice_billing.bill_sequence in (" . BILLSEQ_PRIMARY_PAYER . "," . BILLSEQ_SECONDARY_PAYER .
-					"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER .	")";
+					"," . BILLSEQ_TERTIARY_PAYER . "," . BILLSEQ_QUATERNARY_PAYER .	") order by invoice_billing.bill_sequence";
 	}
 	my $sth1 = $self->{dbiCon}->prepare(qq {$queryStatment});
 	my $sth;
@@ -1022,8 +1107,9 @@ sub assignPolicy
 	$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	while (@row1 = $sth1->fetchrow_array())
 	{
-		$seqNum = $row1[1] + 0;
+#		$seqNum = $row1[1] + 0;
 		$payer = $payers->[$billSeq->[$seqNum]];
+		$seqNum++;
 		if ($payer ne "")
 		{
 #			if ($seqNum ne $no)
@@ -1529,7 +1615,10 @@ sub assignInvoiceProperties
 	$billSeq->[BILLSEQ_SECONDARY_PAYER] = [\$payer2, \$insured2];
 	$billSeq->[BILLSEQ_TERTIARY_PAYER] =  [\$payer3, \$insured3];
 	$billSeq->[BILLSEQ_QUATERNARY_PAYER] = [\$payer4, \$insured4];
-	my $currentPolicy = $billSeq->[$claim->getBillSeq()];
+#	my $currentPolicy = $billSeq->[$claim->getBillSeq()];
+	$claim->setBillSeq(0);
+	$claim->setClaimType(0);
+	my $currentPolicy = $billSeq->[0];
 	if ($currentPolicy ne "")
 	{
 		my $tp1 = ${$currentPolicy->[0]};
@@ -1729,7 +1818,7 @@ sub setClaimProperties
 	$currentClaim->setTotalItems($tempRow[8]);
 	$currentClaim->setInvoiceDate($tempRow[9]);
 	$patient->setId($tempRow[6]);
-	my $no = $currentClaim->getClaimType;
+#	my $no = $currentClaim->getClaimType;
 	my $insureds = [$insured, $insured2, $insured3, $insured4];
 	$currentClaim->addInsured($insureds->[0]);
 	$currentClaim->addInsured($insureds->[1]);
@@ -2189,64 +2278,5 @@ sub populateChangedTreatingDoctor
 		$changedTreatingDoctor->setProfessionalLicenseNo($row[0]);
 	}
 }
-
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI','Billing Interface/Input DBI','Accept assignment is picked form value_int of invoice attribute.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI','Billing Interface/Input DBI','Rendering and pay to provider (tax id,tax idType) is picked from Provider/Tax ID with columns (value_text, value_textb) respectively.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI','Billing Interface/Input DBI',' Pay to provider name XXX is obtained from (Pay To Provider/Name/xxx).'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI','Billing Interface/Input DBI',' Pay to provider Specialty code is obtained from (Pay To Provider/Specialty) with column value_textb.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/17/1999', 'SSI','Billing Interface/Input DBI',' Rendering provider Specialty code is obtained from (Provider/Specialty) with column value_textb.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/17/1999', 'SSI','Billing Interface/Input DBI',' Patient account number is obtained from (Patient/Control Number) with column value_text.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/20/1999', 'SSI','Billing Interface/Input DBI',' Payer and its address is populated from new queries in presubmitted case.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/20/1999', 'SSI','Billing Interface/Input DBI',' Insured and its address is populated from new queries in presubmitted case.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/21/1999', 'SSI','Billing Interface/Input DBI',' InformationReleaseDate value is now set from value_date of Information/Release/indicator.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/23/1999', 'SSI','Billing Interface/Input DBI',' Insurance Type Code value is now set from value_TextB of Insurance/Primary/Type.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/23/1999', 'SSI','Billing Interface/Input DBI',' Provider/Assign Indicator has been renamed to Provider/Assign/Indicator.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/23/1999', 'SSI','Billing Interface/Input DBI',' Source of Payment has been renamed to Payment Source.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/23/1999', 'SSI','Billing Interface/Input DBI',' Pay To Organization/Name is the new attribute for pay to organization name.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/24/1999', 'SSI','Billing Interface/Input DBI',' Constants for column indexes of invoice_attribute and invoice_address are incremented by 1 due to addition of field CR_ORG_ID.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/24/1999', 'SSI','Billing Interface/Input DBI',' Ref Provider/State is now obtained from "Ref Provider/Identification" with column value_textB.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'SSI','Billing Interface/Input DBI','"Pay To Organization/Name" is renamed to  "Pay To Org/Name" in invoice_attribute.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'SSI','Billing Interface/Input DBI','Pay To Organization Id is obtained from value_textB of "Pay To Org/Name" in invoice_attribute.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'SSI','Billing Interface/Input DBI','"Pay To Organization Address" is copied to " Pay To  Provider Address" in invoice_Address.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'SSI','Billing Interface/Input DBI','"Provider/Specialty" is to both pay to provider and rendering provider in invoice_attribute.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/24/1999', 'SSI','Billing Interface/Input DBI','"Pay to Org/Telephone" is provided to pay to organization.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/28/1999', 'SSI','Billing Interface/Input DBI','Ids for status (pre submit, submit) are updated i.e. decremented by 1.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/01/2000', 'SSI','Billing Interface/Input DBI','Diagnosis object is created as required in setClaimProperties, also position for diagnosis is saved.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/03/2000', 'SSI','Billing Interface/Input DBI','DiagnosisCodePointer is set by DBI in setClaimProperties. if there as multiple diagnosis, pointers are space separated numbers.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/04/2000', 'SSI','Billing Interface/Input DBI','ItemMap in populateItem is conveted to array from hash.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/04/2000', 'SSI','Billing Interface/Input DBI','New quries for presubmit are implemented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/05/2000', 'SSI','Billing Interface/Input DBI','New quries for insured and payer for presubmit mode are implemented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/05/2000', 'SSI','Billing Interface/Input DBI','Pin number for rendering and pay to provider is implemented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/11/2000', 'SSI','Billing Interface/Input DBI','New quries for pre-submit and post-submit are implemented.' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/13/2000', 'SSI','Billing Interface/Input DBI','Creation of empty Extra Procedure is removed.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/14/2000', 'SSI','Billing Interface/Input DBI','New quries for pre-submit and post-submit are implemented.' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/18/2000', 'SSI','Billing Interface/Input DBI','Item->reference is populated with Invoice_Item.data_text_c' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/18/2000', 'SSI','Billing Interface/Input DBI','Item->disallowedCostContenment and otherCost are not populated now' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/06/2000', 'SSI','Billing Interface/Input DBI','New changes implemented' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'SSI','Billing Interface/Input DBI','Field AmountPaid in payer is populated by the value invoice_attribute.itemName = Payer/Amount ' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/20/2000', 'SSI','Billing Interface/Input DBI','New changes about person and organization attribute implemented.' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/22/2000', 'SSI','Billing Interface/Input DBI','New quries regarding payers address implemented.' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/28/2000', 'SSI','Billing Interface/Input DBI','New quries regarding source of payment implemented.' ],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'SSI','Billing Interface/Input DBI','The multiple payer and insured object are populated according to Invoice_billing table.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/20/2000', 'SSI','Billing Interface/Input DBI','Signature  is now populated from value textB of person_attribute'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/20/2000', 'SSI','Billing Interface/Input DBI','Workers compensation plan is also included'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','complete_name is used in payer when bill party type is person'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','insured SSN is now populated from insurance.member_number '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','Insured Employment Status is populated from person attribute.value type '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','rendering provider Id is set from value_textb of invoice_attribute with item_name provider/name'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','Patient ID is populated form invoice.client_id in both pre-submit and post-submit cases'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/05/2000', 'SSI','Billing Interface/Input DBI','GRP number is not populated in pre-submit'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/06/2000', 'SSI', 'Billing Interface/Input DBI','payment date property added which holds a payment date for copay and adjustment items'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/06/2000', 'SSI', 'Billing Interface/Input DBI','Patient-Insured is changed to Patient-Insured/Relationship'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/23/2000', 'SSI', 'Billing Interface/Input DBI','Pay to org tax id is now pulling form invoice_attribue in both pre and post submit cases. Pay To Org/Tax ID(item path)'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/24/2000', 'SY', 'Billing Interface/Input DBI','Change the query, to fetch the values of invoice_type, invoice_subtype and total_items'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/24/2000', 'SY', 'Billing Interface/Input DBI','New Invoice Status (void) Implmented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/24/2000', 'SSI', 'Billing Interface/Input DBI','Payer name is being populated nvl(PRODUCT_NAME, PLAN_NAME) when bill_party_type =3 in invoice_billing.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/24/2000', 'SSI', 'Billing Interface/Input DBI','Claim->{totalCharge} will only provide the sum of amount of service and lab items'],
-);
 
 1;
