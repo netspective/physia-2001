@@ -121,9 +121,9 @@ sub makeStateChanges
 
 	my $personId = $page->param('person_id');
 
-	$self->updateFieldFlags('ssndatemf', FLDFLAG_REQUIRED, 1);
-	$self->getField('ssndatemf')->{fields}->[0]->{options} |= FLDFLAG_REQUIRED;
-	$self->getField('ssndatemf')->{fields}->[1]->{options} |= FLDFLAG_REQUIRED;
+	#$self->updateFieldFlags('ssndatemf', FLDFLAG_REQUIRED, 1);
+	#$self->getField('ssndatemf')->{fields}->[0]->{options} |= FLDFLAG_REQUIRED;
+	#$self->getField('ssndatemf')->{fields}->[1]->{options} |= FLDFLAG_REQUIRED;
 
 	#$self->updateFieldFlags('ssn', FLDFLAG_REQUIRED, 1);
 	#$self->updateFieldFlags('date_of_birth', FLDFLAG_REQUIRED, 1);
