@@ -2310,7 +2310,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/0?home=#param.home#', 
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#/0?home=#param.home#',
 			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#/0?home=#param.home#',
 		},
 	},
@@ -3949,6 +3949,63 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodType', [$personId], 'panelTransp'); },
 },
 
+#-----------------------------------------------------------------------------------------------------------------------------------------
+'person.personCategory' => {
+	sqlStmt => qq{
+			select 	p.simple_name, pa.category, pa.person_id, pa.org_internal_id
+			from 	person_org_category pa, person p
+			where	 p.person_id = ?
+				and pa.org_internal_id = ?
+				and pa.category in ('Patient', 'Guarantor','Insured-Person')
+				and	p.person_id = pa.person_id
+			order by pa.category
+		},
+	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
+	publishDefn => {
+		columnDefn => [
+			{head => 'Type', dataFmt => '#1#'},
+		],
+		bullets => 'stpe-#my.stmtId#/dlg-update-person-category/?_f_person_id=#2#&_f_category=#1#&home=#homeArl#',
+		frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-person-category?home=#homeArl#',
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Person Categories' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Person Categories' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-person-category?home=#homeArl#'>Person Category</A> }	},
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-person-category/?_f_person_id=#2#&_f_category=#1#&home=/person/#param.person_id#/profile',
+			delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-person-category/?_f_person_id=#2#&_f_category=#1#&home=/person/#param.person_id#/profile',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId, ) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId], 'panelTransp'); },
+	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId], 'panelStatic'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.personCategory', [$personId,$orgInternalId], 'panelInDlg'); },
+},
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------Doc Short Term Stuff
