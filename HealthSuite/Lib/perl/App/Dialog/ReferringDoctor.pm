@@ -42,7 +42,7 @@ sub new
 
 
 	$self->addContent(
-		new CGI::Dialog::Field(type => 'hidden', name => 'ref-phy_item_id'),
+		new CGI::Dialog::Field(name => 'ref_phy_item_id', type=>'hidden'),
 		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'person_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, types => ['Referring-Doctor'],),
 		#options => FLDFLAG_REQUIRED),
 		#new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
