@@ -270,15 +270,53 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where parent_id = ?
 		 and address_name = 'Home'
 		},
-	'selStatementsForClient' => qq{
-		select statement_id, payto_id as pay_to_id, billto_id as bill_to_id, patient_id, eps.caption as source, ts.caption as trans_status, ack_stamp,
-			ext_statement_id as ext_stmt_id, amount_due, inv_ids as claims
-		from statement, electronic_payer_source eps, transmission_status ts
-		where patient_id = ?
-			and cr_org_internal_id = ?
-			and statement_source = eps.id
-			and transmission_status = ts.id
+	'selStatementsForClient' => {
+		sqlStmt => qq{SELECT * FROM (
+				select s.billto_id,
+					s.patient_id,
+					to_char(s.transmission_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as send_date,
+					to_char(s.ack_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as ack_date,
+					o1.org_id as org_id1,
+					ts.caption as status,
+					s.amount_due,
+					decode (instr(s.inv_ids, ','),
+						0, decode(sign(s.inv_ids), -1, 'Payment Plan', s.inv_ids),
+						s.inv_ids) as claims,
+					o.org_id,
+					s.billto_type
+				from org o1, org o, transmission_status ts, statement s
+				where (s.patient_id = :1 or s.billto_id = :1)
+					and s.cr_org_internal_id = :2
+					and ts.id (+) = s.transmission_status
+					and to_char(o.org_internal_id (+)) = s.billto_id
+					and o1.org_internal_id = s.payto_id
+				order by s.statement_id desc
+			) WHERE ROWNUM < 11
 		},
+
+		publishDefn => {
+			columnDefn => [
+				{ head => 'Payer', colIdx => 9,
+					dataFmt => {
+						0 => qq{<A HREF='/person/#0#/account' title='View #0# Account'>#0#</A>},
+						1 => qq{<A HREF='/person/#0#/account' title='View #0# Account'>#0#</A>},
+						2 => qq{<A HREF='/org/#8#/account' title='View #8# Account'>#8#</A>},
+						3 => qq{<A HREF='/org/#8#/account' title='View #8# Account'>#8#</A>},
+						'_DEFAULT' => '#0#',
+					},
+				},
+				{ head => 'Patient', url => '/person/#&{?}#/account', hint => 'View #&{?}# Account'},
+				{ head => 'Send Date', },
+				{ head => 'Ack Date', },
+				{ head => 'Billing Org', },
+				{ head => 'Status', },
+				{ head => 'Amount Due', dformat => 'currency' },
+				{ head => 'Claim Id(s)', },
+			],
+		},
+
+	},
+
 	'selPersonAddressById' => qq{
 		select *
 		from person_address
@@ -924,7 +962,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 		sqlStmtBindParamDescr => ['Person ID'],
 	},
-	
+
 	'selPerMedById' => {
 		sqlStmt => qq{
 			SELECT *

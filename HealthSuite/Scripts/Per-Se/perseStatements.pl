@@ -185,6 +185,7 @@ sub recordStatement
 		patient_id => $statement->{clientId},
 		statement_source => 2,
 		transmission_stamp => $stamp,
+		transmission_status => 0,
 		amount_due => $statement->{amountDue},
 		inv_ids => join(',', @invoiceIds),
 	);

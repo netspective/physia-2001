@@ -227,30 +227,74 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 		order by invoice_id desc
 	},
 
-	'sel_paymentPlan' => qq{
-		select plan_id, person_id, payment_cycle, payment_min, to_char(first_due, '$SQLSTMT_DEFAULTDATEFORMAT')
-			as first_due, balance, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
-			lastpay_amount, to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date,
-			billing_org_id, inv_ids
-		from Payment_Plan
-		where person_id = :1
-			and owner_org_id = :2
+	'sel_paymentPlan' => {
+		sqlStmt => qq{
+			SELECT payment_cycle, payment_min, to_char(first_due, '$SQLSTMT_DEFAULTDATEFORMAT')
+				as first_due, to_char(next_due, '$SQLSTMT_DEFAULTDATEFORMAT') as next_due,
+				to_char(lastpay_date, '$SQLSTMT_DEFAULTDATEFORMAT' ) as lastpay_date, lastpay_amount,
+				balance, billing_org_id, inv_ids, plan_id, person_id
+			FROM Payment_Plan
+			WHERE person_id = :1
+				and owner_org_id = :2
+		},
+		publishDefn => {
+			columnDefn => [
+				{ head => 'Payment Cycle',
+					dataFmt => {
+						7 => 'Weekly',
+						14 => 'Bi-Weekly',
+						30 => 'Monthly',
+					},
+				},
+				{	head => 'Amount', dformat => 'currency',},
+				{	head => 'First Due', },
+				{	head => 'Next Due', },
+				{	head => 'Last Payment Date',},
+				{	head => 'Last Payment Amount', dformat => 'currency',},
+				{	head => 'Balance', dformat => 'currency',},
+			],
+		},
 	},
 
-	'sel_last4Statements' => qq{
-		select * from
-		(
-			select patient_id, to_char(transmission_stamp, '$SQLSTMT_DEFAULTDATEFORMAT')
-				as transmission_date, transmission_status, to_char(ack_stamp,
-				'$SQLSTMT_DEFAULTDATEFORMAT') as ack_date, int_statement_id, ext_statement_id,
-				amount_due, inv_ids
-			from statement
-			where billto_id = :1
-				and payto_id = :2
-				and patient_id = :3
-			order by statement_id desc
-		)
-		where rownum < 5
+	'sel_paymentHistory' => {
+		sqlStmt => qq{SELECT * FROM (
+				select to_char(value_stamp - :3, '$SQLSTMT_DEFAULTDATEFORMAT'),
+					value_float, value_text
+				from payment_history h, payment_plan p
+				where p.person_id = :1
+					and p.owner_org_id = :2
+					and h.parent_id = p.plan_id
+				order by value_stamp desc
+			) WHERE ROWNUM < 11
+		},
+
+		publishDefn => {
+			columnDefn => [
+				{ head => 'Payment Date', },
+				{	head => 'Amount', dformat => 'currency', summarize => 'sum'},
+				{ head => 'Note', },
+			],
+		},
+
+	},
+
+	'sel_last4Statements' => {
+		sqlStmt => qq{
+			select * from
+			(
+				select patient_id, to_char(transmission_stamp, '$SQLSTMT_DEFAULTDATEFORMAT')
+					as transmission_date, transmission_status.caption as status, to_char(ack_stamp,
+					'$SQLSTMT_DEFAULTDATEFORMAT') as ack_date, int_statement_id, ext_statement_id,
+					amount_due, inv_ids as claim_ids
+				from transmission_status, statement
+				where billto_id = :1
+					and payto_id = :2
+					and patient_id = :3
+					and transmission_status.id (+) = statement.transmission_status
+				order by statement_id desc
+			)
+			where rownum < 5
+		},
 	},
 );
 

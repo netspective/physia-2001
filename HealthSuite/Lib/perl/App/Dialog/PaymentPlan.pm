@@ -192,6 +192,37 @@ sub execute
 		_debug => 1,
 	);
 
+	if ($command eq 'add')
+	{
+		# Add Account Note
+		$page->schemaAction('Transaction', 'add',
+			trans_id => undef,
+			trans_owner_id => $personId || undef,
+			trans_owner_type => 0,
+			provider_id => $page->session('user_id') ||undef,
+			trans_type => App::Universal::TRANSTYPE_ACCOUNTNOTES,
+			caption => 'Account Notes',
+			detail => qq{Patient on Payment Plan '$planId'},
+			trans_begin_stamp => $page->field('first_due') || undef,
+			trans_status => 2,
+		);
+
+		# Add Alert
+		$page->schemaAction('Transaction', 'add',
+			trans_id => undef,
+			trans_owner_id => $personId || undef,
+			trans_owner_type => 0,
+			provider_id => $page->session('user_id') ||undef,
+			trans_type => App::Universal::TRANSTYPE_ALERTACCOUNTING,
+			trans_subtype => 'Low',
+			caption => 'Payment Plan',
+			detail => qq{Patient on Payment Plan '$planId'},
+			trans_status => 2,
+			trans_begin_stamp => $page->field('first_due') || undef,
+			data_text_a => 'Payment Plan',
+		);
+	}
+	
 	$page->field('plan_id', $planId) unless $page->field('plan_id');
 	$self->handlePostExecute($page, $command, $flags);
 }
