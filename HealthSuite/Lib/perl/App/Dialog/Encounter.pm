@@ -368,11 +368,12 @@ sub populateData
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
-			$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});
+			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});	#don't want to populate this in the event fee schedules should change
 			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
 			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
 			$page->param("_f_proc_$line\_actual_diags", $procedures->[$idx]->{rel_diags});
+			$page->param("_f_proc_$line\_ffs_flag", $procedures->[$idx]->{data_num_a});
 		}
 
 
@@ -589,6 +590,7 @@ sub voidInvoicePostSubmit
 		$page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $invoiceId || undef,
+			flags => $item->{flags} || undef,
 			service_begin_date => $item->{service_begin_date} || undef,
 			service_end_date => $item->{service_end_date} || undef,
 			hcfa_service_place => $item->{hcfa_service_place} || undef,
@@ -603,6 +605,7 @@ sub voidInvoicePostSubmit
 			unit_cost => $item->{unit_cost} || undef,
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
+			data_num_a => $item->{data_num_a} || undef,
 			extended_cost => $extCost || undef,
 			balance => $itemBalance || undef,
 			_debug => 0
@@ -1662,6 +1665,7 @@ sub handleProcedureItems
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
 			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,		#the actual icd (diag) codes
 			data_text_a => $page->param("_f_proc_$line\_diags") || undef,			#the diag code pointers
+			data_num_a => $page->param("_f_proc_$line\_ffs_flag") || undef,			#flag indicating if item is ffs
 		);
 
 
@@ -1734,6 +1738,7 @@ sub voidProcedureItem
 			parent_item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $voidItemType ? $voidItemType : undef,
+			flags => $invItem->{flags} || undef,
 			code => $cptCode || undef,
 			caption => $invItem->{caption} || undef,
 			modifier => $invItem->{modifier} || undef,
@@ -1749,6 +1754,7 @@ sub voidProcedureItem
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
+			data_num_a => $invItem->{data_num_a} || undef,
 			_debug => 0
 		);
 

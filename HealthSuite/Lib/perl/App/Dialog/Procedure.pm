@@ -36,6 +36,7 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'item_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_diags'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'data_num_a'),	#used to indicate if item is FFS (null if it isn't)
 
 		new CGI::Dialog::Field::Duration(
 				name => 'illness',
@@ -77,7 +78,7 @@ sub new
 			size => 24,
 			findPopupAppendValue => ',',
 			findPopup => '/lookup/catalog',
-			options => FLDFLAG_PERSIST,
+			#options => FLDFLAG_PERSIST,
 		),
 		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units',
 			name => 'proc_charge_fields'
@@ -178,6 +179,7 @@ sub populateData
 	my $itemId = $page->param('item_id');
 
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selProcedure', $itemId);
+
 	if($page->field('item_type') == App::Universal::INVOICEITEMTYPE_LAB)
 	{
 		$page->field('lab_indicator', 1)
@@ -190,6 +192,9 @@ sub populateData
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrDisability',$invoiceId);
 	$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
+	
+	my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
+	$page->field('fee_schedules', $feeSchedules->{value_text});
 }
 
 sub execAction_submit
@@ -257,12 +262,16 @@ sub hmoCapWriteoff
 
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $writeoffCode = App::Universal::ADJUSTWRITEOFF_CONTRACTAGREEMENT;
+
 	my $totalAdjForItems = 0;
 	my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	foreach my $proc (@{$procItems})
 	{
-		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_DEDUCTIBLE;
-	
+		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY 
+			|| $proc->{item_type} == App::Universal::INVOICEITEMTYPE_DEDUCTIBLE || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_VOID;
+		next if $proc->{data_num_a};	#data_num_a indicates that this item is FFS (null if it isn't)
+		next if $proc->{data_text_b} eq 'void';	#data_text_b indicates that this item has been voided
+		
 		my $writeoffAmt = $proc->{balance};
 		my $netAdjust = 0 - $writeoffAmt;
 		my $itemId = $proc->{item_id};
@@ -903,6 +912,16 @@ sub storeInsuranceInfo
 				);
 
 
+			#E-Remitter Payer ID --------------------
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/E-Remitter ID",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $personInsur->{test} || undef,
+					_debug => 0
+				);
+
 			#Payment Source --------------------
 			my $claimType = $personInsur->{claim_type};
 			my $paySource = '';
@@ -1153,7 +1172,7 @@ sub storeInsuranceInfo
 
 			##MEDICAID - RESUBMISSION CODE AND ORIGINAL REFERENCE
 
-			#if(I think this is needed when a claim is resubmitted - check with toi)
+			#if()
 			#{
 			#	$page->schemaAction(
 			#			'Invoice_Attribute', $command,
@@ -1166,13 +1185,6 @@ sub storeInsuranceInfo
 			#		);
 			#}
 
-			#OLD ATTRIBUTES
-			#Create attributes for secondary insurance (for HCFA Box 11d, 9a-d)
-			#	'Payment Source/Secondary',
-			#	'Insurance/Secondary/Group Number',
-			#	"Other Insured/$occupType/Name",
-			#	'Other Insured/Personal/Gender',
-			#	'Other Insured/Personal/DOB',
 		}
 	}
 }
@@ -1232,6 +1244,9 @@ sub customValidate
 			{
 				my $unitCost = $_->[1];
 				$page->field('proccharge', $unitCost);
+				
+				my $isFfs = $_->[2];
+				$page->field('data_num_a', $isFfs);
 			}
 		}
 		else
@@ -1277,17 +1292,18 @@ sub getMultiPricesHtml
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $invoiceId = $page->param('invoice_id');
 
 	if($command eq 'add' || $command eq 'update')
 	{
 		execute_addOrUpdate($self, $page, $command, $flags);
+		$self->handlePostExecute($page, $command, $flags);
 	}
 	else
 	{
 		voidProcedure($self, $page, $command, $flags);
+		$page->redirect("/invoice/$invoiceId/summary");
 	}
-
-	$self->handlePostExecute($page, $command, $flags);
 }
 
 sub execute_addOrUpdate
@@ -1366,6 +1382,7 @@ sub execute_addOrUpdate
 			service_begin_date => $page->field('service_begin_date') || undef,
 			service_end_date => $page->field('service_end_date') || undef,
 			data_text_a => join(', ', @diagCodePointers) || undef,
+			data_num_a => $page->field('data_num_a') || undef,
 			_debug => 0
 		);
 
@@ -1437,6 +1454,7 @@ sub voidProcedure
 			parent_item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $voidItemType ? $voidItemType : undef,
+			flags => $invItem->{flags} || undef,
 			code => $cptCode || undef,
 			caption => $invItem->{caption} || undef,
 			modifier => $invItem->{modifier} || undef,
@@ -1452,6 +1470,7 @@ sub voidProcedure
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
+			data_num_a => $invItem->{data_num_a} || undef,
 			_debug => 0
 		);
 
