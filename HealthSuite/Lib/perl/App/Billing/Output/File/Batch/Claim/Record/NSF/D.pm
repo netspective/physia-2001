@@ -44,7 +44,7 @@ sub formatData
 	substr($inpClaim->{treatment}->getPriorAuthorizationNo(),0,15),
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getAcceptAssignment(), 0, 1), 
 	substr($inpClaim->{careReceiver}->getSignature(),0,1),	 # patient signature source
-	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToInsured()),
+	$self->numToStr(2, 0, $refClaimInsured->getRelationshipToPatient()),
 	substr($refClaimInsured->getSsn(), 0, 17),
 	$spaces,  # insured id filler
 	substr($refClaimInsured->getLastName(), 0, 20),
@@ -86,7 +86,11 @@ sub formatData
 	'Multiple payers logic has been implemented in DA0 by passing payer number as a key of  hash $flag '],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
 	'Billing Interface/Validating NSF Output',
-	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value in DA0']
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value in DA0'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/03/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'Function getRelationshipToInsured of Insured object has been replaced with getRelationshipToPatient of same object to reflect correct value in DA0']
+
 
 
 );
@@ -262,7 +266,7 @@ sub formatData
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($inpClaim->{careReceiver}->getAccountNo(),0,17),
-	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getBcbsPlanCode(),0,5),
+	substr($inpClaim->{insured}->[$flags->{RECORDFLAGS_NONE}]->getBcbsPlanCode(),0,5),
 	$spaces
 	);
 }

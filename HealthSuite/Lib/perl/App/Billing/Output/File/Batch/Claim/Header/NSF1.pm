@@ -80,7 +80,7 @@ sub formatData
 	$spaces,  # Filler - national
 	$spaces,  # Filler - local	
 	$spaces,   # claim sequence number
-	substr($inpClaim->{insured}->[$inpClaim->getClaimType()]->getId(),0,10)   # patient id
+	substr($refClaimCareReceiver->getSsn(),0,10)   # patient id
 	);
 	
 }
