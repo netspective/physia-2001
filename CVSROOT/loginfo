@@ -24,4 +24,4 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
-DEFAULT mail -s "[CVS Alert-commit]%s(%v)" cvsalert-commit@physia.com
+DEFAULT mail -s "[CVS Alert-commit] %{sv}" cvsalert-commit@physia.com
