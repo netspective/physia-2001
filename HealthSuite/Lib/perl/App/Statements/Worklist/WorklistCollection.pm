@@ -105,6 +105,7 @@ $STMTMGR_LOAD_COLL_INVOICES = qq
 			AND	worklist_type = 'Collection'		
 			AND	invoice_id = i.invoice_id
 		)	
+		AND	i.owner_id = :7
 		AND	ROWNUM<=:10			
 };
 
