@@ -509,7 +509,7 @@ sub getHtml
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		$removeChkbox = $allowRemove && ! $invoiceFlags & $attrDataFlag ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+		$removeChkbox = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
 		my $errorMsgsHtml = '';
 		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
 		{
@@ -709,7 +709,7 @@ sub getHtml
 			</TD>
 	} if $allowQuickRef;
 
-	my $removeHd = $allowRemove && ! $invoiceFlags & $attrDataFlag ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
+	my $removeHd = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
