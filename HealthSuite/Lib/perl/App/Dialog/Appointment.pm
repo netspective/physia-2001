@@ -322,8 +322,8 @@ sub makeStateChanges_cancel
 
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
-
-	$self->updateFieldFlags('minutes_util', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('minutes_util_0', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('minutes_util_1', FLDFLAG_INVISIBLE, 1);
 
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
@@ -350,6 +350,7 @@ sub makeStateChanges_reschedule
 
 	$self->updateFieldFlags('appt_date_time_0', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('appt_date_time_1', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('minutes_util_1', FLDFLAG_INVISIBLE, 1);
 }
 
 sub makeStateChanges_update
