@@ -203,11 +203,13 @@ sub execAction_submit
 	unless($invoiceFlags & $attrDataFlag)
 	{
 		my $mainTransId = $invoice->{main_transaction};
-		my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransaction', $mainTransId);
+		my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selTransactionById', $mainTransId);
+
 
 		##BILLING FACILITY INFORMATION
-		my $billingFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $mainTransData->{billing_facility_id}, 'Mailing');
-		my $billingFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $mainTransData->{billing_facility_id});
+		my $billFacilityId = $mainTransData->{billing_facility_id};
+		my $billingFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Mailing');
+		my $billingFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $billFacilityId);
 
 		$page->schemaAction(
 				'Invoice_Attribute', $command,
@@ -215,24 +217,26 @@ sub execAction_submit
 				item_name => 'Service Provider/Facility/Billing',
 				value_type => defined $textValueType ? $textValueType : undef,
 				value_text => $billingFacilityName,
-				value_textB => $billingFacility->{billing_facility_id}
+				value_textB => $billFacilityId,
+				_debug => 0
 			);
 
 		$page->schemaAction(
 				'Invoice_Address', $command,
 				parent_id => $invoiceId,
 				address_name => 'Billing',
-				line1 => $billingFacility->{line1},
-				line2 => $billingFacility->{line2},
-				city => $billingFacility->{city},
-				state => $billingFacility->{state},
-				zip => $billingFacility->{zip},
+				line1 => $billingFacilityAddr->{line1},
+				line2 => $billingFacilityAddr->{line2},
+				city => $billingFacilityAddr->{city},
+				state => $billingFacilityAddr->{state},
+				zip => $billingFacilityAddr->{zip},
 				_debug => 0
 			);
 
 		##SERVICE FACILITY INFORMATION
-		my $serviceFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $mainTransData->{service_facility_id}, 'Mailing');
-		my $serviceFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $mainTransData->{service_facility_id});
+		my $servFacilityId = $mainTransData->{service_facility_id};
+		my $serviceFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
+		my $serviceFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $servFacilityId);
 
 		$page->schemaAction(
 				'Invoice_Attribute', $command,
@@ -240,7 +244,8 @@ sub execAction_submit
 				item_name => 'Service Provider/Facility/Service',
 				value_type => defined $textValueType ? $textValueType : undef,
 				value_text => $serviceFacilityName,
-				value_textB => $serviceFacility->{service_facility_id}
+				value_textB => $servFacilityId,
+				_debug => 0
 			);
 
 		$page->schemaAction(
@@ -941,8 +946,8 @@ sub execAction_submit
 					trans_status => App::Universal::TRANSSTATUS_ACTIVE,
 					init_onset_date => $mainTransData->{init_onset_date} || undef,
 					curr_onset_date => $mainTransData->{curr_onset_date} || undef,
-					billing_facility_id => $mainTransData->{billing_facility_id},
-					service_facility_id => $mainTransData->{service_facility_id},
+					billing_facility_id => $billFacilityId,
+					service_facility_id => $servFacilityId,
 					code => $icdCode || undef,
 					provider_id => $mainTransData->{provider_id},
 					trans_begin_stamp => $todaysStamp || undef,
