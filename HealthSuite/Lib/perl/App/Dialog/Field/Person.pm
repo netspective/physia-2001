@@ -79,8 +79,8 @@ sub autoSuggest
 	push (@possible, uc($FIFN . $MI . substr($lastname,0,10) . int(10000*rand)));
 	push (@possible, uc($FIFN . $MI . substr($lastname,0,10) . int(10000*rand)));
 	push (@possible, uc($FIFN . $MI . substr($lastname,0,10) . int(10000*rand)));
-	
-	
+
+
 
 
 
@@ -213,7 +213,7 @@ sub new
 			{
 				if (scalar(@$types) > 1)
 				{
-					if (! grep { $_ eq 'patient'} @$types)
+					if (! grep { $_ eq 'Patient'} @$types)
 					{
 						$lookupType = 'associate';
 					}
@@ -224,7 +224,7 @@ sub new
 				}
 				elsif (scalar(@$types))
 				{
-					$lookupType = (grep {$_ eq $$types[0]} ('Physician', 'Nurse', 'Staff'))[0] || 'person';
+					$lookupType = (grep {$_ eq $$types[0]} ('Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient'))[0] || 'person';
 				}
 			}
 		}
