@@ -421,6 +421,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			  	from Referral_Reason
 		},
 
+	'selPrimaryMail' => q{
+			select *
+				from person_attribute
+				where parent_id = ?
+				and value_type = 40
+				and item_name = 'Primary'
+		},
 	#
 	# Registration and profile statements/definitions
 	#
