@@ -102,6 +102,8 @@
 			claims to Clearing Houses.  Please be sure it is unchecked when there are claims still in
 			test mode (like TXGULF).  And check the box to enable live claim processing batch jobs for
 			the specified Org.
+			Additional change: Fixed billing id fields in the physician dialog to look like the ones in the clearing
+			house component for orgs.
 		</deliverable>
 
 		<deliverable id="1264">
@@ -268,6 +270,10 @@
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
 		</deliverable>	
 		
+		<deliverable id="1620">
+			 Fixed prepare method not overridden error found on choose action schedule appointment from patient profile.
+		</deliverable>			
+
 		<deliverable id="1621">
 			 Updated the url for 'Edit Profile' for an Insured-person to showup the correct dialog.
 		</deliverable>			
@@ -278,7 +284,16 @@
 		
 		<deliverable id="1625">
 			 UI: Deleted the search by TaxId option for Orgs as that was added previously for ACS.
+		</deliverable>
+
+		<deliverable id="1629">
+			 Fixed bind param application error on face sheet.
 		</deliverable>			
+
+		<deliverable id="1630">
+			 Removed readonly flag from symptoms field in appointment dialog.
+		</deliverable>			
+
 	</deliverables>
 </release-notes>
 
