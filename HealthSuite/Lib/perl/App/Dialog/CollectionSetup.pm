@@ -115,7 +115,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,
+					#minValue=>1,
 				),
 				new CGI::Dialog::Field(
 					name => 'BalanceAgeMax',
@@ -123,7 +123,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,
+					#minValue=>1,
 				),
 			]),
 
@@ -138,7 +138,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,
+					#minValue=>1,
 				),
 				new CGI::Dialog::Field(
 					name => 'BalanceAmountMax',
@@ -146,7 +146,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,
+					#minValue=>1,
 				),
 			]),
 	);
@@ -185,6 +185,7 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	my $userId =  $page->session('user_id');
 	my $sessOrgId = $page->session('org_internal_id');
 
@@ -425,35 +426,33 @@ sub customValidate
 		$nameRangeFields->invalidate($page, 'Invalid Last-Name range. The value on the left must be equal to or less than the value on the right.');
 	}
 	my ($intBalanceAgeMin, $intBalanceAgeMax) = ($page->field('BalanceAgeMin'), $page->field('BalanceAgeMax'));
+	my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];	
 	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0)
 	{
-		my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];
 		if ($intBalanceAgeMin > $intBalanceAgeMax)
 		{
 
 			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. The value on the left must be equal to or less than the value on the right.");
 		}
-		if ($intBalanceAgeMin == 0 || $intBalanceAgeMax == 0)
-		{
-			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. Min and Max value must be greater than 0.");
-		}
+	}
+	if ( ($intBalanceAgeMin == 0 && length $intBalanceAgeMin > 0 )  || ( $intBalanceAgeMax == 0 && length $intBalanceAgeMax > 0) )
+	{
+		$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. Min and Max value must be greater than 0.");
 	}
 
 	my ($intBalanceAmountMin, $intBalanceAmountMax) = ($page->field('BalanceAmountMin'), $page->field('BalanceAmountMax'));
+	my $balanceAmountFields = $self->getField('BalanceAmountRange')->{fields}->[0];	
 	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0)
 	{
-		my $balanceAmountFields = $self->getField('BalanceAmountRange')->{fields}->[0];
 		if ($intBalanceAmountMin > $intBalanceAmountMax)
 		{
 
 			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. The value on the left must be equal to or less than the value on the right.");
 		}
-		if ($intBalanceAmountMin == 0 || $intBalanceAmountMax == 0)
-		{
-
-			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. Min and Max value must be greater than 0.");
-		}
-
+	}
+	if ( (length $intBalanceAmountMin > 0 &&  $intBalanceAmountMin == 0) || (length $intBalanceAmountMax > 0 &&$intBalanceAmountMax == 0))
+	{
+		$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. Min and Max value must be greater than 0.");
 	}
 }
 
