@@ -113,13 +113,6 @@ sub initialize
 		new CGI::Dialog::Field(type => 'email', caption => 'Email', name => 'email', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 	);
 
-	$self->{activityLog} =
-	{
-		scope =>'person',
-		key => "#field.person_id#",
-		data => "Person '#field.person_id#' <a href='/person/#field.person_id#/profile'>#field.name_first# #field.name_last#</a>"
-	};
-
 	return $self;
 }
 
