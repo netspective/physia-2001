@@ -65,7 +65,17 @@ sub new
 		new App::Dialog::Field::ServicePlaceType(caption => 'Service Place/Type'),
 		new App::Dialog::Field::ProcedureLine(caption => 'CPT / Modf'),
 		new App::Dialog::Field::DiagnosesCheckbox(caption => 'ICD-9 Codes', options => FLDFLAG_REQUIRED),
-		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units'),
+
+		new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules', options => FLDFLAG_PERSIST),
+		new App::Dialog::Field::ProcedureChargeUnits(caption => 'Charge/Units', name => 'proc_charge_fields'),
+
+		new CGI::Dialog::MultiField(caption => 'Units', name => 'units_emg_fields',
+			fields => [
+				new CGI::Dialog::Field(caption => 'Units', name => 'procunits', type => 'integer', size => 6, minValue => 1, value => 1, options => FLDFLAG_REQUIRED),
+				new CGI::Dialog::Field(caption => 'EMG', name => 'emg', type => 'bool', style => 'check'),
+			]),
+
+		new CGI::Dialog::Field(caption => 'Please choose a unit cost', name => 'alt_cost', type => 'select', options => FLDFLAG_REQUIRED),
 
 		#new CGI::Dialog::Field(caption => 'Reference', name => 'reference'),
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo', cols => 25, rows => 4),
@@ -96,6 +106,10 @@ sub makeStateChanges
 
 	my $invoiceId = $page->param('invoice_id');
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+	$self->setFieldFlags('alt_cost', FLDFLAG_INVISIBLE, 1);
+	$self->setFieldFlags('units_emg_fields', FLDFLAG_INVISIBLE, 1);
+
 
 	my $procItem = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItem = App::Universal::INVOICEITEMTYPE_LAB;
@@ -965,6 +979,59 @@ sub execAction_submit
 	);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	#GET ITEM COST FROM FEE SCHEDULE
+	my $enteredCost = $page->field('proccharge');
+	unless($enteredCost)
+	{
+		my $unitCostField = $self->getField('proc_charge_fields')->{fields}->[0];
+		my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
+		my $cptCode = $page->field('procedure');
+		my $modCode = $page->field('procmodifier');
+
+		my $fsResults = App::IntelliCode::getItemCost($page, $cptCode, $modCode, \@feeSchedules);
+		my $resultCount = scalar(@$fsResults);
+		if($resultCount == 0)
+		{
+			$unitCostField->invalidate($page, 'No unit cost was found');
+		}
+		elsif($resultCount == 1)
+		{
+			foreach (@$fsResults)
+			{
+				my $fs = $_->[0];
+				my $entry = $_->[1];
+				my $unitCost = $entry->{unit_cost};
+				$page->field('proccharge', $unitCost);
+			}
+		}
+		else
+		{
+			my @costs = ();
+			foreach (@$fsResults)
+			{
+				my $fs = $_->[0];
+				my $entry = $_->[1];
+				push(@costs, $entry->{unit_cost});
+
+				#$unitCostField->invalidate($page, "Fee Schedule '$fs' returned the unit cost: $unitCost");
+			}
+
+			$self->updateFieldFlags('alt_cost', FLDFLAG_INVISIBLE, 0);
+			$self->updateFieldFlags('units_emg_fields', FLDFLAG_INVISIBLE, 0);
+			$self->updateFieldFlags('proc_charge_fields', FLDFLAG_INVISIBLE, 1);
+
+			my $costList = join(';', @costs);
+			$self->getField('alt_cost')->{selOptions} = "$costList";
+		}
+	}
+
+
+}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -984,29 +1051,26 @@ sub execute
 		$itemType = App::Universal::INVOICEITEMTYPE_LAB;
 	}
 
-	#THIS NEEDS TO BE PUT IN THE PROCEDURE DIALOG - 04-18-00 MAF
-	my @feeSchedules = $page->field('fee_schedule');
-
-	my @relDiags = $page->field('procdiags');
-	my @hcpcsCode = split(/,/, $page->field('hcpcs'));
-	my @cptCode = $page->field('procedure');
-
 	my $comments = $page->field('comments');
 	my $emg = $page->field('emg') == 1 ? 1 : 0;
-	my $extCost = $page->field('proccharge') * $page->field('procunits');
+
+	my $unitCost = $page->field('proccharge') || $page->field('alt_cost');
+	my $extCost = $unitCost * $page->field('procunits');
 	my $balance = $extCost + $invItem->{total_adjust};
 
+	my @feeSchedules = split(/\s*,\s*/, $page->field('fee_schedules'));
+	my @relDiags = split(/\s*,\s*/, $page->field('procdiags'));
+	#my @hcpcsCode = split(/\s*,\s*/, $page->field('hcpcs'));
+	my @cptCodes = split(/\s*,\s*/, $page->field('procedure'));		#there will always be only one value in this array
 
-	## RUN INTELLICODE
+	## RUN INCREMENT USAGE IN INTELLICODE
 	if($command ne 'remove')
 	{
-		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCode, $sessUser, $sessOrg);
+		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
-
-
-		#my @itemCosts = App::IntelliCode::getItemCost($page, \@cptCode, \@feeSchedules);
-
 	}
+
+
 
 	$page->schemaAction(
 			'Invoice_Item', $command,
@@ -1016,7 +1080,7 @@ sub execute
 			code => $page->field('procedure') || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
-			unit_cost => $page->field('proccharge') || undef,
+			unit_cost => $unitCost || undef,
 			quantity => $page->field('procunits') || undef,
 			extended_cost => $extCost || undef,
 			balance => defined $balance ? $balance : undef,
