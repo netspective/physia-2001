@@ -137,37 +137,37 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'Affiliation', name => 'affiliation'),
 				new CGI::Dialog::Field(type => 'date', caption => 'Date', name => 'value_dateend', futureOnly => 0, defaultValue => ''),
 			]),
-		new CGI::Dialog::MultiField(caption => 'Board Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-						fields => [
-							new CGI::Dialog::Field(caption => 'Accreditations', name => 'accreditations'),
-							new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'accredit_exp_date', defaultValue => ''),
-							]),
-		new CGI::Dialog::MultiField(caption =>'Tax ID/Type/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'Tax ID', name => 'tax_id'),
-				new CGI::Dialog::Field(caption => 'Tax ID Type',
-						name => 'tax_id_type',
-						fKeyStmtMgr => $STMTMGR_PERSON,
-						fKeyStmt => 'selTaxIdType',
-						fKeyDisplayCol => 1,
-						fKeyValueCol => 0),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'taxid_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'IRS/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field( caption => 'IRS', name => 'irs'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'irs_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'DEA/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field( caption => 'DEA', name => 'dea'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'dea_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'DPS/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field( caption => 'DPS', name => 'dps'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'dps_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
+		#new CGI::Dialog::MultiField(caption => 'Board Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#				fields => [
+		#					new CGI::Dialog::Field(caption => 'Accreditations', name => 'accreditations'),
+		#					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'accredit_exp_date', defaultValue => ''),
+		#					]),
+		#new CGI::Dialog::MultiField(caption =>'Tax ID/Type/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#	fields => [
+		#		new CGI::Dialog::Field(caption => 'Tax ID', name => 'tax_id'),
+		#		new CGI::Dialog::Field(caption => 'Tax ID Type',
+		#				name => 'tax_id_type',
+		#				fKeyStmtMgr => $STMTMGR_PERSON,
+		#				fKeyStmt => 'selTaxIdType',
+		#				fKeyDisplayCol => 1,
+		#				fKeyValueCol => 0),
+		#		new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'taxid_exp_date', futureOnly => 1, defaultValue => ''),
+		#		]),
+		#new CGI::Dialog::MultiField(caption =>'IRS/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#	fields => [
+		#		new CGI::Dialog::Field( caption => 'IRS', name => 'irs'),
+		#		new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'irs_exp_date', futureOnly => 1, defaultValue => ''),
+		#		]),
+		#new CGI::Dialog::MultiField(caption =>'DEA/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#	fields => [
+		#		new CGI::Dialog::Field( caption => 'DEA', name => 'dea'),
+		#		new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'dea_exp_date', futureOnly => 1, defaultValue => ''),
+		#		]),
+		#new CGI::Dialog::MultiField(caption =>'DPS/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#	fields => [
+		#		new CGI::Dialog::Field( caption => 'DPS', name => 'dps'),
+		#		new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'dps_exp_date', futureOnly => 1, defaultValue => ''),
+		#		]),
 		new CGI::Dialog::MultiField(caption =>'1. State/License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(caption => 'State', name => 'state1'),
@@ -186,11 +186,11 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'License', name => 'license3'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state3_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
-		new CGI::Dialog::MultiField(caption =>'National Provider Indentification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'provider identification', name => 'provider_identif_num'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'identif_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
+		#new CGI::Dialog::MultiField(caption =>'National Provider Indentification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		#	fields => [
+		#		new CGI::Dialog::Field(caption => 'provider identification', name => 'provider_identif_num'),
+		#		new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'identif_exp_date', futureOnly => 1, defaultValue => ''),
+		#		]),
 
 		new CGI::Dialog::Field(
 						type => 'bool',
@@ -436,61 +436,6 @@ sub execute_add
 			value_dateEnd => $page->field('state3_exp_date') || undef,
 			_debug => 0
 	) if $state3 ne '' && $page->field('license3') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'BCBS',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_textB => 'BCBS',
-			value_text => $page->field('bcbs_num') || undef,
-			value_dateEnd => $page->field('bcbs_exp_date') || undef,
-			_debug => 0
-	) if $page->field('bcbs_num') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Railroad Medicare',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_textB => 'Railroad Medicare',
-			value_text => $page->field('rail_medic') || undef,
-			value_dateEnd => $page->field('rail_exp_date') || undef,
-			_debug => 0
-	) if $page->field('rail_medic') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Champus',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_textB => 'Champus',
-			value_text => $page->field('champus') || undef,
-			value_dateEnd => $page->field('champus_exp_date') || undef,
-			_debug => 0
-	) if $page->field('champus') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'WC#',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_textB => 'WC#',
-			value_text => $page->field('wc_num') || undef,
-			value_dateEnd => $page->field('wc_exp_date') || undef,
-			_debug => 0
-	) if $page->field('wc_num') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'National Provider Identification',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_textB => 'National Provider Identification',
-			value_text => $page->field('provider_identif_num') || undef,
-			value_dateEnd => $page->field('identif_exp_date') || undef,
-			_debug => 0
-	) if $page->field('provider_identif_num') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'Physician');
 	$page->endUnitWork();
