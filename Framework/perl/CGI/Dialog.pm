@@ -594,6 +594,7 @@ sub select_as_html
 		elsif($self->{style} eq 'multidual')
 		{
 			my $width = $self->{width} || '175 pt';
+			$width .= ' pt' if $width =~ /^\d+$/;
 			my ($selectOptions, $selectOptionsSelected) = ('', '');
 			foreach (@{$choices})
 			{
