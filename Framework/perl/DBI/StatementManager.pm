@@ -58,6 +58,7 @@ sub new
 	my $name = "$self";
 	$name =~ s/\=.*$//;
 	$ALL_STMT_MANAGERS->{$name} = $self;
+	$self->{id} = $name;
 
 	$self;
 }
