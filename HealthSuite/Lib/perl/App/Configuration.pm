@@ -105,6 +105,20 @@ sub createPath
 	}
 }
 
+sub createLink
+{
+	my (%links) = @_;
+
+	foreach my $key (keys %links)
+	{
+		unless(-l $key)
+		{
+			system(qq{
+				ln -fs $links{$key} $key
+			});
+		}
+	}
+}
 
 # Populate the config with some default values
 sub getDefaultConfig
@@ -136,7 +150,19 @@ sub getDefaultConfig
 	$config->path_PerSeEDIDataOutgoing(File::Spec->catfile($config->path_PerSeEDIData(), 'outgoing'));
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
-	$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));
+	
+	if ($group eq CONFIGGROUP_PRO) {
+		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'paper-claims'));
+	}
+	elsif ($group eq CONFIGGROUP_TEST) {
+		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'test-paper-claims'));
+	}
+	elsif ($group eq CONFIGGROUP_DEMO) {
+		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'demo-paper-claims'));
+	}
+	else {
+		$config->path_PaperClaims(File::Spec->catfile(PATH_EDIDATA, 'dev-paper-claims'));
+	}
 
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
 	$config->file_NSFHeader(File::Spec->catfile(PATH_APPCONF, 'nsf-header-conf'));
@@ -174,7 +200,7 @@ sub getDefaultConfig
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
 	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
-	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_thai/pro@dbi:Oracle:SDEDBS03'),
+	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'sde04/sde@dbi:Oracle:SDEDBS04'),
 	'db-sde02' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
 
 	# New SUN Databases
@@ -230,7 +256,7 @@ createPath(
 	$CONFDATA_SERVER->path_SchemaSQL,
 	$CONFDATA_SERVER->path_temp,
 	$CONFDATA_SERVER->path_PDFOutput
-	);
+);
 requirePath(
 	$CONFDATA_SERVER->path_Database,
 	$CONFDATA_SERVER->path_Reports,
@@ -238,7 +264,9 @@ requirePath(
 	$CONFDATA_SERVER->path_OrgReports,
 	$CONFDATA_SERVER->path_EDIData,
 	$CONFDATA_SERVER->path_PerSeEDIData,
-	$CONFDATA_SERVER->path_PaperClaims,
-	);
+);
+createLink(
+	App::Configuration::PATH_WEBSITE . '/paperclaims' => $CONFDATA_SERVER->path_PaperClaims,
+);
 	
 1;
