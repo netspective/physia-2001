@@ -31,27 +31,11 @@ runSQL('BUILD_0013_create_shahbaz_tables.sql');
 runSQL('BUILD_0013_drop_and_recreate_Blood_Type.sql');
 runSQL('BUILD_0013_load_pre_post_code.sql');
 
-makeSymbolicLink();
-
 ######## END UPGRADE SCRIPT #########
 
 exit;
 
 # Subroutines
-
-sub makeSymbolicLink
-{
-	my $paperClaimDir = App::Configuration::PATH_WEBSITE . '/paperclaims';
-	system(qq{
-		(	echo "---------------------------------------"
-			date
-			echo "---------------------------------------"
-			rm $paperClaimDir
-			ln -fs /u/vusr_edi/paper-claims $paperClaimDir
-		) >> $LOGFILE 2>&1
-	});
-}
-
 
 sub runSQL
 {
@@ -95,5 +79,3 @@ sub connectDB
 		die "DB Schema File and Connect Key are required!";
 	}
 }
-
-
