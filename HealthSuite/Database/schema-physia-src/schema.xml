@@ -308,6 +308,7 @@
 		<column name="total_items" type="integer" calc="trigger" descr="The total number of items (minus 'phantom' adjustment items) in the invoice"/>
 		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice"/>
 		<column name="balance" type="currency" calc="trigger" descr="The total_cost - total_adjust (maintained automatically)"/>
+		<column name="budget_id" indexed="yes" parentref="Invoice_Budget.budget_id" desc="The payment budget payment plan this invoice is part of"/>
 		<column name="data_text_a" type="text" size="128" descr="Extra data"/>
 		<column name="data_text_b" type="text" size="128" descr="Extra data"/>
 		<column name="data_text_c" type="text" size="128" descr="Extra data"/>
@@ -358,6 +359,22 @@
 		<column name="data_date_c" type="date" descr="Extra data, dependent upon invoice item type"/>
 	</table>
 
+	<table name="Invoice_Billing" abbrev="InvBill" parent="Invoice" type="Audit,Secure">
+		<column name="bill_id" type="autoinc" primarykey="yes" descr="Unique billing identifier"/>
+		<column name="invoice_id" lookupref="Invoice.invoice_id" required="yes" descr="The invoice item for which billing information is being defined"/>
+		<column name="invoice_item_id" lookupref="Invoice_Item.item_id" descr="The invoice item for which billing information is being defined (if needed)"/>
+		<column name="assoc_bill_id" lookupref="Invoice_billing.bill_id" descr="Associated parent bill_id (if any)"/>
+		<column name="bill_sequence" lookupref="Bill_Sequence" descr="Primary, secondary, or tertiary insurance (if record type is person plan)"/>
+		<column name="bill_party_type" lookupref="Invoice_Bill_Party_Type" required="yes" descr="The party that should be billed for this item"/>
+		<column name="bill_to_id" type="text" size="32" descr="The ID of the person or organization being billed"/>
+		<column name="bill_ins_id" lookupref="Insurance.ins_internal_id" descr="Internal insurance ID for insurance org (if billing an insurance)"/>
+		<column name="bill_amount" type="currency" descr="The amount of the total invoice to bill to this party"/>
+		<column name="bill_pct" type="percentage" descr="The percentage of the total invoice being billed to this party"/>
+		<column name="bill_date" type="date" descr="Date bill was sent"/>
+		<column name="bill_status" type="text" size="128" descr="Status of the latest bill"/>
+		<column name="bill_result" type="text" size="128" descr="Result of the latest bill"/>
+	</table>
+	
 	<table name="Invoice_Billing" abbrev="InvBill" parent="Invoice" type="Audit,Secure">
 		<column name="bill_id" type="autoinc" primarykey="yes" descr="Unique billing identifier"/>
 		<column name="invoice_id" lookupref="Invoice.invoice_id" required="yes" descr="The invoice item for which billing information is being defined"/>
