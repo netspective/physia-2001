@@ -391,6 +391,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		},
 	'selPayerChoicesByOwnerPersonId' => qq{
 		SELECT
+			i.ins_internal_id,
 			i.plan_name,
 			'Insurance' AS group_name,
 			bs.caption AS bill_seq,
@@ -408,6 +409,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			AND ct.group_name = 'insurance'
 		UNION (
 			SELECT
+				wk.ins_internal_id,
 				wk.plan_name,
 				'Workers Compensation' AS group_name,
 				'' AS bill_seq,
@@ -420,6 +422,7 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			)
 		UNION (
 			SELECT
+				ins_internal_id,
 				guarantor_id AS plan_name,
 				'Third-Party' AS group_name,
 				'' AS bill_seq,
