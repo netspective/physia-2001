@@ -262,7 +262,12 @@
 
 		<deliverable id="1595">
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
-		</deliverable>		
+		</deliverable>	
+
+		<deliverable id="1623">
+			 Updated the url for 'Go to Worklist' under 'Next Action' in 'Add Patient, Physician, staff  and Referring Doctor' dialogs.
+		</deliverable>	
+		
 	</deliverables>
 </release-notes>
 
