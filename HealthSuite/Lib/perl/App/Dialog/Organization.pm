@@ -507,9 +507,20 @@ sub makeStateChanges
 		$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 	}
 
+	my $orgIdField = $self->getField('org_id');
+
+	my $personCategory = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPersonCategory', $page->session('user_id'),
+																			$page->session('org_internal_id'));
+
+	my $orgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'),
+																		$page->param('org_id'));
+
+	if ( $orgInternalId eq $page->session('org_internal_id') && $command eq 'update' && $personCategory ne 'Administrator')
+	{
+		$orgIdField->invalidate($page, "Cannot update a 'Main Org' unless the user is a 'Administrator'.");
+	}
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-
 }
 
 
