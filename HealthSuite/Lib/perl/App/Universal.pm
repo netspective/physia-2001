@@ -127,6 +127,8 @@ use constant ATTRTYPE_STATE => 510;
 use constant ATTRTYPE_ACCREDITATION => 520;
 use constant ATTRTYPE_AFFILIATION => 530;
 use constant ATTRTYPE_SPECIALTY => 540;
+use constant ATTRTYPE_PROVIDER_NUMBER => 550;
+use constant ATTRTYPE_TAXID => 570;
 
 
 
