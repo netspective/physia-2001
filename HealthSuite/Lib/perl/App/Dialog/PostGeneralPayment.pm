@@ -8,6 +8,7 @@ use Carp;
 use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Statements::Catalog;
+use App::Statements::Person;
 use App::Statements::Insurance;
 use App::Statements::BillingStatement;
 use CGI::Dialog;
@@ -68,6 +69,14 @@ sub new
 
 		new CGI::Dialog::Field(caption => 'Authorization/Reference Number', name => 'auth_ref'),
 
+		new CGI::Dialog::Field(
+				caption => 'Provider ID',
+				name => 'provider_id',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_PERSON,
+				fKeyStmt => 'selPersonBySessionOrgAndCategory',
+				fKeyDisplayCol => 0,
+				fKeyValueCol => 0),
 
 		new CGI::Dialog::Subhead(heading => 'Outstanding Invoices', name => 'outstanding_heading'),
 		new App::Dialog::Field::OutstandingInvoices(name =>'outstanding_invoices_list'),
@@ -123,8 +132,13 @@ sub makeStateChanges
 	my $batchDate = $page->param('_p_batch_date') || $page->field('batch_date');
 	if( $batchId && $batchDate )
 	{
-#		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
+		#$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
+
+
+	#pass in bind params to populate provide field
+	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$page->session('org_internal_id'), 'Physician'];
+
 }
 
 sub populateData
@@ -214,6 +228,7 @@ sub executePrePayment
 	my $payType = $page->field('pay_type');
 	my $payRef = $page->field('pay_ref');
 	my $authRef = $page->field('auth_ref');
+	my $providerId = $page->field('provider_id');
 	my $totalAmtRecvd = $page->field('total_amount') || 0;
 
 	my $transId = $page->schemaAction(
@@ -222,8 +237,8 @@ sub executePrePayment
 		trans_status => defined $transStatus ? $transStatus : undef,
 		service_facility_id => $sessOrgIntId || undef,
 		billing_facility_id => $sessOrgIntId || undef,
-	#	provider_id => $billingProvider || undef,
-	#	care_provider_id => $billingProvider || undef,
+		provider_id => $providerId || undef,
+		care_provider_id => $providerId || undef,
 		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
 		trans_owner_id => $payerId || undef,
 		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
