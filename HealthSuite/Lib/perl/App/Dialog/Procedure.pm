@@ -58,7 +58,7 @@ sub new
 		new CGI::Dialog::Field::Duration(
 				name => 'service',
 				caption => 'Service Dates: From/To',
-				begin_options => FLDFLAG_REQUIRED,
+				#begin_options => FLDFLAG_REQUIRED,
 				begin_caption => 'From Date',
 				end_caption => 'To Date'
 				),
