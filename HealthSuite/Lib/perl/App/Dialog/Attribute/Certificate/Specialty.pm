@@ -18,6 +18,7 @@ use App::Statements::Person;
 use vars qw(@ISA @CHANGELOG);
 @ISA = qw(App::Dialog::Attribute::Certificate);
 
+
 sub initialize
 {
 	my $self = shift;
@@ -33,7 +34,10 @@ sub initialize
 					fKeyDisplayCol => 0,
 					fKeyValueCol => 1),
 		new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int', type => 'select',
-					selOptions => "Unknown:" . SEQUENCE_SPECIALTY_UNKNOWN . ";Primary:" . SEQUENCE_SPECIALTY_PRIMARY . ";Secondary:" . SEQUENCE_SPECIALTY_SECONDARY . ";Tertiary:" . SEQUENCE_SPECIALTY_TERTIARY . ";Quaternary:" . SEQUENCE_SPECIALTY_QUATERNARY, value => SEQUENCE_SPECIALTY_UNKNOWN)
+					selOptions => "Unknown:" . $self->SEQUENCE_SPECIALTY_UNKNOWN . ";Primary:" .
+					$self->SEQUENCE_SPECIALTY_PRIMARY . ";Secondary:" . $self->SEQUENCE_SPECIALTY_SECONDARY . ";Tertiary:"
+					. $self->SEQUENCE_SPECIALTY_TERTIARY . ";Quaternary:" . $self->SEQUENCE_SPECIALTY_QUATERNARY,
+					value => $self->SEQUENCE_SPECIALTY_UNKNOWN)
 	);
 
 	$self->SUPER::initialize();
