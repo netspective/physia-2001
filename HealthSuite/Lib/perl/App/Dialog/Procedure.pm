@@ -720,7 +720,7 @@ sub storeInsuranceInfo
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
 					parent_id => $invoiceId,
-					item_name => "Insurance/$payerBillSeq/HMO-PPO/Indicator",
+					item_name => "Insurance/$payerBillSeq/HMO-PPO ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $ppoHmo->{value_text} || undef,
 					_debug => 0
