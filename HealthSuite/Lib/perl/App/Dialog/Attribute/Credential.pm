@@ -36,7 +36,7 @@ sub new
 	$self->addContent(
 		new App::Dialog::Field::Attribute::Name(name => 'value_textb',
 			caption => 'ID Caption', priKey => 1, type => 'select',
-			selOptions => ';Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#',
+			selOptions => ';Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#;Railroad Medicare#',
 			options => FLDFLAG_REQUIRED,
 			attrNameFmt => "#field.value_textb#",
 			fKeyStmtMgr => $STMTMGR_ORG,
