@@ -86,6 +86,7 @@ use constant CONFIGGROUP_PRO => 'production';
 use constant CONFIGGROUP_SWDEV => 'development';
 use constant CONFIGGROUP_TEST => 'testing';
 use constant CONFIGGROUP_DEMO => 'demonstration';
+use constant CONFIGGROUP_DEMOSNAP => 'demonstration Snap Shot';
 use constant CONFIGGROUP_SOLO => 'solo';
 
 use constant PATH_APPROOT    => File::Spec->catfile(defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite');
@@ -275,7 +276,7 @@ sub getDefaultConfig
 	}),
 	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'db-demo02' => getDefaultConfig('Demo02 Configuration', CONFIGGROUP_DEMO, 'demo02/demo@dbi:Oracle:SDEDBS02'),
-	'db-demosnap' => getDefaultConfig('DemoSnap Configuration', CONFIGGROUP_DEMO, 'demosnap/demo@dbi:Oracle:SDEDBS02'),
+	'db-demosnap' => getDefaultConfig('DemoSnap Configuration', CONFIGGROUP_DEMOSNAP, 'demosnap/demo@dbi:Oracle:SDEDBS02'),
 	'db-pro01' => getDefaultConfig('Production Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS04'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/usuz1v4y@dbi:Oracle:SDEDBS03'),
