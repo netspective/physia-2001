@@ -1,4 +1,5 @@
 . /etc/profile
 . $HOME/.bash_profile
 
+cd $HOME/per-se
 nsfClaims.pl -db=db-pro_new -actions=create,transmit,archive >> nsfClaims.log 2>&1

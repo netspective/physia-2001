@@ -1,0 +1,5 @@
+. /etc/profile
+. $HOME/.bash_profile
+
+cd $HOME/per-se/incoming/reports
+archiveReports.pl >> archiveReports.log 2>&1

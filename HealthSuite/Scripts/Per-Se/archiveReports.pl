@@ -4,15 +4,19 @@ use strict;
 
 my $LIMIT = 10;
 
+print "\n-------------------------------\n";
+print `date`;
+print "-------------------------------\n";
+
 opendir(DIR, ".") || die "Can't opendir .: $!\n";
 for my $dir (readdir(DIR))
 {
 	next if $dir =~ /^\.+$/;
 	next unless -d $dir;
 
-	print "\n----------------------------------\n";
+	print "\n--------\n";
 	print "$dir\n";
-	print "----------------------------------\n";
+	print "--------\n";
 	
 	system(qq{
 		mkdir -p $dir/archive
@@ -24,11 +28,9 @@ for my $dir (readdir(DIR))
 	{
 		next unless -f "$dir/$file";
 		next unless $file =~ /^\d\d\d\d/;
-		print "$file\n";
 		$count++;
 		
-		print "mv $dir/$file $dir/archive\n" if $count > $LIMIT;
-		
+		system "mv $dir/$file $dir/archive\n" if $count > $LIMIT;
 	}
 	closedir(ORG);
 }

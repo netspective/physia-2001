@@ -1,4 +1,7 @@
 . /etc/profile
 . $HOME/.bash_profile
 
+cd $HOME/per-se
 getPerseReports.pl >> getPerseReports.log 2>&1
+
+$HOME/projects/HealthSuite/Scripts/Per-Se/archive_reports
