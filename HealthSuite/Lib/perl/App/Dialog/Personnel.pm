@@ -43,7 +43,7 @@ sub new
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(caption => 'Category',
 			type => 'select',
-			selOptions => 'Physician;Nurse;Staff;Patient;Guarantor;Administrator;Referring-Doctor',
+			selOptions => 'Physician;Nurse;Staff;Superuser;Administrator;Referring-Doctor',
 			name => 'category',
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
