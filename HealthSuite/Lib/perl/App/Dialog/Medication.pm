@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.26 2001-01-24 21:28:18 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.27 2001-01-25 20:38:21 munir_faridi Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -101,7 +101,7 @@ sub new
 					name => 'first_dose',
 					type => 'select',
 					selOptions => 'Now;In;After Completing',
-					options => FLDFLAG_REQUIRED,
+					options => FLDFLAG_REQUIRED | FLDFLAG_PREPENDBLANK,
 					onChangeJS => qq{showFieldsOnValues(event, ['In', 'After Completing'], ['first_dose_specs']);},
 				),
 				new CGI::Dialog::Field(caption => 'First Dose Details',
@@ -313,7 +313,7 @@ sub new
 		}
 		if (opObj = eval('document.dialog._f_first_dose'))
 		{
-			if (opObj.value == 'Now')
+			if (opObj.value == '')
 			{
 				setIdDisplay('first_dose_specs', 'none');
 			}
@@ -591,7 +591,7 @@ sub populateData
 
 		my @firstDose = split(': ', $medInfo->{first_dose});
 		$page->field('first_dose', $firstDose[0]);
-		unless($firstDose[0] eq 'Now')
+		unless($firstDose[0] eq 'Now' || $firstDose[0] eq '')
 		{
 			$self->updateFieldFlags('first_dose_specs', FLDFLAG_INVISIBLE, 0);
 			$page->field('first_dose_specs', $firstDose[1]);
@@ -754,7 +754,12 @@ sub execute_add
 
 	my $dose = $page->field('dose');
 	my $route = $page->field('route');
-	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ': ' . $page->field('first_dose_specs');
+	my $firstDose = $page->field('first_dose');
+	my $firstDoseValue;
+	if($firstDose)
+	{
+		$firstDoseValue = $firstDose eq 'Now' ? 'Now' : $firstDoseValue . ': ' . $page->field('first_dose_specs');
+	}
 	my $doseUnits = $page->field('dose_units') eq 'other' ? $page->field('other_dose_units') : $page->field('dose_units');
 	my $frequency = $page->field('frequency') eq 'other' ? $page->field('other_frequency') : $page->field('frequency');
 	my $prn = $page->field('prn') eq 'other' ? $page->field('other_prn') : $page->field('prn');
@@ -788,7 +793,7 @@ sub execute_add
 		status => $page->field('status') || undef,
 		#sale_units => $saleUnits || undef,
 		record_type => defined $recordType ? $recordType : undef,
-		first_dose => $firstDose || undef,
+		first_dose => $firstDoseValue || undef,
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
@@ -830,7 +835,12 @@ sub execute_update
 
 	my $dose = $page->field('dose');
 	my $route = $page->field('route');
-	my $firstDose = $page->field('first_dose') eq 'Now' ? 'Now' : $page->field('first_dose') . ': ' . $page->field('first_dose_specs');
+	my $firstDose = $page->field('first_dose');
+	my $firstDoseValue;
+	if($firstDose)
+	{
+		$firstDoseValue = $firstDose eq 'Now' ? 'Now' : $firstDoseValue . ': ' . $page->field('first_dose_specs');
+	}
 	my $doseUnits = $page->field('dose_units') eq 'other' ? $page->field('other_dose_units') : $page->field('dose_units');
 	my $frequency = $page->field('frequency') eq 'other' ? $page->field('other_frequency') : $page->field('frequency');
 	my $prn = $page->field('prn') eq 'other' ? $page->field('other_prn') : $page->field('prn');
@@ -862,7 +872,7 @@ sub execute_update
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
 		#sale_units => $saleUnits || undef,
-		first_dose => $firstDose || undef,
+		first_dose => $firstDoseValue || undef,
 		ongoing => defined $ongoing ? $ongoing : undef,
 		sig => $sig || undef,
 		prescribed_by => $page->field('prescribed_by') || $page->field('other_prescribed_by') || undef,
