@@ -540,9 +540,11 @@ sub getAppointments
 				$startMinute = '&nbsp';
 			}
 
-			my $short_patient_name = $slots[$i]->{attributes}->{short_patient_name};
-			$short_patient_name = $short_patient_name;
-
+			my $short_patient_name = ucfirst(lc($slots[$i]->{attributes}->{short_patient_name}));
+			my $firstInit = $short_patient_name	=~ /(.)$/;
+			my $u = uc($1);
+			$short_patient_name =~ s/.$/$u/;
+			
 			my $patient_complete_name = $slots[$i]->{attributes}->{patient_complete_name};
 			my $patient_id = $slots[$i]->{attributes}->{patient_id};
 			my $event_id = $slots[$i]->{attributes}->{event_id};

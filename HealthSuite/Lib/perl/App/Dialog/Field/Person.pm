@@ -154,7 +154,7 @@ sub isValid
 			}
 			my $stem = $value;
 			$stem =~ s/_\d$//;
-			return 1 if grep(/^${stem}$/, @rovingPhysicians);
+			return 1 if grep(/${stem}/, @rovingPhysicians);
 		}
 
 		return 1 if $value =~ /,/;

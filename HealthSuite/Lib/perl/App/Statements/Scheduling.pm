@@ -396,7 +396,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'updAssignResource' => qq{
-		update Event_Attribute set value_text = upper(?) where upper(value_text) = upper(?)
+		update Event_Attribute set value_text = ? where upper(value_text) = upper(?)
 		and parent_id in
 			(select event_id from event
 				where start_time between to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')

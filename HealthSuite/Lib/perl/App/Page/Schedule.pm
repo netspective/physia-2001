@@ -390,8 +390,8 @@ sub prepare_dialog_customize
 {
 	my ($self) = @_;
 
-	use App::Dialog::Customize;
-	my $dialog = new App::Dialog::Customize(schema => $self->getSchema());
+	use App::Dialog::ScheduleCustomize;
+	my $dialog = new App::Dialog::ScheduleCustomize(schema => $self->getSchema());
 	$dialog->handle_page($self, $self->param('dialogcommand'));
 	return 1;
 }
@@ -420,8 +420,8 @@ sub prepare_dialog_assign
 {
 	my ($self) = @_;
 
-	use App::Dialog::Assign;
-	my $dialog = new App::Dialog::Assign(schema => $self->getSchema());
+	use App::Dialog::ScheduleAssign;
+	my $dialog = new App::Dialog::ScheduleAssign(schema => $self->getSchema());
 	$dialog->handle_page($self);
 	return 1;
 }
