@@ -31,7 +31,34 @@
 		<deliverable id="1224">
 			Eliminate all tabs other than summary from ACS org page (affects ACS only)
 		</deliverable>
+
+		<deliverable id="1160">
+			If a state of XX is entered then zip code validation will be skipped
+		</deliverable>
+
+		<deliverable id="1220">
+			*ACS ONLY* Added Service Request date "SD" , Service Begin Date "SBD", Service End Date "SDE" removed referral date ,and sorted by Service Begin date desc from the Service and Referrals history component
+		</deliverable>
 		
+		<deliverable id="1215">
+			*ACS ONLY* Modified lookup used for Referral Type for Service Request dialog
+		</deliverable>
+		<deliverable id="1223">
+			*ACS ONLY*  Created new dialog for adding a Service Category Entry to an orgs Service catalog
+		</deliverable>
+		<deliverable id="1178">
+			Modified calc for net rcpts on financial analysis report.
+		</deliverable>
+		<deliverable id="1151">
+			On daily audit report detail section only show the physician and patient name once for an invoice
+		</deliverable>
+		<deliverable id="1124">
+			Ordered the monthly detail audit report and added a batch date col to the 
+detail report.
+		</deliverable>
+		<deliverable id="1145">
+			Added option to select all products in the collection worklist.  When user selects "all" the products list box will not appear on the dialog. If the user does not select "all" then the products list box will appear and the user can select which products to filter 
+		</deliverable>
 	
 	</deliverables>
 </release-notes>
