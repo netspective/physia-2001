@@ -1562,13 +1562,14 @@ sub initialize
 		);
 
 	my $activeView = $self->param('_pm_view');
-	unless($self->hasPermission("page/invoice/$activeView"))
+	#unless($self->hasPermission("page/invoice/$activeView"))
+	unless($self->hasPermission("page/invoice"))
 	{
 		$self->disable(
 				qq{
 					<br>
 					You do not have permission to view this information. 
-					Permission page/invoice/$activeView is required.
+					Permission page/invoice is required.
 
 					Click <a href='javascript:history.back()'>here</a> to go back.
 				});

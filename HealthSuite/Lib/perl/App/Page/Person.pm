@@ -82,13 +82,14 @@ sub initialize
 	my $activeView = $self->param('_pm_view');
 	unless($activeView eq 'home')
 	{
-		unless($self->hasPermission("page/person/$activeView"))
+		#unless($self->hasPermission("page/person/$activeView"))
+		unless($self->hasPermission("page/person"))
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information. 
-						Permission page/person/$activeView is required.
+						Permission page/person is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
