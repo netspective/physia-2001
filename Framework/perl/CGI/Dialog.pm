@@ -1488,7 +1488,6 @@ sub getFlags
 	my $flags = 0;
 
 	$flags |= DLGFLAG_DATAENTRY_INITIAL if $activeExecMode eq 'I';
-	$flags |= DLGFLAG_DATAENTRY_INITIAL if $activeExecMode eq 'I';
 	$flags |= DLGFLAG_DATAENTRY if $activeExecMode eq 'I' || $activeExecMode eq 'V';
 	$flags |= DLGFLAG_EXECUTE if $activeExecMode eq 'E';
 
@@ -1613,6 +1612,15 @@ sub getActiveCommand
 	#
 	my ($self, $page) = @_;
 	return $page->property(PAGEPROPNAME_COMMAND . '_' . $self->id());
+}
+
+sub getActiveFlags
+{
+	#
+	# VALID ONLY INSIDE a call to getHtml
+	#
+	my ($self, $page) = @_;
+	return $page->property(PAGEPROPNAME_FLAGS . '_' . $self->id());
 }
 
 #
