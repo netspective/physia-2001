@@ -13,6 +13,7 @@ use vars qw(
 	);
 @ISA    = qw(Exporter App::Statements::Component);
 @EXPORT = qw($STMTMGR_COMPONENT_INVOICE);
+my $CLAIM_NOTES = App::Universal::TRANSTYPEACTION_NOTES;
 
 $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 
@@ -664,7 +665,64 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 	#publishComp_stpt => sub { my ($page, $flags, $invoiceId) = @_; $invoiceId ||= $page->param('invoice_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.monthlyAuditRecap', [$invoiceId], 'panelTransp'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------
+'invoice.claim-notes' => {
 
+				sqlStmt => qq{
+					select  trans_invoice_id, detail, trans_id, trans_type, initiator_id,
+						to_char(trans_begin_stamp, 'MM/DD/YYYY') as trans_begin_stamp
+					from transaction
+					where trans_invoice_id = :1 and
+					initiator_id = :2 and
+					trans_status = 2 and
+					trans_type = $CLAIM_NOTES
+				},
+				sqlStmtBindParamDescr => ['Invoice ID for transaction table'],
+				publishDefn => {
+						columnDefn => [
+							{ head => 'Claim Notes', dataFmt => '#5# (#4#): <I>#1#</I>' },
+						],
+						bullets => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#2#?home=#homeArl#',
+						frame => {
+							addUrl => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-add-claim-notes?home=#homeArl#',
+							editUrl => '/invoice/#param.invoice_id#/stpe-#my.stmtId#?home=#homeArl#',
+							},
+				},
+				publishDefn_panel =>
+				{
+					# automatically inherites columnDefn and other items from publishDefn
+					style => 'panel',
+					frame => { heading => 'Claim Notes' },
+				},
+				publishDefn_panelTransp =>
+				{
+					# automatically inherites columnDefn and other items from publishDefn
+					style => 'panel.transparent',
+					inherit => 'panel',
+				},
+				publishDefn_panelEdit =>
+				{
+					# automatically inherites columnDefn and other items from publishDefn
+					style => 'panel.edit',
+					frame => { heading => 'Edit Claim Notes' },
+					banner => {
+						actionRows =>
+						[
+							{	url => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-add-alert-person?home=#param.home#',
+								caption => qq{ Add <A HREF= '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-add-claim-notes/#param.invoice_id#?home=#param.home#'>Claim Notes</A> },
+							},
+						],
+					},
+					stdIcons =>	{
+						updUrlFmt => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-update-trans-#3#/#param.invoice_id#?home=#param.home#', delUrlFmt => '/invoice/#param.invoice_id#/stpe-#my.stmtId#/dlg-remove-trans-#3#/#2#/#0#?home=#param.home#'
+					},
+				},
+
+				publishComp_st => sub { my ($page, $flags, $invoiceId,$sessionId) = @_; $invoiceId ||= $page->param('invoice_id'); $sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.claim-notes', [$invoiceId,$sessionId] ); },
+				publishComp_stp => sub { my ($page, $flags, $invoiceId,$sessionId) = @_; $invoiceId ||= $page->param('invoice_id');$sessionId||=$page->session('user_id');  $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.claim-notes', [$invoiceId,$sessionId], 'panel'); },
+				publishComp_stpe => sub { my ($page, $flags, $invoiceId,$sessionId) = @_; $invoiceId ||= $page->param('invoice_id');$sessionId||=$page->session('user_id'); $STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.claim-notes', [$invoiceId,$sessionId], 'panelEdit'); },
+				publishComp_stpt => sub { my ($page, $flags, $invoiceId,$sessionId) = @_; $invoiceId ||= $page->param('invoice_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_INVOICE->createHtml($page, $flags, 'invoice.claim-notes', [$invoiceId,$sessionId], 'panelTransp'); },
+		},
 
 );
 
