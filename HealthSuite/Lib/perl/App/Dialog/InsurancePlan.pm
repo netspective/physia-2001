@@ -225,11 +225,15 @@ sub validateExistingInsSeq
 
 	my $billSeqExists = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $value, $personId);
 	my $billSeqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $value);
+	
+	# Validate that the new sequence is available
+	if (($value >= App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY) && $billSeqExists->{ins_internal_id} ne '')
+	{
+		return ("\u$billSeqCap insurance for '$personId' already exists.");
+	}
 
 	if ($command eq 'add')
 	{
-		return ("\u$billSeqCap insurance for '$personId' already exists.") if $billSeqExists->{ins_internal_id} ne '';
-
 		# If it's Secondary - Quatinary
 		if ($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY)
 		{
@@ -249,12 +253,6 @@ sub validateExistingInsSeq
 		# If they changed the coverage sequence
 		if ($value != $prevSeq)
 		{
-			# Validate that the new sequence is available
-			if ($billSeqExists->{ins_internal_id} ne '')
-			{
-				return ("\u$billSeqCap insurance for '$personId' already exists.");
-			}
-		
 			# Validate that removing the old sequence doesn't leave a hole in the sequence chain
 			if (! $page->field('do_anyway'))
 			{
