@@ -66,7 +66,7 @@ $STMTFMT_SEL_EPSDT_CODE = qq{
 };
 
 $STMTFMT_SEL_CATALOG_CODE = qq{
-	SELECT icd, name, replace(descr, '''', '`'), DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+	SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
 		DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
 		non_specific_code, major_diag_category, comorbidity_complication,
 		medicare_secondary_payer, manifestation_code, questionable_admission,
@@ -79,7 +79,7 @@ $STMTFMT_SEL_CATALOG_CODE = qq{
 };
 
 $STMTFMT_SEL_CPT_CODE = qq{
-	SELECT cpt, name, replace(description, '''', '`'), comprehensive_compound_cpts,
+	SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
 		mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
 		asc_, non_rep, non_cov
 	FROM ref_cpt
@@ -89,7 +89,7 @@ $STMTFMT_SEL_CPT_CODE = qq{
 };
 
 $STMTFMT_SEL_HCPCS_CODE = qq{
-	SELECT hcpcs, name, replace(description, '''', '`')
+	SELECT hcpcs, name, replace(description, '''', '`') as description
 	FROM REF_HCPCS
 	WHERE
 		%whereCond%
