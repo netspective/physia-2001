@@ -32,7 +32,11 @@
 		</deliverable>		
 		<deliverable id="1206">
 			Added notes component on Patient Account and Claim Summary
-		</deliverable>		
+		</deliverable>	
+		<deliverable id="1110">
+			TWCC 73
+		</deliverable>
+			
 	</deliverables>
 </release-notes>
 
