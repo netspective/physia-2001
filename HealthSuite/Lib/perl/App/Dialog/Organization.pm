@@ -809,6 +809,18 @@ sub execute_add
 			_debug => 0
 		) if $page->field('bill_line1') ne '';
 
+	$page->schemaAction(
+			'Org_Address', $command,
+			parent_id => $orgIntId || undef,
+			address_name => 'Billing',
+			line1 => $page->field('addr_line1') || undef,
+			line2 => $page->field('addr_line2') || undef,
+			city => $page->field('addr_city') || undef,
+			state => $page->field('addr_state') || undef,
+			zip => $page->field('addr_zip')|| undef,
+			_debug => 0
+		) if $page->field('bill_line1') eq '';
+
 	my $orgInternalId = $page->session('org_internal_id');
 	my $catalogId = $page->field('org_id').'_FEE_SCHEDULE';
 	my $catInternalId = $page->schemaAction(
