@@ -58,7 +58,7 @@ sub new
 				new CGI::Dialog::MultiField (caption => 'Plan Begin/End Dates',	name => 'dates',
 					fields => [
 								new CGI::Dialog::Field(caption => 'Begin Date', name => 'coverage_begin_date', type => 'date', options => FLDFLAG_REQUIRED, pastOnly => 1),
-								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', futureOnly => 1),
+								new CGI::Dialog::Field(caption => 'End Date', name => 'coverage_end_date', type => 'date', futureOnly => 1,defaultValue => ''),
 							]),
 
 				new CGI::Dialog::MultiField(caption =>'Deductible Amounts', hints => 'Individual/Family', name => 'deduct_amts',
