@@ -87,7 +87,7 @@ sub new
 				enum => 'Payment_Type',
 				),
 
-		new CGI::Dialog::MultiField(caption =>'Pay Method/Check or C.C. No.', name => 'pay_method_fields',
+		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code', name => 'pay_method_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
@@ -95,11 +95,9 @@ sub new
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.pay_ref',
-							type => 'text'),
-			]),
+							type => 'text')
+						]),
 
-		new CGI::Dialog::Field(caption => 'Credit Card Exp.', name => 'cc_exp_date', type => 'date', defaultValue => ''),
-		new CGI::Dialog::Field(caption => 'Authorization/Reference Number', name => 'auth_code'),
 
 		#list of items (used for both insurance and personal payments)
 
@@ -155,8 +153,6 @@ sub makeStateChanges
 		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('cc_exp_date', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('auth_code', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->updateFieldFlags('outstanding_items_list', FLDFLAG_INVISIBLE, 1);
@@ -169,8 +165,6 @@ sub makeStateChanges
 		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
-		$self->updateFieldFlags('cc_exp_date', FLDFLAG_INVISIBLE, $isInsurance);
-		$self->updateFieldFlags('auth_code', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('prepay_comments', FLDFLAG_INVISIBLE, $isInsurance);
 		$self->updateFieldFlags('next_action', FLDFLAG_INVISIBLE, $isPersonal);
 	}
@@ -197,7 +191,7 @@ sub populateData
 	my $clientId = $invoiceInfo->{client_id};
 	$page->field('client_id', $clientId);
 
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	if($paidBy eq 'insurance' || $invoiceInfo->{invoice_type} == App::Universal::INVOICETYPE_SERVICE)
 	{
 		my $currentPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
@@ -251,7 +245,7 @@ sub execute
 	my $sessOrg = $page->session('org_id');
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	my $nextPayerExists = $page->field('next_payer_exists');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $batchId = $page->field('batch_id');
@@ -264,7 +258,6 @@ sub execute
 	my $payerIdDisplay = $page->field('payer_id');
 	my $payRef = $page->field('pay_ref');
 	my $payType = $page->field('pay_type');
-	my $authCode = $page->field('auth_code');
 
 	my $totalAmtRecvd = $page->field('total_amount') || $page->field('check_amount') || 0;
 
@@ -310,8 +303,6 @@ sub execute
 			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
 			writeoff_amount => $writeoffAmt || undef,
 			comments => $comments || undef,
-			data_text_a => defined $authCode ? $authCode : undef,
-			data_date_a => $page->field('cc_exp_date') || undef,
 			_debug => 0
 		);
 
@@ -390,7 +381,7 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
