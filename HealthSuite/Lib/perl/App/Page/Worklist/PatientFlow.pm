@@ -39,7 +39,9 @@ my $baseArl = '/worklist/patientflow';
 sub prepare_view_date
 {
 	my ($self) = @_;
-
+	
+	$self->param('person_id', $self->session('person_id')) unless $self->param('person_id');
+	
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -52,16 +54,19 @@ sub prepare_view_date
 			</TR>
 			<TR VALIGN=TOP>
 				<TD>
+					#component.stp-person.phoneMessage#<BR>
+					#component.stp-person.refillRequest#<BR>
+				</TD>
+				<TD>&nbsp;</TD>			
+				<TD>
 					#component.lookup-records#<BR>
 				</TD>
 				<TD>&nbsp;</TD>
 				<TD>
 					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
 					#component.navigate-reports-root#
 				</TD>
+
 			</TR>
 		</TABLE>
 	});
