@@ -35,6 +35,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'job_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -90,8 +91,22 @@ sub initialize
 				]),
 
 		new CGI::Dialog::Field(type=> 'enum', enum => 'Blood_Type', caption => 'Blood Type', name => 'blood_type', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
-		new CGI::Dialog::Field( type => 'memo', caption => 'Misc Notes', name => 'misc_notes'),
+		new CGI::Dialog::Field(name => 'ethnicity',
+						lookup => 'ethnicity',
+						style => 'multicheck',
+						caption => 'Ethnicity',
+						hints => 'You may choose more than one ethnicity type.'),
 
+		new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name', types => ['Guarantor'],
+							hints => "Please provide either an existing Person ID or leave the field 'Responsible Party' as blank and select 'Self' as 'Relationship'", options => FLDFLAG_REQUIRED),
+		#
+		new App::Dialog::Field::Association(caption => 'Relationship To Responsible Party/Other Relationship Name', name => 'relation'),
+		new CGI::Dialog::MultiField(caption =>"Driver's License Number/State", name => 'license_num_state',
+				fields => [
+						new CGI::Dialog::Field(caption => 'License Number', name => 'license_number'),
+						new CGI::Dialog::Field(caption => 'State', name => 'license_state', size => 2, maxLength => 2,)
+			]),
+		new CGI::Dialog::Field( type => 'memo', caption => 'Misc Notes', name => 'misc_notes'),
 
 		# CONTACT METHODS
 		new CGI::Dialog::Subhead(heading => 'Contact Methods', name => 'contact_methods_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -256,6 +271,12 @@ sub populateData
 	$page->field('job_item_id', $jobCodeData->{'item_id'});
 	$page->field('job_code', $jobCodeData->{'value_textb'});
 	$page->field('job_title', $jobCodeData->{'value_text'});
+
+	my $driverLicense = 'Driver/License';
+	my $driverLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $driverLicense);
+	$page->field('driver_license_item_id', $driverLicenseData->{'item_id'});
+	$page->field('license_number', $driverLicenseData->{'value_text'});
+	$page->field('license_state', $driverLicenseData->{'value_textb'});
 }
 
 sub handleContactInfo
@@ -546,6 +567,18 @@ sub handleAttrs
 			value_text => join(',', @physicianType) || undef,
 			_debug => 0
 		) if $member eq 'Physician';
+
+	my $commandDriverLicense = $command eq 'update' &&  $page->field('driver_license_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+				'Person_Attribute', $commandDriverLicense,
+				parent_id => $personId || undef,
+				item_id => $page->field('driver_license_item_id') || undef,
+				item_name => 'Driver/License',
+				value_type => App::Universal::ATTRTYPE_LICENSE,
+				value_text => $page->field('license_number') || undef,
+				value_textB => $page->field('license_state') || undef,
+				_debug => 0
+	) if $member eq 'Patient';
 }
 
 sub customValidate
