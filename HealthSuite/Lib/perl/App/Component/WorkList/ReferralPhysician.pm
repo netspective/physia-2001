@@ -87,7 +87,7 @@ sub initialize
 	[
 		{
 			caption => qq{
-				<a href='/person/$user_id/dlg-add-referral'>Add Referral</a>
+				<a href='/person/$user_id/dlg-add-referral'>Add Service Request</a>
 			}
 		},
 	];
@@ -123,9 +123,12 @@ sub getComponentHtml
 		#$_->{checkin_time}
 
 		my $referralID;
+		#$page->addDebugStmt("Value: ", $referralID);
+		#$page->addDebugStmt("Value:",$_->{trans_id_mod} );
 		if ($_->{trans_id_mod} eq $_->{referral_id})
 		{
 			$referralID = '/person/' . $_->{patient_id} . '/dlg-add-trans-6010/' . $_->{trans_id_mod};
+
 		}
 		else
 		{
