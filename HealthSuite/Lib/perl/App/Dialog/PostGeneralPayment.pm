@@ -59,16 +59,15 @@ sub new
 					enum => 'Payment_Type',
 					fKeyWhere => "group_name is NULL or group_name = 'personal'"),
 
-		new CGI::Dialog::MultiField(caption =>'Payment Method/Check  or C.C. No.', name => 'pay_method_fields',
+		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number', name => 'pay_method_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.pay_method'),
-				new CGI::Dialog::Field(caption => 'Check or C.C. Number', name => 'pay_ref'),
+				new CGI::Dialog::Field(caption => 'Check Number', name => 'pay_ref'),
 				]),
 
-		new CGI::Dialog::Field(caption => 'Credit Card Exp.', name => 'cc_exp_date', type => 'date', defaultValue => ''),
-		new CGI::Dialog::Field(caption => 'Authorization/Reference Number', name => 'auth_code'),
+		new CGI::Dialog::Field(caption => 'Authorization/Reference Number', name => 'auth_ref'),
 
 		new CGI::Dialog::Field(
 				caption => 'Provider ID',
@@ -124,10 +123,16 @@ sub makeStateChanges
 		$self->setFieldFlags('total_amount', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('pay_type', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, 1);
-		$self->setFieldFlags('cc_exp_date', FLDFLAG_INVISIBLE, 1);
-		$self->setFieldFlags('auth_code', FLDFLAG_INVISIBLE, 1);
+		$self->setFieldFlags('auth_ref', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_invoices_list', FLDFLAG_INVISIBLE, 1);
+	}
+
+	my $batchId = $page->param('_p_batch_id') || $page->field('batch_id');
+	my $batchDate = $page->param('_p_batch_date') || $page->field('batch_date');
+	if( $batchId && $batchDate )
+	{
+		#$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
 	}
 
 
@@ -222,7 +227,7 @@ sub executePrePayment
 	my $payMethod = $page->field('pay_method');
 	my $payType = $page->field('pay_type');
 	my $payRef = $page->field('pay_ref');
-	my $authRef = $page->field('auth_code');
+	my $authRef = $page->field('auth_ref');
 	my $providerId = $page->field('provider_id');
 	my $totalAmtRecvd = $page->field('total_amount') || 0;
 
@@ -304,9 +309,8 @@ sub executePrePayment
 		payer_type => $payerType || 0,
 		payer_id => $payerId || undef,
 		pay_type => defined $payType ? $payType : undef,
-		comments => $comments || undef,
 		data_text_a => $authRef || undef,
-		data_date_a => $page->field('cc_exp_date') || undef,
+		comments => $comments || undef,
 		_debug => 0
 	);
 
@@ -334,7 +338,7 @@ sub executePostPayment
 	my $payMethod = $page->field('pay_method');
 	my $payType = $page->field('pay_type');
 	my $payRef = $page->field('pay_ref');
-	my $authRef = $page->field('auth_code');
+	my $authRef = $page->field('auth_ref');
 
 	my $totalAmtRecvd = $page->field('total_amount') || 0;
 	my $lineCount = $page->param('_f_line_count');
@@ -364,10 +368,9 @@ sub executePostPayment
 			pay_ref => $payRef || undef,
 			payer_type => $payerType || 0,
 			payer_id => $payerId || undef,
+			data_text_a => $authRef || undef,
 			pay_type => defined $payType ? $payType : undef,
 			comments => $comments || undef,
-			data_text_a => $authRef || undef,
-			data_date_a => $page->field('cc_exp_date') || undef,
 			_debug => 0
 		);
 
