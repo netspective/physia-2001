@@ -25,12 +25,49 @@ $STMTFMT_SEL_ORG_DIR = qq{
 			a.state,
 			a.zip,
 			o.tax_id,
-			DECODE(t.group_name, 'other', 'main', t.group_name)
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			 a.line1, pa.value_text as value_text,
+			(NVL(
+					(
+						SELECT	 cc.internal_catalog_id
+						FROM		offering_catalog cc
+						WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+						AND     cc.org_internal_id = o.parent_org_id
+					),
+					(SELECT 		ca.internal_catalog_id
+						FROM		offering_catalog ca, org gg
+						WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+						AND     gg.org_internal_id = o.parent_org_id
+					)
+				)
+			)AS internal_catalog_id,
+			(NVL(
+					(
+						SELECT catalog_id
+						FROM offering_catalog cc
+						WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+						AND     cc.org_internal_id = o.parent_org_id
+					),
+					(SELECT (g.org_id)||'_Fee_Schedule' FROM
+							org g where g.org_internal_id = o.parent_org_id
+					)
+				)
+			)AS catalog_id,
+			(
+				SELECT   tt.value_text
+				FROM     org_attribute tt
+				WHERE    tt.parent_id = o.org_internal_id
+				AND      tt.item_name = 'Negotiated Contract Type'
+				AND      tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
 		FROM
 			org o,
+			org po,
 			org_category cat,
 			org_type t,
-			org_address a
+			org_address a,
+			 org_attribute pa
 		WHERE
 			cat.parent_id = o.org_internal_id
 			AND a.parent_id = o.org_internal_id
@@ -38,20 +75,24 @@ $STMTFMT_SEL_ORG_DIR = qq{
 			AND	cat.member_name = t.caption
 			AND	cat.member_name = (
 				SELECT caption
-				FROM org_type
-				WHERE id = (
-					SELECT MIN(id)
+				FROM org_type ot
+				WHERE ot.id = (
+					SELECT MIN(og.id)
 					FROM
-						org_type,
-						org_category
+						org_type og,
+						org_category oe
 					WHERE
-						parent_id = o.org_internal_id
-						AND caption = member_name
+						oe.parent_id = o.org_internal_id
+						AND og.caption = oe.member_name
 				)
 			)
+			AND     pa.parent_id = o.org_internal_id
+			AND     pa.item_name = 'Primary'
+			AND 	  pa.value_type = 10
+			AND 	  po.org_internal_id = o.parent_org_id
 			AND	%whereCond%
 			AND (
-				 owner_org_id = ?
+				 o.owner_org_id = ?
 			)
 		ORDER BY o.name_primary, o.org_id
 	)
@@ -63,8 +104,42 @@ $STMTFMT_SEL_ORG_SERVICE_DIR = qq{
 		SELECT  unique o.org_id,
 			o.name_primary,
 			a.city,
-			a.state
-		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa
+			a.state, a.line1, pa.value_text as value_text,
+					(NVL(
+							(
+								SELECT	 cc.internal_catalog_id
+								FROM		offering_catalog cc
+								WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+								AND     cc.org_internal_id = o.parent_org_id
+							),
+							(SELECT 		ca.internal_catalog_id
+								FROM		offering_catalog ca, org gg
+								WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+								AND     gg.org_internal_id = o.parent_org_id
+							)
+						)
+					)AS internal_catalog_id,
+					(NVL(
+							(
+								SELECT catalog_id
+							  	FROM offering_catalog cc
+						  	 	WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+						 	 	AND     cc.org_internal_id = o.parent_org_id
+							),
+							(SELECT (g.org_id)||'_Fee_Schedule' FROM
+									org g where g.org_internal_id = o.parent_org_id
+							)
+						)
+					)AS catalog_id,
+					(
+						SELECT   tt.value_text
+						FROM     org_attribute tt
+						WHERE    tt.parent_id = o.org_internal_id
+						AND      tt.item_name = 'Negotiated Contract Type'
+						AND      tt.value_type = 0
+					)AS type,
+					po.org_id AS parent_org
+		FROM 	org o, org po, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc, org_attribute oa, org_attribute pa
 		WHERE    oc.catalog_id = c.internal_catalog_id
 		AND     a.parent_id = o.org_internal_id
 		AND     a.address_name = 'Street'
@@ -74,7 +149,11 @@ $STMTFMT_SEL_ORG_SERVICE_DIR = qq{
 		AND     c.org_internal_id = o.owner_org_id
 		AND 	o.org_internal_id = oa.parent_id
 		AND     oa.item_name = 'Fee Schedule'
-		AND     value_int = c.internal_catalog_id
+		AND     oa.value_int = c.internal_catalog_id
+		AND     pa.parent_id = o.org_internal_id
+		AND     pa.item_name = 'Primary'
+		AND 	  pa.value_type = 10
+		AND 	  po.org_internal_id = o.parent_org_id
 		AND	%whereCond%
 		AND     o.owner_org_id = ?
 		AND     rownum <= $LIMIT
@@ -169,6 +248,11 @@ $STMTRPTDEFN_DEFAULT =
 				{ head => 'State'},
 				{ head => 'Zip Code'},
 				{ head => 'Tax ID'},
+				{head => 'Street', , dataFmt => '#8#'},
+				{head => 'Phone', dataFmt => '#9#'},
+				{head => 'Fee Schedule', dataFmt => '#11#', url => "/org/#0#/catalog/#6#/#7#"},
+				{head => 'Type',dataFmt => '#12#'},
+				{head => 'Parent Provider',  dataFmt => "<img src=\"/resources/images/icons/hand-pointing-to-folder-sm.gif\" border=0></a>", url => q{javascript:doActionPopup('/org/#13#/profile')},  },
 			],
 };
 
@@ -180,6 +264,11 @@ $STMTRPTDEFN_SERVICE_DEFAULT =
 				{ head => 'Provider Name' },
 				{ head => 'City'},
 				{ head => 'State'},
+				{head => 'Street', , dataFmt => '#4#'},
+				{head => 'Phone', dataFmt => '#5#'},
+				{head => 'Fee Schedule', dataFmt => '#7#', url => "/org/#0#/catalog/#6#/#7#"},
+				{head => 'Type',dataFmt => '#8#'},
+				{head => 'Parent Provider',  dataFmt => "<img src=\"/resources/images/icons/hand-pointing-to-folder-sm.gif\" border=0></a>", url => q{javascript:doActionPopup('/org/#9#/profile')},  },
 			],
 };
 
