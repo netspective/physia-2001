@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<!--
+	****************************************************************************
+	DUDES, ARRANGE YOUR BUGS IN NUMERICAL ORDER. IT'S MUCH NICER TO READ !!!!
+	****************************************************************************
+-->
+
+<release-notes>
+	<release-info>
+		<build-id> 24 </build-id>
+		<build-manager>Lloyd Brodsky</build-manager>
+		<tested-date> TBD </tested-date>
+		<release-date>TBD </release-date>
+	</release-info>
+
+	<deliverables>
+		<deliverable id="">
+		</deliverable>
+		
+	</deliverables>
+</release-notes>
