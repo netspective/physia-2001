@@ -163,10 +163,6 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
-	'selStatusList' => qq{
-		select id, caption
-		from invoice_status
-		},
 	'selParentInvoices' => qq{
 		select p1.parent_invoice_id as parent1, p2.parent_invoice_id as parent2, p3.parent_invoice_id as parent3
 		from invoice p1, invoice p2, invoice p3
@@ -604,10 +600,24 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from adjust_method
 			where id = ?
 		},
+	'selPayTypeCaption' => q{
+		select caption
+		from payment_type
+			where id = ?
+		},
+	'selPayMethodCaption' => q{
+		select caption
+		from payment_method
+			where id = ?
+		},
 	'selClaimTypeCaption' => q{
 		select caption
 		from claim_type
 			where id = ?
+		},
+	'selStatusList' => qq{
+		select id, caption
+		from invoice_status
 		},
 	'selItemTypeCaption' => q{
 		select caption
@@ -848,7 +858,7 @@ $PATIENT_BILL_PUBLISH_DEFN =
 		{head => 'Date', colIdx => 0},
 		{head => 'Description', colIdx => 1},
 		{head => 'Amount', colIdx => 2, summarize => 'sum', dAlign => 'right', dformat => 'currency',},
-		{head => 'Paid', colIdx => 3, summarize => 'sum', dAlign => 'right', dformat => 'currency',},
+		{head => 'Adjustments', colIdx => 3, summarize => 'sum', dAlign => 'right', dformat => 'currency',},
 	],
 };
 
