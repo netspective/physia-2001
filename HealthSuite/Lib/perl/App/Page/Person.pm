@@ -24,7 +24,7 @@ use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Statements::Worklist::WorklistCollection;
 use App::Page::Search;
-
+use App::Configuration;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
@@ -413,7 +413,7 @@ sub prepare_view_home
 	my $pageHome;
 	#If user is a Physicina and the user id is TSAMO then show Physicianm home page
 	#Currently this is only for DEMO
-	if (($self->session('user_id') eq 'TSAMO') && grep {$_ eq 'Physician'} @$categories  )	
+	if ($CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO && grep {$_ eq 'Physician'} @$categories  )	
 	{
                 $pageHome =qq
                 {               
@@ -769,11 +769,17 @@ sub handleARL
 	$self->param('person_id', $pathItems->[0]);
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless ($self->arlHasStdAction($rsrc, $pathItems, 1))
+	if($pathItems->[0] eq 'SZSMTIH' && $pathItems->[1] eq 'chart' && $CONFDATA_SERVER->name_Group() eq App::Configuration::CONFIGGROUP_DEMO )
 	{
-		$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
+	                $self->redirect('/temp/EMRsummary/index.html');
+        }
+        else
+        {
+		unless ($self->arlHasStdAction($rsrc, $pathItems, 1))
+		{
+			$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
+		}
 	}
-
 	$self->printContents();
 
 	# return 0 if successfully printed the page (handled the ARL) -- or non-zero error code
