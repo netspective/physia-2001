@@ -9,14 +9,12 @@ use App::Statements::Person;
 use App::Statements::Search::Code;
 
 use Carp;
-use CGI::Dialog;
+
 use CGI::Validator::Field;
 use App::Dialog::Field::Catalog;
-
-use vars qw(@ISA);
 use Date::Manip;
 
-@ISA = qw(CGI::Dialog);
+use base 'CGI::Dialog';
 
 sub new
 {
@@ -33,13 +31,21 @@ sub new
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
 		),
-		new CGI::Dialog::Field(type => 'enum',
-			enum => 'Catalog_Entry_Type',
-			caption => 'Fee Schedule Entry Type',
+		new CGI::Dialog::Field(caption => 'Fee Schedule Entry Type',
 			name => 'entry_type',
+			type => 'enum',
+			enum => 'Catalog_Entry_Type',
 			options => FLDFLAG_REQUIRED
 		),
-		new CGI::Dialog::MultiField(caption =>'Code/Modifier',
+		new CGI::Dialog::Field(caption => 'Entry Cost Type',
+			name => 'flags',
+			choiceDelim =>',',
+			selOptions => "Capitated:0,FFS:1",
+			type => 'select',
+			style => 'radio',
+			#options => FLDFLAG_REQUIRED,
+		),
+		new CGI::Dialog::MultiField(
 			fields => [
 				new CGI::Dialog::Field::TableColumn(caption => 'Code',
 					name => 'code',
@@ -62,11 +68,8 @@ sub new
 			name => 'name',
 			schema => $schema,
 			column => 'Offering_Catalog_Entry.name',
-			#options => FLDFLAG_REQUIRED,
 			size => 40,
 			hints => 'autofill for CPT, ICD and HCPCS codes',
-			#findPopup => '/lookup/catalog/detail/itemValue',
-			#findPopupControlField => '_f_catalog_id',
 		),
 		new CGI::Dialog::Field::TableColumn(caption => 'Description',
 			name => 'description',
@@ -74,10 +77,10 @@ sub new
 			column => 'Offering_Catalog_Entry.description',
 			size => '50'
 		),
-		new CGI::Dialog::Field(type => 'enum',
+		new CGI::Dialog::Field(caption => 'Status',
 			name => 'status',
+			type => 'enum',
 			enum => 'Catalog_Entry_Status',
-			caption => 'Status',
 			options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Cost Type',
@@ -86,7 +89,7 @@ sub new
 			enum => 'Catalog_Entry_Cost_Type',
 			options => FLDFLAG_REQUIRED
 		),
-		new CGI::Dialog::Field( caption => 'Unit Cost',
+		new CGI::Dialog::Field(caption => 'Unit Cost',
 			name => 'unit_cost',
 			size => 10,
 			maxLength => 8,
@@ -113,22 +116,26 @@ sub new
 			key => "#field.catalog_id#",
 			data => "Fee Schedule Entry '#param.entry_id# #field.entry_id#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
 	};
-		# These 3 fields are only for Products, type 200 and up, not for Services
-		#new CGI::Dialog::Field::TableColumn(caption => 'Taxable?', name => 'taxable',
-		#	schema => $schema, column => 'Catalog_Item.taxable'),
-		#new CGI::Dialog::Field::TableColumn(caption => 'Default Units', name => 'default_units',
-		#	schema => $schema, column => 'Catalog_Item.default_units'),
-		#new CGI::Dialog::Field::TableColumn(caption => 'Available Units', name => 'units_avail',
-		#	schema => $schema, column => 'Catalog_Item.units_avail'),
-
+	
 	$self->addFooter(new CGI::Dialog::Buttons(
-					nextActions_add => [
-						['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%field.catalog_id%", 1],
-						['Show Current Fee Schedule Item', '/search/catalog/detail/%field.catalog_id%'],
-						],
-					cancelUrl => $self->{cancelUrl} || undef));
+		nextActions_add => [
+			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%field.catalog_id%", 1],
+			['Show Current Fee Schedule Item', '/search/catalog/detail/%field.catalog_id%'],
+			],
+		cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
+}
+
+sub makeStateChanges_special
+{
+	my ($self, $page) = @_;
+	
+	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
+		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
+	
+	$self->updateFieldFlags('flags', FLDFLAG_INVISIBLE, ! $recExist->{value_int});
+	$page->field('flags', 0) unless $recExist->{value_int};
 }
 
 sub populateData_add
@@ -140,6 +147,7 @@ sub populateData_add
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
 	$page->field('add_mode', 1);
+	$self->makeStateChanges_special($page);	
 }
 
 sub populateData_update
@@ -152,6 +160,10 @@ sub populateData_update
 	if(! $STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selCatalogItemById',$entryId))
 	{
 		$page->addError("Catalog Item ID '$entryId' not found.");
+	}
+	else
+	{
+		$self->makeStateChanges_special($page);
 	}
 }
 
@@ -265,9 +277,11 @@ sub execute
 		modifier => $page->field('modifier') || undef,
 		description => $page->field('description') || undef,
 		parent_entry_id => $page->field('parent_entry_id') || undef,
+		units_avail => $page->field('units_avail') || undef,
+		flags => $page->field('flags') || 0,
+
 		#taxable => $page->field('taxable') || undef,
 		#default_units => $page->field('default_units') || undef,
-		units_avail => $page->field('units_avail') || undef,
 		_debug => 0
 		);
 

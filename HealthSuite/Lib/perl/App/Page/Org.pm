@@ -315,7 +315,7 @@ sub prepare_view_catalog
 		$self->param('internal_catalog_id', $pathItems[3]);
 		$self->addContent(
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_catalog_detail_org',
-				[$pathItems[3]] ),
+				[$pathItems[3], $self->param('org_id')] ),
 		);
 	}
 	else

@@ -9,19 +9,15 @@ use App::Statements::Person;
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
-use App::Dialog::Field::Catalog;
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG %PROCENTRYABBREV);
 use Date::Manip;
 use Text::Abbrev;
+use App::Universal;
 
+use vars qw(@ISA %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %CODE_TYPE_MAP);
 @ISA = qw(CGI::Dialog);
 
-
 %PROCENTRYABBREV = abbrev qw(feescheduleentryid name modifier units description);
-
-use vars qw(%ITEMTOFIELDMAP %CODE_TYPE_MAP);
 
 %ITEMTOFIELDMAP =
 (
@@ -55,11 +51,11 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'internal_catalog_id',
-			type => 'hidden',
-			caption => 'Internal Catalog ID',
+		new CGI::Dialog::Field(caption => 'Internal Catalog ID',
+			name => 'internal_catalog_id',
 			options => FLDFLAG_READONLY,
-			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD,
+			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDATE,
 		),
 
 		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID',
@@ -68,22 +64,25 @@ sub new
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
 		),
-		new CGI::Dialog::Field::TableColumn(type => 'hidden',
+		new CGI::Dialog::Field::TableColumn(
+			name => 'catalog_type',
+			type => 'hidden',
 			column => 'offering_catalog_type.id',
-			name => 'catalog_type', schema => $schema, value => 0
+			schema => $schema, 
+			value => 0
 		),
 		new CGI::Dialog::Field(caption => 'Fee Schedule Name', 
 			name => 'caption', 
 			options => FLDFLAG_REQUIRED,
 			size => 45,
 		),
-		new CGI::Dialog::Field(type => 'memo', 
-			caption => 'Description', 
-			name => 'description'
+		new CGI::Dialog::Field(caption => 'Description',
+			name => 'description',
+			type => 'memo',
 		),
-		new CGI::Dialog::Field(type => 'float', 
-			caption => 'RVRBS Multiplier', 
+		new CGI::Dialog::Field(caption => 'RVRBS Multiplier',
 			name => 'rvrbs_multiplier',
+			type => 'float', 
 			minValue => 0,
 		),
 		new CGI::Dialog::Field::TableColumn(caption => 'Parent Fee Schedule ID', 
@@ -92,13 +91,12 @@ sub new
 			column => 'Offering_Catalog_Entry.catalog_id',
 			findPopup => '/lookup/catalog/'
 		),
-
-#			new CGI::Dialog::Field(type => 'memo', caption => 'Fee Schedule Entries', name => 'feescheduleentries',
-#						cols => 40, rows => 5,
-#						invisibleWhen => (CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE),
-#						hints => 'Format: <b>f.FeeScheduleID,n.ItemName</b>,m.Modifier,u.UnitsAvailable,d.Description,<b>ItemType(item,icd,cpt,proc,procert,service,sercert,product,hcpcs).ItemCode,$UnitCost</b>'),
-			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'feeschedules',types => ['FeeScheduleEntry']),
-			#new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts'),
+		new CGI::Dialog::Field(caption => 'Capitated Contract',
+			name => 'capitated_contract',
+			type => 'bool',
+			style => 'check',
+			defaultValue => 0,
+		),
 	);
 	
 	$self->{activityLog} =
@@ -108,12 +106,12 @@ sub new
 		data => "FeeSchedule '#field.caption#' <a href='/search/catalog/detail/#field.internal_catalog_id#'>#field.catalog_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(
-							nextActions_add => [
-								['Add Another Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 1],
-								['Show Current Fee Schedule', '/search/catalog/detail/%field.catalog_id%'],
-								['Show List of Fee Schedules', '/search/catalog']
-								],
-							cancelUrl => $self->{cancelUrl} || undef));
+		nextActions_add => [
+			['Add Another Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 1],
+			['Show Current Fee Schedule', '/search/catalog/detail/%field.catalog_id%'],
+			['Show List of Fee Schedules', '/search/catalog']
+			],
+		cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
 }
@@ -124,161 +122,11 @@ sub customValidate
 	#	validateFeeScheduleEntryTextArea($self, $page);
 }
 
-#This sub is called from CustomValidate for fee entry validation which is a memo type
-sub validateFeeScheduleEntryTextArea
-{
-	my ($self, $page) = @_;
-	my $endDate = '';
-	my $feeEntry = $self->getField('feescheduleentries');
-	#my $diags = $self->getField('claim_diags');
-	#my @diagCodes = split(/\s*,\s*/, $page->field('claim_diags'));
-	my $feeScheduleflag = 0;
-	my $itemflag = 0;
-	my $unitsflag = 0;
-	my $modifierflag = 0;
-	my $descflag = 0;
-	my $dollarflag = 0;
-
-	if(my $addFeeEntries = $page->field('feescheduleentries'))
-	{
-		my @entries = split(/\n/, $addFeeEntries);
-		foreach (@entries)
-		{
-			my @details = split(/[,;\-]+/);
-
-			#if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selCatalogById', $details[0])))
-			#{
-			#	$page->addDebugStmt($page, $details[0]);
-			#	$feeEntry->invalidate($page, "Fee Schedule ID is incorrect. The first entry is always an existing Fee Schedule ID");
-			#}
-
-
-			#my @procdetails = @details[1 .. $#details];
-			foreach (@details)
-			{
-				if($_ =~ /\r/)
-				{
-					chop($_);
-				}
-				if($_ =~ /^\s/)
-				{
-					substr($_,0,1)="";
-				}
-
-				#validation of diagnosis codes to see if they are in the ICD-9 codes list.
-				if(m/^([^\$]*)\.(.*)$/)
-				{
-					#validation of other entries
-					# $2 is the value XXXX entered in p.XXXX or t.XXXX or ref.XXXX
-					if(my $match = $PROCENTRYABBREV{$1})
-					{
-						if($match eq 'feescheduleentryid') 	{ $feeScheduleflag = 1 };
-						if($match eq 'name') 			{ $itemflag = 1 };
-						if($match eq 'units') 			{ $unitsflag = 1 };
-						if($match eq 'modifier')		{ $modifierflag = 1 };
-						if($match eq 'description')		{ $descflag = 1 };
-
-						validateEachItemInFeeItemEntryTextArea($self, $page, $match, $2);
-					}
-					else
-					{
-						my $feeEntryTypeFlag = 0;
-						foreach my $entryType (keys %CODE_TYPE_MAP)
-						{
-							#$page->addDebugStmt($page, $entryType);
-							if($_ =~ /$entryType/)
-							{
-								$feeEntryTypeFlag = 1;
-							}
-
-						}
-						if($feeEntryTypeFlag == 0)
-						{
-							# add to validation code
-							$feeEntry->invalidate($page, "The data format $_ is not defined. The values allowed for fee schedule entry type are cpt,hcpcs,icd,item,proc,procert,product,service,sercert");
-						}
-					}
-
-				}
-				elsif(m/^\$(.*)/)
-				{
-					#validation of the dollar amount
-					if($1 !~ /^\d+(\.\d\d)?$/)
-					{
-						$feeEntry->invalidate($page, "The dollar amount is wrong. Please verify");
-					}
-					#$1 is the amount
-					$dollarflag = 1;
-				}
-				else
-				{
-					#validation of plain word entries like lab, emergency
-					if(my $plainWordMatch = $PROCENTRYABBREV{$_})
-					{
-					}
-					else
-					{
-						$feeEntry->invalidate($page, "The data format $_ is not defined. Please verify");
-					}
-
-				}
-
-			}
-			if( $feeScheduleflag == 0 )	{ $feeEntry->invalidate($page, "The fee schedule item id is not defined. Fee schedule item ID is required"); }
-			if( $itemflag == 0 )	{ $feeEntry->invalidate($page, "The item name is not defined. Item name is required"); };
-			#if( $unitsflag == 0 )	{ $feeEntry->invalidate($page, "The cpt code is not defined. cpt code is required"); };
-			#if( $modifierflag == 0 ){ $feeEntry->invalidate($page, "The modifier code is not defined. modifier code is required"); };
-			if( $dollarflag == 0 )	{ $feeEntry->invalidate($page, "The dollar amount is not defined. dollar amount is required"); };
-			#if( $descflag == 0 )	{ $feeEntry->invalidate($page, "The diagnosis code is not defined. diagnosis code is required"); };
-
-		}
-	}
-
-}
-
-sub validateEachItemInFeeItemEntryTextArea
-{
-	my ($self, $page, $fieldPrefix, $fieldValue) = @_;
-	my $feeScheduleId = $page->field('catalog_id');
-	my $feeEntry = $self->getField('feescheduleentries');
-
-	#$page->addDebugStmt("feeScheduleId is $feeScheduleId and feeScheduleId in item is $fieldValue");
-
-
-	if($fieldPrefix eq 'feescheduleentryid')
-	{
-
-		if($feeScheduleId ne $fieldValue)
-		{
-			#$page->addDebugStmt($page, $fieldValue);
-			$feeEntry->invalidate($page, "Fee Schedule ID is incorrect. Please verify");
-		}
-
-	}
-	#if($fieldPrefix eq 'modifier')
-	#{
-	#	if($fieldValue =~ m/^(\d+)$/)
-	#	{
-	#		# $1 is the check to see if it is an integer
-	#		if(not($STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericModifierCodeId', $1)))
-	#		{
-	#			$feeEntry->invalidate($page, "The modifier code is wrong. Please verify");
-	#		}
-	#	}
-	#	else
-	#	{
-	#		$feeEntry->invalidate($page, "The modifier code should be an integer. Please verify");
-	#	}
-	#}
-
-}
-
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-
 	$page->field('parent_catalog_id', $page->param('parent_catalog_id'));
 }
 
@@ -299,6 +147,13 @@ sub populateData_update
 		$decimal =~ s/^\./0./;
 		$page->field('rvrbs_multiplier', $decimal)
 	}
+	
+	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
+		$page->field('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN,
+		'Capitated Contract'
+	);
+	
+	$page->field('capitated_contract', 1) if $recExist->{value_int};
 }
 
 sub populateData_remove
@@ -313,222 +168,59 @@ sub execute
 	my $orgId = $page->param('org_id');
 	my $catalogType = $page->field('catalog_type');
 	my $status = $page->field('status');
-	my $costType = $page->field('cost_type');
-	my $entryType = $page->field('entry_type');
+	my $internalCatalogId = $page->field('internal_catalog_id');
+		
 	$page->schemaAction(
-			'Offering_Catalog', $command,
-			internal_catalog_id => $command eq 'add' ? undef : $page->field('internal_catalog_id'),
-			catalog_id => $page->field('catalog_id') || undef,
-			org_id => $orgId || undef,
-			catalog_type => defined $catalogType ? $catalogType : 0,
-			#item_id => $page->field('item_id') || $page->param('item_id') || undef,
-			caption => $page->field('caption') || undef,
-			description => $page->field('description') || undef,
-			rvrbs_multiplier => $page->field('rvrbs_multiplier') || undef,
-			parent_catalog_id => $page->field('parent_catalog_id') || undef,
-			_debug => 0
-			);
+		'Offering_Catalog', $command,
+		internal_catalog_id => $command eq 'add' ? undef : $internalCatalogId,
+		catalog_id => $page->field('catalog_id') || undef,
+		org_id => $orgId || undef,
+		catalog_type => defined $catalogType ? $catalogType : 0,
+		caption => $page->field('caption') || undef,
+		description => $page->field('description') || undef,
+		rvrbs_multiplier => $page->field('rvrbs_multiplier') || undef,
+		parent_catalog_id => $page->field('parent_catalog_id') || undef,
+		_debug => 0
+	);
 
-#	if(my $addEntries = $page->field('feescheduleentries'))
-#	{
-#		my @entries = split(/\n/, $addEntries);
-#		foreach (@entries)
-#		{
-#			my @details = split(/[,;]+/);
-#			my %record = (	catalog_id => $page->field('catalog_id'),
-#					default_units => App::Universal::INVOICEITEM_QUANTITY,				#default for for units is 1
-#					description => ''
-#					);
-#
-#			#my @itemdetails = @details[2 .. $#details];
-#			foreach (@details)
-#			{
-#				if($_ =~ /\r/)
-#				{
-#					chop($_);
-#				}
-#				if($_ =~ /^\s/)
-#				{
-#					substr($_,0,1)="";
-#				}
-#
-#				if(m/^([^\$]*)\.(.*)$/)
-#				{
-#					if(my $match = $PROCENTRYABBREV{$1})
-#					{
-#						if(my $fieldName = $ITEMTOFIELDMAP{$match})
-#						{
-#							$record{$fieldName} = $2;
-#						}
-#					}
-#					else
-#					{
-#						$record{entry_type} = $CODE_TYPE_MAP{$1};
-#						$record{code} = $2;
-#					}
-#
-#				}
-#				elsif(m/^\$(.*)/)
-#				{
-#					$record{unit_cost} = $1;
-#					next;
-#					#$1 is the amount
-#				}
-#
-#				# f.kkkk fee schedule id
-#				# i.jjjj item name
-#				# m.xxxx modifier
-#				# u.yyyy units
-#				# d.zzzz description
-#				# $abcd dollar amount
-#
-#			}
-#
-#			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-#			$page->schemaAction('Offering_Catalog_Entry', 'add', %record, _debug => 1);
-#		}
-#	}
-#
+	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId, 'Capitated Contract', 
+		App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 'sel_Catalog_Attribute',
+		value_int => defined $page->field('capitated_contract') ? 1 : 0,
+	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
-	#$page->redirect("/org/$orgId/dlg-add-feescheduleentry?_f_fs=%field.feeschedules%&_f_cpts=%field.listofcpts%");
 }
 
-##############################################################################
-package App::Dialog::Catalog::Copy;
-##############################################################################
-
-use strict;
-use DBI::StatementManager;
-use App::Statements::Catalog;
-use App::Statements::Person;
-use Carp;
-use CGI::Dialog;
-use CGI::Validator::Field;
-use App::Dialog::Field::Catalog;
-
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG %PROCENTRYABBREV);
-use Date::Manip;
-use Text::Abbrev;
-
-@ISA = qw(CGI::Dialog);
-
-sub new
+sub saveAttribute
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => 'Copy Fee Schedule');
-
-	my $schema = $self->{schema};
-
-	delete $self->{schema};  # make sure we don't store this!
-
-	croak 'schema parameter required' unless $schema;
-	$self->addContent(
-		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID (From)',
-			name => 'from_catalog_id', size => 14,
-			options => FLDFLAG_REQUIRED,
-			postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
-		new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
-			name => 'catalog_type', schema => $schema, value => 0),
-		new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID (To)',
-			name => 'to_catalog_id', size => 14,
-			options => FLDFLAG_REQUIRED,),
+	my ($page, $table, $parentId, $itemName, $valueType, $stmtMgr, $stmt, %data) = @_;
+	
+	my $recExist = $stmtMgr->getRowAsHash($page, STMTMGRFLAG_NONE, $stmt, 
+		$parentId, $valueType, $itemName);
+	
+	my $itemId = $recExist->{item_id};
+	my $command = $itemId ? 'update' : 'add';
+	
+	my $newItemId = $page->schemaAction(
+		$table, $command,
+		item_id    => $command eq 'add' ? undef : $itemId,
+		parent_id  => $parentId,
+		item_name  => $itemName,
+		value_type => $valueType,
+		%data
 	);
-	$self->{activityLog} =
-	{
-		scope =>'offering_catalog',
-		key => "#field.catalog_id#",
-		data => "FeeSchedule '#field.caption#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
-	};
-	$self->addFooter(new CGI::Dialog::Buttons());
 
-	return $self;
+	return $newItemId;
 }
 
-sub populateData_add
-{
-	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
-	$page->field('from_catalog_id', $page->param('parent_catalog_id'));
-}
-
-sub getFeeScheduleGrandChildren
-{
-	my ($self, $page, $catalogId) = @_;
-	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $catalogId);
-}
-
-sub execute
-{
-	my ($self, $page, $command, $flags) = @_;
-	my $id = $self->{'id'};
-	my $orgId = $page->param('org_id');
-	my $catalogType = $page->field('catalog_type');
-	my $fromCatalogId = $page->field('from_catalog_id');
-	my $toCatalogId = $page->field('to_catalog_id');
-	my $endFlag = 0;
-
-	my $fromFeeSchedule = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogById', $fromCatalogId);
-
-	$page->schemaAction(
-			'Offering_Catalog', 'add',
-			catalog_id => $page->field('to_catalog_id') || undef,
-			org_id => $fromFeeSchedule->{org_id} || undef,
-			catalog_type => $fromFeeSchedule->{catalog_type} || undef,
-			caption => $fromFeeSchedule->{caption} || undef,
-			description => $fromFeeSchedule->{description} || undef,
-			parent_catalog_id => $fromFeeSchedule->{parent_catalog_id} || undef,
-			_debug => 0
-			);
-
-	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $fromCatalogId);
-	if (defined $fromFeeScheduleChild)
-	{
-
-	$page->addDebugStmt("fromFeeScheduleChild exists");
-
-		$page->schemaAction(
-				'Offering_Catalog', 'add',
-				catalog_id => $fromFeeScheduleChild->{'catalog_id'} || undef,
-				org_id => $fromFeeScheduleChild->{org_id} || undef,
-				catalog_type => $fromFeeScheduleChild->{catalog_type} || undef,
-				caption => $fromFeeScheduleChild->{caption} || undef,
-				description => $fromFeeScheduleChild->{description} || undef,
-				parent_catalog_id => $page->field('to_catalog_id'),
-				_debug => 0
-				);
-		my $tempChild = $fromFeeScheduleChild->{'catalog_id'};
-		#getFeeScheduleGrandChildren($self, $page, $tempChild);
-
-	}
-#
-	#	do
-	#	{
-	#		my $fromFeeScheduleGrandChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $tempChild );
-	#		if (defined $fromFeeScheduleGrandChild)
-	#		{
-	#			$page->schemaAction(
-	#					'Offering_Catalog', 'add',
-	#					catalog_id => $fromFeeScheduleGrandChild->{'catalog_id'} || undef,
-	#					org_id => $fromFeeScheduleGrandChild->{org_id} || undef,
-	#					catalog_type => $fromFeeScheduleGrandChild->{catalog_type} || undef,
-	#					caption => $fromFeeScheduleGrandChild->{caption} || undef,
-	#					description => $fromFeeScheduleGrandChild->{description} || undef,
-	#					parent_catalog_id => $fromFeeScheduleGrandChild->{'parent_catalog_id'},
-	#					_debug => 0
-	#					);
-	#			$tempChild = $fromFeeScheduleGrandChild->{'catalog_id'}
-	#		}
-	#		else
-	#		{
-	#			my $endFlag = 1;
-	#		}
-	#	}until ($endFlag == 1);
-	#}
-
-	$self->handlePostExecute($page, $command, $flags);
-}
+%RESOURCE_MAP = (
+	'catalog' => {
+		_class => 'App::Dialog::Catalog',
+		_arl_add => ['parent_catalog_id'],
+		_arl_modify => ['internal_catalog_id'],
+		_arl_remove => ['internal_catalog_id'],
+	},
+);
 
 1;

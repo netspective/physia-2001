@@ -22,6 +22,7 @@ $STMTFMT_SEL_INSURANCE = qq{
 				ins.ins_internal_id = addr.parent_id and
 				%whereCond%
 				%catCond%
+			order by 1
 };
 
 $STMTRPTDEFN_DEFAULT =

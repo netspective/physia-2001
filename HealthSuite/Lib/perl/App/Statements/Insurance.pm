@@ -35,6 +35,13 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		where parent_id = ?
 			and item_name = ?
 		},
+	'selInsuranceAttr_Org' => q{
+		select *
+		from insurance_attribute
+		where parent_id = ?
+			and item_name = ?
+			and cr_org_id = ?
+		},
 	'selInsOrgData' => qq{
 		select *
 			from org
@@ -381,35 +388,35 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 				from PPO_HMO_Indicator
 		},
 	'selInsTypeCode' => qq{
-			select  caption, abbrev
-				from insurance_type_code
-				where group_name = 'UI'
+		select  caption, abbrev
+			from insurance_type_code
+			where group_name = 'UI'
 		},
 	'selInsPlan' => qq{
-				select  *
-					from insurance
-					where product_name = ?
-					and plan_name = ?
-					and ins_org_id = ?
-					and record_type = 2
+		select  *
+			from insurance
+			where product_name = ?
+			and plan_name = ?
+			and ins_org_id = ?
+			and record_type = 2
 		},
 	'selInsSequence' => qq{
-					select bill_sequence
-					from insurance
-					where owner_person_id = ?
+			select bill_sequence
+			from insurance
+			where owner_person_id = ?
 		},
 	'selDoesInsSequenceExists' => qq{
-						select bill_sequence
-						from insurance
-						where owner_person_id = ?
-						and bill_sequence = ?
+			select bill_sequence
+			from insurance
+			where owner_person_id = ?
+			and bill_sequence = ?
 		},
 	'selUpdateInsSequence' => qq{
-					update insurance
-					set bill_sequence = 99
-					where owner_person_id = ?
-					and bill_sequence > ?
-					and bill_sequence < 5
+			update insurance
+			set bill_sequence = 99
+			where owner_person_id = ?
+			and bill_sequence > ?
+			and bill_sequence < 5
 		},
 	'selUpdateAndAddInsSeq' => qq{
 					update insurance
@@ -419,27 +426,28 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		},
 
 	'selDeleteFeeSchedule' => qq{
-					delete
-					from insurance_attribute
-					where parent_id = ?
-					and item_name = 'Fee Schedule'
-		},
+		delete
+		from insurance_attribute
+		where parent_id = ?
+			and item_name = 'Fee Schedule'
+			and cr_org_id = ?
+	},
 	'selUpdatePlanAndCoverage' => qq{
-					   update insurance
-					   set ins_type = ?,
-					   product_name = ?,
-					   ins_org_id = ?
-					   where product_name = ?
-					   and ins_org_id = ?
-					   and record_type in (2, 3)
-		},
+		 update insurance
+		 set ins_type = ?,
+		 product_name = ?,
+		 ins_org_id = ?
+		 where product_name = ?
+		 and ins_org_id = ?
+		 and record_type in (2, 3)
+	},
 	'selUpdateCoverage' => qq{
-					   update insurance
-					   set ins_org_id = ?,
-					   product_name = ?,
-					   plan_name = ?
-					   where parent_ins_id = ?
-		},
+		 update insurance
+		 set ins_org_id = ?,
+		 product_name = ?,
+		 plan_name = ?
+		 where parent_ins_id = ?
+	},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {
 		sqlStmt => qq{

@@ -21,14 +21,17 @@ $STMTFMT_SEL_CATALOG = qq{
 			oc.caption,
 			oc.description,
 			oc.parent_catalog_id,
-			oc.internal_catalog_id
-			%extraCols%
-		from offering_catalog oc, offering_catalog_entry oce
+			oc.internal_catalog_id,
+			'Add',
+			decode(oc_a.value_int, 1, '(Capitated)', null) as capitated
+		from Ofcatalog_Attribute oc_a, offering_catalog oc, offering_catalog_entry oce
 		where
-			oc.internal_catalog_id = oce.catalog_id (+) and
+			oce.catalog_id (+) = oc.internal_catalog_id and
+			oc_a.parent_id (+) = oc.internal_catalog_id and
+			(oc.org_id is null or oc.org_id = ?)
 			%whereCond%
 		group by oc.catalog_id, oc.internal_catalog_id, oc.caption, oc.description,
-			oc.parent_catalog_id %extraCols%
+			oc.parent_catalog_id %extraCols%, oc_a.value_int
 		order by oc.catalog_id
 };
 
@@ -42,9 +45,11 @@ $STMTFMT_SEL_CATALOGENTRY = qq{
 			default_units as UOH,
 			'Add',
 			parent_entry_id,
-			name
-		from offering_catalog_entry, catalog_entry_type
+			name,
+			decode(flags, 0, null, 1, '(FFS)')
+		from catalog_entry_type, offering_catalog_entry
 		where 	catalog_id = ?
+			and offering_catalog_entry.cr_org_id = ?
 			and	offering_catalog_entry.entry_type = catalog_entry_type.id
 		order by entry_type, code, modifier
 };
@@ -71,12 +76,13 @@ $STMTRPTDEFN_DEFAULT =
 	columnDefn =>
 	[
 		{ head => 'ID', hint => 'Fee Schedule ID #5#', 
-			url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)', 
+			url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)',
 			#dataFmt => '&{level_indent:0}#0#', 
 			tDataFmt => '&{count:0} Schedules', 
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
+		{	head => 'Contract', dataFmt => '#7#'},
 		{ head => 'Entries', 
 			colIdx => 1, 
 			dAlign => 'CENTER', 
@@ -119,6 +125,7 @@ my $STMTRPTDEFN_ORG =
 			options => PUBLCOLFLAG_DONTWRAP
 		},
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
+		{	head => 'Contract', dataFmt => '#7#'},		
 		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', 
 			summarize => 'sum',
 		},
@@ -141,9 +148,9 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 	columnDefn =>
 	[
 		{ head => 'ID',
-			#url => '/search/catalog/detail/#0#',
 			url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-catalog-item/#0#", "#0#", false)',
-			dataFmt => '&{level_indent:0}#0#',
+			dAlign => 'center',
+			#dataFmt => '&{level_indent:0}#0#',
 			tDataFmt => '&{count:0} Entries',
 			options => PUBLCOLFLAG_DONTWRAP
 		},
@@ -156,6 +163,7 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 		},
 		{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
 		{ head => 'Name', colIdx => 9},
+		{ head => '', colIdx => 10, dAlign => 'center'},
 	],
 };
 
@@ -171,7 +179,6 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 					<a href='/org/#session.org_id#/dlg-add-catalog/#param.internal_catalog_id#'>Add Fee Schedule</a> |
 					<a href='/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#'>Add Item</a>
 				},
-				#url => '/org/#session.org_id#/dlg-add-catalog-item'
 			},
 		],
 	},
@@ -186,7 +193,8 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 	columnDefn =>
 	[
 		{ head => 'ID', url => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
-			dataFmt => '&{level_indent:0}#0#',
+			#dataFmt => '&{level_indent:0}#0#',
+			dAlign => 'center',
 			tDataFmt => '&{count:0} Entries',
 			options => PUBLCOLFLAG_DONTWRAP
 		},
@@ -201,6 +209,7 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 		{ head => '', hint => 'Add Child Entry', 
 			url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#' 
 		},
+		{ head => '', colIdx => 10, dAlign => 'center'},		
 	],
 };
 
@@ -208,68 +217,63 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 	'sel_catalogs_all' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => '(oc.org_id is null or oc.org_id = ?)',
-			#orderBy => 'order by oc.caption',
-			orderBy => 'order by oc.catalog_id',
+			#whereCond => '(oc.org_id is null or oc.org_id = ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 
 	'sel_catalogs_all_org' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => '(oc.org_id is null or oc.org_id = ?)',
-			#orderBy => 'order by oc.caption',
-			orderBy => 'order by oc.catalog_id',
-			extraCols => q{, 'Add'},
+			#whereCond => '(oc.org_id is null or oc.org_id = ?)',
 			publishDefn => $STMTRPTDEFN_ORG,
 		},
 
 	'sel_catalog_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.catalog_id = ?',
+			whereCond => 'and oc.catalog_id = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_id_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.catalog_id like ?',
+			whereCond => 'and oc.catalog_id like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.caption = ?',
+			whereCond => 'and oc.caption = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.caption like ?',
+			whereCond => 'and oc.caption like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_description' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.description = ?',
+			whereCond => 'and oc.description = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_description_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => 'oc.description like ?',
+			whereCond => 'and oc.description like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_nameordescr' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => '(oc.caption = ? or oc.description = ?)',
+			whereCond => 'and (oc.caption = ? or oc.description = ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_catalog_nameordescr_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
-			whereCond => '(oc.caption like ? or oc.description like ?)',
+			whereCond => 'and (oc.caption like ? or oc.description like ?)',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 

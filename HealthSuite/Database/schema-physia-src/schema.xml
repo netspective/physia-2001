@@ -280,7 +280,7 @@
 
 	<table name="Offering_Catalog_Entry" abbrev="OCatEnt" type="Audit,Secure">
 		<description>Contains the actual entries in a product, service, or other catalog (like fees, repricing information, etc).</description>
-		<column name="catalog_id" parentref="Offering_Catalog.internal_catalog_id" descr="The catalog to which entry belongs"/>
+		<column name="catalog_id" indexed="yes" parentref="Offering_Catalog.internal_catalog_id" descr="The catalog to which entry belongs"/>
 		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique entry id (for foreign-key purposes)"/>
 		<column name="parent_entry_id" selfref="Offering_Catalog_Entry.entry_id" indexed="yes" descr="If this item is a child of another item (like a group)"/>
 		<column name="entry_type" lookupref="Catalog_Entry_Type" indexed="yes" descr="The type of item (procedure, service, product, etc)"/>

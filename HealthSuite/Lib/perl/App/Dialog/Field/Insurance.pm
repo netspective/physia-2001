@@ -31,7 +31,7 @@ sub new
 	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	$params{type} = 'text';
-	$params{size} = 16;
+	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 32;
 
 	return CGI::Dialog::Field::new($type, %params);
@@ -157,7 +157,7 @@ sub new
 	#$params{options} |= FLDFLAG_IDENTIFIER;
 
 	$params{type} = 'text';
-	$params{size} = 16;
+	$params{size} = 16 unless exists $params{size};
 	$params{maxLength} = 32;
 
 	return CGI::Dialog::Field::new($type, %params);
